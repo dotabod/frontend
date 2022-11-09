@@ -552,7 +552,7 @@ export function PrimaryFeatures() {
             Best features you need to stream. Try it for yourself.
           </h2>
           <p className="mt-2 text-lg text-gray-400">
-            Dotabod was built for investors like you who play by their own rules
+            Dotabod was built for streamers like you who play by their own rules
             and aren’t going to let SEC regulations get in the way of their
             dreams. If other investing tools are afraid to build it, Dotabod has
             it.
