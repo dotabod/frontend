@@ -228,7 +228,7 @@ export function SecondaryFeatures() {
               <h3 className="mt-6 font-semibold text-gray-900">
                 {feature.name}
               </h3>
-              <p className="mt-2 text-gray-700">{feature.description}</p>
+              <div className="mt-2 text-gray-700">{feature.description}</div>
             </li>
           ))}
         </ul>
