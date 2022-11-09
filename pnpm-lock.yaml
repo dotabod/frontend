@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@headlessui/react': ^1.7.4
   '@next-auth/prisma-adapter': ^1.0.5
-  '@prisma/client': ^4.5.0
+  '@prisma/client': ^4.6.0
   '@tailwindcss/forms': ^0.5.3
   '@types/node': 18.11.9
   '@types/react': 18.0.25
@@ -19,10 +19,10 @@ specifiers:
   postcss-focus-visible: ^7.1.0
   prettier: ^2.7.1
   prettier-plugin-tailwindcss: ^0.1.13
-  prisma: ^4.5.0
+  prisma: ^4.6.0
   react: 18.2.0
   react-dom: 18.2.0
-  tailwindcss: ^3.2.2
+  tailwindcss: ^3.2.3
   typescript: 4.8.4
   use-debounce: ^8.0.4
 
@@ -30,7 +30,7 @@ dependencies:
   '@headlessui/react': 1.7.4_biqbaboplfbrettd7655fr4n2y
   '@next-auth/prisma-adapter': 1.0.5_ruhnq7iyzswb2xlkdi5fzmejem
   '@prisma/client': 4.6.0_prisma@4.6.0
-  '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.2
+  '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.3
   autoprefixer: 10.4.13
   clsx: 1.2.1
   focus-visible: 5.2.0
@@ -40,7 +40,7 @@ dependencies:
   postcss-focus-visible: 7.1.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
-  tailwindcss: 3.2.2
+  tailwindcss: 3.2.3
   use-debounce: 8.0.4_react@18.2.0
 
 devDependencies:
@@ -370,13 +370,13 @@ packages:
       tslib: 2.4.1
     dev: false
 
-  /@tailwindcss/forms/0.5.3_tailwindcss@3.2.2:
+  /@tailwindcss/forms/0.5.3_tailwindcss@3.2.3:
     resolution: {integrity: sha512-y5mb86JUoiUgBjY/o6FJSFZSEttfb3Q5gllE4xoKjAAD+vBrnIhE4dViwUuow3va8mpH4s9jyUbUbrRGoRdc2Q==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
     dependencies:
       mini-svg-data-uri: 1.4.4
-      tailwindcss: 3.2.2
+      tailwindcss: 3.2.3
     dev: false
 
   /@types/json5/0.0.29:
@@ -2333,8 +2333,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  /tailwindcss/3.2.2:
-    resolution: {integrity: sha512-c2GtSdqg+harR4QeoTmex0Ngfg8IIHNeLQH5yr2B9uZbZR1Xt1rYbjWOWTcj3YLTZhrmZnPowoQDbSRFyZHQ5Q==}
+  /tailwindcss/3.2.3:
+    resolution: {integrity: sha512-Xt9D4PK4zuuQCEB8bwK9JUCKmTgUwyac/6b0/42Vqhgl6YJkep+Wf5wq+5uXYfmrupdAD0YY2NY1hyZp1HjRrg==}
     engines: {node: '>=12.13.0'}
     hasBin: true
     dependencies:
