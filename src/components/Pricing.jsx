@@ -12,7 +12,7 @@ const plans = [
     description:
       'You’ve been streaming for a while. Stream more with Dotabod and grow your gaming time.',
     button: {
-      label: 'Login with Twitch',
+      label: 'Try the beta',
       href: '/login',
     },
     features: [
