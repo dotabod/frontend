@@ -7,6 +7,7 @@ specifiers:
   clsx: ^1.2.1
   eslint: 8.27.0
   eslint-config-next: 13.0.2
+  eslint-plugin-unused-imports: ^2.0.0
   focus-visible: ^5.2.0
   framer-motion: ^7.6.5
   next: 13.0.2
@@ -35,6 +36,7 @@ dependencies:
 devDependencies:
   eslint: 8.27.0
   eslint-config-next: 13.0.2_eslint@8.27.0
+  eslint-plugin-unused-imports: 2.0.0_eslint@8.27.0
   prettier: 2.7.1
   prettier-plugin-tailwindcss: 0.1.13_prettier@2.7.1
 
@@ -974,6 +976,25 @@ packages:
       resolve: 2.0.0-next.4
       semver: 6.3.0
       string.prototype.matchall: 4.0.8
+    dev: true
+
+  /eslint-plugin-unused-imports/2.0.0_eslint@8.27.0:
+    resolution: {integrity: sha512-3APeS/tQlTrFa167ThtP0Zm0vctjr4M44HMpeg1P4bK6wItarumq0Ma82xorMKdFsWpphQBlRPzw/pxiVELX1A==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      '@typescript-eslint/eslint-plugin': ^5.0.0
+      eslint: ^8.0.0
+    peerDependenciesMeta:
+      '@typescript-eslint/eslint-plugin':
+        optional: true
+    dependencies:
+      eslint: 8.27.0
+      eslint-rule-composer: 0.3.0
+    dev: true
+
+  /eslint-rule-composer/0.3.0:
+    resolution: {integrity: sha512-bt+Sh8CtDmn2OajxvNO+BX7Wn4CIWMpTRm3MaiKPCQcnnlm0CS2mhui6QaoeQugs+3Kj2ESKEEGJUdVafwhiCg==}
+    engines: {node: '>=4.0.0'}
     dev: true
 
   /eslint-scope/7.1.1:
