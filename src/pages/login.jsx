@@ -1,8 +1,7 @@
 import Head from 'next/head'
 
 import { AuthLayout } from '@/components/AuthLayout'
-import { Button } from '@/components/Button'
-import { TextField } from '@/components/Fields'
+import { UserAuthForm } from '@/components/AuthForm'
 
 export default function Login() {
   return (
@@ -11,29 +10,7 @@ export default function Login() {
         <title>Sign In - Dotabod</title>
       </Head>
       <AuthLayout title="Sign in to account">
-        <form>
-          <div className="space-y-6">
-            <TextField
-              label="Email address"
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-            />
-            <TextField
-              label="Password"
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
-          </div>
-          <Button type="submit" color="cyan" className="mt-8 w-full">
-            Sign in to account
-          </Button>
-        </form>
+        <UserAuthForm />
       </AuthLayout>
     </>
   )
