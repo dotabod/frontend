@@ -24,23 +24,23 @@ const MotionAppScreenBody = motion(AppScreen.Body)
 
 const features = [
   {
-    name: 'Invite friends for better returns',
+    name: 'Picks blocker',
     description:
-      'For every friend you invite to Dotabod, you get insider notifications 5 seconds sooner. And it’s 10 seconds if you invite an insider.',
-    icon: DeviceUserIcon,
+      'Tired of getting your picks banned? Stream snipers ruining your games? Our picks blocker will make it impossible to see what hero you picked and will keep your hero pick safe.',
+    icon: DeviceNotificationIcon,
     screen: InviteScreen,
   },
   {
-    name: 'Notifications on stock dips',
+    name: 'Minimap blocker',
     description:
-      'Get a push notification every time we find out something that’s going to lower the share price on your holdings so you can sell before the information hits the public markets.',
-    icon: DeviceNotificationIcon,
+      'Your wards will be protected by our minimap blocker. Viewers will still be able to enjoy the viewing experience since they can still see heroes on the minimap. But snipers will not be able to see your wards.',
+    icon: DeviceUserIcon,
     screen: StocksScreen,
   },
   {
-    name: 'Invest what you want',
+    name: 'OBS scene switching',
     description:
-      'We hide your stock purchases behind thousands of anonymous trading accounts, so suspicious activity can never be traced back to you.',
+      'Our OBS scene switching feature will allow you to switch between scenes without a single click. Dotabod will choose between three scenes based on whether you\'re  disconnected from Dota, in an active game, or in picking phase.',
     icon: DeviceTouchIcon,
     screen: InvestScreen,
   },
