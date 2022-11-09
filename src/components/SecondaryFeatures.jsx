@@ -1,43 +1,54 @@
 import { useId } from 'react'
 
 import { Container } from '@/components/Container'
+import Image from 'next/image'
 
 const features = [
   {
-    name: 'Invest any amount',
+    name: 'Twitch predictions',
     description:
-      'Whether it’s $1 or $1,000,000, we can put your money to work for you.',
-    icon: DeviceArrowIcon,
-  },
-  {
-    name: 'Build a balanced portfolio',
-    description:
-      'Invest in different industries to find the most opportunities to win huge.',
+      'Create predictions for your viewers to bet on. Dotabod will start and stop the prediction automatically.',
     icon: DeviceCardsIcon,
   },
   {
-    name: 'Trade in real-time',
+    name: 'Fun predictions',
     description:
-      'Get insider tips on big stock moves and act on them within seconds.',
+      'Increase viewer engagement. Every few minutes a new prediction can start. For example, "will streamer die by min 3:00."',
     icon: DeviceClockIcon,
   },
   {
-    name: 'Profit from your network',
+    name: '!mmr command',
     description:
-      'Invite new insiders to get tips faster and beat even other Dotabod users.',
+      'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
+    icon: DeviceArrowIcon,
+  },
+  {
+    name: 'Chatbot says PauseChamp',
+    description: (
+      <div className="flex items-center space-x-1">
+        <span>But only when the Dota game is paused</span>
+        <Image
+          width={22}
+          height={22}
+          alt="pausechamp"
+          src="/images/pauseChamp.webp"
+        />
+        <span>.</span>
+      </div>
+    ),
     icon: DeviceListIcon,
   },
   {
-    name: 'Encrypted and anonymized',
+    name: 'More OBS scenes',
     description:
-      'Cutting-edge security technology that even the NSA doesn’t know about keeps you hidden.',
-    icon: DeviceLockIcon,
+      "Want a new scene when the game is paused? A new scene when you're spectating a game? Or when you get a rampage? All will be possible.",
+    icon: DeviceChartIcon,
   },
   {
-    name: 'Portfolio tracking',
+    name: '!hero command',
     description:
-      'Watch your investments grow exponentially, leaving other investors in the dust.',
-    icon: DeviceChartIcon,
+      'Not only will new players to Dota be able to read the hero name, but they will also be able to read the currently played hero’s lore.',
+    icon: DeviceLockIcon,
   },
 ]
 

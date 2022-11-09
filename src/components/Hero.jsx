@@ -7,14 +7,6 @@ import { AppScreen } from '@/components/AppScreen'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { PhoneFrame } from '@/components/PhoneFrame'
-import logoBbc from '@/images/logos/bbc.svg'
-import logoCbs from '@/images/logos/cbs.svg'
-import logoCnn from '@/images/logos/cnn.svg'
-import logoFastCompany from '@/images/logos/fast-company.svg'
-import logoForbes from '@/images/logos/forbes.svg'
-import logoHuffpost from '@/images/logos/huffpost.svg'
-import logoTechcrunch from '@/images/logos/techcrunch.svg'
-import logoWired from '@/images/logos/wired.svg'
 
 function BackgroundIllustration(props) {
   let id = useId()
@@ -326,10 +318,7 @@ export function Hero() {
               your stream gaming!
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
-              <Button
-                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                variant="outline"
-              >
+              <Button href="/login" variant="outline">
                 <PlayIcon className="h-6 w-6 flex-none" />
                 <span className="ml-2.5">Get started</span>
               </Button>
