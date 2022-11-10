@@ -3,7 +3,7 @@ import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import { PrismaClient } from '@prisma/client'
-import db from '@/lib/db'
+import { db } from '@/lib/db'
 
 const prisma = new PrismaClient()
 

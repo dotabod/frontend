@@ -56,14 +56,15 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?    @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @default(now()) @map("updated_at")
-  settings      settings[] @relation("settingsTousers")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @map("updated_at")
+
+  Setting Setting[]
 
   @@map("users")
 }
@@ -77,11 +78,16 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model settings {
-  id         BigInt    @id @default(autoincrement())
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  user_id    String
-  key        String    @db.VarChar
-  value      Json?     @db.Json
-  users      User      @relation("settingsTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Setting {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+  key       String
+  value     Json?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([key, userId])
+  @@map("settings")
 }
