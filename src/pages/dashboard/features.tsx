@@ -2,10 +2,15 @@ import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
 import PicksCard from '@/components/Dashboard/Features/PicksCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import DashboardShell from '@/components/DashboardShell'
+import { Setting } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 
-export default function DashboardPage() {
+type Props = {
+  settings: Setting[]
+}
+
+export default function DashboardPage({ settings }: Props) {
   const { status } = useSession()
 
   return status === 'authenticated' ? (

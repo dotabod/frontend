@@ -1,6 +1,7 @@
 import { Card } from '@/ui/card'
-import { DisableButton } from '@/components/DisableButton'
-import { Display, Image, Snippet } from '@geist-ui/core'
+import { Button, Display, Image, Snippet } from '@geist-ui/core'
+import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
 
 const sceneNames = [
   '[dotabod] blocking minimap',
@@ -9,6 +10,9 @@ const sceneNames = [
 ]
 
 export default function SceneSwitcher(): JSX.Element {
+  const { isEnabled, loading, updateSetting } =
+    useUpdateSetting('obs-scene-switcher')
+
   return (
     <Card>
       <Card.Header>
@@ -46,7 +50,17 @@ export default function SceneSwitcher(): JSX.Element {
         </Display>
       </Card.Content>
       <Card.Footer>
-        <DisableButton tooltip="To turn this feature off, don't name the OBS scenes to the ones in the instructions." />
+        {loading ? (
+          <Button disabled>loading...</Button>
+        ) : (
+          <Button
+            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+            type="secondary"
+            onClick={() => updateSetting(!isEnabled)}
+          >
+            {isEnabled ? 'Disable' : 'Enable'}
+          </Button>
+        )}
       </Card.Footer>
     </Card>
   )

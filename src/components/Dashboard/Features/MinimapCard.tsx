@@ -1,8 +1,11 @@
 import { Card } from '@/ui/card'
-import { DisableButton } from '@/components/DisableButton'
-import { Display, Image } from '@geist-ui/core'
+import { Button, Display, Image } from '@geist-ui/core'
+import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
 
 export default function MinimapCard(): JSX.Element {
+  const { isEnabled, loading, updateSetting } =
+    useUpdateSetting('minimap-blocker')
   return (
     <Card>
       <Card.Header>
@@ -28,15 +31,19 @@ export default function MinimapCard(): JSX.Element {
             }}
           />
         </Display>
-        {/* <Image
-          alt="minimap blocker"
-          width={244}
-          height={244}
-          src="/images/731-Complex-Large-AntiStreamSnipeMap.png"
-        /> */}
       </Card.Content>
       <Card.Footer>
-        <DisableButton />
+        {loading ? (
+          <Button disabled>loading...</Button>
+        ) : (
+          <Button
+            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+            type="secondary"
+            onClick={() => updateSetting(!isEnabled)}
+          >
+            {isEnabled ? 'Disable' : 'Enable'}
+          </Button>
+        )}
       </Card.Footer>
     </Card>
   )

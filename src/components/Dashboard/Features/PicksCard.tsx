@@ -1,8 +1,12 @@
 import { Card } from '@/ui/card'
-import { DisableButton } from '@/components/DisableButton'
-import { Display, Image } from '@geist-ui/core'
+import { Button, Display, Image } from '@geist-ui/core'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 
 export default function PicksCard() {
+  const { isEnabled, loading, updateSetting } =
+    useUpdateSetting('picks-blocker')
+
   return (
     <Card>
       <Card.Header>
@@ -31,7 +35,17 @@ export default function PicksCard() {
         </Display>
       </Card.Content>
       <Card.Footer>
-        <DisableButton />
+        {loading ? (
+          <Button disabled>loading...</Button>
+        ) : (
+          <Button
+            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+            type="secondary"
+            onClick={() => updateSetting(!isEnabled)}
+          >
+            {isEnabled ? 'Disable' : 'Enable'}
+          </Button>
+        )}
       </Card.Footer>
     </Card>
   )

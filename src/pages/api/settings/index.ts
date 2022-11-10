@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import * as z from 'zod'
 
-import { db } from '@/lib/db'
+import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 
@@ -16,19 +16,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'GET') {
     try {
-      const posts = await db.setting.findMany({
+      const settings = await prisma.setting.findMany({
         select: {
           id: true,
-          title: true,
-          published: true,
+          key: true,
+          value: true,
           createdAt: true,
+          updatedAt: true,
         },
         where: {
-          authorId: session.user.id,
+          userId: session.user.id,
         },
       })
 
-      return res.json(posts)
+      return res.json(settings)
     } catch (error) {
       return res.status(500).end()
     }
@@ -38,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const body = settingCreateSchema.parse(JSON.parse(req.body))
 
-      const post = await db.setting.create({
+      const post = await prisma.setting.create({
         data: {
           key: body.key,
           value: body.value,

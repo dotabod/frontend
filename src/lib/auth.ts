@@ -2,10 +2,7 @@ import TwitchProvider from 'next-auth/providers/twitch'
 import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
-import { PrismaClient } from '@prisma/client'
-import { db } from '@/lib/db'
-
-const prisma = new PrismaClient()
+import prisma from '@/lib/db'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -34,7 +31,7 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async jwt({ token, user }) {
-      const dbUser = await db.user.findFirst({
+      const dbUser = await prisma.user.findFirst({
         where: {
           email: token.email,
         },

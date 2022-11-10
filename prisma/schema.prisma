@@ -64,7 +64,7 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @default(now()) @map("updated_at")
 
-  Setting Setting[]
+  settings Setting[]
 
   @@map("users")
 }
@@ -80,11 +80,11 @@ model VerificationToken {
 
 model Setting {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @default(now()) @map(name: "updated_at")
   key       String
   value     Json?
   userId    String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
 
   user User @relation(fields: [userId], references: [id])
 
