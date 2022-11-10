@@ -19,7 +19,7 @@ export default function Home() {
         />
       </Head>
       <Header />
-      <main>
+      <main className="bg-gray-50">
         <Hero />
         <PrimaryFeatures />
         <SecondaryFeatures />
