@@ -16,7 +16,7 @@ export default function App({
 }: AppProps<{ session: Session }>) {
   return (
     <SessionProvider session={session}>
-      <MantineProvider>
+      <MantineProvider withGlobalStyles withNormalizeCSS>
         <GeistProvider>
           <Component {...pageProps} />
         </GeistProvider>
