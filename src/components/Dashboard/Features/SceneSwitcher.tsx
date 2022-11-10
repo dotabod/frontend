@@ -1,4 +1,3 @@
-'use client'
 import { Card } from '@/ui/card'
 import { DisableButton } from '@/components/DisableButton'
 import { Display, Image, Snippet } from '@geist-ui/core'
@@ -9,7 +8,7 @@ const sceneNames = [
   '[dotabod] game disconnected',
 ]
 
-export function SceneSwitcher(): JSX.Element {
+export default function SceneSwitcher(): JSX.Element {
   return (
     <Card>
       <Card.Header>

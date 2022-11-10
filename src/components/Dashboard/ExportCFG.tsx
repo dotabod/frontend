@@ -1,10 +1,8 @@
-'use client'
-
 import { Card } from '@/ui/card'
 import { Button, Link, Snippet } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 
-export function ExportCFG() {
+export default function ExportCFG() {
   const user = useSession()?.data?.user
   const fileData = `"Dotabod Configuration"
 {

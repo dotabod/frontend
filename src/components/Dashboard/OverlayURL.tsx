@@ -1,10 +1,9 @@
-'use client'
 import { Card } from '@/ui/card'
 import { useBaseUrl } from '@/lib/hooks'
 import { Display, Image, Snippet } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 
-export function OverlayURL() {
+export default function OverlayURL() {
   const user = useSession()?.data?.user
   const copyURL = useBaseUrl(`overlay/${user ? user.id : ''}`)
 

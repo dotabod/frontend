@@ -1,11 +1,11 @@
 import { DashboardHeader } from '@/components/dashboard-header'
 import { DashboardShell } from '@/components/dashboard-shell'
+import DashboardLayout from '@/components/Dashboard/DashboardLayout'
+import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
+import PicksCard from '@/components/Dashboard/Features/PicksCard'
+import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import DashboardLayout from '../DashboardLayout'
-import { MinimapCard } from './MinimapCard'
-import { PicksCard } from './PicksCard'
-import { SceneSwitcher } from './SceneSwitcher'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()

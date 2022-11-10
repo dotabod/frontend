@@ -1,20 +1,23 @@
-"use client"
-import { Card } from "@/ui/card"
-import { DisableButton } from "@/components/DisableButton"
-import { Display, Image } from "@geist-ui/core"
+import { Card } from '@/ui/card'
+import { DisableButton } from '@/components/DisableButton'
+import { Display, Image } from '@geist-ui/core'
 
-export function MinimapCard(): JSX.Element {
+export default function MinimapCard(): JSX.Element {
   return (
     <Card>
       <Card.Header>
         <Card.Title>Minimap</Card.Title>
         <Card.Description>
-          Block your minimap to deter people from destroying your wards or observing teammate
-          positions. This overlay will make it confusing to see where the true wards are.
+          Block your minimap to deter people from destroying your wards or
+          observing teammate positions. This overlay will make it confusing to
+          see where the true wards are.
         </Card.Description>
       </Card.Header>
       <Card.Content className="flex items-center space-x-6">
-        <Display shadow caption="Minimap blocker that auto places itself over your minimap">
+        <Display
+          shadow
+          caption="Minimap blocker that auto places itself over your minimap"
+        >
           <Image
             alt="minimap blocker"
             height="244px"

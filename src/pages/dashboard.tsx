@@ -1,10 +1,10 @@
 import { DashboardHeader } from '@/components/dashboard-header'
 import { DashboardShell } from '@/components/dashboard-shell'
+import DashboardLayout from '@/components/Dashboard/DashboardLayout'
+import ExportCFG from '@/components/Dashboard/ExportCFG'
+import OverlayURL from '@/components/Dashboard/OverlayURL'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { ExportCFG } from './ExportCFG'
-import DashboardLayout from './DashboardLayout'
-import { OverlayURL } from './OverlayURL'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
