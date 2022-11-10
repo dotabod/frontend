@@ -1,10 +1,5 @@
-"use client"
-
-import { User } from "next-auth"
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
-
-import { DropdownMenu } from '@/ui/dropdown'
 
 import { forwardRef } from 'react'
 import { Group, Avatar, Text, Menu, UnstyledButton } from '@mantine/core'

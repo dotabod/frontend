@@ -26,13 +26,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
           <span className="text-lg font-bold">Dotabod</span>
         </Link>
-        <UserAccountNav
-          user={{
-            name: user.name,
-            image: user.image,
-            email: user.email,
-          }}
-        />
+        <UserAccountNav />
       </header>
       <div className="grid grid-cols-[200px_1fr] gap-12">
         <aside className="flex w-[200px] flex-col">

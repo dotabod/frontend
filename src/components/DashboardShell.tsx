@@ -88,13 +88,7 @@ export default function DashboardShell({ children, title }) {
                       <Link href="/">
                         <Logo className="h-6 w-auto" />
                       </Link>
-                      <UserAccountNav
-                        user={{
-                          name: user.name,
-                          image: user.image,
-                          email: user.email,
-                        }}
-                      />
+                      <UserAccountNav />
                     </div>
                     <nav className="mt-5 space-y-1 px-2">
                       {navigation.map((item) => (
@@ -140,13 +134,7 @@ export default function DashboardShell({ children, title }) {
                 <Link href="/">
                   <Logo className="h-6 w-auto" />
                 </Link>
-                <UserAccountNav
-                  user={{
-                    name: user.name,
-                    image: user.image,
-                    email: user.email,
-                  }}
-                />
+                <UserAccountNav />
               </div>
               <nav className="mt-5 flex-1 space-y-1 bg-white px-2">
                 {navigation.map((item) => (
