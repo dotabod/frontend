@@ -6,7 +6,7 @@ export default function ExportCFG() {
   const user = useSession()?.data?.user
   const fileData = `"Dotabod Configuration"
 {
-  "uri" "https://dotabod.lunars.dev/gsi"
+  "uri" "${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}"
   "timeout" "5.0"
   "buffer" "0.1"
   "throttle" "0.1"
