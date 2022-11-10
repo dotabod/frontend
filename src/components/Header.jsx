@@ -2,19 +2,15 @@ import Link from 'next/link'
 import { Popover } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 
-import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Logo } from '@/components/Logo'
 import { NavLinks } from '@/components/NavLinks'
 import { MenuIcon } from './MenuIcon'
 import { MobileNavLink } from './MobileNavLink'
 import { ChevronUpIcon } from './ChevronUpIcon'
-import { signIn } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
+import { LoginButton } from './LoginButton'
 
 export function Header() {
-  const searchParams = useSearchParams()
-
   return (
     <header>
       <nav>
@@ -76,18 +72,7 @@ export function Header() {
                             <MobileNavLink href="#faqs">FAQs</MobileNavLink>
                           </div>
                           <div className="mt-8 flex flex-col gap-4">
-                            <Button
-                              onClick={() =>
-                                signIn('twitch', {
-                                  redirect: false,
-                                  callbackUrl:
-                                    searchParams.get('from') || '/dashboard',
-                                })
-                              }
-                              variant="outline"
-                            >
-                              Log in
-                            </Button>
+                            <LoginButton />
                           </div>
                         </Popover.Panel>
                       </>
@@ -96,18 +81,7 @@ export function Header() {
                 </>
               )}
             </Popover>
-            <Button
-              className="hidden lg:block"
-              onClick={() =>
-                signIn('twitch', {
-                  redirect: false,
-                  callbackUrl: searchParams.get('from') || '/dashboard',
-                })
-              }
-              variant="outline"
-            >
-              Log in
-            </Button>
+            <LoginButton className="hidden lg:block" />
           </div>
         </Container>
       </nav>
