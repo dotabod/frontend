@@ -56,6 +56,7 @@ export default function SceneSwitcher(): JSX.Element {
           <Button
             icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
             type="secondary"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => updateSetting(!isEnabled)}
           >
             {isEnabled ? 'Disable' : 'Enable'}

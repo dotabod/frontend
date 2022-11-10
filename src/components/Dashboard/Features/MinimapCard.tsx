@@ -39,7 +39,10 @@ export default function MinimapCard(): JSX.Element {
           <Button
             icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
             type="secondary"
-            onClick={() => updateSetting(!isEnabled)}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              updateSetting(!isEnabled)
+            }}
           >
             {isEnabled ? 'Disable' : 'Enable'}
           </Button>
