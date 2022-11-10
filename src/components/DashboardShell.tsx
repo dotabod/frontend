@@ -93,7 +93,9 @@ export default function DashboardShell({ children, title }) {
                   </Transition.Child>
                   <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
                     <div className="flex flex-shrink-0 items-center justify-between px-4">
-                      <Logo className="h-6 w-auto" />
+                      <Link href="/">
+                        <Logo className="h-6 w-auto" />
+                      </Link>
                       <UserAccountNav
                         user={{
                           name: user.name,
@@ -143,7 +145,9 @@ export default function DashboardShell({ children, title }) {
           <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white">
             <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
               <div className="flex flex-shrink-0 items-center justify-between px-4">
-                <Logo className="h-6 w-auto" />
+                <Link href="/">
+                  <Logo className="h-6 w-auto" />
+                </Link>
                 <UserAccountNav
                   user={{
                     name: user.name,
