@@ -1,11 +1,12 @@
 import { useToasts } from '@geist-ui/core'
 import useSWR, { useSWRConfig } from 'swr'
+import { getValueOrDefault } from './DBSettings'
 import { fetcher } from './fetcher'
 
 export function useUpdateSetting(key) {
   const { data } = useSWR(`/api/settings/${key}`, fetcher)
   const loading = data === undefined
-  const isEnabled = data?.value !== false
+  const isEnabled = getValueOrDefault(data, key)
 
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()

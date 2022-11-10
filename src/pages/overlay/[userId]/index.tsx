@@ -7,9 +7,23 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
-import { DBSettings } from '@/lib/DBSettings'
+import {
+  DBSettings,
+  defaultSettings,
+  getValueOrDefault,
+} from '@/lib/DBSettings'
 
 let socket
+
+const minimapStates = [
+  'DOTA_GAMERULES_STATE_GAME_IN_PROGRESS',
+  'DOTA_GAMERULES_STATE_PRE_GAME',
+]
+
+const pickSates = [
+  'DOTA_GAMERULES_STATE_HERO_SELECTION',
+  'DOTA_GAMERULES_STATE_STRATEGY_TIME',
+]
 
 const PickBlocker = ({ teamName }) =>
   teamName === 'radiant' ? (
@@ -33,25 +47,21 @@ export default function OverlayPage() {
   const { userId } = router.query
 
   const { data } = useSWR(`/api/settings/?id=${userId}`, fetcher)
-  const minimapXl = data?.find((s) => s.key === DBSettings.xl)?.value !== false
-  const minimapSimple =
-    data?.find((s) => s.key === DBSettings.simple)?.value !== false
-  const obs = data?.find((s) => s.key === DBSettings.obs)?.value !== false
 
   const [gameState, setGameState] = useState('DISCONNECTED')
   const [teamName, setTeamName] = useState('')
 
-  const minimapStates = [
-    'DOTA_GAMERULES_STATE_GAME_IN_PROGRESS',
-    'DOTA_GAMERULES_STATE_PRE_GAME',
-  ]
-  const isMinimapBlocked = minimapStates.includes(gameState)
+  const opts = defaultSettings
+  // Replace defaults with settings from DB
+  Object.values(DBSettings).forEach((key) => {
+    opts[key] = getValueOrDefault(data, key)
+  })
 
-  const pickSates = [
-    'DOTA_GAMERULES_STATE_HERO_SELECTION',
-    'DOTA_GAMERULES_STATE_STRATEGY_TIME',
-  ]
-  const isPicksBlocked = pickSates.includes(gameState)
+  const isMinimapBlocked =
+    opts[DBSettings.mblock] && minimapStates.includes(gameState)
+
+  const isPicksBlocked =
+    opts[DBSettings.pblock] && pickSates.includes(gameState)
 
   useEffect(() => {
     if (!userId) return
@@ -71,7 +81,12 @@ export default function OverlayPage() {
 
   useEffect(() => {
     // Only run in OBS browser source
-    if (!obs || typeof window !== 'object' || !window?.obsstudio) return
+    if (
+      !opts[DBSettings.obs] ||
+      typeof window !== 'object' ||
+      !window?.obsstudio
+    )
+      return
 
     console.log('obs studio connected')
 
@@ -82,7 +97,7 @@ export default function OverlayPage() {
     } else {
       window.obsstudio.setCurrentScene('[dotabod] not blocking')
     }
-  }, [isMinimapBlocked, isPicksBlocked, obs])
+  }, [isMinimapBlocked, isPicksBlocked, opts])
 
   useEffect(() => {
     return () => {
@@ -103,11 +118,11 @@ export default function OverlayPage() {
         <div className="absolute bottom-0 left-0">
           <Image
             alt="minimap blocker"
-            width={minimapXl ? 280 : 240}
-            height={minimapXl ? 280 : 240}
-            src={`/images/731-${minimapSimple ? 'Simple' : 'Complex'}-${
-              minimapXl ? 'X' : ''
-            }Large-AntiStreamSnipeMap.png`}
+            width={opts[DBSettings.xl] ? 280 : 240}
+            height={opts[DBSettings.xl] ? 280 : 240}
+            src={`/images/731-${
+              opts[DBSettings.simple] ? 'Simple' : 'Complex'
+            }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
           />
         </div>
       )}
