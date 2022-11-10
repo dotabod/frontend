@@ -1,15 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-  provider             = "postgresql"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model steam_to_twitch {
@@ -19,13 +15,15 @@ model steam_to_twitch {
   accountid  String    @db.VarChar
   channel    String    @db.VarChar
   added_by   String    @db.VarChar
+
   @@id([steamid, channel], map: "steam to twitch channel_pkey")
 }
+
 model twitch_tokens {
   id           BigInt    @id @default(autoincrement())
   created_at   DateTime? @default(now()) @db.Timestamptz(6)
   refreshToken String?   @db.VarChar
-  accessToken  String?   @db.VarChar
+  accessToken  String?
 }
 
 model Account {
@@ -34,20 +32,18 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String?
   session_state     String?
-  createdAt         DateTime @default(now()) @map(name: "created_at")
-  updatedAt         DateTime @default(now()) @map(name: "updated_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
 
   @@unique([provider, providerAccountId])
-  @@map(name: "accounts")
+  @@map("accounts")
 }
 
 model Session {
@@ -55,25 +51,21 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map(name: "sessions")
+  @@map("sessions")
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?    @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @default(now()) @map(name: "updated_at")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @default(now()) @map("updated_at")
+  settings      settings[] @relation("settingsTousers")
 
-  accounts Account[]
-  sessions Session[]
-  Post     Post[]
-
-  @@map(name: "users")
+  @@map("users")
 }
 
 model VerificationToken {
@@ -82,19 +74,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-  @@map(name: "verification_tokens")
+  @@map("verification_tokens")
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   Json?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @default(now()) @map(name: "updated_at")
-  authorId  String
-
-  author User @relation(fields: [authorId], references: [id])
-
-  @@map(name: "posts")
+model settings {
+  id         BigInt    @id @default(autoincrement())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  user_id    String
+  key        String    @db.VarChar
+  value      Json?     @db.Json
+  users      User      @relation("settingsTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
