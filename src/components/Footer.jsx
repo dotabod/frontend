@@ -4,7 +4,7 @@ import { Container } from '@/components/Container'
 import { Logomark } from '@/components/Logo'
 import { NavLinks } from '@/components/NavLinks'
 
-function QrCodeBorder(props) {
+export function QrCodeBorder(props) {
   return (
     <svg viewBox="0 0 96 96" fill="none" aria-hidden="true" {...props}>
       <path
