@@ -6,8 +6,9 @@ import { authOptions } from '@/lib/auth'
 export function withAuthentication(handler: NextApiHandler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     const session = await unstable_getServerSession(req, res, authOptions)
+    const userId = req.query.id as string
 
-    if (!session) {
+    if (!session && !userId) {
       return res.status(403).end()
     }
 

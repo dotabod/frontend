@@ -11,30 +11,14 @@ import { authOptions } from '@/lib/auth'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await unstable_getServerSession(req, res, authOptions)
   const settingKey = req.query.settingKey as string
-
-  if (req.method === 'DELETE') {
-    try {
-      await prisma.setting.delete({
-        where: {
-          key_userId: {
-            key: settingKey,
-            userId: session?.user?.id,
-          },
-        },
-      })
-
-      return res.status(204).end()
-    } catch (error) {
-      return res.status(500).end()
-    }
-  }
+  const userId = req.query.id as string
 
   if (req.method === 'GET') {
     try {
       const setting = await prisma.setting.findFirst({
         where: {
           key: settingKey,
-          userId: session?.user?.id,
+          userId: session ? session?.user?.id : userId,
         },
       })
 
@@ -77,7 +61,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(
-  ['DELETE', 'PATCH', 'GET'],
-  withAuthentication(handler)
-)
+export default withMethods(['PATCH', 'GET'], withAuthentication(handler))

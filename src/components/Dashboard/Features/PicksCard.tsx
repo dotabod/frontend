@@ -2,10 +2,12 @@ import { Card } from '@/ui/card'
 import { Button, Display, Image } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { DBSettings } from '@/lib/DBSettings'
 
 export default function PicksCard() {
-  const { isEnabled, loading, updateSetting } =
-    useUpdateSetting('picks-blocker')
+  const { isEnabled, loading, updateSetting } = useUpdateSetting(
+    DBSettings.pblock
+  )
 
   return (
     <Card>

@@ -2,6 +2,7 @@ import { Card } from '@/ui/card'
 import { Button, Display, Image, Snippet } from '@geist-ui/core'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { DBSettings } from '@/lib/DBSettings'
 
 const sceneNames = [
   '[dotabod] blocking minimap',
@@ -10,8 +11,7 @@ const sceneNames = [
 ]
 
 export default function SceneSwitcher(): JSX.Element {
-  const { isEnabled, loading, updateSetting } =
-    useUpdateSetting('obs-scene-switcher')
+  const { isEnabled, loading, updateSetting } = useUpdateSetting(DBSettings.obs)
 
   return (
     <Card>

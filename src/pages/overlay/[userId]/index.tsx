@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/fetcher'
+import { DBSettings } from '@/lib/DBSettings'
 
 let socket
 
@@ -28,6 +31,12 @@ const PickBlocker = ({ teamName }) =>
 export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
+
+  const { data } = useSWR(`/api/settings/?id=${userId}`, fetcher)
+  const minimapXl = data?.find((s) => s.key === DBSettings.xl)?.value !== false
+  const minimapSimple =
+    data?.find((s) => s.key === DBSettings.simple)?.value !== false
+  const obs = data?.find((s) => s.key === DBSettings.obs)?.value !== false
 
   const [gameState, setGameState] = useState('DISCONNECTED')
   const [teamName, setTeamName] = useState('')
@@ -61,7 +70,10 @@ export default function OverlayPage() {
   }, [userId])
 
   useEffect(() => {
-    if (typeof window !== 'object' || !window?.obsstudio) return
+    // Only run in OBS browser source
+    if (!obs || typeof window !== 'object' || !window?.obsstudio) return
+
+    console.log('obs studio connected')
 
     if (isMinimapBlocked) {
       window.obsstudio.setCurrentScene('[dotabod] blocking minimap')
@@ -70,7 +82,7 @@ export default function OverlayPage() {
     } else {
       window.obsstudio.setCurrentScene('[dotabod] not blocking')
     }
-  }, [isMinimapBlocked, isPicksBlocked])
+  }, [isMinimapBlocked, isPicksBlocked, obs])
 
   useEffect(() => {
     return () => {
@@ -91,9 +103,11 @@ export default function OverlayPage() {
         <div className="absolute bottom-0 left-0">
           <Image
             alt="minimap blocker"
-            width={244}
-            height={244}
-            src="/images/731-Simple-Large-AntiStreamSnipeMap.png"
+            width={minimapXl ? 280 : 240}
+            height={minimapXl ? 280 : 240}
+            src={`/images/731-${minimapSimple ? 'Simple' : 'Complex'}-${
+              minimapXl ? 'X' : ''
+            }Large-AntiStreamSnipeMap.png`}
           />
         </div>
       )}

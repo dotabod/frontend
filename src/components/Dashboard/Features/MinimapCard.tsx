@@ -2,30 +2,29 @@ import { Card } from '@/ui/card'
 import { Button, Checkbox, Display, Image } from '@geist-ui/core'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { DBSettings } from '@/lib/DBSettings'
 
 export default function MinimapCard(): JSX.Element {
   const {
     isEnabled,
     loading: l0,
     updateSetting,
-  } = useUpdateSetting('minimap-blocker')
+  } = useUpdateSetting(DBSettings.mblock)
   const {
     isEnabled: minimapSimple,
     loading: l1,
     updateSetting: updateSimple,
-  } = useUpdateSetting('minimap-simple')
+  } = useUpdateSetting(DBSettings.simple)
   const {
     isEnabled: minimapXl,
     loading: l2,
     updateSetting: updateXl,
-  } = useUpdateSetting('minimap-xl')
-
-  console.log(minimapSimple, minimapXl)
+  } = useUpdateSetting(DBSettings.xl)
 
   const loading = l0 || l1 || l2
 
   const checkboxHandler = (key, value) => {
-    const updater = key === 'minimap-simple' ? updateSimple : updateXl
+    const updater = key === DBSettings.simple ? updateSimple : updateXl
     updater(value)
   }
   return (
@@ -77,9 +76,9 @@ export default function MinimapCard(): JSX.Element {
           <Checkbox
             disabled={!isEnabled}
             checked={minimapSimple}
-            value="minimap-simple"
+            value={DBSettings.simple}
             onChange={(e) =>
-              checkboxHandler('minimap-simple', !!e?.target?.checked)
+              checkboxHandler(DBSettings.simple, !!e?.target?.checked)
             }
           >
             Use simple minimap background
@@ -87,9 +86,9 @@ export default function MinimapCard(): JSX.Element {
           <Checkbox
             disabled={!isEnabled}
             checked={minimapXl}
-            value="minimap-xl"
+            value={DBSettings.xl}
             onChange={(e) =>
-              checkboxHandler('minimap-xl', !!e?.target?.checked)
+              checkboxHandler(DBSettings.xl, !!e?.target?.checked)
             }
           >
             Use extra large minimap
