@@ -17,9 +17,7 @@ export default function OverlayURL() {
         </Card.Description>
       </Card.Header>
       <Card.Content>
-        <Snippet symbol="" width="500px">
-          {copyURL}
-        </Snippet>
+        <Snippet symbol="" text={copyURL} width="500px" />
 
         <Display shadow caption="Dotabod browser source properties in OBS">
           <Image

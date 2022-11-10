@@ -27,9 +27,7 @@ export default function SceneSwitcher(): JSX.Element {
           <ul className="ml-4 list-none space-y-2">
             {sceneNames.map((sceneName) => (
               <li key={sceneName}>
-                <Snippet symbol="" width="250px">
-                  {sceneName}
-                </Snippet>
+                <Snippet symbol="" text={sceneName} width="250px" />
               </li>
             ))}
           </ul>

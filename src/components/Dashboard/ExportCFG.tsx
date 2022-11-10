@@ -44,10 +44,12 @@ export default function ExportCFG() {
         <div className="space-y-2">
           <div>Restart your Dota 2 client after saving the file.</div>
 
-          <Snippet symbol="" width="750px">
-            C:\Program Files (x86)\Steam\steamapps\common\dota 2
-            beta\game\dota\cfg\gamestate_integration\
-          </Snippet>
+          <Snippet
+            symbol=""
+            text="C:\Program Files (x86)\Steam\steamapps\common\dota 2
+            beta\game\dota\cfg\gamestate_integration\"
+            width="750px"
+          />
         </div>
       </Card.Content>
       <Card.Footer>
