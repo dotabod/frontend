@@ -24,6 +24,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
+        // @ts-ignore do we actually need ID ??
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email

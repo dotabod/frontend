@@ -1,3 +1,4 @@
+import { Analytics } from '@/components/analytics'
 import { Head, Html, Main, NextScript } from 'next/document'
 
 export default function Document() {
@@ -26,9 +27,10 @@ export default function Document() {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <body className="flex h-full flex-col">
+      <body className="min-h-screen">
         <Main />
         <NextScript />
+        <Analytics />
       </body>
     </Html>
   )
