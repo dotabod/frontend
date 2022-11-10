@@ -82,9 +82,6 @@ export function UserAccountNav({ user, className }: UserAccountNavProps) {
           </DropdownMenu.Portal>
         </DropdownMenu>
       </div>
-      <div className="lg:hidden">
-        <UserAvatar user={{ name: user.name, image: user.image }} />
-      </div>
     </>
   )
 }
