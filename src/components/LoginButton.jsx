@@ -11,7 +11,7 @@ export function LoginButton({ className, ...props }) {
   const router = useRouter()
 
   if (user) {
-    return <UserAccountNav user={{ ...user }} />
+    return <UserAccountNav user={{ ...user }} className={className} />
   }
 
   return (
