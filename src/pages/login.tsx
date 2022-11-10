@@ -9,7 +9,10 @@ export default function Login() {
       <Head>
         <title>Sign In - Dotabod</title>
       </Head>
-      <AuthLayout title="Sign in to account">
+      <AuthLayout
+        title="Sign in"
+        subtitle="You can begin using Dotabod right away!"
+      >
         <UserAuthForm />
       </AuthLayout>
     </>
