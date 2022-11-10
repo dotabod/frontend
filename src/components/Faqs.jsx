@@ -32,9 +32,9 @@ const faqs = [
       answer: 'Let’s just say it’s because stream snipers will never find us.',
     },
     {
-      question: 'Is there any age limit to trading on Dotabod?',
+      question: 'Is there any age limit to using Dotabod?',
       answer:
-        'You can use Dotabod even if you’re 9 years old. Or a dog. But there might be age limits to streaming on Twitch.',
+        'You can use Dotabod even if you’re 9 years old. Or a dog. But there might be age limits to streaming on Twitch. So ask a parent first.',
     },
   ],
   [

@@ -543,7 +543,7 @@ export function PrimaryFeatures() {
   return (
     <section
       id="features"
-      aria-label="Features for investing all your money"
+      aria-label="Features for streaing all your Dota"
       className="bg-gray-900 py-20 sm:py-32"
     >
       <Container>
@@ -553,9 +553,8 @@ export function PrimaryFeatures() {
           </h2>
           <p className="mt-2 text-lg text-gray-400">
             Dotabod was built for streamers like you who play by their own rules
-            and aren’t going to let SEC regulations get in the way of their
-            dreams. If other investing tools are afraid to build it, Dotabod has
-            it.
+            and aren’t going to let anything get in the way of their dreams. If
+            other streaming tools are afraid to build it, Dotabod has it.
           </p>
         </div>
       </Container>

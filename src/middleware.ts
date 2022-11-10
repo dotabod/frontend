@@ -11,6 +11,8 @@ export default withAuth(
     const isLoginPage = req.nextUrl.pathname.startsWith('/login')
 
     if (isLoginPage) {
+      console.log(isLoginPage)
+
       if (isAuth) {
         return NextResponse.redirect(new URL('/dashboard', req.url))
       }
@@ -19,7 +21,14 @@ export default withAuth(
     }
 
     if (!isAuth) {
-      return NextResponse.redirect(new URL('/login', req.url))
+      let from = req.nextUrl.pathname
+      if (req.nextUrl.search) {
+        from += req.nextUrl.search
+      }
+
+      return NextResponse.redirect(
+        new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
+      )
     }
   },
 

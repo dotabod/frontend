@@ -14,7 +14,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         className="inline-flex w-full items-center justify-center space-x-2 rounded-lg border bg-white px-5 py-2.5 text-center text-sm font-medium text-black hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-[#24292F]/50 disabled:opacity-50 dark:hover:bg-[#050708]/30 dark:focus:ring-slate-500"
         onClick={() => {
           setIsLoading(true)
-          signIn('twitch')
+          signIn('twitch', { callbackUrl: '/dashboard/features' })
         }}
         disabled={isLoading}
       >

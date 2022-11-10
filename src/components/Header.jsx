@@ -6,46 +6,15 @@ import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Logo } from '@/components/Logo'
 import { NavLinks } from '@/components/NavLinks'
-
-function MenuIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <path
-        d="M5 6h14M5 18h14M5 12h14"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function ChevronUpIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <path
-        d="M17 14l-5-5-5 5"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function MobileNavLink({ children, ...props }) {
-  return (
-    <Popover.Button
-      as={Link}
-      className="block text-base leading-7 tracking-tight text-gray-700"
-      {...props}
-    >
-      {children}
-    </Popover.Button>
-  )
-}
+import { MenuIcon } from './MenuIcon'
+import { MobileNavLink } from './MobileNavLink'
+import { ChevronUpIcon } from './ChevronUpIcon'
+import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 
 export function Header() {
+  const searchParams = useSearchParams()
+
   return (
     <header>
       <nav>
@@ -107,7 +76,16 @@ export function Header() {
                             <MobileNavLink href="#faqs">FAQs</MobileNavLink>
                           </div>
                           <div className="mt-8 flex flex-col gap-4">
-                            <Button href="/login" variant="outline">
+                            <Button
+                              onClick={() =>
+                                signIn('twitch', {
+                                  redirect: false,
+                                  callbackUrl:
+                                    searchParams.get('from') || '/dashboard',
+                                })
+                              }
+                              variant="outline"
+                            >
                               Log in
                             </Button>
                           </div>
@@ -118,7 +96,16 @@ export function Header() {
                 </>
               )}
             </Popover>
-            <Button href="/login" variant="outline" className="hidden lg:block">
+            <Button
+              className="hidden lg:block"
+              onClick={() =>
+                signIn('twitch', {
+                  redirect: false,
+                  callbackUrl: searchParams.get('from') || '/dashboard',
+                })
+              }
+              variant="outline"
+            >
               Log in
             </Button>
           </div>
