@@ -6,7 +6,7 @@ import { fetcher } from './fetcher'
 export function useUpdateSetting(key) {
   const { data } = useSWR(`/api/settings/${key}`, fetcher)
   const loading = data === undefined
-  const isEnabled = getValueOrDefault(data, key)
+  const isEnabled = getValueOrDefault([data], key)
 
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()

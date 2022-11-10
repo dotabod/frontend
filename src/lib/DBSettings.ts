@@ -15,7 +15,12 @@ export const defaultSettings = {
 }
 
 export const getValueOrDefault = (data, key) => {
-  if (!data || !Array.isArray(data) || !data.length) {
+  if (
+    !data ||
+    !Array.isArray(data) ||
+    !data.length ||
+    !data.filter(Boolean).length
+  ) {
     return defaultSettings[key]
   }
 
