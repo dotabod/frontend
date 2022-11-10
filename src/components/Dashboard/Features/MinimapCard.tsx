@@ -4,11 +4,29 @@ import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 
 export default function MinimapCard(): JSX.Element {
-  const { isEnabled, loading, updateSetting } =
-    useUpdateSetting('minimap-blocker')
+  const {
+    isEnabled,
+    loading: l0,
+    updateSetting,
+  } = useUpdateSetting('minimap-blocker')
+  const {
+    isEnabled: minimapSimple,
+    loading: l1,
+    updateSetting: updateSimple,
+  } = useUpdateSetting('minimap-simple')
+  const {
+    isEnabled: minimapXl,
+    loading: l2,
+    updateSetting: updateXl,
+  } = useUpdateSetting('minimap-xl')
 
-  const handler = (value) => {
-    console.log(value)
+  console.log(minimapSimple, minimapXl)
+
+  const loading = l0 || l1 || l2
+
+  const checkboxHandler = (key, value) => {
+    const updater = key === 'minimap-simple' ? updateSimple : updateXl
+    updater(value)
   }
   return (
     <Card>
@@ -24,12 +42,14 @@ export default function MinimapCard(): JSX.Element {
         <div>
           <Display
             shadow
-            caption="Minimap blocker that auto places itself over your minimap"
+            caption="Semi-transparent blocker that auto places itself over your minimap"
           >
             <Image
               alt="minimap blocker"
-              height="244px"
-              src="/images/731-Complex-Large-AntiStreamSnipeMap.png"
+              height={minimapXl ? `280px` : `240px`}
+              src={`/images/731-${minimapSimple ? 'Simple' : 'Complex'}-${
+                minimapXl ? 'X' : ''
+              }Large-AntiStreamSnipeMap.png`}
               style={{
                 backgroundImage:
                   "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
@@ -54,10 +74,24 @@ export default function MinimapCard(): JSX.Element {
           </Button>
         )}
         <div className="flex flex-col items-start space-y-2 md:space-y-1">
-          <Checkbox disabled={!isEnabled} value="complex" checked={false}>
+          <Checkbox
+            disabled={!isEnabled}
+            checked={minimapSimple}
+            value="minimap-simple"
+            onChange={(e) =>
+              checkboxHandler('minimap-simple', !!e?.target?.checked)
+            }
+          >
             Use simple minimap background
           </Checkbox>
-          <Checkbox disabled={!isEnabled} value="extra-large" checked={false}>
+          <Checkbox
+            disabled={!isEnabled}
+            checked={minimapXl}
+            value="minimap-xl"
+            onChange={(e) =>
+              checkboxHandler('minimap-xl', !!e?.target?.checked)
+            }
+          >
             Use extra large minimap
           </Checkbox>
         </div>
