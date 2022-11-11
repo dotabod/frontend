@@ -18,6 +18,10 @@ export function useUpdateSetting(key) {
       rollbackOnError: true,
     }
 
+    let isNow = setting.value
+    if (setting.value === true) isNow = 'enabled'
+    if (setting.value === false) isNow = 'disabled'
+
     const updateFn = async (setting) => {
       const response = await fetch(`/api/settings/${key}`, {
         method: 'PATCH',
@@ -25,7 +29,7 @@ export function useUpdateSetting(key) {
       })
       setToast({
         text: response.ok
-          ? `Updated! Setting is now ${setting.value ? 'enabled' : 'disabled'}`
+          ? `Updated! Setting is now ${isNow}`
           : 'Error updating',
         type: response.ok ? 'success' : 'error',
       })

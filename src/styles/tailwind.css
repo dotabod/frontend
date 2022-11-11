@@ -22,3 +22,8 @@
 #__next {
   min-height: 100%;
 }
+
+/* wtf tailwind */
+[type='text']:focus {
+  @apply ring-0 ring-offset-0;
+}

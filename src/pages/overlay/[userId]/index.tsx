@@ -54,6 +54,7 @@ export default function OverlayPage() {
   const opts = defaultSettings
   // Replace defaults with settings from DB
   Object.values(DBSettings).forEach((key) => {
+    // @ts-ignore ???
     opts[key] = getValueOrDefault(data, key)
   })
 
@@ -62,6 +63,7 @@ export default function OverlayPage() {
 
   const isPicksBlocked =
     opts[DBSettings.pblock] && pickSates.includes(gameState)
+  console.log(opts)
 
   useEffect(() => {
     if (!userId) return
@@ -91,11 +93,11 @@ export default function OverlayPage() {
     console.log('obs studio connected')
 
     if (isMinimapBlocked) {
-      window.obsstudio.setCurrentScene('[dotabod] blocking minimap')
+      window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
     } else if (isPicksBlocked) {
-      window.obsstudio.setCurrentScene('[dotabod] blocking picks')
+      window.obsstudio.setCurrentScene(opts[DBSettings.obsPicks])
     } else {
-      window.obsstudio.setCurrentScene('[dotabod] not blocking')
+      window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
     }
   }, [isMinimapBlocked, isPicksBlocked, opts])
 

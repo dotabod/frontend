@@ -4,6 +4,9 @@ export enum DBSettings {
   simple = 'minimap-simple',
   mblock = 'minimap-blocker',
   pblock = 'picks-blocker',
+  obsMinimap = 'obs-minimap',
+  obsPicks = 'obs-picks',
+  obsDc = 'obs-dc',
 }
 
 export const defaultSettings = {
@@ -12,6 +15,9 @@ export const defaultSettings = {
   [DBSettings.xl]: false,
   [DBSettings.mblock]: true,
   [DBSettings.pblock]: true,
+  [DBSettings.obsMinimap]: '[dotabod] blocking minimap',
+  [DBSettings.obsPicks]: '[dotabod] blocking picks',
+  [DBSettings.obsDc]: '[dotabod] game disconnected',
 }
 
 export const getValueOrDefault = (data, key) => {
