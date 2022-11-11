@@ -63,7 +63,6 @@ export default function OverlayPage() {
 
   const isPicksBlocked =
     opts[DBSettings.pblock] && pickSates.includes(gameState)
-  console.log(opts)
 
   useEffect(() => {
     if (!userId) return

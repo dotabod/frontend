@@ -27,7 +27,7 @@ export default function Document() {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <body className="bg-trasnparent min-h-screen">
+      <body className="min-h-screen bg-transparent">
         <Main />
         <NextScript />
         <Analytics />
