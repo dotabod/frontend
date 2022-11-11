@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image, Input, Loading, Spinner } from '@geist-ui/core'
+import { Button, Display, Image, Input, Loading } from '@geist-ui/core'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
@@ -54,8 +54,6 @@ export default function SceneSwitcher(): JSX.Element {
       helpText: 'Switch to this scene when you disconnect from a Dota game',
     },
   }
-
-  console.log(scenes)
 
   return (
     <Card>
