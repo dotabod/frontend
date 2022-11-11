@@ -51,7 +51,8 @@ export default function SceneSwitcher(): JSX.Element {
       value: obsDc,
       update: updateDc,
       label: 'Game disconnected',
-      helpText: 'Switch to this scene when you disconnect from a Dota game',
+      helpText:
+        'Switch to this scene when you disconnect and leave a Dota game',
     },
   }
 

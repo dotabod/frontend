@@ -49,6 +49,7 @@ export default function OverlayPage() {
   const { data } = useSWR(`/api/settings/?id=${userId}`, fetcher)
 
   const [gameState, setGameState] = useState('DISCONNECTED')
+  const [gameMode, setGameMode] = useState(0)
   const [teamName, setTeamName] = useState('')
 
   const opts = defaultSettings
@@ -64,6 +65,12 @@ export default function OverlayPage() {
   const isPicksBlocked =
     opts[DBSettings.pblock] && pickSates.includes(gameState)
 
+  console.log(
+    { opts, isPicksBlocked, isMinimapBlocked },
+    minimapStates.includes(gameState),
+    pickSates.includes(gameState)
+  )
+
   useEffect(() => {
     if (!userId) return
 
@@ -73,6 +80,7 @@ export default function OverlayPage() {
 
     socket.on('state', setGameState)
     socket.on('map:game_state', setGameState)
+    socket.on('map:game_mode', setGameMode)
     socket.on('player:team_name', setTeamName)
 
     socket.on('connect_error', (err) => {
