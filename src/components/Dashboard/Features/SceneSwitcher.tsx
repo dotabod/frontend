@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image, Input, Loading } from '@geist-ui/core'
+import { Button, Display, Image, Input, Loading, Spinner } from '@geist-ui/core'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
@@ -78,16 +78,20 @@ export default function SceneSwitcher(): JSX.Element {
             <span className="italics">Advanced access to OBS</span>
           </li>
           <li>Must create the following scenes (case sensitive)</li>
-          {loading && <Loading />}
-          {!loading && (
-            <ul className="ml-4 list-none space-y-6">
-              {Object.keys(scenes).map((sceneKey: keyof typeof scenes) => {
-                const scene = scenes[sceneKey]
-                return (
-                  <li key={sceneKey} className="space-y-1">
-                    <label htmlFor={sceneKey} className="block text-sm">
-                      {scene.label}
-                    </label>
+          <ul className="ml-4 list-none space-y-6">
+            {Object.keys(scenes).map((sceneKey: keyof typeof scenes) => {
+              const scene = scenes[sceneKey]
+              return (
+                <li key={sceneKey} className="space-y-1">
+                  <label htmlFor={sceneKey} className="block text-sm">
+                    {scene.label}
+                  </label>
+                  {loading && (
+                    <div className="w-52 rounded-md border border-gray-200 pt-2">
+                      <Loading className="left-0" />
+                    </div>
+                  )}
+                  {!loading && (
                     <Input
                       id={sceneKey}
                       placeholder={defaultSettings[sceneKey]}
@@ -97,14 +101,13 @@ export default function SceneSwitcher(): JSX.Element {
                         handleSceneName(e.target.value, scene.update)
                       }
                     />
-                    <span className="block text-xs italic">
-                      {scene.helpText}
-                    </span>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
+                  )}
+
+                  <span className="block text-xs italic">{scene.helpText}</span>
+                </li>
+              )
+            })}
+          </ul>
         </ul>
 
         <Display shadow caption="Example OBS scenes and sources">
