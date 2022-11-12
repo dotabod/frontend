@@ -15,19 +15,10 @@ import {
 
 let socket
 
-const minimapStates = [
-  'DOTA_GAMERULES_STATE_GAME_IN_PROGRESS',
-  'DOTA_GAMERULES_STATE_PRE_GAME',
-]
-
-const pickSates = [
-  'DOTA_GAMERULES_STATE_HERO_SELECTION',
-  'DOTA_GAMERULES_STATE_STRATEGY_TIME',
-]
-
 const PickBlocker = ({ teamName }) =>
   teamName === 'radiant' ? (
     <Image
+      priority
       alt="picks blocker"
       width={1920}
       height={1080}
@@ -35,6 +26,7 @@ const PickBlocker = ({ teamName }) =>
     />
   ) : (
     <Image
+      priority
       alt="picks blocker"
       width={1920}
       height={1080}
@@ -47,9 +39,8 @@ export default function OverlayPage() {
   const { userId } = router.query
 
   const { data } = useSWR(`/api/settings/?id=${userId}`, fetcher)
-
-  const [blockMinimap, setBlockMinimap] = useState(false)
-  const [blockPicks, setBlockPicks] = useState({ team: null })
+  const [block, setBlock] = useState({ type: null, team: null })
+  const [connected, setConnected] = useState(false)
 
   const opts = defaultSettings
   // Replace defaults with settings from DB
@@ -58,25 +49,48 @@ export default function OverlayPage() {
     opts[key] = getValueOrDefault(data, key)
   })
 
-  const isMinimapBlocked = opts[DBSettings.mblock] && blockMinimap
-  const isPicksBlocked = opts[DBSettings.pblock] && blockPicks?.team
+  const isMinimapBlocked = opts[DBSettings.mblock] && block.type === 'minimap'
+  const isPicksBlocked =
+    opts[DBSettings.pblock] && block?.type === 'picks' && block?.team
 
   useEffect(() => {
     if (!userId) return
+
+    console.log('Connecting to socket...')
 
     socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
     })
 
-    socket.on('block-minimap', setBlockMinimap)
-    socket.on('block-picks', setBlockPicks)
-
-    socket.on('connect_error', (err) => {
-      console.log(err.message)
-    })
+    socket.on('block', setBlock)
+    socket.on('connect', () => setConnected(true))
+    socket.on('connect_error', console.log)
   }, [userId])
 
   useEffect(() => {
+    if (!userId || !opts[DBSettings.obs]) {
+      return
+    }
+
+    if (!connected) {
+      console.log(
+        'Socket not connected just yet, will not run OBS scene switchers'
+      )
+
+      return
+    }
+
+    console.log('Connected to socket! Running OBS scene switchers')
+
+    // Debug info
+    if (isMinimapBlocked) {
+      console.log({ setCurrentScene: opts[DBSettings.obsMinimap] })
+    } else if (isPicksBlocked) {
+      console.log({ setCurrentScene: opts[DBSettings.obsPicks] })
+    } else {
+      console.log({ setCurrentScene: opts[DBSettings.obsDc] })
+    }
+
     // Only run in OBS browser source
     if (
       !opts[DBSettings.obs] ||
@@ -85,7 +99,7 @@ export default function OverlayPage() {
     )
       return
 
-    console.log('obs studio connected')
+    console.log('OBS studio is connected')
 
     if (isMinimapBlocked) {
       window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
@@ -94,12 +108,12 @@ export default function OverlayPage() {
     } else {
       window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
     }
-  }, [isMinimapBlocked, isPicksBlocked, opts])
+  }, [connected, userId, isMinimapBlocked, isPicksBlocked, opts])
 
   useEffect(() => {
     return () => {
-      socket?.off('block-minimap')
-      socket?.off('block-picks')
+      socket?.off('block')
+      socket?.off('connect')
       socket?.off('connect_error')
       socket?.disconnect()
     }
@@ -113,6 +127,7 @@ export default function OverlayPage() {
       {isMinimapBlocked && (
         <div className="absolute bottom-0 left-0">
           <Image
+            priority
             alt="minimap blocker"
             width={opts[DBSettings.xl] ? 280 : 240}
             height={opts[DBSettings.xl] ? 280 : 240}
@@ -123,7 +138,7 @@ export default function OverlayPage() {
         </div>
       )}
 
-      {isPicksBlocked && <PickBlocker teamName={blockPicks?.team} />}
+      {isPicksBlocked && <PickBlocker teamName={block?.team} />}
     </>
   )
 }
