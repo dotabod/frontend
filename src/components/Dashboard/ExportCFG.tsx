@@ -42,7 +42,9 @@ export default function ExportCFG() {
       </Card.Header>
       <Card.Content>
         <div className="space-y-2">
-          <div>Restart your Dota 2 client after saving the file.</div>
+          <div>
+            Restart your Dota 2 client after saving the file to this path:
+          </div>
 
           <Snippet
             symbol=""
