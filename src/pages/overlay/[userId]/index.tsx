@@ -56,14 +56,29 @@ export default function OverlayPage() {
   useEffect(() => {
     if (!userId) return
 
-    console.log('Connecting to socket...')
+    console.log('Connecting to socket init...')
 
     socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
     })
 
     socket.on('block', setBlock)
-    socket.on('connect', () => setConnected(true))
+    socket.on('connect', () => {
+      console.log('Connected to socket!', socket.id)
+
+      return setConnected(true)
+    })
+    socket.on('disconnect', (reason) => {
+      console.log('Disconnected from sockets:', reason)
+       setConnected(false)
+
+       if (reason === 'io server disconnect') {
+         console.log('Reconnecting...')
+         // the disconnection was initiated by the server, you need to reconnect manually
+         socket.connect()
+       }
+    })
+
     socket.on('connect_error', console.log)
   }, [userId])
 
