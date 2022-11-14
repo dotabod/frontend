@@ -155,18 +155,20 @@ export default function OverlayPage() {
               }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
             />
           </div>
-          <div className="absolute bottom-0 right-[276px]">
-            <div className="flex flex-col items-center rounded-md bg-slate-500/50 p-1 shadow-md">
-              <Image
-                priority
-                alt="minimap blocker"
-                width={56}
-                height={56}
-                src={`/images/ranks/${rankFilename}`}
-              />
-              <span className="text-xs text-yellow-500">{data?.mmr}</span>
+          {data?.mmr > 0 && (
+            <div className="absolute bottom-0 right-[276px]">
+              <div className="flex flex-col items-center rounded-md bg-slate-500/50 p-1 shadow-md">
+                <Image
+                  priority
+                  alt="minimap blocker"
+                  width={56}
+                  height={56}
+                  src={`/images/ranks/${rankFilename}`}
+                />
+                <span className="text-xs text-yellow-500">{data?.mmr}</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
