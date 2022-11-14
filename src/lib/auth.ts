@@ -21,6 +21,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
+        session.user.mmr = token.mmr
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email
@@ -42,6 +43,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       return {
+        mmr: dbUser.mmr,
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,

@@ -12,6 +12,7 @@ import {
   defaultSettings,
   getValueOrDefault,
 } from '@/lib/DBSettings'
+import { getRankImage } from '@/lib/ranks'
 
 let socket
 
@@ -38,7 +39,7 @@ export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
 
-  const { data } = useSWR(`/api/settings/?id=${userId}`, fetcher)
+  const { data } = useSWR(`/api/settings/?id=${userId}`, userId && fetcher)
   const [block, setBlock] = useState({ type: null, team: null })
   const [connected, setConnected] = useState(false)
 
@@ -46,7 +47,7 @@ export default function OverlayPage() {
   // Replace defaults with settings from DB
   Object.values(DBSettings).forEach((key) => {
     // @ts-ignore ???
-    opts[key] = getValueOrDefault(data, key)
+    opts[key] = getValueOrDefault(data?.settings, key)
   })
 
   const isMinimapBlocked = opts[DBSettings.mblock] && block.type === 'minimap'
@@ -70,13 +71,13 @@ export default function OverlayPage() {
     })
     socket.on('disconnect', (reason) => {
       console.log('Disconnected from sockets:', reason)
-       setConnected(false)
+      setConnected(false)
 
-       if (reason === 'io server disconnect') {
-         console.log('Reconnecting...')
-         // the disconnection was initiated by the server, you need to reconnect manually
-         socket.connect()
-       }
+      if (reason === 'io server disconnect') {
+        console.log('Reconnecting...')
+        // the disconnection was initiated by the server, you need to reconnect manually
+        socket.connect()
+      }
     })
 
     socket.on('connect_error', console.log)
@@ -134,22 +135,38 @@ export default function OverlayPage() {
     }
   }, [])
 
+  const rankFilename = getRankImage(data?.mmr)
+
   return (
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
       </Head>
       {isMinimapBlocked && (
-        <div className="absolute bottom-0 left-0">
-          <Image
-            priority
-            alt="minimap blocker"
-            width={opts[DBSettings.xl] ? 280 : 240}
-            height={opts[DBSettings.xl] ? 280 : 240}
-            src={`/images/731-${
-              opts[DBSettings.simple] ? 'Simple' : 'Complex'
-            }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
-          />
+        <div>
+          <div className="absolute bottom-0 left-0">
+            <Image
+              priority
+              alt="minimap blocker"
+              width={opts[DBSettings.xl] ? 280 : 240}
+              height={opts[DBSettings.xl] ? 280 : 240}
+              src={`/images/731-${
+                opts[DBSettings.simple] ? 'Simple' : 'Complex'
+              }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
+            />
+          </div>
+          <div className="absolute bottom-0 right-[276px]">
+            <div className="flex flex-col items-center rounded-md bg-slate-500/50 p-1 shadow-md">
+              <Image
+                priority
+                alt="minimap blocker"
+                width={56}
+                height={56}
+                src={`/images/ranks/${rankFilename}`}
+              />
+              <span className="text-xs text-yellow-500">{data?.mmr}</span>
+            </div>
+          </div>
         </div>
       )}
 

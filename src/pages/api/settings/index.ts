@@ -19,18 +19,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const settings = await prisma.setting.findMany({
         select: {
-          id: true,
           key: true,
           value: true,
-          createdAt: true,
-          updatedAt: true,
         },
         where: {
           userId: session ? session?.user?.id : userId,
         },
       })
 
-      return res.json(settings)
+      const { mmr } = await prisma.user.findFirst({
+        select: {
+          mmr: true,
+        },
+        where: {
+          id: session ? session?.user?.id : userId,
+        },
+      })
+
+      return res.json({ settings, mmr })
     } catch (error) {
       return res.status(500).end()
     }
