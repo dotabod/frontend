@@ -68,6 +68,7 @@ model User {
   settings      Setting[]
   Account       Account[]
   Session       Session[]
+  Bet           Bet[]
 
   @@map("users")
 }
@@ -92,4 +93,19 @@ model Setting {
 
   @@unique([key, userId])
   @@map("settings")
+}
+
+model Bet {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+  matchId      String
+  predictionId String
+  won          Boolean  @default(false)
+  myTeam       String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@unique([matchId, userId])
+  @@map("bets")
 }
