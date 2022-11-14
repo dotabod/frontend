@@ -65,10 +65,10 @@ model User {
   image         String?
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @default(now()) @map("updated_at")
-  settings      Setting[]
   Account       Account[]
-  Session       Session[]
   Bet           Bet[]
+  Session       Session[]
+  settings      Setting[]
 
   @@map("users")
 }
@@ -96,7 +96,7 @@ model Setting {
 }
 
 model Bet {
-  id           String   @id @default(cuid())
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @map("updated_at")
   matchId      String
