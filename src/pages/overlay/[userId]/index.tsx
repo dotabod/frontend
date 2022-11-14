@@ -46,9 +46,12 @@ export default function OverlayPage() {
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
     rank: 0,
+    leaderboard: false,
   })
 
-  getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
+  useEffect(() => {
+    getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
+  }, [data?.mmr, data?.playerId])
 
   const [block, setBlock] = useState({ type: null, team: null })
   const [connected, setConnected] = useState(false)
@@ -187,6 +190,7 @@ export default function OverlayPage() {
                   src={`/images/ranks/${rankImageDetails.image}`}
                 />
                 <span className="text-xs text-yellow-500">
+                  {rankImageDetails?.leaderboard && '#'}
                   {rankImageDetails.rank}
                 </span>
               </div>

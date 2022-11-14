@@ -27,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      const { mmr } = await prisma.user.findFirst({
+      const { mmr, playerId } = await prisma.user.findFirst({
         select: {
           mmr: true,
           playerId: true,
@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      return res.json({ settings, mmr })
+      return res.json({ settings, mmr, playerId })
     } catch (error) {
       return res.status(500).end()
     }

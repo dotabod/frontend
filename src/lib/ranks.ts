@@ -41,15 +41,19 @@ export const leaderRanks = [
   { range: [2, 10], image: '91.png', sparklingEffect: true },
   { range: [11, 100], image: '80.png', sparklingEffect: true },
   { range: [101, 1000], image: '80.png', sparklingEffect: true },
-  { range: [1001, 10000], image: '80.png', sparklingEffect: false },
+  { range: [1001, 100000], image: '80.png', sparklingEffect: false },
 ]
 
-export async function lookupLeaderRank(playerId: number) {
-  const standing = await fetch(
-    `https://api.opendota.com/api/players/${playerId}`
-  )
-    .then((response) => response.json())
-    .then((data) => data?.leaderboard_rank as number)
+export async function lookupLeaderRank(mmr: number, playerId: number) {
+  let standing = mmr
+
+  // Not everyone has a playerID saved yet
+  // The dota2gsi should save one for us
+  if (playerId) {
+    standing = await fetch(`https://api.opendota.com/api/players/${playerId}`)
+      .then((response) => response.json())
+      .then((data) => data?.leaderboard_rank as number)
+  }
 
   const [myRank] = leaderRanks.filter((rank) => standing <= rank.range[1])
 
@@ -63,7 +67,7 @@ export function getRankDetail(param: any, playerId?: number) {
 
   // Higher than max mmr? Lets check leaderboards
   if (mmr > ranks[ranks.length - 1].range[1]) {
-    return lookupLeaderRank(playerId)
+    return lookupLeaderRank(mmr, playerId)
   }
 
   const [myRank, nextRank] = ranks.filter((rank) => mmr <= rank.range[1])
@@ -86,32 +90,13 @@ export async function getRankImage(mmr: number, playerId?: number) {
   const deets = await getRankDetail(mmr, playerId)
 
   if (!deets || mmr === 0) {
-    return { image: '0.png', rank: null }
+    return { image: '0.png', rank: null, leaderboard: false }
   }
 
   // Immortal rankers don't have a nextRank
   if (!('nextRank' in deets)) {
-    return { rank: deets.standing, image: deets.image }
+    return { rank: deets.standing, image: deets.image, leaderboard: true }
   }
 
-  return { rank: mmr, image: deets.myRank.image }
-}
-
-// Used for chatting !mmr
-export async function getRankDescription(param: any, playerId?: number) {
-  const deets = await getRankDetail(param, playerId)
-
-  if (!deets) return 'Unknown'
-
-  // Immortal rankers don't have a nextRank
-  if (!('nextRank' in deets)) {
-    return `Immortal #${deets.standing}`
-  }
-
-  const { myRank, nextMMR, mmrToNextRank, winsToNextRank } = deets
-  const nextAt = ` | Next rank at ${nextMMR}`
-  const nextIn = ` in ${winsToNextRank} wins`
-  const oneMore = mmrToNextRank <= 30 ? ' | One more win peepoClap' : ''
-
-  return `${param} | ${myRank?.title}${nextAt}${oneMore || nextIn}`
+  return { rank: mmr, image: deets.myRank.image, leaderboard: false }
 }
