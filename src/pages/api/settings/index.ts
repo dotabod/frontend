@@ -30,6 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const { mmr } = await prisma.user.findFirst({
         select: {
           mmr: true,
+          playerId: true,
         },
         where: {
           id: session ? session?.user?.id : userId,

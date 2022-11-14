@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import {
   DBSettings,
@@ -39,7 +39,17 @@ export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
 
-  const { data } = useSWR(`/api/settings/?id=${userId}`, userId && fetcher)
+  const swrKey = `/api/settings/?id=${userId}`
+  const { data } = useSWR(swrKey, userId && fetcher)
+  const { mutate } = useSWRConfig()
+
+  const [rankImageDetails, setRankImageDetails] = useState({
+    image: '0.png',
+    rank: 0,
+  })
+
+  getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
+
   const [block, setBlock] = useState({ type: null, team: null })
   const [connected, setConnected] = useState(false)
 
@@ -78,6 +88,13 @@ export default function OverlayPage() {
         // the disconnection was initiated by the server, you need to reconnect manually
         socket.connect()
       }
+    })
+
+    socket.on('update-medal', () => {
+      // Refetch mmr and medal image
+      console.log('updating medal')
+
+      mutate(swrKey)
     })
 
     socket.on('connect_error', console.log)
@@ -129,19 +146,23 @@ export default function OverlayPage() {
   useEffect(() => {
     return () => {
       socket?.off('block')
+      socket?.off('update-medal')
       socket?.off('connect')
       socket?.off('connect_error')
       socket?.disconnect()
     }
   }, [])
 
-  const rankFilename = getRankImage(data?.mmr)
-
   return (
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
       </Head>
+      <div className="hidden">
+        <div className="absolute bottom-0 left-[100px]">
+          <span className="text-yellow-500">WL 0 1</span>
+        </div>
+      </div>
       {isMinimapBlocked && (
         <div>
           <div className="absolute bottom-0 left-0">
@@ -155,7 +176,7 @@ export default function OverlayPage() {
               }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
             />
           </div>
-          {data?.mmr > 0 && (
+          {rankImageDetails?.rank > 0 && (
             <div className="absolute bottom-0 right-[276px]">
               <div className="flex flex-col items-center rounded-md bg-slate-500/50 p-1 shadow-md">
                 <Image
@@ -163,9 +184,11 @@ export default function OverlayPage() {
                   alt="minimap blocker"
                   width={56}
                   height={56}
-                  src={`/images/ranks/${rankFilename}`}
+                  src={`/images/ranks/${rankImageDetails.image}`}
                 />
-                <span className="text-xs text-yellow-500">{data?.mmr}</span>
+                <span className="text-xs text-yellow-500">
+                  {rankImageDetails.rank}
+                </span>
               </div>
             </div>
           )}

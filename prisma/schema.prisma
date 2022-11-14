@@ -66,6 +66,7 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @default(now()) @map("updated_at")
   mmr           Int?      @db.SmallInt
+  playerId      String?
   Account       Account[]
   Bet           Bet[]
   Session       Session[]
