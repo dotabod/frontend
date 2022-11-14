@@ -101,7 +101,7 @@ model Bet {
   updatedAt    DateTime @default(now()) @map("updated_at")
   matchId      String
   predictionId String
-  won          Boolean  @default(false)
+  won          Boolean?
   myTeam       String
   userId       String
   user         User     @relation(fields: [userId], references: [id])
