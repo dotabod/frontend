@@ -103,6 +103,8 @@ model Bet {
   updatedAt    DateTime @default(now()) @map("updated_at")
   matchId      String
   predictionId String
+  outcomeYesId String?
+  outcomeNoId  String?
   won          Boolean?
   myTeam       String
   userId       String
