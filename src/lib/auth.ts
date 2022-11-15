@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           scope:
-            'channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls',
+            'openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls',
         },
       },
     }),
