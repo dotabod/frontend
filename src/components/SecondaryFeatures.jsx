@@ -2,6 +2,7 @@ import { useId } from 'react'
 
 import { Container } from '@/components/Container'
 import Image from 'next/image'
+import { Badge } from '@geist-ui/core'
 
 const features = [
   {
@@ -15,6 +16,7 @@ const features = [
     description:
       'Increase viewer engagement. Every few minutes a new prediction can start. For example, "will streamer die by min 3:00."',
     icon: DeviceClockIcon,
+    inProgress: true,
   },
   {
     name: '!mmr command',
@@ -43,12 +45,14 @@ const features = [
     description:
       "Want a new scene when the game is paused? A new scene when you're spectating a game? Or when you get a rampage? All will be possible.",
     icon: DeviceChartIcon,
+    inProgress: true,
   },
   {
     name: '!hero command',
     description:
       'Not only will new players to Dota be able to read the hero name, but they will also be able to read the currently played hero’s lore.',
     icon: DeviceLockIcon,
+    inProgress: true,
   },
 ]
 
@@ -207,12 +211,12 @@ export function SecondaryFeatures() {
       <Container>
         <div className="mx-auto max-w-2xl sm:text-center">
           <h2 className="text-3xl font-medium tracking-tight text-gray-900">
-            But wait...there will be more.
+            But wait, there&apos;s more.
           </h2>
           <p className="mt-2 text-lg text-gray-600">
             Under active development and speaking to multiple Dota 2
             personalities, we will be adding more features as they are
-            requested. For example:
+            requested.
           </p>
         </div>
         <ul
@@ -220,16 +224,23 @@ export function SecondaryFeatures() {
           className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3"
         >
           {features.map((feature) => (
-            <li
-              key={feature.name}
-              className="rounded-2xl border border-gray-200 p-8"
-            >
-              <feature.icon className="h-8 w-8" />
-              <h3 className="mt-6 font-semibold text-gray-900">
-                {feature.name}
-              </h3>
-              <div className="mt-2 text-gray-700">{feature.description}</div>
-            </li>
+            <>
+              <li
+                key={feature.name}
+                className="rounded-2xl border border-gray-200 p-8"
+              >
+                <feature.icon className="h-8 w-8" />
+                <h3 className="mt-6 flex items-center justify-between space-x-2 font-semibold text-gray-900">
+                  {feature.name}
+                  {feature.inProgress && (
+                    <Badge scale={0.5} type="secondary" className="opacity-60">
+                      in progress
+                    </Badge>
+                  )}
+                </h3>
+                <div className="mt-2 text-gray-700">{feature.description}</div>
+              </li>
+            </>
           ))}
         </ul>
       </Container>
