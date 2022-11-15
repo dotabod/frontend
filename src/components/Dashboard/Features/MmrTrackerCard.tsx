@@ -38,6 +38,10 @@ export default function MmrTrackerCard() {
             <Input
               placeholder="Enter MMR"
               name="mmr"
+              style={{ width: 208 }}
+              htmlType="number"
+              min={0}
+              max={30000}
               initialValue={user.mmr}
               disabled={!isEnabled}
               onChange={(e) => {
@@ -54,10 +58,6 @@ export default function MmrTrackerCard() {
             alt="mmr tracker"
             height="200px"
             src="/images/mmr-tracker.png"
-            style={{
-              backgroundImage:
-                "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
-            }}
           />
         </Display>
       </Card.Content>

@@ -8,7 +8,6 @@ export function useUpdateUser() {
 
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()
-  console.log('user data', data)
 
   const updateMmr = (value) => {
     const user = { ...data, mmr: value.trim() ? parseInt(value.trim()) : null }
