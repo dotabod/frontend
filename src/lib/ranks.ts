@@ -44,7 +44,7 @@ export const leaderRanks = [
   { range: [1001, 100000], image: '80.png', sparklingEffect: false },
 ]
 
-export async function lookupLeaderRank(mmr: number, playerId: number) {
+export async function lookupLeaderRank(mmr: number, playerId?: number) {
   let standing = mmr
 
   // Not everyone has a playerID saved yet
