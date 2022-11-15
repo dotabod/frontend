@@ -1,7 +1,7 @@
 import { Card } from '@/ui/card'
 import { Button, Display, Image, Input, Loading } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { ArrowPathIcon, PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateUser } from '@/lib/useUpdateUser'
 
