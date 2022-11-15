@@ -16,6 +16,12 @@ export const authOptions: NextAuthOptions = {
     TwitchProvider({
       clientId: process.env.TWITCH_CLIENT_ID,
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope:
+            'channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls',
+        },
+      },
     }),
   ],
   callbacks: {
