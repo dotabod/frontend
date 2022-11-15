@@ -1,60 +1,8 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 
 import { Container } from '@/components/Container'
 import Image from 'next/image'
-import { Badge } from '@geist-ui/core'
-
-const features = [
-  {
-    name: 'Twitch predictions',
-    description:
-      'Create predictions for your viewers to bet on. Dotabod will start and stop the prediction automatically.',
-    icon: DeviceCardsIcon,
-  },
-  {
-    name: 'Fun predictions',
-    description:
-      'Increase viewer engagement. Every few minutes a new prediction can start. For example, "will streamer die by min 3:00."',
-    icon: DeviceClockIcon,
-    inProgress: true,
-  },
-  {
-    name: '!mmr command',
-    description:
-      'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
-    icon: DeviceArrowIcon,
-  },
-  {
-    name: 'Chatbot says PauseChamp',
-    description: (
-      <div className="flex items-center space-x-1">
-        <span>But only when the Dota game is paused</span>
-        <Image
-          width={22}
-          height={22}
-          alt="pausechamp"
-          src="/images/pauseChamp.webp"
-        />
-        <span>.</span>
-      </div>
-    ),
-    icon: DeviceListIcon,
-  },
-  {
-    name: 'More OBS scenes',
-    description:
-      "Want a new scene when the game is paused? A new scene when you're spectating a game? Or when you get a rampage? All will be possible.",
-    icon: DeviceChartIcon,
-    inProgress: true,
-  },
-  {
-    name: '!hero command',
-    description:
-      'Not only will new players to Dota be able to read the hero name, but they will also be able to read the currently played hero’s lore.',
-    icon: DeviceLockIcon,
-    inProgress: true,
-  },
-]
+import { Badge, Display, Link } from '@geist-ui/core'
 
 function DeviceArrowIcon(props) {
   return (
@@ -202,6 +150,81 @@ function DeviceChartIcon(props) {
 }
 
 export function SecondaryFeatures() {
+  const [showMMRPreview, setShowMMRPreview] = useState(false)
+
+  const features = [
+    {
+      name: 'Twitch predictions',
+      description:
+        'Create predictions for your viewers to bet on. Dotabod will start and stop the prediction automatically.',
+      icon: DeviceCardsIcon,
+    },
+    {
+      name: 'MMR badge overlay',
+      description: (
+        <span>
+          Show off your current rank, or leaderboard standing on stream.{' '}
+          <Link
+            color
+            onClick={(e) => {
+              e.preventDefault()
+              setShowMMRPreview(!showMMRPreview)
+            }}
+          >
+            {showMMRPreview ? 'Hide' : 'Show'} preview
+          </Link>
+          {showMMRPreview && (
+            <Display shadow caption="Shown next to shop button">
+              <Image
+                alt="mmr tracker"
+                width={291}
+                height={760}
+                src="/images/mmr-tracker.png"
+              />
+            </Display>
+          )}
+        </span>
+      ),
+      icon: DeviceClockIcon,
+    },
+    {
+      name: '!mmr command',
+      description:
+        'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
+      icon: DeviceArrowIcon,
+    },
+    {
+      name: 'Chatbot says PauseChamp',
+      description: (
+        <div className="flex items-center space-x-1">
+          <span>But only when the Dota game is paused</span>
+          <Image
+            width={22}
+            height={22}
+            alt="pausechamp"
+            src="/images/pauseChamp.webp"
+          />
+          <span>.</span>
+        </div>
+      ),
+      icon: DeviceListIcon,
+    },
+    {
+      name: 'More OBS scenes',
+      description:
+        "Want a new scene when the game is paused? A new scene when you're spectating a game? Or when you get a rampage? All will be possible.",
+      icon: DeviceChartIcon,
+      inProgress: true,
+    },
+    {
+      name: '!hero command',
+      description:
+        'Not only will new players to Dota be able to read the hero name, but they will also be able to read the currently played hero’s lore.',
+      icon: DeviceLockIcon,
+      inProgress: true,
+    },
+  ]
+
   return (
     <section
       id="secondary-features"
@@ -224,23 +247,21 @@ export function SecondaryFeatures() {
           className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3"
         >
           {features.map((feature) => (
-            <>
-              <li
-                key={feature.name}
-                className="rounded-2xl border border-gray-200 p-8"
-              >
-                <feature.icon className="h-8 w-8" />
-                <h3 className="mt-6 flex items-center justify-between space-x-2 font-semibold text-gray-900">
-                  {feature.name}
-                  {feature.inProgress && (
-                    <Badge scale={0.5} type="secondary" className="opacity-60">
-                      in progress
-                    </Badge>
-                  )}
-                </h3>
-                <div className="mt-2 text-gray-700">{feature.description}</div>
-              </li>
-            </>
+            <li
+              key={feature.name}
+              className="rounded-2xl border border-gray-200 p-8"
+            >
+              <feature.icon className="h-8 w-8" />
+              <h3 className="mt-6 flex items-center justify-between space-x-2 font-semibold text-gray-900">
+                {feature.name}
+                {feature.inProgress && (
+                  <Badge scale={0.5} type="secondary" className="opacity-60">
+                    in progress
+                  </Badge>
+                )}
+              </h3>
+              <div className="mt-2 text-gray-700">{feature.description}</div>
+            </li>
           ))}
         </ul>
       </Container>
