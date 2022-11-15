@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image, Input } from '@geist-ui/core'
+import { Button, Display, Image, Input, Loading } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { ArrowPathIcon, PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
@@ -18,32 +18,38 @@ export default function MmrTrackerCard() {
     <Card>
       <Card.Header>
         <Card.Title>MMR Tracker</Card.Title>
-        <Card.Description>Show your MMR on the screen</Card.Description>
+        <Card.Description>
+          Automatically goes up or down after every match. !mmr` will work to
+          show mmr to your chatters! If it ever gets out of sync, you can update
+          it here.
+        </Card.Description>
       </Card.Header>
       <Card.Content>
         <label htmlFor="mmr" className="block text-sm">
           Current MMR
         </label>
         <div className="flex space-x-4">
-          <Input
-            placeholder="Enter MMR"
-            name="mmr"
-            initialValue={user.mmr}
-            disabled={!isEnabled}
-            onChange={(e) => {
-              updateMmr(e.target.value)
-            }}
-          />
-          <Button
-            icon={<ArrowPathIcon />}
-            type="secondary"
-            scale={0.7}
-            disabled={!isEnabled}
-          >
-            Sync
-          </Button>
+          {loading && (
+            <div className="w-52 rounded-md border border-gray-200 pt-2">
+              <Loading className="left-0" />
+            </div>
+          )}
+          {!loading && (
+            <Input
+              placeholder="Enter MMR"
+              name="mmr"
+              initialValue={user.mmr}
+              disabled={!isEnabled}
+              onChange={(e) => {
+                updateMmr(e.target.value)
+              }}
+            />
+          )}
         </div>
-        <Display shadow caption="Show your MMR on the screen">
+        <Display
+          shadow
+          caption="Correct badge and MMR shown next to shop button"
+        >
           <Image
             alt="mmr tracker"
             height="200px"
