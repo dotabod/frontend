@@ -16,9 +16,9 @@ const faqs = [
         'This feels like one-hundred percent a you problem. Dotabod is not responsible in any way for your marital grievances. But you could also just tell her Dotabod was free.',
     },
     {
-      question: 'How do I become a beta tester?',
+      question: 'How do I get started?',
       answer:
-        'Login with your Twitch account and you can begin using it right away. Beware of some spooky bugs though! Just report them if you see any.',
+        'Login with your Twitch account and you can begin using it right away. There will be a setup screen to guide you through the process.',
     },
   ],
   [

@@ -1,8 +1,6 @@
 import Image from 'next/image'
 import clsx from 'clsx'
 
-import dotaLogo from '@/images/logos/dota.svg'
-
 function PlaceholderFrame(props) {
   return (
     <svg viewBox="0 0 366 729" aria-hidden="true" {...props}>
@@ -25,13 +23,7 @@ export function PhoneFrame({
 }) {
   return (
     <div className={clsx('relative aspect-[366/729]', className)} {...props}>
-      <Image
-        src={dotaLogo}
-        width={240}
-        height={240}
-        alt="dota logo"
-        className="pointer-events-none absolute inset-0 h-full w-full"
-      />
+      {children}
     </div>
   )
 }

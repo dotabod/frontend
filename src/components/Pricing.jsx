@@ -12,15 +12,17 @@ const plans = [
     description:
       'You’ve been streaming for a while. Stream more with Dotabod and grow your gaming time.',
     button: {
-      label: 'Try the beta',
+      label: 'Get started',
       href: '/login',
     },
     features: [
       "It's literally free",
-      'Auto picks blocker',
-      'Auto OBS scene changer',
-      'Auto minimap blocker',
-      '...More to come',
+      'Picks blocker',
+      'OBS scene changer',
+      'Minimap blocker',
+      'Twitch predictions',
+      'MMR tracking',
+      '...more to come',
     ],
     logomarkClassName: 'fill-gray-500',
   },
