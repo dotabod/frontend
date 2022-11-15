@@ -8,6 +8,7 @@ export enum DBSettings {
   obsPicks = 'obs-picks',
   obsDc = 'obs-dc',
   onlyBlockRanked = 'only-block-ranked',
+  mmrTracker = 'mmr-tracker',
 }
 
 export const defaultSettings = {
@@ -16,6 +17,7 @@ export const defaultSettings = {
   [DBSettings.xl]: false,
   [DBSettings.mblock]: true,
   [DBSettings.pblock]: true,
+  [DBSettings.mmrTracker]: true,
   [DBSettings.onlyBlockRanked]: true,
   [DBSettings.obsMinimap]: '[dotabod] blocking minimap',
   [DBSettings.obsPicks]: '[dotabod] blocking picks',
