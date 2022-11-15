@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import clsx from 'clsx'
 
 function PlaceholderFrame(props) {
