@@ -1,5 +1,6 @@
 import { useToasts } from '@geist-ui/core'
 import useSWR, { useSWRConfig } from 'swr'
+import { useDebouncedCallback } from 'use-debounce'
 import { fetcher } from './fetcher'
 
 export function useUpdateUser() {
@@ -9,7 +10,7 @@ export function useUpdateUser() {
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()
 
-  const updateMmr = (value) => {
+  const updateMmr = useDebouncedCallback((value) => {
     const user = { ...data, mmr: value.trim() ? parseInt(value.trim()) : null }
     const options = {
       optimisticData: user,
@@ -48,7 +49,7 @@ export function useUpdateUser() {
     }
 
     mutate(`/api/user`, updateFn(user), options)
-  }
+  }, 500)
 
   return { user: data, updateMmr, loading }
 }
