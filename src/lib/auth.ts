@@ -16,6 +16,12 @@ export const authOptions: NextAuthOptions = {
     TwitchProvider({
       clientId: process.env.TWITCH_CLIENT_ID,
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope:
+            'openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls',
+        },
+      },
     }),
   ],
   callbacks: {
@@ -30,7 +36,10 @@ export const authOptions: NextAuthOptions = {
 
       return session
     },
-    async jwt({ token, user }) {
+    async jwt({ token, account, user }) {
+      // Save a db lookup
+      if (token.id) return token
+
       const dbUser = await prisma.user.findFirst({
         where: {
           email: token.email,
@@ -40,6 +49,24 @@ export const authOptions: NextAuthOptions = {
       if (!dbUser) {
         token.id = user.id
         return token
+      }
+
+      // Refresh jwt account with potentially new scopes
+      if (account) {
+        await prisma.account.update({
+          where: {
+            provider_providerAccountId: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          },
+          data: {
+            refresh_token: account.refresh_token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            scope: account.scope,
+          },
+        })
       }
 
       return {
