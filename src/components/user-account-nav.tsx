@@ -2,7 +2,7 @@ import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 import { forwardRef } from 'react'
-import { Group, Avatar, Text, Menu, UnstyledButton } from '@mantine/core'
+import { Group, Avatar, Text, Menu } from '@mantine/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { LogOut, Settings } from 'lucide-react'
 
