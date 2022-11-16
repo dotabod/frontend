@@ -13,6 +13,7 @@ import {
   getValueOrDefault,
 } from '@/lib/DBSettings'
 import { getRankImage } from '@/lib/ranks'
+import { Rankbadge } from '@/components/Rankbadge'
 
 let socket
 
@@ -166,7 +167,7 @@ export default function OverlayPage() {
           <span className="text-yellow-500">WL 0 1</span>
         </div>
       </div>
-      {isMinimapBlocked && (
+      {!isMinimapBlocked && (
         <div>
           <div className="absolute bottom-0 left-0">
             <Image
@@ -181,19 +182,7 @@ export default function OverlayPage() {
           </div>
           {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
             <div className="absolute bottom-0 right-[276px]">
-              <div className="flex flex-col items-center rounded-md bg-slate-500/50 p-1 shadow-md">
-                <Image
-                  priority
-                  alt="minimap blocker"
-                  width={56}
-                  height={56}
-                  src={`/images/ranks/${rankImageDetails.image}`}
-                />
-                <span className="text-xs text-yellow-500">
-                  {rankImageDetails?.leaderboard && '#'}
-                  {rankImageDetails.rank}
-                </span>
-              </div>
+              <Rankbadge {...rankImageDetails} />
             </div>
           )}
         </div>
