@@ -167,7 +167,7 @@ export default function OverlayPage() {
           <span className="text-yellow-500">WL 0 1</span>
         </div>
       </div>
-      {!isMinimapBlocked && (
+      {isMinimapBlocked && (
         <div>
           <div className="absolute bottom-0 left-0">
             <Image
