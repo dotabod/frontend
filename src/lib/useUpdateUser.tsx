@@ -27,7 +27,7 @@ export function useUpdateUser() {
 
     if (user.mmr > 30000) {
       setToast({
-        text: 'MMR Cannot be more than 30000',
+        text: 'MMR Cannot be that high 😳',
         type: 'error',
       })
       return

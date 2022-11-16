@@ -37,6 +37,7 @@ export default function MmrTrackerCard() {
           {!loading && (
             <Input
               placeholder="Enter MMR"
+              id="mmr"
               name="mmr"
               style={{ width: 208 }}
               htmlType="number"

@@ -20,10 +20,10 @@ export default function DashboardPage({ settings }: Props) {
         <title>Dotabod | Stream overlays</title>
       </Head>
       <DashboardShell title="Features">
-        <SceneSwitcher />
+        <MmrTrackerCard />
         <MinimapCard />
         <PicksCard />
-        <MmrTrackerCard />
+        <SceneSwitcher />
       </DashboardShell>
     </>
   ) : null

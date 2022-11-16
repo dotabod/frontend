@@ -6,7 +6,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function Card({ className, ...props }: CardProps) {
   return (
     <div
-      className={clsx('overflow-hidden rounded-lg border', className)}
+      className={clsx('bg-white shadow sm:rounded-lg', className)}
       {...props}
     />
   )
@@ -15,7 +15,7 @@ export function Card({ className, ...props }: CardProps) {
 interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 Card.Header = function CardHeader({ className, ...props }: CardHeaderProps) {
-  return <div className={clsx('grid gap-1 p-6', className)} {...props} />
+  return <div className={clsx('px-4 py-5 sm:px-6', className)} {...props} />
 }
 
 interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -23,7 +23,7 @@ interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 Card.Content = function CardContent({ className, ...props }: CardContentProps) {
   return (
     <div
-      className={clsx('px-6 pb-4 text-sm text-gray-700', className)}
+      className={clsx('border-t border-gray-200 px-4 py-5 sm:px-6', className)}
       {...props}
     />
   )
@@ -34,7 +34,10 @@ interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 Card.Footer = function CardFooter({ className, ...props }: CardFooterProps) {
   return (
     <div
-      className={clsx('border-t bg-slate-50 px-6 py-4', className)}
+      className={clsx(
+        'block bg-gray-50 px-4 py-4 text-sm font-medium text-gray-500 sm:rounded-b-lg',
+        className
+      )}
       {...props}
     />
   )
@@ -43,7 +46,12 @@ Card.Footer = function CardFooter({ className, ...props }: CardFooterProps) {
 interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
 Card.Title = function CardTitle({ className, ...props }: CardTitleProps) {
-  return <h4 className={clsx('text-lg font-medium', className)} {...props} />
+  return (
+    <h4
+      className={clsx('text-lg font-medium leading-6 text-gray-900', className)}
+      {...props}
+    />
+  )
 }
 
 interface CardDescriptionProps
@@ -53,7 +61,12 @@ Card.Description = function CardDescription({
   className,
   ...props
 }: CardDescriptionProps) {
-  return <p className={clsx('text-sm text-gray-600', className)} {...props} />
+  return (
+    <p
+      className={clsx('mt-1 max-w-2xl text-sm text-gray-500', className)}
+      {...props}
+    />
+  )
 }
 
 Card.Skeleton = function CardSeleton() {

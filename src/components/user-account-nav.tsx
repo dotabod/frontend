@@ -10,51 +10,44 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   image: string
   name: string
   email: string
+  showDetails: boolean
   icon?: React.ReactNode
 }
 
 const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
-  ({ image, name, email, icon, ...others }: UserButtonProps, ref) => (
-    <UnstyledButton
+  (
+    { image, name, email, icon, showDetails, ...others }: UserButtonProps,
+    ref
+  ) => (
+    <button
       ref={ref}
-      sx={(theme) => ({
-        display: 'block',
-        width: '100%',
-        padding: theme.spacing.md,
-        color:
-          theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-
-        '&:hover': {
-          backgroundColor:
-            theme.colorScheme === 'dark'
-              ? theme.colors.dark[8]
-              : theme.colors.gray[0],
-        },
-      })}
       {...others}
+      className="group w-full rounded-md bg-gray-100 px-3.5 py-2 text-left text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-100"
     >
       <Group>
         <Avatar src={image} radius="xl" />
 
-        <div style={{ flex: 1 }} className="hidden">
-          <Text size="sm" weight={500}>
-            {name}
-          </Text>
+        {showDetails && (
+          <div style={{ flex: 1 }}>
+            <Text size="sm" weight={500}>
+              {name}
+            </Text>
 
-          <Text color="dimmed" size="xs">
-            {email}
-          </Text>
-        </div>
+            <Text color="dimmed" size="xs">
+              {email}
+            </Text>
+          </div>
+        )}
 
         {icon || <ChevronRightIcon height={16} />}
       </Group>
-    </UnstyledButton>
+    </button>
   )
 )
 
 UserButton.displayName = 'UserButton'
 
-function GroupButton() {
+export function UserAccountNav({ showDetails = false }) {
   const user = useSession()?.data?.user
 
   return (
@@ -62,6 +55,7 @@ function GroupButton() {
       <Menu withArrow>
         <Menu.Target>
           <UserButton
+            showDetails={showDetails}
             image={user?.image}
             name={user?.name}
             email="Dota 2 Streamer"
@@ -99,8 +93,4 @@ function GroupButton() {
       </Menu>
     </Group>
   )
-}
-
-export function UserAccountNav() {
-  return <GroupButton />
 }

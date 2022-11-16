@@ -24,6 +24,7 @@
 }
 
 /* wtf tailwind */
-[type='text']:focus {
+[type='text']:focus,
+[type='number']:focus {
   @apply ring-0 ring-offset-0;
 }

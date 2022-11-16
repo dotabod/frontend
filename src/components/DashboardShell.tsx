@@ -59,7 +59,7 @@ export default function DashboardShell({ children, title }) {
                 leaveFrom="translate-x-0"
                 leaveTo="-translate-x-full"
               >
-                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
+                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-gray-100">
                   <Transition.Child
                     as={Fragment}
                     enter="ease-in-out duration-300"
@@ -126,24 +126,26 @@ export default function DashboardShell({ children, title }) {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
+        <div className="hidden bg-gray-100 md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:border-r md:border-gray-200 md:pt-5 md:pb-4">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white">
+          <div className="flex flex-shrink-0 items-center px-6">
+            <Link href="/">
+              <Logo className="h-6 w-auto" />
+            </Link>
+          </div>
+          <div className="mt-5 flex h-0 flex-1 flex-col overflow-y-auto pt-1">
             <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
               <div className="flex flex-shrink-0 items-center justify-between px-4">
-                <Link href="/">
-                  <Logo className="h-6 w-auto" />
-                </Link>
-                <UserAccountNav />
+                <UserAccountNav showDetails />
               </div>
-              <nav className="mt-5 flex-1 space-y-1 bg-white px-2">
+              <nav className="mt-5 flex-1 space-y-1 bg-gray-100 px-2">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     className={classNames(
                       window.location.href.endsWith(item.href)
-                        ? 'bg-gray-100 text-gray-900'
+                        ? 'bg-gray-200 text-gray-900'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                       'group flex items-center rounded-md px-2 py-2 text-sm font-medium'
                     )}
@@ -177,13 +179,13 @@ export default function DashboardShell({ children, title }) {
           </div>
           <main className="flex-1">
             <div className="py-6">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">
+              <div className="mx-auto max-w-7xl border-b border-gray-200 px-6 pb-6 md:px-8 md:pb-8">
+                <h1 className="text-2xl font-normal leading-6 text-gray-900 sm:truncate">
                   {title}
                 </h1>
               </div>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <div className="space-y-10 py-4">{children}</div>
+                <div className="space-y-10 pt-12">{children}</div>
               </div>
             </div>
           </main>
