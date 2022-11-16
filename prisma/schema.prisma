@@ -28,12 +28,12 @@ model twitch_tokens {
 
 model Account {
   id                String   @id @default(cuid())
-  userId            String
+  userId            String   @unique
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String
+  access_token      String
   expires_at        Int?
   token_type        String?
   scope             String?
@@ -41,7 +41,7 @@ model Account {
   session_state     String?
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @default(now()) @map("updated_at")
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -59,15 +59,15 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
+  name          String
+  email         String    @unique
   emailVerified DateTime?
   image         String?
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @default(now()) @map("updated_at")
-  mmr           Int?      @db.SmallInt
-  playerId      Int?
-  Account       Account[]
+  mmr           Int       @default(0) @db.SmallInt
+  playerId      Int?      @unique
+  Account       Account?
   Bet           Bet[]
   Session       Session[]
   settings      Setting[]
@@ -103,11 +103,11 @@ model Bet {
   updatedAt    DateTime @default(now()) @map("updated_at")
   matchId      String
   predictionId String
-  outcomeYesId String?
-  outcomeNoId  String?
   won          Boolean?
   myTeam       String
   userId       String
+  outcomeNoId  String?
+  outcomeYesId String?
   user         User     @relation(fields: [userId], references: [id])
 
   @@unique([matchId, userId])
