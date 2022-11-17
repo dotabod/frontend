@@ -10,7 +10,7 @@ export default function OverlayURL() {
   return (
     <Card>
       <Card.Header>
-        <Card.Title>OBS Overlay</Card.Title>
+        <Card.Title>3. OBS Overlay</Card.Title>
         <Card.Description>
           Copy the below settings to your browser source in OBS. Change the URL
           to the one below.

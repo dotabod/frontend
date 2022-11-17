@@ -35,7 +35,7 @@ export default function ExportCFG() {
   return (
     <Card>
       <Card.Header>
-        <Card.Title>Dota GSI File</Card.Title>
+        <Card.Title>2. Dota GSI File</Card.Title>
         <Card.Description>
           This enables Dotabod to see your games.
         </Card.Description>
