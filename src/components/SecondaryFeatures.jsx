@@ -2,7 +2,8 @@ import { useId, useState } from 'react'
 
 import { Container } from '@/components/Container'
 import Image from 'next/image'
-import { Badge, Display, Link } from '@geist-ui/core'
+import { Badge, Link } from '@geist-ui/core'
+import { HoverCard } from '@mantine/core'
 
 function DeviceArrowIcon(props) {
   return (
@@ -164,25 +165,21 @@ export function SecondaryFeatures() {
       description: (
         <span>
           Show off your current rank, or leaderboard standing on stream.{' '}
-          <Link
-            color
-            onClick={(e) => {
-              e.preventDefault()
-              setShowMMRPreview(!showMMRPreview)
-            }}
-          >
-            {showMMRPreview ? 'Hide' : 'Show'} preview
-          </Link>
-          {showMMRPreview && (
-            <Display shadow caption="Shown next to shop button">
+          <HoverCard width={647} closeDelay={400} shadow="md">
+            <HoverCard.Target>
+              <Link color underline>
+                Preview
+              </Link>
+            </HoverCard.Target>
+            <HoverCard.Dropdown>
               <Image
                 alt="mmr tracker"
-                width={291}
-                height={760}
+                width={647}
+                height={333}
                 src="/images/mmr-tracker.png"
               />
-            </Display>
-          )}
+            </HoverCard.Dropdown>
+          </HoverCard>
         </span>
       ),
       icon: DeviceClockIcon,
