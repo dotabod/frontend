@@ -2,7 +2,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import DiscordSvg from '@/images/logos/discord.svg'
-import TwitchSvg from '@/images/logos/twitch.svg'
 import Image from 'next/image'
 
 export function NavLinks() {
