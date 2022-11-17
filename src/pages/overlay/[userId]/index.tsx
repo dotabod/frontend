@@ -102,7 +102,7 @@ export default function OverlayPage() {
     })
 
     socket.on('connect_error', console.log)
-  }, [userId])
+  }, [mutate, swrKey, userId])
 
   useEffect(() => {
     if (!userId || !opts[DBSettings.obs]) {
