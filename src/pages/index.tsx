@@ -13,10 +13,43 @@ export default function Home() {
     <>
       <Head>
         <title>Dotabod - Tools for Dota 2 streamers.</title>
+        <meta name="title" content="Dotabod - Tools for Dota 2 streamers." />
         <meta
           name="description"
-          content="By leveraging insights from the Dota 2 official API, Dotabod will know exactly when to hide sensitive streamer information."
+          content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
         />
+
+        {/* <!-- Open Graph / Facebook --> */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://dotabod.com/" />
+        <meta
+          property="og:title"
+          content="Dotabod - Tools for Dota 2 streamers."
+        />
+        <meta
+          property="og:description"
+          content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
+        />
+        <meta
+          property="og:image"
+          content="https://dotabod.com/images/welcome.png"
+        />
+
+        {/* <!-- Twitter --> */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://dotabod.com/" />
+        <meta
+          property="twitter:title"
+          content="Dotabod - Tools for Dota 2 streamers."
+        />
+        <meta
+          property="twitter:description"
+          content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
+        />
+        <meta
+          property="twitter:image"
+          content="https://dotabod.com/images/welcome.png"
+        ></meta>
       </Head>
       <Header />
       <main className="bg-gray-50">
