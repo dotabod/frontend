@@ -158,7 +158,6 @@ export function SecondaryFeatures() {
       name: 'Twitch predictions',
       description:
         'Create predictions for your viewers to bet on. Dotabod will start and stop the prediction automatically.',
-      icon: DeviceCardsIcon,
     },
     {
       name: 'MMR badge overlay',
@@ -182,13 +181,11 @@ export function SecondaryFeatures() {
           </HoverCard>
         </span>
       ),
-      icon: DeviceClockIcon,
     },
     {
       name: '!mmr command',
       description:
         'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
-      icon: DeviceArrowIcon,
     },
     {
       name: 'Chatbot says PauseChamp',
@@ -204,20 +201,32 @@ export function SecondaryFeatures() {
           <span>.</span>
         </div>
       ),
-      icon: DeviceListIcon,
     },
     {
       name: 'More OBS scenes',
       description:
         "Want a new scene when the game is paused? A new scene when you're spectating a game? Or when you get a rampage? All will be possible.",
-      icon: DeviceChartIcon,
       inProgress: true,
     },
     {
       name: '!hero command',
       description:
         'New players to Dota will be able to read fun trivia about the hero being played.',
-      icon: DeviceLockIcon,
+    },
+    {
+      name: '!camps command',
+      description:
+        "Show your chat how many camps you have stacked so far. Can be fun to see if you're keeping up as a truly dedicated support player.",
+    },
+    {
+      name: '!gpm command',
+      description:
+        'At any time, chatters can request your live gpm with !gpm. Playing alch or anti-mage? Show off your gpm!',
+    },
+    {
+      name: '!pleb command',
+      description:
+        'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
     },
   ]
 
@@ -247,7 +256,6 @@ export function SecondaryFeatures() {
               key={feature.name}
               className="rounded-2xl border border-gray-200 p-8"
             >
-              <feature.icon className="h-8 w-8" />
               <h3 className="mt-6 flex items-center justify-between space-x-2 font-semibold text-gray-900">
                 {feature.name}
                 {feature.inProgress && (
