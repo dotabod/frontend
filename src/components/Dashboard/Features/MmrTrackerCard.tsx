@@ -4,7 +4,6 @@ import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateUser } from '@/lib/useUpdateUser'
-import { Rankbadge } from '@/components/Rankbadge'
 
 export default function MmrTrackerCard() {
   const {

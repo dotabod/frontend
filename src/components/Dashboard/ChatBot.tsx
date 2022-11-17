@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Link, Snippet } from '@geist-ui/core'
+import { Snippet } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 
 export default function ChatBot() {
