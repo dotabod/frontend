@@ -70,6 +70,9 @@ export function Header() {
                               Pricing
                             </MobileNavLink>
                             <MobileNavLink href="#faqs">FAQs</MobileNavLink>
+                            <MobileNavLink href="https://discord.dotabod.com">
+                              Discord
+                            </MobileNavLink>
                             <MobileNavLink href="/dashboard">
                               Dashboard
                             </MobileNavLink>
