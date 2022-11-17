@@ -12,8 +12,8 @@ export default function OverlayURL() {
       <Card.Header>
         <Card.Title>3. OBS Overlay</Card.Title>
         <Card.Description>
-          Copy the below settings to your browser source in OBS. Change the URL
-          to the one below.
+          Add a new Browser source to OBS. Copy the settings shown below. Change
+          the URL to:
         </Card.Description>
       </Card.Header>
       <Card.Content>
