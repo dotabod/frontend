@@ -214,14 +214,13 @@ export function SecondaryFeatures() {
         'New players to Dota will be able to read fun trivia about the hero being played.',
     },
     {
-      name: '!camps command',
-      description:
-        "Show your chat how many camps you have stacked so far. Can be fun to see if you're keeping up as a truly dedicated support player.",
+      name: '!xpm command',
+      description: 'Live experience per minute for your chatters on demand.',
     },
     {
       name: '!gpm command',
       description:
-        'At any time, chatters can request your live gpm with !gpm. Playing alch or anti-mage? Show off your gpm!',
+        'At any time, chatters can request your live gold per minute with !gpm. Playing alch or anti-mage? Show off your gpm!',
     },
     {
       name: '!pleb command',
