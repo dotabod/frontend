@@ -219,9 +219,8 @@ export function SecondaryFeatures() {
     {
       name: '!hero command',
       description:
-        'Not only will new players to Dota be able to read the hero name, but they will also be able to read the currently played hero’s lore.',
+        'New players to Dota will be able to read fun trivia about the hero being played.',
       icon: DeviceLockIcon,
-      inProgress: true,
     },
   ]
 
