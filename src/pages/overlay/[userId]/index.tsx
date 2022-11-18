@@ -99,11 +99,11 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      mutate(data, { revalidate: true })
+      mutate({}, { revalidate: true })
     })
 
     socket.on('connect_error', console.log)
-  }, [data, mutate, userId])
+  }, [mutate, userId])
 
   useEffect(() => {
     if (!userId || !opts[DBSettings.obs]) {
