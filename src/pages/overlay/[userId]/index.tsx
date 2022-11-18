@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import {
   DBSettings,
@@ -40,10 +39,8 @@ export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
 
-  const { data, mutate } = useSWR(
-    [`/api/settings/?id=`, userId],
-    userId && fetcher
-  )
+  const [shouldRefetch, setShouldRefetch] = useState(true)
+  const [data, setData] = useState(null)
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -52,8 +49,15 @@ export default function OverlayPage() {
   })
 
   useEffect(() => {
-    getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
-  }, [data?.mmr, data?.playerId])
+    if (!userId || !shouldRefetch) return
+
+    fetcher(`/api/settings/?id=`, userId).then((data) => {
+      setData(data)
+      getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
+    })
+
+    setShouldRefetch(false)
+  }, [userId, shouldRefetch])
 
   const [block, setBlock] = useState({ type: null, team: null })
   const [connected, setConnected] = useState(false)
@@ -99,11 +103,11 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      mutate({}, { revalidate: true })
+      setShouldRefetch(true)
     })
 
     socket.on('connect_error', console.log)
-  }, [mutate, userId])
+  }, [userId])
 
   useEffect(() => {
     if (!userId || !opts[DBSettings.obs]) {
