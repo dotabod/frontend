@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import useSWR, { useSWRConfig } from 'swr'
+import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import {
   DBSettings,
@@ -40,9 +40,10 @@ export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
 
-  const swrKey = `/api/settings/?id=${userId}`
-  const { data } = useSWR(swrKey, userId && fetcher)
-  const { mutate } = useSWRConfig()
+  const { data, mutate } = useSWR(
+    [`/api/settings/?id=`, userId],
+    userId && fetcher
+  )
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -98,11 +99,11 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      mutate(swrKey)
+      mutate()
     })
 
     socket.on('connect_error', console.log)
-  }, [mutate, swrKey, userId])
+  }, [mutate, userId])
 
   useEffect(() => {
     if (!userId || !opts[DBSettings.obs]) {
