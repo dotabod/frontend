@@ -27,17 +27,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      const { mmr, playerId } = await prisma.user.findFirst({
+      const { mmr, steam32Id } = await prisma.user.findFirst({
         select: {
           mmr: true,
-          playerId: true,
+          steam32Id: true,
         },
         where: {
           id: session ? session?.user?.id : userId,
         },
       })
 
-      return res.json({ settings, mmr, playerId })
+      return res.json({ settings, mmr, steam32Id })
     } catch (error) {
       return res.status(500).end()
     }

@@ -44,13 +44,13 @@ export const leaderRanks = [
   { range: [1001, 100000], image: '80.png', sparklingEffect: false },
 ]
 
-export async function lookupLeaderRank(mmr: number, playerId?: number) {
+export async function lookupLeaderRank(mmr: number, steam32Id?: number) {
   let standing = mmr
 
   // Not everyone has a playerID saved yet
   // The dota2gsi should save one for us
-  if (playerId) {
-    standing = await fetch(`https://api.opendota.com/api/players/${playerId}`)
+  if (steam32Id) {
+    standing = await fetch(`https://api.opendota.com/api/players/${steam32Id}`)
       .then((response) => response.json())
       .then((data) => data?.leaderboard_rank as number)
   }
@@ -60,14 +60,14 @@ export async function lookupLeaderRank(mmr: number, playerId?: number) {
   return { ...myRank, standing }
 }
 
-export function getRankDetail(param: any, playerId?: number) {
+export function getRankDetail(param: any, steam32Id?: number) {
   const mmr = Number(param)
 
   if (!mmr || mmr < 0) return null
 
   // Higher than max mmr? Lets check leaderboards
   if (mmr > ranks[ranks.length - 1].range[1]) {
-    return lookupLeaderRank(mmr, playerId)
+    return lookupLeaderRank(mmr, steam32Id)
   }
 
   const [myRank, nextRank] = ranks.filter((rank) => mmr <= rank.range[1])
@@ -86,8 +86,8 @@ export function getRankDetail(param: any, playerId?: number) {
 }
 
 // Used for obs overlay
-export async function getRankImage(mmr: number, playerId?: number) {
-  const deets = await getRankDetail(mmr, playerId)
+export async function getRankImage(mmr: number, steam32Id?: number) {
+  const deets = await getRankDetail(mmr, steam32Id)
 
   if (!deets || mmr === 0) {
     return { image: '0.png', rank: null, leaderboard: false }

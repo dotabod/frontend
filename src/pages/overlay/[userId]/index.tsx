@@ -52,7 +52,7 @@ export default function OverlayPage() {
 
     fetcher(`/api/settings/?id=`, userId).then((data) => {
       setData(data)
-      getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
+      getRankImage(data?.mmr, data?.steam32Id).then(setRankImageDetails)
     })
   }, [userId])
 
@@ -96,11 +96,11 @@ export default function OverlayPage() {
       }
     })
 
-    socket.on('update-medal', ({ mmr, playerId }) => {
+    socket.on('update-medal', ({ mmr, steam32Id }) => {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      getRankImage(mmr, playerId).then(setRankImageDetails)
+      getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
 
     socket.on('connect_error', console.log)
