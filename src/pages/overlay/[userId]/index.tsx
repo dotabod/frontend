@@ -39,7 +39,6 @@ export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
 
-  const [shouldRefetch, setShouldRefetch] = useState(true)
   const [data, setData] = useState(null)
 
   const [rankImageDetails, setRankImageDetails] = useState({
@@ -49,15 +48,13 @@ export default function OverlayPage() {
   })
 
   useEffect(() => {
-    if (!userId || !shouldRefetch) return
+    if (!userId) return
 
     fetcher(`/api/settings/?id=`, userId).then((data) => {
       setData(data)
       getRankImage(data?.mmr, data?.playerId).then(setRankImageDetails)
     })
-
-    setShouldRefetch(false)
-  }, [userId, shouldRefetch])
+  }, [userId])
 
   const [block, setBlock] = useState({ type: null, team: null })
   const [connected, setConnected] = useState(false)
@@ -99,11 +96,11 @@ export default function OverlayPage() {
       }
     })
 
-    socket.on('update-medal', () => {
+    socket.on('update-medal', (mmr) => {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      setShouldRefetch(true)
+      getRankImage(mmr, data?.playerId).then(setRankImageDetails)
     })
 
     socket.on('connect_error', console.log)
