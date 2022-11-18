@@ -99,14 +99,11 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      // Might be a .then() issue for not getting called
-      mutate().then(() => {
-        console.log('Mutated?')
-      })
+      mutate(data, { revalidate: true })
     })
 
     socket.on('connect_error', console.log)
-  }, [mutate, userId])
+  }, [data, mutate, userId])
 
   useEffect(() => {
     if (!userId || !opts[DBSettings.obs]) {
