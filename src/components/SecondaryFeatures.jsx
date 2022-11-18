@@ -4,6 +4,7 @@ import { Container } from '@/components/Container'
 import Image from 'next/image'
 import { Badge, Link } from '@geist-ui/core'
 import { HoverCard } from '@mantine/core'
+import { SparklesIcon } from '@heroicons/react/24/outline'
 
 function DeviceArrowIcon(props) {
   return (
@@ -160,14 +161,19 @@ export function SecondaryFeatures() {
         'Create predictions for your viewers to bet on. Dotabod will start and stop the prediction automatically.',
     },
     {
-      name: 'MMR badge overlay',
-      description: (
-        <span>
-          Show off your current rank, or leaderboard standing on stream.{' '}
-          <HoverCard width={647} closeDelay={400} shadow="md">
+      name: (
+        <div className="space-between flex w-full items-center">
+          <span className="w-full">MMR badge overlay</span>
+          <HoverCard width={647} closeDelay={200} shadow="md">
             <HoverCard.Target>
-              <Link color underline>
-                Preview
+              <Link
+                className="flex !items-center space-x-1"
+                onClick={(e) => e.preventDefault()}
+                color
+                underline
+              >
+                <SparklesIcon height={22} />
+                <span>Preview</span>
               </Link>
             </HoverCard.Target>
             <HoverCard.Dropdown>
@@ -179,6 +185,11 @@ export function SecondaryFeatures() {
               />
             </HoverCard.Dropdown>
           </HoverCard>
+        </div>
+      ),
+      description: (
+        <span>
+          Show off your current rank, or leaderboard standing on stream.
         </span>
       ),
     },
