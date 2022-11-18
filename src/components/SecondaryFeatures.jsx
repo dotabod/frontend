@@ -152,8 +152,6 @@ function DeviceChartIcon(props) {
 }
 
 export function SecondaryFeatures() {
-  const [showMMRPreview, setShowMMRPreview] = useState(false)
-
   const features = [
     {
       name: 'Twitch predictions',
