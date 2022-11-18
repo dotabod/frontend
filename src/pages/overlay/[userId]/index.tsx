@@ -100,9 +100,7 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      getRankImage(mmr || data?.mmr, playerId || data?.playerId).then(
-        setRankImageDetails
-      )
+      getRankImage(mmr, playerId).then(setRankImageDetails)
     })
 
     socket.on('connect_error', console.log)
