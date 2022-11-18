@@ -1,17 +1,20 @@
 import { useToasts } from '@geist-ui/core'
 import useSWR, { useSWRConfig } from 'swr'
-import { getValueOrDefault } from './DBSettings'
+import { useDebouncedCallback } from 'use-debounce'
+import { DBSettings, getValueOrDefault } from './DBSettings'
 import { fetcher } from './fetcher'
 
 export function useUpdateSetting(key) {
-  const { data } = useSWR(`/api/settings/${key}`, fetcher)
+  const { data } = useSWR(`/api/settings`, fetcher)
+
   const loading = data === undefined
-  const isEnabled = getValueOrDefault([data], key)
+  let isEnabled = getValueOrDefault(data?.settings, key)
+  if (key === DBSettings.mmr) isEnabled = data?.mmr || 0
 
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()
 
-  const updateSetting = (value) => {
+  const updateSetting = useDebouncedCallback((value) => {
     const setting = { ...data, value }
     const options = {
       optimisticData: setting,
@@ -34,11 +37,16 @@ export function useUpdateSetting(key) {
         type: response.ok ? 'success' : 'error',
       })
 
-      return setting
+      const newData =
+        (Array.isArray(data?.settings) &&
+          data?.settings.filter((k) => k !== key)) ||
+        []
+      newData.push(setting)
+      return newData
     }
 
-    mutate(`/api/settings/${key}`, updateFn(setting), options)
-  }
+    mutate(`/api/settings`, updateFn(setting), options)
+  }, 400)
 
   return { isEnabled, loading, updateSetting }
 }

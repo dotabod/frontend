@@ -9,6 +9,7 @@ export enum DBSettings {
   obsDc = 'obs-dc',
   onlyBlockRanked = 'only-block-ranked',
   mmrTracker = 'mmr-tracker',
+  mmr = 'mmr',
 }
 
 export const defaultSettings = {
@@ -22,6 +23,7 @@ export const defaultSettings = {
   [DBSettings.obsMinimap]: '[dotabod] blocking minimap',
   [DBSettings.obsPicks]: '[dotabod] blocking picks',
   [DBSettings.obsDc]: '[dotabod] game disconnected',
+  [DBSettings.mmr]: null,
 }
 
 export const getValueOrDefault = (data, key) => {
@@ -158,6 +160,3 @@ const gameModeDescriptions = [
     description: '???',
   },
 ]
-
-
-

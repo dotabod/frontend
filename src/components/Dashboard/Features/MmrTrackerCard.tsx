@@ -3,7 +3,6 @@ import { Button, Display, Image, Input, Loading } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
-import { useUpdateUser } from '@/lib/useUpdateUser'
 
 export default function MmrTrackerCard() {
   const {
@@ -11,7 +10,11 @@ export default function MmrTrackerCard() {
     loading: l0,
     updateSetting,
   } = useUpdateSetting(DBSettings.mmrTracker)
-  const { user, updateMmr, loading: l1 } = useUpdateUser()
+  const {
+    isEnabled: mmr,
+    updateSetting: updateMmr,
+    loading: l1,
+  } = useUpdateSetting(DBSettings.mmr)
   const loading = l0 || l1
 
   return (
@@ -43,10 +46,10 @@ export default function MmrTrackerCard() {
               htmlType="number"
               min={0}
               max={30000}
-              initialValue={user.mmr}
+              initialValue={mmr}
               disabled={!isEnabled}
               onChange={(e) => {
-                updateMmr(e.target.value)
+                updateMmr(Number(e.target.value))
               }}
             />
           )}
