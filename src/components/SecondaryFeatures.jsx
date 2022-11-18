@@ -162,7 +162,7 @@ export function SecondaryFeatures() {
       name: (
         <div className="space-between flex w-full items-center">
           <span className="w-full">MMR badge overlay</span>
-          <HoverCard width={647} closeDelay={200} shadow="md">
+          <HoverCard closeDelay={200} shadow="md">
             <HoverCard.Target>
               <Link
                 className="flex !items-center space-x-1"
@@ -177,7 +177,7 @@ export function SecondaryFeatures() {
             <HoverCard.Dropdown>
               <Image
                 alt="mmr tracker"
-                width={647}
+                width={353}
                 height={333}
                 src="/images/mmr-tracker.png"
               />
