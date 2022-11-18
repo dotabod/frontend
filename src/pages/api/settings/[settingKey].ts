@@ -16,8 +16,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'PATCH') {
     try {
       if (settingKey === DBSettings.mmr) {
-        console.log(JSON.parse(req.body))
-
         const body = mmrPatchSchema.parse(JSON.parse(req.body))
 
         await prisma.user.update({
