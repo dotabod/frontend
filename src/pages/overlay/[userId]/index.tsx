@@ -99,7 +99,10 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      mutate()
+      // Might be a .then() issue for not getting called
+      mutate().then(() => {
+        console.log('Mutated?')
+      })
     })
 
     socket.on('connect_error', console.log)
