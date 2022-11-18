@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId } from 'react'
 
 import { Container } from '@/components/Container'
 import Image from 'next/image'
