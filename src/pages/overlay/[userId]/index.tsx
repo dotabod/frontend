@@ -98,8 +98,12 @@ export default function OverlayPage() {
       getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
 
+    socket.on('refresh', () => {
+      router.reload()
+    })
+
     socket.on('connect_error', console.log)
-  }, [userId])
+  }, [router, userId])
 
   useEffect(() => {
     if (!userId || !opts[DBSettings.obs]) {
