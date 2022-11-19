@@ -16,24 +16,19 @@ import { Rankbadge } from '@/components/Rankbadge'
 
 let socket
 
-const PickBlocker = ({ teamName }) =>
-  teamName === 'radiant' ? (
+const HeroBlocker = ({ teamName, type }) => {
+  if (!type) return null
+
+  return (
     <Image
       priority
-      alt="picks blocker"
+      alt={`${type} blocker`}
       width={1920}
       height={1080}
-      src="/images/block-radiant-picks.png"
-    />
-  ) : (
-    <Image
-      priority
-      alt="picks blocker"
-      width={1920}
-      height={1080}
-      src="/images/block-dire-picks.png"
+      src={`/images/block-${teamName}-${type}.png`}
     />
   )
+}
 
 export default function OverlayPage() {
   const router = useRouter()
@@ -68,7 +63,7 @@ export default function OverlayPage() {
 
   const isMinimapBlocked = opts[DBSettings.mblock] && block.type === 'minimap'
   const isPicksBlocked =
-    opts[DBSettings.pblock] && block?.type === 'picks' && block?.team
+    opts[DBSettings.pblock] && block?.type && block?.type !== 'minimap'
 
   useEffect(() => {
     if (!userId) return
@@ -190,7 +185,9 @@ export default function OverlayPage() {
         </div>
       )}
 
-      {isPicksBlocked && <PickBlocker teamName={block?.team} />}
+      {isPicksBlocked && (
+        <HeroBlocker type={block?.type} teamName={block?.team} />
+      )}
     </>
   )
 }
