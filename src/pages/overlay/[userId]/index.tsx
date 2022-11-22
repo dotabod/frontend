@@ -12,7 +12,7 @@ import {
   getValueOrDefault,
 } from '@/lib/DBSettings'
 import { getRankImage } from '@/lib/ranks'
-import { Rankbadge } from '@/components/Rankbadge'
+import { Card, Rankbadge } from '@/components/Rankbadge'
 
 let socket
 
@@ -30,11 +30,21 @@ const HeroBlocker = ({ teamName, type }) => {
   )
 }
 
+const getWL = (steam32Id, cb) => {
+  fetcher(
+    `https://api.opendota.com/api/players/${steam32Id}/wl/?date=0.5`
+  ).then(cb)
+}
+
 export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
 
   const [data, setData] = useState(null)
+  const [wl, setWL] = useState({
+    win: 0,
+    lose: 0,
+  })
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -47,6 +57,7 @@ export default function OverlayPage() {
 
     fetcher(`/api/settings/?id=`, userId).then((data) => {
       setData(data)
+      getWL(data?.steam32Id, setWL)
       getRankImage(data?.mmr, data?.steam32Id).then(setRankImageDetails)
     })
   }, [userId])
@@ -95,6 +106,7 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
+      getWL(steam32Id, setWL)
       getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
 
@@ -163,35 +175,54 @@ export default function OverlayPage() {
       <Head>
         <title>Dotabod | Stream overlays</title>
       </Head>
-      <div className="hidden">
-        <div className="absolute bottom-0 left-[100px]">
-          <span className="text-yellow-500">WL 0 1</span>
-        </div>
-      </div>
-      {isMinimapBlocked && (
-        <div>
-          <div className="absolute bottom-0 left-0">
-            <Image
-              priority
-              alt="minimap blocker"
-              width={opts[DBSettings.xl] ? 280 : 240}
-              height={opts[DBSettings.xl] ? 280 : 240}
-              src={`/images/731-${
-                opts[DBSettings.simple] ? 'Simple' : 'Complex'
-              }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
-            />
-          </div>
-          {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
-            <div className="absolute bottom-0 right-[276px]">
-              <Rankbadge {...rankImageDetails} />
-            </div>
-          )}
-        </div>
-      )}
+      <div>
+        {false && process.env.NODE_ENV === 'development' && (
+          <Image
+            height={1080}
+            width={1920}
+            alt={`main game`}
+            src={`/images/shot_0012.png`}
+          />
+        )}
 
-      {isPicksBlocked && (
-        <HeroBlocker type={block?.type} teamName={block?.team} />
-      )}
+        {isMinimapBlocked && (
+          <>
+            <div>
+              <Image
+                className={`absolute ${
+                  opts[DBSettings.bp]
+                    ? 'bottom-[14px] left-[11px]'
+                    : 'bottom-0 left-0'
+                }`}
+                priority
+                alt="minimap blocker"
+                width={opts[DBSettings.xl] ? 280 : 240}
+                height={opts[DBSettings.xl] ? 280 : 240}
+                src={`/images/731-${
+                  opts[DBSettings.simple] ? 'Simple' : 'Complex'
+                }-${
+                  opts[DBSettings.xl] ? 'X' : ''
+                }Large-AntiStreamSnipeMap.png`}
+              />
+            </div>
+            <div className="absolute bottom-0 right-[340px]">
+              <Card>
+                W{wl.win || 0} L{wl.lose || 0}
+              </Card>
+            </div>
+
+            {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
+              <div className="absolute bottom-0 right-[276px]">
+                <Rankbadge {...rankImageDetails} />
+              </div>
+            )}
+          </>
+        )}
+
+        {isPicksBlocked && (
+          <HeroBlocker type={block?.type} teamName={block?.team} />
+        )}
+      </div>
     </>
   )
 }

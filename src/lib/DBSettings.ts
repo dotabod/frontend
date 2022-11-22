@@ -10,6 +10,7 @@ export enum DBSettings {
   onlyBlockRanked = 'only-block-ranked',
   mmrTracker = 'mmr-tracker',
   mmr = 'mmr',
+  bp = 'battlepass',
 }
 
 export const defaultSettings = {
@@ -24,6 +25,7 @@ export const defaultSettings = {
   [DBSettings.obsPicks]: '[dotabod] blocking picks',
   [DBSettings.obsDc]: '[dotabod] game disconnected',
   [DBSettings.mmr]: null,
+  [DBSettings.bp]: false,
 }
 
 export const getValueOrDefault = (data, key) => {
