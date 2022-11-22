@@ -89,7 +89,7 @@ export function getRankDetail(param: any, steam32Id?: number) {
 export async function getRankImage(mmr: number, steam32Id?: number) {
   const deets = await getRankDetail(mmr, steam32Id)
 
-  if (!deets || mmr === 0) {
+  if (!deets || mmr <= 0) {
     return { image: '0.png', rank: null, leaderboard: false }
   }
 
