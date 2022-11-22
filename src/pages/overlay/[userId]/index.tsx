@@ -12,7 +12,8 @@ import {
   getValueOrDefault,
 } from '@/lib/DBSettings'
 import { getRankImage } from '@/lib/ranks'
-import { Card, Rankbadge } from '@/components/Rankbadge'
+import { Rankbadge } from '@/components/Rankbadge'
+import { Card } from '@/components/Card'
 
 let socket
 
