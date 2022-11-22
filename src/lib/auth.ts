@@ -65,11 +65,6 @@ export const authOptions: NextAuthOptions = {
             access_token: account.access_token,
             expires_at: account.expires_at,
             scope: account.scope,
-            user: {
-              update: {
-                name: user.name,
-              },
-            },
           },
         })
       }
