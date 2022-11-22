@@ -8,12 +8,11 @@ export default function ExportCFG() {
 {
   "uri" "${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}"
   "timeout" "5.0"
-  "buffer" "0.1"
-  "throttle" "0.1"
-  "heartbeat" "10.0"
+  "buffer" "0.5"
+  "throttle" "0.5"
+  "heartbeat" "30.0"
   "data"
   {
-    "buildings" "1"
     "provider" "1"
     "map" "1"
     "player" "1"
@@ -21,6 +20,8 @@ export default function ExportCFG() {
     "abilities" "1"
     "items" "1"
     "draft" "1"
+    "events" "1"
+    "buildings" "1"
     "wearables" "0"
   }
   "auth"
