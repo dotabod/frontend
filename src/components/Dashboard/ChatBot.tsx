@@ -1,6 +1,5 @@
 import { Card } from '@/ui/card'
 import { Snippet } from '@geist-ui/core'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 const emotes = [
