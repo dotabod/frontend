@@ -1,6 +1,7 @@
 import { Card } from '@/ui/card'
-import { Button, Link, Snippet } from '@geist-ui/core'
+import { Button, Keyboard, Snippet } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 
 export default function ExportCFG() {
   const user = useSession()?.data?.user
@@ -42,29 +43,48 @@ export default function ExportCFG() {
         </Card.Description>
       </Card.Header>
       <Card.Content>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div>
-            Restart your Dota 2 client after saving the file to this path:
+            i. Download this cfg file and save to the path below. If you do not
+            have a <Keyboard>gamestate_integration</Keyboard> folder in{' '}
+            <Keyboard>cfg</Keyboard>, create it.
           </div>
 
-          <Snippet
-            symbol=""
-            text="C:\Program Files (x86)\Steam\steamapps\common\dota 2
+          <div className="ml-4 space-y-4">
+            <Snippet
+              symbol=""
+              text="C:\Program Files (x86)\Steam\steamapps\common\dota 2
             beta\game\dota\cfg\gamestate_integration\"
-            width="750px"
-          />
+              width="750px"
+            />
+
+            <a
+              className="block"
+              href={url}
+              download={`gamestate_integration_dotabod-${user.name}.cfg`}
+            >
+              <Button type="secondary" className="!normal-case">
+                Download config file
+              </Button>
+            </a>
+          </div>
+
+          <div>
+            ii. Follow{' '}
+            <Link
+              className="text-blue-500 hover:text-blue-300"
+              href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
+              target="_blank"
+            >
+              these instructions
+            </Link>{' '}
+            to add <Keyboard>-gamestateintegration</Keyboard> to your Dota 2
+            launch options.
+          </div>
+
+          <div>iii. Restart Steam and Dota 2 client.</div>
         </div>
       </Card.Content>
-      <Card.Footer>
-        <Link
-          href={url}
-          download={`gamestate_integration_dotabod-${user.name}.cfg`}
-        >
-          <Button type="secondary" className="!normal-case">
-            Download gamestate_integration.cfg
-          </Button>
-        </Link>
-      </Card.Footer>
     </Card>
   )
 }

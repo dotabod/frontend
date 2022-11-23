@@ -39,7 +39,7 @@ export default function ChatBot() {
             {emotes.map((emote) => (
               <li key={emote}>
                 <Link
-                  className="text-blue underline"
+                  className="text-blue-500 hover:text-blue-300"
                   target="_blank"
                   href={`https://betterttv.com/emotes/shared/search?query=${emote}`}
                 >
