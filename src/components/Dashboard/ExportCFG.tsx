@@ -1,9 +1,6 @@
 import { Card } from '@/ui/card'
-import { Button, Code, Display, Image, Keyboard, Snippet } from '@geist-ui/core'
-import {
-  ChevronDoubleLeftIcon,
-  ChevronRightIcon,
-} from '@heroicons/react/24/outline'
+import { Button, Code, Display, Image, Keyboard } from '@geist-ui/core'
+import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
