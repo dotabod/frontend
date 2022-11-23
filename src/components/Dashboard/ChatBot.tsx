@@ -4,13 +4,13 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 const emotes = [
-  'Chatting',
-  'massivePIDAS',
-  'Sadge',
-  'EZ',
-  'Clap',
-  'peepoGamble',
-  'PauseChamp',
+  { label: 'Chatting' },
+  { label: 'massivePIDAS' },
+  { label: 'Sadge' },
+  { label: 'EZ', url: 'https://betterttv.com/emotes/5590b223b344e2c42a9e28e3' },
+  { label: 'Clap' },
+  { label: 'peepoGamble' },
+  { label: 'PauseChamp' },
 ]
 
 export default function ChatBot() {
@@ -36,14 +36,17 @@ export default function ChatBot() {
 
           <div>ii. Add the following emotes using BTTV (case sensitive):</div>
           <ul className="ml-8 list-disc">
-            {emotes.map((emote) => (
-              <li key={emote}>
+            {emotes.map(({ label, url }) => (
+              <li key={label}>
                 <Link
                   className="text-blue-500 hover:text-blue-300"
                   target="_blank"
-                  href={`https://betterttv.com/emotes/shared/search?query=${emote}`}
+                  href={
+                    url ??
+                    `https://betterttv.com/emotes/shared/search?query=${label}`
+                  }
                 >
-                  {emote}
+                  {label}
                 </Link>
               </li>
             ))}
