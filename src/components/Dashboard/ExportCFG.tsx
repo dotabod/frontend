@@ -1,5 +1,9 @@
 import { Card } from '@/ui/card'
-import { Button, Code, Snippet } from '@geist-ui/core'
+import { Button, Code, Display, Image, Keyboard, Snippet } from '@geist-ui/core'
+import {
+  ChevronDoubleLeftIcon,
+  ChevronRightIcon,
+} from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -44,30 +48,48 @@ export default function ExportCFG() {
       </Card.Header>
       <Card.Content>
         <div className="space-y-4">
-          <div>i. Download the config file and save it to the path below.</div>
-
+          <div>
+            i. In Steam, right click Dota 2{' '}
+            <ChevronRightIcon height={12} className="inline" /> Manage{' '}
+            <ChevronRightIcon height={12} className="inline" /> Browse local
+            files. Then open the folder to{' '}
+            <Keyboard>\game\dota\cfg\gamestate_integration\</Keyboard>
+          </div>
+          <p className="ml-4 text-xs">
+            If you do not have a{' '}
+            <Keyboard className="!text-xs">gamestate_integration</Keyboard>{' '}
+            folder, create it.
+          </p>
+          <a
+            className="ml-4 block w-48"
+            href={url}
+            download={`gamestate_integration_dotabod-${user.name}.cfg`}
+          >
+            <Button type="secondary" className="!normal-case">
+              Download config file
+            </Button>
+          </a>
           <div className="ml-4 space-y-4">
             <div>
-              <Snippet
-                symbol=""
-                text="C:\Program Files (x86)\Steam\steamapps\common\dota 2
-            beta\game\dota\cfg\gamestate_integration\"
-                width="750px"
-              />
-              <p className="mt-2 text-xs">
-                If you do not have a <Code>\cfg\gamestate_integration\</Code>{' '}
-                folder, create it.
-              </p>
+              <Display
+                shadow
+                caption={
+                  <>
+                    <p>Full path to save config file to:</p>
+                    <Code>
+                      C:\Program Files (x86)\Steam\steamapps\common\dota 2
+                      beta\game\dota\cfg\gamestate_integration
+                    </Code>
+                  </>
+                }
+              >
+                <Image
+                  alt="dotabod browser source properties"
+                  height="170px"
+                  src="/images/steam-browse-files.png"
+                />
+              </Display>
             </div>
-            <a
-              className="block w-48"
-              href={url}
-              download={`gamestate_integration_dotabod-${user.name}.cfg`}
-            >
-              <Button type="secondary" className="!normal-case">
-                Download config file
-              </Button>
-            </a>
           </div>
 
           <div>
