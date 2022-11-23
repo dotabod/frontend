@@ -14,8 +14,6 @@ const emotes = [
 ]
 
 export default function ChatBot() {
-  const user = useSession()?.data?.user
-
   return (
     <Card>
       <Card.Header>
@@ -34,7 +32,10 @@ export default function ChatBot() {
 
           <Snippet symbol="" text="/mod dotabod" width="750px" />
 
-          <div>ii. Add the following emotes using BTTV (case sensitive):</div>
+          <div>
+            ii. Add the following emotes to your channel using BTTV (case
+            sensitive):
+          </div>
           <ul className="ml-8 list-disc">
             {emotes.map(({ label, url }) => (
               <li key={label}>
