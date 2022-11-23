@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Keyboard, Snippet } from '@geist-ui/core'
+import { Button, Code, Snippet } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -44,22 +44,23 @@ export default function ExportCFG() {
       </Card.Header>
       <Card.Content>
         <div className="space-y-4">
-          <div>
-            i. Download this cfg file and save to the path below. If you do not
-            have a <Keyboard>gamestate_integration</Keyboard> folder in{' '}
-            <Keyboard>cfg</Keyboard>, create it.
-          </div>
+          <div>i. Download the config file and save it to the path below.</div>
 
           <div className="ml-4 space-y-4">
-            <Snippet
-              symbol=""
-              text="C:\Program Files (x86)\Steam\steamapps\common\dota 2
+            <div>
+              <Snippet
+                symbol=""
+                text="C:\Program Files (x86)\Steam\steamapps\common\dota 2
             beta\game\dota\cfg\gamestate_integration\"
-              width="750px"
-            />
-
+                width="750px"
+              />
+              <p className="mt-2 text-xs">
+                If you do not have a <Code>\cfg\gamestate_integration\</Code>{' '}
+                folder, create it.
+              </p>
+            </div>
             <a
-              className="block"
+              className="block w-48"
               href={url}
               download={`gamestate_integration_dotabod-${user.name}.cfg`}
             >
@@ -78,8 +79,8 @@ export default function ExportCFG() {
             >
               these instructions
             </Link>{' '}
-            to add <Keyboard>-gamestateintegration</Keyboard> to your Dota 2
-            launch options.
+            to add <Code>-gamestateintegration</Code> to your Dota 2 launch
+            options in Steam.
           </div>
 
           <div>iii. Restart Steam and Dota 2 client.</div>
