@@ -3,6 +3,7 @@ import { Snippet } from '@geist-ui/core'
 import Link from 'next/link'
 
 const emotes = [
+  { label: 'BASED' },
   { label: 'Chatting' },
   { label: 'massivePIDAS' },
   { label: 'Sadge' },
