@@ -101,9 +101,8 @@ export default function OverlayPage() {
     opts[key] = getValueOrDefault(data?.settings, key)
   })
 
-  const isMinimapBlocked = opts[DBSettings.mblock] && block.type === 'minimap'
-  const isPicksBlocked =
-    opts[DBSettings.pblock] && block?.type && block?.type !== 'minimap'
+  const isMinimapBlocked = opts[DBSettings.mblock] && block.type === 'playing'
+  const isPicksBlocked = opts[DBSettings.pblock] && block.type === 'picks'
 
   useEffect(() => {
     if (!userId) return
@@ -215,25 +214,28 @@ export default function OverlayPage() {
         )}
 
         {isMinimapBlocked && (
+          <Image
+            className={`absolute ${
+              opts[DBSettings.bp]
+                ? 'bottom-[14px] left-[11px]'
+                : 'bottom-0 left-0'
+            }`}
+            priority
+            alt="minimap blocker"
+            width={opts[DBSettings.xl] ? 280 : 240}
+            height={opts[DBSettings.xl] ? 280 : 240}
+            src={`/images/731-${
+              opts[DBSettings.simple] ? 'Simple' : 'Complex'
+            }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
+          />
+        )}
+
+        {isPicksBlocked && (
+          <HeroBlocker type={block?.type} teamName={block?.team} />
+        )}
+
+        {(block.type === 'spectator' || block.type === 'playing') && (
           <>
-            <div>
-              <Image
-                className={`absolute ${
-                  opts[DBSettings.bp]
-                    ? 'bottom-[14px] left-[11px]'
-                    : 'bottom-0 left-0'
-                }`}
-                priority
-                alt="minimap blocker"
-                width={opts[DBSettings.xl] ? 280 : 240}
-                height={opts[DBSettings.xl] ? 280 : 240}
-                src={`/images/731-${
-                  opts[DBSettings.simple] ? 'Simple' : 'Complex'
-                }-${
-                  opts[DBSettings.xl] ? 'X' : ''
-                }Large-AntiStreamSnipeMap.png`}
-              />
-            </div>
             <div className="absolute bottom-0 right-[350px]">
               <Card>
                 {wl.map(({ win, lose, type }) => (
@@ -257,10 +259,6 @@ export default function OverlayPage() {
               </div>
             )}
           </>
-        )}
-
-        {isPicksBlocked && (
-          <HeroBlocker type={block?.type} teamName={block?.team} />
         )}
       </div>
     </>
