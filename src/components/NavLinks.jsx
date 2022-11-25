@@ -2,16 +2,18 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import DiscordSvg from '@/images/logos/discord.svg'
+import GithubSvg from '@/images/logos/github.svg'
 import Image from 'next/image'
 
-export function NavLinks() {
+export function NavLinks({ bottom = false }) {
   let [hoveredIndex, setHoveredIndex] = useState(null)
 
   return [
-    ['Discord', 'https://discord.dotabod.com', DiscordSvg],
     ['Features', '#features'],
     ['Pricing', '#pricing'],
     ['FAQs', '#faqs'],
+    ['Github', 'https://github.com/dotabod', GithubSvg],
+    ['Discord', 'https://discord.dotabod.com', DiscordSvg],
     // ['Twitch', 'https://twitch.tv/dotabod/about', TwitchSvg],
   ].map(([label, href, Icon], index) => (
     <Link
@@ -38,7 +40,7 @@ export function NavLinks() {
       </AnimatePresence>
 
       <span className="relative z-10">
-        {Icon && (
+        {bottom && Icon && (
           <Image
             src={Icon}
             width={18}
