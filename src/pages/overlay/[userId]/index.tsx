@@ -208,7 +208,7 @@ export default function OverlayPage() {
             </div>
             <div className="absolute bottom-0 right-[340px]">
               <Card>
-                W{wl.win || 0} L{wl.lose || 0}
+                {wl.win || 0} W - {wl.lose || 0} L
               </Card>
             </div>
 
