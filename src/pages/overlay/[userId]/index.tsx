@@ -58,8 +58,9 @@ export default function OverlayPage() {
     opts[key] = getValueOrDefault(data?.settings, key)
   })
 
-  const isMinimapBlocked = opts[DBSettings.mblock] && block.type === 'playing'
-  const isPicksBlocked = opts[DBSettings.pblock] && block.type === 'picks'
+  const shouldBlockMap = opts[DBSettings.mblock] && block.type === 'playing'
+  const shouldBlockPicks =
+    opts[DBSettings.pblock] && ['picks', 'strategy'].includes(block.type)
 
   useEffect(() => {
     if (!userId) return
@@ -118,9 +119,9 @@ export default function OverlayPage() {
     console.log('Connected to socket! Running OBS scene switchers')
 
     // Debug info
-    if (isMinimapBlocked) {
+    if (shouldBlockMap) {
       console.log({ setCurrentScene: opts[DBSettings.obsMinimap] })
-    } else if (isPicksBlocked) {
+    } else if (shouldBlockPicks) {
       console.log({ setCurrentScene: opts[DBSettings.obsPicks] })
     } else {
       console.log({ setCurrentScene: opts[DBSettings.obsDc] })
@@ -136,14 +137,14 @@ export default function OverlayPage() {
 
     console.log('OBS studio is connected')
 
-    if (isMinimapBlocked) {
+    if (shouldBlockMap) {
       window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
-    } else if (isPicksBlocked) {
+    } else if (shouldBlockPicks) {
       window.obsstudio.setCurrentScene(opts[DBSettings.obsPicks])
     } else {
       window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
     }
-  }, [connected, userId, isMinimapBlocked, isPicksBlocked, opts])
+  }, [connected, userId, shouldBlockMap, shouldBlockPicks, opts])
 
   useEffect(() => {
     return () => {
@@ -170,13 +171,13 @@ export default function OverlayPage() {
           />
         )}
 
-        {false && block?.type === 'spectator' && (
+        {block?.type === 'spectator' && (
           <div className={`absolute bottom-[260px] left-[49px] text-white/90`}>
             Spectating a match
           </div>
         )}
 
-        {isMinimapBlocked && (
+        {shouldBlockMap && (
           <Image
             className={`absolute ${
               opts[DBSettings.bp]
@@ -193,11 +194,11 @@ export default function OverlayPage() {
           />
         )}
 
-        {isPicksBlocked && (
+        {shouldBlockPicks && (
           <HeroBlocker type={block?.type} teamName={block?.team} />
         )}
 
-        {(block.type === 'spectator' || block.type === 'playing') && (
+        {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
             {WinLossCard(wl)}
 
