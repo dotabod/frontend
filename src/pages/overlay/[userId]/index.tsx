@@ -13,54 +13,11 @@ import {
 } from '@/lib/DBSettings'
 import { getRankImage } from '@/lib/ranks'
 import { Rankbadge } from '@/components/Rankbadge'
-import { Card } from '@/components/Card'
+import { getWL } from '@/lib/getWL'
+import { HeroBlocker } from '@/components/HeroBlocker'
+import { WinLossCard } from '@/components/WinLossCard'
 
 let socket
-
-const HeroBlocker = ({ teamName, type }) => {
-  if (!type) return null
-
-  return (
-    <Image
-      priority
-      alt={`${type} blocker`}
-      width={1920}
-      height={1080}
-      src={`/images/block-${teamName}-${type}.png`}
-    />
-  )
-}
-
-const getWL = (steam32Id, cb) => {
-  const promises = [
-    fetcher(
-      `https://api.opendota.com/api/players/${steam32Id}/wl/?date=0.5&lobby_type=0`
-    ),
-    fetcher(
-      `https://api.opendota.com/api/players/${steam32Id}/wl/?date=0.5&lobby_type=7`
-    ),
-  ]
-
-  Promise.all(promises)
-    .then((values: { win: number; lose: number }[]) => {
-      const [unranked, ranked] = values
-      const { win, lose } = ranked
-      const { win: unrankedWin, lose: unrankedLose } = unranked
-      const hasUnranked = unrankedWin + unrankedLose !== 0
-      const hasRanked = win + lose !== 0
-
-      const record = []
-      if (hasRanked) record.push({ win: win, lose: lose, type: 'R' })
-      if (hasUnranked)
-        record.push({ win: unrankedWin, lose: unrankedLose, type: 'U' })
-      if (!hasRanked && !hasUnranked)
-        record.push({ win: 0, lose: 0, type: 'U' })
-      cb(record)
-    })
-    .catch((e) => {
-      console.log(e)
-    })
-}
 
 export default function OverlayPage() {
   const router = useRouter()
@@ -213,6 +170,12 @@ export default function OverlayPage() {
           />
         )}
 
+        {false && block?.type === 'spectator' && (
+          <div className={`absolute bottom-[260px] left-[49px] text-white/90`}>
+            Spectating a match
+          </div>
+        )}
+
         {isMinimapBlocked && (
           <Image
             className={`absolute ${
@@ -236,22 +199,7 @@ export default function OverlayPage() {
 
         {(block.type === 'spectator' || block.type === 'playing') && (
           <>
-            <div className="absolute bottom-0 right-[350px]">
-              <Card>
-                {wl.map(({ win, lose, type }) => (
-                  <div
-                    key={type}
-                    className="flex w-full flex-row items-baseline justify-end space-x-1"
-                  >
-                    <span>
-                      {win || 0} <span className="text-green-300">W</span> -{' '}
-                      {lose || 0} <span className="text-red-300">L</span>
-                    </span>
-                    {wl.length > 1 && <span className="text-xs ">{type}</span>}
-                  </div>
-                ))}
-              </Card>
-            </div>
+            {WinLossCard(wl)}
 
             {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
               <div className="absolute bottom-0 right-[276px]">
