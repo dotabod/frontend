@@ -32,9 +32,34 @@ const HeroBlocker = ({ teamName, type }) => {
 }
 
 const getWL = (steam32Id, cb) => {
-  fetcher(
-    `https://api.opendota.com/api/players/${steam32Id}/wl/?date=0.5`
-  ).then(cb)
+  const promises = [
+    fetcher(
+      `https://api.opendota.com/api/players/${steam32Id}/wl/?date=0.5&lobby_type=0`
+    ),
+    fetcher(
+      `https://api.opendota.com/api/players/${steam32Id}/wl/?date=0.5&lobby_type=7`
+    ),
+  ]
+
+  Promise.all(promises)
+    .then((values: { win: number; lose: number }[]) => {
+      const [unranked, ranked] = values
+      const { win, lose } = ranked
+      const { win: unrankedWin, lose: unrankedLose } = unranked
+      const hasUnranked = unrankedWin + unrankedLose !== 0
+      const hasRanked = win + lose !== 0
+
+      const record = []
+      if (hasRanked) record.push({ win: win, lose: lose, type: 'R' })
+      if (hasUnranked)
+        record.push({ win: unrankedWin, lose: unrankedLose, type: 'U' })
+      if (!hasRanked && !hasUnranked)
+        record.push({ win: 0, lose: 0, type: 'U' })
+      cb(record)
+    })
+    .catch((e) => {
+      console.log(e)
+    })
 }
 
 export default function OverlayPage() {
@@ -42,10 +67,13 @@ export default function OverlayPage() {
   const { userId } = router.query
 
   const [data, setData] = useState(null)
-  const [wl, setWL] = useState({
-    win: 0,
-    lose: 0,
-  })
+  const [wl, setWL] = useState([
+    {
+      win: 0,
+      lose: 0,
+      type: 'U',
+    },
+  ])
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -206,9 +234,20 @@ export default function OverlayPage() {
                 }Large-AntiStreamSnipeMap.png`}
               />
             </div>
-            <div className="absolute bottom-0 right-[340px]">
+            <div className="absolute bottom-0 right-[350px]">
               <Card>
-                {wl.win || 0} W - {wl.lose || 0} L
+                {wl.map(({ win, lose, type }) => (
+                  <div
+                    key={type}
+                    className="flex w-full flex-row items-baseline justify-end space-x-1"
+                  >
+                    <span>
+                      {win || 0} <span className="text-green-300">W</span> -{' '}
+                      {lose || 0} <span className="text-red-300">L</span>
+                    </span>
+                    {wl.length > 1 && <span className="text-xs ">{type}</span>}
+                  </div>
+                ))}
               </Card>
             </div>
 
