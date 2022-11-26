@@ -16,6 +16,7 @@ import { Rankbadge } from '@/components/Rankbadge'
 import { getWL } from '@/lib/getWL'
 import { HeroBlocker } from '@/components/HeroBlocker'
 import { WinLossCard } from '@/components/WinLossCard'
+import Countdown, { zeroPad } from 'react-countdown'
 
 let socket
 
@@ -50,6 +51,17 @@ export default function OverlayPage() {
   }, [userId])
 
   const [block, setBlock] = useState({ type: null, team: null })
+  const [roshan, setRoshan] = useState({
+    minTime: '',
+    maxTime: '',
+    minDate: '',
+    maxDate: '',
+  })
+  const [aegis, setAegis] = useState({
+    expireTime: '',
+    expireDate: '',
+    playerId: null,
+  })
   const [connected, setConnected] = useState(false)
 
   const opts = defaultSettings
@@ -73,6 +85,8 @@ export default function OverlayPage() {
     })
 
     socket.on('block', setBlock)
+    socket.on('aegis-picked-up', setAegis)
+    socket.on('roshan-killed', setRoshan)
     socket.on('connect', () => {
       console.log('Connected to socket!', socket.id)
 
@@ -148,13 +162,15 @@ export default function OverlayPage() {
     }
   }, [])
 
+  const positions = [555, 615, 680, 745, 800, 1065, 1130, 1192, 1250, 1320]
+
   return (
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
       </Head>
       <div>
-        {false && process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === 'development' && (
           <Image
             height={1080}
             width={1920}
@@ -166,6 +182,27 @@ export default function OverlayPage() {
         {block?.type === 'spectator' && (
           <div className={`absolute bottom-[260px] left-[49px] text-white/90`}>
             Spectating a match
+          </div>
+        )}
+
+        {block.type === 'playing' && aegis.expireDate && (
+          <div
+            style={{
+              left: positions[aegis.playerId],
+            }}
+            className={`absolute top-[40px] text-white/90`}
+          >
+            <Countdown
+              date={aegis.expireDate}
+              renderer={aegisRender}
+              onComplete={() => {
+                setAegis({
+                  expireTime: '',
+                  expireDate: '',
+                  playerId: null,
+                })
+              }}
+            />
           </div>
         )}
 
@@ -203,5 +240,43 @@ export default function OverlayPage() {
         )}
       </div>
     </>
+  )
+}
+
+const aegisRender = ({ minutes, seconds, completed }) => {
+  if (completed) {
+    return null
+  }
+  return (
+    <div className="flex flex-col items-center">
+      <Image
+        src="/images/aegis-icon.png"
+        height={42}
+        width={42}
+        alt="aegis icon"
+      />
+      <span className="-mt-2 text-xs text-white/80">
+        {zeroPad(minutes)}:{zeroPad(seconds)}
+      </span>
+    </div>
+  )
+}
+
+const roshRender = ({ minutes, seconds, completed }) => {
+  if (completed) {
+    return null
+  }
+  return (
+    <span>
+      <Image
+        src="/images/aegis-icon.png"
+        height={52}
+        width={52}
+        alt="aegis icon"
+      />
+      <span className="text-sm text-white/80">
+        {zeroPad(minutes)}:{zeroPad(seconds)}
+      </span>
+    </span>
   )
 }
