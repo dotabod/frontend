@@ -38,6 +38,7 @@ export default function OverlayPage() {
     leaderboard: false,
   })
 
+  // On first load / refresh
   useEffect(() => {
     if (!userId) return
 
@@ -117,15 +118,6 @@ export default function OverlayPage() {
     }
 
     console.log('Connected to socket! Running OBS scene switchers')
-
-    // Debug info
-    if (shouldBlockMap) {
-      console.log({ setCurrentScene: opts[DBSettings.obsMinimap] })
-    } else if (shouldBlockPicks) {
-      console.log({ setCurrentScene: opts[DBSettings.obsPicks] })
-    } else {
-      console.log({ setCurrentScene: opts[DBSettings.obsDc] })
-    }
 
     // Only run in OBS browser source
     if (

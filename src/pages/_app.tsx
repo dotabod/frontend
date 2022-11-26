@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react'
 import { SessionProvider } from 'next-auth/react'
 
 import '@/styles/tailwind.css'
@@ -19,6 +20,7 @@ export default function App({
       <MantineProvider>
         <GeistProvider>
           <Component {...pageProps} />
+          <Analytics />
         </GeistProvider>
       </MantineProvider>
     </SessionProvider>

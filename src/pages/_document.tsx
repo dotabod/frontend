@@ -1,4 +1,3 @@
-import { Analytics } from '@/components/analytics'
 import { Head, Html, Main, NextScript } from 'next/document'
 
 export default function Document() {
@@ -30,7 +29,6 @@ export default function Document() {
       <body className="min-h-screen bg-transparent">
         <Main />
         <NextScript />
-        <Analytics />
       </body>
     </Html>
   )
