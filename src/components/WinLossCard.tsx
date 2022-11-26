@@ -14,7 +14,7 @@ export function WinLossCard(wl: { win: number; lose: number; type: string }[]) {
               {win || 0} <span className="text-green-300">W</span> - {lose || 0}{' '}
               <span className="text-red-300">L</span>
             </span>
-            {wl.length > 1 && <span className="text-xs ">{type}</span>}
+            <span className="text-xs ">{type}</span>
           </div>
         ))}
       </Card>
