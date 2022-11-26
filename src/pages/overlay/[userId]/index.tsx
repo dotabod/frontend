@@ -17,6 +17,7 @@ import { getWL } from '@/lib/getWL'
 import { HeroBlocker } from '@/components/HeroBlocker'
 import { WinLossCard } from '@/components/WinLossCard'
 import Countdown, { zeroPad } from 'react-countdown'
+import { Card } from '@/components/Card'
 
 let socket
 
@@ -180,8 +181,41 @@ export default function OverlayPage() {
         )}
 
         {block?.type === 'spectator' && (
-          <div className={`absolute bottom-[260px] left-[49px] text-white/90`}>
-            Spectating a match
+          <div className={`absolute bottom-[260px] left-[49px]`}>
+            <Card>Spectating a match</Card>
+          </div>
+        )}
+
+        {block.type === 'playing' && roshan?.maxDate && (
+          <div className={`absolute bottom-[100px] left-[255px]`}>
+            <Card>
+              {roshan?.minDate && (
+                <Countdown
+                  date={roshan?.minDate}
+                  renderer={roshRender}
+                  onComplete={() => {
+                    setRoshan({
+                      ...roshan,
+                      minDate: '',
+                    })
+                  }}
+                />
+              )}
+              {!roshan?.minDate && roshan?.maxDate && (
+                <Countdown
+                  date={roshan?.maxDate}
+                  renderer={roshRender}
+                  onComplete={() => {
+                    setRoshan({
+                      minTime: '',
+                      maxTime: '',
+                      minDate: '',
+                      maxDate: '',
+                    })
+                  }}
+                />
+              )}
+            </Card>
           </div>
         )}
 
@@ -255,7 +289,7 @@ const aegisRender = ({ minutes, seconds, completed }) => {
         width={42}
         alt="aegis icon"
       />
-      <span className="-mt-2 text-xs text-white/80">
+      <span className="-mt-2 text-xs text-white/90">
         {zeroPad(minutes)}:{zeroPad(seconds)}
       </span>
     </div>
@@ -267,16 +301,17 @@ const roshRender = ({ minutes, seconds, completed }) => {
     return null
   }
   return (
-    <span>
+    <div className="flex flex-col items-center">
       <Image
-        src="/images/aegis-icon.png"
-        height={52}
-        width={52}
-        alt="aegis icon"
+        src="/images/roshan-icon.png"
+        height={50}
+        width={33}
+        alt="roshan icon"
+        className="rounded-full"
       />
-      <span className="text-sm text-white/80">
+      <span className="text-xs text-white/90">
         {zeroPad(minutes)}:{zeroPad(seconds)}
       </span>
-    </span>
+    </div>
   )
 }
