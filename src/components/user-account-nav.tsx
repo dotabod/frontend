@@ -78,6 +78,12 @@ export function UserAccountNav({ showDetails = false }) {
             Features
           </Menu.Item>
           <Menu.Divider />
+          <Menu.Item component={Link} href="https://github.com/dotabod">
+            Github
+          </Menu.Item>
+          <Menu.Item component={Link} href="https://discord.dotabod.com">
+            Discord
+          </Menu.Item>
           <Menu.Item
             component="a"
             onClick={() => {

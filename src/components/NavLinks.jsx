@@ -40,7 +40,7 @@ export function NavLinks({ bottom = false }) {
       </AnimatePresence>
 
       <span className="relative z-10">
-        {bottom && Icon && (
+        {Icon && (
           <Image
             src={Icon}
             width={18}

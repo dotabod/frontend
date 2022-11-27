@@ -4,8 +4,11 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Logo } from '@/components/Logo'
 import Link from 'next/link'
+import Image from 'next/image'
 import { UserAccountNav } from '@/components/user-account-nav'
 import { HomeIcon, InboxIcon } from '@heroicons/react/24/outline'
+import { Github } from 'lucide-react'
+import DiscordSvg from '@/images/logos/discord.svg'
 
 export const navigation = [
   {
@@ -17,6 +20,16 @@ export const navigation = [
     name: 'Features',
     href: '/dashboard/features',
     icon: InboxIcon,
+  },
+  {
+    name: 'Github',
+    href: 'https://github.com/dotabod/',
+    icon: Github,
+  },
+  {
+    name: 'Discord',
+    href: 'https://discord.dotabod.com',
+    icon: ({ ...props }) => <Image alt="discord" src={DiscordSvg} {...props} />,
   },
 ]
 
