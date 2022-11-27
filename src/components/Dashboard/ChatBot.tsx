@@ -5,7 +5,10 @@ import Link from 'next/link'
 const emotes = [
   { label: 'BASED' },
   { label: 'Chatting' },
-  { label: 'massivePIDAS' },
+  {
+    label: 'massivePIDAS',
+    url: 'https://7tv.app/emotes/6257e7a3131d4588262a7505',
+  },
   { label: 'Sadge' },
   { label: 'EZ', url: 'https://betterttv.com/emotes/5590b223b344e2c42a9e28e3' },
   { label: 'Clap' },
