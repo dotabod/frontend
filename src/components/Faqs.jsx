@@ -46,7 +46,7 @@ const faqs = [
     {
       question: 'Isn’t this against TOS?',
       answer:
-        'Not at all. In fact, Valve themselves sanction and allow this practice officially.',
+        'Not at all. In fact, Valve themselves sanction and allow this practice officially. Valve provides Gamestate Integration for Dota 2 so that any thirdparty apps, like Dotabod, can receive live data.',
     },
     {
       question: 'Will this make me a better streamer?',
