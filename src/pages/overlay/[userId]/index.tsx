@@ -106,7 +106,7 @@ export default function OverlayPage() {
     })
 
     socket.on('block', setBlock)
-    socket.on('pause', setPaused)
+    socket.on('paused', setPaused)
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
     socket.on('connect', () => {
