@@ -95,6 +95,7 @@ export default function SceneSwitcher(): JSX.Element {
                       id={sceneKey}
                       placeholder={defaultSettings[sceneKey]}
                       initialValue={scene.value}
+                      width="400px"
                       name={sceneKey}
                       onChange={(e) =>
                         handleSceneName(e.target.value, scene.update)
