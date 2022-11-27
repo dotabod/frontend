@@ -1,7 +1,8 @@
 'use client'
 
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import io from 'socket.io-client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -26,6 +27,7 @@ export default function OverlayPage() {
   const { userId } = router.query
 
   const [data, setData] = useState(null)
+  const [paused, setPaused] = useState(false)
   const [wl, setWL] = useState([
     {
       win: 0,
@@ -52,16 +54,22 @@ export default function OverlayPage() {
   }, [userId])
 
   const [block, setBlock] = useState({ type: null, team: null })
+  const time = new Date().getTime()
+  const isDev = process.env.NODE_ENV === 'development'
+  const devMin = isDev ? new Date(time + 6000).toISOString() : ''
+  const devMax = isDev ? new Date(time + 9000).toISOString() : ''
   const [roshan, setRoshan] = useState({
-    minTime: '',
-    maxTime: '',
-    minDate: '',
-    maxDate: '',
+    minS: isDev ? 6 : 0,
+    maxS: isDev ? 6 : 0,
+    minDate: devMin,
+    maxDate: devMax,
   })
+
   const [aegis, setAegis] = useState({
+    expireS: isDev ? 6 : 0,
     expireTime: '',
-    expireDate: '',
-    playerId: null,
+    expireDate: isDev ? devMin : '',
+    playerId: isDev ? 1 : null,
   })
   const [connected, setConnected] = useState(false)
 
@@ -75,6 +83,18 @@ export default function OverlayPage() {
   const shouldBlockMap = opts[DBSettings.mblock] && block.type === 'playing'
   const shouldBlockPicks =
     opts[DBSettings.pblock] && ['picks', 'strategy'].includes(block.type)
+  const countdownRef = useRef<Countdown>()
+  const aegisRef = useRef<Countdown>()
+
+  useEffect(() => {
+    if (paused) {
+      countdownRef.current?.api?.pause()
+      aegisRef.current?.api?.pause()
+    } else {
+      countdownRef.current?.api?.start()
+      aegisRef.current?.api?.start()
+    }
+  }, [paused])
 
   useEffect(() => {
     if (!userId) return
@@ -86,6 +106,7 @@ export default function OverlayPage() {
     })
 
     socket.on('block', setBlock)
+    socket.on('pause', setPaused)
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
     socket.on('connect', () => {
@@ -171,7 +192,7 @@ export default function OverlayPage() {
         <title>Dotabod | Stream overlays</title>
       </Head>
       <div>
-        {process.env.NODE_ENV === 'development' && (
+        {isDev && (
           <Image
             height={1080}
             width={1920}
@@ -186,40 +207,61 @@ export default function OverlayPage() {
           </div>
         )}
 
-        {block.type === 'playing' && roshan?.maxDate && (
+        {(block.type === 'playing' || isDev) && roshan?.maxDate && (
           <div className={`absolute bottom-[100px] left-[255px]`}>
-            <Card>
-              {roshan?.minDate && (
-                <Countdown
-                  date={roshan?.minDate}
-                  renderer={roshRender}
-                  onComplete={() => {
-                    setRoshan({
-                      ...roshan,
-                      minDate: '',
-                    })
-                  }}
-                />
-              )}
-              {!roshan?.minDate && roshan?.maxDate && (
-                <Countdown
-                  date={roshan?.maxDate}
-                  renderer={roshRender}
-                  onComplete={() => {
-                    setRoshan({
-                      minTime: '',
-                      maxTime: '',
-                      minDate: '',
-                      maxDate: '',
-                    })
-                  }}
-                />
-              )}
-            </Card>
+            {roshan?.minDate && (
+              <CountdownCircleTimer
+                isPlaying={!paused}
+                duration={roshan?.minS}
+                colors="#A30000"
+                size={50}
+                strokeWidth={3}
+              >
+                {({ remainingTime }) => (
+                  <Countdown
+                    ref={countdownRef}
+                    date={roshan?.minDate}
+                    renderer={roshRender}
+                    onComplete={() => {
+                      setRoshan({
+                        ...roshan,
+                        minDate: '',
+                        minS: 0,
+                      })
+                    }}
+                  />
+                )}
+              </CountdownCircleTimer>
+            )}
+            {!roshan?.minDate && roshan?.maxDate && (
+              <CountdownCircleTimer
+                isPlaying={!paused}
+                duration={roshan?.maxS}
+                colors="#a39800"
+                size={50}
+                strokeWidth={3}
+              >
+                {({ remainingTime }) => (
+                  <Countdown
+                    ref={countdownRef}
+                    date={roshan?.maxDate}
+                    renderer={roshRender}
+                    onComplete={() => {
+                      setRoshan({
+                        minS: 0,
+                        minDate: '',
+                        maxDate: '',
+                        maxS: 0,
+                      })
+                    }}
+                  />
+                )}
+              </CountdownCircleTimer>
+            )}
           </div>
         )}
 
-        {block.type === 'playing' && aegis.expireDate && (
+        {(block.type === 'playing' || isDev) && aegis.expireDate && (
           <div
             style={{
               left: positions[aegis.playerId],
@@ -229,8 +271,10 @@ export default function OverlayPage() {
             <Countdown
               date={aegis.expireDate}
               renderer={aegisRender}
+              ref={aegisRef}
               onComplete={() => {
                 setAegis({
+                  expireS: 0,
                   expireTime: '',
                   expireDate: '',
                   playerId: null,
@@ -300,6 +344,7 @@ const roshRender = ({ minutes, seconds, completed }) => {
   if (completed) {
     return null
   }
+
   return (
     <div className="flex flex-col items-center">
       <Image
