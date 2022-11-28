@@ -192,15 +192,6 @@ export default function OverlayPage() {
         <title>Dotabod | Stream overlays</title>
       </Head>
       <div>
-        {isDev && (
-          <Image
-            height={1080}
-            width={1920}
-            alt={`main game`}
-            src={`/images/shot_0012.png`}
-          />
-        )}
-
         {block?.type === 'spectator' && (
           <div className={`absolute bottom-[260px] left-[49px]`}>
             <Card>Spectating a match</Card>
@@ -315,6 +306,15 @@ export default function OverlayPage() {
               </div>
             )}
           </>
+        )}
+
+        {isDev && (
+          <Image
+            height={1080}
+            width={1920}
+            alt={`main game`}
+            src={`/images/shot_0012.png`}
+          />
         )}
       </div>
     </>
