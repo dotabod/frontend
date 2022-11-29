@@ -1,3 +1,5 @@
+import BetsCard from '@/components/Dashboard/Features/BetsCard'
+import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
 import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
 import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
 import PicksCard from '@/components/Dashboard/Features/PicksCard'
@@ -22,6 +24,8 @@ export default function DashboardPage({ settings }: Props) {
       <DashboardShell title="Features">
         <MmrTrackerCard />
         <MinimapCard />
+        <BetsCard />
+        <ChatterCard />
         <PicksCard />
         <SceneSwitcher />
       </DashboardShell>

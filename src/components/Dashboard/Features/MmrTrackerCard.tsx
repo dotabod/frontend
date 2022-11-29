@@ -101,7 +101,12 @@ export default function MmrTrackerCard() {
                 </div>
               )
             })}
-            <Button loading={loadingAccounts} auto htmlType="submit">
+            <Button
+              disabled={!isEnabled}
+              loading={loadingAccounts}
+              auto
+              htmlType="submit"
+            >
               Save
             </Button>
           </form>
@@ -144,8 +149,8 @@ export default function MmrTrackerCard() {
         >
           <Image
             alt="mmr tracker"
-            width="647px"
-            height="333px"
+            width="255px"
+            height="233px"
             src="/images/mmr-tracker.png"
           />
         </Display>
