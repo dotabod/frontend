@@ -141,6 +141,12 @@ export default function OverlayPage() {
       }
     })
 
+    socket.on('refresh-settings', () => {
+      console.log('refreshing settings')
+
+      fetcher(`/api/settings/?id=`, userId).then(setData)
+    })
+
     socket.on('update-medal', ({ mmr, steam32Id }) => {
       // Refetch mmr and medal image
       console.log('updating medal')
