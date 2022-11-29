@@ -16,6 +16,7 @@
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@mantine/core": "^5.7.1",
+    "@mantine/form": "^5.8.4",
     "@mantine/hooks": "^5.7.1",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.6.1",

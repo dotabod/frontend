@@ -1,8 +1,42 @@
 import { useToasts } from '@geist-ui/core'
+import { SteamAccount } from '@prisma/client'
 import useSWR, { useSWRConfig } from 'swr'
 import { useDebouncedCallback } from 'use-debounce'
 import { DBSettings, getValueOrDefault } from './DBSettings'
 import { fetcher } from './fetcher'
+
+export function useUpdateAccount() {
+  const { data } = useSWR(`/api/settings/accounts`, fetcher)
+
+  const loading = data === undefined
+
+  const { setToast } = useToasts()
+  const { mutate } = useSWRConfig()
+
+  const update = useDebouncedCallback((accounts: SteamAccount[]) => {
+    const options = {
+      optimisticData: { accounts },
+      rollbackOnError: true,
+    }
+
+    const updateFn = async (accounts) => {
+      const response = await fetch(`/api/settings/accounts`, {
+        method: 'PATCH',
+        body: JSON.stringify(accounts),
+      })
+      setToast({
+        text: response.ok ? `Updated accounts!` : 'Error updating',
+        type: response.ok ? 'success' : 'error',
+      })
+
+      return { accounts }
+    }
+
+    mutate(`/api/settings/accounts`, updateFn(accounts), options)
+  }, 400)
+
+  return { data, loading, update }
+}
 
 export function useUpdateSetting(key) {
   const { data } = useSWR(`/api/settings`, fetcher)

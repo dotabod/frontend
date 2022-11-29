@@ -62,7 +62,7 @@ Card.Description = function CardDescription({
   ...props
 }: CardDescriptionProps) {
   return (
-    <p
+    <div
       className={clsx('mt-1 max-w-2xl text-sm text-gray-500', className)}
       {...props}
     />
