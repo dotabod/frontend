@@ -22,6 +22,19 @@ import { Card } from '@/components/Card'
 
 let socket
 
+type dataProp = {
+  steam32Id: number
+  mmr: number
+  settings: {
+    value: any
+    key: string
+  }[]
+  SteamAccount: {
+    steam32Id: number
+    mmr: number
+  }[]
+}
+
 export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
@@ -46,10 +59,13 @@ export default function OverlayPage() {
   useEffect(() => {
     if (!userId) return
 
-    fetcher(`/api/settings/?id=`, userId).then((data) => {
+    fetcher(`/api/settings/?id=`, userId).then((data: dataProp) => {
       setData(data)
-      getWL(data?.steam32Id, setWL)
-      getRankImage(data?.mmr, data?.steam32Id).then(setRankImageDetails)
+
+      const steam32Id = data?.SteamAccount[0]?.steam32Id || data?.steam32Id
+      const mmr = data?.SteamAccount[0]?.mmr || data?.mmr
+      getWL(steam32Id, setWL)
+      getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
   }, [userId])
 
@@ -200,7 +216,11 @@ export default function OverlayPage() {
       </Head>
       <div>
         {block?.type === 'spectator' && (
-          <div className={`absolute bottom-[260px] left-[49px]`}>
+          <div
+            className={`absolute ${
+              opts[DBSettings.xl] ? 'bottom-[300px]' : 'bottom-[260px]'
+            } left-0`}
+          >
             <Card>Spectating a match</Card>
           </div>
         )}

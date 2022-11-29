@@ -17,18 +17,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'GET') {
     try {
-      const settings = await prisma.setting.findMany({
+      const data = await prisma.user.findFirst({
         select: {
-          key: true,
-          value: true,
-        },
-        where: {
-          userId: session ? session?.user?.id : userId,
-        },
-      })
-
-      const { mmr, steam32Id } = await prisma.user.findFirst({
-        select: {
+          settings: {
+            select: {
+              key: true,
+              value: true,
+            },
+          },
+          SteamAccount: {
+            select: {
+              mmr: true,
+              steam32Id: true,
+            },
+          },
           mmr: true,
           steam32Id: true,
         },
@@ -37,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      return res.json({ settings, mmr, steam32Id })
+      return res.json(data)
     } catch (error) {
       return res.status(500).end()
     }
