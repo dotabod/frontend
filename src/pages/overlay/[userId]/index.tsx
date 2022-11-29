@@ -56,11 +56,11 @@ export default function OverlayPage() {
   const [block, setBlock] = useState({ type: null, team: null })
   const time = new Date().getTime()
   const isDev = process.env.NODE_ENV === 'development'
-  const devMin = isDev ? new Date(time + 6000).toISOString() : ''
-  const devMax = isDev ? new Date(time + 9000).toISOString() : ''
+  const devMin = isDev ? new Date(time + 600000).toISOString() : ''
+  const devMax = isDev ? new Date(time + 900000).toISOString() : ''
   const [roshan, setRoshan] = useState({
-    minS: isDev ? 6 : 0,
-    maxS: isDev ? 6 : 0,
+    minS: isDev ? 600 : 0,
+    maxS: isDev ? 600 : 0,
     minDate: devMin,
     maxDate: devMax,
   })
@@ -186,6 +186,13 @@ export default function OverlayPage() {
 
   const positions = [555, 615, 680, 745, 800, 1065, 1130, 1192, 1250, 1320]
 
+  let aegisLeft = 0
+  if (opts[DBSettings.bp]) {
+    aegisLeft = opts[DBSettings.xl] ? 290 : 255
+  } else {
+    aegisLeft = opts[DBSettings.xl] ? 285 : 250
+  }
+
   return (
     <>
       <Head>
@@ -199,37 +206,42 @@ export default function OverlayPage() {
         )}
 
         {(block.type === 'playing' || isDev) && roshan?.maxDate && (
-          <div className={`absolute bottom-[100px] left-[255px]`}>
+          <div
+            style={{ left: aegisLeft }}
+            className={`absolute bottom-[100px]`}
+          >
             {roshan?.minDate && (
-              <CountdownCircleTimer
-                isPlaying={!paused}
-                duration={roshan?.minS}
-                colors="#A30000"
-                size={50}
-                strokeWidth={3}
-              >
-                {({ remainingTime }) => (
-                  <Countdown
-                    ref={countdownRef}
-                    date={roshan?.minDate}
-                    renderer={roshRender}
-                    onComplete={() => {
-                      setRoshan({
-                        ...roshan,
-                        minDate: '',
-                        minS: 0,
-                      })
-                    }}
-                  />
-                )}
-              </CountdownCircleTimer>
+              <div className="rounded-full bg-red-900/70">
+                <CountdownCircleTimer
+                  isPlaying={!paused}
+                  duration={roshan?.minS}
+                  colors="#A30000"
+                  size={45}
+                  strokeWidth={3}
+                >
+                  {({ remainingTime }) => (
+                    <Countdown
+                      ref={countdownRef}
+                      date={roshan?.minDate}
+                      renderer={roshRender}
+                      onComplete={() => {
+                        setRoshan({
+                          ...roshan,
+                          minDate: '',
+                          minS: 0,
+                        })
+                      }}
+                    />
+                  )}
+                </CountdownCircleTimer>
+              </div>
             )}
             {!roshan?.minDate && roshan?.maxDate && (
               <CountdownCircleTimer
                 isPlaying={!paused}
                 duration={roshan?.maxS}
                 colors="#a39800"
-                size={50}
+                size={45}
                 strokeWidth={3}
               >
                 {({ remainingTime }) => (
@@ -257,7 +269,7 @@ export default function OverlayPage() {
             style={{
               left: positions[aegis.playerId],
             }}
-            className={`absolute top-[40px] text-white/90`}
+            className={`absolute top-[65px] text-white/90`}
           >
             <Countdown
               date={aegis.expireDate}
@@ -307,15 +319,6 @@ export default function OverlayPage() {
             )}
           </>
         )}
-
-        {isDev && (
-          <Image
-            height={1080}
-            width={1920}
-            alt={`main game`}
-            src={`/images/shot_0012.png`}
-          />
-        )}
       </div>
     </>
   )
@@ -333,8 +336,8 @@ const aegisRender = ({ minutes, seconds, completed }) => {
         width={42}
         alt="aegis icon"
       />
-      <span className="-mt-2 text-xs text-white/90">
-        {zeroPad(minutes)}:{zeroPad(seconds)}
+      <span className="-mt-2 text-sm text-white/90">
+        {minutes}:{zeroPad(seconds)}
       </span>
     </div>
   )
@@ -354,8 +357,8 @@ const roshRender = ({ minutes, seconds, completed }) => {
         alt="roshan icon"
         className="rounded-full"
       />
-      <span className="text-xs text-white/90">
-        {zeroPad(minutes)}:{zeroPad(seconds)}
+      <span className="-mt-3 text-sm text-white/90">
+        {minutes}:{zeroPad(seconds)}
       </span>
     </div>
   )
