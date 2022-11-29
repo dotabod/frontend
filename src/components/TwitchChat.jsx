@@ -1,7 +1,7 @@
 import ModImage from './ModImage'
 
 export default function TwitchChat({
-  command,
+  command = null,
   modOnly = false,
   responses = [],
   response = null,
