@@ -1,8 +1,16 @@
 'use client'
 
-export const Card = ({ children }) => {
+import clsx from 'clsx'
+
+export const Card = ({ children, className = '', ...props }) => {
   return (
-    <div className="flex flex-col items-center rounded bg-slate-700/50 p-1 text-white/90">
+    <div
+      className={clsx(
+        className,
+        'flex flex-col items-center rounded bg-slate-700/50 p-1 text-white/90'
+      )}
+      {...props}
+    >
       {children}
     </div>
   )

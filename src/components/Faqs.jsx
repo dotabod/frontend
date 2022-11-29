@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 import { Container } from '@/components/Container'
 
@@ -6,8 +7,19 @@ const faqs = [
   [
     {
       question: 'Why the name Dotabod?',
-      answer:
-        'Because we all have a little dota bod in us. But also because dotabot was taken.',
+      answer: (
+        <div>
+          Because we all have a little dota bod in us{' '}
+          <Image
+            className="inline align-bottom"
+            src="/images/peepofat.gif"
+            height={28}
+            width={28}
+            alt="peepofat"
+          />
+          . But also because dotabot was taken.
+        </div>
+      ),
     },
     {
       question:

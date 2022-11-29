@@ -16,9 +16,9 @@ import { getRankImage } from '@/lib/ranks'
 import { Rankbadge } from '@/components/Rankbadge'
 import { getWL } from '@/lib/getWL'
 import { HeroBlocker } from '@/components/HeroBlocker'
-import { WinLossCard } from '@/components/WinLossCard'
 import Countdown, { zeroPad } from 'react-countdown'
 import { Card } from '@/components/Card'
+import WinLossCard from '@/components/WinLossCard'
 
 let socket
 
@@ -336,7 +336,11 @@ export default function OverlayPage() {
 
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
-            {WinLossCard(wl)}
+            {
+              <div className="absolute bottom-0 right-[350px]">
+                <WinLossCard wl={wl} />
+              </div>
+            }
 
             {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
               <div className="absolute bottom-0 right-[276px]">

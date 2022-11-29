@@ -5,24 +5,47 @@ import Image from 'next/image'
 import { Badge, Link } from '@geist-ui/core'
 import { HoverCard } from '@mantine/core'
 import { SparklesIcon } from '@heroicons/react/24/outline'
+import { Rankbadge } from './Rankbadge'
+import WinLossCard from './WinLossCard'
 
-function DeviceArrowIcon(props) {
+const ModImage = () => (
+  <Image
+    height={18}
+    width={18}
+    className="mr-1 inline align-middle"
+    alt="twitch mod icon"
+    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAE5SURBVHgBpZQ/TgJBGMXfuNho4STGQhu3sLExMdRG0QPgDYweQFkPoOABzOoBhNhDgj0x0dpCGwtNGBpb1wIbimG+CQwssDOb5SWT+bPf/PZ7b5NlaHgnkAgBcGSTAEOZoe611cbHfIpyaSEXW+cId26nzlmDEOALaSD+0ibK21fWGieIL3I877X0PBfoWnXiL/uuMjuIcimpkUaJIFcuUS9C8HFp9rnJDpo/TVX0Z81F/HdQeDnU80h1T9IovQeS1O4KWRU1maTw607yp1U5vDccTC8GVqiLpGDJSuXzBuH3/cznBmSDzbYSl/Pz1zqP2G3lrZAYaLwbuiS6Qp8frO2r0FfgkgFV8w8GQjYKr0caRi84Xi86QbGwCXb6dmZsaMhGMTHgSdAvsv+LBpKCrAW0QGbJCPAqfZUtm2qML5G2AAAAAElFTkSuQmCC"
+  />
+)
+
+function TwitchChat({
+  command,
+  modOnly = false,
+  responses = [],
+  response = null,
+}) {
+  if (response) responses.push(response)
   return (
-    <svg viewBox="0 0 32 32" aria-hidden="true" {...props}>
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M9 0a4 4 0 00-4 4v24a4 4 0 004 4h14a4 4 0 004-4V4a4 4 0 00-4-4H9zm0 2a2 2 0 00-2 2v24a2 2 0 002 2h14a2 2 0 002-2V4a2 2 0 00-2-2h-1.382a1 1 0 00-.894.553l-.448.894a1 1 0 01-.894.553h-6.764a1 1 0 01-.894-.553l-.448-.894A1 1 0 0010.382 2H9z"
-        fill="#737373"
-      />
-      <path
-        d="M12 25l8-8m0 0h-6m6 0v6"
-        stroke="#171717"
-        strokeWidth={2}
-        strokeLinecap="round"
-      />
-      <circle cx={16} cy={16} r={16} fill="#A3A3A3" fillOpacity={0.2} />
-    </svg>
+    <div className="mt-2 rounded border p-2">
+      {command && (
+        <div>
+          {modOnly && <ModImage />}
+          <span className="font-bold text-[#8a2be2]">techleed</span>
+          <span className="mr-1">:</span>
+          <div className="inline">{command}</div>
+        </div>
+      )}
+      <div className="space-y-1">
+        {responses.map((response, i) => (
+          <div key={i}>
+            <ModImage />
+            <span className="font-bold text-[#c90909]">dotabod</span>
+            <span className="mr-1">:</span>
+            <div className="inline">{response}</div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -154,9 +177,53 @@ function DeviceChartIcon(props) {
 export function SecondaryFeatures() {
   const features = [
     {
-      name: 'Twitch predictions',
-      description:
-        'Create predictions for your viewers to bet on. Dotabod will start and stop the prediction automatically.',
+      name: (
+        <div className="space-between flex w-full items-center">
+          <span className="w-full">Win loss overlay</span>
+          <HoverCard closeDelay={200} shadow="md">
+            <HoverCard.Target>
+              <Link
+                className="flex !items-center space-x-1"
+                onClick={(e) => e.preventDefault()}
+                color
+                underline
+              >
+                <SparklesIcon height={22} />
+                <span>Preview</span>
+              </Link>
+            </HoverCard.Target>
+            <HoverCard.Dropdown>
+              <Image
+                alt="wl overlay"
+                width={353}
+                height={333}
+                src="/images/wl-overlay.png"
+              />
+            </HoverCard.Dropdown>
+          </HoverCard>
+        </div>
+      ),
+      description: (
+        <div>
+          <span>
+            Create predictions for your viewers to bet on. Dotabod will start
+            and stop the prediction automatically.
+          </span>
+
+          <div className="mt-6 flex justify-center space-x-4">
+            <WinLossCard
+              className="self-center"
+              wl={[{ win: 1, lose: 50, type: 'R' }]}
+            />
+            <WinLossCard
+              wl={[
+                { win: 1, lose: 50, type: 'R' },
+                { win: 1, lose: 50, type: 'U' },
+              ]}
+            />
+          </div>
+        </div>
+      ),
     },
     {
       name: (
@@ -186,28 +253,64 @@ export function SecondaryFeatures() {
         </div>
       ),
       description: (
-        <span>
-          Show off your current rank, or leaderboard standing on stream.
-        </span>
+        <div>
+          <span>
+            Show off your current rank, or leaderboard standing on stream.
+          </span>
+          <div className="mt-6 flex justify-center space-x-4">
+            <Rankbadge image="55.png" rank="3860" />
+            <Rankbadge image="92.png" leaderboard rank="9" />
+          </div>
+        </div>
       ),
     },
     {
-      name: '!mmr command',
-      description:
-        'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
+      name: 'MMR command',
+      description: (
+        <>
+          Using chat command !mmr, viewers can get an accurate mmr update in
+          chat. Auto updates immediately with every match!
+          <TwitchChat
+            command="!mmr"
+            response="2720 | Archon☆3 | Next rank at 2772 in 2 wins"
+          />
+        </>
+      ),
     },
     {
-      name: 'Chatbot says PauseChamp',
+      name: 'Dotabod has things to say',
       description: (
-        <div className="flex items-center space-x-1">
-          <span>But only when the Dota game is paused</span>
-          <Image
-            width={22}
-            height={22}
-            alt="pausechamp"
-            src="/images/pauseChamp.webp"
+        <div className="">
+          <span>
+            But only when the game conditions meet the correct parameters.
+          </span>
+          <TwitchChat
+            responses={[
+              <>
+                <Image
+                  width={22}
+                  height={22}
+                  alt="pausechamp"
+                  className="mr-1 inline align-middle"
+                  src="/images/pauseChamp.webp"
+                />
+                <span>Who paused the game?</span>
+              </>,
+              <>
+                <Image
+                  width={22}
+                  height={22}
+                  alt="pausechamp"
+                  className="mr-1 inline align-middle"
+                  src="/images/massivePIDAS.webp"
+                />
+                <span>Use your midas</span>
+              </>,
+              <>
+                <span>🚬💣 Clockwerk is smoked!</span>
+              </>,
+            ]}
           />
-          <span>.</span>
         </div>
       ),
     },
@@ -218,23 +321,48 @@ export function SecondaryFeatures() {
       inProgress: true,
     },
     {
-      name: '!hero command',
-      description:
-        'New players to Dota will be able to read fun trivia about the hero being played.',
+      name: 'Hero command',
+      description: (
+        <>
+          Shows the stats for your currently played hero.
+          <TwitchChat
+            command="!hero"
+            response="Winrate: 90% as Clockwerk in 30d of 12 matches."
+          />
+        </>
+      ),
     },
     {
-      name: '!xpm command',
-      description: 'Live experience per minute for your chatters on demand.',
+      name: 'XPM command',
+      description: (
+        <>
+          Live experience per minute for your chatters on demand.
+          <TwitchChat command="!xpm" response="Live XPM: 778" />
+        </>
+      ),
     },
     {
-      name: '!gpm command',
-      description:
-        'At any time, chatters can request your live gold per minute with !gpm. Playing alch or anti-mage? Show off your gpm!',
+      name: 'GPM command',
+      description: (
+        <>
+          At any time, chatters can request your live gold per minute with !gpm.
+          Playing alch or anti-mage? Show off your gpm!
+          <TwitchChat
+            command="!gpm"
+            response="Live GPM: 660. 5270 from hero kills, 9295 from creep kills."
+          />
+        </>
+      ),
     },
     {
-      name: '!pleb command',
-      description:
-        'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
+      name: 'Pleb command',
+      description: (
+        <div>
+          When you have sub only mode turned on, use !pleb to let one non-sub
+          send a message. Then all your subs can point and laugh 😂.
+          <TwitchChat modOnly command="!pleb" response="One pleb IN 👇" />
+        </div>
+      ),
     },
   ]
 
