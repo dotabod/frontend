@@ -4,6 +4,7 @@ import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
 import Image from 'next/image'
+import TwitchChat from '@/components/TwitchChat'
 
 export default function ChatterCard() {
   const { isEnabled, loading, updateSetting } = useUpdateSetting(
@@ -19,27 +20,33 @@ export default function ChatterCard() {
         </Card.Description>
       </Card.Header>
       <Card.Content className="space-y-2">
-        <div className="flex items-center space-x-2 text-left">
-          <Image
-            width={22}
-            height={22}
-            alt="pausechamp"
-            src="/images/pauseChamp.webp"
-          />
-          <span>Who paused the game?</span>
-        </div>
-        <div className="flex items-center space-x-2 text-left">
-          <Image
-            width={36}
-            height={22}
-            alt="massivePIDAS"
-            src="/images/massivePIDAS.webp"
-          />
-          <span>Use your midas</span>
-        </div>
-        <div className="flex items-center space-x-2 text-left">
-          <span>🚬💣 Streamer-hero-name is smoked!</span>
-        </div>
+        <TwitchChat
+          responses={[
+            <>
+              <Image
+                width={22}
+                height={22}
+                alt="pausechamp"
+                className="mr-1 inline align-middle"
+                src="/images/pauseChamp.webp"
+              />
+              <span>Who paused the game?</span>
+            </>,
+            <>
+              <Image
+                width={22}
+                height={22}
+                alt="pausechamp"
+                className="mr-1 inline align-middle"
+                src="/images/massivePIDAS.webp"
+              />
+              <span>Use your midas</span>
+            </>,
+            <>
+              <span>🚬💣 Clockwerk is smoked!</span>
+            </>,
+          ]}
+        />
       </Card.Content>
       <Card.Footer>
         {loading ? (
