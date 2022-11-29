@@ -3,6 +3,7 @@ import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
 import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
 import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
 import PicksCard from '@/components/Dashboard/Features/PicksCard'
+import RoshCard from '@/components/Dashboard/Features/RoshCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import DashboardShell from '@/components/DashboardShell'
 import { Setting } from '@prisma/client'
@@ -24,6 +25,7 @@ export default function DashboardPage({ settings }: Props) {
       <DashboardShell title="Features">
         <MmrTrackerCard />
         <MinimapCard />
+        <RoshCard />
         <BetsCard />
         <ChatterCard />
         <PicksCard />

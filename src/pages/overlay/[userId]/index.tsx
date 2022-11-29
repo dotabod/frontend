@@ -231,87 +231,91 @@ export default function OverlayPage() {
           </div>
         )}
 
-        {(block.type === 'playing' || isDev) && roshan?.maxDate && (
-          <div
-            style={{ left: aegisLeft }}
-            className={`absolute bottom-[100px]`}
-          >
-            {roshan?.minDate && (
-              <div className="rounded-full bg-red-900/70">
+        {opts[DBSettings.rosh] &&
+          (block.type === 'playing' || isDev) &&
+          roshan?.maxDate && (
+            <div
+              style={{ left: aegisLeft }}
+              className={`absolute bottom-[100px]`}
+            >
+              {roshan?.minDate && (
+                <div className="rounded-full bg-red-900/70">
+                  <CountdownCircleTimer
+                    isPlaying={!paused}
+                    duration={roshan?.minS}
+                    colors="#A30000"
+                    size={45}
+                    strokeWidth={3}
+                  >
+                    {({ remainingTime }) => (
+                      <Countdown
+                        ref={countdownRef}
+                        date={roshan?.minDate}
+                        renderer={roshRender}
+                        onComplete={() => {
+                          setRoshan({
+                            ...roshan,
+                            minDate: '',
+                            minS: 0,
+                          })
+                        }}
+                      />
+                    )}
+                  </CountdownCircleTimer>
+                </div>
+              )}
+              {!roshan?.minDate && roshan?.maxDate && (
                 <CountdownCircleTimer
                   isPlaying={!paused}
-                  duration={roshan?.minS}
-                  colors="#A30000"
+                  duration={roshan?.maxS}
+                  colors="#a39800"
                   size={45}
                   strokeWidth={3}
                 >
                   {({ remainingTime }) => (
                     <Countdown
                       ref={countdownRef}
-                      date={roshan?.minDate}
+                      date={roshan?.maxDate}
                       renderer={roshRender}
                       onComplete={() => {
                         setRoshan({
-                          ...roshan,
-                          minDate: '',
                           minS: 0,
+                          minDate: '',
+                          maxDate: '',
+                          maxS: 0,
                         })
                       }}
                     />
                   )}
                 </CountdownCircleTimer>
-              </div>
-            )}
-            {!roshan?.minDate && roshan?.maxDate && (
-              <CountdownCircleTimer
-                isPlaying={!paused}
-                duration={roshan?.maxS}
-                colors="#a39800"
-                size={45}
-                strokeWidth={3}
-              >
-                {({ remainingTime }) => (
-                  <Countdown
-                    ref={countdownRef}
-                    date={roshan?.maxDate}
-                    renderer={roshRender}
-                    onComplete={() => {
-                      setRoshan({
-                        minS: 0,
-                        minDate: '',
-                        maxDate: '',
-                        maxS: 0,
-                      })
-                    }}
-                  />
-                )}
-              </CountdownCircleTimer>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
-        {(block.type === 'playing' || isDev) && aegis.expireDate && (
-          <div
-            style={{
-              left: positions[aegis.playerId],
-            }}
-            className={`absolute top-[65px] text-white/90`}
-          >
-            <Countdown
-              date={aegis.expireDate}
-              renderer={aegisRender}
-              ref={aegisRef}
-              onComplete={() => {
-                setAegis({
-                  expireS: 0,
-                  expireTime: '',
-                  expireDate: '',
-                  playerId: null,
-                })
+        {opts[DBSettings.aegis] &&
+          (block.type === 'playing' || isDev) &&
+          aegis.expireDate && (
+            <div
+              style={{
+                left: positions[aegis.playerId],
               }}
-            />
-          </div>
-        )}
+              className={`absolute top-[65px] text-white/90`}
+            >
+              <Countdown
+                date={aegis.expireDate}
+                renderer={aegisRender}
+                ref={aegisRef}
+                onComplete={() => {
+                  setAegis({
+                    expireS: 0,
+                    expireTime: '',
+                    expireDate: '',
+                    playerId: null,
+                  })
+                }}
+              />
+            </div>
+          )}
 
         {shouldBlockMap && (
           <Image
