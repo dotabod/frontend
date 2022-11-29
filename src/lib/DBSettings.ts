@@ -11,6 +11,8 @@ export enum DBSettings {
   mmrTracker = 'mmr-tracker',
   mmr = 'mmr',
   bp = 'battlepass',
+  bets = 'bets',
+  chatter = 'chatter',
 }
 
 export const defaultSettings = {
@@ -26,6 +28,8 @@ export const defaultSettings = {
   [DBSettings.obsDc]: '[dotabod] game disconnected',
   [DBSettings.mmr]: null,
   [DBSettings.bp]: false,
+  [DBSettings.bets]: true,
+  [DBSettings.chatter]: false,
 }
 
 export const getValueOrDefault = (data, key) => {
