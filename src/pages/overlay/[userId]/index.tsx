@@ -72,8 +72,8 @@ export default function OverlayPage() {
   const [block, setBlock] = useState({ type: null, team: null })
   const time = new Date().getTime()
   const isDev = process.env.NODE_ENV === 'development'
-  const devMin = isDev ? new Date(time + 600000).toISOString() : ''
-  const devMax = isDev ? new Date(time + 900000).toISOString() : ''
+  const devMin = isDev ? new Date(time + 300000).toISOString() : ''
+  const devMax = isDev ? new Date(time + 600000).toISOString() : ''
   const [roshan, setRoshan] = useState({
     minS: isDev ? 600 : 0,
     maxS: isDev ? 600 : 0,

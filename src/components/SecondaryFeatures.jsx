@@ -149,10 +149,34 @@ export function SecondaryFeatures() {
       ),
     },
     {
-      name: 'More OBS scenes',
+      name: (
+        <div className="space-between flex w-full items-center">
+          <span className="w-full">Aegis and rosh timer</span>
+          <HoverCard closeDelay={200} shadow="md">
+            <HoverCard.Target>
+              <Link
+                className="flex !items-center space-x-1"
+                onClick={(e) => e.preventDefault()}
+                color
+                underline
+              >
+                <SparklesIcon height={22} />
+                <span>Preview</span>
+              </Link>
+            </HoverCard.Target>
+            <HoverCard.Dropdown>
+              <Image
+                alt="aegis timer"
+                width={293}
+                height={533}
+                src="/images/aegis-timer.png"
+              />
+            </HoverCard.Dropdown>
+          </HoverCard>
+        </div>
+      ),
       description:
-        "Want a new scene when the game is paused? A new scene when you're spectating a game? Or when you get a rampage? All will be possible.",
-      inProgress: true,
+        'Tired of copy pasting three clock times? Dotabod knows when rosh is killed or when the aegis is picked up. A timer will display for your viewers to see!',
     },
     {
       name: 'Hero command',
