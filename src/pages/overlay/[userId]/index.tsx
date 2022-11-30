@@ -64,7 +64,7 @@ export default function OverlayPage() {
 
       const steam32Id = data?.SteamAccount[0]?.steam32Id || data?.steam32Id
       const mmr = data?.SteamAccount[0]?.mmr || data?.mmr
-      getWL(steam32Id, setWL)
+      getWL(userId, setWL)
       getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
   }, [userId])
@@ -151,7 +151,7 @@ export default function OverlayPage() {
       // Refetch mmr and medal image
       console.log('updating medal')
 
-      getWL(steam32Id, setWL)
+      getWL(userId, setWL)
       getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
 
