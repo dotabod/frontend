@@ -5,6 +5,8 @@ import { Container } from '@/components/Container'
 import { PhoneFrame } from '@/components/PhoneFrame'
 import { useSession } from 'next-auth/react'
 import dotaLogo from '@/images/logos/dota.svg'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/fetcher'
 
 function BackgroundIllustration(props) {
   let id = useId()
@@ -90,6 +92,8 @@ function PlayIcon(props) {
 
 export function Hero() {
   const name = useSession()?.data?.user?.name || 'streamers'
+  const { data: featuredUsers } = useSWR('/api/featured-users', fetcher)
+  console.log(featuredUsers)
 
   return (
     <div className="overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">
@@ -131,6 +135,36 @@ export function Hero() {
               </PhoneFrame>
             </div>
           </div>
+        </div>
+        <div className="relative -mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
+          <p className="text-center text-sm font-semibold text-gray-900 lg:text-left">
+            As featured in
+          </p>
+          <ul
+            role="list"
+            className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
+          >
+            {featuredUsers?.map(({ name, image }) => (
+              <li key={name} className="">
+                <a
+                  className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
+                  rel="noreferrer"
+                  href={`https://twitch.tv/${name}`}
+                  target="_blank"
+                >
+                  <Image
+                    src={image}
+                    width={50}
+                    height={50}
+                    alt={name}
+                    unoptimized
+                    className="rounded-lg shadow-lg"
+                  />
+                  <span className="text-xs text-gray-500">{name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </Container>
     </div>
