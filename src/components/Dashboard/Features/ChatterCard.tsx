@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button } from '@geist-ui/core'
+import { Button, Collapse } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
@@ -13,14 +13,13 @@ export default function ChatterCard() {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>Chatter</Card.Title>
-        <Card.Description>
-          The bot can post some random messages as you play your game.
-        </Card.Description>
-      </Card.Header>
-      <Card.Content className="space-y-2">
+      <Collapse
+        shadow
+        title="Chatter"
+        subtitle="The bot can post some random messages as you play your game."
+      >
         <TwitchChat
+          dark
           responses={[
             <>
               <Image
@@ -47,21 +46,21 @@ export default function ChatterCard() {
             </>,
           ]}
         />
-      </Card.Content>
-      <Card.Footer>
-        {loading ? (
-          <Button disabled>loading...</Button>
-        ) : (
-          <Button
-            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
-            type="secondary"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => updateSetting(!isEnabled)}
-          >
-            {isEnabled ? 'Disable' : 'Enable'}
-          </Button>
-        )}
-      </Card.Footer>
+        <Card.Footer>
+          {loading ? (
+            <Button disabled>loading...</Button>
+          ) : (
+            <Button
+              icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+              type="success"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => updateSetting(!isEnabled)}
+            >
+              {isEnabled ? 'Disable' : 'Enable'}
+            </Button>
+          )}
+        </Card.Footer>
+      </Collapse>
     </Card>
   )
 }

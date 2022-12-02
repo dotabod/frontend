@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Snippet } from '@geist-ui/core'
+import { Collapse, Snippet } from '@geist-ui/core'
 import Link from 'next/link'
 
 const emotes = [
@@ -19,15 +19,14 @@ const emotes = [
 export default function ChatBot() {
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>1. Twitch bot</Card.Title>
-        <Card.Description>
-          Allows the Dotabod chat bot to type in your chat in case you have
-          followers mode or subscribers mode ever turned on.
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <div className="space-y-2">
+      <Collapse
+        className="border-dark-700"
+        shadow
+        title="Step one. Chat bot"
+        subtitle="Allows the Dotabod chat bot to type in your chat in case you have
+        followers mode or subscribers mode ever turned on."
+      >
+        <div className="space-y-2 text-sm text-dark-300">
           <div>
             i. Add @dotabod as a moderator to your channel. Type the following
             in your stream.
@@ -43,7 +42,7 @@ export default function ChatBot() {
             {emotes.map(({ label, url }) => (
               <li key={label}>
                 <Link
-                  className="text-blue-500 hover:text-blue-300"
+                  className="text-dark-300 transition-colors hover:text-[#E6E8F1]"
                   target="_blank"
                   href={
                     url ??
@@ -56,7 +55,7 @@ export default function ChatBot() {
             ))}
           </ul>
         </div>
-      </Card.Content>
+      </Collapse>
     </Card>
   )
 }

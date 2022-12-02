@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image, Input, Link, Loading } from '@geist-ui/core'
+import { Button, Collapse, Display, Image, Link, Loading } from '@geist-ui/core'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
@@ -8,6 +8,7 @@ import { useForm } from '@mantine/form'
 import { useEffect } from 'react'
 import { Badge } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
+import { Input } from '@/components/Input'
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
@@ -39,27 +40,20 @@ export default function MmrTrackerCard() {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>MMR Tracker</Card.Title>
-        <Card.Description>
-          <div>
-            <div>
-              Automatically goes up or down after every match. !mmr will work to
-              show mmr to your chatters! If it ever gets out of sync, you can
-              update it here.
-            </div>
-            <div className="mt-2 flex items-center space-x-2 text-xs">
-              <Badge style={{ width: 100 }}>New</Badge>
-              <span>
-                Multi account support enabled. Play on your smurf or main to
-                track MMR separately! A list of accounts will show below as you
-                play on them.
-              </span>
-            </div>
-          </div>
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+      <Collapse
+        initialVisible
+        shadow
+        title="MMR tracker"
+        subtitle="Automatically goes up or down 30 MMR every ranked match."
+      >
+        <div className="my-6 flex items-center space-x-2 text-xs">
+          <Badge variant="filled">New</Badge>
+          <span>
+            Multi account support enabled. Play on your smurf or main to track
+            MMR separately! A list of accounts will show below as you play on
+            them.
+          </span>
+        </div>
         {accounts?.length ? (
           <form
             onSubmit={form.onSubmit((values) => {
@@ -93,7 +87,7 @@ export default function MmrTrackerCard() {
                     </Link>
                   </Input>
                   <Input
-                    placeholder="Enter MMR"
+                    placeholder="Your MMR?"
                     style={{ width: 108 }}
                     htmlType="number"
                     min={0}
@@ -118,9 +112,12 @@ export default function MmrTrackerCard() {
         ) : null}
 
         {accounts.length === 0 && (
-          <>
-            <label htmlFor="mmr" className="block text-sm">
-              Current MMR
+          <div className="mt-6">
+            <label
+              htmlFor="mmr"
+              className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
+            >
+              Your current MMR (required)
             </label>
             <div className="flex space-x-4">
               {loading && (
@@ -130,7 +127,7 @@ export default function MmrTrackerCard() {
               )}
               {!loading && (
                 <Input
-                  placeholder="Enter MMR"
+                  placeholder="0"
                   id="mmr"
                   name="mmr"
                   style={{ width: 208 }}
@@ -143,7 +140,7 @@ export default function MmrTrackerCard() {
                 />
               )}
             </div>
-          </>
+          </div>
         )}
 
         <Display
@@ -157,21 +154,22 @@ export default function MmrTrackerCard() {
             src="/images/mmr-tracker.png"
           />
         </Display>
-      </Card.Content>
-      <Card.Footer>
-        {loading ? (
-          <Button disabled>loading...</Button>
-        ) : (
-          <Button
-            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
-            type="secondary"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => updateSetting(!isEnabled)}
-          >
-            {isEnabled ? 'Disable' : 'Enable'}
-          </Button>
-        )}
-      </Card.Footer>
+
+        <Card.Footer>
+          {loading ? (
+            <Button disabled>loading...</Button>
+          ) : (
+            <Button
+              icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+              type="success"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => updateSetting(!isEnabled)}
+            >
+              {isEnabled ? 'Disable' : 'Enable'}
+            </Button>
+          )}
+        </Card.Footer>
+      </Collapse>
     </Card>
   )
 }

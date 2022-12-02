@@ -6,7 +6,10 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function Card({ className, ...props }: CardProps) {
   return (
     <div
-      className={clsx('bg-white shadow sm:rounded-lg', className)}
+      className={clsx(
+        'bg-dark-800 text-dark-300 shadow-lg transition-all sm:rounded-lg',
+        className
+      )}
       {...props}
     />
   )
@@ -15,31 +18,44 @@ export function Card({ className, ...props }: CardProps) {
 interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 Card.Header = function CardHeader({ className, ...props }: CardHeaderProps) {
-  return <div className={clsx('px-4 py-5 sm:px-6', className)} {...props} />
+  return (
+    <div className={clsx('p-8 text-dark-300 sm:px-6', className)} {...props} />
+  )
 }
 
 interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-Card.Content = function CardContent({ className, ...props }: CardContentProps) {
+Card.Content = function CardContent({
+  className,
+  children,
+  ...props
+}: CardContentProps) {
   return (
     <div
-      className={clsx('border-t border-gray-200 px-4 py-5 sm:px-6', className)}
+      className={clsx('px-6 pb-4 text-sm text-dark-300', className)}
       {...props}
-    />
+    >
+      <div className="grid w-full border-t border-solid border-dark-700 pt-4"></div>
+      {children}
+    </div>
   )
 }
 
 interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-Card.Footer = function CardFooter({ className, ...props }: CardFooterProps) {
+Card.Footer = function CardFooter({
+  className,
+  children,
+  ...props
+}: CardFooterProps) {
   return (
     <div
-      className={clsx(
-        'block bg-gray-50 px-4 py-4 text-sm font-medium text-gray-500 sm:rounded-b-lg',
-        className
-      )}
+      className={clsx('block text-sm font-medium sm:rounded-b-lg', className)}
       {...props}
-    />
+    >
+      <div className="grid w-full border-t border-solid border-dark-700  pt-4"></div>
+      {children}
+    </div>
   )
 }
 
@@ -48,7 +64,7 @@ interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 Card.Title = function CardTitle({ className, ...props }: CardTitleProps) {
   return (
     <h4
-      className={clsx('text-lg font-medium leading-6 text-gray-900', className)}
+      className={clsx('text-lg font-medium leading-6 text-white', className)}
       {...props}
     />
   )
@@ -63,7 +79,7 @@ Card.Description = function CardDescription({
 }: CardDescriptionProps) {
   return (
     <div
-      className={clsx('mt-1 max-w-2xl text-sm text-gray-500', className)}
+      className={clsx('mt-1 max-w-2xl text-sm text-dark-300', className)}
       {...props}
     />
   )

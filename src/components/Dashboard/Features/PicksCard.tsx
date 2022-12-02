@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image } from '@geist-ui/core'
+import { Button, Collapse, Display, Image } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
@@ -11,15 +11,15 @@ export default function PicksCard() {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>Picks</Card.Title>
-        <Card.Description>
-          Block your picks to deter people from banning your heros or countering
-          your picks. Radiant blocker shown below as an example. The bot will
-          pick the right overlay depending on which team you end up on.
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+      <Collapse
+        shadow
+        title="Picks"
+        subtitle="Prevent stream snipers from seeing your picks."
+      >
+        <div>
+          Radiant blocker shown below as an example. The bot will pick the right
+          overlay depending on which team you end up on.
+        </div>
         <Display
           shadow
           caption="Picks blocker that auto places itself over your pick screen"
@@ -35,21 +35,21 @@ export default function PicksCard() {
             }}
           />
         </Display>
-      </Card.Content>
-      <Card.Footer>
-        {loading ? (
-          <Button disabled>loading...</Button>
-        ) : (
-          <Button
-            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
-            type="secondary"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => updateSetting(!isEnabled)}
-          >
-            {isEnabled ? 'Disable' : 'Enable'}
-          </Button>
-        )}
-      </Card.Footer>
+        <Card.Footer>
+          {loading ? (
+            <Button disabled>loading...</Button>
+          ) : (
+            <Button
+              icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+              type="success"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => updateSetting(!isEnabled)}
+            >
+              {isEnabled ? 'Disable' : 'Enable'}
+            </Button>
+          )}
+        </Card.Footer>
+      </Collapse>
     </Card>
   )
 }

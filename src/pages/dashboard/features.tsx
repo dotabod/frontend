@@ -24,11 +24,11 @@ export default function DashboardPage({ settings }: Props) {
       </Head>
       <DashboardShell title="Features">
         <MmrTrackerCard />
-        <MinimapCard />
-        <RoshCard />
         <BetsCard />
-        <ChatterCard />
+        <MinimapCard />
         <PicksCard />
+        <RoshCard />
+        <ChatterCard />
         <SceneSwitcher />
       </DashboardShell>
     </>

@@ -1,5 +1,12 @@
 import { Card } from '@/ui/card'
-import { Button, Code, Display, Image, Keyboard } from '@geist-ui/core'
+import {
+  Button,
+  Code,
+  Collapse,
+  Display,
+  Image,
+  Keyboard,
+} from '@geist-ui/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -37,13 +44,11 @@ export default function ExportCFG() {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>2. Dota GSI File</Card.Title>
-        <Card.Description>
-          This enables Dotabod to see your games.
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+      <Collapse
+        shadow
+        title="Step two. Dota GSI"
+        subtitle="Enable Dotabod to see your games."
+      >
         <div className="space-y-4">
           <div>
             i. In Steam, right click Dota 2{' '}
@@ -62,7 +67,7 @@ export default function ExportCFG() {
             href={url}
             download={`gamestate_integration_dotabod-${user.name}.cfg`}
           >
-            <Button type="secondary" className="!normal-case">
+            <Button type="success" className="!normal-case">
               Download config file
             </Button>
           </a>
@@ -104,7 +109,7 @@ export default function ExportCFG() {
 
           <div>iii. Restart Steam and Dota 2 client.</div>
         </div>
-      </Card.Content>
+      </Collapse>
     </Card>
   )
 }

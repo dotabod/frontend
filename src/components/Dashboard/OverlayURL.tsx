@@ -1,6 +1,6 @@
 import { Card } from '@/ui/card'
 import { useBaseUrl } from '@/lib/hooks'
-import { Display, Image, Snippet } from '@geist-ui/core'
+import { Collapse, Display, Image, Snippet } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 
 export default function OverlayURL() {
@@ -9,16 +9,18 @@ export default function OverlayURL() {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>3. OBS Overlay</Card.Title>
-        <Card.Description>
-          Add a new Browser source to OBS. Copy the settings shown below. Change
-          the URL to:
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <Snippet symbol="" text={copyURL} width="500px" />
-
+      <Collapse
+        shadow
+        title="Step three. OBS Overlay"
+        subtitle="Add a new Browser source to OBS."
+      >
+        Add a new Browser source to OBS. Copy the settings shown below. Change
+        the URL to:
+        <Snippet
+          symbol=""
+          text={copyURL}
+          className="!max-w-[500px] overflow-hidden"
+        />
         <Display shadow caption="Dotabod browser source properties in OBS">
           <Image
             alt="dotabod browser source properties"
@@ -26,7 +28,7 @@ export default function OverlayURL() {
             src="/images/dotabod-obs-config.png"
           />
         </Display>
-      </Card.Content>
+      </Collapse>
     </Card>
   )
 }

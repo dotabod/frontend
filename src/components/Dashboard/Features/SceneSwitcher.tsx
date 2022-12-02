@@ -1,9 +1,10 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image, Input, Loading } from '@geist-ui/core'
+import { Button, Collapse, Display, Image, Loading } from '@geist-ui/core'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useDebouncedCallback } from 'use-debounce'
+import { Input } from '../../Input'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
@@ -58,16 +59,16 @@ export default function SceneSwitcher(): JSX.Element {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>Automatic Scene Switcher</Card.Title>
-        <Card.Description className="space-y-2">
-          Will auto switch scenes in OBS depending on game state. This is
-          optional but useful if you want to make your stream look unique for
-          different game states!
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
-        <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm text-gray-700">
+      <Collapse
+        shadow
+        title="OBS scene switcher"
+        subtitle="Will auto switch scenes in OBS depending on game state."
+      >
+        <div className="mb-4">
+          This is optional but useful if you want to make your stream look
+          unique for different game states!
+        </div>
+        <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm">
           <li>
             Must put the dotabod browser source in the scenes you want to block
             hero picks or minimap in.
@@ -94,8 +95,7 @@ export default function SceneSwitcher(): JSX.Element {
                     <Input
                       id={sceneKey}
                       placeholder={defaultSettings[sceneKey]}
-                      initialValue={scene.value}
-                      width="400px"
+                      defaultValue={scene.value}
                       name={sceneKey}
                       onChange={(e) =>
                         handleSceneName(e.target.value, scene.update)
@@ -117,21 +117,21 @@ export default function SceneSwitcher(): JSX.Element {
             src="/images/scene-switcher.png"
           />
         </Display>
-      </Card.Content>
-      <Card.Footer>
-        {loading ? (
-          <Button disabled>loading...</Button>
-        ) : (
-          <Button
-            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
-            type="secondary"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => updateSetting(!isEnabled)}
-          >
-            {isEnabled ? 'Disable' : 'Enable'}
-          </Button>
-        )}
-      </Card.Footer>
+        <Card.Footer>
+          {loading ? (
+            <Button disabled>loading...</Button>
+          ) : (
+            <Button
+              icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+              type="success"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => updateSetting(!isEnabled)}
+            >
+              {isEnabled ? 'Disable' : 'Enable'}
+            </Button>
+          )}
+        </Card.Footer>
+      </Collapse>
     </Card>
   )
 }

@@ -1,8 +1,7 @@
-import { useSession } from 'next-auth/react'
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Logo } from '@/components/Logo'
+import { DarkLogo } from '@/components/Logo'
 import Link from 'next/link'
 import Image from 'next/image'
 import { UserAccountNav } from '@/components/user-account-nav'
@@ -38,12 +37,17 @@ export function classNames(...classes) {
 }
 
 export default function DashboardShell({ children, title }) {
-  const user = useSession()?.data?.user
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <>
-      <div>
+      <style global jsx>{`
+        html,
+        body {
+          background-color: rgb(39, 41, 52) !important;
+        }
+      `}</style>
+      <div className=" bg-dark-700">
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog
             as="div"
@@ -72,7 +76,7 @@ export default function DashboardShell({ children, title }) {
                 leaveFrom="translate-x-0"
                 leaveTo="-translate-x-full"
               >
-                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-gray-100">
+                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-dark-800">
                   <Transition.Child
                     as={Fragment}
                     enter="ease-in-out duration-300"
@@ -99,9 +103,9 @@ export default function DashboardShell({ children, title }) {
                   <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
                     <div className="flex flex-shrink-0 items-center justify-between px-4">
                       <Link href="/">
-                        <Logo className="h-6 w-auto" />
+                        <DarkLogo className="h-12 w-auto text-white" />
                       </Link>
-                      <UserAccountNav />
+                      <UserAccountNav dark />
                     </div>
                     <nav className="mt-5 space-y-1 px-2">
                       {navigation.map((item) => (
@@ -110,8 +114,8 @@ export default function DashboardShell({ children, title }) {
                           href={item.href}
                           className={classNames(
                             window.location.href.endsWith(item.href)
-                              ? 'bg-gray-100 text-gray-900'
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                              ? ' bg-dark-700 text-[#F4F4FB]'
+                              : 'text-[#9195AB] hover:fill-gray-50 hover:text-[#F4F4FB]',
                             'group flex items-center rounded-md px-2 py-2 text-base font-medium'
                           )}
                         >
@@ -119,7 +123,7 @@ export default function DashboardShell({ children, title }) {
                             className={classNames(
                               window.location.href.endsWith(item.href)
                                 ? 'text-gray-500'
-                                : 'text-gray-400 group-hover:text-gray-500',
+                                : 'text-gray-400 group-hover:text-white',
                               'mr-4 h-6 w-6 flex-shrink-0'
                             )}
                             aria-hidden="true"
@@ -139,35 +143,35 @@ export default function DashboardShell({ children, title }) {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden bg-gray-100 md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:border-r md:border-gray-200 md:pt-5 md:pb-4">
+        <div className="z-30 hidden bg-dark-800 md:fixed md:inset-y-0 md:flex md:flex-col md:border-r md:border-dark-600 md:pt-5 md:pb-4 2xl:pl-64">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-shrink-0 items-center px-6">
             <Link href="/">
-              <Logo className="h-6 w-auto" />
+              <DarkLogo className="h-12 w-auto" />
             </Link>
           </div>
           <div className="mt-5 flex h-0 flex-1 flex-col overflow-y-auto pt-1">
             <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
               <div className="flex flex-shrink-0 items-center justify-between px-4">
-                <UserAccountNav showDetails />
+                <UserAccountNav dark showDetails />
               </div>
-              <nav className="mt-5 flex-1 space-y-1 bg-gray-100 px-2">
+              <nav className="mt-5 flex-1 space-y-1 bg-dark-800 px-2">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     className={classNames(
                       window.location.href.endsWith(item.href)
-                        ? 'bg-gray-200 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                      'group flex items-center rounded-md px-2 py-2 text-sm font-medium'
+                        ? ' bg-dark-700 text-[#F4F4FB]'
+                        : 'text-[#9195AB] hover:fill-[#F4F4FB] hover:text-[#F4F4FB]',
+                      'group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-colors'
                     )}
                   >
                     <item.icon
                       className={classNames(
                         window.location.href.endsWith(item.href)
                           ? 'text-gray-500'
-                          : 'text-gray-400 group-hover:text-gray-500',
+                          : 'text-gray-400 group-hover:text-white',
                         'mr-3 h-6 w-6 flex-shrink-0'
                       )}
                       aria-hidden="true"
@@ -179,8 +183,8 @@ export default function DashboardShell({ children, title }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-1 flex-col md:pl-64">
-          <div className="sticky top-0 z-10 bg-gray-100 pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden">
+        <div className="flex flex-1 flex-col  bg-dark-700 pb-12 transition-all 2xl:pl-64">
+          <div className="sticky top-0 z-10 bg-dark-800 pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden">
             <button
               type="button"
               className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
@@ -190,15 +194,16 @@ export default function DashboardShell({ children, title }) {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          <main className="flex-1">
-            <div className="py-6">
-              <div className="mx-auto max-w-7xl border-b border-gray-200 px-6 pb-6 md:px-8 md:pb-8">
-                <h1 className="text-2xl font-normal leading-6 text-gray-900 sm:truncate">
+          <div className="sticky top-0 z-10 hidden h-full w-full flex-shrink-0 justify-end bg-dark-800  px-6 py-2 md:flex md:px-8">
+            <UserAccountNav dark />
+          </div>
+          <main className=" w-full bg-dark-700 px-4 md:pl-64">
+            <div className="min-h-full w-full max-w-screen-2xl pr-8 opacity-100 transition-all">
+              <div className="space-y-4 pt-12">
+                <h1 className="mb-12 text-2xl font-bold leading-6 text-white">
                   {title}
                 </h1>
-              </div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                <div className="space-y-10 pt-12">{children}</div>
+                {children}
               </div>
             </div>
           </main>

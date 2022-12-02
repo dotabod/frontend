@@ -23,8 +23,19 @@
   min-height: 100%;
 }
 
-/* wtf tailwind */
-[type='text']:focus,
-[type='number']:focus {
-  @apply ring-0 ring-offset-0;
+/* Geist UI stuff */
+.caption {
+  @apply !text-dark-300;
+}
+
+.title h3 {
+  @apply pb-2 !text-lg !font-medium !leading-6 !text-white;
+}
+
+.subtitle {
+  @apply !text-sm !text-dark-300;
+}
+
+.collapse {
+  @apply !border-dark-700 !shadow-none;
 }

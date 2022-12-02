@@ -36,7 +36,18 @@ export function Logo(props) {
       <svg viewBox="0 0 45 40" aria-hidden="true" {...props}>
         <Logomark width="40" height="40" />
       </svg>
-      <span className="fill-gray-900 font-medium">Dotabod</span>
+      <span className="font-medium text-gray-900">Dotabod</span>
+    </div>
+  )
+}
+
+export function DarkLogo(props) {
+  return (
+    <div className="flex h-full items-center space-x-2">
+      <svg viewBox="0 0 45 40" aria-hidden="true" {...props}>
+        <Logomark width="40" height="40" />
+      </svg>
+      <span className="text-2xl font-medium text-white">Dotabod</span>
     </div>
   )
 }

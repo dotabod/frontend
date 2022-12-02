@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Badge, Button, Display, Image } from '@geist-ui/core'
+import { Badge, Button, Collapse, Display, Image } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
@@ -11,15 +11,15 @@ export default function BetsCard() {
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>Twitch Predictions</Card.Title>
-        <Card.Description>
-          Let your chatters bet with their native Twitch channel points whether
-          you win or lose the game. After the match ends, the bets will close
-          and points go to the winners!
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+      <Collapse
+        shadow
+        title="Twitch predictions"
+        subtitle="Let your chatters bet on your matches."
+      >
+        <div>
+          Chatters can use their native Twitch channel points to bet on whether
+          you win or lose a match.
+        </div>
         <Display
           shadow
           caption={
@@ -40,21 +40,21 @@ export default function BetsCard() {
             className="bg-gray-500"
           />
         </Display>
-      </Card.Content>
-      <Card.Footer>
-        {loading ? (
-          <Button disabled>loading...</Button>
-        ) : (
-          <Button
-            icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
-            type="secondary"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => updateSetting(!isEnabled)}
-          >
-            {isEnabled ? 'Disable' : 'Enable'}
-          </Button>
-        )}
-      </Card.Footer>
+        <Card.Footer>
+          {loading ? (
+            <Button disabled>loading...</Button>
+          ) : (
+            <Button
+              icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
+              type="success"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => updateSetting(!isEnabled)}
+            >
+              {isEnabled ? 'Disable' : 'Enable'}
+            </Button>
+          )}
+        </Card.Footer>
+      </Collapse>
     </Card>
   )
 }
