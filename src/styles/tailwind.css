@@ -39,3 +39,7 @@
 .collapse {
   @apply !border-dark-700 !shadow-none;
 }
+
+.collapse .content {
+  @apply text-sm text-dark-300;
+}

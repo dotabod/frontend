@@ -20,11 +20,11 @@ export default function ChatBot() {
   return (
     <Card>
       <Collapse
+        initialVisible
         className="border-dark-700"
         shadow
         title="Step one. Chat bot"
-        subtitle="Allows the Dotabod chat bot to type in your chat in case you have
-        followers mode or subscribers mode ever turned on."
+        subtitle="Allows the Dotabod chat bot to type in your chat in case you ever turn on follower or subscribe mode."
       >
         <div className="space-y-2 text-sm text-dark-300">
           <div>

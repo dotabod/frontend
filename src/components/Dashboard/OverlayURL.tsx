@@ -14,8 +14,7 @@ export default function OverlayURL() {
         title="Step three. OBS Overlay"
         subtitle="Add a new Browser source to OBS."
       >
-        Add a new Browser source to OBS. Copy the settings shown below. Change
-        the URL to:
+        Copy the settings shown below. Change the URL to:
         <Snippet
           symbol=""
           text={copyURL}
