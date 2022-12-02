@@ -5,8 +5,6 @@ import { Container } from '@/components/Container'
 import { PhoneFrame } from '@/components/PhoneFrame'
 import { useSession } from 'next-auth/react'
 import dotaLogo from '@/images/logos/dota.svg'
-import useSWR from 'swr'
-import { fetcher } from '@/lib/fetcher'
 
 function BackgroundIllustration(props) {
   let id = useId()
@@ -92,14 +90,29 @@ function PlayIcon(props) {
 
 const featuredUsers = [
   {
+    name: 'Grubby',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
+  },
+  {
+    name: 'XcaliburYe',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/69bea0f7-b170-4067-92f0-d1410a020b62-profile_image-150x150.png',
+  },
+  {
+    name: 'WagamamaTV',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
+  },
+  {
     name: 'Draskyl',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
   },
   {
-    name: 'Grubby',
+    name: 'febbydoto',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
   },
   {
     name: 'FiXeRsdota2',
@@ -112,29 +125,15 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/12c011d3-a153-4a92-989e-e7dce4d0f084-profile_image-150x150.png',
   },
   {
-    name: 'WagamamaTV',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
-  },
-  {
-    name: 'febbydoto',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
-  },
-  {
-    name: 'SabeRLighT00',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/2b742b63-ec00-46e7-b14b-0037ccafb61c-profile_image-150x150.png',
-  },
-  {
     name: 'YuHengTV',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/63ecfd96-a140-449e-a301-593874c98229-profile_image-150x150.png',
   },
   {
-    name: 'XcaliburYe',
+    link: false,
+    name: 'You?',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/69bea0f7-b170-4067-92f0-d1410a020b62-profile_image-150x150.png',
+      'https://static-cdn.jtvnw.net/user-default-pictures-uv/75305d54-c7cc-40d1-bb9c-91fbe85943c7-profile_image-300x300.png',
   },
 ]
 
@@ -191,13 +190,18 @@ export function Hero() {
             role="list"
             className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
           >
-            {featuredUsers?.map(({ name, image }) => (
+            {featuredUsers?.map(({ name, image, link }) => (
               <li key={name} className="">
                 <a
                   className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
                   rel="noreferrer"
-                  href={`https://twitch.tv/${name}`}
+                  href={link !== false ? `https://twitch.tv/${name}` : '#'}
                   target="_blank"
+                  onClick={(e) => {
+                    if (link === false) {
+                      e.preventDefault()
+                    }
+                  }}
                 >
                   <Image
                     src={image}
