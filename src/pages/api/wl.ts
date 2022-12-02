@@ -7,9 +7,15 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.query.id as string
 
+  console.log(userId)
+
+  if (!userId) {
+    return res.status(500).end()
+  }
+
   if (req.method === 'GET') {
     try {
-      prisma.bet
+      const data = await prisma.bet
         .groupBy({
           by: ['won', 'lobby_type'],
           _count: {
@@ -49,12 +55,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             }
           })
 
-          return res.json({ ranked, unranked })
+          return { ranked, unranked }
         })
         .catch((e) => {
-          return res.status(500).end()
+          return { ranked: { win: 0, lose: 0 }, unranked: { win: 0, lose: 0 } }
         })
+
+      return res.json(data)
     } catch (error) {
+      console.log('OOPS 2', error)
+
       return res.status(500).end()
     }
   }
