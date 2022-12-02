@@ -15,6 +15,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req })
   const userId = req.query.id as string
 
+  if (!userId && !session?.user?.id) {
+    return res.status(500).end()
+  }
+
   if (req.method === 'GET') {
     try {
       const data = await prisma.user.findFirst({

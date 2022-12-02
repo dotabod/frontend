@@ -7,8 +7,6 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.query.id as string
 
-  console.log(userId)
-
   if (!userId) {
     return res.status(500).end()
   }

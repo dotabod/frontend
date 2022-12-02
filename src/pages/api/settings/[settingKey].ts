@@ -13,6 +13,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await unstable_getServerSession(req, res, authOptions)
   const settingKey = req.query.settingKey as string
 
+  if (!session?.user?.id) {
+    return res.status(500).end()
+  }
+
   if (req.method === 'PATCH') {
     try {
       if (settingKey === DBSettings.mmr) {
