@@ -58,6 +58,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).end()
     }
   }
+
+  return res.status(500).end()
 }
 
 export default withMethods(['GET'], withAuthentication(handler))

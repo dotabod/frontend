@@ -65,7 +65,6 @@ export default function OverlayPage() {
       const steam32Id = data?.SteamAccount[0]?.steam32Id || data?.steam32Id
       const mmr = data?.SteamAccount[0]?.mmr || data?.mmr
       getWL(userId, setWL)
-      getRankImage(mmr, steam32Id).then(setRankImageDetails)
     })
   }, [userId])
 
@@ -147,12 +146,12 @@ export default function OverlayPage() {
       fetcher(`/api/settings/?id=`, userId).then(setData)
     })
 
-    socket.on('update-medal', ({ mmr, steam32Id }) => {
+    socket.on('update-medal', (deets) => {
       // Refetch mmr and medal image
       console.log('updating medal')
 
       getWL(userId, setWL)
-      getRankImage(mmr, steam32Id).then(setRankImageDetails)
+      getRankImage(deets).then(setRankImageDetails)
     })
 
     socket.on('refresh', () => {
@@ -187,13 +186,30 @@ export default function OverlayPage() {
 
     console.log('OBS studio is connected')
 
-    if (shouldBlockMap) {
-      window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
-    } else if (shouldBlockPicks) {
-      window.obsstudio.setCurrentScene(opts[DBSettings.obsPicks])
-    } else {
-      window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
-    }
+    window.obsstudio.getCurrentScene(function (scene) {
+      const myScenes = [
+        opts[DBSettings.obsMinimap],
+        opts[DBSettings.obsPicks],
+        opts[DBSettings.obsDc],
+      ]
+
+      if (shouldBlockMap) {
+        window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
+        return
+      }
+      if (shouldBlockPicks) {
+        window.obsstudio.setCurrentScene(opts[DBSettings.obsPicks])
+        return
+      }
+
+      // Streamer has a custom scene, lets not override it
+      // This allows streamers to make a scene for playing other games, and having
+      // dota in the background wont switch scenes on them
+      if (myScenes.includes(scene.name)) {
+        window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
+        return
+      }
+    })
   }, [connected, userId, shouldBlockMap, shouldBlockPicks, opts])
 
   useEffect(() => {
