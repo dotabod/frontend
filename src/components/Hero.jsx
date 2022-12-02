@@ -90,10 +90,57 @@ function PlayIcon(props) {
   )
 }
 
+const featuredUsers = [
+  {
+    name: 'Draskyl',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
+  },
+  {
+    name: 'Grubby',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
+  },
+  {
+    name: 'FiXeRsdota2',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/23acf5b0-d151-4db3-8b40-0e9cfbb86e5a-profile_image-150x150.png',
+  },
+  {
+    name: 'SequinoxTV',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/12c011d3-a153-4a92-989e-e7dce4d0f084-profile_image-150x150.png',
+  },
+  {
+    name: 'WagamamaTV',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
+  },
+  {
+    name: 'febbydoto',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
+  },
+  {
+    name: 'SabeRLighT00',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/2b742b63-ec00-46e7-b14b-0037ccafb61c-profile_image-150x150.png',
+  },
+  {
+    name: 'YuHengTV',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/63ecfd96-a140-449e-a301-593874c98229-profile_image-150x150.png',
+  },
+  {
+    name: 'XcaliburYe',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/69bea0f7-b170-4067-92f0-d1410a020b62-profile_image-150x150.png',
+  },
+]
+
 export function Hero() {
   const name = useSession()?.data?.user?.name || 'streamers'
-  const { data: featuredUsers } = useSWR('/api/featured-users', fetcher)
-  console.log(featuredUsers)
+  // const { data: featuredUsers } = useSWR('/api/featured-users', fetcher)
 
   return (
     <div className="overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">
