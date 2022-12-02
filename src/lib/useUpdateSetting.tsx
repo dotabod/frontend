@@ -1,7 +1,6 @@
 import { useToasts } from '@geist-ui/core'
 import { SteamAccount } from '@prisma/client'
 import useSWR, { useSWRConfig } from 'swr'
-import { useDebouncedCallback } from 'use-debounce'
 import { DBSettings, getValueOrDefault } from './DBSettings'
 import { fetcher } from './fetcher'
 
@@ -13,7 +12,7 @@ export function useUpdateAccount() {
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()
 
-  const update = useDebouncedCallback((accounts: SteamAccount[]) => {
+  const update = (accounts: SteamAccount[]) => {
     const options = {
       optimisticData: { accounts },
       rollbackOnError: true,
@@ -33,7 +32,7 @@ export function useUpdateAccount() {
     }
 
     mutate(`/api/settings/accounts`, updateFn(accounts), options)
-  }, 400)
+  }
 
   return { data, loading, update }
 }
@@ -48,7 +47,7 @@ export function useUpdateSetting(key) {
   const { setToast } = useToasts()
   const { mutate } = useSWRConfig()
 
-  const updateSetting = useDebouncedCallback((value) => {
+  const updateSetting = (value) => {
     const setting = { ...data, value }
     const options = {
       optimisticData: setting,
@@ -80,7 +79,7 @@ export function useUpdateSetting(key) {
     }
 
     mutate(`/api/settings`, updateFn(setting), options)
-  }, 400)
+  }
 
   return { isEnabled, loading, updateSetting }
 }

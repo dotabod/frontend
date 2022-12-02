@@ -7,6 +7,7 @@ import { SteamAccount } from '@prisma/client'
 import { useForm } from '@mantine/form'
 import { useEffect } from 'react'
 import { Badge } from '@mantine/core'
+import { useDebouncedCallback } from 'use-debounce'
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
@@ -31,6 +32,10 @@ export default function MmrTrackerCard() {
     loading: l1,
   } = useUpdateSetting(DBSettings.mmr)
   const loading = l0 || l1
+
+  const debouncedMmr = useDebouncedCallback((e) => {
+    updateMmr(Number(e.target.value))
+  }, 500)
 
   return (
     <Card>
@@ -134,9 +139,7 @@ export default function MmrTrackerCard() {
                   max={30000}
                   initialValue={mmr}
                   disabled={!isEnabled}
-                  onChange={(e) => {
-                    updateMmr(Number(e.target.value))
-                  }}
+                  onChange={debouncedMmr}
                 />
               )}
             </div>
