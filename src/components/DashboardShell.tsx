@@ -46,6 +46,23 @@ export default function DashboardShell({ children, title }) {
         body {
           background-color: rgb(39, 41, 52) !important;
         }
+        ::-webkit-scrollbar {
+          width: 6px;
+          outline: none;
+          border: none;
+          background: transparent;
+          padding: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: ${'#43454F'};
+          border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: ${'rgba(0, 0, 0, 0.14)'};
+          border-radius: 6px;
+        }
       `}</style>
       <div className=" bg-dark-700">
         <Transition.Root show={sidebarOpen} as={Fragment}>
