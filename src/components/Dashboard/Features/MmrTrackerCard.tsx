@@ -134,7 +134,7 @@ export default function MmrTrackerCard() {
                   htmlType="number"
                   min={0}
                   max={30000}
-                  initialValue={mmr}
+                  defaultValue={mmr}
                   disabled={!isEnabled}
                   onChange={debouncedMmr}
                 />
