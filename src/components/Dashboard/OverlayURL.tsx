@@ -1,7 +1,8 @@
 import { Card } from '@/ui/card'
 import { useBaseUrl } from '@/lib/hooks'
-import { Collapse, Display, Image, Snippet } from '@geist-ui/core'
+import { Badge, Button, Collapse, Display, Image } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
+import { CopyButton } from '@mantine/core'
 
 export default function OverlayURL() {
   const user = useSession()?.data?.user
@@ -14,16 +15,30 @@ export default function OverlayURL() {
         title="Step three. OBS Overlay"
         subtitle="Add a new Browser source to OBS."
       >
-        Copy the settings shown below. Change the URL to:
-        <Snippet
-          symbol=""
-          text={copyURL}
-          className="!max-w-[500px] overflow-hidden"
-        />
+        <div className="space-y-2">
+          <p>
+            Copy and paste your personal URL into the URL field for the browser
+            source.
+          </p>
+
+          <div className="space-x-2 text-xs">
+            <Badge type="error" className="!bg-red-800 !text-xs">
+              Warning
+            </Badge>
+            <span>Do not share or show this URL on stream</span>
+          </div>
+          <CopyButton value={copyURL}>
+            {({ copied, copy }) => (
+              <Button type="success" onClick={copy}>
+                {copied ? 'Copied!' : 'Copy your URL'}
+              </Button>
+            )}
+          </CopyButton>
+        </div>
         <Display shadow caption="Dotabod browser source properties in OBS">
           <Image
             alt="dotabod browser source properties"
-            height="433px"
+            height="450px"
             src="/images/dotabod-obs-config.png"
           />
         </Display>
