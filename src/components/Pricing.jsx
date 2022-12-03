@@ -13,7 +13,7 @@ const plans = [
       'You’ve been streaming for a while. Stream more with Dotabod and grow your gaming time.',
     button: {
       label: 'Get started',
-      href: '/login',
+      href: '/dashboard',
     },
     features: [
       "It's literally free",

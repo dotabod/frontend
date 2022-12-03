@@ -139,7 +139,8 @@ const featuredUsers = [
 ]
 
 export function Hero() {
-  const name = useSession()?.data?.user?.name || 'streamers'
+  const session = useSession()
+  const name = session.data?.user?.name || 'streamers'
   // const { data: featuredUsers } = useSWR('/api/featured-users', fetcher)
 
   return (
@@ -162,7 +163,7 @@ export function Hero() {
               with your Twitch audience.
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
-              <Button href="/login">
+              <Button href="/dashboard">
                 <PlayIcon className="h-6 w-6 flex-none" />
                 <span className="ml-2.5">Get started</span>
               </Button>

@@ -27,7 +27,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
-        session.user.mmr = token.mmr
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email
@@ -36,19 +35,21 @@ export const authOptions: NextAuthOptions = {
 
       return session
     },
-    async jwt({ token, account, user }) {
+    async jwt({ token, account, user, profile }) {
       // Save a db lookup
       if (token.id) return token
 
-      const dbUser = await prisma.user.findFirst({
-        where: {
-          email: token.email,
-        },
-      })
-
-      if (!dbUser) {
-        token.id = user.id
+      if (!user) {
+        token.id = token.sub
         return token
+      }
+
+      const newUser = {
+        email: profile.email || user.email,
+        // @ts-ignore from twitch?
+        name: profile?.preferred_username || user.name,
+        // @ts-ignore from twitch?
+        image: profile?.picture || user.image,
       }
 
       // Refresh jwt account with potentially new scopes
@@ -61,20 +62,26 @@ export const authOptions: NextAuthOptions = {
             },
           },
           data: {
+            user: {
+              update: newUser,
+            },
+            // @ts-ignore from twitch?
             refresh_token: account.refresh_token,
+            // @ts-ignore from twitch?
             access_token: account.access_token,
+            // @ts-ignore from twitch?
             expires_at: account.expires_at,
+            // @ts-ignore from twitch?
             scope: account.scope,
           },
         })
       }
 
       return {
-        mmr: dbUser.mmr,
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        picture: dbUser.image,
+        id: user.id,
+        name: newUser.name,
+        email: newUser.email,
+        picture: newUser.image,
       }
     },
   },

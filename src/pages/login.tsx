@@ -2,8 +2,22 @@ import Head from 'next/head'
 
 import { AuthLayout } from '@/components/AuthLayout'
 import { UserAuthForm } from '@/components/AuthForm'
+import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 
 export default function Login() {
+  const { status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      void router.push('/dashboard')
+    }
+  }, [router, status])
+
+  if (status === 'authenticated') return null
+
   return (
     <>
       <Head>

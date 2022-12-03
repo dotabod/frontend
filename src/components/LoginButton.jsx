@@ -23,6 +23,12 @@ export function LoginButton({ className, ...props }) {
               redirect: false,
               callbackUrl: searchParams.get('from') || '/dashboard',
             })
+              .then((e) => {
+                console.log(e)
+              })
+              .catch((e) => {
+                console.log(e)
+              })
           : router.push('/dashboard')
       }
       variant="outline"

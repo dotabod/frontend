@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { signIn } from 'next-auth/react'
 import clsx from 'clsx'
+import { useSearchParams } from 'next/navigation'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const searchParams = useSearchParams()
 
   return (
     <div className={clsx('grid gap-6', className)} {...props}>
@@ -14,7 +16,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         className="inline-flex w-full items-center justify-center space-x-2 rounded-lg border bg-white px-5 py-2.5 text-center text-sm font-medium text-black hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-[#24292F]/50 disabled:opacity-50 dark:hover:bg-[#050708]/30 dark:focus:ring-slate-500"
         onClick={() => {
           setIsLoading(true)
-          signIn('twitch', { callbackUrl: '/dashboard/features' })
+          signIn('twitch', {
+            redirect: false,
+            callbackUrl: searchParams.get('from') || '/dashboard',
+          })
+            .catch((e) => {
+              console.log(e)
+              setIsLoading(false)
+            })
+            .then((e) => {
+              console.log(e)
+            })
         }}
         disabled={isLoading}
       >

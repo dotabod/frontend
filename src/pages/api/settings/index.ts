@@ -16,7 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.query.id as string
 
   if (!userId && !session?.user?.id) {
-    return res.status(500).end()
+    return res.status(403).end()
   }
 
   if (req.method === 'GET') {
@@ -42,6 +42,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           id: session ? session?.user?.id : userId,
         },
       })
+
+      if (!data) {
+        return res.status(403).end()
+      }
 
       return res.json(data)
     } catch (error) {
