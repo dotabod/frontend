@@ -96,7 +96,6 @@ export default function MmrTrackerCard() {
 
                   <Input
                     placeholder="Your MMR?"
-                    style={{ width: 108 }}
                     type="number"
                     min={0}
                     max={30000}
@@ -136,7 +135,6 @@ export default function MmrTrackerCard() {
                   placeholder="0"
                   id="mmr"
                   name="mmr"
-                  style={{ width: 208 }}
                   type="number"
                   min={0}
                   max={30000}
