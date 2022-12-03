@@ -1,3 +1,4 @@
+import DiscordSvg from '@/images/logos/discord.svg'
 import { useId } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/Button'
@@ -164,6 +165,19 @@ export function Hero() {
               <Button href="/login">
                 <PlayIcon className="h-6 w-6 flex-none" />
                 <span className="ml-2.5">Get started</span>
+              </Button>
+              <Button
+                variant="outline"
+                color="gray"
+                href="https://discord.dotabod.com"
+                target="_blank"
+              >
+                <Image
+                  alt="discord"
+                  src={DiscordSvg}
+                  className="h-6 w-6 flex-none"
+                />
+                <span className="ml-2.5">Join Discord</span>
               </Button>
             </div>
           </div>
