@@ -54,29 +54,23 @@ export default function MmrTrackerCard() {
             them.
           </span>
         </div>
-        {accounts?.length ? (
-          <form
-            onSubmit={form.onSubmit((values) => {
-              update(
-                values.accounts.map((act) => ({
-                  ...act,
-                  mmr: Number(act.mmr) || 0,
-                }))
-              )
-            })}
-            className="space-y-2"
-          >
-            {accounts.map((account, index) => {
-              return (
-                <div key={account.steam32Id} className="space-x-2">
-                  <Input
-                    placeholder="Name"
-                    style={{ width: 208 }}
-                    htmlType="text"
-                    disabled={!isEnabled}
-                    {...form.getInputProps(`accounts.${index}.name`)}
-                  >
-                    Display name for{' '}
+        <form
+          onSubmit={form.onSubmit((values) => {
+            update(
+              values.accounts.map((act) => ({
+                ...act,
+                mmr: Number(act.mmr) || 0,
+              }))
+            )
+          })}
+          className="space-y-2"
+        >
+          {accounts.map((account, index) => {
+            return (
+              <div key={account.steam32Id} className="flex space-x-2">
+                <div>
+                  <label className="mb-2 text-sm font-medium text-dark-400 ">
+                    <span className="mr-2">Display name for</span>
                     <Link
                       color
                       target="_blank"
@@ -85,31 +79,43 @@ export default function MmrTrackerCard() {
                     >
                       {account.steam32Id}
                     </Link>
-                  </Input>
+                  </label>
+                  <Input
+                    placeholder="Name"
+                    style={{ width: 208 }}
+                    type="text"
+                    disabled={!isEnabled}
+                    {...form.getInputProps(`accounts.${index}.name`)}
+                  />
+                </div>
+
+                <div>
+                  <label className="mt-2 mb-2 text-sm font-medium text-dark-400 ">
+                    Your current MMR (required)
+                  </label>
+
                   <Input
                     placeholder="Your MMR?"
                     style={{ width: 108 }}
-                    htmlType="number"
+                    type="number"
                     min={0}
                     max={30000}
                     disabled={!isEnabled}
                     {...form.getInputProps(`accounts.${index}.mmr`)}
-                  >
-                    MMR
-                  </Input>
+                  />
                 </div>
-              )
-            })}
-            <Button
-              disabled={!isEnabled}
-              loading={loadingAccounts}
-              auto
-              htmlType="submit"
-            >
-              Save
-            </Button>
-          </form>
-        ) : null}
+              </div>
+            )
+          })}
+          <Button
+            disabled={!isEnabled}
+            loading={loadingAccounts}
+            auto
+            htmlType="submit"
+          >
+            Save
+          </Button>
+        </form>
 
         {accounts.length === 0 && (
           <div className="mt-6">
@@ -131,7 +137,7 @@ export default function MmrTrackerCard() {
                   id="mmr"
                   name="mmr"
                   style={{ width: 208 }}
-                  htmlType="number"
+                  type="number"
                   min={0}
                   max={30000}
                   defaultValue={mmr}
