@@ -240,14 +240,12 @@ export default function DashboardShell({ children, title }) {
           <div className="sticky top-0 z-10 hidden h-full w-full flex-shrink-0 justify-end bg-dark-800  px-6 py-2 md:flex md:px-8">
             <UserAccountNav dark />
           </div>
-          <main className=" w-full bg-dark-700 px-4 md:pl-64">
-            <div className="min-h-full w-full max-w-screen-2xl pr-8 opacity-100 transition-all">
-              <div className="space-y-4 pt-12">
-                <h1 className="mb-12 text-2xl font-bold leading-6 text-white">
-                  {title}
-                </h1>
-                {children}
-              </div>
+          <main className="w-full bg-dark-700 px-4 md:pr-12 md:pl-72">
+            <div className="min-h-full w-full max-w-screen-2xl space-y-6 pt-8 transition-all">
+              <h1 className="mb-12 text-2xl font-bold leading-6 text-white">
+                {title}
+              </h1>
+              {children}
             </div>
           </main>
         </div>
