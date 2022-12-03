@@ -224,11 +224,53 @@ export default function OverlayPage() {
 
   const positions = [555, 615, 680, 745, 800, 1065, 1130, 1192, 1250, 1320]
 
-  let aegisLeft = 0
+  let badgePosition = {
+    bottom: 0,
+    right: 276,
+    left: null,
+  }
+
+  let wlPosition = {
+    bottom: 0,
+    right: 350,
+    left: null,
+  }
+
+  let roshPosition = {
+    left: opts[DBSettings.xl] ? 285 : 250,
+    bottom: 100,
+    right: null,
+  }
+
+  let minimapPosition = {
+    bottom: 0,
+    left: 0,
+    right: null,
+  }
+
   if (opts[DBSettings.bp]) {
-    aegisLeft = opts[DBSettings.xl] ? 290 : 255
-  } else {
-    aegisLeft = opts[DBSettings.xl] ? 285 : 250
+    minimapPosition.bottom += 9
+    minimapPosition.left += 9
+    roshPosition.left = opts[DBSettings.xl] ? 290 : 255
+  }
+
+  if (opts[DBSettings.minimapRight]) {
+    roshPosition.right = roshPosition.left
+    roshPosition.left = null
+
+    minimapPosition.right = minimapPosition.left
+    minimapPosition.left = null
+
+    wlPosition.left = wlPosition.right
+    wlPosition.right = null
+
+    badgePosition.left = badgePosition.right
+    badgePosition.right = null
+
+    if (opts[DBSettings.bp]) {
+      minimapPosition.right += -3
+      minimapPosition.bottom += -5
+    }
   }
 
   return (
@@ -250,10 +292,7 @@ export default function OverlayPage() {
         {opts[DBSettings.rosh] &&
           (block.type === 'playing' || isDev) &&
           roshan?.maxDate && (
-            <div
-              style={{ left: aegisLeft }}
-              className={`absolute bottom-[100px]`}
-            >
+            <div style={roshPosition} className="absolute">
               {roshan?.minDate && (
                 <div className="rounded-full bg-red-900/70">
                   <CountdownCircleTimer
@@ -335,15 +374,12 @@ export default function OverlayPage() {
 
         {shouldBlockMap && (
           <Image
-            className={`absolute ${
-              opts[DBSettings.bp]
-                ? 'bottom-[14px] left-[11px]'
-                : 'bottom-0 left-0'
-            }`}
+            className="absolute"
             priority
             alt="minimap blocker"
             width={opts[DBSettings.xl] ? 280 : 240}
             height={opts[DBSettings.xl] ? 280 : 240}
+            style={minimapPosition}
             src={`/images/731-${
               opts[DBSettings.simple] ? 'Simple' : 'Complex'
             }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
@@ -357,17 +393,26 @@ export default function OverlayPage() {
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
             {
-              <div className="absolute bottom-0 right-[350px]">
+              <div className="absolute" style={wlPosition}>
                 <WinLossCard wl={wl} />
               </div>
             }
 
             {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
-              <div className="absolute bottom-0 right-[276px]">
+              <div className="absolute" style={badgePosition}>
                 <Rankbadge {...rankImageDetails} />
               </div>
             )}
           </>
+        )}
+
+        {false && process.env.NODE_ENV === 'development' && (
+          <Image
+            height={1080}
+            width={1920}
+            alt={`main game`}
+            src={`/images/shot_0012.png`}
+          />
         )}
       </div>
     </>

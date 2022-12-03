@@ -15,6 +15,7 @@ export enum DBSettings {
   chatter = 'chatter',
   rosh = 'rosh',
   aegis = 'aegis',
+  minimapRight = 'minimapRight',
 }
 
 export const defaultSettings = {
@@ -34,6 +35,7 @@ export const defaultSettings = {
   [DBSettings.chatter]: false,
   [DBSettings.rosh]: true,
   [DBSettings.aegis]: true,
+  [DBSettings.minimapRight]: false,
 }
 
 export const getValueOrDefault = (data, key) => {

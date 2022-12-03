@@ -25,6 +25,11 @@ export default function MinimapCard(): JSX.Element {
     loading: l3,
     updateSetting: updateBP,
   } = useUpdateSetting(DBSettings.bp)
+  const {
+    isEnabled: isMinimapRight,
+    loading: l4,
+    updateSetting: updateMinimapRight,
+  } = useUpdateSetting(DBSettings.minimapRight)
 
   const loading = l0 || l1 || l2 || l3
 
@@ -87,6 +92,14 @@ export default function MinimapCard(): JSX.Element {
                 onChange={(e) => updateXl(!!e?.target?.checked)}
               >
                 Use extra large minimap
+              </Checkbox>
+              <Checkbox
+                disabled={!isEnabled}
+                checked={isMinimapRight}
+                value={DBSettings.minimapRight}
+                onChange={(e) => updateMinimapRight(!!e?.target?.checked)}
+              >
+                Show minimap on the right
               </Checkbox>
               <Checkbox
                 disabled={!isEnabled}
