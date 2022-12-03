@@ -1,11 +1,15 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import {
+  Bars3Icon,
+  BeakerIcon,
+  BoltIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 import { DarkLogo } from '@/components/Logo'
 import Link from 'next/link'
 import Image from 'next/image'
 import { UserAccountNav } from '@/components/user-account-nav'
-import { HomeIcon, InboxIcon } from '@heroicons/react/24/outline'
 import { Github } from 'lucide-react'
 import DiscordSvg from '@/images/logos/discord.svg'
 
@@ -13,12 +17,17 @@ export const navigation = [
   {
     name: 'Setup',
     href: '/dashboard',
-    icon: HomeIcon,
+    icon: BeakerIcon,
   },
   {
     name: 'Features',
     href: '/dashboard/features',
-    icon: InboxIcon,
+    icon: BoltIcon,
+  },
+  {
+    name: '',
+    href: '',
+    icon: null,
   },
   {
     name: 'Github',
@@ -125,29 +134,39 @@ export default function DashboardShell({ children, title }) {
                       <UserAccountNav dark />
                     </div>
                     <nav className="mt-5 space-y-1 px-2">
-                      {navigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className={classNames(
-                            window.location.href.endsWith(item.href)
-                              ? ' bg-dark-700 text-[#F4F4FB]'
-                              : 'text-[#9195AB] hover:fill-gray-50 hover:text-[#F4F4FB]',
-                            'group flex items-center rounded-md px-2 py-2 text-base font-medium'
-                          )}
-                        >
-                          <item.icon
+                      {navigation.map((item, i) => {
+                        if (!item.name)
+                          return (
+                            <div
+                              key={i}
+                              className="!my-6 border-t border-dark-600"
+                            />
+                          )
+
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
                             className={classNames(
                               window.location.href.endsWith(item.href)
-                                ? 'text-gray-500'
-                                : 'text-gray-400 group-hover:text-white',
-                              'mr-4 h-6 w-6 flex-shrink-0'
+                                ? ' bg-dark-700 text-[#F4F4FB]'
+                                : 'text-[#9195AB] hover:fill-gray-50 hover:text-[#F4F4FB]',
+                              'group flex items-center rounded-md px-2 py-2 text-base font-medium'
                             )}
-                            aria-hidden="true"
-                          />
-                          {item.name}
-                        </Link>
-                      ))}
+                          >
+                            <item.icon
+                              className={classNames(
+                                window.location.href.endsWith(item.href)
+                                  ? 'text-gray-500'
+                                  : 'text-gray-400 group-hover:text-white',
+                                'mr-4 h-6 w-6 flex-shrink-0'
+                              )}
+                              aria-hidden="true"
+                            />
+                            {item.name}
+                          </Link>
+                        )
+                      })}
                     </nav>
                   </div>
                 </Dialog.Panel>
@@ -173,29 +192,36 @@ export default function DashboardShell({ children, title }) {
                 <UserAccountNav dark showDetails />
               </div>
               <nav className="mt-5 flex-1 space-y-1 bg-dark-800 px-2">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={classNames(
-                      window.location.href.endsWith(item.href)
-                        ? ' bg-dark-700 text-[#F4F4FB]'
-                        : 'text-[#9195AB] hover:fill-[#F4F4FB] hover:text-[#F4F4FB]',
-                      'group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-colors'
-                    )}
-                  >
-                    <item.icon
+                {navigation.map((item, i) => {
+                  if (!item.name)
+                    return (
+                      <div key={i} className="!my-6 border-t border-dark-600" />
+                    )
+
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
                       className={classNames(
                         window.location.href.endsWith(item.href)
-                          ? 'text-gray-500'
-                          : 'text-gray-400 group-hover:text-white',
-                        'mr-3 h-6 w-6 flex-shrink-0'
+                          ? ' bg-dark-700 text-[#F4F4FB]'
+                          : 'text-[#9195AB] hover:fill-[#F4F4FB] hover:text-[#F4F4FB]',
+                        'group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-colors'
                       )}
-                      aria-hidden="true"
-                    />
-                    {item.name}
-                  </Link>
-                ))}
+                    >
+                      <item.icon
+                        className={classNames(
+                          window.location.href.endsWith(item.href)
+                            ? 'text-gray-500'
+                            : 'text-gray-400 group-hover:text-white',
+                          'mr-3 h-6 w-6 flex-shrink-0'
+                        )}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </Link>
+                  )
+                })}
               </nav>
             </div>
           </div>
