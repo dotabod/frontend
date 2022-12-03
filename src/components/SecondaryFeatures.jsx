@@ -245,11 +245,8 @@ export function SecondaryFeatures() {
           role="list"
           className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3"
         >
-          {features.map((feature) => (
-            <li
-              key={feature.name}
-              className="rounded-2xl border border-gray-200 p-8"
-            >
+          {features.map((feature, i) => (
+            <li key={i} className="rounded-2xl border border-gray-200 p-8">
               <h3 className="mt-6 flex items-center justify-between space-x-2 font-semibold text-gray-900">
                 {feature.name}
                 {feature.inProgress && (
