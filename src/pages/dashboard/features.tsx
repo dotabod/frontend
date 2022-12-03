@@ -20,7 +20,7 @@ export default function DashboardPage({ settings }: Props) {
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Stream overlays</title>
+        <title>Dotabod | Features</title>
       </Head>
       <DashboardShell title="Features">
         <MmrTrackerCard />

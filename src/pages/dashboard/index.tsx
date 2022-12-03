@@ -11,7 +11,7 @@ export default function DashboardPage() {
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Stream overlays</title>
+        <title>Dotabod | Setup</title>
       </Head>
       <DashboardShell title="Setup">
         <ChatBot />

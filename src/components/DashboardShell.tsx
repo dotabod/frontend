@@ -4,6 +4,7 @@ import {
   Bars3Icon,
   BeakerIcon,
   BoltIcon,
+  QuestionMarkCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { DarkLogo } from '@/components/Logo'
@@ -23,6 +24,11 @@ export const navigation = [
     name: 'Features',
     href: '/dashboard/features',
     icon: BoltIcon,
+  },
+  {
+    name: 'Troubleshoot',
+    href: '/dashboard/troubleshoot',
+    icon: QuestionMarkCircleIcon,
   },
   {
     name: '',
