@@ -31,7 +31,7 @@
     "framer-motion": "^7.6.18",
     "lucide-react": "^0.103.0",
     "next": "13.0.6",
-    "next-auth": "^4.18.0",
+    "next-auth": "4.17.0",
     "postcss-focus-visible": "^7.1.0",
     "react": "18.2.0",
     "react-countdown": "^2.3.5",
