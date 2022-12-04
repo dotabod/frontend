@@ -85,7 +85,6 @@ export default function MmrTrackerCard() {
                       placeholder="Name"
                       style={{ width: 208 }}
                       type="text"
-                      disabled={!isEnabled}
                       {...form.getInputProps(`accounts.${index}.name`)}
                     />
                   </div>
@@ -100,19 +99,13 @@ export default function MmrTrackerCard() {
                       type="number"
                       min={0}
                       max={30000}
-                      disabled={!isEnabled}
                       {...form.getInputProps(`accounts.${index}.mmr`)}
                     />
                   </div>
                 </div>
               )
             })}
-            <Button
-              disabled={!isEnabled}
-              loading={loadingAccounts}
-              auto
-              htmlType="submit"
-            >
+            <Button loading={loadingAccounts} auto htmlType="submit">
               Save
             </Button>
           </form>
@@ -141,7 +134,6 @@ export default function MmrTrackerCard() {
                   min={0}
                   max={30000}
                   defaultValue={mmr}
-                  disabled={!isEnabled}
                   onChange={debouncedMmr}
                 />
               )}
