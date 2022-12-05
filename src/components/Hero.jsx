@@ -91,6 +91,11 @@ function PlayIcon(props) {
 
 const featuredUsers = [
   {
+    name: 'dubudota',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/c876efcc8901bd08-profile_image-150x150.jpeg',
+  },
+  {
     name: 'Grubby',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
