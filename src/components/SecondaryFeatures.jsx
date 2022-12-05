@@ -6,6 +6,9 @@ import { SparklesIcon } from '@heroicons/react/24/outline'
 import { Rankbadge } from './Rankbadge'
 import WinLossCard from './WinLossCard'
 import TwitchChat from './TwitchChat'
+import { CommandDetail } from '@/pages/dashboard/commands'
+import { DBSettings } from '@/lib/DBSettings'
+import React from 'react'
 
 export function SecondaryFeatures() {
   const features = [
@@ -42,7 +45,7 @@ export function SecondaryFeatures() {
             Create predictions for your viewers to bet on. Dotabod will start
             and stop the prediction automatically.
           </span>
-          <TwitchChat command="!wl" response="Ranked 0 W - 9 L" />
+          {CommandDetail[DBSettings.commandWL].response()}
 
           <div className="mt-2 flex justify-center space-x-4">
             <WinLossCard
@@ -101,14 +104,10 @@ export function SecondaryFeatures() {
     {
       name: 'MMR command',
       description: (
-        <>
-          Using chat command !mmr, viewers can get an accurate mmr update in
-          chat. Auto updates immediately with every match!
-          <TwitchChat
-            command="!mmr"
-            response="2720 | Archon☆3 | Next rank at 2772 in 2 wins"
-          />
-        </>
+        <div>
+          {CommandDetail[DBSettings.mmrTracker].description}
+          {CommandDetail[DBSettings.mmrTracker].response()}
+        </div>
       ),
     },
     {
@@ -120,7 +119,7 @@ export function SecondaryFeatures() {
           </span>
           <TwitchChat
             responses={[
-              <>
+              <React.Fragment key={1}>
                 <Image
                   width={22}
                   height={22}
@@ -129,8 +128,8 @@ export function SecondaryFeatures() {
                   src="/images/pauseChamp.webp"
                 />
                 <span>Who paused the game?</span>
-              </>,
-              <>
+              </React.Fragment>,
+              <React.Fragment key={2}>
                 <Image
                   width={22}
                   height={22}
@@ -139,10 +138,10 @@ export function SecondaryFeatures() {
                   src="/images/massivePIDAS.webp"
                 />
                 <span>Use your midas</span>
-              </>,
-              <>
+              </React.Fragment>,
+              <React.Fragment key={3}>
                 <span>🚬💣 Clockwerk is smoked!</span>
-              </>,
+              </React.Fragment>,
             ]}
           />
         </div>
@@ -181,44 +180,36 @@ export function SecondaryFeatures() {
     {
       name: 'Hero command',
       description: (
-        <>
-          Shows the stats for your currently played hero.
-          <TwitchChat
-            command="!hero"
-            response="Winrate: 90% as Clockwerk in 30d of 12 matches."
-          />
-        </>
+        <React.Fragment>
+          {CommandDetail[DBSettings.commandHero].description}
+          {CommandDetail[DBSettings.commandHero].response()}
+        </React.Fragment>
       ),
     },
     {
       name: 'XPM command',
       description: (
-        <>
-          Live experience per minute for your chatters on demand.
-          <TwitchChat command="!xpm" response="Live XPM: 778" />
-        </>
+        <React.Fragment>
+          {CommandDetail[DBSettings.commandXPM].description}
+          {CommandDetail[DBSettings.commandXPM].response()}
+        </React.Fragment>
       ),
     },
     {
       name: 'GPM command',
       description: (
-        <>
-          At any time, chatters can request your live gold per minute with !gpm.
-          Playing alch or anti-mage? Show off your gpm!
-          <TwitchChat
-            command="!gpm"
-            response="Live GPM: 660. 5270 from hero kills, 9295 from creep kills."
-          />
-        </>
+        <React.Fragment>
+          {CommandDetail[DBSettings.commandGPM].description}
+          {CommandDetail[DBSettings.commandGPM].response()}
+        </React.Fragment>
       ),
     },
     {
       name: 'Pleb command',
       description: (
         <div>
-          When you have sub only mode turned on, use !pleb to let one non-sub
-          send a message. Then all your subs can point and laugh 😂.
-          <TwitchChat modOnly command="!pleb" response="One pleb IN 👇" />
+          {CommandDetail[DBSettings.commandPleb].description}
+          {CommandDetail[DBSettings.commandPleb].response()}
         </div>
       ),
     },

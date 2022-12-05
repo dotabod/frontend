@@ -12,7 +12,7 @@ export default function TwitchChat({
   return (
     <div
       className={clsx(
-        'mt-2 max-w-xs rounded border p-2',
+        'mt-2 max-w-xs rounded border p-2 text-sm',
         dark && 'border-dark-500'
       )}
     >

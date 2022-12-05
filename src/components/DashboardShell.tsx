@@ -4,6 +4,7 @@ import {
   Bars3Icon,
   BeakerIcon,
   BoltIcon,
+  CommandLineIcon,
   QuestionMarkCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
@@ -24,6 +25,11 @@ export const navigation = [
     name: 'Features',
     href: '/dashboard/features',
     icon: BoltIcon,
+  },
+  {
+    name: 'Commands',
+    href: '/dashboard/commands',
+    icon: CommandLineIcon,
   },
   {
     name: 'Troubleshoot',

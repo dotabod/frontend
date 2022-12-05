@@ -1,11 +1,6 @@
 import DashboardShell from '@/components/DashboardShell'
-import { Setting } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-
-type Props = {
-  settings: Setting[]
-}
 
 const faqs = [
   {
@@ -28,7 +23,7 @@ const faqs = [
   },
 ]
 
-export default function DashboardPage({ settings }: Props) {
+export default function TroubleshootPage() {
   const { status } = useSession()
 
   return status === 'authenticated' ? (
