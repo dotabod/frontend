@@ -159,7 +159,7 @@ export function Hero() {
                 src="/images/peepoclap.webp"
                 width={38}
                 height={38}
-                alt="wave"
+                alt="peepoclap"
               />
             </h1>
             <p className="mt-6 text-lg text-gray-600">

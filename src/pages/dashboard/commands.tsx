@@ -199,7 +199,10 @@ export default function CommandsPage() {
       <Head>
         <title>Dotabod | Features</title>
       </Head>
-      <DashboardShell title="Commands">
+      <DashboardShell
+        subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
+        title="Commands"
+      >
         {Object.keys(CommandDetail).map((key) => (
           <CommandsCard key={key} command={CommandDetail[key]} />
         ))}

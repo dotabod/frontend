@@ -17,7 +17,10 @@ export default function FeaturesPage() {
       <Head>
         <title>Dotabod | Features</title>
       </Head>
-      <DashboardShell title="Features">
+      <DashboardShell
+        subtitle="Customize the options your stream receives."
+        title="Features"
+      >
         <MmrTrackerCard />
         <BetsCard />
         <MinimapCard />

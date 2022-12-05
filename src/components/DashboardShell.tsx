@@ -57,7 +57,7 @@ export function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function DashboardShell({ children, title }) {
+export default function DashboardShell({ children, title, subtitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -254,9 +254,12 @@ export default function DashboardShell({ children, title }) {
           </div>
           <main className="w-full bg-dark-700 px-4 md:pr-12 md:pl-72">
             <div className="min-h-full w-full max-w-screen-2xl space-y-6 pt-8 transition-all">
-              <h1 className="mb-12 text-2xl font-bold leading-6 text-white">
-                {title}
-              </h1>
+              <div className="mb-12 space-y-4">
+                <h1 className="text-2xl font-bold leading-6 text-white">
+                  {title}
+                </h1>
+                <div className="text-dark-300">{subtitle}</div>
+              </div>
               {children}
             </div>
           </main>
