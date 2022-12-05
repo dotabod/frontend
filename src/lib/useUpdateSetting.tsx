@@ -39,13 +39,14 @@ export function useUpdateAccount() {
 
 export function useUpdateSetting(key) {
   const { data } = useSWR(`/api/settings`, fetcher)
+  const { setToast } = useToasts()
+  const { mutate } = useSWRConfig()
+
+  if (!key) return {}
 
   const loading = data === undefined
   let isEnabled = getValueOrDefault(data?.settings, key)
   if (key === DBSettings.mmr) isEnabled = data?.mmr || 0
-
-  const { setToast } = useToasts()
-  const { mutate } = useSWRConfig()
 
   const updateSetting = (value) => {
     const setting = { ...data, value }

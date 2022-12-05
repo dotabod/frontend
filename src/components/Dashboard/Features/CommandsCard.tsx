@@ -18,16 +18,18 @@ export default function CommandsCard({
             <h3>{command.title}</h3>
             <div className="subtitle">{command.description}</div>
           </div>
-          {<command.response dark />}
+          {command.response && <command.response dark />}
         </div>
 
-        <Toggle
-          scale={3}
-          initialChecked={isEnabled}
-          onChange={(e) => updateSetting(!!e?.target?.checked)}
-        >
-          !mmr
-        </Toggle>
+        {command.key && (
+          <Toggle
+            scale={3}
+            initialChecked={isEnabled}
+            onChange={(e) => updateSetting(!!e?.target?.checked)}
+          >
+            !mmr
+          </Toggle>
+        )}
       </div>
     </Card>
   )

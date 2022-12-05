@@ -121,6 +121,74 @@ export const CommandDetail = {
       />
     ),
   },
+  ping: {
+    title: 'Ping',
+    description: '',
+    cmd: '!ping',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat {...props} command="!ping" response="Pong EZ Clap" />
+    ),
+  },
+  dotabod: {
+    title: 'About',
+    description: "Tell everyone about the new bot you're using!",
+    cmd: '!dotabod',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!dotabod"
+        response="I'm an open source bot made by @techleed. More info: https://dotabod.com"
+      />
+    ),
+  },
+  refresh: {
+    title: 'Refresh',
+    description:
+      'Refreshes your OBS overlay without having to do it from OBS. Used in case the overlay is messed up.',
+    cmd: '!refresh',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!refresh"
+        response="Refreshing overlay..."
+      />
+    ),
+  },
+  steam: {
+    title: 'Steam ID',
+    description:
+      "Retrieve the steam ID of the account you're currently playing on.",
+    cmd: '!steam',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!steam"
+        response={`ChannelName https://steamid.xyz/1234567`}
+      />
+    ),
+  },
+  'mmr=': {
+    title: 'Set MMR',
+    description: 'Manually set your MMR.',
+    cmd: '!mmr=',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!mmr= 1234"
+        response="Updated MMR to 1234"
+      />
+    ),
+  },
 }
 
 export default function CommandsPage() {
@@ -133,7 +201,7 @@ export default function CommandsPage() {
       </Head>
       <DashboardShell title="Commands">
         {Object.keys(CommandDetail).map((key) => (
-          <CommandsCard key={key} command={CommandDetail[key as DBSettings]} />
+          <CommandsCard key={key} command={CommandDetail[key]} />
         ))}
       </DashboardShell>
     </>
