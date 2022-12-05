@@ -273,41 +273,41 @@
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
 "@mantine/core@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.9.0.tgz#8ae8bf6a80a79edfd65b41786378630ee96fe847"
-  integrity sha512-ofjUWMDmAepuU5hGIk/RabLhJkd4Bl6Wx6KtPUpIzxjsgkhIr18o6UDBiVXm96muAvQfo4Ru8nhpG8P0VnPOUQ==
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.9.1.tgz#b9af73eda90144dd3edcb8f408b37a5b81789402"
+  integrity sha512-2WbP1MP5HqVcBBfhAXh/PK1VoiLohJuIm+aFLK8uFXPlT/D9ccQ3BHwrR+x5gUJtCioSPzmuoVUdvTlJTGqf3A==
   dependencies:
     "@floating-ui/react-dom-interactions" "^0.10.1"
-    "@mantine/styles" "5.9.0"
-    "@mantine/utils" "5.9.0"
+    "@mantine/styles" "5.9.1"
+    "@mantine/utils" "5.9.1"
     "@radix-ui/react-scroll-area" "1.0.0"
     react-textarea-autosize "8.3.4"
 
 "@mantine/form@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@mantine/form/-/form-5.9.0.tgz#af62f27c9f4c62f64a2efc35a7e75ded4a51f78a"
-  integrity sha512-7Wngy3AvckDNrMql0ObbmIb8Fx1JNx1JLaD4WGAoF2OSRhiIyyjff1fyNWFsLk63XZA1W8fTJSUYgUdJwpSHeQ==
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/form/-/form-5.9.1.tgz#bbbee92fb005dd31d87f8ae19e795857fdc44254"
+  integrity sha512-U+LVrz7Jm8Cg3Rn8MuAgnlym9UtPitreWQmdJFuHbhZoOy21Rq6Pqg+EiQt/Ua9+ijv+1af7wQcImKKyhfpXYw==
   dependencies:
     fast-deep-equal "^3.1.3"
     klona "^2.0.5"
 
 "@mantine/hooks@^5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.9.0.tgz#c3ad41ab73a06b5b9a71d7c57571f8e0b1bc96cb"
-  integrity sha512-SkxMMYMe/X7UBcWrgjPy5kWMRZrphEueeopYvrivGLKf0xsL1o5O7DH2yq9r5IlTXb8B3vwwoEctxH5FA8Yb2Q==
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.9.1.tgz#bf335e4629050283cc79866f44177591f66d28e3"
+  integrity sha512-xBo5ylJfEI8emnJjmqe1sZYyzsQzn5KAlb/YrIiJ4KLct4MSzFndQDQc0xIeNbQsSrOpz7UhWADeEEmOgcT+qw==
 
-"@mantine/styles@5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.9.0.tgz#067fe20e68ac9c5c0c4033a491da36912ea74abb"
-  integrity sha512-xt7zPz7pISTnmP/OWBLsqVJocn7AMHAnwRvbfs8q4M8Vm1kn1IQEIpLUuWGcJn1+z8py5GxCwIVMU3jBEuow4A==
+"@mantine/styles@5.9.1":
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.9.1.tgz#fc4c69199ca68ede398af8188048b22499678342"
+  integrity sha512-S4bHfAk62zR7++ANi3sxekyCeeKDCHpwlnCa0xz+C2FZSn0N0/d1Q+Z9Lhp1DB+PJCY2svCzuQJ7VU/AfGtCQw==
   dependencies:
     clsx "1.1.1"
     csstype "3.0.9"
 
-"@mantine/utils@5.9.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.9.0.tgz#f21ba4c518a6561bea079c7c909298f35f492a99"
-  integrity sha512-UU5kO1VcsntrKvznJMjZ1S/ZM6arAXFkBnBqAKfCPOPJJIcwUWOfQP8u1sxp8ounAHThp9GtkpuzzGOQy1rcPA==
+"@mantine/utils@5.9.1":
+  version "5.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.9.1.tgz#684ee4abcf042d768c7b32ea8b36d23e05017be7"
+  integrity sha512-Uz0kbUyS1E6YmE1zU2tpT6n1y973Us1brTtoMjdiix9E1eZMvJ+fTTO2ie9clzWZ3r4atpi9kyWHQ9HIu2VoCg==
 
 "@motionone/animation@^10.13.1":
   version "10.14.0"
@@ -2643,10 +2643,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
-next-auth@^4.18.0:
-  version "4.18.0"
-  resolved "https://registry.yarnpkg.com/next-auth/-/next-auth-4.18.0.tgz#f6fb4d2a1bfd6e90650755c13324e24d1f44b0d4"
-  integrity sha512-lqJtusYqUwDiwzO4+B+lx/vKCuf/akcdhxT5R47JmS5gvI9O6Y4CZYc8coysY7XaMGHCxfttvTSEw76RA8gNTg==
+next-auth@4.17.0:
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/next-auth/-/next-auth-4.17.0.tgz#776d2a0999d4e2eb56968cad282c1ecd37516a2c"
+  integrity sha512-aN2tdnjS0MDeUpB2tBDOaWnegkgeMWrsccujbXRGMJ607b+EwRcy63MFGSr0OAboDJEe0902piXQkt94GqF8Qw==
   dependencies:
     "@babel/runtime" "^7.16.3"
     "@panva/hkdf" "^1.0.1"
