@@ -1,14 +1,8 @@
 import { Card } from '@/ui/card'
-import {
-  Button,
-  Code,
-  Collapse,
-  Display,
-  Image,
-  Keyboard,
-} from '@geist-ui/core'
+import { Button, Code, Collapse, Display, Keyboard } from '@geist-ui/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function ExportCFG() {
@@ -73,22 +67,31 @@ export default function ExportCFG() {
           </a>
           <div className="ml-4 space-y-4">
             <div>
+              <Display shadow>
+                <Image
+                  alt="dotabod browser source properties"
+                  height={170}
+                  width={429}
+                  src="/images/steam-browse-files.png"
+                />
+              </Display>
               <Display
-                shadow
                 caption={
                   <>
                     <p>Full path to save config file to:</p>
                     <Code>
                       C:\Program Files (x86)\Steam\steamapps\common\dota 2
-                      beta\game\dota\cfg\gamestate_integration
+                      beta\game\dota\cfg\gamestate_integration\
                     </Code>
                   </>
                 }
+                shadow
               >
                 <Image
-                  alt="dotabod browser source properties"
-                  height="170px"
-                  src="/images/steam-browse-files.png"
+                  alt="steam gamestate folder"
+                  height={990}
+                  width={595}
+                  src="/images/gamestate-folder.png"
                 />
               </Display>
             </div>
@@ -107,7 +110,7 @@ export default function ExportCFG() {
             options in Steam.
           </div>
 
-          <div>iii. Restart Steam and Dota 2 client.</div>
+          <div>iii. Restart Dota 2.</div>
         </div>
       </Collapse>
     </Card>
