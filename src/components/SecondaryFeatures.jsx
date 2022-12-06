@@ -140,7 +140,14 @@ export function SecondaryFeatures() {
                 <span>Use your midas</span>
               </React.Fragment>,
               <React.Fragment key={3}>
-                <span>🚬💣 Clockwerk is smoked!</span>
+                <Image
+                  width={22}
+                  height={22}
+                  alt="pausechamp"
+                  className="mr-1 inline align-middle"
+                  src="/images/Shush.png"
+                />
+                <span>Clockwerk is smoked!</span>
               </React.Fragment>,
             ]}
           />
