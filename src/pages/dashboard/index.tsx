@@ -1,6 +1,6 @@
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import ChatBot from '@/components/Dashboard/ChatBot'
-import OverlayURL from '@/components/Dashboard/OverlayURL'
+import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import DashboardShell from '@/components/DashboardShell'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -33,7 +33,7 @@ export default function DashboardPage() {
       >
         <ChatBot />
         <ExportCFG />
-        <OverlayURL />
+        <OBSOverlay />
       </DashboardShell>
     </>
   ) : null
