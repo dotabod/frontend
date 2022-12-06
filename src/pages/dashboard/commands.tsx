@@ -155,6 +155,7 @@ export const CommandDetail = {
     response: (props) => (
       <TwitchChat
         {...props}
+        modOnly
         command="!refresh"
         response="Refreshing overlay..."
       />
@@ -170,6 +171,7 @@ export const CommandDetail = {
     response: (props) => (
       <TwitchChat
         {...props}
+        modOnly
         command="!steam"
         response={`ChannelName https://steamid.xyz/1234567`}
       />
@@ -184,6 +186,7 @@ export const CommandDetail = {
     response: (props) => (
       <TwitchChat
         {...props}
+        modOnly
         command="!mmr= 1234"
         response="Updated MMR to 1234"
       />
