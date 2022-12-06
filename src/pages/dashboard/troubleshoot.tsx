@@ -31,7 +31,10 @@ export default function TroubleshootPage() {
       <Head>
         <title>Dotabod | Troubleshooting</title>
       </Head>
-      <DashboardShell title="Troubleshooting">
+      <DashboardShell
+        subtitle="In case something isn't working."
+        title="Troubleshooting"
+      >
         <div className="mt-12 lg:col-span-2 lg:mt-0">
           <dl className="space-y-12">
             {faqs.map(
