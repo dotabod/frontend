@@ -12,9 +12,8 @@ import {
   defaultSettings,
   getValueOrDefault,
 } from '@/lib/DBSettings'
-import { getRankImage } from '@/lib/ranks'
+import { getRankImage, RankDeets } from '@/lib/ranks'
 import { Rankbadge } from '@/components/Rankbadge'
-import { getWL } from '@/lib/getWL'
 import { HeroBlocker } from '@/components/HeroBlocker'
 import Countdown, { zeroPad } from 'react-countdown'
 import { Card } from '@/components/Card'
@@ -59,13 +58,7 @@ export default function OverlayPage() {
   useEffect(() => {
     if (!userId) return
 
-    fetcher(`/api/settings/?id=`, userId).then((data: dataProp) => {
-      setData(data)
-
-      const steam32Id = data?.SteamAccount[0]?.steam32Id || data?.steam32Id
-      const mmr = data?.SteamAccount[0]?.mmr || data?.mmr
-      getWL(userId, setWL)
-    })
+    fetcher(`/api/settings/?id=`, userId).then(setData)
   }, [userId])
 
   const [block, setBlock] = useState({ type: null, team: null })
@@ -146,12 +139,12 @@ export default function OverlayPage() {
       fetcher(`/api/settings/?id=`, userId).then(setData)
     })
 
-    socket.on('update-medal', (deets) => {
-      // Refetch mmr and medal image
-      console.log('updating medal')
-
-      getWL(userId, setWL)
+    socket.on('update-medal', (deets: RankDeets) => {
       getRankImage(deets).then(setRankImageDetails)
+    })
+
+    socket.on('update-wl', (records: typeof wl) => {
+      setWL(records)
     })
 
     socket.on('refresh', () => {

@@ -1,8 +1,8 @@
 'use client'
 import { Card } from '@/components/Card'
 
-type typer = { wl: { win: number; lose: number; type: string }[] }
-const WinLossCard = ({ wl, ...props }: typer) => (
+type WLType = { wl: { win: number; lose: number; type: string }[] }
+const WinLossCard = ({ wl, ...props }: WLType) => (
   <Card {...props}>
     {wl.map(({ win, lose, type }) => (
       <div
