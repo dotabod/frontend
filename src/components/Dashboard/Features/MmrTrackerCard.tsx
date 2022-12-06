@@ -1,5 +1,13 @@
 import { Card } from '@/ui/card'
-import { Button, Collapse, Display, Image, Link, Loading } from '@geist-ui/core'
+import {
+  Button,
+  Collapse,
+  Display,
+  Image,
+  Link,
+  Loading,
+  Toggle,
+} from '@geist-ui/core'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
@@ -94,13 +102,25 @@ export default function MmrTrackerCard() {
                       Your current MMR (required)
                     </label>
 
-                    <Input
-                      placeholder="Your MMR?"
-                      type="number"
-                      min={0}
-                      max={30000}
-                      {...form.getInputProps(`accounts.${index}.mmr`)}
-                    />
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        placeholder="Your MMR?"
+                        type="number"
+                        min={0}
+                        max={30000}
+                        {...form.getInputProps(`accounts.${index}.mmr`)}
+                      />
+
+                      {accounts.length > 1 && (
+                        <Toggle
+                          scale={3}
+                          initialChecked={isEnabled}
+                          onChange={(e) => updateSetting(!!e?.target?.checked)}
+                        >
+                          !mmr
+                        </Toggle>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
