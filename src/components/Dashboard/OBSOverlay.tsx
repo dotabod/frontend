@@ -4,7 +4,7 @@ import { Badge, Button, Collapse, Display, Image } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import { CopyButton } from '@mantine/core'
 
-export default function OverlayURL() {
+export default function OBSOverlay() {
   const user = useSession()?.data?.user
   const copyURL = useBaseUrl(`overlay/${user ? user.id : ''}`)
 
