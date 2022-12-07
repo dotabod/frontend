@@ -13,6 +13,7 @@ const settingCreateSchema = z.object({
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req })
+
   const userId = req.query.id as string
 
   if (!userId && !session?.user?.id) {
@@ -44,7 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
 
       if (!data) {
-        return res.status(403).end()
+        return res.json({})
       }
 
       return res.json(data)
