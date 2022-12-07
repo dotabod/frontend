@@ -14,8 +14,9 @@ const faqs = [
       'Enter your current MMR in the dashboard so that it isnt 0. You must also add the dotabod overlay to OBS for MMR tracking to start. It will not track without the overlay.',
   },
   {
-    question: '',
-    answer: '',
+    question: 'How do I test that it works?',
+    answer:
+      'Try loading a solo bot match. If OBS is showing your overlays, it works.',
   },
   {
     question: 'Still not working?',
