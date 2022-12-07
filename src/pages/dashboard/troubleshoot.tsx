@@ -16,7 +16,7 @@ const faqs = [
   {
     question: 'How do I test that it works?',
     answer:
-      'Try loading a solo bot match. If OBS is showing your overlays, it works.',
+      'Try loading a solo bot match. If OBS is showing your overlays, it works. Also type !ping in your Twitch chat to make sure dotabod can type.',
   },
   {
     question: 'Still not working?',
