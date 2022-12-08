@@ -220,6 +220,33 @@ export function SecondaryFeatures() {
         </div>
       ),
     },
+    {
+      name: 'Notable players command',
+      description: (
+        <div>
+          {CommandDetail[DBSettings.commandNP].description}
+          {CommandDetail[DBSettings.commandNP].response()}
+        </div>
+      ),
+    },
+    {
+      name: 'Game medals command',
+      description: (
+        <div>
+          {CommandDetail[DBSettings.commandGM].description}
+          {CommandDetail[DBSettings.commandGM].response()}
+        </div>
+      ),
+    },
+    {
+      name: 'Last game command',
+      description: (
+        <div>
+          {CommandDetail[DBSettings.commandLG].description}
+          {CommandDetail[DBSettings.commandLG].response()}
+        </div>
+      ),
+    },
   ]
 
   return (

@@ -89,6 +89,54 @@ export const CommandDetail = {
       />
     ),
   },
+  [DBSettings.commandNP]: {
+    key: DBSettings.commandNP,
+    title: 'Notable players',
+    description: 'Find out if your match has any pros.',
+    cmd: '!np',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!np"
+        response="All Pick [9162 avg MMR]: Xcalibur (Shadow Shaman) · Arteezy (Ember Spirit) · Puppy (Snapfire) · Kyzko (Tusk) · Egor (Timbersaw)"
+      />
+    ),
+  },
+  [DBSettings.commandGM]: {
+    key: DBSettings.commandGM,
+    title: 'Game medals',
+    description: 'Return the rankings for all players in the game.',
+    cmd: '!gm',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!gm"
+        response="Legion Commander: #856 · Dark Willow: #402 · Crystal Maiden: #321 · Weaver: #553 · Storm Spirit: #794 · Doom: #536 · Rubick: #524 · Dawnbreaker: #946 · Venomancer: #631 · Lifestealer: #294"
+      />
+    ),
+  },
+  [DBSettings.commandLG]: {
+    key: DBSettings.commandLG,
+    title: 'Last game',
+    description: "Find out if you're playing with anyone from your last match.",
+    cmd: '!lg',
+    alias: ['!lastgame'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!lg"
+        response="Rubick played as Crystal Maiden"
+      />
+    ),
+  },
   [DBSettings.commandModsonly]: {
     key: DBSettings.commandModsonly,
     title: 'Mods only',
