@@ -1,8 +1,9 @@
 import { Card } from '@/ui/card'
-import { Badge, Button, Collapse, Display, Image } from '@geist-ui/core'
+import { Badge, Button, Collapse, Display } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
+import Image from 'next/image'
 
 export default function BetsCard() {
   const { isEnabled, loading, updateSetting } = useUpdateSetting(
@@ -34,8 +35,9 @@ export default function BetsCard() {
           }
         >
           <Image
-            alt="picks blocker"
-            height="200px"
+            alt="bets image"
+            width={400}
+            height={640}
             src="/images/bets.png"
             className="bg-gray-500"
           />

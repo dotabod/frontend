@@ -42,7 +42,7 @@ export default function RoshCard() {
             />
 
             <Image
-              alt="aegis timer"
+              alt="rosh timer"
               width={293}
               height={533}
               src="/images/rosh-timer.png"

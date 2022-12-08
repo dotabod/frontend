@@ -24,7 +24,7 @@ export default function DashboardPage() {
                 width={30}
                 className="inline"
                 height={30}
-                alt="wave"
+                alt="peepo clap"
               />
             </div>
           </>

@@ -123,7 +123,7 @@ export function SecondaryFeatures() {
                 <Image
                   width={22}
                   height={22}
-                  alt="pausechamp"
+                  alt="pauseChamp"
                   className="mr-1 inline align-middle"
                   src="/images/pauseChamp.webp"
                 />
@@ -133,7 +133,7 @@ export function SecondaryFeatures() {
                 <Image
                   width={22}
                   height={22}
-                  alt="pausechamp"
+                  alt="massivePIDAS"
                   className="mr-1 inline align-middle"
                   src="/images/massivePIDAS.webp"
                 />
@@ -143,7 +143,7 @@ export function SecondaryFeatures() {
                 <Image
                   width={22}
                   height={22}
-                  alt="pausechamp"
+                  alt="Shush"
                   className="mr-1 inline align-middle"
                   src="/images/Shush.png"
                 />

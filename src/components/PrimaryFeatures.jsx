@@ -27,7 +27,7 @@ const features = [
     icon: () => (
       <Image
         className="ml-1 inline"
-        alt="twitch MODS emote"
+        alt="peepogamba emote"
         height={32}
         width={32}
         src="/images/peepogamba.webp"
@@ -48,7 +48,7 @@ const features = [
     icon: () => (
       <Image
         className="ml-1 inline"
-        alt="twitch MODS emote"
+        alt="ttours emote"
         height={32}
         width={32}
         src="/images/ttours.png"
@@ -63,7 +63,7 @@ const features = [
     icon: () => (
       <Image
         className="ml-1 inline"
-        alt="twitch MODS emote"
+        alt="petthestreamer emote"
         height={36}
         width={32}
         src="/images/petthestreamer.webp"
@@ -170,8 +170,8 @@ function BetsScreen({ custom, animated = false }) {
             src="/images/bets.png"
             alt="bets screen"
             unoptimized={true}
-            width={415}
-            height={401}
+            width={600}
+            height={840}
           />
         </Display>
       </MotionAppScreenBody>
