@@ -1,7 +1,8 @@
 import { Card } from '@/ui/card'
-import { Badge, Toggle } from '@geist-ui/core'
+import { Badge } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { CommandDetail } from '@/pages/dashboard/commands'
+import { Switch } from '@mantine/core'
 
 const all = ['Moderators', 'Broadcaster', 'Everyone']
 
@@ -46,13 +47,13 @@ export default function CommandsCard({
         </div>
 
         {command.key && (
-          <Toggle
-            scale={3}
-            initialChecked={isEnabled}
-            onChange={(e) => updateSetting(!!e?.target?.checked)}
+          <Switch
+            color="indigo"
+            checked={isEnabled}
+            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
           >
             !mmr
-          </Toggle>
+          </Switch>
         )}
       </div>
     </Card>

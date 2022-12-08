@@ -254,9 +254,11 @@ export default function CommandsPage() {
         subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
         title="Commands"
       >
-        {Object.keys(CommandDetail).map((key) => (
-          <CommandsCard key={key} command={CommandDetail[key]} />
-        ))}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Object.keys(CommandDetail).map((key) => (
+            <CommandsCard key={key} command={CommandDetail[key]} />
+          ))}
+        </div>
       </DashboardShell>
     </>
   ) : null
