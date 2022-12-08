@@ -6,6 +6,20 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 
 export const CommandDetail = {
+  commands: {
+    title: 'Command list',
+    description: 'All available commands with Dotabod',
+    cmd: '!commands',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!commands"
+        response="command1 · command2 · command3 · etc..."
+      />
+    ),
+  },
   [DBSettings.commandWL]: {
     key: DBSettings.commandWL,
     title: 'Win / Loss',
@@ -99,23 +113,36 @@ export const CommandDetail = {
     response: (props) => (
       <TwitchChat
         {...props}
-        modOnly
         command="!np"
         response="All Pick [9162 avg MMR]: Xcalibur (Shadow Shaman) · Arteezy (Ember Spirit) · Puppy (Snapfire) · Kyzko (Tusk) · Egor (Timbersaw)"
+      />
+    ),
+  },
+  [DBSettings.commandSmurfs]: {
+    key: DBSettings.commandSmurfs,
+    title: 'Smurfs',
+    description: 'Shows total games played for each player in the match.',
+    cmd: '!smurfs',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!smurfs"
+        response="Lifetime games: Tusk: 4,202 · Pugna: 4,466 · Doom: 657 · Drow Ranger: 3,136 · Lina: 2,735 · Clinkz: 3,384 · Viper: 408 · Sniper: 2,850 · Hoodwink: 2,243 · Dazzle: 6,626"
       />
     ),
   },
   [DBSettings.commandGM]: {
     key: DBSettings.commandGM,
     title: 'Game medals',
-    description: 'Return the rankings for all players in the game.',
+    description: 'Return the rankings for each players in the game.',
     cmd: '!gm',
     alias: [],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
         {...props}
-        modOnly
         command="!gm"
         response="Legion Commander: #856 · Dark Willow: #402 · Crystal Maiden: #321 · Weaver: #553 · Storm Spirit: #794 · Doom: #536 · Rubick: #524 · Dawnbreaker: #946 · Venomancer: #631 · Lifestealer: #294"
       />
@@ -131,7 +158,6 @@ export const CommandDetail = {
     response: (props) => (
       <TwitchChat
         {...props}
-        modOnly
         command="!lg"
         response="Rubick played as Crystal Maiden"
       />
