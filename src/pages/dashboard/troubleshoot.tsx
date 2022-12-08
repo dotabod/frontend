@@ -19,6 +19,11 @@ const faqs = [
       'Try loading a solo bot match. If OBS is showing your overlays, it works. Also type !ping in your Twitch chat to make sure dotabod can type.',
   },
   {
+    question: "Why do bets open right when I pick? Can't I get counter picked?",
+    answer:
+      'Bets open when its no longer possible to counter pick or counter ban your hero. That is to say, when the enemy can now see who you picked in-game.',
+  },
+  {
     question: 'Still not working?',
     answer: 'Get help in our Discord.',
   },
