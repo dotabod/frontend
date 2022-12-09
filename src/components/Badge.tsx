@@ -6,8 +6,8 @@ export const Badge = ({ transformRes, image, ...props }) => {
     <Image
       priority
       alt="rank badge"
-      width={transformRes({ width: 56 })}
-      height={transformRes({ height: 56 })}
+      width={transformRes ? transformRes({ width: 56 }) : 56}
+      height={transformRes ? transformRes({ height: 56 }) : 56}
       src={`/images/ranks/${image}`}
       {...props}
     />
