@@ -244,6 +244,9 @@ export default function OverlayPage() {
 
       setScene(scene)
 
+      // Some people don't enable the permissions
+      if (typeof window.obsstudio.setCurrentScene !== 'function') return
+
       if (shouldBlockMap) {
         window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
         return
