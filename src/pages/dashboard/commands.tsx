@@ -4,6 +4,7 @@ import TwitchChat from '@/components/TwitchChat'
 import { DBSettings } from '@/lib/DBSettings'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import Image from 'next/image'
 
 export const CommandDetail = {
   commands: {
@@ -114,7 +115,51 @@ export const CommandDetail = {
       <TwitchChat
         {...props}
         command="!np"
-        response="All Pick [9162 avg MMR]: Xcalibur (Shadow Shaman) · Arteezy (Ember Spirit) · Puppy (Snapfire) · Kyzko (Tusk) · Egor (Timbersaw)"
+        response={
+          <>
+            All Pick [9162 avg]:
+            <Image
+              src="/images/south-korea.png"
+              width={24}
+              height={24}
+              alt="south korea"
+              className="ml-1 mr-1 inline"
+            />
+            DuBu (Shadow Shaman) ·
+            <Image
+              src="/images/russia.png"
+              width={24}
+              height={24}
+              alt="russia"
+              className="ml-1 mr-1 inline"
+            />
+            Collapse (Magnus) ·
+            <Image
+              src="/images/estonia.png"
+              width={24}
+              height={24}
+              alt="estonia"
+              className="ml-1 mr-1 inline"
+            />
+            Puppy (Chen) ·
+            <Image
+              src="/images/usa.png"
+              width={24}
+              height={24}
+              alt="usa"
+              className="ml-1 mr-1 inline"
+            />
+            PPD (Tusk) ·
+            <Image
+              src="/images/lebanon.png"
+              width={24}
+              height={24}
+              alt="usa"
+              className="ml-1 mr-1 inline"
+            />
+            Rajjix (Timbersaw)
+          </>
+        }
       />
     ),
   },
