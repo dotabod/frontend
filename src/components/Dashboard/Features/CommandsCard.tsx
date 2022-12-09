@@ -14,48 +14,45 @@ export default function CommandsCard({
   const { isEnabled, loading, updateSetting } = useUpdateSetting(command.key)
 
   return (
-    <Card className="p-5">
-      <div className="flex justify-between">
-        <div>
-          <div className="title">
-            <h3>
-              {command.title}{' '}
-              <div className="ml-4 inline space-x-2">
-                {' '}
-                {command.allowed === 'mods' && (
-                  <>
-                    <Badge type="success" className="!bg-green-800" scale={0.5}>
-                      Moderator
-                    </Badge>
-                    <Badge type="success" className="!bg-red-800" scale={0.5}>
-                      Broadcaster
-                    </Badge>
-                  </>
-                )}
-                {command.allowed === 'all' && (
-                  <>
-                    <Badge type="default" scale={0.5}>
-                      Everyone
-                    </Badge>
-                  </>
-                )}
-              </div>
-            </h3>
-            <div className="subtitle">{command.description}</div>
+    <Card>
+      <div className="title">
+        <div className="flex justify-between">
+          <div className="flex space-x-2">
+            <h3>{command.title}</h3>
+            <div className="space-x-2">
+              {command.allowed === 'mods' && (
+                <>
+                  <Badge type="success" className="!bg-green-800" scale={0.5}>
+                    Mods
+                  </Badge>
+                  <Badge type="success" className="!bg-red-800" scale={0.5}>
+                    Streamer
+                  </Badge>
+                </>
+              )}
+              {command.allowed === 'all' && (
+                <>
+                  <Badge type="default" scale={0.5}>
+                    All
+                  </Badge>
+                </>
+              )}
+            </div>
           </div>
-          {command.response && <command.response dark />}
+          {command.key && (
+            <Switch
+              className="flex"
+              color="indigo"
+              checked={isEnabled}
+              onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
+            >
+              !mmr
+            </Switch>
+          )}
         </div>
-
-        {command.key && (
-          <Switch
-            color="indigo"
-            checked={isEnabled}
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-          >
-            !mmr
-          </Switch>
-        )}
+        <div className="subtitle">{command.description}</div>
       </div>
+      {command.response && <command.response dark />}
     </Card>
   )
 }
