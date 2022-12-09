@@ -69,8 +69,8 @@ export default function OverlayPage() {
     const defaultWidth = 1920
     const defaultHeight = 1080
 
-    const widthRatio = scene.width / defaultWidth
-    const heightRatio = scene.height / defaultHeight
+    const widthRatio = (scene?.width || defaultWidth) / defaultWidth
+    const heightRatio = (scene?.height || defaultHeight) / defaultHeight
 
     if (height) {
       return height * heightRatio || height
@@ -256,7 +256,7 @@ export default function OverlayPage() {
       // Streamer has a custom scene, lets not override it
       // This allows streamers to make a scene for playing other games, and having
       // dota in the background wont switch scenes on them
-      if (myScenes.includes(scene.name)) {
+      if (myScenes.includes(scene?.name)) {
         window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
         return
       }
