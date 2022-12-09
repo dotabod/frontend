@@ -2,11 +2,21 @@
 import { Badge } from './Badge'
 import { Card } from './Card'
 
-export const Rankbadge = ({ image, leaderboard, rank, ...props }) => {
+export const Rankbadge = ({
+  image,
+  leaderboard,
+  rank,
+  transformRes,
+  ...props
+}) => {
   return (
     <Card {...props}>
-      <Badge image={image} />
-      <span>
+      <Badge transformRes={transformRes} image={image} />
+      <span
+        style={{
+          fontSize: transformRes({ height: 16 }),
+        }}
+      >
         {leaderboard && '#'}
         {rank}
       </span>
