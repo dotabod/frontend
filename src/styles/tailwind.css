@@ -28,8 +28,16 @@
   @apply !text-dark-300;
 }
 
+.title:not(.command) {
+  @apply flex items-center justify-between;
+}
+
+.title {
+  @apply pb-2;
+}
+
 .title h3 {
-  @apply pb-2 !text-lg !font-medium !leading-6 !text-white;
+  @apply !text-lg !font-medium !leading-6 !text-white;
 }
 
 .subtitle {
@@ -44,6 +52,18 @@
   @apply text-sm text-dark-300;
 }
 
+@layer base {
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
 .mantine-Checkbox-label {
   @apply font-normal text-dark-300;
+}
+
+.mantine-Switch-root {
+  @apply flex;
 }

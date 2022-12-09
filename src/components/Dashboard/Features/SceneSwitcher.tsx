@@ -1,10 +1,10 @@
 import { Card } from '@/ui/card'
-import { Button, Collapse, Display, Image, Loading } from '@geist-ui/core'
-import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { Display, Image, Loading } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
+import { Switch } from '@mantine/core'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
@@ -59,79 +59,74 @@ export default function SceneSwitcher(): JSX.Element {
 
   return (
     <Card>
-      <Collapse
-        shadow
-        title="OBS scene switcher"
-        subtitle="Will auto switch scenes in OBS depending on game state."
-      >
-        <div className="mb-4">
-          This is optional but useful if you want to make your stream look
-          unique for different game states!
-        </div>
-        <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm">
-          <li>
-            Must put the dotabod browser source in the scenes you want to block
-            hero picks or minimap in.
-          </li>
-          <li>
-            Must set browser properties to{' '}
-            <span className="italics">Advanced access to OBS</span>
-          </li>
-          <li>Must create the following scenes (case sensitive)</li>
-          <ul className="ml-4 list-none space-y-6">
-            {Object.keys(scenes).map((sceneKey: keyof typeof scenes) => {
-              const scene = scenes[sceneKey]
-              return (
-                <li key={sceneKey} className="space-y-1">
-                  <label htmlFor={sceneKey} className="block text-sm">
-                    {scene.label}
-                  </label>
-                  {loading && (
-                    <div className="w-52 rounded-md border border-gray-200 pt-2">
-                      <Loading className="left-0" />
-                    </div>
-                  )}
-                  {!loading && (
-                    <Input
-                      id={sceneKey}
-                      placeholder={defaultSettings[sceneKey]}
-                      defaultValue={scene.value}
-                      name={sceneKey}
-                      onChange={(e) =>
-                        handleSceneName(e.target.value, scene.update)
-                      }
-                    />
-                  )}
-
-                  <span className="block text-xs italic">{scene.helpText}</span>
-                </li>
-              )
-            })}
-          </ul>
-        </ul>
-
-        <Display shadow caption="Example OBS scenes and sources">
-          <Image
-            height="246px"
-            alt="scene switcher"
-            src="/images/scene-switcher.png"
+      <div className="title">
+        <h3>OBS scene switcher</h3>
+        {l0 && <Switch disabled size="lg" color="indigo" />}
+        {!l0 && (
+          <Switch
+            size="lg"
+            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
+            color="indigo"
+            defaultChecked={isEnabled}
           />
-        </Display>
-        <Card.Footer>
-          {loading ? (
-            <Button disabled>loading...</Button>
-          ) : (
-            <Button
-              icon={isEnabled ? <PauseIcon /> : <PlayIcon />}
-              type="success"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => updateSetting(!isEnabled)}
-            >
-              {isEnabled ? 'Disable' : 'Enable'}
-            </Button>
-          )}
-        </Card.Footer>
-      </Collapse>
+        )}
+      </div>
+      <div className="subtitle">
+        Will auto switch scenes in OBS depending on game state.
+      </div>
+
+      <div className="mb-4">
+        This is optional but useful if you want to make your stream look unique
+        for different game states!
+      </div>
+      <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm">
+        <li>
+          Must put the dotabod browser source in the scenes you want to block
+          hero picks or minimap in.
+        </li>
+        <li>
+          Must set browser properties to{' '}
+          <span className="italics">Advanced access to OBS</span>
+        </li>
+        <li>Must create the following scenes (case sensitive)</li>
+        <ul className="ml-4 list-none space-y-6">
+          {Object.keys(scenes).map((sceneKey: keyof typeof scenes) => {
+            const scene = scenes[sceneKey]
+            return (
+              <li key={sceneKey} className="space-y-1">
+                <label htmlFor={sceneKey} className="block text-sm">
+                  {scene.label}
+                </label>
+                {loading && (
+                  <div className="w-52 rounded-md border border-gray-200 pt-2">
+                    <Loading className="left-0" />
+                  </div>
+                )}
+                {!loading && (
+                  <Input
+                    id={sceneKey}
+                    placeholder={defaultSettings[sceneKey]}
+                    defaultValue={scene.value}
+                    name={sceneKey}
+                    onChange={(e) =>
+                      handleSceneName(e.target.value, scene.update)
+                    }
+                  />
+                )}
+
+                <span className="block text-xs italic">{scene.helpText}</span>
+              </li>
+            )
+          })}
+        </ul>
+      </ul>
+      <Display shadow caption="Example OBS scenes and sources">
+        <Image
+          height="246px"
+          alt="scene switcher"
+          src="/images/scene-switcher.png"
+        />
+      </Display>
     </Card>
   )
 }

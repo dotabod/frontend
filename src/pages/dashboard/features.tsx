@@ -21,13 +21,15 @@ export default function FeaturesPage() {
         subtitle="Customize the options your stream receives."
         title="Features"
       >
-        <MmrTrackerCard />
-        <BetsCard />
-        <MinimapCard />
-        <PicksCard />
-        <RoshCard />
-        <ChatterCard />
-        <SceneSwitcher />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          <MmrTrackerCard />
+          <BetsCard />
+          <MinimapCard />
+          <PicksCard />
+          <RoshCard />
+          <ChatterCard />
+          <SceneSwitcher />
+        </div>
       </DashboardShell>
     </>
   ) : null

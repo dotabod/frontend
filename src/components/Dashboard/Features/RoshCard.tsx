@@ -1,9 +1,9 @@
 import { Card } from '@/ui/card'
-import { Button, Collapse, Display } from '@geist-ui/core'
+import { Display } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
 import Image from 'next/image'
+import { Switch } from '@mantine/core'
 
 export default function RoshCard() {
   const {
@@ -20,63 +20,61 @@ export default function RoshCard() {
 
   return (
     <Card>
-      <Collapse
-        shadow
-        title="Roshan timers"
-        subtitle="Dotabod can detect when roshan is killed or aegis is picked up."
-      >
-        <div>
-          Sadly the data does not tell us when someone dies with aegis, so{' '}
-          <b>the aegis icon will remain for the full 5 minutes</b>. The rosh
-          timer starts red for 8 minutes (min rosh spawn), then turns yellow for
-          3 minutes (max rosh spawn).
+      <div className="title">
+        <h3>Roshan timers</h3>
+        <div className="flex space-x-4">
+          {lA && <Switch disabled size="lg" color="indigo" />}
+          {!lA && (
+            <Switch
+              size="lg"
+              onLabel="Aegis"
+              offLabel="Aegis"
+              onChange={(e) => uA(!!e?.currentTarget?.checked)}
+              color="indigo"
+              defaultChecked={hasAegis}
+            />
+          )}
+          {lR && <Switch disabled size="lg" color="indigo" />}
+          {!lR && (
+            <Switch
+              size="lg"
+              onLabel="Rosh"
+              offLabel="Rosh"
+              onChange={(e) => uR(!!e?.currentTarget?.checked)}
+              color="indigo"
+              defaultChecked={hasRosh}
+            />
+          )}
         </div>
-        <Display shadow>
-          <div className="flex items-center justify-center space-x-4">
-            <Image
-              alt="aegis timer"
-              width={219}
-              height={107}
-              src="/images/just-aegis-timer.png"
-              className="inline"
-            />
+      </div>
+      <div className="subtitle">
+        Dotabod can detect when roshan is killed or aegis is picked up.
+      </div>
+      <div>
+        Sadly the data does not tell us when someone dies with aegis, so{' '}
+        <b>the aegis icon will remain for the full 5 minutes</b>. The rosh timer
+        starts red for 8 minutes (min rosh spawn), then turns yellow for 3
+        minutes (max rosh spawn).
+      </div>
+      <Display shadow>
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <Image
+            alt="aegis timer"
+            width={219}
+            height={107}
+            src="/images/just-aegis-timer.png"
+            className="inline"
+          />
 
-            <Image
-              alt="rosh timer"
-              width={293}
-              height={533}
-              src="/images/rosh-timer.png"
-              className="inline"
-            />
-          </div>
-        </Display>
-        <Card.Footer className="space-x-4">
-          {lA ? (
-            <Button disabled>loading...</Button>
-          ) : (
-            <Button
-              icon={hasAegis ? <PauseIcon /> : <PlayIcon />}
-              type="success"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => uA(!hasAegis)}
-            >
-              {hasAegis ? 'Disable' : 'Enable'} aegis
-            </Button>
-          )}
-          {lR ? (
-            <Button disabled>loading...</Button>
-          ) : (
-            <Button
-              icon={hasRosh ? <PauseIcon /> : <PlayIcon />}
-              type="success"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => uR(!hasRosh)}
-            >
-              {hasRosh ? 'Disable' : 'Enable'} rosh
-            </Button>
-          )}
-        </Card.Footer>
-      </Collapse>
+          <Image
+            alt="rosh timer"
+            width={293}
+            height={533}
+            src="/images/rosh-timer.png"
+            className="inline"
+          />
+        </div>
+      </Display>
     </Card>
   )
 }

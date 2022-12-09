@@ -4,8 +4,6 @@ import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { CommandDetail } from '@/pages/dashboard/commands'
 import { Switch } from '@mantine/core'
 
-const all = ['Moderators', 'Broadcaster', 'Everyone']
-
 export default function CommandsCard({
   command,
 }: {
@@ -15,7 +13,7 @@ export default function CommandsCard({
 
   return (
     <Card>
-      <div className="title">
+      <div className="title command">
         <div className="flex justify-between">
           <div className="flex space-x-2">
             <h3>{command.title}</h3>
@@ -39,19 +37,23 @@ export default function CommandsCard({
               )}
             </div>
           </div>
-          {command.key && (
+          {loading && command.key && (
+            <Switch disabled size="lg" className="flex" color="indigo" />
+          )}
+          {!loading && command.key && (
             <Switch
+              size="lg"
               className="flex"
               color="indigo"
-              checked={isEnabled}
+              defaultChecked={isEnabled}
               onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
             >
               !mmr
             </Switch>
           )}
         </div>
-        <div className="subtitle">{command.description}</div>
       </div>
+      <div className="subtitle">{command.description}</div>
       {command.response && <command.response dark />}
     </Card>
   )
