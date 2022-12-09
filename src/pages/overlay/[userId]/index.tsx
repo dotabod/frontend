@@ -339,11 +339,21 @@ export default function OverlayPage() {
       <div>
         {block?.type === 'spectator' && (
           <div
-            className={`absolute ${
-              opts[DBSettings.xl] ? 'bottom-[300px]' : 'bottom-[260px]'
-            } left-0`}
+            className="absolute"
+            style={{
+              bottom: opts[DBSettings.xl]
+                ? transformRes({ height: 300 })
+                : transformRes({ height: 260 }),
+              left: 0,
+            }}
           >
-            <Card>Spectating a match</Card>
+            <Card
+              style={{
+                fontSize: transformRes({ width: 16 }),
+              }}
+            >
+              Spectating a match
+            </Card>
           </div>
         )}
 
