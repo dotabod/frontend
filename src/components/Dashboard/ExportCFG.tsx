@@ -16,16 +16,15 @@ export default function ExportCFG() {
   "heartbeat" "30.0"
   "data"
   {
-    "provider" "1"
+    "abilities" "1"
+    "buildings" "1"
+    "events" "1"
+    "hero" "1"
+    "items" "1"
     "map" "1"
     "player" "1"
-    "hero" "1"
-    "abilities" "1"
-    "items" "1"
-    "draft" "1"
-    "events" "1"
-    "buildings" "1"
-    "wearables" "0"
+    "provider" "1"
+    "wearables" "1"
   }
   "auth"
   {
