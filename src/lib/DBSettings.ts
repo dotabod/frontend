@@ -76,7 +76,11 @@ export const getValueOrDefault = (data, key) => {
     return defaultSettings[key]
   }
 
-  return dbVal
+  try {
+    return JSON.parse(dbVal)
+  } catch {
+    return dbVal
+  }
 }
 
 export const rankedModes = [2, 22]
