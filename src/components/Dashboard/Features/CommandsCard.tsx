@@ -1,8 +1,10 @@
 import { Card } from '@/ui/card'
-import { Badge } from '@geist-ui/core'
+import { Badge, Loading } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { CommandDetail } from '@/pages/dashboard/commands'
 import { Switch } from '@mantine/core'
+import { DBSettings, defaultSettings } from '@/lib/DBSettings'
+import { Input } from '@/components/Input'
 
 export default function CommandsCard({
   command,
@@ -10,6 +12,12 @@ export default function CommandsCard({
   command: typeof CommandDetail.commandAPM
 }): JSX.Element {
   const { isEnabled, loading, updateSetting } = useUpdateSetting(command.key)
+
+  const {
+    isEnabled: customMmr,
+    loading: loadingCustomMmr,
+    updateSetting: updateCustomMmr,
+  } = useUpdateSetting(DBSettings.customMmr)
 
   return (
     <Card>
@@ -54,6 +62,31 @@ export default function CommandsCard({
         </div>
       </div>
       <div className="subtitle">{command.description}</div>
+      {command.key === DBSettings.mmrTracker && (
+        <div className="py-4">
+          <p className="ml-1 pb-1">
+            Custom message. Variables: [currentmmr] [currentrank] [nextmmr]
+            [wins]
+          </p>
+          {loadingCustomMmr && (
+            <div className="w-52 rounded-md border border-gray-200 pt-2">
+              <Loading className="left-0" />
+            </div>
+          )}
+          {!loadingCustomMmr && (
+            <Input
+              placeholder={defaultSettings.customMmr}
+              id="customMmr"
+              name="customMmr"
+              type="text"
+              defaultValue={customMmr}
+              onChange={(e) => {
+                updateCustomMmr(e.target.value || defaultSettings.customMmr)
+              }}
+            />
+          )}
+        </div>
+      )}
       {command.response && <command.response dark />}
     </Card>
   )
