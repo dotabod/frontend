@@ -5,6 +5,7 @@ import { CommandDetail } from '@/pages/dashboard/commands'
 import { Switch } from '@mantine/core'
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { Input } from '@/components/Input'
+import { useDebouncedCallback } from 'use-debounce'
 
 export default function CommandsCard({
   command,
@@ -18,6 +19,10 @@ export default function CommandsCard({
     loading: loadingCustomMmr,
     updateSetting: updateCustomMmr,
   } = useUpdateSetting(DBSettings.customMmr)
+
+  let onChangeMmr = useDebouncedCallback((e) => {
+    updateCustomMmr(e.target.value ? e.target.value : defaultSettings.customMmr)
+  }, 350)
 
   return (
     <Card>
@@ -80,9 +85,7 @@ export default function CommandsCard({
               name="customMmr"
               type="text"
               defaultValue={customMmr}
-              onChange={(e) => {
-                updateCustomMmr(e.target.value || defaultSettings.customMmr)
-              }}
+              onChange={onChangeMmr}
             />
           )}
         </div>

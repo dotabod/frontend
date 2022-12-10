@@ -44,11 +44,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         },
         update: {
-          value: body.value,
+          value: JSON.stringify(body.value),
         },
         create: {
           key: settingKey,
-          value: body.value,
+          value: JSON.stringify(body.value),
           userId: session?.user?.id,
         },
       })
