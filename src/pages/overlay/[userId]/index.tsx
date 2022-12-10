@@ -476,11 +476,11 @@ export default function OverlayPage() {
 
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
-            {
+            {opts[DBSettings.commandWL] && (
               <div className="absolute" style={wlPosition}>
                 <WinLossCard wl={wl} />
               </div>
-            }
+            )}
 
             {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
               <div className="absolute" style={badgePosition}>
