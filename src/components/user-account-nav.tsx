@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { forwardRef } from 'react'
 import { Group, Avatar, Text, Menu } from '@mantine/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
-import { LogOut, Settings } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import clsx from 'clsx'
+import { navigation } from './DashboardShell'
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   image: string
@@ -73,27 +74,26 @@ export function UserAccountNav({ showDetails = false, dark = false }) {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Label>{user?.name}</Menu.Label>
-          <Menu.Item
-            component={Link}
-            href="/dashboard"
-            icon={<Settings size={14} />}
-          >
-            Dashboard
-          </Menu.Item>
-          <Menu.Item
-            component={Link}
-            href="/dashboard/features"
-            icon={<Settings size={14} />}
-          >
-            Features
-          </Menu.Item>
-          <Menu.Divider />
-          <Menu.Item component={Link} href="https://github.com/dotabod">
-            Github
-          </Menu.Item>
-          <Menu.Item component={Link} href="https://discord.dotabod.com">
-            Discord
-          </Menu.Item>
+          {navigation.map((item, i) => {
+            if (!item.name)
+              return (
+                <div key={i} className="!my-2 mx-4 border-t border-dark-400" />
+              )
+
+            return (
+              <Menu.Item
+                key={item.name}
+                component={Link}
+                href={item.href}
+                icon={<item.icon className="h-4 w-4" />}
+              >
+                {item.name}
+              </Menu.Item>
+            )
+          })}
+
+          <div className="!my-2 mx-4 border-t border-dark-400" />
+
           <Menu.Item
             component="a"
             onClick={() => {
