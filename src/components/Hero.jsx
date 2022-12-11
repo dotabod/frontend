@@ -91,6 +91,11 @@ function PlayIcon(props) {
 
 const featuredUsers = [
   {
+    name: 'ODPixel',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/21d275f5-b27d-4cf2-805e-94006c08c25c-profile_image-150x150.png',
+  },
+  {
     name: 'dubudota',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/c876efcc8901bd08-profile_image-150x150.jpeg',
