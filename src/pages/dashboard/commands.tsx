@@ -299,14 +299,14 @@ export const CommandDetail = {
   'mmr=': {
     title: 'Set MMR',
     description: 'Manually set your MMR.',
-    cmd: '!mmr=',
+    cmd: '!setmmr',
     alias: [],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
         {...props}
         modOnly
-        command="!mmr= 1234"
+        command="!setmmr 1234"
         response="Updated MMR to 1234"
       />
     ),
@@ -319,7 +319,7 @@ export default function CommandsPage() {
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Features</title>
+        <title>Dotabod | Commands</title>
       </Head>
       <DashboardShell
         subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
