@@ -9,7 +9,7 @@ import Image from 'next/image'
 export const CommandDetail = {
   [DBSettings.commandDisable]: {
     title: 'Disable Dotabod',
-    description: 'Disable or enable all Dotabod features.',
+    description: 'Enable or disable all Dotabod features.',
     cmd: '!toggle',
     alias: [],
     allowed: 'mods',
