@@ -14,6 +14,9 @@ import Image from 'next/image'
 import { UserAccountNav } from '@/components/user-account-nav'
 import { Github } from 'lucide-react'
 import DiscordSvg from '@/images/logos/discord.svg'
+import { Switch } from '@mantine/core'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { DBSettings } from '@/lib/DBSettings'
 
 export const navigation = [
   {
@@ -59,6 +62,10 @@ export function classNames(...classes) {
 
 export default function DashboardShell({ children, title, subtitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const { isEnabled, loading, updateSetting } = useUpdateSetting(
+    DBSettings.commandDisable
+  )
 
   return (
     <>
@@ -161,16 +168,16 @@ export default function DashboardShell({ children, title, subtitle }) {
                             href={item.href}
                             className={classNames(
                               window.location.href.endsWith(item.href)
-                                ? ' bg-dark-700 text-[#F4F4FB]'
-                                : 'text-[#9195AB] hover:fill-gray-50 hover:text-[#F4F4FB]',
+                                ? ' bg-dark-700 text-dark-100'
+                                : 'text-dark-300 hover:fill-gray-50 hover:text-dark-100',
                               'group flex items-center rounded-md px-2 py-2 text-base font-medium'
                             )}
                           >
                             <item.icon
                               className={classNames(
                                 window.location.href.endsWith(item.href)
-                                  ? 'text-gray-500'
-                                  : 'text-gray-400 group-hover:text-white',
+                                  ? 'text-dark-400'
+                                  : 'text-dark-300 group-hover:text-white',
                                 'mr-4 h-6 w-6 flex-shrink-0'
                               )}
                               aria-hidden="true"
@@ -216,16 +223,16 @@ export default function DashboardShell({ children, title, subtitle }) {
                       href={item.href}
                       className={classNames(
                         window.location.href.endsWith(item.href)
-                          ? ' bg-dark-700 text-[#F4F4FB]'
-                          : 'text-[#9195AB] hover:fill-[#F4F4FB] hover:text-[#F4F4FB]',
+                          ? ' bg-dark-700 text-dark-100'
+                          : 'text-dark-300 hover:fill-dark-100 hover:text-dark-100',
                         'group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-colors'
                       )}
                     >
                       <item.icon
                         className={classNames(
                           window.location.href.endsWith(item.href)
-                            ? 'text-gray-500'
-                            : 'text-gray-400 group-hover:text-white',
+                            ? 'text-dark-400'
+                            : 'text-dark-300 group-hover:text-white',
                           'mr-3 h-6 w-6 flex-shrink-0'
                         )}
                         aria-hidden="true"
@@ -234,6 +241,38 @@ export default function DashboardShell({ children, title, subtitle }) {
                     </Link>
                   )
                 })}
+
+                <div className="ml-1 space-y-2 rounded border-2 border-red-900/50 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-dark-300">Disable Dotabod</p>
+
+                    {loading && (
+                      <Switch
+                        disabled
+                        size="lg"
+                        className="flex"
+                        color="indigo"
+                      />
+                    )}
+                    {!loading && (
+                      <Switch
+                        size="lg"
+                        className="flex"
+                        color="indigo"
+                        defaultChecked={isEnabled}
+                        onChange={(e) =>
+                          updateSetting(!!e?.currentTarget?.checked)
+                        }
+                      >
+                        !mmr
+                      </Switch>
+                    )}
+                  </div>
+                  <p className="w-48 text-xs text-dark-400">
+                    With this turned on, game events will no longer be
+                    recognized and commands will not be responded to.
+                  </p>
+                </div>
               </nav>
             </div>
           </div>
@@ -242,7 +281,7 @@ export default function DashboardShell({ children, title, subtitle }) {
           <div className="sticky top-0 z-10 bg-dark-800 pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden">
             <button
               type="button"
-              className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-dark-400 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
               onClick={() => setSidebarOpen(true)}
             >
               <span className="sr-only">Open sidebar</span>

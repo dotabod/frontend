@@ -7,6 +7,21 @@ import Head from 'next/head'
 import Image from 'next/image'
 
 export const CommandDetail = {
+  [DBSettings.commandDisable]: {
+    title: 'Disable Dotabod',
+    description: 'Disable or enable all Dotabod features.',
+    cmd: '!toggle',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!toggle"
+        response="Will no longer watch game events nor respond to commands. Type !toggle again to enable."
+      />
+    ),
+  },
   commands: {
     title: 'Command list',
     description: 'All available commands with Dotabod',
@@ -17,7 +32,9 @@ export const CommandDetail = {
       <TwitchChat
         {...props}
         command="!commands"
-        response="command1 · command2 · command3 · etc..."
+        responses={[
+          'Everyone can use: command1 · command2 · command3 · etc...',
+        ]}
       />
     ),
   },
@@ -296,7 +313,7 @@ export const CommandDetail = {
       />
     ),
   },
-  'mmr=': {
+  setmmr: {
     title: 'Set MMR',
     description: 'Manually set your MMR.',
     cmd: '!setmmr',

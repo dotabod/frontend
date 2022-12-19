@@ -28,6 +28,7 @@ export enum DBSettings {
   commandLG = 'commandLG',
   commandSmurfs = 'commandSmurfs',
   customMmr = 'customMmr',
+  commandDisable = 'commandDisable',
 }
 
 export const defaultSettings = {
@@ -61,6 +62,7 @@ export const defaultSettings = {
   [DBSettings.commandSmurfs]: true,
   [DBSettings.customMmr]:
     '[currentmmr] | [currentrank] | Next rank at [nextmmr] [wins]',
+  [DBSettings.commandDisable]: false,
 }
 
 export const getValueOrDefault = (data, key) => {
