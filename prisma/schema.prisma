@@ -59,15 +59,6 @@ model User {
   @@map("users")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
 model Setting {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created_at")
