@@ -92,7 +92,7 @@ export default function OverlayPage() {
           alt="aegis icon"
         />
         <span
-          className="-mt-2 text-white/90"
+          className="-mt-1 text-white/90"
           style={{
             fontSize: transformRes({ height: 14 }),
           }}
@@ -118,7 +118,7 @@ export default function OverlayPage() {
           className="rounded-full"
         />
         <span
-          className="-mt-3 text-white/90"
+          className="-mt-1 text-white/90"
           style={{
             fontSize: transformRes({ height: 14 }),
           }}
@@ -369,8 +369,9 @@ export default function OverlayPage() {
                   <CountdownCircleTimer
                     isPlaying={!paused}
                     duration={roshan?.minS}
-                    colors="#A30000"
-                    size={transformRes({ width: 45 })}
+                    colors="#ff0000"
+                    trailColor="#0000000"
+                    size={transformRes({ width: 55 })}
                     strokeWidth={transformRes({ width: 3 })}
                   >
                     {({ remainingTime }) => (
@@ -391,29 +392,31 @@ export default function OverlayPage() {
                 </div>
               )}
               {!roshan?.minDate && roshan?.maxDate && (
-                <CountdownCircleTimer
-                  isPlaying={!paused}
-                  duration={roshan?.maxS}
-                  colors="#a39800"
-                  size={transformRes({ width: 45 })}
-                  strokeWidth={transformRes({ width: 3 })}
-                >
-                  {({ remainingTime }) => (
-                    <Countdown
-                      ref={countdownRef}
-                      date={roshan?.maxDate}
-                      renderer={roshRender}
-                      onComplete={() => {
-                        setRoshan({
-                          minS: 0,
-                          minDate: '',
-                          maxDate: '',
-                          maxS: 0,
-                        })
-                      }}
-                    />
-                  )}
-                </CountdownCircleTimer>
+                <div className="rounded-full bg-yellow-800/70">
+                  <CountdownCircleTimer
+                    isPlaying={!paused}
+                    duration={roshan?.maxS}
+                    colors="#a39800"
+                    size={transformRes({ width: 55 })}
+                    strokeWidth={transformRes({ width: 3 })}
+                  >
+                    {({ remainingTime }) => (
+                      <Countdown
+                        ref={countdownRef}
+                        date={roshan?.maxDate}
+                        renderer={roshRender}
+                        onComplete={() => {
+                          setRoshan({
+                            minS: 0,
+                            minDate: '',
+                            maxDate: '',
+                            maxS: 0,
+                          })
+                        }}
+                      />
+                    )}
+                  </CountdownCircleTimer>
+                </div>
               )}
             </div>
           )}
@@ -490,7 +493,7 @@ export default function OverlayPage() {
           </>
         )}
 
-        {false && process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === 'development' && (
           <Image
             height={transformRes({ height: 1080 })}
             width={transformRes({ width: 1920 })}
