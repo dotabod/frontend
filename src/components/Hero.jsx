@@ -91,16 +91,6 @@ function PlayIcon(props) {
 
 const featuredUsers = [
   {
-    name: 'ODPixel',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/21d275f5-b27d-4cf2-805e-94006c08c25c-profile_image-150x150.png',
-  },
-  {
-    name: 'dubudota',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/c876efcc8901bd08-profile_image-150x150.jpeg',
-  },
-  {
     name: 'Grubby',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
@@ -116,6 +106,21 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
   },
   {
+    name: 'dubudota',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/c876efcc8901bd08-profile_image-150x150.jpeg',
+  },
+  {
+    name: 'BananaSlamJamma',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/bananaslamjamma-profile_image-8a07eac563581ffe-70x70.png',
+  },
+  {
+    name: 'ODPixel',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/21d275f5-b27d-4cf2-805e-94006c08c25c-profile_image-150x150.png',
+  },
+  {
     name: 'Draskyl',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
@@ -124,11 +129,6 @@ const featuredUsers = [
     name: 'febbydoto',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
-  },
-  {
-    name: 'FiXeRsdota2',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/23acf5b0-d151-4db3-8b40-0e9cfbb86e5a-profile_image-150x150.png',
   },
   {
     name: 'SequinoxTV',
