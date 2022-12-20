@@ -86,6 +86,7 @@ export default function OverlayPage() {
     return (
       <div className="flex flex-col items-center">
         <Image
+          className="animate-pulse"
           src="/images/aegis-icon.png"
           height={transformRes({ height: 42 })}
           width={transformRes({ width: 42 })}
