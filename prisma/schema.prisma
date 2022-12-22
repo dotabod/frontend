@@ -30,10 +30,9 @@ model Account {
 
 model User {
   id            String         @id @default(cuid())
-  displayName   String         @unique(map: "users_name_key")
+  displayName   String?        @unique(map: "users_name_key")
   email         String         @unique
   image         String?
-  emailVerified DateTime?
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @default(now()) @map("updated_at")
   mmr           Int            @default(0) @db.SmallInt
@@ -41,6 +40,7 @@ model User {
   followers     Int?
   stream_delay  Int?           @default(0) @db.SmallInt
   name          String         @unique(map: "users_username_key") @default("")
+  emailVerified DateTime?
   Account       Account?
   Bet           Bet[]
   settings      Setting[]
