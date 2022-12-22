@@ -289,9 +289,9 @@ export default function OverlayPage() {
 
   let wlPosition = {
     bottom: 0,
-    right: transformRes({ width: 350 }),
+    right: transformRes({ width: 360 }),
     left: null,
-    fontSize: transformRes({ width: 16 }),
+    fontSize: transformRes({ width: 22 }),
   }
 
   let roshPosition = {

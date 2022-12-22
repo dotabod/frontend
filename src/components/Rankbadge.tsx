@@ -14,7 +14,7 @@ export const Rankbadge = ({
       <Badge transformRes={transformRes} image={image} />
       <span
         style={{
-          fontSize: transformRes ? transformRes({ height: 16 }) : 16,
+          fontSize: transformRes ? transformRes({ height: 22 }) : 16,
         }}
       >
         {leaderboard && '#'}
