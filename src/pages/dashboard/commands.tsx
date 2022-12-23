@@ -23,6 +23,7 @@ export const CommandDetail = {
     ),
   },
   commands: {
+    key: DBSettings.commandCommands,
     title: 'Command list',
     description: 'All available commands with Dotabod',
     cmd: '!commands',
