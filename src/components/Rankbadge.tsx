@@ -4,7 +4,7 @@ import { Card } from './Card'
 
 export const Rankbadge = ({
   image,
-  leaderboard,
+  leaderboard = false,
   rank,
   transformRes,
   ...props
@@ -13,6 +13,7 @@ export const Rankbadge = ({
     <Card {...props}>
       <Badge transformRes={transformRes} image={image} />
       <span
+        className={leaderboard ? '-mt-2' : '-mt-4'}
         style={{
           fontSize: transformRes ? transformRes({ height: 22 }) : 16,
         }}
