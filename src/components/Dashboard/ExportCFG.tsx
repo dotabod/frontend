@@ -58,7 +58,7 @@ export default function ExportCFG() {
           <a
             className="ml-4 block w-48"
             href={url}
-            download={`gamestate_integration_dotabod-${user.name}.cfg`}
+            download={`gamestate_integration_dotabod.cfg`}
           >
             <Button type="success" className="!normal-case">
               Download config file

@@ -3,6 +3,7 @@ import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/db'
+import { getBotAPI } from './getBotApi'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -35,7 +36,7 @@ export const authOptions: NextAuthOptions = {
 
       return session
     },
-    async jwt({ token, account, user, profile }) {
+    async jwt({ token, account, user, profile, isNewUser }) {
       // Save a db lookup
       if (token.id) return token
 
@@ -47,13 +48,29 @@ export const authOptions: NextAuthOptions = {
       const newUser = {
         email: profile.email || user.email,
         // @ts-ignore from twitch?
-        name: profile?.preferred_username || user.name,
+        name: user.displayName || user.name || profile?.preferred_username,
+        displayName:
+          // @ts-ignore from twitch?
+          profile?.preferred_username || user.displayName || user.name,
         // @ts-ignore from twitch?
         image: profile?.picture || user.image,
       }
 
       // Refresh jwt account with potentially new scopes
       if (account) {
+        const twitchApi = await getBotAPI()
+        const twitchUser = await twitchApi.users.getUserById(
+          account.providerAccountId
+        )
+
+        if (!twitchUser?.name || !twitchUser.displayName) return null
+        const follows = twitchApi.users.getFollowsPaginated({
+          followedUser: account.providerAccountId,
+        })
+        const totalFollowerCount = await follows.getTotalCount()
+        newUser.displayName = twitchUser.displayName
+        newUser.name = twitchUser.name
+
         await prisma.account.update({
           where: {
             provider_providerAccountId: {
@@ -63,7 +80,7 @@ export const authOptions: NextAuthOptions = {
           },
           data: {
             user: {
-              update: newUser,
+              update: { ...newUser, followers: totalFollowerCount },
             },
             // @ts-ignore from twitch?
             refresh_token: account.refresh_token,
@@ -79,7 +96,7 @@ export const authOptions: NextAuthOptions = {
 
       return {
         id: user.id,
-        name: newUser.name,
+        name: newUser.displayName || newUser.name,
         email: newUser.email,
         picture: newUser.image,
       }
