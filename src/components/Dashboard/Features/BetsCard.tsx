@@ -47,7 +47,7 @@ export default function BetsCard() {
       </div>
       <form onSubmit={form.onSubmit(updateInfo)} className="mt-6 space-y-2">
         <label htmlFor="name" className="block text-sm">
-          Title
+          Title. Variables: [heroname]
         </label>
         {loadingInfo && <Input placeholder="Loading..." disabled />}
         {!loadingInfo && (
