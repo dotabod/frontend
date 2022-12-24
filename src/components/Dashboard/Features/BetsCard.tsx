@@ -1,14 +1,30 @@
 import { Card } from '@/ui/card'
-import { Badge, Display } from '@geist-ui/core'
+import { Button, Display } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings } from '@/lib/DBSettings'
 import Image from 'next/image'
 import { Switch } from '@mantine/core'
+import { Input } from '../../Input'
+import { useForm } from '@mantine/form'
+import { useEffect } from 'react'
 
 export default function BetsCard() {
   const { isEnabled, loading, updateSetting } = useUpdateSetting(
     DBSettings.bets
   )
+  const {
+    isEnabled: info,
+    loading: loadingInfo,
+    updateSetting: updateInfo,
+  } = useUpdateSetting(DBSettings.betsInfo)
+
+  const form = useForm({ initialValues: info })
+
+  useEffect(() => {
+    if (info?.title && !loadingInfo) {
+      form.setValues(info)
+    }
+  }, [info, loadingInfo])
 
   return (
     <Card>
@@ -29,6 +45,65 @@ export default function BetsCard() {
         Chatters can use their native Twitch channel points to bet on whether
         you win or lose a match.
       </div>
+      <form onSubmit={form.onSubmit(updateInfo)} className="mt-6 space-y-2">
+        <label htmlFor="name" className="block text-sm">
+          Title
+        </label>
+        {loadingInfo && <Input placeholder="Loading..." disabled />}
+        {!loadingInfo && (
+          <>
+            <Input
+              id="name"
+              placeholder="Title"
+              maxLength={45}
+              {...form.getInputProps(`title`)}
+            />
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-1 lg:grid-cols-3">
+              <div>
+                <label htmlFor="yes" className="block text-sm">
+                  Yes
+                </label>
+                <Input
+                  style={{ width: 208 }}
+                  id="yes"
+                  maxLength={25}
+                  placeholder="Yes"
+                  {...form.getInputProps(`yes`)}
+                />
+              </div>
+              <div>
+                <label htmlFor="no" className="block text-sm">
+                  No
+                </label>
+                <Input
+                  style={{ width: 208 }}
+                  id="no"
+                  maxLength={25}
+                  placeholder="No"
+                  {...form.getInputProps(`no`)}
+                />
+              </div>
+              <div>
+                <label htmlFor="duration" className="block text-sm">
+                  Seconds open
+                </label>
+                <Input
+                  id="duration"
+                  style={{ width: 208 }}
+                  min={30}
+                  max={1800}
+                  placeholder="240"
+                  type="number"
+                  {...form.getInputProps(`duration`)}
+                />
+              </div>
+            </div>
+          </>
+        )}
+        <Button loading={loadingInfo} auto htmlType="submit">
+          Save
+        </Button>
+      </form>
       <Display
         shadow
         caption={
@@ -36,9 +111,6 @@ export default function BetsCard() {
             <p className="inline">
               Customize the prediction title and answers.
             </p>
-            <Badge scale={0.5} type="secondary" className="inline opacity-60">
-              coming soon
-            </Badge>
           </div>
         }
       >

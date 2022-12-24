@@ -66,7 +66,9 @@ export function useUpdateSetting(key) {
       })
       setToast({
         text: response.ok
-          ? `Updated! Setting is now ${isNow}`
+          ? `Updated! Setting is now ${
+              ['string', 'number'].includes(typeof isNow) ? isNow : 'updated'
+            }`
           : 'Error updating',
         type: response.ok ? 'success' : 'error',
       })
