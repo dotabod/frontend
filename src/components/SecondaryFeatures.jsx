@@ -173,8 +173,8 @@ export function SecondaryFeatures() {
             <HoverCard.Dropdown>
               <Image
                 alt="aegis timer"
-                width={293}
-                height={533}
+                width={384}
+                height={443}
                 src="/images/aegis-timer.png"
               />
             </HoverCard.Dropdown>
