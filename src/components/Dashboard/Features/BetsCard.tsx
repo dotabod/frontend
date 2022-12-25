@@ -1,9 +1,9 @@
 import { Card } from '@/ui/card'
-import { Button, Display } from '@geist-ui/core'
+import { Display } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings } from '@/lib/DBSettings'
 import Image from 'next/image'
-import { Switch } from '@mantine/core'
+import { Button, Switch } from '@mantine/core'
 import { Input } from '../../Input'
 import { useForm } from '@mantine/form'
 import { useEffect } from 'react'
@@ -21,10 +21,16 @@ export default function BetsCard() {
   const form = useForm({ initialValues: info })
 
   useEffect(() => {
-    if (info?.title && !loadingInfo) {
+    if (info && !loadingInfo) {
       form.setValues(info)
+      form.resetDirty(info)
     }
-  }, [info, loadingInfo])
+  }, [loadingInfo])
+
+  useEffect(() => {
+    form.resetDirty()
+    form.resetTouched()
+  }, [])
 
   return (
     <Card>
@@ -45,7 +51,13 @@ export default function BetsCard() {
         Chatters can use their native Twitch channel points to bet on whether
         you win or lose a match.
       </div>
-      <form onSubmit={form.onSubmit(updateInfo)} className="mt-6 space-y-2">
+      <form
+        onSubmit={form.onSubmit((v) => {
+          updateInfo(v)
+          form.resetDirty()
+        })}
+        className="mt-6 space-y-2"
+      >
         <label htmlFor="name" className="block text-sm">
           Title. Variables: [heroname]
         </label>
@@ -98,11 +110,17 @@ export default function BetsCard() {
                 />
               </div>
             </div>
+            <Button
+              variant="outline"
+              color="green"
+              loading={loadingInfo}
+              type="submit"
+              disabled={!form.isDirty()}
+            >
+              Save
+            </Button>
           </>
         )}
-        <Button loading={loadingInfo} auto htmlType="submit">
-          Save
-        </Button>
       </form>
       <Display
         shadow

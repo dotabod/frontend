@@ -1,11 +1,11 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Image, Link, Loading } from '@geist-ui/core'
+import { Display, Image, Link, Loading } from '@geist-ui/core'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings } from '@/lib/DBSettings'
 import { SteamAccount } from '@prisma/client'
 import { useForm } from '@mantine/form'
 import { useEffect } from 'react'
-import { Badge, Switch } from '@mantine/core'
+import { Badge, Button, Switch } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '@/components/Input'
 
@@ -18,8 +18,9 @@ export default function MmrTrackerCard() {
   useEffect(() => {
     if (accounts.length && !loadingAccounts) {
       form.setValues({ accounts })
+      form.resetDirty({ accounts })
     }
-  }, [accounts, loadingAccounts])
+  }, [loadingAccounts])
 
   const {
     isEnabled,
@@ -69,6 +70,7 @@ export default function MmrTrackerCard() {
                 mmr: Number(act.mmr) || 0,
               }))
             )
+            form.resetDirty()
           })}
           className="space-y-2"
         >
@@ -115,7 +117,13 @@ export default function MmrTrackerCard() {
               </div>
             )
           })}
-          <Button loading={loadingAccounts} auto htmlType="submit">
+          <Button
+            variant="outline"
+            color="green"
+            disabled={!form.isDirty()}
+            loading={loadingAccounts}
+            type="submit"
+          >
             Save
           </Button>
         </form>
