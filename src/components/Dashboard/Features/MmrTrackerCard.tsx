@@ -122,6 +122,7 @@ export default function MmrTrackerCard() {
             color="green"
             disabled={!form.isDirty()}
             loading={loadingAccounts}
+            className="border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500"
             type="submit"
           >
             Save

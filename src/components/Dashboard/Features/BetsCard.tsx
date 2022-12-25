@@ -115,6 +115,7 @@ export default function BetsCard() {
               color="green"
               loading={loadingInfo}
               type="submit"
+              className="border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500"
               disabled={!form.isDirty()}
             >
               Save
