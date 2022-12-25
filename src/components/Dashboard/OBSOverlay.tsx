@@ -44,7 +44,7 @@ export default function OBSOverlay() {
           </Display>
 
           <p>
-            3. Close the settings window, and under Scenes click Add &gt;
+            3. Close the settings window, and under Sources click Add &gt;
             Browser and press OK.
           </p>
 
