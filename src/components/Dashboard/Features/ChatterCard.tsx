@@ -30,10 +30,20 @@ export default function ChatterCard() {
     <Card>
       <div className="title">
         <h3>Chatter</h3>
-        {loading && <Switch disabled size="lg" color="indigo" />}
+        {loading && (
+          <Switch
+            disabled
+            size="lg"
+            offLabel="All"
+            onLabel="All"
+            color="indigo"
+          />
+        )}
         {!loading && (
           <Switch
             size="lg"
+            offLabel="All"
+            onLabel="All"
             onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
             color="indigo"
             defaultChecked={isEnabled}
