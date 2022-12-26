@@ -241,39 +241,36 @@ export default function DashboardShell({ children, title, subtitle }) {
                     </Link>
                   )
                 })}
-
-                <div className="ml-1 space-y-2 rounded border-2 border-red-900/50 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-dark-300">Disable Dotabod</p>
-
-                    {loading && (
-                      <Switch
-                        disabled
-                        size="lg"
-                        className="flex"
-                        color="indigo"
-                      />
-                    )}
-                    {!loading && (
-                      <Switch
-                        size="lg"
-                        className="flex"
-                        color="indigo"
-                        defaultChecked={isEnabled}
-                        onChange={(e) =>
-                          updateSetting(!!e?.currentTarget?.checked)
-                        }
-                      >
-                        !mmr
-                      </Switch>
-                    )}
-                  </div>
-                  <p className="w-48 text-xs text-dark-400">
-                    With this turned on, game events will no longer be
-                    recognized and commands will not be responded to.
-                  </p>
-                </div>
               </nav>
+
+              <div className="ml-1 mr-2 space-y-2 rounded border-2 border-red-900/50 p-4 transition-colors hover:border-red-700">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-dark-300">Disable Dotabod</p>
+
+                  {loading && (
+                    <Switch disabled size="lg" className="flex" color="red" />
+                  )}
+                  {!loading && (
+                    <Switch
+                      size="lg"
+                      className="flex"
+                      color="red"
+                      onLabel="On"
+                      offLabel="Off"
+                      defaultChecked={isEnabled}
+                      onChange={(e) =>
+                        updateSetting(!!e?.currentTarget?.checked)
+                      }
+                    >
+                      !mmr
+                    </Switch>
+                  )}
+                </div>
+                <p className="w-48 text-xs text-dark-400">
+                  With this turned on, game events will no longer be recognized
+                  and commands will not be responded to.
+                </p>
+              </div>
             </div>
           </div>
         </div>
