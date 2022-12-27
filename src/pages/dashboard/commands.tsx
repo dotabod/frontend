@@ -25,7 +25,8 @@ export const CommandDetail = {
   commands: {
     key: DBSettings.commandCommands,
     title: 'Command list',
-    description: 'All available commands with Dotabod',
+    description:
+      'All available commands with Dotabod. This list is filtered to only the commands you enabled. If a mod uses !commands, it will show mod only commands as well.',
     cmd: '!commands',
     alias: [],
     allowed: 'all',
@@ -39,6 +40,70 @@ export const CommandDetail = {
       />
     ),
   },
+  fixparty: {
+    title: 'Fix party match',
+    description:
+      "Dotabod can't detect party games right now (sadge). So if it does 30 mmr for a completed match, use !fixparty to adjust it to 20. You must type this after every party match.",
+    cmd: '!fixparty',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!fixparty"
+        modOnly
+        responses={[
+          'Changing this match to party mmr: dotabuff.com/matches/1234567.',
+          'Updated MMR to 3090, -10',
+        ]}
+      />
+    ),
+  },
+
+  [DBSettings.commandOpendota]: {
+    key: DBSettings.commandOpendota,
+    title: 'Opendota',
+    description:
+      'Shows the Opendota link for your currently logged in steam account.',
+    cmd: '!opendota',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!opendota"
+        response="Here's <streamername>: opendota.com/players/1234567"
+      />
+    ),
+  },
+
+  [DBSettings.commandDotabuff]: {
+    key: DBSettings.commandDotabuff,
+    title: 'Dotabuff',
+    description:
+      'Shows the Dotabuff link for your currently logged in steam account.',
+    cmd: '!dotabuff',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!dotabuff"
+        response="Here's <streamername>: dotabuff.com/players/1234567"
+      />
+    ),
+  },
+  [DBSettings.commandXPM]: {
+    key: DBSettings.commandXPM,
+    title: 'XPM',
+    description: 'Live experience per minute for your chatters on demand.',
+    cmd: '!xpm',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat {...props} command="!xpm" response="Live XPM: 778" />
+    ),
+  },
   [DBSettings.commandWL]: {
     key: DBSettings.commandWL,
     title: 'Win / Loss',
@@ -47,7 +112,18 @@ export const CommandDetail = {
     alias: [],
     allowed: 'all',
     response: (props) => (
-      <TwitchChat {...props} command="!wl" response="Ranked 0 W - 9 L" />
+      <>
+        <TwitchChat
+          {...props}
+          command="!wl"
+          response="Ranked 0 W - 9 L | -270 MMR"
+        />
+        <TwitchChat
+          {...props}
+          command="!wl"
+          response="Ranked 0 W - 9 L | -270 MMR | Unranked 2 W - 1 L"
+        />
+      </>
     ),
   },
   [DBSettings.mmrTracker]: {
@@ -66,15 +142,26 @@ export const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandXPM]: {
-    key: DBSettings.commandXPM,
-    title: 'XPM',
-    description: 'Live experience per minute for your chatters on demand.',
-    cmd: '!xpm',
+  profile: {
+    title: 'Profile',
+    description:
+      'Shows the profile link for the hero color you specify during a live match.',
+    cmd: '!profile',
     alias: [],
     allowed: 'all',
     response: (props) => (
-      <TwitchChat {...props} command="!xpm" response="Live XPM: 778" />
+      <>
+        <TwitchChat
+          {...props}
+          command="!profile blue"
+          response="Here's blue: dotabuff.com/matches/1234567."
+        />
+        <TwitchChat
+          {...props}
+          command="!profile ?"
+          response="Invalid hero color. Must be one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown"
+        />
+      </>
     ),
   },
   [DBSettings.commandGPM]: {
@@ -310,7 +397,7 @@ export const CommandDetail = {
         {...props}
         modOnly
         command="!steam"
-        response={`ChannelName https://steamid.xyz/1234567`}
+        response="steamid.xyz/1234567"
       />
     ),
   },
