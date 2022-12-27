@@ -180,6 +180,7 @@ export default function MmrTrackerCard() {
             {!loading && (
               <Input
                 placeholder="0"
+                className="w-full"
                 id="mmr"
                 name="mmr"
                 type="number"
