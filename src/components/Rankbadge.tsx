@@ -1,4 +1,5 @@
 'use client'
+import clsx from 'clsx'
 import { Badge } from './Badge'
 import { Card } from './Card'
 
@@ -13,11 +14,12 @@ export const Rankbadge = ({
     <Card {...props}>
       <Badge transformRes={transformRes} image={image} />
       <span
-        className={
+        className={clsx(
           leaderboard || ['80.png', '92.png'].includes(image)
             ? '-mt-1'
-            : '-mt-3'
-        }
+            : '-mt-3',
+          'font-mono'
+        )}
         style={{
           fontSize: transformRes ? transformRes({ height: 22 }) : 16,
         }}
