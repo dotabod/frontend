@@ -3,7 +3,7 @@ import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image, Link, Loading } from '@geist-ui/core'
-import { Button, clsx, Switch } from '@mantine/core'
+import { Badge, Button, clsx, Switch } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
 import { XCircle } from 'lucide-react'
@@ -159,6 +159,12 @@ export default function MmrTrackerCard() {
 
       {accounts.length === 0 && (
         <div className="mt-6">
+          <p className="mb-4">
+            <Badge>INFO</Badge>
+            <span>
+              Play a bot game for Dotabod to detect your Steam account!
+            </span>
+          </p>
           <label
             htmlFor="mmr"
             className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
