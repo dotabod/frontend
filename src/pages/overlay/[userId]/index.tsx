@@ -1,23 +1,23 @@
 'use client'
 
-import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import io from 'socket.io-client'
-import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { fetcher } from '@/lib/fetcher'
+import { Card } from '@/components/Card'
+import { HeroBlocker } from '@/components/HeroBlocker'
+import { Rankbadge } from '@/components/Rankbadge'
+import WinLossCard from '@/components/WinLossCard'
 import {
   DBSettings,
   defaultSettings,
   getValueOrDefault,
 } from '@/lib/DBSettings'
+import { fetcher } from '@/lib/fetcher'
 import { getRankImage, RankDeets } from '@/lib/ranks'
-import { Rankbadge } from '@/components/Rankbadge'
-import { HeroBlocker } from '@/components/HeroBlocker'
+import Head from 'next/head'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
-import { Card } from '@/components/Card'
-import WinLossCard from '@/components/WinLossCard'
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import io from 'socket.io-client'
 
 let socket
 
@@ -289,7 +289,7 @@ export default function OverlayPage() {
 
   let wlPosition = {
     bottom: 0,
-    right: transformRes({ width: 360 }),
+    right: transformRes({ width: 356 }),
     left: null,
     fontSize: transformRes({ width: 22 }),
   }

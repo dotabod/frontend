@@ -11,7 +11,7 @@ export const Rankbadge = ({
   ...props
 }) => {
   return (
-    <Card {...props}>
+    <Card className="rounded-bl-none" {...props}>
       <Badge transformRes={transformRes} image={image} />
       <span
         className={clsx(
