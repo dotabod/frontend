@@ -2,9 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import * as z from 'zod'
 
-import prisma from '@/lib/db'
-import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
+import prisma from '@/lib/db'
 
 const accountUpdateSchema = z.array(
   z.object({
@@ -14,6 +14,29 @@ const accountUpdateSchema = z.array(
   })
 )
 
+async function getAccounts(id: string) {
+  try {
+    const accounts = await prisma.steamAccount.findMany({
+      select: {
+        mmr: true,
+        name: true,
+        steam32Id: true,
+      },
+      where: {
+        userId: id,
+      },
+    })
+
+    if (!accounts) {
+      return []
+    }
+
+    return accounts
+  } catch (error) {
+    return null
+  }
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req })
   const userId = req.query.id as string
@@ -22,34 +45,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
+  const accounts = await getAccounts(session ? session?.user?.id : userId)
   if (req.method === 'GET') {
-    try {
-      const accounts = await prisma.steamAccount.findMany({
-        select: {
-          mmr: true,
-          name: true,
-          steam32Id: true,
-        },
-        where: {
-          userId: session ? session?.user?.id : userId,
-        },
-      })
-
-      if (!accounts) {
-        return res.status(403).end()
-      }
-
-      return res.json({ accounts })
-    } catch (error) {
+    // Caught error
+    if (!accounts) {
       return res.status(500).end()
     }
+
+    return res.json({ accounts })
   }
 
   if (req.method === 'PATCH') {
     try {
-      const body = accountUpdateSchema.parse(JSON.parse(req.body))
       const promises = []
+      const body = accountUpdateSchema.parse(JSON.parse(req.body))
+      const deletedAccounts = accounts.filter((obj) =>
+        body.every((s) => s.steam32Id !== obj.steam32Id)
+      )
+
+      deletedAccounts.forEach((account) => {
+        promises.push(
+          prisma.steamAccount.delete({
+            where: {
+              steam32Id: account.steam32Id,
+            },
+          })
+        )
+      })
+
       body.forEach((account) => {
+        // Check if user has the steam accountid from body array
+        if (!accounts.find((obj) => obj.steam32Id === account.steam32Id)) {
+          return
+        }
+
         promises.push(
           prisma.steamAccount.update({
             data: {

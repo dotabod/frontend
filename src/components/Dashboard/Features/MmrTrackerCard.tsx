@@ -1,13 +1,14 @@
+import { Input } from '@/components/Input'
+import { DBSettings } from '@/lib/DBSettings'
+import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image, Link, Loading } from '@geist-ui/core'
-import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings } from '@/lib/DBSettings'
-import { SteamAccount } from '@prisma/client'
+import { Button, clsx, Switch } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { SteamAccount } from '@prisma/client'
+import { XCircle } from 'lucide-react'
 import { useEffect } from 'react'
-import { Badge, Button, Switch } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
-import { Input } from '@/components/Input'
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
@@ -52,15 +53,10 @@ export default function MmrTrackerCard() {
           />
         )}
       </div>
-      <div className="subtitle">Let your chatters bet on your matches.</div>
-      <div>Automatically goes up or down 30 MMR every ranked match.</div>
-      <div className="my-6 space-x-2 text-xs">
-        <Badge variant="filled">New</Badge>
-        <span>
-          Multi account support enabled. Play on your smurf or main to track MMR
-          separately! A list of accounts will show below as you play on them.
-        </span>
+      <div className="subtitle">
+        Give or take 30 MMR after every ranked match.
       </div>
+      <div>A list of accounts will show below as you play on them.</div>
       {accounts?.length ? (
         <form
           onSubmit={form.onSubmit((values) => {
@@ -72,61 +68,92 @@ export default function MmrTrackerCard() {
             )
             form.resetDirty()
           })}
-          className="space-y-2"
+          className="mt-6 space-y-2"
         >
-          {accounts.map((account, index) => {
-            return (
-              <div
-                key={account.steam32Id}
-                className="grid grid-cols-1 gap-2 md:grid-cols-1 lg:grid-cols-2"
-              >
-                <div>
-                  <label className="mb-2 text-sm font-medium text-dark-400 ">
-                    <span className="mr-2">Display name for</span>
-                    <Link
-                      color
-                      target="_blank"
-                      href={`https://steamid.xyz/${account.steam32Id}`}
-                      rel="noreferrer"
-                    >
-                      {account.steam32Id}
-                    </Link>
-                  </label>
+          {form.values.accounts.map((account, index) => (
+            <div key={account.steam32Id}>
+              <div className="mb-1 space-x-1">
+                <label
+                  htmlFor={`${account.steam32Id}-mmr`}
+                  className="cursor-pointer text-sm font-medium text-dark-400 "
+                >
+                  <span>MMR for</span>
+                </label>
+                <Link
+                  color
+                  target="_blank"
+                  href={`https://steamid.xyz/${account.steam32Id}`}
+                  rel="noreferrer"
+                >
+                  {account.name}
+                </Link>
+              </div>
+              <div className="flex items-center">
+                <div className="w-full">
                   <Input
-                    placeholder="Name"
-                    style={{ width: 208 }}
-                    type="text"
-                    {...form.getInputProps(`accounts.${index}.name`)}
-                  />
-                </div>
-
-                <div>
-                  <label className="mt-2 mb-2 text-sm font-medium text-dark-400 ">
-                    Your current MMR (required)
-                  </label>
-
-                  <Input
+                    id={`${account.steam32Id}-mmr`}
                     placeholder="Your MMR?"
                     type="number"
-                    className="w-24"
                     min={0}
                     max={30000}
                     {...form.getInputProps(`accounts.${index}.mmr`)}
                   />
                 </div>
+                <Button
+                  variant="outline"
+                  color="red"
+                  size="xs"
+                  className="h-full w-fit border-transparent bg-transparent py-2 text-dark-200 transition-colors hover:bg-transparent hover:text-red-600"
+                  onClick={() => {
+                    form.setValues({
+                      accounts: form.values.accounts.filter(
+                        (act) => act.steam32Id !== account.steam32Id
+                      ),
+                    })
+                  }}
+                >
+                  <XCircle size={24} />
+                </Button>
               </div>
-            )
-          })}
-          <Button
-            variant="outline"
-            color="green"
-            disabled={!form.isDirty()}
-            loading={loadingAccounts}
-            className="border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500"
-            type="submit"
-          >
-            Save
-          </Button>
+            </div>
+          ))}
+          <div className="space-x-4">
+            <Button
+              variant="outline"
+              color="green"
+              disabled={!form.isDirty()}
+              loading={loadingAccounts}
+              className={clsx(
+                ' border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
+                accounts.length - form.values.accounts.length > 0 &&
+                  'border-red-700 bg-red-700 hover:bg-red-600'
+              )}
+              type="submit"
+            >
+              <span className="space-x-1">
+                {accounts.length - form.values.accounts.length > 0 ? (
+                  <span>
+                    Confirm remove{' '}
+                    {accounts.length - form.values.accounts.length}
+                  </span>
+                ) : null}
+                {form.values.accounts.length ? <span>Save</span> : null}
+                <span>
+                  account
+                  {form.values.accounts.length > 1 ? 's' : ''}
+                </span>
+              </span>
+            </Button>
+            <Button
+              disabled={!form.isDirty()}
+              onClick={() => {
+                form.setValues({ accounts })
+              }}
+              className=" hov text-dark-200 transition-colors"
+            >
+              Cancel
+            </Button>
+          </div>
         </form>
       ) : null}
 
@@ -136,7 +163,7 @@ export default function MmrTrackerCard() {
             htmlFor="mmr"
             className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
           >
-            Your current MMR (required)
+            Current MMR
           </label>
           <div className="flex space-x-4">
             {loading && (
