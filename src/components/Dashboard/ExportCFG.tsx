@@ -44,7 +44,7 @@ export default function ExportCFG() {
       >
         <div className="space-y-4">
           <div>
-            i. In Steam, right click Dota 2{' '}
+            1. In Steam, right click Dota 2{' '}
             <ChevronRightIcon height={12} className="inline" /> Manage{' '}
             <ChevronRightIcon height={12} className="inline" /> Browse local
             files. Then open the folder to{' '}
@@ -77,7 +77,9 @@ export default function ExportCFG() {
               <Display
                 caption={
                   <>
-                    <p>Full path to save config file to:</p>
+                    <p>
+                      Full path to save config file to (if you use the C drive):
+                    </p>
                     <Code>
                       C:\Program Files (x86)\Steam\steamapps\common\dota 2
                       beta\game\dota\cfg\gamestate_integration\
@@ -97,9 +99,9 @@ export default function ExportCFG() {
           </div>
 
           <div>
-            ii. Follow{' '}
+            2. Follow{' '}
             <Link
-              className="text-blue-500 hover:text-blue-300"
+              className="text-blue-400 hover:text-blue-300"
               href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
               target="_blank"
             >
@@ -109,7 +111,7 @@ export default function ExportCFG() {
             options in Steam.
           </div>
 
-          <div>iii. Restart Dota 2.</div>
+          <div>3. Restart Dota 2.</div>
         </div>
       </Collapse>
     </Card>

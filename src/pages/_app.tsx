@@ -29,6 +29,18 @@ export default function App({
         theme={{
           colorScheme: 'dark',
           colors: {
+            blue: [
+              '#eff6ff',
+              '#dbeafe',
+              '#bfdbfe',
+              '#93c5fd',
+              '#60a5fa',
+              '#3b82f6',
+              '#2563eb',
+              '#1d4ed8',
+              '#1e40af',
+              '#1e3a8a',
+            ],
             // override dark colors to change them for all components
             dark: [
               '#F9FAFB',

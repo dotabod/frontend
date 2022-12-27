@@ -28,21 +28,21 @@ export default function ChatBot() {
       >
         <div className="space-y-2 text-sm text-dark-300">
           <div>
-            i. Add @dotabod as a moderator to your channel. Type the following
+            1. Add @dotabod as a moderator to your channel. Type the following
             in your stream.
           </div>
 
           <Snippet symbol="" text="/mod dotabod" width="750px" />
 
           <div>
-            ii. Add the following emotes to your channel using BTTV (case
+            2. Add the following emotes to your channel using BTTV (case
             sensitive):
           </div>
           <ul className="ml-8 list-disc">
             {emotes.map(({ label, url }) => (
               <li key={label}>
                 <Link
-                  className="text-dark-300 transition-colors hover:text-[#E6E8F1]"
+                  className="text-blue-400 transition-colors hover:text-[#E6E8F1]"
                   target="_blank"
                   href={
                     url ??
