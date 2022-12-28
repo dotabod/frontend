@@ -1,7 +1,7 @@
+import { DBSettings } from '@/lib/DBSettings'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image } from '@geist-ui/core'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings } from '@/lib/DBSettings'
 import { Switch } from '@mantine/core'
 
 export default function PicksCard() {
@@ -13,12 +13,12 @@ export default function PicksCard() {
     <Card>
       <div className="title">
         <h3>Picks</h3>
-        {loading && <Switch disabled size="lg" color="indigo" />}
+        {loading && <Switch disabled size="lg" color="blue" />}
         {!loading && (
           <Switch
             size="lg"
             onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="indigo"
+            color="blue"
             defaultChecked={isEnabled}
           />
         )}

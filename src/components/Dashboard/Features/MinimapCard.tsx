@@ -1,7 +1,7 @@
+import { DBSettings } from '@/lib/DBSettings'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image } from '@geist-ui/core'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings } from '@/lib/DBSettings'
 import { Checkbox, Switch } from '@mantine/core'
 
 export default function MinimapCard(): JSX.Element {
@@ -37,12 +37,12 @@ export default function MinimapCard(): JSX.Element {
     <Card>
       <div className="title">
         <h3>Minimap blocker</h3>
-        {loading && <Switch disabled size="lg" color="indigo" />}
+        {loading && <Switch disabled size="lg" color="blue" />}
         {!loading && (
           <Switch
             size="lg"
             onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="indigo"
+            color="blue"
             defaultChecked={isEnabled}
           />
         )}

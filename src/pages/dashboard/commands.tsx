@@ -2,6 +2,7 @@ import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/DashboardShell'
 import TwitchChat from '@/components/TwitchChat'
 import { DBSettings } from '@/lib/DBSettings'
+import { Accordion } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -19,24 +20,6 @@ export const CommandDetail = {
         modOnly
         command="!toggle"
         response="Will no longer watch game events nor respond to commands. Type !toggle again to enable."
-      />
-    ),
-  },
-  commands: {
-    key: DBSettings.commandCommands,
-    title: 'Command list',
-    description:
-      'All available commands with Dotabod. This list is filtered to only the commands you enabled. If a mod uses !commands, it will show mod only commands as well.',
-    cmd: '!commands',
-    alias: [],
-    allowed: 'all',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        command="!commands"
-        responses={[
-          'Everyone can use: command1 · command2 · command3 · etc...',
-        ]}
       />
     ),
   },
@@ -59,7 +42,105 @@ export const CommandDetail = {
       />
     ),
   },
-
+  refresh: {
+    title: 'Refresh',
+    description:
+      'Refreshes your OBS overlay without having to do it from OBS. Used in case the overlay is messed up.',
+    cmd: '!refresh',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!refresh"
+        response="Refreshing overlay..."
+      />
+    ),
+  },
+  steam: {
+    title: 'Steam ID',
+    description:
+      "Retrieve the steam ID of the account you're currently playing on.",
+    cmd: '!steam',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!steam"
+        response="steamid.xyz/1234567"
+      />
+    ),
+  },
+  setmmr: {
+    title: 'Set MMR',
+    description: 'Manually set your MMR.',
+    cmd: '!setmmr',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!setmmr 1234"
+        response="Updated MMR to 1234"
+      />
+    ),
+  },
+  [DBSettings.commandPleb]: {
+    key: DBSettings.commandPleb,
+    title: 'Pleb',
+    description:
+      'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
+    cmd: '!pleb',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!pleb"
+        response="One pleb IN 👇"
+      />
+    ),
+  },
+  [DBSettings.commandModsonly]: {
+    key: DBSettings.commandModsonly,
+    title: 'Mods only',
+    description:
+      'Only allow mods to send messages in chat. Turns sub only mode on and deletes messages from subs.',
+    cmd: '!modsonly',
+    alias: [],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!modsonly"
+        response="Mod only mode enabled"
+      />
+    ),
+  },
+  commands: {
+    key: DBSettings.commandCommands,
+    title: 'Command list',
+    description:
+      'All available commands with Dotabod. This list is filtered to only the commands you enabled. If a mod uses !commands, it will show mod only commands as well.',
+    cmd: '!commands',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!commands"
+        responses={[
+          'Everyone can use: command1 · command2 · command3 · etc...',
+        ]}
+      />
+    ),
+  },
   [DBSettings.commandOpendota]: {
     key: DBSettings.commandOpendota,
     title: 'Opendota',
@@ -142,28 +223,6 @@ export const CommandDetail = {
       />
     ),
   },
-  profile: {
-    title: 'Profile',
-    description:
-      'Shows the profile link for the hero color you specify during a live match.',
-    cmd: '!profile',
-    alias: [],
-    allowed: 'all',
-    response: (props) => (
-      <>
-        <TwitchChat
-          {...props}
-          command="!profile blue"
-          response="Here's blue: dotabuff.com/matches/1234567."
-        />
-        <TwitchChat
-          {...props}
-          command="!profile ?"
-          response="Invalid hero color. Must be one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown"
-        />
-      </>
-    ),
-  },
   [DBSettings.commandGPM]: {
     key: DBSettings.commandGPM,
     title: 'GPM',
@@ -192,23 +251,7 @@ export const CommandDetail = {
       <TwitchChat {...props} command="!apm" response="Live APM: 123" />
     ),
   },
-  [DBSettings.commandPleb]: {
-    key: DBSettings.commandPleb,
-    title: 'Pleb',
-    description:
-      'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
-    cmd: '!pleb',
-    alias: [],
-    allowed: 'mods',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!pleb"
-        response="One pleb IN 👇"
-      />
-    ),
-  },
+
   [DBSettings.commandNP]: {
     key: DBSettings.commandNP,
     title: 'Notable players',
@@ -313,23 +356,7 @@ export const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandModsonly]: {
-    key: DBSettings.commandModsonly,
-    title: 'Mods only',
-    description:
-      'Only allow mods to send messages in chat. Turns sub only mode on and deletes messages from subs.',
-    cmd: '!modsonly',
-    alias: [],
-    allowed: 'mods',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!modsonly"
-        response="Mod only mode enabled"
-      />
-    ),
-  },
+
   [DBSettings.commandHero]: {
     key: DBSettings.commandHero,
     title: 'Hero',
@@ -369,51 +396,26 @@ export const CommandDetail = {
       />
     ),
   },
-  refresh: {
-    title: 'Refresh',
+  profile: {
+    title: 'Profile',
     description:
-      'Refreshes your OBS overlay without having to do it from OBS. Used in case the overlay is messed up.',
-    cmd: '!refresh',
+      'Shows the profile link for the hero color you specify during a live match.',
+    cmd: '!profile',
     alias: [],
-    allowed: 'mods',
+    allowed: 'all',
     response: (props) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!refresh"
-        response="Refreshing overlay..."
-      />
-    ),
-  },
-  steam: {
-    title: 'Steam ID',
-    description:
-      "Retrieve the steam ID of the account you're currently playing on.",
-    cmd: '!steam',
-    alias: [],
-    allowed: 'mods',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!steam"
-        response="steamid.xyz/1234567"
-      />
-    ),
-  },
-  setmmr: {
-    title: 'Set MMR',
-    description: 'Manually set your MMR.',
-    cmd: '!setmmr',
-    alias: [],
-    allowed: 'mods',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!setmmr 1234"
-        response="Updated MMR to 1234"
-      />
+      <>
+        <TwitchChat
+          {...props}
+          command="!profile blue"
+          response="Here's blue: dotabuff.com/matches/1234567."
+        />
+        <TwitchChat
+          {...props}
+          command="!profile ?"
+          response="Invalid hero color. Must be one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown"
+        />
+      </>
     ),
   },
 }
@@ -430,11 +432,58 @@ export default function CommandsPage() {
         subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
         title="Commands"
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Object.keys(CommandDetail).map((key) => (
-            <CommandsCard key={key} command={CommandDetail[key]} />
-          ))}
-        </div>
+        <Accordion
+          variant="separated"
+          styles={{
+            item: {
+              marginTop: '0px !important',
+              padding: 0,
+              margin: 0,
+              // styles added to all items
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+
+              '.subtitle': {
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              },
+
+              // styles added to expanded item
+              '&[data-active]': {
+                '& .subtitle': {
+                  overflow: 'initial',
+                  textOverflow: 'unset',
+                  whiteSpace: 'normal',
+                },
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
+              },
+            },
+
+            content: {
+              padding: 0,
+            },
+
+            control: {
+              padding: 23,
+            },
+
+            chevron: {
+              alignSelf: 'flex-start',
+              // styles added to chevron when it should rotate
+              '&[data-rotate]': {
+                transform: 'rotate(-90deg)',
+              },
+            },
+          }}
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.keys(CommandDetail).map((key) => (
+              <CommandsCard key={key} command={CommandDetail[key]} />
+            ))}
+          </div>
+        </Accordion>
       </DashboardShell>
     </>
   ) : null

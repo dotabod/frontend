@@ -1,9 +1,9 @@
+import { DBSettings } from '@/lib/DBSettings'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings } from '@/lib/DBSettings'
-import Image from 'next/image'
 import { Switch } from '@mantine/core'
+import Image from 'next/image'
 
 export default function RoshCard() {
   const {
@@ -23,25 +23,25 @@ export default function RoshCard() {
       <div className="title">
         <h3>Roshan timers</h3>
         <div className="flex space-x-4">
-          {lA && <Switch disabled size="lg" color="indigo" />}
+          {lA && <Switch disabled size="lg" color="blue" />}
           {!lA && (
             <Switch
               size="lg"
               onLabel="Aegis"
               offLabel="Aegis"
               onChange={(e) => uA(!!e?.currentTarget?.checked)}
-              color="indigo"
+              color="blue"
               defaultChecked={hasAegis}
             />
           )}
-          {lR && <Switch disabled size="lg" color="indigo" />}
+          {lR && <Switch disabled size="lg" color="blue" />}
           {!lR && (
             <Switch
               size="lg"
               onLabel="Rosh"
               offLabel="Rosh"
               onChange={(e) => uR(!!e?.currentTarget?.checked)}
-              color="indigo"
+              color="blue"
               defaultChecked={hasRosh}
             />
           )}

@@ -1,10 +1,10 @@
+import { DBSettings, defaultSettings } from '@/lib/DBSettings'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image, Loading } from '@geist-ui/core'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings, defaultSettings } from '@/lib/DBSettings'
+import { Switch } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
-import { Switch } from '@mantine/core'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
@@ -61,12 +61,12 @@ export default function SceneSwitcher(): JSX.Element {
     <Card>
       <div className="title">
         <h3>OBS scene switcher</h3>
-        {l0 && <Switch disabled size="lg" color="indigo" />}
+        {l0 && <Switch disabled size="lg" color="blue" />}
         {!l0 && (
           <Switch
             size="lg"
             onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="indigo"
+            color="blue"
             defaultChecked={isEnabled}
           />
         )}

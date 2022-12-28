@@ -1,8 +1,8 @@
-import { Card } from '@/ui/card'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings, defaultSettings } from '@/lib/DBSettings'
-import { Button, Switch } from '@mantine/core'
 import { Input } from '@/components/Input'
+import { DBSettings, defaultSettings } from '@/lib/DBSettings'
+import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { Card } from '@/ui/card'
+import { Button, Switch } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useEffect } from 'react'
 
@@ -36,7 +36,7 @@ export default function ChatterCard() {
             size="lg"
             offLabel="All"
             onLabel="All"
-            color="indigo"
+            color="blue"
           />
         )}
         {!loading && (
@@ -45,7 +45,7 @@ export default function ChatterCard() {
             offLabel="All"
             onLabel="All"
             onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="indigo"
+            color="blue"
             defaultChecked={isEnabled}
           />
         )}
@@ -75,7 +75,7 @@ export default function ChatterCard() {
                 <div className="flex items-center space-x-3">
                   <Switch
                     size="lg"
-                    color="indigo"
+                    color="blue"
                     disabled={!isEnabled}
                     {...form.getInputProps(`${key}.enabled`, {
                       type: 'checkbox',

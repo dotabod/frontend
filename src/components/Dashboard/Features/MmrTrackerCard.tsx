@@ -43,12 +43,12 @@ export default function MmrTrackerCard() {
     <Card>
       <div className="title">
         <h3>MMR tracker</h3>
-        {l0 && <Switch disabled size="lg" color="indigo" />}
+        {l0 && <Switch disabled size="lg" color="blue" />}
         {!l0 && (
           <Switch
             size="lg"
             onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="indigo"
+            color="blue"
             defaultChecked={isEnabled}
           />
         )}
