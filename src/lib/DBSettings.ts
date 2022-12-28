@@ -117,13 +117,26 @@ export const getValueOrDefault = (data, key) => {
   }
 
   try {
-    const val = JSON.parse(dbVal) as unknown as any
-    if (typeof val === 'object' && typeof defaultSettings[key] === 'object') {
+    if (typeof dbVal === 'string') {
+      const val = JSON.parse(dbVal) as unknown as any
+      if (typeof val === 'object' && typeof defaultSettings[key] === 'object') {
+        return {
+          ...(defaultSettings[key] as any),
+          ...val,
+        }
+      }
+
+      return val
+    }
+
+    if (typeof dbVal === 'object' && typeof defaultSettings[key] === 'object') {
       return {
         ...(defaultSettings[key] as any),
-        ...val,
+        ...dbVal,
       }
     }
+
+    return dbVal
   } catch {
     return dbVal
   }

@@ -56,7 +56,10 @@ export default function ChatterCard() {
 
       <form
         onSubmit={form.onSubmit((v) => {
-          updateChatters(v)
+          const localV = v as typeof defaultSettings[DBSettings.chatters]
+          // delete the description key from each object
+          Object.keys(localV).forEach((i) => delete localV[i].description)
+          updateChatters(localV)
           form.resetDirty()
         })}
         className="mt-6 space-y-2"
@@ -69,7 +72,7 @@ export default function ChatterCard() {
                   htmlFor={key}
                   className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
                 >
-                  {chatters[key].description}
+                  {defaultSettings[DBSettings.chatters][key].description}
                 </label>
 
                 <div className="flex items-center space-x-3">
