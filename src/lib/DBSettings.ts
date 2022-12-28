@@ -81,7 +81,7 @@ export const defaultSettings = {
   },
   [DBSettings.chatters]: {
     midas: {
-      description: 'If your midas is ready and unused for 30s',
+      description: 'If your midas is ready and unused for 10s',
       enabled: true,
       message: 'massivePIDAS Use your midas',
     },
