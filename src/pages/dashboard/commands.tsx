@@ -141,6 +141,21 @@ export const CommandDetail = {
       />
     ),
   },
+  [DBSettings.commandRanked]: {
+    key: DBSettings.commandRanked,
+    title: 'Ranked or not?',
+    description: 'Chatters can find out if this match is ranked or not.',
+    cmd: '!ranked',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!ranked"
+        response="Yes this game is ranked"
+      />
+    ),
+  },
   [DBSettings.commandOpendota]: {
     key: DBSettings.commandOpendota,
     title: 'Opendota',
