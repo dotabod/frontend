@@ -29,6 +29,7 @@ export enum DBSettings {
   commandSmurfs = 'commandSmurfs',
   customMmr = 'customMmr',
   commandRanked = 'commandRanked',
+  commandAvg = 'commandAvg',
   commandDisable = 'commandDisable',
   commandCommands = 'commandCommands',
   commandDotabuff = 'commandDotabuff',
@@ -69,6 +70,7 @@ export const defaultSettings = {
   [DBSettings.customMmr]:
     '[currentmmr] | [currentrank] | Next rank at [nextmmr] [wins]',
   [DBSettings.commandRanked]: true,
+  [DBSettings.commandAvg]: true,
   [DBSettings.commandDisable]: false,
   [DBSettings.commandCommands]: true,
   [DBSettings.commandOpendota]: true,

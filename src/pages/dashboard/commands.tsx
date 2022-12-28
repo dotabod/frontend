@@ -156,6 +156,22 @@ export const CommandDetail = {
       />
     ),
   },
+  [DBSettings.commandAvg]: {
+    key: DBSettings.commandAvg,
+    title: 'Average MMR',
+    description:
+      'For the current game, show the average MMR of all players. Only works if not immortal.',
+    cmd: '!avg',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!avg"
+        response="3311 · Legend☆2 - Average rank this game"
+      />
+    ),
+  },
   [DBSettings.commandOpendota]: {
     key: DBSettings.commandOpendota,
     title: 'Opendota',
