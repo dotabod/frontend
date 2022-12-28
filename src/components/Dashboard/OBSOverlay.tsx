@@ -1,10 +1,10 @@
-import { Card } from '@/ui/card'
 import { useBaseUrl } from '@/lib/hooks'
+import { Card } from '@/ui/card'
 import { Badge, Collapse, Display } from '@geist-ui/core'
-import { useSession } from 'next-auth/react'
 import { Button, CopyButton, Tabs } from '@mantine/core'
-import Image from 'next/image'
 import clsx from 'clsx'
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -140,6 +140,26 @@ export default function OBSOverlay() {
 
           <Tabs.Panel value="streamlabs" pt="xs">
             <div className="mt-4 space-y-4">
+              <div className="space-x-2">
+                <Badge type="warning" className="!text-xs">
+                  Warning
+                </Badge>
+                <span className="!text-xs">
+                  Streamlabs for Dotabod only supports 1920x1080 canvas size.
+                  Use OBS if you require custom resolutions.
+                </span>
+              </div>
+
+              <Display shadow>
+                <Image
+                  alt="dotabod browser source properties"
+                  width={453}
+                  unoptimized
+                  height={320}
+                  src="/images/streamlabs-warning.png"
+                />
+              </Display>
+
               <p>
                 1. Let&apos;s add the browser source. Under Sources click Add
                 &gt; Browser and press OK.
