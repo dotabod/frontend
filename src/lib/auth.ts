@@ -37,6 +37,7 @@ export const authOptions: NextAuthOptions = {
 
       return session
     },
+    // @ts-ignore
     async jwt({ token, account, user, profile, isNewUser }) {
       // Save a db lookup
       if (token.id) return token
