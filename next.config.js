@@ -12,6 +12,10 @@ const moduleExports = {
     scrollRestoration: true,
   },
 
+  images: {
+    domains: ['cdn.7tv.app', 'cdn.frankerfacez.com', 'cdn.betterttv.net'],
+  },
+
   sentry: {
     // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
     // for client-side builds. (This will be the default starting in

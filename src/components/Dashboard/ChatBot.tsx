@@ -1,8 +1,14 @@
 import { Card } from '@/ui/card'
 import { Collapse, Snippet } from '@geist-ui/core'
+import { List } from '@mantine/core'
+import clsx from 'clsx'
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import TwitchFetcher from 'twitch-fetcher'
 
-const emotes = [
+const emotesRequired = [
   { label: 'BASED' },
   { label: 'Chatting' },
   {
@@ -17,6 +23,26 @@ const emotes = [
 ]
 
 export default function ChatBot() {
+  const session = useSession()
+  const [emotes, setEmotes] = useState([])
+
+  useEffect(() => {
+    if (!session.data.user.twitchId) return
+
+    const emoteFetcher = new TwitchFetcher()
+    emoteFetcher
+      .getEmotesByID(session.data.user.twitchId, {
+        ffz: true,
+        '7tv': true,
+        bttv: true,
+      })
+      .then(setEmotes)
+      .catch((e) => {
+        //
+      })
+  }, [session.data.user.twitchId])
+  console.log(emotes)
+
   return (
     <Card>
       <Collapse
@@ -38,22 +64,47 @@ export default function ChatBot() {
             2. Add the following emotes to your channel using BTTV (case
             sensitive):
           </div>
-          <ul className="ml-8 list-disc">
-            {emotes.map(({ label, url }) => (
-              <li key={label}>
-                <Link
-                  className="text-blue-400 transition-colors hover:text-[#E6E8F1]"
-                  target="_blank"
-                  href={
-                    url ??
-                    `https://betterttv.com/emotes/shared/search?query=${label}`
-                  }
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <List size="xs" className="ml-8 list-disc">
+            {emotesRequired
+              .sort((a, b) => {
+                // if its found in emotes, put it at the bottom
+                if (emotes.find((e) => e.code === a.label)) return 1
+                if (emotes.find((e) => e.code === b.label)) return -1
+                return 0
+              })
+              .map(({ label, url }) => {
+                const thisEmote = emotes.find((e) => e.code === label)
+                return (
+                  <List.Item key={label}>
+                    <div className="flex items-center space-x-2 space-y-2">
+                      {thisEmote && (
+                        <Image
+                          height={22}
+                          width={22}
+                          src={thisEmote.cdn.low}
+                          alt={thisEmote.code}
+                        />
+                      )}
+                      <Link
+                        className={clsx(
+                          ' transition-colors hover:text-[#E6E8F1]',
+                          thisEmote
+                            ? 'text-dark-300 line-through'
+                            : 'text-blue-400'
+                        )}
+                        target="_blank"
+                        href={
+                          url ??
+                          `https://betterttv.com/emotes/shared/search?query=${label}`
+                        }
+                      >
+                        {label}
+                      </Link>
+                    </div>
+                  </List.Item>
+                )
+              })}
+          </List>
         </div>
       </Collapse>
     </Card>

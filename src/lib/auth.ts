@@ -28,6 +28,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
+        session.user.twitchId = token.twitchId
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email
@@ -55,6 +56,22 @@ export const authOptions: NextAuthOptions = {
         // @ts-ignore from twitch?
         image: profile?.picture || user.image,
       }
+
+      console.log('Fetching twitch id')
+      const provider = await prisma.user.findFirst({
+        where: {
+          email: newUser.email,
+        },
+        select: {
+          Account: {
+            select: {
+              providerAccountId: true,
+            },
+          },
+        },
+      })
+
+      const twitchId = Number(provider.Account.providerAccountId)
 
       // Refresh jwt account with potentially new scopes
       if (account) {
@@ -95,6 +112,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       return {
+        twitchId: twitchId,
         id: user.id,
         name: newUser.displayName || newUser.name,
         email: newUser.email,

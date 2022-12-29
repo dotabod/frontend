@@ -159,12 +159,12 @@ export default function MmrTrackerCard() {
 
       {accounts.length === 0 && (
         <div className="mt-6">
-          <p className="mb-4">
+          <div className="mb-4">
             <Badge>INFO</Badge>
             <span>
               Play a bot game for Dotabod to detect your Steam account!
             </span>
-          </p>
+          </div>
           <label
             htmlFor="mmr"
             className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "

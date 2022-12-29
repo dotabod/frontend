@@ -1,18 +1,18 @@
 import 'next-auth/jwt'
 import { User } from 'next-auth'
 
-type UserId = string
-
 declare module 'next-auth/jwt' {
   interface JWT {
-    id: UserId
+    id: string
+    twitchId: string
   }
 }
 
 declare module 'next-auth' {
   interface Session {
     user: User & {
-      id: UserId
+      id: string
+      twitchId: string
     }
   }
 }
