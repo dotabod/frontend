@@ -13,7 +13,7 @@ const WinLossCard = ({ wl, ...props }: WLType) => (
           <span>{lose || 0}</span>
           <span className="text-red-300">L</span>
         </span>
-        {wl.length > 1 && <span className="text-xs">{type}</span>}
+        {wl.length > 1 && <span className="text-sm">{type}</span>}
       </div>
     ))}
   </Card>
