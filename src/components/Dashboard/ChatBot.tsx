@@ -9,6 +9,10 @@ import { useEffect, useState } from 'react'
 import TwitchFetcher from 'twitch-fetcher'
 
 const emotesRequired = [
+  { label: 'Madge' },
+  { label: 'POGGIES' },
+  { label: 'PepeLaugh' },
+  { label: 'ICANT' },
   { label: 'BASED' },
   { label: 'Chatting' },
   {
