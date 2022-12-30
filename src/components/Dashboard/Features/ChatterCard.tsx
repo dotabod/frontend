@@ -57,8 +57,10 @@ export default function ChatterCard() {
       <form
         onSubmit={form.onSubmit((v) => {
           const localV = v as typeof defaultSettings[DBSettings.chatters]
-          // delete the description key from each object
-          Object.keys(localV).forEach((i) => delete localV[i].description)
+          Object.keys(localV).forEach((i) => {
+            delete localV[i].description
+            delete localV[i].message
+          })
           updateChatters(localV)
           form.resetDirty()
         })}
@@ -77,21 +79,17 @@ export default function ChatterCard() {
 
                 <div className="flex items-center space-x-3">
                   <Switch
-                    size="lg"
+                    size="sm"
                     color="blue"
                     disabled={!isEnabled}
                     {...form.getInputProps(`${key}.enabled`, {
                       type: 'checkbox',
                     })}
                   />
-                  <Input
-                    id={key}
-                    maxLength={500}
-                    placeholder={chatters[key].message}
-                    className="w-full"
-                    disabled={!form.values[key].enabled || !isEnabled}
-                    {...form.getInputProps(`${key}.message`)}
-                  />
+
+                  <span>
+                    {defaultSettings[DBSettings.chatters][key].message}
+                  </span>
                 </div>
               </div>
             )

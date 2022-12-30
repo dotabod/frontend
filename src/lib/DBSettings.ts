@@ -95,12 +95,12 @@ export const defaultSettings = {
     smoke: {
       description: 'Whenever your hero has smoke debuff',
       enabled: true,
-      message: 'Shush [heroname] is smoked!',
+      message: 'Shush Clockwerk is smoked!',
     },
     passiveDeath: {
       description: 'Whenever you die with passive stick / faerie / etc',
       enabled: true,
-      message: '[heroname] died with passive [itemnames] ICANT',
+      message: 'Clockwerk died with passive faerie fire ICANT',
     },
   },
 }
