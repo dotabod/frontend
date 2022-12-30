@@ -121,9 +121,9 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/21d275f5-b27d-4cf2-805e-94006c08c25c-profile_image-150x150.png',
   },
   {
-    name: 'Draskyl',
+    name: 'TpaBoMaH',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/509c81ae-7dad-4764-b0f3-e810c3f0bafc-profile_image-150x150.png',
   },
   {
     name: 'febbydoto',
@@ -131,14 +131,14 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
   },
   {
-    name: 'SequinoxTV',
+    name: 'Henry',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/12c011d3-a153-4a92-989e-e7dce4d0f084-profile_image-150x150.png',
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/b01082d9-6ba0-4927-ba82-62f60f95931e-profile_image-150x150.png',
   },
   {
-    name: 'YuHengTV',
+    name: 'Draskyl',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/63ecfd96-a140-449e-a301-593874c98229-profile_image-150x150.png',
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
   },
   {
     link: false,
