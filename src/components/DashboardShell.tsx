@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, forwardRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {
   Bars3Icon,
@@ -14,9 +14,49 @@ import Image from 'next/image'
 import { UserAccountNav } from '@/components/user-account-nav'
 import { Github } from 'lucide-react'
 import DiscordSvg from '@/images/logos/discord.svg'
-import { Switch } from '@mantine/core'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { Group, Text, Select, Switch } from '@mantine/core'
+import { useUpdateLocale, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings } from '@/lib/DBSettings'
+
+const localeOptions = [
+  {
+    flag: '🇺🇸',
+    label: 'English',
+    value: 'en',
+  },
+
+  {
+    flag: '🇮🇹',
+    label: 'Italian',
+    value: 'it',
+  },
+  {
+    flag: '🇷🇺',
+    label: 'Russian',
+    value: 'ru',
+  },
+]
+
+interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
+  flag: string
+  label: string
+}
+
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
+  ({ flag, label, ...others }: ItemProps, ref) => (
+    <div ref={ref} {...others}>
+      <Group noWrap>
+        <Text size="sm">{flag}</Text>
+
+        <div>
+          <Text size="sm">{label}</Text>
+        </div>
+      </Group>
+    </div>
+  )
+)
+
+SelectItem.displayName = 'SelectItem'
 
 export const navigation = [
   {
@@ -66,6 +106,12 @@ export default function DashboardShell({ children, title, subtitle }) {
   const { isEnabled, loading, updateSetting } = useUpdateSetting(
     DBSettings.commandDisable
   )
+
+  const {
+    data,
+    loading: loadingLocale,
+    update: updateLocale,
+  } = useUpdateLocale()
 
   return (
     <>
@@ -285,7 +331,30 @@ export default function DashboardShell({ children, title, subtitle }) {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          <div className="sticky top-0 z-10 hidden h-full w-full flex-shrink-0 justify-end bg-dark-800  px-6 py-2 md:flex md:px-8">
+          <div className="sticky top-0 z-10 hidden h-full w-full flex-shrink-0 items-center justify-between bg-dark-800 px-4 py-2  md:flex md:px-8 md:pr-12 md:pl-72">
+            {!loadingLocale && (
+              <Select
+                placeholder="Language selector"
+                itemComponent={SelectItem}
+                data={localeOptions}
+                maxDropdownHeight={400}
+                defaultValue={data?.locale}
+                onChange={updateLocale}
+                filter={(value, item) =>
+                  item.label.toLowerCase().includes(value.toLowerCase().trim())
+                }
+              />
+            )}
+            {loadingLocale && (
+              <Select
+                placeholder="Language selector"
+                itemComponent={SelectItem}
+                data={localeOptions}
+                maxDropdownHeight={400}
+                disabled
+              />
+            )}
+
             <UserAccountNav dark />
           </div>
           <main className="w-full bg-dark-700 px-4 md:pr-12 md:pl-72">

@@ -8,3 +8,7 @@ export const settingPatchSchema = z.object({
 export const mmrPatchSchema = z.object({
   value: z.number().min(0).max(20000),
 })
+
+export const localePatchSchema = z.object({
+  value: z.enum(['en', 'ru', 'it']),
+})

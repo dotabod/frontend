@@ -28,6 +28,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
+        session.user.locale = token.locale
         session.user.twitchId = token.twitchId
         session.user.id = token.id
         session.user.name = token.name
@@ -69,6 +70,7 @@ export const authOptions: NextAuthOptions = {
               providerAccountId: true,
             },
           },
+          locale: true,
         },
       })
 
@@ -113,6 +115,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       return {
+        locale: provider.locale,
         twitchId: twitchId,
         id: user.id,
         name: newUser.displayName || newUser.name,

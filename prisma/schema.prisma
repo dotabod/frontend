@@ -44,6 +44,7 @@ model User {
   stream_online     Boolean        @default(false)
   stream_start_date DateTime?      @db.Timestamp(6)
   beta_tester       Boolean        @default(false)
+  locale            String         @default("en")
   Account           Account?
   Bet               Bet[]
   settings          Setting[]

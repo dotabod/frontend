@@ -37,6 +37,39 @@ export function useUpdateAccount() {
   return { data, loading, update }
 }
 
+export function useUpdateLocale() {
+  const { data } = useSWR(`/api/settings/locale`, fetcher)
+
+  const loading = data === undefined
+
+  const { setToast } = useToasts()
+  const { mutate } = useSWRConfig()
+
+  const update = (locale: string) => {
+    const options = {
+      optimisticData: { value: locale },
+      rollbackOnError: true,
+    }
+
+    const updateFn = async (locale) => {
+      const response = await fetch(`/api/settings/locale`, {
+        method: 'PATCH',
+        body: JSON.stringify({ value: locale }),
+      })
+      setToast({
+        text: response.ok ? `Updated locale!` : 'Error updating',
+        type: response.ok ? 'success' : 'error',
+      })
+
+      return { locale }
+    }
+
+    mutate(`/api/settings/locale`, updateFn(locale), options)
+  }
+
+  return { data, loading, update }
+}
+
 export function useUpdateSetting(key) {
   const { data } = useSWR(`/api/settings`, fetcher)
   const { setToast } = useToasts()

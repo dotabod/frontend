@@ -7,6 +7,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: UserId
     twitchId: UserId
+    locale: UserId
   }
 }
 
@@ -15,6 +16,7 @@ declare module 'next-auth' {
     user: User & {
       id: UserId
       twitchId: UserId
+      locale: UserId
     }
   }
 }
