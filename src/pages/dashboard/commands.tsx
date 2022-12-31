@@ -427,6 +427,21 @@ export const CommandDetail = {
       />
     ),
   },
+  lgs: {
+    title: 'Last game score',
+    description:
+      'Quickly see whether or not you won last game, duration, how long ago',
+    cmd: '!lgs',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!lgs blue"
+        response="Last game: won · 47m long · Ended 4m ago · dotabuff.com/matches/6945205"
+      />
+    ),
+  },
   profile: {
     title: 'Profile',
     description:
