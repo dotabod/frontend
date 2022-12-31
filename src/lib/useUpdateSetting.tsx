@@ -1,121 +1,72 @@
-import { useToasts } from '@geist-ui/core'
-import { SteamAccount } from '@prisma/client'
 import useSWR, { useSWRConfig } from 'swr'
 import { DBSettings, getValueOrDefault } from './DBSettings'
 import { fetcher } from './fetcher'
+import { showNotification } from '@mantine/notifications'
 
-export function useUpdateAccount() {
-  const { data } = useSWR(`/api/settings/accounts`, fetcher)
-
-  const loading = data === undefined
-
-  const { setToast } = useToasts()
+const useUpdate = (key, path, dataTransform = (data) => data) => {
+  const { data } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
 
-  const update = (accounts: SteamAccount[]) => {
+  const loading = data === undefined
+  let value = getValueOrDefault(data?.settings, key)
+  if (key === DBSettings.mmr) value = data?.mmr || 0
+
+  const updateSetting = (newValue) => {
     const options = {
-      optimisticData: { accounts },
+      optimisticData: dataTransform({ ...data, value: newValue }),
       rollbackOnError: true,
     }
 
-    const updateFn = async (accounts) => {
-      const response = await fetch(`/api/settings/accounts`, {
+    let isNow = newValue
+    if (newValue === true) isNow = 'enabled'
+    if (newValue === false) isNow = 'disabled'
+
+    const updateFn = async (data) => {
+      const response = await fetch(`${path}${key ? `/${key}` : ''}`, {
         method: 'PATCH',
-        body: JSON.stringify(accounts),
+        body: JSON.stringify({ value: newValue }),
       })
-      setToast({
-        text: response.ok ? `Updated accounts!` : 'Error updating',
-        type: response.ok ? 'success' : 'error',
-      })
-
-      return { accounts }
-    }
-
-    mutate(`/api/settings/accounts`, updateFn(accounts), options)
-  }
-
-  return { data, loading, update }
-}
-
-export function useUpdateLocale() {
-  const { data } = useSWR(`/api/settings/locale`, fetcher)
-
-  const loading = data === undefined
-
-  const { setToast } = useToasts()
-  const { mutate } = useSWRConfig()
-
-  const update = (locale: string) => {
-    const options = {
-      optimisticData: { value: locale },
-      rollbackOnError: true,
-    }
-
-    const updateFn = async (locale) => {
-      const response = await fetch(`/api/settings/locale`, {
-        method: 'PATCH',
-        body: JSON.stringify({ value: locale }),
-      })
-      setToast({
-        text: response.ok ? `Updated locale!` : 'Error updating',
-        type: response.ok ? 'success' : 'error',
-      })
-
-      return { locale }
-    }
-
-    mutate(`/api/settings/locale`, updateFn(locale), options)
-  }
-
-  return { data, loading, update }
-}
-
-export function useUpdateSetting(key) {
-  const { data } = useSWR(`/api/settings`, fetcher)
-  const { setToast } = useToasts()
-  const { mutate } = useSWRConfig()
-
-  if (!key) return {}
-
-  const loading = data === undefined
-  let isEnabled = getValueOrDefault(data?.settings, key)
-  if (key === DBSettings.mmr) isEnabled = data?.mmr || 0
-
-  const updateSetting = (value) => {
-    const setting = { ...data, value }
-    const options = {
-      optimisticData: setting,
-      rollbackOnError: true,
-    }
-
-    let isNow = setting.value
-    if (setting.value === true) isNow = 'enabled'
-    if (setting.value === false) isNow = 'disabled'
-
-    const updateFn = async (setting) => {
-      const response = await fetch(`/api/settings/${key}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ value: setting.value }),
-      })
-      setToast({
-        text: response.ok
+      showNotification({
+        title: response.ok ? 'Success' : 'Error',
+        message: response.ok
           ? `Updated! Setting is now ${
               ['string', 'number'].includes(typeof isNow) ? isNow : 'updated'
             }`
-          : 'Error updating',
-        type: response.ok ? 'success' : 'error',
+          : 'Could not save your settings',
+        color: response.ok ? 'green' : 'red',
       })
 
-      const newData =
-        (Array.isArray(data?.settings) &&
-          data?.settings.filter((k) => k !== key)) ||
-        []
-      newData.push(setting)
-      return newData
+      return dataTransform(data)
     }
 
-    mutate(`/api/settings`, updateFn(setting), options)
+    mutate(path, updateFn(data), options)
   }
 
-  return { isEnabled, loading, updateSetting }
+  console.log(data)
+
+  return { data: key ? value : data, loading, updateSetting }
+}
+
+export function useUpdateAccount() {
+  const { data, loading, updateSetting } = useUpdate(
+    undefined,
+    '/api/settings/accounts',
+    (data) => ({ accounts: data })
+  )
+
+  return { data, loading, update: updateSetting }
+}
+
+export function useUpdateLocale() {
+  const { data, loading, updateSetting } = useUpdate(
+    undefined,
+    '/api/settings/locale',
+    (data) => ({ value: data })
+  )
+
+  return { data, loading, update: updateSetting }
+}
+
+export function useUpdateSetting(key) {
+  return useUpdate(key, '/api/settings', (data) => data.settings)
 }

@@ -5,9 +5,11 @@ import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { DBSettings } from '@/lib/DBSettings'
 
 export default function PicksCard() {
-  const { isEnabled, loading, updateSetting } = useUpdateSetting(
-    DBSettings.onlyBlockRanked
-  )
+  const {
+    data: isEnabled,
+    loading,
+    updateSetting,
+  } = useUpdateSetting(DBSettings.onlyBlockRanked)
 
   return (
     <Card>

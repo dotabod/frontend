@@ -8,22 +8,22 @@ import { Input } from '../../Input'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
-    isEnabled,
+    data: isEnabled,
     loading: l0,
     updateSetting,
   } = useUpdateSetting(DBSettings.obs)
   const {
-    isEnabled: obsDc,
+    data: obsDc,
     loading: l1,
     updateSetting: updateDc,
   } = useUpdateSetting(DBSettings.obsDc)
   const {
-    isEnabled: obsMini,
+    data: obsMini,
     loading: l2,
     updateSetting: updateMini,
   } = useUpdateSetting(DBSettings.obsMinimap)
   const {
-    isEnabled: obsPick,
+    data: obsPick,
     loading: l3,
     updateSetting: updatePicks,
   } = useUpdateSetting(DBSettings.obsPicks)

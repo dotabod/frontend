@@ -8,6 +8,7 @@ import type { AppProps } from 'next/app'
 import type { Session } from 'next-auth'
 import { GeistProvider, Themes } from '@geist-ui/core'
 import { MantineProvider } from '@mantine/core'
+import { NotificationsProvider } from '@mantine/notifications'
 
 const myTheme1 = Themes.createFromDark({
   type: 'coolTheme',
@@ -57,10 +58,12 @@ export default function App({
           },
         }}
       >
-        <GeistProvider themes={[myTheme1]} themeType="coolTheme">
-          <Component {...pageProps} />
-          <Analytics />
-        </GeistProvider>
+        <NotificationsProvider position="top-center">
+          <GeistProvider themes={[myTheme1]} themeType="coolTheme">
+            <Component {...pageProps} />
+            <Analytics />
+          </GeistProvider>
+        </NotificationsProvider>
       </MantineProvider>
     </SessionProvider>
   )

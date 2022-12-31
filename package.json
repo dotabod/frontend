@@ -18,6 +18,7 @@
     "@mantine/core": "^5.9.0",
     "@mantine/form": "^5.9.0",
     "@mantine/hooks": "^5.9.0",
+    "@mantine/notifications": "^5.9.5",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.7.1",
     "@radix-ui/react-avatar": "^1.0.1",

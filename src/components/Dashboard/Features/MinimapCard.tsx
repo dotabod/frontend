@@ -6,27 +6,27 @@ import { Checkbox, Switch } from '@mantine/core'
 
 export default function MinimapCard(): JSX.Element {
   const {
-    isEnabled,
+    data: isEnabled,
     loading: l0,
     updateSetting,
   } = useUpdateSetting(DBSettings.mblock)
   const {
-    isEnabled: minimapSimple,
+    data: minimapSimple,
     loading: l1,
     updateSetting: updateSimple,
   } = useUpdateSetting(DBSettings.simple)
   const {
-    isEnabled: minimapXl,
+    data: minimapXl,
     loading: l2,
     updateSetting: updateXl,
   } = useUpdateSetting(DBSettings.xl)
   const {
-    isEnabled: isBP,
+    data: isBP,
     loading: l3,
     updateSetting: updateBP,
   } = useUpdateSetting(DBSettings.bp)
   const {
-    isEnabled: isMinimapRight,
+    data: isMinimapRight,
     loading: l4,
     updateSetting: updateMinimapRight,
   } = useUpdateSetting(DBSettings.minimapRight)

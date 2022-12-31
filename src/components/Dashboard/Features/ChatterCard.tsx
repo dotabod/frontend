@@ -1,4 +1,3 @@
-import { Input } from '@/components/Input'
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
@@ -7,11 +6,13 @@ import { useForm } from '@mantine/form'
 import { useEffect } from 'react'
 
 export default function ChatterCard() {
-  const { isEnabled, loading, updateSetting } = useUpdateSetting(
-    DBSettings.chatter
-  )
   const {
-    isEnabled: dbChatters,
+    data: isEnabled,
+    loading,
+    updateSetting,
+  } = useUpdateSetting(DBSettings.chatter)
+  const {
+    data: dbChatters,
     loading: loadingChatters,
     updateSetting: updateChatters,
   } = useUpdateSetting(DBSettings.chatters)

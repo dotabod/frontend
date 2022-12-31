@@ -24,12 +24,12 @@ export default function MmrTrackerCard() {
   }, [loadingAccounts])
 
   const {
-    isEnabled,
+    data: isEnabled,
     loading: l0,
     updateSetting,
   } = useUpdateSetting(DBSettings.mmrTracker)
   const {
-    isEnabled: mmr,
+    data: mmr,
     updateSetting: updateMmr,
     loading: l1,
   } = useUpdateSetting(DBSettings.mmr)

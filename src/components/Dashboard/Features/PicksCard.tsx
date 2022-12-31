@@ -5,9 +5,11 @@ import { Display, Image } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
 
 export default function PicksCard() {
-  const { isEnabled, loading, updateSetting } = useUpdateSetting(
-    DBSettings.pblock
-  )
+  const {
+    data: isEnabled,
+    loading,
+    updateSetting,
+  } = useUpdateSetting(DBSettings.pblock)
 
   return (
     <Card>

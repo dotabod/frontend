@@ -9,11 +9,13 @@ import { useEffect } from 'react'
 import { Input } from '../../Input'
 
 export default function BetsCard() {
-  const { isEnabled, loading, updateSetting } = useUpdateSetting(
-    DBSettings.bets
-  )
   const {
-    isEnabled: info,
+    data: isEnabled,
+    loading,
+    updateSetting,
+  } = useUpdateSetting(DBSettings.bets)
+  const {
+    data: info,
     loading: loadingInfo,
     updateSetting: updateInfo,
   } = useUpdateSetting(DBSettings.betsInfo)

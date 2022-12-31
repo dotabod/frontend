@@ -103,9 +103,11 @@ export function classNames(...classes) {
 export default function DashboardShell({ children, title, subtitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const { isEnabled, loading, updateSetting } = useUpdateSetting(
-    DBSettings.commandDisable
-  )
+  const {
+    data: isEnabled,
+    loading,
+    updateSetting,
+  } = useUpdateSetting(DBSettings.commandDisable)
 
   const {
     data,

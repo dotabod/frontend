@@ -7,13 +7,13 @@ import Image from 'next/image'
 
 export default function RoshCard() {
   const {
-    isEnabled: hasAegis,
+    data: hasAegis,
     loading: lA,
     updateSetting: uA,
   } = useUpdateSetting(DBSettings.aegis)
 
   const {
-    isEnabled: hasRosh,
+    data: hasRosh,
     loading: lR,
     updateSetting: uR,
   } = useUpdateSetting(DBSettings.rosh)

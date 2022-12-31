@@ -12,10 +12,14 @@ export default function CommandsCard({
 }: {
   command: typeof CommandDetail.commandAPM
 }): JSX.Element {
-  const { isEnabled, loading, updateSetting } = useUpdateSetting(command.key)
+  const {
+    data: isEnabled,
+    loading,
+    updateSetting,
+  } = useUpdateSetting(command.key)
 
   const {
-    isEnabled: customMmr,
+    data: customMmr,
     loading: loadingCustomMmr,
     updateSetting: updateCustomMmr,
   } = useUpdateSetting(DBSettings.customMmr)
