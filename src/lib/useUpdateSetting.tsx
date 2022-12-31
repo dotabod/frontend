@@ -42,8 +42,6 @@ const useUpdate = (key, path, dataTransform = (data) => data) => {
     mutate(path, updateFn(data), options)
   }
 
-  console.log(data)
-
   return { data: key ? value : data, loading, updateSetting }
 }
 
