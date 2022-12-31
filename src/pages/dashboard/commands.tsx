@@ -387,22 +387,6 @@ export const CommandDetail = {
       />
     ),
   },
-
-  [DBSettings.commandHero]: {
-    key: DBSettings.commandHero,
-    title: 'Hero',
-    description: 'Shows the stats for your currently played hero.',
-    cmd: '!hero',
-    alias: [],
-    allowed: 'all',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        command="!hero"
-        response="Winrate: 90% as Clockwerk in 30d of 12 matches."
-      />
-    ),
-  },
   ping: {
     title: 'Ping',
     description: '',
@@ -459,7 +443,7 @@ export const CommandDetail = {
         <TwitchChat
           {...props}
           command="!profile ?"
-          response="Invalid hero color. Must be one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown"
+          response="Invalid hero color. Must be 1-10 or one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown"
         />
       </>
     ),
