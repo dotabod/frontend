@@ -215,31 +215,42 @@ export function Hero() {
             role="list"
             className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
           >
-            {featuredUsers?.map(({ name, image, link }) => (
-              <li key={name} className="">
-                <a
-                  className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
-                  rel="noreferrer"
-                  href={link !== false ? `https://twitch.tv/${name}` : '#'}
-                  target="_blank"
-                  onClick={(e) => {
-                    if (link === false) {
-                      e.preventDefault()
+            {featuredUsers?.map(({ name, image, link }) => {
+              const isLast = name === 'You?'
+              return (
+                <li key={name} className="">
+                  <a
+                    className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
+                    rel="noreferrer"
+                    href={
+                      link !== false
+                        ? `https://twitch.tv/${
+                            isLast ? session?.data?.user?.name || name : name
+                          }`
+                        : '#'
                     }
-                  }}
-                >
-                  <Image
-                    src={image}
-                    width={50}
-                    height={50}
-                    alt={name}
-                    unoptimized
-                    className="rounded-lg shadow-lg"
-                  />
-                  <span className="text-xs text-gray-500">{name}</span>
-                </a>
-              </li>
-            ))}
+                    target="_blank"
+                    onClick={(e) => {
+                      if (link === false) {
+                        e.preventDefault()
+                      }
+                    }}
+                  >
+                    <Image
+                      src={isLast ? session?.data?.user?.image || image : image}
+                      width={50}
+                      height={50}
+                      alt={isLast ? session?.data?.user?.name || name : name}
+                      unoptimized
+                      className="rounded-lg shadow-lg"
+                    />
+                    <span className="text-xs text-gray-500">
+                      {isLast ? session?.data?.user?.name || name : name}
+                    </span>
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </Container>
