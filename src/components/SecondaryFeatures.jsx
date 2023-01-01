@@ -185,15 +185,6 @@ export function SecondaryFeatures() {
         'Tired of copy pasting three clock times? Dotabod knows when rosh is killed or when the aegis is picked up. A timer will display for your viewers to see!',
     },
     {
-      name: 'Hero command',
-      description: (
-        <React.Fragment>
-          {CommandDetail[DBSettings.commandHero].description}
-          {CommandDetail[DBSettings.commandHero].response()}
-        </React.Fragment>
-      ),
-    },
-    {
       name: 'XPM command',
       description: (
         <React.Fragment>
