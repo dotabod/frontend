@@ -3,17 +3,15 @@ import { DBSettings, getValueOrDefault } from './DBSettings'
 import { fetcher } from './fetcher'
 import { showNotification } from '@mantine/notifications'
 
-const useUpdate = (key, path, dataTransform = (data) => data) => {
+const useUpdate = (path, dataTransform = (data, newValue) => newValue) => {
   const { data } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
 
   const loading = data === undefined
-  let value = getValueOrDefault(data?.settings, key)
-  if (key === DBSettings.mmr) value = data?.mmr || 0
 
-  const updateSetting = (newValue) => {
+  const updateSetting = (newValue, customPath = '') => {
     const options = {
-      optimisticData: dataTransform({ ...data, value: newValue }),
+      optimisticData: dataTransform(data, newValue),
       rollbackOnError: true,
     }
 
@@ -22,9 +20,9 @@ const useUpdate = (key, path, dataTransform = (data) => data) => {
     if (newValue === false) isNow = 'disabled'
 
     const updateFn = async (data) => {
-      const response = await fetch(`${path}${key ? `/${key}` : ''}`, {
+      const response = await fetch(customPath || path, {
         method: 'PATCH',
-        body: JSON.stringify({ value: newValue }),
+        body: JSON.stringify(newValue),
       })
       showNotification({
         title: response.ok ? 'Success' : 'Error',
@@ -36,35 +34,50 @@ const useUpdate = (key, path, dataTransform = (data) => data) => {
         color: response.ok ? 'green' : 'red',
       })
 
-      return dataTransform(data)
+      return dataTransform(data, newValue)
     }
 
     mutate(path, updateFn(data), options)
   }
 
-  return { data: key ? value : data, loading, updateSetting }
+  return { data, loading, updateSetting }
 }
 
 export function useUpdateAccount() {
   const { data, loading, updateSetting } = useUpdate(
-    undefined,
     '/api/settings/accounts',
-    (data) => ({ accounts: data })
+    (data, newValue) => ({ accounts: newValue ?? data })
   )
+
+  console.log(data)
 
   return { data, loading, update: updateSetting }
 }
 
 export function useUpdateLocale() {
   const { data, loading, updateSetting } = useUpdate(
-    undefined,
     '/api/settings/locale',
-    (data) => ({ value: data })
+    (data, newValue) => ({ value: newValue ?? data })
   )
 
   return { data, loading, update: updateSetting }
 }
 
 export function useUpdateSetting(key) {
-  return useUpdate(key, '/api/settings', (data) => data.settings)
+  const {
+    data,
+    loading,
+    updateSetting: update,
+  } = useUpdate(`/api/settings`, (data, newValue) => ({
+    value: newValue ?? data,
+  }))
+
+  let value = getValueOrDefault(data?.settings, key)
+  if (key === DBSettings.mmr) value = data?.mmr || 0
+
+  const updateSetting = (newValue) => {
+    update({ value: newValue }, `/api/settings/${key}`)
+  }
+
+  return { data: value, loading, updateSetting }
 }

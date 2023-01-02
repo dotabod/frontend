@@ -66,7 +66,6 @@ export default function CommandsCard({
               {!loading && command.key && (
                 <Switch
                   size="lg"
-                  className="flex rounded-full border border-transparent transition-colors hover:border hover:border-blue-500"
                   color="blue"
                   defaultChecked={isEnabled}
                   onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}

@@ -57,7 +57,7 @@ export default function MmrTrackerCard() {
         Give or take 30 MMR after every ranked match.
       </div>
       <div>A list of accounts will show below as you play on them.</div>
-      {accounts?.length ? (
+      {accounts?.length !== 0 ? (
         <form
           onSubmit={form.onSubmit((values) => {
             update(

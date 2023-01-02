@@ -17,6 +17,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).end()
   }
 
+  if (req.method === 'GET') {
+    const setting = await prisma.setting.findFirst({
+      where: {
+        userId: session?.user?.id,
+        key: settingKey,
+      },
+    })
+
+    return setting
+  }
+
   if (req.method === 'PATCH') {
     try {
       if (settingKey === DBSettings.mmr) {
