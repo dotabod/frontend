@@ -45,7 +45,6 @@ export default function ChatBot() {
         //
       })
   }, [session.data.user.twitchId])
-  console.log(emotes)
 
   return (
     <Card>
