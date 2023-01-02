@@ -59,7 +59,6 @@ export const authOptions: NextAuthOptions = {
         image: profile?.picture || user.image,
       }
 
-      console.log('Fetching twitch id')
       const provider = await prisma.user.findFirst({
         where: {
           id: token.id || user.id || profile.sub,
