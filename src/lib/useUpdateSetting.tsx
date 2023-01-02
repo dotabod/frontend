@@ -49,8 +49,6 @@ export function useUpdateAccount() {
     (data, newValue) => ({ accounts: newValue ?? data })
   )
 
-  console.log(data)
-
   return { data, loading, update: updateSetting }
 }
 
