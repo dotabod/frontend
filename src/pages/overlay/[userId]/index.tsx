@@ -142,7 +142,7 @@ export default function OverlayPage() {
   // Replace defaults with settings from DB
   Object.values(DBSettings).forEach((key) => {
     // @ts-ignore ???
-    opts[key] = getValueOrDefault(data?.settings, key)
+    opts[key] = getValueOrDefault(key, data?.settings)
   })
 
   const shouldBlockMap =

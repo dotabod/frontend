@@ -83,7 +83,10 @@ Object.keys(defaultSettings).forEach((key) => {
   DBSettings[key as SettingKeys] = key as SettingKeys
 })
 
-export const getValueOrDefault = (data: any, key: SettingKeys) => {
+export const getValueOrDefault = (
+  key: SettingKeys,
+  data?: { key: string; value: any }[]
+) => {
   if (!Array.isArray(data) || !data.length || !data.filter(Boolean).length) {
     return defaultSettings[key]
   }

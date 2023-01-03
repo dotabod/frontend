@@ -70,7 +70,7 @@ export function useUpdateSetting(key: SettingKeys) {
     value: newValue ?? data,
   }))
 
-  let value = getValueOrDefault(data?.settings, key)
+  let value = getValueOrDefault(key, data?.settings)
   if (key === DBSettings.mmr) value = data?.mmr || 0
 
   const updateSetting = (newValue) => {
