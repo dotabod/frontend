@@ -35,6 +35,21 @@ const localeOptions = [
     label: 'Russian',
     value: 'ru',
   },
+  {
+    flag: '🇪🇸',
+    label: 'Spanish',
+    value: 'es',
+  },
+  {
+    flag: '🇧🇷',
+    label: 'Portuguese (Brazil)',
+    value: 'pt-BR',
+  },
+  {
+    flag: '🇵🇹',
+    label: 'Portuguese (Portugal)',
+    value: 'pt',
+  },
 ]
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {

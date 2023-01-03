@@ -9,7 +9,7 @@ export default function PicksCard() {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings.pblock)
+  } = useUpdateSetting(DBSettings['picks-blocker'])
 
   return (
     <Card>

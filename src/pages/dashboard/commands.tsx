@@ -238,8 +238,8 @@ export const CommandDetail = {
       </>
     ),
   },
-  [DBSettings.mmrTracker]: {
-    key: DBSettings.mmrTracker,
+  [DBSettings['mmr-tracker']]: {
+    key: DBSettings['mmr-tracker'],
     title: 'MMR',
     description:
       'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',

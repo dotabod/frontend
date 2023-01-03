@@ -192,7 +192,7 @@ export default function ChatterCard() {
     updateSetting: updateChatters,
   } = useUpdateSetting(DBSettings.chatters)
 
-  const chatters = dbChatters as typeof defaultSettings[DBSettings.chatters]
+  const chatters = dbChatters as typeof defaultSettings.chatters | undefined
   const form = useForm({ initialValues: chatters })
 
   useEffect(() => {
@@ -202,7 +202,7 @@ export default function ChatterCard() {
     }
   }, [loadingChatters])
 
-  const handleSubmit = (v: typeof defaultSettings[DBSettings.chatters]) => {
+  const handleSubmit = (v: typeof defaultSettings.chatters) => {
     Object.keys(v).forEach((i) => {
       delete v[i].description
       delete v[i].message
@@ -241,7 +241,7 @@ export default function ChatterCard() {
 
       <form className="mt-6 space-y-2">
         <div className="space-y-6">
-          {Object.keys(chatters).map((key) => {
+          {(Object.keys(chatters || {}) || []).map((key) => {
             return (
               <div key={key}>
                 <Tooltip

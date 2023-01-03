@@ -9,4 +9,4 @@ export const mmrPatchSchema = z.object({
   value: z.number().min(0).max(20000),
 })
 
-export const localePatchSchema = z.enum(['en', 'ru', 'it'])
+export const localePatchSchema = z.enum(['en', 'es', 'it', 'pt', 'pt-BR', 'ru'])

@@ -9,22 +9,22 @@ export default function MinimapCard(): JSX.Element {
     data: isEnabled,
     loading: l0,
     updateSetting,
-  } = useUpdateSetting(DBSettings.mblock)
+  } = useUpdateSetting(DBSettings['minimap-blocker'])
   const {
     data: minimapSimple,
     loading: l1,
     updateSetting: updateSimple,
-  } = useUpdateSetting(DBSettings.simple)
+  } = useUpdateSetting(DBSettings['minimap-simple'])
   const {
     data: minimapXl,
     loading: l2,
     updateSetting: updateXl,
-  } = useUpdateSetting(DBSettings.xl)
+  } = useUpdateSetting(DBSettings['minimap-xl'])
   const {
     data: isBP,
     loading: l3,
     updateSetting: updateBP,
-  } = useUpdateSetting(DBSettings.bp)
+  } = useUpdateSetting(DBSettings.battlepass)
   const {
     data: isMinimapRight,
     loading: l4,
@@ -76,7 +76,7 @@ export default function MinimapCard(): JSX.Element {
             label="Use simple minimap background"
             disabled={!isEnabled}
             checked={minimapSimple}
-            value={DBSettings.simple}
+            value={DBSettings['minimap-simple']}
             onChange={(e) => updateSimple(!!e?.target?.checked)}
           />
 
@@ -84,7 +84,7 @@ export default function MinimapCard(): JSX.Element {
             label="Use extra large minimap"
             disabled={!isEnabled}
             checked={minimapXl}
-            value={DBSettings.xl}
+            value={DBSettings['minimap-xl']}
             onChange={(e) => updateXl(!!e?.target?.checked)}
           />
           <Checkbox
@@ -99,7 +99,7 @@ export default function MinimapCard(): JSX.Element {
             label="Use Battlepass 2022 HUD"
             disabled={!isEnabled}
             checked={isBP}
-            value={DBSettings.bp}
+            value={DBSettings.battlepass}
             onChange={(e) => updateBP(!!e?.target?.checked)}
           />
         </div>

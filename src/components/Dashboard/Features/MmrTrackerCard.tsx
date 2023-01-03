@@ -27,7 +27,7 @@ export default function MmrTrackerCard() {
     data: isEnabled,
     loading: l0,
     updateSetting,
-  } = useUpdateSetting(DBSettings.mmrTracker)
+  } = useUpdateSetting(DBSettings['mmr-tracker'])
   const {
     data: mmr,
     updateSetting: updateMmr,

@@ -105,8 +105,8 @@ export function SecondaryFeatures() {
       name: 'MMR command',
       description: (
         <div>
-          {CommandDetail[DBSettings.mmrTracker].description}
-          {CommandDetail[DBSettings.mmrTracker].response()}
+          {CommandDetail[DBSettings['mmr-tracker']].description}
+          {CommandDetail[DBSettings['mmr-tracker']].response()}
         </div>
       ),
     },

@@ -77,7 +77,7 @@ export default function CommandsCard({
           </div>
           <div className="subtitle">{command.description}</div>
           <Accordion.Panel>
-            {command.key === DBSettings.mmrTracker && (
+            {command.key === DBSettings['mmr-tracker'] && (
               <div className="py-4">
                 <p className="ml-1 pb-1">
                   Custom message. Variables: [currentmmr] [currentrank]

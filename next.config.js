@@ -17,6 +17,10 @@ const moduleExports = {
   },
 
   sentry: {
+    disableServerWebpackPlugin:
+      !process.env.SENTRY_DSN && !process.env.NEXT_PUBLIC_SENTRY_DSN,
+    disableClientWebpackPlugin:
+      !process.env.SENTRY_DSN && !process.env.NEXT_PUBLIC_SENTRY_DSN,
     // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
     // for client-side builds. (This will be the default starting in
     // `@sentry/nextjs` version 8.0.0.) See

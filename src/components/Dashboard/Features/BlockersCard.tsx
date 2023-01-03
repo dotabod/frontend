@@ -9,7 +9,7 @@ export default function PicksCard() {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings.onlyBlockRanked)
+  } = useUpdateSetting(DBSettings['only-block-ranked'])
 
   return (
     <Card>

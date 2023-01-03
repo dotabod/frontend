@@ -1,5 +1,5 @@
 import useSWR, { useSWRConfig } from 'swr'
-import { DBSettings, getValueOrDefault } from './DBSettings'
+import { DBSettings, getValueOrDefault, SettingKeys } from './DBSettings'
 import { fetcher } from './fetcher'
 import { showNotification } from '@mantine/notifications'
 
@@ -61,7 +61,7 @@ export function useUpdateLocale() {
   return { data, loading, update: updateSetting }
 }
 
-export function useUpdateSetting(key) {
+export function useUpdateSetting(key: SettingKeys) {
   const {
     data,
     loading,

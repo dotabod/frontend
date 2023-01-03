@@ -145,9 +145,11 @@ export default function OverlayPage() {
     opts[key] = getValueOrDefault(data?.settings, key)
   })
 
-  const shouldBlockMap = opts[DBSettings.mblock] && block.type === 'playing'
+  const shouldBlockMap =
+    opts[DBSettings['minimap-blocker']] && block.type === 'playing'
   const shouldBlockPicks =
-    opts[DBSettings.pblock] && ['picks', 'strategy'].includes(block.type)
+    opts[DBSettings['picks-blocker']] &&
+    ['picks', 'strategy'].includes(block.type)
   const countdownRef = useRef<Countdown>()
   const aegisRef = useRef<Countdown>()
 
@@ -212,7 +214,7 @@ export default function OverlayPage() {
   }, [router, userId])
 
   useEffect(() => {
-    if (!userId || !opts[DBSettings.obs]) {
+    if (!userId || !opts[DBSettings['obs-scene-switcher']]) {
       return
     }
 
@@ -228,7 +230,7 @@ export default function OverlayPage() {
 
     // Only run in OBS browser source
     if (
-      !opts[DBSettings.obs] ||
+      !opts[DBSettings['obs-scene-switcher']] ||
       typeof window !== 'object' ||
       !window?.obsstudio
     )
@@ -238,9 +240,9 @@ export default function OverlayPage() {
 
     window.obsstudio.getCurrentScene(function (scene) {
       const myScenes = [
-        opts[DBSettings.obsMinimap],
-        opts[DBSettings.obsPicks],
-        opts[DBSettings.obsDc],
+        opts[DBSettings['obs-minimap']],
+        opts[DBSettings['obs-picks']],
+        opts[DBSettings['obs-dc']],
       ]
 
       setScene(scene)
@@ -249,11 +251,11 @@ export default function OverlayPage() {
       if (typeof window.obsstudio.setCurrentScene !== 'function') return
 
       if (shouldBlockMap) {
-        window.obsstudio.setCurrentScene(opts[DBSettings.obsMinimap])
+        window.obsstudio.setCurrentScene(opts[DBSettings['obs-minimap']])
         return
       }
       if (shouldBlockPicks) {
-        window.obsstudio.setCurrentScene(opts[DBSettings.obsPicks])
+        window.obsstudio.setCurrentScene(opts[DBSettings['obs-picks']])
         return
       }
 
@@ -261,7 +263,7 @@ export default function OverlayPage() {
       // This allows streamers to make a scene for playing other games, and having
       // dota in the background wont switch scenes on them
       if (myScenes.includes(scene?.name)) {
-        window.obsstudio.setCurrentScene(opts[DBSettings.obsDc])
+        window.obsstudio.setCurrentScene(opts[DBSettings['obs-dc']])
         return
       }
     })
@@ -295,7 +297,7 @@ export default function OverlayPage() {
   }
 
   let roshPosition = {
-    left: opts[DBSettings.xl]
+    left: opts[DBSettings['minimap-xl']]
       ? transformRes({ width: 285 })
       : transformRes({ width: 250 }),
     bottom: transformRes({ height: 100 }),
@@ -308,10 +310,10 @@ export default function OverlayPage() {
     right: null,
   }
 
-  if (opts[DBSettings.bp]) {
+  if (opts[DBSettings.battlepass]) {
     minimapPosition.bottom += transformRes({ height: 9 })
     minimapPosition.left += transformRes({ width: 9 })
-    roshPosition.left = opts[DBSettings.xl]
+    roshPosition.left = opts[DBSettings['minimap-xl']]
       ? transformRes({ width: 290 })
       : transformRes({ width: 255 })
   }
@@ -329,7 +331,7 @@ export default function OverlayPage() {
     badgePosition.left = badgePosition.right
     badgePosition.right = null
 
-    if (opts[DBSettings.bp]) {
+    if (opts[DBSettings.battlepass]) {
       minimapPosition.right += transformRes({ width: -3 })
       minimapPosition.bottom += transformRes({ height: -5 })
     }
@@ -345,7 +347,7 @@ export default function OverlayPage() {
           <div
             className="absolute"
             style={{
-              bottom: opts[DBSettings.xl]
+              bottom: opts[DBSettings['minimap-xl']]
                 ? transformRes({ height: 300 })
                 : transformRes({ height: 260 }),
               left: 0,
@@ -454,19 +456,21 @@ export default function OverlayPage() {
             priority
             alt="minimap blocker"
             width={
-              opts[DBSettings.xl]
+              opts[DBSettings['minimap-xl']]
                 ? transformRes({ width: 280 })
                 : transformRes({ width: 240 })
             }
             height={
-              opts[DBSettings.xl]
+              opts[DBSettings['minimap-xl']]
                 ? transformRes({ height: 280 })
                 : transformRes({ height: 240 })
             }
             style={minimapPosition}
             src={`/images/731-${
-              opts[DBSettings.simple] ? 'Simple' : 'Complex'
-            }-${opts[DBSettings.xl] ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
+              opts[DBSettings['minimap-simple']] ? 'Simple' : 'Complex'
+            }-${
+              opts[DBSettings['minimap-xl']] ? 'X' : ''
+            }Large-AntiStreamSnipeMap.png`}
           />
         )}
 
@@ -486,7 +490,7 @@ export default function OverlayPage() {
               </div>
             )}
 
-            {opts[DBSettings.mmrTracker] && rankImageDetails?.rank > 0 && (
+            {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
               <div className="absolute" style={badgePosition}>
                 <Rankbadge {...rankImageDetails} transformRes={transformRes} />
               </div>
