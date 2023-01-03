@@ -1,9 +1,184 @@
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Switch } from '@mantine/core'
+import { Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import Image from 'next/image'
 import { useEffect } from 'react'
+
+const descriptions = {
+  midas: {
+    description: 'If your midas is ready and unused for 10s',
+    message: (
+      <div className="space-x-2">
+        <Image
+          width={22}
+          height={22}
+          alt="massivePIDAS"
+          className="inline align-middle"
+          src="/images/massivePIDAS.webp"
+        />
+        <span>Use your midas</span>
+      </div>
+    ),
+  },
+  pause: {
+    description: 'As soon as anyone presses F9',
+    message: (
+      <div className="space-x-2">
+        <Image
+          width={22}
+          height={22}
+          alt="pauseChamp"
+          className="inline align-middle"
+          src="/images/pauseChamp.webp"
+        />
+        <span>Who paused the game?</span>
+      </div>
+    ),
+  },
+  smoke: {
+    description: 'Whenever your hero has smoke debuff',
+    message: (
+      <div className="space-x-2">
+        <Image
+          width={22}
+          height={22}
+          alt="Shush"
+          className="inline align-middle"
+          src="/images/Shush.png"
+        />
+        <span>Clockwerk is smoked!</span>
+      </div>
+    ),
+  },
+  passiveDeath: {
+    description: 'Whenever you die with passive stick / faerie / etc',
+    message: (
+      <div className="space-x-2">
+        <span>Clockwerk died with passive faerie fire</span>
+        <Image
+          width={22}
+          height={22}
+          alt="ICANT"
+          className="inline align-middle"
+          src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+        />
+      </div>
+    ),
+  },
+  roshPickup: {
+    description: '',
+    message: 'Clockwerk picked up the aegis!',
+  },
+  roshDeny: {
+    description: '',
+    message: (
+      <div className="space-x-2">
+        <span>Clockwerk denied the aegis</span>
+        <Image
+          width={22}
+          height={22}
+          alt="ICANT"
+          className="inline align-middle"
+          src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+        />
+      </div>
+    ),
+  },
+  roshanKilled: {
+    description: '',
+    message: 'Roshan killed! Next roshan between 15:32 and 26:32',
+  },
+  tip: {
+    description: '',
+    message: (
+      <>
+        <div className="space-x-2">
+          <span>The tip from Spectre</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+          />
+        </div>
+        <div className="space-x-2">
+          <span>We tipping Crystal Maiden</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+          />
+        </div>
+      </>
+    ),
+  },
+  bounties: {
+    description: '',
+    message: (
+      <div className="space-x-2">
+        <span>+80 gold from bounty</span>
+        <Image
+          width={22}
+          height={22}
+          alt="ICANT"
+          className="inline align-middle"
+          src="https://cdn.betterttv.net/emote/600ae212df6a0665f274c9df/1x"
+        />
+        <Image
+          width={22}
+          height={22}
+          alt="ICANT"
+          className="inline align-middle"
+          src="https://cdn.betterttv.net/emote/62b103336ef7a5f0b7df90c4/1x"
+        />
+        <span>Thanks Pink, Yellow</span>
+        <Image
+          width={22}
+          height={22}
+          alt="ICANT"
+          className="inline align-middle"
+          src="https://cdn.betterttv.net/emote/60936f4a39b5010444d0c752/1x"
+        />
+      </div>
+    ),
+  },
+  powerTreads: {
+    description: '',
+    message: 'We toggled treads 6 time to save a total 284 mana this match.',
+  },
+  killstreak: {
+    description: '',
+    message: (
+      <>
+        <div className="space-x-2">
+          <span>Clockwerk has a 4 kill streak</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/62aafeef6ef7a5f0b7df3d98/1x"
+          />
+        </div>
+        <div className="space-x-2">
+          <span>Clockwerk lost the 4 kill streak</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/61a5e69b371b825d3f6dd0b2/1x"
+          />
+        </div>
+      </>
+    ),
+  },
+}
 
 export default function ChatterCard() {
   const {
@@ -26,6 +201,15 @@ export default function ChatterCard() {
       form.resetDirty(chatters)
     }
   }, [loadingChatters])
+
+  const handleSubmit = (v: typeof defaultSettings[DBSettings.chatters]) => {
+    Object.keys(v).forEach((i) => {
+      delete v[i].description
+      delete v[i].message
+    })
+    updateChatters(v)
+    form.resetDirty()
+  }
 
   return (
     <Card>
@@ -55,57 +239,48 @@ export default function ChatterCard() {
         The bot can post some random messages as you play your game.
       </div>
 
-      <form
-        onSubmit={form.onSubmit((v) => {
-          const localV = v as typeof defaultSettings[DBSettings.chatters]
-          Object.keys(localV).forEach((i) => {
-            delete localV[i].description
-            delete localV[i].message
-          })
-          updateChatters(localV)
-          form.resetDirty()
-        })}
-        className="mt-6 space-y-2"
-      >
+      <form className="mt-6 space-y-2">
         <div className="space-y-6">
           {Object.keys(chatters).map((key) => {
             return (
               <div key={key}>
-                <label
-                  htmlFor={key}
-                  className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
+                <Tooltip
+                  label={descriptions[key].description}
+                  disabled={!descriptions[key].description}
                 >
-                  {defaultSettings[DBSettings.chatters][key].description}
-                </label>
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      size="sm"
+                      color="blue"
+                      disabled={!isEnabled}
+                      {...form.getInputProps(`${key}.enabled`, {
+                        type: 'checkbox',
+                      })}
+                      onChange={(e) => {
+                        const originalChange = form.getInputProps(
+                          `${key}.enabled`,
+                          {
+                            type: 'checkbox',
+                          }
+                        ).onChange
 
-                <div className="flex items-center space-x-3">
-                  <Switch
-                    size="sm"
-                    color="blue"
-                    disabled={!isEnabled}
-                    {...form.getInputProps(`${key}.enabled`, {
-                      type: 'checkbox',
-                    })}
-                  />
+                        if (originalChange) originalChange(e)
 
-                  <span>
-                    {defaultSettings[DBSettings.chatters][key].message}
-                  </span>
-                </div>
+                        handleSubmit({
+                          ...form.values,
+                          [key]: {
+                            enabled: !!e?.currentTarget?.checked,
+                          },
+                        })
+                      }}
+                    />
+                    <div>{descriptions[key].message}</div>
+                  </div>
+                </Tooltip>
               </div>
             )
           })}
         </div>
-        <Button
-          type="submit"
-          variant="outline"
-          color="green"
-          className="border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500"
-          loading={loadingChatters}
-          disabled={!form.isDirty()}
-        >
-          Save
-        </Button>
       </form>
     </Card>
   )

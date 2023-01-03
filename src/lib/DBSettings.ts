@@ -75,33 +75,46 @@ export const defaultSettings = {
   [DBSettings.commandCommands]: true,
   [DBSettings.commandOpendota]: true,
   [DBSettings.commandDotabuff]: true,
+  [DBSettings.chatters]: {
+    midas: {
+      enabled: true,
+    },
+    pause: {
+      enabled: true,
+    },
+    smoke: {
+      enabled: true,
+    },
+    passiveDeath: {
+      enabled: true,
+    },
+    roshPickup: {
+      enabled: true,
+    },
+    roshDeny: {
+      enabled: true,
+    },
+    roshanKilled: {
+      enabled: true,
+    },
+    tip: {
+      enabled: true,
+    },
+    bounties: {
+      enabled: true,
+    },
+    powerTreads: {
+      enabled: true,
+    },
+    killstreak: {
+      enabled: true,
+    },
+  },
   [DBSettings.betsInfo]: {
     title: 'Will we win with [heroname]?',
     yes: 'Yes',
     no: 'No',
     duration: 4 * 60,
-  },
-  [DBSettings.chatters]: {
-    midas: {
-      description: 'If your midas is ready and unused for 10s',
-      enabled: true,
-      message: 'massivePIDAS Use your midas',
-    },
-    pause: {
-      description: 'As soon as anyone presses F9',
-      enabled: true,
-      message: 'PauseChamp Who paused the game?',
-    },
-    smoke: {
-      description: 'Whenever your hero has smoke debuff',
-      enabled: true,
-      message: 'Shush Clockwerk is smoked!',
-    },
-    passiveDeath: {
-      description: 'Whenever you die with passive stick / faerie / etc',
-      enabled: true,
-      message: 'Clockwerk died with passive faerie fire ICANT',
-    },
   },
 }
 
