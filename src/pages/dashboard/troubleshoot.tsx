@@ -1,4 +1,5 @@
 import DashboardShell from '@/components/DashboardShell'
+import { Link } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 
@@ -10,22 +11,34 @@ const faqs = [
   },
   {
     question: 'Dotabod keeps saying play a match, no steam id?',
-    answer: 'Add the OBS overlay, step 3 of setup.',
+    answer:
+      'You probably placed the cfg file in the wrong folder. Reboot Dota after finding the right folder.',
   },
   {
     question: 'MMR not tracking?',
-    answer:
-      'Enter your current MMR in the dashboard so that it isnt 0. You must also add the dotabod overlay to OBS for MMR tracking to start. It will not track without the overlay.',
+    answer: 'Enter your current MMR in the dashboard so that it isnt 0.',
   },
   {
     question: 'How do I test that it works?',
     answer:
-      'Try loading a solo bot match. If OBS is showing your overlays, it works. Also type !ping in your Twitch chat to make sure dotabod can type.',
+      'Try loading a solo bot match. If OBS is showing your overlays, it works. Also type !ping in your Twitch chat to make sure dotabod can type. And you can spectate a live pro match and type !np to confirm again.',
   },
   {
     question: 'Can I still use 9kmmrbot?',
-    answer:
-      "I'd remove it if I were you. Dotabod has all the features 9kmmrbot had, and more. Visit https://www.twitch.tv/popout/9kmmrbot/chat and type !part to remove 9kmmrbot.",
+    answer: (
+      <span>
+        I&apos;d remove it if I were you. Dotabod has all the features 9kmmrbot
+        had, and more. Visit{' '}
+        <Link
+          color
+          target="_blank"
+          href="https://twitch.tv/popout/9kmmrbot/chat"
+        >
+          9kmmrbot chat
+        </Link>{' '}
+        and type <code>!part</code> to remove 9kmmrbot.
+      </span>
+    ),
   },
   {
     question: "Why do bets open right when I pick? Can't I get counter picked?",
@@ -34,7 +47,15 @@ const faqs = [
   },
   {
     question: 'Still not working?',
-    answer: 'Get help in our Discord.',
+    answer: (
+      <span>
+        Get help in our{' '}
+        <Link color target="_blank" href="https://discord.dotabod.com">
+          Discord
+        </Link>
+        .
+      </span>
+    ),
   },
 ]
 
@@ -47,7 +68,7 @@ export default function TroubleshootPage() {
         <title>Dotabod | Troubleshooting</title>
       </Head>
       <DashboardShell
-        subtitle="In case something isn't working."
+        subtitle="Try these steps in case something isn't working."
         title="Troubleshooting"
       >
         <div className="mt-12 lg:col-span-2 lg:mt-0">
