@@ -125,21 +125,12 @@ export default function BetsCard() {
           </>
         )}
       </form>
-      <Display
-        shadow
-        caption={
-          <div className="space-x-1 text-sm text-gray-500">
-            <p className="inline">
-              Customize the prediction title and answers.
-            </p>
-          </div>
-        }
-      >
+      <Display shadow caption="Customize the prediction title and answers.">
         <Image
           alt="bets image"
-          width={400}
-          height={640}
-          src="/images/bets.png"
+          width={425}
+          height={168}
+          src="https://i.imgur.com/8ZsUxJR.png"
           className="bg-gray-500"
         />
       </Display>

@@ -14,6 +14,7 @@ const moduleExports = {
 
   images: {
     domains: [
+      'i.imgur.com',
       'emojipedia-us.s3.dualstack.us-west-1.amazonaws.com',
       'cdn.7tv.app',
       'cdn.frankerfacez.com',
