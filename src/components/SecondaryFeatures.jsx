@@ -235,7 +235,7 @@ export function SecondaryFeatures() {
         >
           {features.map((feature, i) => (
             <li key={i} className="rounded-2xl border border-gray-200 p-8">
-              <h3 className="mt-6 flex items-center justify-between space-x-2 font-semibold text-gray-900">
+              <h3 className="flex items-center justify-between space-x-2 font-semibold text-gray-900">
                 {feature.name}
                 {feature.inProgress && (
                   <Badge scale={0.5} type="secondary" className="opacity-60">
