@@ -36,7 +36,9 @@ const faqs = [
         >
           9kmmrbot chat
         </Link>{' '}
-        and type <code>!part</code> to remove 9kmmrbot.
+        and type <code>!part</code> to remove 9kmmrbot. You may have to ban
+        9kmmrbot from your channel because it may keep trying to join and
+        respond to commands still.
       </span>
     ),
   },
