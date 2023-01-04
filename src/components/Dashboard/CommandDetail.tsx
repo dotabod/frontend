@@ -293,7 +293,7 @@ const CommandDetail = {
           command="!np"
           response={
             <>
-              All Pick [9162 avg]:
+              All Pick:
               <Image
                 src="/images/south-korea.png"
                 width={24}
