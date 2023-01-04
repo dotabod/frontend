@@ -12,7 +12,7 @@ import {
 } from '@mantine/core'
 import { useHotkeys, useInputState, useLocalStorage } from '@mantine/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
-import { List, ListX, MailQuestion } from 'lucide-react'
+import { ListX } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useState } from 'react'
