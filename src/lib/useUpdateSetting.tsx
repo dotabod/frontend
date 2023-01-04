@@ -1,4 +1,4 @@
-import useSWR, { useSWRConfig } from 'swr'
+import useSWR, { MutatorOptions, useSWRConfig } from 'swr'
 import { DBSettings, getValueOrDefault, SettingKeys } from './DBSettings'
 import { fetcher } from './fetcher'
 import { showNotification } from '@mantine/notifications'
@@ -13,9 +13,10 @@ export const useUpdate = (
   const loading = data === undefined
 
   const updateSetting = (newValue, customPath = '') => {
-    const options = {
+    const options: MutatorOptions = {
       optimisticData: dataTransform(data, newValue),
       rollbackOnError: true,
+      revalidate: false,
     }
 
     let isNow = newValue
@@ -69,9 +70,17 @@ export function useUpdateSetting(key: SettingKeys) {
     data,
     loading,
     updateSetting: update,
-  } = useUpdate(`/api/settings`, (data, newValue) => ({
-    value: newValue ?? data,
-  }))
+  } = useUpdate(`/api/settings`, (data, newValue) => {
+    // find the key in data, then update the value to be new
+    const newData = data?.settings?.map((setting) => {
+      if (setting.key === key) {
+        return { ...setting, ...newValue }
+      }
+      return setting
+    })
+
+    return { ...data, settings: newData }
+  })
 
   let value = getValueOrDefault(key, data?.settings)
   if (key === DBSettings.mmr) value = data?.mmr || 0
