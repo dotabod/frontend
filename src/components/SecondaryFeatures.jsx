@@ -8,7 +8,7 @@ import WinLossCard from './WinLossCard'
 import TwitchChat from './TwitchChat'
 import { DBSettings } from '@/lib/DBSettings'
 import React from 'react'
-import CommandDetail from '@/pages/dashboard/CommandDetail'
+import CommandDetail from '@/components/Dashboard/CommandDetail'
 
 export function SecondaryFeatures() {
   const features = [

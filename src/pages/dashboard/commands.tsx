@@ -3,7 +3,7 @@ import DashboardShell from '@/components/DashboardShell'
 import { Accordion, Chip, Group } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import CommandDetail from './CommandDetail'
+import CommandDetail from '../../components/Dashboard/CommandDetail'
 
 export default function CommandsPage() {
   const { status } = useSession()
