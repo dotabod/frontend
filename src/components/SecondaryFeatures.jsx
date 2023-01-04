@@ -81,8 +81,8 @@ export function SecondaryFeatures() {
             <HoverCard.Dropdown>
               <Image
                 alt="mmr tracker"
-                width={353}
-                height={333}
+                width={534}
+                height={82}
                 src="/images/mmr-tracker.png"
               />
             </HoverCard.Dropdown>

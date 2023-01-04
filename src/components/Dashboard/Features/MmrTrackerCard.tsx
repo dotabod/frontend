@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import { Input } from '@/components/Input'
 import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display, Image, Link, Loading } from '@geist-ui/core'
+import { Display, Link, Loading } from '@geist-ui/core'
 import { Badge, Button, clsx, Switch } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
@@ -197,8 +198,8 @@ export default function MmrTrackerCard() {
       <Display shadow caption="Correct badge and MMR shown next to shop button">
         <Image
           alt="mmr tracker"
-          width="255px"
-          height="233px"
+          width={534}
+          height={82}
           src="/images/mmr-tracker.png"
         />
       </Display>
