@@ -184,7 +184,7 @@ export default function DashboardShell({ children, title, subtitle }) {
       <style global jsx>{`
         html,
         body {
-          background-color: rgb(39, 41, 52) !important;
+          @apply !bg-dark-700;
         }
         ::-webkit-scrollbar {
           width: 6px;
@@ -195,12 +195,12 @@ export default function DashboardShell({ children, title, subtitle }) {
         }
 
         ::-webkit-scrollbar-thumb {
-          background: ${'#43454F'};
+          @apply bg-dark-500;
           border-radius: 6px;
         }
 
         ::-webkit-scrollbar-track {
-          background: ${'rgba(0, 0, 0, 0.14)'};
+          @apply bg-transparent/10;
           border-radius: 6px;
         }
       `}</style>
