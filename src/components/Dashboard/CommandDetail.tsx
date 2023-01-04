@@ -5,7 +5,8 @@ import Image from 'next/image'
 const CommandDetail = {
   [DBSettings.commandDisable]: {
     title: 'Disable Dotabod',
-    description: 'Enable or disable all Dotabod features.',
+    description:
+      'With this turned on, game events will no longer be recognized and commands will not be responded to.',
     cmd: '!toggle',
     alias: [],
     allowed: 'mods',

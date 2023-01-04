@@ -8,8 +8,10 @@ import { Accordion, Switch } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
 
 export default function CommandsCard({
+  id,
   command,
 }: {
+  id: string
   command: typeof CommandDetail.commandAPM
 }): JSX.Element {
   const {
@@ -29,7 +31,7 @@ export default function CommandsCard({
   }, 350)
 
   return (
-    <Accordion.Item value={command.cmd}>
+    <Accordion.Item value={id}>
       <Card className="p-0">
         <Accordion.Control>
           <div className="title command">
