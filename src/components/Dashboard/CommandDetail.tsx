@@ -8,7 +8,7 @@ const CommandDetail = {
     description:
       'With this turned on, game events will no longer be recognized and commands will not be responded to.',
     cmd: '!toggle',
-    alias: [],
+    alias: ['mute', 'unmute'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -24,7 +24,7 @@ const CommandDetail = {
     description:
       "Dotabod can't detect party games right now (sadge). So if it does 30 mmr for a completed match, use !fixparty to adjust it to 20. You must type this after every party match.",
     cmd: '!fixparty',
-    alias: [],
+    alias: ['fixsolo'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -59,7 +59,7 @@ const CommandDetail = {
     description:
       "Retrieve the steam ID of the account you're currently playing on.",
     cmd: '!steam',
-    alias: [],
+    alias: ['steamid', 'account'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -74,7 +74,7 @@ const CommandDetail = {
     title: 'Set MMR',
     description: 'Manually set your MMR.',
     cmd: '!setmmr',
-    alias: [],
+    alias: ['mmr=', 'mmrset'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -142,7 +142,7 @@ const CommandDetail = {
     title: 'Ranked or not?',
     description: 'Chatters can find out if this match is ranked or not.',
     cmd: '!ranked',
-    alias: [],
+    alias: ['isranked'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -217,7 +217,7 @@ const CommandDetail = {
     title: 'Win / Loss',
     description: '',
     cmd: '!wl',
-    alias: [],
+    alias: ['score', 'winrate', 'wr'],
     allowed: 'all',
     response: (props) => (
       <>
@@ -240,7 +240,7 @@ const CommandDetail = {
     description:
       'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
     cmd: '!mmr',
-    alias: [],
+    alias: ['rank', 'medal'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -284,7 +284,7 @@ const CommandDetail = {
     title: 'Notable players',
     description: 'Find out if your match has any pros.',
     cmd: '!np',
-    alias: [],
+    alias: ['who', 'players'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -343,7 +343,7 @@ const CommandDetail = {
     title: 'Smurfs',
     description: 'Shows total games played for each player in the match.',
     cmd: '!smurfs',
-    alias: [],
+    alias: ['lifetimes', 'totals', 'games'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -358,7 +358,7 @@ const CommandDetail = {
     title: 'Game medals',
     description: 'Return the rankings for each players in the game.',
     cmd: '!gm',
-    alias: [],
+    alias: ['medals', 'ranks'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -412,7 +412,7 @@ const CommandDetail = {
     description:
       'Quickly see whether or not you won last game, duration, how long ago',
     cmd: '!lgs',
-    alias: [],
+    alias: ['lastgamescore', 'lgscore', 'lgwl'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -427,7 +427,7 @@ const CommandDetail = {
     description:
       'Shows the profile link for the hero color you specify during a live match.',
     cmd: '!profile',
-    alias: [],
+    alias: ['stats', 'check'],
     allowed: 'all',
     response: (props) => (
       <>

@@ -17,6 +17,7 @@ import DiscordSvg from '@/images/logos/discord.svg'
 import { Group, Select, Switch } from '@mantine/core'
 import { useUpdateLocale, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings } from '@/lib/DBSettings'
+import CommandDetail from './Dashboard/CommandDetail'
 
 const localeOptions = [
   {
@@ -356,7 +357,9 @@ export default function DashboardShell({ children, title, subtitle }) {
 
               <div className="ml-1 mr-2 space-y-2 rounded border-2 border-red-900/50 p-4 transition-colors hover:border-red-700">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-dark-300">Disable Dotabod</p>
+                  <p className="text-sm text-dark-300">
+                    {CommandDetail.commandDisable.title}
+                  </p>
 
                   {loading && (
                     <Switch disabled size="lg" className="flex" color="red" />
@@ -378,8 +381,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                   )}
                 </div>
                 <p className="w-48 text-xs text-dark-400">
-                  With this turned on, game events will no longer be recognized
-                  and commands will not be responded to.
+                  {CommandDetail.commandDisable.description}
                 </p>
               </div>
             </div>
