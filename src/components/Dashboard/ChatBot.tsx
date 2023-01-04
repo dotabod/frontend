@@ -1,7 +1,8 @@
 import { Card } from '@/ui/card'
 import { Collapse, Snippet } from '@geist-ui/core'
-import { List } from '@mantine/core'
+import { List, ThemeIcon } from '@mantine/core'
 import clsx from 'clsx'
+import { X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -67,7 +68,7 @@ export default function ChatBot() {
             2. Add the following emotes to your channel using BTTV (case
             sensitive):
           </div>
-          <List size="xs" className="ml-8 list-disc">
+          <List size="sm" className="ml-8 grid grid-cols-3 lg:grid-cols-4">
             {emotesRequired
               .sort((a, b) => {
                 // if its found in emotes, put it at the bottom
@@ -78,8 +79,25 @@ export default function ChatBot() {
               .map(({ label, url }) => {
                 const thisEmote = emotes.find((e) => e.code === label)
                 return (
-                  <List.Item key={label}>
-                    <div className="flex items-center space-x-2 space-y-2">
+                  <List.Item
+                    icon={
+                      !thisEmote && (
+                        <ThemeIcon
+                          color={thisEmote ? 'green' : 'blue'}
+                          size={22}
+                        >
+                          <X size={15} />
+                        </ThemeIcon>
+                      )
+                    }
+                    key={label}
+                  >
+                    <div
+                      className={clsx(
+                        'flex items-center space-x-2',
+                        thisEmote && 'opacity-50'
+                      )}
+                    >
                       {thisEmote && (
                         <Image
                           height={22}
