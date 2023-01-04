@@ -3,6 +3,7 @@ import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
+import clsx from 'clsx'
 import Image from 'next/image'
 
 export default function RoshCard() {
@@ -22,6 +23,7 @@ export default function RoshCard() {
     <Card>
       <div className="title">
         <h3>Roshan timers</h3>
+
         <div className="flex space-x-4">
           {lA && <Switch disabled size="lg" color="blue" />}
           {!lA && (
@@ -50,11 +52,15 @@ export default function RoshCard() {
       <div className="subtitle">
         Dotabod can detect when roshan is killed or aegis is picked up.
       </div>
-      <div>
-        Sadly the data does not tell us when someone dies with aegis, so{' '}
-        <b>the aegis icon will remain for the full 5 minutes</b>. The rosh timer
-        starts red for 8 minutes (min rosh spawn), then turns yellow for 3
-        minutes (max rosh spawn).
+      <div className="space-y-2 text-sm text-dark-300">
+        <p>
+          Sadly the data does not tell us when someone dies with aegis, so{' '}
+          <b>the aegis icon will remain for the full 5 minutes</b>.
+        </p>
+        <p>
+          The rosh timer starts red for 8 minutes (min rosh spawn), then turns
+          yellow for 3 minutes (max rosh spawn).
+        </p>
       </div>
       <Display shadow>
         <div className="flex flex-col items-center justify-center space-y-4">
@@ -63,7 +69,7 @@ export default function RoshCard() {
             width={219}
             height={107}
             src="/images/just-aegis-timer.png"
-            className="inline"
+            className={clsx('inline', !hasAegis && 'opacity-40')}
           />
 
           <Image
@@ -71,7 +77,7 @@ export default function RoshCard() {
             width={293}
             height={533}
             src="/images/rosh-timer.png"
-            className="inline"
+            className={clsx('inline', !hasRosh && 'opacity-40')}
           />
         </div>
       </Display>

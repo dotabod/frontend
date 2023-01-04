@@ -3,6 +3,7 @@ import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 
@@ -255,7 +256,7 @@ export default function ChatterCard() {
         <div className="space-y-6">
           {(Object.keys(chatters || {}) || []).map((key) => {
             return (
-              <div key={key}>
+              <div key={key} className={clsx(!isEnabled && 'opacity-40')}>
                 <Tooltip
                   label={descriptions[key].description}
                   disabled={!descriptions[key].description}

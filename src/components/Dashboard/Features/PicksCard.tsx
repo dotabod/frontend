@@ -3,6 +3,7 @@ import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
+import clsx from 'clsx'
 
 export default function PicksCard() {
   const {
@@ -33,6 +34,7 @@ export default function PicksCard() {
         overlay depending on which team you end up on.
       </div>
       <Display
+        className={clsx(!isEnabled && 'opacity-40')}
         shadow
         caption="Picks blocker that auto places itself over your pick screen"
       >

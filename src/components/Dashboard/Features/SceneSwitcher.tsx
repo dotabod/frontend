@@ -1,8 +1,9 @@
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display, Image, Loading } from '@geist-ui/core'
+import { Display, Loading } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
+import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
 
@@ -79,52 +80,56 @@ export default function SceneSwitcher(): JSX.Element {
         This is optional but useful if you want to make your stream look unique
         for different game states!
       </div>
-      <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm">
-        <li>
-          Must put the dotabod browser source in the scenes you want to block
-          hero picks or minimap in.
-        </li>
-        <li>
-          Must set browser properties to{' '}
-          <span className="italics">Advanced access to OBS</span>
-        </li>
-        <li>Must create the following scenes (case sensitive)</li>
-        <ul className="ml-4 list-none space-y-6">
-          {Object.keys(scenes).map((sceneKey: string) => {
-            const scene = scenes[sceneKey]
-            return (
-              <li key={sceneKey} className="space-y-1">
-                <label htmlFor={sceneKey} className="block text-sm">
-                  {scene.label}
-                </label>
-                {loading && (
-                  <div className="w-52 rounded-md border border-gray-200 pt-2">
-                    <Loading className="left-0" />
-                  </div>
-                )}
-                {!loading && (
-                  <Input
-                    id={sceneKey}
-                    placeholder={
-                      defaultSettings['obs-scene-switcher'][sceneKey]
-                    }
-                    defaultValue={scene.value}
-                    name={sceneKey}
-                    onChange={(e) =>
-                      handleSceneName(e.target.value, scene.update)
-                    }
-                  />
-                )}
+      {isEnabled && (
+        <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm">
+          <li>
+            Must put the dotabod browser source in the scenes you want to block
+            hero picks or minimap in.
+          </li>
+          <li>
+            Must set browser properties to{' '}
+            <span className="italics">Advanced access to OBS</span>
+          </li>
+          <li>Must create the following scenes (case sensitive)</li>
+          <ul className="ml-4 list-none space-y-6">
+            {Object.keys(scenes).map((sceneKey: string) => {
+              const scene = scenes[sceneKey]
+              return (
+                <li key={sceneKey} className="space-y-1">
+                  <label htmlFor={sceneKey} className="block text-sm">
+                    {scene.label}
+                  </label>
+                  {loading && (
+                    <div className="w-52 rounded-md border border-gray-200 pt-2">
+                      <Loading className="left-0" />
+                    </div>
+                  )}
+                  {!loading && (
+                    <Input
+                      id={sceneKey}
+                      placeholder={
+                        defaultSettings['obs-scene-switcher'][sceneKey]
+                      }
+                      defaultValue={scene.value}
+                      name={sceneKey}
+                      onChange={(e) =>
+                        handleSceneName(e.target.value, scene.update)
+                      }
+                    />
+                  )}
 
-                <span className="block text-xs italic">{scene.helpText}</span>
-              </li>
-            )
-          })}
+                  <span className="block text-xs italic">{scene.helpText}</span>
+                </li>
+              )
+            })}
+          </ul>
         </ul>
-      </ul>
+      )}
+
       <Display shadow caption="Example OBS scenes and sources">
         <Image
-          height="246px"
+          width={536}
+          height={115}
           alt="scene switcher"
           src="/images/scene-switcher.png"
         />

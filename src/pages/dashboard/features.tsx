@@ -1,3 +1,4 @@
+import { accordionStyles } from '@/components/accordionStyles'
 import BetsCard from '@/components/Dashboard/Features/BetsCard'
 import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
 import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
@@ -6,11 +7,14 @@ import PicksCard from '@/components/Dashboard/Features/PicksCard'
 import RoshCard from '@/components/Dashboard/Features/RoshCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import DashboardShell from '@/components/DashboardShell'
+import { Accordion } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import { useState } from 'react'
 
 export default function FeaturesPage() {
   const { status } = useSession()
+  const [value, setValue] = useState<string[]>()
 
   return status === 'authenticated' ? (
     <>
@@ -21,15 +25,17 @@ export default function FeaturesPage() {
         subtitle="Customize the options your stream receives."
         title="Features"
       >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
-          <MmrTrackerCard />
-          <BetsCard />
-          <MinimapCard />
-          <PicksCard />
-          <RoshCard />
-          <ChatterCard />
-          <SceneSwitcher />
-        </div>
+        <Accordion multiple variant="separated" styles={accordionStyles}>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
+            <MmrTrackerCard />
+            <BetsCard />
+            <MinimapCard />
+            <PicksCard />
+            <RoshCard />
+            <ChatterCard />
+            <SceneSwitcher />
+          </div>
+        </Accordion>
       </DashboardShell>
     </>
   ) : null

@@ -355,7 +355,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                 })}
               </nav>
 
-              <div className="ml-1 mr-2 space-y-2 rounded border-2 border-red-900/50 p-4 transition-colors hover:border-red-700">
+              <div className="mx-2 space-y-2 rounded border-2 border-red-900/50 p-4 transition-colors hover:border-red-700">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-dark-300">
                     {CommandDetail.commandDisable.title}

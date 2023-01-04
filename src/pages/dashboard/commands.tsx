@@ -4,7 +4,6 @@ import { getValueOrDefault } from '@/lib/DBSettings'
 import { useUpdate } from '@/lib/useUpdateSetting'
 import {
   Accordion,
-  AccordionProps,
   Center,
   Group,
   SegmentedControl,
@@ -17,6 +16,7 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
+import { accordionStyles } from '../../components/accordionStyles'
 
 export default function CommandsPage() {
   const { status } = useSession()
@@ -102,51 +102,6 @@ export default function CommandsPage() {
       }
       return true
     })
-
-  const accordionStyles: AccordionProps['styles'] = {
-    item: {
-      marginTop: '0px !important',
-      padding: 0,
-      margin: 0,
-      // styles added to all items
-      backgroundColor: 'transparent',
-      borderColor: 'transparent',
-
-      '.subtitle': {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      },
-
-      // styles added to expanded item
-      '&[data-active]': {
-        '& .subtitle': {
-          overflow: 'initial',
-          textOverflow: 'unset',
-          whiteSpace: 'normal',
-        },
-        backgroundColor: 'transparent',
-        borderColor: 'transparent',
-      },
-    },
-
-    content: {
-      padding: 0,
-    },
-
-    control: {
-      padding: 23,
-    },
-
-    chevron: {
-      position: 'absolute',
-      alignSelf: 'flex-start',
-      // styles added to chevron when it should rotate
-      '&[data-rotate]': {
-        transform: 'rotate(-90deg)',
-      },
-    },
-  }
 
   return status === 'authenticated' ? (
     <>

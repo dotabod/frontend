@@ -59,103 +59,105 @@ export default function MmrTrackerCard() {
       </div>
       <div>A list of accounts will show below as you play on them.</div>
       {accounts?.length !== 0 ? (
-        <form
-          onSubmit={form.onSubmit((values) => {
-            update(
-              values.accounts.map((act) => ({
-                ...act,
-                mmr: Number(act.mmr) || 0,
-              }))
-            )
-            form.resetDirty()
-          })}
-          className="mt-6 space-y-2"
-        >
-          {form.values.accounts.map((account, index) => (
-            <div key={account.steam32Id}>
-              <div className="mb-1 space-x-1">
-                <label
-                  htmlFor={`${account.steam32Id}-mmr`}
-                  className="cursor-pointer text-sm font-medium text-dark-400 "
-                >
-                  <span>MMR for</span>
-                </label>
-                <Link
-                  color
-                  target="_blank"
-                  href={`https://steamid.xyz/${account.steam32Id}`}
-                  rel="noreferrer"
-                >
-                  {account.name}
-                </Link>
-              </div>
-              <div className="flex items-center">
-                <div className="w-full">
-                  <Input
-                    id={`${account.steam32Id}-mmr`}
-                    placeholder="Your MMR?"
-                    type="number"
-                    min={0}
-                    max={30000}
-                    {...form.getInputProps(`accounts.${index}.mmr`)}
-                  />
+        <div className={clsx(!isEnabled && 'opacity-40')}>
+          <form
+            onSubmit={form.onSubmit((values) => {
+              update(
+                values.accounts.map((act) => ({
+                  ...act,
+                  mmr: Number(act.mmr) || 0,
+                }))
+              )
+              form.resetDirty()
+            })}
+            className="mt-6 space-y-2"
+          >
+            {form.values.accounts.map((account, index) => (
+              <div key={account.steam32Id}>
+                <div className="mb-1 space-x-1">
+                  <label
+                    htmlFor={`${account.steam32Id}-mmr`}
+                    className="cursor-pointer text-sm font-medium text-dark-400 "
+                  >
+                    <span>MMR for</span>
+                  </label>
+                  <Link
+                    color
+                    target="_blank"
+                    href={`https://steamid.xyz/${account.steam32Id}`}
+                    rel="noreferrer"
+                  >
+                    {account.name}
+                  </Link>
                 </div>
-                <Button
-                  variant="outline"
-                  color="red"
-                  size="xs"
-                  className="h-full w-fit border-transparent bg-transparent py-2 text-dark-200 transition-colors hover:bg-transparent hover:text-red-600"
-                  onClick={() => {
-                    form.setValues({
-                      accounts: form.values.accounts.filter(
-                        (act) => act.steam32Id !== account.steam32Id
-                      ),
-                    })
-                  }}
-                >
-                  <XCircle size={24} />
-                </Button>
+                <div className="flex items-center">
+                  <div className="w-full">
+                    <Input
+                      id={`${account.steam32Id}-mmr`}
+                      placeholder="Your MMR?"
+                      type="number"
+                      min={0}
+                      max={30000}
+                      {...form.getInputProps(`accounts.${index}.mmr`)}
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    color="red"
+                    size="xs"
+                    className="h-full w-fit border-transparent bg-transparent py-2 text-dark-200 transition-colors hover:bg-transparent hover:text-red-600"
+                    onClick={() => {
+                      form.setValues({
+                        accounts: form.values.accounts.filter(
+                          (act) => act.steam32Id !== account.steam32Id
+                        ),
+                      })
+                    }}
+                  >
+                    <XCircle size={24} />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-          <div className="space-x-4">
-            <Button
-              variant="outline"
-              color="green"
-              disabled={!form.isDirty()}
-              loading={loadingAccounts}
-              className={clsx(
-                ' border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
-                accounts.length - form.values.accounts.length > 0 &&
-                  'border-red-700 bg-red-700 hover:bg-red-600'
-              )}
-              type="submit"
-            >
-              <span className="space-x-1">
-                {accounts.length - form.values.accounts.length > 0 ? (
+            ))}
+            <div className="space-x-4">
+              <Button
+                variant="outline"
+                color="green"
+                disabled={!form.isDirty()}
+                loading={loadingAccounts}
+                className={clsx(
+                  ' border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
+                  accounts.length - form.values.accounts.length > 0 &&
+                    'border-red-700 bg-red-700 hover:bg-red-600'
+                )}
+                type="submit"
+              >
+                <span className="space-x-1">
+                  {accounts.length - form.values.accounts.length > 0 ? (
+                    <span>
+                      Confirm remove{' '}
+                      {accounts.length - form.values.accounts.length}
+                    </span>
+                  ) : null}
+                  {form.values.accounts.length ? <span>Save</span> : null}
                   <span>
-                    Confirm remove{' '}
-                    {accounts.length - form.values.accounts.length}
+                    account
+                    {form.values.accounts.length > 1 ? 's' : ''}
                   </span>
-                ) : null}
-                {form.values.accounts.length ? <span>Save</span> : null}
-                <span>
-                  account
-                  {form.values.accounts.length > 1 ? 's' : ''}
                 </span>
-              </span>
-            </Button>
-            <Button
-              disabled={!form.isDirty()}
-              onClick={() => {
-                form.setValues({ accounts })
-              }}
-              className=" hov text-dark-200 transition-colors"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+              </Button>
+              <Button
+                disabled={!form.isDirty()}
+                onClick={() => {
+                  form.setValues({ accounts })
+                }}
+                className=" hov text-dark-200 transition-colors"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
       ) : null}
 
       {accounts.length === 0 && (
@@ -166,43 +168,50 @@ export default function MmrTrackerCard() {
               Play a bot game for Dotabod to detect your Steam account!
             </span>
           </div>
-          <label
-            htmlFor="mmr"
-            className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
-          >
-            Current MMR
-          </label>
-          <div className="flex space-x-4">
-            {loading && (
-              <div className="w-52 rounded-md border border-gray-200 pt-2">
-                <Loading className="left-0" />
-              </div>
-            )}
-            {!loading && (
-              <Input
-                placeholder="0"
-                className="w-full"
-                id="mmr"
-                name="mmr"
-                type="number"
-                min={0}
-                max={30000}
-                defaultValue={mmr}
-                onChange={debouncedMmr}
-              />
-            )}
+          <div className={clsx(!isEnabled && 'opacity-40')}>
+            <label
+              htmlFor="mmr"
+              className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
+            >
+              Current MMR
+            </label>
+            <div className="flex space-x-4">
+              {loading && (
+                <div className="w-52 rounded-md border border-gray-200 pt-2">
+                  <Loading className="left-0" />
+                </div>
+              )}
+              {!loading && (
+                <Input
+                  placeholder="0"
+                  className="w-full"
+                  id="mmr"
+                  name="mmr"
+                  type="number"
+                  min={0}
+                  max={30000}
+                  defaultValue={mmr}
+                  onChange={debouncedMmr}
+                />
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      <Display shadow caption="Correct badge and MMR shown next to shop button">
-        <Image
-          alt="mmr tracker"
-          width={534}
-          height={82}
-          src="/images/mmr-tracker.png"
-        />
-      </Display>
+      <div className={clsx(!isEnabled && 'opacity-40')}>
+        <Display
+          shadow
+          caption="Correct badge and MMR shown next to shop button"
+        >
+          <Image
+            alt="mmr tracker"
+            width={534}
+            height={82}
+            src="/images/mmr-tracker.png"
+          />
+        </Display>
+      </div>
     </Card>
   )
 }
