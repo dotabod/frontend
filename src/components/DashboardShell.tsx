@@ -14,7 +14,7 @@ import Image from 'next/image'
 import { UserAccountNav } from '@/components/user-account-nav'
 import { Github } from 'lucide-react'
 import DiscordSvg from '@/images/logos/discord.svg'
-import { Group, Text, Select, Switch } from '@mantine/core'
+import { Group, Select, Switch } from '@mantine/core'
 import { useUpdateLocale, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { DBSettings } from '@/lib/DBSettings'
 
