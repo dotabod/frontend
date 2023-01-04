@@ -20,35 +20,89 @@ import { DBSettings } from '@/lib/DBSettings'
 
 const localeOptions = [
   {
-    flag: '🇺🇸',
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-united-states_1f1fa-1f1f8.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
     label: 'English',
     value: 'en',
   },
 
   {
-    flag: '🇮🇹',
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-italy_1f1ee-1f1f9.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
     label: 'Italian',
     value: 'it',
   },
   {
-    flag: '🇷🇺',
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-russia_1f1f7-1f1fa.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
     label: 'Russian',
     value: 'ru',
   },
   {
-    flag: '🇪🇸',
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-spain_1f1ea-1f1f8.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
     label: 'Spanish',
     value: 'es',
   },
   {
-    flag: '🇧🇷',
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-brazil_1f1e7-1f1f7.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
     label: 'Portuguese (Brazil)',
     value: 'pt-BR',
   },
   {
-    flag: '🇵🇹',
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-portugal_1f1f5-1f1f9.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
     label: 'Portuguese (Portugal)',
     value: 'pt',
+  },
+  {
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-slovakia_1f1f8-1f1f0.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
+    label: 'Czech (Slovakia)',
+    value: 'cs-SK',
   },
 ]
 
@@ -59,15 +113,9 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ flag, label, ...others }: ItemProps, ref) => (
-    <div ref={ref} {...others}>
-      <Group noWrap>
-        <Text size="sm">{flag}</Text>
-
-        <div>
-          <Text size="sm">{label}</Text>
-        </div>
-      </Group>
-    </div>
+    <Group noWrap ref={ref} {...others}>
+      {flag} {label}
+    </Group>
   )
 )
 
@@ -356,6 +404,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                 data={localeOptions}
                 maxDropdownHeight={400}
                 defaultValue={data?.locale}
+                icon={localeOptions.find((x) => x.value === data?.locale)?.flag}
                 onChange={updateLocale}
                 filter={(value, item) =>
                   item.label.toLowerCase().includes(value.toLowerCase().trim())

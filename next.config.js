@@ -13,7 +13,12 @@ const moduleExports = {
   },
 
   images: {
-    domains: ['cdn.7tv.app', 'cdn.frankerfacez.com', 'cdn.betterttv.net'],
+    domains: [
+      'emojipedia-us.s3.dualstack.us-west-1.amazonaws.com',
+      'cdn.7tv.app',
+      'cdn.frankerfacez.com',
+      'cdn.betterttv.net',
+    ],
   },
 
   sentry: {
