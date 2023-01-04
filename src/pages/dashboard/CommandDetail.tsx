@@ -348,7 +348,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!smurfs"
-        response="Lifetime games: Tusk: 4,202 · Pugna: 4,466 · Doom: 657 · Drow Ranger: 3,136 · Lina: 2,735 · Clinkz: 3,384 · Viper: 408 · Sniper: 2,850 · Hoodwink: 2,243 · Dazzle: 6,626"
+        response="Lifetime games: Viper: 408 · Doom: 657 · Hoodwink: 2,243 · Lina: 2,735 · Sniper: 2,850 · Drow Ranger: 3,136 · Clinkz: 3,384 · Tusk: 4,202 · Pugna: 4,466 · Dazzle: 6,626"
       />
     ),
   },
