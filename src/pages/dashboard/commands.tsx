@@ -1,12 +1,25 @@
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/DashboardShell'
-import { Accordion, Chip, Group } from '@mantine/core'
+import { getValueOrDefault } from '@/lib/DBSettings'
+import { useUpdate } from '@/lib/useUpdateSetting'
+import { Accordion, Group, SegmentedControl } from '@mantine/core'
+import { useLocalStorage } from '@mantine/hooks'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 
 export default function CommandsPage() {
   const { status } = useSession()
+  const [permission, setPermission] = useLocalStorage({
+    key: 'command-display-permission',
+    defaultValue: 'All',
+  })
+  const [enabled, setEnabled] = useLocalStorage({
+    key: 'command-display-enabled',
+    defaultValue: 'All',
+  })
+  const { data } = useUpdate(`/api/settings`)
 
   return status === 'authenticated' ? (
     <>
@@ -63,16 +76,52 @@ export default function CommandsPage() {
             },
           }}
         >
-          <Group className="mb-4 hidden">
-            <Chip>Mod</Chip>
-            <Chip>Everyone</Chip>
-            <Chip>Enabled</Chip>
-            <Chip>Disabled</Chip>
+          <Group className="mb-4">
+            <SegmentedControl
+              value={permission}
+              onChange={setPermission}
+              data={['All', 'Mods', 'Plebs']}
+              color="blue"
+            />
+            <SegmentedControl
+              value={enabled}
+              onChange={setEnabled}
+              data={['All', 'Enabled', 'Disabled']}
+              color="blue"
+            />
           </Group>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Object.keys(CommandDetail).map((key) => (
-              <CommandsCard key={key} command={CommandDetail[key]} />
-            ))}
+            <AnimatePresence>
+              {Object.keys(CommandDetail)
+                .filter((command) => {
+                  const isEnabled = getValueOrDefault(
+                    CommandDetail[command].key,
+                    data?.settings
+                  )
+
+                  if (enabled === 'Enabled' && CommandDetail[command].key) {
+                    return isEnabled === true
+                  } else if (enabled === 'Disabled') {
+                    return isEnabled === false
+                  }
+
+                  return true
+                })
+                .filter((command) => {
+                  if (permission === 'Mods') {
+                    return CommandDetail[command].allowed === 'mods'
+                  } else if (permission === 'Plebs') {
+                    return CommandDetail[command].allowed === 'all'
+                  }
+
+                  return true
+                })
+                .map((key) => (
+                  <motion.div layout key={key}>
+                    <CommandsCard command={CommandDetail[key]} />
+                  </motion.div>
+                ))}
+            </AnimatePresence>
           </div>
         </Accordion>
       </DashboardShell>

@@ -3,7 +3,10 @@ import { DBSettings, getValueOrDefault, SettingKeys } from './DBSettings'
 import { fetcher } from './fetcher'
 import { showNotification } from '@mantine/notifications'
 
-const useUpdate = (path, dataTransform = (data, newValue) => newValue) => {
+export const useUpdate = (
+  path,
+  dataTransform = (data, newValue) => newValue
+) => {
   const { data } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
 
