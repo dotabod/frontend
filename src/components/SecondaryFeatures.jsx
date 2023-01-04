@@ -6,7 +6,7 @@ import { SparklesIcon } from '@heroicons/react/24/outline'
 import { Rankbadge } from './Rankbadge'
 import WinLossCard from './WinLossCard'
 import TwitchChat from './TwitchChat'
-import { CommandDetail } from '@/pages/dashboard/commands'
+import { CommandDetail } from '@/pages/dashboard/CommandDetail'
 import { DBSettings } from '@/lib/DBSettings'
 import React from 'react'
 
