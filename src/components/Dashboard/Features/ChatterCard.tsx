@@ -10,16 +10,28 @@ const descriptions = {
   midas: {
     description: 'If your midas is ready and unused for 10s',
     message: (
-      <div className="space-x-2">
-        <Image
-          width={22}
-          height={22}
-          alt="massivePIDAS"
-          className="inline align-middle"
-          src="/images/massivePIDAS.webp"
-        />
-        <span>Use your midas</span>
-      </div>
+      <>
+        <div className="space-x-2">
+          <Image
+            width={22}
+            height={22}
+            alt="massivePIDAS"
+            className="inline align-middle"
+            src="/images/massivePIDAS.webp"
+          />
+          <span>Use your midas</span>
+        </div>
+        <div className="space-x-2">
+          <span>Midas was finally used, 64 seconds late</span>
+          <Image
+            width={22}
+            height={22}
+            alt="massivePIDAS"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/6350aa989bb828a9f0d42863/1x"
+          />
+        </div>
+      </>
     ),
   },
   pause: {
