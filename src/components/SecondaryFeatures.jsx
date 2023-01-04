@@ -6,9 +6,9 @@ import { SparklesIcon } from '@heroicons/react/24/outline'
 import { Rankbadge } from './Rankbadge'
 import WinLossCard from './WinLossCard'
 import TwitchChat from './TwitchChat'
-import { CommandDetail } from '@/pages/dashboard/CommandDetail'
 import { DBSettings } from '@/lib/DBSettings'
 import React from 'react'
+import CommandDetail from '@/pages/dashboard/CommandDetail'
 
 export function SecondaryFeatures() {
   const features = [
@@ -102,7 +102,16 @@ export function SecondaryFeatures() {
       ),
     },
     {
-      name: 'MMR command',
+      name: 'Smurf detection',
+      description: (
+        <div>
+          {CommandDetail[DBSettings.commandSmurfs].description}
+          {CommandDetail[DBSettings.commandSmurfs].response()}
+        </div>
+      ),
+    },
+    {
+      name: 'MMR tracking',
       description: (
         <div>
           {CommandDetail[DBSettings['mmr-tracker']].description}
