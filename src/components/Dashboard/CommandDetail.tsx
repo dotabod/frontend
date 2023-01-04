@@ -287,55 +287,67 @@ const CommandDetail = {
     alias: ['who', 'players'],
     allowed: 'all',
     response: (props) => (
-      <TwitchChat
-        {...props}
-        command="!np"
-        response={
-          <>
-            All Pick [9162 avg]:
-            <Image
-              src="/images/south-korea.png"
-              width={24}
-              height={24}
-              alt="south korea"
-              className="ml-1 mr-1 inline"
-            />
-            DuBu (Shadow Shaman) ·
-            <Image
-              src="/images/russia.png"
-              width={24}
-              height={24}
-              alt="russia"
-              className="ml-1 mr-1 inline"
-            />
-            Collapse (Magnus) ·
-            <Image
-              src="/images/estonia.png"
-              width={24}
-              height={24}
-              alt="estonia"
-              className="ml-1 mr-1 inline"
-            />
-            Puppy (Chen) ·
-            <Image
-              src="/images/usa.png"
-              width={24}
-              height={24}
-              alt="usa"
-              className="ml-1 mr-1 inline"
-            />
-            PPD (Tusk) ·
-            <Image
-              src="/images/lebanon.png"
-              width={24}
-              height={24}
-              alt="usa"
-              className="ml-1 mr-1 inline"
-            />
-            Rajjix (Timbersaw)
-          </>
-        }
-      />
+      <div className="space-y-6">
+        <TwitchChat
+          {...props}
+          command="!np"
+          response={
+            <>
+              All Pick [9162 avg]:
+              <Image
+                src="/images/south-korea.png"
+                width={24}
+                height={24}
+                alt="south korea"
+                className="ml-1 mr-1 inline"
+              />
+              DuBu (Shadow Shaman) ·
+              <Image
+                src="/images/russia.png"
+                width={24}
+                height={24}
+                alt="russia"
+                className="ml-1 mr-1 inline"
+              />
+              Collapse (Magnus) ·
+              <Image
+                src="/images/estonia.png"
+                width={24}
+                height={24}
+                alt="estonia"
+                className="ml-1 mr-1 inline"
+              />
+              Puppy (Chen) ·
+              <Image
+                src="/images/usa.png"
+                width={24}
+                height={24}
+                alt="usa"
+                className="ml-1 mr-1 inline"
+              />
+              PPD (Tusk) ·
+              <Image
+                src="/images/lebanon.png"
+                width={24}
+                height={24}
+                alt="usa"
+                className="ml-1 mr-1 inline"
+              />
+              Rajjix (Timbersaw)
+            </>
+          }
+        />
+        <TwitchChat
+          {...props}
+          command="!np add"
+          response="Try !np add <steam32id> <playername>"
+        />
+        <TwitchChat
+          {...props}
+          command="!np remove"
+          response="Try !np remove <steam32id>"
+        />
+      </div>
     ),
   },
   [DBSettings.commandSmurfs]: {
