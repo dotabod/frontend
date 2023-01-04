@@ -219,18 +219,20 @@ const CommandDetail = {
     cmd: '!wl',
     alias: ['score', 'winrate', 'wr'],
     allowed: 'all',
-    response: (props) => (
+    response: (props, all = true) => (
       <>
         <TwitchChat
           {...props}
           command="!wl"
           response="Ranked 0 W - 9 L | -270 MMR"
         />
-        <TwitchChat
-          {...props}
-          command="!wl"
-          response="Ranked 0 W - 9 L | -270 MMR | Unranked 2 W - 1 L"
-        />
+        {all && (
+          <TwitchChat
+            {...props}
+            command="!wl"
+            response="Ranked 0 W - 9 L | -270 MMR | Unranked 2 W - 1 L"
+          />
+        )}
       </>
     ),
   },
@@ -286,7 +288,7 @@ const CommandDetail = {
     cmd: '!np',
     alias: ['who', 'players'],
     allowed: 'all',
-    response: (props) => (
+    response: (props, all = true) => (
       <div className="space-y-6">
         <TwitchChat
           {...props}
@@ -337,16 +339,20 @@ const CommandDetail = {
             </>
           }
         />
-        <TwitchChat
-          {...props}
-          command="!np add"
-          response="Try !np add <steam32id> <playername>"
-        />
-        <TwitchChat
-          {...props}
-          command="!np remove"
-          response="Try !np remove <steam32id>"
-        />
+        {all && (
+          <>
+            <TwitchChat
+              {...props}
+              command="!np add"
+              response="Try !np add <steam32id> <playername>"
+            />
+            <TwitchChat
+              {...props}
+              command="!np remove"
+              response="Try !np remove <steam32id>"
+            />
+          </>
+        )}
       </div>
     ),
   },

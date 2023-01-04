@@ -45,7 +45,7 @@ export function SecondaryFeatures() {
             Create predictions for your viewers to bet on. Dotabod will start
             and stop the prediction automatically.
           </span>
-          {CommandDetail[DBSettings.commandWL].response()}
+          {CommandDetail[DBSettings.commandWL].response({}, false)}
 
           <div className="mt-2 flex justify-center space-x-4">
             <WinLossCard
@@ -65,7 +65,7 @@ export function SecondaryFeatures() {
     {
       name: (
         <div className="space-between flex w-full items-center">
-          <span className="w-full">MMR badge overlay</span>
+          <span className="w-full">MMR badge and tracking</span>
           <HoverCard closeDelay={200} shadow="md">
             <HoverCard.Target>
               <Link
@@ -94,6 +94,7 @@ export function SecondaryFeatures() {
           <span>
             Show off your current rank, or leaderboard standing on stream.
           </span>
+          {CommandDetail[DBSettings['mmr-tracker']].response()}
           <div className="mt-6 flex justify-center space-x-4">
             <Rankbadge image="55.png" rank="3860" />
             <Rankbadge image="92.png" leaderboard rank="9" />
@@ -107,15 +108,6 @@ export function SecondaryFeatures() {
         <div>
           {CommandDetail[DBSettings.commandSmurfs].description}
           {CommandDetail[DBSettings.commandSmurfs].response()}
-        </div>
-      ),
-    },
-    {
-      name: 'MMR tracking',
-      description: (
-        <div>
-          {CommandDetail[DBSettings['mmr-tracker']].description}
-          {CommandDetail[DBSettings['mmr-tracker']].response()}
         </div>
       ),
     },
@@ -190,60 +182,32 @@ export function SecondaryFeatures() {
           </HoverCard>
         </div>
       ),
-      description:
-        'Tired of copy pasting three clock times? Dotabod knows when rosh is killed or when the aegis is picked up. A timer will display for your viewers to see!',
-    },
-    {
-      name: 'XPM command',
-      description: (
-        <React.Fragment>
-          {CommandDetail[DBSettings.commandXPM].description}
-          {CommandDetail[DBSettings.commandXPM].response()}
-        </React.Fragment>
-      ),
-    },
-    {
-      name: 'GPM command',
-      description: (
-        <React.Fragment>
-          {CommandDetail[DBSettings.commandGPM].description}
-          {CommandDetail[DBSettings.commandGPM].response()}
-        </React.Fragment>
-      ),
-    },
-    {
-      name: 'Pleb command',
       description: (
         <div>
-          {CommandDetail[DBSettings.commandPleb].description}
-          {CommandDetail[DBSettings.commandPleb].response()}
+          <p>
+            Tired of copy pasting three clock times? Dotabod knows when rosh is
+            killed or when the aegis is picked up. A timer will display for your
+            viewers to see!
+          </p>
+          <TwitchChat
+            responses={[
+              <React.Fragment key={1}>
+                <span>Roshan killed! Next roshan between 15:32 and 26:32</span>
+              </React.Fragment>,
+              <React.Fragment key={2}>
+                <span>Clockwerk picked up the aegis!</span>
+              </React.Fragment>,
+            ]}
+          />
         </div>
       ),
     },
     {
-      name: 'Notable players command',
-      description: (
-        <div>
-          {CommandDetail[DBSettings.commandNP].description}
-          {CommandDetail[DBSettings.commandNP].response()}
-        </div>
-      ),
-    },
-    {
-      name: 'Game medals command',
+      name: 'Game medals',
       description: (
         <div>
           {CommandDetail[DBSettings.commandGM].description}
           {CommandDetail[DBSettings.commandGM].response()}
-        </div>
-      ),
-    },
-    {
-      name: 'Last game command',
-      description: (
-        <div>
-          {CommandDetail[DBSettings.commandLG].description}
-          {CommandDetail[DBSettings.commandLG].response()}
         </div>
       ),
     },
@@ -262,8 +226,7 @@ export function SecondaryFeatures() {
           </h2>
           <p className="mt-2 text-lg text-gray-600">
             Under active development and speaking to multiple Dota 2
-            personalities, we will be adding more features as they are
-            requested.
+            personalities, features are added as they are requested.
           </p>
         </div>
         <ul
