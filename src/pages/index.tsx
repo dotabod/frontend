@@ -18,7 +18,10 @@ export default function Home() {
           name="description"
           content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
         />
-
+        <meta
+          name="keywords"
+          content="Dota 2, assistant app, MMR tracker, Twitch predictions, minimap blocker, hero picks blocker, roshan timer, OBS scene switcher, twitch chat generator"
+        />
         {/* <!-- Open Graph / Facebook --> */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://dotabod.com/" />
