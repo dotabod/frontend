@@ -1,19 +1,19 @@
-# Dotabod
+# Dotabod frontend
 
-Dotabod is a [Tailwind UI](https://tailwindui.com) site template built using [Tailwind CSS](https://tailwindcss.com) and [Next.js](https://nextjs.org).
+Open source UI for Dotabod, including the overlay used in OBS, dashboard to manage all settings, and the https://dotabod.com homepage. 
 
 ## Getting started
 
-To get started with this template, first install the npm dependencies:
+To get started, first install the dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 Next, run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Finally, open [http://localhost:3000](http://localhost:3000) in your browser to view the website.
@@ -21,10 +21,6 @@ Finally, open [http://localhost:3000](http://localhost:3000) in your browser to 
 ## Customizing
 
 You can start editing this template by modifying the files in the `/src` folder. The site will auto-update as you edit these files.
-
-## License
-
-This site template is a commercial product and is licensed under the [Tailwind UI license](https://tailwindui.com/license).
 
 ## Learn more
 
