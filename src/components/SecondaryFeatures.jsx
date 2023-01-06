@@ -9,6 +9,7 @@ import TwitchChat from './TwitchChat'
 import { DBSettings } from '@/lib/DBSettings'
 import React from 'react'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
+import { chatterInfo } from './Dashboard/Features/ChatterCard'
 
 export function SecondaryFeatures() {
   const features = [
@@ -120,36 +121,10 @@ export function SecondaryFeatures() {
           </span>
           <TwitchChat
             responses={[
-              <React.Fragment key={1}>
-                <Image
-                  width={22}
-                  height={22}
-                  alt="pauseChamp"
-                  className="mr-1 inline align-middle"
-                  src="/images/pauseChamp.webp"
-                />
-                <span>Who paused the game?</span>
-              </React.Fragment>,
-              <React.Fragment key={2}>
-                <Image
-                  width={22}
-                  height={22}
-                  alt="massivePIDAS"
-                  className="mr-1 inline align-middle"
-                  src="/images/massivePIDAS.webp"
-                />
-                <span>Use your midas</span>
-              </React.Fragment>,
-              <React.Fragment key={3}>
-                <Image
-                  width={22}
-                  height={22}
-                  alt="Shush"
-                  className="mr-1 inline align-middle"
-                  src="/images/Shush.png"
-                />
-                <span>Clockwerk is smoked!</span>
-              </React.Fragment>,
+              chatterInfo.smoke.message,
+              chatterInfo.passiveDeath.message,
+              chatterInfo.pause.message,
+              chatterInfo.powerTreads.message,
             ]}
           />
         </div>
@@ -226,7 +201,7 @@ export function SecondaryFeatures() {
           </h2>
           <p className="mt-2 text-lg text-gray-600">
             Under active development and speaking to multiple Dota 2
-            personalities, features are added as they are requested.
+            personalities, features are being added as they are requested.
           </p>
         </div>
         <ul

@@ -36,6 +36,21 @@ const features = [
     screen: BetsScreen,
   },
   {
+    name: 'Active chatting',
+    description:
+      'Help keep your stream lively and engaging for your viewers, while also providing useful information about the current game. Dotabod can see your current game conditions so the messages will always be relevant, not random!',
+    icon: () => (
+      <Image
+        className="ml-1 inline"
+        alt="chatting emote"
+        height={40}
+        width={40}
+        src="https://cdn.betterttv.net/emote/618c77311f8ff7628e6d5b8f/3x"
+      />
+    ),
+    screen: OBSScreen,
+  },
+  {
     name: 'Minimap and hero picks blocker',
     description: (
       <span>
@@ -55,21 +70,6 @@ const features = [
       />
     ),
     screen: BlockScreen,
-  },
-  {
-    name: 'OBS scene switcher',
-    description:
-      "Switch between scenes without a single click or press of a button. Dotabod will choose between three scenes based on whether you're disconnected from Dota, in an active game, or in picking phase.",
-    icon: () => (
-      <Image
-        className="ml-1 inline"
-        alt="petthestreamer emote"
-        height={36}
-        width={32}
-        src="/images/petthestreamer.webp"
-      />
-    ),
-    screen: OBSScreen,
   },
 ]
 
@@ -183,10 +183,10 @@ function OBSScreen({ custom, animated = false }) {
   return (
     <AppScreen className="w-full">
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
-        <AppScreen.Title>Optional choices</AppScreen.Title>
+        <AppScreen.Title>Dotabod has things to say</AppScreen.Title>
         <AppScreen.Subtitle>
-          You can name the scenes <span className="text-white">whatever</span>{' '}
-          you like. Dotabod will pick the right one.
+          So many chatter options to choose from, why not just{' '}
+          <span className="text-white">enable them all</span>?
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
@@ -196,11 +196,11 @@ function OBSScreen({ custom, animated = false }) {
         <Display>
           <Image
             className="rounded-xl"
-            src="/images/obs.png"
-            alt="obs screen"
+            src="https://i.imgur.com/NgczeXd.png"
+            alt="chatter toggles"
             unoptimized={true}
-            width={523}
-            height={826}
+            width={738}
+            height={1126}
           />
         </Display>
       </MotionAppScreenBody>

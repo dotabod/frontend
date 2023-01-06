@@ -12,7 +12,6 @@ export default function RoshCard() {
     loading: lA,
     updateSetting: uA,
   } = useUpdateSetting(DBSettings.aegis)
-
   const {
     data: hasRosh,
     loading: lR,

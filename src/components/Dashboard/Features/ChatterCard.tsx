@@ -7,7 +7,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 
-const descriptions = {
+export const chatterInfo = {
   midas: {
     description: 'If your midas is ready and unused for 10s',
     message: (
@@ -38,7 +38,7 @@ const descriptions = {
   pause: {
     description: 'As soon as anyone presses F9',
     message: (
-      <div className="space-x-2">
+      <span className="space-x-2">
         <Image
           width={22}
           height={22}
@@ -47,13 +47,13 @@ const descriptions = {
           src="/images/pauseChamp.webp"
         />
         <span>Who paused the game?</span>
-      </div>
+      </span>
     ),
   },
   smoke: {
     description: 'Whenever your hero has smoke debuff',
     message: (
-      <div className="space-x-2">
+      <span className="space-x-2">
         <Image
           width={22}
           height={22}
@@ -62,13 +62,13 @@ const descriptions = {
           src="/images/Shush.png"
         />
         <span>Clockwerk is smoked!</span>
-      </div>
+      </span>
     ),
   },
   passiveDeath: {
     description: 'Whenever you die with passive stick / faerie / etc',
     message: (
-      <div className="space-x-2">
+      <span className="space-x-2">
         <span>Clockwerk died with passive faerie fire</span>
         <Image
           width={22}
@@ -77,7 +77,7 @@ const descriptions = {
           className="inline align-middle"
           src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
         />
-      </div>
+      </span>
     ),
   },
   roshPickup: {
@@ -87,7 +87,7 @@ const descriptions = {
   roshDeny: {
     description: '',
     message: (
-      <div className="space-x-2">
+      <span className="space-x-2">
         <span>Clockwerk denied the aegis</span>
         <Image
           width={22}
@@ -96,7 +96,7 @@ const descriptions = {
           className="inline align-middle"
           src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
         />
-      </div>
+      </span>
     ),
   },
   roshanKilled: {
@@ -258,8 +258,8 @@ export default function ChatterCard() {
             return (
               <div key={key} className={clsx(!isEnabled && 'opacity-40')}>
                 <Tooltip
-                  label={descriptions[key].description}
-                  disabled={!descriptions[key].description}
+                  label={chatterInfo[key].description}
+                  disabled={!chatterInfo[key].description}
                 >
                   <div className="flex items-center space-x-3">
                     <Switch
@@ -287,7 +287,7 @@ export default function ChatterCard() {
                         })
                       }}
                     />
-                    <div>{descriptions[key].message}</div>
+                    <div>{chatterInfo[key].message}</div>
                   </div>
                 </Tooltip>
               </div>
