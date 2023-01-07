@@ -1,9 +1,19 @@
 'use client'
 import { Card } from '@/components/Card'
+import clsx from 'clsx'
 
-type WLType = { wl: { win: number; lose: number; type: string }[] }
-const WinLossCard = ({ wl, ...props }: WLType) => (
-  <Card className="rounded-r-none" {...props}>
+type WLType = {
+  mainScreen?: boolean
+  wl: { win: number; lose: number; type: string }[]
+}
+const WinLossCard = ({ mainScreen = false, wl, ...props }: WLType) => (
+  <Card
+    className={clsx(
+      'rounded-r-none',
+      mainScreen && 'bg-transparent p-0 leading-none text-yellow-200'
+    )}
+    {...props}
+  >
     {wl.map(({ win, lose, type }) => (
       <div key={type} className="w-full space-x-1 font-mono">
         <span className="space-x-1">

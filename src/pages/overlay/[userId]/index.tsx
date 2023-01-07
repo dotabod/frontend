@@ -21,6 +21,14 @@ import io from 'socket.io-client'
 
 let socket
 
+const heroPosition = (teamName: string, i: number) => ({
+  top: 4,
+  right: teamName === 'radiant' ? null : 115 + i * 125,
+  left: teamName === 'dire' ? null : 115 + i * 125,
+  height: 55,
+  width: 55,
+})
+
 export default function OverlayPage() {
   const router = useRouter()
   const { userId } = router.query
@@ -498,13 +506,43 @@ export default function OverlayPage() {
           </>
         )}
 
-        {process.env.NODE_ENV === 'development' && (
-          <Image
-            height={transformRes({ height: 1080 })}
-            width={transformRes({ width: 1920 })}
-            alt={`main game`}
-            src={`/images/shot_0012.png`}
-          />
+        {[null].includes(block.type) && (
+          <>
+            {opts[DBSettings.commandWL] && (
+              <div
+                className="absolute"
+                style={{
+                  ...wlPosition,
+                  bottom: null,
+                  top:
+                    wl.length > 1
+                      ? transformRes({ height: 5 })
+                      : transformRes({ height: 17 }),
+                  right: transformRes({ width: 600 }),
+                }}
+              >
+                <WinLossCard wl={wl} mainScreen />
+              </div>
+            )}
+
+            {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
+              <div
+                className="absolute"
+                style={{
+                  ...badgePosition,
+                  bottom: null,
+                  top: transformRes({ height: 5 }),
+                  right: transformRes({ width: 480 }),
+                }}
+              >
+                <Rankbadge
+                  {...rankImageDetails}
+                  mainScreen
+                  transformRes={transformRes}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </>
