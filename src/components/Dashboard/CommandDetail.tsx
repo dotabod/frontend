@@ -435,7 +435,7 @@ const CommandDetail = {
     response: (props) => (
       <TwitchChat
         {...props}
-        command="!lgs blue"
+        command="!lgs"
         response="Last game: won · 47m long · Ended 4m ago · dotabuff.com/matches/6945205"
       />
     ),
