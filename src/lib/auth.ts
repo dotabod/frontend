@@ -15,6 +15,7 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     TwitchProvider({
+      allowDangerousEmailAccountLinking: true,
       clientId: process.env.TWITCH_CLIENT_ID,
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
