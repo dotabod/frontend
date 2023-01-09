@@ -12,7 +12,7 @@ model Account {
   userId            String   @unique
   type              String
   provider          String
-  providerAccountId String
+  providerAccountId String   @unique
   refresh_token     String
   access_token      String
   expires_at        Int?
@@ -36,7 +36,7 @@ model User {
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @default(now()) @map("updated_at")
   mmr               Int            @default(0) @db.SmallInt
-  steam32Id         Int?           @unique(map: "users_playerId_key")
+  steam32Id         Int?
   followers         Int?
   stream_delay      Int?           @default(0) @db.SmallInt
   name              String         @unique(map: "users_username_key") @default("")
