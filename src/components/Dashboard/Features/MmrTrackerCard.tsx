@@ -4,7 +4,7 @@ import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Link, Loading } from '@geist-ui/core'
-import { Badge, Button, clsx, Switch } from '@mantine/core'
+import { Badge, Button, clsx, Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
 import { XCircle } from 'lucide-react'
@@ -29,12 +29,20 @@ export default function MmrTrackerCard() {
     loading: l0,
     updateSetting,
   } = useUpdateSetting(DBSettings['mmr-tracker'])
+
   const {
     data: mmr,
     updateSetting: updateMmr,
     loading: l1,
   } = useUpdateSetting(DBSettings.mmr)
-  const loading = l0 || l1
+
+  const {
+    data: onlyParty,
+    loading: l2,
+    updateSetting: updateOnlyParty,
+  } = useUpdateSetting(DBSettings.onlyParty)
+
+  const loading = l0 || l1 || l2
 
   const debouncedMmr = useDebouncedCallback((e) => {
     updateMmr(Number(e.target.value))
@@ -55,7 +63,7 @@ export default function MmrTrackerCard() {
         )}
       </div>
       <div className="subtitle">
-        Give or take 30 MMR after every ranked match.
+        Give or take {onlyParty ? 20 : 30} MMR after every ranked match.
       </div>
       <div>A list of accounts will show below as you play on them.</div>
       {accounts?.length !== 0 ? (
@@ -197,6 +205,30 @@ export default function MmrTrackerCard() {
             </div>
           </div>
         </div>
+      )}
+
+      {l2 && (
+        <div className="mt-5 flex items-center space-x-2">
+          <Switch size="sm" disabled color="blue" />
+          <span>Party queue only</span>
+        </div>
+      )}
+      {!l2 && (
+        <Tooltip
+          width={300}
+          multiline
+          label="Enable this to award 20 MMR instead of 30 for all matches. Disable to use 30 MMR again."
+        >
+          <div className="mt-5 flex w-fit items-center space-x-2">
+            <Switch
+              size="sm"
+              onChange={(e) => updateOnlyParty(!!e?.currentTarget?.checked)}
+              color="blue"
+              defaultChecked={onlyParty}
+            />
+            <span>Party queue only</span>
+          </div>
+        </Tooltip>
       )}
 
       <div className={clsx(!isEnabled && 'opacity-40')}>
