@@ -3,7 +3,7 @@ import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { Card } from '@/ui/card'
-import { Badge, Loading } from '@geist-ui/core'
+import { Badge } from '@geist-ui/core'
 import { Accordion, Switch } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
 
