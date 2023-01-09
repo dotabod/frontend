@@ -1,7 +1,7 @@
 import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display, Loading } from '@geist-ui/core'
+import { Display } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
