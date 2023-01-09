@@ -99,11 +99,7 @@ export default function SceneSwitcher(): JSX.Element {
                   <label htmlFor={sceneKey} className="block text-sm">
                     {scene.label}
                   </label>
-                  {loading && (
-                    <div className="w-52 rounded-md border border-gray-200 pt-2">
-                      <Loading className="left-0" />
-                    </div>
-                  )}
+                  {loading && <Input placeholder="Loading..." disabled />}
                   {!loading && (
                     <Input
                       id={sceneKey}

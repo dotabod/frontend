@@ -185,9 +185,7 @@ export default function MmrTrackerCard() {
             </label>
             <div className="flex space-x-4">
               {loading && (
-                <div className="w-52 rounded-md border border-gray-200 pt-2">
-                  <Loading className="left-0" />
-                </div>
+                <Input placeholder="Loading..." className="w-full" disabled />
               )}
               {!loading && (
                 <Input

@@ -86,9 +86,7 @@ export default function CommandsCard({
                   [nextmmr] [wins]
                 </p>
                 {loadingCustomMmr && (
-                  <div className="w-52 rounded-md border border-gray-200 pt-2">
-                    <Loading className="left-0" />
-                  </div>
+                  <Input disabled placeholder="Loading..." type="text" />
                 )}
                 {!loadingCustomMmr && (
                   <Input
