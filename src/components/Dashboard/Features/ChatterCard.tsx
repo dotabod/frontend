@@ -191,6 +191,21 @@ export const chatterInfo = {
       </>
     ),
   },
+  firstBloodDeath: {
+    description: '',
+    message: (
+      <>
+        <span>Clockwerk gave up first blood</span>
+        <Image
+          width={22}
+          height={22}
+          alt="ICANT"
+          className="inline align-middle"
+          src="https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x"
+        />
+      </>
+    ),
+  },
 }
 
 export default function ChatterCard() {
