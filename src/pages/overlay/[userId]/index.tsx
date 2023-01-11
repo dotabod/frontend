@@ -22,6 +22,22 @@ import io from 'socket.io-client'
 
 let socket
 
+// add ordinal string to count variable
+const ordinal = (count) => {
+  const j = count % 10,
+    k = count % 100
+  if (j == 1 && k != 11) {
+    return count + 'st'
+  }
+  if (j == 2 && k != 12) {
+    return count + 'nd'
+  }
+  if (j == 3 && k != 13) {
+    return count + 'rd'
+  }
+  return count + 'th'
+}
+
 const heroPosition = (teamName: string, i: number) => ({
   top: 4,
   right: teamName === 'radiant' ? null : 115 + i * 125,
@@ -72,6 +88,7 @@ export default function OverlayPage() {
     maxS: isDev ? 600 : 0,
     minDate: devMin,
     maxDate: devMax,
+    count: isDev ? 1 : 0,
   })
 
   const transformRes = ({ height = 0, width = 0 }) => {
@@ -115,13 +132,26 @@ export default function OverlayPage() {
     )
   }
 
-  const roshRender = ({ minutes, seconds, completed, color }) => {
+  const roshRender = ({ minutes, seconds, completed, color, count }) => {
     if (completed) {
       return null
     }
 
     return (
       <div className="flex flex-col items-center">
+        {count > 0 && (
+          <span
+            className="absolute z-40 text-white/90"
+            style={{
+              top: transformRes({ height: -5 }),
+              left: transformRes({ width: 0 }),
+              fontSize: transformRes({ height: 16 }),
+              fontWeight: 500,
+            }}
+          >
+            {ordinal(count)}
+          </span>
+        )}
         <Image
           src="/images/rosh/roshan_timer_bg_psd1.png"
           height={transformRes({ height: 95 })}
@@ -440,7 +470,11 @@ export default function OverlayPage() {
                       ref={countdownRef}
                       date={roshan?.minDate}
                       renderer={(props) =>
-                        roshRender({ ...props, color: 'red' })
+                        roshRender({
+                          ...props,
+                          color: 'red',
+                          count: roshan.count,
+                        })
                       }
                       onComplete={() => {
                         setRoshan({
@@ -468,10 +502,15 @@ export default function OverlayPage() {
                         ref={countdownRef}
                         date={roshan?.maxDate}
                         renderer={(props) =>
-                          roshRender({ ...props, color: 'yellow' })
+                          roshRender({
+                            ...props,
+                            color: 'yellow',
+                            count: roshan.count,
+                          })
                         }
                         onComplete={() => {
                           setRoshan({
+                            ...roshan,
                             minS: 0,
                             minDate: '',
                             maxDate: '',
@@ -600,7 +639,7 @@ export default function OverlayPage() {
             width={transformRes({ width: 1920 })}
             height={transformRes({ height: 1080 })}
             alt={`main game`}
-            src={`/images/rosh/grubby.png`}
+            src={`/images/rosh/draskyl.png`}
           />
         )}
       </div>
