@@ -11,6 +11,7 @@ import {
 } from '@/lib/DBSettings'
 import { fetcher } from '@/lib/fetcher'
 import { getRankImage, RankDeets } from '@/lib/ranks'
+import clsx from 'clsx'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -95,14 +96,16 @@ export default function OverlayPage() {
       <div className="flex flex-col items-center">
         <Image
           className="animate-pulse"
-          src="/images/aegis-icon.png"
-          height={transformRes({ height: 42 })}
-          width={transformRes({ width: 42 })}
+          src="/images/rosh/aegis-icon-glow.png"
+          width={transformRes({ width: 67 })}
+          height={transformRes({ height: 1 })}
           alt="aegis icon"
         />
         <span
-          className="-mt-1 text-white/90"
+          className=" z-10 text-white/90"
           style={{
+            marginLeft: transformRes({ width: 11 }),
+            marginTop: transformRes({ height: -19 }),
             fontSize: transformRes({ height: 14 }),
           }}
         >
@@ -112,7 +115,7 @@ export default function OverlayPage() {
     )
   }
 
-  const roshRender = ({ minutes, seconds, completed }) => {
+  const roshRender = ({ minutes, seconds, completed, color }) => {
     if (completed) {
       return null
     }
@@ -120,16 +123,46 @@ export default function OverlayPage() {
     return (
       <div className="flex flex-col items-center">
         <Image
-          src="/images/roshan-icon.png"
-          height={transformRes({ height: 50 })}
-          width={transformRes({ width: 33 })}
+          src="/images/rosh/roshan_timer_bg_psd1.png"
+          height={transformRes({ height: 95 })}
+          width={transformRes({ width: 95 })}
+          style={{
+            left: transformRes({ width: 0 }),
+            top: transformRes({ height: 0 }),
+            height: transformRes({ height: 70 }),
+            width: transformRes({ width: 70 }),
+            maxWidth: transformRes({ width: 70 }),
+          }}
+          alt="main bg"
+          className="absolute z-0"
+        />
+        <Image
+          src="/images/rosh/icon_roshan_timerbackground_norosh_psd.png"
+          height={transformRes({ height: 40 })}
+          width={transformRes({ width: 40 })}
+          style={{ top: transformRes({ height: 8 }) }}
+          alt="red glow"
+          className={clsx(
+            'absolute z-10',
+            color === 'yellow' && 'hue-rotate-60'
+          )}
+        />
+        <Image
+          src="/images/rosh/roshan_timer_roshan_psd.png"
+          height={transformRes({ height: 28 })}
+          width={transformRes({ width: 28 })}
           alt="roshan icon"
-          className="rounded-full"
+          className="absolute z-20"
+          style={{
+            top: transformRes({ height: 8 }),
+            left: transformRes({ height: 13 }),
+          }}
         />
         <span
-          className="-mt-1 text-white/90"
+          className="absolute z-40 text-white/90"
           style={{
-            fontSize: transformRes({ height: 14 }),
+            bottom: transformRes({ height: 8 }),
+            fontSize: transformRes({ height: 12 }),
           }}
         >
           {minutes}:{zeroPad(seconds)}
@@ -289,7 +322,7 @@ export default function OverlayPage() {
 
   const leftPositions = [
     555, 615, 680, 745, 800, 1065, 1130, 1192, 1250, 1320,
-  ].map((w) => transformRes({ width: w }))
+  ].map((w) => transformRes({ width: w - 20 }))
 
   let badgePosition = {
     bottom: 0,
@@ -350,6 +383,20 @@ export default function OverlayPage() {
       <Head>
         <title>Dotabod | Stream overlays</title>
       </Head>
+      <style global jsx>{`
+        .rosh-timer svg {
+          position: absolute;
+          z-index: 30;
+          top: ${transformRes({ height: 8 })}px;
+          left: ${transformRes({ width: 5 })}px;
+          height: ${transformRes({ height: 42 })}px;
+          width: ${transformRes({ width: 42 })}px;
+        }
+        .rosh-timer > div {
+          height: ${transformRes({ height: 55 })}px !important;
+          width: ${transformRes({ width: 55 })}px !important;
+        }
+      `}</style>
       <div>
         {block?.type === 'spectator' && (
           <div
@@ -374,13 +421,40 @@ export default function OverlayPage() {
         {opts[DBSettings.rosh] &&
           (block.type === 'playing' || isDev) &&
           roshan?.maxDate && (
-            <div style={roshPosition} className="absolute">
+            <div style={roshPosition} className="rosh-timer absolute">
               {roshan?.minDate && (
-                <div className="rounded-full bg-red-900/70">
+                <CountdownCircleTimer
+                  isPlaying={!paused}
+                  duration={roshan?.minS}
+                  colors="#ff0000"
+                  trailColor="#0000000"
+                  size={transformRes({ width: 45 })}
+                  strokeWidth={transformRes({ width: 3 })}
+                >
+                  {({ remainingTime }) => (
+                    <Countdown
+                      ref={countdownRef}
+                      date={roshan?.minDate}
+                      renderer={(props) =>
+                        roshRender({ ...props, color: 'red' })
+                      }
+                      onComplete={() => {
+                        setRoshan({
+                          ...roshan,
+                          minDate: '',
+                          minS: 0,
+                        })
+                      }}
+                    />
+                  )}
+                </CountdownCircleTimer>
+              )}
+              {!roshan?.minDate && roshan?.maxDate && (
+                <div className="rounded-full">
                   <CountdownCircleTimer
                     isPlaying={!paused}
-                    duration={roshan?.minS}
-                    colors="#ff0000"
+                    duration={roshan?.maxS}
+                    colors="#a39800"
                     trailColor="#0000000"
                     size={transformRes({ width: 55 })}
                     strokeWidth={transformRes({ width: 3 })}
@@ -388,34 +462,10 @@ export default function OverlayPage() {
                     {({ remainingTime }) => (
                       <Countdown
                         ref={countdownRef}
-                        date={roshan?.minDate}
-                        renderer={roshRender}
-                        onComplete={() => {
-                          setRoshan({
-                            ...roshan,
-                            minDate: '',
-                            minS: 0,
-                          })
-                        }}
-                      />
-                    )}
-                  </CountdownCircleTimer>
-                </div>
-              )}
-              {!roshan?.minDate && roshan?.maxDate && (
-                <div className="rounded-full bg-yellow-800/70">
-                  <CountdownCircleTimer
-                    isPlaying={!paused}
-                    duration={roshan?.maxS}
-                    colors="#a39800"
-                    size={transformRes({ width: 55 })}
-                    strokeWidth={transformRes({ width: 3 })}
-                  >
-                    {({ remainingTime }) => (
-                      <Countdown
-                        ref={countdownRef}
                         date={roshan?.maxDate}
-                        renderer={roshRender}
+                        renderer={(props) =>
+                          roshRender({ ...props, color: 'yellow' })
+                        }
                         onComplete={() => {
                           setRoshan({
                             minS: 0,
@@ -543,6 +593,15 @@ export default function OverlayPage() {
               </div>
             )}
           </>
+        )}
+
+        {isDev && (
+          <Image
+            height={transformRes({ height: 1080 })}
+            width={transformRes({ width: 1920 })}
+            alt={`main game`}
+            src={`/images/shot_0012.png`}
+          />
         )}
       </div>
     </>
