@@ -1,5 +1,6 @@
 'use client'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { Card } from '@/components/Card'
 import { HeroBlocker } from '@/components/HeroBlocker'
 import { Rankbadge } from '@/components/Rankbadge'
@@ -429,9 +430,23 @@ export default function OverlayPage() {
           width: ${transformRes({ width: 55 })}px !important;
         }
       `}</style>
-      <div>
+      <AnimatePresence>
         {block?.type === 'spectator' && (
-          <div
+          <motion.div
+            initial={{
+              bottom: 0,
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 260,
+              damping: 20,
+            }}
+            animate={{
+              bottom: isXL
+                ? transformRes({ height: 300 })
+                : transformRes({ height: 260 }),
+            }}
+            exit={{ top: 0 }}
             className="absolute"
             style={{
               bottom: isXL
@@ -449,13 +464,28 @@ export default function OverlayPage() {
                 ? `Spectating match ${block.matchId}`
                 : 'Spectating a match'}
             </Card>
-          </div>
+          </motion.div>
         )}
 
         {opts[DBSettings.rosh] &&
           (block.type === 'playing' || isDev) &&
           roshan?.maxDate && (
-            <div style={roshPosition} className="rosh-timer absolute">
+            <motion.div
+              initial={{
+                scale: 0,
+              }}
+              transition={{
+                type: 'spring',
+                stiffness: 260,
+                damping: 20,
+              }}
+              animate={{
+                scale: 1,
+              }}
+              exit={{ scale: 0 }}
+              style={roshPosition}
+              className="rosh-timer absolute"
+            >
               {roshan?.minDate && (
                 <CountdownCircleTimer
                   isPlaying={!paused}
@@ -522,13 +552,25 @@ export default function OverlayPage() {
                   </CountdownCircleTimer>
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
 
         {opts[DBSettings.aegis] &&
           (block.type === 'playing' || isDev) &&
           aegis.expireDate && (
-            <div
+            <motion.div
+              initial={{
+                scale: 2,
+              }}
+              transition={{
+                type: 'spring',
+                stiffness: 260,
+                damping: 20,
+              }}
+              animate={{
+                scale: 1,
+              }}
+              exit={{ scale: 0 }}
               style={{
                 left: leftPositions[aegis.playerId],
                 top: transformRes({ height: 65 }),
@@ -548,49 +590,112 @@ export default function OverlayPage() {
                   })
                 }}
               />
-            </div>
+            </motion.div>
           )}
 
         {shouldBlockMap && (
-          <Image
-            className="absolute"
-            priority
-            alt="minimap blocker"
-            width={
-              isXL ? transformRes({ width: 280 }) : transformRes({ width: 240 })
-            }
-            height={
-              isXL
-                ? transformRes({ height: 280 })
-                : transformRes({ height: 240 })
-            }
+          <motion.div
+            initial={{
+              scale: 0,
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 260,
+              damping: 20,
+            }}
+            animate={{
+              scale: 1,
+            }}
+            exit={{ scale: 0 }}
             style={minimapPosition}
-            src={`/images/731-${isSimple ? 'Simple' : 'Complex'}-${
-              isXL ? 'X' : ''
-            }Large-AntiStreamSnipeMap.png`}
-          />
+            className="absolute"
+          >
+            <Image
+              priority
+              alt="minimap blocker"
+              width={
+                isXL
+                  ? transformRes({ width: 280 })
+                  : transformRes({ width: 240 })
+              }
+              height={
+                isXL
+                  ? transformRes({ height: 280 })
+                  : transformRes({ height: 240 })
+              }
+              src={`/images/731-${isSimple ? 'Simple' : 'Complex'}-${
+                isXL ? 'X' : ''
+              }Large-AntiStreamSnipeMap.png`}
+            />
+          </motion.div>
         )}
 
         {shouldBlockPicks && (
-          <HeroBlocker
-            transformRes={transformRes}
-            type={block?.type}
-            teamName={block?.team}
-          />
+          <motion.div
+            initial={{
+              scale: 2,
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 260,
+              damping: 20,
+            }}
+            animate={{
+              scale: 1,
+            }}
+            exit={{ scale: 0 }}
+          >
+            <HeroBlocker
+              transformRes={transformRes}
+              type={block?.type}
+              teamName={block?.team}
+            />
+          </motion.div>
         )}
 
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
             {opts[DBSettings.commandWL] && (
-              <div className="absolute" style={wlPosition}>
+              <motion.div
+                initial={{
+                  right: wlPosition.right * -1,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                animate={{
+                  right: wlPosition.right,
+                }}
+                exit={{ right: wlPosition.right * -1 }}
+                className="absolute"
+                style={wlPosition}
+              >
                 <WinLossCard wl={wl} />
-              </div>
+              </motion.div>
             )}
 
             {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
-              <div className="absolute" style={badgePosition}>
+              <motion.div
+                initial={{
+                  right: badgePosition.right * -1,
+                }}
+                transition={{
+                  delay: 0.3,
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                animate={{
+                  right: badgePosition.right,
+                }}
+                exit={{ right: badgePosition.right * -1 }}
+                className="absolute"
+                style={badgePosition}
+              >
                 <Rankbadge {...rankImageDetails} transformRes={transformRes} />
-              </div>
+              </motion.div>
             )}
           </>
         )}
@@ -598,7 +703,21 @@ export default function OverlayPage() {
         {[null].includes(block.type) && (
           <>
             {opts[DBSettings.commandWL] && (
-              <div
+              <motion.div
+                initial={{
+                  scale: 0,
+                  right: 0,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                animate={{
+                  scale: 1,
+                  right: transformRes({ width: 600 }),
+                }}
+                exit={{ scale: 0, right: 0 }}
                 className="absolute"
                 style={{
                   ...wlPosition,
@@ -611,11 +730,25 @@ export default function OverlayPage() {
                 }}
               >
                 <WinLossCard wl={wl} mainScreen />
-              </div>
+              </motion.div>
             )}
 
             {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
-              <div
+              <motion.div
+                initial={{
+                  scale: 0,
+                  right: 0,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                animate={{
+                  scale: 1,
+                  right: transformRes({ width: 480 }),
+                }}
+                exit={{ scale: 0, right: 0 }}
                 className="absolute"
                 style={{
                   ...badgePosition,
@@ -629,7 +762,7 @@ export default function OverlayPage() {
                   mainScreen
                   transformRes={transformRes}
                 />
-              </div>
+              </motion.div>
             )}
           </>
         )}
@@ -639,10 +772,10 @@ export default function OverlayPage() {
             width={transformRes({ width: 1920 })}
             height={transformRes({ height: 1080 })}
             alt={`main game`}
-            src={`/images/rosh/draskyl.png`}
+            src={`/images/shot_0012.png`}
           />
         )}
-      </div>
+      </AnimatePresence>
     </>
   )
 }
