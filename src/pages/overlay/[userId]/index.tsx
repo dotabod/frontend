@@ -337,10 +337,13 @@ export default function OverlayPage() {
     fontSize: transformRes({ width: 22 }),
   }
 
+  const isSimple = opts[DBSettings['minimap-simple']]
+  const isXL = opts[DBSettings['minimap-xl']]
+
   let roshPosition = {
-    left: opts[DBSettings['minimap-xl']]
-      ? transformRes({ width: 285 })
-      : transformRes({ width: 250 }),
+    left: isXL
+      ? transformRes({ width: isSimple ? 280 : 285 })
+      : transformRes({ width: isSimple ? 243 : 250 }),
     bottom: transformRes({ height: 100 }),
     right: null,
   }
@@ -597,10 +600,10 @@ export default function OverlayPage() {
 
         {isDev && (
           <Image
-            height={transformRes({ height: 1080 })}
             width={transformRes({ width: 1920 })}
+            height={transformRes({ height: 1080 })}
             alt={`main game`}
-            src={`/images/shot_0012.png`}
+            src={`/images/rosh/limitlessqt.png`}
           />
         )}
       </div>
