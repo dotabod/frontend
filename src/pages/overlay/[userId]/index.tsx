@@ -307,8 +307,6 @@ export default function OverlayPage() {
     )
       return
 
-    console.log('OBS studio is connected')
-
     window.obsstudio.getCurrentScene(function (scene) {
       const myScenes = [
         opts[DBSettings['obs-minimap']],
@@ -321,11 +319,11 @@ export default function OverlayPage() {
       // Some people don't enable the permissions
       if (typeof window.obsstudio.setCurrentScene !== 'function') return
 
-      if (shouldBlockMap) {
+      if (block.type === 'playing') {
         window.obsstudio.setCurrentScene(opts[DBSettings['obs-minimap']])
         return
       }
-      if (shouldBlockPicks) {
+      if (['picks', 'strategy'].includes(block.type)) {
         window.obsstudio.setCurrentScene(opts[DBSettings['obs-picks']])
         return
       }
@@ -338,7 +336,7 @@ export default function OverlayPage() {
         return
       }
     })
-  }, [connected, userId, shouldBlockMap, shouldBlockPicks, opts])
+  }, [connected, userId, opts, block.type])
 
   useEffect(() => {
     return () => {
