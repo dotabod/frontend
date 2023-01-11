@@ -78,7 +78,7 @@ export default function OverlayPage() {
     fetcher(`/api/settings/?id=`, userId).then(setData)
   }, [userId])
 
-  const [block, setBlock] = useState({ type: null, team: null })
+  const [block, setBlock] = useState({ type: null, team: null, matchId: null })
   const time = new Date().getTime()
   const isDev = process.env.NODE_ENV === 'development'
   const devMin = isDev ? new Date(time + 300000).toISOString() : ''
@@ -444,10 +444,12 @@ export default function OverlayPage() {
           >
             <Card
               style={{
-                fontSize: transformRes({ width: 16 }),
+                fontSize: transformRes({ width: 18 }),
               }}
             >
-              Spectating a match
+              {block?.matchId
+                ? `Spectating match ${block.matchId}`
+                : 'Spectating a match'}
             </Card>
           </div>
         )}
