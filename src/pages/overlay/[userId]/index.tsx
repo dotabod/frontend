@@ -339,6 +339,7 @@ export default function OverlayPage() {
 
   const isSimple = opts[DBSettings['minimap-simple']]
   const isXL = opts[DBSettings['minimap-xl']]
+  const isBp = opts[DBSettings.battlepass]
 
   let roshPosition = {
     left: isXL
@@ -354,10 +355,10 @@ export default function OverlayPage() {
     right: null,
   }
 
-  if (opts[DBSettings.battlepass]) {
+  if (isBp) {
     minimapPosition.bottom += transformRes({ height: 9 })
     minimapPosition.left += transformRes({ width: 9 })
-    roshPosition.left = opts[DBSettings['minimap-xl']]
+    roshPosition.left = isXL
       ? transformRes({ width: 290 })
       : transformRes({ width: 255 })
   }
@@ -375,7 +376,7 @@ export default function OverlayPage() {
     badgePosition.left = badgePosition.right
     badgePosition.right = null
 
-    if (opts[DBSettings.battlepass]) {
+    if (isBp) {
       minimapPosition.right += transformRes({ width: -3 })
       minimapPosition.bottom += transformRes({ height: -5 })
     }
@@ -405,7 +406,7 @@ export default function OverlayPage() {
           <div
             className="absolute"
             style={{
-              bottom: opts[DBSettings['minimap-xl']]
+              bottom: isXL
                 ? transformRes({ height: 300 })
                 : transformRes({ height: 260 }),
               left: 0,
@@ -517,20 +518,16 @@ export default function OverlayPage() {
             priority
             alt="minimap blocker"
             width={
-              opts[DBSettings['minimap-xl']]
-                ? transformRes({ width: 280 })
-                : transformRes({ width: 240 })
+              isXL ? transformRes({ width: 280 }) : transformRes({ width: 240 })
             }
             height={
-              opts[DBSettings['minimap-xl']]
+              isXL
                 ? transformRes({ height: 280 })
                 : transformRes({ height: 240 })
             }
             style={minimapPosition}
-            src={`/images/731-${
-              opts[DBSettings['minimap-simple']] ? 'Simple' : 'Complex'
-            }-${
-              opts[DBSettings['minimap-xl']] ? 'X' : ''
+            src={`/images/731-${isSimple ? 'Simple' : 'Complex'}-${
+              isXL ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
         )}
@@ -603,7 +600,7 @@ export default function OverlayPage() {
             width={transformRes({ width: 1920 })}
             height={transformRes({ height: 1080 })}
             alt={`main game`}
-            src={`/images/rosh/limitlessqt.png`}
+            src={`/images/rosh/grubby.png`}
           />
         )}
       </div>
