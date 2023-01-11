@@ -17,4 +17,5 @@ export const localePatchSchema = z.enum([
   'pt',
   'pt-BR',
   'ru',
+  'uk-UA',
 ])

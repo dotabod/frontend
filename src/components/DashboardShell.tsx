@@ -48,6 +48,18 @@ const localeOptions = [
   {
     flag: (
       <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-ukraine_1f1fa-1f1e6.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
+    label: 'Ukrainian',
+    value: 'uk-UA',
+  },
+  {
+    flag: (
+      <Image
         src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-russia_1f1f7-1f1fa.png"
         width={22}
         height={22}
