@@ -350,7 +350,7 @@ export default function OverlayPage() {
               aegis={aegis}
               top={transformRes({ height: 65 })}
               transformRes={transformRes}
-              ref={aegisRef}
+              aegisRef={aegisRef}
               onComplete={() => {
                 setAegis({
                   expireS: 0,

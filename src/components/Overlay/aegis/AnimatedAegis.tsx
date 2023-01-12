@@ -7,7 +7,7 @@ export const AnimatedAegis = ({
   aegis: { expireDate, playerId },
   numbers,
   onComplete,
-  ref,
+  aegisRef,
   top,
   transformRes,
 }: {
@@ -20,7 +20,7 @@ export const AnimatedAegis = ({
   }
   top: number
   transformRes: ({ height, width }: { height?: any; width?: any }) => number
-  ref: React.MutableRefObject<Countdown | undefined>
+  aegisRef: React.MutableRefObject<Countdown | undefined>
   onComplete: () => void
 }) => (
   <motion.div
@@ -41,7 +41,7 @@ export const AnimatedAegis = ({
     <Countdown
       date={expireDate}
       renderer={AegisTimer(transformRes)}
-      ref={ref}
+      ref={aegisRef}
       onComplete={onComplete}
     />
   </motion.div>
