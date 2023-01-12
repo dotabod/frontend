@@ -84,7 +84,7 @@ export default function OverlayPage() {
     expireS: isDev ? 6 : 0,
     expireTime: '',
     expireDate: isDev ? devMin : '',
-    playerId: isDev ? 1 : null,
+    playerId: isDev ? 5 : null,
   })
   const [connected, setConnected] = useState(false)
 
