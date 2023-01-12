@@ -16,8 +16,8 @@ import { Github } from 'lucide-react'
 import DiscordSvg from '@/images/logos/discord.svg'
 import { Group, Select, Switch } from '@mantine/core'
 import { useUpdateLocale, useUpdateSetting } from '@/lib/useUpdateSetting'
-import { DBSettings } from '@/lib/DBSettings'
 import CommandDetail from './CommandDetail'
+import { Settings } from '@/lib/defaultSettings'
 
 const localeOptions = [
   {
@@ -183,7 +183,7 @@ export default function DashboardShell({ children, title, subtitle }) {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings.commandDisable)
+  } = useUpdateSetting(Settings.commandDisable)
 
   const {
     data,

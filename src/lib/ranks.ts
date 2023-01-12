@@ -1,4 +1,4 @@
-export type RankDeets = {
+export type RankType = {
   mmr: number
   mmrToNextRank: number
   nextMMR: number
@@ -17,14 +17,14 @@ export type RankDeets = {
 }
 
 // Used for obs overlay
-export async function getRankImage(deets: RankDeets) {
-  if (!deets?.mmr) {
+export async function getRankImage(rank: RankType) {
+  if (!rank?.mmr) {
     return { image: '0.png', rank: null, leaderboard: false }
   }
 
   return {
-    rank: deets.standing || deets.mmr,
-    image: deets.myRank.image,
-    leaderboard: !!deets.standing,
+    rank: rank.standing || rank.mmr,
+    image: rank.myRank.image,
+    leaderboard: !!rank.standing,
   }
 }

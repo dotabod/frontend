@@ -1,9 +1,9 @@
 import TwitchChat from '@/components/TwitchChat'
-import { DBSettings } from '@/lib/DBSettings'
 import Image from 'next/image'
+import { Settings } from '@/lib/defaultSettings'
 
 const CommandDetail = {
-  [DBSettings.commandDisable]: {
+  [Settings.commandDisable]: {
     title: 'Disable Dotabod',
     description:
       'With this turned on, game events will no longer be recognized and commands will not be responded to.',
@@ -85,8 +85,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandPleb]: {
-    key: DBSettings.commandPleb,
+  [Settings.commandPleb]: {
+    key: Settings.commandPleb,
     title: 'Pleb',
     description:
       'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
@@ -102,8 +102,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandModsonly]: {
-    key: DBSettings.commandModsonly,
+  [Settings.commandModsonly]: {
+    key: Settings.commandModsonly,
     title: 'Mods only',
     description:
       'Only allow mods to send messages in chat. Turns sub only mode on and deletes messages from subs.',
@@ -120,7 +120,7 @@ const CommandDetail = {
     ),
   },
   commands: {
-    key: DBSettings.commandCommands,
+    key: Settings.commandCommands,
     title: 'Command list',
     description:
       'All available commands with Dotabod. This list is filtered to only the commands you enabled. If a mod uses !commands, it will show mod only commands as well.',
@@ -137,8 +137,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandRanked]: {
-    key: DBSettings.commandRanked,
+  [Settings.commandRanked]: {
+    key: Settings.commandRanked,
     title: 'Ranked or not?',
     description: 'Chatters can find out if this match is ranked or not.',
     cmd: '!ranked',
@@ -152,8 +152,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandAvg]: {
-    key: DBSettings.commandAvg,
+  [Settings.commandAvg]: {
+    key: Settings.commandAvg,
     title: 'Average MMR',
     description:
       'For the current game, show the average MMR of all players. Only works if not immortal.',
@@ -168,8 +168,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandOpendota]: {
-    key: DBSettings.commandOpendota,
+  [Settings.commandOpendota]: {
+    key: Settings.commandOpendota,
     title: 'Opendota',
     description:
       'Shows the Opendota link for your currently logged in steam account.',
@@ -185,8 +185,8 @@ const CommandDetail = {
     ),
   },
 
-  [DBSettings.commandDotabuff]: {
-    key: DBSettings.commandDotabuff,
+  [Settings.commandDotabuff]: {
+    key: Settings.commandDotabuff,
     title: 'Dotabuff',
     description:
       'Shows the Dotabuff link for your currently logged in steam account.',
@@ -201,8 +201,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandXPM]: {
-    key: DBSettings.commandXPM,
+  [Settings.commandXPM]: {
+    key: Settings.commandXPM,
     title: 'XPM',
     description: 'Live experience per minute for your chatters on demand.',
     cmd: '!xpm',
@@ -212,8 +212,8 @@ const CommandDetail = {
       <TwitchChat {...props} command="!xpm" response="Live XPM: 778" />
     ),
   },
-  [DBSettings.commandWL]: {
-    key: DBSettings.commandWL,
+  [Settings.commandWL]: {
+    key: Settings.commandWL,
     title: 'Win / Loss',
     description: '',
     cmd: '!wl',
@@ -236,8 +236,8 @@ const CommandDetail = {
       </>
     ),
   },
-  [DBSettings['mmr-tracker']]: {
-    key: DBSettings['mmr-tracker'],
+  [Settings['mmr-tracker']]: {
+    key: Settings['mmr-tracker'],
     title: 'MMR',
     description:
       'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
@@ -252,8 +252,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandGPM]: {
-    key: DBSettings.commandGPM,
+  [Settings.commandGPM]: {
+    key: Settings.commandGPM,
     title: 'GPM',
     description:
       'At any time, chatters can request your live gold per minute with !gpm. Playing alch or anti-mage? Show off your gpm!',
@@ -268,8 +268,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandAPM]: {
-    key: DBSettings.commandAPM,
+  [Settings.commandAPM]: {
+    key: Settings.commandAPM,
     title: 'APM',
     description:
       'Actions per minute. A good indicator of speed and efficiency.',
@@ -281,8 +281,8 @@ const CommandDetail = {
     ),
   },
 
-  [DBSettings.commandNP]: {
-    key: DBSettings.commandNP,
+  [Settings.commandNP]: {
+    key: Settings.commandNP,
     title: 'Notable players',
     description: 'Find out if your match has any pros.',
     cmd: '!np',
@@ -356,8 +356,8 @@ const CommandDetail = {
       </div>
     ),
   },
-  [DBSettings.commandSmurfs]: {
-    key: DBSettings.commandSmurfs,
+  [Settings.commandSmurfs]: {
+    key: Settings.commandSmurfs,
     title: 'Smurfs',
     description: 'Shows total games played for each player in the match.',
     cmd: '!smurfs',
@@ -371,8 +371,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandGM]: {
-    key: DBSettings.commandGM,
+  [Settings.commandGM]: {
+    key: Settings.commandGM,
     title: 'Game medals',
     description: 'Return the rankings for each players in the game.',
     cmd: '!gm',
@@ -386,8 +386,8 @@ const CommandDetail = {
       />
     ),
   },
-  [DBSettings.commandLG]: {
-    key: DBSettings.commandLG,
+  [Settings.commandLG]: {
+    key: Settings.commandLG,
     title: 'Last game',
     description: "Find out if you're playing with anyone from your last match.",
     cmd: '!lg',

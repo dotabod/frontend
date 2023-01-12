@@ -2,14 +2,14 @@ import { Card } from '@/ui/card'
 import { Button, Collapse } from '@geist-ui/core'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
-import { DBSettings } from '@/lib/DBSettings'
+import { Settings } from '@/lib/defaultSettings'
 
 export default function PicksCard() {
   const {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings['only-block-ranked'])
+  } = useUpdateSetting(Settings['only-block-ranked'])
 
   return (
     <Card>

@@ -1,11 +1,11 @@
 import { Input } from '@/components/Input'
-import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { Card } from '@/ui/card'
 import { Badge } from '@geist-ui/core'
 import { Accordion, Switch } from '@mantine/core'
 import { useDebouncedCallback } from 'use-debounce'
+import { defaultSettings, Settings } from '@/lib/defaultSettings'
 
 export default function CommandsCard({
   id,
@@ -24,7 +24,7 @@ export default function CommandsCard({
     data: customMmr,
     loading: loadingCustomMmr,
     updateSetting: updateCustomMmr,
-  } = useUpdateSetting(DBSettings.customMmr)
+  } = useUpdateSetting(Settings.customMmr)
 
   let onChangeMmr = useDebouncedCallback((e) => {
     updateCustomMmr(e.target.value ? e.target.value : defaultSettings.customMmr)
@@ -79,7 +79,7 @@ export default function CommandsCard({
           </div>
           <div className="subtitle">{command.description}</div>
           <Accordion.Panel>
-            {command.key === DBSettings['mmr-tracker'] && (
+            {command.key === Settings['mmr-tracker'] && (
               <div className="py-4">
                 <p className="ml-1 pb-1">
                   Custom message. Variables: [currentmmr] [currentrank]

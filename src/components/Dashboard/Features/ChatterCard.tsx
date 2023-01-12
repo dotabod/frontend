@@ -1,4 +1,3 @@
-import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch, Tooltip } from '@mantine/core'
@@ -6,6 +5,7 @@ import { useForm } from '@mantine/form'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
+import { defaultSettings, Settings } from '@/lib/defaultSettings'
 
 export const chatterInfo = {
   midas: {
@@ -213,12 +213,12 @@ export default function ChatterCard() {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings.chatter)
+  } = useUpdateSetting(Settings.chatter)
   const {
     data: dbChatters,
     loading: loadingChatters,
     updateSetting: updateChatters,
-  } = useUpdateSetting(DBSettings.chatters)
+  } = useUpdateSetting(Settings.chatters)
 
   const chatters = dbChatters as typeof defaultSettings.chatters | undefined
   const form = useForm({ initialValues: chatters })

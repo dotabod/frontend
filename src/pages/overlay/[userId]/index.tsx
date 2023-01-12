@@ -1,11 +1,7 @@
 import { AnimatePresence } from 'framer-motion'
-import {
-  DBSettings,
-  defaultSettings,
-  getValueOrDefault,
-} from '@/lib/DBSettings'
+import { getValueOrDefault } from '@/lib/settings'
 import { fetcher } from '@/lib/fetcher'
-import { getRankImage, RankDeets } from '@/lib/ranks'
+import { getRankImage, RankType } from '@/lib/ranks'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -21,6 +17,7 @@ import { AnimatedWLCard } from '@/components/Overlay/wl/AnimatedWLCard'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRank_Mainscreen } from '@/components/Overlay/rank/AnimatedRank_Mainscreen'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
+import { defaultSettings, Settings } from '@/lib/defaultSettings'
 
 let socket
 
@@ -93,15 +90,15 @@ export default function OverlayPage() {
 
   const opts = defaultSettings
   // Replace defaults with settings from DB
-  Object.values(DBSettings).forEach((key) => {
+  Object.values(Settings).forEach((key) => {
     // @ts-ignore ???
     opts[key] = getValueOrDefault(key, data?.settings)
   })
 
   const shouldBlockMap =
-    opts[DBSettings['minimap-blocker']] && block.type === 'playing'
+    opts[Settings['minimap-blocker']] && block.type === 'playing'
   const shouldBlockPicks =
-    opts[DBSettings['picks-blocker']] &&
+    opts[Settings['picks-blocker']] &&
     ['picks', 'strategy'].includes(block.type)
   const countdownRef = useRef<Countdown>()
   const aegisRef = useRef<Countdown>()
@@ -151,7 +148,7 @@ export default function OverlayPage() {
       fetcher(`/api/settings/?id=`, userId).then(setData)
     })
 
-    socket.on('update-medal', (deets: RankDeets) => {
+    socket.on('update-medal', (deets: RankType) => {
       getRankImage(deets).then(setRankImageDetails)
     })
 
@@ -167,7 +164,7 @@ export default function OverlayPage() {
   }, [router, userId])
 
   useEffect(() => {
-    if (!userId || !opts[DBSettings['obs-scene-switcher']]) {
+    if (!userId || !opts[Settings['obs-scene-switcher']]) {
       return
     }
 
@@ -183,7 +180,7 @@ export default function OverlayPage() {
 
     // Only run in OBS browser source
     if (
-      !opts[DBSettings['obs-scene-switcher']] ||
+      !opts[Settings['obs-scene-switcher']] ||
       typeof window !== 'object' ||
       !window?.obsstudio
     )
@@ -191,9 +188,9 @@ export default function OverlayPage() {
 
     window.obsstudio.getCurrentScene(function (scene) {
       const myScenes = [
-        opts[DBSettings['obs-minimap']],
-        opts[DBSettings['obs-picks']],
-        opts[DBSettings['obs-dc']],
+        opts[Settings['obs-minimap']],
+        opts[Settings['obs-picks']],
+        opts[Settings['obs-dc']],
       ]
 
       setScene(scene)
@@ -202,11 +199,11 @@ export default function OverlayPage() {
       if (typeof window.obsstudio.setCurrentScene !== 'function') return
 
       if (block.type === 'playing') {
-        window.obsstudio.setCurrentScene(opts[DBSettings['obs-minimap']])
+        window.obsstudio.setCurrentScene(opts[Settings['obs-minimap']])
         return
       }
       if (['picks', 'strategy'].includes(block.type)) {
-        window.obsstudio.setCurrentScene(opts[DBSettings['obs-picks']])
+        window.obsstudio.setCurrentScene(opts[Settings['obs-picks']])
         return
       }
 
@@ -214,7 +211,7 @@ export default function OverlayPage() {
       // This allows streamers to make a scene for playing other games, and having
       // dota in the background wont switch scenes on them
       if (myScenes.includes(scene?.name)) {
-        window.obsstudio.setCurrentScene(opts[DBSettings['obs-dc']])
+        window.obsstudio.setCurrentScene(opts[Settings['obs-dc']])
         return
       }
     })
@@ -247,9 +244,9 @@ export default function OverlayPage() {
     fontSize: transformRes({ width: 22 }),
   }
 
-  const isSimple = opts[DBSettings['minimap-simple']]
-  const isXL = opts[DBSettings['minimap-xl']]
-  const isBp = opts[DBSettings.battlepass]
+  const isSimple = opts[Settings['minimap-simple']]
+  const isXL = opts[Settings['minimap-xl']]
+  const isBp = opts[Settings.battlepass]
 
   let roshPosition = {
     left: isXL
@@ -273,7 +270,7 @@ export default function OverlayPage() {
       : transformRes({ width: 255 })
   }
 
-  if (opts[DBSettings.minimapRight]) {
+  if (opts[Settings.minimapRight]) {
     roshPosition.right = roshPosition.left
     roshPosition.left = null
 
@@ -320,7 +317,7 @@ export default function OverlayPage() {
           />
         )}
 
-        {opts[DBSettings.rosh] &&
+        {opts[Settings.rosh] &&
           (block.type === 'playing' || isDev) &&
           roshan?.maxDate && (
             <AnimateRosh
@@ -345,7 +342,7 @@ export default function OverlayPage() {
             />
           )}
 
-        {opts[DBSettings.aegis] &&
+        {opts[Settings.aegis] &&
           (block.type === 'playing' || isDev) &&
           aegis.expireDate && (
             <AnimatedAegis
@@ -380,11 +377,11 @@ export default function OverlayPage() {
 
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
-            {opts[DBSettings.commandWL] && (
+            {opts[Settings.commandWL] && (
               <AnimatedWLCard wlPosition={wlPosition} wl={wl} />
             )}
 
-            {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
+            {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
               <AnimateRankBadge
                 badgePosition={badgePosition}
                 rankImageDetails={rankImageDetails}
@@ -396,7 +393,7 @@ export default function OverlayPage() {
 
         {[null].includes(block.type) && (
           <>
-            {opts[DBSettings.commandWL] && (
+            {opts[Settings.commandWL] && (
               <AnimatedWL
                 right={transformRes({ width: 600 })}
                 wlPosition={wlPosition}
@@ -406,7 +403,7 @@ export default function OverlayPage() {
               />
             )}
 
-            {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
+            {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
               <AnimatedRank_Mainscreen
                 right={transformRes({ width: 480 })}
                 badgePosition={badgePosition}

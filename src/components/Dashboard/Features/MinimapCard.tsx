@@ -1,36 +1,36 @@
-import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image } from '@geist-ui/core'
 import { Checkbox, Switch } from '@mantine/core'
 import clsx from 'clsx'
+import { Settings } from '@/lib/defaultSettings'
 
 export default function MinimapCard(): JSX.Element {
   const {
     data: isEnabled,
     loading: l0,
     updateSetting,
-  } = useUpdateSetting(DBSettings['minimap-blocker'])
+  } = useUpdateSetting(Settings['minimap-blocker'])
   const {
     data: minimapSimple,
     loading: l1,
     updateSetting: updateSimple,
-  } = useUpdateSetting(DBSettings['minimap-simple'])
+  } = useUpdateSetting(Settings['minimap-simple'])
   const {
     data: minimapXl,
     loading: l2,
     updateSetting: updateXl,
-  } = useUpdateSetting(DBSettings['minimap-xl'])
+  } = useUpdateSetting(Settings['minimap-xl'])
   const {
     data: isBP,
     loading: l3,
     updateSetting: updateBP,
-  } = useUpdateSetting(DBSettings.battlepass)
+  } = useUpdateSetting(Settings.battlepass)
   const {
     data: isMinimapRight,
     loading: l4,
     updateSetting: updateMinimapRight,
-  } = useUpdateSetting(DBSettings.minimapRight)
+  } = useUpdateSetting(Settings.minimapRight)
 
   const loading = l0 || l1 || l2 || l3 || l4
 
@@ -80,7 +80,7 @@ export default function MinimapCard(): JSX.Element {
             label="Use simple minimap background"
             disabled={!isEnabled}
             checked={minimapSimple}
-            value={DBSettings['minimap-simple']}
+            value={Settings['minimap-simple']}
             onChange={(e) => updateSimple(!!e?.target?.checked)}
           />
 
@@ -88,14 +88,14 @@ export default function MinimapCard(): JSX.Element {
             label="Use extra large minimap"
             disabled={!isEnabled}
             checked={minimapXl}
-            value={DBSettings['minimap-xl']}
+            value={Settings['minimap-xl']}
             onChange={(e) => updateXl(!!e?.target?.checked)}
           />
           <Checkbox
             label="Show minimap on the right"
             disabled={!isEnabled}
             checked={isMinimapRight}
-            value={DBSettings.minimapRight}
+            value={Settings.minimapRight}
             onChange={(e) => updateMinimapRight(!!e?.target?.checked)}
           />
 
@@ -103,7 +103,7 @@ export default function MinimapCard(): JSX.Element {
             label="Use Battlepass 2022 HUD"
             disabled={!isEnabled}
             checked={isBP}
-            value={DBSettings.battlepass}
+            value={Settings.battlepass}
             onChange={(e) => updateBP(!!e?.target?.checked)}
           />
         </div>

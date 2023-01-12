@@ -1,4 +1,3 @@
-import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
@@ -8,18 +7,19 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Input } from '../../Input'
+import { Settings } from '@/lib/defaultSettings'
 
 export default function BetsCard() {
   const {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings.bets)
+  } = useUpdateSetting(Settings.bets)
   const {
     data: info,
     loading: loadingInfo,
     updateSetting: updateInfo,
-  } = useUpdateSetting(DBSettings.betsInfo)
+  } = useUpdateSetting(Settings.betsInfo)
 
   const form = useForm({ initialValues: info })
 

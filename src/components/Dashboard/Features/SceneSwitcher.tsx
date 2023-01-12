@@ -1,4 +1,3 @@
-import { DBSettings, defaultSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
@@ -6,28 +5,29 @@ import { Switch } from '@mantine/core'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
+import { defaultSettings, Settings } from '@/lib/defaultSettings'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
     data: isEnabled,
     loading: l0,
     updateSetting,
-  } = useUpdateSetting(DBSettings['obs-scene-switcher'])
+  } = useUpdateSetting(Settings['obs-scene-switcher'])
   const {
     data: obsDc,
     loading: l1,
     updateSetting: updateDc,
-  } = useUpdateSetting(DBSettings['obs-dc'])
+  } = useUpdateSetting(Settings['obs-dc'])
   const {
     data: obsMini,
     loading: l2,
     updateSetting: updateMini,
-  } = useUpdateSetting(DBSettings['obs-minimap'])
+  } = useUpdateSetting(Settings['obs-minimap'])
   const {
     data: obsPick,
     loading: l3,
     updateSetting: updatePicks,
-  } = useUpdateSetting(DBSettings['obs-picks'])
+  } = useUpdateSetting(Settings['obs-picks'])
 
   const loading = l0 || l1 || l2 || l3
 
@@ -36,20 +36,20 @@ export default function SceneSwitcher(): JSX.Element {
   }, 500)
 
   const scenes = {
-    [DBSettings['obs-minimap']]: {
+    [Settings['obs-minimap']]: {
       value: obsMini,
       update: updateMini,
       label: 'Minimap blocker',
       helpText: 'Whenever the minimap is first shown, switch to this scene',
     },
-    [DBSettings['obs-picks']]: {
+    [Settings['obs-picks']]: {
       value: obsPick,
       update: updatePicks,
       label: 'Picks blocker',
       helpText:
         'As soon as picks are shown and heroes are able to be selected, switch to this scene',
     },
-    [DBSettings['obs-dc']]: {
+    [Settings['obs-dc']]: {
       value: obsDc,
       update: updateDc,
       label: 'Game disconnected',

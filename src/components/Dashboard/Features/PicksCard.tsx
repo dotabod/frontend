@@ -1,16 +1,16 @@
-import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Image } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
 import clsx from 'clsx'
+import { Settings } from '@/lib/defaultSettings'
 
 export default function PicksCard() {
   const {
     data: isEnabled,
     loading,
     updateSetting,
-  } = useUpdateSetting(DBSettings['picks-blocker'])
+  } = useUpdateSetting(Settings['picks-blocker'])
 
   return (
     <Card>

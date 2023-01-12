@@ -1,22 +1,22 @@
-import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
 import { Switch } from '@mantine/core'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { Settings } from '@/lib/defaultSettings'
 
 export default function RoshCard() {
   const {
     data: hasAegis,
     loading: lA,
     updateSetting: uA,
-  } = useUpdateSetting(DBSettings.aegis)
+  } = useUpdateSetting(Settings.aegis)
   const {
     data: hasRosh,
     loading: lR,
     updateSetting: uR,
-  } = useUpdateSetting(DBSettings.rosh)
+  } = useUpdateSetting(Settings.rosh)
 
   return (
     <Card>

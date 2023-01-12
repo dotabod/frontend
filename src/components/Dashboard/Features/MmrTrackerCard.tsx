@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import { Input } from '@/components/Input'
-import { DBSettings } from '@/lib/DBSettings'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Link } from '@geist-ui/core'
@@ -10,6 +9,7 @@ import { SteamAccount } from '@prisma/client'
 import { XCircle } from 'lucide-react'
 import { useEffect } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+import { Settings } from '@/lib/defaultSettings'
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
@@ -28,19 +28,19 @@ export default function MmrTrackerCard() {
     data: isEnabled,
     loading: l0,
     updateSetting,
-  } = useUpdateSetting(DBSettings['mmr-tracker'])
+  } = useUpdateSetting(Settings['mmr-tracker'])
 
   const {
     data: mmr,
     updateSetting: updateMmr,
     loading: l1,
-  } = useUpdateSetting(DBSettings.mmr)
+  } = useUpdateSetting(Settings.mmr)
 
   const {
     data: onlyParty,
     loading: l2,
     updateSetting: updateOnlyParty,
-  } = useUpdateSetting(DBSettings.onlyParty)
+  } = useUpdateSetting(Settings.onlyParty)
 
   const loading = l0 || l1 || l2
 

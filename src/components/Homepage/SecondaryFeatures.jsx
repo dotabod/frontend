@@ -6,10 +6,10 @@ import { SparklesIcon } from '@heroicons/react/24/outline'
 import { Rankbadge } from '../Overlay/rank/Rankbadge'
 import WinLossCard from '../Overlay/WinLossCard'
 import TwitchChat from '../TwitchChat'
-import { DBSettings } from 'src/lib/DBSettings'
 import React from 'react'
 import CommandDetail from 'src/components/Dashboard/CommandDetail'
 import { chatterInfo } from '../Dashboard/Features/ChatterCard'
+import { Settings } from '@/lib/defaultSettings'
 
 export function SecondaryFeatures() {
   const features = [
@@ -46,7 +46,7 @@ export function SecondaryFeatures() {
             Create predictions for your viewers to bet on. Dotabod will start
             and stop the prediction automatically.
           </span>
-          {CommandDetail[DBSettings.commandWL].response({}, false)}
+          {CommandDetail[Settings.commandWL].response({}, false)}
 
           <div className="mt-2 flex justify-center space-x-4">
             <WinLossCard
@@ -95,7 +95,7 @@ export function SecondaryFeatures() {
           <span>
             Show off your current rank, or leaderboard standing on stream.
           </span>
-          {CommandDetail[DBSettings['mmr-tracker']].response()}
+          {CommandDetail[Settings['mmr-tracker']].response()}
           <div className="mt-6 flex justify-center space-x-4">
             <Rankbadge image="55.png" rank="3860" />
             <Rankbadge image="92.png" leaderboard rank="9" />
@@ -107,8 +107,8 @@ export function SecondaryFeatures() {
       name: 'Smurf detection',
       description: (
         <div>
-          {CommandDetail[DBSettings.commandSmurfs].description}
-          {CommandDetail[DBSettings.commandSmurfs].response()}
+          {CommandDetail[Settings.commandSmurfs].description}
+          {CommandDetail[Settings.commandSmurfs].response()}
         </div>
       ),
     },
@@ -181,8 +181,8 @@ export function SecondaryFeatures() {
       name: 'Game medals',
       description: (
         <div>
-          {CommandDetail[DBSettings.commandGM].description}
-          {CommandDetail[DBSettings.commandGM].response()}
+          {CommandDetail[Settings.commandGM].description}
+          {CommandDetail[Settings.commandGM].response()}
         </div>
       ),
     },

@@ -7,7 +7,7 @@ import { mmrPatchSchema, settingPatchSchema } from '@/lib/validations/setting'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { unstable_getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { DBSettings } from '@/lib/DBSettings'
+import { Settings } from '@/lib/defaultSettings'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await unstable_getServerSession(req, res, authOptions)
@@ -30,7 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'PATCH') {
     try {
-      if (settingKey === DBSettings.mmr) {
+      if (settingKey === Settings.mmr) {
         const body = mmrPatchSchema.parse(JSON.parse(req.body))
 
         await prisma.user.update({
