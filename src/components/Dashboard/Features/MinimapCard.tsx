@@ -32,7 +32,7 @@ export default function MinimapCard(): JSX.Element {
     updateSetting: updateMinimapRight,
   } = useUpdateSetting(DBSettings.minimapRight)
 
-  const loading = l0 || l1 || l2 || l3
+  const loading = l0 || l1 || l2 || l3 || l4
 
   return (
     <Card>

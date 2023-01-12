@@ -15,7 +15,7 @@ export const RoshCounter = (props) => (
       width: 3,
     })}
   >
-    {({ remainingTime }) => (
+    {() => (
       <Countdown
         ref={props.countdownRef}
         date={props.date}

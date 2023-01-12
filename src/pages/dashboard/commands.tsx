@@ -16,7 +16,7 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
-import { accordionStyles } from '../../components/accordionStyles'
+import { accordionStyles } from '@/components/accordionStyles'
 
 export default function CommandsPage() {
   const { status } = useSession()
@@ -97,10 +97,7 @@ export default function CommandsPage() {
         }
       })
 
-      if (searchTerm && !containsStringValue) {
-        return false
-      }
-      return true
+      return !(searchTerm && !containsStringValue)
     })
 
   return status === 'authenticated' ? (

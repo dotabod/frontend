@@ -10,11 +10,9 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { Accordion } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { useState } from 'react'
 
 export default function FeaturesPage() {
   const { status } = useSession()
-  const [value, setValue] = useState<string[]>()
 
   return status === 'authenticated' ? (
     <>
