@@ -1,7 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
-import { Rankbadge } from '@/components/Overlay/rank/Rankbadge'
-import WinLossCard from '@/components/Overlay/WinLossCard'
+import { AnimatePresence } from 'framer-motion'
 import {
   DBSettings,
   defaultSettings,
@@ -16,42 +13,16 @@ import { useEffect, useRef, useState } from 'react'
 import Countdown from 'react-countdown'
 import io from 'socket.io-client'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
-import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
 import { MinimapBlocker } from '@/components/Overlay/blocker/MinimapBlocker'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { AnimateRankBadge } from '@/components/Overlay/rank/AnimateRankBadge'
+import { AnimatedHeroBlocker } from '@/components/Overlay/blocker/AnimatedHeroBlocker'
+import { AnimatedWLCard } from '@/components/Overlay/wl/AnimatedWLCard'
+import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
+import { AnimatedRank_Mainscreen } from '@/components/Overlay/rank/AnimatedRank_Mainscreen'
+import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 
 let socket
-
-// add ordinal string to count variable
-export const ordinal = (count) => {
-  const j = count % 10
-  const k = count % 100
-  if (j == 1 && k != 11) {
-    return count + 'st'
-  }
-  if (j == 2 && k != 12) {
-    return count + 'nd'
-  }
-  if (j == 3 && k != 13) {
-    return count + 'rd'
-  }
-  return count + 'th'
-}
-
-const heroPosition = (teamName: string, i: number) => ({
-  top: 4,
-  right: teamName === 'radiant' ? null : 115 + i * 125,
-  left: teamName === 'dire' ? null : 115 + i * 125,
-  height: 55,
-  width: 55,
-})
-
-export const transition = {
-  type: 'spring',
-  stiffness: 260,
-  damping: 20,
-}
 
 export default function OverlayPage() {
   const router = useRouter()
@@ -377,35 +348,21 @@ export default function OverlayPage() {
         {opts[DBSettings.aegis] &&
           (block.type === 'playing' || isDev) &&
           aegis.expireDate && (
-            <motion.div
-              initial={{
-                scale: 2,
+            <AnimatedAegis
+              numbers={leftPositions}
+              aegis={aegis}
+              top={transformRes({ height: 65 })}
+              transformRes={transformRes}
+              ref={aegisRef}
+              onComplete={() => {
+                setAegis({
+                  expireS: 0,
+                  expireTime: '',
+                  expireDate: '',
+                  playerId: null,
+                })
               }}
-              transition={transition}
-              animate={{
-                scale: 1,
-              }}
-              exit={{ scale: 0 }}
-              style={{
-                left: leftPositions[aegis.playerId],
-                top: transformRes({ height: 65 }),
-              }}
-              className={`absolute text-white/90`}
-            >
-              <Countdown
-                date={aegis.expireDate}
-                renderer={AegisTimer(transformRes)}
-                ref={aegisRef}
-                onComplete={() => {
-                  setAegis({
-                    expireS: 0,
-                    expireTime: '',
-                    expireDate: '',
-                    playerId: null,
-                  })
-                }}
-              />
-            </motion.div>
+            />
           )}
 
         {shouldBlockMap && (
@@ -418,41 +375,13 @@ export default function OverlayPage() {
         )}
 
         {shouldBlockPicks && (
-          <motion.div
-            initial={{
-              scale: 2,
-            }}
-            transition={transition}
-            animate={{
-              scale: 1,
-            }}
-            exit={{ scale: 0 }}
-          >
-            <HeroBlocker
-              transformRes={transformRes}
-              type={block?.type}
-              teamName={block?.team}
-            />
-          </motion.div>
+          <AnimatedHeroBlocker transformRes={transformRes} block={block} />
         )}
 
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
             {opts[DBSettings.commandWL] && (
-              <motion.div
-                initial={{
-                  right: wlPosition.right * -1,
-                }}
-                transition={transition}
-                animate={{
-                  right: wlPosition.right,
-                }}
-                exit={{ right: wlPosition.right * -1 }}
-                className="absolute"
-                style={wlPosition}
-              >
-                <WinLossCard wl={wl} />
-              </motion.div>
+              <AnimatedWLCard wlPosition={wlPosition} wl={wl} />
             )}
 
             {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
@@ -468,58 +397,23 @@ export default function OverlayPage() {
         {[null].includes(block.type) && (
           <>
             {opts[DBSettings.commandWL] && (
-              <motion.div
-                initial={{
-                  scale: 0,
-                  right: 0,
-                }}
-                transition={transition}
-                animate={{
-                  scale: 1,
-                  right: transformRes({ width: 600 }),
-                }}
-                exit={{ scale: 0, right: 0 }}
-                className="absolute"
-                style={{
-                  ...wlPosition,
-                  bottom: null,
-                  top:
-                    wl.length > 1
-                      ? transformRes({ height: 5 })
-                      : transformRes({ height: 17 }),
-                  right: transformRes({ width: 600 }),
-                }}
-              >
-                <WinLossCard wl={wl} mainScreen />
-              </motion.div>
+              <AnimatedWL
+                right={transformRes({ width: 600 })}
+                wlPosition={wlPosition}
+                wl={wl}
+                number={transformRes({ height: 5 })}
+                number1={transformRes({ height: 17 })}
+              />
             )}
 
             {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
-              <motion.div
-                initial={{
-                  scale: 0,
-                  right: 0,
-                }}
-                transition={transition}
-                animate={{
-                  scale: 1,
-                  right: transformRes({ width: 480 }),
-                }}
-                exit={{ scale: 0, right: 0 }}
-                className="absolute"
-                style={{
-                  ...badgePosition,
-                  bottom: null,
-                  top: transformRes({ height: 5 }),
-                  right: transformRes({ width: 480 }),
-                }}
-              >
-                <Rankbadge
-                  {...rankImageDetails}
-                  mainScreen
-                  transformRes={transformRes}
-                />
-              </motion.div>
+              <AnimatedRank_Mainscreen
+                right={transformRes({ width: 480 })}
+                badgePosition={badgePosition}
+                top={transformRes({ height: 5 })}
+                rankImageDetails={rankImageDetails}
+                transformRes={transformRes}
+              />
             )}
           </>
         )}

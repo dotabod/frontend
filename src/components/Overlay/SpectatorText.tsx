@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/Card'
 
-export const SpectatorText = (props) => {
+export const SpectatorText = ({ block, isXL, transformRes }) => {
   return (
     <motion.div
       initial={{
@@ -13,11 +13,11 @@ export const SpectatorText = (props) => {
         damping: 20,
       }}
       animate={{
-        bottom: props.isXL
-          ? props.transformRes({
+        bottom: isXL
+          ? transformRes({
               height: 300,
             })
-          : props.transformRes({
+          : transformRes({
               height: 260,
             }),
       }}
@@ -26,11 +26,11 @@ export const SpectatorText = (props) => {
       }}
       className="absolute"
       style={{
-        bottom: props.isXL
-          ? props.transformRes({
+        bottom: isXL
+          ? transformRes({
               height: 300,
             })
-          : props.transformRes({
+          : transformRes({
               height: 260,
             }),
         left: 0,
@@ -38,13 +38,13 @@ export const SpectatorText = (props) => {
     >
       <Card
         style={{
-          fontSize: props.transformRes({
+          fontSize: transformRes({
             width: 18,
           }),
         }}
       >
-        {props.block?.matchId
-          ? `Spectating match ${props.block.matchId}`
+        {block?.matchId
+          ? `Spectating match ${block.matchId}`
           : 'Spectating a match'}
       </Card>
     </motion.div>

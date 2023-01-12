@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
-import { ordinal } from '@/pages/overlay/[userId]'
+import { ordinal } from '@/ui/utils'
 
 export const RoshTimer = ({ color, count, transformRes }) => {
   return function render({ minutes, seconds, completed }) {

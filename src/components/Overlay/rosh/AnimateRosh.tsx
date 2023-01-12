@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
 import Countdown from 'react-countdown'
-import { transition } from '@/pages/overlay/[userId]'
+import { transition } from '@/ui/utils'
 
 interface AnimateRoshProps {
   style: { left: number; bottom: number; right: null }

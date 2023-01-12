@@ -1,8 +1,13 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { transition } from '@/pages/overlay/[userId]'
+import { transition } from '@/ui/utils'
 
-export const MinimapBlocker = (props) => {
+export const MinimapBlocker = ({
+  isSimple,
+  isXL,
+  minimapPosition,
+  transformRes,
+}) => {
   return (
     <motion.div
       initial={{
@@ -15,33 +20,33 @@ export const MinimapBlocker = (props) => {
       exit={{
         scale: 0,
       }}
-      style={props.minimapPosition}
+      style={minimapPosition}
       className="absolute"
     >
       <Image
         priority
         alt="minimap blocker"
         width={
-          props.isXL
-            ? props.transformRes({
+          isXL
+            ? transformRes({
                 width: 280,
               })
-            : props.transformRes({
+            : transformRes({
                 width: 240,
               })
         }
         height={
-          props.isXL
-            ? props.transformRes({
+          isXL
+            ? transformRes({
                 height: 280,
               })
-            : props.transformRes({
+            : transformRes({
                 height: 240,
               })
         }
-        src={`/images/overlay/minimap/731-${
-          props.isSimple ? 'Simple' : 'Complex'
-        }-${props.isXL ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
+        src={`/images/overlay/minimap/731-${isSimple ? 'Simple' : 'Complex'}-${
+          isXL ? 'X' : ''
+        }Large-AntiStreamSnipeMap.png`}
       />
     </motion.div>
   )

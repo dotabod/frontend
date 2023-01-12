@@ -2,29 +2,38 @@ import Countdown from 'react-countdown'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { RoshTimer } from './RoshTimer'
 
-export const RoshCounter = (props) => (
+export const RoshCounter = ({
+  color,
+  count,
+  countdownRef,
+  date,
+  duration,
+  onComplete,
+  paused,
+  transformRes,
+}) => (
   <CountdownCircleTimer
-    isPlaying={!props.paused}
-    duration={props.duration}
-    colors={props.color === 'red' ? '#ff0000' : '#a39800'}
+    isPlaying={!paused}
+    duration={duration}
+    colors={color === 'red' ? '#ff0000' : '#a39800'}
     trailColor="#0000000"
-    size={props.transformRes({
+    size={transformRes({
       width: 55,
     })}
-    strokeWidth={props.transformRes({
+    strokeWidth={transformRes({
       width: 3,
     })}
   >
     {() => (
       <Countdown
-        ref={props.countdownRef}
-        date={props.date}
+        ref={countdownRef}
+        date={date}
         renderer={RoshTimer({
-          transformRes: props.transformRes,
-          color: props.color,
-          count: props.count,
+          transformRes: transformRes,
+          color: color,
+          count: count,
         })}
-        onComplete={props.onComplete}
+        onComplete={onComplete}
       />
     )}
   </CountdownCircleTimer>
