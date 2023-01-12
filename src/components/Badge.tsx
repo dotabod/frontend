@@ -1,4 +1,3 @@
-'use client'
 import Image from 'next/image'
 
 export const Badge = ({ transformRes, image, ...props }) => {

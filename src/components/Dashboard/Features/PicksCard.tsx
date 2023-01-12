@@ -41,7 +41,7 @@ export default function PicksCard() {
         <Image
           alt="picks blocker"
           height="400px"
-          src="/images/block-radiant-picks.png"
+          src="/images/overlay/picks/block-radiant-picks.png"
           className="bg-gray-500"
           style={{
             backgroundImage:

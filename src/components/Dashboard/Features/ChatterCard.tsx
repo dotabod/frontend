@@ -18,7 +18,7 @@ export const chatterInfo = {
             height={22}
             alt="massivePIDAS"
             className="inline align-middle"
-            src="/images/massivePIDAS.webp"
+            src="/images/emotes/massivePIDAS.webp"
           />
           <span>Use your midas</span>
         </div>
@@ -44,7 +44,7 @@ export const chatterInfo = {
           height={22}
           alt="pauseChamp"
           className="inline align-middle"
-          src="/images/pauseChamp.webp"
+          src="/images/emotes/pauseChamp.webp"
         />
         <span>Who paused the game?</span>
       </span>
@@ -59,7 +59,7 @@ export const chatterInfo = {
           height={22}
           alt="Shush"
           className="inline align-middle"
-          src="/images/Shush.png"
+          src="/images/emotes/Shush.png"
         />
         <span>Clockwerk is smoked!</span>
       </span>

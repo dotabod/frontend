@@ -1,12 +1,12 @@
 import Head from 'next/head'
 
-import { Faqs } from '@/components/Faqs'
-import { Footer } from '@/components/Footer'
-import { Header } from '@/components/Header'
-import { Hero } from '@/components/Hero'
-import { Pricing } from '@/components/Pricing'
-import { PrimaryFeatures } from '@/components/PrimaryFeatures'
-import { SecondaryFeatures } from '@/components/SecondaryFeatures'
+import { Faqs } from '@/components/Homepage/Faqs'
+import { Footer } from '@/components/Homepage/Footer'
+import { Header } from '@/components/Homepage/Header'
+import { Hero } from '@/components/Homepage/Hero'
+import { Pricing } from '@/components/Homepage/Pricing'
+import { PrimaryFeatures } from '@/components/Homepage/PrimaryFeatures'
+import { SecondaryFeatures } from '@/components/Homepage/SecondaryFeatures'
 
 export default function Home() {
   return (

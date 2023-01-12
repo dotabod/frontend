@@ -1,10 +1,7 @@
-'use client'
-
 import { AnimatePresence, motion } from 'framer-motion'
-import { Card } from '@/components/Card'
-import { HeroBlocker } from '@/components/HeroBlocker'
-import { Rankbadge } from '@/components/Rankbadge'
-import WinLossCard from '@/components/WinLossCard'
+import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
+import { Rankbadge } from '@/components/Overlay/rank/Rankbadge'
+import WinLossCard from '@/components/Overlay/WinLossCard'
 import {
   DBSettings,
   defaultSettings,
@@ -12,21 +9,24 @@ import {
 } from '@/lib/DBSettings'
 import { fetcher } from '@/lib/fetcher'
 import { getRankImage, RankDeets } from '@/lib/ranks'
-import clsx from 'clsx'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import Countdown, { zeroPad } from 'react-countdown'
-import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import Countdown from 'react-countdown'
 import io from 'socket.io-client'
+import { SpectatorText } from '@/components/Overlay/SpectatorText'
+import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
+import { MinimapBlocker } from '@/components/Overlay/blocker/MinimapBlocker'
+import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
+import { AnimateRankBadge } from '@/components/Overlay/rank/AnimateRankBadge'
 
 let socket
 
 // add ordinal string to count variable
-const ordinal = (count) => {
-  const j = count % 10,
-    k = count % 100
+export const ordinal = (count) => {
+  const j = count % 10
+  const k = count % 100
   if (j == 1 && k != 11) {
     return count + 'st'
   }
@@ -46,6 +46,12 @@ const heroPosition = (teamName: string, i: number) => ({
   height: 55,
   width: 55,
 })
+
+export const transition = {
+  type: 'spring',
+  stiffness: 260,
+  damping: 20,
+}
 
 export default function OverlayPage() {
   const router = useRouter()
@@ -104,102 +110,6 @@ export default function OverlayPage() {
     }
 
     return width * widthRatio || width
-  }
-
-  const aegisRender = ({ minutes, seconds, completed }) => {
-    if (completed) {
-      return null
-    }
-    return (
-      <div className="flex flex-col items-center">
-        <Image
-          className="animate-pulse"
-          src="/images/rosh/aegis-icon-glow.png"
-          width={transformRes({ width: 67 })}
-          height={transformRes({ height: 1 })}
-          alt="aegis icon"
-        />
-        <span
-          className=" z-10 text-white/90"
-          style={{
-            marginLeft: transformRes({ width: 11 }),
-            marginTop: transformRes({ height: -19 }),
-            fontSize: transformRes({ height: 14 }),
-          }}
-        >
-          {minutes}:{zeroPad(seconds)}
-        </span>
-      </div>
-    )
-  }
-
-  const roshRender = ({ minutes, seconds, completed, color, count }) => {
-    if (completed) {
-      return null
-    }
-
-    return (
-      <div className="flex flex-col items-center">
-        {count > 0 && (
-          <span
-            className="absolute z-40 text-white/90"
-            style={{
-              top: transformRes({ height: -5 }),
-              left: transformRes({ width: 0 }),
-              fontSize: transformRes({ height: 16 }),
-              fontWeight: 500,
-            }}
-          >
-            {ordinal(count)}
-          </span>
-        )}
-        <Image
-          src="/images/rosh/roshan_timer_bg_psd1.png"
-          height={transformRes({ height: 95 })}
-          width={transformRes({ width: 95 })}
-          style={{
-            left: transformRes({ width: 0 }),
-            top: transformRes({ height: 0 }),
-            height: transformRes({ height: 70 }),
-            width: transformRes({ width: 70 }),
-            maxWidth: transformRes({ width: 70 }),
-          }}
-          alt="main bg"
-          className="absolute z-0"
-        />
-        <Image
-          src="/images/rosh/icon_roshan_timerbackground_norosh_psd.png"
-          height={transformRes({ height: 40 })}
-          width={transformRes({ width: 40 })}
-          style={{ top: transformRes({ height: 8 }) }}
-          alt="red glow"
-          className={clsx(
-            'absolute z-10',
-            color === 'yellow' && 'hue-rotate-60'
-          )}
-        />
-        <Image
-          src="/images/rosh/roshan_timer_roshan_psd.png"
-          height={transformRes({ height: 28 })}
-          width={transformRes({ width: 28 })}
-          alt="roshan icon"
-          className="absolute z-20"
-          style={{
-            top: transformRes({ height: 8 }),
-            left: transformRes({ height: 13 }),
-          }}
-        />
-        <span
-          className="absolute z-40 text-white/90"
-          style={{
-            bottom: transformRes({ height: 8 }),
-            fontSize: transformRes({ height: 12 }),
-          }}
-        >
-          {minutes}:{zeroPad(seconds)}
-        </span>
-      </div>
-    )
   }
 
   const [aegis, setAegis] = useState({
@@ -432,127 +342,36 @@ export default function OverlayPage() {
       `}</style>
       <AnimatePresence>
         {block?.type === 'spectator' && (
-          <motion.div
-            initial={{
-              bottom: 0,
-            }}
-            transition={{
-              type: 'spring',
-              stiffness: 260,
-              damping: 20,
-            }}
-            animate={{
-              bottom: isXL
-                ? transformRes({ height: 300 })
-                : transformRes({ height: 260 }),
-            }}
-            exit={{ top: 0 }}
-            className="absolute"
-            style={{
-              bottom: isXL
-                ? transformRes({ height: 300 })
-                : transformRes({ height: 260 }),
-              left: 0,
-            }}
-          >
-            <Card
-              style={{
-                fontSize: transformRes({ width: 18 }),
-              }}
-            >
-              {block?.matchId
-                ? `Spectating match ${block.matchId}`
-                : 'Spectating a match'}
-            </Card>
-          </motion.div>
+          <SpectatorText
+            block={block}
+            transformRes={transformRes}
+            isXL={isXL}
+          />
         )}
 
         {opts[DBSettings.rosh] &&
           (block.type === 'playing' || isDev) &&
           roshan?.maxDate && (
-            <motion.div
-              initial={{
-                scale: 0,
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 260,
-                damping: 20,
-              }}
-              animate={{
-                scale: 1,
-              }}
-              exit={{ scale: 0 }}
+            <AnimateRosh
               style={roshPosition}
-              className="rosh-timer absolute"
-            >
-              {roshan?.minDate && (
-                <CountdownCircleTimer
-                  isPlaying={!paused}
-                  duration={roshan?.minS}
-                  colors="#ff0000"
-                  trailColor="#0000000"
-                  size={transformRes({ width: 45 })}
-                  strokeWidth={transformRes({ width: 3 })}
-                >
-                  {({ remainingTime }) => (
-                    <Countdown
-                      ref={countdownRef}
-                      date={roshan?.minDate}
-                      renderer={(props) =>
-                        roshRender({
-                          ...props,
-                          color: 'red',
-                          count: roshan.count,
-                        })
-                      }
-                      onComplete={() => {
-                        setRoshan({
-                          ...roshan,
-                          minDate: '',
-                          minS: 0,
-                        })
-                      }}
-                    />
-                  )}
-                </CountdownCircleTimer>
-              )}
-              {!roshan?.minDate && roshan?.maxDate && (
-                <div className="rounded-full">
-                  <CountdownCircleTimer
-                    isPlaying={!paused}
-                    duration={roshan?.maxS}
-                    colors="#a39800"
-                    trailColor="#0000000"
-                    size={transformRes({ width: 55 })}
-                    strokeWidth={transformRes({ width: 3 })}
-                  >
-                    {({ remainingTime }) => (
-                      <Countdown
-                        ref={countdownRef}
-                        date={roshan?.maxDate}
-                        renderer={(props) =>
-                          roshRender({
-                            ...props,
-                            color: 'yellow',
-                            count: roshan.count,
-                          })
-                        }
-                        onComplete={() => {
-                          setRoshan({
-                            ...roshan,
-                            minS: 0,
-                            minDate: '',
-                            maxDate: '',
-                            maxS: 0,
-                          })
-                        }}
-                      />
-                    )}
-                  </CountdownCircleTimer>
-                </div>
-              )}
-            </motion.div>
+              roshan={roshan}
+              paused={paused}
+              onComplete={() => {
+                if (roshan?.minDate) {
+                  setRoshan({ ...roshan, minDate: '', minS: 0 })
+                } else {
+                  setRoshan({
+                    ...roshan,
+                    minS: 0,
+                    minDate: '',
+                    maxDate: '',
+                    maxS: 0,
+                  })
+                }
+              }}
+              transformRes={transformRes}
+              countdownRef={countdownRef}
+            />
           )}
 
         {opts[DBSettings.aegis] &&
@@ -562,11 +381,7 @@ export default function OverlayPage() {
               initial={{
                 scale: 2,
               }}
-              transition={{
-                type: 'spring',
-                stiffness: 260,
-                damping: 20,
-              }}
+              transition={transition}
               animate={{
                 scale: 1,
               }}
@@ -579,7 +394,7 @@ export default function OverlayPage() {
             >
               <Countdown
                 date={aegis.expireDate}
-                renderer={aegisRender}
+                renderer={AegisTimer(transformRes)}
                 ref={aegisRef}
                 onComplete={() => {
                   setAegis({
@@ -594,40 +409,12 @@ export default function OverlayPage() {
           )}
 
         {shouldBlockMap && (
-          <motion.div
-            initial={{
-              scale: 0,
-            }}
-            transition={{
-              type: 'spring',
-              stiffness: 260,
-              damping: 20,
-            }}
-            animate={{
-              scale: 1,
-            }}
-            exit={{ scale: 0 }}
-            style={minimapPosition}
-            className="absolute"
-          >
-            <Image
-              priority
-              alt="minimap blocker"
-              width={
-                isXL
-                  ? transformRes({ width: 280 })
-                  : transformRes({ width: 240 })
-              }
-              height={
-                isXL
-                  ? transformRes({ height: 280 })
-                  : transformRes({ height: 240 })
-              }
-              src={`/images/731-${isSimple ? 'Simple' : 'Complex'}-${
-                isXL ? 'X' : ''
-              }Large-AntiStreamSnipeMap.png`}
-            />
-          </motion.div>
+          <MinimapBlocker
+            transformRes={transformRes}
+            isSimple={isSimple}
+            isXL={isXL}
+            minimapPosition={minimapPosition}
+          />
         )}
 
         {shouldBlockPicks && (
@@ -635,11 +422,7 @@ export default function OverlayPage() {
             initial={{
               scale: 2,
             }}
-            transition={{
-              type: 'spring',
-              stiffness: 260,
-              damping: 20,
-            }}
+            transition={transition}
             animate={{
               scale: 1,
             }}
@@ -660,11 +443,7 @@ export default function OverlayPage() {
                 initial={{
                   right: wlPosition.right * -1,
                 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                }}
+                transition={transition}
                 animate={{
                   right: wlPosition.right,
                 }}
@@ -677,25 +456,11 @@ export default function OverlayPage() {
             )}
 
             {opts[DBSettings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
-              <motion.div
-                initial={{
-                  right: badgePosition.right * -1,
-                }}
-                transition={{
-                  delay: 0.3,
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                }}
-                animate={{
-                  right: badgePosition.right,
-                }}
-                exit={{ right: badgePosition.right * -1 }}
-                className="absolute"
-                style={badgePosition}
-              >
-                <Rankbadge {...rankImageDetails} transformRes={transformRes} />
-              </motion.div>
+              <AnimateRankBadge
+                badgePosition={badgePosition}
+                rankImageDetails={rankImageDetails}
+                transformRes={transformRes}
+              />
             )}
           </>
         )}
@@ -708,11 +473,7 @@ export default function OverlayPage() {
                   scale: 0,
                   right: 0,
                 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                }}
+                transition={transition}
                 animate={{
                   scale: 1,
                   right: transformRes({ width: 600 }),
@@ -739,11 +500,7 @@ export default function OverlayPage() {
                   scale: 0,
                   right: 0,
                 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                }}
+                transition={transition}
                 animate={{
                   scale: 1,
                   right: transformRes({ width: 480 }),
@@ -772,7 +529,7 @@ export default function OverlayPage() {
             width={transformRes({ width: 1920 })}
             height={transformRes({ height: 1080 })}
             alt={`main game`}
-            src={`/images/shot_0012.png`}
+            src={`/images/dev/shot_0012.png`}
           />
         )}
       </AnimatePresence>

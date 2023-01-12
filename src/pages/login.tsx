@@ -1,7 +1,7 @@
 import Head from 'next/head'
 
-import { AuthLayout } from '@/components/AuthLayout'
-import { UserAuthForm } from '@/components/AuthForm'
+import { AuthLayout } from '@/components/Homepage/AuthLayout'
+import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'

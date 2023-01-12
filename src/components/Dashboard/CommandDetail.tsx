@@ -297,7 +297,7 @@ const CommandDetail = {
             <>
               All Pick:
               <Image
-                src="/images/south-korea.png"
+                src="/images/flags/south-korea.png"
                 width={24}
                 height={24}
                 alt="south korea"
@@ -305,7 +305,7 @@ const CommandDetail = {
               />
               DuBu (Shadow Shaman) ·
               <Image
-                src="/images/russia.png"
+                src="/images/flags/russia.png"
                 width={24}
                 height={24}
                 alt="russia"
@@ -313,7 +313,7 @@ const CommandDetail = {
               />
               Collapse (Magnus) ·
               <Image
-                src="/images/estonia.png"
+                src="/images/flags/estonia.png"
                 width={24}
                 height={24}
                 alt="estonia"
@@ -321,7 +321,7 @@ const CommandDetail = {
               />
               Puppy (Chen) ·
               <Image
-                src="/images/usa.png"
+                src="/images/flags/usa.png"
                 width={24}
                 height={24}
                 alt="usa"
@@ -329,7 +329,7 @@ const CommandDetail = {
               />
               PPD (Tusk) ·
               <Image
-                src="/images/lebanon.png"
+                src="/images/flags/lebanon.png"
                 width={24}
                 height={24}
                 alt="usa"

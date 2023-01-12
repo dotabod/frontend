@@ -1,4 +1,4 @@
-import DashboardShell from '@/components/DashboardShell'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { Link } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'

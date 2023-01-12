@@ -1,5 +1,5 @@
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
-import DashboardShell from '@/components/DashboardShell'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { getValueOrDefault } from '@/lib/DBSettings'
 import { useUpdate } from '@/lib/useUpdateSetting'
 import {

@@ -64,9 +64,9 @@ export default function MinimapCard(): JSX.Element {
           <Image
             alt="minimap blocker"
             height={minimapXl ? `280px` : `240px`}
-            src={`/images/731-${minimapSimple ? 'Simple' : 'Complex'}-${
-              minimapXl ? 'X' : ''
-            }Large-AntiStreamSnipeMap.png`}
+            src={`/images/overlay/minimap/731-${
+              minimapSimple ? 'Simple' : 'Complex'
+            }-${minimapXl ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
             style={{
               backgroundImage:
                 "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",

@@ -1,5 +1,3 @@
-'use client'
-
 import clsx from 'clsx'
 
 export const Card = ({ children, className = '', ...props }) => {

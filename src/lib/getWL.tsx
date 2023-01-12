@@ -1,4 +1,3 @@
-'use client'
 import { fetcher } from '@/lib/fetcher'
 
 export const getWL = (userId, cb) => {

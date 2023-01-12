@@ -67,7 +67,7 @@ export default function RoshCard() {
             alt="aegis timer"
             width={219}
             height={107}
-            src="/images/just-aegis-timer.png"
+            src="/images/dashboard/just-aegis-timer.png"
             className={clsx('inline', !hasAegis && 'opacity-40')}
           />
 
@@ -75,7 +75,7 @@ export default function RoshCard() {
             alt="rosh timer"
             width={293}
             height={533}
-            src="/images/rosh-timer.png"
+            src="/images/dashboard/rosh-timer.png"
             className={clsx('inline', !hasRosh && 'opacity-40')}
           />
         </div>

@@ -156,7 +156,7 @@ export default function OBSOverlay() {
                   width={453}
                   unoptimized
                   height={320}
-                  src="/images/streamlabs-warning.png"
+                  src="/images/setup/streamlabs-warning.png"
                 />
               </Display>
 
@@ -171,7 +171,7 @@ export default function OBSOverlay() {
                   width={773}
                   unoptimized
                   height={350}
-                  src="/images/streamlabs-step-1.png"
+                  src="/images/setup/streamlabs-step-1.png"
                 />
               </Display>
 
@@ -194,7 +194,7 @@ export default function OBSOverlay() {
                   unoptimized
                   width={533}
                   height={567}
-                  src="/images/streamlabs-step-2.png"
+                  src="/images/setup/streamlabs-step-2.png"
                 />
               </Display>
               <p>
@@ -207,7 +207,7 @@ export default function OBSOverlay() {
                   unoptimized
                   width={380}
                   height={428}
-                  src="/images/obs-last-step.png"
+                  src="/images/setup/obs-last-step.png"
                 />
               </Display>
               <p>
@@ -231,7 +231,7 @@ export default function OBSOverlay() {
                   width={331}
                   unoptimized
                   height={292}
-                  src="/images/obs-step-1.png"
+                  src="/images/setup/obs-step-1.png"
                 />
               </Display>
 
@@ -246,7 +246,7 @@ export default function OBSOverlay() {
                   width={544}
                   unoptimized
                   height={310}
-                  src="/images/obs-step-2.png"
+                  src="/images/setup/obs-step-2.png"
                 />
               </Display>
 
@@ -261,7 +261,7 @@ export default function OBSOverlay() {
                   width={572}
                   unoptimized
                   height={256}
-                  src="/images/obs-step-3.png"
+                  src="/images/setup/obs-step-3.png"
                 />
               </Display>
 
@@ -285,7 +285,7 @@ export default function OBSOverlay() {
                   unoptimized
                   width={635}
                   height={519}
-                  src="/images/obs-step-4.png"
+                  src="/images/setup/obs-step-4.png"
                 />
               </Display>
               <p>

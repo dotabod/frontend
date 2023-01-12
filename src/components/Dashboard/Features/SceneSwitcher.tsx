@@ -127,7 +127,7 @@ export default function SceneSwitcher(): JSX.Element {
           width={536}
           height={115}
           alt="scene switcher"
-          src="/images/scene-switcher.png"
+          src="/images/setup/scene-switcher.png"
         />
       </Display>
     </Card>

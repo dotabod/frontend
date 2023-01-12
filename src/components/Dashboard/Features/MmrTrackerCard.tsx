@@ -238,7 +238,7 @@ export default function MmrTrackerCard() {
             alt="mmr tracker"
             width={534}
             height={82}
-            src="/images/mmr-tracker.png"
+            src="/images/dashboard/mmr-tracker.png"
           />
         </Display>
       </div>

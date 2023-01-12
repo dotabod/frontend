@@ -71,7 +71,7 @@ export default function ExportCFG() {
                   alt="dotabod browser source properties"
                   height={170}
                   width={429}
-                  src="/images/steam-browse-files.png"
+                  src="/images/setup/steam-browse-files.png"
                 />
               </Display>
               <Display
@@ -92,7 +92,7 @@ export default function ExportCFG() {
                   alt="steam gamestate folder"
                   height={990}
                   width={595}
-                  src="/images/gamestate-folder.png"
+                  src="/images/setup/gamestate-folder.png"
                 />
               </Display>
             </div>

@@ -1,7 +1,7 @@
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import ChatBot from '@/components/Dashboard/ChatBot'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
-import DashboardShell from '@/components/DashboardShell'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -20,7 +20,7 @@ export default function DashboardPage() {
             <div>
               Let&apos;s get Dotabod working for you right away{' '}
               <Image
-                src="/images/peepoclap.webp"
+                src="/images/emotes/peepoclap.webp"
                 width={30}
                 className="inline"
                 height={30}
