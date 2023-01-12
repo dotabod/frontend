@@ -56,11 +56,13 @@ export default function OverlayPage() {
   const [block, setBlock] = useState({ type: null, team: null, matchId: null })
   const time = new Date().getTime()
   const isDev = process.env.NODE_ENV === 'development'
-  const devMin = isDev ? new Date(time + 300000).toISOString() : ''
-  const devMax = isDev ? new Date(time + 600000).toISOString() : ''
+  const devMin = isDev ? new Date(time + 5000).toISOString() : ''
+  const devMax = isDev
+    ? new Date(new Date(time + 5000).getTime() + 5000).toISOString()
+    : ''
   const [roshan, setRoshan] = useState({
-    minS: isDev ? 600 : 0,
-    maxS: isDev ? 600 : 0,
+    minS: isDev ? 5000 / 1000 : 0,
+    maxS: isDev ? 5000 / 1000 : 0,
     minDate: devMin,
     maxDate: devMax,
     count: isDev ? 1 : 0,
@@ -317,30 +319,26 @@ export default function OverlayPage() {
           />
         )}
 
-        {opts[Settings.rosh] &&
-          (block.type === 'playing' || isDev) &&
-          roshan?.maxDate && (
-            <AnimateRosh
-              style={roshPosition}
-              roshan={roshan}
-              paused={paused}
-              onComplete={() => {
-                if (roshan?.minDate) {
-                  setRoshan({ ...roshan, minDate: '', minS: 0 })
-                } else {
-                  setRoshan({
-                    ...roshan,
-                    minS: 0,
-                    minDate: '',
-                    maxDate: '',
-                    maxS: 0,
-                  })
-                }
-              }}
-              transformRes={transformRes}
-              countdownRef={countdownRef}
-            />
-          )}
+        {opts[Settings.rosh] && (block.type === 'playing' || isDev) && (
+          <AnimateRosh
+            style={roshPosition}
+            roshan={roshan}
+            paused={paused}
+            onComplete={() => {
+              if (roshan?.minDate) {
+                setRoshan({ ...roshan, minDate: '', minS: 0 })
+              } else {
+                setRoshan({
+                  ...roshan,
+                  maxDate: '',
+                  maxS: 0,
+                })
+              }
+            }}
+            transformRes={transformRes}
+            countdownRef={countdownRef}
+          />
+        )}
 
         {opts[Settings.aegis] &&
           (block.type === 'playing' || isDev) &&

@@ -1,7 +1,5 @@
-import { motion } from 'framer-motion'
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
 import Countdown from 'react-countdown'
-import { transition } from '@/ui/utils'
 
 interface AnimateRoshProps {
   style: { left: number; bottom: number; right: null }
@@ -25,30 +23,23 @@ export const AnimateRosh = ({
   roshan: { count, maxDate, maxS, minDate, minS },
   style,
   transformRes,
-}: AnimateRoshProps) => (
-  <motion.div
-    initial={{
-      scale: 0,
-    }}
-    transition={transition}
-    animate={{
-      scale: 1,
-    }}
-    exit={{ scale: 0 }}
-    style={style}
-    className="rosh-timer absolute"
-  >
-    {(minDate || maxDate) && (
-      <RoshCounter
-        color={minDate ? 'red' : 'yellow'}
-        duration={minS || maxS}
-        date={minDate || maxDate}
-        paused={paused}
-        count={count}
-        onComplete={onComplete}
-        transformRes={transformRes}
-        countdownRef={countdownRef}
-      />
-    )}
-  </motion.div>
-)
+}: AnimateRoshProps) => {
+  const props = {
+    color: minDate ? 'red' : 'yellow',
+    count,
+    countdownRef,
+    date: minDate || maxDate,
+    duration: minS || maxS,
+    onComplete,
+    paused,
+    style,
+    transformRes,
+  }
+  return (
+    <div>
+      {/*We have to create two counters, because the other one doesn't start unless the first one is unmounted */}
+      {minDate && <RoshCounter {...props} />}
+      {!minDate && maxDate && <RoshCounter {...props} />}
+    </div>
+  )
+}
