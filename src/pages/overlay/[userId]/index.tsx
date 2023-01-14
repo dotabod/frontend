@@ -18,10 +18,13 @@ import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRank_Mainscreen } from '@/components/Overlay/rank/AnimatedRank_Mainscreen'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 import { defaultSettings, Settings } from '@/lib/defaultSettings'
+import { useWindowSize } from '@/lib/hooks'
 
 let socket
 
 export default function OverlayPage() {
+  const isDev = process.env.NODE_ENV === 'development'
+
   const router = useRouter()
   const { userId } = router.query
 
@@ -29,20 +32,23 @@ export default function OverlayPage() {
   const [paused, setPaused] = useState(false)
   const [scene, setScene] = useState({
     name: '',
+    // set width to default window size of browser
     width: 1920,
     height: 1080,
   })
+  const windowSize = useWindowSize()
+
   const [wl, setWL] = useState([
     {
-      win: 0,
-      lose: 0,
+      win: isDev ? 2 : 0,
+      lose: isDev ? 1 : 0,
       type: 'U',
     },
   ])
 
   const [rankImageDetails, setRankImageDetails] = useState({
-    image: '0.png',
-    rank: 0,
+    image: isDev ? '41.png' : '0.png',
+    rank: isDev ? 5380 : 0,
     leaderboard: false,
   })
 
@@ -55,7 +61,6 @@ export default function OverlayPage() {
 
   const [block, setBlock] = useState({ type: null, team: null, matchId: null })
   const time = new Date().getTime()
-  const isDev = process.env.NODE_ENV === 'development'
   const devMin = isDev ? new Date(time + 5000).toISOString() : ''
   const devMax = isDev
     ? new Date(new Date(time + 5000).getTime() + 5000).toISOString()
@@ -72,8 +77,8 @@ export default function OverlayPage() {
     const defaultWidth = 1920
     const defaultHeight = 1080
 
-    const widthRatio = (scene?.width || defaultWidth) / defaultWidth
-    const heightRatio = (scene?.height || defaultHeight) / defaultHeight
+    const widthRatio = (windowSize?.width || defaultWidth) / defaultWidth
+    const heightRatio = (windowSize?.height || defaultHeight) / defaultHeight
 
     if (height) {
       return height * heightRatio || height
@@ -237,6 +242,7 @@ export default function OverlayPage() {
     bottom: 0,
     right: transformRes({ width: 276 }),
     left: null,
+    top: null,
   }
 
   let wlPosition = {
@@ -403,38 +409,56 @@ export default function OverlayPage() {
         )}
 
         {[null].includes(block.type) && (
-          <>
-            {opts[Settings.commandWL] && (
-              <AnimatedWL
-                key="animate-wl-class"
-                right={transformRes({ width: 600 })}
-                wlPosition={wlPosition}
-                wl={wl}
-                number={transformRes({ height: 5 })}
-                number1={transformRes({ height: 17 })}
-              />
-            )}
+          <div
+            style={{
+              height: transformRes({ height: 61 }),
+              width: windowSize.width,
+              top: 0,
+            }}
+            className="absolute"
+          >
+            <div
+              className="flex h-full items-center justify-end space-x-2"
+              style={{
+                marginRight: transformRes({ width: 470 }),
+              }}
+            >
+              {opts[Settings.commandWL] && (
+                <AnimatedWL
+                  key="animate-wl-class"
+                  wlPosition={{
+                    ...wlPosition,
+                    bottom: null,
+                    right: null,
+                    top: null,
+                  }}
+                  wl={wl}
+                />
+              )}
 
-            {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
-              <AnimatedRank_Mainscreen
-                key="animate-rank-mainscreen-class"
-                right={transformRes({ width: 480 })}
-                badgePosition={badgePosition}
-                top={transformRes({ height: 5 })}
-                rankImageDetails={rankImageDetails}
-                transformRes={transformRes}
-              />
-            )}
-          </>
+              {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
+                <AnimatedRank_Mainscreen
+                  key="animate-rank-mainscreen-class"
+                  badgePosition={{
+                    ...badgePosition,
+                    right: null,
+                    top: null,
+                  }}
+                  rankImageDetails={rankImageDetails}
+                  transformRes={transformRes}
+                />
+              )}
+            </div>
+          </div>
         )}
 
         {isDev && (
           <Image
             key="dev-image"
-            width={transformRes({ width: 1920 })}
-            height={transformRes({ height: 1080 })}
+            width={windowSize.width}
+            height={windowSize.height}
             alt={`main game`}
-            src={`/images/dev/shot_0012.png`}
+            src={`/images/dev/1440p-main-menu.png`}
           />
         )}
       </AnimatePresence>

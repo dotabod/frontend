@@ -3,17 +3,17 @@ import WinLossCard from '@/components/Overlay/wl/WinLossCard'
 import { transition } from '@/ui/utils'
 
 export const AnimatedWL = ({
-  number,
-  number1,
-  right,
   wl,
   wlPosition,
 }: {
-  right: number
-  wlPosition: { left: null; bottom: number; fontSize: number; right: number }
+  wlPosition: {
+    left: null
+    bottom: number
+    fontSize: number
+    right: number
+    top: number
+  }
   wl: { lose: number; type: string; win: number }[]
-  number: number
-  number1: number
 }) => (
   <motion.div
     key="mainscreen-wl"
@@ -24,16 +24,11 @@ export const AnimatedWL = ({
     transition={transition}
     animate={{
       scale: 1,
-      right: right,
+      right: wlPosition.right,
     }}
     exit={{ scale: 0, right: 0 }}
-    className="absolute"
-    style={{
-      ...wlPosition,
-      bottom: null,
-      top: wl.length > 1 ? number : number1,
-      right: right,
-    }}
+    className="relative flex h-full items-center"
+    style={wlPosition}
   >
     <WinLossCard wl={wl} mainScreen />
   </motion.div>

@@ -28,12 +28,18 @@ export const Rankbadge = ({
 
   if (mainScreen) {
     return (
-      <div {...props} className="flex items-center space-x-1 text-amber-200">
+      <div
+        {...props}
+        className="flex h-full items-center space-x-1 text-amber-200"
+      >
         <Badge
           transformRes={transformRes}
-          width={50}
-          height={50}
+          width={transformRes({ width: 75 })}
+          height={transformRes({ height: 75 })}
           image={image}
+          style={{
+            marginTop: transformRes({ height: 20 }),
+          }}
         />
         <Numbers />
       </div>

@@ -5,13 +5,9 @@ import { transition } from '@/ui/utils'
 export const AnimatedRank_Mainscreen = ({
   badgePosition,
   rankImageDetails,
-  right,
-  top,
   transformRes,
 }: {
-  right: number
-  badgePosition: { left: null; bottom: number; right: number }
-  top: number
+  badgePosition: { left: null; bottom: number; right: number; top: number }
   rankImageDetails: { image: string; leaderboard: boolean; rank: number }
   transformRes: ({ height, width }: { height?: any; width?: any }) => number
 }) => (
@@ -24,15 +20,13 @@ export const AnimatedRank_Mainscreen = ({
     transition={transition}
     animate={{
       scale: 1,
-      right: right,
+      right: badgePosition.right,
     }}
     exit={{ scale: 0, right: 0 }}
-    className="absolute"
+    className="relative h-full"
     style={{
       ...badgePosition,
       bottom: null,
-      top: top,
-      right: right,
     }}
   >
     <Rankbadge {...rankImageDetails} mainScreen transformRes={transformRes} />
