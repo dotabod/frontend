@@ -16,6 +16,7 @@ export const RoshCounter = ({
   style,
 }) => (
   <motion.div
+    key="rosh-counter"
     initial={{
       bottom: -50,
     }}

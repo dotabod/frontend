@@ -10,6 +10,7 @@ export const MinimapBlocker = ({
 }) => {
   return (
     <motion.div
+      key="minimap-blocker"
       initial={{
         scale: 0,
       }}

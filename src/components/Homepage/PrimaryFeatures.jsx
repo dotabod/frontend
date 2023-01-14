@@ -248,6 +248,7 @@ function FeaturesDesktop() {
           >
             {featureIndex === selectedIndex && (
               <motion.div
+                key={`${feature.name}-motion`}
                 layoutId="activeBackground"
                 className="absolute inset-0 bg-gray-800"
                 initial={{ borderRadius: 16 }}

@@ -24,6 +24,7 @@ export const AnimatedAegis = ({
   onComplete: () => void
 }) => (
   <motion.div
+    key="aegis-counter"
     initial={{
       scale: 2,
     }}

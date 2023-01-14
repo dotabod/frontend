@@ -16,6 +16,7 @@ export const AnimatedRank_Mainscreen = ({
   transformRes: ({ height, width }: { height?: any; width?: any }) => number
 }) => (
   <motion.div
+    key="animated-rank-mainscreen"
     initial={{
       scale: 0,
       right: 0,

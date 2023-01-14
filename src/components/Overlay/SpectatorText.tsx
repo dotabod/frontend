@@ -4,6 +4,7 @@ import { Card } from '@/components/Card'
 export const SpectatorText = ({ block, isXL, transformRes }) => {
   return (
     <motion.div
+      key="spectator-text"
       initial={{
         bottom: 0,
       }}

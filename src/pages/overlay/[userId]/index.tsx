@@ -297,6 +297,11 @@ export default function OverlayPage() {
         <title>Dotabod | Stream overlays</title>
       </Head>
       <style global jsx>{`
+        // remove scrollbars from main divs
+        html,
+        body {
+          overflow: hidden;
+        }
         .rosh-timer svg {
           position: absolute;
           z-index: 30;
@@ -321,6 +326,7 @@ export default function OverlayPage() {
 
         {opts[Settings.rosh] && (block.type === 'playing' || isDev) && (
           <AnimateRosh
+            key="animate-rosh-class"
             style={roshPosition}
             roshan={roshan}
             paused={paused}
@@ -344,6 +350,7 @@ export default function OverlayPage() {
           (block.type === 'playing' || isDev) &&
           aegis.expireDate && (
             <AnimatedAegis
+              key="animate-aegis-class"
               numbers={leftPositions}
               aegis={aegis}
               top={transformRes({ height: 65 })}
@@ -362,6 +369,7 @@ export default function OverlayPage() {
 
         {shouldBlockMap && (
           <MinimapBlocker
+            key="minimap-blocker-class"
             transformRes={transformRes}
             isSimple={isSimple}
             isXL={isXL}
@@ -376,11 +384,16 @@ export default function OverlayPage() {
         {['spectator', 'playing', 'arcade'].includes(block.type) && (
           <>
             {opts[Settings.commandWL] && (
-              <AnimatedWLCard wlPosition={wlPosition} wl={wl} />
+              <AnimatedWLCard
+                key="animate-wl-card-class"
+                wlPosition={wlPosition}
+                wl={wl}
+              />
             )}
 
             {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
               <AnimateRankBadge
+                key="animate-rank-badge-class"
                 badgePosition={badgePosition}
                 rankImageDetails={rankImageDetails}
                 transformRes={transformRes}
@@ -393,6 +406,7 @@ export default function OverlayPage() {
           <>
             {opts[Settings.commandWL] && (
               <AnimatedWL
+                key="animate-wl-class"
                 right={transformRes({ width: 600 })}
                 wlPosition={wlPosition}
                 wl={wl}
@@ -403,6 +417,7 @@ export default function OverlayPage() {
 
             {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
               <AnimatedRank_Mainscreen
+                key="animate-rank-mainscreen-class"
                 right={transformRes({ width: 480 })}
                 badgePosition={badgePosition}
                 top={transformRes({ height: 5 })}
@@ -415,6 +430,7 @@ export default function OverlayPage() {
 
         {isDev && (
           <Image
+            key="dev-image"
             width={transformRes({ width: 1920 })}
             height={transformRes({ height: 1080 })}
             alt={`main game`}

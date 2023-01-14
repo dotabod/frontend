@@ -10,6 +10,7 @@ export const AnimatedHeroBlocker = ({
   block: { team: null; type: null; matchId: null }
 }) => (
   <motion.div
+    key="animated-hero-blocker"
     initial={{
       scale: 2,
     }}

@@ -12,6 +12,7 @@ export const AnimateRankBadge = ({
   transformRes: ({ height, width }: { height?: any; width?: any }) => number
 }) => (
   <motion.div
+    key="animated-rank-badge"
     initial={{
       right: badgePosition.right * -1,
     }}

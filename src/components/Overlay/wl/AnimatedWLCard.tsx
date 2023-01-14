@@ -10,6 +10,7 @@ export const AnimatedWLCard = ({
   wl: { lose: number; type: string; win: number }[]
 }) => (
   <motion.div
+    key="ingame-wl"
     initial={{
       right: wlPosition.right * -1,
     }}

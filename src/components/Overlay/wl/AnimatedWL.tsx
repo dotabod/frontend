@@ -16,6 +16,7 @@ export const AnimatedWL = ({
   number1: number
 }) => (
   <motion.div
+    key="mainscreen-wl"
     initial={{
       scale: 0,
       right: 0,
