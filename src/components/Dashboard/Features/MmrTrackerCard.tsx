@@ -146,11 +146,14 @@ export default function MmrTrackerCard() {
                       Confirm remove{' '}
                       {accounts.length - form.values.accounts.length}
                     </span>
+                  ) : form.values.accounts.length ? (
+                    <span>Save</span>
                   ) : null}
-                  {form.values.accounts.length ? <span>Save</span> : null}
                   <span>
                     account
-                    {form.values.accounts.length > 1 ? 's' : ''}
+                    {accounts.length - form.values.accounts.length > 1
+                      ? 's'
+                      : ''}
                   </span>
                 </span>
               </Button>
