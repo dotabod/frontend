@@ -425,13 +425,10 @@ export default function OverlayPage() {
             >
               {opts[Settings.commandWL] && (
                 <AnimatedWL
-                  key="animate-wl-class"
-                  wlPosition={{
-                    ...wlPosition,
-                    bottom: null,
-                    right: null,
-                    top: null,
+                  style={{
+                    fontSize: wlPosition.fontSize,
                   }}
+                  key="animate-wl-class"
                   wl={wl}
                 />
               )}
@@ -439,11 +436,6 @@ export default function OverlayPage() {
               {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
                 <AnimatedRank_Mainscreen
                   key="animate-rank-mainscreen-class"
-                  badgePosition={{
-                    ...badgePosition,
-                    right: null,
-                    top: null,
-                  }}
                   rankImageDetails={rankImageDetails}
                   transformRes={transformRes}
                 />
