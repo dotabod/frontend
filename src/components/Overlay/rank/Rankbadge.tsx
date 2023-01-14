@@ -30,7 +30,7 @@ export const Rankbadge = ({
     return (
       <div
         {...props}
-        className="flex h-full items-center space-x-1 text-amber-200"
+        className="flex h-full items-center space-x-1 text-[#e4d98d]"
       >
         <Badge
           transformRes={transformRes}

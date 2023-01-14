@@ -9,7 +9,7 @@ const WinLossCard = ({ mainScreen = false, wl, ...props }: WLType) => (
   <Card
     className={clsx(
       'rounded-r-none',
-      mainScreen && 'bg-transparent p-0 leading-none text-yellow-200'
+      mainScreen && 'bg-transparent p-0 leading-none text-[#e4d98d]'
     )}
     {...props}
   >
