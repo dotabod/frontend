@@ -101,7 +101,7 @@ export default function OverlayPage() {
     opts[Settings['minimap-blocker']] && block.type === 'playing'
   const shouldBlockPicks =
     opts[Settings['picks-blocker']] &&
-    ['picks', 'strategy'].includes(block.type)
+    ['picks', 'strategy', 'strategy-2'].includes(block.type)
   const countdownRef = useRef<Countdown>()
   const aegisRef = useRef<Countdown>()
 
@@ -204,7 +204,7 @@ export default function OverlayPage() {
         window.obsstudio.setCurrentScene(opts[Settings['obs-minimap']])
         return
       }
-      if (['picks', 'strategy'].includes(block.type)) {
+      if (['picks', 'strategy', 'strategy-2'].includes(block.type)) {
         window.obsstudio.setCurrentScene(opts[Settings['obs-picks']])
         return
       }
