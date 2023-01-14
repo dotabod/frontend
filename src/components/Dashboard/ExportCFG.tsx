@@ -64,38 +64,27 @@ export default function ExportCFG() {
               Download config file
             </Button>
           </a>
-          <div className="ml-4 space-y-4">
-            <div>
-              <Display shadow>
-                <Image
-                  alt="dotabod browser source properties"
-                  height={170}
-                  width={429}
-                  src="/images/setup/steam-browse-files.png"
-                />
-              </Display>
-              <Display
-                caption={
-                  <>
-                    <p>
-                      Full path to save config file to (if you use the C drive):
-                    </p>
-                    <Code>
-                      C:\Program Files (x86)\Steam\steamapps\common\dota 2
-                      beta\game\dota\cfg\gamestate_integration\
-                    </Code>
-                  </>
-                }
-                shadow
-              >
-                <Image
-                  alt="steam gamestate folder"
-                  height={990}
-                  width={595}
-                  src="/images/setup/gamestate-folder.png"
-                />
-              </Display>
-            </div>
+          <div className="space-y-4">
+            <Display
+              caption={
+                <>
+                  <p>Full path to save config file to:</p>
+                  <Code>
+                    ...\Steam\steamapps\common\dota 2
+                    beta\game\dota\cfg\gamestate_integration\
+                  </Code>
+                </>
+              }
+              shadow
+            >
+              <Image
+                unoptimized
+                alt="steam gamestate folder"
+                height={608}
+                width={518}
+                src="/images/setup/how-to-create-cfg.gif"
+              />
+            </Display>
           </div>
 
           <div>
