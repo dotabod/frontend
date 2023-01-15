@@ -87,17 +87,27 @@ export default function ExportCFG() {
           </div>
 
           <div>
-            2. Follow{' '}
+            2. Add <Code>-gamestateintegration</Code> to your Dota 2 launch
+            options in Steam.{' '}
             <Link
               className="text-blue-400 hover:text-blue-300"
               href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
               target="_blank"
             >
-              these instructions
-            </Link>{' '}
-            to add <Code>-gamestateintegration</Code> to your Dota 2 launch
-            options in Steam.
+              Instructions here
+            </Link>
+            , or follow the video below.
           </div>
+
+          <Display shadow>
+            <video width="482" height="392" controls autoPlay muted loop>
+              <source
+                src="/images/setup/how-to-gsi-properties.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </Display>
 
           <div>3. Restart Dota 2.</div>
         </div>
