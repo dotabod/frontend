@@ -1,11 +1,15 @@
 import { useBaseUrl } from '@/lib/hooks'
 import { Card } from '@/ui/card'
 import { Badge, Display } from '@geist-ui/core'
-import { Accordion, Button, CopyButton } from '@mantine/core'
+import { Accordion, Button, Center, CopyButton, Tabs } from '@mantine/core'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import {
+  ChatBubbleBottomCenterTextIcon,
+  VideoCameraIcon,
+} from '@heroicons/react/24/solid'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -24,7 +28,7 @@ export default function OBSOverlay() {
             )}
             onClick={copy}
           >
-            {copied ? 'Copied to clipboard!' : 'Copy your personal URL'}
+            {copied ? 'Copied to clipboard!' : 'Copy your browser source URL'}
           </Button>
         )}
       </CopyButton>
@@ -50,108 +54,202 @@ export default function OBSOverlay() {
         </Accordion.Control>
         <Accordion.Panel>
           <div className="space-y-4 px-8 pb-8 text-sm text-dark-300">
-            <div className="flex items-center space-x-2">
-              <Badge className="!text-xs" type="secondary">
-                Note
-              </Badge>
-              <span>OBS and Streamlabs have the same instructions</span>
-            </div>
-            <div className="mt-4 space-y-4">
-              <p>
-                1. Let&apos;s see what our canvas resolution is set to. Open OBS
-                Studio and go to File &gt; Settings
-              </p>
-              <Display shadow>
-                <Image
-                  alt="dotabod browser source properties"
-                  width={331}
-                  unoptimized
-                  height={292}
-                  src="/images/setup/obs-step-1.png"
-                />
-              </Display>
+            <Tabs
+              unstyled
+              variant="pills"
+              defaultValue="video"
+              styles={(theme) => ({
+                tab: {
+                  ...theme.fn.focusStyles(),
+                  backgroundColor:
+                    theme.colorScheme === 'dark'
+                      ? theme.colors.dark[6]
+                      : theme.white,
+                  color:
+                    theme.colorScheme === 'dark'
+                      ? theme.colors.dark[0]
+                      : theme.colors.gray[9],
+                  border: `1px solid ${
+                    theme.colorScheme === 'dark'
+                      ? theme.colors.dark[6]
+                      : theme.colors.gray[4]
+                  }`,
+                  borderRadius: theme.radius.sm,
+                  transitionProperty: 'all',
+                  transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                  transitionDuration: '150ms',
+                  padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
+                  cursor: 'pointer',
+                  fontSize: theme.fontSizes.sm,
+                  display: 'flex',
+                  alignItems: 'center',
 
-              <p>
-                2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s
-                usually 1920x1080 but you could have a different one. Don&apos;t
-                copy 1234x789, that&apos;s just there as an example.
-              </p>
-              <Display shadow>
-                <Image
-                  alt="dotabod browser source properties"
-                  width={544}
-                  unoptimized
-                  height={310}
-                  src="/images/setup/obs-step-2.png"
-                />
-              </Display>
+                  '&:hover': {
+                    backgroundColor: theme.colors.blue[5],
+                  },
 
-              <p>
-                3. Close the settings window. Now let&apos;s add the browser
-                source. Under Sources click Add &gt; Browser and press OK.
-              </p>
+                  '&:disabled': {
+                    opacity: 0.5,
+                    cursor: 'not-allowed',
+                  },
 
-              <Display shadow>
-                <Image
-                  alt="dotabod browser source properties"
-                  width={572}
-                  unoptimized
-                  height={256}
-                  src="/images/setup/obs-step-3.png"
-                />
-              </Display>
+                  '&[data-active]': {
+                    backgroundColor: theme.colors.blue[6],
+                    borderColor: theme.colors.blue[6],
+                    color: theme.white,
+                  },
 
-              <p>
-                4. Fill out the properties, entering your &quot;Base (Canvas)
-                Resolution&quot; from Step 2 earlier. If you had 1920x1080, put
-                1920 for width, and 1080 for height.
-              </p>
-              <div className="ml-4 space-y-4">
-                <p>
-                  Copy and paste your personal URL into the URL field (1) for
-                  the browser source. Click OK to save.
-                </p>
+                  '&:not([data-active])': {},
+                },
 
-                <CopyInstructions />
+                tabIcon: {
+                  marginRight: theme.spacing.xs,
+                  display: 'flex',
+                  alignItems: 'center',
+                },
+
+                tabsList: {
+                  display: 'flex',
+                },
+              })}
+            >
+              <Tabs.List className="space-x-2">
+                <Tabs.Tab value="video">
+                  <div className="flex items-center space-x-2">
+                    <VideoCameraIcon width={24} height={24} />
+                    <span>Video instructions</span>
+                  </div>
+                </Tabs.Tab>
+                <Tabs.Tab value="text">
+                  <div className="flex items-center space-x-2">
+                    <ChatBubbleBottomCenterTextIcon width={24} height={24} />
+                    <span>Text instructions</span>
+                  </div>
+                </Tabs.Tab>
+              </Tabs.List>
+              <div className="mt-4 flex items-center space-x-2">
+                <Badge className="!text-xs" type="secondary">
+                  Note
+                </Badge>
+                <span>OBS and Streamlabs have the same instructions</span>
               </div>
+              <Tabs.Panel value="video" className="ml-6 mt-12">
+                <Center className="flex flex-col space-y-4">
+                  <CopyInstructions />
+                  <p>
+                    Paste this into the URL field when making the browser source
+                  </p>
+                </Center>
+                <Display shadow>
+                  <video width="630" height="766" controls autoPlay muted loop>
+                    <source
+                      src="/images/setup/how-to-obs.mp4"
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
+                </Display>
+              </Tabs.Panel>
+              <Tabs.Panel value="text" className="ml-6 mt-12">
+                <div className="mt-4 space-y-4">
+                  <p>
+                    1. Let&apos;s see what our canvas resolution is set to. Open
+                    OBS Studio and go to File &gt; Settings
+                  </p>
+                  <Display shadow>
+                    <Image
+                      alt="dotabod browser source properties"
+                      width={331}
+                      unoptimized
+                      height={292}
+                      src="/images/setup/obs-step-1.png"
+                    />
+                  </Display>
 
-              <Display shadow>
-                <Image
-                  alt="dotabod browser source properties"
-                  unoptimized
-                  width={635}
-                  height={519}
-                  src="/images/setup/obs-step-4.png"
-                />
-              </Display>
-              <p>
-                5. Right click the Dotabod browser source &gt; Transform &gt;
-                Fit to screen.
-              </p>
-              <p>
-                6. All done! Dotabod browser source should be full screen now.
-                Test it by joining a bot match! Look at your OBS preview to
-                confirm the overlay is showing. You should see the minimap
-                blocker overlay, but badge may be missing until you fill out
-                your MMR from the{' '}
-                <Link
-                  className="text-blue-400 hover:text-blue-300"
-                  href="dashboard/features"
-                >
-                  settings page
-                </Link>
-                .
-              </p>
-            </div>
-            <Display shadow>
-              <Image
-                alt="dotabod browser source properties"
-                width={284}
-                unoptimized
-                height={863}
-                src="/images/setup/play-vs-bots.png"
-              />
-            </Display>
+                  <p>
+                    2. Remember your &quot;Base (Canvas) Resolution&quot;.
+                    It&apos;s usually 1920x1080 but you could have a different
+                    one. Don&apos;t copy 1234x789, that&apos;s just there as an
+                    example.
+                  </p>
+                  <Display shadow>
+                    <Image
+                      alt="dotabod browser source properties"
+                      width={544}
+                      unoptimized
+                      height={310}
+                      src="/images/setup/obs-step-2.png"
+                    />
+                  </Display>
+
+                  <p>
+                    3. Close the settings window. Now let&apos;s add the browser
+                    source. Under Sources click Add &gt; Browser and press OK.
+                  </p>
+
+                  <Display shadow>
+                    <Image
+                      alt="dotabod browser source properties"
+                      width={572}
+                      unoptimized
+                      height={256}
+                      src="/images/setup/obs-step-3.png"
+                    />
+                  </Display>
+
+                  <p>
+                    4. Fill out the properties, entering your &quot;Base
+                    (Canvas) Resolution&quot; from Step 2 earlier. If you had
+                    1920x1080, put 1920 for width, and 1080 for height.
+                  </p>
+                  <div className="ml-4 space-y-4">
+                    <p>
+                      Copy and paste your personal URL into the URL field (1)
+                      for the browser source. Click OK to save.
+                    </p>
+
+                    <CopyInstructions />
+                  </div>
+
+                  <Display shadow>
+                    <Image
+                      alt="dotabod browser source properties"
+                      unoptimized
+                      width={635}
+                      height={519}
+                      src="/images/setup/obs-step-4.png"
+                    />
+                  </Display>
+                  <p>
+                    5. Right click the Dotabod browser source &gt; Transform
+                    &gt; Fit to screen.
+                  </p>
+                  <p>
+                    6. All done! Dotabod browser source should be full screen
+                    now. Test it by joining a bot match! Look at your OBS
+                    preview to confirm the overlay is showing. You should see
+                    the minimap blocker overlay, but badge may be missing until
+                    you fill out your MMR from the{' '}
+                    <Link
+                      className="text-blue-400 hover:text-blue-300"
+                      href="dashboard/features"
+                    >
+                      settings page
+                    </Link>
+                    .
+                  </p>
+                </div>
+                <Display shadow>
+                  <Image
+                    alt="dotabod browser source properties"
+                    width={284}
+                    unoptimized
+                    height={863}
+                    src="/images/setup/play-vs-bots.png"
+                  />
+                </Display>
+              </Tabs.Panel>
+            </Tabs>
           </div>
         </Accordion.Panel>
       </Card>
