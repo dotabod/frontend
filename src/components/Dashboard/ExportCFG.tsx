@@ -76,7 +76,7 @@ export default function ExportCFG() {
               }
               shadow
             >
-              <video width="508" height="504" controls autoPlay muted>
+              <video width="508" height="504" controls autoPlay muted loop>
                 <source
                   src="/images/setup/how-to-create-cfg.mp4"
                   type="video/mp4"
