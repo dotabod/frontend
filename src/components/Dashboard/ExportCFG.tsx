@@ -2,7 +2,6 @@ import { Card } from '@/ui/card'
 import { Button, Code, Collapse, Display, Keyboard } from '@geist-ui/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
-import Image from 'next/image'
 import Link from 'next/link'
 
 export default function ExportCFG() {
@@ -77,13 +76,13 @@ export default function ExportCFG() {
               }
               shadow
             >
-              <Image
-                unoptimized
-                alt="steam gamestate folder"
-                height={608}
-                width={518}
-                src="/images/setup/how-to-create-cfg.gif"
-              />
+              <video width="508" height="504" controls autoPlay muted>
+                <source
+                  src="/images/setup/how-to-create-cfg.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
             </Display>
           </div>
 
