@@ -5,6 +5,7 @@ import { Accordion, Button, CopyButton } from '@mantine/core'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -130,11 +131,27 @@ export default function OBSOverlay() {
               <p>
                 6. All done! Dotabod browser source should be full screen now.
                 Test it by joining a bot match! Look at your OBS preview to
-                confirm the overlay is showing. You should see the WL overlay,
-                but badge may be missing until you fill out your MMR from the
-                settings page.
+                confirm the overlay is showing. You should see the minimap
+                blocker overlay, but badge may be missing until you fill out
+                your MMR from the{' '}
+                <Link
+                  className="text-blue-400 hover:text-blue-300"
+                  href="dashboard/features"
+                >
+                  settings page
+                </Link>
+                .
               </p>
             </div>
+            <Display shadow>
+              <Image
+                alt="dotabod browser source properties"
+                width={284}
+                unoptimized
+                height={863}
+                src="/images/setup/play-vs-bots.png"
+              />
+            </Display>
           </div>
         </Accordion.Panel>
       </Card>
