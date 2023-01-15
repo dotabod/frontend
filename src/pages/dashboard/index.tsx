@@ -5,6 +5,8 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
+import { accordionStyles } from '@/components/accordionStyles'
+import { Accordion } from '@mantine/core'
 
 export default function DashboardPage() {
   const { status } = useSession()
@@ -31,9 +33,17 @@ export default function DashboardPage() {
         }
         title="Setup"
       >
-        <ChatBot />
-        <ExportCFG />
-        <OBSOverlay />
+        <Accordion
+          variant="separated"
+          defaultValue="chatbot"
+          styles={accordionStyles}
+        >
+          <div className="grid grid-cols-1 gap-6">
+            <ChatBot />
+            <ExportCFG />
+            <OBSOverlay />
+          </div>
+        </Accordion>
       </DashboardShell>
     </>
   ) : null
