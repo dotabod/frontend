@@ -35,6 +35,7 @@
     "lucide-react": "^0.103.0",
     "next": "13.0.6",
     "next-auth": "4.17.0",
+    "nextjs-google-analytics": "^2.2.2",
     "postcss-focus-visible": "^7.1.0",
     "react": "18.2.0",
     "react-countdown": "^2.3.5",
