@@ -397,7 +397,7 @@ export default function OverlayPage() {
               />
             )}
 
-            {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
+            {opts[Settings['mmr-tracker']] && (
               <AnimateRankBadge
                 key="animate-rank-badge-class"
                 badgePosition={badgePosition}
@@ -433,7 +433,7 @@ export default function OverlayPage() {
                 />
               )}
 
-              {opts[Settings['mmr-tracker']] && rankImageDetails?.rank > 0 && (
+              {opts[Settings['mmr-tracker']] && (
                 <AnimatedRank_Mainscreen
                   key="animate-rank-mainscreen-class"
                   rankImageDetails={rankImageDetails}

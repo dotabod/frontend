@@ -19,12 +19,13 @@ export const Rankbadge = ({
     fontSize: transformRes ? transformRes({ height: 22 }) : 16,
   }
 
-  const Numbers = () => (
-    <span className={className} style={style}>
-      {leaderboard && '#'}
-      {rank}
-    </span>
-  )
+  const Numbers = () =>
+    leaderboard || rank ? (
+      <span className={className} style={style}>
+        {leaderboard && '#'}
+        {rank}
+      </span>
+    ) : null
 
   if (mainScreen) {
     return (
