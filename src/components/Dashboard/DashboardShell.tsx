@@ -141,7 +141,7 @@ const localeOptions = [
     label: 'Czech (Slovakia)',
     value: 'cs-SK',
   },
-]
+].sort((a, b) => (a.label > b.label ? 1 : -1))
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   flag: string
