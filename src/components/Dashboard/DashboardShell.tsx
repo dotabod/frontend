@@ -84,6 +84,30 @@ const localeOptions = [
   {
     flag: (
       <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-hungary_1f1ed-1f1fa.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
+    label: 'Hungarian',
+    value: 'hu',
+  },
+  {
+    flag: (
+      <Image
+        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-iran_1f1ee-1f1f7.png"
+        width={22}
+        height={22}
+        alt="flag"
+      />
+    ),
+    label: 'Persian',
+    value: 'fa',
+  },
+  {
+    flag: (
+      <Image
         src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-brazil_1f1e7-1f1f7.png"
         width={22}
         height={22}
