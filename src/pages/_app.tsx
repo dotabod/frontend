@@ -1,4 +1,4 @@
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { SessionProvider } from 'next-auth/react'
 
 import '@/styles/tailwind.css'
@@ -9,6 +9,7 @@ import type { Session } from 'next-auth'
 import { GeistProvider, Themes } from '@geist-ui/core'
 import { MantineProvider } from '@mantine/core'
 import { NotificationsProvider } from '@mantine/notifications'
+import { GoogleAnalytics } from 'nextjs-google-analytics'
 
 const myTheme1 = Themes.createFromDark({
   type: 'coolTheme',
@@ -58,10 +59,11 @@ export default function App({
           },
         }}
       >
+        <VercelAnalytics />
+        <GoogleAnalytics />
         <NotificationsProvider position="top-center">
           <GeistProvider themes={[myTheme1]} themeType="coolTheme">
             <Component {...pageProps} />
-            <Analytics />
           </GeistProvider>
         </NotificationsProvider>
       </MantineProvider>
