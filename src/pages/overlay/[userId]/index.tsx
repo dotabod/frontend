@@ -59,7 +59,6 @@ export default function OverlayPage() {
       <style global jsx>{`
         html,
         body {
-          // remove scrollbars from main divs
           overflow: hidden;
         }
       `}</style>
