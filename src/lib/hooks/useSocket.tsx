@@ -71,7 +71,6 @@ interface UseSocketParams {
         })
       | { image: string; leaderboard: boolean; rank: number }
   ) => void
-  wl: { lose: number; type: string; win: number }[]
   setWL: (
     value:
       | ((
@@ -81,6 +80,11 @@ interface UseSocketParams {
   ) => void
 }
 
+type wlType = {
+  win: number
+  lose: number
+  type: string
+}[]
 export const useSocket = ({
   setBlock,
   setPaused,
@@ -88,7 +92,6 @@ export const useSocket = ({
   setRoshan,
   setConnected,
   setRankImageDetails,
-  wl,
   setWL,
 }: UseSocketParams) => {
   const router = useRouter()
@@ -129,7 +132,7 @@ export const useSocket = ({
       getRankImage(deets).then(setRankImageDetails)
     })
 
-    socket.on('update-wl', (records: typeof wl) => {
+    socket.on('update-wl', (records: wlType) => {
       setWL(records)
     })
 

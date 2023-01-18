@@ -46,7 +46,6 @@ export default function OverlayPage() {
     setRankImageDetails,
     setRoshan,
     setWL,
-    wl,
   })
 
   useOBS({ block, connected })
