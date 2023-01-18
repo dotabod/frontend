@@ -97,17 +97,6 @@ export const useSocket = ({
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
 
-  // on react unmount
-  useEffect(() => {
-    return () => {
-      socket?.off('block')
-      socket?.off('update-medal')
-      socket?.off('connect')
-      socket?.off('connect_error')
-      socket?.disconnect()
-    }
-  }, [])
-
   useEffect(() => {
     if (!userId) return
 
