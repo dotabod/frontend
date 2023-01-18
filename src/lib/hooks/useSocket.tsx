@@ -141,16 +141,5 @@ export const useSocket = ({
     })
 
     socket.on('connect_error', console.log)
-  }, [
-    mutate,
-    router,
-    setAegis,
-    setBlock,
-    setConnected,
-    setPaused,
-    setRankImageDetails,
-    setRoshan,
-    setWL,
-    userId,
-  ])
+  }, [userId])
 }
