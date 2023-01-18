@@ -1,12 +1,20 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/Card'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
-export const SpectatorText = ({ block, isXL, transformRes }) => {
+export const SpectatorText = ({ block }) => {
+  const res = useTransformRes()
+  const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+
+  if (block?.type !== 'spectator') return null
+
   return (
     <motion.div
       key="spectator-text"
       initial={{
-        bottom: 0,
+        scale: 0,
       }}
       transition={{
         type: 'spring',
@@ -14,33 +22,27 @@ export const SpectatorText = ({ block, isXL, transformRes }) => {
         damping: 20,
       }}
       animate={{
-        bottom: isXL
-          ? transformRes({
-              height: 300,
-            })
-          : transformRes({
-              height: 260,
-            }),
+        scale: 1,
       }}
       exit={{
-        bottom: 0,
+        scale: 0,
       }}
       className="absolute"
       style={{
         bottom: isXL
-          ? transformRes({
-              height: 300,
+          ? res({
+              h: 300,
             })
-          : transformRes({
-              height: 260,
+          : res({
+              h: 260,
             }),
         left: 0,
       }}
     >
       <Card
         style={{
-          fontSize: transformRes({
-            width: 18,
+          fontSize: res({
+            w: 18,
           }),
         }}
       >

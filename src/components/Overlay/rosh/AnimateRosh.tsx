@@ -1,8 +1,10 @@
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
-import Countdown from 'react-countdown'
+import { Settings } from '@/lib/defaultSettings'
+import { isDev } from '@/lib/hooks/rosh'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 interface AnimateRoshProps {
-  style: { left: number; bottom: number; right: null }
+  block: any
   roshan: {
     minS: number
     minDate: string
@@ -12,29 +14,30 @@ interface AnimateRoshProps {
   }
   paused: boolean
   onComplete: () => void
-  transformRes: ({ height, width }: { height?: any; width?: any }) => number
-  countdownRef: React.MutableRefObject<Countdown | undefined>
 }
 
 export const AnimateRosh = ({
-  countdownRef,
   onComplete,
   paused,
+  block,
   roshan: { count, maxDate, maxS, minDate, minS },
-  style,
-  transformRes,
 }: AnimateRoshProps) => {
   const props = {
     color: minDate ? 'red' : 'yellow',
     count,
-    countdownRef,
     date: minDate || maxDate,
     duration: minS || maxS,
     onComplete,
     paused,
-    style,
-    transformRes,
   }
+
+  const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+  const { data: isEnabled } = useUpdateSetting(Settings.rosh)
+
+  if (!isEnabled || (block.type !== 'playing' && !isDev)) {
+    return null
+  }
+
   return (
     <div>
       {/*We have to create two counters, because the other one doesn't start unless the first one is unmounted */}

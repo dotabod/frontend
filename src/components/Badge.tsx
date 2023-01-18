@@ -1,12 +1,12 @@
 import Image from 'next/image'
 
-export const Badge = ({ transformRes, image, ...props }) => {
+export const Badge = ({ res, image, ...props }) => {
   return (
     <Image
       priority
       alt="rank badge"
-      width={transformRes ? transformRes({ width: 72 }) : 56}
-      height={transformRes ? transformRes({ height: 72 }) : 56}
+      width={res ? res({ w: 72 }) : 56}
+      height={res ? res({ h: 72 }) : 56}
       src={`/images/ranks/${image}`}
       {...props}
     />

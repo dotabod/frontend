@@ -1,4 +1,4 @@
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
 import { Button, Switch } from '@mantine/core'

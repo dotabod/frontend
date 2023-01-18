@@ -2,13 +2,7 @@ import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
 
 export const AegisTimer = (
-  transformRes: ({
-    height,
-    width,
-  }: {
-    height?: number
-    width?: number
-  }) => number
+  res: ({ h, w }: { h?: number; w?: number }) => number
 ) => {
   return function render({ minutes, seconds, completed }) {
     if (completed) {
@@ -19,16 +13,16 @@ export const AegisTimer = (
         <Image
           className="animate-pulse"
           src="/images/rosh/aegis-icon-glow.png"
-          width={transformRes({ width: 67 })}
-          height={transformRes({ height: 1 })}
+          width={res({ w: 67 })}
+          height={res({ h: 1 })}
           alt="aegis icon"
         />
         <span
           className=" z-10 text-white/90"
           style={{
-            marginLeft: transformRes({ width: 11 }),
-            marginTop: transformRes({ height: -19 }),
-            fontSize: transformRes({ height: 14 }),
+            marginLeft: res({ w: 11 }),
+            marginTop: res({ h: -19 }),
+            fontSize: res({ h: 14 }),
           }}
         >
           {minutes}:{zeroPad(seconds)}

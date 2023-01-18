@@ -1,7 +1,7 @@
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { getValueOrDefault } from '@/lib/settings'
-import { useUpdate } from '@/lib/useUpdateSetting'
+import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import {
   Accordion,
   Center,

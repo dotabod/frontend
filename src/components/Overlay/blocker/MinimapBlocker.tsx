@@ -1,13 +1,22 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { transition } from '@/ui/utils'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 
-export const MinimapBlocker = ({
-  isSimple,
-  isXL,
-  minimapPosition,
-  transformRes,
-}) => {
+export const MinimapBlocker = ({ block }) => {
+  const res = useTransformRes()
+  const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
+  const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
+  const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+  const { minimapPosition } = useOverlayPositions()
+
+  const shouldBlockMap = isEnabled && block.type === 'playing'
+
+  if (!shouldBlockMap) return null
+
   return (
     <motion.div
       key="minimap-blocker"
@@ -29,20 +38,20 @@ export const MinimapBlocker = ({
         alt="minimap blocker"
         width={
           isXL
-            ? transformRes({
-                width: 280,
+            ? res({
+                w: 280,
               })
-            : transformRes({
-                width: 240,
+            : res({
+                w: 240,
               })
         }
         height={
           isXL
-            ? transformRes({
-                height: 280,
+            ? res({
+                h: 280,
               })
-            : transformRes({
-                height: 240,
+            : res({
+                h: 240,
               })
         }
         src={`/images/overlay/minimap/731-${isSimple ? 'Simple' : 'Complex'}-${

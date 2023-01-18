@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
 import { ordinal } from '@/ui/utils'
 
-export const RoshTimer = ({ color, count, transformRes }) => {
+export const RoshTimer = ({ color, count, res }) => {
   return function render({ minutes, seconds, completed }) {
     if (completed) {
       return null
@@ -15,9 +15,9 @@ export const RoshTimer = ({ color, count, transformRes }) => {
           <span
             className="absolute z-40 text-white/90"
             style={{
-              top: transformRes({ height: -5 }),
-              left: transformRes({ width: 0 }),
-              fontSize: transformRes({ height: 16 }),
+              top: res({ h: -5 }),
+              left: res({ w: 0 }),
+              fontSize: res({ h: 16 }),
               fontWeight: 500,
             }}
           >
@@ -26,23 +26,23 @@ export const RoshTimer = ({ color, count, transformRes }) => {
         )}
         <Image
           src="/images/rosh/roshan_timer_bg_psd1.png"
-          height={transformRes({ height: 95 })}
-          width={transformRes({ width: 95 })}
+          height={res({ h: 95 })}
+          width={res({ w: 95 })}
           style={{
-            left: transformRes({ width: 0 }),
-            top: transformRes({ height: 0 }),
-            height: transformRes({ height: 70 }),
-            width: transformRes({ width: 70 }),
-            maxWidth: transformRes({ width: 70 }),
+            left: res({ w: 0 }),
+            top: res({ h: 0 }),
+            height: res({ h: 70 }),
+            width: res({ w: 70 }),
+            maxWidth: res({ w: 70 }),
           }}
           alt="main bg"
           className="absolute z-0"
         />
         <Image
           src="/images/rosh/icon_roshan_timerbackground_norosh_psd.png"
-          height={transformRes({ height: 40 })}
-          width={transformRes({ width: 40 })}
-          style={{ top: transformRes({ height: 8 }) }}
+          height={res({ h: 40 })}
+          width={res({ w: 40 })}
+          style={{ top: res({ h: 8 }) }}
           alt="red glow"
           className={clsx(
             'absolute z-10',
@@ -51,20 +51,20 @@ export const RoshTimer = ({ color, count, transformRes }) => {
         />
         <Image
           src="/images/rosh/roshan_timer_roshan_psd.png"
-          height={transformRes({ height: 28 })}
-          width={transformRes({ width: 28 })}
+          height={res({ h: 28 })}
+          width={res({ w: 28 })}
           alt="roshan icon"
           className="absolute z-20"
           style={{
-            top: transformRes({ height: 8 }),
-            left: transformRes({ height: 13 }),
+            top: res({ h: 8 }),
+            left: res({ h: 13 }),
           }}
         />
         <span
           className="absolute z-40 text-white/90"
           style={{
-            bottom: transformRes({ height: 8 }),
-            fontSize: transformRes({ height: 12 }),
+            bottom: res({ h: 8 }),
+            fontSize: res({ h: 12 }),
           }}
         >
           {minutes}:{zeroPad(seconds)}

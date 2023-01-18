@@ -1,22 +1,29 @@
 import clsx from 'clsx'
 import { Badge } from '../../Badge'
 import { Card } from '../../Card'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
 
 export const Rankbadge = ({
   image,
   leaderboard = false,
   rank,
-  transformRes,
   mainScreen = false,
   ...props
 }) => {
+  const res = useTransformRes()
+  const { data: isEnabled } = useUpdateSetting(Settings['mmr-tracker'])
+
+  if (!isEnabled) return null
+
   const className = clsx(
     !mainScreen &&
       (leaderboard || ['80.png', '92.png'].includes(image) ? '-mt-1' : '-mt-3'),
     'font-mono'
   )
   const style = {
-    fontSize: transformRes ? transformRes({ height: 22 }) : 16,
+    fontSize: res ? res({ h: 22 }) : 16,
   }
 
   const Numbers = () =>
@@ -34,12 +41,12 @@ export const Rankbadge = ({
         className="flex h-full items-center space-x-1 text-[#e4d98d]"
       >
         <Badge
-          transformRes={transformRes}
-          width={transformRes({ width: 75 })}
-          height={transformRes({ height: 75 })}
+          res={res}
+          width={res({ w: 75 })}
+          height={res({ h: 75 })}
           image={image}
           style={{
-            marginTop: transformRes({ height: 20 }),
+            marginTop: res({ h: 20 }),
           }}
         />
         <Numbers />
@@ -48,7 +55,7 @@ export const Rankbadge = ({
   }
   return (
     <Card className="rounded-bl-none" {...props}>
-      <Badge transformRes={transformRes} image={image} />
+      <Badge res={res} image={image} />
       <Numbers />
     </Card>
   )

@@ -15,7 +15,7 @@ import { UserAccountNav } from '@/components/UserAccountNav'
 import { Github } from 'lucide-react'
 import DiscordSvg from '@/images/logos/discord.svg'
 import { Group, Select, Switch } from '@mantine/core'
-import { useUpdateLocale, useUpdateSetting } from '@/lib/useUpdateSetting'
+import { useUpdateLocale, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import CommandDetail from './CommandDetail'
 import { Settings } from '@/lib/defaultSettings'
 

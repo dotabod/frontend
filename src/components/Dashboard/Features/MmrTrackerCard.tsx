@@ -1,6 +1,9 @@
 import Image from 'next/image'
 import { Input } from '@/components/Input'
-import { useUpdateAccount, useUpdateSetting } from '@/lib/useUpdateSetting'
+import {
+  useUpdateAccount,
+  useUpdateSetting,
+} from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display, Link } from '@geist-ui/core'
 import { Badge, Button, clsx, Switch, Tooltip } from '@mantine/core'

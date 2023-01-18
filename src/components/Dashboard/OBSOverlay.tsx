@@ -1,4 +1,4 @@
-import { useBaseUrl } from '@/lib/hooks'
+import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { Card } from '@/ui/card'
 import { Badge, Display } from '@geist-ui/core'
 import { Accordion, Button, Center, CopyButton, Tabs } from '@mantine/core'

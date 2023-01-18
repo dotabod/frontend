@@ -1,4 +1,4 @@
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'

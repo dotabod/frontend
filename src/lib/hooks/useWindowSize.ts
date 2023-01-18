@@ -1,21 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-export const useBaseUrl = (append?: string) => {
-  const [baseUrl, setBaseUrl] = useState('')
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const base = window.location.protocol + '//' + window.location.host
-    setBaseUrl(append ? `${base}/${append}` : base)
-  }, [append])
-
-  return baseUrl
-}
-
-interface Size {
+export interface Size {
   width: number | undefined
   height: number | undefined
 }
+
 export const useWindowSize = (): Size => {
   // Initialize state with undefined width/height so server and client renders match
   // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
@@ -32,6 +21,7 @@ export const useWindowSize = (): Size => {
         height: window.innerHeight,
       })
     }
+
     // Add event listener
     window.addEventListener('resize', handleResize)
     // Call handler right away so state gets updated with initial window size

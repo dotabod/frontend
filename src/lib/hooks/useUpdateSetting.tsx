@@ -1,8 +1,9 @@
 import useSWR, { MutatorOptions, useSWRConfig } from 'swr'
-import { getValueOrDefault } from './settings'
-import { fetcher } from './fetcher'
+import { getValueOrDefault } from '../settings'
+import { fetcher } from '../fetcher'
 import { showNotification } from '@mantine/notifications'
 import { SettingKeys, Settings } from '@/lib/defaultSettings'
+import { useRouter } from 'next/router'
 
 export const useUpdate = (
   path,
@@ -45,7 +46,7 @@ export const useUpdate = (
     mutate(path, updateFn(data), options)
   }
 
-  return { data, loading, updateSetting }
+  return { data, loading, updateSetting, mutate }
 }
 
 export function useUpdateAccount() {
@@ -67,11 +68,17 @@ export function useUpdateLocale() {
 }
 
 export function useUpdateSetting(key: SettingKeys) {
+  const router = useRouter()
+  const { userId } = router.query
+
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
+
   const {
     data,
+    mutate,
     loading,
     updateSetting: update,
-  } = useUpdate(`/api/settings`, (data, newValue) => {
+  } = useUpdate(url, (data, newValue) => {
     // find the key in data, then update the value to be new
     const newData = data?.settings?.map((setting) => {
       if (setting.key === key) {
@@ -94,5 +101,5 @@ export function useUpdateSetting(key: SettingKeys) {
     update({ value: newValue }, `/api/settings/${key}`)
   }
 
-  return { data: value, loading, updateSetting }
+  return { data: value, loading, updateSetting, mutate: () => mutate(url) }
 }

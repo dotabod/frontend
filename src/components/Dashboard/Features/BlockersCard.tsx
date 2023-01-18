@@ -1,6 +1,6 @@
 import { Card } from '@/ui/card'
 import { Button, Collapse } from '@geist-ui/core'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { Settings } from '@/lib/defaultSettings'
 

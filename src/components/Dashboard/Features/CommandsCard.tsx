@@ -1,5 +1,5 @@
 import { Input } from '@/components/Input'
-import { useUpdateSetting } from '@/lib/useUpdateSetting'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { Card } from '@/ui/card'
 import { Badge } from '@geist-ui/core'
