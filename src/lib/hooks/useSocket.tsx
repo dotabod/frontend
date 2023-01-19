@@ -163,7 +163,8 @@ export const useSocket = ({
     socket.on('channelPollOrBet', (data: any, eventName: string) => {
       console.log('twitchEvent', { eventName, data })
       const func = eventName.includes('Poll') ? setPollData : setBetData
-      const newData = ['End', 'Lock'].includes(eventName) ? null : data
+      const newData =
+        eventName.includes('End') || eventName.includes('Lock') ? null : data
       func(newData)
     })
 
