@@ -23,7 +23,9 @@ const PollTimer = ({ minutes, seconds, completed }) =>
       {zeroPad(minutes)}:{zeroPad(seconds)}
     </span>
   )
-export const PollOverlay = ({ title, choices, endDate }) => {
+export const PollOverlay = ({ title, choices, endDate, block }) => {
+  if (!['spectator', 'playing', 'arcade'].includes(block.type)) return null
+
   const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
   const choicesWithPercent = choices.map((choice) => {
     const percent = !totalVotes

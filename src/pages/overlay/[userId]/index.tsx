@@ -99,6 +99,7 @@ export default function OverlayPage() {
           {pollData && (
             <PollOverlay
               key="poll-overlay"
+              block={block}
               endDate={pollData.endDate}
               title={pollData.title}
               choices={pollData.choices}
@@ -107,6 +108,7 @@ export default function OverlayPage() {
           {betData && (
             <PollOverlay
               key="bet-overlay"
+              block={block}
               endDate={betData.endDate}
               title={betData.title}
               choices={betData.outcomes}
