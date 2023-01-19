@@ -71,7 +71,6 @@ interface UseSocketParams {
         })
       | { image: string; leaderboard: boolean; rank: number }
   ) => void
-  wl: { lose: number; type: string; win: number }[]
   setWL: (
     value:
       | ((
@@ -81,6 +80,11 @@ interface UseSocketParams {
   ) => void
 }
 
+type wlType = {
+  win: number
+  lose: number
+  type: string
+}[]
 export const useSocket = ({
   setBlock,
   setPaused,
@@ -88,7 +92,6 @@ export const useSocket = ({
   setRoshan,
   setConnected,
   setRankImageDetails,
-  wl,
   setWL,
 }: UseSocketParams) => {
   const router = useRouter()
@@ -96,17 +99,6 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
-
-  // on react unmount
-  useEffect(() => {
-    return () => {
-      socket?.off('block')
-      socket?.off('update-medal')
-      socket?.off('connect')
-      socket?.off('connect_error')
-      socket?.disconnect()
-    }
-  }, [])
 
   useEffect(() => {
     if (!userId) return
@@ -140,7 +132,7 @@ export const useSocket = ({
       getRankImage(deets).then(setRankImageDetails)
     })
 
-    socket.on('update-wl', (records: typeof wl) => {
+    socket.on('update-wl', (records: wlType) => {
       setWL(records)
     })
 
@@ -149,5 +141,5 @@ export const useSocket = ({
     })
 
     socket.on('connect_error', console.log)
-  }, [router, userId])
+  }, [userId])
 }
