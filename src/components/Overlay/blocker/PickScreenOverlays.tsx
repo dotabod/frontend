@@ -4,7 +4,7 @@ import { transition } from '@/ui/utils'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
-export const AnimatedHeroBlocker = ({ block: { team, type } }) => {
+export const PickScreenOverlays = ({ block: { team, type } }) => {
   const { data: isEnabled } = useUpdateSetting(Settings['picks-blocker'])
   const shouldBlockPicks =
     isEnabled && ['picks', 'strategy', 'strategy-2'].includes(type)

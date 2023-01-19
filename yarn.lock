@@ -137,6 +137,14 @@
     "@types/node" "^14.11.2"
     tslib "^2.0.3"
 
+"@d-fischer/typed-event-emitter@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@d-fischer/typed-event-emitter/-/typed-event-emitter-3.3.0.tgz#eb3126bba4bd5552f3cb55e7c2a1859e3d391a0a"
+  integrity sha512-A8cFoHtzUgk4JHIsyEB+7SegBjyOmNxeTl2BwU+VVcbnyNCXfbFdC0fUYZTls7bdEpqH1GSBw9nlo2zk8ttQNw==
+  dependencies:
+    "@types/node" "^14.11.2"
+    tslib "^2.4.0"
+
 "@emotion/babel-plugin@^11.10.5":
   version "11.10.5"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.10.5.tgz#65fa6e1790ddc9e23cc22658a4c5dea423c55c3c"
@@ -1036,7 +1044,7 @@
     "@types/node-fetch" "^2.5.7"
     tslib "^2.0.3"
 
-"@twurple/api@^5.3.3":
+"@twurple/api@5.3.3", "@twurple/api@^5.3.3":
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/@twurple/api/-/api-5.3.3.tgz#6b79e0f1a7332e67151235c61eee0fb134222ed6"
   integrity sha512-GmTEUVbH2fmQP60Q7TkKsmprKPWMV1Bu52RAc3agQIeyDcKLxCgT/GuUC3qAv+UBOpnH8IKIFQj0RbKMI/tJBw==
@@ -1050,7 +1058,7 @@
     "@twurple/common" "5.3.3"
     tslib "^2.0.3"
 
-"@twurple/auth@^5.3.3":
+"@twurple/auth@5.3.3", "@twurple/auth@^5.3.3":
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/@twurple/auth/-/auth-5.3.3.tgz#24c131b5be621f9b091e8d44fdb2f623944a21b8"
   integrity sha512-fsQlD+Q/iWbXq7Q8wHOtzTI5kc+zZlUHnmUQDJ9SQYz4yLsiQIFOvP4toYCVg70tm1Mr2XM9pPWGXK5O1AKaMQ==
@@ -1068,6 +1076,19 @@
   dependencies:
     "@d-fischer/shared-utils" "^3.4.0"
     klona "^2.0.4"
+    tslib "^2.0.3"
+
+"@twurple/eventsub-base@^5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@twurple/eventsub-base/-/eventsub-base-5.3.3.tgz#b182538b5fce61f4bf49d869b4be24944ab83760"
+  integrity sha512-pzLzWl77xMK1fXbJg5FheVtJeuTIWSvutY/LTOZrWgGsS7iUJzDfAKoGcAeMpwnOVHOfNOPlDufZ9NY8CLcr8w==
+  dependencies:
+    "@d-fischer/logger" "^4.0.0"
+    "@d-fischer/shared-utils" "^3.4.0"
+    "@d-fischer/typed-event-emitter" "^3.3.0"
+    "@twurple/api" "5.3.3"
+    "@twurple/auth" "5.3.3"
+    "@twurple/common" "5.3.3"
     tslib "^2.0.3"
 
 "@types/estree@*", "@types/estree@^1.0.0":
