@@ -9,6 +9,7 @@ export function HeroBlocker({ teamName, type }) {
   return (
     <Image
       priority
+      unoptimized
       alt={`${type} blocker`}
       width={res({ w: 1920 })}
       height={res({ h: 1080 })}

@@ -3,13 +3,7 @@ import { useEffect } from 'react'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useRouter } from 'next/router'
 
-export const useOBS = ({
-  connected,
-  block,
-}: {
-  connected: boolean
-  block: { team: null; type: null; matchId: null }
-}) => {
+export const useOBS = ({ connected, block }) => {
   const router = useRouter()
   const { userId } = router.query
 

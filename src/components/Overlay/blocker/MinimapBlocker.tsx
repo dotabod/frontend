@@ -34,6 +34,7 @@ export const MinimapBlocker = ({ block }) => {
       className="absolute"
     >
       <Image
+        unoptimized
         priority
         alt="minimap blocker"
         width={
