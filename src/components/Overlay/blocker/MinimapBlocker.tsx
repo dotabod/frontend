@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { transition } from '@/ui/utils'
+import { motionProps } from '@/ui/utils'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
@@ -20,16 +20,7 @@ export const MinimapBlocker = ({ block }) => {
   return (
     <motion.div
       key="minimap-blocker"
-      initial={{
-        scale: 0,
-      }}
-      transition={transition}
-      animate={{
-        scale: 1,
-      }}
-      exit={{
-        scale: 0,
-      }}
+      {...motionProps}
       style={minimapPosition}
       className="absolute"
     >

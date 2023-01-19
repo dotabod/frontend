@@ -3,6 +3,7 @@ import { Card } from '@/components/Card'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { motionProps } from '@/ui/utils'
 
 export const SpectatorText = ({ block }) => {
   const res = useTransformRes()
@@ -13,20 +14,7 @@ export const SpectatorText = ({ block }) => {
   return (
     <motion.div
       key="spectator-text"
-      initial={{
-        scale: 0,
-      }}
-      transition={{
-        type: 'spring',
-        stiffness: 260,
-        damping: 20,
-      }}
-      animate={{
-        scale: 1,
-      }}
-      exit={{
-        scale: 0,
-      }}
+      {...motionProps}
       className="absolute"
       style={{
         bottom: isXL

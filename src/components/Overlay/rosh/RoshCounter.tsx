@@ -1,7 +1,7 @@
 import Countdown from 'react-countdown'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { RoshTimer } from './RoshTimer'
-import { transition } from '@/ui/utils'
+import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
@@ -45,14 +45,7 @@ export const RoshCounter = ({
       `}</style>
       <motion.div
         key="rosh-counter"
-        initial={{
-          bottom: -50,
-        }}
-        transition={transition}
-        animate={{
-          bottom: style.bottom,
-        }}
-        exit={{ bottom: -50 }}
+        {...motionProps}
         style={style}
         className="rosh-timer absolute"
       >

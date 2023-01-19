@@ -4,8 +4,8 @@ export const isDev = false
 export const devTotalTimer = 500000
 export const time = new Date().getTime()
 
-export const devMin = isDev ? new Date(time + devTotalTimer).toISOString() : ''
-export const devMax = isDev
+export const devMin = false ? new Date(time + devTotalTimer).toISOString() : ''
+export const devMax = false
   ? new Date(
       new Date(time + devTotalTimer).getTime() + devTotalTimer
     ).toISOString()
@@ -13,21 +13,21 @@ export const devMax = isDev
 
 export const useRoshan = () => {
   const [roshan, setRoshan] = useState({
-    minS: isDev ? devTotalTimer / 1000 : 0,
-    maxS: isDev ? devTotalTimer / 1000 : 0,
+    minS: false ? devTotalTimer / 1000 : 0,
+    maxS: false ? devTotalTimer / 1000 : 0,
     minDate: devMin,
     maxDate: devMax,
-    count: isDev ? 1 : 0,
+    count: false ? 1 : 0,
   })
 
   return { roshan, setRoshan }
 }
 export const useAegis = () => {
   const [aegis, setAegis] = useState({
-    expireS: isDev ? 6 : 0,
+    expireS: false ? 6 : 0,
     expireTime: '',
-    expireDate: isDev ? devMin : '',
-    playerId: isDev ? 5 : null,
+    expireDate: false ? devMin : '',
+    playerId: false ? 5 : null,
   })
 
   return { aegis, setAegis }

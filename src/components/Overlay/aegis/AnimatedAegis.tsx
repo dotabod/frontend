@@ -1,12 +1,11 @@
 import Countdown from 'react-countdown'
 import { motion } from 'framer-motion'
 import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
-import { transition } from '@/ui/utils'
+import { motionProps } from '@/ui/utils'
 import { useEffect, useRef } from 'react'
 import { usePlayerPositions } from '@/lib/hooks/useOverlayPositions'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { Settings } from '@/lib/defaultSettings'
-import { isDev } from '@/lib/hooks/rosh'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 export const AnimatedAegis = ({
@@ -40,21 +39,14 @@ export const AnimatedAegis = ({
     }
   }, [paused])
 
-  if (!isEnabled || (block.type !== 'playing' && !isDev) || !expireDate) {
+  if (!isEnabled || block.type !== 'playing' || !expireDate) {
     return null
   }
 
   return (
     <motion.div
       key="aegis-counter"
-      initial={{
-        scale: 2,
-      }}
-      transition={transition}
-      animate={{
-        scale: 1,
-      }}
-      exit={{ scale: 0 }}
+      {...motionProps}
       style={{
         left: playerPositions[playerId],
         top: top,

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Rankbadge } from '@/components/Overlay/rank/Rankbadge'
-import { transition } from '@/ui/utils'
+import { motionProps } from '@/ui/utils'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 
 export const AnimatedRankBadge = ({
@@ -17,14 +17,7 @@ export const AnimatedRankBadge = ({
   return (
     <motion.div
       key="animated-rank-badge"
-      initial={{
-        scale: 0,
-      }}
-      transition={{ ...transition, delay: 0.3 }}
-      animate={{
-        scale: 1,
-      }}
-      exit={{ scale: 0 }}
+      {...motionProps}
       style={!mainScreen ? badgePosition : null}
       className={className}
     >
