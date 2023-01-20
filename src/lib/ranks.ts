@@ -23,8 +23,8 @@ export async function getRankImage(rank: RankType) {
   }
 
   return {
-    rank: rank.standing || rank.mmr,
+    rank: rank.mmr,
     image: rank.myRank.image,
-    leaderboard: !!rank.standing,
+    leaderboard: rank.standing,
   }
 }

@@ -90,7 +90,11 @@ export const InGameOverlays = ({
 
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 
-      <AnimatedWL key="animate-wl-class" wl={wl} />
+      <AnimatedWL
+        key="animate-wl-class"
+        wl={wl}
+        isLeaderboard={!!rankImageDetails?.leaderboard}
+      />
 
       <AnimatedRankBadge
         key="animate-rank-badge-class"

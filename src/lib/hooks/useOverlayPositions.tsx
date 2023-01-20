@@ -12,7 +12,7 @@ export const usePlayerPositions = () => {
   return { playerPositions }
 }
 
-export const useOverlayPositions = () => {
+export const useOverlayPositions = ({ isLeaderboard = false } = {}) => {
   const res = useTransformRes()
 
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
@@ -29,7 +29,7 @@ export const useOverlayPositions = () => {
 
   let wlPosition = {
     bottom: 0,
-    right: res({ w: 366 }),
+    right: res({ w: isLeaderboard ? 399 : 366 }),
     left: null,
     fontSize: res({ w: 22 }),
   }

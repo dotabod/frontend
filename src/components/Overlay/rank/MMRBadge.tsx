@@ -10,10 +10,17 @@ export const Numbers = ({ leaderboard, rank, className, ...props }) => {
 
   const fontSize = res?.({ h: 22 }) ?? 16
   return (
-    <span style={{ fontSize }} className={clsx(className)} {...props}>
-      {leaderboard && '#'}
-      {rank ? rank : ''}
-    </span>
+    <div
+      style={{ fontSize }}
+      className={clsx(className, 'flex flex-col items-center')}
+      {...props}
+    >
+      <span>{leaderboard && `#${leaderboard}`}</span>
+      <span>
+        {rank && rank}
+        {leaderboard && ' MMR'}
+      </span>
+    </div>
   )
 }
 

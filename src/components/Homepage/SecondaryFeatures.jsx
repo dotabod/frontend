@@ -97,8 +97,17 @@ export function SecondaryFeatures() {
           </span>
           {CommandDetail[Settings['mmr-tracker']].response()}
           <div className="mt-6 flex justify-center space-x-4">
-            <MMRBadge image="55.png" rank="3860" />
-            <MMRBadge image="92.png" leaderboard rank="9" />
+            <MMRBadge
+              image="55.png"
+              rank="3860"
+              className="self-center !rounded-md"
+            />
+            <MMRBadge
+              image="92.png"
+              className="self-center !rounded-md"
+              leaderboard="1"
+              rank="12490"
+            />
           </div>
         </div>
       ),
