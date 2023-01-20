@@ -1,204 +1,33 @@
-import { Fragment, useState, forwardRef } from 'react'
+import { forwardRef, Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import {
-  Bars3Icon,
-  BeakerIcon,
-  BoltIcon,
-  CommandLineIcon,
-  QuestionMarkCircleIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { DarkLogo } from '@/components/Logo'
 import Link from 'next/link'
-import Image from 'next/image'
 import { UserAccountNav } from '@/components/UserAccountNav'
-import { Github } from 'lucide-react'
-import DiscordSvg from '@/images/logos/discord.svg'
 import { Group, Select, Switch } from '@mantine/core'
 import { useUpdateLocale, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import CommandDetail from './CommandDetail'
 import { Settings } from '@/lib/defaultSettings'
-
-const localeOptions = [
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-united-states_1f1fa-1f1f8.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'English',
-    value: 'en',
-  },
-
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-italy_1f1ee-1f1f9.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Italian',
-    value: 'it',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-ukraine_1f1fa-1f1e6.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Ukrainian',
-    value: 'uk-UA',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-russia_1f1f7-1f1fa.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Russian',
-    value: 'ru',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-spain_1f1ea-1f1f8.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Spanish',
-    value: 'es',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-hungary_1f1ed-1f1fa.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Hungarian',
-    value: 'hu',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-iran_1f1ee-1f1f7.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Persian',
-    value: 'fa',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-brazil_1f1e7-1f1f7.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Brazilian Portuguese',
-    value: 'pt-BR',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-portugal_1f1f5-1f1f9.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Portuguese',
-    value: 'pt',
-  },
-  {
-    flag: (
-      <Image
-        src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/322/flag-slovakia_1f1f8-1f1f0.png"
-        width={22}
-        height={22}
-        alt="flag"
-      />
-    ),
-    label: 'Slovak',
-    value: 'cs-SK',
-  },
-].sort((a, b) => (a.label > b.label ? 1 : -1))
+import { localeOptions } from '@/components/Dashboard/locales'
+import { navigation } from '@/components/Dashboard/navigation'
+import clsx from 'clsx'
+import { FlagProps } from 'mantine-flagpack/declarations/create-flag'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
-  flag: string
+  Flag: (props: FlagProps) => JSX.Element
   label: string
 }
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ flag, label, ...others }: ItemProps, ref) => (
+  ({ Flag, label, ...others }: ItemProps, ref) => (
     <Group noWrap ref={ref} {...others}>
-      {flag} {label}
+      <Flag w={24} radius={2} />
+      <span>{label}</span>
     </Group>
   )
 )
 
 SelectItem.displayName = 'SelectItem'
-
-export const navigation = [
-  {
-    name: 'Setup',
-    href: '/dashboard',
-    icon: BeakerIcon,
-  },
-  {
-    name: 'Features',
-    href: '/dashboard/features',
-    icon: BoltIcon,
-  },
-  {
-    name: 'Commands',
-    href: '/dashboard/commands',
-    icon: CommandLineIcon,
-  },
-  {
-    name: 'Troubleshoot',
-    href: '/dashboard/troubleshoot',
-    icon: QuestionMarkCircleIcon,
-  },
-  {
-    name: '',
-    href: '',
-    icon: null,
-  },
-  {
-    name: 'Github',
-    href: 'https://github.com/dotabod/',
-    icon: Github,
-  },
-  {
-    name: 'Discord',
-    href: 'https://discord.dotabod.com',
-    icon: ({ ...props }) => <Image alt="discord" src={DiscordSvg} {...props} />,
-  },
-]
-
-export function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
 
 export default function DashboardShell({ children, title, subtitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -210,10 +39,14 @@ export default function DashboardShell({ children, title, subtitle }) {
   } = useUpdateSetting(Settings.commandDisable)
 
   const {
-    data,
+    data: localeOption,
     loading: loadingLocale,
     update: updateLocale,
   } = useUpdateLocale()
+
+  const CurrentFlag = localeOptions.find(
+    (x) => x.value === localeOption?.locale
+  )?.Flag
 
   return (
     <>
@@ -314,7 +147,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                           <Link
                             key={item.name}
                             href={item.href}
-                            className={classNames(
+                            className={clsx(
                               window.location.href.endsWith(item.href)
                                 ? ' bg-dark-700 text-dark-100'
                                 : 'text-dark-300 hover:fill-gray-50 hover:text-dark-100',
@@ -322,7 +155,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                             )}
                           >
                             <item.icon
-                              className={classNames(
+                              className={clsx(
                                 window.location.href.endsWith(item.href)
                                   ? 'text-dark-400'
                                   : 'text-dark-300 group-hover:text-white',
@@ -369,7 +202,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={classNames(
+                      className={clsx(
                         window.location.href.endsWith(item.href)
                           ? ' bg-dark-700 text-dark-100'
                           : 'text-dark-300 hover:fill-dark-100 hover:text-dark-100',
@@ -377,7 +210,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                       )}
                     >
                       <item.icon
-                        className={classNames(
+                        className={clsx(
                           window.location.href.endsWith(item.href)
                             ? 'text-dark-400'
                             : 'text-dark-300 group-hover:text-white',
@@ -439,10 +272,10 @@ export default function DashboardShell({ children, title, subtitle }) {
               <Select
                 placeholder="Language selector"
                 itemComponent={SelectItem}
+                icon={<CurrentFlag w={25} h={17} radius={2} />}
                 data={localeOptions}
                 maxDropdownHeight={400}
-                defaultValue={data?.locale}
-                icon={localeOptions.find((x) => x.value === data?.locale)?.flag}
+                defaultValue={localeOption?.locale}
                 onChange={updateLocale}
                 filter={(value, item) =>
                   item.label.toLowerCase().includes(value.toLowerCase().trim())

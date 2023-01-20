@@ -6,7 +6,7 @@ import { Group, Avatar, Text, Menu } from '@mantine/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { LogOut } from 'lucide-react'
 import clsx from 'clsx'
-import { navigation } from './Dashboard/DashboardShell'
+import { navigation } from '@/components/Dashboard/navigation'
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   image: string
