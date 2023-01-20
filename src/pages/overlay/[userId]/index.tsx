@@ -53,7 +53,7 @@ export default function OverlayPage() {
   const [rankImageDetails, setRankImageDetails] = useState({
     image: isDev ? '80.png' : '0.png',
     rank: isDev ? 3180 : 0,
-    leaderboard: true,
+    leaderboard: isDev ? true : false,
   })
 
   useSocket({
