@@ -29,7 +29,7 @@ export const useOverlayPositions = ({ isLeaderboard = false } = {}) => {
 
   let wlPosition = {
     bottom: 0,
-    right: res({ w: isLeaderboard ? 399 : 366 }),
+    right: res({ w: isLeaderboard ? 367 : 366 }),
     left: null,
     fontSize: res({ w: 22 }),
   }
