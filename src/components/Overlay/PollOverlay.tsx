@@ -2,6 +2,7 @@ import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
 import { motion } from 'framer-motion'
 import Countdown, { zeroPad } from 'react-countdown'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
 const PollColors = [
   '#3159ff',
@@ -24,6 +25,8 @@ const PollTimer = ({ minutes, seconds, completed }) =>
     </span>
   )
 export const PollOverlay = ({ title, choices, endDate }) => {
+  const res = useTransformRes()
+
   const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
   const choicesWithPercent = choices.map((choice) => {
     const percent = !totalVotes
@@ -39,7 +42,7 @@ export const PollOverlay = ({ title, choices, endDate }) => {
           {title}
         </h1>
         <Progress
-          size={24}
+          size={res({ w: 24 })}
           radius="lg"
           sections={choicesWithPercent.map((choice, i) => ({
             label: `${choice.title}${
