@@ -13,32 +13,38 @@ export const PickScreenOverlays = ({
   block: { team, type },
 }) => {
   const res = useTransformRes()
-  const { data: isEnabled } = useUpdateSetting(Settings['picks-blocker'])
-  const shouldBlockPicks =
-    isEnabled && ['picks', 'strategy', 'strategy-2'].includes(type)
+  const { data: shouldBlock } = useUpdateSetting(Settings['picks-blocker'])
+  const hasPickScreen = ['picks', 'strategy', 'strategy-2'].includes(type)
+
+  if (!hasPickScreen) return null
 
   return (
     <>
-      {['strategy', 'picks'].includes(type) && (
-        <div
-          style={{
-            right: res({ w: 40 }),
-            bottom: res({ h: 100 }),
-            width: res({ w: 100 }),
-            height: res({ h: 150 }),
-          }}
-          className="absolute"
-        >
-          <AnimatedWL mainScreen key="animate-wl-class" wl={wl} />
-
+      <div
+        style={{
+          width: res({ w: 200 }),
+          height: 150,
+          bottom: res({ h: 300 }),
+          right: 0,
+        }}
+        className="absolute"
+      >
+        <div className="flex h-full flex-col items-center">
           <AnimatedRankBadge
             mainScreen
-            key="animate-rank-badge-class"
+            key="animate-rank-badge-class-main"
+            className="relative h-full"
             rankImageDetails={rankImageDetails}
           />
+          <AnimatedWL
+            mainScreen
+            className="relative flex h-full items-center"
+            key="animate-wl-class-main"
+            wl={wl}
+          />
         </div>
-      )}
-      {shouldBlockPicks && (
+      </div>
+      {shouldBlock && (
         <motion.div
           key="animated-hero-blocker"
           {...motionProps}

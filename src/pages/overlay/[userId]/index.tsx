@@ -9,16 +9,14 @@ import { useOBS } from '@/lib/hooks/useOBS'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { PollOverlay } from '@/components/Overlay/PollOverlay'
-
-const devBlockTypes = {
-  matchId: 123456789,
-  team: 'radiant',
-  type: 'playing',
-}
 
 export default function OverlayPage() {
+  const devBlockTypes = {
+    matchId: 123456789,
+    team: 'radiant',
+    type: 'picks',
+  }
+
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
@@ -53,7 +51,7 @@ export default function OverlayPage() {
   ])
 
   const [rankImageDetails, setRankImageDetails] = useState({
-    image: isDev ? '41.png' : '0.png',
+    image: isDev ? '55.png' : '0.png',
     rank: isDev ? 5380 : 0,
     leaderboard: false,
   })
@@ -72,9 +70,6 @@ export default function OverlayPage() {
 
   useOBS({ block, connected })
 
-  const res = useTransformRes()
-  const windowSize = useWindowSize()
-
   return (
     <>
       <Head>
@@ -87,35 +82,6 @@ export default function OverlayPage() {
         }
       `}</style>
       <AnimatePresence>
-        <div
-          key="poll-primary"
-          className="absolute"
-          style={{
-            right: res({ w: 1920 / 2 - 200 }),
-            top: res({ h: 70 }),
-            width: res({ w: 400 }),
-          }}
-        >
-          {pollData && (
-            <PollOverlay
-              key="poll-overlay"
-              block={block}
-              endDate={pollData.endDate}
-              title={pollData.title}
-              choices={pollData.choices}
-            />
-          )}
-          {betData && (
-            <PollOverlay
-              key="bet-overlay"
-              block={block}
-              endDate={betData.endDate}
-              title={betData.title}
-              choices={betData.outcomes}
-            />
-          )}
-        </div>
-
         <MainScreenOverlays
           key="main-screen-overlays"
           block={block}
@@ -131,6 +97,8 @@ export default function OverlayPage() {
         />
 
         <InGameOverlays
+          pollData={pollData}
+          betData={betData}
           key="in-game-overlays"
           block={block}
           wl={wl}
@@ -147,8 +115,8 @@ export default function OverlayPage() {
             key="dev-image"
             width={width}
             height={height}
-            alt={`main game`}
-            src={`/images/dev/in-game.png`}
+            alt={`${devBlockTypes.type} dev screenshot`}
+            src={`/images/dev/${devBlockTypes.type}.png`}
           />
         )}
       </AnimatePresence>
