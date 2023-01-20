@@ -40,11 +40,11 @@ export const MMRBadge = ({
         )}
       >
         <Badge
-          width={res({ w: 75 })}
-          height={res({ h: 75 })}
+          width={res?.({ w: 75 }) ?? 75}
+          height={res?.({ h: 75 }) ?? 75}
           image={image}
           style={{
-            marginTop: res({ h: 20 }),
+            marginTop: res?.({ h: 20 }) ?? 0,
           }}
         />
         <Numbers className="font-mono" rank={rank} leaderboard={leaderboard} />
@@ -53,7 +53,11 @@ export const MMRBadge = ({
   }
   return (
     <Card {...props} className={clsx(className, 'rounded-bl-none')}>
-      <Badge width={res({ w: 82 })} height={res({ h: 75 })} image={image} />
+      <Badge
+        width={res?.({ w: 82 }) ?? 82}
+        height={res?.({ h: 75 }) ?? 75}
+        image={image}
+      />
       <Numbers
         rank={rank}
         leaderboard={leaderboard}
