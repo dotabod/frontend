@@ -114,7 +114,7 @@ const localeOptions = [
         alt="flag"
       />
     ),
-    label: 'Portuguese (Brazil)',
+    label: 'Brazilian Portuguese',
     value: 'pt-BR',
   },
   {
@@ -126,7 +126,7 @@ const localeOptions = [
         alt="flag"
       />
     ),
-    label: 'Portuguese (Portugal)',
+    label: 'Portuguese',
     value: 'pt',
   },
   {
@@ -138,7 +138,7 @@ const localeOptions = [
         alt="flag"
       />
     ),
-    label: 'Czech (Slovakia)',
+    label: 'Slovak',
     value: 'cs-SK',
   },
 ].sort((a, b) => (a.label > b.label ? 1 : -1))
