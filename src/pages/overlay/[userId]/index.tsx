@@ -14,7 +14,7 @@ export default function OverlayPage() {
   const devBlockTypes = {
     matchId: 123456789,
     team: 'radiant',
-    type: 'playing',
+    type: 'picks',
   }
 
   const { height, width } = useWindowSize()

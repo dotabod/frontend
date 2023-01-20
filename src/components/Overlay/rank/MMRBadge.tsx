@@ -35,7 +35,7 @@ export const MMRBadge = ({
       <div
         {...props}
         className={clsx(
-          'flex h-full flex-col items-center space-x-1 text-[#e4d98d]',
+          'flex h-full items-center space-x-1 text-[#e4d98d]',
           className
         )}
       >
