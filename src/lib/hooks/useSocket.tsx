@@ -16,81 +16,6 @@ import {
 
 export let socket: Socket | null = null
 
-interface UseSocketParams {
-  setBlock: (
-    value:
-      | ((prevState: { team: null; type: null; matchId: null }) => {
-          team: null
-          type: null
-          matchId: null
-        })
-      | { team: null; type: null; matchId: null }
-  ) => void
-  setPaused: (value: ((prevState: boolean) => boolean) | boolean) => void
-  setAegis: (
-    value:
-      | ((prevState: {
-          expireS: number
-          expireTime: string
-          expireDate: string
-          playerId: number
-        }) => {
-          expireS: number
-          expireTime: string
-          expireDate: string
-          playerId: number
-        })
-      | {
-          expireS: number
-          expireTime: string
-          expireDate: string
-          playerId: number
-        }
-  ) => void
-  setRoshan: (
-    value:
-      | ((prevState: {
-          minS: number
-          minDate: string
-          count: number
-          maxDate: string
-          maxS: number
-        }) => {
-          minS: number
-          minDate: string
-          count: number
-          maxDate: string
-          maxS: number
-        })
-      | {
-          minS: number
-          minDate: string
-          count: number
-          maxDate: string
-          maxS: number
-        }
-  ) => void
-  setConnected: (value: ((prevState: boolean) => boolean) | boolean) => void
-  setRankImageDetails: (
-    value:
-      | ((prevState: { image: string; leaderboard: boolean; rank: number }) => {
-          image: string
-          leaderboard: boolean
-          rank: number
-        })
-      | { image: string; leaderboard: boolean; rank: number }
-  ) => void
-  setWL: (
-    value:
-      | ((
-          prevState: { lose: number; type: string; win: number }[]
-        ) => { lose: number; type: string; win: number }[])
-      | { lose: number; type: string; win: number }[]
-  ) => void
-  setPollData: (value) => void
-  setBetData: (value) => void
-}
-
 type wlType = {
   win: number
   lose: number
@@ -106,7 +31,7 @@ export const useSocket = ({
   setConnected,
   setRankImageDetails,
   setWL,
-}: UseSocketParams) => {
+}) => {
   const router = useRouter()
   const { userId } = router.query
 

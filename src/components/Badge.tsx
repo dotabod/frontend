@@ -1,6 +1,9 @@
 import Image from 'next/image'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
-export const Badge = ({ res, image, ...props }) => {
+export const Badge = ({ image, ...props }) => {
+  const res = useTransformRes()
+
   return (
     <Image
       priority

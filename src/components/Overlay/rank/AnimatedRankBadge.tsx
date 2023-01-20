@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Rankbadge } from '@/components/Overlay/rank/Rankbadge'
+import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { motionProps } from '@/ui/utils'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 
@@ -21,7 +21,7 @@ export const AnimatedRankBadge = ({
       style={!mainScreen ? badgePosition : null}
       className={className}
     >
-      <Rankbadge {...rankImageDetails} mainScreen={mainScreen} />
+      <MMRBadge {...rankImageDetails} mainScreen={mainScreen} />
     </motion.div>
   )
 }

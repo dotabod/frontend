@@ -14,7 +14,7 @@ export default function OverlayPage() {
   const devBlockTypes = {
     matchId: 123456789,
     team: 'radiant',
-    type: 'picks',
+    type: 'playing',
   }
 
   const { height, width } = useWindowSize()
@@ -51,9 +51,9 @@ export default function OverlayPage() {
   ])
 
   const [rankImageDetails, setRankImageDetails] = useState({
-    image: isDev ? '55.png' : '0.png',
-    rank: isDev ? 5380 : 0,
-    leaderboard: false,
+    image: isDev ? '80.png' : '0.png',
+    rank: isDev ? 3180 : 0,
+    leaderboard: true,
   })
 
   useSocket({

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Badge, Link } from '@geist-ui/core'
 import { HoverCard } from '@mantine/core'
 import { SparklesIcon } from '@heroicons/react/24/outline'
-import { Rankbadge } from '../Overlay/rank/Rankbadge'
+import { MMRBadge } from '../Overlay/rank/MMRBadge'
 import WinLossCard from '../Overlay/wl/WinLossCard'
 import TwitchChat from '../TwitchChat'
 import React from 'react'
@@ -97,8 +97,8 @@ export function SecondaryFeatures() {
           </span>
           {CommandDetail[Settings['mmr-tracker']].response()}
           <div className="mt-6 flex justify-center space-x-4">
-            <Rankbadge image="55.png" rank="3860" />
-            <Rankbadge image="92.png" leaderboard rank="9" />
+            <MMRBadge image="55.png" rank="3860" />
+            <MMRBadge image="92.png" leaderboard rank="9" />
           </div>
         </div>
       ),
