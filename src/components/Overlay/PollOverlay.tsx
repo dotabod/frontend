@@ -4,6 +4,12 @@ import { motion } from 'framer-motion'
 import Countdown, { zeroPad } from 'react-countdown'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
+export type PollData = {
+  title: string
+  endDate: number
+  choices: { title: string; totalVotes?: number }[]
+}
+
 const PollColors = [
   '#3159ff',
   '#ee27a6',
@@ -24,7 +30,7 @@ const PollTimer = ({ minutes, seconds, completed }) =>
       {zeroPad(minutes)}:{zeroPad(seconds)}
     </span>
   )
-export const PollOverlay = ({ title, choices, endDate }) => {
+export const PollOverlay = ({ title, choices, endDate }: PollData) => {
   const res = useTransformRes()
 
   const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)

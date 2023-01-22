@@ -10,47 +10,8 @@ import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
-
-type PollData = {
-  title: string
-  endDate: number
-  choices: { title: string; totalVotes?: number }[]
-}
-
-const devBlockTypes = {
-  matchId: 123456789,
-  team: 'radiant',
-  type: null,
-}
-
-const devPoll: PollData = {
-  endDate: new Date().getTime() + 1000 * 60 * 60 * 24,
-  title: 'What is your favorite color?',
-  choices: [
-    {
-      title: 'Blue',
-      totalVotes: 500000,
-    },
-    {
-      title: 'Red',
-      totalVotes: 300000,
-    },
-  ],
-}
-
-const devRank = {
-  image: '55.png',
-  rank: 5500,
-  leaderboard: false,
-}
-
-const devWL = [
-  {
-    win: 5,
-    lose: 1,
-    type: 'U',
-  },
-]
+import { devBlockTypes, devPoll, devRank, devWL } from '@/lib/devConsts'
+import { PollData } from '@/components/Overlay/PollOverlay'
 
 export default function OverlayPage() {
   const { height, width } = useWindowSize()
