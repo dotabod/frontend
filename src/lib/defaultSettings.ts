@@ -79,6 +79,7 @@ export const defaultSettings = {
   'minimap-simple': false,
   'minimap-xl': false,
   onlyParty: false,
+  livePolls: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>

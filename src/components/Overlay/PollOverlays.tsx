@@ -1,8 +1,14 @@
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { PollOverlay } from '@/components/Overlay/PollOverlay'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
 
 export const PollOverlays = ({ pollData, betData }) => {
   const res = useTransformRes()
+
+  const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
+
+  if (!isEnabled) return null
 
   return (
     <>
