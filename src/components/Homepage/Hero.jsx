@@ -106,14 +106,14 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
   },
   {
+    name: 'qSnake',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/7d5a4932-be42-481c-a47a-4136404f2c54-profile_image-70x70.png',
+  },
+  {
     name: 'dubudota',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/c876efcc8901bd08-profile_image-150x150.jpeg',
-  },
-  {
-    name: 'BananaSlamJamma',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/bananaslamjamma-profile_image-8a07eac563581ffe-70x70.png',
   },
   {
     name: 'ODPixel',
@@ -139,6 +139,11 @@ const featuredUsers = [
     name: 'Draskyl',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
+  },
+  {
+    name: 'BananaSlamJamma',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/bananaslamjamma-profile_image-8a07eac563581ffe-70x70.png',
   },
   {
     link: false,
