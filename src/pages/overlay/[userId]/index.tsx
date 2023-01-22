@@ -9,14 +9,50 @@ import { useOBS } from '@/lib/hooks/useOBS'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
+import { PollOverlays } from '@/components/Overlay/PollOverlays'
+
+type PollData = {
+  title: string
+  endDate: number
+  choices: { title: string; totalVotes?: number }[]
+}
+
+const devBlockTypes = {
+  matchId: 123456789,
+  team: 'radiant',
+  type: null,
+}
+
+const devPoll: PollData = {
+  endDate: new Date().getTime() + 1000 * 60 * 60 * 24,
+  title: 'What is your favorite color?',
+  choices: [
+    {
+      title: 'Blue',
+      totalVotes: 500000,
+    },
+    {
+      title: 'Red',
+      totalVotes: 300000,
+    },
+  ],
+}
+
+const devRank = {
+  image: '55.png',
+  rank: 5500,
+  leaderboard: false,
+}
+
+const devWL = [
+  {
+    win: 5,
+    lose: 1,
+    type: 'U',
+  },
+]
 
 export default function OverlayPage() {
-  const devBlockTypes = {
-    matchId: 123456789,
-    team: 'radiant',
-    type: 'picks',
-  }
-
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
@@ -29,11 +65,9 @@ export default function OverlayPage() {
           type: null,
         }
   )
-  const [pollData, setPollData] = useState<{
-    title: string
-    endDate: string
-    choices: { title: string; totalVotes?: number }[]
-  } | null>(null)
+  const [pollData, setPollData] = useState<PollData | null>(
+    isDev ? devPoll : null
+  )
   const [betData, setBetData] = useState<{
     title: string
     endDate: string
@@ -42,19 +76,27 @@ export default function OverlayPage() {
   const [paused, setPaused] = useState(false)
   const { roshan, setRoshan } = useRoshan()
   const { aegis, setAegis } = useAegis()
-  const [wl, setWL] = useState([
-    {
-      win: isDev ? 2 : 0,
-      lose: isDev ? 1 : 0,
-      type: 'U',
-    },
-  ])
+  const [wl, setWL] = useState(
+    isDev
+      ? devWL
+      : [
+          {
+            win: 0,
+            lose: 0,
+            type: 'U',
+          },
+        ]
+  )
 
-  const [rankImageDetails, setRankImageDetails] = useState({
-    image: isDev ? '80.png' : '0.png',
-    rank: isDev ? 3180 : 0,
-    leaderboard: isDev ? true : false,
-  })
+  const [rankImageDetails, setRankImageDetails] = useState(
+    isDev
+      ? devRank
+      : {
+          image: '0.png',
+          rank: 0,
+          leaderboard: false,
+        }
+  )
 
   useSocket({
     setAegis,
@@ -82,6 +124,12 @@ export default function OverlayPage() {
         }
       `}</style>
       <AnimatePresence>
+        <PollOverlays
+          pollData={pollData}
+          betData={betData}
+          key="poll-overlays"
+        />
+
         <MainScreenOverlays
           key="main-screen-overlays"
           block={block}
@@ -97,8 +145,6 @@ export default function OverlayPage() {
         />
 
         <InGameOverlays
-          pollData={pollData}
-          betData={betData}
           key="in-game-overlays"
           block={block}
           wl={wl}

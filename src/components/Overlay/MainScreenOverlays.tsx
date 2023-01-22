@@ -21,7 +21,7 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
       <div
         className="flex h-full items-center justify-end space-x-2"
         style={{
-          marginRight: res({ w: 470 }),
+          marginRight: res({ w: 428 }),
         }}
       >
         <AnimatedWL

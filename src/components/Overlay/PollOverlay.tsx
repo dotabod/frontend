@@ -20,7 +20,7 @@ const PollTimer = ({ minutes, seconds, completed }) =>
   completed ? (
     <></>
   ) : (
-    <span className="text-white">
+    <span className="font-outline-2 text-slate-50">
       {zeroPad(minutes)}:{zeroPad(seconds)}
     </span>
   )
@@ -38,11 +38,12 @@ export const PollOverlay = ({ title, choices, endDate }) => {
   return (
     <motion.div key="poll-overlay" {...motionProps}>
       <div>
-        <h1 className="text-center text-xl font-semibold text-white">
+        <h1 className="font-outline-4 text-center text-2xl font-bold text-slate-50">
           {title}
         </h1>
         <Progress
           size={res({ w: 24 })}
+          className="border border-slate-600 shadow-lg"
           radius="lg"
           sections={choicesWithPercent.map((choice, i) => ({
             label: `${choice.title}${
