@@ -16,7 +16,7 @@ export const Numbers = ({ leaderboard, rank, className, ...props }) => {
       {...props}
     >
       <span>{leaderboard && `#${leaderboard}`}</span>
-      <span className={clsx(leaderboard && 'text-base', 'leading-3')}>
+      <span className={clsx(leaderboard && 'text-base')}>
         {rank && rank}
         {leaderboard && ' MMR'}
       </span>
