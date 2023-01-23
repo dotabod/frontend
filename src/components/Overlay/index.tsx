@@ -1,7 +1,7 @@
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { isDev, useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useSocket } from '@/lib/hooks/useSocket'
@@ -13,6 +13,8 @@ import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import { devBlockTypes, devPoll, devRank, devWL } from '@/lib/devConsts'
 import { PollData } from '@/components/Overlay/PollOverlay'
 import { Center, Container, Loader } from '@mantine/core'
+import clsx from 'clsx'
+import { motionProps } from '@/ui/utils'
 
 const OverlayPage = (props) => {
   const { height, width } = useWindowSize()
@@ -49,6 +51,11 @@ const OverlayPage = (props) => {
           },
         ]
   )
+  const [isInIframe, setIsInIframe] = useState(false)
+
+  useEffect(() => {
+    setIsInIframe(window.self !== window.top)
+  }, [])
 
   const [rankImageDetails, setRankImageDetails] = useState(
     isDev
@@ -87,19 +94,24 @@ const OverlayPage = (props) => {
         }
       `}</style>
       <AnimatePresence>
-        {rankImageDetails?.notLoaded && (
-          <Container>
+        <motion.div key="not-detected" {...motionProps}>
+          <Container
+            className={clsx(
+              'hidden',
+              isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
+            )}
+          >
             <Center style={{ height }}>
-              <div className="space-y-6 rounded-md bg-blue-50 p-4">
+              <div className="space-y-6 rounded-md bg-dark-300 p-4">
                 <Center>
-                  <Loader size="xl" />
+                  <Loader color="black" variant="bars" size="xl" />
                 </Center>
                 <div className="flex text-center">
                   <div className="ml-3">
-                    <h3 className="text-2xl font-medium text-blue-800">
+                    <h3 className="text-2xl font-medium text-dark-800">
                       Waiting for Dota
                     </h3>
-                    <div className="mt-2 text-lg text-blue-700">
+                    <div className="mt-2 text-lg text-dark-700">
                       <p>Dotabod hasn&apos;t detected your game yet.</p>
                     </div>
                   </div>
@@ -107,7 +119,7 @@ const OverlayPage = (props) => {
               </div>
             </Center>
           </Container>
-        )}
+        </motion.div>
 
         <PollOverlays
           pollData={pollData}

@@ -30,6 +30,7 @@ export const MMRBadge = ({
   rank,
   mainScreen = false,
   className = '',
+  notLoaded = undefined,
   ...props
 }) => {
   const res = useTransformRes()
