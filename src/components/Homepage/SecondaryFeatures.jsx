@@ -1,6 +1,6 @@
 import { Container } from 'src/components/Container'
 import Image from 'next/image'
-import { Badge, Link } from '@geist-ui/core'
+import { Badge, Display, Link } from '@geist-ui/core'
 import { HoverCard } from '@mantine/core'
 import { SparklesIcon } from '@heroicons/react/24/outline'
 import { MMRBadge } from '../Overlay/rank/MMRBadge'
@@ -156,12 +156,22 @@ export function SecondaryFeatures() {
               </Link>
             </HoverCard.Target>
             <HoverCard.Dropdown>
-              <Image
-                alt="aegis timer"
-                width={384}
-                height={443}
-                src="/images/dashboard/aegis-timer.png"
-              />
+              <Display shadow caption="Aegis timer">
+                <Image
+                  alt="aegis timer"
+                  width={372}
+                  height={141}
+                  src="/images/dashboard/just-aegis-timer.png"
+                />
+              </Display>
+              <Display shadow caption="Roshan timer">
+                <Image
+                  alt="rosh timer"
+                  width={336}
+                  height={249}
+                  src="/images/dashboard/rosh-timer.png"
+                />
+              </Display>
             </HoverCard.Dropdown>
           </HoverCard>
         </div>

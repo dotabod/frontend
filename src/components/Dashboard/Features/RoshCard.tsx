@@ -61,24 +61,23 @@ export default function RoshCard() {
           yellow for 3 minutes (max rosh spawn).
         </p>
       </div>
-      <Display shadow>
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <Image
-            alt="aegis timer"
-            width={219}
-            height={107}
-            src="/images/dashboard/just-aegis-timer.png"
-            className={clsx('inline', !hasAegis && 'opacity-40')}
-          />
-
-          <Image
-            alt="rosh timer"
-            width={293}
-            height={533}
-            src="/images/dashboard/rosh-timer.png"
-            className={clsx('inline', !hasRosh && 'opacity-40')}
-          />
-        </div>
+      <Display shadow caption="Aegis timer">
+        <Image
+          alt="aegis timer"
+          width={372}
+          height={141}
+          src="/images/dashboard/just-aegis-timer.png"
+          className={clsx('inline', !hasAegis && 'opacity-40')}
+        />
+      </Display>
+      <Display shadow caption="Roshan timer">
+        <Image
+          alt="rosh timer"
+          width={336}
+          height={249}
+          src="/images/dashboard/rosh-timer.png"
+          className={clsx('inline', !hasRosh && 'opacity-40')}
+        />
       </Display>
     </Card>
   )
