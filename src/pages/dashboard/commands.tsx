@@ -28,7 +28,7 @@ export default function CommandsPage() {
     key: 'command-display-enabled',
     defaultValue: 'All',
   })
-  const { data } = useUpdate(`/api/settings`)
+  const { data } = useUpdate({ path: `/api/settings` })
 
   const [isFinding, setIsFinding] = useState(false)
   const [value, setValue] = useState<string[] | string>('')

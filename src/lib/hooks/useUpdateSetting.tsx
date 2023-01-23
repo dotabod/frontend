@@ -5,10 +5,17 @@ import { showNotification } from '@mantine/notifications'
 import { SettingKeys, Settings } from '@/lib/defaultSettings'
 import { useRouter } from 'next/router'
 
-export const useUpdate = (
+interface UpdateProps {
+  path?: any
+  revalidate?: boolean
+  dataTransform?: (data, newValue) => any
+}
+
+export const useUpdate = ({
   path,
-  dataTransform = (data, newValue) => newValue
-) => {
+  revalidate = false,
+  dataTransform = (data, newValue) => newValue,
+}: UpdateProps) => {
   const { data } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
 
@@ -18,7 +25,7 @@ export const useUpdate = (
     const options: MutatorOptions = {
       optimisticData: dataTransform(data, newValue),
       rollbackOnError: true,
-      revalidate: false,
+      revalidate,
     }
 
     let isNow = newValue
@@ -50,19 +57,20 @@ export const useUpdate = (
 }
 
 export function useUpdateAccount() {
-  const { data, loading, updateSetting } = useUpdate(
-    '/api/settings/accounts',
-    (data, newValue) => ({ accounts: newValue ?? data })
-  )
+  const { data, loading, updateSetting } = useUpdate({
+    path: '/api/settings/accounts',
+    dataTransform: (data, newValue) => ({ accounts: newValue ?? data }),
+  })
 
   return { data, loading, update: updateSetting }
 }
 
-export function useUpdateLocale() {
-  const { data, loading, updateSetting } = useUpdate(
-    '/api/settings/locale',
-    (data, newValue) => ({ value: newValue ?? data })
-  )
+export function useUpdateLocale(props: UpdateProps) {
+  const { data, loading, updateSetting } = useUpdate({
+    path: '/api/settings/locale',
+    dataTransform: (data, newValue) => ({ value: newValue ?? data }),
+    ...props,
+  })
 
   return { data, loading, update: updateSetting }
 }
@@ -78,20 +86,23 @@ export function useUpdateSetting(key: SettingKeys) {
     mutate,
     loading,
     updateSetting: update,
-  } = useUpdate(url, (data, newValue) => {
-    // find the key in data, then update the value to be new
-    const newData = data?.settings?.map((setting) => {
-      if (setting.key === key) {
-        return { ...setting, ...newValue }
+  } = useUpdate({
+    path: url,
+    dataTransform: (data, newValue) => {
+      // find the key in data, then update the value to be new
+      const newData = data?.settings?.map((setting) => {
+        if (setting.key === key) {
+          return { ...setting, ...newValue }
+        }
+        return setting
+      })
+
+      if (!newData.find((setting) => setting.key === key)) {
+        newData.push({ key, value: newValue })
       }
-      return setting
-    })
 
-    if (!newData.find((setting) => setting.key === key)) {
-      newData.push({ key, value: newValue })
-    }
-
-    return { ...data, settings: newData }
+      return { ...data, settings: newData }
+    },
   })
 
   let value = getValueOrDefault(key, data?.settings)

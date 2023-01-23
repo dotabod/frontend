@@ -12,6 +12,7 @@ import { localeOptions } from '@/components/Dashboard/locales'
 import { navigation } from '@/components/Dashboard/navigation'
 import clsx from 'clsx'
 import { FlagProps } from 'mantine-flagpack/declarations/create-flag'
+import { USFlag } from 'mantine-flagpack'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   Flag: (props: FlagProps) => JSX.Element
@@ -29,6 +30,11 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 
 SelectItem.displayName = 'SelectItem'
 
+const CurrentFlag = (props) => {
+  const Flag = localeOptions.find((x) => x.value === props.flag)?.Flag ?? USFlag
+  return <Flag {...props} />
+}
+
 export default function DashboardShell({ children, title, subtitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -42,11 +48,11 @@ export default function DashboardShell({ children, title, subtitle }) {
     data: localeOption,
     loading: loadingLocale,
     update: updateLocale,
-  } = useUpdateLocale()
+  } = useUpdateLocale({ revalidate: true })
 
-  const CurrentFlag = localeOptions.find(
-    (x) => x.value === localeOption?.locale
-  )?.Flag
+  const flagIcon = (
+    <CurrentFlag flag={localeOption?.locale} w={25} h={17} radius={2} />
+  )
 
   return (
     <>
@@ -272,7 +278,7 @@ export default function DashboardShell({ children, title, subtitle }) {
               <Select
                 placeholder="Language selector"
                 itemComponent={SelectItem}
-                icon={<CurrentFlag w={25} h={17} radius={2} />}
+                icon={flagIcon}
                 data={localeOptions}
                 maxDropdownHeight={400}
                 defaultValue={localeOption?.locale}
