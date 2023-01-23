@@ -31,7 +31,10 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
         focus:ring-2 `,
         dark
           ? `bg-[#17181e] text-white hover:border hover:border-blue-500 hover:bg-[#17181e] focus:ring-offset-blue-100`
-          : `bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-100`
+          : `bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-100`,
+        showDetails
+          ? 'cursor-default select-text hover:border-transparent focus:ring-transparent focus:ring-offset-transparent'
+          : 'cursor-pointer'
       )}
     >
       <Group>
@@ -49,7 +52,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
           </div>
         )}
 
-        {icon || <ChevronRightIcon height={16} />}
+        {!showDetails && (icon || <ChevronRightIcon height={16} />)}
       </Group>
     </button>
   )
@@ -60,6 +63,17 @@ UserButton.displayName = 'UserButton'
 export function UserAccountNav({ showDetails = false, dark = false }) {
   const user = useSession()?.data?.user
 
+  if (showDetails) {
+    return (
+      <UserButton
+        dark={dark}
+        showDetails={showDetails}
+        image={user?.image}
+        name={user?.name}
+        email="Dota 2 Streamer"
+      />
+    )
+  }
   return (
     <Group position="center">
       <Menu withArrow>
