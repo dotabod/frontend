@@ -11,8 +11,8 @@ export default function TroubleshootPage() {
         <title>Dotabod | Troubleshooting</title>
       </Head>
       <DashboardShell
-        subtitle="Try these steps in case something isn't working."
-        title="Troubleshooting"
+        subtitle="Take a peak to see if your OBS is showing the correct overlay. Try joining a bot match to have this preview show the pick blocker, for example."
+        title="Live preview"
       >
         <div className="mt-12 origin-top-left lg:col-span-2 lg:mt-0 ">
           <iframe
