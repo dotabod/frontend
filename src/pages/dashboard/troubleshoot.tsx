@@ -12,7 +12,7 @@ const faqs = [
   {
     question: 'Dotabod keeps saying play a match, no steam id?',
     answer:
-      'You probably placed the cfg file in the wrong folder. Reboot Dota after finding the right folder.',
+      'You probably placed the cfg file in the wrong folder. Follow Step 2 of setup again. Reboot Dota after finding the right folder. Play a bot match to verify Dotabod can find your account. Still nothing? Could your Steam account be linked to another Dotabod user? Only one person may have the Steam account linked. To remove it from the other user, join the Dotabod discord to get help verifying your steam account.',
   },
   {
     question: 'MMR not tracking?',
