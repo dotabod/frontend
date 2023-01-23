@@ -4,9 +4,11 @@ import {
   BoltIcon,
   CommandLineIcon,
   QuestionMarkCircleIcon,
+  VideoCameraIcon,
 } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import DiscordSvg from '@/images/logos/discord.svg'
+import clsx from 'clsx'
 
 export const navigation = [
   {
@@ -28,6 +30,16 @@ export const navigation = [
     name: 'Troubleshoot',
     href: '/dashboard/troubleshoot',
     icon: QuestionMarkCircleIcon,
+  },
+  {
+    name: 'Live preview',
+    href: '/overlay/',
+    icon: (props) => (
+      <VideoCameraIcon
+        {...props}
+        className={clsx(props.className, 'text-red-400')}
+      />
+    ),
   },
   {
     name: '',

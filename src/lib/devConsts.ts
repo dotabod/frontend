@@ -23,6 +23,7 @@ export const devRank = {
   image: '55.png',
   rank: 5500,
   leaderboard: false,
+  notLoaded: null,
 }
 export const devWL = [
   {

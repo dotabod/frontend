@@ -69,8 +69,9 @@ export function useUpdateLocale() {
 
 export function useUpdateSetting(key: SettingKeys) {
   const router = useRouter()
-  const { userId } = router.query
 
+  // This is only used to get user settings from the OBS overlay
+  const { userId } = router.query
   const url = `/api/settings${userId ? `?id=${userId}` : ''}`
 
   const {
