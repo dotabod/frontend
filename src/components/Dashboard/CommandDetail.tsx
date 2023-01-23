@@ -85,6 +85,22 @@ const CommandDetail = {
       />
     ),
   },
+  beta: {
+    title: 'Dotabod Beta',
+    description:
+      'Want to join the beta? You will get the latest features and updates before anyone else.',
+    cmd: '!beta',
+    alias: ['joinbeta', 'leavebeta', 'betaoff', 'betaon'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!beta"
+        response="You are now a beta tester. Visit discord.dotabod.com to see the beta features. Type !beta to undo"
+      />
+    ),
+  },
   [Settings.commandPleb]: {
     key: Settings.commandPleb,
     title: 'Pleb',
@@ -115,7 +131,26 @@ const CommandDetail = {
         {...props}
         modOnly
         command="!modsonly"
-        response="Mod only mode enabled"
+        response={
+          <>
+            Mods only mode is now on BASED Clap
+            <Image
+              src="https://cdn.betterttv.net/emote/61e918ab06fd6a9f5be168f3/1x.webp"
+              width={24}
+              height={24}
+              alt="based"
+              className="ml-1 mr-1 inline"
+            />
+            <Image
+              src="https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/1x.webp"
+              width={24}
+              height={24}
+              alt="clap"
+              className="ml-1 mr-1 inline"
+            />
+            . Only mods can type.
+          </>
+        }
       />
     ),
   },
@@ -361,7 +396,7 @@ const CommandDetail = {
     title: 'Smurfs',
     description: 'Shows total games played for each player in the match.',
     cmd: '!smurfs',
-    alias: ['lifetimes', 'totals', 'games'],
+    alias: ['lifetimes', 'totals', 'games', 'smurf'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -391,7 +426,7 @@ const CommandDetail = {
     title: 'Last game',
     description: "Find out if you're playing with anyone from your last match.",
     cmd: '!lg',
-    alias: ['!lastgame'],
+    alias: ['lastgame'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat

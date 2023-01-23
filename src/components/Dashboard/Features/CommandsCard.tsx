@@ -55,9 +55,7 @@ export default function CommandsCard({
                   )}
                   {command.allowed === 'all' && (
                     <>
-                      <Badge type="default" scale={0.5}>
-                        All
-                      </Badge>
+                      <Badge scale={0.5}>All</Badge>
                     </>
                   )}
                 </div>
@@ -101,6 +99,26 @@ export default function CommandsCard({
               </div>
             )}
             {command.response && <command.response dark />}
+            <div className="py-1">
+              <p className="ml-1 pb-1">Command</p>
+              <div className="flex flex-wrap">
+                <div className="mr-2 mb-2">
+                  <Badge>{command.cmd}</Badge>
+                </div>
+              </div>
+            </div>
+            {command.alias && command.alias.length ? (
+              <div className="py-1">
+                <p className="ml-1 pb-1">Alias</p>
+                <div className="flex flex-wrap">
+                  {command.alias.map((alias) => (
+                    <div key={`${alias}`} className="mr-2 mb-2">
+                      <Badge>!{alias}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </Accordion.Panel>
         </Accordion.Control>
       </Card>
