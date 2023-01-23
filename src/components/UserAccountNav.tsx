@@ -1,10 +1,9 @@
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 import { forwardRef } from 'react'
 import { Group, Avatar, Text, Menu } from '@mantine/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
-import { LogOut } from 'lucide-react'
 import clsx from 'clsx'
 import { navigation } from '@/components/Dashboard/navigation'
 
@@ -99,26 +98,13 @@ export function UserAccountNav({ showDetails = false, dark = false }) {
                 key={item.name}
                 component={Link}
                 href={item.href}
+                onClick={item.onClick}
                 icon={<item.icon className="h-4 w-4" />}
               >
                 {item.name}
               </Menu.Item>
             )
           })}
-
-          <div className="!my-2 mx-4 border-t border-dark-400" />
-
-          <Menu.Item
-            component="a"
-            onClick={() => {
-              signOut({
-                callbackUrl: `${window.location.origin}/`,
-              })
-            }}
-            icon={<LogOut size={14} />}
-          >
-            Log out
-          </Menu.Item>
         </Menu.Dropdown>
       </Menu>
     </Group>

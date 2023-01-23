@@ -65,10 +65,10 @@ export function useUpdateAccount() {
   return { data, loading, update: updateSetting }
 }
 
-export function useUpdateLocale(props: UpdateProps) {
+export const useUpdateLocale = (props?: UpdateProps) => {
   const { data, loading, updateSetting } = useUpdate({
     path: '/api/settings/locale',
-    dataTransform: (data, newValue) => ({ value: newValue ?? data }),
+    dataTransform: (data, newValue) => ({ locale: newValue ?? data }),
     ...props,
   })
 

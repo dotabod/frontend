@@ -1,39 +1,15 @@
-import { forwardRef, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { DarkLogo } from '@/components/Logo'
 import Link from 'next/link'
 import { UserAccountNav } from '@/components/UserAccountNav'
-import { Group, Select, Switch } from '@mantine/core'
-import { useUpdateLocale, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Switch } from '@mantine/core'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import CommandDetail from './CommandDetail'
 import { Settings } from '@/lib/defaultSettings'
-import { localeOptions } from '@/components/Dashboard/locales'
 import { navigation } from '@/components/Dashboard/navigation'
 import clsx from 'clsx'
-import { FlagProps } from 'mantine-flagpack/declarations/create-flag'
-import { USFlag } from 'mantine-flagpack'
-
-interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
-  Flag: (props: FlagProps) => JSX.Element
-  label: string
-}
-
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ Flag, label, ...others }: ItemProps, ref) => (
-    <Group noWrap ref={ref} {...others}>
-      <Flag w={24} radius={2} />
-      <span>{label}</span>
-    </Group>
-  )
-)
-
-SelectItem.displayName = 'SelectItem'
-
-const CurrentFlag = (props) => {
-  const Flag = localeOptions.find((x) => x.value === props.flag)?.Flag ?? USFlag
-  return <Flag {...props} />
-}
 
 export default function DashboardShell({ children, title, subtitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -43,16 +19,6 @@ export default function DashboardShell({ children, title, subtitle }) {
     loading,
     updateSetting,
   } = useUpdateSetting(Settings.commandDisable)
-
-  const {
-    data: localeOption,
-    loading: loadingLocale,
-    update: updateLocale,
-  } = useUpdateLocale({ revalidate: true })
-
-  const flagIcon = (
-    <CurrentFlag flag={localeOption?.locale} w={25} h={17} radius={2} />
-  )
 
   return (
     <>
@@ -137,7 +103,6 @@ export default function DashboardShell({ children, title, subtitle }) {
                       <Link href="/">
                         <DarkLogo className="h-12 w-auto text-white" />
                       </Link>
-                      <UserAccountNav dark />
                     </div>
                     <nav className="mt-5 space-y-1 px-2">
                       {navigation.map((item, i) => {
@@ -194,7 +159,7 @@ export default function DashboardShell({ children, title, subtitle }) {
           </div>
           <div className="mt-5 flex h-0 flex-1 flex-col overflow-y-auto pt-1">
             <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-              <div className="flex flex-shrink-0 items-center justify-between px-4">
+              <div className="flex flex-shrink-0 items-center justify-center px-4">
                 <UserAccountNav dark showDetails />
               </div>
               <nav className="mt-5 flex-1 space-y-1 bg-dark-800 px-2">
@@ -272,33 +237,6 @@ export default function DashboardShell({ children, title, subtitle }) {
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
-          </div>
-          <div className="sticky top-0 z-10 hidden h-full w-full flex-shrink-0 items-center justify-between bg-dark-800 px-4 py-2  md:flex md:px-8 md:pr-12 md:pl-72">
-            {!loadingLocale && (
-              <Select
-                placeholder="Language selector"
-                itemComponent={SelectItem}
-                icon={flagIcon}
-                data={localeOptions}
-                maxDropdownHeight={400}
-                defaultValue={localeOption?.locale}
-                onChange={updateLocale}
-                filter={(value, item) =>
-                  item.label.toLowerCase().includes(value.toLowerCase().trim())
-                }
-              />
-            )}
-            {loadingLocale && (
-              <Select
-                placeholder="Language selector"
-                itemComponent={SelectItem}
-                data={localeOptions}
-                maxDropdownHeight={400}
-                disabled
-              />
-            )}
-
-            <UserAccountNav dark />
           </div>
           <main className="w-full bg-dark-700 px-4 md:pr-12 md:pl-72">
             <div className="min-h-full w-full max-w-screen-2xl space-y-6 pt-8 transition-all">

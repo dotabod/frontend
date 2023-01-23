@@ -10,6 +10,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { Accordion } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
 
 export default function FeaturesPage() {
   const { status } = useSession()
@@ -23,6 +24,8 @@ export default function FeaturesPage() {
         subtitle="Customize the options your stream receives."
         title="Features"
       >
+        <LanguageCard />
+
         <Accordion multiple variant="separated" styles={accordionStyles}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
             <MmrTrackerCard />

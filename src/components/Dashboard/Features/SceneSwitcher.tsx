@@ -1,7 +1,7 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Display } from '@geist-ui/core'
-import { Switch } from '@mantine/core'
+import { Badge, Switch } from '@mantine/core'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
@@ -73,7 +73,8 @@ export default function SceneSwitcher(): JSX.Element {
         )}
       </div>
       <div className="subtitle">
-        Will auto switch scenes in OBS depending on game state.
+        <Badge>Optional</Badge>Auto switch scenes in OBS depending on game
+        state. Your blockers will still work without this.
       </div>
 
       <div className="mb-4">

@@ -1,4 +1,4 @@
-import { Github } from 'lucide-react'
+import { Github, LogOut } from 'lucide-react'
 import {
   BeakerIcon,
   BoltIcon,
@@ -9,6 +9,7 @@ import {
 import Image from 'next/image'
 import DiscordSvg from '@/images/logos/discord.svg'
 import clsx from 'clsx'
+import { signOut } from 'next-auth/react'
 
 export const navigation = [
   {
@@ -55,5 +56,21 @@ export const navigation = [
     name: 'Discord',
     href: 'https://discord.dotabod.com',
     icon: ({ ...props }) => <Image alt="discord" src={DiscordSvg} {...props} />,
+  },
+  {
+    name: '',
+    href: '',
+    icon: null,
+  },
+  {
+    name: 'Sign out',
+    href: '#',
+    onClick: async (e) => {
+      e.preventDefault()
+      await signOut({
+        callbackUrl: `${window.location.origin}/`,
+      })
+    },
+    icon: LogOut,
   },
 ]
