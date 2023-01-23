@@ -1,7 +1,6 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
-import { ordinal } from '@/ui/utils'
 
 export const RoshTimer = ({ color, count, res }) => {
   return function render({ minutes, seconds, completed }) {
@@ -12,17 +11,19 @@ export const RoshTimer = ({ color, count, res }) => {
     return (
       <div className="flex flex-col items-center">
         {count > 0 && (
-          <span
-            className="absolute z-40 text-white/90"
+          <div
+            className="absolute z-40 flex items-center justify-center rounded-full border border-slate-500 bg-black/60 text-white/90 shadow"
             style={{
-              top: res({ h: -5 }),
+              height: res({ h: 20 }),
+              width: res({ w: 20 }),
+              top: res({ h: -2 }),
               left: res({ w: 0 }),
-              fontSize: res({ h: 16 }),
+              fontSize: res({ h: 15 }),
               fontWeight: 500,
             }}
           >
-            {ordinal(count)}
-          </span>
+            {count}
+          </div>
         )}
         <Image
           src="/images/rosh/roshan_timer_bg_psd1.png"
