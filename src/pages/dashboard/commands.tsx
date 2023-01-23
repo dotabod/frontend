@@ -10,7 +10,6 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useHotkeys, useInputState, useLocalStorage } from '@mantine/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ListX } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -146,13 +145,9 @@ export default function CommandsPage() {
             </Center>
           )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence>
-              {filteredCommands.map((key) => (
-                <motion.div key={key}>
-                  <CommandsCard id={key} command={CommandDetail[key]} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {filteredCommands.map((key) => (
+              <CommandsCard id={key} command={CommandDetail[key]} />
+            ))}
           </div>
         </Accordion>
       </DashboardShell>
