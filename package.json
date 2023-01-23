@@ -12,6 +12,7 @@
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
     "@emotion/react": "^11.10.5",
+    "@fullstory/browser": "^1.6.2",
     "@geist-ui/core": "^2.3.8",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
