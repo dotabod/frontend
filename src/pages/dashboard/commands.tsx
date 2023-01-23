@@ -146,7 +146,7 @@ export default function CommandsPage() {
           )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredCommands.map((key) => (
-              <CommandsCard id={key} command={CommandDetail[key]} />
+              <CommandsCard key={key} id={key} command={CommandDetail[key]} />
             ))}
           </div>
         </Accordion>
