@@ -148,7 +148,7 @@ export default function CommandsPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence>
               {filteredCommands.map((key) => (
-                <motion.div layout key={key}>
+                <motion.div key={key}>
                   <CommandsCard id={key} command={CommandDetail[key]} />
                 </motion.div>
               ))}
