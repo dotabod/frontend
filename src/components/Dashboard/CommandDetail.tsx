@@ -133,7 +133,7 @@ const CommandDetail = {
         command="!modsonly"
         response={
           <>
-            Mods only mode is now on BASED Clap
+            Mods only mode is now on
             <Image
               src="https://cdn.betterttv.net/emote/61e918ab06fd6a9f5be168f3/1x.webp"
               width={24}
