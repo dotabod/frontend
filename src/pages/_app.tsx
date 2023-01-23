@@ -10,7 +10,6 @@ import { GeistProvider, Themes } from '@geist-ui/core'
 import { MantineProvider } from '@mantine/core'
 import { NotificationsProvider } from '@mantine/notifications'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
-import FullStorySession from '@/components/FullStorySession'
 
 const myTheme1 = Themes.createFromDark({
   type: 'coolTheme',
@@ -60,7 +59,6 @@ export default function App({
           },
         }}
       >
-        <FullStorySession />
         <VercelAnalytics />
         <GoogleAnalytics />
         <NotificationsProvider position="top-center">

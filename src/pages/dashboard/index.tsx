@@ -7,12 +7,15 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { accordionStyles } from '@/components/accordionStyles'
 import { Accordion } from '@mantine/core'
+import FullStorySession from '@/components/FullStorySession'
 
 export default function DashboardPage() {
   const { status } = useSession()
 
   return status === 'authenticated' ? (
     <>
+      <FullStorySession />
+
       <Head>
         <title>Dotabod | Setup</title>
       </Head>
