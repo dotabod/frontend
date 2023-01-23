@@ -270,17 +270,18 @@ export default function ChatterCard() {
       <form className="mt-6 space-y-2">
         <div className="space-y-6">
           {(Object.keys(chatters || {}) || []).map((key) => {
+            if (!chatterInfo[key]) return null
             return (
               <div key={key} className={clsx(!isEnabled && 'opacity-40')}>
                 <Tooltip
-                  label={chatterInfo[key].description}
-                  disabled={!chatterInfo[key].description}
+                  label={chatterInfo[key]?.description}
+                  disabled={!chatterInfo[key]?.description}
                 >
                   <div className="flex items-center space-x-3">
                     <Switch
                       size="sm"
                       color="blue"
-                      disabled={!isEnabled}
+                      disabled={!isEnabled || loadingChatters}
                       {...form.getInputProps(`${key}.enabled`, {
                         type: 'checkbox',
                       })}
