@@ -5,14 +5,21 @@ import { useSession } from 'next-auth/react'
 
 const FullStorySession = () => {
   const { data, status } = useSession()
+
   useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_FULLSTORY_ORG_ID) return
+
     FullStory.init({
-      orgId: 'o-1GSF8Z-na1',
+      host: process.env.NEXT_PUBLIC_FULLSTORY_HOST,
+      orgId: process.env.NEXT_PUBLIC_FULLSTORY_ORG_ID,
+      script: `${process.env.NEXT_PUBLIC_FULLSTORY_HOST}/s/fs.js`,
       debug: process.env.NODE_ENV !== 'production',
       devMode: process.env.NODE_ENV !== 'production',
     })
   }, [])
   useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_FULLSTORY_ORG_ID) return
+
     if (status === 'authenticated') {
       FullStory.identify(data?.user?.id, {
         displayName: data?.user?.name,
