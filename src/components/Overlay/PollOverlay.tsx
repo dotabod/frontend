@@ -60,11 +60,15 @@ const transformTextToTextWithEmotes = ({
     return word
   })
 
-  return textWithEmotes.map((word, i) => (
-    <span key={i} className="text-slate-50">
-      {word}
-    </span>
-  ))
+  return (
+    <div className="space-x-1">
+      {textWithEmotes.map((word, i) => (
+        <span key={i} className="text-slate-50">
+          {word}
+        </span>
+      ))}
+    </div>
+  )
 }
 
 export type Emotes = Emote[]
