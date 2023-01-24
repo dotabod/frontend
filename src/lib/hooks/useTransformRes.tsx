@@ -5,9 +5,14 @@ export const useTransformRes = () => {
   const windowSize = useWindowSize()
   const href = useRouter()
 
-  if (!href.asPath.includes('overlay')) return null
-
   const res = ({ h = 0, w = 0 }) => {
+    if (
+      href?.asPath &&
+      typeof href.asPath === 'string' &&
+      !href.asPath.includes('overlay')
+    )
+      return h || w
+
     const defaultWidth = 1920
     const defaultHeight = 1080
 
