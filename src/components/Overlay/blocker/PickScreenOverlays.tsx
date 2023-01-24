@@ -23,9 +23,9 @@ export const PickScreenOverlays = ({
     <>
       <div
         style={{
-          width: res({ w: 378 }),
-          height: res({ h: 195 }),
-          bottom: res({ h: 22 }),
+          width: res({ w: 381 }),
+          height: res({ h: 200 }),
+          bottom: res({ h: 16 }),
           right: type === 'strategy-2' ? 0 : res({ w: 199 }),
           zIndex: 40,
         }}
