@@ -1,6 +1,12 @@
 import { Card } from '@/ui/card'
-import { Snippet } from '@geist-ui/core'
-import { List, ThemeIcon } from '@mantine/core'
+import {
+  ActionIcon,
+  CheckIcon,
+  Input,
+  List,
+  ThemeIcon,
+  Tooltip,
+} from '@mantine/core'
 import clsx from 'clsx'
 import { X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -9,6 +15,9 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import TwitchFetcher from 'twitch-fetcher'
 import { Badge } from '@mantine/core'
+import { ClipboardIcon } from '@heroicons/react/24/outline'
+import ModImage from '@/components/ModImage'
+import { useClipboard } from '@mantine/hooks'
 
 const emotesRequired = [
   { label: 'Madge' },
@@ -31,6 +40,7 @@ const emotesRequired = [
 export default function ChatBot() {
   const session = useSession()
   const [emotes, setEmotes] = useState([])
+  const clipboard = useClipboard({ timeout: 2000 })
 
   useEffect(() => {
     if (!session.data.user.twitchId) return
@@ -59,11 +69,48 @@ export default function ChatBot() {
       </div>
       <div className="space-y-4 px-8 pb-8 text-sm text-dark-300">
         <div>
-          1. Add @dotabod as a moderator to your channel. Type the following in
-          your stream.
+          1. Type the following in your stream to add @dotabod as a moderator to{' '}
+          <Link
+            className="text-blue-400 hover:text-blue-300"
+            target="_blank"
+            href={`https://www.twitch.tv/popout/${session.data.user.name}/chat`}
+          >
+            your channel
+          </Link>
+          .
         </div>
-
-        <Snippet symbol="" text="/mod dotabod" width="750px" />
+        <Input
+          icon={<ModImage />}
+          readOnly
+          styles={(theme) => ({
+            input: {
+              focusRing: 'never',
+              borderColor: clipboard.copied ? theme.colors.green[9] : '',
+            },
+          })}
+          className={clsx('max-w-sm transition-colors')}
+          value="/mod dotabod"
+          onClick={() => clipboard.copy('/mod dotabod')}
+          rightSection={
+            <Tooltip
+              opened={clipboard.copied}
+              label={clipboard.copied ? 'Copied' : 'Copy'}
+              withArrow
+              position="right"
+            >
+              <ActionIcon
+                color={clipboard.copied ? 'teal' : 'gray'}
+                onClick={() => clipboard.copy('/mod dotabod')}
+              >
+                {clipboard.copied ? (
+                  <CheckIcon width={16} />
+                ) : (
+                  <ClipboardIcon width={16} />
+                )}
+              </ActionIcon>
+            </Tooltip>
+          }
+        />
 
         <div>
           2. <Badge>Optional</Badge> Add the following emotes to your channel

@@ -102,6 +102,7 @@ export default function DashboardPage() {
             <Button size="lg" variant="default" onClick={prevStep}>
               Back
             </Button>
+
             <Button size="lg" onClick={nextStep}>
               Next step
             </Button>
