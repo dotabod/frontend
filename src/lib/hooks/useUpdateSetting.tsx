@@ -91,14 +91,15 @@ export function useUpdateSetting(key: SettingKeys) {
     path: url,
     dataTransform: (data, newValue) => {
       // find the key in data, then update the value to be new
-      const newData = data?.settings?.map((setting) => {
-        if (setting.key === key) {
-          return { ...setting, ...newValue }
-        }
-        return setting
-      })
+      const newData =
+        data?.settings?.map((setting) => {
+          if (setting.key === key) {
+            return { ...setting, ...newValue }
+          }
+          return setting
+        }) || []
 
-      if (!newData.find((setting) => setting.key === key)) {
+      if (!newData?.find((setting) => setting.key === key)) {
         newData.push({ key, value: newValue })
       }
 
