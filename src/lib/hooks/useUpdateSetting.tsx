@@ -75,7 +75,7 @@ export const useUpdateLocale = (props?: UpdateProps) => {
   return { data, loading, update: updateSetting }
 }
 
-export function useUpdateSetting(key: SettingKeys) {
+export function useUpdateSetting(key?: SettingKeys) {
   const router = useRouter()
 
   // This is only used to get user settings from the OBS overlay
@@ -115,4 +115,14 @@ export function useUpdateSetting(key: SettingKeys) {
   }
 
   return { data: value, loading, updateSetting, mutate: () => mutate(url) }
+}
+
+export function useGetSettings() {
+  const router = useRouter()
+
+  // This is only used to get user settings from the OBS overlay
+  const { userId } = router.query
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
+  const { data, loading } = useUpdate({ path: url })
+  return { data, loading }
 }

@@ -1,8 +1,11 @@
+import TwitchFetcher from 'twitch-fetcher'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
 import { motion } from 'framer-motion'
 import Countdown, { zeroPad } from 'react-countdown'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useEffect, useState } from 'react'
+import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 
 export type PollData = {
   title: string
@@ -30,8 +33,76 @@ const PollTimer = ({ minutes, seconds, completed }) =>
       {zeroPad(minutes)}:{zeroPad(seconds)}
     </span>
   )
+
+const transformTextToTextWithEmotes = ({
+  emotes,
+  text,
+  res,
+}: {
+  emotes: Emotes
+  text: string
+  res: any
+}) => {
+  const textWithEmotes = text.split(' ').map((word) => {
+    const emote = emotes.find((e) => e.code === word)
+    if (emote) {
+      return (
+        <img
+          key={emote.id}
+          src={emote.cdn.medium}
+          alt={emote.code}
+          width={res({ w: 25 })}
+          height={res({ h: 25 })}
+          className="mx-1 inline"
+        />
+      )
+    }
+    return word
+  })
+
+  return textWithEmotes.map((word, i) => (
+    <span key={i} className="text-slate-50">
+      {word}
+    </span>
+  ))
+}
+
+export type Emotes = Emote[]
+
+export interface Emote {
+  type: string
+  id: string
+  code: string
+  owner?: string
+  cdn: Cdn
+}
+
+export interface Cdn {
+  low: string
+  medium: string
+  high: string
+}
+
 export const PollOverlay = ({ title, choices, endDate }: PollData) => {
   const res = useTransformRes()
+  const [emotes, setEmotes] = useState([])
+  const { data } = useGetSettings()
+
+  useEffect(() => {
+    if (!data?.Account?.providerAccountId) return
+
+    const emoteFetcher = new TwitchFetcher()
+    emoteFetcher
+      .getEmotesByID(data?.Account?.providerAccountId, {
+        ffz: true,
+        '7tv': true,
+        bttv: true,
+      })
+      .then(setEmotes)
+      .catch((e) => {
+        //
+      })
+  }, [data?.Account?.providerAccountId])
 
   const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
   const choicesWithPercent = choices.map((choice) => {
@@ -50,7 +121,11 @@ export const PollOverlay = ({ title, choices, endDate }: PollData) => {
             fontSize: res({ h: 20 }),
           }}
         >
-          {title}
+          {transformTextToTextWithEmotes({
+            emotes: emotes,
+            text: title,
+            res: res,
+          })}
         </h1>
         <Progress
           size={res({ w: 24 })}

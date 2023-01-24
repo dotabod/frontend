@@ -30,6 +30,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               value: true,
             },
           },
+          Account: {
+            select: {
+              providerAccountId: true,
+            },
+          },
           SteamAccount: {
             select: {
               mmr: true,
