@@ -118,9 +118,18 @@ export default function DashboardPage() {
               Back
             </Button>
 
-            <Button size="lg" onClick={nextStep}>
-              Next step
-            </Button>
+            {active === 3 && (
+              <Link href="/dashboard/features">
+                <Button color="green" className="bg-green-600" size="lg">
+                  View features
+                </Button>
+              </Link>
+            )}
+            {active !== 3 && (
+              <Button className="bg-blue-600" size="lg" onClick={nextStep}>
+                Next step
+              </Button>
+            )}
           </Group>
         </>
       </DashboardShell>
