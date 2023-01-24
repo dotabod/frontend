@@ -10,7 +10,7 @@ export const mmrPatchSchema = z.object({
 })
 
 export const localePatchSchema = z.enum([
-  'cs-SK',
+  'cs',
   'en',
   'es',
   'it',

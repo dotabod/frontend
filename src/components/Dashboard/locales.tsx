@@ -1,12 +1,12 @@
 import {
   BRFlag,
+  CZFlag,
   ESFlag,
   HUFlag,
   IRFlag,
   ITFlag,
   PTFlag,
   RUFlag,
-  SKFlag,
   UAFlag,
   USFlag,
 } from 'mantine-flagpack'
@@ -63,8 +63,8 @@ export const localeOptions: {
     Flag: PTFlag,
   },
   {
-    label: 'Slovak',
-    value: 'cs-SK',
-    Flag: SKFlag,
+    label: 'Czech',
+    value: 'cs',
+    Flag: CZFlag,
   },
 ].sort((a, b) => (a.label > b.label ? 1 : -1))
