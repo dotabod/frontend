@@ -19,9 +19,10 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
       className="absolute"
     >
       <div
-        className="flex h-full items-center justify-end space-x-2"
+        className="absolute flex h-full items-center justify-center space-x-2 "
         style={{
-          marginRight: res({ w: 428 }),
+          width: res({ w: 299 }),
+          right: res({ w: 416 }),
         }}
       >
         <AnimatedWL
@@ -34,7 +35,7 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
         <AnimatedRankBadge
           mainScreen
           key="animate-rank-badge-class-main"
-          className="relative h-full"
+          className="relative h-full leading-none"
           rankImageDetails={rankImageDetails}
         />
       </div>

@@ -6,21 +6,14 @@ import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 export const AnimatedWL = ({
   wl,
   className = 'absolute',
-  isLeaderboard = false,
   mainScreen = false,
 }: {
   mainScreen?: boolean
-  isLeaderboard?: boolean
   className?: string
   wl: { lose: number; type: string; win: number }[]
 }) => {
-  const { wlPosition } = useOverlayPositions({ isLeaderboard })
-
-  const style = mainScreen
-    ? {
-        fontSize: wlPosition.fontSize,
-      }
-    : wlPosition
+  const { wlPosition } = useOverlayPositions()
+  const style = mainScreen ? { fontSize: wlPosition.fontSize } : {}
 
   return (
     <motion.div

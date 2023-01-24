@@ -12,7 +12,7 @@ export const usePlayerPositions = () => {
   return { playerPositions }
 }
 
-export const useOverlayPositions = ({ isLeaderboard = false } = {}) => {
+export const useOverlayPositions = () => {
   const res = useTransformRes()
 
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
@@ -20,16 +20,9 @@ export const useOverlayPositions = ({ isLeaderboard = false } = {}) => {
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const { data: isBp } = useUpdateSetting(Settings.battlepass)
 
-  let badgePosition = {
-    bottom: 0,
-    right: res({ w: 276 }),
-    left: null,
-    top: null,
-  }
-
   let wlPosition = {
     bottom: 0,
-    right: res({ w: isLeaderboard ? 367 : 366 }),
+    right: res({ w: 290 }),
     left: null,
     fontSize: res({ w: 22 }),
   }
@@ -64,16 +57,12 @@ export const useOverlayPositions = ({ isLeaderboard = false } = {}) => {
     wlPosition.left = wlPosition.right
     wlPosition.right = null
 
-    badgePosition.left = badgePosition.right
-    badgePosition.right = null
-
     if (isBp) {
       minimapPosition.right += res({ w: -3 })
       minimapPosition.bottom += res({ h: -5 })
     }
   }
   return {
-    badgePosition,
     wlPosition,
     roshPosition,
     minimapPosition,

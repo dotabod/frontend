@@ -5,6 +5,7 @@ import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 import { MinimapBlocker } from '@/components/Overlay/blocker/MinimapBlocker'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
+import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 
 export const InGameOverlays = ({
   wl,
@@ -17,6 +18,7 @@ export const InGameOverlays = ({
   aegis,
 }) => {
   const res = useTransformRes()
+  const { wlPosition } = useOverlayPositions()
 
   if (!['spectator', 'playing', 'arcade'].includes(block.type)) return null
 
@@ -60,16 +62,18 @@ export const InGameOverlays = ({
 
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 
-      <AnimatedWL
-        key="animate-wl-class"
-        wl={wl}
-        isLeaderboard={!!rankImageDetails?.leaderboard}
-      />
+      <div
+        className="absolute flex items-end justify-center"
+        style={{ ...wlPosition, width: res({ w: 225 }) }}
+      >
+        <AnimatedWL key="animate-wl-class" wl={wl} className="block" />
 
-      <AnimatedRankBadge
-        key="animate-rank-badge-class"
-        rankImageDetails={rankImageDetails}
-      />
+        <AnimatedRankBadge
+          className="block"
+          key="animate-rank-badge-class"
+          rankImageDetails={rankImageDetails}
+        />
+      </div>
     </>
   )
 }

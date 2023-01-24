@@ -13,6 +13,7 @@ import {
   EventSubChannelPredictionLockEvent,
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
+import { isDev } from '@/lib/hooks/rosh'
 
 export let socket: Socket | null = null
 
@@ -94,10 +95,12 @@ export const useSocket = ({
     })
 
     socket.on('update-medal', (deets: RankType) => {
+      if (isDev) return
       getRankImage(deets).then(setRankImageDetails)
     })
 
     socket.on('update-wl', (records: wlType) => {
+      if (isDev) return
       setWL(records)
     })
 
