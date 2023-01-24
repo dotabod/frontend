@@ -160,7 +160,7 @@ export default function ChatBot() {
                       )}
                       target="_blank"
                       href={
-                        url ??
+                        url ||
                         `https://betterttv.com/emotes/shared/search?query=${label}`
                       }
                     >

@@ -6,7 +6,7 @@ export const getStreamerSettings = (data) => {
 
   // Replace defaults with settings from DB
   Object.values(Settings).forEach((key) => {
-    // @ts-ignore ???
+    // @ts-ignore ||?
     opts[key] = getValueOrDefault(key, data?.settings)
   })
   return opts

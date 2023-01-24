@@ -23,7 +23,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 SelectItem.displayName = 'SelectItem'
 
 const CurrentFlag = (props) => {
-  const Flag = localeOptions.find((x) => x.value === props.flag)?.Flag ?? USFlag
+  const Flag = localeOptions.find((x) => x.value === props.flag)?.Flag || USFlag
   return <Flag {...props} />
 }
 

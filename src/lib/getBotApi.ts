@@ -14,14 +14,14 @@ export const getAuthProvider = function () {
 
   const authProvider = new RefreshingAuthProvider(
     {
-      clientId: process.env.TWITCH_CLIENT_ID ?? '',
-      clientSecret: process.env.TWITCH_CLIENT_SECRET ?? '',
+      clientId: process.env.TWITCH_CLIENT_ID || '',
+      clientSecret: process.env.TWITCH_CLIENT_SECRET || '',
     },
     {
       expiresIn: 86400,
       obtainmentTimestamp: Date.now(),
-      accessToken: process.env.TWITCH_ACCESS_TOKEN ?? '',
-      refreshToken: process.env.TWITCH_REFRESH_TOKEN ?? '',
+      accessToken: process.env.TWITCH_ACCESS_TOKEN || '',
+      refreshToken: process.env.TWITCH_REFRESH_TOKEN || '',
     }
   )
 

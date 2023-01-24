@@ -59,7 +59,7 @@ export const useUpdate = ({
 export function useUpdateAccount() {
   const { data, loading, updateSetting } = useUpdate({
     path: '/api/settings/accounts',
-    dataTransform: (data, newValue) => ({ accounts: newValue ?? data }),
+    dataTransform: (data, newValue) => ({ accounts: newValue || data }),
   })
 
   return { data, loading, update: updateSetting }
@@ -68,7 +68,7 @@ export function useUpdateAccount() {
 export const useUpdateLocale = (props?: UpdateProps) => {
   const { data, loading, updateSetting } = useUpdate({
     path: '/api/settings/locale',
-    dataTransform: (data, newValue) => ({ locale: newValue ?? data }),
+    dataTransform: (data, newValue) => ({ locale: newValue || data }),
     ...props,
   })
 
