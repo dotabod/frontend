@@ -46,7 +46,22 @@ export default function DashboardPage() {
         title="Setup"
       >
         <>
-          <Stepper active={active} onStepClick={setActive} breakpoint="sm">
+          <Stepper
+            styles={{
+              stepIcon: {
+                borderColor: 'rgb(61,65,85)',
+                '&[data-progress]': {
+                  borderColor: '#2563eb',
+                },
+                '&[data-completed]': {
+                  backgroundColor: '#2563eb',
+                },
+              },
+            }}
+            active={active}
+            onStepClick={setActive}
+            breakpoint="sm"
+          >
             <Stepper.Step label="First step" description="Twitch chat account">
               <ChatBot />
             </Stepper.Step>
