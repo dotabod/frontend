@@ -16,7 +16,7 @@ export const PollOverlays = ({ pollData, betData }) => {
       className="absolute"
       style={{
         right: res({ w: 1920 / 2 - 200 }),
-        top: res({ h: 70 }),
+        top: res({ h: 90 }),
         width: res({ w: 400 }),
       }}
     >

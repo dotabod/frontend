@@ -44,7 +44,12 @@ export const PollOverlay = ({ title, choices, endDate }: PollData) => {
   return (
     <motion.div key="poll-overlay" {...motionProps}>
       <div>
-        <h1 className="font-outline-2 text-center text-lg font-bold text-slate-50">
+        <h1
+          className="font-outline-2 text-center font-bold text-slate-50"
+          style={{
+            fontSize: res({ h: 20 }),
+          }}
+        >
           {title}
         </h1>
         <Progress
