@@ -13,14 +13,14 @@ export type PollData = {
 const PollColors = [
   '#3159ff',
   '#ee27a6',
-  '#FFFF00',
-  '#00FF00',
-  '#FF0000',
+  '#8d8d00',
+  '#00b700',
+  '#bf0000',
   '#4B0082',
   '#9400D3',
-  '#FF0000',
-  '#FF7F00',
-  '#ff6b6b',
+  '#00bb68',
+  '#c46300',
+  '#c60000',
 ]
 const PollTimer = ({ minutes, seconds, completed }) =>
   completed ? (
@@ -63,7 +63,7 @@ export const PollOverlay = ({ title, choices, endDate }: PollData) => {
                 : ''
             }`,
             value: choice.percent,
-            color: PollColors[i],
+            color: PollColors[i] || PollColors[0],
           }))}
         />
         <Center>
