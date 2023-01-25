@@ -20,6 +20,7 @@ import ModImage from '@/components/ModImage'
 import { useClipboard } from '@mantine/hooks'
 
 const emotesRequired = [
+  { label: 'Happi' },
   { label: 'Madge' },
   { label: 'POGGIES' },
   { label: 'PepeLaugh' },
