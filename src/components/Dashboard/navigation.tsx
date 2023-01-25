@@ -3,6 +3,7 @@ import {
   BeakerIcon,
   BoltIcon,
   CommandLineIcon,
+  HeartIcon,
   QuestionMarkCircleIcon,
   VideoCameraIcon,
 } from '@heroicons/react/24/outline'
@@ -35,12 +36,7 @@ export const navigation = [
   {
     name: 'Live preview',
     href: '/overlay/',
-    icon: (props) => (
-      <VideoCameraIcon
-        {...props}
-        className={clsx(props.className, 'text-red-400')}
-      />
-    ),
+    icon: VideoCameraIcon,
   },
   {
     name: '',
@@ -56,6 +52,13 @@ export const navigation = [
     name: 'Discord',
     href: 'https://discord.dotabod.com',
     icon: ({ ...props }) => <Image alt="discord" src={DiscordSvg} {...props} />,
+  },
+  {
+    name: 'Support',
+    href: 'https://ko-fi.com/dotabod',
+    icon: ({ ...props }) => (
+      <HeartIcon {...props} className={clsx(props.className, 'text-red-500')} />
+    ),
   },
   {
     name: '',
