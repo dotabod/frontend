@@ -6,7 +6,7 @@ import { Logomark } from 'src/components/Logo'
 
 const plans = [
   {
-    name: 'Streamer',
+    name: 'Casual',
     featured: false,
     price: { Monthly: '$0', Annually: '$0' },
     description:
@@ -22,8 +22,20 @@ const plans = [
       'Minimap blocker',
       'Twitch predictions',
       'MMR tracking',
-      '...more to come',
     ],
+    logomarkClassName: 'fill-gray-500',
+  },
+  {
+    name: 'Supporter',
+    featured: true,
+    price: { Monthly: '$5', Annually: '$5' },
+    description:
+      'You’ve been streaming for a while. Stream more with Dotabod and grow your gaming time.',
+    button: {
+      label: 'Support me',
+      href: 'http://ko-fi.com/dotabod/tiers',
+    },
+    features: ['Everything in free tier', 'Exclusive Discord badge'],
     logomarkClassName: 'fill-gray-500',
   },
 ]
@@ -159,7 +171,7 @@ export function Pricing() {
       className="border-t border-gray-200 bg-gray-100 py-20 sm:py-32"
     >
       <Container>
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto max-w-lg text-center">
           <h2
             id="pricing-title"
             className="text-3xl font-medium tracking-tight text-gray-900"
@@ -172,7 +184,7 @@ export function Pricing() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20">
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-2 items-start gap-x-8 gap-y-10 sm:mt-20">
           {plans.map((plan) => (
             <Plan key={plan.name} {...plan} activePeriod="Monthly" />
           ))}

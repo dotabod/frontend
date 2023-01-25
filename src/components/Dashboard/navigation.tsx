@@ -55,7 +55,7 @@ export const navigation = [
   },
   {
     name: 'Support me',
-    href: 'https://ko-fi.com/dotabod',
+    href: 'http://ko-fi.com/dotabod/tiers',
     icon: ({ ...props }) => (
       <HeartIcon {...props} className={clsx(props.className, 'text-red-500')} />
     ),
