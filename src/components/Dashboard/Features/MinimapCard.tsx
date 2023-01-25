@@ -1,6 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Center, Checkbox, Switch } from '@mantine/core'
+import { Center, Switch } from '@mantine/core'
 import clsx from 'clsx'
 import { Settings } from '@/lib/defaultSettings'
 import Image from 'next/image'
@@ -58,23 +58,39 @@ export default function MinimapCard(): JSX.Element {
           !isEnabled && 'opacity-40'
         )}
       >
-        <div className="flex flex-col items-start space-y-2 md:space-y-1">
-          <Checkbox
+        <div className="flex flex-col items-start space-y-2 md:space-y-3">
+          <Switch
+            styles={{
+              labelWrapper: {
+                color: 'var(--mantine-color-dark-3)',
+              },
+            }}
             label="Use simple minimap background"
             disabled={!isEnabled}
+            color="blue"
             checked={minimapSimple}
             value={Settings['minimap-simple']}
             onChange={(e) => updateSimple(!!e?.target?.checked)}
           />
 
-          <Checkbox
+          <Switch
+            styles={{
+              labelWrapper: {
+                color: 'var(--mantine-color-dark-3)',
+              },
+            }}
             label="Use extra large minimap"
             disabled={!isEnabled}
             checked={minimapXl}
             value={Settings['minimap-xl']}
             onChange={(e) => updateXl(!!e?.target?.checked)}
           />
-          <Checkbox
+          <Switch
+            styles={{
+              labelWrapper: {
+                color: 'var(--mantine-color-dark-3)',
+              },
+            }}
             label="Show minimap on the right"
             disabled={!isEnabled}
             checked={isMinimapRight}
@@ -82,7 +98,12 @@ export default function MinimapCard(): JSX.Element {
             onChange={(e) => updateMinimapRight(!!e?.target?.checked)}
           />
 
-          <Checkbox
+          <Switch
+            styles={{
+              labelWrapper: {
+                color: 'var(--mantine-color-dark-3)',
+              },
+            }}
             label="Use Battlepass 2022 HUD"
             disabled={!isEnabled}
             checked={isBP}

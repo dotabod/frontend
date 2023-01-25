@@ -49,12 +49,12 @@ export default function DashboardPage() {
           <Stepper
             styles={{
               stepIcon: {
-                borderColor: 'rgb(61,65,85)',
+                borderColor: 'var(--mantine-color-dark-5)',
                 '&[data-progress]': {
-                  borderColor: '#2563eb',
+                  borderColor: 'var(--mantine-color-blue-6)',
                 },
                 '&[data-completed]': {
-                  backgroundColor: '#2563eb',
+                  backgroundColor: 'var(--mantine-color-blue-6)',
                 },
               },
             }}

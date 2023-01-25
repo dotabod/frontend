@@ -280,8 +280,14 @@ export default function ChatterCard() {
                   label={chatterInfo[key]?.description}
                   disabled={!chatterInfo[key]?.description}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 !text-dark-50">
                     <Switch
+                      styles={{
+                        labelWrapper: {
+                          color: 'var(--mantine-color-dark-3)',
+                        },
+                      }}
+                      label={chatterInfo[key].message}
                       size="sm"
                       color="blue"
                       disabled={!isEnabled || loadingChatters}
@@ -306,7 +312,6 @@ export default function ChatterCard() {
                         })
                       }}
                     />
-                    <div>{chatterInfo[key].message}</div>
                   </div>
                 </Tooltip>
               </div>

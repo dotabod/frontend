@@ -28,6 +28,7 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <MantineProvider
+        withCSSVariables
         theme={{
           colorScheme: 'dark',
           colors: {
