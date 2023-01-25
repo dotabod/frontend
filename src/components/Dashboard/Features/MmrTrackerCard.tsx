@@ -14,8 +14,6 @@ import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
 import { TrashIcon } from '@heroicons/react/24/outline'
 
-import { transition } from '@/ui/utils'
-
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
   const accounts = (data?.accounts || []) as SteamAccount[]
@@ -146,11 +144,7 @@ export default function MmrTrackerCard() {
               )
             })}
             {form.isDirty() && (
-              <div
-                key="motion-save-fields"
-                {...transition}
-                className={clsx('space-x-4')}
-              >
+              <div className={clsx('space-x-4')}>
                 <Button
                   variant="outline"
                   color="green"
