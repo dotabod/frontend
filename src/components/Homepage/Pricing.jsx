@@ -42,7 +42,7 @@ const plans = [
       'You’re a good person. You know Dotabod is free but you want to support the project anyway ❤.',
     button: {
       label: 'Support the project',
-      href: 'http://ko-fi.com/dotabod/tiers',
+      href: 'https://ko-fi.com/dotabod',
     },
     features: [
       'Everything in free tier',

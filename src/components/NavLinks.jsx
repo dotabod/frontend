@@ -17,7 +17,7 @@ export function NavLinks({ bottom = false }) {
     ['Discord', 'https://discord.dotabod.com', DiscordSvg, 'Discord'],
     [
       'Support the project',
-      'http://ko-fi.com/dotabod/tiers',
+      'https://ko-fi.com/dotabod',
       <svg
         key="heart"
         xmlns="http://www.w3.org/2000/svg"

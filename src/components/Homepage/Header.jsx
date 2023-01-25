@@ -79,7 +79,7 @@ export function Header() {
                             <MobileNavLink href="https://discord.dotabod.com">
                               Discord
                             </MobileNavLink>
-                            <MobileNavLink href="http://ko-fi.com/dotabod/tiers">
+                            <MobileNavLink href="https://ko-fi.com/dotabod">
                               Support the project
                             </MobileNavLink>
                           </div>
