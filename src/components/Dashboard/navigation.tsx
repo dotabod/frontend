@@ -54,7 +54,7 @@ export const navigation = [
     icon: ({ ...props }) => <Image alt="discord" src={DiscordSvg} {...props} />,
   },
   {
-    name: 'Support',
+    name: 'Support me',
     href: 'https://ko-fi.com/dotabod',
     icon: ({ ...props }) => (
       <HeartIcon {...props} className={clsx(props.className, 'text-red-500')} />
