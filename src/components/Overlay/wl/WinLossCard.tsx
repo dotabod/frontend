@@ -21,7 +21,10 @@ const WinLossCard = ({ mainScreen = false, wl, ...props }: WLType) => {
       {...props}
     >
       {wl.map(({ win, lose, type }) => (
-        <div key={type} className="w-full space-x-1 font-mono">
+        <div
+          key={type}
+          className={clsx('w-full space-x-1', wl.length > 1 && 'font-mono')}
+        >
           <span>{win || 0}</span>
           <span className="text-green-300">W</span>
           <span>-</span>
