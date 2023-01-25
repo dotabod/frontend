@@ -9,10 +9,12 @@ import { Display, Link } from '@geist-ui/core'
 import { Badge, Button, clsx, Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
-import { XCircle } from 'lucide-react'
 import { useEffect } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
+import { TrashIcon } from '@heroicons/react/24/outline'
+
+import { transition } from '@/ui/utils'
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
@@ -83,93 +85,114 @@ export default function MmrTrackerCard() {
             })}
             className="mt-6 space-y-2"
           >
-            {form.values.accounts.map((account, index) => (
-              <div key={account.steam32Id}>
-                <div className="mb-1 space-x-1">
-                  <label
-                    htmlFor={`${account.steam32Id}-mmr`}
-                    className="cursor-pointer text-sm font-medium text-dark-400 "
-                  >
-                    <span>MMR for</span>
-                  </label>
-                  <Link
-                    color
-                    target="_blank"
-                    href={`https://steamid.xyz/${account.steam32Id}`}
-                    rel="noreferrer"
-                  >
-                    {account.name}
-                  </Link>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-full">
+            {accounts.map((account, index) => {
+              const removed =
+                form.isDirty() &&
+                form.values.accounts.findIndex(
+                  (act) => act.steam32Id === account.steam32Id
+                ) === -1
+              return (
+                <div
+                  key={account.steam32Id}
+                  className={clsx(removed && 'opacity-40')}
+                >
+                  <div className="mb-1 flex items-center space-x-1 text-dark-400">
+                    <label
+                      htmlFor={`${account.steam32Id}-mmr`}
+                      className="cursor-pointer text-sm font-medium"
+                    >
+                      <span>MMR for</span>
+                    </label>
+                    <Link
+                      color
+                      target="_blank"
+                      href={`https://steamid.xyz/${account.steam32Id}`}
+                      rel="noreferrer"
+                    >
+                      {account.name}
+                    </Link>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
                     <Input
+                      disabled={removed}
                       id={`${account.steam32Id}-mmr`}
-                      placeholder="Your MMR?"
+                      placeholder="1234"
                       type="number"
                       min={0}
                       max={30000}
+                      className="w-full"
                       {...form.getInputProps(`accounts.${index}.mmr`)}
                     />
+                    <Button
+                      disabled={removed}
+                      onClick={() => {
+                        form.setValues({
+                          accounts: form.values.accounts.filter(
+                            (act) => act.steam32Id !== account.steam32Id
+                          ),
+                        })
+                      }}
+                      leftIcon={<TrashIcon width={14} />}
+                      color="red"
+                      className="font-normal"
+                      variant="subtle"
+                      size="xs"
+                    >
+                      Remove account
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    color="red"
-                    size="xs"
-                    className="h-full w-fit border-transparent bg-transparent py-2 text-dark-200 transition-colors hover:bg-transparent hover:text-red-600"
-                    onClick={() => {
-                      form.setValues({
-                        accounts: form.values.accounts.filter(
-                          (act) => act.steam32Id !== account.steam32Id
-                        ),
-                      })
-                    }}
-                  >
-                    <XCircle size={24} />
-                  </Button>
                 </div>
-              </div>
-            ))}
-            <div className="space-x-4">
-              <Button
-                variant="outline"
-                color="green"
-                disabled={!form.isDirty()}
-                loading={loadingAccounts}
-                className={clsx(
-                  ' border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
-                  accounts.length - form.values.accounts.length > 0 &&
-                    'border-red-700 bg-red-700 hover:bg-red-600'
-                )}
-                type="submit"
+              )
+            })}
+            {form.isDirty() && (
+              <div
+                key="motion-save-fields"
+                {...transition}
+                className={clsx('space-x-4')}
               >
-                <span className="space-x-1">
-                  {accounts.length - form.values.accounts.length > 0 ? (
+                <Button
+                  variant="outline"
+                  color="green"
+                  disabled={!form.isDirty()}
+                  loading={loadingAccounts}
+                  className={clsx(
+                    'border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
+                    form.isDirty() &&
+                      accounts.length - form.values.accounts.length > 0 &&
+                      'border-red-700 bg-red-700 hover:bg-red-600'
+                  )}
+                  type="submit"
+                >
+                  <span className="space-x-1">
+                    {form.isDirty() &&
+                    accounts.length - form.values.accounts.length > 0 ? (
+                      <span>
+                        Confirm remove{' '}
+                        {accounts.length - form.values.accounts.length}
+                      </span>
+                    ) : accounts.length ? (
+                      <span>Save</span>
+                    ) : null}
                     <span>
-                      Confirm remove{' '}
-                      {accounts.length - form.values.accounts.length}
+                      account
+                      {accounts.length - form.values.accounts.length > 1
+                        ? 's'
+                        : ''}
                     </span>
-                  ) : form.values.accounts.length ? (
-                    <span>Save</span>
-                  ) : null}
-                  <span>
-                    account
-                    {accounts.length - form.values.accounts.length > 1
-                      ? 's'
-                      : ''}
                   </span>
-                </span>
-              </Button>
-              <Button
-                disabled={!form.isDirty()}
-                onClick={() => {
-                  form.setValues({ accounts })
-                }}
-                className=" hov text-dark-200 transition-colors"
-              >
-                Cancel
-              </Button>
-            </div>
+                </Button>
+                <Button
+                  disabled={!form.isDirty()}
+                  onClick={() => {
+                    form.setValues({ accounts })
+                  }}
+                  className="text-dark-300 transition-colors disabled:bg-transparent"
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </form>
         </div>
       ) : null}
