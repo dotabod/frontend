@@ -19,6 +19,8 @@ const moduleExports = {
       'cdn.7tv.app',
       'cdn.frankerfacez.com',
       'cdn.betterttv.net',
+      'avatars.akamai.steamstatic.com',
+      'avatars.cloudflare.steamstatic.com',
     ],
   },
 

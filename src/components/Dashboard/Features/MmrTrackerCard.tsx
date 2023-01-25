@@ -13,12 +13,33 @@ import { useEffect } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
 import { TrashIcon } from '@heroicons/react/24/outline'
+import { fetcher } from '@/lib/fetcher'
+import useSWR from 'swr'
+
+const SteamAvatar = ({ data: response, id }) => {
+  if (!response) return <p>Loading...</p>
+  return (
+    <Image
+      width={45}
+      height={45}
+      className="rounded"
+      src={
+        response?.data?.find((d) => `${d.id}` === `${id}`)?.avatar ||
+        'https://avatars.cloudflare.steamstatic.com/fe7c264f9d2b435dfc2c4e099e3a5fc0ab71f492.jpg'
+      }
+      alt="Steam avatar"
+    />
+  )
+}
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
   const accounts = (data?.accounts || []) as SteamAccount[]
-
   const form = useForm({ initialValues: { accounts } })
+
+  const steamIds = accounts.map((a) => a.steam32Id)
+  const path = `/api/steam/${steamIds.join('/')}`
+  const { data: steamData } = useSWR(path, fetcher)
 
   useEffect(() => {
     if (accounts.length && !loadingAccounts) {
@@ -95,12 +116,6 @@ export default function MmrTrackerCard() {
                   className={clsx(removed && 'opacity-40')}
                 >
                   <div className="mb-1 flex items-center space-x-1 text-dark-400">
-                    <label
-                      htmlFor={`${account.steam32Id}-mmr`}
-                      className="cursor-pointer text-sm font-medium"
-                    >
-                      <span>MMR for</span>
-                    </label>
                     <Link
                       color
                       target="_blank"
@@ -112,6 +127,7 @@ export default function MmrTrackerCard() {
                   </div>
 
                   <div className="flex items-center space-x-2">
+                    <SteamAvatar id={account.steam32Id} data={steamData} />
                     <Input
                       disabled={removed}
                       id={`${account.steam32Id}-mmr`}
