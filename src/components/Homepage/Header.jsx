@@ -80,7 +80,7 @@ export function Header() {
                               Discord
                             </MobileNavLink>
                             <MobileNavLink href="http://ko-fi.com/dotabod/tiers">
-                              Support me
+                              Support the project
                             </MobileNavLink>
                           </div>
                           <div className="mt-8 flex flex-col gap-4">

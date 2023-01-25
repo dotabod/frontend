@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { Button } from 'src/components/Button'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
+import Image from 'next/image'
 
 const plans = [
   {
@@ -23,19 +24,44 @@ const plans = [
       'Twitch predictions',
       'MMR tracking',
     ],
+    logo: (
+      <Image
+        src="https://cdn.betterttv.net/emote/58cd3345994bb43c8d300b82/3x.webp"
+        width={24}
+        height={24}
+        alt="Krappa"
+      />
+    ),
     logomarkClassName: 'fill-gray-500',
   },
   {
-    name: 'Supporter',
+    name: 'Gigachad',
     featured: true,
-    price: { Monthly: '$5', Annually: '$5' },
+    price: { Monthly: '$5-$25', Annually: '$5' },
     description:
       'You’re a good person. You know Dotabod is free but you want to support the project anyway ❤.',
     button: {
-      label: 'Support me',
+      label: 'Support the project',
       href: 'http://ko-fi.com/dotabod/tiers',
     },
-    features: ['Everything in free tier', 'Exclusive Discord badge'],
+    features: [
+      'Everything in free tier',
+      'Exclusive Discord badge',
+      'Logo or name visible on Dotabod.com',
+      'Logo or name visible on project Github',
+      'Access to pre-release builds',
+      'Have your bug reports prioritized',
+      'Access to personal Discord to DM dev',
+    ],
+    logo: (
+      <Image
+        src="https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp"
+        width={24}
+        height={24}
+        className="rounded"
+        alt="Krappa"
+      />
+    ),
     logomarkClassName: 'fill-gray-500',
   },
 ]
@@ -62,6 +88,7 @@ function CheckIcon(props) {
 }
 
 function Plan({
+  logo,
   name,
   price,
   description,
@@ -84,7 +111,13 @@ function Plan({
           featured ? 'text-white' : 'text-gray-900'
         )}
       >
-        <Logomark className={clsx('h-6 w-auto flex-none', logomarkClassName)} />
+        {logo ? (
+          logo
+        ) : (
+          <Logomark
+            className={clsx('h-6 w-auto flex-none', logomarkClassName)}
+          />
+        )}
         <span className="ml-4">{name}</span>
       </h3>
       <p
@@ -184,7 +217,7 @@ export function Pricing() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-2 items-start gap-x-8 gap-y-10 sm:mt-20">
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 md:grid-cols-2">
           {plans.map((plan) => (
             <Plan key={plan.name} {...plan} activePeriod="Monthly" />
           ))}
