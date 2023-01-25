@@ -7,13 +7,10 @@ import { Hero } from '@/components/Homepage/Hero'
 import { Pricing } from '@/components/Homepage/Pricing'
 import { PrimaryFeatures } from '@/components/Homepage/PrimaryFeatures'
 import { SecondaryFeatures } from '@/components/Homepage/SecondaryFeatures'
-import FullStorySession from '@/components/FullStorySession'
 
 export default function Home() {
   return (
     <>
-      <FullStorySession />
-
       <Head>
         <title>Dotabod - Tools for Dota 2 streamers.</title>
         <meta name="title" content="Dotabod - Tools for Dota 2 streamers." />

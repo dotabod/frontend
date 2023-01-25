@@ -6,7 +6,6 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { Button, Group, Stepper } from '@mantine/core'
-import FullStorySession from '@/components/FullStorySession'
 import { useState } from 'react'
 import { Card } from '@/ui/card'
 import Link from 'next/link'
@@ -23,8 +22,6 @@ export default function DashboardPage() {
 
   return status === 'authenticated' ? (
     <>
-      <FullStorySession />
-
       <Head>
         <title>Dotabod | Setup</title>
       </Head>
