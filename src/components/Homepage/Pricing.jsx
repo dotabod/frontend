@@ -30,7 +30,7 @@ const plans = [
     featured: true,
     price: { Monthly: '$5', Annually: '$5' },
     description:
-      'You’ve been streaming for a while. Stream more with Dotabod and grow your gaming time.',
+      'You’re a good person. You know Dotabod is free but you want to support the project anyway ❤.',
     button: {
       label: 'Support me',
       href: 'http://ko-fi.com/dotabod/tiers',
