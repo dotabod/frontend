@@ -20,7 +20,10 @@ import ModImage from '@/components/ModImage'
 import { useClipboard } from '@mantine/hooks'
 
 const emotesRequired = [
-  { label: 'Happi' },
+  {
+    label: 'Happi',
+    url: 'https://betterttv.com/emotes/634042bce6cf26500b42ce56',
+  },
   { label: 'Madge' },
   { label: 'POGGIES' },
   { label: 'PepeLaugh' },
