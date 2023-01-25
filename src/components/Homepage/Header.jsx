@@ -79,6 +79,9 @@ export function Header() {
                             <MobileNavLink href="https://discord.dotabod.com">
                               Discord
                             </MobileNavLink>
+                            <MobileNavLink href="https://ko-fi.com/dotabod">
+                              Support
+                            </MobileNavLink>
                           </div>
                           <div className="mt-8 flex flex-col gap-4">
                             <LoginButton />
