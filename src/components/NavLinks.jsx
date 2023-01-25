@@ -38,9 +38,8 @@ export function NavLinks({ bottom = false }) {
     // ['Twitch', 'https://twitch.tv/dotabod/about', TwitchSvg],
   ].map(([label, href, Icon, tooltip], index) => {
     return (
-      <Tooltip label={tooltip} disabled={!tooltip} position="top">
+      <Tooltip key={label} label={tooltip} disabled={!tooltip} position="top">
         <Link
-          key={label}
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
           className="relative -my-2 -mx-3 flex items-center rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors delay-150 hover:text-gray-900 hover:delay-[0ms]"
