@@ -70,7 +70,7 @@ export default function MmrTrackerCard() {
       </div>
       <div>A list of accounts will show below as you play on them.</div>
       {accounts?.length !== 0 ? (
-        <div className={clsx(!isEnabled && 'opacity-40')}>
+        <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
           <form
             onSubmit={form.onSubmit((values) => {
               update(
@@ -182,7 +182,7 @@ export default function MmrTrackerCard() {
               Play a bot game for Dotabod to detect your Steam account!
             </span>
           </div>
-          <div className={clsx(!isEnabled && 'opacity-40')}>
+          <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
             <label
               htmlFor="mmr"
               className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
@@ -223,7 +223,12 @@ export default function MmrTrackerCard() {
           multiline
           label="Enable this to award 20 MMR instead of 30 for all matches. Disable to use 30 MMR again."
         >
-          <div className="mt-5 flex w-fit items-center space-x-2">
+          <div
+            className={clsx(
+              !isEnabled && 'opacity-40',
+              'mt-5 flex w-fit items-center space-x-2 transition-all'
+            )}
+          >
             <Switch
               size="sm"
               onChange={(e) => updateOnlyParty(!!e?.currentTarget?.checked)}
@@ -235,7 +240,7 @@ export default function MmrTrackerCard() {
         </Tooltip>
       )}
 
-      <div className={clsx(!isEnabled && 'opacity-40')}>
+      <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
         <Display
           shadow
           caption="Correct badge and MMR shown next to shop button"

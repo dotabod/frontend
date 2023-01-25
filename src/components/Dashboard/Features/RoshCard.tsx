@@ -67,7 +67,7 @@ export default function RoshCard() {
           width={372}
           height={141}
           src="/images/dashboard/just-aegis-timer.png"
-          className={clsx('inline', !hasAegis && 'opacity-40')}
+          className={clsx('inline transition-all', !hasAegis && 'opacity-40')}
         />
       </Display>
       <Display shadow caption="Roshan timer">
@@ -76,7 +76,7 @@ export default function RoshCard() {
           width={336}
           height={249}
           src="/images/dashboard/rosh-timer.png"
-          className={clsx('inline', !hasRosh && 'opacity-40')}
+          className={clsx('inline transition-all', !hasRosh && 'opacity-40')}
         />
       </Display>
     </Card>

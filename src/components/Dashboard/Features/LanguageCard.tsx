@@ -50,10 +50,9 @@ export default function LanguageCard() {
       <div>
         {!loadingLocale && (
           <Select
-            searchable
             placeholder="Language selector"
             itemComponent={SelectItem}
-            className="max-w-fit"
+            className="max-w-fit transition-all"
             icon={flagIcon}
             data={localeOptions}
             maxDropdownHeight={400}

@@ -72,7 +72,7 @@ export default function BetsCard() {
         )}
         <span>Show live betting / polls overlay</span>
       </div>
-      <div className={clsx(!isEnabled && 'opacity-40')}>
+      <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
         <form
           onSubmit={form.onSubmit((v) => {
             updateInfo(v)

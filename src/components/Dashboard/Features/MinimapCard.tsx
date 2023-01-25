@@ -1,9 +1,9 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display, Image } from '@geist-ui/core'
-import { Checkbox, Switch } from '@mantine/core'
+import { Center, Checkbox, Switch } from '@mantine/core'
 import clsx from 'clsx'
 import { Settings } from '@/lib/defaultSettings'
+import Image from 'next/image'
 
 export default function MinimapCard(): JSX.Element {
   const {
@@ -49,32 +49,15 @@ export default function MinimapCard(): JSX.Element {
         )}
       </div>
       <div className="subtitle">
-        Block your minimap to deter people from farming your wards.
+        Semi-transparent blocker that auto places itself over your minimap to
+        deter people from farming your wards.
       </div>
       <div
         className={clsx(
-          'flex flex-col items-center',
+          'pt-4 pb-12 transition-all',
           !isEnabled && 'opacity-40'
         )}
       >
-        <Display
-          shadow
-          caption="Semi-transparent blocker that auto places itself over your minimap"
-        >
-          <Image
-            alt="minimap blocker"
-            height={minimapXl ? `280px` : `240px`}
-            src={`/images/overlay/minimap/731-${
-              minimapSimple ? 'Simple' : 'Complex'
-            }-${minimapXl ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
-            style={{
-              backgroundImage:
-                "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
-            }}
-          />
-        </Display>
-      </div>
-      <Card.Footer className={clsx(!isEnabled && 'opacity-40')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-1">
           <Checkbox
             label="Use simple minimap background"
@@ -107,7 +90,49 @@ export default function MinimapCard(): JSX.Element {
             onChange={(e) => updateBP(!!e?.target?.checked)}
           />
         </div>
-      </Card.Footer>
+      </div>
+
+      <Center>
+        <div
+          className={clsx(
+            'flex items-center space-x-4 transition-all',
+            !isEnabled && 'opacity-40'
+          )}
+        >
+          <div className="flex flex-col items-center space-y-4">
+            <Image
+              className={clsx(
+                !minimapSimple && 'border border-2 border-blue-600',
+                minimapSimple && 'opacity-60',
+                'rounded-xl border-2 border-transparent transition-all'
+              )}
+              alt="minimap blocker"
+              width={minimapXl ? 280 : 240}
+              height={minimapXl ? 280 : 240}
+              src={`/images/overlay/minimap/731-${'Complex'}-${
+                minimapXl ? 'X' : ''
+              }Large-AntiStreamSnipeMap.png`}
+            />
+            <span>Complex minimap</span>
+          </div>
+          <div className="flex flex-col items-center space-y-4">
+            <Image
+              className={clsx(
+                minimapSimple && 'border border-2 border-blue-600',
+                !minimapSimple && 'opacity-60',
+                'rounded-xl border-2 border-transparent transition-all'
+              )}
+              alt="minimap blocker"
+              width={minimapXl ? 280 : 240}
+              height={minimapXl ? 280 : 240}
+              src={`/images/overlay/minimap/731-${'Simple'}-${
+                minimapXl ? 'X' : ''
+              }Large-AntiStreamSnipeMap.png`}
+            />
+            <span>Simple minimap</span>
+          </div>
+        </div>
+      </Center>
     </Card>
   )
 }

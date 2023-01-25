@@ -272,7 +272,10 @@ export default function ChatterCard() {
           {(Object.keys(chatters || {}) || []).map((key) => {
             if (!chatterInfo[key]) return null
             return (
-              <div key={key} className={clsx(!isEnabled && 'opacity-40')}>
+              <div
+                key={key}
+                className={clsx(!isEnabled && 'opacity-40 transition-all')}
+              >
                 <Tooltip
                   label={chatterInfo[key]?.description}
                   disabled={!chatterInfo[key]?.description}
