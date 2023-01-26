@@ -5,10 +5,10 @@ import { Settings } from '@/lib/defaultSettings'
 import clsx from 'clsx'
 import { Card } from '../../Card'
 
-export const Numbers = ({ leaderboard, rank, className, ...props }) => {
+export const Numbers = ({ leaderboard, rank, className = '', ...props }) => {
   const res = useTransformRes()
 
-  const fontSize = res({ h: 22 })
+  const fontSize = res({ h: 18 })
   return (
     <div
       style={{ fontSize }}
@@ -55,7 +55,7 @@ export const MMRBadge = ({
             marginTop: res({ h: 20 }),
           }}
         />
-        <Numbers className="font-mono" rank={rank} leaderboard={leaderboard} />
+        <Numbers rank={rank} leaderboard={leaderboard} />
       </div>
     )
   }

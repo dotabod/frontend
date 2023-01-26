@@ -24,7 +24,7 @@ export const useOverlayPositions = () => {
     bottom: 0,
     right: res({ w: 290 }),
     left: null,
-    fontSize: res({ w: 22 }),
+    fontSize: res({ w: 18 }),
   }
 
   let roshPosition = {
