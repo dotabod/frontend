@@ -63,8 +63,8 @@ export const InGameOverlays = ({
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 
       <div
-        className="absolute flex items-end justify-center"
-        style={{ ...wlPosition, width: res({ w: 225 }) }}
+        className="absolute flex items-end justify-end"
+        style={{ ...wlPosition, width: res({ w: 245 }) }}
       >
         <AnimatedWL key="animate-wl-class" wl={wl} className="block" />
 
