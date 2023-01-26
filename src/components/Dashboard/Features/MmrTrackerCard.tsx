@@ -9,7 +9,7 @@ import { Display, Link } from '@geist-ui/core'
 import { Badge, Button, clsx, Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
 import { TrashIcon } from '@heroicons/react/24/outline'
@@ -34,19 +34,24 @@ const SteamAvatar = ({ data: response, id }) => {
 
 export default function MmrTrackerCard() {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
-  const accounts = (data?.accounts || []) as SteamAccount[]
-  const form = useForm({ initialValues: { accounts } })
+  const [accounts, setAccounts] = useState<SteamAccount[]>([])
+  const form = useForm({
+    initialValues: {
+      accounts: [],
+    },
+  })
 
   const steamIds = accounts.map((a) => a.steam32Id)
   const path = `/api/steam/${steamIds.join('/')}`
-  const { data: steamData } = useSWR(path, fetcher)
+  const { data: steamData } = useSWR(path, steamIds.length && fetcher)
 
   useEffect(() => {
-    if (accounts.length && !loadingAccounts) {
-      form.setValues({ accounts })
-      form.resetDirty({ accounts })
+    if (data?.accounts) {
+      setAccounts(data?.accounts || [])
+      form.setValues({ accounts: data?.accounts })
+      form.resetDirty({ accounts: data?.accounts })
     }
-  }, [loadingAccounts])
+  }, [data])
 
   const {
     data: isEnabled,
@@ -90,7 +95,7 @@ export default function MmrTrackerCard() {
         Give or take {onlyParty ? 20 : 30} MMR after every ranked match.
       </div>
       <div>A list of accounts will show below as you play on them.</div>
-      {accounts?.length !== 0 ? (
+      {form.values.accounts?.length !== 0 ? (
         <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
           <form
             onSubmit={form.onSubmit((values) => {
@@ -104,12 +109,12 @@ export default function MmrTrackerCard() {
             })}
             className="mt-6 space-y-2"
           >
-            {accounts.map((account, index) => {
+            {form.values.accounts.map((account, index) => {
               const removed =
                 form.isDirty() &&
                 form.values.accounts.findIndex(
-                  (act) => act.steam32Id === account.steam32Id
-                ) === -1
+                  (act) => act.steam32Id === account.steam32Id && act.delete
+                ) !== -1
               return (
                 <div
                   key={account.steam32Id}
@@ -142,9 +147,15 @@ export default function MmrTrackerCard() {
                       disabled={removed}
                       onClick={() => {
                         form.setValues({
-                          accounts: form.values.accounts.filter(
-                            (act) => act.steam32Id !== account.steam32Id
-                          ),
+                          accounts: form.values.accounts.map((act) => {
+                            if (act.steam32Id === account.steam32Id) {
+                              return {
+                                ...act,
+                                delete: true,
+                              }
+                            }
+                            return act
+                          }),
                         })
                       }}
                       leftIcon={<TrashIcon width={14} />}
@@ -169,24 +180,24 @@ export default function MmrTrackerCard() {
                   className={clsx(
                     'border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
                     form.isDirty() &&
-                      accounts.length - form.values.accounts.length > 0 &&
+                      form.values.accounts.some((a) => a.delete) &&
                       'border-red-700 bg-red-700 hover:bg-red-600'
                   )}
                   type="submit"
                 >
                   <span className="space-x-1">
                     {form.isDirty() &&
-                    accounts.length - form.values.accounts.length > 0 ? (
+                    form.values.accounts.some((a) => a.delete) ? (
                       <span>
                         Confirm remove{' '}
-                        {accounts.length - form.values.accounts.length}
+                        {form.values.accounts.filter((a) => a.delete).length}
                       </span>
                     ) : accounts.length ? (
                       <span>Save</span>
                     ) : null}
                     <span>
                       account
-                      {accounts.length - form.values.accounts.length > 1
+                      {form.values.accounts.filter((a) => a.delete).length > 1
                         ? 's'
                         : ''}
                     </span>
@@ -207,7 +218,7 @@ export default function MmrTrackerCard() {
         </div>
       ) : null}
 
-      {accounts.length === 0 && (
+      {form.values.accounts.length === 0 && (
         <div className="mt-6">
           <div className="mb-4">
             <Badge>INFO</Badge>

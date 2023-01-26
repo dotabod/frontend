@@ -59,7 +59,9 @@ export const useUpdate = ({
 export function useUpdateAccount() {
   const { data, loading, updateSetting } = useUpdate({
     path: '/api/settings/accounts',
-    dataTransform: (data, newValue) => ({ accounts: newValue || data }),
+    dataTransform: (data, newValue) => ({
+      accounts: newValue?.filter((a) => !a.delete) || data?.accounts,
+    }),
   })
 
   return { data, loading, update: updateSetting }
