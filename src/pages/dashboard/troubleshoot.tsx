@@ -2,8 +2,23 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { Link } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import Image from 'next/image'
 
 const faqs = [
+  {
+    question: "Overlay stuck, won't update?",
+    answer: (
+      <div>
+        Press refresh on the dotabod overlay source in OBS. Or, restart OBS.
+        <Image
+          src="https://i.imgur.com/d0qzlFa.png"
+          alt="OBS dotabod source"
+          width={589}
+          height={140}
+        />
+      </div>
+    ),
+  },
   {
     question: 'Overlay not showing anything?',
     answer:
