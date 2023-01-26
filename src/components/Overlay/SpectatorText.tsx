@@ -8,24 +8,33 @@ import { motionProps } from '@/ui/utils'
 export const SpectatorText = ({ block }) => {
   const res = useTransformRes()
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+  const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 
   if (block?.type !== 'spectator') return null
+
+  const styles = {
+    bottom: isXL
+      ? res({
+          h: 300,
+        })
+      : res({
+          h: 260,
+        }),
+    left: 0,
+    right: undefined,
+  }
+
+  if (isRight) {
+    styles.right = styles.left
+    styles.left = null
+  }
 
   return (
     <motion.div
       key="spectator-text"
       {...motionProps}
       className="absolute"
-      style={{
-        bottom: isXL
-          ? res({
-              h: 300,
-            })
-          : res({
-              h: 260,
-            }),
-        left: 0,
-      }}
+      style={styles}
     >
       <Card
         style={{
