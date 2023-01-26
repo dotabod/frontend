@@ -106,9 +106,9 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
   },
   {
-    name: 'Draskyl',
+    name: 'TpaBoMaH',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/509c81ae-7dad-4764-b0f3-e810c3f0bafc-profile_image-70x70.png',
   },
   {
     link: false,
