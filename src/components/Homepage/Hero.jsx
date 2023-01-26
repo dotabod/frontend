@@ -122,7 +122,6 @@ const featuredUsers = [
 export function Hero() {
   const session = useSession()
   const name = session.data?.user?.name || 'streamers'
-  // const { data: featuredUsers } = useSWR('/api/featured-users', fetcher)
 
   return (
     <div className="overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">

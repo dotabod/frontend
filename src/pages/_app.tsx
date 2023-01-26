@@ -10,6 +10,7 @@ import { GeistProvider, Themes } from '@geist-ui/core'
 import { MantineProvider } from '@mantine/core'
 import { NotificationsProvider } from '@mantine/notifications'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
+import SentrySession from '@/components/SentrySession'
 
 const myTheme1 = Themes.createFromDark({
   type: 'coolTheme',
@@ -60,6 +61,7 @@ export default function App({
           },
         }}
       >
+        <SentrySession />
         <VercelAnalytics />
         <GoogleAnalytics />
         <NotificationsProvider position="top-center">
