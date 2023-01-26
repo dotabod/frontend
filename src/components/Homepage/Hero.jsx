@@ -6,6 +6,7 @@ import { Container } from 'src/components/Container'
 import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { useSession } from 'next-auth/react'
 import dotaLogo from 'src/images/logos/dota.svg'
+import TwitchSvg from 'src/images/logos/twitch.svg'
 
 function BackgroundIllustration(props) {
   let id = useId()
@@ -178,9 +179,13 @@ export function Hero() {
           </div>
         </div>
         <div className="relative -mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
-          <p className="text-center text-sm font-semibold text-gray-900 lg:text-left">
-            As featured in
-          </p>
+          <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-900 lg:text-left">
+            <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
+            <span>
+              Over {Number(2000).toLocaleString()} Twitch streamers use Dotabod,
+              such as:
+            </span>
+          </div>
           <ul
             role="list"
             className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
