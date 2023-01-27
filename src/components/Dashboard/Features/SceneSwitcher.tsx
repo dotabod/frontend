@@ -61,7 +61,9 @@ export default function SceneSwitcher(): JSX.Element {
   return (
     <Card>
       <div className="title">
-        <h3>OBS scene switcher</h3>
+        <h3>
+          OBS scene switcher <Badge>Optional</Badge>
+        </h3>
         {l0 && <Switch disabled size="lg" color="blue" />}
         {!l0 && (
           <Switch
@@ -73,8 +75,8 @@ export default function SceneSwitcher(): JSX.Element {
         )}
       </div>
       <div className="subtitle">
-        <Badge>Optional</Badge>Auto switch scenes in OBS depending on game
-        state. Your blockers will still work without this.
+        Auto switch scenes in OBS depending on game state. Your blockers will
+        still work without this.
       </div>
 
       <div className="mb-4">
