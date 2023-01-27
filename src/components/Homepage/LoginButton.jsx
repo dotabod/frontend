@@ -4,10 +4,14 @@ import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import { UserAccountNav } from '../UserAccountNav'
+import { useState } from 'react'
+import * as React from 'react'
+import { LoadingOverlay } from '@mantine/core'
 
 export function LoginButton({ className, ...props }) {
   const searchParams = useSearchParams()
   const user = useSession()?.data?.user
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   if (user) {
@@ -16,9 +20,11 @@ export function LoginButton({ className, ...props }) {
 
   return (
     <Button
-      className={clsx(className)}
-      onClick={() =>
-        !user
+      className={clsx(className, 'relative')}
+      disabled={loading}
+      onClick={() => {
+        setLoading(true)
+        return !user
           ? signIn('twitch', {
               redirect: false,
               callbackUrl: searchParams.get('from') || '/dashboard',
@@ -29,11 +35,19 @@ export function LoginButton({ className, ...props }) {
               .catch((e) => {
                 console.log(e)
               })
+              .finally(() => setLoading(false))
           : router.push('/dashboard')
-      }
+      }}
       variant="outline"
       {...props}
     >
+      <LoadingOverlay
+        visible={loading}
+        loaderProps={{ size: 'sm', color: 'pink' }}
+        overlayOpacity={0.3}
+        overlayColor="#c5c5c5"
+        className="rounded"
+      />
       <span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
