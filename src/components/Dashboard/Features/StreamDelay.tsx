@@ -20,7 +20,7 @@ export default function StreamDelayCard() {
     <Card>
       <div className="title">
         <h3>
-          Stream delay <Badge>Optional</Badge>
+          Stream delay <Badge>beta</Badge>
         </h3>
       </div>
       <div className="subtitle mb-2">
