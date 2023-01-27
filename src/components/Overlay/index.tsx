@@ -20,18 +20,12 @@ const OverlayPage = (props) => {
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
-  const [block, setBlock] = useState(
-    isDev
-      ? devBlockTypes
-      : {
-          matchId: null,
-          team: null,
-          type: null,
-        }
-  )
-  const [pollData, setPollData] = useState<PollData | null>(
-    isDev ? devPoll : null
-  )
+  const [block, setBlock] = useState({
+    matchId: null,
+    team: null,
+    type: null,
+  })
+  const [pollData, setPollData] = useState<PollData | null>()
   const [betData, setBetData] = useState<{
     title: string
     endDate: string
@@ -40,19 +34,21 @@ const OverlayPage = (props) => {
   const [paused, setPaused] = useState(false)
   const { roshan, setRoshan } = useRoshan()
   const { aegis, setAegis } = useAegis()
-  const [wl, setWL] = useState(
-    isDev
-      ? devWL
-      : [
-          {
-            win: 0,
-            lose: 0,
-            type: 'U',
-          },
-        ]
-  )
+  const [wl, setWL] = useState([
+    {
+      win: 0,
+      lose: 0,
+      type: 'U',
+    },
+  ])
   const [isInIframe, setIsInIframe] = useState(false)
 
+  useEffect(() => {
+    if (!isDev) return
+    setWL(devWL)
+    setPollData(devPoll)
+    setBlock(devBlockTypes)
+  }, [isDev])
   useEffect(() => {
     setIsInIframe(window.self !== window.top)
   }, [])
