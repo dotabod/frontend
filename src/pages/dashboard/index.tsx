@@ -59,13 +59,25 @@ export default function DashboardPage() {
             onStepClick={setActive}
             breakpoint="sm"
           >
-            <Stepper.Step label="First step" description="Twitch chat account">
+            <Stepper.Step
+              translate="no"
+              label="First step"
+              description="Twitch chat account"
+            >
               <ChatBot />
             </Stepper.Step>
-            <Stepper.Step label="Second step" description="Dota 2 integration">
+            <Stepper.Step
+              translate="no"
+              label="Second step"
+              description="Dota 2 integration"
+            >
               <ExportCFG />
             </Stepper.Step>
-            <Stepper.Step label="Final step" description="Stream overlay">
+            <Stepper.Step
+              translate="no"
+              label="Final step"
+              description="Stream overlay"
+            >
               <OBSOverlay />
             </Stepper.Step>
             <Stepper.Completed>
