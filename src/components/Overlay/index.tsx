@@ -10,7 +10,13 @@ import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
-import { devBlockTypes, devPoll, devRank, devWL } from '@/lib/devConsts'
+import {
+  blockType,
+  devBlockTypes,
+  devPoll,
+  devRank,
+  devWL,
+} from '@/lib/devConsts'
 import { PollData } from '@/components/Overlay/PollOverlay'
 import { Center, Container, Loader } from '@mantine/core'
 import clsx from 'clsx'
@@ -20,7 +26,7 @@ const OverlayPage = (props) => {
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
-  const [block, setBlock] = useState({
+  const [block, setBlock] = useState<blockType>({
     matchId: null,
     team: null,
     type: null,
@@ -41,28 +47,27 @@ const OverlayPage = (props) => {
       type: 'U',
     },
   ])
+
+  const [rankImageDetails, setRankImageDetails] = useState({
+    image: '0.png',
+    rank: 0,
+    leaderboard: false,
+    notLoaded: true,
+  })
+
   const [isInIframe, setIsInIframe] = useState(false)
+
+  useEffect(() => {
+    setIsInIframe(window.self !== window.top)
+  }, [])
 
   useEffect(() => {
     if (!isDev) return
     setWL(devWL)
     setPollData(devPoll)
     setBlock(devBlockTypes)
+    setRankImageDetails(devRank)
   }, [isDev])
-  useEffect(() => {
-    setIsInIframe(window.self !== window.top)
-  }, [])
-
-  const [rankImageDetails, setRankImageDetails] = useState(
-    isDev
-      ? devRank
-      : {
-          image: '0.png',
-          rank: 0,
-          leaderboard: false,
-          notLoaded: true,
-        }
-  )
 
   useSocket({
     setAegis,
@@ -154,8 +159,10 @@ const OverlayPage = (props) => {
             key="dev-image"
             width={width}
             height={height}
-            alt={`${devBlockTypes.type} dev screenshot`}
-            src={`/images/dev/${devBlockTypes.type}.png`}
+            alt={`${block.type} dev screenshot`}
+            src={`/images/dev/${
+              block.type === 'spectator' ? 'playing' : block.type
+            }.png`}
           />
         )}
       </AnimatePresence>
