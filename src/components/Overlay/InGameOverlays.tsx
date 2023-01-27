@@ -6,6 +6,9 @@ import { MinimapBlocker } from '@/components/Overlay/blocker/MinimapBlocker'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
+import { clsx } from '@mantine/styles'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
 
 export const InGameOverlays = ({
   wl,
@@ -19,6 +22,7 @@ export const InGameOverlays = ({
 }) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
+  const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 
   if (!['spectator', 'playing', 'arcade'].includes(block.type)) return null
 
@@ -63,13 +67,20 @@ export const InGameOverlays = ({
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 
       <div
-        className="absolute flex items-end justify-end"
+        className={clsx(
+          'absolute flex items-end justify-end',
+          isRight && '!justify-start'
+        )}
         style={{ ...wlPosition, width: res({ w: 245 }) }}
       >
-        <AnimatedWL key="animate-wl-class" wl={wl} className="block" />
+        <AnimatedWL
+          key="animate-wl-class"
+          wl={wl}
+          className={clsx('block', isRight && 'order-2')}
+        />
 
         <AnimatedRankBadge
-          className="block"
+          className={clsx('block', isRight && 'order-1')}
           key="animate-rank-badge-class"
           rankImageDetails={rankImageDetails}
         />
