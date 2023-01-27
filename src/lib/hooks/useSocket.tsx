@@ -74,6 +74,7 @@ export const useSocket = ({
     socket.on('connect', () => setConnected(true))
     socket.on('disconnect', (reason) => {
       setConnected(false)
+      console.log('Disconnected from socket', { reason })
 
       if (reason === 'io server disconnect') {
         console.log('Reconnecting...')
