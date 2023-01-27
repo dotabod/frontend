@@ -13,7 +13,7 @@ export default function StreamDelayCard() {
   } = useUpdateSetting(Settings.streamDelay)
 
   const debouncedUpdate = useDebouncedCallback((e) => {
-    updateSetting(Number(e.target.value) * 1000)
+    updateSetting(Math.abs(Number(e.target.value) * 1000))
   }, 500)
 
   return (
@@ -32,9 +32,10 @@ export default function StreamDelayCard() {
         {!loading && (
           <Input
             type="number"
+            min="0"
             placeholder="0 seconds"
             className="max-w-fit transition-all"
-            defaultValue={(Number(delay) || 0) / 1000}
+            defaultValue={Math.abs(Number(delay) || 0) / 1000}
             onChange={debouncedUpdate}
           />
         )}
