@@ -180,10 +180,7 @@ export function Hero() {
         <div className="relative -mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
           <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-900 lg:text-left">
             <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
-            <span>
-              Over {Number(2000).toLocaleString()} Twitch streamers use Dotabod,
-              such as:
-            </span>
+            <span>Over 2,000 Twitch streamers use Dotabod, such as:</span>
           </div>
           <ul
             role="list"
