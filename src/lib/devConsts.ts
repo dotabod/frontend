@@ -1,9 +1,14 @@
 import { PollData } from '@/components/Overlay/PollOverlay'
 
-export const devBlockTypes = {
+export type blockType = {
+  matchId: number
+  team: string
+  type: 'picks' | 'playing' | 'strategy' | 'strategy-2' | 'spectator'
+}
+export const devBlockTypes: blockType = {
   matchId: 123456789,
   team: 'radiant',
-  type: 'picks',
+  type: 'playing',
 }
 export const devPoll: PollData = {
   endDate: new Date().getTime() + 1000 * 60 * 60 * 24,
