@@ -145,7 +145,11 @@ export function Hero() {
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
               <Button href="/dashboard">
                 <PlayIcon className="h-6 w-6 flex-none" />
-                <span className="ml-2.5">Get started</span>
+                {session?.status === 'authenticated' ? (
+                  <span className="ml-2.5">Go to dashboard</span>
+                ) : (
+                  <span className="ml-2.5">Get started</span>
+                )}
               </Button>
               <Button
                 variant="outline"
