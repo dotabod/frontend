@@ -14,6 +14,7 @@ import {
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
 import { isDev } from '@/lib/hooks/rosh'
+import { fetcher } from '@/lib/fetcher'
 
 export let socket: Socket | null = null
 
@@ -66,6 +67,23 @@ export const useSocket = ({
     socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
     })
+
+    socket.on(
+      'requestHeroData',
+      ({ data: { allTime, heroId, steam32Id } }, cb) => {
+        fetcher(
+          `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
+            allTime ? '' : '&date=30'
+          }`
+        )
+          .then(({ win = 0, lose = 0 }) => {
+            cb({ win, lose })
+          })
+          .catch((e: any) => {
+            cb({ win: 0, lose: 0 })
+          })
+      }
+    )
 
     socket.on('block', setBlock)
     socket.on('paused', setPaused)
