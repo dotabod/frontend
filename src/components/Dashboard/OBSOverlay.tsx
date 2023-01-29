@@ -15,7 +15,7 @@ export default function OBSOverlay() {
   const copyURL = useBaseUrl(`overlay/${user ? user.id : ''}`)
 
   const CopyInstructions = () => (
-    <div className="flex items-center space-x-4">
+    <div className="flex flex-col items-center space-x-4 md:flex-row">
       <CopyButton value={copyURL}>
         {({ copied, copy }) => (
           <Button
@@ -31,7 +31,7 @@ export default function OBSOverlay() {
           </Button>
         )}
       </CopyButton>
-      <div className="space-x-2 text-xs">
+      <div className="mt-4 space-x-2 text-xs md:mt-0">
         <Badge type="error" className="!bg-red-800 !text-xs">
           Warning
         </Badge>
@@ -73,7 +73,7 @@ export default function OBSOverlay() {
               transitionProperty: 'all',
               transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
               transitionDuration: '150ms',
-              padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
+              padding: `${theme.spacing.xs}px ${theme.spacing.xs}px`,
               cursor: 'pointer',
               fontSize: theme.fontSizes.sm,
               display: 'flex',
@@ -108,7 +108,7 @@ export default function OBSOverlay() {
             },
           })}
         >
-          <Tabs.List className="space-x-2">
+          <Tabs.List className="mt-4 flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-2">
             <Tabs.Tab value="video">
               <div className="flex items-center space-x-2">
                 <VideoCameraIcon width={24} height={24} />

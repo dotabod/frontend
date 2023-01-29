@@ -1,5 +1,5 @@
 import { Card } from '@/ui/card'
-import { Button, Code, Display, Keyboard } from '@geist-ui/core'
+import { Button, Display, Keyboard } from '@geist-ui/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -47,11 +47,15 @@ export default function ExportCFG() {
           <ChevronRightIcon height={12} className="inline" /> Manage{' '}
           <ChevronRightIcon height={12} className="inline" /> Browse local
           files. Then open the folder to{' '}
-          <Keyboard>\game\dota\cfg\gamestate_integration\</Keyboard>
+          <Keyboard className="whitespace-pre-wrap break-all">
+            \game\dota\cfg\gamestate_integration\
+          </Keyboard>
         </div>
         <p className="ml-4 text-xs">
           If you do not have a{' '}
-          <Keyboard className="!text-xs">gamestate_integration</Keyboard>{' '}
+          <Keyboard className="whitespace-pre-wrap break-all !text-xs">
+            gamestate_integration
+          </Keyboard>{' '}
           folder, create it.
         </p>
         <a
@@ -68,10 +72,10 @@ export default function ExportCFG() {
             caption={
               <>
                 <p>Full path to save config file to:</p>
-                <Code>
+                <Keyboard className="whitespace-pre-wrap break-all">
                   ...\Steam\steamapps\common\dota 2
                   beta\game\dota\cfg\gamestate_integration\
-                </Code>
+                </Keyboard>
               </>
             }
             shadow
@@ -87,8 +91,11 @@ export default function ExportCFG() {
         </div>
 
         <div>
-          2. Add <Code>-gamestateintegration</Code> to your Dota 2 launch
-          options in Steam.{' '}
+          2. Add{' '}
+          <Keyboard className="whitespace-pre-wrap break-all !text-xs">
+            -gamestateintegration
+          </Keyboard>{' '}
+          to your Dota 2 launch options in Steam.{' '}
           <Link
             className="text-blue-400 hover:text-blue-300"
             href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"

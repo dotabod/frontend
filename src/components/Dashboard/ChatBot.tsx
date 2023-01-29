@@ -120,7 +120,10 @@ export default function ChatBot() {
           2. <Badge>Optional</Badge> Add the following emotes to your channel
           using BTTV (case sensitive):
         </div>
-        <List size="sm" className="ml-8 grid grid-cols-3 lg:grid-cols-4">
+        <List
+          size="sm"
+          className="ml-8 grid grid-cols-1 space-y-1 md:grid-cols-3 md:space-y-0 lg:grid-cols-4"
+        >
           {emotesRequired
             .sort((a, b) => {
               // if its found in emotes, put it at the bottom
