@@ -32,32 +32,16 @@ export default function MinimapCard(): JSX.Element {
     updateSetting: updateMinimapRight,
   } = useUpdateSetting(Settings.minimapRight)
 
-  const loading = l0 || l1 || l2 || l3 || l4
-
   return (
     <Card>
       <div className="title">
-        <h3>Minimap blocker</h3>
-        {loading && <Switch disabled size="lg" color="blue" />}
-        {!loading && (
-          <Switch
-            size="lg"
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={isEnabled}
-          />
-        )}
+        <h3>Minimap</h3>
       </div>
       <div className="subtitle">
         Semi-transparent blocker that auto places itself over your minimap to
         deter people from farming your wards.
       </div>
-      <div
-        className={clsx(
-          'pt-4 pb-12 transition-all',
-          !isEnabled && 'opacity-40'
-        )}
-      >
+      <div className={clsx('pt-4 pb-12 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <Switch
             styles={{
@@ -66,7 +50,6 @@ export default function MinimapCard(): JSX.Element {
               },
             }}
             label="Use simple minimap background"
-            disabled={!isEnabled}
             color="blue"
             checked={minimapSimple}
             value={Settings['minimap-simple']}
@@ -80,7 +63,6 @@ export default function MinimapCard(): JSX.Element {
               },
             }}
             label="Use extra large minimap"
-            disabled={!isEnabled}
             checked={minimapXl}
             value={Settings['minimap-xl']}
             onChange={(e) => updateXl(!!e?.target?.checked)}
@@ -92,7 +74,6 @@ export default function MinimapCard(): JSX.Element {
               },
             }}
             label="Show minimap on the right"
-            disabled={!isEnabled}
             checked={isMinimapRight}
             value={Settings.minimapRight}
             onChange={(e) => updateMinimapRight(!!e?.target?.checked)}
@@ -105,10 +86,22 @@ export default function MinimapCard(): JSX.Element {
               },
             }}
             label="Use Battlepass 2022 HUD"
-            disabled={!isEnabled}
             checked={isBP}
             value={Settings.battlepass}
             onChange={(e) => updateBP(!!e?.target?.checked)}
+          />
+          <Switch
+            styles={{
+              labelWrapper: {
+                color: 'var(--mantine-color-dark-3)',
+              },
+            }}
+            label="Enable minimap blocker"
+            color="blue"
+            checked={isEnabled}
+            value={Settings['minimap-blocker']}
+            onChange={(e) => updateSetting(!!e?.target?.checked)}
+            defaultChecked={isEnabled}
           />
         </div>
       </div>
