@@ -90,6 +90,12 @@ export const useSocket = ({
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
     socket.on('connect', () => setConnected(true))
+    socket.on('connect_error', () => {
+      setTimeout(() => {
+        console.log('Reconnecting due to connect error...')
+        socket.connect()
+      }, 1000)
+    })
     socket.on('disconnect', (reason) => {
       setConnected(false)
       console.log('Disconnected from socket', { reason })
@@ -126,8 +132,6 @@ export const useSocket = ({
     socket.on('refresh', () => {
       router.reload()
     })
-
-    socket.on('connect_error', console.log)
   }, [userId])
 }
 
