@@ -1,14 +1,6 @@
 import { Card } from '@/ui/card'
-import {
-  ActionIcon,
-  CheckIcon,
-  Input,
-  List,
-  ThemeIcon,
-  Tooltip,
-} from '@mantine/core'
+import { ActionIcon, CheckIcon, Input, List, Tooltip } from '@mantine/core'
 import clsx from 'clsx'
-import { X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -18,6 +10,7 @@ import { Badge } from '@mantine/core'
 import { ClipboardIcon } from '@heroicons/react/24/outline'
 import ModImage from '@/components/ModImage'
 import { useClipboard } from '@mantine/hooks'
+import { ExternalLinkIcon } from 'lucide-react'
 
 const emotesRequired = [
   {
@@ -134,16 +127,7 @@ export default function ChatBot() {
             .map(({ label, url }) => {
               const thisEmote = emotes.find((e) => e.code === label)
               return (
-                <List.Item
-                  icon={
-                    !thisEmote && (
-                      <ThemeIcon color={thisEmote ? 'green' : 'blue'} size={22}>
-                        <X size={15} />
-                      </ThemeIcon>
-                    )
-                  }
-                  key={label}
-                >
+                <List.Item key={label}>
                   <div
                     className={clsx(
                       'flex items-center space-x-2',
@@ -160,6 +144,7 @@ export default function ChatBot() {
                     )}
                     <Link
                       className={clsx(
+                        'flex items-center space-x-1',
                         ' transition-colors hover:text-[#E6E8F1]',
                         thisEmote
                           ? 'text-dark-300 line-through'
@@ -171,7 +156,8 @@ export default function ChatBot() {
                         `https://betterttv.com/emotes/shared/search?query=${label}`
                       }
                     >
-                      {label}
+                      <span>{label}</span>
+                      <ExternalLinkIcon size={14} />
                     </Link>
                   </div>
                 </List.Item>
