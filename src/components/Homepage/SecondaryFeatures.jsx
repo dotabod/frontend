@@ -43,8 +43,8 @@ export function SecondaryFeatures() {
       description: (
         <div>
           <span>
-            Create predictions for your viewers to bet on. Dotabod will start
-            and stop the prediction automatically.
+            Tell everyone watching what your current Win Loss record is.
+            Automatically displays ranked or unranked, or both at the same time!
           </span>
           {CommandDetail[Settings.commandWL].response({}, false)}
 
