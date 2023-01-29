@@ -104,8 +104,8 @@ export default function DashboardShell({ children, title, subtitle }) {
                       <item.icon
                         className={clsx(
                           window.location.href.endsWith(item.href)
-                            ? 'text-dark-400'
-                            : 'text-dark-300 group-hover:text-white',
+                            ? `!text-dark-400`
+                            : `!text-dark-300 group-hover:text-white`,
                           'mr-3 h-6 w-6 flex-shrink-0'
                         )}
                         aria-hidden="true"

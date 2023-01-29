@@ -7,10 +7,9 @@ import {
   QuestionMarkCircleIcon,
   VideoCameraIcon,
 } from '@heroicons/react/24/outline'
-import Image from 'next/image'
-import DiscordSvg from '@/images/logos/discord.svg'
 import clsx from 'clsx'
 import { signOut } from 'next-auth/react'
+import Discord from '@/images/logos/Discord'
 
 export const navigation = [
   {
@@ -51,7 +50,7 @@ export const navigation = [
   {
     name: 'Discord',
     href: 'https://discord.dotabod.com',
-    icon: ({ ...props }) => <Image alt="discord" src={DiscordSvg} {...props} />,
+    icon: Discord,
   },
   {
     name: 'Support the project',
