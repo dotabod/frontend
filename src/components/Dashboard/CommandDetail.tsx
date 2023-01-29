@@ -497,6 +497,61 @@ const CommandDetail = {
       </>
     ),
   },
+  [Settings.commandHero]: {
+    key: Settings.commandHero,
+    title: 'Hero',
+    description:
+      "Shows currently playing hero's score in the last 30 days. Uses OpenDota API, so your profile must be public for this to work.",
+    cmd: '!hero',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <>
+        <TwitchChat
+          {...props}
+          command="!hero"
+          response="No matches played as Clockwerk in 30d"
+        />
+        <TwitchChat
+          {...props}
+          command="!hero"
+          response="Winrate: 53% as Clockwerk in 30d of 41 matches. "
+        />
+      </>
+    ),
+  },
+  [Settings.commandBuilds]: {
+    key: Settings.commandBuilds,
+    title: 'Dota 2 Pro Tracker',
+    description:
+      'Get a quick link to pro builds and guides for your currently playing hero.',
+    cmd: '!builds',
+    alias: ['dota2pt', 'build', 'd2pt', 'getbuild'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!builds"
+        response="Need pro build ideas for Clockwerk? Check here dota2protracker.com/hero/Clockwerk "
+      />
+    ),
+  },
+  [Settings.commandDelay]: {
+    key: Settings.commandDelay,
+    title: 'Stream delay',
+    description:
+      'Tells chat the Dotabod bot delay you configured from the features page.',
+    cmd: '!delay',
+    alias: ['streamdelay'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!delay"
+        response="Stream delay: 3 seconds"
+      />
+    ),
+  },
 }
 
 export default CommandDetail

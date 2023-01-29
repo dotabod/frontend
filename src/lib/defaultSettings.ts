@@ -81,6 +81,8 @@ export const defaultSettings = {
   onlyParty: false,
   livePolls: true,
   streamDelay: 0,
+  commandDelay: true,
+  commandBuilds: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
