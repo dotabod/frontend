@@ -94,7 +94,7 @@ export const useSocket = ({
       setTimeout(() => {
         console.log('Reconnecting due to connect error...')
         socket.connect()
-      }, 1000)
+      }, 4000)
     })
     socket.on('disconnect', (reason) => {
       setConnected(false)
