@@ -109,7 +109,12 @@ export interface Cdn {
   high: string
 }
 
-export const PollOverlay = ({ title, choices, endDate }: PollData) => {
+export const PollOverlay = ({
+  title,
+  choices,
+  endDate,
+  onComplete,
+}: PollData & { onComplete: () => void }) => {
   const res = useTransformRes()
   const [emotes, setEmotes] = useState([])
   const { data } = useGetSettings()
@@ -139,40 +144,42 @@ export const PollOverlay = ({ title, choices, endDate }: PollData) => {
   })
 
   return (
-    <motion.div key="poll-overlay" {...motionProps}>
-      <div>
-        <h1
-          className="font-outline-2 text-center font-bold text-slate-50"
-          style={{
-            fontSize: res({ h: 20 }),
-          }}
-        >
-          {transformTextToTextWithEmotes({
-            emotes: emotes,
-            text: title,
-            res: res,
-          })}
-        </h1>
-        <Progress
-          size={res({ w: 24 })}
-          className="border border-slate-600 shadow-lg"
-          radius="lg"
-          sections={choicesWithPercent.map((choice, i) => ({
-            label: `${choice.title}${
-              choice.totalVotes
-                ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})`
-                : ''
-            }`,
-            value: choice.percent,
-            color: PollColors[i] || PollColors[0],
-          }))}
-        />
-        <Center>
-          {endDate && (
-            <Countdown renderer={PollTimer} date={new Date(endDate)} />
-          )}
-        </Center>
-      </div>
+    <motion.div key="poll-overlay-inner" {...motionProps}>
+      <h1
+        className="font-outline-2 text-center font-bold text-slate-50"
+        style={{
+          fontSize: res({ h: 20 }),
+        }}
+      >
+        {transformTextToTextWithEmotes({
+          emotes: emotes,
+          text: title,
+          res: res,
+        })}
+      </h1>
+      <Progress
+        size={res({ w: 24 })}
+        className="border border-slate-600 shadow-lg"
+        radius="lg"
+        sections={choicesWithPercent.map((choice, i) => ({
+          label: `${choice.title}${
+            choice.totalVotes
+              ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})`
+              : ''
+          }`,
+          value: choice.percent,
+          color: PollColors[i] || PollColors[0],
+        }))}
+      />
+      <Center>
+        {endDate && (
+          <Countdown
+            onComplete={onComplete}
+            renderer={PollTimer}
+            date={new Date(endDate)}
+          />
+        )}
+      </Center>
     </motion.div>
   )
 }

@@ -124,6 +124,8 @@ const OverlayPage = (props) => {
 
         <PollOverlays
           pollData={pollData}
+          setBetData={setBetData}
+          setPollData={setPollData}
           betData={betData}
           key="poll-overlays"
         />
