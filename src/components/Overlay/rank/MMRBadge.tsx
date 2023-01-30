@@ -16,9 +16,14 @@ export const Numbers = ({ leaderboard, rank, className = '', ...props }) => {
       {...props}
     >
       <span>{leaderboard && `#${leaderboard}`}</span>
-      <span className={clsx(leaderboard && 'text-base')}>
+      <span
+        className={clsx(
+          leaderboard && 'text-base',
+          !rank && !leaderboard && 'hidden'
+        )}
+      >
         {rank && rank}
-        {leaderboard && ' MMR'}
+        {leaderboard && rank && ' MMR'}
       </span>
     </div>
   )
@@ -26,7 +31,7 @@ export const Numbers = ({ leaderboard, rank, className = '', ...props }) => {
 
 export const MMRBadge = ({
   image,
-  leaderboard = false,
+  leaderboard = null,
   rank,
   mainScreen = false,
   className = '',
@@ -59,17 +64,22 @@ export const MMRBadge = ({
       </div>
     )
   }
+
   return (
-    <Card {...props} className={clsx(className, 'rounded-bl-none')}>
+    <Card
+      {...props}
+      className={clsx(className, 'rounded-bl-none', !image && 'p-2')}
+    >
       <Badge width={res({ w: 82 })} height={res({ h: 75 })} image={image} />
       <Numbers
         rank={rank}
         leaderboard={leaderboard}
-        className={
-          leaderboard || ['80.png', '92.png'].includes(image)
+        className={clsx(
+          !image && 'mt-0',
+          leaderboard || ['80.png', '91.png', '92.png'].includes(image)
             ? '-mt-1'
             : '-mt-3'
-        }
+        )}
       />
     </Card>
   )

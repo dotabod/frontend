@@ -121,7 +121,7 @@ export const useSocket = ({
 
     socket.on('update-medal', (deets: RankType) => {
       if (isDev) return
-      getRankImage(deets).then(setRankImageDetails)
+      setRankImageDetails(getRankImage(deets))
     })
 
     socket.on('update-wl', (records: wlType) => {

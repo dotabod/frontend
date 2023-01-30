@@ -4,6 +4,8 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 export const Badge = ({ image, ...props }) => {
   const res = useTransformRes()
 
+  if (!image) return null
+
   return (
     <Image
       priority

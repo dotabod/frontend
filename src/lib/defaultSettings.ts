@@ -83,6 +83,9 @@ export const defaultSettings = {
   streamDelay: 0,
   commandDelay: true,
   commandBuilds: true,
+  showRankMmr: true,
+  showRankImage: true,
+  showRankLeader: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>

@@ -22,6 +22,7 @@ async function getAccounts(id: string) {
         mmr: true,
         name: true,
         steam32Id: true,
+        leaderboard_rank: true,
       },
       where: {
         userId: id,
