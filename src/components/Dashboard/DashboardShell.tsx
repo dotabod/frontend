@@ -1,10 +1,8 @@
-import { Fragment, useState } from 'react'
-import { DarkLogo } from '@/components/Logo'
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   AppShell,
   Burger,
-  Header,
   MediaQuery,
   Navbar,
   Switch,
@@ -16,6 +14,8 @@ import { navigation } from '@/components/Dashboard/navigation'
 import clsx from 'clsx'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
+import { DonationMenu } from '@/components/DonationMenu'
+import { DarkLogo } from '@/components/Logo'
 
 export default function DashboardShell({ children, title, subtitle }) {
   const theme = useMantineTheme()
@@ -66,7 +66,7 @@ export default function DashboardShell({ children, title, subtitle }) {
         asideOffsetBreakpoint="sm"
         navbar={
           <Navbar
-            className="overflow-auto transition-all"
+            className="overflow-y-scroll transition-all"
             style={{
               background:
                 theme.colorScheme === 'dark'
@@ -79,8 +79,11 @@ export default function DashboardShell({ children, title, subtitle }) {
             width={{ sm: 300, lg: 400, xl: 600 }}
           >
             <div className="flex flex-col items-end">
-              <div className="max-w-xs">
-                <div className="flex w-full pb-4">
+              <div className="w-full md:max-w-xs">
+                <div className="mb-4 h-12">
+                  <DarkLogo className="h-full w-auto text-white" />
+                </div>
+                <div className=" w-full pb-4">
                   <UserAccountNav dark showDetails />
                 </div>
 
@@ -89,6 +92,10 @@ export default function DashboardShell({ children, title, subtitle }) {
                     return (
                       <div key={i} className="!my-6 border-t border-dark-600" />
                     )
+
+                  if (item.name === 'Support the project') {
+                    return <DonationMenu key={i} />
+                  }
 
                   return (
                     <Link
@@ -149,32 +156,17 @@ export default function DashboardShell({ children, title, subtitle }) {
           </Navbar>
         }
         header={
-          <Header
-            style={{
-              background:
-                theme.colorScheme === 'dark'
-                  ? theme.colors.dark[8]
-                  : theme.colors.gray[0],
-            }}
-            height={{ base: 70 }}
-            p="md"
-          >
-            <div
-              style={{ display: 'flex', alignItems: 'center', height: '100%' }}
-            >
-              <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-                <Burger
-                  opened={opened}
-                  onClick={() => setOpened((o) => !o)}
-                  size="sm"
-                  color={theme.colors.gray[6]}
-                  mr="xl"
-                />
-              </MediaQuery>
-
-              <DarkLogo className="h-12 w-auto text-white" />
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <div className="absolute top-0 right-0 z-[101] m-4">
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((o) => !o)}
+                size="sm"
+                color={theme.colors.gray[6]}
+                mr="xl"
+              />
             </div>
-          </Header>
+          </MediaQuery>
         }
       >
         <main className="px-4">
