@@ -95,7 +95,7 @@ export function SecondaryFeatures() {
           <span>
             Show off your current rank, or leaderboard standing on stream.
           </span>
-          {CommandDetail[Settings['mmr-tracker']].response()}
+          {CommandDetail[Settings.commandMmr].response()}
           <div className="mt-6 flex justify-center space-x-4">
             <MMRBadge
               image="55.png"
