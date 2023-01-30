@@ -33,6 +33,12 @@ export default function DashboardShell({ children, title, subtitle }) {
         html,
         body {
           @apply !bg-dark-700;
+          scrollbar-width: thin;
+          scrollbar-color: #3e4155 transparent;
+        }
+        .mantine-Navbar-root {
+          scrollbar-width: thin;
+          scrollbar-color: #3e4155 transparent;
         }
         ::-webkit-scrollbar {
           width: 6px;
