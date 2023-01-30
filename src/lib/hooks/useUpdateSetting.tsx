@@ -92,6 +92,10 @@ export function useUpdateSetting(key?: SettingKeys) {
   } = useUpdate({
     path: url,
     dataTransform: (data, newValue) => {
+      if (key === Settings.mmr) {
+        return { ...data, mmr: newValue.value }
+      }
+
       // find the key in data, then update the value to be new
       const newData =
         data?.settings?.map((setting) => {
