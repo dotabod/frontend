@@ -337,13 +337,16 @@ export default function MmrTrackerCard() {
 
       <div className="mt-6 flex justify-center space-x-4">
         {accounts.map((account) => {
-          const rank = getRankDetail(account.mmr, account.leaderboard_rank)
+          const rankResponse = getRankDetail(
+            account.mmr,
+            account.leaderboard_rank
+          )
+          const rank = getRankImage(rankResponse as RankType)
           return (
             <MMRBadge
-              {...getRankImage(rank as RankType)}
-              leaderboard={200}
-              image={null}
-              rank={null}
+              leaderboard={showRankLeader ? rank?.leaderboard : null}
+              image={showRankImage ? rank?.image : null}
+              rank={showRankMmr ? rank?.rank : null}
               key={account.steam32Id}
               className="self-center !rounded-md"
             />

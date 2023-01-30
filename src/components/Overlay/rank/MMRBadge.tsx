@@ -1,11 +1,15 @@
 import { Badge } from '../../Badge'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Settings } from '@/lib/defaultSettings'
 import clsx from 'clsx'
 import { Card } from '../../Card'
 
-export const Numbers = ({ leaderboard, rank, className = '', ...props }) => {
+export const Numbers = ({
+  hasImage,
+  leaderboard,
+  rank,
+  className = '',
+  ...props
+}) => {
   const res = useTransformRes()
 
   const fontSize = res({ h: 18 })
@@ -23,7 +27,7 @@ export const Numbers = ({ leaderboard, rank, className = '', ...props }) => {
         )}
       >
         {rank && rank}
-        {leaderboard && rank && ' MMR'}
+        {((leaderboard && rank) || !hasImage) && ' MMR'}
       </span>
     </div>
   )
@@ -39,9 +43,7 @@ export const MMRBadge = ({
   ...props
 }) => {
   const res = useTransformRes()
-  const { data: isEnabled } = useUpdateSetting(Settings['mmr-tracker'])
-
-  if (!isEnabled) return null
+  if (!image && !leaderboard && !rank) return null
 
   if (mainScreen) {
     return (
@@ -60,25 +62,23 @@ export const MMRBadge = ({
             marginTop: res({ h: 20 }),
           }}
         />
-        <Numbers rank={rank} leaderboard={leaderboard} />
+        <Numbers hasImage={!!image} rank={rank} leaderboard={leaderboard} />
       </div>
     )
   }
 
   return (
-    <Card
-      {...props}
-      className={clsx(className, 'rounded-bl-none', !image && 'p-2')}
-    >
+    <Card {...props} className={clsx(className, 'rounded-bl-none')}>
       <Badge width={res({ w: 82 })} height={res({ h: 75 })} image={image} />
       <Numbers
+        hasImage={!!image}
         rank={rank}
         leaderboard={leaderboard}
         className={clsx(
           !image && 'mt-0',
-          leaderboard || ['80.png', '91.png', '92.png'].includes(image)
-            ? '-mt-1'
-            : '-mt-3'
+          (leaderboard || ['80.png', '91.png', '92.png'].includes(image)) &&
+            '-mt-1',
+          image && rank && '-mt-3'
         )}
       />
     </Card>
