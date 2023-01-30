@@ -81,7 +81,9 @@ export default function DashboardShell({ children, title, subtitle }) {
             <div className="flex flex-col items-end">
               <div className="w-full md:max-w-xs">
                 <div className="mb-4 h-12">
-                  <DarkLogo className="h-full w-auto text-white" />
+                  <Link href="/">
+                    <DarkLogo className="h-full w-auto text-white" />
+                  </Link>
                 </div>
                 <div className=" w-full pb-4">
                   <UserAccountNav dark showDetails />
