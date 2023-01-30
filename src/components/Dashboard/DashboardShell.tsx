@@ -76,7 +76,7 @@ export default function DashboardShell({ children, title, subtitle }) {
             p="md"
             hiddenBreakpoint="sm"
             hidden={!opened}
-            width={{ sm: 300, lg: 400, xl: 600 }}
+            width={{ sm: 300, md: 400, lg: 500 }}
           >
             <div className="flex flex-col items-end">
               <div className="w-full md:max-w-xs">
