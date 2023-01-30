@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "doppler run -- next dev",
+    "pull": "doppler run -- yarn prisma db pull",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
