@@ -86,6 +86,7 @@ export const defaultSettings = {
   showRankMmr: true,
   showRankImage: true,
   showRankLeader: true,
+  commandMmr: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>

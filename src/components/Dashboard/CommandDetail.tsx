@@ -271,8 +271,8 @@ const CommandDetail = {
       </>
     ),
   },
-  [Settings['mmr-tracker']]: {
-    key: Settings['mmr-tracker'],
+  [Settings.commandMmr]: {
+    key: Settings.commandMmr,
     title: 'MMR',
     description:
       'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
