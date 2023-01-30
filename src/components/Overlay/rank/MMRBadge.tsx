@@ -27,7 +27,7 @@ export const Numbers = ({
         )}
       >
         {rank && rank}
-        {((leaderboard && rank) || !hasImage) && ' MMR'}
+        {rank && (leaderboard || !hasImage || rank) && ' MMR'}
       </span>
     </div>
   )
