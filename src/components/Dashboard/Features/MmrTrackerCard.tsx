@@ -89,6 +89,9 @@ export default function MmrTrackerCard() {
     updateMmr(Number(e.target.value))
   }, 500)
 
+  const noSteamRankResponse = getRankDetail(mmr, null)
+  const noSteamRank = getRankImage(noSteamRankResponse as RankType)
+
   return (
     <Card>
       <div className="title">
@@ -190,6 +193,12 @@ export default function MmrTrackerCard() {
             className="mt-6 space-y-2"
           >
             {form.values.accounts.map((account, index) => {
+              const rankResponse = getRankDetail(
+                account.mmr,
+                account.leaderboard_rank
+              )
+              const rank = getRankImage(rankResponse as RankType)
+
               const removed =
                 form.isDirty() &&
                 form.values.accounts.findIndex(
@@ -212,6 +221,13 @@ export default function MmrTrackerCard() {
                   </div>
 
                   <div className="flex items-center space-x-2">
+                    <MMRBadge
+                      leaderboard={null}
+                      image={rank?.image}
+                      rank={null}
+                      key={account.steam32Id}
+                      className="self-center !rounded-md"
+                    />
                     <SteamAvatar id={account.steam32Id} data={steamData} />
                     <Input
                       disabled={removed}
@@ -306,14 +322,14 @@ export default function MmrTrackerCard() {
               Play a bot game for Dotabod to detect your Steam account!
             </span>
           </div>
-          <div className={clsx('transition-all')}>
-            <label
-              htmlFor="mmr"
-              className="mb-2 flex items-start justify-start text-sm font-medium text-dark-400 "
-            >
-              Current MMR
-            </label>
-            <div className="flex space-x-4">
+          <div className="flex space-x-4 transition-all">
+            <MMRBadge
+              leaderboard={null}
+              image={noSteamRank?.image}
+              rank={null}
+              className="h-12 w-12 !rounded-md"
+            />
+            <div className="flex flex-col">
               {loading && (
                 <Input placeholder="Loading..." className="w-full" disabled />
               )}
@@ -330,28 +346,30 @@ export default function MmrTrackerCard() {
                   onChange={debouncedMmr}
                 />
               )}
+              <label
+                htmlFor="mmr"
+                className="mb-2 flex text-sm font-medium text-dark-400 "
+              >
+                Enter your current MMR
+              </label>
             </div>
           </div>
         </div>
       )}
 
       <div className="mt-6 flex justify-center space-x-4">
-        {accounts.map((account) => {
-          const rankResponse = getRankDetail(
-            account.mmr,
-            account.leaderboard_rank
-          )
-          const rank = getRankImage(rankResponse as RankType)
-          return (
-            <MMRBadge
-              leaderboard={showRankLeader ? rank?.leaderboard : null}
-              image={showRankImage ? rank?.image : null}
-              rank={showRankMmr ? rank?.rank : null}
-              key={account.steam32Id}
-              className="self-center !rounded-md"
-            />
-          )
-        })}
+        <MMRBadge
+          leaderboard={null}
+          image={showRankImage ? '11.png' : null}
+          rank={showRankMmr ? '130' : null}
+          className="self-center !rounded-md"
+        />
+        <MMRBadge
+          leaderboard={showRankLeader ? '1' : null}
+          image={showRankImage ? '92.png' : null}
+          rank={showRankMmr ? '13150' : null}
+          className="self-center !rounded-md"
+        />
       </div>
 
       <div className={clsx('transition-all')}>
@@ -361,9 +379,9 @@ export default function MmrTrackerCard() {
         >
           <Image
             alt="mmr tracker"
-            width={534}
-            height={82}
-            src="/images/dashboard/mmr-tracker.png"
+            width={269}
+            height={89}
+            src="/images/dashboard/wl-overlay.png"
           />
         </Display>
       </div>

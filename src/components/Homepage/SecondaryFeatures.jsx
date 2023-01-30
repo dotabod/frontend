@@ -106,7 +106,7 @@ export function SecondaryFeatures() {
               image="92.png"
               className="self-center !rounded-md"
               leaderboard="1"
-              rank="12490"
+              rank="13150"
             />
           </div>
         </div>

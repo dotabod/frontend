@@ -78,7 +78,7 @@ export const MMRBadge = ({
           !image && 'mt-0',
           (leaderboard || ['80.png', '91.png', '92.png'].includes(image)) &&
             '-mt-1',
-          image && rank && '-mt-3'
+          image && rank && !leaderboard && '-mt-3'
         )}
       />
     </Card>
