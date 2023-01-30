@@ -102,7 +102,7 @@ export function useUpdateSetting(key?: SettingKeys) {
         }) || []
 
       if (!newData?.find((setting) => setting.key === key)) {
-        newData.push({ key, value: newValue })
+        newData.push({ key, ...newValue })
       }
 
       return { ...data, settings: newData }
