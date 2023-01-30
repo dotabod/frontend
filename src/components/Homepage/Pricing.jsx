@@ -4,6 +4,7 @@ import { Button } from 'src/components/Button'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import Image from 'next/image'
+import { DonationMenu } from '@/components/DonationMenu'
 
 const plans = [
   {
@@ -41,6 +42,7 @@ const plans = [
     description:
       'You’re a good person. You know Dotabod is free but you want to support the project anyway ❤.',
     button: {
+      custom: DonationMenu,
       label: 'Support the project',
       href: 'https://ko-fi.com/dotabod',
     },
@@ -184,14 +186,29 @@ function Plan({
           ))}
         </ul>
       </div>
-      <Button
-        href={button.href}
-        color={featured ? 'cyan' : 'gray'}
-        className="mt-6"
-        aria-label={`Get started with the ${name} plan for ${price}`}
-      >
-        {button.label}
-      </Button>
+      {button.custom && (
+        <button.custom
+          trigger={
+            <Button
+              color={featured ? 'cyan' : 'gray'}
+              className="mt-6"
+              aria-label={`Get started with the ${name} plan for ${price}`}
+            >
+              {button.label}
+            </Button>
+          }
+        />
+      )}
+      {!button.custom && (
+        <Button
+          href={button.href}
+          color={featured ? 'cyan' : 'gray'}
+          className="mt-6"
+          aria-label={`Get started with the ${name} plan for ${price}`}
+        >
+          {button.label}
+        </Button>
+      )}
     </section>
   )
 }
