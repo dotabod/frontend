@@ -52,7 +52,7 @@ export default function OBSOverlay() {
         <Tabs
           unstyled
           variant="pills"
-          defaultValue="video"
+          defaultValue="text"
           styles={(theme) => ({
             tab: {
               ...theme.fn.focusStyles(),
