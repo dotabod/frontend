@@ -36,14 +36,10 @@ export const InGameOverlays = ({
         roshan={roshan}
         paused={paused}
         onComplete={() => {
-          if (roshan?.minDate) {
-            setRoshan({ ...roshan, minDate: '', minS: 0 })
+          if (roshan?.minS) {
+            setRoshan({ ...roshan, minS: 0 })
           } else {
-            setRoshan({
-              ...roshan,
-              maxDate: '',
-              maxS: 0,
-            })
+            setRoshan({ ...roshan, maxS: 0 })
           }
         }}
       />
@@ -57,8 +53,6 @@ export const InGameOverlays = ({
         onComplete={() => {
           setAegis({
             expireS: 0,
-            expireTime: '',
-            expireDate: '',
             playerId: null,
           })
         }}

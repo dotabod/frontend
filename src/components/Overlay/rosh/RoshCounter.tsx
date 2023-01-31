@@ -1,31 +1,13 @@
-import Countdown from 'react-countdown'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { RoshTimer } from './RoshTimer'
 import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
-import { useEffect, useRef } from 'react'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 
-export const RoshCounter = ({
-  color,
-  count,
-  date,
-  duration,
-  onComplete,
-  paused,
-}) => {
-  const countdownRef = useRef<Countdown>()
+export const RoshCounter = ({ color, count, duration, onComplete, paused }) => {
   const res = useTransformRes()
   const { roshPosition: style } = useOverlayPositions()
-
-  useEffect(() => {
-    if (paused) {
-      countdownRef.current?.api?.pause()
-    } else {
-      countdownRef.current?.api?.start()
-    }
-  }, [paused])
 
   return (
     <>
@@ -54,6 +36,7 @@ export const RoshCounter = ({
           duration={duration}
           colors={color === 'red' ? '#ff0000' : '#a39800'}
           trailColor="#0000000"
+          onComplete={onComplete}
           size={res({
             w: 55,
           })}
@@ -61,18 +44,22 @@ export const RoshCounter = ({
             w: 3,
           })}
         >
-          {() => (
-            <Countdown
-              ref={countdownRef}
-              date={date}
-              renderer={RoshTimer({
-                res: res,
-                color: color,
-                count: count,
-              })}
-              onComplete={onComplete}
-            />
-          )}
+          {(props) => {
+            const totalSeconds = props.remainingTime
+            // convert totalSeconds into minutes and seconds
+            const minutes = Math.floor(totalSeconds / 60)
+            const seconds = totalSeconds - minutes * 60
+
+            return (
+              <RoshTimer
+                minutes={minutes}
+                seconds={seconds}
+                res={res}
+                color={props.color}
+                roshanCount={count}
+              />
+            )
+          }}
         </CountdownCircleTimer>
       </motion.div>
     </>
