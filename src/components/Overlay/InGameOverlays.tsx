@@ -31,25 +31,16 @@ export const InGameOverlays = ({
       <SpectatorText key="spectator-class" block={block} />
 
       <AnimateRosh
-        key="animate-rosh-class-red"
+        key="animate-rosh-class"
         block={block}
         roshan={roshan}
         paused={paused}
-        color={roshan?.minS ? 'red' : null}
-        duration={roshan?.minS ? roshan?.minS : null}
         onComplete={() => {
-          setRoshan((prev) => ({ ...prev, minS: 0 }))
-        }}
-      />
-      <AnimateRosh
-        key="animate-rosh-class-yellow"
-        block={block}
-        roshan={roshan}
-        paused={paused}
-        color={!roshan?.minS ? 'yellow' : null}
-        duration={!roshan?.minS ? roshan?.maxS : null}
-        onComplete={() => {
-          setRoshan((prev) => ({ ...prev, minS: 0, maxS: 0 }))
+          if (roshan?.minS) {
+            setRoshan({ ...roshan, minS: 0 })
+          } else {
+            setRoshan({ ...roshan, minS: 0, maxS: 0 })
+          }
         }}
       />
 
