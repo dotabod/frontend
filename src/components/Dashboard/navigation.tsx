@@ -1,4 +1,4 @@
-import { Github, LogOut } from 'lucide-react'
+import { Github, LogOut, StickyNoteIcon } from 'lucide-react'
 import {
   BeakerIcon,
   BoltIcon,
@@ -61,6 +61,11 @@ export const navigation = [
         className={clsx(props.className, '!text-red-500')}
       />
     ),
+  },
+  {
+    name: 'Changelog',
+    href: 'https://discord.com/channels/1039887907705593876/1069124160179163146',
+    icon: StickyNoteIcon,
   },
   {
     name: '',
