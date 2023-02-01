@@ -109,6 +109,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                     <Link
                       key={item.name}
                       href={item.href}
+                      target={item.href.startsWith('http') ? '_blank' : '_self'}
                       className={clsx(
                         window.location.href.endsWith(item.href)
                           ? ' bg-dark-700 text-dark-100'
