@@ -574,7 +574,7 @@ const CommandDetail = {
     title: 'Get items',
     description:
       'Want to know what a hero, enemy or ally, has in their inventory?',
-    cmd: '!delay',
+    cmd: '!items',
     alias: ['item'],
     allowed: 'all',
     response: (props) => (
