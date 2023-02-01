@@ -250,7 +250,8 @@ const CommandDetail = {
   [Settings.commandWL]: {
     key: Settings.commandWL,
     title: 'Win / Loss',
-    description: '',
+    description:
+      'Says the total wins and losses for current stream duration. Disabling this command will hide these statistics in the stream overlay.',
     cmd: '!wl',
     alias: ['score', 'winrate', 'wr'],
     allowed: 'all',
@@ -438,7 +439,8 @@ const CommandDetail = {
   },
   ping: {
     title: 'Ping',
-    description: '',
+    description:
+      'If Dotabod responds with Pong, that means the servers are operating normally.',
     cmd: '!ping',
     alias: [],
     allowed: 'all',
