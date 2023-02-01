@@ -10,6 +10,8 @@ interface AnimateRoshProps {
     count: number
     maxS: number
   }
+  color: string
+  duration: number
   paused: boolean
   onComplete: () => void
 }
@@ -18,12 +20,14 @@ export const AnimateRosh = ({
   onComplete,
   paused,
   block,
+  color,
+  duration,
   roshan: { count, maxS, minS },
 }: AnimateRoshProps) => {
   const props = {
-    color: minS ? 'red' : 'yellow',
+    color,
     count,
-    duration: minS || maxS,
+    duration,
     onComplete,
     paused,
   }
@@ -34,11 +38,5 @@ export const AnimateRosh = ({
     return null
   }
 
-  return (
-    <div>
-      {/*We have to create two counters, because the other one doesn't start unless the first one is unmounted */}
-      {minS ? <RoshCounter {...props} /> : null}
-      {!minS && maxS ? <RoshCounter {...props} /> : null}
-    </div>
-  )
+  return duration ? <RoshCounter {...props} /> : null
 }
