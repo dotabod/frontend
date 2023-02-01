@@ -552,6 +552,37 @@ const CommandDetail = {
       />
     ),
   },
+  [Settings.commandRosh]: {
+    key: Settings.commandRosh,
+    title: 'Roshan and aegis',
+    description: 'Tells chat the current roshan and aegis status.',
+    cmd: '!rosh',
+    alias: ['rosh', 'aegis'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!rosh"
+        response="Roshan killed! Next roshan between 35:07 and 38:07 · Rosh deaths: 1 · Next drop: agh's shard. · Marci picked up the aegis!"
+      />
+    ),
+  },
+  [Settings.commandItems]: {
+    key: Settings.commandItems,
+    title: 'Get items',
+    description:
+      'Want to know what a hero, enemy or ally, has in their inventory?',
+    cmd: '!delay',
+    alias: ['item'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!items marci"
+        response="(2m delay) Marci has: Power Treads · Blink Dagger · Black King Bar · Skull Basher · Aegis of the Immortal · Battle Fury · Iron Branch · Magic Stick"
+      />
+    ),
+  },
 }
 
 export default CommandDetail
