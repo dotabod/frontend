@@ -28,7 +28,6 @@ export const AnimateRosh = ({
     paused,
   }
 
-  const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isEnabled } = useUpdateSetting(Settings.rosh)
 
   if (!isEnabled || (block.type !== 'playing' && !isDev)) {

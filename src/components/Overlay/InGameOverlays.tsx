@@ -39,7 +39,7 @@ export const InGameOverlays = ({
           if (roshan?.minS) {
             setRoshan({ ...roshan, minS: 0 })
           } else {
-            setRoshan({ ...roshan, maxS: 0 })
+            setRoshan({ ...roshan, minS: 0, maxS: 0 })
           }
         }}
       />
