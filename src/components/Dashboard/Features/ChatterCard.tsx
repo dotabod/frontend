@@ -7,9 +7,16 @@ import Image from 'next/image'
 import { useEffect } from 'react'
 import { defaultSettings, Settings } from '@/lib/defaultSettings'
 
+enum CATEGORIES {
+  General = 'General',
+  Hero = 'Heroes',
+  Item = 'Item Usage',
+  Event = 'Events',
+}
 export const chatterInfo = {
   midas: {
-    description: 'If your midas is ready and unused for 10s',
+    tooltip: 'If your midas is ready and unused for 10s',
+    category: CATEGORIES.Item,
     message: (
       <>
         <div className="flex items-center space-x-2">
@@ -36,7 +43,8 @@ export const chatterInfo = {
     ),
   },
   pause: {
-    description: 'As soon as anyone presses F9',
+    tooltip: 'As soon as anyone presses F9',
+    category: CATEGORIES.Item,
     message: (
       <span className="flex items-center space-x-2">
         <Image
@@ -51,7 +59,8 @@ export const chatterInfo = {
     ),
   },
   smoke: {
-    description: 'Whenever your hero has smoke debuff',
+    tooltip: 'Whenever your hero has smoke debuff',
+    category: CATEGORIES.Hero,
     message: (
       <span className="flex items-center space-x-2">
         <Image
@@ -66,7 +75,8 @@ export const chatterInfo = {
     ),
   },
   passiveDeath: {
-    description: 'Whenever you die with passive stick / faerie / etc',
+    tooltip: 'Whenever you die with passive stick / faerie / etc',
+    category: CATEGORIES.Item,
     message: (
       <span className="flex items-center space-x-2">
         <span>Clockwerk died with passive faerie fire</span>
@@ -81,11 +91,13 @@ export const chatterInfo = {
     ),
   },
   roshPickup: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Event,
     message: 'Clockwerk picked up the aegis!',
   },
   roshDeny: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Event,
     message: (
       <span className="flex items-center space-x-2">
         <span>Clockwerk denied the aegis</span>
@@ -100,11 +112,13 @@ export const chatterInfo = {
     ),
   },
   roshanKilled: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Event,
     message: 'Roshan killed! Next roshan between 15:32 and 26:32',
   },
   tip: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Event,
     message: (
       <>
         <div className="flex items-center space-x-2">
@@ -131,7 +145,8 @@ export const chatterInfo = {
     ),
   },
   bounties: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Event,
     message: (
       <div className="flex items-center space-x-2">
         <span>+80 gold from bounty</span>
@@ -161,11 +176,13 @@ export const chatterInfo = {
     ),
   },
   powerTreads: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Item,
     message: 'We toggled treads 6 time to save a total 284 mana this match.',
   },
   killstreak: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Hero,
     message: (
       <>
         <div className="flex items-center space-x-2">
@@ -192,7 +209,8 @@ export const chatterInfo = {
     ),
   },
   firstBloodDeath: {
-    description: '',
+    tooltip: '',
+    category: CATEGORIES.Hero,
     message: (
       <div className="flex items-center space-x-2">
         <span>Clockwerk gave up first blood</span>
@@ -207,7 +225,8 @@ export const chatterInfo = {
     ),
   },
   noTp: {
-    description: 'If you dont have a tp within 30 seconds, you get a message',
+    tooltip: 'If you dont have a tp within 30 seconds, you get a message',
+    category: CATEGORIES.Item,
     message: (
       <>
         <div className="flex items-center space-x-2">
@@ -235,6 +254,20 @@ export const chatterInfo = {
   },
 }
 
+const groupedChatterInfo = Object.entries(chatterInfo).reduce(
+  (acc, [key, value]) => {
+    const { category } = value
+    if (!acc[category]) {
+      acc[category] = []
+    }
+    acc[category].push({ ...value, id: key })
+    return acc
+  },
+  {}
+)
+
+console.log(groupedChatterInfo)
+
 export default function ChatterCard() {
   const {
     data: isEnabled,
@@ -259,7 +292,7 @@ export default function ChatterCard() {
 
   const handleSubmit = (v: typeof defaultSettings.chatters) => {
     Object.keys(v).forEach((i) => {
-      delete v[i].description
+      delete v[i].tooltip
       delete v[i].message
     })
     updateChatters(v)
@@ -296,52 +329,58 @@ export default function ChatterCard() {
 
       <form className="mt-6 space-y-2">
         <div className="space-y-6">
-          {(Object.keys(chatters || {}) || []).map((key) => {
-            if (!chatterInfo[key]) return null
-            return (
-              <div
-                key={key}
-                className={clsx(!isEnabled && 'opacity-40 transition-all')}
-              >
-                <Tooltip
-                  label={chatterInfo[key]?.description}
-                  disabled={!chatterInfo[key]?.description}
-                >
-                  <div className="flex items-center space-x-3 !text-dark-50">
-                    <Switch
-                      styles={{
-                        labelWrapper: {
-                          color: 'var(--mantine-color-dark-3)',
-                        },
-                      }}
-                      label={chatterInfo[key].message}
-                      size="sm"
-                      color="blue"
-                      disabled={!isEnabled || loadingChatters}
-                      {...form.getInputProps(`${key}.enabled`, {
-                        type: 'checkbox',
-                      })}
-                      onChange={(e) => {
-                        const originalChange = form.getInputProps(
-                          `${key}.enabled`,
-                          {
+          {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
+            return (groupedChatterInfo[categoryName] || []).map(
+              (value, index) => {
+                if (!value) return null
+                return (
+                  <div
+                    key={value.id}
+                    className={clsx(!isEnabled && 'opacity-40 transition-all')}
+                  >
+                    {!index && value?.category ? (
+                      <div className="mb-2 text-sm text-dark-200">
+                        {value.category}
+                      </div>
+                    ) : null}
+                    <Tooltip label={value?.tooltip} disabled={!value?.tooltip}>
+                      <div className="ml-4 flex items-center space-x-3">
+                        <Switch
+                          styles={{
+                            labelWrapper: {
+                              color: 'var(--mantine-color-dark-3)',
+                            },
+                          }}
+                          label={value.message}
+                          size="sm"
+                          color="blue"
+                          disabled={!isEnabled || loadingChatters}
+                          {...form.getInputProps(`${value.id}.enabled`, {
                             type: 'checkbox',
-                          }
-                        ).onChange
+                          })}
+                          onChange={(e) => {
+                            const originalChange = form.getInputProps(
+                              `${value.id}.enabled`,
+                              {
+                                type: 'checkbox',
+                              }
+                            ).onChange
 
-                        if (originalChange) originalChange(e)
+                            if (originalChange) originalChange(e)
 
-                        handleSubmit({
-                          ...form.values,
-                          [key]: {
-                            enabled: !!e?.currentTarget?.checked,
-                          },
-                        })
-                      }}
-                    />
+                            handleSubmit({
+                              ...form.values,
+                              [value.id]: {
+                                enabled: !!e?.currentTarget?.checked,
+                              },
+                            })
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
                   </div>
-                </Tooltip>
-              </div>
+                )
+              }
             )
           })}
         </div>
