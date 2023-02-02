@@ -93,7 +93,21 @@ export const chatterInfo = {
   roshPickup: {
     tooltip: '',
     category: CATEGORIES.Event,
-    message: 'Clockwerk picked up the aegis!',
+    message: (
+      <>
+        <span>Clockwerk picked up the aegis!</span>
+        <div className="flex items-center space-x-2">
+          <span>Clockwerk snatched the aegis</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+          />
+        </div>
+      </>
+    ),
   },
   roshDeny: {
     tooltip: '',
@@ -114,7 +128,8 @@ export const chatterInfo = {
   roshanKilled: {
     tooltip: '',
     category: CATEGORIES.Event,
-    message: 'Roshan killed! Next roshan between 15:32 and 26:32',
+    message:
+      "Roshan killed! Next roshan between 30:27 and 33:27 · Rosh deaths: 1 · Next drop: agh's shard. · Invoker picked up the aegis!",
   },
   tip: {
     tooltip: '',
@@ -149,7 +164,7 @@ export const chatterInfo = {
     category: CATEGORIES.Event,
     message: (
       <div className="flex items-center space-x-2">
-        <span>+80 gold from bounty</span>
+        <span>+80 gold from bounty (2/4)</span>
         <Image
           width={22}
           height={22}
@@ -213,7 +228,7 @@ export const chatterInfo = {
     category: CATEGORIES.Hero,
     message: (
       <div className="flex items-center space-x-2">
-        <span>Clockwerk gave up first blood</span>
+        <span>Clockwerk giving up first blood</span>
         <Image
           width={22}
           height={22}

@@ -186,10 +186,10 @@ export function SecondaryFeatures() {
           <TwitchChat
             responses={[
               <React.Fragment key={1}>
-                <span>Roshan killed! Next roshan between 15:32 and 26:32</span>
+                <span>{chatterInfo.roshanKilled.message}</span>
               </React.Fragment>,
               <React.Fragment key={2}>
-                <span>Clockwerk picked up the aegis!</span>
+                <span>{chatterInfo.roshPickup.message}</span>
               </React.Fragment>,
             ]}
           />

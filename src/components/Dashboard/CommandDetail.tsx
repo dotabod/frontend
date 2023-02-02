@@ -1,6 +1,7 @@
 import TwitchChat from '@/components/TwitchChat'
 import Image from 'next/image'
 import { Settings } from '@/lib/defaultSettings'
+import { chatterInfo } from '@/components/Dashboard/Features/ChatterCard'
 
 const CommandDetail = {
   [Settings.commandDisable]: {
@@ -565,7 +566,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!rosh"
-        response="Roshan killed! Next roshan between 35:07 and 38:07 · Rosh deaths: 1 · Next drop: agh's shard. · Marci picked up the aegis!"
+        response={chatterInfo.roshanKilled.message}
       />
     ),
   },
