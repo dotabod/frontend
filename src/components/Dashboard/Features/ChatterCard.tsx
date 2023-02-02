@@ -12,7 +12,7 @@ export const chatterInfo = {
     description: 'If your midas is ready and unused for 10s',
     message: (
       <>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <Image
             width={22}
             height={22}
@@ -22,7 +22,7 @@ export const chatterInfo = {
           />
           <span>Use your midas</span>
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <span>Midas was finally used, 64 seconds late</span>
           <Image
             width={22}
@@ -38,7 +38,7 @@ export const chatterInfo = {
   pause: {
     description: 'As soon as anyone presses F9',
     message: (
-      <span className="space-x-2">
+      <span className="flex items-center space-x-2">
         <Image
           width={22}
           height={22}
@@ -53,7 +53,7 @@ export const chatterInfo = {
   smoke: {
     description: 'Whenever your hero has smoke debuff',
     message: (
-      <span className="space-x-2">
+      <span className="flex items-center space-x-2">
         <Image
           width={22}
           height={22}
@@ -68,7 +68,7 @@ export const chatterInfo = {
   passiveDeath: {
     description: 'Whenever you die with passive stick / faerie / etc',
     message: (
-      <span className="space-x-2">
+      <span className="flex items-center space-x-2">
         <span>Clockwerk died with passive faerie fire</span>
         <Image
           width={22}
@@ -87,7 +87,7 @@ export const chatterInfo = {
   roshDeny: {
     description: '',
     message: (
-      <span className="space-x-2">
+      <span className="flex items-center space-x-2">
         <span>Clockwerk denied the aegis</span>
         <Image
           width={22}
@@ -107,7 +107,7 @@ export const chatterInfo = {
     description: '',
     message: (
       <>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <span>The tip from Spectre</span>
           <Image
             width={22}
@@ -117,7 +117,7 @@ export const chatterInfo = {
             src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
           />
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <span>We tipping Crystal Maiden</span>
           <Image
             width={22}
@@ -133,7 +133,7 @@ export const chatterInfo = {
   bounties: {
     description: '',
     message: (
-      <div className="space-x-2">
+      <div className="flex items-center space-x-2">
         <span>+80 gold from bounty</span>
         <Image
           width={22}
@@ -168,7 +168,7 @@ export const chatterInfo = {
     description: '',
     message: (
       <>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <span>Clockwerk has a 4 kill streak</span>
           <Image
             width={22}
@@ -178,7 +178,7 @@ export const chatterInfo = {
             src="https://cdn.betterttv.net/emote/62aafeef6ef7a5f0b7df3d98/1x"
           />
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <span>Clockwerk lost the 4 kill streak</span>
           <Image
             width={22}
@@ -194,7 +194,7 @@ export const chatterInfo = {
   firstBloodDeath: {
     description: '',
     message: (
-      <>
+      <div className="flex items-center space-x-2">
         <span>Clockwerk gave up first blood</span>
         <Image
           width={22}
@@ -203,6 +203,33 @@ export const chatterInfo = {
           className="inline align-middle"
           src="https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x"
         />
+      </div>
+    ),
+  },
+  noTp: {
+    description: 'If you dont have a tp within 30 seconds, you get a message',
+    message: (
+      <>
+        <div className="flex items-center space-x-2">
+          <span>@techleed where&apos;s your tp</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp"
+          />
+        </div>
+        <div className="flex items-center space-x-2">
+          <span>@techleed nice job getting a tp finally after 322 seconds</span>
+          <Image
+            width={22}
+            height={22}
+            alt="ICANT"
+            className="inline align-middle"
+            src="https://cdn.betterttv.net/emote/60ec91f58ed8b373e4221742/1x.webp"
+          />
+        </div>
       </>
     ),
   },
