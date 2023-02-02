@@ -1,9 +1,9 @@
 import { PollData } from '@/components/Overlay/PollOverlay'
 
 export type blockType = {
-  matchId: number
-  team: string
-  type: 'picks' | 'playing' | 'strategy' | 'strategy-2' | 'spectator'
+  matchId: number | null
+  team: 'radiant' | 'dire' | null
+  type: 'picks' | 'playing' | 'strategy' | 'strategy-2' | 'spectator' | null
 }
 export const devBlockTypes: blockType = {
   matchId: 123456789,

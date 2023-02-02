@@ -15,6 +15,7 @@ import {
 } from '@twurple/eventsub-base'
 import { isDev } from '@/lib/hooks/rosh'
 import { fetcher } from '@/lib/fetcher'
+import { blockType } from '@/lib/devConsts'
 
 export let socket: Socket | null = null
 
@@ -85,7 +86,15 @@ export const useSocket = ({
       }
     )
 
-    socket.on('block', setBlock)
+    socket.on('block', (data: blockType) => {
+      if (data.type === 'playing') {
+        setTimeout(() => {
+          setBlock(data)
+        }, 5000)
+      } else {
+        setBlock(data)
+      }
+    })
     socket.on('paused', setPaused)
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
