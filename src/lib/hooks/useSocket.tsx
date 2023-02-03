@@ -87,7 +87,7 @@ export const useSocket = ({
     )
 
     socket.on('block', (data: blockType) => {
-      if (data.type === 'playing') {
+      if (data?.type === 'playing') {
         setTimeout(() => {
           setBlock(data)
         }, 5000)
