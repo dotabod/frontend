@@ -9,6 +9,7 @@ import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 import { clsx } from '@mantine/styles'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
+import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
 
 export const InGameOverlays = ({
   wl,
@@ -49,7 +50,6 @@ export const InGameOverlays = ({
         block={block}
         paused={paused}
         aegis={aegis}
-        top={res({ h: 65 })}
         onComplete={() => {
           setAegis({
             expireS: 0,
@@ -57,6 +57,8 @@ export const InGameOverlays = ({
           })
         }}
       />
+
+      <NotablePlayers key="animate-np-class" block={block} />
 
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 

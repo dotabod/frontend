@@ -5,9 +5,21 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 export const usePlayerPositions = () => {
   const res = useTransformRes()
 
+  const spaceFromLeft = 472
+  const initialSize = 62
+  const gapSize = 520
+
+  // there are 5 on left, 5 on right
+  const firstFive = Array.from({ length: 5 }, (_, i) => i).map((i) => {
+    return initialSize * (i + 1) + spaceFromLeft
+  })
+  // repeat(5, 111px) 356px repeat(5, 111px)
   const playerPositions = [
-    555, 615, 680, 745, 800, 1065, 1130, 1192, 1250, 1320,
-  ].map((w) => res({ w: w - 20 }))
+    ...firstFive, // left
+    ...firstFive.map((w, i) => w + gapSize), // right
+  ].map((w) => res({ w }))
+
+  console.log(playerPositions)
 
   return { playerPositions }
 }

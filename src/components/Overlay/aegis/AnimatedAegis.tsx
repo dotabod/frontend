@@ -12,7 +12,6 @@ export const AnimatedAegis = ({
   paused,
   onComplete,
   block,
-  top,
 }: {
   paused: boolean
   aegis: {
@@ -20,7 +19,6 @@ export const AnimatedAegis = ({
     playerId: number
   }
   block: any
-  top: number
   onComplete: () => void
 }) => {
   const res = useTransformRes()
@@ -37,7 +35,7 @@ export const AnimatedAegis = ({
       {...motionProps}
       style={{
         left: playerPositions[playerId],
-        top: top,
+        top: res({ h: 65 }),
       }}
       className={`absolute text-white/90`}
     >
