@@ -92,6 +92,7 @@ export const defaultSettings = {
   commandMmr: true,
   commandRosh: true,
   commandItems: true,
+  notablePlayersOverlay: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
