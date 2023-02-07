@@ -23,6 +23,7 @@ export const PlayerTopbar = ({
         top: res({ h: 65 }),
         width: res({ w: 62 }),
         left: position + res({ w: 15 }),
+        maxHeight: res({ h: 50.5 }),
       }}
       className={`absolute space-x-1 truncate whitespace-pre-wrap break-all text-center text-sm leading-none text-white/90`}
     >

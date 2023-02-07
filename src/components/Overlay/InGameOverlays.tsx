@@ -20,6 +20,7 @@ export const InGameOverlays = ({
   setRoshan,
   setAegis,
   aegis,
+  notablePlayers,
 }) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
@@ -58,7 +59,11 @@ export const InGameOverlays = ({
         }}
       />
 
-      <NotablePlayers key="animate-np-class" block={block} />
+      <NotablePlayers
+        players={notablePlayers}
+        key="animate-np-class"
+        block={block}
+      />
 
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 

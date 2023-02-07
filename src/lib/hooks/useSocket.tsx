@@ -30,6 +30,7 @@ export const useSocket = ({
   setBlock,
   setPaused,
   setAegis,
+  setNotablePlayers,
   setRoshan,
   setConnected,
   setRankImageDetails,
@@ -51,6 +52,7 @@ export const useSocket = ({
       socket?.off('connect')
       socket?.off('disconnect')
       socket?.off('refresh-settings')
+      socket?.off('notable-players')
       socket?.off('channelPollOrBet')
       socket?.off('update-medal')
       socket?.off('update-wl')
@@ -96,6 +98,7 @@ export const useSocket = ({
       }
     })
     socket.on('paused', setPaused)
+    socket.on('notable-players', setNotablePlayers)
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
     socket.on('connect', () => setConnected(true))
