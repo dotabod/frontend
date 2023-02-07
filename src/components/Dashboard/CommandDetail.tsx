@@ -560,7 +560,7 @@ const CommandDetail = {
     title: 'Roshan and aegis',
     description: 'Tells chat the current roshan and aegis status.',
     cmd: '!rosh',
-    alias: ['rosh', 'aegis'],
+    alias: ['aegis'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
