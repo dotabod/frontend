@@ -7,7 +7,7 @@ export const usePlayerPositions = () => {
 
   const spaceFromLeft = 472
   const initialSize = 62
-  const gapSize = 520
+  const gapSize = 513
 
   // there are 5 on left, 5 on right
   const firstFive = Array.from({ length: 5 }, (_, i) => i).map((i) => {
@@ -18,8 +18,6 @@ export const usePlayerPositions = () => {
     ...firstFive, // left
     ...firstFive.map((w, i) => w + gapSize), // right
   ].map((w) => res({ w }))
-
-  console.log(playerPositions)
 
   return { playerPositions }
 }
