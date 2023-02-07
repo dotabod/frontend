@@ -220,7 +220,7 @@ export default function MmrTrackerCard() {
                     </Link>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-2">
                     <MMRBadge
                       leaderboard={null}
                       image={rank?.image}

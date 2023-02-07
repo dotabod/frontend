@@ -128,7 +128,7 @@ function BlockScreen({ custom, animated = false }) {
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
-        className="z-50 bg-transparent"
+        className="bg-transparent"
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
         <Display>
@@ -160,7 +160,7 @@ function BetsScreen({ custom, animated = false }) {
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
-        className="z-50 bg-transparent"
+        className="bg-transparent"
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
         <Display>
@@ -189,7 +189,7 @@ function OBSScreen({ custom, animated = false }) {
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
-        className="z-50 bg-transparent"
+        className="bg-transparent"
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
         <Display>
