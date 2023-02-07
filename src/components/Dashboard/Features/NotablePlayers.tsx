@@ -40,11 +40,11 @@ export default function NotablePlayersCard() {
             'rounded-xl border-2 border-transparent transition-all'
           )}
           alt="minimap blocker"
-          width={584}
-          height={75}
+          width={413}
+          height={50}
           src={`/images/dashboard/notable-players.png`}
         />
-        <span>Simple minimap</span>
+        <span>Players with their country flags</span>
       </div>
     </Card>
   )

@@ -20,12 +20,12 @@ const devPlayers = [
     name: '!Attacker',
   },
   {
-    country_code: 'ru',
+    country_code: 'ua',
     account_id: 39,
     position: 4,
     heroId: 5,
     heroName: 'Lich',
-    name: 'arteezys smurf ',
+    name: 'Yatoro',
   },
   {
     country_code: 'rs',
@@ -36,12 +36,12 @@ const devPlayers = [
     name: 'BoraNija ',
   },
   {
-    country_code: 'ru',
+    country_code: 'us',
     account_id: 39,
     position: 9,
     heroId: 5,
     heroName: 'Lich',
-    name: 'airu ',
+    name: 'Gunnar ',
   },
 ]
 
