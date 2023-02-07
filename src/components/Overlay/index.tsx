@@ -21,6 +21,7 @@ import { PollData } from '@/components/Overlay/PollOverlay'
 import { Center, Container, Loader } from '@mantine/core'
 import clsx from 'clsx'
 import { motionProps } from '@/ui/utils'
+import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 
 const OverlayPage = (props) => {
   const { height, width } = useWindowSize()
@@ -40,6 +41,7 @@ const OverlayPage = (props) => {
   const [paused, setPaused] = useState(false)
   const { roshan, setRoshan } = useRoshan()
   const { aegis, setAegis } = useAegis()
+  const { notablePlayers, setNotablePlayers } = useNotablePlayers()
   const [wl, setWL] = useState([
     {
       win: 0,
@@ -78,6 +80,7 @@ const OverlayPage = (props) => {
     setRoshan,
     setPollData,
     setBetData,
+    setNotablePlayers,
     setWL,
   })
 
@@ -154,6 +157,7 @@ const OverlayPage = (props) => {
           setRoshan={setRoshan}
           setAegis={setAegis}
           aegis={aegis}
+          notablePlayers={notablePlayers}
         />
 
         {isDev && (

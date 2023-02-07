@@ -11,7 +11,7 @@ export const devBlockTypes: blockType = {
   type: 'playing',
 }
 export const devPoll: PollData = {
-  endDate: new Date().getTime() + 3000,
+  endDate: new Date().getTime() + 30000,
   title: 'What is your favorite color?',
   choices: [
     {

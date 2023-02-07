@@ -21,7 +21,7 @@ export const PollOverlays = ({
       className="absolute"
       style={{
         right: res({ w: 1920 / 2 - 200 }),
-        top: res({ h: 90 }),
+        top: res({ h: 115 }),
         width: res({ w: 400 }),
       }}
     >

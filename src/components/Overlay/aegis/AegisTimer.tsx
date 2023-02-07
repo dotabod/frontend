@@ -4,17 +4,16 @@ import { zeroPad } from 'react-countdown'
 export const AegisTimer = ({ minutes, seconds, res }) => (
   <div className="flex flex-col items-center">
     <Image
-      className="animate-pulse"
+      className="animate-pulse rounded-full"
       src="/images/rosh/aegis-icon-glow.png"
-      width={res({ w: 67 })}
-      height={res({ h: 1 })}
+      width={res({ w: 40 })}
+      height={res({ h: 38 })}
       alt="aegis icon"
     />
     <span
-      className=" z-10 text-white/90"
+      className="font-outline-2 z-10 text-white/90"
       style={{
-        marginLeft: res({ w: 11 }),
-        marginTop: res({ h: -19 }),
+        marginTop: res({ h: -13 }),
         fontSize: res({ h: 14 }),
       }}
     >
