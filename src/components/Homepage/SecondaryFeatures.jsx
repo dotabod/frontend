@@ -32,9 +32,9 @@ export function SecondaryFeatures() {
             <HoverCard.Dropdown>
               <Image
                 alt="wl overlay"
-                width={353}
-                height={333}
-                src="/images/dashboard/wl-overlay.png"
+                width={534}
+                height={82}
+                src="/images/dashboard/mmr-tracker.png"
               />
             </HoverCard.Dropdown>
           </HoverCard>
