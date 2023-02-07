@@ -267,6 +267,36 @@ export const chatterInfo = {
       </>
     ),
   },
+  matchOutcome: {
+    tooltip: 'At the end of every match',
+    category: CATEGORIES.Event,
+    message: (
+      <>
+        <div className="flex items-center space-x-2">
+          <span>We have lost, gg nt</span>
+          <Image
+            width={22}
+            height={22}
+            alt="happi"
+            className="inline align-middle"
+            src="https://cdn.7tv.app/emote/63c4520819eab0d59a02e872/1x.webp"
+          />
+          <span>go next</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span>We have won</span>
+          <Image
+            width={22}
+            height={22}
+            alt="happi"
+            className="inline align-middle"
+            src="https://cdn.7tv.app/emote/63c4520819eab0d59a02e872/1x.webp"
+          />
+          <span>go next</span>
+        </div>
+      </>
+    ),
+  },
 }
 
 const groupedChatterInfo = Object.entries(chatterInfo).reduce(
