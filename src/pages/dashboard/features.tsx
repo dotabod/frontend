@@ -13,6 +13,7 @@ import Head from 'next/head'
 import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import NotablePlayersCard from '@/components/Dashboard/Features/NotablePlayers'
+import ComingSoonCard from '@/components/Dashboard/Features/ComingSoonCard'
 
 export default function FeaturesPage() {
   const { status } = useSession()
@@ -31,6 +32,7 @@ export default function FeaturesPage() {
             <LanguageCard />
             <StreamDelayCard />
             <NotablePlayersCard />
+            <ComingSoonCard />
           </div>
         </Accordion>
         <Accordion multiple variant="separated" styles={accordionStyles}>
