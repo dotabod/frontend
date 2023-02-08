@@ -105,8 +105,11 @@ export default function DashboardShell({ children, title, subtitle }) {
                     return <DonationMenu key={i} />
                   }
 
+                  const props = item.onClick ? { onClick: item.onClick } : {}
+
                   return (
                     <Link
+                      {...props}
                       key={item.name}
                       href={item.href}
                       target={item.href.startsWith('http') ? '_blank' : '_self'}

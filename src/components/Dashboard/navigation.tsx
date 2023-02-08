@@ -75,9 +75,9 @@ export const navigation = [
   {
     name: 'Sign out',
     href: '#',
-    onClick: async (e) => {
+    onClick: (e) => {
       e.preventDefault()
-      await signOut({
+      signOut({
         callbackUrl: `${window.location.origin}/`,
       })
     },
