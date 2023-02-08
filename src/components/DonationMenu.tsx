@@ -7,7 +7,7 @@ import BoostyLogo from '@/images/logos/BoostyIcon.png'
 import { HeartIcon } from '@heroicons/react/24/outline'
 
 export const DonationMenu = ({ trigger = null }) => (
-  <Menu trigger="hover" openDelay={100} closeDelay={400}>
+  <Menu trigger="hover" openDelay={100} closeDelay={100}>
     <Menu.Target>
       {trigger ? (
         trigger
