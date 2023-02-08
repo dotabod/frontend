@@ -82,7 +82,7 @@ export default function DashboardShell({ children, title, subtitle }) {
             p="md"
             hiddenBreakpoint="sm"
             hidden={!opened}
-            width={{ sm: 300, md: 400, lg: 500 }}
+            width={{ sm: 250, md: 300, lg: 400 }}
           >
             <div className="flex flex-col items-end">
               <div className="w-full md:max-w-xs">
@@ -159,7 +159,7 @@ export default function DashboardShell({ children, title, subtitle }) {
                       </Switch>
                     )}
                   </div>
-                  <p className="w-48 text-xs text-dark-400">
+                  <p className="max-w-48 text-xs text-dark-400">
                     {CommandDetail.commandDisable.description}
                   </p>
                 </div>
