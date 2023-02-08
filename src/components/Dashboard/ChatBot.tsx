@@ -14,24 +14,41 @@ import { ExternalLinkIcon } from 'lucide-react'
 
 const emotesRequired = [
   {
-    label: 'Happi',
-    url: 'https://betterttv.com/emotes/634042bce6cf26500b42ce56',
+    label: 'HECANT',
+    url: 'https://7tv.app/emotes/62978b4c441e9cea5e91f9e7',
   },
-  { label: 'Madge' },
-  { label: 'POGGIES' },
-  { label: 'PepeLaugh' },
-  { label: 'ICANT' },
-  { label: 'BASED' },
-  { label: 'Chatting' },
+  {
+    label: 'SuskaygeAgreeGe',
+    url: 'https://7tv.app/emotes/61ae3975e9684edbbc395461',
+  },
+  {
+    label: 'Happi',
+    url: 'https://7tv.app/emotes/63e2f6ff5d4acdefd447be20',
+  },
+  { label: 'Madge', url: 'https://7tv.app/emotes/60a95f109d598ea72fad13bd' },
+  { label: 'POGGIES', url: 'https://7tv.app/emotes/60af1b5a35c50a77926314ad' },
+  {
+    label: 'PepeLaugh',
+    url: 'https://7tv.app/emotes/60420e3f77137b000de9e675',
+  },
+  { label: 'ICANT', url: 'https://7tv.app/emotes/61e2d59077175547b4254999' },
+  { label: 'BASED', url: 'https://7tv.app/emotes/6043181d1d4963000d9dae39' },
+  { label: 'Chatting', url: 'https://7tv.app/emotes/60ef410f48cde2fcc3eb5caa' },
   {
     label: 'massivePIDAS',
     url: 'https://7tv.app/emotes/6257e7a3131d4588262a7505',
   },
-  { label: 'Sadge' },
-  { label: 'EZ', url: 'https://betterttv.com/emotes/5590b223b344e2c42a9e28e3' },
-  { label: 'Clap' },
-  { label: 'peepoGamble' },
-  { label: 'PauseChamp' },
+  { label: 'Sadge', url: 'https://7tv.app/emotes/61630205c1ff9a17cc396522' },
+  { label: 'EZ', url: 'https://7tv.app/emotes/63071b80942ffb69e13d700f' },
+  { label: 'Clap', url: 'https://7tv.app/emotes/60aed217c9cf495e5be86812' },
+  {
+    label: 'peepoGamble',
+    url: 'https://7tv.app/emotes/60d83a6277324757d60ae099',
+  },
+  {
+    label: 'PauseChamp',
+    url: 'https://7tv.app/emotes/60b012a8e5a579561100b67f',
+  },
 ]
 
 export default function ChatBot() {
@@ -111,7 +128,7 @@ export default function ChatBot() {
 
         <div>
           2. <Badge>Optional</Badge> Add the following emotes to your channel
-          using BTTV (case sensitive):
+          using 7TV (case sensitive):
         </div>
         <List
           size="sm"
