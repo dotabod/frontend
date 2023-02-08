@@ -12,7 +12,7 @@ export default function ComingSoonCard() {
         </h3>
       </div>
       <div className="subtitle mb-2">
-        We&apos;re so excited to unveil this surprise feature. Stay tuned!
+        We&apos;re so excited to release this surprise feature. Stay tuned!
       </div>
       <div className="flex flex-col items-center space-y-4">
         <img
