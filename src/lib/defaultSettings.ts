@@ -52,6 +52,9 @@ export const defaultSettings = {
     matchOutcome: {
       enabled: true,
     },
+    commandsReady: {
+      enabled: true,
+    },
   },
   commandAPM: true,
   commandAvg: true,

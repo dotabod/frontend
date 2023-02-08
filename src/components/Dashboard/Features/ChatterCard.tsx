@@ -297,6 +297,17 @@ export const chatterInfo = {
       </>
     ),
   },
+  commandsReady: {
+    tooltip:
+      'At the beginning of every match, once !np etc are ready. Usually when you first spawn in fountain.',
+    category: CATEGORIES.Event,
+    message: (
+      <span>
+        Match data found !np · !smurfs · !gm · !lg · !avg · !items commands
+        activated.
+      </span>
+    ),
+  },
 }
 
 const groupedChatterInfo = Object.entries(chatterInfo).reduce(
