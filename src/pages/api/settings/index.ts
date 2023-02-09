@@ -24,6 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const data = await prisma.user.findFirst({
         select: {
+          stream_online: true,
           settings: {
             select: {
               key: true,

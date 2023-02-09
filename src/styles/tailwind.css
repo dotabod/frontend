@@ -29,6 +29,43 @@
   }
 }
 
+
+.animate-border-rgb {
+  position: relative;
+}
+
+.animate-border-rgb:before, .animate-border-rgb:after {
+  @apply rounded-md;
+
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  background: linear-gradient(45deg, #fb0094, #ff0084, #0033ff, #b700ff, #ff0000, #fb0094,
+  #ff00f2, #0066ff, #9900ff, #ff0066);
+  background-size: 400%;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: -1;
+  animation: steam 20s linear infinite;
+}
+
+@keyframes steam {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.animate-border-rgb:after {
+  filter: blur(10px);
+}
+
 #__next {
   min-height: 100%;
 }
