@@ -5,6 +5,7 @@ import { localeOptions } from '@/components/Dashboard/locales'
 import { FlagProps } from 'mantine-flagpack/declarations/create-flag'
 import { forwardRef } from 'react'
 import { USFlag } from 'mantine-flagpack'
+import { Button } from 'antd'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   Flag: (props: FlagProps) => JSX.Element
@@ -46,6 +47,7 @@ export default function LanguageCard() {
       <div className="subtitle mb-2">
         The @dotabod Twitch chat bot will speak in this language.
       </div>
+      <Button type="primary">Button</Button>
 
       <div>
         {!loadingLocale && (

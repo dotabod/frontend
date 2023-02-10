@@ -31,7 +31,7 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
     const isLive = data?.stream_online
 
     return (
-      <Link href="/dashboard/features">
+      <Link className="block h-full" href="/dashboard/features">
         <button
           ref={ref}
           {...others}

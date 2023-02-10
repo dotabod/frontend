@@ -4,7 +4,6 @@ import clsx from 'clsx'
 import KofiIcon from '@/images/logos/Kofi'
 import Image from 'next/image'
 import BoostyLogo from '@/images/logos/BoostyIcon.png'
-import { HeartIcon } from '@heroicons/react/24/outline'
 
 export const DonationMenu = ({ trigger = null }) => (
   <Menu trigger="hover" openDelay={100} closeDelay={100}>
@@ -20,13 +19,6 @@ export const DonationMenu = ({ trigger = null }) => (
             'group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-colors'
           )}
         >
-          <HeartIcon
-            className={clsx(
-              `!text-red-500 group-hover:text-white`,
-              'mr-3 h-6 w-6 flex-shrink-0'
-            )}
-            aria-hidden="true"
-          />
           Support the project
         </Link>
       )}

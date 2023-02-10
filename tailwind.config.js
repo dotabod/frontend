@@ -3,6 +3,9 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 // Added tsx
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  corePlugins: {
+    preflight: true, // fix for ant design
+  },
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     fontSize: {
