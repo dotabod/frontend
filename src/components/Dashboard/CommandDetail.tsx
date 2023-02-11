@@ -6,8 +6,7 @@ import { chatterInfo } from '@/components/Dashboard/Features/ChatterCard'
 const CommandDetail = {
   [Settings.commandDisable]: {
     title: 'Disable Dotabod',
-    description:
-      'With this turned on, game events will no longer be recognized and commands will not be responded to.',
+    description: 'Stop game events and commands from being responded to.',
     cmd: '!toggle',
     alias: ['mute', 'unmute'],
     allowed: 'mods',

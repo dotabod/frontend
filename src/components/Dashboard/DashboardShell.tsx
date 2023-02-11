@@ -22,7 +22,7 @@ export default function DashboardShell({ children, title, subtitle }) {
   const [opened, setOpened] = useState(false)
 
   const {
-    data: isEnabled,
+    data: isDotabodDisabled,
     loading,
     updateSetting,
   } = useUpdateSetting(Settings.commandDisable)
@@ -134,23 +134,33 @@ export default function DashboardShell({ children, title, subtitle }) {
                   )
                 })}
 
-                <div className="mx-2 mt-10 space-y-2 rounded border-2 border-red-900/50 p-4 transition-colors hover:border-red-700">
+                <div
+                  className={clsx(
+                    'mx-2 mt-10 space-y-2 rounded border-2 p-4 transition-colors',
+                    isDotabodDisabled
+                      ? 'border-red-900/50 hover:border-red-700'
+                      : 'border-green-900/50 hover:border-green-700'
+                  )}
+                >
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-dark-300">
-                      {CommandDetail.commandDisable.title}
+                      Dotabod is {isDotabodDisabled ? 'disabled' : 'enabled'}
                     </p>
 
                     {loading && (
-                      <Switch disabled size="lg" className="flex" color="red" />
+                      <Switch
+                        disabled
+                        size="lg"
+                        className="flex"
+                        color={isDotabodDisabled ? 'red' : 'green'}
+                      />
                     )}
                     {!loading && (
                       <Switch
                         size="lg"
                         className="flex"
-                        color="red"
-                        onLabel="On"
-                        offLabel="Off"
-                        defaultChecked={isEnabled}
+                        color={isDotabodDisabled ? 'red' : 'green'}
+                        defaultChecked={isDotabodDisabled}
                         onChange={(e) =>
                           updateSetting(!!e?.currentTarget?.checked)
                         }
