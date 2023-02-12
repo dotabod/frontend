@@ -5,7 +5,6 @@ import '@/styles/tailwind.css'
 import 'focus-visible'
 
 import type { Session } from 'next-auth'
-import { MantineProvider } from '@mantine/core'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
 import SentrySession from '@/components/SentrySession'
 import { ConfigProvider, theme, App as AntProvider } from 'antd'
@@ -51,44 +50,10 @@ export default function App({
         }}
       >
         <StyleProvider hashPriority="high">
-          <MantineProvider
-            withCSSVariables
-            theme={{
-              colorScheme: 'dark',
-              colors: {
-                blue: [
-                  '#eff6ff',
-                  '#dbeafe',
-                  '#bfdbfe',
-                  '#93c5fd',
-                  '#60a5fa',
-                  '#3b82f6',
-                  '#2563eb',
-                  '#1d4ed8',
-                  '#1e40af',
-                  '#1e3a8a',
-                ],
-                // override dark colors to change them for all components
-                dark: [
-                  '#F9FAFB',
-                  'rgb(242,244,251)',
-                  'rgb(198,200,215)',
-                  'rgb(145,149,171)',
-                  'rgb(101,106,131)',
-                  'rgb(61,65,85)',
-                  'rgb(49,52,66)',
-                  'rgb(39,41,52)',
-                  'rgb(31,33,41)',
-                  'rgb(23,24,30)',
-                ],
-              },
-            }}
-          >
-            <SentrySession />
-            <VercelAnalytics />
-            <GoogleAnalytics />
-            <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
-          </MantineProvider>
+          <SentrySession />
+          <VercelAnalytics />
+          <GoogleAnalytics />
+          <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
         </StyleProvider>
       </ConfigProvider>
     </SessionProvider>
