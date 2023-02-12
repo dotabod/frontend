@@ -71,7 +71,12 @@ export default function DashboardShell({
 
           <div className="flex flex-col items-end">
             <div className="w-full md:max-w-xs">
-              <div className="m-auto mb-4 flex h-12 w-full justify-center space-x-2 pt-4">
+              <div
+                className={clsx(
+                  collapsed ? 'justify-center' : 'justify-between',
+                  'm-auto mb-4 flex h-12 w-full px-4 pt-4'
+                )}
+              >
                 {!collapsed && (
                   <Link href="/">
                     <DarkLogo className="h-full w-auto text-white" />
