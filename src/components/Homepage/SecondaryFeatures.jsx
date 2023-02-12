@@ -1,7 +1,5 @@
 import { Container } from 'src/components/Container'
 import Image from 'next/image'
-import { Badge, Display, Link } from '@geist-ui/core'
-import { HoverCard } from '@mantine/core'
 import { SparklesIcon } from '@heroicons/react/24/outline'
 import { MMRBadge } from '../Overlay/rank/MMRBadge'
 import WinLossCard from '../Overlay/wl/WinLossCard'
@@ -10,34 +8,35 @@ import React from 'react'
 import CommandDetail from 'src/components/Dashboard/CommandDetail'
 import { chatterInfo } from '../Dashboard/Features/ChatterCard'
 import { Settings } from '@/lib/defaultSettings'
+import { Badge, Typography, Popover } from 'antd'
+
+const { Link } = Typography
 
 export function SecondaryFeatures() {
   const features = [
     {
       name: (
-        <div className="space-between flex w-full items-center">
-          <span className="w-full">Win loss overlay and command</span>
-          <HoverCard closeDelay={200} shadow="md">
-            <HoverCard.Target>
-              <Link
-                className="flex !items-center space-x-1"
-                onClick={(e) => e.preventDefault()}
-                color
-                underline
-              >
-                <SparklesIcon height={22} />
-                <span>Preview</span>
-              </Link>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
+        <div className="flex items-center justify-between">
+          <span>Win loss overlay and command</span>
+          <Popover
+            placement="bottom"
+            content={
               <Image
                 alt="wl overlay"
                 width={534}
                 height={82}
                 src="/images/dashboard/mmr-tracker.png"
               />
-            </HoverCard.Dropdown>
-          </HoverCard>
+            }
+          >
+            <Link
+              className="flex space-x-1"
+              onClick={(e) => e.preventDefault()}
+            >
+              <SparklesIcon height={22} />
+              <span>Preview</span>
+            </Link>
+          </Popover>
         </div>
       ),
       description: (
@@ -65,29 +64,26 @@ export function SecondaryFeatures() {
     },
     {
       name: (
-        <div className="space-between flex w-full items-center">
-          <span className="w-full">MMR badge and tracking</span>
-          <HoverCard closeDelay={200} shadow="md">
-            <HoverCard.Target>
-              <Link
-                className="flex !items-center space-x-1"
-                onClick={(e) => e.preventDefault()}
-                color
-                underline
-              >
-                <SparklesIcon height={22} />
-                <span>Preview</span>
-              </Link>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
+        <div className="flex items-center justify-between">
+          <span>MMR badge and tracking</span>
+          <Popover
+            placement="bottom"
+            content={
               <Image
                 alt="mmr tracker"
                 width={534}
                 height={82}
                 src="/images/dashboard/mmr-tracker.png"
               />
-            </HoverCard.Dropdown>
-          </HoverCard>
+            }
+          >
+            <Link onClick={(e) => e.preventDefault()}>
+              <span className="flex items-center space-x-1">
+                <SparklesIcon height={22} />
+                <span>Preview</span>
+              </span>
+            </Link>
+          </Popover>
         </div>
       ),
       description: (
@@ -141,39 +137,37 @@ export function SecondaryFeatures() {
     },
     {
       name: (
-        <div className="space-between flex w-full items-center">
-          <span className="w-full">Aegis and rosh timer</span>
-          <HoverCard closeDelay={200} shadow="md">
-            <HoverCard.Target>
-              <Link
-                className="flex !items-center space-x-1"
-                onClick={(e) => e.preventDefault()}
-                color
-                underline
-              >
-                <SparklesIcon height={22} />
-                <span>Preview</span>
-              </Link>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
-              <Display shadow caption="Aegis timer">
+        <div className="flex items-center justify-between">
+          <span>Aegis and rosh timer</span>
+          <Popover
+            placement="bottom"
+            content={
+              <div className="flex flex-col items-center space-y-4 text-white">
                 <Image
                   alt="aegis timer"
                   width={372}
                   height={141}
                   src="/images/dashboard/just-aegis-timer.png"
                 />
-              </Display>
-              <Display shadow caption="Roshan timer">
+                <span>Aegis timer</span>
                 <Image
                   alt="rosh timer"
                   width={336}
                   height={249}
                   src="/images/dashboard/rosh-timer.png"
                 />
-              </Display>
-            </HoverCard.Dropdown>
-          </HoverCard>
+                <span>Roshan timer</span>
+              </div>
+            }
+          >
+            <Link
+              className="flex !items-center space-x-1"
+              onClick={(e) => e.preventDefault()}
+            >
+              <SparklesIcon height={22} />
+              <span>Preview</span>
+            </Link>
+          </Popover>
         </div>
       ),
       description: (
@@ -229,12 +223,10 @@ export function SecondaryFeatures() {
         >
           {features.map((feature, i) => (
             <li key={i} className="rounded-2xl border border-gray-200 p-8">
-              <h3 className="flex items-center justify-between space-x-2 font-semibold text-gray-900">
+              <h3 className="space-x-2 font-semibold text-gray-900">
                 {feature.name}
                 {feature.inProgress && (
-                  <Badge scale={0.5} type="secondary" className="opacity-60">
-                    in progress
-                  </Badge>
+                  <Badge className="opacity-60">in progress</Badge>
                 )}
               </h3>
               <div className="mt-2 text-gray-700">{feature.description}</div>

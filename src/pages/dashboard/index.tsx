@@ -8,7 +8,6 @@ import { Button, Group, Stepper } from '@mantine/core'
 import { ReactElement, useState } from 'react'
 import { Card } from '@/ui/card'
 import Link from 'next/link'
-import { Display } from '@geist-ui/core'
 import Header from '@/components/Dashboard/Header'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 
@@ -109,15 +108,17 @@ const SetupPage = () => {
                 </Link>
                 .
               </p>
-              <Display shadow>
+              <div className="flex flex-col items-center space-y-4">
                 <Image
                   alt="dotabod browser source properties"
                   width={284}
                   unoptimized
                   height={863}
+                  className="rounded-xl"
                   src="/images/setup/play-vs-bots.png"
                 />
-              </Display>
+                <span>Simple minimap</span>
+              </div>
             </div>
           </Card>
         </Stepper.Completed>
