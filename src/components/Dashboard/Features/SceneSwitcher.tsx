@@ -1,6 +1,5 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display } from '@geist-ui/core'
 import { Badge, Switch } from '@mantine/core'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
@@ -125,14 +124,15 @@ export default function SceneSwitcher(): JSX.Element {
         </ul>
       )}
 
-      <Display shadow caption="Example OBS scenes and sources">
+      <div className="flex flex-col items-center space-y-4 text-white">
         <Image
           width={536}
           height={115}
           alt="scene switcher"
           src="/images/setup/scene-switcher.png"
         />
-      </Display>
+        <span>Example OBS scenes and sources</span>
+      </div>
     </Card>
   )
 }

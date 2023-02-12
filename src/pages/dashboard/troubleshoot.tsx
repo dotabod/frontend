@@ -1,10 +1,10 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { Link } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { ReactElement } from 'react'
 import Header from '@/components/Dashboard/Header'
+import { Typography } from 'antd'
 
 const faqs = [
   {
@@ -46,13 +46,12 @@ const faqs = [
       <span>
         I&apos;d remove it if I were you. Dotabod has all the features 9kmmrbot
         had, and more. Visit{' '}
-        <Link
-          color
+        <Typography.Link
           target="_blank"
           href="https://twitch.tv/popout/9kmmrbot/chat"
         >
           9kmmrbot chat
-        </Link>{' '}
+        </Typography.Link>{' '}
         and type <code>!part</code> to remove 9kmmrbot. You may have to ban
         9kmmrbot from your channel because it may keep trying to join and
         respond to commands still.
@@ -69,9 +68,9 @@ const faqs = [
     answer: (
       <span>
         Get help in our{' '}
-        <Link color target="_blank" href="https://discord.dotabod.com">
+        <Typography.Link target="_blank" href="https://discord.dotabod.com">
           Discord
-        </Link>
+        </Typography.Link>
         .
       </span>
     ),

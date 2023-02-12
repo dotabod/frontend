@@ -5,7 +5,6 @@ import {
   useUpdateSetting,
 } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display, Link } from '@geist-ui/core'
 import { Badge, Button, clsx, Switch, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
@@ -17,6 +16,7 @@ import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { getRankDetail, getRankImage, RankType } from '@/lib/ranks'
+import { Typography } from 'antd'
 
 const SteamAvatar = ({ data: response, id }) => {
   if (!response) return <p>Loading...</p>
@@ -210,14 +210,13 @@ export default function MmrTrackerCard() {
                   className={clsx(removed && 'opacity-40')}
                 >
                   <div className="mb-1 flex items-center space-x-1 text-dark-400">
-                    <Link
-                      color
+                    <Typography.Link
                       target="_blank"
                       href={`https://steamid.xyz/${account.steam32Id}`}
                       rel="noreferrer"
                     >
                       {account.name}
-                    </Link>
+                    </Typography.Link>
                   </div>
 
                   <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-2">
@@ -373,17 +372,15 @@ export default function MmrTrackerCard() {
       </div>
 
       <div className={clsx('transition-all')}>
-        <Display
-          shadow
-          caption="Correct badge and MMR shown next to shop button"
-        >
+        <div className="flex flex-col items-center space-y-4 text-white">
           <Image
             alt="mmr tracker"
             width={534}
             height={82}
             src="/images/dashboard/mmr-tracker.png"
           />
-        </Display>
+          <span>Correct badge and MMR shown next to shop button</span>
+        </div>
       </div>
     </Card>
   )

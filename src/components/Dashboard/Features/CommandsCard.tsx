@@ -1,8 +1,8 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { Card } from '@/ui/card'
-import { Badge } from '@geist-ui/core'
 import { Accordion, Switch } from '@mantine/core'
+import { Badge } from 'antd'
 
 export default function CommandsCard({
   id,
@@ -28,21 +28,13 @@ export default function CommandsCard({
                 <div className="space-x-2">
                   {command.allowed === 'mods' && (
                     <>
-                      <Badge
-                        type="success"
-                        className="!bg-green-800"
-                        scale={0.5}
-                      >
-                        Mods
-                      </Badge>
-                      <Badge type="success" className="!bg-red-800" scale={0.5}>
-                        Streamer
-                      </Badge>
+                      <Badge color="green">Mods</Badge>
+                      <Badge color="red">Streamer</Badge>
                     </>
                   )}
                   {command.allowed === 'all' && (
                     <>
-                      <Badge scale={0.5}>All</Badge>
+                      <Badge>All</Badge>
                     </>
                   )}
                 </div>

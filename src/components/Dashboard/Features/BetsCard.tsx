@@ -1,6 +1,5 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display } from '@geist-ui/core'
 import { Button, Switch } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import clsx from 'clsx'
@@ -145,7 +144,7 @@ export default function BetsCard() {
             </>
           )}
         </form>
-        <Display shadow caption="Customize the prediction title and answers.">
+        <div className="flex flex-col items-center space-y-4 text-white">
           <Image
             alt="bets image"
             width={425}
@@ -153,7 +152,8 @@ export default function BetsCard() {
             src="https://i.imgur.com/8ZsUxJR.png"
             className="bg-gray-500"
           />
-        </Display>
+          <span>Customize the prediction title and answers.</span>
+        </div>
       </div>
     </Card>
   )

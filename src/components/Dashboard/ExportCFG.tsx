@@ -1,6 +1,6 @@
 import { Card } from '@/ui/card'
-import { Button, Display, Keyboard } from '@geist-ui/core'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
+import { Button, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -47,15 +47,18 @@ export default function ExportCFG() {
           <ChevronRightIcon height={12} className="inline" /> Manage{' '}
           <ChevronRightIcon height={12} className="inline" /> Browse local
           files. Then open the folder to{' '}
-          <Keyboard className="whitespace-pre-wrap break-all">
+          <Typography.Text code className="whitespace-pre-wrap break-all">
             \game\dota\cfg\gamestate_integration\
-          </Keyboard>
+          </Typography.Text>
         </div>
         <p className="ml-4 text-xs">
           If you do not have a{' '}
-          <Keyboard className="whitespace-pre-wrap break-all !text-xs">
+          <Typography.Text
+            code
+            className="whitespace-pre-wrap break-all !text-xs"
+          >
             gamestate_integration
-          </Keyboard>{' '}
+          </Typography.Text>{' '}
           folder, create it.
         </p>
         <a
@@ -63,23 +66,10 @@ export default function ExportCFG() {
           href={url}
           download={`gamestate_integration_dotabod.cfg`}
         >
-          <Button type="success" className="!normal-case">
-            Download config file
-          </Button>
+          <Button color="green">Download config file</Button>
         </a>
         <div className="space-y-4">
-          <Display
-            caption={
-              <>
-                <p>Full path to save config file to:</p>
-                <Keyboard className="whitespace-pre-wrap break-all">
-                  ...\Steam\steamapps\common\dota 2
-                  beta\game\dota\cfg\gamestate_integration\
-                </Keyboard>
-              </>
-            }
-            shadow
-          >
+          <div className="flex flex-col items-center space-y-4 text-white">
             <video width="508" height="504" controls autoPlay muted loop>
               <source
                 src="/images/setup/how-to-create-cfg.mp4"
@@ -87,14 +77,24 @@ export default function ExportCFG() {
               />
               Your browser does not support the video tag.
             </video>
-          </Display>
+            <div>
+              <p>Full path to save config file to:</p>
+              <Typography.Text code className="whitespace-pre-wrap break-all">
+                ...\Steam\steamapps\common\dota 2
+                beta\game\dota\cfg\gamestate_integration\
+              </Typography.Text>
+            </div>
+          </div>
         </div>
 
         <div>
           2. Add{' '}
-          <Keyboard className="whitespace-pre-wrap break-all !text-xs">
+          <Typography.Text
+            code
+            className="whitespace-pre-wrap break-all !text-xs"
+          >
             -gamestateintegration
-          </Keyboard>{' '}
+          </Typography.Text>{' '}
           to your Dota 2 launch options in Steam.{' '}
           <Link
             className="text-blue-400 hover:text-blue-300"
@@ -106,7 +106,7 @@ export default function ExportCFG() {
           , or follow the video below.
         </div>
 
-        <Display shadow>
+        <div className="flex flex-col items-center space-y-4 text-white">
           <video width="482" height="392" controls autoPlay muted loop>
             <source
               src="/images/setup/how-to-gsi-properties.mp4"
@@ -114,7 +114,7 @@ export default function ExportCFG() {
             />
             Your browser does not support the video tag.
           </video>
-        </Display>
+        </div>
 
         <div>3. Restart Dota 2.</div>
       </div>

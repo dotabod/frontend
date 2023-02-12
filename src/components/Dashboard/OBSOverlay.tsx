@@ -1,6 +1,5 @@
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { Card } from '@/ui/card'
-import { Badge, Display } from '@geist-ui/core'
 import { Button, Center, CopyButton, Tabs } from '@mantine/core'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
@@ -9,6 +8,7 @@ import {
   ChatBubbleBottomCenterTextIcon,
   VideoCameraIcon,
 } from '@heroicons/react/24/solid'
+import { Badge } from 'antd'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -32,9 +32,7 @@ export default function OBSOverlay() {
         )}
       </CopyButton>
       <div className="mt-4 space-x-2 text-xs md:mt-0">
-        <Badge type="error" className="!bg-red-800 !text-xs">
-          Warning
-        </Badge>
+        <Badge color="red">Warning</Badge>
         <span>Do not share or show this URL on stream</span>
       </div>
     </div>
@@ -135,12 +133,12 @@ export default function OBSOverlay() {
                 Paste this into the URL field when making the browser source
               </p>
             </Center>
-            <Display shadow>
+            <div className="flex flex-col items-center space-y-4 text-white">
               <video width="630" height="766" controls autoPlay muted loop>
                 <source src="/images/setup/how-to-obs.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
-            </Display>
+            </div>
           </Tabs.Panel>
           <Tabs.Panel value="text" className="ml-6 mt-12">
             <div className="mt-4 space-y-4">
@@ -148,7 +146,7 @@ export default function OBSOverlay() {
                 1. Let&apos;s see what our canvas resolution is set to. Open OBS
                 Studio and go to File &gt; Settings
               </p>
-              <Display shadow>
+              <div className="flex flex-col items-center space-y-4 text-white">
                 <Image
                   alt="dotabod browser source properties"
                   width={331}
@@ -156,14 +154,14 @@ export default function OBSOverlay() {
                   height={292}
                   src="/images/setup/obs-step-1.png"
                 />
-              </Display>
+              </div>
 
               <p>
                 2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s
                 usually 1920x1080 but you could have a different one. Don&apos;t
                 copy 1234x789, that&apos;s just there as an example.
               </p>
-              <Display shadow>
+              <div className="flex flex-col items-center space-y-4 text-white">
                 <Image
                   alt="dotabod browser source properties"
                   width={544}
@@ -171,14 +169,14 @@ export default function OBSOverlay() {
                   height={310}
                   src="/images/setup/obs-step-2.png"
                 />
-              </Display>
+              </div>
 
               <p>
                 3. Close the settings window. Now let&apos;s add the browser
                 source. Under Sources click Add &gt; Browser and press OK.
               </p>
 
-              <Display shadow>
+              <div className="flex flex-col items-center space-y-4 text-white">
                 <Image
                   alt="dotabod browser source properties"
                   width={572}
@@ -186,7 +184,7 @@ export default function OBSOverlay() {
                   height={256}
                   src="/images/setup/obs-step-3.png"
                 />
-              </Display>
+              </div>
 
               <p>
                 4. Fill out the properties, entering your &quot;Base (Canvas)
@@ -202,7 +200,7 @@ export default function OBSOverlay() {
                 <CopyInstructions />
               </div>
 
-              <Display shadow>
+              <div className="flex flex-col items-center space-y-4 text-white">
                 <Image
                   alt="dotabod browser source properties"
                   unoptimized
@@ -210,7 +208,7 @@ export default function OBSOverlay() {
                   height={519}
                   src="/images/setup/obs-step-4.png"
                 />
-              </Display>
+              </div>
               <p>
                 5. Right click the Dotabod browser source &gt; Transform &gt;
                 Fit to screen.

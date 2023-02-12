@@ -5,7 +5,6 @@ import '@/styles/tailwind.css'
 import 'focus-visible'
 
 import type { Session } from 'next-auth'
-import { GeistProvider, Themes } from '@geist-ui/core'
 import { MantineProvider } from '@mantine/core'
 import { NotificationsProvider } from '@mantine/notifications'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
@@ -16,14 +15,6 @@ import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
 import 'antd/dist/reset.css'
-
-const myTheme1 = Themes.createFromDark({
-  type: 'coolTheme',
-  palette: {
-    background: '#17181e',
-    foreground: '#F2F4FB',
-  },
-})
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -98,9 +89,7 @@ export default function App({
             <VercelAnalytics />
             <GoogleAnalytics />
             <NotificationsProvider position="top-center">
-              <GeistProvider themes={[myTheme1]} themeType="coolTheme">
-                {getLayout(<Component {...pageProps} />)}
-              </GeistProvider>
+              {getLayout(<Component {...pageProps} />)}
             </NotificationsProvider>
           </MantineProvider>
         </StyleProvider>

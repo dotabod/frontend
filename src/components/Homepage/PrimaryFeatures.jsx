@@ -9,7 +9,6 @@ import { CircleBackground } from 'src/components/CircleBackground'
 import { Container } from 'src/components/Container'
 import { PhoneFrame } from 'src/components/Homepage/PhoneFrame'
 import Image from 'next/image'
-import { Display } from '@geist-ui/core'
 
 const MotionAppScreenHeader = motion(AppScreen.Header)
 const MotionAppScreenBody = motion(AppScreen.Body)
@@ -131,7 +130,7 @@ function BlockScreen({ custom, animated = false }) {
         className="bg-transparent"
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
-        <Display>
+        <div className="flex flex-col items-center space-y-4 text-white">
           <Image
             alt="minimap blocker"
             height={280}
@@ -143,7 +142,8 @@ function BlockScreen({ custom, animated = false }) {
                 "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
             }}
           />
-        </Display>
+          <span>Minimap blocker</span>
+        </div>
       </MotionAppScreenBody>
     </AppScreen>
   )
@@ -163,7 +163,7 @@ function BetsScreen({ custom, animated = false }) {
         className="bg-transparent"
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
-        <Display>
+        <div className="flex flex-col items-center space-y-4 text-white">
           <Image
             className="rounded-xl"
             src="/images/dashboard/bets.png"
@@ -172,7 +172,7 @@ function BetsScreen({ custom, animated = false }) {
             width={600}
             height={840}
           />
-        </Display>
+        </div>
       </MotionAppScreenBody>
     </AppScreen>
   )
@@ -192,7 +192,7 @@ function OBSScreen({ custom, animated = false }) {
         className="bg-transparent"
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
-        <Display>
+        <div className="flex flex-col items-center space-y-4 text-white">
           <Image
             className="rounded-xl"
             src="https://i.imgur.com/NgczeXd.png"
@@ -201,7 +201,7 @@ function OBSScreen({ custom, animated = false }) {
             width={738}
             height={1126}
           />
-        </Display>
+        </div>
       </MotionAppScreenBody>
     </AppScreen>
   )
