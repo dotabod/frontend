@@ -10,12 +10,12 @@ import { MantineProvider } from '@mantine/core'
 import { NotificationsProvider } from '@mantine/notifications'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
 import SentrySession from '@/components/SentrySession'
-import 'antd/dist/reset.css'
 import { ConfigProvider, theme } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
+import 'antd/dist/reset.css'
 
 const myTheme1 = Themes.createFromDark({
   type: 'coolTheme',
