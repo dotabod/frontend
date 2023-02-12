@@ -1,4 +1,3 @@
-import { accordionStyles } from '@/components/accordionStyles'
 import BetsCard from '@/components/Dashboard/Features/BetsCard'
 import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
 import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
@@ -7,7 +6,6 @@ import PicksCard from '@/components/Dashboard/Features/PicksCard'
 import RoshCard from '@/components/Dashboard/Features/RoshCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { Accordion } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
@@ -32,25 +30,19 @@ const FeaturesPage: NextPageWithLayout = () => {
         title="Features"
       />
 
-      <Accordion multiple variant="separated" styles={accordionStyles}>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
-          <LanguageCard />
-          <StreamDelayCard />
-          <NotablePlayersCard />
-          <ComingSoonCard />
-        </div>
-      </Accordion>
-      <Accordion multiple variant="separated" styles={accordionStyles}>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
-          <MmrTrackerCard />
-          <BetsCard />
-          <MinimapCard />
-          <PicksCard />
-          <RoshCard />
-          <ChatterCard />
-          <SceneSwitcher />
-        </div>
-      </Accordion>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
+        <LanguageCard />
+        <StreamDelayCard />
+        <NotablePlayersCard />
+        <ComingSoonCard />
+        <MmrTrackerCard />
+        <BetsCard />
+        <MinimapCard />
+        <PicksCard />
+        <RoshCard />
+        <ChatterCard />
+        <SceneSwitcher />
+      </div>
     </>
   ) : null
 }

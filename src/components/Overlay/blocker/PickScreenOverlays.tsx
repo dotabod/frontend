@@ -6,7 +6,7 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { clsx } from '@mantine/styles'
+import { clsx } from 'clsx'
 
 export const PickScreenOverlays = ({
   rankImageDetails,

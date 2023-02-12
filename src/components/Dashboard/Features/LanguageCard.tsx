@@ -1,6 +1,6 @@
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Group, Select } from '@mantine/core'
+import { Select } from 'antd'
 import { localeOptions } from '@/components/Dashboard/locales'
 import { FlagProps } from 'mantine-flagpack/declarations/create-flag'
 import { forwardRef } from 'react'
@@ -13,10 +13,10 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ Flag, label, ...others }: ItemProps, ref) => (
-    <Group noWrap ref={ref} {...others}>
+    <div ref={ref} className="flex items-center space-x-2" {...others}>
       <Flag w={24} radius={2} />
-      <span>{label}</span>
-    </Group>
+      <span className="ml-2">{label}</span>
+    </div>
   )
 )
 
@@ -35,7 +35,13 @@ export default function LanguageCard() {
   } = useUpdateLocale()
 
   const flagIcon = (
-    <CurrentFlag flag={localeOption?.locale} w={25} h={17} radius={2} />
+    <CurrentFlag
+      flag={localeOption?.locale}
+      w={25}
+      h={17}
+      radius={2}
+      className="pl-2"
+    />
   )
 
   return (
@@ -51,25 +57,17 @@ export default function LanguageCard() {
         {!loadingLocale && (
           <Select
             placeholder="Language selector"
-            itemComponent={SelectItem}
             className="max-w-fit transition-all"
-            icon={flagIcon}
-            data={localeOptions}
-            maxDropdownHeight={400}
+            suffixIcon={flagIcon}
+            options={localeOptions}
             defaultValue={localeOption?.locale}
-            onChange={updateLocale}
-            filter={(value, item) =>
-              item.label.toLowerCase().includes(value.toLowerCase().trim())
-            }
+            onChange={(value) => updateLocale(value)}
           />
         )}
         {loadingLocale && (
           <Select
             placeholder="Language selector"
-            itemComponent={SelectItem}
             className="max-w-fit"
-            data={localeOptions}
-            maxDropdownHeight={400}
             disabled
           />
         )}

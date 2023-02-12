@@ -64,7 +64,7 @@ export default function SceneSwitcher(): JSX.Element {
           OBS scene switcher <Tag>Optional</Tag>
         </h3>
         {l0 && <Switch disabled />}
-        {!l0 && <Switch onChange={updateSetting} defaultChecked={isEnabled} />}
+        {!l0 && <Switch onChange={updateSetting} checked={isEnabled} />}
       </div>
       <div className="subtitle">
         Auto switch scenes in OBS depending on game state. Your blockers will

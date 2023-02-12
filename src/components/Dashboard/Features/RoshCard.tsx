@@ -1,6 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from '@mantine/core'
+import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { Settings } from '@/lib/defaultSettings'
@@ -33,39 +33,20 @@ export default function RoshCard() {
 
       <div className={clsx('pt-4 pb-12 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Enable roshan timer"
-            checked={hasRosh}
-            value={Settings.rosh}
-            onChange={(e) => uR(!!e?.target?.checked)}
-          />
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Enable aegis timer"
-            checked={hasAegis}
-            value={Settings.aegis}
-            onChange={(e) => uA(!!e?.target?.checked)}
-          />
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Use extra large minimap"
-            checked={minimapXl}
-            value={Settings['minimap-xl']}
-            onChange={(e) => updateXl(!!e?.target?.checked)}
-          />
+          <div className="flex items-center">
+            <Switch checked={hasRosh} onChange={uR} />
+            <span className="ml-2 text-sm text-dark-300">Roshan timer</span>
+          </div>
+          <div className="flex items-center">
+            <Switch checked={hasAegis} onChange={uA} />
+            <span className="ml-2 text-sm text-dark-300">Aegis timer</span>
+          </div>
+          <div className="flex items-center">
+            <Switch checked={minimapXl} onChange={updateXl} />
+            <span className="ml-2 text-sm text-dark-300">
+              Use extra large minimap
+            </span>
+          </div>
         </div>
       </div>
 
