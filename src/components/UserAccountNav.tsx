@@ -53,9 +53,7 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
           </div>
         )}
 
-        {!showDetails && (
-          <Avatar className="m-auto" size="sm" src={user?.image} radius="xl" />
-        )}
+        {!showDetails && <Avatar className="m-auto" src={user?.image} />}
       </div>
     </Link>
   )

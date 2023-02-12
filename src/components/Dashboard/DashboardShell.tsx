@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { navigation } from '@/components/Dashboard/navigation'
 import clsx from 'clsx'
@@ -22,11 +22,17 @@ export default function DashboardShell({
   const {
     token: { colorBgContainer, colorBgLayout },
   } = theme.useToken()
-  const [current, setCurrent] = useState('Setup')
+  const [current, setCurrent] = useState('/dashboard')
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
   }
+
+  useEffect(() => {
+    const { pathname } = window.location
+    const path = pathname.split('/').pop()
+    setCurrent(path)
+  }, [])
 
   return (
     <>
@@ -116,7 +122,7 @@ export default function DashboardShell({
 
                   return {
                     ...item,
-                    key: item.name,
+                    key: item.href?.split('/').pop() || item.name,
                     icon: (
                       <item.icon
                         className={clsx('h-4 w-4')}

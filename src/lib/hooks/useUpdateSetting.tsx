@@ -1,7 +1,7 @@
 import useSWR, { MutatorOptions, useSWRConfig } from 'swr'
 import { getValueOrDefault } from '../settings'
 import { fetcher } from '../fetcher'
-import { showNotification } from '@mantine/notifications'
+import { App } from 'antd'
 import { SettingKeys, Settings } from '@/lib/defaultSettings'
 import { useRouter } from 'next/router'
 
@@ -18,6 +18,7 @@ export const useUpdate = ({
 }: UpdateProps) => {
   const { data } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
+  const { message } = App.useApp()
 
   const loading = data === undefined
 
@@ -37,14 +38,13 @@ export const useUpdate = ({
         method: 'PATCH',
         body: JSON.stringify(newValue),
       })
-      showNotification({
-        title: response.ok ? 'Success' : 'Error',
-        message: response.ok
-          ? `Updated! Setting is now ${
+      message.open({
+        type: response.ok ? 'success' : 'error',
+        content: response.ok
+          ? `Success! Setting is now ${
               ['string', 'number'].includes(typeof isNow) ? isNow : 'updated'
             }`
           : 'Could not save your settings',
-        color: response.ok ? 'green' : 'red',
       })
 
       return dataTransform(data, newValue)

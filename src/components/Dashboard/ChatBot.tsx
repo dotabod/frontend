@@ -135,7 +135,7 @@ export default function ChatBot() {
             xxl: 3,
           }}
           dataSource={emotesRequired.sort((a, b) => {
-            // if its found in emotes, put it at the bottom
+            // if it's found in emotes, put it at the bottom
             if (emotes.find((e) => e.code === a.label)) return 1
             if (emotes.find((e) => e.code === b.label)) return -1
             return 0
@@ -148,7 +148,7 @@ export default function ChatBot() {
                 <div
                   className={clsx(
                     'flex items-center space-x-2',
-                    thisEmote && 'text-dark-300 line-through'
+                    thisEmote && 'line-through'
                   )}
                 >
                   {thisEmote && (
@@ -160,7 +160,10 @@ export default function ChatBot() {
                     />
                   )}
                   <Link
-                    className={clsx('flex items-center space-x-1')}
+                    className={clsx(
+                      'flex items-center space-x-1',
+                      thisEmote && '!text-dark-300 opacity-80'
+                    )}
                     target="_blank"
                     href={
                       url ||

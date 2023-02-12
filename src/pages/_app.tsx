@@ -6,10 +6,9 @@ import 'focus-visible'
 
 import type { Session } from 'next-auth'
 import { MantineProvider } from '@mantine/core'
-import { NotificationsProvider } from '@mantine/notifications'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
 import SentrySession from '@/components/SentrySession'
-import { ConfigProvider, theme } from 'antd'
+import { ConfigProvider, theme, App as AntProvider } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
@@ -88,9 +87,7 @@ export default function App({
             <SentrySession />
             <VercelAnalytics />
             <GoogleAnalytics />
-            <NotificationsProvider position="top-center">
-              {getLayout(<Component {...pageProps} />)}
-            </NotificationsProvider>
+            <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
           </MantineProvider>
         </StyleProvider>
       </ConfigProvider>
