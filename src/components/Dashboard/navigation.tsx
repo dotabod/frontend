@@ -101,8 +101,7 @@ export const navigation = [
   {
     name: 'Sign out',
     href: '#',
-    onClick: (e) => {
-      e.preventDefault()
+    onClick: () => {
       signOut({
         callbackUrl: `${window.location.origin}/`,
       })

@@ -4,7 +4,6 @@ import { Button } from 'src/components/Button'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import Image from 'next/image'
-import { DonationMenu } from '@/components/DonationMenu'
 
 const plans = [
   {
@@ -42,7 +41,6 @@ const plans = [
     description:
       'You’re a good person. You know Dotabod is free but you want to support the project anyway ❤.',
     button: {
-      custom: DonationMenu,
       label: 'Support the project',
       href: 'https://ko-fi.com/dotabod',
     },

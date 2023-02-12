@@ -1,6 +1,6 @@
 import { useSession } from 'next-auth/react'
 
-import { Avatar } from '@mantine/core'
+import { Avatar } from 'antd'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { Session } from 'next-auth'
@@ -37,7 +37,7 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
         {showDetails && (
           <div className="flex h-full w-full items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Avatar size="sm" src={user?.image} radius="xl" />
+              <Avatar src={user?.image} />
               <span className="font-500 text-sm">{user?.name}</span>
             </div>
 

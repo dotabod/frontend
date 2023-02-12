@@ -2,21 +2,14 @@ import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { getValueOrDefault } from '@/lib/settings'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
-import {
-  Accordion,
-  Center,
-  Group,
-  SegmentedControl,
-  TextInput,
-} from '@mantine/core'
-import { useHotkeys, useInputState, useLocalStorage } from '@mantine/hooks'
-import { ListX } from 'lucide-react'
+import { Group, SegmentedControl, TextInput } from '@mantine/core'
+import { useInputState, useLocalStorage } from '@mantine/hooks'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { ReactElement, useState } from 'react'
+import { ReactElement } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
-import { accordionStyles } from '@/components/accordionStyles'
 import Header from '@/components/Dashboard/Header'
+import { Empty } from 'antd'
 
 const CommandsPage = () => {
   const { status } = useSession()
@@ -29,32 +22,6 @@ const CommandsPage = () => {
     defaultValue: 'All',
   })
   const { data } = useUpdate({ path: `/api/settings` })
-
-  const [isFinding, setIsFinding] = useState(false)
-  const [value, setValue] = useState<string[] | string>('')
-
-  useHotkeys([
-    [
-      'mod+f',
-      () => {
-        setIsFinding(true)
-        setValue(Object.keys(CommandDetail))
-      },
-      {
-        preventDefault: false,
-      },
-    ],
-    [
-      'escape',
-      () => {
-        setIsFinding(false)
-        setValue('')
-      },
-      {
-        preventDefault: false,
-      },
-    ],
-  ])
 
   const [searchTerm, setSearchTerm] = useInputState('')
 
@@ -131,27 +98,18 @@ const CommandsPage = () => {
           onChange={setSearchTerm}
         />
       </div>
-      <Accordion
-        multiple={isFinding}
-        value={value}
-        onChange={setValue}
-        variant="separated"
-        styles={accordionStyles}
-      >
-        {filteredCommands.length < 1 && (
-          <Center style={{ height: 200 }}>
-            <div className="flex flex-col items-center text-center text-dark-300">
-              <ListX size={80} />
-              <p>Could not find any matching commands.</p>
-            </div>
-          </Center>
-        )}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredCommands.map((key) => (
-            <CommandsCard key={key} id={key} command={CommandDetail[key]} />
-          ))}
-        </div>
-      </Accordion>
+      {filteredCommands.length < 1 && (
+        <Empty
+          description="Could not find any matching commands."
+          imageStyle={{ height: 60 }}
+        />
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredCommands.map((key, i) => (
+          <CommandsCard key={i} id={key} command={CommandDetail[key]} />
+        ))}
+      </div>
     </>
   ) : null
 }

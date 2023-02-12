@@ -3,7 +3,7 @@ import { Settings } from '@/lib/defaultSettings'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import React from 'react'
 import clsx from 'clsx'
-import { Switch } from '@mantine/core'
+import { Switch } from 'antd'
 
 export function DisableToggle({ collapsed }: { collapsed: boolean }) {
   const {
@@ -42,21 +42,16 @@ export function DisableToggle({ collapsed }: { collapsed: boolean }) {
         {loading && (
           <Switch
             disabled
-            size={collapsed ? 'sm' : 'lg'}
+            size={collapsed ? 'small' : 'default'}
             className="flex"
-            color={isDotabodDisabled ? 'red' : 'green'}
           />
         )}
         {!loading && (
           <Switch
-            size={collapsed ? 'lg' : 'lg'}
             className="flex"
-            color={isDotabodDisabled ? 'red' : 'green'}
             defaultChecked={isDotabodDisabled}
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-          >
-            !mmr
-          </Switch>
+            onChange={updateSetting}
+          />
         )}
       </div>
       <p
