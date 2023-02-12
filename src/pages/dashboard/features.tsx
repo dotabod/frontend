@@ -14,8 +14,11 @@ import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import NotablePlayersCard from '@/components/Dashboard/Features/NotablePlayers'
 import ComingSoonCard from '@/components/Dashboard/Features/ComingSoonCard'
+import { ReactElement } from 'react'
+import type { NextPageWithLayout } from '@/pages/_app'
+import Header from '@/components/Dashboard/Header'
 
-export default function FeaturesPage() {
+const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
 
   return status === 'authenticated' ? (
@@ -23,30 +26,37 @@ export default function FeaturesPage() {
       <Head>
         <title>Dotabod | Features</title>
       </Head>
-      <DashboardShell
+
+      <Header
         subtitle="Customize the options your stream receives."
         title="Features"
-      >
-        <Accordion multiple variant="separated" styles={accordionStyles}>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
-            <LanguageCard />
-            <StreamDelayCard />
-            <NotablePlayersCard />
-            <ComingSoonCard />
-          </div>
-        </Accordion>
-        <Accordion multiple variant="separated" styles={accordionStyles}>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
-            <MmrTrackerCard />
-            <BetsCard />
-            <MinimapCard />
-            <PicksCard />
-            <RoshCard />
-            <ChatterCard />
-            <SceneSwitcher />
-          </div>
-        </Accordion>
-      </DashboardShell>
+      />
+
+      <Accordion multiple variant="separated" styles={accordionStyles}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
+          <LanguageCard />
+          <StreamDelayCard />
+          <NotablePlayersCard />
+          <ComingSoonCard />
+        </div>
+      </Accordion>
+      <Accordion multiple variant="separated" styles={accordionStyles}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-2">
+          <MmrTrackerCard />
+          <BetsCard />
+          <MinimapCard />
+          <PicksCard />
+          <RoshCard />
+          <ChatterCard />
+          <SceneSwitcher />
+        </div>
+      </Accordion>
     </>
   ) : null
 }
+
+FeaturesPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardShell>{page}</DashboardShell>
+}
+
+export default FeaturesPage

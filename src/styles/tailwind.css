@@ -15,7 +15,6 @@
   src: url('/fonts/Inter-italic.var.woff2') format('woff2');
 }
 
-@import 'antd/dist/reset.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,6 +68,7 @@
 
 #__next {
   min-height: 100%;
+  display: flex;
 }
 
 /* Geist UI stuff */

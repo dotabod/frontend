@@ -13,11 +13,12 @@ import { useHotkeys, useInputState, useLocalStorage } from '@mantine/hooks'
 import { ListX } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 import { accordionStyles } from '@/components/accordionStyles'
+import Header from '@/components/Dashboard/Header'
 
-export default function CommandsPage() {
+const CommandsPage = () => {
   const { status } = useSession()
   const [permission, setPermission] = useLocalStorage({
     key: 'command-display-permission',
@@ -104,53 +105,59 @@ export default function CommandsPage() {
       <Head>
         <title>Dotabod | Commands</title>
       </Head>
-      <DashboardShell
+      <Header
         subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
         title="Commands"
-      >
-        <div className="flex justify-between">
-          <Group className="mb-4">
-            <SegmentedControl
-              value={permission}
-              onChange={setPermission}
-              data={['All', 'Mods', 'Plebs']}
-              color="blue"
-            />
-            <SegmentedControl
-              value={enabled}
-              onChange={setEnabled}
-              data={['All', 'Enabled', 'Disabled']}
-              color="blue"
-            />
-          </Group>
-          <TextInput
-            placeholder="Search commands..."
-            value={searchTerm}
-            onChange={setSearchTerm}
+      />
+
+      <div className="flex justify-between">
+        <Group className="mb-4">
+          <SegmentedControl
+            value={permission}
+            onChange={setPermission}
+            data={['All', 'Mods', 'Plebs']}
+            color="blue"
           />
+          <SegmentedControl
+            value={enabled}
+            onChange={setEnabled}
+            data={['All', 'Enabled', 'Disabled']}
+            color="blue"
+          />
+        </Group>
+        <TextInput
+          placeholder="Search commands..."
+          value={searchTerm}
+          onChange={setSearchTerm}
+        />
+      </div>
+      <Accordion
+        multiple={isFinding}
+        value={value}
+        onChange={setValue}
+        variant="separated"
+        styles={accordionStyles}
+      >
+        {filteredCommands.length < 1 && (
+          <Center style={{ height: 200 }}>
+            <div className="flex flex-col items-center text-center text-dark-300">
+              <ListX size={80} />
+              <p>Could not find any matching commands.</p>
+            </div>
+          </Center>
+        )}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredCommands.map((key) => (
+            <CommandsCard key={key} id={key} command={CommandDetail[key]} />
+          ))}
         </div>
-        <Accordion
-          multiple={isFinding}
-          value={value}
-          onChange={setValue}
-          variant="separated"
-          styles={accordionStyles}
-        >
-          {filteredCommands.length < 1 && (
-            <Center style={{ height: 200 }}>
-              <div className="flex flex-col items-center text-center text-dark-300">
-                <ListX size={80} />
-                <p>Could not find any matching commands.</p>
-              </div>
-            </Center>
-          )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredCommands.map((key) => (
-              <CommandsCard key={key} id={key} command={CommandDetail[key]} />
-            ))}
-          </div>
-        </Accordion>
-      </DashboardShell>
+      </Accordion>
     </>
   ) : null
 }
+
+CommandsPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardShell>{page}</DashboardShell>
+}
+
+export default CommandsPage

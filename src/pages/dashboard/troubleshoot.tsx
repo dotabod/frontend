@@ -3,6 +3,8 @@ import { Link } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
+import { ReactElement } from 'react'
+import Header from '@/components/Dashboard/Header'
 
 const faqs = [
   {
@@ -76,7 +78,7 @@ const faqs = [
   },
 ]
 
-export default function TroubleshootPage() {
+const TroubleshootPage = () => {
   const { status } = useSession()
 
   return status === 'authenticated' ? (
@@ -84,28 +86,31 @@ export default function TroubleshootPage() {
       <Head>
         <title>Dotabod | Troubleshooting</title>
       </Head>
-      <DashboardShell
+      <Header
         subtitle="Try these steps in case something isn't working."
         title="Troubleshooting"
-      >
-        <div className="mt-12 lg:col-span-2 lg:mt-0">
-          <dl className="space-y-12">
-            {faqs.map(
-              (faq) =>
-                faq.question && (
-                  <div key={faq.question}>
-                    <dt className="text-lg font-medium leading-6 text-white">
-                      {faq.question}
-                    </dt>
-                    <dd className="mt-2 text-base text-dark-300">
-                      {faq.answer}
-                    </dd>
-                  </div>
-                )
-            )}
-          </dl>
-        </div>
-      </DashboardShell>
+      />
+      <div className="mt-12 lg:col-span-2 lg:mt-0">
+        <dl className="space-y-12">
+          {faqs.map(
+            (faq) =>
+              faq.question && (
+                <div key={faq.question}>
+                  <dt className="text-lg font-medium leading-6 text-white">
+                    {faq.question}
+                  </dt>
+                  <dd className="mt-2 text-base text-dark-300">{faq.answer}</dd>
+                </div>
+              )
+          )}
+        </dl>
+      </div>
     </>
   ) : null
 }
+
+TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardShell>{page}</DashboardShell>
+}
+
+export default TroubleshootPage

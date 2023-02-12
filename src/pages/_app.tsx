@@ -4,7 +4,6 @@ import { SessionProvider } from 'next-auth/react'
 import '@/styles/tailwind.css'
 import 'focus-visible'
 
-import type { AppProps } from 'next/app'
 import type { Session } from 'next-auth'
 import { GeistProvider, Themes } from '@geist-ui/core'
 import { MantineProvider } from '@mantine/core'
@@ -14,6 +13,9 @@ import SentrySession from '@/components/SentrySession'
 import 'antd/dist/reset.css'
 import { ConfigProvider, theme } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
+import type { NextPage } from 'next'
+import type { AppProps } from 'next/app'
+import type { ReactElement, ReactNode } from 'react'
 
 const myTheme1 = Themes.createFromDark({
   type: 'coolTheme',
@@ -23,20 +25,38 @@ const myTheme1 = Themes.createFromDark({
   },
 })
 
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+  session: Session
+}
+
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
-}: AppProps<{ session: Session }>) {
+}: AppPropsWithLayout) {
+  // Use the layout defined at the page level, if available
+  const getLayout = Component.getLayout ?? ((page) => page)
+
   return (
     <SessionProvider session={session}>
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
+          components: {
+            Menu: {
+              colorItemBgSelected: 'var(--mantine-color-dark-5)',
+              colorItemTextSelected: 'var(--mantine-color-dark-1)',
+            },
+          },
           token: {
-            colorBgLayout: 'rgb(31,33,41)',
-            colorBgContainer: 'rgb(39,41,52)',
+            colorBgLayout: 'var(--mantine-color-dark-8)',
+            colorBgContainer: 'var(--mantine-color-dark-7)',
           },
         }}
       >
@@ -79,7 +99,7 @@ export default function App({
             <GoogleAnalytics />
             <NotificationsProvider position="top-center">
               <GeistProvider themes={[myTheme1]} themeType="coolTheme">
-                <Component {...pageProps} />
+                {getLayout(<Component {...pageProps} />)}
               </GeistProvider>
             </NotificationsProvider>
           </MantineProvider>
