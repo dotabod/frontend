@@ -23,15 +23,12 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
       <div
         className={clsx(
           isLive && 'animate-border-rgb',
-          `outline:transparent group block h-full w-full rounded-md border border-transparent px-3.5
+          `outline:transparent group block h-full w-full cursor-pointer rounded-md border border-transparent px-3.5
             py-2 text-left text-sm transition-all
-            focus:ring-2 `,
+            `,
           dark
-            ? `bg-[#17181e] text-dark-200 hover:border hover:border-blue-500 hover:bg-[#17181e] focus:ring-offset-blue-100`
-            : `bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-100`,
-          showDetails
-            ? 'cursor-pointer select-text hover:border-transparent focus:ring-transparent focus:ring-offset-transparent'
-            : 'cursor-pointer'
+            ? `bg-dark-800 text-dark-200 hover:bg-dark-700`
+            : `bg-gray-100 text-gray-700 hover:bg-gray-200`
         )}
       >
         {showDetails && (
