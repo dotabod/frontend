@@ -6,14 +6,13 @@ export default function TwitchChat({
   modOnly = false,
   responses = [],
   response = null,
-  dark = false,
 }) {
   if (response) responses.push(response)
   return (
     <div
       className={clsx(
         'mt-2 max-w-xs rounded border p-2 text-sm',
-        dark && 'border-dark-500'
+        'border-dark-500'
       )}
     >
       {command && (
@@ -30,9 +29,7 @@ export default function TwitchChat({
             <ModImage />
             <span className="font-bold text-[#c90909]">dotabod</span>
             <span className="mr-1">:</span>
-            <div className={clsx('inline', dark && 'text-[#EFEFF1]')}>
-              {response}
-            </div>
+            <div className={clsx('inline', 'text-[#EFEFF1]')}>{response}</div>
           </div>
         ))}
       </div>

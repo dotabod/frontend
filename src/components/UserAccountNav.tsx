@@ -28,7 +28,7 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
             `,
           dark
             ? `bg-dark-800 text-dark-200 hover:bg-dark-700`
-            : `bg-gray-100 text-gray-700 hover:bg-gray-200`
+            : `bg-dark-800 text-dark-300 hover:bg-gray-200`
         )}
       >
         {showDetails && (

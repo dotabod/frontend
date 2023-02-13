@@ -128,7 +128,7 @@ export function Hero() {
       <Container>
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
-            <h1 className="flex items-center space-x-2 text-4xl font-medium tracking-tight text-gray-900">
+            <h1 className="flex items-center space-x-2 text-4xl font-medium tracking-tight text-dark-200">
               <span>Welcome, {name}</span>
               <Image
                 src="/images/emotes/peepoclap.webp"
@@ -137,7 +137,7 @@ export function Hero() {
                 alt="peepoclap"
               />
             </h1>
-            <p className="mt-6 text-lg text-gray-600">
+            <p className="mt-6 text-lg text-dark-300">
               By leveraging insights from the Dota 2 official API, Dotabod will
               know exactly when to hide sensitive streamer information or engage
               with your Twitch audience.
@@ -182,7 +182,7 @@ export function Hero() {
           </div>
         </div>
         <div className="relative -mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
-          <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-900 lg:text-left">
+          <div className="flex items-center space-x-2 text-center text-sm font-semibold text-dark-200 lg:text-left">
             <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
             <span>Over 2,000 Twitch streamers use Dotabod, such as:</span>
           </div>
