@@ -64,6 +64,8 @@ export default function DashboardShell({
       `}</style>
       <Layout>
         <Sider
+          breakpoint="md"
+          onBreakpoint={(broken) => setCollapsed(broken)}
           style={{
             background: colorBgLayout,
           }}
