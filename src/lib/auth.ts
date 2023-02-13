@@ -5,6 +5,15 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import prisma from '@/lib/db'
 import { getBotAPI } from './getBotApi'
 
+const chatBotScopes = [
+  'channel:moderate',
+  'chat:edit',
+  'chat:read',
+  'whispers:read',
+  'whispers:edit',
+  'moderator:manage:chat_messages',
+].join(' ')
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -20,8 +29,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope:
-            'openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls',
+          scope: `openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
         },
       },
     }),

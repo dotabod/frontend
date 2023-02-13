@@ -1,7 +1,7 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Settings } from '@/lib/defaultSettings'
-import { Badge, Switch } from '@mantine/core'
+import { Tag, Switch } from 'antd'
 import React from 'react'
 import Image from 'next/image'
 import clsx from 'clsx'
@@ -17,19 +17,9 @@ export default function NotablePlayersCard() {
     <Card>
       <div className="title">
         <h3>
-          Notable players <Badge>beta</Badge>
+          Notable players <Tag>beta</Tag>
         </h3>
-        <Switch
-          styles={{
-            labelWrapper: {
-              color: 'var(--mantine-color-dark-3)',
-            },
-          }}
-          size="lg"
-          checked={isEnabled}
-          value={Settings.notablePlayersOverlay}
-          onChange={(e) => updateSetting(!!e?.target?.checked)}
-        />
+        <Switch checked={isEnabled} onChange={updateSetting} />
       </div>
       <div className="subtitle mb-2">
         Show notable players for 2 minutes under the hero top bar.

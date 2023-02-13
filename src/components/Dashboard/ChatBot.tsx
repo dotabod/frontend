@@ -1,16 +1,15 @@
 import { Card } from '@/ui/card'
-import { ActionIcon, CheckIcon, Input, List, Tooltip } from '@mantine/core'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import TwitchFetcher from 'twitch-fetcher'
-import { Badge } from '@mantine/core'
-import { ClipboardIcon } from '@heroicons/react/24/outline'
+import { CheckIcon, ClipboardIcon } from '@heroicons/react/24/outline'
 import ModImage from '@/components/ModImage'
 import { useClipboard } from '@mantine/hooks'
 import { ExternalLinkIcon } from 'lucide-react'
+import { Tooltip, Input, List, Button } from 'antd'
 
 const emotesRequired = [
   {
@@ -85,7 +84,6 @@ export default function ChatBot() {
         <div>
           1. Type the following in your stream to add @dotabod as a moderator to{' '}
           <Link
-            className="text-blue-400 hover:text-blue-300"
             target="_blank"
             href={`https://www.twitch.tv/popout/${session.data.user.name}/chat`}
           >
@@ -94,93 +92,92 @@ export default function ChatBot() {
           .
         </div>
         <Input
-          icon={<ModImage />}
+          addonBefore={<ModImage />}
           readOnly
-          styles={(theme) => ({
-            input: {
-              focusRing: 'never',
-              borderColor: clipboard.copied ? theme.colors.green[9] : '',
-            },
-          })}
+          color={clipboard.copied ? 'green' : ''}
           className={clsx('max-w-sm transition-colors')}
           value="/mod dotabod"
           onClick={() => clipboard.copy('/mod dotabod')}
-          rightSection={
+          addonAfter={
             <Tooltip
-              opened={clipboard.copied}
-              label={clipboard.copied ? 'Copied' : 'Copy'}
-              withArrow
-              position="right"
+              color={clipboard.copied ? 'green' : ''}
+              title={clipboard.copied ? 'Copied' : 'Copy'}
             >
-              <ActionIcon
-                color={clipboard.copied ? 'teal' : 'gray'}
+              <Button
+                type="ghost"
+                size="small"
+                block
+                icon={
+                  clipboard.copied ? (
+                    <CheckIcon width={16} />
+                  ) : (
+                    <ClipboardIcon width={16} />
+                  )
+                }
                 onClick={() => clipboard.copy('/mod dotabod')}
-              >
-                {clipboard.copied ? (
-                  <CheckIcon width={16} />
-                ) : (
-                  <ClipboardIcon width={16} />
-                )}
-              </ActionIcon>
+              />
             </Tooltip>
           }
         />
 
         <div>
-          2. <Badge>Optional</Badge> Add the following emotes to your channel
-          using 7TV (case sensitive):
+          2. Add the following emotes to your channel using 7TV (case
+          sensitive):
         </div>
         <List
-          size="sm"
-          className="ml-8 grid grid-cols-1 space-y-1 md:grid-cols-3 md:space-y-0 lg:grid-cols-4"
-        >
-          {emotesRequired
-            .sort((a, b) => {
-              // if its found in emotes, put it at the bottom
-              if (emotes.find((e) => e.code === a.label)) return 1
-              if (emotes.find((e) => e.code === b.label)) return -1
-              return 0
-            })
-            .map(({ label, url }) => {
-              const thisEmote = emotes.find((e) => e.code === label)
-              return (
-                <List.Item key={label}>
-                  <div
+          grid={{
+            gutter: 16,
+            xs: 1,
+            sm: 2,
+            md: 4,
+            lg: 4,
+            xl: 6,
+            xxl: 3,
+          }}
+          dataSource={emotesRequired.sort((a, b) => {
+            // if it's found in emotes, put it at the bottom
+            if (emotes.find((e) => e.code === a.label)) return 1
+            if (emotes.find((e) => e.code === b.label)) return -1
+            return 0
+          })}
+          renderItem={({ label, url }) => {
+            const thisEmote = emotes.find((e) => e.code === label)
+
+            return (
+              <List.Item key={label}>
+                <div
+                  className={clsx(
+                    'flex items-center space-x-2',
+                    thisEmote && 'line-through'
+                  )}
+                >
+                  {thisEmote && (
+                    <Image
+                      height={22}
+                      width={22}
+                      src={thisEmote.cdn.low}
+                      alt={thisEmote.code}
+                    />
+                  )}
+                  <Link
                     className={clsx(
-                      'flex items-center space-x-2',
-                      thisEmote && 'opacity-50'
+                      'flex items-center space-x-1',
+                      thisEmote && '!text-dark-300 opacity-80'
                     )}
+                    target="_blank"
+                    href={
+                      url ||
+                      `https://betterttv.com/emotes/shared/search?query=${label}`
+                    }
                   >
-                    {thisEmote && (
-                      <Image
-                        height={22}
-                        width={22}
-                        src={thisEmote.cdn.low}
-                        alt={thisEmote.code}
-                      />
-                    )}
-                    <Link
-                      className={clsx(
-                        'flex items-center space-x-1',
-                        ' transition-colors hover:text-[#E6E8F1]',
-                        thisEmote
-                          ? 'text-dark-300 line-through'
-                          : 'text-blue-400'
-                      )}
-                      target="_blank"
-                      href={
-                        url ||
-                        `https://betterttv.com/emotes/shared/search?query=${label}`
-                      }
-                    >
-                      <span>{label}</span>
-                      <ExternalLinkIcon size={14} />
-                    </Link>
-                  </div>
-                </List.Item>
-              )
-            })}
-        </List>
+                    <span>{label}</span>
+                    <ExternalLinkIcon size={14} />
+                  </Link>
+                </div>
+              </List.Item>
+            )
+          }}
+        />
       </div>
     </Card>
   )

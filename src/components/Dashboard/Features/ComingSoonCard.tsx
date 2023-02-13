@@ -1,14 +1,14 @@
 import { Card } from '@/ui/card'
-import { Badge } from '@mantine/core'
 import React from 'react'
 import clsx from 'clsx'
+import { Tag } from 'antd'
 
 export default function ComingSoonCard() {
   return (
     <Card className="hover:border-indigo-800">
       <div className="title">
         <h3>
-          Secret feature <Badge>coming soon</Badge>
+          Secret feature <Tag>Coming soon</Tag>
         </h3>
       </div>
       <div className="subtitle mb-2">

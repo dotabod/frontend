@@ -5,12 +5,28 @@ import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { showNotification } from '@mantine/notifications'
-import Link from 'next/link'
+import { App, Typography } from 'antd'
 
 export default function Login() {
   const { status } = useSession()
+  const { message } = App.useApp()
   const router = useRouter()
+
+  const showError = () => {
+    message.error({
+      key: 'login-error',
+      duration: 50000,
+      content: (
+        <span>
+          Oops. Unable to log you in. Reach out to us on{' '}
+          <Typography.Link href="https://discord.dotabod.com" target="_blank">
+            Discord
+          </Typography.Link>{' '}
+          to get help.
+        </span>
+      ),
+    })
+  }
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -20,25 +36,7 @@ export default function Login() {
 
   useEffect(() => {
     if (router.asPath.toLowerCase().includes('error')) {
-      showNotification({
-        id: 'login-error',
-        title: 'Unable to log you in',
-        disallowClose: true,
-        autoClose: 50000,
-        message: (
-          <div>
-            <Link
-              href="https://discord.dotabod.com"
-              target="_blank"
-              className="text-blue-400 hover:text-blue-300"
-            >
-              Reach out to us on Discord
-            </Link>{' '}
-            to get help
-          </div>
-        ),
-        color: 'red',
-      })
+      showError()
     }
   }, [router.asPath])
 

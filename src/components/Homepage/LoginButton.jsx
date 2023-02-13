@@ -1,4 +1,3 @@
-import { Button } from 'src/components/Button'
 import { signIn, useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
@@ -6,7 +5,7 @@ import clsx from 'clsx'
 import { UserAccountNav } from '../UserAccountNav'
 import { useState } from 'react'
 import * as React from 'react'
-import { LoadingOverlay } from '@mantine/core'
+import { Button } from 'antd'
 
 export function LoginButton({ className, ...props }) {
   const searchParams = useSearchParams()
@@ -20,8 +19,11 @@ export function LoginButton({ className, ...props }) {
 
   return (
     <Button
-      className={clsx(className, 'relative')}
-      disabled={loading}
+      className={clsx(
+        className,
+        'relative !border-slate-200 !bg-slate-100 !text-dark-500'
+      )}
+      loading={loading}
       onClick={() => {
         setLoading(true)
         return !user
@@ -38,16 +40,8 @@ export function LoginButton({ className, ...props }) {
               .finally(() => setLoading(false))
           : router.push('/dashboard')
       }}
-      variant="outline"
       {...props}
     >
-      <LoadingOverlay
-        visible={loading}
-        loaderProps={{ size: 'sm', color: 'pink' }}
-        overlayOpacity={0.3}
-        overlayColor="#c5c5c5"
-        className="rounded"
-      />
       <span>
         <svg
           xmlns="http://www.w3.org/2000/svg"

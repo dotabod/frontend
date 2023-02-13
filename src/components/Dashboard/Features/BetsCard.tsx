@@ -1,7 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display } from '@geist-ui/core'
-import { Button, Switch } from '@mantine/core'
+import { Button, Switch } from 'antd'
 import { useForm } from '@mantine/form'
 import clsx from 'clsx'
 import Image from 'next/image'
@@ -45,15 +44,7 @@ export default function BetsCard() {
     <Card>
       <div className="title">
         <h3>Twitch predictions</h3>
-        {l0 && <Switch disabled size="lg" color="blue" />}
-        {!l0 && (
-          <Switch
-            size="lg"
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={isEnabled}
-          />
-        )}
+        <Switch onChange={updateSetting} checked={isEnabled} />
       </div>
       <div className="subtitle">Let your chatters bet on your matches.</div>
       <div>
@@ -61,18 +52,16 @@ export default function BetsCard() {
         you win or lose a match.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        {l2 && <Switch disabled size="sm" color="blue" />}
-        {!l2 && (
-          <Switch
-            size="sm"
-            onChange={(e) => updateLivePoll(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={showLivePolls}
-          />
-        )}
+        <Switch
+          loading={l2}
+          onChange={updateLivePoll}
+          checked={showLivePolls}
+        />
         <span>Show live betting / polls overlay</span>
       </div>
-      <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
+      <div
+        className={clsx(!isEnabled && 'opacity-40', 'space-y-6 transition-all')}
+      >
         <form
           onSubmit={form.onSubmit((v) => {
             updateInfo(v)
@@ -92,13 +81,13 @@ export default function BetsCard() {
                 maxLength={45}
                 {...form.getInputProps(`title`)}
               />
-              <div className="grid grid-cols-1 gap-2 md:grid-cols-1 lg:grid-cols-3">
+              <div className="flex flex-col space-y-4 md:flex-row md:space-x-4">
                 <div>
                   <label htmlFor="yes" className="block text-sm">
                     Yes
                   </label>
                   <Input
-                    style={{ width: 208 }}
+                    style={{ maxWidth: 108 }}
                     id="yes"
                     maxLength={25}
                     placeholder="Yes"
@@ -110,7 +99,7 @@ export default function BetsCard() {
                     No
                   </label>
                   <Input
-                    style={{ width: 208 }}
+                    style={{ maxWidth: 108 }}
                     id="no"
                     maxLength={25}
                     placeholder="No"
@@ -123,7 +112,7 @@ export default function BetsCard() {
                   </label>
                   <Input
                     id="duration"
-                    style={{ width: 208 }}
+                    style={{ maxWidth: 108 }}
                     min={30}
                     max={1800}
                     placeholder="240"
@@ -133,11 +122,9 @@ export default function BetsCard() {
                 </div>
               </div>
               <Button
-                variant="outline"
-                color="green"
-                className="border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500"
+                type="primary"
+                htmlType="submit"
                 loading={loadingInfo}
-                type="submit"
                 disabled={!form.isDirty()}
               >
                 Save
@@ -145,7 +132,7 @@ export default function BetsCard() {
             </>
           )}
         </form>
-        <Display shadow caption="Customize the prediction title and answers.">
+        <div className="flex flex-col items-center space-y-4">
           <Image
             alt="bets image"
             width={425}
@@ -153,7 +140,8 @@ export default function BetsCard() {
             src="https://i.imgur.com/8ZsUxJR.png"
             className="bg-gray-500"
           />
-        </Display>
+          <span>Customize the prediction title and answers.</span>
+        </div>
       </div>
     </Card>
   )

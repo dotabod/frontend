@@ -1,8 +1,10 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { Link } from '@geist-ui/core'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
+import { ReactElement } from 'react'
+import Header from '@/components/Dashboard/Header'
+import { Typography } from 'antd'
 
 const faqs = [
   {
@@ -44,13 +46,12 @@ const faqs = [
       <span>
         I&apos;d remove it if I were you. Dotabod has all the features 9kmmrbot
         had, and more. Visit{' '}
-        <Link
-          color
+        <Typography.Link
           target="_blank"
           href="https://twitch.tv/popout/9kmmrbot/chat"
         >
           9kmmrbot chat
-        </Link>{' '}
+        </Typography.Link>{' '}
         and type <code>!part</code> to remove 9kmmrbot. You may have to ban
         9kmmrbot from your channel because it may keep trying to join and
         respond to commands still.
@@ -67,16 +68,16 @@ const faqs = [
     answer: (
       <span>
         Get help in our{' '}
-        <Link color target="_blank" href="https://discord.dotabod.com">
+        <Typography.Link target="_blank" href="https://discord.dotabod.com">
           Discord
-        </Link>
+        </Typography.Link>
         .
       </span>
     ),
   },
 ]
 
-export default function TroubleshootPage() {
+const TroubleshootPage = () => {
   const { status } = useSession()
 
   return status === 'authenticated' ? (
@@ -84,28 +85,31 @@ export default function TroubleshootPage() {
       <Head>
         <title>Dotabod | Troubleshooting</title>
       </Head>
-      <DashboardShell
+      <Header
         subtitle="Try these steps in case something isn't working."
         title="Troubleshooting"
-      >
-        <div className="mt-12 lg:col-span-2 lg:mt-0">
-          <dl className="space-y-12">
-            {faqs.map(
-              (faq) =>
-                faq.question && (
-                  <div key={faq.question}>
-                    <dt className="text-lg font-medium leading-6 text-white">
-                      {faq.question}
-                    </dt>
-                    <dd className="mt-2 text-base text-dark-300">
-                      {faq.answer}
-                    </dd>
-                  </div>
-                )
-            )}
-          </dl>
-        </div>
-      </DashboardShell>
+      />
+      <div className="mt-12 lg:col-span-2 lg:mt-0">
+        <dl className="space-y-12">
+          {faqs.map(
+            (faq) =>
+              faq.question && (
+                <div key={faq.question}>
+                  <dt className="text-lg font-medium leading-6">
+                    {faq.question}
+                  </dt>
+                  <dd className="mt-2 text-base text-dark-300">{faq.answer}</dd>
+                </div>
+              )
+          )}
+        </dl>
+      </div>
     </>
   ) : null
 }
+
+TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardShell>{page}</DashboardShell>
+}
+
+export default TroubleshootPage

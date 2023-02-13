@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import DiscordSvg from '@/images/logos/discord.svg'
 import GithubSvg from '@/images/logos/github.svg'
 import Image from 'next/image'
-import { Tooltip } from '@mantine/core'
+import { Tooltip } from 'antd'
 
 export function NavLinks({ bottom = false }) {
   let [hoveredIndex, setHoveredIndex] = useState(null)
@@ -38,7 +38,7 @@ export function NavLinks({ bottom = false }) {
     // ['Twitch', 'https://twitch.tv/dotabod/about', TwitchSvg],
   ].map(([label, href, Icon, tooltip], index) => {
     return (
-      <Tooltip key={label} label={tooltip} disabled={!tooltip} position="top">
+      <Tooltip key={label} title={tooltip} disabled={!tooltip} position="top">
         <Link
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}

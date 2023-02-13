@@ -3,7 +3,34 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 // Added tsx
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  corePlugins: {
+    preflight: true, // fix for ant design
+  },
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  plugins: [
+    function ({ addBase, theme }) {
+      function extractColorVars(colorObj, colorGroup = '') {
+        return Object.keys(colorObj).reduce((vars, colorKey) => {
+          const value = colorObj[colorKey]
+          const cssVariable =
+            colorKey === 'DEFAULT'
+              ? `--color${colorGroup}`
+              : `--color${colorGroup}-${colorKey}`
+
+          const newVars =
+            typeof value === 'string'
+              ? { [cssVariable]: value }
+              : extractColorVars(value, `-${colorKey}`)
+
+          return { ...vars, ...newVars }
+        }, {})
+      }
+
+      addBase({
+        ':root': extractColorVars(theme('colors')),
+      })
+    },
+  ],
   theme: {
     fontSize: {
       xs: ['0.75rem', { lineHeight: '1rem' }],

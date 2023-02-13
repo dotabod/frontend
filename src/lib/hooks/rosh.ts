@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const isDev = process.env.NODE_ENV === 'development'
+export const isDev = true
 export const devTotalTimer = 480000
 export const useRoshan = () => {
   const [roshan, setRoshan] = useState({

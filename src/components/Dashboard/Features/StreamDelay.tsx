@@ -1,7 +1,7 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Settings } from '@/lib/defaultSettings'
-import { Input } from '@/components/Input'
+import { Input } from 'antd'
 import { useDebouncedCallback } from 'use-debounce'
 
 export default function StreamDelayCard() {
@@ -29,9 +29,10 @@ export default function StreamDelayCard() {
         {!loading && (
           <Input
             type="number"
-            min="0"
+            min={0}
+            max={60}
             placeholder="0 seconds"
-            className="max-w-fit transition-all"
+            className="!w-[200px] transition-all"
             defaultValue={Math.abs(Number(delay) || 0) / 1000}
             onChange={debouncedUpdate}
           />

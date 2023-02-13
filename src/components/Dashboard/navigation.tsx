@@ -1,15 +1,19 @@
-import { Github, LogOut, StickyNoteIcon } from 'lucide-react'
+import { Github, LogOut } from 'lucide-react'
 import {
   BeakerIcon,
-  BoltIcon,
+  SparklesIcon,
   CommandLineIcon,
   HeartIcon,
   QuestionMarkCircleIcon,
-  VideoCameraIcon,
+  RssIcon,
 } from '@heroicons/react/24/outline'
-import clsx from 'clsx'
 import { signOut } from 'next-auth/react'
 import Discord from '@/images/logos/Discord'
+import KofiIcon from '@/images/logos/Kofi'
+import Image from 'next/image'
+import BoostyLogo from '@/images/logos/BoostyIcon.png'
+import React from 'react'
+import clsx from 'clsx'
 
 export const navigation = [
   {
@@ -20,7 +24,7 @@ export const navigation = [
   {
     name: 'Features',
     href: '/dashboard/features',
-    icon: BoltIcon,
+    icon: SparklesIcon,
   },
   {
     name: 'Commands',
@@ -31,11 +35,6 @@ export const navigation = [
     name: 'Troubleshoot',
     href: '/dashboard/troubleshoot',
     icon: QuestionMarkCircleIcon,
-  },
-  {
-    name: 'Live preview',
-    href: '/overlay/',
-    icon: VideoCameraIcon,
   },
   {
     name: '',
@@ -54,18 +53,39 @@ export const navigation = [
   },
   {
     name: 'Support the project',
-    href: 'https://ko-fi.com/dotabod',
-    icon: ({ ...props }) => (
+    key: 'donate',
+    icon: ({ className }) => (
       <HeartIcon
-        {...props}
-        className={clsx(props.className, '!text-red-500')}
+        className={clsx('h-4 w-4 !text-red-500', className)}
+        aria-hidden="true"
       />
     ),
+    children: [
+      {
+        key: 'kofi',
+        label: (
+          <a href="https://ko-fi.com/dotabod" target="_blank" rel="noreferrer">
+            Ko-fi
+          </a>
+        ),
+        icon: <KofiIcon className="h-4 w-4" />,
+      },
+      {
+        label: (
+          <a href="https://boosty.to/dotabod" target="_blank" rel="noreferrer">
+            Boosty
+          </a>
+        ),
+        key: 'boosty',
+        href: 'https://boosty.to/dotabod',
+        icon: <Image src={BoostyLogo} height={16} width={16} alt="boosty" />,
+      },
+    ],
   },
   {
     name: 'Changelog',
     href: 'https://discord.com/channels/1039887907705593876/1069124160179163146',
-    icon: StickyNoteIcon,
+    icon: RssIcon,
   },
   {
     name: '',
@@ -75,8 +95,7 @@ export const navigation = [
   {
     name: 'Sign out',
     href: '#',
-    onClick: (e) => {
-      e.preventDefault()
+    onClick: () => {
       signOut({
         callbackUrl: `${window.location.origin}/`,
       })

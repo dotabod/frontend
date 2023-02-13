@@ -1,11 +1,10 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Display } from '@geist-ui/core'
-import { Badge, Switch } from '@mantine/core'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
 import { defaultSettings, Settings } from '@/lib/defaultSettings'
+import { Switch, Tag } from 'antd'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
@@ -62,17 +61,10 @@ export default function SceneSwitcher(): JSX.Element {
     <Card>
       <div className="title">
         <h3>
-          OBS scene switcher <Badge>Optional</Badge>
+          OBS scene switcher <Tag>Optional</Tag>
         </h3>
-        {l0 && <Switch disabled size="lg" color="blue" />}
-        {!l0 && (
-          <Switch
-            size="lg"
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={isEnabled}
-          />
-        )}
+        {l0 && <Switch disabled />}
+        {!l0 && <Switch onChange={updateSetting} checked={isEnabled} />}
       </div>
       <div className="subtitle">
         Auto switch scenes in OBS depending on game state. Your blockers will
@@ -125,14 +117,15 @@ export default function SceneSwitcher(): JSX.Element {
         </ul>
       )}
 
-      <Display shadow caption="Example OBS scenes and sources">
+      <div className="flex flex-col items-center space-y-4">
         <Image
           width={536}
           height={115}
           alt="scene switcher"
           src="/images/setup/scene-switcher.png"
         />
-      </Display>
+        <span>Example OBS scenes and sources</span>
+      </div>
     </Card>
   )
 }

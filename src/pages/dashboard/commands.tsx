@@ -2,60 +2,20 @@ import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { getValueOrDefault } from '@/lib/settings'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
-import {
-  Accordion,
-  Center,
-  Group,
-  SegmentedControl,
-  TextInput,
-} from '@mantine/core'
-import { useHotkeys, useInputState, useLocalStorage } from '@mantine/hooks'
-import { ListX } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
-import { accordionStyles } from '@/components/accordionStyles'
+import Header from '@/components/Dashboard/Header'
+import { Empty, Input, Segmented } from 'antd'
 
-export default function CommandsPage() {
+const CommandsPage = () => {
   const { status } = useSession()
-  const [permission, setPermission] = useLocalStorage({
-    key: 'command-display-permission',
-    defaultValue: 'All',
-  })
-  const [enabled, setEnabled] = useLocalStorage({
-    key: 'command-display-enabled',
-    defaultValue: 'All',
-  })
+  const [permission, setPermission] = useState('All')
+  const [enabled, setEnabled] = useState('All')
   const { data } = useUpdate({ path: `/api/settings` })
 
-  const [isFinding, setIsFinding] = useState(false)
-  const [value, setValue] = useState<string[] | string>('')
-
-  useHotkeys([
-    [
-      'mod+f',
-      () => {
-        setIsFinding(true)
-        setValue(Object.keys(CommandDetail))
-      },
-      {
-        preventDefault: false,
-      },
-    ],
-    [
-      'escape',
-      () => {
-        setIsFinding(false)
-        setValue('')
-      },
-      {
-        preventDefault: false,
-      },
-    ],
-  ])
-
-  const [searchTerm, setSearchTerm] = useInputState('')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
@@ -104,53 +64,48 @@ export default function CommandsPage() {
       <Head>
         <title>Dotabod | Commands</title>
       </Head>
-      <DashboardShell
+      <Header
         subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
         title="Commands"
-      >
-        <div className="flex justify-between">
-          <Group className="mb-4">
-            <SegmentedControl
-              value={permission}
-              onChange={setPermission}
-              data={['All', 'Mods', 'Plebs']}
-              color="blue"
-            />
-            <SegmentedControl
-              value={enabled}
-              onChange={setEnabled}
-              data={['All', 'Enabled', 'Disabled']}
-              color="blue"
-            />
-          </Group>
-          <TextInput
-            placeholder="Search commands..."
-            value={searchTerm}
-            onChange={setSearchTerm}
+      />
+
+      <div className="flex items-baseline space-x-6">
+        <div className="flex flex-col space-y-3">
+          <Segmented
+            value={enabled}
+            onChange={(v) => setEnabled(v as string)}
+            options={['All', 'Enabled', 'Disabled']}
+          />
+          <Segmented
+            value={permission}
+            onChange={(v) => setPermission(v as string)}
+            options={['All', 'Mods', 'Plebs']}
           />
         </div>
-        <Accordion
-          multiple={isFinding}
-          value={value}
-          onChange={setValue}
-          variant="separated"
-          styles={accordionStyles}
-        >
-          {filteredCommands.length < 1 && (
-            <Center style={{ height: 200 }}>
-              <div className="flex flex-col items-center text-center text-dark-300">
-                <ListX size={80} />
-                <p>Could not find any matching commands.</p>
-              </div>
-            </Center>
-          )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredCommands.map((key) => (
-              <CommandsCard key={key} id={key} command={CommandDetail[key]} />
-            ))}
-          </div>
-        </Accordion>
-      </DashboardShell>
+        <Input
+          placeholder="Search commands..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      {filteredCommands.length < 1 && (
+        <Empty
+          description="Could not find any matching commands."
+          imageStyle={{ height: 60 }}
+        />
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredCommands.map((key, i) => (
+          <CommandsCard key={i} id={key} command={CommandDetail[key]} />
+        ))}
+      </div>
     </>
   ) : null
 }
+
+CommandsPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardShell>{page}</DashboardShell>
+}
+
+export default CommandsPage

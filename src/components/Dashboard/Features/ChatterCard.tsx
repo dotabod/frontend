@@ -1,6 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch, Tooltip } from '@mantine/core'
+import { Switch, Tooltip } from 'antd'
 import { useForm } from '@mantine/form'
 import clsx from 'clsx'
 import Image from 'next/image'
@@ -357,25 +357,13 @@ export default function ChatterCard() {
     <Card>
       <div className="title">
         <h3>Chatter</h3>
-        {loading && (
-          <Switch
-            disabled
-            size="lg"
-            offLabel="All"
-            onLabel="All"
-            color="blue"
-          />
-        )}
-        {!loading && (
-          <Switch
-            size="lg"
-            offLabel="All"
-            onLabel="All"
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={isEnabled}
-          />
-        )}
+        <Switch
+          loading={loading}
+          checkedChildren="All"
+          unCheckedChildren="All"
+          onChange={updateSetting}
+          checked={isEnabled}
+        />
       </div>
       <div className="subtitle mb-2">
         The bot can post some random messages as you play your game.
@@ -397,39 +385,23 @@ export default function ChatterCard() {
                         {value.category}
                       </div>
                     ) : null}
-                    <Tooltip label={value?.tooltip} disabled={!value?.tooltip}>
+                    <Tooltip title={value?.tooltip}>
                       <div className="ml-4 flex items-center space-x-3">
                         <Switch
-                          styles={{
-                            labelWrapper: {
-                              color: 'var(--mantine-color-dark-3)',
-                            },
-                          }}
-                          label={value.message}
-                          size="sm"
-                          color="blue"
                           disabled={!isEnabled || loadingChatters}
                           {...form.getInputProps(`${value.id}.enabled`, {
                             type: 'checkbox',
                           })}
-                          onChange={(e) => {
-                            const originalChange = form.getInputProps(
-                              `${value.id}.enabled`,
-                              {
-                                type: 'checkbox',
-                              }
-                            ).onChange
-
-                            if (originalChange) originalChange(e)
-
+                          onChange={(checked, e) => {
                             handleSubmit({
                               ...form.values,
                               [value.id]: {
-                                enabled: !!e?.currentTarget?.checked,
+                                enabled: checked,
                               },
                             })
                           }}
                         />
+                        <span>{value.message}</span>
                       </div>
                     </Tooltip>
                   </div>

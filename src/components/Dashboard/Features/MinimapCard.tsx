@@ -1,6 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Center, Switch } from '@mantine/core'
+import { Switch } from 'antd'
 import clsx from 'clsx'
 import { Settings } from '@/lib/defaultSettings'
 import Image from 'next/image'
@@ -32,6 +32,39 @@ export default function MinimapCard(): JSX.Element {
     updateSetting: updateMinimapRight,
   } = useUpdateSetting(Settings.minimapRight)
 
+  const switches = [
+    {
+      loading: l0,
+      checked: isEnabled,
+      onChange: updateSetting,
+      label: 'Enable minimap blocker',
+    },
+    {
+      loading: l1,
+      checked: minimapSimple,
+      onChange: updateSimple,
+      label: 'Use simple minimap background',
+    },
+    {
+      loading: l2,
+      checked: minimapXl,
+      onChange: updateXl,
+      label: 'Use extra large minimap',
+    },
+    {
+      loading: l3,
+      checked: isBP,
+      onChange: updateBP,
+      label: 'Use battlepass minimap',
+    },
+    {
+      loading: l4,
+      checked: isMinimapRight,
+      onChange: updateMinimapRight,
+      label: 'Use right side minimap',
+    },
+  ]
+
   return (
     <Card>
       <div className="title">
@@ -43,110 +76,54 @@ export default function MinimapCard(): JSX.Element {
       </div>
       <div className={clsx('pt-4 pb-12 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Use simple minimap background"
-            color="blue"
-            checked={minimapSimple}
-            value={Settings['minimap-simple']}
-            onChange={(e) => updateSimple(!!e?.target?.checked)}
-          />
-
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Use extra large minimap"
-            checked={minimapXl}
-            value={Settings['minimap-xl']}
-            onChange={(e) => updateXl(!!e?.target?.checked)}
-          />
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Show minimap on the right"
-            checked={isMinimapRight}
-            value={Settings.minimapRight}
-            onChange={(e) => updateMinimapRight(!!e?.target?.checked)}
-          />
-
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Use Battlepass 2022 HUD"
-            checked={isBP}
-            value={Settings.battlepass}
-            onChange={(e) => updateBP(!!e?.target?.checked)}
-          />
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Enable minimap blocker"
-            color="blue"
-            checked={isEnabled}
-            value={Settings['minimap-blocker']}
-            onChange={(e) => updateSetting(!!e?.target?.checked)}
-            defaultChecked={isEnabled}
-          />
+          {switches.map(({ loading, checked, onChange, label }, i) => (
+            <div key={i} className="flex items-center space-x-2">
+              <Switch checked={checked} loading={loading} onChange={onChange} />
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <Center>
-        <div
-          className={clsx(
-            'flex items-center space-x-4 transition-all',
-            !isEnabled && 'opacity-40'
-          )}
-        >
-          <div className="flex flex-col items-center space-y-4">
-            <Image
-              className={clsx(
-                !minimapSimple && 'border border-2 border-blue-600',
-                minimapSimple && 'opacity-60',
-                'rounded-xl border-2 border-transparent transition-all'
-              )}
-              alt="minimap blocker"
-              width={minimapXl ? 280 : 240}
-              height={minimapXl ? 280 : 240}
-              src={`/images/overlay/minimap/731-${'Complex'}-${
-                minimapXl ? 'X' : ''
-              }Large-AntiStreamSnipeMap.png`}
-            />
-            <span>Complex minimap</span>
-          </div>
-          <div className="flex flex-col items-center space-y-4">
-            <Image
-              className={clsx(
-                minimapSimple && 'border border-2 border-blue-600',
-                !minimapSimple && 'opacity-60',
-                'rounded-xl border-2 border-transparent transition-all'
-              )}
-              alt="minimap blocker"
-              width={minimapXl ? 280 : 240}
-              height={minimapXl ? 280 : 240}
-              src={`/images/overlay/minimap/731-${'Simple'}-${
-                minimapXl ? 'X' : ''
-              }Large-AntiStreamSnipeMap.png`}
-            />
-            <span>Simple minimap</span>
-          </div>
+      <div
+        className={clsx(
+          'flex w-full items-center justify-center space-x-4 transition-all',
+          !isEnabled && 'opacity-40'
+        )}
+      >
+        <div className="flex flex-col items-center space-y-4">
+          <Image
+            className={clsx(
+              !minimapSimple && 'border-2 border-blue-600',
+              minimapSimple && 'opacity-60',
+              'rounded-xl border-2 border-transparent transition-all'
+            )}
+            alt="minimap blocker"
+            width={minimapXl ? 280 : 240}
+            height={minimapXl ? 280 : 240}
+            src={`/images/overlay/minimap/731-${'Complex'}-${
+              minimapXl ? 'X' : ''
+            }Large-AntiStreamSnipeMap.png`}
+          />
+          <span>Complex minimap</span>
         </div>
-      </Center>
+        <div className="flex flex-col items-center space-y-4">
+          <Image
+            className={clsx(
+              minimapSimple && 'border border-2 border-blue-600',
+              !minimapSimple && 'opacity-60',
+              'rounded-xl border-2 border-transparent transition-all'
+            )}
+            alt="minimap blocker"
+            width={minimapXl ? 280 : 240}
+            height={minimapXl ? 280 : 240}
+            src={`/images/overlay/minimap/731-${'Simple'}-${
+              minimapXl ? 'X' : ''
+            }Large-AntiStreamSnipeMap.png`}
+          />
+          <span>Simple minimap</span>
+        </div>
+      </div>
     </Card>
   )
 }
