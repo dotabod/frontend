@@ -81,13 +81,13 @@ export default function BetsCard() {
                 maxLength={45}
                 {...form.getInputProps(`title`)}
               />
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-4 md:flex-row md:space-x-4">
                 <div>
                   <label htmlFor="yes" className="block text-sm">
                     Yes
                   </label>
                   <Input
-                    style={{ width: 208 }}
+                    style={{ maxWidth: 108 }}
                     id="yes"
                     maxLength={25}
                     placeholder="Yes"
@@ -99,7 +99,7 @@ export default function BetsCard() {
                     No
                   </label>
                   <Input
-                    style={{ width: 208 }}
+                    style={{ maxWidth: 108 }}
                     id="no"
                     maxLength={25}
                     placeholder="No"
@@ -112,7 +112,7 @@ export default function BetsCard() {
                   </label>
                   <Input
                     id="duration"
-                    style={{ width: 208 }}
+                    style={{ maxWidth: 108 }}
                     min={30}
                     max={1800}
                     placeholder="240"
