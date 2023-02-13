@@ -22,15 +22,15 @@ const SetupPage = () => {
 
   const steps = [
     {
-      title: 'Twitch chat account',
+      title: 'Twitch',
       content: <ChatBot />,
     },
     {
-      title: 'Dota 2 integration',
+      title: 'Dota 2',
       content: <ExportCFG />,
     },
     {
-      title: 'Stream overlay',
+      title: 'OBS',
       content: <OBSOverlay />,
     },
     {
@@ -107,24 +107,26 @@ const SetupPage = () => {
 
       {steps[active].content}
 
-      {active > 0 && (
-        <Button size="large" onClick={prevStep}>
-          Back
-        </Button>
-      )}
-
-      {active === steps.length - 1 && (
-        <Link href="/dashboard/features">
-          <Button size="large" type="primary">
-            View features
+      <div className="flex space-x-4 pb-10">
+        {active > 0 && (
+          <Button size="large" onClick={prevStep}>
+            Back
           </Button>
-        </Link>
-      )}
-      {active < steps.length - 1 && (
-        <Button size="large" type="primary" onClick={nextStep}>
-          Next step
-        </Button>
-      )}
+        )}
+
+        {active === steps.length - 1 && (
+          <Link href="/dashboard/features">
+            <Button size="large" type="primary">
+              View features
+            </Button>
+          </Link>
+        )}
+        {active < steps.length - 1 && (
+          <Button size="large" type="primary" onClick={nextStep}>
+            Next step
+          </Button>
+        )}
+      </div>
     </>
   ) : null
 }

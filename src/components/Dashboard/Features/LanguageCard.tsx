@@ -54,25 +54,17 @@ export default function LanguageCard() {
       </div>
 
       <div>
-        {!loadingLocale && (
-          <Select
-            placeholder="Language selector"
-            className="max-w-fit transition-all"
-            options={localeOptions.map((x) => ({
-              ...x,
-              label: <SelectItem Flag={x.Flag} label={x.label} />,
-            }))}
-            defaultValue={localeOption?.locale}
-            onChange={(value) => updateLocale(value)}
-          />
-        )}
-        {loadingLocale && (
-          <Select
-            placeholder="Language selector"
-            className="max-w-fit"
-            disabled
-          />
-        )}
+        <Select
+          loading={loadingLocale}
+          placeholder="Language selector"
+          className="w-[200px] transition-all"
+          options={localeOptions.map((x) => ({
+            ...x,
+            label: <SelectItem Flag={x.Flag} label={x.label} />,
+          }))}
+          value={localeOption?.locale}
+          onChange={(value) => updateLocale(value)}
+        />
       </div>
     </Card>
   )

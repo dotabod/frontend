@@ -189,7 +189,7 @@ export default function MmrTrackerCard() {
                       image={rank?.image}
                       rank={null}
                       key={account.steam32Id}
-                      className="self-center !rounded-md"
+                      className="!h-12 !w-12 !rounded-md bg-transparent !p-0"
                     />
                     <SteamAvatar id={account.steam32Id} data={steamData} />
                     <Input
@@ -199,7 +199,7 @@ export default function MmrTrackerCard() {
                       type="number"
                       min={0}
                       max={30000}
-                      className="w-full"
+                      className="!w-[200px]"
                       {...form.getInputProps(`accounts.${index}.mmr`)}
                     />
                     <Button
@@ -281,16 +281,21 @@ export default function MmrTrackerCard() {
               leaderboard={null}
               image={noSteamRank?.image}
               rank={null}
-              className="h-12 w-12 !rounded-md"
+              className="bg-transparent"
             />
             <div className="flex flex-col">
-              {loading && (
-                <Input placeholder="Loading..." className="w-full" disabled />
-              )}
+              {loading &&
+                !(
+                  <Input
+                    placeholder="Loading..."
+                    className="!w-[200px]"
+                    disabled
+                  />
+                )}
               {!loading && (
                 <Input
                   placeholder="0"
-                  className="w-full"
+                  className="!w-[200px]"
                   id="mmr"
                   name="mmr"
                   type="number"
@@ -311,7 +316,7 @@ export default function MmrTrackerCard() {
         </div>
       )}
 
-      <div className="mt-6 flex justify-center space-x-4">
+      <div className="my-6 flex justify-center space-x-4">
         <MMRBadge
           leaderboard={null}
           image={showRankImage ? '11.png' : null}
