@@ -59,7 +59,9 @@ export default function BetsCard() {
         />
         <span>Show live betting / polls overlay</span>
       </div>
-      <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
+      <div
+        className={clsx(!isEnabled && 'opacity-40', 'space-y-6 transition-all')}
+      >
         <form
           onSubmit={form.onSubmit((v) => {
             updateInfo(v)
@@ -79,7 +81,7 @@ export default function BetsCard() {
                 maxLength={45}
                 {...form.getInputProps(`title`)}
               />
-              <div className="grid grid-cols-1 gap-2 md:grid-cols-1 lg:grid-cols-3">
+              <div className="flex flex-col">
                 <div>
                   <label htmlFor="yes" className="block text-sm">
                     Yes
