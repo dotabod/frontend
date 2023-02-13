@@ -27,7 +27,7 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
             py-2 text-left text-sm transition-all
             focus:ring-2 `,
           dark
-            ? `bg-[#17181e] text-white hover:border hover:border-blue-500 hover:bg-[#17181e] focus:ring-offset-blue-100`
+            ? `bg-[#17181e] text-dark-200 hover:border hover:border-blue-500 hover:bg-[#17181e] focus:ring-offset-blue-100`
             : `bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-100`,
           showDetails
             ? 'cursor-pointer select-text hover:border-transparent focus:ring-transparent focus:ring-offset-transparent'

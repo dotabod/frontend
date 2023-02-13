@@ -327,7 +327,7 @@ export default function MmrTrackerCard() {
       </div>
 
       <div className={clsx('transition-all')}>
-        <div className="flex flex-col items-center space-y-4 text-white">
+        <div className="flex flex-col items-center space-y-4">
           <Image
             alt="mmr tracker"
             width={534}

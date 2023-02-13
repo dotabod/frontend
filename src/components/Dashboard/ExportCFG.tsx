@@ -69,7 +69,7 @@ export default function ExportCFG() {
           <Button color="green">Download config file</Button>
         </a>
         <div className="space-y-4">
-          <div className="flex flex-col items-center space-y-4 text-white">
+          <div className="flex flex-col items-center space-y-4">
             <video width="508" height="504" controls autoPlay muted loop>
               <source
                 src="/images/setup/how-to-create-cfg.mp4"
@@ -106,7 +106,7 @@ export default function ExportCFG() {
           , or follow the video below.
         </div>
 
-        <div className="flex flex-col items-center space-y-4 text-white">
+        <div className="flex flex-col items-center space-y-4">
           <video width="482" height="392" controls autoPlay muted loop>
             <source
               src="/images/setup/how-to-gsi-properties.mp4"

@@ -132,7 +132,7 @@ export default function BetsCard() {
             </>
           )}
         </form>
-        <div className="flex flex-col items-center space-y-4 text-white">
+        <div className="flex flex-col items-center space-y-4">
           <Image
             alt="bets image"
             width={425}

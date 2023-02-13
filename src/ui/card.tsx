@@ -6,7 +6,7 @@ export function Card({ className, ...props }: CardProps) {
   return (
     <div
       className={clsx(
-        'rounded-lg border border-transparent bg-dark-800 p-5 text-sm text-dark-300 shadow-lg transition-all hover:border hover:border-blue-600 hover:shadow-blue-500/10',
+        'rounded-lg border border-transparent bg-dark-900 p-5 text-sm text-dark-300 shadow-lg transition-all hover:border hover:border-blue-600 hover:shadow-blue-500/10',
         className
       )}
       {...props}

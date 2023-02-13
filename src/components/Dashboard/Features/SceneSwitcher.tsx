@@ -117,7 +117,7 @@ export default function SceneSwitcher(): JSX.Element {
         </ul>
       )}
 
-      <div className="flex flex-col items-center space-y-4 text-white">
+      <div className="flex flex-col items-center space-y-4">
         <Image
           width={536}
           height={115}

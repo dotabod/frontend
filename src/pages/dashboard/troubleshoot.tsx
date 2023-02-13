@@ -95,7 +95,7 @@ const TroubleshootPage = () => {
             (faq) =>
               faq.question && (
                 <div key={faq.question}>
-                  <dt className="text-lg font-medium leading-6 text-white">
+                  <dt className="text-lg font-medium leading-6">
                     {faq.question}
                   </dt>
                   <dd className="mt-2 text-base text-dark-300">{faq.answer}</dd>

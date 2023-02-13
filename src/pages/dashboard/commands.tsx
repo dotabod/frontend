@@ -69,17 +69,19 @@ const CommandsPage = () => {
         title="Commands"
       />
 
-      <div className="flex justify-between">
-        <Segmented
-          value={permission}
-          onChange={(v) => setPermission(v as string)}
-          options={['All', 'Mods', 'Plebs']}
-        />
-        <Segmented
-          value={enabled}
-          onChange={(v) => setEnabled(v as string)}
-          options={['All', 'Enabled', 'Disabled']}
-        />
+      <div className="flex items-baseline space-x-6">
+        <div className="flex flex-col space-y-3">
+          <Segmented
+            value={enabled}
+            onChange={(v) => setEnabled(v as string)}
+            options={['All', 'Enabled', 'Disabled']}
+          />
+          <Segmented
+            value={permission}
+            onChange={(v) => setPermission(v as string)}
+            options={['All', 'Mods', 'Plebs']}
+          />
+        </div>
         <Input
           placeholder="Search commands..."
           value={searchTerm}

@@ -62,7 +62,7 @@ export default function DashboardShell({
           border-radius: 6px;
         }
       `}</style>
-      <Layout>
+      <Layout className="h-full">
         <Sider
           breakpoint="md"
           onBreakpoint={(broken) => setCollapsed(broken)}
@@ -87,7 +87,7 @@ export default function DashboardShell({
               >
                 {!collapsed && (
                   <Link href="/">
-                    <DarkLogo className="h-full w-auto text-white" />
+                    <DarkLogo className="h-full w-auto" />
                   </Link>
                 )}
 

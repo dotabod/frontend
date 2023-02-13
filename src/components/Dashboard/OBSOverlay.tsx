@@ -35,7 +35,7 @@ export default function OBSOverlay() {
     <div className="space-y-2">
       <CopyInstructions />
       <p>Paste this into the URL field when making the browser source</p>
-      <div className="flex flex-col items-center space-y-4 text-white">
+      <div className="flex flex-col items-center space-y-4">
         <video width="630" height="766" controls autoPlay muted loop>
           <source src="/images/setup/how-to-obs.mp4" type="video/mp4" />
           Your browser does not support the video tag.
@@ -50,7 +50,7 @@ export default function OBSOverlay() {
         1. Let&apos;s see what our canvas resolution is set to. Open OBS Studio
         and go to File &gt; Settings
       </p>
-      <div className="flex flex-col items-center space-y-4 text-white">
+      <div className="flex flex-col items-center space-y-4">
         <Image
           alt="dotabod browser source properties"
           width={331}
@@ -65,7 +65,7 @@ export default function OBSOverlay() {
         1920x1080 but you could have a different one. Don&apos;t copy 1234x789,
         that&apos;s just there as an example.
       </p>
-      <div className="flex flex-col items-center space-y-4 text-white">
+      <div className="flex flex-col items-center space-y-4">
         <Image
           alt="dotabod browser source properties"
           width={544}
@@ -80,7 +80,7 @@ export default function OBSOverlay() {
         Under Sources click Add &gt; Browser and press OK.
       </p>
 
-      <div className="flex flex-col items-center space-y-4 text-white">
+      <div className="flex flex-col items-center space-y-4">
         <Image
           alt="dotabod browser source properties"
           width={572}
@@ -104,7 +104,7 @@ export default function OBSOverlay() {
         <CopyInstructions />
       </div>
 
-      <div className="flex flex-col items-center space-y-4 text-white">
+      <div className="flex flex-col items-center space-y-4">
         <Image
           alt="dotabod browser source properties"
           unoptimized
