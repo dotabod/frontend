@@ -39,20 +39,12 @@ export function DisableToggle({ collapsed }: { collapsed: boolean }) {
           <span>{isDotabodDisabled ? 'disabled' : 'enabled'}</span>
         </p>
 
-        {loading && (
-          <Switch
-            disabled
-            size={collapsed ? 'small' : 'default'}
-            className="flex"
-          />
-        )}
-        {!loading && (
-          <Switch
-            className="flex"
-            defaultChecked={isDotabodDisabled}
-            onChange={updateSetting}
-          />
-        )}
+        <Switch
+          loading={loading}
+          className="flex"
+          checked={isDotabodDisabled}
+          onChange={updateSetting}
+        />
       </div>
       <p
         className={clsx(

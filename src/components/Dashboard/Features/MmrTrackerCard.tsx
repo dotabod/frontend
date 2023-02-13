@@ -5,7 +5,7 @@ import {
   useUpdateSetting,
 } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Badge, Button, clsx, Switch, Tooltip } from '@mantine/core'
+import { Typography, Tag, Button, Switch, Tooltip } from 'antd'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
 import React, { useEffect, useState } from 'react'
@@ -16,7 +16,7 @@ import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { getRankDetail, getRankImage, RankType } from '@/lib/ranks'
-import { Typography } from 'antd'
+import clsx from 'clsx'
 
 const SteamAvatar = ({ data: response, id }) => {
   if (!response) return <p>Loading...</p>
@@ -104,75 +104,39 @@ export default function MmrTrackerCard() {
 
       <div className={clsx('py-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Update mmr with every match"
-            checked={isEnabled}
-            value={Settings['mmr-tracker']}
-            onChange={(e) => updateSetting(!!e?.target?.checked)}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch checked={isEnabled} onChange={updateSetting} />
+            <span>Update mmr with every match</span>
+          </div>
 
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Show MMR"
-            checked={showRankMmr}
-            value={Settings.showRankMmr}
-            onChange={(e) => updateHideMmr(!!e?.target?.checked)}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch checked={showRankMmr} onChange={updateHideMmr} />
+            <span>Show MMR</span>
+          </div>
 
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Show leaderboard ranking"
-            checked={showRankLeader}
-            value={Settings.showRankLeader}
-            onChange={(e) => updateHideRankLeader(!!e?.target?.checked)}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch checked={showRankLeader} onChange={updateHideRankLeader} />
+            <span>Show leaderboard ranking</span>
+          </div>
 
-          <Switch
-            styles={{
-              labelWrapper: {
-                color: 'var(--mantine-color-dark-3)',
-              },
-            }}
-            label="Show rank badge"
-            checked={showRankImage}
-            value={Settings.showRankImage}
-            onChange={(e) => updateHideRankImage(!!e?.target?.checked)}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch checked={showRankImage} onChange={updateHideRankImage} />
+            <span>Show rank badge</span>
+          </div>
 
           <Tooltip
-            width={300}
-            multiline
-            label="Enable this to award 20 MMR instead of 30 for all matches. Disable to use 30 MMR again."
+            placement="bottom"
+            title="Enable this to award 20 MMR instead of 30 for all matches. Disable to use 30 MMR again."
           >
             <div
               className={clsx(
                 'mt-5 flex w-fit items-center space-x-2 transition-all'
               )}
             >
-              <Switch
-                styles={{
-                  labelWrapper: {
-                    color: 'var(--mantine-color-dark-3)',
-                  },
-                }}
-                label="Party queue only"
-                checked={onlyParty}
-                value={Settings.onlyParty}
-                onChange={(e) => updateOnlyParty(!!e?.target?.checked)}
-              />
+              <div className="flex items-center space-x-2">
+                <Switch checked={onlyParty} onChange={updateOnlyParty} />
+                <span>Party queue only</span>
+              </div>
             </div>
           </Tooltip>
         </div>
@@ -240,6 +204,7 @@ export default function MmrTrackerCard() {
                     />
                     <Button
                       disabled={removed}
+                      danger
                       onClick={() => {
                         form.setValues({
                           accounts: form.values.accounts.map((act) => {
@@ -253,13 +218,8 @@ export default function MmrTrackerCard() {
                           }),
                         })
                       }}
-                      leftIcon={<TrashIcon width={14} />}
-                      color="red"
-                      className="font-normal"
-                      variant="subtle"
-                      size="xs"
                     >
-                      Remove account
+                      <TrashIcon height={16} />
                     </Button>
                   </div>
                 </div>
@@ -268,17 +228,13 @@ export default function MmrTrackerCard() {
             {form.isDirty() && (
               <div className={clsx('space-x-4')}>
                 <Button
-                  variant="outline"
-                  color="green"
+                  htmlType="submit"
+                  type="primary"
                   disabled={!form.isDirty()}
                   loading={loadingAccounts}
-                  className={clsx(
-                    'border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500',
-                    form.isDirty() &&
-                      form.values.accounts.some((a) => a.delete) &&
-                      'border-red-700 bg-red-700 hover:bg-red-600'
-                  )}
-                  type="submit"
+                  danger={
+                    form.isDirty() && form.values.accounts.some((a) => a.delete)
+                  }
                 >
                   <span className="space-x-1">
                     {form.isDirty() &&
@@ -303,7 +259,6 @@ export default function MmrTrackerCard() {
                   onClick={() => {
                     form.setValues({ accounts })
                   }}
-                  className="text-dark-300 transition-colors disabled:bg-transparent"
                 >
                   Cancel
                 </Button>
@@ -316,7 +271,7 @@ export default function MmrTrackerCard() {
       {form.values.accounts.length === 0 && (
         <div className="mt-6">
           <div className="mb-4">
-            <Badge>INFO</Badge>
+            <Tag>INFO</Tag>
             <span>
               Play a bot game for Dotabod to detect your Steam account!
             </span>

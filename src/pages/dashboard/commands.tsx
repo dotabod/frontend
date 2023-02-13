@@ -2,28 +2,20 @@ import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { getValueOrDefault } from '@/lib/settings'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
-import { Group, SegmentedControl, TextInput } from '@mantine/core'
-import { useInputState, useLocalStorage } from '@mantine/hooks'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 import Header from '@/components/Dashboard/Header'
-import { Empty } from 'antd'
+import { Empty, Input, Segmented } from 'antd'
 
 const CommandsPage = () => {
   const { status } = useSession()
-  const [permission, setPermission] = useLocalStorage({
-    key: 'command-display-permission',
-    defaultValue: 'All',
-  })
-  const [enabled, setEnabled] = useLocalStorage({
-    key: 'command-display-enabled',
-    defaultValue: 'All',
-  })
+  const [permission, setPermission] = useState('All')
+  const [enabled, setEnabled] = useState('All')
   const { data } = useUpdate({ path: `/api/settings` })
 
-  const [searchTerm, setSearchTerm] = useInputState('')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
@@ -78,24 +70,20 @@ const CommandsPage = () => {
       />
 
       <div className="flex justify-between">
-        <Group className="mb-4">
-          <SegmentedControl
-            value={permission}
-            onChange={setPermission}
-            data={['All', 'Mods', 'Plebs']}
-            color="blue"
-          />
-          <SegmentedControl
-            value={enabled}
-            onChange={setEnabled}
-            data={['All', 'Enabled', 'Disabled']}
-            color="blue"
-          />
-        </Group>
-        <TextInput
+        <Segmented
+          value={permission}
+          onChange={(v) => setPermission(v as string)}
+          options={['All', 'Mods', 'Plebs']}
+        />
+        <Segmented
+          value={enabled}
+          onChange={(v) => setEnabled(v as string)}
+          options={['All', 'Enabled', 'Disabled']}
+        />
+        <Input
           placeholder="Search commands..."
           value={searchTerm}
-          onChange={setSearchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
       {filteredCommands.length < 1 && (

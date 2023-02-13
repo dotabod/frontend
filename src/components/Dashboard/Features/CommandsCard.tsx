@@ -32,10 +32,10 @@ export default function CommandsCard({
                 {command.allowed === 'all' && <Tag>All</Tag>}
               </div>
             </div>
-            {loading && command.key && <Switch disabled className="flex" />}
-            {!loading && command.key && (
+            {command.key && (
               <Switch
-                defaultChecked={isEnabled}
+                loading={loading}
+                checked={isEnabled}
                 onChange={updateSetting}
                 onClick={(v, e) => {
                   e.stopPropagation()

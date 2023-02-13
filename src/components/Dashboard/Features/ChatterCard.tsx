@@ -357,17 +357,13 @@ export default function ChatterCard() {
     <Card>
       <div className="title">
         <h3>Chatter</h3>
-        {loading && (
-          <Switch disabled unCheckedChildren="All" checkedChildren="All" />
-        )}
-        {!loading && (
-          <Switch
-            checkedChildren="All"
-            unCheckedChildren="All"
-            onChange={updateSetting}
-            checked={isEnabled}
-          />
-        )}
+        <Switch
+          loading={loading}
+          checkedChildren="All"
+          unCheckedChildren="All"
+          onChange={updateSetting}
+          checked={isEnabled}
+        />
       </div>
       <div className="subtitle mb-2">
         The bot can post some random messages as you play your game.

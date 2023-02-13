@@ -78,8 +78,7 @@ export default function MinimapCard(): JSX.Element {
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           {switches.map(({ loading, checked, onChange, label }, i) => (
             <div key={i} className="flex items-center space-x-2">
-              {loading && <Switch disabled />}
-              {!loading && <Switch checked={checked} onChange={onChange} />}
+              <Switch checked={checked} loading={loading} onChange={onChange} />
               <span>{label}</span>
             </div>
           ))}

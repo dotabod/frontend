@@ -39,13 +39,13 @@ export default function App({
           algorithm: theme.darkAlgorithm,
           components: {
             Menu: {
-              colorItemBgSelected: 'var(--mantine-color-dark-5)',
-              colorItemTextSelected: 'var(--mantine-color-dark-1)',
+              colorItemBgSelected: 'var(--color-dark-500)',
+              colorItemTextSelected: 'var(--color-dark-100)',
             },
           },
           token: {
-            colorBgLayout: 'var(--mantine-color-dark-8)',
-            colorBgContainer: 'var(--mantine-color-dark-7)',
+            colorBgLayout: 'var(--color-dark-800)',
+            colorBgContainer: 'var(--color-dark-700)',
           },
         }}
       >

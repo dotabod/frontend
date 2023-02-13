@@ -16,8 +16,11 @@ export default function PicksCard() {
     <Card>
       <div className="title">
         <h3>Picks</h3>
-        {loading && <Switch disabled />}
-        {!loading && <Switch onChange={updateSetting} checked={isEnabled} />}
+        <Switch
+          onChange={updateSetting}
+          loading={loading}
+          checked={isEnabled}
+        />
       </div>
       <div className="subtitle">
         Prevent stream snipers from seeing your picks.

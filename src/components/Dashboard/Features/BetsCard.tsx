@@ -1,6 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Switch } from '@mantine/core'
+import { Button, Switch } from 'antd'
 import { useForm } from '@mantine/form'
 import clsx from 'clsx'
 import Image from 'next/image'
@@ -44,15 +44,7 @@ export default function BetsCard() {
     <Card>
       <div className="title">
         <h3>Twitch predictions</h3>
-        {l0 && <Switch disabled size="lg" color="blue" />}
-        {!l0 && (
-          <Switch
-            size="lg"
-            onChange={(e) => updateSetting(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={isEnabled}
-          />
-        )}
+        <Switch onChange={updateSetting} checked={isEnabled} />
       </div>
       <div className="subtitle">Let your chatters bet on your matches.</div>
       <div>
@@ -60,15 +52,11 @@ export default function BetsCard() {
         you win or lose a match.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        {l2 && <Switch disabled size="sm" color="blue" />}
-        {!l2 && (
-          <Switch
-            size="sm"
-            onChange={(e) => updateLivePoll(!!e?.currentTarget?.checked)}
-            color="blue"
-            defaultChecked={showLivePolls}
-          />
-        )}
+        <Switch
+          loading={l2}
+          onChange={updateLivePoll}
+          checked={showLivePolls}
+        />
         <span>Show live betting / polls overlay</span>
       </div>
       <div className={clsx(!isEnabled && 'opacity-40', 'transition-all')}>
@@ -132,11 +120,9 @@ export default function BetsCard() {
                 </div>
               </div>
               <Button
-                variant="outline"
-                color="green"
-                className="border-blue-500 bg-blue-600 text-dark-200 transition-colors hover:bg-blue-500"
+                type="primary"
+                htmlType="submit"
                 loading={loadingInfo}
-                type="submit"
                 disabled={!form.isDirty()}
               >
                 Save
