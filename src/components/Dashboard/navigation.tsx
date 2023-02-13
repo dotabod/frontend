@@ -5,7 +5,6 @@ import {
   CommandLineIcon,
   HeartIcon,
   QuestionMarkCircleIcon,
-  VideoCameraIcon,
   RssIcon,
 } from '@heroicons/react/24/outline'
 import { signOut } from 'next-auth/react'
@@ -36,11 +35,6 @@ export const navigation = [
     name: 'Troubleshoot',
     href: '/dashboard/troubleshoot',
     icon: QuestionMarkCircleIcon,
-  },
-  {
-    name: 'Live preview',
-    href: '/overlay/',
-    icon: VideoCameraIcon,
   },
   {
     name: '',

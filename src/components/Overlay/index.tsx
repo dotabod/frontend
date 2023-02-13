@@ -18,10 +18,11 @@ import {
   devWL,
 } from '@/lib/devConsts'
 import { PollData } from '@/components/Overlay/PollOverlay'
-import { Center, Container, Loader } from '@mantine/core'
+import { Center } from '@mantine/core'
 import clsx from 'clsx'
 import { motionProps } from '@/ui/utils'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
+import { Spin } from 'antd'
 
 const OverlayPage = (props) => {
   const { height, width } = useWindowSize()
@@ -99,7 +100,7 @@ const OverlayPage = (props) => {
       `}</style>
       <AnimatePresence>
         <motion.div key="not-detected" {...motionProps}>
-          <Container
+          <div
             className={clsx(
               'hidden',
               isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
@@ -107,22 +108,21 @@ const OverlayPage = (props) => {
           >
             <Center style={{ height }}>
               <div className="space-y-6 rounded-md bg-dark-300 p-4">
-                <Center>
-                  <Loader color="black" variant="bars" size="xl" />
-                </Center>
-                <div className="flex text-center">
-                  <div className="ml-3">
-                    <h3 className="text-2xl font-medium text-dark-800">
-                      Waiting for Dota
-                    </h3>
-                    <div className="mt-2 text-lg text-dark-700">
-                      <p>Dotabod hasn&apos;t detected your game yet.</p>
+                <Spin spinning>
+                  <div className="flex text-center">
+                    <div className="ml-3">
+                      <h3 className="text-2xl font-medium text-dark-800">
+                        Waiting for Dota
+                      </h3>
+                      <div className="mt-2 text-lg text-dark-700">
+                        <p>Dotabod hasn&apos;t detected your game yet.</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Spin>
               </div>
             </Center>
-          </Container>
+          </div>
         </motion.div>
 
         <PollOverlays
