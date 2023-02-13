@@ -1,11 +1,9 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch, Tooltip } from 'antd'
-import { useForm } from '@mantine/form'
 import clsx from 'clsx'
 import Image from 'next/image'
-import { useEffect } from 'react'
-import { defaultSettings, Settings } from '@/lib/defaultSettings'
+import { Settings } from '@/lib/defaultSettings'
 
 enum CATEGORIES {
   General = 'General',
@@ -334,25 +332,6 @@ export default function ChatterCard() {
     updateSetting: updateChatters,
   } = useUpdateSetting(Settings.chatters)
 
-  const chatters = dbChatters as typeof defaultSettings.chatters | undefined
-  const form = useForm({ initialValues: chatters })
-
-  useEffect(() => {
-    if (chatters && !loadingChatters) {
-      form.setValues(chatters)
-      form.resetDirty(chatters)
-    }
-  }, [loadingChatters])
-
-  const handleSubmit = (v: typeof defaultSettings.chatters) => {
-    Object.keys(v).forEach((i) => {
-      delete v[i].tooltip
-      delete v[i].message
-    })
-    updateChatters(v)
-    form.resetDirty()
-  }
-
   return (
     <Card>
       <div className="title">
@@ -369,48 +348,44 @@ export default function ChatterCard() {
         The bot can post some random messages as you play your game.
       </div>
 
-      <form className="mt-6 space-y-2">
-        <div className="space-y-6">
-          {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
-            return (groupedChatterInfo[categoryName] || []).map(
-              (value, index) => {
-                if (!value) return null
-                return (
-                  <div
-                    key={value.id}
-                    className={clsx(!isEnabled && 'opacity-40 transition-all')}
-                  >
-                    {!index && value?.category ? (
-                      <div className="mb-2 text-sm text-dark-200">
-                        {value.category}
-                      </div>
-                    ) : null}
-                    <Tooltip title={value?.tooltip}>
-                      <div className="ml-4 flex items-center space-x-3">
-                        <Switch
-                          disabled={!isEnabled || loadingChatters}
-                          {...form.getInputProps(`${value.id}.enabled`, {
-                            type: 'checkbox',
-                          })}
-                          onChange={(checked, e) => {
-                            handleSubmit({
-                              ...form.values,
-                              [value.id]: {
-                                enabled: checked,
-                              },
-                            })
-                          }}
-                        />
-                        <span>{value.message}</span>
-                      </div>
-                    </Tooltip>
-                  </div>
-                )
-              }
-            )
-          })}
-        </div>
-      </form>
+      <div className="my-6 space-y-6">
+        {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
+          return (groupedChatterInfo[categoryName] || []).map(
+            (value, index) => {
+              if (!value) return null
+              return (
+                <div
+                  key={value.id}
+                  className={clsx(!isEnabled && 'opacity-40 transition-all')}
+                >
+                  {!index && value?.category ? (
+                    <div className="mb-2 text-sm text-dark-200">
+                      {value.category}
+                    </div>
+                  ) : null}
+                  <Tooltip title={value?.tooltip}>
+                    <div className="ml-4 flex items-center space-x-3">
+                      <Switch
+                        disabled={!isEnabled || loadingChatters}
+                        checked={dbChatters[value.id]?.enabled}
+                        onChange={(checked, e) => {
+                          updateChatters({
+                            ...dbChatters,
+                            [value.id]: {
+                              enabled: checked,
+                            },
+                          })
+                        }}
+                      />
+                      <span>{value.message}</span>
+                    </div>
+                  </Tooltip>
+                </div>
+              )
+            }
+          )
+        })}
+      </div>
     </Card>
   )
 }
