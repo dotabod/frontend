@@ -21,7 +21,7 @@ export function DisableToggle({ collapsed }: { collapsed: boolean }) {
         <div
           className={clsx(
             collapsed ? 'justify-center' : 'text-center',
-            'flex items-center space-x-2'
+            'flex flex-col items-center space-x-2 md:flex-row'
           )}
         >
           <Switch
