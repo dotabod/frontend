@@ -3,7 +3,6 @@ import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/db'
-import { getBotAPI } from './getBotApi'
 
 const chatBotScopes = [
   'channel:moderate',
@@ -29,7 +28,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: `openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
+          scope: `${
+            process.env.NODE_ENV !== 'development' ? '' : chatBotScopes
+          } openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
         },
       },
     }),
@@ -85,20 +86,8 @@ export const authOptions: NextAuthOptions = {
       const twitchId = Number(provider.Account.providerAccountId)
 
       // Refresh jwt account with potentially new scopes
-      if (account) {
-        const twitchApi = await getBotAPI()
-        const twitchUser = await twitchApi.users.getUserById(
-          account.providerAccountId
-        )
-
-        if (!twitchUser?.name || !twitchUser.displayName) return null
-        const follows = twitchApi.users.getFollowsPaginated({
-          followedUser: account.providerAccountId,
-        })
-        const totalFollowerCount = await follows.getTotalCount()
-        newUser.displayName = twitchUser.displayName
-        newUser.name = twitchUser.name
-
+      const isDotabod = (newUser.displayName || newUser.name) === 'dotabod'
+      if (account && !isDotabod) {
         await prisma.account.update({
           where: {
             provider_providerAccountId: {
@@ -107,16 +96,9 @@ export const authOptions: NextAuthOptions = {
             },
           },
           data: {
-            user: {
-              update: { ...newUser, followers: totalFollowerCount },
-            },
-            // @ts-ignore from twitch?
             refresh_token: account.refresh_token,
-            // @ts-ignore from twitch?
             access_token: account.access_token,
-            // @ts-ignore from twitch?
             expires_at: account.expires_at,
-            // @ts-ignore from twitch?
             scope: account.scope,
           },
         })

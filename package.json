@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "doppler run -- next dev",
     "pull": "doppler run -- yarn prisma db pull",
+    "studio": "doppler run -- yarn prisma studio",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
