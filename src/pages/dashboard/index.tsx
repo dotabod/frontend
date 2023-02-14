@@ -72,7 +72,6 @@ const SetupPage = () => {
                 className="rounded-xl"
                 src="/images/setup/play-vs-bots.png"
               />
-              <span>Simple minimap</span>
             </div>
           </div>
         </Card>

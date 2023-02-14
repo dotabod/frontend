@@ -45,14 +45,14 @@ export default function App({
               colorItemText: 'var(--color-gray-300)',
             },
             Switch: {
-              colorPrimary: 'rgb(0,86,12)',
+              colorPrimary: 'var(--color-purple-900)',
             },
           },
           token: {
             colorPrimary: 'rgb(124,124,124)',
-            colorLink: 'var(--color-green-600)',
-            colorLinkActive: 'var(--color-green-400)',
-            colorLinkHover: 'var(--color-green-400)',
+            colorLink: 'var(--color-purple-500)',
+            colorLinkActive: 'var(--color-purple-300)',
+            colorLinkHover: 'var(--color-purple-300)',
             colorText: 'var(--color-gray-200)',
             colorBgLayout: 'var(--color-gray-900)',
             colorBgContainer: 'var(--color-gray-800)',
