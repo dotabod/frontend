@@ -512,12 +512,12 @@ const CommandDetail = {
         <TwitchChat
           {...props}
           command="!hero"
-          response="No matches played as Clockwerk in 30d"
+          response="No matches played as Pudge in 30d"
         />
         <TwitchChat
           {...props}
           command="!hero"
-          response="Winrate: 53% as Clockwerk in 30d of 41 matches. "
+          response="Winrate: 53% as Pudge in 30d of 41 matches. "
         />
       </>
     ),
@@ -534,7 +534,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!builds"
-        response="Need pro build ideas for Clockwerk? Check here dota2protracker.com/hero/Clockwerk "
+        response="Need pro build ideas for Pudge? Check here dota2protracker.com/hero/Pudge "
       />
     ),
   },
