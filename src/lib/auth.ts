@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
         params: {
           scope: `${
             process.env.NODE_ENV !== 'development' ? '' : chatBotScopes
-          } openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
+          }openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
         },
       },
     }),
