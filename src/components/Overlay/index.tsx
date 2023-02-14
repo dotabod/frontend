@@ -107,14 +107,14 @@ const OverlayPage = (props) => {
             )}
           >
             <Center style={{ height }}>
-              <div className="space-y-6 rounded-md bg-dark-300 p-4">
+              <div className="space-y-6 rounded-md bg-gray-300 p-4">
                 <Spin spinning>
                   <div className="flex text-center">
                     <div className="ml-3">
-                      <h3 className="text-2xl font-medium text-dark-800">
+                      <h3 className="text-2xl font-medium text-gray-800">
                         Waiting for Dota
                       </h3>
-                      <div className="mt-2 text-lg text-dark-700">
+                      <div className="mt-2 text-lg text-gray-700">
                         <p>Dotabod hasn&apos;t detected your game yet.</p>
                       </div>
                     </div>

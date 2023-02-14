@@ -173,7 +173,7 @@ export default function MmrTrackerCard() {
                   key={account.steam32Id}
                   className={clsx(removed && 'opacity-40')}
                 >
-                  <div className="mb-1 flex items-center space-x-1 text-dark-400">
+                  <div className="mb-1 flex items-center space-x-1 text-gray-400">
                     <Typography.Link
                       target="_blank"
                       href={`https://steamid.xyz/${account.steam32Id}`}
@@ -307,7 +307,7 @@ export default function MmrTrackerCard() {
               )}
               <label
                 htmlFor="mmr"
-                className="mb-2 flex text-sm font-medium text-dark-400 "
+                className="mb-2 flex text-sm font-medium text-gray-400 "
               >
                 Enter your current MMR
               </label>

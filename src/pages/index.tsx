@@ -55,7 +55,7 @@ export default function Home() {
         ></meta>
       </Head>
       <Header />
-      <main className="bg-dark-800">
+      <main className="bg-gray-800">
         <Hero />
         <PrimaryFeatures />
         <SecondaryFeatures />

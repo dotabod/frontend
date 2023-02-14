@@ -3,6 +3,7 @@ import ModImage from './ModImage'
 
 export default function TwitchChat({
   command = null,
+  className = '',
   modOnly = false,
   responses = [],
   response = null,
@@ -11,8 +12,9 @@ export default function TwitchChat({
   return (
     <div
       className={clsx(
+        className,
         'mt-2 max-w-xs rounded border p-2 text-sm',
-        'border-dark-500'
+        'border-gray-700'
       )}
     >
       {command && (

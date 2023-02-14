@@ -359,7 +359,7 @@ export default function ChatterCard() {
                   className={clsx(!isEnabled && 'opacity-40 transition-all')}
                 >
                   {!index && value?.category ? (
-                    <div className="mb-2 text-sm text-dark-200">
+                    <div className="mb-2 text-sm text-gray-200">
                       {value.category}
                     </div>
                   ) : null}

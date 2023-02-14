@@ -27,8 +27,8 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
             py-2 text-left text-sm transition-all
             `,
           dark
-            ? `bg-dark-800 text-dark-200 hover:bg-dark-700`
-            : `bg-dark-800 text-dark-300 hover:bg-gray-200`
+            ? `bg-gray-800 text-gray-200 hover:bg-gray-700`
+            : `bg-gray-800 text-gray-300 hover:bg-gray-200`
         )}
       >
         {showDetails && (
@@ -43,7 +43,7 @@ const UserButton = ({ user, showDetails, dark }: UserButtonProps) => {
                 Live
               </span>
             ) : (
-              <span className="rounded-md bg-dark-700 px-2 py-0.5 text-xs">
+              <span className="rounded-md bg-gray-700 px-2 py-0.5 text-xs">
                 Offline
               </span>
             )}

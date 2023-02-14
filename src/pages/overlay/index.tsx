@@ -20,7 +20,7 @@ const TroubleshootPage = () => {
       <div className="mt-12 origin-top-left lg:col-span-2 lg:mt-0 ">
         <iframe
           src={`/overlay/${data?.user?.id}`}
-          className="rounded-lg border border-dark-500"
+          className="rounded-lg border border-gray-500"
           style={{
             aspectRatio: '16/9',
             width: '100%',

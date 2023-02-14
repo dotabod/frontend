@@ -39,16 +39,23 @@ export default function App({
           algorithm: theme.darkAlgorithm,
           components: {
             Menu: {
-              colorSubItemBg: 'var(--color-dark-800)',
-              colorItemBgSelected: 'var(--color-dark-700)',
-              colorItemTextSelected: 'var(--color-dark-200)',
-              colorItemText: 'var(--color-dark-300)',
+              colorSubItemBg: 'var(--color-gray-800)',
+              colorItemBgSelected: 'var(--color-gray-700)',
+              colorItemTextSelected: 'var(--color-gray-200)',
+              colorItemText: 'var(--color-gray-300)',
+            },
+            Switch: {
+              colorPrimary: 'rgb(0,86,12)',
             },
           },
           token: {
-            colorText: 'var(--color-dark-200)',
-            colorBgLayout: 'var(--color-dark-900)',
-            colorBgContainer: 'var(--color-dark-800)',
+            colorPrimary: 'rgb(124,124,124)',
+            colorLink: 'var(--color-green-600)',
+            colorLinkActive: 'var(--color-green-400)',
+            colorLinkHover: 'var(--color-green-400)',
+            colorText: 'var(--color-gray-200)',
+            colorBgLayout: 'var(--color-gray-900)',
+            colorBgContainer: 'var(--color-gray-800)',
           },
         }}
       >

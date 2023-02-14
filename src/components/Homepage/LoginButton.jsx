@@ -19,10 +19,7 @@ export function LoginButton({ className, ...props }) {
 
   return (
     <Button
-      className={clsx(
-        className,
-        'relative !border-slate-200 !bg-slate-100 !text-dark-500'
-      )}
+      className={clsx(className)}
       loading={loading}
       onClick={() => {
         setLoading(true)

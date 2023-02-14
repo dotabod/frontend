@@ -11,13 +11,13 @@ const baseStyles = {
 
 const variantStyles = {
   solid: {
-    cyan: 'relative overflow-hidden bg-cyan-500 text-white before:absolute before:inset-0 active:before:bg-transparent hover:before:bg-dark-700/10 active:bg-cyan-600 active:text-white/80 before:transition-colors',
+    cyan: 'relative overflow-hidden bg-cyan-500 text-white before:absolute before:inset-0 active:before:bg-transparent hover:before:bg-gray-700/10 active:bg-cyan-600 active:text-white/80 before:transition-colors',
     white:
-      'bg-dark-700 text-cyan-900 hover:bg-dark-700/90 active:bg-dark-700/90 active:text-cyan-900/70',
-    gray: 'bg-gray-800 text-white hover:bg-dark-900 active:bg-gray-800 active:text-white/80',
+      'bg-gray-700 text-cyan-900 hover:bg-gray-700/90 active:bg-gray-700/90 active:text-cyan-900/70',
+    gray: 'bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80',
   },
   outline: {
-    gray: 'border-gray-300 text-dark-300 hover:border-gray-400 active:bg-dark-800 active:text-dark-300/80',
+    gray: 'border-gray-300 text-gray-300 hover:border-gray-400 active:bg-gray-800 active:text-gray-300/80',
   },
 }
 

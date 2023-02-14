@@ -15,6 +15,7 @@
   src: url('/fonts/Inter-italic.var.woff2') format('woff2');
 }
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -93,7 +94,7 @@
 
 /* Geist UI stuff */
 .caption {
-  @apply !text-dark-300;
+  @apply !text-gray-300;
 }
 
 .title:not(.command) {
@@ -109,15 +110,15 @@
 }
 
 .subtitle {
-  @apply !text-sm !text-dark-300;
+  @apply !text-sm !text-gray-300;
 }
 
 .collapse {
-  @apply !border-dark-700 !shadow-none;
+  @apply !border-gray-700 !shadow-none;
 }
 
 .collapse .content {
-  @apply text-sm text-dark-300;
+  @apply text-sm text-gray-300;
 }
 
 @layer base {
@@ -131,7 +132,7 @@
 }
 
 .mantine-Checkbox-label {
-  @apply font-normal text-dark-300;
+  @apply font-normal text-gray-300;
 }
 
 .mantine-Switch-root {

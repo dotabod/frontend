@@ -80,7 +80,7 @@ export default function ChatBot() {
         Allows the Dotabod chat bot to type in your chat in case you ever turn
         on follower or subscribe mode.
       </div>
-      <div className="space-y-4 px-8 pb-8 text-sm text-dark-300">
+      <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <div>
           1. Type the following in your stream to add @dotabod as a moderator to{' '}
           <Link
@@ -162,7 +162,7 @@ export default function ChatBot() {
                   <Link
                     className={clsx(
                       'flex items-center space-x-1',
-                      thisEmote && '!text-dark-300 opacity-80'
+                      thisEmote && '!text-gray-300 opacity-80'
                     )}
                     target="_blank"
                     href={

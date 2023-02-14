@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import DiscordSvg from '@/images/logos/discord.svg'
 import GithubSvg from '@/images/logos/github.svg'
 import Image from 'next/image'
-import { Tooltip } from 'antd'
+import { Tooltip, Typography } from 'antd'
 
 export function NavLinks({ bottom = false }) {
   let [hoveredIndex, setHoveredIndex] = useState(null)
@@ -39,10 +38,10 @@ export function NavLinks({ bottom = false }) {
   ].map(([label, href, Icon, tooltip], index) => {
     return (
       <Tooltip key={label} title={tooltip} disabled={!tooltip} position="top">
-        <Link
+        <Typography.Link
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
-          className="relative -my-2 -mx-3 flex items-center rounded-lg px-3 py-2 text-sm text-dark-300 transition-colors delay-150 hover:text-dark-200 hover:delay-[0ms]"
+          className="relative -my-2 -mx-3 flex items-center rounded-lg px-3 py-2 text-sm !text-gray-300 transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]"
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
@@ -50,7 +49,7 @@ export function NavLinks({ bottom = false }) {
             {hoveredIndex === index && (
               <motion.span
                 key={index}
-                className="absolute inset-0 rounded-lg bg-dark-800"
+                className="absolute inset-0 rounded-lg bg-gray-700"
                 layoutId="hoverBackground"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.15 } }}
@@ -76,7 +75,7 @@ export function NavLinks({ bottom = false }) {
             )}
             {!Icon && label}
           </span>
-        </Link>
+        </Typography.Link>
       </Tooltip>
     )
   })

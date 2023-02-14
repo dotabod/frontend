@@ -209,10 +209,10 @@ export function SecondaryFeatures() {
     >
       <Container>
         <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-3xl font-medium tracking-tight text-dark-200">
+          <h2 className="text-3xl font-medium tracking-tight text-gray-200">
             But wait, there&apos;s more.
           </h2>
-          <p className="mt-2 text-lg text-dark-300">
+          <p className="mt-2 text-lg text-gray-300">
             Under active development and speaking to multiple Dota 2
             personalities, features are being added as they are requested.
           </p>
@@ -222,14 +222,17 @@ export function SecondaryFeatures() {
           className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3"
         >
           {features.map((feature, i) => (
-            <li key={i} className="rounded-2xl border border-dark-600 p-4">
-              <h3 className="space-x-2 font-semibold text-dark-200">
+            <li
+              key={i}
+              className="rounded-2xl border border-gray-700 p-4 shadow-lg"
+            >
+              <h3 className="space-x-2 font-semibold text-gray-200">
                 {feature.name}
                 {feature.inProgress && (
                   <Badge className="opacity-60">in progress</Badge>
                 )}
               </h3>
-              <div className="mt-2 text-dark-300">{feature.description}</div>
+              <div className="mt-2 text-gray-300">{feature.description}</div>
             </li>
           ))}
         </ul>

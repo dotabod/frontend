@@ -15,7 +15,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       <Button
         loading={isLoading}
         block
-        className="!border-slate-200 !bg-slate-100 !text-dark-500"
+        size="large"
         onClick={() => {
           setIsLoading(true)
           signIn('twitch', {
@@ -30,14 +30,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               console.log(e)
             })
         }}
-        disabled={isLoading}
-        icon={
+      >
+        <div className="inline flex items-center justify-center space-x-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 48 48"
             width="48px"
             height="48px"
-            className="h-4 w-4"
+            className="inline h-5 w-5"
             aria-hidden="true"
             focusable="false"
             data-prefix="fab"
@@ -54,9 +54,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             />
             <path fill="#8E24AA" d="M32 25h-5V15h5V25zM24 25h-5V15h5V25z" />
           </svg>
-        }
-      >
-        Sign in with Twitch
+          <span>Sign in with Twitch</span>
+        </div>
       </Button>
     </div>
   )

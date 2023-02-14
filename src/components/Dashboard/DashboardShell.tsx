@@ -39,7 +39,7 @@ export default function DashboardShell({
       <style global jsx>{`
         html,
         body {
-          @apply !bg-dark-700;
+          @apply !bg-gray-700;
           scrollbar-width: thin;
           scrollbar-color: #3e4155 transparent;
         }
@@ -53,7 +53,7 @@ export default function DashboardShell({
         }
 
         ::-webkit-scrollbar-thumb {
-          @apply bg-dark-500;
+          @apply bg-gray-500;
           border-radius: 6px;
         }
 
@@ -70,7 +70,7 @@ export default function DashboardShell({
             background: colorBgLayout,
           }}
           width={250}
-          className="border-r border-r-dark-500"
+          className="border-r border-r-gray-500"
           trigger={null}
           collapsible
           collapsed={collapsed}
@@ -92,7 +92,7 @@ export default function DashboardShell({
                 )}
 
                 <button
-                  className="flex items-center text-dark-300 transition-all hover:scale-110 hover:text-dark-200"
+                  className="flex items-center text-gray-300 transition-all hover:scale-110 hover:text-gray-200"
                   onClick={() => setCollapsed(!collapsed)}
                 >
                   {collapsed ? (
@@ -117,7 +117,7 @@ export default function DashboardShell({
                   if (!item.name)
                     return {
                       type: 'divider',
-                      className: '!m-6 !bg-dark-500',
+                      className: '!m-6 !bg-gray-500',
                     }
 
                   const props = item.onClick ? { onClick: item.onClick } : {}

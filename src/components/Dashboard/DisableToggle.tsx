@@ -32,7 +32,7 @@ export function DisableToggle({ collapsed }: { collapsed: boolean }) {
           />
           <span
             className={clsx(
-              'text-sm text-dark-300',
+              'text-sm text-gray-300',
               collapsed && 'flex flex-col items-center'
             )}
           >

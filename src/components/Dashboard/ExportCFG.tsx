@@ -41,7 +41,7 @@ export default function ExportCFG() {
       </div>
       <div className="subtitle">Enable Dotabod to see your games</div>
 
-      <div className="space-y-4 px-8 pb-8 text-sm text-dark-300">
+      <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <div>
           1. In Steam, right click Dota 2{' '}
           <ChevronRightIcon height={12} className="inline" /> Manage{' '}
