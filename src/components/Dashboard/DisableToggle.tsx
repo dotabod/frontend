@@ -13,35 +13,27 @@ export function DisableToggle({ collapsed }: { collapsed: boolean }) {
   } = useUpdateSetting(Settings.commandDisable)
 
   return (
-    <div className={clsx('mx-2 space-y-2 rounded p-4 transition-colors')}>
-      <Tooltip
-        placement="bottom"
-        title={CommandDetail.commandDisable.description}
+    <Tooltip
+      className={clsx('mx-2 space-y-2 space-x-2 rounded p-4 transition-colors')}
+      placement="right"
+      title={CommandDetail.commandDisable.description}
+    >
+      <Switch
+        loading={loading}
+        className="flex"
+        checked={!isDotabodDisabled}
+        onChange={(checked) => updateSetting(!checked)}
+      />
+      <span
+        className={clsx(
+          'text-sm text-gray-300',
+          collapsed && 'flex flex-col items-center'
+        )}
       >
-        <div
-          className={clsx(
-            collapsed ? 'justify-center' : 'text-center',
-            'flex flex-col items-center space-x-2 md:flex-row'
-          )}
-        >
-          <Switch
-            loading={loading}
-            className="flex"
-            checked={!isDotabodDisabled}
-            onChange={(checked) => updateSetting(!checked)}
-          />
-          <span
-            className={clsx(
-              'text-sm text-gray-300',
-              collapsed && 'flex flex-col items-center'
-            )}
-          >
-            <span>Dotabod</span>
-            <span className={clsx(collapsed && 'hidden')}> is </span>
-            <span>{isDotabodDisabled ? 'disabled' : 'enabled'}</span>
-          </span>
-        </div>
-      </Tooltip>
-    </div>
+        <span>Dotabod</span>
+        <span className={clsx(collapsed && 'hidden')}> is </span>
+        <span>{isDotabodDisabled ? 'disabled' : 'enabled'}</span>
+      </span>
+    </Tooltip>
   )
 }

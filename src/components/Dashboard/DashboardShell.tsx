@@ -152,17 +152,9 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout className="site-layout">
-          <Content
-            style={{
-              background: colorBgContainer,
-            }}
-          >
-            <main className="px-4">
-              <div className="min-h-full w-full max-w-screen-2xl space-y-6 pt-8 transition-all">
-                {children}
-              </div>
-            </main>
+        <Layout>
+          <Content className="min-h-full w-full max-w-screen-2xl space-y-6 bg-gray-800 p-8 transition-all">
+            {children}
           </Content>
         </Layout>
       </Layout>
