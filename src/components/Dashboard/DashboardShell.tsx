@@ -39,7 +39,7 @@ export default function DashboardShell({
       <style global jsx>{`
         html,
         body {
-          @apply !bg-gray-700;
+          @apply !bg-gray-800;
           scrollbar-width: thin;
           scrollbar-color: #3e4155 transparent;
         }
@@ -62,7 +62,7 @@ export default function DashboardShell({
           border-radius: 6px;
         }
       `}</style>
-      <Layout className="h-full">
+      <Layout className="h-full bg-gray-800">
         <Sider
           breakpoint="md"
           onBreakpoint={(broken) => setCollapsed(broken)}
@@ -152,7 +152,7 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout>
+        <Layout className="!bg-gray-800">
           <Content className="min-h-full w-full max-w-screen-2xl space-y-6 bg-gray-800 p-8 transition-all">
             {children}
           </Content>
