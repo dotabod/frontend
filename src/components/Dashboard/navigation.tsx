@@ -102,4 +102,9 @@ export const navigation = [
     },
     icon: LogOut,
   },
+  {
+    name: '',
+    href: '',
+    icon: null,
+  },
 ]
