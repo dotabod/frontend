@@ -1,7 +1,6 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Switch } from 'antd'
-import { useForm } from '@mantine/form'
+import { Button, Form, Spin, Switch, Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
@@ -16,7 +15,7 @@ export default function BetsCard() {
   } = useUpdateSetting(Settings.bets)
   const {
     data: info,
-    loading: l1,
+    loading: loading,
     updateSetting: updateInfo,
   } = useUpdateSetting(Settings.betsInfo)
   const {
@@ -24,21 +23,15 @@ export default function BetsCard() {
     updateSetting: updateLivePoll,
     loading: l2,
   } = useUpdateSetting(Settings.livePolls)
-  const loadingInfo = l0 || l1 || l2
+  const {
+    data: tellChatBets,
+    updateSetting: updateTellChatBets,
+    loading: l3,
+  } = useUpdateSetting(Settings.tellChatBets)
 
-  const form = useForm({ initialValues: info })
+  const [form] = Form.useForm()
 
-  useEffect(() => {
-    if (info && !loadingInfo) {
-      form.setValues(info)
-      form.resetDirty(info)
-    }
-  }, [loadingInfo])
-
-  useEffect(() => {
-    form.resetDirty()
-    form.resetTouched()
-  }, [])
+  useEffect(() => form.resetFields(), [info])
 
   return (
     <Card>
@@ -59,79 +52,86 @@ export default function BetsCard() {
         />
         <span>Show live betting / polls overlay</span>
       </div>
-      <div
-        className={clsx(!isEnabled && 'opacity-40', 'space-y-6 transition-all')}
-      >
-        <form
-          onSubmit={form.onSubmit((v) => {
-            updateInfo(v)
-            form.resetDirty()
-          })}
-          className="mt-6 space-y-2"
-        >
-          <label htmlFor="name" className="block text-sm">
-            Title. Variables: [heroname]
-          </label>
-          {loadingInfo && <Input placeholder="Loading..." disabled />}
-          {!loadingInfo && (
-            <>
-              <Input
-                id="name"
-                placeholder="Title"
-                maxLength={45}
-                {...form.getInputProps(`title`)}
-              />
-              <div className="flex flex-col space-y-4 md:flex-row md:space-x-4">
-                <div>
-                  <label htmlFor="yes" className="block text-sm">
-                    Yes
-                  </label>
-                  <Input
-                    style={{ maxWidth: 108 }}
-                    id="yes"
-                    maxLength={25}
-                    placeholder="Yes"
-                    {...form.getInputProps(`yes`)}
-                  />
+      <div className="mt-5 flex items-center space-x-2">
+        <Switch
+          loading={l3}
+          onChange={updateTellChatBets}
+          checked={tellChatBets}
+        />
+        <span>
+          Tell chat when bets open, close, or get remade due to hero swap
+        </span>
+      </div>
+
+      <div className={clsx(!isEnabled && 'opacity-40', 'mt-6')}>
+        <Spin spinning={loading} tip="Loading">
+          <Form
+            form={form}
+            layout="vertical"
+            initialValues={info}
+            name="bets-form"
+            onFinish={updateInfo}
+          >
+            <Form.Item
+              colon={false}
+              label="Title"
+              name="title"
+              help={
+                <div className="my-2">
+                  <Tag>[heroname]</Tag> will be replaced with the hero name
                 </div>
-                <div>
-                  <label htmlFor="no" className="block text-sm">
-                    No
-                  </label>
-                  <Input
-                    style={{ maxWidth: 108 }}
-                    id="no"
-                    maxLength={25}
-                    placeholder="No"
-                    {...form.getInputProps(`no`)}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="duration" className="block text-sm">
-                    Seconds open
-                  </label>
-                  <Input
-                    id="duration"
-                    style={{ maxWidth: 108 }}
-                    min={30}
-                    max={1800}
-                    placeholder="240"
-                    type="number"
-                    {...form.getInputProps(`duration`)}
-                  />
-                </div>
-              </div>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loadingInfo}
-                disabled={!form.isDirty()}
+              }
+            >
+              <Input placeholder="Title" maxLength={45} />
+            </Form.Item>
+            <div className="flex flex-col md:flex-row md:space-x-4">
+              <Form.Item colon={false} label="Yes" name="yes">
+                <Input
+                  style={{ maxWidth: 108 }}
+                  maxLength={25}
+                  placeholder="Yes"
+                />
+              </Form.Item>
+              <Form.Item colon={false} label="No" name="no">
+                <Input
+                  style={{ maxWidth: 108 }}
+                  maxLength={25}
+                  placeholder="No"
+                />
+              </Form.Item>
+              <Form.Item
+                colon={false}
+                label="Duration"
+                help="How long to keep bets open"
+                name="duration"
               >
-                Save
-              </Button>
-            </>
-          )}
-        </form>
+                <Input
+                  style={{ maxWidth: 108 }}
+                  min={30}
+                  max={1800}
+                  placeholder="240"
+                  type="number"
+                />
+              </Form.Item>
+            </div>
+            <Form.Item colon={false} shouldUpdate>
+              {() => (
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !form.isFieldsTouched() ||
+                    !!form
+                      .getFieldsError()
+                      .filter(({ errors }) => errors.length).length
+                  }
+                >
+                  Save
+                </Button>
+              )}
+            </Form.Item>
+          </Form>
+        </Spin>
         <div className="flex flex-col items-center space-y-4">
           <Image
             alt="bets image"

@@ -73,6 +73,12 @@ export default function MmrTrackerCard() {
     updateSetting: updateOnlyParty,
   } = useUpdateSetting(Settings.onlyParty)
 
+  const {
+    data: tellChatNewMMR,
+    loading: l3,
+    updateSetting: updateChatNewMmr,
+  } = useUpdateSetting(Settings.tellChatNewMMR)
+
   const { data: showRankMmr, updateSetting: updateHideMmr } = useUpdateSetting(
     Settings.showRankMmr
   )
@@ -107,6 +113,17 @@ export default function MmrTrackerCard() {
           <div className="flex items-center space-x-2">
             <Switch checked={isEnabled} onChange={updateSetting} />
             <span>Update mmr with every match</span>
+          </div>
+
+          <div>
+            <Tooltip
+              placement="bottom"
+              title="When you win/lose a match or change your mmr manually"
+              className="flex items-center space-x-2"
+            >
+              <Switch checked={tellChatNewMMR} onChange={updateChatNewMmr} />
+              <span>Tell chat anytime mmr changes</span>
+            </Tooltip>
           </div>
 
           <div className="flex items-center space-x-2">
