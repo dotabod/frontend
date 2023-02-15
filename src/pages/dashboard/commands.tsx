@@ -43,7 +43,11 @@ const CommandsPage = () => {
       ;['alias', 'title', 'description', 'cmd'].forEach((key) => {
         if (Array.isArray(CommandDetail[command][key])) {
           CommandDetail[command][key].forEach((alias) => {
-            if (alias.toLowerCase().includes(searchTerm.toLowerCase())) {
+            if (
+              [alias.toLowerCase(), `!${alias.toLowerCase()}`].includes(
+                searchTerm.toLowerCase()
+              )
+            ) {
               containsStringValue = true
             }
           })
@@ -65,26 +69,25 @@ const CommandsPage = () => {
         <title>Dotabod | Commands</title>
       </Head>
       <Header
-        subtitle="An exhaustive list of all commands available with the Dotabod chat bot."
+        subtitle="An exhaustive list of all commands available using Twitch chat."
         title="Commands"
       />
 
       <div className="flex items-baseline space-x-6">
-        <div className="flex flex-col space-y-3">
-          <Segmented
-            value={enabled}
-            onChange={(v) => setEnabled(v as string)}
-            options={['All', 'Enabled', 'Disabled']}
-          />
-          <Segmented
-            value={permission}
-            onChange={(v) => setPermission(v as string)}
-            options={['All', 'Mods', 'Plebs']}
-          />
-        </div>
+        <Segmented
+          value={enabled}
+          onChange={(v) => setEnabled(v as string)}
+          options={['All', 'Enabled', 'Disabled']}
+        />
+        <Segmented
+          value={permission}
+          onChange={(v) => setPermission(v as string)}
+          options={['All', 'Mods', 'Plebs']}
+        />
         <Input
           placeholder="Search commands..."
           value={searchTerm}
+          style={{ width: 300 }}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
