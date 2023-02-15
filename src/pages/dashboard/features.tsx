@@ -11,10 +11,10 @@ import Head from 'next/head'
 import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import NotablePlayersCard from '@/components/Dashboard/Features/NotablePlayers'
-import ComingSoonCard from '@/components/Dashboard/Features/ComingSoonCard'
 import { ReactElement } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Header from '@/components/Dashboard/Header'
+import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
@@ -34,7 +34,7 @@ const FeaturesPage: NextPageWithLayout = () => {
         <LanguageCard />
         <StreamDelayCard />
         <NotablePlayersCard />
-        <ComingSoonCard />
+        <IdeaCard />
         <MmrTrackerCard />
         <BetsCard />
         <MinimapCard />
