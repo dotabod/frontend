@@ -28,9 +28,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: `${
-            process.env.NODE_ENV !== 'development' ? '' : chatBotScopes
-          }openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
+          scope: `openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
         },
       },
     }),
