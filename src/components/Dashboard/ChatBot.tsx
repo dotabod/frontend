@@ -22,7 +22,7 @@ const emotesRequired = [
   },
   {
     label: 'Happi',
-    url: 'https://7tv.app/emotes/63e2f6ff5d4acdefd447be20',
+    url: 'https://betterttv.com/emotes/634042bce6cf26500b42ce56',
   },
   { label: 'Madge', url: 'https://7tv.app/emotes/60a95f109d598ea72fad13bd' },
   { label: 'POGGIES', url: 'https://7tv.app/emotes/60af1b5a35c50a77926314ad' },
