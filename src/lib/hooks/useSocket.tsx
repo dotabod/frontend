@@ -91,24 +91,18 @@ export const useSocket = ({
 
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
       try {
-        // Get match data before making a job to see if its alreayd done
-        const preData = await getMatchData(matchId, heroSlot)
-        cb(preData)
+        // Create a job to parse the match
+        const jobId = await createJob(matchId)
+
+        // Wait for the job to finish
+        await getJobStatus(jobId)
+
+        // Get match data once parsing is complete
+        const data = await getMatchData(matchId, heroSlot)
+        cb(data)
       } catch (e) {
-        try {
-          // Create a job to parse the match
-          const jobId = await createJob(matchId)
-
-          // Wait for the job to finish
-          await getJobStatus(jobId)
-
-          // Get match data once parsing is complete
-          const data = await getMatchData(matchId, heroSlot)
-          cb(data)
-        } catch (e) {
-          console.log('[MMR] Error fetching match data', { e })
-          cb(null)
-        }
+        console.log('[MMR] Error fetching match data', { e })
+        cb(null)
       }
     })
 
