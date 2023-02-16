@@ -17,7 +17,7 @@ function getItem(item) {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   return {
-    key: item.href?.split('/').pop() || item.name,
+    key: item.name,
     icon: item.icon ? (
       <item.icon className={clsx('h-4 w-4')} aria-hidden="true" />
     ) : null,
