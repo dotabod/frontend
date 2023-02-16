@@ -306,8 +306,6 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce(
   {}
 )
 
-console.log({ groupedChatterInfo })
-
 export default function ChatterCard() {
   const {
     data: isEnabled,

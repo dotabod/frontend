@@ -16,8 +16,7 @@ import {
 import { isDev } from '@/lib/hooks/rosh'
 import { fetcher } from '@/lib/fetcher'
 import { blockType } from '@/lib/devConsts'
-import axios from 'axios'
-import retry from 'retry'
+import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
 
 export let socket: Socket | null = null
 
@@ -91,53 +90,20 @@ export const useSocket = ({
     )
 
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
-      const createJob = await axios.post(
-        `https://api.opendota.com/api/request/${matchId}`
-      )
-      const jobId = createJob.data?.job?.jobId
+      try {
+        // Create a job to parse the match
+        const jobId = await createJob(matchId)
 
-      // Set up the retry operation
-      const operation = retry.operation({
-        retries: 8, // Number of retries
-        factor: 3, // Exponential backoff factor
-        minTimeout: 1 * 1000, // Minimum retry timeout (1 second)
-        maxTimeout: 60 * 1000, // Maximum retry timeout (60 seconds)
-      })
-      operation.attempt(async (currentAttempt) => {
-        const jobStatus = await axios.get(
-          `https://api.opendota.com/api/request/${jobId}`
-        )
+        // Wait for the job to finish
+        await getJobStatus(jobId)
 
-        if (jobStatus?.data?.type === 'parse') {
-          operation.retry(new Error('Job not ready'))
-          return
-        }
-
-        // Continue once parsing is complete
-        const opendotaMatch = await axios(
-          `https://api.opendota.com/api/matches/${matchId}`
-        )
-
-        let isParty = false
-        if (
-          Array.isArray(opendotaMatch.data?.players) &&
-          typeof heroSlot === 'number'
-        ) {
-          const partySize = opendotaMatch.data?.players[heroSlot]?.party_size
-          if (typeof partySize === 'number' && partySize > 1) {
-            console.log('[MMR] Party match detected')
-            isParty = true
-          }
-
-          console.log('[MMR] Match found in opendota', {
-            matchId,
-            heroSlot,
-            isParty,
-          })
-
-          cb({ matchId, isParty })
-        }
-      })
+        // Get match data once parsing is complete
+        const data = await getMatchData(matchId, heroSlot)
+        cb(data)
+      } catch (e) {
+        console.log('[MMR] Error fetching match data', { e })
+        cb(null)
+      }
     })
 
     socket.on('block', (data: blockType) => {
