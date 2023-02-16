@@ -13,6 +13,30 @@ import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 
 const { Header, Sider, Content } = Layout
 
+function getItem(item) {
+  const props = item.onClick ? { onClick: item.onClick } : {}
+
+  return {
+    key: item.href?.split('/').pop() || item.name,
+    icon: item.icon ? (
+      <item.icon className={clsx('h-4 w-4')} aria-hidden="true" />
+    ) : null,
+    label: item.href ? (
+      <Link
+        {...props}
+        href={item.href}
+        className="!text-gray-200"
+        target={item.href.startsWith('http') ? '_blank' : '_self'}
+      >
+        {item.name}
+      </Link>
+    ) : (
+      item.name
+    ),
+    children: item.children?.map(getItem),
+  }
+}
+
 export default function DashboardShell({
   children,
 }: {
@@ -116,35 +140,12 @@ export default function DashboardShell({
                 items={navigation.map((item, i) => {
                   if (!item.name)
                     return {
+                      key: i,
                       type: 'divider',
                       className: '!m-6 !bg-gray-500',
                     }
 
-                  const props = item.onClick ? { onClick: item.onClick } : {}
-
-                  return {
-                    ...item,
-                    key: item.href?.split('/').pop() || item.name,
-                    icon: (
-                      <item.icon
-                        className={clsx('h-4 w-4')}
-                        aria-hidden="true"
-                      />
-                    ),
-                    label: item.href ? (
-                      <Link
-                        {...props}
-                        href={item.href}
-                        target={
-                          item.href.startsWith('http') ? '_blank' : '_self'
-                        }
-                      >
-                        {item.name}
-                      </Link>
-                    ) : (
-                      item.name
-                    ),
-                  }
+                  return getItem(item)
                 })}
               />
 

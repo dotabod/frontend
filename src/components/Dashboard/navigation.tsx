@@ -6,6 +6,10 @@ import {
   HeartIcon,
   QuestionMarkCircleIcon,
   RssIcon,
+  GlobeEuropeAfricaIcon,
+  MegaphoneIcon,
+  ScaleIcon,
+  TvIcon,
 } from '@heroicons/react/24/outline'
 import { signOut } from 'next-auth/react'
 import Discord from '@/images/logos/Discord'
@@ -25,6 +29,28 @@ export const navigation = [
     name: 'Features',
     href: '/dashboard/features',
     icon: SparklesIcon,
+    children: [
+      {
+        name: 'Main',
+        href: '/dashboard/features',
+        icon: GlobeEuropeAfricaIcon,
+      },
+      {
+        name: 'Overlay',
+        href: '/dashboard/features/overlay',
+        icon: TvIcon,
+      },
+      {
+        name: 'Chat',
+        href: '/dashboard/features/chat',
+        icon: MegaphoneIcon,
+      },
+      {
+        name: 'Advanced',
+        href: '/dashboard/features/advanced',
+        icon: ScaleIcon,
+      },
+    ],
   },
   {
     name: 'Commands',
@@ -53,7 +79,6 @@ export const navigation = [
   },
   {
     name: 'Support the project',
-    key: 'donate',
     icon: ({ className }) => (
       <HeartIcon
         className={clsx('h-4 w-4 !text-red-500', className)}
@@ -62,23 +87,22 @@ export const navigation = [
     ),
     children: [
       {
-        key: 'kofi',
-        label: (
-          <a href="https://ko-fi.com/dotabod" target="_blank" rel="noreferrer">
-            Ko-fi
-          </a>
-        ),
-        icon: <KofiIcon className="h-4 w-4" />,
+        name: 'Ko-fi',
+        href: 'https://ko-fi.com/dotabod',
+        icon: KofiIcon,
       },
       {
-        label: (
-          <a href="https://boosty.to/dotabod" target="_blank" rel="noreferrer">
-            Boosty
-          </a>
-        ),
-        key: 'boosty',
+        name: 'Boosty',
         href: 'https://boosty.to/dotabod',
-        icon: <Image src={BoostyLogo} height={16} width={16} alt="boosty" />,
+        icon: ({ className }) => (
+          <Image
+            src={BoostyLogo}
+            height={16}
+            width={16}
+            alt="boosty"
+            className={className}
+          />
+        ),
       },
     ],
   },

@@ -306,6 +306,8 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce(
   {}
 )
 
+console.log({ groupedChatterInfo })
+
 export default function ChatterCard() {
   const {
     data: isEnabled,
@@ -319,59 +321,61 @@ export default function ChatterCard() {
   } = useUpdateSetting(Settings.chatters)
 
   return (
-    <Card>
-      <div className="title">
-        <h3>Chatter</h3>
-        <Switch
-          loading={loading}
-          checkedChildren="All"
-          unCheckedChildren="All"
-          onChange={updateSetting}
-          checked={isEnabled}
-        />
-      </div>
-      <div className="subtitle mb-2">
-        The bot can post some random messages as you play your game.
-      </div>
+    <>
+      <Card>
+        <div className="title">
+          <h3>Everything</h3>
+        </div>
 
-      <div className="my-6 space-y-6">
+        <div className="flex items-center space-x-4">
+          <Switch
+            loading={loading}
+            checkedChildren="All"
+            unCheckedChildren="All"
+            onChange={updateSetting}
+            checked={isEnabled}
+          />
+          <span>Turn off every chatter</span>
+        </div>
+      </Card>
+
+      <div className="space-y-6">
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
-          return (groupedChatterInfo[categoryName] || []).map(
-            (value, index) => {
-              if (!value) return null
-              return (
-                <div
-                  key={value.id}
-                  className={clsx(!isEnabled && 'opacity-40 transition-all')}
-                >
-                  {!index && value?.category ? (
-                    <div className="mb-2 text-sm text-gray-200">
-                      {value.category}
-                    </div>
-                  ) : null}
-                  <Tooltip title={value?.tooltip}>
-                    <div className="ml-4 flex items-center space-x-3">
-                      <Switch
-                        disabled={!isEnabled || loadingChatters}
-                        checked={dbChatters[value.id]?.enabled}
-                        onChange={(checked, e) => {
-                          updateChatters({
-                            ...dbChatters,
-                            [value.id]: {
-                              enabled: checked,
-                            },
-                          })
-                        }}
-                      />
-                      <span>{value.message}</span>
-                    </div>
-                  </Tooltip>
-                </div>
-              )
-            }
+          return (
+            <Card key={categoryName}>
+              <div className="title">
+                <h3>{categoryName}</h3>
+              </div>
+              <div className="ml-4 flex flex-col space-y-3">
+                {(groupedChatterInfo[categoryName] || []).map((value) => (
+                  <div
+                    key={value.id}
+                    className={clsx(!isEnabled && 'opacity-40 transition-all')}
+                  >
+                    <Tooltip title={value?.tooltip} placement="left">
+                      <div className="flex items-center space-x-3">
+                        <Switch
+                          disabled={!isEnabled || loadingChatters}
+                          checked={dbChatters[value.id]?.enabled}
+                          onChange={(checked, e) => {
+                            updateChatters({
+                              ...dbChatters,
+                              [value.id]: {
+                                enabled: checked,
+                              },
+                            })
+                          }}
+                        />
+                        <span>{value.message}</span>
+                      </div>
+                    </Tooltip>
+                  </div>
+                ))}
+              </div>
+            </Card>
           )
         })}
       </div>
-    </Card>
+    </>
   )
 }

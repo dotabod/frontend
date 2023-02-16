@@ -44,17 +44,14 @@ const CommandsPage = () => {
         if (Array.isArray(CommandDetail[command][key])) {
           CommandDetail[command][key].forEach((alias) => {
             if (
-              [alias.toLowerCase(), `!${alias.toLowerCase()}`].includes(
-                searchTerm.toLowerCase()
-              )
+              alias.toLowerCase().includes(searchTerm) ||
+              `!${alias.toLowerCase()}`.includes(searchTerm)
             ) {
               containsStringValue = true
             }
           })
         } else if (
-          CommandDetail[command][key]
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          CommandDetail[command][key].toLowerCase().includes(searchTerm)
         ) {
           containsStringValue = true
         }
@@ -88,7 +85,7 @@ const CommandsPage = () => {
           placeholder="Search commands..."
           value={searchTerm}
           style={{ width: 300 }}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
         />
       </div>
       {filteredCommands.length < 1 && (

@@ -60,7 +60,7 @@ export default function RoshCard() {
           yellow for 3 minutes (max rosh spawn).
         </p>
       </div>
-      <div className="my-4 space-y-4">
+      <div className="my-4 flex items-center justify-center space-x-4">
         <div className="flex flex-col items-center space-y-4">
           <Image
             alt="aegis timer"

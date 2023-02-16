@@ -40,7 +40,8 @@ export default function App({
           components: {
             Menu: {
               colorSubItemBg: 'var(--color-gray-800)',
-              colorItemBgSelected: 'var(--color-gray-700)',
+              colorItemBgHover: 'var(--color-gray-700)',
+              colorItemBgSelected: 'var(--color-gray-600)',
               colorItemTextSelected: 'var(--color-gray-200)',
               colorItemText: 'var(--color-gray-300)',
             },
