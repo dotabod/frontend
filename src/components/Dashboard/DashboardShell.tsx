@@ -43,6 +43,7 @@ export default function DashboardShell({
   children: React.ReactElement
 }) {
   const [collapsed, setCollapsed] = useState(false)
+  const [broken, setBroken] = useState(false)
   const {
     token: { colorBgContainer, colorBgLayout },
   } = theme.useToken()
@@ -89,7 +90,10 @@ export default function DashboardShell({
       <Layout className="h-full bg-gray-800">
         <Sider
           breakpoint="md"
-          onBreakpoint={(broken) => setCollapsed(broken)}
+          onBreakpoint={(broken) => {
+            setCollapsed(broken)
+            setBroken(broken)
+          }}
           style={{
             background: colorBgLayout,
           }}
@@ -153,7 +157,9 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout className="!bg-gray-800">
+        <Layout
+          className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}
+        >
           <Content className="min-h-full w-full max-w-screen-2xl space-y-6 bg-gray-800 p-8 transition-all">
             {children}
           </Content>
