@@ -23,6 +23,7 @@ export const PollOverlays = ({
         right: res({ w: 1920 / 2 - 200 }),
         top: res({ h: 115 }),
         width: res({ w: 400 }),
+        zIndex: 1,
       }}
     >
       <AnimatePresence key="poll-primary">
