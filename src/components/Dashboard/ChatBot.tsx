@@ -83,12 +83,17 @@ export default function ChatBot() {
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <div>
           1. Type the following in your stream to add @dotabod as a moderator to{' '}
-          <Link
-            target="_blank"
-            href={`https://www.twitch.tv/popout/${session.data.user.name}/chat`}
+          <a
+            onClick={() => {
+              window.open(
+                `https://www.twitch.tv/popout/${session.data.user.name}/chat`,
+                'mywindow',
+                'menubar=1,resizable=1,width=350,height=250'
+              )
+            }}
           >
             your channel
-          </Link>
+          </a>
           .
         </div>
         <Input
