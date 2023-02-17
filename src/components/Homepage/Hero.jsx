@@ -102,14 +102,34 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
   },
   {
-    name: 'WagamamaTV',
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/wagamamatv-profile_image-fcc33886efd92c4f-150x150.jpeg',
-  },
-  {
     name: 'TpaBoMaH',
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/509c81ae-7dad-4764-b0f3-e810c3f0bafc-profile_image-70x70.png',
+  },
+  {
+    name: 'XcaliburYe',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/69bea0f7-b170-4067-92f0-d1410a020b62-profile_image-150x150.png',
+  },
+  {
+    name: 'qSnake',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/7d5a4932-be42-481c-a47a-4136404f2c54-profile_image-70x70.png',
+  },
+  {
+    name: 'Draskyl',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/draskyl-profile_image-216adae4d74b615e-150x150.png',
+  },
+  {
+    name: 'febbydoto',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
+  },
+  {
+    name: 'BananaSlamJamma',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/bananaslamjamma-profile_image-8a07eac563581ffe-70x70.png',
   },
   {
     link: false,
