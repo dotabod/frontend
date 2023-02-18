@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import DiscordSvg from '@/images/logos/discord.svg'
 import GithubSvg from '@/images/logos/github.svg'
+import TwitterSvg from '@/images/logos/twitter.svg'
 import Image from 'next/image'
 import { Tooltip, Typography } from 'antd'
 
@@ -13,6 +14,7 @@ export function NavLinks({ bottom = false }) {
     ['Pricing', '#pricing'],
     ['FAQs', '#faqs'],
     ['Github', 'https://github.com/dotabod', GithubSvg, 'Github'],
+    ['Twitter', 'https://twitter.com/dotabod_', TwitterSvg, 'Twitter'],
     ['Discord', 'https://discord.dotabod.com', DiscordSvg, 'Discord'],
     [
       'Support the project',
