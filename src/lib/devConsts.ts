@@ -8,7 +8,7 @@ export type blockType = {
 export const devBlockTypes: blockType = {
   matchId: 123456789,
   team: 'radiant',
-  type: 'playing',
+  type: null,
 }
 export const devPoll: PollData = {
   endDate: new Date().getTime() + 300000,

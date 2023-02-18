@@ -8,6 +8,7 @@ import NotablePlayersCard from '@/components/Dashboard/Features/NotablePlayers'
 import { ReactElement } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Header from '@/components/Dashboard/Header'
+import QueueCard from '@/components/Dashboard/Features/QueueCard'
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
@@ -26,6 +27,7 @@ const FeaturesPage: NextPageWithLayout = () => {
       <div className="flex flex-col space-y-8">
         <MinimapCard />
         <PicksCard />
+        <QueueCard />
         <RoshCard />
         <NotablePlayersCard />
       </div>

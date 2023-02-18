@@ -101,6 +101,7 @@ export const defaultSettings = {
   notablePlayersOverlay: true,
   tellChatNewMMR: true,
   tellChatBets: true,
+  queueBlocker: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
