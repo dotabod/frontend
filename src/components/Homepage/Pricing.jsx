@@ -59,7 +59,7 @@ const plans = [
         width={24}
         height={24}
         className="rounded"
-        alt="Krappa"
+        alt="Gigachad"
       />
     ),
     logomarkClassName: 'fill-gray-500',
