@@ -3,7 +3,11 @@ import * as z from 'zod'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
-import { mmrPatchSchema, settingPatchSchema } from '@/lib/validations/setting'
+import {
+  mmrPatchSchema,
+  settingPatchSchema,
+  streamDelaySchema,
+} from '@/lib/validations/setting'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { unstable_getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -43,6 +47,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })
 
         return res.end()
+      }
+
+      if (settingKey === Settings.streamDelay) {
+        streamDelaySchema.parse(JSON.parse(req.body))
       }
 
       const body = settingPatchSchema.parse(JSON.parse(req.body))

@@ -1,7 +1,7 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Settings } from '@/lib/defaultSettings'
-import { Input } from 'antd'
+import { Input, InputNumber } from 'antd'
 import { useDebouncedCallback } from 'use-debounce'
 
 export default function StreamDelayCard() {
@@ -11,8 +11,8 @@ export default function StreamDelayCard() {
     updateSetting,
   } = useUpdateSetting(Settings.streamDelay)
 
-  const debouncedUpdate = useDebouncedCallback((e) => {
-    updateSetting(Math.abs(Number(e.target.value) * 1000))
+  const debouncedUpdate = useDebouncedCallback((value) => {
+    updateSetting(value * 1000)
   }, 500)
 
   return (
@@ -27,8 +27,7 @@ export default function StreamDelayCard() {
 
       <div>
         {!loading && (
-          <Input
-            type="number"
+          <InputNumber
             min={0}
             max={60}
             placeholder="0 seconds"

@@ -9,6 +9,10 @@ export const mmrPatchSchema = z.object({
   value: z.number().min(0).max(20000),
 })
 
+export const streamDelaySchema = z.object({
+  value: z.number().min(0).max(60000),
+})
+
 export const localePatchSchema = z.enum([
   'cs',
   'en',
