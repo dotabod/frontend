@@ -1,7 +1,7 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Settings } from '@/lib/defaultSettings'
-import { Input, InputNumber } from 'antd'
+import { Form, Input, InputNumber } from 'antd'
 import { useDebouncedCallback } from 'use-debounce'
 
 export default function StreamDelayCard() {
@@ -25,25 +25,27 @@ export default function StreamDelayCard() {
         write 15 for 15 seconds.
       </div>
 
-      <div>
-        {!loading && (
-          <InputNumber
-            min={0}
-            max={60}
-            placeholder="0 seconds"
-            className="!w-[200px] transition-all"
-            defaultValue={Math.abs(Number(delay) || 0) / 1000}
-            onChange={debouncedUpdate}
-          />
-        )}
-        {loading && (
-          <Input
-            placeholder="Loading..."
-            className="max-w-fit transition-all"
-            disabled
-          />
-        )}
-      </div>
+      <Form layout="vertical">
+        <Form.Item label="Delay in seconds" colon={false} help="60 seconds max">
+          {!loading && (
+            <InputNumber
+              min={0}
+              max={60}
+              placeholder="0 seconds"
+              className="!w-[200px] transition-all"
+              defaultValue={Math.abs(Number(delay) || 0) / 1000}
+              onChange={debouncedUpdate}
+            />
+          )}
+          {loading && (
+            <Input
+              placeholder="Loading..."
+              className="max-w-fit transition-all"
+              disabled
+            />
+          )}
+        </Form.Item>
+      </Form>
     </Card>
   )
 }
