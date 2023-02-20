@@ -17,7 +17,7 @@ function getItem(item) {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   return {
-    key: item.name,
+    key: item.href,
     icon: item.icon ? (
       <item.icon className={clsx('h-4 w-4')} aria-hidden="true" />
     ) : null,
@@ -45,7 +45,7 @@ export default function DashboardShell({
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
   const {
-    token: { colorBgContainer, colorBgLayout },
+    token: { colorBgLayout },
   } = theme.useToken()
   const [current, setCurrent] = useState('/dashboard')
 
@@ -55,8 +55,7 @@ export default function DashboardShell({
 
   useEffect(() => {
     const { pathname } = window.location
-    const path = pathname.split('/').pop()
-    setCurrent(path)
+    setCurrent(pathname)
   }, [])
 
   return (
@@ -137,6 +136,7 @@ export default function DashboardShell({
               <Menu
                 onClick={onClick}
                 selectedKeys={[current]}
+                defaultOpenKeys={['/dashboard/features']}
                 style={{
                   background: colorBgLayout,
                 }}
@@ -144,7 +144,7 @@ export default function DashboardShell({
                 items={navigation.map((item, i) => {
                   if (!item.name)
                     return {
-                      key: i,
+                      key: item?.href || i,
                       type: 'divider',
                       className: '!m-6 !bg-gray-500',
                     }
