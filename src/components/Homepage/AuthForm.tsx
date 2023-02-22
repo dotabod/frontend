@@ -31,7 +31,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             })
         }}
       >
-        <div className="inline flex items-center justify-center space-x-4">
+        <span className="space-x-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 48 48"
@@ -55,7 +55,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <path fill="#8E24AA" d="M32 25h-5V15h5V25zM24 25h-5V15h5V25z" />
           </svg>
           <span>Sign in with Twitch</span>
-        </div>
+        </span>
       </Button>
     </div>
   )
