@@ -1,4 +1,4 @@
-import { Github, LogOut } from 'lucide-react'
+import { Github, LogOut, Share2Icon, Twitter } from 'lucide-react'
 import {
   BeakerIcon,
   SparklesIcon,
@@ -68,14 +68,25 @@ export const navigation = [
     icon: null,
   },
   {
-    name: 'Github',
-    href: 'https://github.com/dotabod/',
-    icon: Github,
-  },
-  {
-    name: 'Discord',
-    href: 'https://discord.dotabod.com',
-    icon: Discord,
+    name: 'Socials',
+    icon: Share2Icon,
+    children: [
+      {
+        name: 'Github',
+        href: 'https://github.com/dotabod/',
+        icon: Github,
+      },
+      {
+        name: 'Twitter',
+        href: 'https://twitter.com/dotabod_',
+        icon: Twitter,
+      },
+      {
+        name: 'Discord',
+        href: 'https://discord.dotabod.com',
+        icon: Discord,
+      },
+    ],
   },
   {
     name: 'Support the project',

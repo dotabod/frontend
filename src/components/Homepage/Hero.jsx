@@ -1,7 +1,7 @@
-import useSWR from 'swr'
+import { WatchDotabod } from './WatchDotabod'
 import DiscordSvg from 'src/images/logos/discord.svg'
 import Image from 'next/image'
-import { Badge, Button } from 'antd'
+import { Button } from 'antd'
 import { Container } from 'src/components/Container'
 import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { useSession } from 'next-auth/react'
@@ -10,7 +10,6 @@ import TwitchSvg from 'src/images/logos/twitch.svg'
 import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustration'
 import Link from 'next/link'
 import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
-import { fetcher } from '@/lib/fetcher'
 
 const featuredUsers = [
   {
@@ -117,7 +116,6 @@ const TwitchUser = ({
 export function Hero() {
   const session = useSession()
   const name = session.data?.user?.name || 'streamers'
-  const { data: isDotabodLive } = useSWR('/api/is-dotabod-live', fetcher)
 
   const [supporters, nonSupporters] = Object.values(grouped)
 
@@ -163,34 +161,7 @@ export function Hero() {
                   <span>Join Discord</span>
                 </div>
               </Button>
-              {isDotabodLive && (
-                <Button
-                  type="primary"
-                  className="!bg-purple-700 hover:!bg-purple-600"
-                  href="https://twitch.tv/dotabod"
-                  target="_blank"
-                >
-                  <div className="flex items-center space-x-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7"></path>
-                    </svg>
-                    <span>Watch me make Dotabod</span>
-                    <span className="animate-pulse rounded-md bg-red-700 px-2 py-0.5 text-xs">
-                      Live
-                    </span>
-                  </div>
-                </Button>
-              )}
+              <WatchDotabod />
             </div>
           </div>
           <div className="relative lg:col-span-5 lg:row-span-2 xl:col-span-6">
