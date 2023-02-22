@@ -1,13 +1,16 @@
+import useSWR from 'swr'
 import DiscordSvg from 'src/images/logos/discord.svg'
 import Image from 'next/image'
-import { Button } from 'antd'
+import { Badge, Button } from 'antd'
 import { Container } from 'src/components/Container'
 import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { useSession } from 'next-auth/react'
 import dotaLogo from 'src/images/logos/dota.svg'
 import TwitchSvg from 'src/images/logos/twitch.svg'
 import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustration'
-import { PlayIcon } from '@/components/Homepage/PlayIcon'
+import Link from 'next/link'
+import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
+import { fetcher } from '@/lib/fetcher'
 
 const featuredUsers = [
   {
@@ -84,39 +87,37 @@ const TwitchUser = ({
   onClick,
   session,
   supporter,
-}) => (
-  <li className="relative">
-    <a
-      className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
-      rel="noreferrer"
-      href={
-        link !== false
-          ? `https://twitch.tv/${
-              last ? session?.data?.user?.name || name : name
-            }`
-          : '#'
-      }
-      target="_blank"
-      onClick={onClick}
-    >
-      <Image
-        src={last ? session?.data?.user?.image || image : image}
-        width={50}
-        height={50}
-        alt={last ? session?.data?.user?.name || name : name}
-        unoptimized
-        className="rounded-lg shadow-lg"
-      />
-      <span className="text-xs text-gray-300">
-        {last ? session?.data?.user?.name || name : name}
-      </span>
-    </a>
-  </li>
-)
+}) => {
+  const userName = last ? session?.data?.user?.name || name : name
+  const imagesrc = last ? session?.data?.user?.image || image : image
+
+  return (
+    <li className="relative">
+      <a
+        className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
+        rel="noreferrer"
+        href={link !== false ? `https://twitch.tv/${userName}` : '#'}
+        target="_blank"
+        onClick={onClick}
+      >
+        <Image
+          src={imagesrc}
+          width={50}
+          height={50}
+          alt={userName}
+          unoptimized
+          className="rounded-lg shadow-lg"
+        />
+        <span className="text-xs text-gray-300">{userName}</span>
+      </a>
+    </li>
+  )
+}
 
 export function Hero() {
   const session = useSession()
   const name = session.data?.user?.name || 'streamers'
+  const { data: isDotabodLive } = useSWR('/api/is-dotabod-live', fetcher)
 
   const [supporters, nonSupporters] = Object.values(grouped)
 
@@ -140,27 +141,56 @@ export function Hero() {
               with your Twitch audience.
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
-              <Button href="/dashboard">
-                <PlayIcon className="inline h-5 w-5 flex-none" />
-                {session?.status === 'authenticated' ? (
-                  <span className="ml-2.5">Go to dashboard</span>
-                ) : (
-                  <span className="ml-2.5">Get started</span>
-                )}
-              </Button>
+              <Link href="/dashboard">
+                <Button type="primary">
+                  <div className="flex items-center space-x-2">
+                    <CursorArrowRaysIcon className="flex h-4 w-4" />
+                    {session?.status === 'authenticated' ? (
+                      <span>Go to dashboard</span>
+                    ) : (
+                      <span>Get started</span>
+                    )}
+                  </div>
+                </Button>
+              </Link>
               <Button
-                variant="outline"
-                color="gray"
                 href="https://discord.dotabod.com"
                 target="_blank"
+                className="space-x-2"
               >
-                <Image
-                  alt="discord"
-                  src={DiscordSvg}
-                  className="inline h-5 w-5 flex-none"
-                />
-                <span className="ml-2.5">Join Discord</span>
+                <div className="flex items-center space-x-2">
+                  <Image alt="discord" src={DiscordSvg} className="h-4 w-4" />
+                  <span>Join Discord</span>
+                </div>
               </Button>
+              {isDotabodLive && (
+                <Button
+                  type="primary"
+                  className="!bg-purple-700 hover:!bg-purple-600"
+                  href="https://twitch.tv/dotabod"
+                  target="_blank"
+                >
+                  <div className="flex items-center space-x-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7"></path>
+                    </svg>
+                    <span>Watch me make Dotabod</span>
+                    <span className="animate-pulse rounded-md bg-red-700 px-2 py-0.5 text-xs">
+                      Live
+                    </span>
+                  </div>
+                </Button>
+              )}
             </div>
           </div>
           <div className="relative lg:col-span-5 lg:row-span-2 xl:col-span-6">
