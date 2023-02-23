@@ -133,8 +133,7 @@ export default function ChatBot() {
         <MmrForm hideText={true} />
 
         <div>
-          3. Add the following emotes to your channel using 7TV (case
-          sensitive):
+          3. Dotabod uses these emotes in chat, so add them to your channel:
         </div>
         <List
           grid={{
