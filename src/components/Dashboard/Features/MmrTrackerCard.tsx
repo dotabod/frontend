@@ -6,7 +6,7 @@ import React from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import clsx from 'clsx'
-import MmrForm from './MMRForm'
+import MmrForm from './MmrForm'
 
 export default function MmrTrackerCard() {
   const { data: isEnabled, updateSetting } = useUpdateSetting(

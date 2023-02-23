@@ -33,7 +33,7 @@ const SteamAvatar = ({ data: response, id }) => {
   )
 }
 
-export default function MmrForm({ hideText = false }) {
+const MmrForm = ({ hideText = false }) => {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
   const [accounts, setAccounts] = useState<SteamAccount[]>([])
   const form = useForm({
@@ -247,3 +247,5 @@ export default function MmrForm({ hideText = false }) {
     </>
   )
 }
+
+export default MmrForm

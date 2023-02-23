@@ -10,7 +10,7 @@ import ModImage from '@/components/ModImage'
 import { useClipboard } from '@mantine/hooks'
 import { ExternalLinkIcon } from 'lucide-react'
 import { Tooltip, Input, List, Button } from 'antd'
-import MmrForm from './Features/MMRForm'
+import MmrForm from './Features/MmrForm'
 
 const emotesRequired = [
   {
