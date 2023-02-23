@@ -1,4 +1,4 @@
-import { Github, LogOut, Share2Icon, Twitter } from 'lucide-react'
+import { Github, LogOut, Twitter } from 'lucide-react'
 import {
   BeakerIcon,
   SparklesIcon,
@@ -10,6 +10,7 @@ import {
   MegaphoneIcon,
   ScaleIcon,
   TvIcon,
+  ShareIcon,
 } from '@heroicons/react/24/outline'
 import { signOut } from 'next-auth/react'
 import Discord from '@/images/logos/Discord'
@@ -69,7 +70,7 @@ export const navigation = [
   },
   {
     name: 'Socials',
-    icon: Share2Icon,
+    icon: ShareIcon,
     children: [
       {
         name: 'Github',
