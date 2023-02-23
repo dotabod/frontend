@@ -10,6 +10,7 @@ import ModImage from '@/components/ModImage'
 import { useClipboard } from '@mantine/hooks'
 import { ExternalLinkIcon } from 'lucide-react'
 import { Tooltip, Input, List, Button } from 'antd'
+import MmrForm from './Features/MMRForm'
 
 const emotesRequired = [
   {
@@ -124,9 +125,15 @@ export default function ChatBot() {
             </Tooltip>
           }
         />
+        <div>
+          2. Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
+          (you can change it later)
+        </div>
+
+        <MmrForm hideText={true} />
 
         <div>
-          2. Add the following emotes to your channel using 7TV (case
+          3. Add the following emotes to your channel using 7TV (case
           sensitive):
         </div>
         <List
