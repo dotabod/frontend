@@ -7,6 +7,7 @@ import {
   ITFlag,
   PTFlag,
   RUFlag,
+  TRFlag,
   UAFlag,
   USFlag,
 } from 'mantine-flagpack'
@@ -46,6 +47,11 @@ export const localeOptions: {
     label: 'Hungarian',
     value: 'hu',
     Flag: HUFlag,
+  },
+  {
+    label: 'Turkish',
+    value: 'tr',
+    Flag: TRFlag,
   },
   {
     label: 'Persian',
