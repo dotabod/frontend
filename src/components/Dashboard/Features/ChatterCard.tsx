@@ -17,7 +17,7 @@ export const chatterInfo = {
     category: CATEGORIES.Item,
     message: (
       <>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <Image
             width={22}
             height={22}
@@ -27,7 +27,7 @@ export const chatterInfo = {
           />
           <span>Use your midas</span>
         </div>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>Midas was finally used, 64 seconds late</span>
           <Image
             width={22}
@@ -120,7 +120,7 @@ export const chatterInfo = {
     category: CATEGORIES.Event,
     message: (
       <>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>The tip from Spectre</span>
           <Image
             width={22}
@@ -130,7 +130,7 @@ export const chatterInfo = {
             src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
           />
         </div>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>We tipping Crystal Maiden</span>
           <Image
             width={22}
@@ -147,7 +147,7 @@ export const chatterInfo = {
     tooltip: '',
     category: CATEGORIES.Event,
     message: (
-      <div className="inline space-x-2">
+      <div className="space-x-2">
         <span>+80 gold from bounty (2/4)</span>
         <Image
           width={22}
@@ -184,7 +184,7 @@ export const chatterInfo = {
     category: CATEGORIES.Hero,
     message: (
       <>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>Pudge has a 4 kill streak</span>
           <Image
             width={22}
@@ -194,7 +194,7 @@ export const chatterInfo = {
             src="https://cdn.betterttv.net/emote/62aafeef6ef7a5f0b7df3d98/1x"
           />
         </div>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>Pudge lost the 4 kill streak</span>
           <Image
             width={22}
@@ -211,7 +211,7 @@ export const chatterInfo = {
     tooltip: '',
     category: CATEGORIES.Hero,
     message: (
-      <div className="inline space-x-2">
+      <div className="space-x-2">
         <span>Pudge giving up first blood</span>
         <Image
           width={22}
@@ -228,7 +228,7 @@ export const chatterInfo = {
     category: CATEGORIES.Item,
     message: (
       <>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>@techleed where&apos;s your tp</span>
           <Image
             width={22}
@@ -238,7 +238,7 @@ export const chatterInfo = {
             src="https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp"
           />
         </div>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>@techleed nice job getting a tp finally after 322 seconds</span>
           <Image
             width={22}
@@ -256,7 +256,7 @@ export const chatterInfo = {
     category: CATEGORIES.Event,
     message: (
       <>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>We have lost, gg nt</span>
           <Image
             width={22}
@@ -267,7 +267,7 @@ export const chatterInfo = {
           />
           <span>go next</span>
         </div>
-        <div className="inline space-x-2">
+        <div className="space-x-2">
           <span>We have won</span>
           <Image
             width={22}
