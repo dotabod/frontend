@@ -109,7 +109,7 @@
 }
 
 .subtitle {
-  @apply !text-sm !text-gray-300;
+  @apply mb-4 border-b border-gray-500 pb-4 !text-sm !text-gray-300;
 }
 
 .collapse {
