@@ -1,6 +1,6 @@
 import { signOut, useSession } from 'next-auth/react'
 
-import { Avatar, Dropdown, Space } from 'antd'
+import { Dropdown, Space } from 'antd'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { Session } from 'next-auth'
