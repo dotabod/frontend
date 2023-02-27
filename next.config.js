@@ -15,6 +15,7 @@ const moduleExports = {
 
   images: {
     domains: [
+      'static-cdn.jtvnw.net',
       'i.imgur.com',
       'cdn.7tv.app',
       'cdn.frankerfacez.com',

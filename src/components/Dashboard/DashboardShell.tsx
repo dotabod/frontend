@@ -129,9 +129,6 @@ export default function DashboardShell({
                   )}
                 </button>
               </div>
-              <div className="w-full p-2">
-                <UserAccountNav dark showDetails={!collapsed} />
-              </div>
 
               <Menu
                 onClick={onClick}
@@ -152,15 +149,26 @@ export default function DashboardShell({
                   return getItem(item)
                 })}
               />
-
-              <DisableToggle collapsed={collapsed} />
             </div>
           </div>
         </Sider>
         <Layout
           className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}
         >
-          <Content className="min-h-full w-full max-w-screen-2xl space-y-6 bg-gray-800 p-8 transition-all">
+          <Header
+            className={clsx(
+              '!bg-gray-900',
+              broken && !collapsed && '!hidden',
+              'flex w-full items-center justify-between !p-8'
+            )}
+          >
+            <DisableToggle />
+
+            <div className="w-fit py-2">
+              <UserAccountNav dark showDetails={!collapsed} />
+            </div>
+          </Header>
+          <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
             {children}
           </Content>
         </Layout>

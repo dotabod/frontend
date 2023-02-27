@@ -1,4 +1,4 @@
-import { Github, LogOut, Twitter } from 'lucide-react'
+import { Github, Twitter } from 'lucide-react'
 import {
   BeakerIcon,
   SparklesIcon,
@@ -12,7 +12,6 @@ import {
   TvIcon,
   ShareIcon,
 } from '@heroicons/react/24/outline'
-import { signOut } from 'next-auth/react'
 import Discord from '@/images/logos/Discord'
 import KofiIcon from '@/images/logos/Kofi'
 import Image from 'next/image'
@@ -122,25 +121,5 @@ export const navigation = [
     name: 'Changelog',
     href: 'https://discord.com/channels/1039887907705593876/1069124160179163146',
     icon: RssIcon,
-  },
-  {
-    name: '',
-    href: '',
-    icon: null,
-  },
-  {
-    name: 'Sign out',
-    href: '#',
-    onClick: () => {
-      signOut({
-        callbackUrl: `${window.location.origin}/`,
-      })
-    },
-    icon: LogOut,
-  },
-  {
-    name: '',
-    href: '',
-    icon: null,
   },
 ]
