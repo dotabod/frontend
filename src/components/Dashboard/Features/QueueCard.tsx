@@ -29,7 +29,9 @@ export default function QueueCard() {
         snipe you.
       </div>
       <div>
-        Currently only the queue timer in the bottom right will be covered.
+        Both the &quot;PLAY DOTA&quot; in the bottom right, and the
+        &quot;Finding match&quot; at the top left while in main menu will be
+        blocked.
       </div>
       <div
         className={clsx(
@@ -37,15 +39,24 @@ export default function QueueCard() {
           !isEnabled && 'opacity-40'
         )}
       >
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-row items-center space-x-4">
           <Image
             className={clsx(
               'rounded-xl border-2 border-transparent transition-all'
             )}
             alt="queue blocker"
-            width={600}
-            height={600}
-            src="/images/dashboard/fake-queue-timer.png"
+            width={497}
+            height={208}
+            src="https://i.imgur.com/PmMjd4V.png"
+          />
+          <Image
+            className={clsx(
+              'rounded-xl border-2 border-transparent transition-all'
+            )}
+            alt="queue blocker"
+            width={204}
+            height={247}
+            src="https://i.imgur.com/ZHyrR1k.png"
           />
         </div>
       </div>
