@@ -16,7 +16,6 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
   return (
     <>
       {showQueueBlocker && <FindMatch />}
-
       <div
         style={{
           height: res({ h: 61 }),

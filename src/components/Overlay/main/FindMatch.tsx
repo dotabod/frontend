@@ -1,42 +1,59 @@
-import { MatchTimer } from './MatchTimer'
 import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { useEffect, useState } from 'react'
-
-// random number between 15 minutes and maximum 99 minutes
-function getRandomNumber() {
-  return Math.floor(Math.random() * 99 * 60) + 15 * 60
-}
 
 export const FindMatch = () => {
   const res = useTransformRes()
 
-  const [duration, setDuration] = useState(0)
-
-  useEffect(() => {
-    setDuration(getRandomNumber())
-
-    const timer = setInterval(() => {
-      setDuration((duration) => duration + 1)
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
   return (
     <>
-      <motion.div
-        key="match-counter"
-        {...motionProps}
+      <span
         style={{
           fontSize: res({ w: 14 }),
-          bottom: res({ h: 73 }), // correct is n
-          right: res({ w: 55 }), // correct is 50
+          height: res({ h: 24 }),
+          width: res({ w: 120 }),
+          top: res({ h: 143 }),
+          left: res({ w: 108 }),
         }}
-        className="match-timer absolute"
+        className="font-outline-2 absolute flex items-center rounded-sm bg-[#1b1c1f] font-semibold capitalize tracking-wide text-[#6a9461]"
       >
-        <MatchTimer duration={duration} res={res} />
+        Main menu
+      </span>
+
+      <motion.div
+        key="queue-blocker-class"
+        {...motionProps}
+        style={{
+          bottom: res({ h: 0 }), // correct is n
+          right: res({ w: 0 }), // correct is 50
+        }}
+        className="absolute"
+      >
+        <div
+          style={{
+            width: res({ w: 330 }),
+            height: res({ h: 49 }),
+            right: res({ w: 59 }),
+            bottom: res({ h: 22 }),
+          }}
+          className="absolute flex items-center justify-center overflow-hidden"
+        >
+          <span
+            style={{
+              fontSize: res({ w: 26 }),
+            }}
+            className="font-outline-2 whitespace-nowrap font-bold uppercase tracking-[0.15em] text-white"
+          >
+            play dota
+          </span>
+        </div>
+
+        <img
+          width={res({ w: 769 })}
+          height={res({ h: 156 })}
+          src="/images/overlay/finding-match.png"
+          alt="Finding Match"
+        />
       </motion.div>
     </>
   )
