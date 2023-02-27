@@ -165,7 +165,7 @@ export default function DashboardShell({
             <DisableToggle />
 
             <div className="w-fit py-2">
-              <UserAccountNav dark showDetails={!collapsed} />
+              <UserAccountNav />
             </div>
           </Header>
           <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
