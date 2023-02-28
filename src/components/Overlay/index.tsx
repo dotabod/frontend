@@ -23,8 +23,11 @@ import clsx from 'clsx'
 import { motionProps } from '@/ui/utils'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { Spin } from 'antd'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
 
 const OverlayPage = (props) => {
+  const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
@@ -87,7 +90,7 @@ const OverlayPage = (props) => {
 
   useOBS({ block, connected })
 
-  return (
+  return isDotabodDisabled ? null : (
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
