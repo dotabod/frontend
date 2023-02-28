@@ -2,6 +2,7 @@ import {
   BRFlag,
   CZFlag,
   ESFlag,
+  GRFlag,
   HUFlag,
   IRFlag,
   ITFlag,
@@ -52,6 +53,11 @@ export const localeOptions: {
     label: 'Turkish',
     value: 'tr',
     Flag: TRFlag,
+  },
+  {
+    label: 'German',
+    value: 'gr',
+    Flag: GRFlag,
   },
   {
     label: 'Persian',
