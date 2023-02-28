@@ -24,14 +24,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Fetch the XML data for the user's Steam profile
     const response = await fetch(
-      `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${
-        process.env.STEAM_WEB_API
-      }&steamids=${
-        !Array.isArray(steamIds)
-          ? steamIds
-          : steamIds.map(convertSteam32To64).join(',')
+      `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_WEB_API
+      }&steamids=${!Array.isArray(steamIds)
+        ? steamIds
+        : steamIds.map(convertSteam32To64).join(',')
       }}`
     )
+
     const json = await response.json()
     // return an array of avatars for each steam id from the input
 
@@ -44,6 +43,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })) || [],
     })
   } catch (error) {
+    console.error(error)
+
     // return the error message
     return res.status(500).end()
   }

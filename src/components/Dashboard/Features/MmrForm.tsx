@@ -4,18 +4,19 @@ import {
   useUpdateAccount,
   useUpdateSetting,
 } from '@/lib/hooks/useUpdateSetting'
-import { Typography, Tag, Button, InputNumber } from 'antd'
+import { Typography, Tag, Button, InputNumber, Form } from 'antd'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
 import React, { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
-import { TrashIcon } from '@heroicons/react/24/outline'
+import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { getRankDetail, getRankImage, RankType } from '@/lib/ranks'
 import clsx from 'clsx'
+import { ExternalLinkIcon } from 'lucide-react'
 
 const SteamAvatar = ({ data: response, id }) => {
   if (!response) return <p>Loading...</p>
@@ -92,65 +93,107 @@ const MmrForm = ({ hideText = false }) => {
               )
               const rank = getRankImage(rankResponse as RankType)
 
+              const isMultiAccount = false
+
               const removed =
                 form.isDirty() &&
                 form.values.accounts.findIndex(
                   (act) => act.steam32Id === account.steam32Id && act.delete
                 ) !== -1
               return (
-                <div
-                  key={account.steam32Id}
-                  className={clsx(removed && 'opacity-40')}
-                >
-                  <div className="mb-1 flex items-center space-x-1 text-gray-400">
-                    <Typography.Link
-                      target="_blank"
-                      href={`https://steamid.xyz/${account.steam32Id}`}
-                      rel="noreferrer"
-                    >
-                      {account.name}
-                    </Typography.Link>
-                  </div>
+                <div key={account.steam32Id}>
+                  <Form.Item
+                    className={clsx(
+                      'max-w-[327px]',
+                      isMultiAccount &&
+                        'rounded border border-solid border-yellow-500/40 !p-4',
+                      removed &&
+                        'rounded border border-dashed border-red-500/80 !p-4'
+                    )}
+                    help={
+                      isMultiAccount && (
+                        <Typography.Paragraph>
+                          <ExclamationTriangleIcon className="mr-1 inline h-4 w-4 text-yellow-500" />
+                          You will not be able to use this account until{' '}
+                          <Typography.Link
+                            target="_blank"
+                            href={`https://twitch.tv/gorgc`}
+                            rel="noreferrer"
+                            className="mx-1 inline"
+                          >
+                            @Gorgc
+                          </Typography.Link>
+                          removes it from their dashboard.
+                        </Typography.Paragraph>
+                      )
+                    }
+                  >
+                    <div className="flex flex-col items-start">
+                      <div
+                        className={clsx(
+                          'flex items-start space-x-2',
+                          (removed || isMultiAccount) && 'opacity-40'
+                        )}
+                      >
+                        <div className="!h-12 !w-12">
+                          <MMRBadge
+                            leaderboard={null}
+                            image={rank?.image}
+                            rank={null}
+                            key={account.steam32Id}
+                            className="!rounded-md bg-transparent !p-0"
+                          />
+                        </div>
+                        <SteamAvatar id={account.steam32Id} data={steamData} />
+                        <Form.Item
+                          help={
+                            <Typography.Link
+                              target="_blank"
+                              href={`https://steamid.xyz/${account.steam32Id}`}
+                              rel="noreferrer"
+                              className="flex items-center space-x-2"
+                            >
+                              <span className="max-w-[90px] overflow-hidden overflow-ellipsis whitespace-nowrap">
+                                {account.name}
+                              </span>
+                              <ExternalLinkIcon className="h-4 w-4" />
+                            </Typography.Link>
+                          }
+                        >
+                          <InputNumber
+                            disabled={removed || isMultiAccount}
+                            id={`${account.steam32Id}-mmr`}
+                            placeholder="9000"
+                            type="number"
+                            min={0}
+                            max={30000}
+                            className="!w-[120px]"
+                            {...form.getInputProps(`accounts.${index}.mmr`)}
+                          />
+                        </Form.Item>
 
-                  <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-2">
-                    <MMRBadge
-                      leaderboard={null}
-                      image={rank?.image}
-                      rank={null}
-                      key={account.steam32Id}
-                      className="!h-12 !w-12 !rounded-md bg-transparent !p-0"
-                    />
-                    <SteamAvatar id={account.steam32Id} data={steamData} />
-                    <InputNumber
-                      disabled={removed}
-                      id={`${account.steam32Id}-mmr`}
-                      placeholder="9000"
-                      type="number"
-                      min={0}
-                      max={30000}
-                      className="!w-[200px]"
-                      {...form.getInputProps(`accounts.${index}.mmr`)}
-                    />
-                    <Button
-                      disabled={removed}
-                      danger
-                      onClick={() => {
-                        form.setValues({
-                          accounts: form.values.accounts.map((act) => {
-                            if (act.steam32Id === account.steam32Id) {
-                              return {
-                                ...act,
-                                delete: true,
-                              }
-                            }
-                            return act
-                          }),
-                        })
-                      }}
-                    >
-                      <TrashIcon height={16} />
-                    </Button>
-                  </div>
+                        <Button
+                          disabled={removed || isMultiAccount}
+                          danger
+                          onClick={() => {
+                            form.setValues({
+                              accounts: form.values.accounts.map((act) => {
+                                if (act.steam32Id === account.steam32Id) {
+                                  return {
+                                    ...act,
+                                    delete: true,
+                                  }
+                                }
+                                return act
+                              }),
+                            })
+                          }}
+                        >
+                          <TrashIcon height={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  </Form.Item>
                 </div>
               )
             })}

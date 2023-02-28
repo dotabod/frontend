@@ -98,13 +98,13 @@ export default function MmrTrackerCard() {
           leaderboard={null}
           image={showRankImage ? '11.png' : null}
           rank={showRankMmr ? '130' : null}
-          className="self-center !rounded-md"
+          className="self-center !rounded-md bg-transparent"
         />
         <MMRBadge
           leaderboard={showRankLeader ? '1' : null}
           image={showRankImage ? '92.png' : null}
           rank={showRankMmr ? '13150' : null}
-          className="self-center !rounded-md"
+          className="self-center !rounded-md bg-transparent"
         />
       </div>
 
