@@ -93,7 +93,9 @@ const MmrForm = ({ hideText = false }) => {
               )
               const rank = getRankImage(rankResponse as RankType)
 
-              const isMultiAccount = false
+              const multiUsedBy = !!account.connectedUserIds?.length
+                ? account.connectedUserIds[0]
+                : false
 
               const removed =
                 form.isDirty() &&
@@ -105,23 +107,23 @@ const MmrForm = ({ hideText = false }) => {
                   <Form.Item
                     className={clsx(
                       'max-w-[327px]',
-                      isMultiAccount &&
+                      multiUsedBy &&
                         'rounded border border-solid border-yellow-500/40 !p-4',
                       removed &&
                         'rounded border border-dashed border-red-500/80 !p-4'
                     )}
                     help={
-                      isMultiAccount && (
+                      multiUsedBy && (
                         <Typography.Paragraph>
                           <ExclamationTriangleIcon className="mr-1 inline h-4 w-4 text-yellow-500" />
                           You will not be able to use this account until{' '}
                           <Typography.Link
                             target="_blank"
-                            href={`https://twitch.tv/gorgc`}
+                            href={`https://twitch.tv/${multiUsedBy}`}
                             rel="noreferrer"
                             className="mx-1 inline"
                           >
-                            @Gorgc
+                            {multiUsedBy}
                           </Typography.Link>
                           removes it from their dashboard.
                         </Typography.Paragraph>
@@ -132,7 +134,7 @@ const MmrForm = ({ hideText = false }) => {
                       <div
                         className={clsx(
                           'flex items-start space-x-2',
-                          (removed || isMultiAccount) && 'opacity-40'
+                          (removed || multiUsedBy) && 'opacity-40'
                         )}
                       >
                         <div className="!h-12 !w-12">
@@ -161,7 +163,7 @@ const MmrForm = ({ hideText = false }) => {
                           }
                         >
                           <InputNumber
-                            disabled={removed || isMultiAccount}
+                            disabled={removed || multiUsedBy}
                             id={`${account.steam32Id}-mmr`}
                             placeholder="9000"
                             type="number"
@@ -173,7 +175,7 @@ const MmrForm = ({ hideText = false }) => {
                         </Form.Item>
 
                         <Button
-                          disabled={removed || isMultiAccount}
+                          disabled={removed || multiUsedBy}
                           danger
                           onClick={() => {
                             form.setValues({

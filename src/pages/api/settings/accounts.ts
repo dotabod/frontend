@@ -10,7 +10,7 @@ const accountUpdateSchema = z.array(
   z.object({
     steam32Id: z.number().min(0),
     mmr: z.number().min(0).max(20000),
-    name: z.string(),
+    name: z.string().optional(),
     delete: z.boolean().optional(),
   })
 )
@@ -22,10 +22,25 @@ async function getAccounts(id: string) {
         mmr: true,
         name: true,
         steam32Id: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         leaderboard_rank: true,
+        connectedUserIds: true,
       },
       where: {
-        userId: id,
+        OR: [
+          { userId: id },
+          {
+            connectedUserIds: {
+              has: id,
+            }
+          }
+        ],
+
       },
     })
 
@@ -33,8 +48,27 @@ async function getAccounts(id: string) {
       return []
     }
 
+    accounts.forEach((account) => {
+      if (account.user.id === id) {
+        delete account.connectedUserIds
+        delete account.user
+        return
+      }
+
+      // filter connectedUserIds to only show the current user
+      account.connectedUserIds = account.connectedUserIds.filter(
+        (userId) => userId === id
+      )
+      // add the user using this account to the connectedUserIds array
+      if (account.connectedUserIds.length) {
+        account.connectedUserIds = [account.user.name]
+      }
+      delete account.user
+    })
+
     return accounts
   } catch (error) {
+    console.error(error, 'in getAccounts')
     return null
   }
 }
@@ -96,7 +130,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               data: {
                 steam32Id: account.steam32Id,
                 mmr: account.mmr,
-                name: account.name,
               },
               where: {
                 steam32Id: account.steam32Id,
