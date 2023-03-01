@@ -18,8 +18,8 @@ const emotesRequired = [
     url: 'https://7tv.app/emotes/62978b4c441e9cea5e91f9e7',
   },
   {
-    label: 'SuskaygeAgreeGe',
-    url: 'https://7tv.app/emotes/61ae3975e9684edbbc395461',
+    label: 'Okayeg',
+    url: 'https://7tv.app/emotes/603caa69faf3a00014dff0b1',
   },
   {
     label: 'Happi',
