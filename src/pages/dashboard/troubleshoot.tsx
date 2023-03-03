@@ -8,36 +8,48 @@ import { Typography } from 'antd'
 import { Card } from '@/ui/card'
 
 const faqs = [
-    {
-      question: "Overlay stuck, won't update?",
-      answer: (
-        <div>
-          <p>Try the following steps:</p>
-          <ol className="list-decimal list-inside">
-            <li>Press refresh on the dotabod overlay source in OBS.</li>
-            <li>Restart OBS.</li>
-          </ol>
-          <p>If the problem persists, check if you have the latest version of dotabod installed.</p>
-          <Image
-            src="https://i.imgur.com/d0qzlFa.png"
-            alt="OBS dotabod source"
-            width={589}
-            height={140}
-          />
-        </div>
-      ),
-    },
+  {
+    question: "Overlay stuck, won't update?",
+    answer: (
+      <div>
+        <p>Try the following steps:</p>
+        <ol className="list-inside list-decimal">
+          <li>Press refresh on the dotabod overlay source in OBS.</li>
+          <li>Restart OBS.</li>
+        </ol>
+        <p>
+          If the problem persists, check if you have the latest version of
+          dotabod installed.
+        </p>
+        <Image
+          src="https://i.imgur.com/d0qzlFa.png"
+          alt="OBS dotabod source"
+          width={589}
+          height={140}
+        />
+      </div>
+    ),
+  },
   {
     question: 'Overlay not showing anything?',
     answer: (
       <div>
         <p>Try the following steps:</p>
-        <ol className="list-decimal list-inside">
-          <li>Check that you placed the cfg file in the correct folder. It goes in /gamestate_integration/, not in /cfg/.</li>
+        <ol className="list-inside list-decimal">
+          <li>
+            Check that you placed the cfg file in the correct folder. It goes in
+            /gamestate_integration/, not in /cfg/.
+          </li>
           <li>Add -gamestateintegration to Dota launch options.</li>
           <li>Restart Dota.</li>
-          <li>OBS dotabod browser source must be above your other sources so it doesn&apos;t get blocked.</li>
-          <li>Right click the dotabod source in preview, click transform, and click fit to content so it resizes and fills your screen.</li>
+          <li>
+            OBS dotabod browser source must be above your other sources so it
+            doesn&apos;t get blocked.
+          </li>
+          <li>
+            Right click the dotabod source in preview, click transform, and
+            click fit to content so it resizes and fills your screen.
+          </li>
         </ol>
       </div>
     ),
@@ -60,41 +72,37 @@ const faqs = [
     question: 'Can I still use 9kmmrbot?',
     answer: (
       <div>
-        The answer is dependent on your current MMR rank and Steam profile
-        privacy settings. 9kmmrbot no longer works for accounts that are
-        outside of the top 100 MMR live matches and have their game details
-        Steam profile setting set to &quot;Private.&quot;
+        9kmmrbot is no longer able to retrieve game data for accounts outside of
+        the high immortal bracket and for those with their Dota social profile
+        setting set to private.
         <br />
         <br />
-        This means that if you are not in the high immortal bracket or have your
-        Steam profile set to private, the bot will not be able to retrieve your
-        game data. This is due to changes in the Valve rich presence system,
-        which previously had a bug that allowed the bot to retrieve private data
+        This is due to changes in the Valve rich presence system, which
+        previously had a bug that allowed the bot to retrieve private data
         regardless of profile settings.
         <br />
         <br />
         It&apos;s worth noting that this change does not affect Dotabod&apos;s
         GSI integration, which is still operational and safe to use. If you are
         unable to use 9kmmrbot due to these changes, we recommend trying out
-        Dotabod&apos;s other features such as live match tracking and
-        statistics.
+        Dotabod as it includes all the features 9kmmrbot had to offer and more.
         <br />
         <br />
         We hope this information helps clarify why 9kmmrbot may no longer be
         working for some users and encourage you to explore other aspects of
         Dotabod&apos;s services.
-        <div>
-        Visit{' '}
-        <Typography.Link
-          target="_blank"
-          href="https://twitch.tv/popout/9kmmrbot/chat"
-        >
-          9kmmrbot chat
-        </Typography.Link>{' '}
-        and type <code>!part</code> to remove 9kmmrbot. You may have to ban
-        9kmmrbot from your channel because it may keep trying to join and
-        respond to commands still.
-      </div>
+        <br />
+        <br />
+          Visit{' '}
+          <Typography.Link
+            target="_blank"
+            href="https://twitch.tv/popout/9kmmrbot/chat"
+          >
+            9kmmrbot chat
+          </Typography.Link>{' '}
+          and type <code>!part</code> to remove 9kmmrbot. You may have to ban
+          9kmmrbot from your channel because it may keep trying to join and
+          respond to commands still.
       </div>
     ),
   },
@@ -130,7 +138,7 @@ const TroubleshootPage = () => {
         title="Troubleshooting"
       />
       <div className="mt-12 lg:col-span-2 lg:mt-0">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {faqs.map(
             (faq) =>
               faq.question && (
