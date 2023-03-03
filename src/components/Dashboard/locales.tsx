@@ -1,8 +1,8 @@
 import {
   BRFlag,
   CZFlag,
+  DEFlag,
   ESFlag,
-  GRFlag,
   HUFlag,
   IRFlag,
   ITFlag,
@@ -56,8 +56,8 @@ export const localeOptions: {
   },
   {
     label: 'German',
-    value: 'gr',
-    Flag: GRFlag,
+    value: 'de',
+    Flag: DEFlag,
   },
   {
     label: 'Persian',
