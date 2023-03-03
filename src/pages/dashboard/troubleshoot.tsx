@@ -73,7 +73,7 @@ const faqs = [
     answer: (
       <div>
         9kmmrbot is no longer able to retrieve game data for accounts outside of
-        the high immortal bracket and for those with their Dota social profile
+        the high immortal bracket and for those with their Steam Profile &gt; Privacy Settings &gt; Game Details
         setting set to private.
         <br />
         <br />
@@ -91,18 +91,6 @@ const faqs = [
         We hope this information helps clarify why 9kmmrbot may no longer be
         working for some users and encourage you to explore other aspects of
         Dotabod&apos;s services.
-        <br />
-        <br />
-          Visit{' '}
-          <Typography.Link
-            target="_blank"
-            href="https://twitch.tv/popout/9kmmrbot/chat"
-          >
-            9kmmrbot chat
-          </Typography.Link>{' '}
-          and type <code>!part</code> to remove 9kmmrbot. You may have to ban
-          9kmmrbot from your channel because it may keep trying to join and
-          respond to commands still.
       </div>
     ),
   },
