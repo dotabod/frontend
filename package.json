@@ -41,6 +41,7 @@
     "framer-motion": "^9.0.2",
     "i18next": "^22.4.10",
     "lucide-react": "^0.112.0",
+    "mantine-flagpack": "^1.0.1",
     "next": "13.1.6",
     "next-auth": "4.19.2",
     "next-i18next": "^13.2.1",
