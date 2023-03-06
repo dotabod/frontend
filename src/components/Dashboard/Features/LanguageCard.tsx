@@ -1,31 +1,51 @@
+import useLanguageTranslations, {
+  CrowdinLanguage,
+  getLanguageProgress,
+} from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Select } from 'antd'
-import { localeOptions } from '@/components/Dashboard/locales'
-import { FlagProps } from 'mantine-flagpack/declarations/create-flag'
+import { Button, Progress, Select } from 'antd'
+import clsx from 'clsx'
+import Link from 'next/link'
 import { forwardRef } from 'react'
-import { USFlag } from 'mantine-flagpack'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
-  Flag: (props: FlagProps) => JSX.Element
   label: string
+  translation?: CrowdinLanguage
 }
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ Flag, label, ...others }: ItemProps, ref) => (
-    <div ref={ref} className="flex items-center space-x-2" {...others}>
-      <Flag w={24} radius={2} />
-      <span className="ml-2">{label}</span>
+  ({ translation, label, ...others }: ItemProps, ref) => (
+    <div
+      ref={ref}
+      className="flex items-center justify-between space-x-2"
+      {...others}
+    >
+      <div className="flex items-center space-x-2">
+        <span>{label}</span>
+      </div>
+      <div
+        className={clsx(
+          (!translation?.data?.languageId ||
+            translation?.data?.languageId === 'en') &&
+            'hidden'
+        )}
+      >
+        {translation?.data?.translationProgress < 80 ? (
+          <span className="text-red-600">
+            {translation?.data?.translationProgress}% translated
+          </span>
+        ) : (
+          <span className="text-green-600">
+            {translation?.data?.translationProgress}% translated
+          </span>
+        )}
+      </div>
     </div>
   )
 )
 
 SelectItem.displayName = 'SelectItem'
-
-const CurrentFlag = (props) => {
-  const Flag = localeOptions.find((x) => x.value === props.flag)?.Flag || USFlag
-  return <Flag {...props} />
-}
 
 export default function LanguageCard() {
   const {
@@ -34,15 +54,13 @@ export default function LanguageCard() {
     update: updateLocale,
   } = useUpdateLocale()
 
-  const flagIcon = (
-    <CurrentFlag
-      flag={localeOption?.locale}
-      w={25}
-      h={17}
-      radius={2}
-      className="pl-2"
-    />
+  const data = useLanguageTranslations()
+  const languageProgress = getLanguageProgress(
+    data?.progress,
+    localeOption?.locale
   )
+  const arr = data?.progress ? Object.values(data?.progress) : []
+  console.log(arr, data)
 
   return (
     <Card>
@@ -57,15 +75,60 @@ export default function LanguageCard() {
         <Select
           loading={loadingLocale}
           placeholder="Language selector"
-          className="w-[200px] transition-all"
-          options={localeOptions.map((x) => ({
-            ...x,
-            label: <SelectItem Flag={x.Flag} label={x.label} />,
+          className="w-full transition-all"
+          options={arr.map((x: CrowdinLanguage) => ({
+            value: x.data.languageId,
+            label: (
+              <SelectItem
+                label={x.data.languageId}
+                translation={getLanguageProgress(
+                  data?.progress,
+                  x.data.languageId
+                )}
+              />
+            ),
           }))}
           value={localeOption?.locale}
           onChange={(value) => updateLocale(value)}
         />
       </div>
+
+      {languageProgress?.data && (
+        <div className="mt-4">
+          <div>{languageProgress?.data?.translationProgress}% translated</div>
+          <Progress
+            showInfo={false}
+            percent={languageProgress?.data?.translationProgress}
+            size="small"
+          />
+          <div className="flex flex-row items-center space-x-4">
+            {languageProgress?.data?.translationProgress < 100 ? (
+              <Link
+                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data?.languageId}?filter=basic&value=0`}
+                target="_blank"
+                passHref
+              >
+                <Button>Help finish translation</Button>
+              </Link>
+            ) : (
+              <Link
+                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data?.languageId}?filter=basic&value=0`}
+                target="_blank"
+                passHref
+              >
+                <Button>Help with proofreading</Button>
+              </Link>
+            )}
+            <Link
+              href="https://crowdin.com/project/dotabod"
+              target="_blank"
+              passHref
+            >
+              <Button>View all translations</Button>
+            </Link>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }
