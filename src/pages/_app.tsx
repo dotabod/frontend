@@ -12,6 +12,7 @@ import { StyleProvider } from '@ant-design/cssinjs'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
+import { appWithTranslation } from 'next-i18next'
 import 'antd/dist/reset.css'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -25,10 +26,10 @@ type AppPropsWithLayout = AppProps & {
 
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
-export default function App({
+const App = ({
   Component,
   pageProps: { session, ...pageProps },
-}: AppPropsWithLayout) {
+}: AppPropsWithLayout) => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -70,3 +71,5 @@ export default function App({
     </SessionProvider>
   )
 }
+
+export default appWithTranslation(App)

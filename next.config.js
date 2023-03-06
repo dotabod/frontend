@@ -4,8 +4,10 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require('@sentry/nextjs')
+const { i18n } = require('./next-i18next.config')
 
 const moduleExports = {
+  i18n,
   // Your existing module.exports
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
