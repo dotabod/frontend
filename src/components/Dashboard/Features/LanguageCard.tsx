@@ -1,5 +1,6 @@
 import useLanguageTranslations, {
   CrowdinLanguage,
+  crowdinToLocale,
   getLanguageProgress,
 } from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
@@ -12,35 +13,40 @@ import { forwardRef } from 'react'
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   label: string
   translation?: CrowdinLanguage
+  code: string
 }
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ translation, label, ...others }: ItemProps, ref) => (
+  ({ code, translation, label, ...others }: ItemProps, ref) => (
     <div
       ref={ref}
       className="flex items-center justify-between space-x-2"
       {...others}
     >
       <div className="flex items-center space-x-2">
+        <img
+          width={30}
+          height={30}
+          alt={label}
+          src={`https://d2gma3rgtloi6d.cloudfront.net/12e76b30/images/flags/small/${code}.png`}
+        />
         <span>{label}</span>
       </div>
-      <div
-        className={clsx(
-          (!translation?.data?.languageId ||
-            translation?.data?.languageId === 'en') &&
-            'hidden'
-        )}
-      >
-        {translation?.data?.translationProgress < 80 ? (
-          <span className="text-red-600">
+      {!isNaN(translation?.data?.translationProgress) && (
+        <div>
+          <span
+            className={clsx(
+              !translation?.data?.translationProgress && 'text-gray-600',
+              translation?.data?.translationProgress > 0 &&
+                translation?.data?.translationProgress < 80 &&
+                'text-amber-600',
+              translation?.data?.translationProgress > 80 && 'text-green-400'
+            )}
+          >
             {translation?.data?.translationProgress}% translated
           </span>
-        ) : (
-          <span className="text-green-600">
-            {translation?.data?.translationProgress}% translated
-          </span>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 )
@@ -54,13 +60,43 @@ export default function LanguageCard() {
     update: updateLocale,
   } = useUpdateLocale()
 
-  const data = useLanguageTranslations()
+  const { isLoading, data } = useLanguageTranslations()
   const languageProgress = getLanguageProgress(
-    data?.progress,
+    data?.languageProgress,
     localeOption?.locale
   )
-  const arr = data?.progress ? Object.values(data?.progress) : []
-  console.log(arr, data)
+  const arr = (
+    data?.languageProgress ? Object.values(data?.languageProgress) : []
+  ).map((x) => ({
+    ...x,
+    data: {
+      ...x.data,
+      languageId: crowdinToLocale(x.data.languageId),
+      name: data?.project?.targetLanguages
+        ? Object.values(data?.project?.targetLanguages).find(
+            (t) => t.id === x.data.languageId
+          ).name
+        : 'Unknown',
+    },
+  }))
+
+  arr.push({
+    data: {
+      languageId: 'en',
+      name: 'English',
+    },
+  })
+  arr.sort((a, b) => {
+    const nameA = a.data.name.toUpperCase() // ignore upper and lowercase
+    const nameB = b.data.name.toUpperCase() // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1
+    }
+    if (nameA > nameB) {
+      return 1
+    }
+    return 0
+  })
 
   return (
     <Card>
@@ -73,16 +109,29 @@ export default function LanguageCard() {
 
       <div>
         <Select
-          loading={loadingLocale}
+          loading={loadingLocale || isLoading}
           placeholder="Language selector"
           className="w-full transition-all"
           options={arr.map((x: CrowdinLanguage) => ({
             value: x.data.languageId,
             label: (
               <SelectItem
-                label={x.data.languageId}
+                label={
+                  data?.project?.targetLanguages
+                    ? Object.values(data?.project?.targetLanguages).find(
+                        (t) => crowdinToLocale(t.id) === x.data.languageId
+                      )?.name || 'English'
+                    : 'English'
+                }
+                code={
+                  data?.project?.targetLanguages
+                    ? Object.values(data?.project?.targetLanguages).find(
+                        (t) => crowdinToLocale(t.id) === x.data.languageId
+                      )?.id || 'en-US'
+                    : 'en-US'
+                }
                 translation={getLanguageProgress(
-                  data?.progress,
+                  data?.languageProgress,
                   x.data.languageId
                 )}
               />

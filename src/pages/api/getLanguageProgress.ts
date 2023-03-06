@@ -1,12 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
+const token = process.env.CROWDIN_TOKEN
 
-async function fetchLanguageProgress(
-  projectId: string,
-  languageId: string,
-  token: string
-) {
+async function fetchLanguageProgress(projectId: string, languageId: string) {
   const url = `${CROWDIN_API_BASE_URL}/projects/${projectId}/languages/progress?limit=50`
   const response = await fetch(url, {
     headers: {
@@ -24,7 +21,7 @@ async function fetchLanguageProgress(
   return data?.data
 }
 
-async function fetchProject(projectId: string, token: string) {
+async function fetchProject(projectId: string) {
   const url = `${CROWDIN_API_BASE_URL}/projects/${projectId}`
   const response = await fetch(url, {
     headers: {
@@ -33,6 +30,7 @@ async function fetchProject(projectId: string, token: string) {
   })
 
   if (!response.ok) {
+    console.log(await response.text())
     throw new Error(
       `Failed to fetch Crowdin project. Status: ${response.status}`
     )
@@ -48,16 +46,12 @@ export default async function handler(
 ) {
   const { projectId, languageId } = req.query
 
-  // Retrieve the Crowdin token from your Next.js environment
-  const token = process.env.CROWDIN_TOKEN
-
   try {
     const languageProgress = await fetchLanguageProgress(
       projectId as string,
-      languageId as string,
-      token
+      languageId as string
     )
-    const project = await fetchProject(projectId as string, token)
+    const project = await fetchProject(projectId as string)
 
     res.status(200).json({ languageProgress, project })
   } catch (error) {

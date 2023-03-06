@@ -122,12 +122,23 @@ const mappings = [
   },
 ]
 
+export const crowdinToLocale = (languageId: string) => {
+  const mappedLanguageId =
+    mappings.find((x) => x.crowdin === languageId)?.locale || languageId
+  return mappedLanguageId
+}
+
+export const localeToCrowdin = (languageId: string) => {
+  const mappedLanguageId =
+    mappings.find((x) => x.locale === languageId)?.crowdin || languageId
+  return mappedLanguageId
+}
+
 export const getLanguageProgress = (
   data: TranslationData,
   languageId: string
 ) => {
-  const mappedLanguageId =
-    mappings.find((x) => x.locale === languageId)?.crowdin || languageId
+  const mappedLanguageId = localeToCrowdin(languageId)
   const languageProgress: CrowdinLanguage | null = data
     ? Object.values(data)?.find(
         (x: CrowdinLanguage) => x?.data?.languageId === mappedLanguageId
@@ -138,12 +149,12 @@ export const getLanguageProgress = (
 }
 
 const useLanguageTranslations = () => {
-  const { data } = useSWR<{ progress: TranslationData; project: Project }>(
-    `/api/getLanguageProgress?projectId=${projectId}`,
-    fetcher
-  )
+  const { data, isLoading } = useSWR<{
+    languageProgress: TranslationData
+    project: Project
+  }>(`/api/getLanguageProgress?projectId=${projectId}`, fetcher)
 
-  return data
+  return { data, isLoading }
 }
 
 export default useLanguageTranslations
