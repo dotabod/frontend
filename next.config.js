@@ -7,7 +7,6 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const { i18n } = require('./next-i18next.config')
 
 const moduleExports = {
-  i18n,
   // Your existing module.exports
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
@@ -33,6 +32,8 @@ const moduleExports = {
     disableServerWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
     disableClientWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
+
+  i18n,
 }
 
 const sentryWebpackPluginOptions = {

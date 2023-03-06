@@ -13,6 +13,7 @@ import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
 import { appWithTranslation } from 'next-i18next'
+import nextI18NextConfig from '../../next-i18next.config.js'
 import 'antd/dist/reset.css'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -72,4 +73,4 @@ const App = ({
   )
 }
 
-export default appWithTranslation(App)
+export default appWithTranslation(App, nextI18NextConfig)

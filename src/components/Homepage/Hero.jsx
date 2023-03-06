@@ -10,6 +10,7 @@ import TwitchSvg from 'src/images/logos/twitch.svg'
 import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustration'
 import Link from 'next/link'
 import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from 'next-i18next'
 
 const featuredUsers = [
   {
@@ -114,6 +115,7 @@ const TwitchUser = ({
 }
 
 export function Hero() {
+  const { t } = useTranslation()
   const session = useSession()
   const name = session.data?.user?.name || 'streamers'
 
@@ -134,9 +136,7 @@ export function Hero() {
               />
             </h1>
             <p className="mt-6 text-lg text-gray-300">
-              By leveraging insights from the Dota 2 official API, Dotabod will
-              know exactly when to hide sensitive streamer information or engage
-              with your Twitch audience.
+              {t('hero.description')}
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
               <Link href="/dashboard">

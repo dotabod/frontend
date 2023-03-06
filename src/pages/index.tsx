@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import type { NextPage, NextPageContext } from 'next'
 
 import { Faqs } from '@/components/Homepage/Faqs'
 import { Footer } from '@/components/Homepage/Footer'
@@ -8,7 +9,7 @@ import { Pricing } from '@/components/Homepage/Pricing'
 import { PrimaryFeatures } from '@/components/Homepage/PrimaryFeatures'
 import { SecondaryFeatures } from '@/components/Homepage/SecondaryFeatures'
 
-export default function Home() {
+const Home: NextPage = () => {
   return (
     <>
       <Head>
@@ -65,4 +66,16 @@ export default function Home() {
       <Footer />
     </>
   )
+}
+
+export default Home
+
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
+export async function getStaticProps({ locale }: NextPageContext) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale || 'en', ['common'])),
+    },
+  }
 }

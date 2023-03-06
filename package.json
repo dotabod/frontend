@@ -10,10 +10,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "parse": "i18next -c ./i18next-parser.config.mjs",
     "postinstall": "prisma generate"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
+    "@crowdin/ota-client": "^0.7.0",
     "@emotion/react": "^11.10.5",
     "@fullstory/browser": "^1.6.2",
     "@headlessui/react": "^1.7.10",
