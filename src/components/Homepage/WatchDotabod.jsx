@@ -2,9 +2,11 @@ import useSWR from 'swr'
 import React from 'react'
 import { Button } from 'antd'
 import { fetcher } from '@/lib/fetcher'
+import { useTranslation } from 'next-i18next'
 
 export const WatchDotabod = () => {
   const { data: isDotabodLive } = useSWR('/api/is-dotabod-live', fetcher)
+  const { t } = useTranslation('common')
 
   if (!isDotabodLive) return null
 
@@ -29,9 +31,9 @@ export const WatchDotabod = () => {
         >
           <path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7"></path>
         </svg>
-        <span>Watch me make Dotabod</span>
+        <span>{t('hero.watch')}</span>
         <span className="animate-pulse rounded-md bg-red-700 px-2 py-0.5 text-xs">
-          Live
+          {t('live')}
         </span>
       </div>
     </Button>

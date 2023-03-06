@@ -1,3 +1,8 @@
 {
-    "hero.description": "By leveraging insights from the Dota 2 official API, Dotabod will know exactly when to hide sensitive streamer information or engage with your Twitch audience."
+    "hero": {
+        "watch": "Watch me make Dotabod",
+        "title": "Welcome, streamer",
+        "description": "By leveraging insights from the Dota 2 official API, Dotabod will know exactly when to hide sensitive streamer information or engage with your Twitch audience."
+    },
+    "live": "Live"
 }
