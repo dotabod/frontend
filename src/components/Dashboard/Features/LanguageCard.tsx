@@ -86,6 +86,7 @@ export default function LanguageCard() {
       name: 'English',
     },
   })
+
   arr.sort((a, b) => {
     const nameA = a.data.name.toUpperCase() // ignore upper and lowercase
     const nameB = b.data.name.toUpperCase() // ignore upper and lowercase
