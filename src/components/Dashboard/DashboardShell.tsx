@@ -51,6 +51,7 @@ export default function DashboardShell({
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
+    if (broken) setCollapsed(true)
   }
 
   useEffect(() => {
