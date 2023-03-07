@@ -43,25 +43,25 @@ export default function MinimapCard(): JSX.Element {
       loading: l1,
       checked: minimapSimple,
       onChange: updateSimple,
-      label: 'Use simple minimap background',
+      label: 'Simple minimap background',
     },
     {
       loading: l2,
       checked: minimapXl,
       onChange: updateXl,
-      label: 'Use extra large minimap',
-    },
-    {
-      loading: l3,
-      checked: isBP,
-      onChange: updateBP,
-      label: 'Use battlepass minimap',
+      label: 'Extra large minimap',
     },
     {
       loading: l4,
       checked: isMinimapRight,
       onChange: updateMinimapRight,
-      label: 'Use right side minimap',
+      label: 'Right side minimap',
+    },
+    {
+      loading: l3,
+      checked: isBP,
+      onChange: updateBP,
+      label: 'Battlepass hud',
     },
   ]
 

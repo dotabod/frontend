@@ -8,19 +8,19 @@ export type blockType = {
 export const devBlockTypes: blockType = {
   matchId: 123456789,
   team: 'radiant',
-  type: null,
+  type: 'playing',
 }
 export const devPoll: PollData = {
   endDate: new Date().getTime() + 300000,
-  title: 'What is your favorite color?',
+  title: 'Will we win with Muerta?',
   choices: [
     {
-      title: 'Blue',
-      totalVotes: 500000,
+      title: 'Always',
+      totalVotes: 530104,
     },
     {
-      title: 'Red',
-      totalVotes: 300000,
+      title: 'Never',
+      totalVotes: 323909,
     },
   ],
 }

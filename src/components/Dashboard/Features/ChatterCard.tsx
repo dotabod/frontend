@@ -4,6 +4,7 @@ import { Switch, Tooltip } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { Settings } from '@/lib/defaultSettings'
+import DotabodChatter from './DotabodChatter'
 
 enum CATEGORIES {
   General = 'General',
@@ -338,6 +339,7 @@ export default function ChatterCard() {
       </Card>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <DotabodChatter />
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
           return (
             <Card key={categoryName}>

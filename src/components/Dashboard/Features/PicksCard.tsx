@@ -16,19 +16,38 @@ export default function PicksCard() {
     <Card>
       <div className="title">
         <h3>Picks</h3>
+      </div>
+      <div className="subtitle">
+        Prevent stream snipers from seeing your picks.
+      </div>
+      <div className="mb-4 flex items-center space-x-2">
         <Switch
           onChange={updateSetting}
           loading={loading}
           checked={isEnabled}
         />
+        <span>Enable pick blocker</span>
       </div>
-      <div className="subtitle">
-        Prevent stream snipers from seeing your picks.
+      <div className={clsx(' transition-all', !isEnabled && 'opacity-40')}>
+        <p>
+          There are several pick blocker overlays phases available. Dotabod
+          intelligently auto chooses which one to show.
+        </p>
+        <ol className="ml-6 list-decimal">
+          <li>During hero picking phase, heroes are fully covered</li>
+          <li>
+            When you pick early, and it isn&apos;t locked in yet. While the
+            enemy can still pick ban your pick. Heroes are fully covered
+          </li>
+          <li>
+            When your hero is locked in and can no longer be banned. Your hero
+            will be shown, but your teammate&apos;s heroes are still fully
+            covered.
+          </li>
+          <li>When you enter strategy phase, the overlay is removed.</li>
+        </ol>
       </div>
-      <div>
-        Radiant blocker shown below as an example. The bot will pick the right
-        overlay depending on which team you end up on.
-      </div>
+
       <div
         className={clsx(
           'mt-6 flex flex-col items-center space-y-12 transition-all',
@@ -45,7 +64,7 @@ export default function PicksCard() {
             height={600}
             src="/images/overlay/picks/block-radiant-picks.png"
           />
-          <span>Picks blocker</span>
+          <span>Hero picking phase for radiant</span>
         </div>
       </div>
     </Card>

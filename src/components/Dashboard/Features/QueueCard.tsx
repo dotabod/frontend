@@ -3,7 +3,7 @@ import { Card } from '@/ui/card'
 import clsx from 'clsx'
 import { Settings } from '@/lib/defaultSettings'
 import Image from 'next/image'
-import { Switch, Tag } from 'antd'
+import { Switch } from 'antd'
 
 export default function QueueCard() {
   const {
@@ -15,18 +15,19 @@ export default function QueueCard() {
   return (
     <Card>
       <div className="title">
-        <h3>
-          Queue blocker <Tag color="blue">new</Tag>
-        </h3>
+        <h3>Queue blocker</h3>
+      </div>
+      <div className="subtitle">
+        Stream snipers won&apos;t know what your queue time is to be able to
+        snipe you.
+      </div>
+      <div className="mt-5 flex items-center space-x-2">
         <Switch
           onChange={updateSetting}
           loading={loading}
           checked={isEnabled}
         />
-      </div>
-      <div className="subtitle">
-        Stream snipers won&apos;t know what your queue time is to be able to
-        snipe you.
+        <span>Enable queue blocker overlay</span>
       </div>
       <div>
         Both the &quot;PLAY DOTA&quot; in the bottom right, and the
@@ -39,10 +40,10 @@ export default function QueueCard() {
           !isEnabled && 'opacity-40'
         )}
       >
-        <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-x-4">
+        <div className="flex flex-wrap items-center justify-center space-x-4">
           <Image
             className={clsx(
-              'rounded-xl border-2 border-transparent transition-all'
+              'mt-4 inline rounded-xl border-2 border-transparent transition-all'
             )}
             alt="queue blocker"
             width={497}
@@ -51,7 +52,7 @@ export default function QueueCard() {
           />
           <Image
             className={clsx(
-              'rounded-xl border-2 border-transparent transition-all'
+              'mt-4 inline rounded-xl border-2 border-transparent transition-all'
             )}
             alt="queue blocker"
             width={204}

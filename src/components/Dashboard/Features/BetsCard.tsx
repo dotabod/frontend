@@ -18,16 +18,6 @@ export default function BetsCard() {
     loading: loading,
     updateSetting: updateInfo,
   } = useUpdateSetting(Settings.betsInfo)
-  const {
-    data: showLivePolls,
-    updateSetting: updateLivePoll,
-    loading: l2,
-  } = useUpdateSetting(Settings.livePolls)
-  const {
-    data: tellChatBets,
-    updateSetting: updateTellChatBets,
-    loading: l3,
-  } = useUpdateSetting(Settings.tellChatBets)
 
   const [form] = Form.useForm()
 
@@ -37,7 +27,6 @@ export default function BetsCard() {
     <Card>
       <div className="title">
         <h3>Twitch predictions</h3>
-        <Switch onChange={updateSetting} checked={isEnabled} />
       </div>
       <div className="subtitle">Let your chatters bet on your matches.</div>
       <div>
@@ -45,22 +34,8 @@ export default function BetsCard() {
         you win or lose a match.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        <Switch
-          loading={l2}
-          onChange={updateLivePoll}
-          checked={showLivePolls}
-        />
-        <span>Show live betting / polls overlay</span>
-      </div>
-      <div className="mt-5 flex items-center space-x-2">
-        <Switch
-          loading={l3}
-          onChange={updateTellChatBets}
-          checked={tellChatBets}
-        />
-        <span>
-          Tell chat when bets open, close, or get remade due to hero swap
-        </span>
+        <Switch onChange={updateSetting} checked={isEnabled} />
+        <span>Enable auto gamba</span>
       </div>
 
       <div className={clsx(!isEnabled && 'opacity-40', 'mt-6')}>

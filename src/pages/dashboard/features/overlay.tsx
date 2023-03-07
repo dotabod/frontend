@@ -9,6 +9,8 @@ import { ReactElement } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Header from '@/components/Dashboard/Header'
 import QueueCard from '@/components/Dashboard/Features/QueueCard'
+import MmrOverlay from '@/components/Overlay/MmrOverlay'
+import BetsOverlay from '@/components/Overlay/BetsOverlay'
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
@@ -27,8 +29,10 @@ const FeaturesPage: NextPageWithLayout = () => {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
         <MinimapCard />
         <PicksCard />
-        <QueueCard />
+        <MmrOverlay />
+        <BetsOverlay />
         <RoshCard />
+        <QueueCard />
         <NotablePlayersCard />
       </div>
     </>
