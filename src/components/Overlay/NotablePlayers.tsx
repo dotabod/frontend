@@ -3,6 +3,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import React from 'react'
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
+import clsx from 'clsx'
 
 export type NotablePlayer = {
   heroId: number
@@ -21,6 +22,9 @@ export const NotablePlayers = ({
   block: any
 }) => {
   const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
+  const { data: showFlags } = useUpdateSetting(
+    Settings.notablePlayersOverlayFlags
+  )
 
   if (!isEnabled || !['spectator', 'playing'].includes(block.type)) {
     return null
@@ -36,11 +40,13 @@ export const NotablePlayers = ({
         return (
           <PlayerTopbar key={i} position={player.position}>
             <div className="flex flex-col items-center">
-              {FlagComp ? (
-                <FlagComp w={30} radius={2} />
-              ) : (
-                <div style={{ height: 22.5 }} />
-              )}
+              <div className={clsx(!showFlags && 'hidden')}>
+                {FlagComp ? (
+                  <FlagComp w={30} radius={2} />
+                ) : (
+                  <div style={{ height: 22.5 }} />
+                )}
+              </div>
               <div className="font-outline-2">{player.name}</div>
             </div>
           </PlayerTopbar>
