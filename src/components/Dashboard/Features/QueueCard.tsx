@@ -39,7 +39,7 @@ export default function QueueCard() {
           !isEnabled && 'opacity-40'
         )}
       >
-        <div className="flex flex-row items-center space-x-4">
+        <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-x-4">
           <Image
             className={clsx(
               'rounded-xl border-2 border-transparent transition-all'
