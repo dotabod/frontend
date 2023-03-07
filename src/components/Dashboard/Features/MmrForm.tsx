@@ -130,10 +130,10 @@ const MmrForm = ({ hideText = false }) => {
                       )
                     }
                   >
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col justify-center sm:items-start">
                       <div
                         className={clsx(
-                          'flex items-start space-x-2',
+                          'flex flex-col items-center sm:flex-row sm:items-start sm:justify-start sm:space-x-2',
                           (removed || multiUsedBy) && 'opacity-40'
                         )}
                       >

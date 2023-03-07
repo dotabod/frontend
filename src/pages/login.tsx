@@ -35,10 +35,13 @@ export default function Login() {
   }, [router, status])
 
   useEffect(() => {
-    if (router.asPath.toLowerCase().includes('error')) {
+    if (
+      status !== 'authenticated' &&
+      router.asPath.toLowerCase().includes('error')
+    ) {
       showError()
     }
-  }, [router.asPath])
+  }, [router.asPath, status])
 
   if (status === 'authenticated') return null
 
