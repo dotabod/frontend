@@ -337,7 +337,7 @@ export default function ChatterCard() {
         </div>
       </Card>
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
           return (
             <Card key={categoryName}>
