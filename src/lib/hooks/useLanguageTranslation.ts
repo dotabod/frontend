@@ -148,11 +148,16 @@ export const getLanguageProgress = (
   return languageProgress
 }
 
-const useLanguageTranslations = () => {
+const useLanguageTranslations = ({ languageId }: { languageId: string }) => {
   const { data, isLoading } = useSWR<{
     languageProgress: TranslationData
     project: Project
-  }>(`/api/getLanguageProgress?projectId=${projectId}`, fetcher)
+    total: number | undefined
+    percentage: number
+  }>(
+    `/api/getLanguageProgress?projectId=${projectId}&languageId=${languageId}`,
+    fetcher
+  )
 
   return { data, isLoading }
 }

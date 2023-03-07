@@ -5,8 +5,9 @@ import useLanguageTranslations, {
 } from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Progress, Select } from 'antd'
+import { Button, Progress, Select, Spin } from 'antd'
 import clsx from 'clsx'
+import Image from 'next/image'
 import Link from 'next/link'
 import { forwardRef } from 'react'
 
@@ -60,7 +61,9 @@ export default function LanguageCard() {
     update: updateLocale,
   } = useUpdateLocale()
 
-  const { isLoading, data } = useLanguageTranslations()
+  const { isLoading, data } = useLanguageTranslations({
+    languageId: localeOption?.locale,
+  })
   const languageProgress = getLanguageProgress(
     data?.languageProgress,
     localeOption?.locale
@@ -98,6 +101,35 @@ export default function LanguageCard() {
     }
     return 0
   })
+
+  const currentLabel = data?.project?.targetLanguages
+    ? Object.values(data?.project?.targetLanguages).find(
+        (t) => crowdinToLocale(t.id) === localeOption?.locale
+      )?.name || 'English'
+    : 'English'
+
+  const UsedBy = () => (
+    <span className="space-x-1">
+      <span>Used by</span>
+      {isLoading ? (
+        <Spin size="small" className="!mr-2" />
+      ) : (
+        <span>
+          {data?.total
+            ? `${data?.total.toLocaleString()}`
+            : `${data?.percentage?.toLocaleString()}% of`}
+        </span>
+      )}
+      <span>dotabods</span>
+      <Image
+        className="inline align-bottom"
+        src="/images/emotes/peepofat.gif"
+        height={28}
+        width={28}
+        alt="peepofat"
+      />
+    </span>
+  )
 
   return (
     <Card>
@@ -143,9 +175,26 @@ export default function LanguageCard() {
         />
       </div>
 
-      {languageProgress?.data && (
+      {languageProgress?.data ? (
         <div className="mt-4">
-          <div>{languageProgress?.data?.translationProgress}% translated</div>
+          <div className="flex items-center justify-between">
+            <span>
+              {languageProgress?.data?.translationProgress}% translated
+            </span>
+            {data?.total === 1 && (
+              <span>
+                You&apos;re the only one using this language
+                <Image
+                  className="inline align-bottom"
+                  src="https://cdn.7tv.app/emote/6293b16a3fae4eb13f5e5f60/2x.webp"
+                  height={28}
+                  width={28}
+                  alt="lonely"
+                />
+              </span>
+            )}
+            {data?.total !== 1 && <UsedBy />}
+          </div>
           <Progress
             showInfo={false}
             percent={languageProgress?.data?.translationProgress}
@@ -166,18 +215,13 @@ export default function LanguageCard() {
                 target="_blank"
                 passHref
               >
-                <Button>Help with proofreading</Button>
+                <Button>Found a translation error?</Button>
               </Link>
             )}
-            <Link
-              href="https://crowdin.com/project/dotabod"
-              target="_blank"
-              passHref
-            >
-              <Button>View all translations</Button>
-            </Link>
           </div>
         </div>
+      ) : (
+        <UsedBy />
       )}
     </Card>
   )
