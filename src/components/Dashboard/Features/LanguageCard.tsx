@@ -21,7 +21,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ code, translation, label, ...others }: ItemProps, ref) => (
     <div
       ref={ref}
-      className="flex flex-col sm:items-center sm:justify-between sm:space-x-2"
+      className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-2"
       {...others}
     >
       <div className="flex items-center space-x-2">
@@ -177,7 +177,7 @@ export default function LanguageCard() {
 
       {languageProgress?.data ? (
         <div className="mt-4">
-          <div className="flex flex-col sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <span>
               {languageProgress?.data?.translationProgress}% translated
             </span>
