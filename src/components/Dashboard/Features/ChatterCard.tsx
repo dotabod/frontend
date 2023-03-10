@@ -338,7 +338,12 @@ export default function ChatterCard() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
+      <div
+        className={clsx(
+          !isEnabled && 'opacity-40 transition-all',
+          'grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'
+        )}
+      >
         <DotabodChatter />
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
           return (
@@ -348,10 +353,7 @@ export default function ChatterCard() {
               </div>
               <div className="ml-4 flex flex-col space-y-3">
                 {(groupedChatterInfo[categoryName] || []).map((value) => (
-                  <div
-                    key={value.id}
-                    className={clsx(!isEnabled && 'opacity-40 transition-all')}
-                  >
+                  <div key={value.id}>
                     <Tooltip title={value?.tooltip} placement="left">
                       <div className="flex items-center space-x-3">
                         <Switch
