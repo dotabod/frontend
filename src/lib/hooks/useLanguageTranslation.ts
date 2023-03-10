@@ -106,39 +106,12 @@ export interface TranslationData {
     limit: number
   }
 }
-const projectId = 564471
-const mappings = [
-  {
-    locale: 'uk-UA',
-    crowdin: 'uk',
-  },
-  {
-    locale: 'pt',
-    crowdin: 'pt-PT',
-  },
-  {
-    locale: 'es',
-    crowdin: 'es-ES',
-  },
-]
-
-export const crowdinToLocale = (languageId: string) => {
-  const mappedLanguageId =
-    mappings.find((x) => x.crowdin === languageId)?.locale || languageId
-  return mappedLanguageId
-}
-
-export const localeToCrowdin = (languageId: string) => {
-  const mappedLanguageId =
-    mappings.find((x) => x.locale === languageId)?.crowdin || languageId
-  return mappedLanguageId
-}
 
 export const getLanguageProgress = (
   data: TranslationData,
   languageId: string
 ) => {
-  const mappedLanguageId = localeToCrowdin(languageId)
+  const mappedLanguageId = languageId
   const languageProgress: CrowdinLanguage | null = data
     ? Object.values(data)?.find(
         (x: CrowdinLanguage) => x?.data?.languageId === mappedLanguageId
@@ -154,10 +127,7 @@ const useLanguageTranslations = ({ languageId }: { languageId: string }) => {
     project: Project
     total: number | undefined
     percentage: number
-  }>(
-    `/api/getLanguageProgress?projectId=${projectId}&languageId=${languageId}`,
-    fetcher
-  )
+  }>(`/api/getLanguageProgress?languageId=${languageId}`, fetcher)
 
   return { data, isLoading }
 }

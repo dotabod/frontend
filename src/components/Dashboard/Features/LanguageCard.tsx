@@ -1,6 +1,5 @@
 import useLanguageTranslations, {
   CrowdinLanguage,
-  crowdinToLocale,
   getLanguageProgress,
 } from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
@@ -70,29 +69,27 @@ export default function LanguageCard() {
   )
   const arr = (
     data?.languageProgress ? Object.values(data?.languageProgress) : []
-  ).map((x) => ({
-    ...x,
-    data: {
-      ...x.data,
-      languageId: crowdinToLocale(x.data.languageId),
-      name: data?.project?.targetLanguages
-        ? Object.values(data?.project?.targetLanguages).find(
-            (t) => t.id === x.data.languageId
-          ).name
-        : 'Unknown',
-    },
-  }))
+  ).map((x) => {
+    const fullLanguage = Object.values(data?.project?.targetLanguages).find(
+      (t) => t.id === x.data.languageId
+    )
+
+    return {
+      value: fullLanguage.locale,
+      id: fullLanguage.id,
+      label: data?.project?.targetLanguages ? fullLanguage.name : 'Unknown',
+    }
+  })
 
   arr.push({
-    data: {
-      languageId: 'en',
-      name: 'English',
-    },
+    value: 'en',
+    id: 'en-US',
+    label: 'English',
   })
 
   arr.sort((a, b) => {
-    const nameA = a.data.name.toUpperCase() // ignore upper and lowercase
-    const nameB = b.data.name.toUpperCase() // ignore upper and lowercase
+    const nameA = a.label.toUpperCase() // ignore upper and lowercase
+    const nameB = b.label.toUpperCase() // ignore upper and lowercase
     if (nameA < nameB) {
       return -1
     }
@@ -101,12 +98,6 @@ export default function LanguageCard() {
     }
     return 0
   })
-
-  const currentLabel = data?.project?.targetLanguages
-    ? Object.values(data?.project?.targetLanguages).find(
-        (t) => crowdinToLocale(t.id) === localeOption?.locale
-      )?.name || 'English'
-    : 'English'
 
   const UsedBy = () => (
     <span className="space-x-1">
@@ -145,28 +136,13 @@ export default function LanguageCard() {
           loading={loadingLocale || isLoading}
           placeholder="Language selector"
           className="w-full transition-all"
-          options={arr.map((x: CrowdinLanguage) => ({
-            value: x.data.languageId,
+          options={arr.map((x) => ({
+            value: x.value,
             label: (
               <SelectItem
-                label={
-                  data?.project?.targetLanguages
-                    ? Object.values(data?.project?.targetLanguages).find(
-                        (t) => crowdinToLocale(t.id) === x.data.languageId
-                      )?.name || 'English'
-                    : 'English'
-                }
-                code={
-                  data?.project?.targetLanguages
-                    ? Object.values(data?.project?.targetLanguages).find(
-                        (t) => crowdinToLocale(t.id) === x.data.languageId
-                      )?.id || 'en-US'
-                    : 'en-US'
-                }
-                translation={getLanguageProgress(
-                  data?.languageProgress,
-                  x.data.languageId
-                )}
+                label={x.label}
+                code={x.id}
+                translation={getLanguageProgress(data?.languageProgress, x.id)}
               />
             ),
           }))}

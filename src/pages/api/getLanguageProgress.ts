@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
 const token = process.env.CROWDIN_TOKEN
+const projectId = 564471
 
 async function getTotalUsersForLanguage(languageId: string) {
   try {
@@ -23,7 +24,7 @@ async function getTotalUsersForLanguage(languageId: string) {
   }
 }
 
-async function fetchLanguageProgress(projectId: string, languageId: string) {
+async function fetchLanguageProgress(languageId: string) {
   const url = `${CROWDIN_API_BASE_URL}/projects/${projectId}/languages/progress?limit=50`
   const response = await fetch(url, {
     headers: {
@@ -41,7 +42,7 @@ async function fetchLanguageProgress(projectId: string, languageId: string) {
   return data?.data
 }
 
-async function fetchProject(projectId: string) {
+async function fetchProject() {
   const url = `${CROWDIN_API_BASE_URL}/projects/${projectId}`
   const response = await fetch(url, {
     headers: {
@@ -61,7 +62,7 @@ async function fetchProject(projectId: string) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { projectId, languageId } = req.query
+  const { languageId } = req.query
   const session = await unstable_getServerSession(req, res, authOptions)
 
   if (req.method !== 'GET') {
@@ -73,11 +74,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const languageProgress = await fetchLanguageProgress(
-      projectId as string,
-      languageId as string
-    )
-    const project = await fetchProject(projectId as string)
+    const languageProgress = await fetchLanguageProgress(languageId as string)
+    const project = await fetchProject()
     const { total, percentage } = await getTotalUsersForLanguage(
       languageId as string
     )
