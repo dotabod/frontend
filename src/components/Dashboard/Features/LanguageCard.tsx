@@ -63,10 +63,9 @@ export default function LanguageCard() {
   const { isLoading, data } = useLanguageTranslations({
     languageId: localeOption?.locale,
   })
-  const languageProgress = getLanguageProgress(
-    data?.languageProgress,
-    localeOption?.locale
-  )
+  const languageProgress = getLanguageProgress(data, localeOption?.locale)
+  console.log({ languageProgress, data, localeOption })
+
   const arr = (
     data?.languageProgress ? Object.values(data?.languageProgress) : []
   ).map((x) => {
@@ -142,7 +141,7 @@ export default function LanguageCard() {
               <SelectItem
                 label={x.label}
                 code={x.id}
-                translation={getLanguageProgress(data?.languageProgress, x.id)}
+                translation={getLanguageProgress(data, x.value)}
               />
             ),
           }))}
@@ -179,7 +178,9 @@ export default function LanguageCard() {
           <div className="flex flex-row items-center space-x-4">
             {languageProgress?.data?.translationProgress < 100 ? (
               <Link
-                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data?.languageId}?filter=basic&value=0`}
+                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data.languageId
+                  .toLowerCase()
+                  .replace('-', '')}?filter=basic&value=0`}
                 target="_blank"
                 passHref
               >
@@ -187,7 +188,9 @@ export default function LanguageCard() {
               </Link>
             ) : (
               <Link
-                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data?.languageId}?filter=basic&value=0`}
+                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data.languageId
+                  .toLowerCase()
+                  .replace('-', '')}?filter=basic&value=0`}
                 target="_blank"
                 passHref
               >
