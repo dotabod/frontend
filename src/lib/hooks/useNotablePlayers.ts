@@ -5,19 +5,21 @@ import { isDev } from '@/lib/hooks/rosh'
 const devPlayers = [
   {
     country_code: 'se',
-    account_id: 39,
+    account_id: 103910993,
     position: 0,
     heroId: 5,
     heroName: 'Lich',
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/gorgc-profile_image-469e05d25a1e8594-70x70.jpeg',
     name: 'Gorgc',
   },
   {
     country_code: 'ae',
-    account_id: 39,
+    account_id: 48594480,
     position: 1,
     heroId: 5,
     heroName: 'Lich',
-    name: '!Attacker',
+    name: 'lil pleb',
   },
   {
     country_code: 'ua',
