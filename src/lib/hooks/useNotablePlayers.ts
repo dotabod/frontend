@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { NotablePlayer } from '@/components/Overlay/NotablePlayers'
 import { isDev } from '@/lib/hooks/rosh'
 
-const devPlayers = [
+const devPlayers: NotablePlayer[] = [
   {
     country_code: 'se',
     account_id: 103910993,
     position: 0,
     heroId: 5,
     heroName: 'Lich',
+    isMe: false,
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/gorgc-profile_image-469e05d25a1e8594-70x70.jpeg',
     name: 'Gorgc',
@@ -19,6 +20,7 @@ const devPlayers = [
     position: 1,
     heroId: 5,
     heroName: 'Lich',
+    isMe: true,
     name: 'lil pleb',
   },
   {
@@ -27,6 +29,7 @@ const devPlayers = [
     position: 4,
     heroId: 5,
     heroName: 'Lich',
+    isMe: false,
     name: 'Yatoro',
   },
   {
@@ -35,6 +38,7 @@ const devPlayers = [
     position: 8,
     heroId: 5,
     heroName: 'Lich',
+    isMe: false,
     name: 'BoraNija ',
   },
   {
@@ -43,6 +47,7 @@ const devPlayers = [
     position: 9,
     heroId: 5,
     heroName: 'Lich',
+    isMe: false,
     name: 'Gunnar ',
   },
 ]
