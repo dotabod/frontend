@@ -75,9 +75,6 @@ export const selectSettings = (state) => state.settings
 export const selectMainHero = (state) =>
   state.status ? state.status.hero.replace('npc_dota_hero_', '') : ''
 
-export const selectTeam = (state) =>
-  state.status ? state.status.teamP : 'radiant'
-
 export const selectHeroes = (state) => (state.heroes ? state.heroes : [])
 
 export const selectHeroUnits = (state) =>

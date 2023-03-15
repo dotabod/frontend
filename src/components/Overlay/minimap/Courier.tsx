@@ -1,11 +1,7 @@
-import { selectTeam } from '@/lib/redux/store'
 import React from 'react'
-import { useSelector } from 'react-redux'
 
-const Courier = ({ data }) => {
-  const team = useSelector(selectTeam)
+const Courier = ({ data, team }) => {
   const isEnemy = data.teamP !== team
-
   const hasIcon = data.image !== 'plaincircle'
   const isFlying = data.image.includes('flying')
 

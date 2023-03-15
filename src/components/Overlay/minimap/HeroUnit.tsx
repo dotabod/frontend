@@ -1,10 +1,7 @@
-import { selectTeam } from '@/lib/redux/store'
 import React from 'react'
-import { useSelector } from 'react-redux'
-import styles from './HeroUnit.module.css'
 
-const HeroUnit = ({ data }) => {
-  const isEnemy = data.teamP !== useSelector(selectTeam)
+const HeroUnit = ({ data, team }) => {
+  const isEnemy = data.teamP !== team
   const unitType = data.unitname
   const isBrewling = unitType.includes('brewmaster')
 

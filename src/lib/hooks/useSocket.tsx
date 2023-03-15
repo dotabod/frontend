@@ -24,6 +24,7 @@ import {
   setMinimapDataCreeps,
   setMinimapDataHeroes,
   setMinimapDataHeroUnits,
+  setMinimapStatus,
 } from '../redux/store'
 
 export let socket: Socket | null = null
@@ -98,6 +99,9 @@ export const useSocket = ({
     })
     socket.on('DATA_hero_units', (data: any) => {
       dispatch(setMinimapDataHeroUnits(data))
+    })
+    socket.on('STATUS', (data: any) => {
+      dispatch(setMinimapStatus(data))
     })
 
     socket.on(

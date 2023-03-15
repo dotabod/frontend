@@ -168,6 +168,7 @@
   left: 0;
   bottom: 0;
   width: 12.7vw;
+  height: 100%;
   aspect-ratio: 1/1;
   padding-left: 0.19%;
   background-color: black;
@@ -206,7 +207,7 @@
 .fog {
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .container-creep {
@@ -237,32 +238,34 @@
 
     /* Building Types */
     &.filler {
-      top: -0.2vw;
+      /* + 0.65 */
+      top: 0.45vw;
+      /* + 0.35 */
       left: -0.2vw;
       width: 0.4vw;
       height: 0.4vw;
     }
     &.tower {
-      top: -0.25vw;
-      left: -0.25vw;
+      top: 0.5vw;
+      left: -0.1vw;
       width: 0.5vw;
       height: 0.5vw;
     }
     &.racks {
-      top: -0.2vw;
-      left: -0.2vw;
+      top: 0.45vw;
+      left: 0.15vw;
       width: 0.4vw;
       height: 0.4vw;
     }
     &.ancient {
-      top: -0.35vw;
-      left: -0.35vw;
+      top: 0.75vw;
+      left: -0.1vw;
       width: 0.7vw;
       height: 0.7vw;
     }
     &.outpost {
-      top: -0.45vw;
-      left: -0.45vw;
+      top: 0.8vw;
+      left: -0.1vw;
       width: 0.9vw;
       height: 0.9vw;
     }
@@ -276,8 +279,8 @@
       height: 0.6vw;
     }
     .racks {
-      top: -0.25vw;
-      left: -0.25vw;
+      top: 0.4vw;
+      left: 0.1vw;
       width: 0.5vw;
       height: 0.5vw;
     }
@@ -291,11 +294,9 @@
 }
 
 .container-courier {
-  position: absolute;
+  position: relative;
   margin-top: -0.1vw;
   margin-left: -0.1vw;
-  width: 0.2vw;
-  height: 0.2vw;
   border-radius: 50%;
   background: rgb(41, 240, 41);
 
@@ -304,10 +305,8 @@
   }
 
   .icon {
+    background: transparent;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     width: 0.6vw;
     height: 0.6vw;
 
@@ -319,25 +318,24 @@
 }
 
 .container-hero {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  transition: all linear 0.5s;
+  position: relative;
+  transition: all linear 1.1s;
 
   &.default {
     .icon {
-      filter: drop-shadow(0 0 0.1vw black);
+      filter: drop-shadow(0 0 0.3vw black);
     }
   }
 
   &.icon {
     .icon {
-      filter: drop-shadow(0 0 0.1vw rgba(green, 0.8))
-        drop-shadow(0 0 0.1vw rgba(green, 0.8))
-        drop-shadow(0 0 0.1vw rgba(green, 0.8));
+      filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
 
       &.enemy {
-        filter: drop-shadow(0 0 0.1vw rgba(red, 0.8))
-          drop-shadow(0 0 0.1vw rgba(red, 0.8));
+        filter: drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4))
+          drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4));
       }
     }
   }
@@ -348,14 +346,14 @@
     left: -1.05vw;
     width: 2.1vw;
     height: 2.1vw;
-    filter: drop-shadow(0 0 0.1vw rgba(green, 0.8))
-      drop-shadow(0 0 0.1vw rgba(green, 0.8))
-      drop-shadow(0 0 0.1vw rgba(green, 0.8));
-    transition: transform linear 0.5s;
+    filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
+    transition: transform linear 2s;
 
     &.enemy {
-      filter: drop-shadow(0 0 0.1vw rgba(red, 0.8))
-        drop-shadow(0 0 0.1vw rgba(red, 0.8));
+      filter: drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4))
+        drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4));
     }
 
     &.illusion {
@@ -372,21 +370,22 @@
     left: -0.75vw;
     width: 1.5vw;
     height: 1.5vw;
-    /* transition: transform linear 0.5s; */
+    transition: transform linear 1.1s;
 
     &.illusion {
       top: -0.6vw;
       left: -0.6vw;
-      width: 1.2vw;
-      height: 1.2vw;
+      /* width: 1.2vw; */
+      /* height: 1.2vw; */
       /* opacity: 0.5; */
     }
   }
 }
 
 .container-hero-unit {
-  position: absolute;
+  position: relative;
   transform: rotate(45deg);
+  transition: all linear 1.1s;
 
   &:not(.brewling) {
     margin-top: -0.15vw;
@@ -409,7 +408,7 @@
   }
 
   &.brewling {
-    transform: translate(-50%, -50%);
+    transform: translate(0%, 0%);
 
     .icon {
       position: absolute;

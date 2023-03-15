@@ -1,3 +1,4 @@
+import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { Button, Typography } from 'antd'
@@ -6,6 +7,8 @@ import Link from 'next/link'
 
 export default function ExportCFG() {
   const user = useSession()?.data?.user
+  const { data } = useUpdate({ path: `/api/settings` })
+
   const fileData = `"Dotabod Configuration"
 {
   "uri" "${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}"
@@ -24,6 +27,7 @@ export default function ExportCFG() {
     "player" "1"
     "provider" "1"
     "wearables" "1"
+    ${data?.beta_tester ? '"minimap" "1"' : ''}
   }
   "auth"
   {

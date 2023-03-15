@@ -9,7 +9,7 @@ import { clsx } from 'clsx'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
-import Minimap from './minimap'
+import { MinimapBlocker } from './blocker/MinimapBlocker'
 
 export const InGameOverlays = ({
   wl,
@@ -65,7 +65,7 @@ export const InGameOverlays = ({
         block={block}
       />
 
-      <Minimap />
+      <MinimapBlocker block={block} key="minimap-blocker-class" />
 
       <div
         className={clsx(

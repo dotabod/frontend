@@ -2,13 +2,13 @@ import {
   selectHeroUnits,
   selectMainHero,
   selectSettings,
-  selectTeam,
 } from '@/lib/redux/store'
 import { useSelector } from 'react-redux'
 
-function Hero({ data }) {
+function Hero({ data, team }) {
   const heroUnits = useSelector(selectHeroUnits)
-  const displayType = useSelector(selectSettings)?.hero_display
+  // default, custom, or icon
+  const displayType = useSelector(selectSettings)?.hero_display || 'default'
   const mainHero = useSelector(selectMainHero)
 
   const position = {
@@ -16,10 +16,8 @@ function Hero({ data }) {
     left: data.xposP,
   }
 
-  const isEnemy = data.teamP !== useSelector(selectTeam)
-
+  const isEnemy = data.teamP !== team
   const isIllusion = data.image === 'heroimage' || data.image === 'enemyimage'
-
   const isBrewmaster = data.name === 'brewmaster'
 
   const brewlingCount = heroUnits.filter((unit) =>

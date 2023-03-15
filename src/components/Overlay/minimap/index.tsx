@@ -14,8 +14,15 @@ import Building from './Building'
 import Courier from './Courier'
 import Hero from './Hero'
 import HeroUnit from './HeroUnit'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
+import { blockType } from '@/lib/devConsts'
 
-function Minimap() {
+function Minimap({ block }: { block: blockType }) {
+  const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
+  const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+  const { data: isRight } = useUpdateSetting(Settings.minimapRight)
+
   const isPreview = useSelector(selectIsPreview)
   const settings = useSelector(selectSettings)
   const heroes = useSelector(selectHeroes)
@@ -28,37 +35,49 @@ function Minimap() {
     <div
       className={[
         wrapper,
-        settings?.size_xl ? xl : '',
+        isXL ? xl : '',
         isPreview ? preview : '',
-        settings?.position_right ? right : '',
+        isRight ? right : '',
       ].join(' ')}
     >
       <div
         className={[
           container,
-          settings?.size_xl ? xl : '',
-          settings?.bg_simple ? simple : '',
+          isXL ? xl : '',
+          isSimple ? simple : '',
           settings?.bg_hidden ? hidden : '',
-          settings?.position_right ? right : '',
+          isRight ? right : '',
           isPreview ? preview : '',
         ].join(' ')}
       >
-        <div className={fog}></div>
+        <div className={fog} />
 
         {buildings.map((building, index) => (
-          <Building data={building} key={`minimap-building-${index}`} />
+          <Building
+            team={block?.team}
+            data={building}
+            key={`minimap-building-${index}`}
+          />
         ))}
         {creeps.map((creep, index) => (
-          <Creep data={creep} key={`minimap-creep-${index}`} />
+          <Creep
+            team={block?.team}
+            data={creep}
+            key={`minimap-creep-${index}`}
+          />
         ))}
         {heroes.map((hero, index) => (
-          <Hero data={hero} key={`${hero.name}-${index}`} />
+          <Hero team={block?.team} data={hero} key={`${hero.name}-${index}`} />
         ))}
         {heroUnits.map((unit, index) => (
-          <HeroUnit data={unit} key={`${unit.unitname}-${index}`} />
+          <HeroUnit
+            team={block?.team}
+            data={unit}
+            key={`${unit.unitname}-${index}`}
+          />
         ))}
         {couriers.map((courier, index) => (
-          <Courier data={courier} key={`courier-${index}`} />
+          <Courier team={block?.team} data={courier} key={`courier-${index}`} />
         ))}
       </div>
     </div>

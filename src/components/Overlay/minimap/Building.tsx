@@ -1,9 +1,8 @@
-import { useSelector } from 'react-redux'
-import { selectSettings, selectTeam } from '@/lib/redux/store'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
 
-const Building = ({ data }) => {
-  const isXL = useSelector(selectSettings)?.size_xl
-  const team = useSelector(selectTeam)
+const Building = ({ data, team }) => {
+  const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const isEnemy = data.teamP !== team
 
   const buildingType = () => {
