@@ -17,6 +17,15 @@ import { isDev } from '@/lib/hooks/rosh'
 import { fetcher } from '@/lib/fetcher'
 import { blockType } from '@/lib/devConsts'
 import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
+import { useDispatch } from 'react-redux'
+import {
+  setMinimapDataBuildings,
+  setMinimapDataCouriers,
+  setMinimapDataCreeps,
+  setMinimapDataHeroes,
+  setMinimapDataHeroUnits,
+  setMinimapStatus,
+} from '../redux/store'
 
 export let socket: Socket | null = null
 
@@ -39,6 +48,7 @@ export const useSocket = ({
 }) => {
   const router = useRouter()
   const { userId } = router.query
+  const dispatch = useDispatch()
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
@@ -70,6 +80,28 @@ export const useSocket = ({
 
     socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
+    })
+
+    socket.on('DATA_buildings', (data: any) => {
+      dispatch(setMinimapDataBuildings(data))
+    })
+
+    socket.on('DATA_heroes', (data: any) => {
+      dispatch(setMinimapDataHeroes(data))
+    })
+
+    socket.on('DATA_couriers', (data: any) => {
+      dispatch(setMinimapDataCouriers(data))
+    })
+
+    socket.on('DATA_creeps', (data: any) => {
+      dispatch(setMinimapDataCreeps(data))
+    })
+    socket.on('DATA_hero_units', (data: any) => {
+      dispatch(setMinimapDataHeroUnits(data))
+    })
+    socket.on('STATUS', (data: any) => {
+      dispatch(setMinimapStatus(data))
     })
 
     socket.on(

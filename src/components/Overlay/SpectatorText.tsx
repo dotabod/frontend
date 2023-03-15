@@ -4,8 +4,9 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { motionProps } from '@/ui/utils'
+import { blockType } from '@/lib/devConsts'
 
-export const SpectatorText = ({ block }) => {
+export const SpectatorText = ({ block }: { block: blockType }) => {
   const res = useTransformRes()
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)

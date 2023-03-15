@@ -31,6 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               value: true,
             },
           },
+          beta_tester: true,
           Account: {
             select: {
               providerAccountId: true,
@@ -61,6 +62,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === 'POST') {
+    if (!session?.user?.id) {
+      return res.status(403).end()
+    }
+
     try {
       const body = settingCreateSchema.parse(JSON.parse(req.body))
 

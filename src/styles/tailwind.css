@@ -137,3 +137,290 @@
 .mantine-Switch-root {
   @apply flex;
 }
+
+.wrapper-minimap {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 12.7vw;
+  height: 12.7vw;
+  overflow: hidden;
+
+  &.xl {
+    width: 14.56vw;
+    height: 14.56vw;
+  }
+
+  &.preview {
+    width: 280px;
+    height: 280px;
+  }
+
+  &.right {
+    bottom: 0;
+    left: auto;
+    right: 0;
+  }
+}
+
+.container-minimap {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 12.7vw;
+  height: 100%;
+  aspect-ratio: 1/1;
+  padding-left: 0.19%;
+  background-color: black;
+  background-image: url('/images/overlay/minimap/blocker/bg/graphical.png');
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  transform: scale(1.05);
+
+  &.xl {
+    width: 14.56vw;
+  }
+
+  &.simple {
+    background-image: url('/images/overlay/minimap/blocker/bg/simple.png');
+    .fog {
+      display: none;
+    }
+  }
+
+  &.hidden {
+    background-image: none;
+    background-color: #111111;
+
+    .fog {
+      display: none;
+    }
+  }
+
+  &.preview {
+    width: 280px;
+    height: 280px;
+  }
+}
+
+.fog {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.container-creep {
+  position: absolute;
+  margin-top: -0.15vw;
+  margin-left: -0.15vw;
+  width: 0.3vw;
+  height: 0.3vw;
+  border: 0.05vw solid black;
+  border-radius: 50%;
+  background: green;
+
+  &.enemy {
+    background: rgb(224, 40, 40);
+  }
+}
+
+.container-building {
+  position: absolute;
+  transform: translate(-50%, -50%);
+
+  .icon {
+    position: relative;
+    top: -0.75vw;
+    left: -0.75vw;
+    width: 1.5vw;
+    height: 1.5vw;
+
+    /* Building Types */
+    &.filler {
+      /* + 0.65 */
+      top: 0.45vw;
+      /* + 0.35 */
+      left: -0.2vw;
+      width: 0.4vw;
+      height: 0.4vw;
+    }
+    &.tower {
+      top: 0.5vw;
+      left: -0.1vw;
+      width: 0.5vw;
+      height: 0.5vw;
+    }
+    &.racks {
+      top: 0.45vw;
+      left: 0.15vw;
+      width: 0.4vw;
+      height: 0.4vw;
+    }
+    &.ancient {
+      top: 0.75vw;
+      left: -0.1vw;
+      width: 0.7vw;
+      height: 0.7vw;
+    }
+    &.outpost {
+      top: 0.8vw;
+      left: -0.1vw;
+      width: 0.9vw;
+      height: 0.9vw;
+    }
+  }
+
+  &.xl {
+    .tower {
+      top: -0.3vw;
+      left: -0.3vw;
+      width: 0.6vw;
+      height: 0.6vw;
+    }
+    .racks {
+      top: 0.4vw;
+      left: 0.1vw;
+      width: 0.5vw;
+      height: 0.5vw;
+    }
+    .outpost {
+      top: -0.45vw;
+      left: -0.45vw;
+      width: 0.9vw;
+      height: 0.9vw;
+    }
+  }
+}
+
+.container-courier {
+  position: relative;
+  margin-top: -0.1vw;
+  margin-left: -0.1vw;
+  border-radius: 50%;
+  background: rgb(41, 240, 41);
+
+  &.enemy {
+    background: white;
+  }
+
+  .icon {
+    background: transparent;
+    position: absolute;
+    width: 0.6vw;
+    height: 0.6vw;
+
+    &.flying {
+      height: 0.6vw;
+      width: 1.2vw;
+    }
+  }
+}
+
+.container-hero {
+  position: relative;
+  transition: all linear 1.1s;
+
+  &.default {
+    .icon {
+      filter: drop-shadow(0 0 0.3vw black);
+    }
+  }
+
+  &.icon {
+    .icon {
+      filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
+
+      &.enemy {
+        filter: drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4))
+          drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4));
+      }
+    }
+  }
+
+  .pointer {
+    position: absolute;
+    top: -1.05vw;
+    left: -1.05vw;
+    width: 2.1vw;
+    height: 2.1vw;
+    filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
+      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
+    transition: transform linear 2s;
+
+    &.enemy {
+      filter: drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4))
+        drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4));
+    }
+
+    &.illusion {
+      top: -0.95vw;
+      left: -0.95vw;
+      width: 1.9vw;
+      height: 1.9vw;
+    }
+  }
+
+  .icon {
+    position: absolute;
+    top: -0.75vw;
+    left: -0.75vw;
+    width: 1.5vw;
+    height: 1.5vw;
+    transition: transform linear 1.1s;
+
+    &.illusion {
+      top: -0.6vw;
+      left: -0.6vw;
+      /* width: 1.2vw; */
+      /* height: 1.2vw; */
+      /* opacity: 0.5; */
+    }
+  }
+}
+
+.container-hero-unit {
+  position: relative;
+  transform: rotate(45deg);
+  transition: all linear 1.1s;
+
+  &:not(.brewling) {
+    margin-top: -0.15vw;
+    margin-left: -0.15vw;
+    width: 0.3vw;
+    height: 0.3vw;
+    border: 0.05vw solid black;
+    background: rgb(91, 255, 91);
+
+    &.enemy {
+      background: rgb(255, 66, 66);
+    }
+
+    &.warlock_golem {
+      margin-top: -0.175vw;
+      margin-left: -0.175vw;
+      width: 0.35vw;
+      height: 0.35vw;
+    }
+  }
+
+  &.brewling {
+    transform: translate(0%, 0%);
+
+    .icon {
+      position: absolute;
+      top: -0.75vw;
+      left: -0.75vw;
+      width: 1.5vw;
+      height: 1.5vw;
+      filter: drop-shadow(0 0 0.2vw green);
+
+      &.enemy {
+        filter: drop-shadow(0 0 0.2vw red);
+      }
+    }
+  }
+}

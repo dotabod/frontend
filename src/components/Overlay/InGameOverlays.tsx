@@ -2,7 +2,6 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
-import { MinimapBlocker } from '@/components/Overlay/blocker/MinimapBlocker'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
@@ -10,6 +9,7 @@ import { clsx } from 'clsx'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
+import { MinimapBlocker } from './blocker/MinimapBlocker'
 
 export const InGameOverlays = ({
   wl,

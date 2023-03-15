@@ -15,6 +15,8 @@ import type { ReactElement, ReactNode } from 'react'
 import { appWithTranslation } from 'next-i18next'
 import nextI18NextConfig from '../../next-i18next.config.js'
 import 'antd/dist/reset.css'
+import { Provider } from 'react-redux'
+import store from '@/lib/redux/store'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -66,7 +68,11 @@ const App = ({
           <SentrySession />
           <VercelAnalytics />
           <GoogleAnalytics />
-          <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
+          <AntProvider>
+            <Provider store={store}>
+              {getLayout(<Component {...pageProps} />)}
+            </Provider>
+          </AntProvider>
         </StyleProvider>
       </ConfigProvider>
     </SessionProvider>
