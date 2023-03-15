@@ -16,7 +16,12 @@ export const useUpdate = ({
   revalidate = false,
   dataTransform = (data, newValue) => newValue,
 }: UpdateProps) => {
-  const { data } = useSWR(path, fetcher)
+  const router = useRouter()
+
+  // This is only used to get user settings from the OBS overlay
+  const { userId } = router.query
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
+  const { data } = useSWR(url, fetcher)
   const { mutate } = useSWRConfig()
   const { message } = App.useApp()
 
