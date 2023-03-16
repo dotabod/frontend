@@ -25,9 +25,10 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
     >
       <span>{label}</span>
       {!isNaN(translation?.data?.translationProgress) && (
-        <div>
+        <div style={{ width: 170 }} className="min-w-fit">
           <span
             className={clsx(
+              'w-11',
               !translation?.data?.translationProgress && 'text-gray-600',
               translation?.data?.translationProgress > 0 &&
                 translation?.data?.translationProgress < 80 &&
@@ -35,7 +36,10 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
               translation?.data?.translationProgress > 80 && 'text-green-400'
             )}
           >
-            {translation?.data?.translationProgress}% translated
+            <Progress
+              size="small"
+              percent={translation?.data?.translationProgress}
+            />
           </span>
         </div>
       )}
@@ -121,27 +125,6 @@ export default function LanguageCard() {
       <div className="subtitle mb-2">
         The @dotabod Twitch chat bot will speak in this language.
       </div>
-
-      <div>
-        <Select
-          loading={loadingLocale || isLoading}
-          placeholder="Language selector"
-          className="w-full transition-all"
-          options={arr.map((x) => ({
-            value: x.value,
-            label: (
-              <SelectItem
-                label={x.label}
-                code={x.id}
-                translation={getLanguageProgress(data, x.value)}
-              />
-            ),
-          }))}
-          value={localeOption?.locale}
-          onChange={(value) => updateLocale(value)}
-        />
-      </div>
-
       {languageProgress?.data ? (
         <div className="mt-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -162,38 +145,59 @@ export default function LanguageCard() {
             )}
             {data?.total !== 1 && <UsedBy />}
           </div>
-          <Progress
-            showInfo={false}
-            percent={languageProgress?.data?.translationProgress}
-            size="small"
-          />
-          <div className="flex flex-row items-center space-x-4">
-            {languageProgress?.data?.translationProgress < 100 ? (
-              <Link
-                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data.languageId
-                  .toLowerCase()
-                  .replace('-', '')}?filter=basic&value=0`}
-                target="_blank"
-                passHref
-              >
-                <Button>Help finish translation</Button>
-              </Link>
-            ) : (
-              <Link
-                href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data.languageId
-                  .toLowerCase()
-                  .replace('-', '')}?filter=basic&value=0`}
-                target="_blank"
-                passHref
-              >
-                <Button>Found a translation error?</Button>
-              </Link>
-            )}
-          </div>
         </div>
       ) : (
         <UsedBy />
       )}
+      <div>
+        <Select
+          showSearch
+          filterOption={(input, option) =>
+            (arr.find((a) => a.value === option.value)?.label ?? '')
+              .toLowerCase()
+              .includes(input?.toLowerCase())
+          }
+          loading={loadingLocale || isLoading}
+          placeholder="Language selector"
+          className="w-full transition-all"
+          options={arr.map((x) => ({
+            value: x.value,
+            label: (
+              <SelectItem
+                label={x.label}
+                code={x.id}
+                translation={getLanguageProgress(data, x.value)}
+              />
+            ),
+          }))}
+          value={localeOption?.locale}
+          onChange={(value) => updateLocale(value)}
+        />
+      </div>
+
+      <div className="mt-4 flex flex-row items-center space-x-4">
+        {languageProgress?.data?.translationProgress < 100 ? (
+          <Link
+            href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data.languageId
+              .toLowerCase()
+              .replace('-', '')}?filter=basic&value=0`}
+            target="_blank"
+            passHref
+          >
+            <Button>Help finish translation</Button>
+          </Link>
+        ) : (
+          <Link
+            href={`https://crowdin.com/translate/dotabod/all/en-${languageProgress?.data.languageId
+              .toLowerCase()
+              .replace('-', '')}?filter=basic&value=0`}
+            target="_blank"
+            passHref
+          >
+            <Button>Found a translation error?</Button>
+          </Link>
+        )}
+      </div>
     </Card>
   )
 }
