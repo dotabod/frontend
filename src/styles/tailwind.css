@@ -165,7 +165,8 @@
 
 .container-minimap {
   position: absolute;
-  left: 0;
+  top: 0.3vw;
+  left: -0.3vw;
   bottom: 0;
   width: 12.7vw;
   height: 100%;
@@ -179,13 +180,17 @@
   transform: scale(1.05);
 
   &.xl {
-    width: 14.56vw;
+    top: 0.3vw;
+    left: -0.4vw;
+    width: 14.6vw;
   }
 
   &.simple {
     background-image: url('/images/overlay/minimap/blocker/bg/simple.png');
     .fog {
-      display: none;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0);
     }
   }
 
@@ -194,7 +199,9 @@
     background-color: #111111;
 
     .fog {
-      display: none;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0);
     }
   }
 
@@ -227,68 +234,55 @@
 
 .container-building {
   position: absolute;
-  transform: translate(-50%, -50%);
 
   .icon {
     position: relative;
-    top: -0.75vw;
-    left: -0.75vw;
     width: 1.5vw;
     height: 1.5vw;
 
     /* Building Types */
     &.filler {
-      /* + 0.65 */
-      top: 0.45vw;
-      /* + 0.35 */
-      left: -0.2vw;
       width: 0.4vw;
       height: 0.4vw;
     }
     &.tower {
-      top: 0.5vw;
-      left: -0.1vw;
       width: 0.5vw;
       height: 0.5vw;
     }
     &.racks {
-      top: 0.45vw;
-      left: 0.15vw;
       width: 0.4vw;
       height: 0.4vw;
     }
     &.ancient {
-      top: 0.75vw;
-      left: -0.1vw;
       width: 0.7vw;
       height: 0.7vw;
     }
     &.outpost {
-      top: 0.8vw;
-      left: -0.1vw;
-      width: 0.9vw;
-      height: 0.9vw;
+      left: -0.25vw;
+      top: 0.2vw;
+      width: 1vw;
+      height: 1vw;
     }
   }
 
   &.xl {
     .tower {
-      top: -0.3vw;
-      left: -0.3vw;
       width: 0.6vw;
       height: 0.6vw;
     }
     .racks {
-      top: 0.4vw;
-      left: 0.1vw;
       width: 0.5vw;
       height: 0.5vw;
     }
+    .filler {
+      left: 0.2vw;
+      top: -0.1vw;
+    }
     .outpost {
-      top: -0.45vw;
-      left: -0.45vw;
-      width: 0.9vw;
-      height: 0.9vw;
+      left: -0.3vw;
+      top: 0.4vw;
+      width: 1.3vw;
+      height: 1.3vw;
     }
   }
 }
@@ -307,8 +301,8 @@
   .icon {
     background: transparent;
     position: absolute;
-    width: 0.6vw;
-    height: 0.6vw;
+    width: 0.7vw;
+    height: 0.7vw;
 
     &.flying {
       height: 0.6vw;

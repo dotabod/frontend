@@ -10,11 +10,44 @@ import Image from 'next/image'
 import { selectStatus } from '@/lib/redux/store'
 import { useSelector } from 'react-redux'
 
-export const MinimapBlocker = ({ block }: { block: blockType }) => {
-  const res = useTransformRes()
-  const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
+export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+  const res = useTransformRes()
+
+  return (
+    <Image
+      unoptimized
+      priority
+      alt="minimap blocker"
+      width={
+        isXL
+          ? res({
+              w: 280,
+            })
+          : res({
+              w: 240,
+            })
+      }
+      height={
+        isXL
+          ? res({
+              h: 280,
+            })
+          : res({
+              h: 240,
+            })
+      }
+      src={`/images/overlay/minimap/731-${isSimple ? 'Simple' : 'Complex'}-${
+        isXL ? 'X' : ''
+      }Large-AntiStreamSnipeMap.png`}
+    />
+  )
+}
+
+export const MinimapBlocker = ({ block }: { block: blockType }) => {
+  const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
+
   const { minimapPosition } = useOverlayPositions()
   const { original } = useUpdateSetting()
   const status = useSelector(selectStatus)?.active
@@ -32,32 +65,7 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
       {status && original?.beta_tester ? (
         <Minimap block={block} />
       ) : (
-        <Image
-          unoptimized
-          priority
-          alt="minimap blocker"
-          width={
-            isXL
-              ? res({
-                  w: 280,
-                })
-              : res({
-                  w: 240,
-                })
-          }
-          height={
-            isXL
-              ? res({
-                  h: 280,
-                })
-              : res({
-                  h: 240,
-                })
-          }
-          src={`/images/overlay/minimap/731-${
-            isSimple ? 'Simple' : 'Complex'
-          }-${isXL ? 'X' : ''}Large-AntiStreamSnipeMap.png`}
-        />
+        <OriginalMinimapBlocker block={block} />
       )}
     </motion.div>
   )
