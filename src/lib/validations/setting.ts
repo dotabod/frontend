@@ -1,7 +1,12 @@
 import * as z from 'zod'
+import { defaultSettings } from '../defaultSettings'
 
+const VALUES = Object.keys(defaultSettings).reduce((obj, key) => {
+  obj[key] = key
+  return obj
+}, {} as { [key: string]: string })
 export const settingPatchSchema = z.object({
-  key: z.string().min(3).max(128).optional(),
+  key: z.nativeEnum(VALUES).optional(),
   value: z.any().optional(),
 })
 
