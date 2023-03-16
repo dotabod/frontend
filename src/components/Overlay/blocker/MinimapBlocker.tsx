@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { motionProps } from '@/ui/utils'
 import { Settings } from '@/lib/defaultSettings'
-import { useUpdate, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 import Minimap from '../minimap'
@@ -16,7 +16,7 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { minimapPosition } = useOverlayPositions()
-  const { data } = useUpdate({ path: `/api/settings` })
+  const { data } = useUpdateSetting()
   const status = useSelector(selectStatus)?.active
 
   const shouldBlockMap = isEnabled && block.type === 'playing'
