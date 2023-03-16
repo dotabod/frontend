@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { unstable_getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
@@ -63,7 +63,7 @@ async function fetchProject() {
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { languageId } = req.query
-  const session = await unstable_getServerSession(req, res, authOptions)
+  const session = await getServerSession(req, res, authOptions)
 
   if (req.method !== 'GET') {
     return res.status(500).end()

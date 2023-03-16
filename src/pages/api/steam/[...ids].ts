@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { unstable_getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 function convertSteam32To64(steam32Id) {
@@ -9,7 +9,7 @@ function convertSteam32To64(steam32Id) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await unstable_getServerSession(req, res, authOptions)
+  const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
     return res.status(500).end()
@@ -24,10 +24,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Fetch the XML data for the user's Steam profile
     const response = await fetch(
-      `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_WEB_API
-      }&steamids=${!Array.isArray(steamIds)
-        ? steamIds
-        : steamIds.map(convertSteam32To64).join(',')
+      `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${
+        process.env.STEAM_WEB_API
+      }&steamids=${
+        !Array.isArray(steamIds)
+          ? steamIds
+          : steamIds.map(convertSteam32To64).join(',')
       }}`
     )
 

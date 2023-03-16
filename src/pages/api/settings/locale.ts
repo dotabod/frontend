@@ -4,11 +4,11 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
 import { localePatchSchema } from '@/lib/validations/setting'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-import { unstable_getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await unstable_getServerSession(req, res, authOptions)
+  const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
     return res.status(500).end()
