@@ -7,8 +7,8 @@ const Courier = ({ data, team }) => {
 
   const icon = hasIcon
     ? isFlying
-      ? `/images/overlay/minimap/blocker/icons/courier/${data.teamP}_flying.png`
-      : `/images/overlay/minimap/blocker/icons/courier/${data.teamP}.png`
+      ? `/images/overlay/minimap/blocker/icons/courier/radiant_flying.png`
+      : `/images/overlay/minimap/blocker/icons/courier/radiant.png`
     : ''
 
   return (

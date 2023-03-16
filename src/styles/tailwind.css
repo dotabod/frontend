@@ -289,9 +289,7 @@
 
 .container-courier {
   position: relative;
-  margin-top: -0.1vw;
-  margin-left: -0.1vw;
-  border-radius: 50%;
+  margin-top: -0.6vw;
   background: rgb(41, 240, 41);
 
   &.enemy {
@@ -301,12 +299,14 @@
   .icon {
     background: transparent;
     position: absolute;
-    width: 0.7vw;
-    height: 0.7vw;
+    width: 0.8vw;
+    height: 0.8vw;
 
     &.flying {
+      margin-left: -0.3vw;
+
       height: 0.6vw;
-      width: 1.2vw;
+      width: 1.4vw;
     }
   }
 }
