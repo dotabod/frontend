@@ -16,7 +16,7 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { minimapPosition } = useOverlayPositions()
-  const { data } = useUpdateSetting()
+  const { original } = useUpdateSetting()
   const status = useSelector(selectStatus)?.active
 
   const shouldBlockMap = isEnabled && block.type === 'playing'
@@ -29,7 +29,7 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
       style={minimapPosition}
       className="absolute"
     >
-      {status && data?.beta_tester ? (
+      {status && original?.beta_tester ? (
         <Minimap block={block} />
       ) : (
         <Image

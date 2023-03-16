@@ -120,7 +120,13 @@ export function useUpdateSetting(key?: SettingKeys) {
     update({ value: newValue }, `/api/settings/${key}`)
   }
 
-  return { data: value, loading, updateSetting, mutate: () => mutate(url) }
+  return {
+    data: value,
+    original: data,
+    loading,
+    updateSetting,
+    mutate: () => mutate(url),
+  }
 }
 
 export function useGetSettings() {
