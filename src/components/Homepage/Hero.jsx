@@ -32,6 +32,12 @@ const featuredUsers = [
     supporter: true,
   },
   {
+    name: 'EternaLEnVyy',
+    supporter: false,
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/eternalenvyy-profile_image-6b20e441fd6342b1-70x70.png',
+  },
+  {
     name: 'XcaliburYe',
     supporter: false,
     image:
@@ -44,10 +50,10 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/7d5a4932-be42-481c-a47a-4136404f2c54-profile_image-70x70.png',
   },
   {
-    name: 'febbydoto',
+    name: 'Cr1tdota',
     supporter: false,
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/f5b3e70c-f968-43e1-a0ff-e89a87b28097-profile_image-150x150.png',
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/cr1tdota-profile_image-7e4ec45409fd1b1f-150x150.jpeg',
   },
   {
     name: 'BananaSlamJamma',
@@ -60,6 +66,30 @@ const featuredUsers = [
     supporter: true,
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/4dbfff30-bbab-4bef-8531-457d26768b48-profile_image-70x70.png',
+  },
+  {
+    name: 'canceldota',
+    supporter: false,
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/e381d7db-3efc-44c4-b2b7-51007be87791-profile_image-150x150.png',
+  },
+  {
+    name: 'GunnarDotA2',
+    supporter: false,
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/e7ca5b8a-cf52-4b7a-addd-d6d7b1b4216c-profile_image-150x150.png',
+  },
+  {
+    name: 'sheevergaming',
+    supporter: false,
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/09074d0a-4a09-4db0-b290-29bea0fe963d-profile_image-150x150.png',
+  },
+  {
+    name: 'ODPixel',
+    supporter: false,
+    image:
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/21d275f5-b27d-4cf2-805e-94006c08c25c-profile_image-150x150.png',
   },
   {
     link: false,
