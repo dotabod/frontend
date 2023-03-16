@@ -5,12 +5,14 @@ const VALUES = Object.keys(defaultSettings).reduce((obj, key) => {
   obj[key] = key
   return obj
 }, {} as { [key: string]: string })
+
+export const settingKeySchema = z.nativeEnum(VALUES)
 export const settingPatchSchema = z.object({
-  key: z.nativeEnum(VALUES).optional(),
+  key: settingKeySchema.optional(),
   value: z.any().optional(),
 })
 export const settingCreateSchema = z.object({
-  key: z.nativeEnum(VALUES),
+  key: settingKeySchema,
   value: z.string(),
 })
 
