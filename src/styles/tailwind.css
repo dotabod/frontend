@@ -190,7 +190,23 @@
     .fog {
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0);
+      background: transparent;
+    }
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('/images/overlay/minimap/blocker/bg/simple.png');
+      background-size: 100%;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      transform: scale(1.05);
+      background-color: black;
+      filter: brightness(200%);
+      z-index: -1;
     }
   }
 
@@ -201,7 +217,7 @@
     .fog {
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0);
+      background: transparent;
     }
   }
 
@@ -312,6 +328,8 @@
 }
 
 .container-hero {
+  /* margin-top: -0.3vw; */
+  /* margin-left: 0.3vw; */
   position: relative;
   transition: all linear 1.1s;
 
@@ -336,10 +354,10 @@
 
   .pointer {
     position: absolute;
-    top: -1.05vw;
+    top: -1.15vw;
     left: -1.05vw;
-    width: 2.1vw;
-    height: 2.1vw;
+    width: 1.9vw;
+    height: 1.9vw;
     filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
       drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
       drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
@@ -360,10 +378,10 @@
 
   .icon {
     position: absolute;
-    top: -0.75vw;
-    left: -0.75vw;
-    width: 1.5vw;
-    height: 1.5vw;
+    top: -1.15vw;
+    left: -0.45vw;
+    width: 1.6vw;
+    height: 1.6vw;
     transition: transform linear 1.1s;
 
     &.illusion {
