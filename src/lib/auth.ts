@@ -4,6 +4,7 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/db'
 
+// Do not delete this declaration
 const chatBotScopes = [
   'channel:moderate',
   'chat:edit',
@@ -11,6 +12,15 @@ const chatBotScopes = [
   'whispers:read',
   'whispers:edit',
   'moderator:manage:chat_messages',
+].join(' ')
+
+const defaultScopes = [
+  'openid',
+  'user:read:email',
+  'channel:manage:predictions',
+  'channel:manage:polls',
+  'channel:read:predictions',
+  'channel:read:polls',
 ].join(' ')
 
 export const authOptions: NextAuthOptions = {
@@ -28,7 +38,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: `openid user:read:email channel:manage:predictions channel:manage:polls channel:read:predictions channel:read:polls`,
+          // when logging in with the chatbot, append the chatbot scopes
+          // scope: `${chatBotScopes} ${chatBotScopes}`,
+          scope: `${defaultScopes}`,
         },
       },
     }),
@@ -74,6 +86,7 @@ export const authOptions: NextAuthOptions = {
         select: {
           Account: {
             select: {
+              requires_refresh: true,
               providerAccountId: true,
             },
           },
@@ -83,9 +96,24 @@ export const authOptions: NextAuthOptions = {
 
       const twitchId = Number(provider.Account.providerAccountId)
 
-      // Refresh jwt account with potentially new scopes
+      // The dotabod user shouldn't update because
+      // it has specific scopes that we don't want to overwrite
+      // see `chatBotScopes` above
       const isDotabod = (newUser.displayName || newUser.name) === 'dotabod'
       if (account && !isDotabod) {
+        // Refresh jwt account with potentially new scopes
+        const newData = {
+          refresh_token: account.refresh_token,
+          access_token: account.access_token,
+          expires_at: account.expires_at,
+          scope: account.scope,
+          requires_refresh: provider.Account.requires_refresh,
+        }
+
+        // Set requires_refresh to false if the user is logging in
+        // Because this new token will be the fresh one we needed
+        newData.requires_refresh = false
+
         await prisma.account.update({
           where: {
             provider_providerAccountId: {
@@ -93,12 +121,7 @@ export const authOptions: NextAuthOptions = {
               providerAccountId: account.providerAccountId,
             },
           },
-          data: {
-            refresh_token: account.refresh_token,
-            access_token: account.access_token,
-            expires_at: account.expires_at,
-            scope: account.scope,
-          },
+          data: newData,
         })
       }
 
