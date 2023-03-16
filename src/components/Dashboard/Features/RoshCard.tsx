@@ -31,7 +31,7 @@ export default function RoshCard() {
         Dotabod can detect when roshan is killed or aegis is picked up.
       </div>
 
-      <div className={clsx('pt-4 pb-12 transition-all')}>
+      <div className={clsx('py-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <div className="flex items-center">
             <Switch checked={hasRosh} onChange={uR} />
@@ -60,7 +60,7 @@ export default function RoshCard() {
           yellow for 3 minutes (max rosh spawn).
         </p>
       </div>
-      <div className="my-4 flex items-center justify-center space-x-4">
+      <div className="my-2 flex items-center justify-center space-x-4">
         <div className="flex flex-col items-center space-y-4">
           <Image
             alt="aegis timer"

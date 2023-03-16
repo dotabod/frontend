@@ -36,7 +36,7 @@ export default function QueueCard() {
       </div>
       <div
         className={clsx(
-          'mt-6 flex flex-col items-center space-y-12 transition-all',
+          'mt-2 flex flex-col items-center space-y-12 transition-all',
           !isEnabled && 'opacity-40'
         )}
       >
