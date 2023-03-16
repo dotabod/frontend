@@ -79,7 +79,7 @@ export default function ChatBot() {
       </div>
       <div className="subtitle">
         Allows the Dotabod chat bot to type in your chat in case you ever turn
-        on follower or subscribe mode.
+        on follower or subscriber only mode.
       </div>
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <div>

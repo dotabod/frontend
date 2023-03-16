@@ -3,6 +3,7 @@ import { Card } from '@/ui/card'
 import { Switch } from 'antd'
 import { Settings } from '@/lib/defaultSettings'
 import Image from 'next/image'
+import clsx from 'clsx'
 
 export default function BetsOverlay() {
   const {
@@ -35,7 +36,10 @@ export default function BetsOverlay() {
         alt="Live betting overlay"
         width={1070}
         height={436}
-        className="scale-90 rounded shadow"
+        className={clsx(
+          !showLivePolls && 'opacity-40',
+          'scale-90 rounded shadow'
+        )}
       />
     </Card>
   )

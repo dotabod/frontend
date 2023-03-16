@@ -47,13 +47,14 @@ export default function ExportCFG() {
 
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <div>
-          1. In Steam, right click Dota 2{' '}
+          1. Open Steam, and under your game libray, right click Dota 2{' '}
           <ChevronRightIcon height={12} className="inline" /> Manage{' '}
           <ChevronRightIcon height={12} className="inline" /> Browse local
           files. Then open the folder to{' '}
           <Typography.Text code className="whitespace-pre-wrap break-all">
             \game\dota\cfg\gamestate_integration\
           </Typography.Text>
+          . Doing this will instruct Dota what data Dotabod needs.
         </div>
         <p className="ml-4 text-xs">
           If you do not have a{' '}
@@ -107,7 +108,8 @@ export default function ExportCFG() {
           >
             Instructions here
           </Link>
-          , or follow the video below.
+          , or follow the video below. This allows the Dota 2 client to send
+          game data to Dotabod.
         </div>
 
         <div className="flex flex-col items-center space-y-4">
