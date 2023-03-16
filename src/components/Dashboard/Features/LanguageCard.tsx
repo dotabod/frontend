@@ -23,15 +23,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
       className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-2"
       {...others}
     >
-      <div className="flex items-center space-x-2">
-        <img
-          width={30}
-          height={30}
-          alt={label}
-          src={`https://d2gma3rgtloi6d.cloudfront.net/12e76b30/images/flags/small/${code}.png`}
-        />
-        <span>{label}</span>
-      </div>
+      <span>{label}</span>
       {!isNaN(translation?.data?.translationProgress) && (
         <div>
           <span
