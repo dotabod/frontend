@@ -9,6 +9,10 @@ export const settingPatchSchema = z.object({
   key: z.nativeEnum(VALUES).optional(),
   value: z.any().optional(),
 })
+export const settingCreateSchema = z.object({
+  key: z.nativeEnum(VALUES),
+  value: z.string(),
+})
 
 export const mmrPatchSchema = z.object({
   value: z.number().min(0).max(20000),

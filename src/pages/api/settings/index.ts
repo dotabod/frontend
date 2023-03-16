@@ -5,11 +5,7 @@ import * as z from 'zod'
 import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-
-const settingCreateSchema = z.object({
-  key: z.string(),
-  value: z.string(),
-})
+import { settingCreateSchema } from '@/lib/validations/setting'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req })
