@@ -131,6 +131,7 @@ export default function OBSOverlay() {
         <Image
           className="inline"
           alt="ok emote"
+          unoptimized
           src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
           width={28}
           height={28}

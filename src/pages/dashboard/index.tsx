@@ -44,6 +44,7 @@ const SetupPage = () => {
             <Image
               className="inline"
               alt="ok emote"
+              unoptimized
               src="https://cdn.7tv.app/emote/61767e69ffc7244d797d22f4/1x.webp"
               width={28}
               height={28}
