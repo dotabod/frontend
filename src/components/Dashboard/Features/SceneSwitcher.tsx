@@ -69,6 +69,9 @@ export default function SceneSwitcher(): JSX.Element {
       <div className="subtitle">
         Auto switch scenes in OBS depending on game state. Your blockers will
         still work without this.
+        <p className="mt-2 text-xs">
+          <Tag color="purple">Note</Tag>Does not work with Streamlabs
+        </p>
       </div>
 
       <div className="mb-4">
