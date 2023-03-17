@@ -37,11 +37,17 @@ const SetupPage = () => {
       title: 'All done!',
       content: (
         <Card>
-          <div className="title command">
-            <h3>All done!</h3>
-          </div>
-          <div className="subtitle">
-            Dotabod browser source should be full screen now.
+          <div className="mb-4 space-x-2">
+            <span>
+              <b>That&apos;s it!</b> You&apos;re all set up.
+            </span>
+            <Image
+              className="inline"
+              alt="ok emote"
+              src="https://cdn.7tv.app/emote/61767e69ffc7244d797d22f4/1x.webp"
+              width={28}
+              height={28}
+            />
           </div>
           <div>
             <p>

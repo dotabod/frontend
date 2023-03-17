@@ -1,13 +1,16 @@
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { ChevronRightIcon } from '@heroicons/react/24/outline'
-import { Button, Typography } from 'antd'
+import { Button, Steps, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
+import DownloadButton from './DownloadButton'
 
 export default function ExportCFG() {
   const user = useSession()?.data?.user
   const { data } = useUpdate({ path: `/api/settings` })
+  const [current, setCurrent] = useState(0)
 
   const fileData = `"Dotabod Configuration"
 {
@@ -38,91 +41,147 @@ export default function ExportCFG() {
   const blob = new Blob([fileData], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
 
-  return (
-    <Card>
-      <div className="title command">
-        <h3>Step two. Dota 2 integration</h3>
-      </div>
-      <div className="subtitle">Enable Dotabod to see your games</div>
+  const items = [
+    {
+      title: 'Save the file',
+      content: (
+        <>
+          <ol className="ml-4 list-decimal space-y-2">
+            <li>Open Steam and go to your game library.</li>
+            <li>Right-click on Dota 2 and select &quot;Manage&quot;.</li>
+            <li>
+              From there, click on &quot;Browse local files&quot;. This will
+              open the Dota 2 game folder.
+            </li>
+            <li>
+              Navigate to the &quot;gamestate_integration&quot; folder within
+              the &quot;\game\dota\cfg&quot; directory.
+              <p className="text-xs">
+                If you don&apos;t already have a
+                &quot;gamestate_integration&quot; folder, you&apos;ll need to
+                create it.
+              </p>
+            </li>
+            <li>
+              Download the file and drag it into the
+              &quot;gamestate_integration&quot; folder.
+            </li>
+          </ol>
 
-      <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
-        <div>
-          1. Open Steam, and under your game libray, right click Dota 2{' '}
-          <ChevronRightIcon height={12} className="inline" /> Manage{' '}
-          <ChevronRightIcon height={12} className="inline" /> Browse local
-          files. Then open the folder to{' '}
-          <Typography.Text code className="whitespace-pre-wrap break-all">
-            \game\dota\cfg\gamestate_integration\
-          </Typography.Text>
-          . Doing this will instruct Dota what data Dotabod needs.
-        </div>
-        <p className="ml-4 text-xs">
-          If you do not have a{' '}
-          <Typography.Text
-            code
-            className="whitespace-pre-wrap break-all !text-xs"
-          >
-            gamestate_integration
-          </Typography.Text>{' '}
-          folder, create it.
-        </p>
-        <a
-          className="ml-4 block w-48"
-          href={url}
-          download={`gamestate_integration_dotabod-${user.name}.cfg`}
-        >
-          <Button color="green">Download config file</Button>
-        </a>
-        <div className="space-y-4">
+          <DownloadButton url={url} user={user} data={data} />
+
+          <div className="space-y-4">
+            <div className="flex flex-col items-center space-y-4">
+              <video width="508" height="504" controls autoPlay muted loop>
+                <source
+                  src="/images/setup/how-to-create-cfg.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+              <div>
+                <div>Full path to save config file to:</div>
+                <Typography.Text code className="whitespace-pre-wrap break-all">
+                  .../Steam/steamapps/common/dota 2
+                  beta/game/dota/cfg/gamestate_integration/
+                </Typography.Text>
+              </div>
+            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      title: 'Add launch option',
+      content: (
+        <>
+          <div>
+            Add{' '}
+            <Typography.Text
+              code
+              className="whitespace-pre-wrap break-all !text-xs"
+            >
+              -gamestateintegration
+            </Typography.Text>{' '}
+            to your Dota 2 launch options in Steam.{' '}
+            <Link
+              className="text-blue-400 hover:text-blue-300"
+              href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
+              target="_blank"
+            >
+              Instructions here
+            </Link>
+            , or follow the video below. This allows the Dota 2 client to send
+            game data to Dotabod.
+          </div>
+
           <div className="flex flex-col items-center space-y-4">
-            <video width="508" height="504" controls autoPlay muted loop>
+            <video width="482" height="392" controls autoPlay muted loop>
               <source
-                src="/images/setup/how-to-create-cfg.mp4"
+                src="/images/setup/how-to-gsi-properties.mp4"
                 type="video/mp4"
               />
               Your browser does not support the video tag.
             </video>
-            <div>
-              <p>Full path to save config file to:</p>
-              <Typography.Text code className="whitespace-pre-wrap break-all">
-                ...\Steam\steamapps\common\dota 2
-                beta\game\dota\cfg\gamestate_integration\
-              </Typography.Text>
-            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      title: 'Restart Dota 2',
+      content: (
+        <>
+          <div>
+            After you&apos;ve added the launch option, restart Dota 2 to ensure
+            that the changes take effect.
+          </div>
+        </>
+      ),
+    },
+  ]
+
+  return (
+    <Card>
+      <div className="mb-4 space-x-2">
+        <span>
+          <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
+          data Dotabod requires. It&apos;s a Valve approved way of getting game
+          data.
+        </span>
+        <Image
+          className="inline"
+          alt="ok emote"
+          src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
+          width={28}
+          height={28}
+        />
+      </div>
+      <div className="space-y-4">
+        <div className="flex flex-col items-center space-y-4">
+          <Steps
+            type="inline"
+            onChange={(i) => setCurrent(i)}
+            current={current}
+            items={items}
+            className="!text-red-500"
+          />
+          <div className="space-x-2">
+            <Button
+              type="link"
+              onClick={() => setCurrent(current - 1)}
+              disabled={current === 0}
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={() => setCurrent(current + 1)}
+              disabled={current === items.length - 1}
+            >
+              Next
+            </Button>
           </div>
         </div>
-
-        <div>
-          2. Add{' '}
-          <Typography.Text
-            code
-            className="whitespace-pre-wrap break-all !text-xs"
-          >
-            -gamestateintegration
-          </Typography.Text>{' '}
-          to your Dota 2 launch options in Steam.{' '}
-          <Link
-            className="text-blue-400 hover:text-blue-300"
-            href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
-            target="_blank"
-          >
-            Instructions here
-          </Link>
-          , or follow the video below. This allows the Dota 2 client to send
-          game data to Dotabod.
-        </div>
-
-        <div className="flex flex-col items-center space-y-4">
-          <video width="482" height="392" controls autoPlay muted loop>
-            <source
-              src="/images/setup/how-to-gsi-properties.mp4"
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        <div>3. Restart Dota 2.</div>
+        <div>{items[current].content}</div>
       </div>
     </Card>
   )

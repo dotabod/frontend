@@ -122,11 +122,19 @@ export default function OBSOverlay() {
 
   return (
     <Card>
-      <div className="title command">
-        <h3>Step three. Stream Overlay</h3>
-      </div>
-      <div className="subtitle">
-        Add a new browser source to your streaming software.
+      <div className="mb-4 space-x-2">
+        <span>
+          <b>Why?</b> Dotabod can show game related overlays on your stream.
+          Your medal, the blockers, prediction polls, and more. Some commands
+          like !hero require the overlay.
+        </span>
+        <Image
+          className="inline"
+          alt="ok emote"
+          src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
+          width={28}
+          height={28}
+        />
       </div>
       <div className="mt-2 flex items-center space-x-2">
         <Tag className="!text-xs">Note</Tag>

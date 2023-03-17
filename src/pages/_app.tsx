@@ -41,7 +41,13 @@ const App = ({
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
+
           components: {
+            Steps: {
+              controlItemBgActive: 'var(--color-purple-500)',
+              colorSplit: 'var(--color-gray-600)',
+              colorTextQuaternary: 'var(--color-gray-300)',
+            },
             Menu: {
               colorSubItemBg: 'var(--color-gray-800)',
               colorItemBgHover: 'var(--color-gray-700)',
@@ -54,7 +60,7 @@ const App = ({
             },
           },
           token: {
-            colorPrimary: 'rgb(124,124,124)',
+            colorPrimary: 'rgb(85, 24, 103)',
             colorLink: 'var(--color-purple-500)',
             colorLinkActive: 'var(--color-purple-300)',
             colorLinkHover: 'var(--color-purple-300)',
