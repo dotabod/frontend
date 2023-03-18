@@ -15,7 +15,9 @@ export function Footer() {
               <Logomark className="h-10 w-auto flex-none fill-cyan-500" />
               <div className="ml-4">
                 <p className="text-base font-semibold">Dotabod</p>
-                <p className="mt-1 text-sm">Tools for Dota 2 streamers.</p>
+                <p className="mt-1 text-sm">
+                  Enhance Your Dota 2 Streaming Experience
+                </p>
               </div>
             </div>
             <nav className="mt-11 flex gap-8">

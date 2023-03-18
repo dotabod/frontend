@@ -13,26 +13,29 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Dotabod - Tools for Dota 2 streamers.</title>
-        <meta name="title" content="Dotabod - Tools for Dota 2 streamers." />
+        <title>Dotabod - Enhance Your Dota 2 Streaming Experience</title>
+        <meta
+          name="title"
+          content="Dotabod - Enhance Your Dota 2 Streaming Experience"
+        />
         <meta
           name="description"
-          content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
+          content="Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!"
         />
         <meta
           name="keywords"
-          content="Dota 2, assistant app, MMR tracker, Twitch predictions, minimap blocker, hero picks blocker, roshan timer, OBS scene switcher, twitch chat generator"
+          content="Dotabod Twitch Bot, Dota 2 Streaming Tools, Dota 2 Chat Commands, Dotabod MMR Tracking, Twitch Bot for Dota 2, Live Dota 2 Stats, Interactive Dota 2 Stream, Dota 2 Game Analytics, Dotabod Pro Builds, Dota 2 Stream Enhancements, Twitch bets, Automatic"
         />
         {/* <!-- Open Graph / Facebook --> */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://dotabod.com/" />
         <meta
           property="og:title"
-          content="Dotabod - Tools for Dota 2 streamers."
+          content="Dotabod - Enhance Your Dota 2 Streaming Experience"
         />
         <meta
           property="og:description"
-          content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
+          content="Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!"
         />
         <meta
           property="og:image"
@@ -44,11 +47,11 @@ const Home: NextPage = () => {
         <meta property="twitter:url" content="https://dotabod.com/" />
         <meta
           property="twitter:title"
-          content="Dotabod - Tools for Dota 2 streamers."
+          content="Dotabod - Enhance Your Dota 2 Streaming Experience"
         />
         <meta
           property="twitter:description"
-          content="For Dota 2 Streamers. Automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, mmr tracking, and more for your stream!"
+          content="Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!"
         />
         <meta
           property="twitter:image"
