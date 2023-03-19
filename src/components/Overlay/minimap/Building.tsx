@@ -22,6 +22,8 @@ const Building = ({ data, team }) => {
     }
   }
 
+  if (!data.image) return null
+
   return (
     <div
       className={`container-building ${isXL ? 'xl' : ''}`}
