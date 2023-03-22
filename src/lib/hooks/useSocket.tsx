@@ -78,7 +78,7 @@ export const useSocket = ({
 
     console.log('Connecting to socket init...')
 
-    socket = io('http://localhost:5000', {
+    socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
     })
 
