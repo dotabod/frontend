@@ -62,12 +62,6 @@ const featuredUsers = [
       'https://static-cdn.jtvnw.net/jtv_user_pictures/bananaslamjamma-profile_image-8a07eac563581ffe-70x70.png',
   },
   {
-    name: 'dvor0',
-    supporter: true,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/4dbfff30-bbab-4bef-8531-457d26768b48-profile_image-70x70.png',
-  },
-  {
     name: 'canceldota',
     supporter: false,
     image:
