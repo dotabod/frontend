@@ -23,6 +23,8 @@ const Building = ({ data, team }) => {
   }
 
   if (!data.image) return null
+  
+  const image = data.image.replace(/sword|shield/g, 'miscbuilding')
 
   return (
     <div
@@ -34,7 +36,7 @@ const Building = ({ data, team }) => {
         className={`icon ${buildingType()}`}
         src={`/images/overlay/minimap/blocker/icons/buildings/${
           isEnemy ? 'enemy_' : ''
-        }${data.image}.png`}
+        }${image}.png`}
       />
     </div>
   )
