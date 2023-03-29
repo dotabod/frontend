@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux'
 function Hero({ data, team }) {
   const heroUnits = useSelector(selectHeroUnits)
   // default, custom, or icon
-  const displayType = useSelector(selectSettings)?.hero_display || 'default'
+  const displayType = useSelector(selectSettings)?.hero_display || 'icon'
   const mainHero = useSelector(selectMainHero)
 
   const position = {
