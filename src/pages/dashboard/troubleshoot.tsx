@@ -37,6 +37,10 @@ const faqs = [
         <p>Try the following steps:</p>
         <ol className="list-inside list-decimal">
           <li>
+            Update OBS to v29 or higher. Dotabod overlay will not show on v27
+            for example
+          </li>
+          <li>
             Check that you placed the cfg file in the correct folder. It goes in
             /gamestate_integration/, not in /cfg/.
           </li>
@@ -73,8 +77,8 @@ const faqs = [
     answer: (
       <div>
         9kmmrbot is no longer able to retrieve game data for accounts outside of
-        the high immortal bracket and for those with their Steam Profile &gt; Privacy Settings &gt; Game Details
-        setting set to private.
+        the high immortal bracket and for those with their Steam Profile &gt;
+        Privacy Settings &gt; Game Details setting set to private.
         <br />
         <br />
         This is due to changes in the Valve rich presence system, which

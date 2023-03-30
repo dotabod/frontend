@@ -262,6 +262,7 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
+            unoptimized
             alt="happi"
             className="inline align-middle"
             src="https://cdn.7tv.app/emote/63c4520819eab0d59a02e872/1x.webp"
@@ -273,6 +274,7 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
+            unoptimized
             alt="happi"
             className="inline align-middle"
             src="https://cdn.7tv.app/emote/63c4520819eab0d59a02e872/1x.webp"
