@@ -120,7 +120,7 @@ export const getLanguageProgress = (
     ? data?.project?.targetLanguages?.find((x) => x.locale === locale)
     : null
 
-  const progress = data?.languageProgress.find(
+  const progress = data?.languageProgress?.find(
     (x) => x.data.languageId === language?.id
   )
 
