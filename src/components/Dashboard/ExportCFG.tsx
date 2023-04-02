@@ -95,15 +95,15 @@ export default function ExportCFG() {
       title: 'Add launch option',
       content: (
         <>
-          <div>
-            Add{' '}
+          <div className="space-x-1">
+            <span>Add</span>
             <Typography.Text
               code
               className="whitespace-pre-wrap break-all !text-xs"
             >
               -gamestateintegration
-            </Typography.Text>{' '}
-            to your Dota 2 launch options in Steam.{' '}
+            </Typography.Text>
+            <span>to your Dota 2 launch options in Steam.</span>
             <Link
               className="text-blue-400 hover:text-blue-300"
               href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
@@ -111,8 +111,10 @@ export default function ExportCFG() {
             >
               Instructions here
             </Link>
-            , or follow the video below. This allows the Dota 2 client to send
-            game data to Dotabod.
+            <span>
+              , or follow the video below. This allows the Dota 2 client to send
+              game data to Dotabod.
+            </span>
           </div>
 
           <div className="flex flex-col items-center space-y-4">
