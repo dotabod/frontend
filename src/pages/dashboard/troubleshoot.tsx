@@ -1,11 +1,11 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
+import Header from '@/components/Dashboard/Header'
+import { Card } from '@/ui/card'
+import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { ReactElement } from 'react'
-import Header from '@/components/Dashboard/Header'
-import { Typography } from 'antd'
-import { Card } from '@/ui/card'
 
 const faqs = [
   {
@@ -29,6 +29,17 @@ const faqs = [
         />
       </div>
     ),
+  },
+  {
+    question:
+      'Unable to open bets. Your Twitch account needs to be reconnected to Dotabod',
+    answer:
+      'Logout and login again on the Dotabod dashboard to reconnect your Twitch account. Press your picture in the top right and click Logout.',
+  },
+  {
+    question: "Dotabod won't talk in chat? Or accidentally banned Dotabod?",
+    answer:
+      'Try enabling and disabling Dotabod using the toggle in the top left of Dotabod dashboard. Then type !ping in chat to see if Dotabod can talk again.',
   },
   {
     question: 'Overlay not showing anything?',
