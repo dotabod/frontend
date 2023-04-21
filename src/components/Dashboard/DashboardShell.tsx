@@ -4,7 +4,7 @@ import { navigation } from '@/components/Dashboard/navigation'
 import clsx from 'clsx'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import { DarkLogo } from '@/components/Logo'
-import { Layout, Menu, MenuProps, theme } from 'antd'
+import { Alert, Layout, Menu, MenuProps, theme } from 'antd'
 import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
@@ -169,6 +169,36 @@ export default function DashboardShell({
               <UserAccountNav />
             </div>
           </Header>
+          <Alert
+            className="!mx-auto !mt-4 max-w-xs"
+            type="warning"
+            message={
+              <div>
+                The New Frontiers update on April 20, 2023 broke most things so
+                Dotabod has been disabled for everyone until it can be fixed.
+              </div>
+            }
+          />
+          <Alert
+            message={
+              <div>
+                Are you a developer and want to help? Visit us on{' '}
+                <Link
+                  target="_blank"
+                  href="https://github.com/dotabod/backend/issues/308"
+                >
+                  Github
+                </Link>{' '}
+                and join our{' '}
+                <Link target="_blank" href="https://discord.dotabod.com">
+                  Discord
+                </Link>
+                !
+              </div>
+            }
+            type="info"
+            className="!mx-auto !mt-4 max-w-xs"
+          />
           <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
             {children}
           </Content>
