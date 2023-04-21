@@ -1,7 +1,8 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import React from 'react'
-import { Switch } from 'antd'
+import { Switch, Tooltip } from 'antd'
+import CommandDetail from '@/components/Dashboard/CommandDetail'
 
 export function DisableToggle() {
   const {
@@ -11,19 +12,21 @@ export function DisableToggle() {
   } = useUpdateSetting(Settings.commandDisable)
 
   return (
-    <label
-      htmlFor="disable-toggle"
-      aria-disabled={true}
-      className="cursor-not-allowed space-x-2 rounded text-xs text-gray-300"
-    >
-      <Switch
-        id="disable-toggle"
-        size="small"
-        className="flex"
-        checked={false}
-        disabled
-      />
-      <span>Dotabod is disabled</span>
-    </label>
+    <Tooltip placement="right" title={CommandDetail.commandDisable.description}>
+      <label
+        htmlFor="disable-toggle"
+        className="cursor-pointer space-x-2 rounded text-xs text-gray-300"
+      >
+        <Switch
+          id="disable-toggle"
+          loading={loading}
+          size="small"
+          className="flex"
+          checked={!isDotabodDisabled}
+          onChange={(checked) => updateSetting(!checked)}
+        />
+        <span>Dotabod is {isDotabodDisabled ? 'disabled' : 'enabled'}</span>
+      </label>
+    </Tooltip>
   )
 }
