@@ -30,7 +30,6 @@ export default function ExportCFG() {
     "player" "1"
     "provider" "1"
     "wearables" "1"
-    ${data?.beta_tester ? '"minimap" "1"' : ''}
   }
   "auth"
   {
