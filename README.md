@@ -31,4 +31,4 @@ To learn more about the technologies used in this site template, see the followi
 - [Tailwind CSS](https://tailwindcss.com/docs) - the official Tailwind CSS documentation
 - [Next.js](https://nextjs.org/docs) - the official Next.js documentation
 
-<img alt="Vercel Logo" width="132" height="26" src="/images/vercel.svg">
+<img alt="Vercel Logo" width="132" height="26" src="public/images/vercel.svg">
