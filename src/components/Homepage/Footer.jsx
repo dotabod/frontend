@@ -49,13 +49,13 @@ export function Footer() {
             DOTA is a trademark of Valve Corporation and used under license. By
             making use of the term &quot;DOTA&quot; in any content posted on any
             Dotabod website, you agree that use of this trademark is subject to
-            Valve’s trademark guidelines found at
+            Valve&apos;s trademark guidelines found at
             https://store.steampowered.com/legal.
           </p>
         </div>
         <Link
           target="_blank"
-          href="https://vercel.com/?utm_source=dotabod&utm_campaign=oss"
+          href="https://vercel.com/?utm_source=ketodevs&utm_campaign=oss"
         >
           <Image
             className="pb-8"
