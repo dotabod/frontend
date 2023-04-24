@@ -1,8 +1,8 @@
 # Dotabod frontend
 
-Open source UI for Dotabod, including the overlay used in OBS, dashboard to manage all settings, and the https://dotabod.com homepage. 
+Open source UI for Dotabod, including the overlay used in OBS, dashboard to manage all settings, and the <https://dotabod.com> homepage.
 
-![Alt](https://repobeats.axiom.co/api/embed/ea30ccaa0e412de306ca98de53ea20d18cfdfa37.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/ea30ccaa0e412de306ca98de53ea20d18cfdfa37.svg 'Repobeats analytics image')
 
 ## Getting started
 
@@ -30,3 +30,5 @@ To learn more about the technologies used in this site template, see the followi
 
 - [Tailwind CSS](https://tailwindcss.com/docs) - the official Tailwind CSS documentation
 - [Next.js](https://nextjs.org/docs) - the official Next.js documentation
+
+<img alt="Vercel Logo" width="132" height="26" src="/images/vercel.svg">
