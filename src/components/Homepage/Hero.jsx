@@ -142,8 +142,7 @@ export function Hero() {
   const { t } = useTranslation()
   const session = useSession()
   const name = session.data?.user?.name || 'streamers'
-
-  const [supporters, nonSupporters] = Object.values(grouped)
+  const { supporters, nonSupporters } = grouped
 
   return (
     <div className="overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">
@@ -204,45 +203,49 @@ export function Hero() {
           </div>
         </div>
         <div className="relative lg:col-span-7 xl:col-span-6">
-          <div className="flex items-center space-x-2">
-            <Image
-              src="https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp"
-              width={24}
-              height={24}
-              className="animate-bounce rounded"
-              alt="Gigachad"
-            />
-            <h1>Gigachad supporters</h1>
-          </div>
-          <ul
-            role="list"
-            className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
-          >
-            {supporters?.map(({ name, image, link, supporter }) => {
-              const isLast = name === 'You?'
-              return (
-                <TwitchUser
-                  key={name}
-                  supporter={supporter}
-                  link={link}
-                  last={isLast}
-                  session={session}
-                  name={name}
-                  onClick={(e) => {
-                    if (link === false) {
-                      e.preventDefault()
-                    }
-                  }}
-                  image={image}
+          {supporters && (
+            <>
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp"
+                  width={24}
+                  height={24}
+                  className="animate-bounce rounded"
+                  alt="Gigachad"
                 />
-              )
-            })}
-          </ul>
+                <h1>Gigachad supporters</h1>
+              </div>
+              <ul
+                role="list"
+                className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
+              >
+                {supporters?.map(({ name, image, link, supporter }) => {
+                  const isLast = name === 'You?'
+                  return (
+                    <TwitchUser
+                      key={name}
+                      supporter={supporter}
+                      link={link}
+                      last={isLast}
+                      session={session}
+                      name={name}
+                      onClick={(e) => {
+                        if (link === false) {
+                          e.preventDefault()
+                        }
+                      }}
+                      image={image}
+                    />
+                  )
+                })}
+              </ul>
+            </>
+          )}
 
           <div className="relative lg:col-span-7 xl:col-span-6">
             <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
               <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
-              <span>Also featured in over 4,000 Twitch streamers</span>
+              <span>Featured in over 5,000 Twitch streamers</span>
             </div>
           </div>
           <ul
