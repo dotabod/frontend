@@ -389,11 +389,6 @@
     aria-hidden "^1.1.3"
     tabbable "^6.0.1"
 
-"@fullstory/browser@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@fullstory/browser/-/browser-1.7.0.tgz#bf8577524eb387972c0e9bea3d485f5c4cdab779"
-  integrity sha512-O+3qAfKdi0lh4XgLK5fxm2Qk4VtkFh16D6yLa40dmuDMJSdhQT76P8eO7xyNgeB/L4FPWyEcPiUGh7NvEOq9Kw==
-
 "@headlessui/react@^1.7.13":
   version "1.7.13"
   resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.7.13.tgz#fd150b394954e9f1d86ed2340cffd1217d6e7628"
