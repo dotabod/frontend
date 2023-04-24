@@ -15,7 +15,7 @@ import { useTranslation } from 'next-i18next'
 const featuredUsers = [
   {
     name: 'Gorgc',
-    supporter: true,
+    supporter: false,
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/gorgc-profile_image-469e05d25a1e8594-70x70.jpeg',
   },
@@ -28,8 +28,8 @@ const featuredUsers = [
   {
     name: 'TpaBoMaH',
     image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/509c81ae-7dad-4764-b0f3-e810c3f0bafc-profile_image-70x70.png',
-    supporter: true,
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/ebbb7ac5-5120-4805-87f3-3887bb86f80c-profile_image-70x70.png',
+    supporter: false,
   },
   {
     name: 'EternaLEnVyy',
