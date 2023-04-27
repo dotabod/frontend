@@ -32,7 +32,7 @@ export const useOverlayPositions = () => {
 
   let wlPosition = {
     bottom: 0,
-    right: res({ w: 275 }),
+    right: res({ w: 311 }),
     left: null,
     fontSize: res({ w: 18 }),
   }

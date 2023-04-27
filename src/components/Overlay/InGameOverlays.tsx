@@ -72,7 +72,7 @@ export const InGameOverlays = ({
           'absolute flex items-end justify-end',
           isRight && '!justify-start'
         )}
-        style={{ ...wlPosition, width: res({ w: 245 }) }}
+        style={{ ...wlPosition, width: res({ w: 215 }) }}
       >
         <AnimatedWL
           key="animate-wl-class"
