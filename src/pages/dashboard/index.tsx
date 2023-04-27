@@ -50,27 +50,8 @@ const SetupPage = () => {
               height={28}
             />
           </div>
-          <div>
-            <p>
-              Test it by joining a bot match. Visit the{' '}
-              <Link
-                className="text-blue-400 hover:text-blue-300"
-                href="overlay"
-              >
-                Live Preview page
-              </Link>{' '}
-              to confirm the overlay is showing. You should see the minimap
-              blocker overlay, but badge may be missing until you fill out your
-              MMR from the{' '}
-              <Link
-                className="text-blue-400 hover:text-blue-300"
-                href="dashboard/features"
-              >
-                settings page
-              </Link>
-              .
-            </p>
-            <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-row space-x-4">
+            <div className="flex-none">
               <Image
                 alt="dotabod browser source properties"
                 width={284}
@@ -79,6 +60,20 @@ const SetupPage = () => {
                 className="rounded-xl"
                 src="/images/setup/play-vs-bots.png"
               />
+            </div>
+            <div>
+              <p>
+                Test it by joining a bot match. Visit the{' '}
+                <Link
+                  className="text-blue-400 hover:text-blue-300"
+                  href="overlay"
+                >
+                  Live Preview page
+                </Link>{' '}
+                to confirm the overlay is showing. You should see the minimap
+                blocker overlay once you&apos;re in a match.
+              </p>
+              <p>Note: Dotabod will only work if your stream is online.</p>
             </div>
           </div>
         </Card>

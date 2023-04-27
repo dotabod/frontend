@@ -21,8 +21,7 @@ export default function StreamDelayCard() {
         <h3>Stream delay</h3>
       </div>
       <div className="subtitle mb-2">
-        Increase the delay that Dotabod responds to game events. For example,
-        write 15 for 15 seconds.
+        Increase the delay that Dotabod responds to game events.
       </div>
 
       <Form layout="vertical">

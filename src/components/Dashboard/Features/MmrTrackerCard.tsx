@@ -21,7 +21,7 @@ export default function MmrTrackerCard() {
         <h3>MMR tracker</h3>
       </div>
       <div className="subtitle">
-        Give or take {onlyParty ? 20 : 30} MMR after every ranked match.
+        <p>Give or take {onlyParty ? 20 : 30} MMR after every ranked match.</p>
       </div>
       <div>A list of accounts will show below as you play on them.</div>
 
@@ -51,6 +51,11 @@ export default function MmrTrackerCard() {
           </Tooltip>
         </div>
       </div>
+      <p className="text-xs">
+        Note: Since the 7.33 patch, Dotabod can no longer accurately estimate
+        the MMR from each game. You can either use !setmmr or update it here
+        after a game or after your stream. Mods can also use !setmmr
+      </p>
     </Card>
   )
 }

@@ -5,6 +5,7 @@ import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ReactElement } from 'react'
 
 const faqs = [
@@ -16,11 +17,9 @@ const faqs = [
         <ol className="list-inside list-decimal">
           <li>Press refresh on the dotabod overlay source in OBS.</li>
           <li>Restart OBS.</li>
+          <li>Dotabod will only work if your stream is online.</li>
+          <li>Try the steps under &quot;Overlay not showing anything?&quot;</li>
         </ol>
-        <p>
-          If the problem persists, check if you have the latest version of
-          dotabod installed.
-        </p>
         <Image
           src="https://i.imgur.com/d0qzlFa.png"
           alt="OBS dotabod source"
@@ -34,7 +33,7 @@ const faqs = [
     question:
       'Unable to open bets. Your Twitch account needs to be reconnected to Dotabod',
     answer:
-      'Logout and login again on the Dotabod dashboard to reconnect your Twitch account. Press your picture in the top right and click Logout.',
+      'Logout and login again on the Dotabod dashboard to reconnect your Twitch account. Press your picture in the top right and click Logout. If it still does not work after logging in again, join our Discord.',
   },
   {
     question: "Dotabod won't talk in chat? Or accidentally banned Dotabod?",
@@ -47,6 +46,10 @@ const faqs = [
       <div>
         <p>Try the following steps:</p>
         <ol className="list-inside list-decimal">
+          <li>
+            Make sure your stream is online. Dotabod will not work if you are
+            offline.
+          </li>
           <li>
             Update OBS to v29 or higher. Dotabod overlay will not show on v27
             for example
@@ -71,8 +74,22 @@ const faqs = [
   },
   {
     question: 'Dotabod keeps saying play a match, no steam id?',
-    answer:
-      'You probably placed the cfg file in the wrong folder. Follow Step 2 of setup again. Reboot Dota after finding the right folder. Play a bot match to verify Dotabod can find your account. Still nothing? Could your Steam account be linked to another Dotabod user? Only one person may have the Steam account linked. To remove it from the other user, join the Dotabod discord to get help verifying your steam account.',
+    answer: (
+      <ol className="list-inside list-decimal">
+        <li>
+          You probably placed the cfg file in the wrong folder. Follow Step 2 of
+          setup again. Reboot Dota after finding the right folder.
+        </li>
+        <li>Play a bot match to verify Dotabod can find your account.</li>
+        <li>
+          Still nothing? Could your Steam account be linked to another Dotabod
+          user? Only one person may have the Steam account linked. Dotabod will
+          tell you who is using your account from the MMR tracker in the{' '}
+          <Link href="/dashboard/features">Features page</Link>. You can then
+          ask them to remove it from their account.
+        </li>
+      </ol>
+    ),
   },
   {
     question: 'MMR not tracking?',
