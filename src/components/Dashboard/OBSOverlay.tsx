@@ -62,8 +62,7 @@ export default function OBSOverlay() {
 
       <p>
         2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s usually
-        1920x1080 but you could have a different one. Don&apos;t copy 1234x789,
-        that&apos;s just there as an example.
+        1920x1080 but you could have a different one.
       </p>
       <div className="flex flex-col items-center space-y-4">
         <Image
