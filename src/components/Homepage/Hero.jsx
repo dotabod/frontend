@@ -16,80 +16,68 @@ const featuredUsers = [
   {
     name: 'Gorgc',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/gorgc-profile_image-469e05d25a1e8594-70x70.jpeg',
+    image: '/images/hero/gorgc.jpeg',
   },
   {
     name: 'Grubby',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/e5d06b76-4e12-44f9-82cf-1bcc03359667-profile_image-150x150.png',
+    image: '/images/hero/grubby.png',
   },
   {
     name: 'TpaBoMaH',
-    image: 'https://i.imgur.com/5NOuZ3z.png',
+    image: '/images/hero/tpabomah.png',
     supporter: false,
   },
   {
     name: 'EternaLEnVyy',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/eternalenvyy-profile_image-6b20e441fd6342b1-70x70.png',
+    image: '/images/hero/ee.png',
   },
   {
     name: 'XcaliburYe',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/69bea0f7-b170-4067-92f0-d1410a020b62-profile_image-150x150.png',
+    image: '/images/hero/xcaliburye.png',
   },
   {
     name: 'qSnake',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/7d5a4932-be42-481c-a47a-4136404f2c54-profile_image-70x70.png',
+    image: '/images/hero/qsnake.png',
   },
   {
     name: 'Cr1tdota',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/cr1tdota-profile_image-7e4ec45409fd1b1f-150x150.jpeg',
+    image: '/images/hero/crit.jpeg',
   },
   {
     name: 'BananaSlamJamma',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/bananaslamjamma-profile_image-8a07eac563581ffe-70x70.png',
+    image: '/images/hero/bsj.png',
   },
   {
     name: 'canceldota',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/e381d7db-3efc-44c4-b2b7-51007be87791-profile_image-150x150.png',
+    image: '/images/hero/cancel.png',
   },
   {
     name: 'GunnarDotA2',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/e7ca5b8a-cf52-4b7a-addd-d6d7b1b4216c-profile_image-150x150.png',
+    image: '/images/hero/gunnar.png',
   },
   {
     name: 'sheevergaming',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/09074d0a-4a09-4db0-b290-29bea0fe963d-profile_image-150x150.png',
+    image: '/images/hero/sheever.png',
   },
   {
     name: 'ODPixel',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/jtv_user_pictures/21d275f5-b27d-4cf2-805e-94006c08c25c-profile_image-150x150.png',
+    image: '/images/hero/od.png',
   },
   {
     link: false,
     name: 'You?',
     supporter: false,
-    image:
-      'https://static-cdn.jtvnw.net/user-default-pictures-uv/75305d54-c7cc-40d1-bb9c-91fbe85943c7-profile_image-300x300.png',
+    image: '/images/hero/default.png',
   },
 ]
 
