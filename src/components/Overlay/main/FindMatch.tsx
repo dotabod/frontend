@@ -1,5 +1,6 @@
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { MatchTimer } from './MatchTimer'
+import { motionProps } from '@/ui/utils'
+import { motion } from 'framer-motion'
 
 export const FindMatch = () => {
   const res = useTransformRes()
@@ -19,7 +20,41 @@ export const FindMatch = () => {
         Main menu
       </span>
 
-      <MatchTimer res={res} />
+      <motion.div
+        key="queue-blocker-class"
+        {...motionProps}
+        style={{
+          bottom: res({ h: 0 }), // correct is n
+          right: res({ w: 0 }), // correct is 50
+        }}
+        className="absolute"
+      >
+        <div
+          style={{
+            width: res({ w: 330 }),
+            height: res({ h: 49 }),
+            right: res({ w: 59 }),
+            bottom: res({ h: 22 }),
+          }}
+          className="absolute flex items-center justify-center overflow-hidden"
+        >
+          <span
+            style={{
+              fontSize: res({ w: 26 }),
+            }}
+            className="font-outline-2 whitespace-nowrap font-bold uppercase tracking-[0.15em] text-white"
+          >
+            play dota
+          </span>
+        </div>
+
+        <img
+          width={res({ w: 850 })}
+          height={res({ h: 355 })}
+          src="/images/overlay/finding-match.png"
+          alt="Finding Match"
+        />
+      </motion.div>
     </>
   )
 }
