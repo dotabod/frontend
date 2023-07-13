@@ -49,8 +49,8 @@ export const FindMatch = () => {
         </div>
 
         <img
-          width={res({ w: 850 })}
-          height={res({ h: 355 })}
+          width={res({ w: 705 })}
+          height={res({ h: 160 })}
           src="/images/overlay/finding-match.png"
           alt="Finding Match"
         />
