@@ -1,5 +1,3 @@
-import { motionProps } from '@/ui/utils'
-import { motion } from 'framer-motion'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { MatchTimer } from './MatchTimer'
 
