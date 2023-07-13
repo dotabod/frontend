@@ -1,6 +1,7 @@
 import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { MatchTimer } from './MatchTimer'
 
 export const FindMatch = () => {
   const res = useTransformRes()
@@ -48,12 +49,7 @@ export const FindMatch = () => {
           </span>
         </div>
 
-        <img
-          width={res({ w: 850 })}
-          height={res({ h: 355 })}
-          src="/images/overlay/finding-match.png"
-          alt="Finding Match"
-        />
+        <MatchTimer res={res} />
       </motion.div>
     </>
   )
