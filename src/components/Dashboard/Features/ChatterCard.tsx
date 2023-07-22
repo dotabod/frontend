@@ -1,9 +1,9 @@
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch, Tooltip } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
-import { Settings } from '@/lib/defaultSettings'
 import DotabodChatter from './DotabodChatter'
 
 enum CATEGORIES {
@@ -265,7 +265,7 @@ export const chatterInfo = {
             unoptimized
             alt="happi"
             className="inline align-middle"
-            src="https://cdn.7tv.app/emote/63c4520819eab0d59a02e872/1x.webp"
+            src="https://cdn.betterttv.net/emote/634042bce6cf26500b42ce56/1x.webp"
           />
           <span>go next</span>
         </div>
@@ -277,7 +277,7 @@ export const chatterInfo = {
             unoptimized
             alt="happi"
             className="inline align-middle"
-            src="https://cdn.7tv.app/emote/63c4520819eab0d59a02e872/1x.webp"
+            src="https://cdn.betterttv.net/emote/634042bce6cf26500b42ce56/1x.webp"
           />
           <span>go next</span>
         </div>

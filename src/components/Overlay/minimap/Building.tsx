@@ -1,9 +1,17 @@
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useState } from 'react'
 
 const Building = ({ data, team }) => {
+  const [imageError, setImageError] = useState(false)
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const isEnemy = data.teamP !== team
+
+  if (!data.image || imageError) return null
+
+  const handleImageError = () => {
+    setImageError(true)
+  }
 
   const buildingType = () => {
     const { image, unitname } = data
@@ -23,7 +31,7 @@ const Building = ({ data, team }) => {
   }
 
   if (!data.image) return null
-  
+
   const image = data.image.replace(/sword|shield/g, 'miscbuilding')
 
   return (
@@ -32,11 +40,12 @@ const Building = ({ data, team }) => {
       style={{ bottom: data.yposP, left: data.xposP }}
     >
       <img
-        alt="building icon"
         className={`icon ${buildingType()}`}
         src={`/images/overlay/minimap/blocker/icons/buildings/${
           isEnemy ? 'enemy_' : ''
         }${image}.png`}
+        onError={handleImageError}
+        style={{ display: imageError ? 'none' : 'block' }}
       />
     </div>
   )

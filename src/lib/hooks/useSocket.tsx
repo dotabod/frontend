@@ -13,7 +13,7 @@ import {
   EventSubChannelPredictionLockEvent,
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
-import { isDev } from '@/lib/hooks/rosh'
+import { isDev } from '@/lib/devConsts'
 import { fetcher } from '@/lib/fetcher'
 import { blockType } from '@/lib/devConsts'
 import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
