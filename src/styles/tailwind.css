@@ -436,3 +436,28 @@
     }
   }
 }
+
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(62, 65, 85) transparent;
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+    opacity: 0.1;
+    border-radius: 6px;
+  }
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+    outline: none;
+    border: none;
+    padding: 3px;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgb(158, 158, 158);
+    border-radius: 6px;
+  }
+}
+
