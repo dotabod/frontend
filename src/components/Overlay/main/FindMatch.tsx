@@ -1,6 +1,6 @@
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
 export const FindMatch = () => {
   const res = useTransformRes()
@@ -49,8 +49,8 @@ export const FindMatch = () => {
         </div>
 
         <img
-          width={res({ w: 769 })}
-          height={res({ h: 156 })}
+          width={res({ w: 850 })}
+          height={res({ h: 355 })}
           src="/images/overlay/finding-match.png"
           alt="Finding Match"
         />

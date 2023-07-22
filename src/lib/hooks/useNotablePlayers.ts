@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NotablePlayer } from '@/components/Overlay/NotablePlayers'
-import { isDev } from '@/lib/hooks/rosh'
+import { isDev } from '@/lib/devConsts'
 
 const devPlayers: NotablePlayer[] = [
   {
