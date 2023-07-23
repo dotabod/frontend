@@ -6,9 +6,37 @@ Welcome to the open source UI for Dotabod! This repository includes the overlay 
 
 Dotabod is a platform designed to enhance the experience of Dota 2 streamers and viewers. By providing real-time stats, twitch bets, mmr tracking, and more, Dotabod allows viewers to engage with Dota 2 streams in new and exciting ways.
 
-## About the Frontend 🖥️
+## Installation 🛠️
 
-The Dotabod Frontend is built using modern web technologies including React, Next.js, and Tailwind CSS. It includes several third-party dependencies to enhance the user experience, including i18next for internationalization, SWR for data fetching, and Ant Design for UI components.
+1. Clone the repository & copy the example environment file
+
+```bash
+git clone https://github.com/dotabod/frontend.git
+cd frontend
+
+# Fill out the values in .env.local with your own
+cp .env.example .env.local
+```
+
+1. Install dependencies
+
+  ```bash
+  yarn install
+  ```
+
+1. Setup your postgres database
+
+  ```bash
+  yarn prisma db push
+  ```
+
+1. Start the development server
+
+  ```bash
+  yarn dev
+  ```
+
+1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Contributing 🤝
 
