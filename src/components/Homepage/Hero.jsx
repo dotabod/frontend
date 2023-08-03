@@ -232,7 +232,7 @@ export function Hero() {
           <div className="relative lg:col-span-7 xl:col-span-6">
             <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
               <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
-              <span>Featured in over 5,000 Twitch streamers</span>
+              <span>Featured in over 8,000 Twitch streamers</span>
             </div>
           </div>
           <ul
