@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           // when logging in with the chatbot, append the chatbot scopes
-          // scope: `${chatBotScopes} ${chatBotScopes}`,
+          // scope: `${defaultScopes} ${chatBotScopes}`,
           scope: `${defaultScopes}`,
         },
       },
