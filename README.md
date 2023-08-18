@@ -38,6 +38,10 @@ Dotabod is a platform designed to enhance the experience of Dota 2 streamers and
 
 1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+1. [Alter the frontend to use moderator scopes](https://github.com/dotabod/frontend/blob/3d884389f4b448fcf67ce5c149f265bbe9394ee4/src/lib/auth.ts#L42), then login with your chatbot
+
+1. Undo the moderator scope changes and login with a normal twitch user that you want to stream on
+
 ## Contributing 🤝
 
 We welcome contributions from the community! Whether you want to submit a bug report, suggest a new feature, or contribute code, we would love to hear from you. Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
