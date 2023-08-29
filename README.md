@@ -14,8 +14,8 @@ Dotabod is a platform designed to enhance the experience of Dota 2 streamers and
   git clone https://github.com/dotabod/frontend.git
   cd frontend
 
-  # Fill out the values in .env.local with your own
-  cp .env.example .env.local
+  # Fill out the values in .env with your own
+  cp .env.example .env
   ```
 
 1. Install dependencies
