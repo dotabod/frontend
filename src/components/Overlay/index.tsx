@@ -23,7 +23,7 @@ import { Center } from '@mantine/core'
 import clsx from 'clsx'
 import { motionProps } from '@/ui/utils'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
-import { Spin } from 'antd'
+import { Alert, Spin } from 'antd'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 
@@ -103,26 +103,13 @@ const OverlayPage = (props) => {
       <>
         <motion.div
           className={clsx(
-            'absolute left-0 right-0 m-auto mt-9 hidden max-w-xs !opacity-100',
+            'absolute right-0 mt-9 hidden max-w-xs',
             !isLive ? '!block' : ''
           )}
-          style={{
-            transform: 'translate(-50%, -50%)',
-          }}
           key="not-live"
           {...motionProps}
         >
-          <div className="rounded-md bg-gray-600 p-2">
-            <div className="flex flex-col text-center">
-              <h3 className="text-lg font-medium text-gray-200">
-                Stream looks offline!
-              </h3>
-              <p className="text-gray-100">
-                Dotabod is disabled when stream is offline. Not offline? Type
-                !online in chat
-              </p>
-            </div>
-          </div>
+          <Alert message="Dotabod is disabled when stream is offline. Not offline? Type !online in chat" />
         </motion.div>
 
         {isDev && (
