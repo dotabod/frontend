@@ -91,7 +91,56 @@ const OverlayPage = (props) => {
 
   useOBS({ block, connected })
 
-  return isDotabodDisabled ? null : (
+  const { original } = useUpdateSetting()
+  const isLive = original?.stream_online
+
+  if (isDotabodDisabled) {
+    return null
+  }
+
+  if (!isLive) {
+    return (
+      <>
+        <motion.div
+          className={clsx(
+            'absolute left-0 right-0 m-auto mt-9 hidden max-w-xs !opacity-100',
+            !isLive ? '!block' : ''
+          )}
+          style={{
+            transform: 'translate(-50%, -50%)',
+          }}
+          key="not-live"
+          {...motionProps}
+        >
+          <div className="rounded-md bg-gray-600 p-2">
+            <div className="flex flex-col text-center">
+              <h3 className="text-lg font-medium text-gray-200">
+                Stream looks offline!
+              </h3>
+              <p className="text-gray-100">
+                Dotabod is disabled when stream is offline. Not offline? Type
+                !online in chat
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {isDev && (
+          <Image
+            key="dev-image"
+            width={width}
+            height={height}
+            alt={`${block.type} dev screenshot`}
+            src={`/images/dev/${
+              block.type === 'spectator' ? 'playing' : block.type
+            }.png`}
+          />
+        )}
+      </>
+    )
+  }
+
+  return (
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
