@@ -99,7 +99,9 @@ export const authOptions: NextAuthOptions = {
       // The dotabod user shouldn't update because
       // it has specific scopes that we don't want to overwrite
       // see `chatBotScopes` above
-      const isDotabod = (newUser.displayName || newUser.name) === 'dotabod'
+      const isDotabod =
+        (newUser.displayName || newUser.name) === 'dotabod' ||
+        (newUser.displayName || newUser.name) === 'dotabod_test'
       if (account && !isDotabod) {
         // Refresh jwt account with potentially new scopes
         const newData = {
