@@ -20,6 +20,19 @@ export const FindMatch = () => {
         Main menu
       </span>
 
+      <span
+        style={{
+          fontSize: res({ w: 14 }),
+          height: res({ h: 24 }),
+          width: res({ w: 131 }),
+          top: res({ h: 224 }),
+          left: res({ w: 411 }),
+        }}
+        className="font-outline-2 absolute flex items-center rounded-sm bg-black font-semibold uppercase tracking-wide text-[#77b26b]"
+      >
+        Main menu
+      </span>
+
       <motion.div
         key="queue-blocker-class"
         {...motionProps}
