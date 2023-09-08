@@ -95,17 +95,33 @@ const OverlayPage = (props) => {
   const isLive = original?.stream_online
 
   if (isDotabodDisabled) {
-    return null
+    return isDev ? (
+      <>
+        <motion.div
+          className={clsx('absolute right-0 mt-9 block max-w-xs')}
+          key="not-live"
+          {...motionProps}
+        >
+          <Alert message="Dotabod is disabled!" />
+        </motion.div>
+        <Image
+          key="dev-image"
+          width={width}
+          height={height}
+          alt={`${block.type} dev screenshot`}
+          src={`/images/dev/${
+            block.type === 'spectator' ? 'playing' : block.type
+          }.png`}
+        />
+      </>
+    ) : null
   }
 
   if (!isLive) {
     return (
       <>
         <motion.div
-          className={clsx(
-            'absolute right-0 mt-9 hidden max-w-xs',
-            !isLive ? '!block' : ''
-          )}
+          className={clsx('absolute right-0 mt-9 block max-w-xs')}
           key="not-live"
           {...motionProps}
         >
