@@ -43,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           steam32Id: true,
         },
         where: {
-          id: session?.user?.id ?? userId,
+          id: userId ?? session?.user?.id,
         },
       })
 
