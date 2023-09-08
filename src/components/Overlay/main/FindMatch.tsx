@@ -66,6 +66,7 @@ export const FindMatch = () => {
           height={res({ h: 355 })}
           src="/images/overlay/finding-match.png"
           alt="Finding Match"
+          className="rounded-lg"
         />
       </motion.div>
     </>
