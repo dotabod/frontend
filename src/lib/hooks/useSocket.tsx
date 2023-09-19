@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
-import io, { Socket } from 'socket.io-client'
-import { getRankImage, RankType } from '@/lib/ranks'
-import { useRouter } from 'next/router'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
+import { blockType, isDev } from '@/lib/devConsts'
+import { fetcher } from '@/lib/fetcher'
+import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { RankType, getRankImage } from '@/lib/ranks'
 import {
   EventSubChannelPollBeginEvent,
   EventSubChannelPollEndEvent,
@@ -13,17 +13,16 @@ import {
   EventSubChannelPredictionLockEvent,
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
-import { isDev } from '@/lib/devConsts'
-import { fetcher } from '@/lib/fetcher'
-import { blockType } from '@/lib/devConsts'
-import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import io, { Socket } from 'socket.io-client'
 import {
   setMinimapDataBuildings,
   setMinimapDataCouriers,
   setMinimapDataCreeps,
-  setMinimapDataHeroes,
   setMinimapDataHeroUnits,
+  setMinimapDataHeroes,
   setMinimapStatus,
 } from '../redux/store'
 
@@ -104,22 +103,21 @@ export const useSocket = ({
       dispatch(setMinimapStatus(data))
     })
 
-    socket.on(
-      'requestHeroData',
-      ({ data: { allTime, heroId, steam32Id } }, cb) => {
-        fetcher(
-          `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
-            allTime ? '' : '&date=30'
-          }`
-        )
-          .then(({ win = 0, lose = 0 }) => {
-            cb({ win, lose })
-          })
-          .catch((e: any) => {
-            cb({ win: 0, lose: 0 })
-          })
+    socket.on('requestHeroData', async ({ allTime, heroId, steam32Id }, cb) => {
+      const wl = { win: 0, lose: 0 }
+      const response = await fetcher(
+        `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
+          allTime ? '' : '&date=30'
+        }`
+      )
+
+      if (response) {
+        wl.win = response.win
+        wl.lose = response.lose
       }
-    )
+
+      cb(wl)
+    })
 
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
       try {
