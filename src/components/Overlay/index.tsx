@@ -117,7 +117,8 @@ const OverlayPage = (props) => {
     ) : null
   }
 
-  if (!isLive) {
+  // remove for now, !isLive
+  if (false) {
     return (
       <>
         <motion.div
