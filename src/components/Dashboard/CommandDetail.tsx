@@ -54,7 +54,8 @@ const CommandDetail = {
       />
     ),
   },
-  steam: {
+  [Settings.commandSteam]: {
+    key: Settings.commandSteam,
     title: 'Steam ID',
     description:
       "Retrieve the steam ID of the account you're currently playing on.",
@@ -154,7 +155,7 @@ const CommandDetail = {
       />
     ),
   },
-  commands: {
+  [Settings.commandCommands]: {
     key: Settings.commandCommands,
     title: 'Command list',
     description:
@@ -462,7 +463,8 @@ const CommandDetail = {
       />
     ),
   },
-  lgs: {
+  [Settings.commandLGS]: {
+    key: Settings.commandLGS,
     title: 'Last game score',
     description:
       'Quickly see whether or not you won last game, duration, how long ago',
@@ -477,7 +479,8 @@ const CommandDetail = {
       />
     ),
   },
-  profile: {
+  [Settings.commandProfile]: {
+    key: Settings.commandProfile,
     title: 'Profile',
     description:
       'Shows the profile link for the hero color you specify during a live match.',
