@@ -1,6 +1,5 @@
 import React from 'react'
-import { App, Button } from 'antd'
-import Image from 'next/image'
+import { Button } from 'antd'
 
 function JustButton({ url, data, user, extension = 'cfg', onClick = null }) {
   return (
