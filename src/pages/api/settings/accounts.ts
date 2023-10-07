@@ -1,10 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from 'next-auth/react'
 import * as z from 'zod'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
+import {getServerSession} from 'next-auth';
+import {authOptions} from '@/lib/auth';
 
 const accountUpdateSchema = z.array(
   z.object({
@@ -74,7 +75,7 @@ async function getAccounts(id: string) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession({ req })
+  const session = await getServerSession(req, res, authOptions)
   const userId = req.query.id as string
 
   if (!userId && !session?.user?.id) {

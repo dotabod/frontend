@@ -1,14 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from 'next-auth/react'
 import * as z from 'zod'
 
 import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { settingCreateSchema } from '@/lib/validations/setting'
+import {getServerSession} from 'next-auth';
+import {authOptions} from '@/lib/auth';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession({ req })
+  const session = await getServerSession(req, res, authOptions)
 
   const userId = req.query.id as string
 
