@@ -65,7 +65,6 @@ const SetupPage = () => {
               <p>
                 Test it by joining a bot match. Visit the{' '}
                 <Link
-                  className="text-blue-400 hover:text-blue-300"
                   href="overlay"
                 >
                   Live Preview page

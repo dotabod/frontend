@@ -117,14 +117,14 @@ const MmrForm = ({ hideText = false }) => {
                         <Typography.Paragraph>
                           <ExclamationTriangleIcon className="mr-1 inline h-4 w-4 text-yellow-500" />
                           You will not be able to use this account until{' '}
-                          <Typography.Link
+                          <a
                             target="_blank"
                             href={`https://twitch.tv/${multiUsedBy}`}
                             rel="noreferrer"
                             className="mx-1 inline"
                           >
                             {multiUsedBy}
-                          </Typography.Link>
+                          </a>
                           removes it from their dashboard.
                         </Typography.Paragraph>
                       )
@@ -149,7 +149,7 @@ const MmrForm = ({ hideText = false }) => {
                         <SteamAvatar id={account.steam32Id} data={steamData} />
                         <Form.Item
                           help={
-                            <Typography.Link
+                            <a
                               target="_blank"
                               href={`https://steamid.xyz/${account.steam32Id}`}
                               rel="noreferrer"
@@ -159,7 +159,7 @@ const MmrForm = ({ hideText = false }) => {
                                 {account.name}
                               </span>
                               <ExternalLinkIcon className="h-4 w-4" />
-                            </Typography.Link>
+                            </a>
                           }
                         >
                           <InputNumber

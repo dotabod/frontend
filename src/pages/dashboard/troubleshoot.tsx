@@ -136,9 +136,9 @@ const faqs = [
     answer: (
       <span>
         Get help in our{' '}
-        <Typography.Link target="_blank" href="https://discord.dotabod.com">
+        <a target="_blank" href="https://discord.dotabod.com">
           Discord
-        </Typography.Link>
+        </a>
         .
       </span>
     ),

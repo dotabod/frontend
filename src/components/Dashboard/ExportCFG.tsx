@@ -3,7 +3,6 @@ import { Card } from '@/ui/card'
 import { Button, Steps, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useState } from 'react'
 import DownloadButton from './DownloadButton'
 
@@ -98,20 +97,10 @@ export default function ExportCFG() {
             <span>Add</span>
             <Typography.Text
               code
-              className="whitespace-pre-wrap break-all !text-xs"
             >
               -gamestateintegration
             </Typography.Text>
-            <span>to your Dota 2 launch options in Steam.</span>
-            <Link
-              className="text-blue-400 hover:text-blue-300"
-              href="https://support.overwolf.com/en/support/solutions/articles/9000212745-how-to-enable-game-state-integration-for-dota-2"
-              target="_blank"
-            >
-              Instructions here
-            </Link>
-            <span>
-              , or follow the video below. This allows the Dota 2 client to send
+            <span>to your Dota 2 launch options in Steam. This allows the Dota 2 client to send
               game data to Dotabod.
             </span>
           </div>

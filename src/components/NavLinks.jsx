@@ -40,7 +40,7 @@ export function NavLinks({ bottom = false }) {
   ].map(([label, href, Icon, tooltip], index) => {
     return (
       <Tooltip key={label} title={tooltip} disabled={!tooltip} position="top">
-        <Typography.Link
+        <a
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
           className="relative -my-2 -mx-3 flex items-center rounded-lg px-3 py-2 text-sm !text-gray-300 transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]"
@@ -77,7 +77,7 @@ export function NavLinks({ bottom = false }) {
             )}
             {!Icon && label}
           </span>
-        </Typography.Link>
+        </a>
       </Tooltip>
     )
   })

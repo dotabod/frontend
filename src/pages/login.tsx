@@ -19,9 +19,9 @@ export default function Login() {
       content: (
         <span>
           Oops. Unable to log you in. Reach out to us on{' '}
-          <Typography.Link href="https://discord.dotabod.com" target="_blank">
+          <a href="https://discord.dotabod.com" target="_blank">
             Discord
-          </Typography.Link>{' '}
+          </a>{' '}
           to get help.
         </span>
       ),

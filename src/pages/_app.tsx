@@ -41,12 +41,14 @@ const App = ({
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
-
           components: {
-            Steps: {
-              controlItemBgActive: 'var(--color-purple-500)',
-              colorSplit: 'var(--color-gray-600)',
-              colorTextQuaternary: 'var(--color-gray-300)',
+            Button: {
+              colorLink: 'var(--color-purple-300)',
+              colorPrimaryHover: 'var(--color-purple-300)',
+            },
+            Tabs: {
+              colorPrimary: 'var(--color-purple-400)',
+              itemHoverColor: 'var(--color-purple-300)',
             },
             Menu: {
               colorSubItemBg: 'var(--color-gray-800)',
@@ -54,6 +56,7 @@ const App = ({
               colorItemBgSelected: 'var(--color-gray-600)',
               colorItemTextSelected: 'var(--color-gray-200)',
               colorItemText: 'var(--color-gray-300)',
+
             },
             Switch: {
               colorPrimary: 'var(--color-purple-900)',
