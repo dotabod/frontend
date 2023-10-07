@@ -4,8 +4,8 @@ import * as z from 'zod'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
-import {getServerSession} from 'next-auth';
-import {authOptions} from '@/lib/auth';
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 const accountUpdateSchema = z.array(
   z.object({
@@ -13,7 +13,7 @@ const accountUpdateSchema = z.array(
     mmr: z.number().min(0).max(20000),
     name: z.string().optional(),
     delete: z.boolean().optional(),
-  })
+  }),
 )
 
 async function getAccounts(id: string) {
@@ -38,10 +38,9 @@ async function getAccounts(id: string) {
           {
             connectedUserIds: {
               has: id,
-            }
-          }
+            },
+          },
         ],
-
       },
     })
 
@@ -58,7 +57,7 @@ async function getAccounts(id: string) {
 
       // filter connectedUserIds to only show the current user
       account.connectedUserIds = account.connectedUserIds.filter(
-        (userId) => userId === id
+        (userId) => userId === id,
       )
       // add the user using this account to the connectedUserIds array
       if (account.connectedUserIds.length) {
@@ -114,7 +113,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               where: {
                 steam32Id: account.steam32Id,
               },
-            })
+            }),
           )
         })
 
@@ -140,7 +139,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 mmr: true,
                 name: true,
               },
-            })
+            }),
           )
         })
 

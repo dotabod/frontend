@@ -5,8 +5,8 @@ import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { settingCreateSchema } from '@/lib/validations/setting'
-import {getServerSession} from 'next-auth';
-import {authOptions} from '@/lib/auth';
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
