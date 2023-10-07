@@ -128,9 +128,9 @@ export default function ChatBot() {
                 title={clipboard.copied ? 'Copied' : 'Copy'}
               >
                 <Button
-                  type="ghost"
-                  size="small"
+                  type="text"
                   block
+                  size="small"
                   icon={
                     clipboard.copied ? (
                       <CheckIcon width={16} />

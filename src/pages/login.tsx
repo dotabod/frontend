@@ -5,7 +5,7 @@ import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { App, Typography } from 'antd'
+import { App } from 'antd'
 
 export default function Login() {
   const { status } = useSession()

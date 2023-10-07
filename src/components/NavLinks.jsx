@@ -4,7 +4,7 @@ import DiscordSvg from '@/images/logos/discord.svg'
 import GithubSvg from '@/images/logos/github.svg'
 import TwitterSvg from '@/images/logos/twitter.svg'
 import Image from 'next/image'
-import { Tooltip, Typography } from 'antd'
+import { Tooltip } from 'antd'
 
 export function NavLinks({ bottom = false }) {
   let [hoveredIndex, setHoveredIndex] = useState(null)

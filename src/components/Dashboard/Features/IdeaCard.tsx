@@ -1,7 +1,6 @@
 import { Card } from '@/ui/card'
 import React from 'react'
 import clsx from 'clsx'
-import { Typography } from 'antd'
 
 export default function IdeaCard() {
   return (

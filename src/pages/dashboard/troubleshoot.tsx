@@ -1,7 +1,6 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { Card } from '@/ui/card'
-import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
