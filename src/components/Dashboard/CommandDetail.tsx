@@ -8,7 +8,7 @@ const CommandDetail = {
     title: 'Disable Dotabod',
     description: 'Toggle off to stop responding to game events and commands.',
     cmd: '!toggle',
-    alias: ['mute', 'unmute'],
+    alias: ['enable', 'disable'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -16,6 +16,22 @@ const CommandDetail = {
         modOnly
         command="!toggle"
         response="Will no longer watch game events nor respond to commands. Type !toggle again to enable."
+      />
+    ),
+  },
+  [Settings.chatter]: {
+    title: 'Mute Dotabod',
+    description:
+      'Will prevent Dotabod from auto sending chatters, but will still respond to commands.',
+    cmd: '!mute',
+    alias: ['unmute'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command="!mute"
+        response="Will no longer auto chat on game events, but will still respond to commands. Type !unmute to undo"
       />
     ),
   },
