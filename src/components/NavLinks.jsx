@@ -43,7 +43,7 @@ export function NavLinks({ bottom = false }) {
         <a
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
-          className="relative -my-2 -mx-3 flex items-center rounded-lg px-3 py-2 text-sm !text-gray-300 transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]"
+          className="relative -my-2 -mx-3 flex items-center rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors delay-150 hover:text-gray-900 hover:delay-[0ms]"
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
@@ -51,7 +51,7 @@ export function NavLinks({ bottom = false }) {
             {hoveredIndex === index && (
               <motion.span
                 key={index}
-                className="absolute inset-0 rounded-lg bg-gray-700"
+                className="absolute inset-0 rounded-lg bg-gray-100"
                 layoutId="hoverBackground"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.15 } }}

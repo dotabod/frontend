@@ -25,7 +25,8 @@ const UserButton = ({ user }: UserButtonProps) => {
           'text-gray-200',
           `outline:transparent group block h-full w-full cursor-pointer rounded-md border border-transparent px-3.5
             py-2 text-left text-sm transition-all
-            `
+            `,
+          `bg-gray-100 text-gray-700 hover:bg-gray-200`
         )}
       >
         <div className="flex h-full w-full items-center justify-between space-x-4">

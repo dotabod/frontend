@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import { Button } from 'antd'
+import { Button } from 'src/components/Button'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import Image from 'next/image'
@@ -102,15 +102,13 @@ function Plan({
     <section
       className={clsx(
         'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5',
-        featured
-          ? 'order-first border border-blue-900/80 bg-blue-900/10 shadow shadow-blue-700 lg:order-none'
-          : 'bg-gray-800'
+        featured ? 'order-first bg-gray-900 lg:order-none' : 'bg-white'
       )}
     >
       <h3
         className={clsx(
           'flex items-center text-sm font-semibold',
-          featured ? 'text-white' : 'text-gray-200'
+          featured ? 'text-white' : 'text-gray-900'
         )}
       >
         {logo ? (
@@ -125,7 +123,7 @@ function Plan({
       <p
         className={clsx(
           'relative mt-5 flex text-3xl tracking-tight',
-          featured ? 'text-white' : 'text-gray-200'
+          featured ? 'text-white' : 'text-gray-900'
         )}
       >
         {price.Monthly === price.Annually ? (
@@ -158,7 +156,7 @@ function Plan({
       <p
         className={clsx(
           'mt-3 text-sm',
-          featured ? 'text-gray-300' : 'text-gray-300'
+          featured ? 'text-gray-300' : 'text-gray-700'
         )}
       >
         {description}
@@ -169,8 +167,8 @@ function Plan({
           className={clsx(
             '-my-2 divide-y text-sm',
             featured
-              ? 'divide-blue-800 text-gray-300'
-              : 'divide-gray-700 text-gray-300'
+              ? 'divide-gray-800 text-gray-300'
+              : 'divide-gray-200 text-gray-700'
           )}
         >
           {features.map((feature) => (
@@ -202,8 +200,7 @@ function Plan({
       {!button.custom && (
         <Button
           href={button.href}
-          size="large"
-          type={featured ? 'primary' : 'default'}
+          color={featured ? 'cyan' : 'gray'}
           className="mt-6"
           aria-label={`Get started with the ${name} plan for ${price}`}
         >
@@ -219,17 +216,17 @@ export function Pricing() {
     <section
       id="pricing"
       aria-labelledby="pricing-title"
-      className="border-t border-gray-500 bg-gray-900 py-20 sm:py-32"
+      className="border-t border-gray-200 bg-gray-100 py-20 sm:py-32"
     >
       <Container>
         <div className="mx-auto max-w-lg text-center">
           <h2
             id="pricing-title"
-            className="text-3xl font-medium tracking-tight text-gray-200"
+            className="text-3xl font-medium tracking-tight text-gray-900"
           >
             Flat pricing, no management fees.
           </h2>
-          <p className="mt-2 text-lg text-gray-300">
+          <p className="mt-2 text-lg text-gray-600">
             Whether you’re one person trying to get ahead or a big firm trying
             to take over the world, we’ve got a plan for you.
           </p>

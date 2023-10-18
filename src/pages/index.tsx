@@ -59,7 +59,7 @@ const Home: NextPage = () => {
         ></meta>
       </Head>
       <Header />
-      <main className="bg-gray-800">
+      <main className="bg-gray-50">
         <Hero />
         <PrimaryFeatures />
         <SecondaryFeatures />

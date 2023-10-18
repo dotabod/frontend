@@ -119,7 +119,7 @@ const TwitchUser = ({
           unoptimized
           className="rounded-lg shadow-lg"
         />
-        <span className="text-xs text-gray-300">{userName}</span>
+        <span className="text-xs text-gray-900">{userName}</span>
       </a>
     </li>
   )
@@ -136,7 +136,7 @@ export function Hero() {
       <Container>
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
-            <h1 className="flex items-center space-x-2 text-4xl font-medium tracking-tight text-gray-200">
+            <h1 className="flex items-center space-x-2 text-4xl font-medium tracking-tight text-gray-900">
               <span>Welcome, {name}</span>
               <Image
                 src="/images/emotes/peepoclap.webp"
@@ -145,8 +145,10 @@ export function Hero() {
                 alt="peepoclap"
               />
             </h1>
-            <p className="mt-6 text-lg text-gray-300">
-              {t('hero.description')}
+            <p className="mt-6 text-lg text-gray-600">
+              By leveraging insights from the Dota 2 official API, Dotabod will
+              know exactly when to hide sensitive streamer information or engage
+              with your Twitch audience.
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
               <Link href="/dashboard">
@@ -189,51 +191,10 @@ export function Hero() {
             </div>
           </div>
         </div>
-        <div className="relative lg:col-span-7 xl:col-span-6">
-          {supporters && (
-            <>
-              <div className="flex items-center space-x-2">
-                <Image
-                  src="https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp"
-                  width={24}
-                  height={24}
-                  className="animate-bounce rounded"
-                  alt="Gigachad"
-                />
-                <h1>Gigachad supporters</h1>
-              </div>
-              <ul
-                role="list"
-                className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
-              >
-                {supporters?.map(({ name, image, link, supporter }) => {
-                  const isLast = name === 'You?'
-                  return (
-                    <TwitchUser
-                      key={name}
-                      supporter={supporter}
-                      link={link}
-                      last={isLast}
-                      session={session}
-                      name={name}
-                      onClick={(e) => {
-                        if (link === false) {
-                          e.preventDefault()
-                        }
-                      }}
-                      image={image}
-                    />
-                  )
-                })}
-              </ul>
-            </>
-          )}
-
-          <div className="relative lg:col-span-7 xl:col-span-6">
-            <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
-              <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
-              <span>Featured in over 8,000 Twitch streamers</span>
-            </div>
+        <div className="relative -mt-4 lg:col-span-7 lg:mt-0 xl:col-span-6">
+          <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-900 lg:text-left">
+            <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
+            <span>Over 10,000 Twitch streamers use Dotabod, such as:</span>
           </div>
           <ul
             role="list"
