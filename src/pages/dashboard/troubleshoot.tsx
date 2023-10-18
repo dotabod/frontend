@@ -165,7 +165,7 @@ const TroubleshootPage = () => {
                   <dt className="text-lg font-medium leading-6">
                     {faq.question}
                   </dt>
-                  <dd className="mt-2 text-base text-gray-300">{faq.answer}</dd>
+                  <dd className="mt-2 text-base ">{faq.answer}</dd>
                 </Card>
               )
           )}

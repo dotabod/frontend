@@ -6,7 +6,7 @@ export function Card({ className, ...props }: CardProps) {
   return (
     <div
       className={clsx(
-        'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
+        'rounded-lg bg-white p-5 text-sm shadow-lg transition-all',
         className
       )}
       {...props}
@@ -26,7 +26,7 @@ Card.Footer = function CardFooter({
       className={clsx('block text-sm font-medium sm:rounded-b-lg', className)}
       {...props}
     >
-      <div className="grid w-full border-t border-solid border-gray-700  pt-4"></div>
+      <div className="grid w-full border-t border-solid pt-4"></div>
       {children}
     </div>
   )

@@ -15,7 +15,7 @@ export function DisableToggle() {
     <Tooltip placement="right" title={CommandDetail.commandDisable.description}>
       <label
         htmlFor="disable-toggle"
-        className="cursor-pointer space-x-2 rounded text-xs text-gray-300"
+        className="cursor-pointer space-x-2 rounded text-xs "
       >
         <Switch
           id="disable-toggle"

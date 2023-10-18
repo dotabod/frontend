@@ -25,7 +25,7 @@ function getItem(item) {
       <Link
         {...props}
         href={item.href}
-        className="!text-gray-200"
+        className=""
         target={item.href.startsWith('http') ? '_blank' : '_self'}
       >
         {item.name}
@@ -64,7 +64,6 @@ export default function DashboardShell({
       <style global jsx>{`
         html,
         body {
-          @apply !bg-gray-800;
           scrollbar-width: thin;
           scrollbar-color: #3e4155 transparent;
         }
@@ -87,7 +86,7 @@ export default function DashboardShell({
           border-radius: 6px;
         }
       `}</style>
-      <Layout className="h-full bg-gray-800">
+      <Layout className="h-full ">
         <Sider
           breakpoint="md"
           onBreakpoint={(broken) => {
@@ -95,7 +94,7 @@ export default function DashboardShell({
             setBroken(broken)
           }}
           style={{
-            background: colorBgLayout,
+            background: 'white',
           }}
           width={250}
           className="border-r border-r-gray-500"
@@ -120,7 +119,7 @@ export default function DashboardShell({
                 )}
 
                 <button
-                  className="flex items-center text-gray-300 transition-all hover:scale-110 hover:text-gray-200"
+                  className="flex items-center  transition-all hover:scale-110"
                   onClick={() => setCollapsed(!collapsed)}
                 >
                   {collapsed ? (
@@ -136,7 +135,7 @@ export default function DashboardShell({
                 selectedKeys={[current]}
                 defaultOpenKeys={['/dashboard/features']}
                 style={{
-                  background: colorBgLayout,
+                  background: 'white',
                 }}
                 mode="inline"
                 items={navigation.map((item, i) => {
@@ -153,12 +152,10 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout
-          className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}
-        >
+        <Layout className={clsx('', broken && !collapsed && '!hidden')}>
           <Header
             className={clsx(
-              '!bg-gray-900',
+              '!bg-white',
               broken && !collapsed && '!hidden',
               'flex w-full items-center justify-between !p-8'
             )}
@@ -169,7 +166,7 @@ export default function DashboardShell({
               <UserAccountNav />
             </div>
           </Header>
-          <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
+          <Content className="min-h-full w-full space-y-6  p-8 transition-all">
             {children}
           </Content>
         </Layout>

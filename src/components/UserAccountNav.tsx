@@ -22,7 +22,6 @@ const UserButton = ({ user }: UserButtonProps) => {
     <Link href="/dashboard/features">
       <div
         className={clsx(
-          'text-gray-200',
           `outline:transparent group block h-full w-full cursor-pointer rounded-md border border-transparent px-3.5
             py-2 text-left text-sm transition-all
             `,

@@ -18,7 +18,7 @@ export default function CommandsCard({
   return (
     <Collapse bordered={false} className="!bg-transparent">
       <Collapse.Panel
-        className="!rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-sm hover:shadow-gray-500"
+        className="!rounded-lg bg-white p-5 text-sm shadow-sm transition-all hover:shadow-lg hover:shadow-gray-500"
         style={{ padding: 0 }}
         header={
           <div className="flex justify-between">

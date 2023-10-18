@@ -31,7 +31,7 @@ export default function NotablePlayersCard() {
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <div className="flex items-center">
             <Switch checked={isEnabled} onChange={updateSetting} />
-            <span className="ml-2 text-sm text-gray-300">
+            <span className="ml-2 text-sm ">
               Enable overlay under hero top bar
             </span>
           </div>
@@ -43,9 +43,7 @@ export default function NotablePlayersCard() {
               checked={showFlags}
               onChange={showFlagsUpdate}
             />
-            <span className="ml-2 text-sm text-gray-300">
-              Show country flags in overlay
-            </span>
+            <span className="ml-2 text-sm ">Show country flags in overlay</span>
           </div>
           <div
             className={clsx('flex items-center', !isEnabled && 'opacity-40')}
@@ -55,7 +53,7 @@ export default function NotablePlayersCard() {
               checked={showFlagsCmd}
               onChange={showFlagsCmdUpdate}
             />
-            <span className="ml-2 text-sm text-gray-300">
+            <span className="ml-2 text-sm ">
               Show country flags in !np twitch chat command
             </span>
           </div>

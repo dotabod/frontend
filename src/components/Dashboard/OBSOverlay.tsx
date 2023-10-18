@@ -140,7 +140,7 @@ export default function OBSOverlay() {
         <Tag className="!text-xs">Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
-      <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
+      <div className="space-y-4 px-8 pb-8 text-sm ">
         <Tabs
           items={[
             { label: 'Text instructions', key: 'text', children: <OBSText /> },

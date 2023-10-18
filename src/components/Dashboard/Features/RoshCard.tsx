@@ -35,22 +35,20 @@ export default function RoshCard() {
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <div className="flex items-center">
             <Switch checked={hasRosh} onChange={uR} />
-            <span className="ml-2 text-sm text-gray-300">Roshan timer</span>
+            <span className="ml-2 text-sm ">Roshan timer</span>
           </div>
           <div className="flex items-center">
             <Switch checked={hasAegis} onChange={uA} />
-            <span className="ml-2 text-sm text-gray-300">Aegis timer</span>
+            <span className="ml-2 text-sm ">Aegis timer</span>
           </div>
           <div className="flex items-center">
             <Switch checked={minimapXl} onChange={updateXl} />
-            <span className="ml-2 text-sm text-gray-300">
-              Use extra large minimap
-            </span>
+            <span className="ml-2 text-sm ">Use extra large minimap</span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-2 text-sm text-gray-300">
+      <div className="space-y-2 text-sm ">
         <p>
           Sadly the data does not tell us when someone dies with aegis, so the
           aegis icon will remain for the full 5 minutes.

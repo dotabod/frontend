@@ -91,10 +91,6 @@
   display: grid;
 }
 
-/* Geist UI stuff */
-.caption {
-  @apply !text-gray-300;
-}
 
 .title:not(.command) {
   @apply flex items-center justify-between;
@@ -109,15 +105,12 @@
 }
 
 .subtitle {
-  @apply mb-4 border-b border-gray-500 pb-4 !text-sm !text-gray-300;
+  @apply mb-4 border-b border-gray-500 pb-4 !text-sm;
 }
 
-.collapse {
-  @apply !border-gray-700 !shadow-none;
-}
 
 .collapse .content {
-  @apply text-sm text-gray-300;
+  @apply text-sm ;
 }
 
 @layer base {
@@ -131,7 +124,7 @@
 }
 
 .mantine-Checkbox-label {
-  @apply font-normal text-gray-300;
+  @apply font-normal ;
 }
 
 .mantine-Switch-root {
@@ -461,7 +454,3 @@ body {
   }
 }
 
-
-a:not(.ant-btn) {
-  @apply text-purple-400;
-}
