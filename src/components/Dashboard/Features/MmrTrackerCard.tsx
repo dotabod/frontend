@@ -8,11 +8,11 @@ import MmrForm from './MmrForm'
 
 export default function MmrTrackerCard() {
   const { data: isEnabled, updateSetting } = useUpdateSetting(
-    Settings['mmr-tracker']
+    Settings['mmr-tracker'],
   )
 
   const { data: onlyParty, updateSetting: updateOnlyParty } = useUpdateSetting(
-    Settings.onlyParty
+    Settings.onlyParty,
   )
 
   return (
@@ -36,11 +36,11 @@ export default function MmrTrackerCard() {
 
           <Tooltip
             placement="bottom"
-            title="Enable this to award 20 MMR instead of 30 for all matches. Disable to use 30 MMR again."
+            title="Enable this to award 20 MMR instead of 30 for all matches. Disable to use 25 MMR again."
           >
             <div
               className={clsx(
-                'mt-5 flex w-fit items-center space-x-2 transition-all'
+                'mt-5 flex w-fit items-center space-x-2 transition-all',
               )}
             >
               <div className="flex items-center space-x-2">

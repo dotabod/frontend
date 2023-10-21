@@ -38,7 +38,7 @@ const CommandDetail = {
   fixparty: {
     title: 'Fix party match',
     description:
-      "Dotabod can't detect party games right now (sadge). So if it does 30 mmr for a completed match, use !fixparty to adjust it to 20. You must type this after every party match.",
+      "Dotabod can't detect party games right now (sadge). So if it does 25 mmr for a completed match, use !fixparty to adjust it to 20. You must type this after every party match.",
     cmd: '!fixparty',
     alias: ['fixsolo'],
     allowed: 'mods',
