@@ -24,6 +24,21 @@ const featuredUsers = [
     image: '/images/hero/grubby.png',
   },
   {
+    name: 'admiralbulldog',
+    supporter: false,
+    image: '/images/hero/admiralbulldog.jpeg',
+  },
+  {
+    name: 'limitlessqt',
+    supporter: false,
+    image: '/images/hero/limitlessqt.png',
+  },
+  {
+    name: 'watsondoto',
+    supporter: false,
+    image: '/images/hero/watsondoto.jpg',
+  },
+  {
     name: 'TpaBoMaH',
     image: '/images/hero/tpabomah.png',
     supporter: false,
@@ -39,19 +54,9 @@ const featuredUsers = [
     image: '/images/hero/xcaliburye.png',
   },
   {
-    name: 'admiralbulldog',
-    supporter: false,
-    image: '/images/hero/admiralbulldog.jpeg',
-  },
-  {
     name: 'Cr1tdota',
     supporter: false,
     image: '/images/hero/crit.jpeg',
-  },
-  {
-    name: 'limitlessqt',
-    supporter: false,
-    image: '/images/hero/limitlessqt.png',
   },
   {
     name: 'canceldota',
@@ -62,11 +67,6 @@ const featuredUsers = [
     name: 'GunnarDotA2',
     supporter: false,
     image: '/images/hero/gunnar.png',
-  },
-  {
-    name: 'watsondoto',
-    supporter: false,
-    image: '/images/hero/watsondoto.jpg',
   },
   {
     name: 'iannihilate',
