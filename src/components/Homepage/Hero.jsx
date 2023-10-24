@@ -29,9 +29,9 @@ const featuredUsers = [
     supporter: false,
   },
   {
-    name: 'EternaLEnVyy',
+    name: 'leostyledota',
     supporter: false,
-    image: '/images/hero/ee.png',
+    image: '/images/hero/leostyledota.jpeg',
   },
   {
     name: 'XcaliburYe',
@@ -39,9 +39,9 @@ const featuredUsers = [
     image: '/images/hero/xcaliburye.png',
   },
   {
-    name: 'qSnake',
+    name: 'admiralbulldog',
     supporter: false,
-    image: '/images/hero/qsnake.png',
+    image: '/images/hero/admiralbulldog.jpeg',
   },
   {
     name: 'Cr1tdota',
@@ -49,9 +49,9 @@ const featuredUsers = [
     image: '/images/hero/crit.jpeg',
   },
   {
-    name: 'BananaSlamJamma',
+    name: 'limitlessqt',
     supporter: false,
-    image: '/images/hero/bsj.png',
+    image: '/images/hero/limitlessqt.png',
   },
   {
     name: 'canceldota',
@@ -64,14 +64,14 @@ const featuredUsers = [
     image: '/images/hero/gunnar.png',
   },
   {
-    name: 'sheevergaming',
+    name: 'watsondoto',
     supporter: false,
-    image: '/images/hero/sheever.png',
+    image: '/images/hero/watsondoto.jpg',
   },
   {
-    name: 'ODPixel',
+    name: 'iannihilate',
     supporter: false,
-    image: '/images/hero/od.png',
+    image: '/images/hero/iannihilate.jpeg',
   },
   {
     link: false,
