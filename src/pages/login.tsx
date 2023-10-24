@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { App } from 'antd'
+import * as Sentry from '@sentry/nextjs'
 
 export default function Login() {
   const { status } = useSession()
@@ -13,16 +14,24 @@ export default function Login() {
   const router = useRouter()
 
   const showError = () => {
+    Sentry.captureMessage('Login error', {
+      tags: {
+        page: 'login',
+      },
+    })
+
     message.error({
       key: 'login-error',
       duration: 50000,
       content: (
         <span>
-          Oops. Unable to log you in. Reach out to us on{' '}
+          Oops. Unable to log you in. This usually happens if you already have
+          an account on Dotabod under the same email. Try to change your email
+          on twitch.tv to something new and login again. Reach out to us on{' '}
           <a href="https://discord.dotabod.com" target="_blank">
             Discord
           </a>{' '}
-          to get help.
+          for more help.
         </span>
       ),
     })
