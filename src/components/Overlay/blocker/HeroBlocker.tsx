@@ -8,6 +8,7 @@ export function HeroBlocker({ teamName, type }) {
 
   return (
     <Image
+      id={`hero-blocker-${type}`}
       priority
       unoptimized
       alt={`${type} blocker`}

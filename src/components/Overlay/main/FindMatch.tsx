@@ -8,6 +8,7 @@ export const FindMatch = () => {
   return (
     <>
       <span
+        id="find-match-main-menu-1"
         style={{
           fontSize: res({ w: 14 }),
           height: res({ h: 24 }),
@@ -21,6 +22,7 @@ export const FindMatch = () => {
       </span>
 
       <span
+        id="find-match-main-menu-2"
         style={{
           fontSize: res({ w: 14 }),
           height: res({ h: 24 }),
@@ -36,6 +38,7 @@ export const FindMatch = () => {
       <motion.div
         key="queue-blocker-class"
         {...motionProps}
+        id="find-match-queue-blocker-main"
         style={{
           bottom: res({ h: 0 }), // correct is n
           right: res({ w: 0 }), // correct is 50
@@ -43,6 +46,7 @@ export const FindMatch = () => {
         className="absolute"
       >
         <div
+          id="find-match-queue-blocker"
           style={{
             width: res({ w: 330 }),
             height: res({ h: 49 }),
@@ -62,6 +66,7 @@ export const FindMatch = () => {
         </div>
 
         <img
+          id="find-match-queue-blocker-bg"
           width={res({ w: 850 })}
           height={res({ h: 355 })}
           src="/images/overlay/finding-match.png"

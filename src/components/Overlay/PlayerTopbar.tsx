@@ -19,6 +19,7 @@ export const PlayerTopbar = ({
     <motion.div
       key={`topbar-for-player-${position}`}
       {...motionProps}
+      id={`topbar-for-player-${position}`}
       style={{
         top: res({ h: 65 }),
         width: res({ w: 62 }),

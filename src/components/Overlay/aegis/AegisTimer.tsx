@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
 
 export const AegisTimer = ({ minutes, seconds, res }) => (
-  <div className="flex flex-col items-center">
+  <div className="flex flex-col items-center" id="aegis-timer">
     <Image
       className="animate-pulse rounded-full"
       src="/images/rosh/aegis-icon-glow.png"

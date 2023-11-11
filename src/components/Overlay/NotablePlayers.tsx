@@ -35,7 +35,7 @@ export const NotablePlayers = ({
   }
 
   return (
-    <div>
+    <div id="notable-players">
       {(players || []).map((player, i) => {
         const FlagComp = player.country_code
           ? Flags[`${player.country_code.toUpperCase()}Flag`]

@@ -37,7 +37,11 @@ export const PickScreenOverlays = ({
 
   return (
     <>
-      <div style={styles} className={clsx('absolute ')}>
+      <div
+        style={styles}
+        className={clsx('absolute ')}
+        id="picks-blocker-parent"
+      >
         <div
           className={clsx(
             'flex h-full w-full items-end justify-end bg-slate-800/50 backdrop-blur-lg backdrop-filter',

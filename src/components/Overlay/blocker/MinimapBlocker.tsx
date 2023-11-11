@@ -17,6 +17,7 @@ export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
 
   return (
     <Image
+      id="minimap-blocker"
       unoptimized
       priority
       alt="minimap blocker"

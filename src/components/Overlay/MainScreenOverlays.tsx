@@ -22,6 +22,7 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
           width: width,
           top: 0,
         }}
+        id="main-screen-overlay"
         className="absolute"
       >
         <div

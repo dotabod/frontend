@@ -22,6 +22,7 @@ export const AnimatedRankBadge = ({
       key="animated-rank-badge"
       {...motionProps}
       className={className}
+      id="rank-badge-motion"
     >
       <MMRBadge
         leaderboard={showRankLeader ? rank?.leaderboard : null}

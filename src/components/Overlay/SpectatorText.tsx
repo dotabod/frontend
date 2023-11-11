@@ -35,6 +35,7 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
       key="spectator-text"
       {...motionProps}
       className="absolute"
+      id="spectator-text"
       style={styles}
     >
       <Card

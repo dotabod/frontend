@@ -21,6 +21,7 @@ const WinLossCard = ({ mainScreen = false, wl, ...props }: WLType) => {
         'rounded-r-none',
         mainScreen && 'bg-transparent p-0 leading-none text-[#e4d98d]'
       )}
+      id="win-loss-card"
       {...props}
     >
       {wl.map(({ win, lose, type }) => (

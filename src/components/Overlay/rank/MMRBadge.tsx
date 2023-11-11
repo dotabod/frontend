@@ -15,6 +15,7 @@ export const Numbers = ({
   const fontSize = res({ h: 18 })
   return (
     <div
+      id="rank-numbers"
       style={{ fontSize }}
       className={clsx(className, 'flex flex-col items-center')}
       {...props}
@@ -68,8 +69,17 @@ export const MMRBadge = ({
   }
 
   return (
-    <Card {...props} className={clsx(className, 'rounded-bl-none')}>
-      <Badge width={res({ w: 82 })} height={res({ h: 75 })} image={image} />
+    <Card
+      {...props}
+      className={clsx(className, 'rounded-bl-none')}
+      id="rank-card"
+    >
+      <Badge
+        width={res({ w: 82 })}
+        height={res({ h: 75 })}
+        image={image}
+        id="rank-badge"
+      />
       <Numbers
         hasImage={!!image}
         rank={rank}

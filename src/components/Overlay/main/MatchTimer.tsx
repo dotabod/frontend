@@ -33,6 +33,7 @@ export const MatchTimer = ({ res }) => {
         bottom: res({ h: 73 }), // correct is n
         right: res({ w: 55 }), // correct is 50
       }}
+      id="match-timer"
       className="match-timer absolute"
     >
       <div className="flex text-center">

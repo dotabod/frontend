@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
 
 export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }) => (
-  <div className="flex flex-col items-center">
+  <div className="flex flex-col items-center" id="rosh-timer">
     {roshanCount > 0 ? (
       <div
         className="absolute z-40 flex items-center justify-center rounded-full border border-slate-500 bg-black/60 text-white/90 shadow"
