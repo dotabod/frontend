@@ -51,12 +51,11 @@ const App = ({
               itemHoverColor: 'var(--color-purple-300)',
             },
             Menu: {
-              colorSubItemBg: 'var(--color-gray-800)',
-              colorItemBgHover: 'var(--color-gray-700)',
-              colorItemBgSelected: 'var(--color-gray-600)',
-              colorItemTextSelected: 'var(--color-gray-200)',
-              colorItemText: 'var(--color-gray-300)',
-
+              subMenuItemBg: 'var(--color-gray-800)',
+              itemHoverBg: 'var(--color-gray-700)',
+              itemSelectedBg: 'var(--color-gray-600)',
+              itemSelectedColor: 'var(--color-gray-200)',
+              itemColor: 'var(--color-gray-300)',
             },
             Switch: {
               colorPrimary: 'var(--color-purple-900)',

@@ -16,6 +16,7 @@ const moduleExports = {
 
   images: {
     domains: [
+      'lh3.googleusercontent.com',
       'avatars.steamstatic.com',
       'static-cdn.jtvnw.net',
       'i.imgur.com',

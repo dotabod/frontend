@@ -23,7 +23,7 @@ function AnimatedNumber({ from, to }) {
           ref.current.textContent = latest.toFixed(0)
         }
       }),
-    [springValue]
+    [springValue],
   )
 
   return <span ref={ref} />
@@ -119,12 +119,16 @@ export const PollOverlay = ({
   const [emotes, setEmotes] = useState([])
   const { data } = useGetSettings()
 
+  const twitchId = Number(
+    data?.accounts?.find((p) => p.provider === 'twitch')?.providerAccountId,
+  )
+
   useEffect(() => {
-    if (!data?.Account?.providerAccountId) return
+    if (!twitchId) return
 
     const emoteFetcher = new TwitchFetcher()
     emoteFetcher
-      .getEmotesByID(data?.Account?.providerAccountId, {
+      .getEmotesByID(twitchId, {
         ffz: true,
         '7tv': true,
         bttv: true,
@@ -133,7 +137,7 @@ export const PollOverlay = ({
       .catch((e) => {
         //
       })
-  }, [data?.Account?.providerAccountId])
+  }, [twitchId])
 
   const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
   const choicesWithPercent = choices.map((choice) => {

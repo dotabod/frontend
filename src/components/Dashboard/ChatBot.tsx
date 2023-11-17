@@ -106,7 +106,7 @@ export default function ChatBot() {
                   window.open(
                     `https://www.twitch.tv/popout/${session.data.user.name}/chat`,
                     'mywindow',
-                    'menubar=1,resizable=1,width=350,height=250'
+                    'menubar=1,resizable=1,width=350,height=250',
                   )
                 }}
               >
@@ -195,7 +195,7 @@ export default function ChatBot() {
                           <Image
                             className={clsx(
                               !added && 'grayscale group-hover:grayscale-0',
-                              'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
+                              'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
                             )}
                             height={50}
                             width={50}

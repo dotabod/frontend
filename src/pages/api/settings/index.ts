@@ -29,9 +29,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             },
           },
           beta_tester: true,
-          Account: {
+          accounts: {
             select: {
               providerAccountId: true,
+              provider: true,
             },
           },
           SteamAccount: {

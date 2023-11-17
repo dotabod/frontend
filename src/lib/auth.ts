@@ -1,11 +1,13 @@
 import TwitchProvider from 'next-auth/providers/twitch'
+import GoogleProvider from 'next-auth/providers/google'
 import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/db'
+import fetchLiveChatId from './fetchYouTubeData'
 
 // Do not delete this declaration
-const chatBotScopes = [
+const chatBotTwitchScopes = [
   'channel:moderate',
   'chat:edit',
   'chat:read',
@@ -14,7 +16,7 @@ const chatBotScopes = [
   'moderator:manage:chat_messages',
 ].join(' ')
 
-const defaultScopes = [
+const defaultTwitchScopes = [
   'openid',
   'user:read:email',
   'channel:manage:predictions',
@@ -32,6 +34,19 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   providers: [
+    GoogleProvider({
+      clientId: process.env.YOUTUBE_CLIENT_ID,
+      clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope:
+            'openid email profile https://www.googleapis.com/auth/youtube.readonly',
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
+    }),
     TwitchProvider({
       allowDangerousEmailAccountLinking: true,
       clientId: process.env.TWITCH_CLIENT_ID,
@@ -40,7 +55,7 @@ export const authOptions: NextAuthOptions = {
         params: {
           // when logging in with the chatbot, append the chatbot scopes
           // scope: `${defaultScopes} ${chatBotScopes}`,
-          scope: defaultScopes,
+          scope: defaultTwitchScopes,
         },
       },
     }),
@@ -84,17 +99,16 @@ export const authOptions: NextAuthOptions = {
           id: token.id || user.id || profile.sub,
         },
         select: {
-          Account: {
+          accounts: {
             select: {
               requires_refresh: true,
               providerAccountId: true,
+              provider: true,
             },
           },
           locale: true,
         },
       })
-
-      const twitchId = Number(provider.Account.providerAccountId)
 
       // The dotabod user shouldn't update because
       // it has specific scopes that we don't want to overwrite
@@ -103,18 +117,40 @@ export const authOptions: NextAuthOptions = {
         (newUser.displayName || newUser.name) === 'dotabod' ||
         (newUser.displayName || newUser.name) === 'dotabod_test'
       if (account && !isDotabod) {
+        if (!user.youtube && account.provider === 'google') {
+          // save their broadcast id for youtube live
+          fetchLiveChatId(account.access_token, account.refresh_token)
+            .then(async (liveChatId) => {
+              if (liveChatId) {
+                console.log('Live Chat ID:', liveChatId)
+                await prisma.user.update({
+                  where: {
+                    id: user.id,
+                  },
+                  data: {
+                    youtube: liveChatId,
+                  },
+                })
+              } else {
+                console.log('No active live broadcasts found.')
+              }
+            })
+            .catch((error) => {
+              console.error('Error fetching Live Chat ID:', error)
+            })
+        }
+
         // Refresh jwt account with potentially new scopes
         const newData = {
           refresh_token: account.refresh_token,
           access_token: account.access_token,
           expires_at: account.expires_at,
           scope: account.scope,
-          requires_refresh: provider.Account.requires_refresh,
-        }
 
-        // Set requires_refresh to false if the user is logging in
-        // Because this new token will be the fresh one we needed
-        newData.requires_refresh = false
+          // Set requires_refresh to false if the user is logging in
+          // Because this new token will be the fresh one we needed
+          requires_refresh: false,
+        }
 
         await prisma.account.update({
           where: {
@@ -127,9 +163,14 @@ export const authOptions: NextAuthOptions = {
         })
       }
 
+      const twitchId = Number(
+        provider.accounts.find((p) => p.provider === 'twitch')
+          ?.providerAccountId,
+      )
+
       return {
         locale: provider.locale,
-        twitchId: twitchId,
+        twitchId,
         id: user.id,
         name: newUser.displayName || newUser.name,
         email: newUser.email,

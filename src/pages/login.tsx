@@ -1,12 +1,12 @@
 import Head from 'next/head'
 
 import { AuthLayout } from '@/components/Homepage/AuthLayout'
-import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { App } from 'antd'
 import * as Sentry from '@sentry/nextjs'
+import { LoginButton } from '@/components/Homepage/LoginButton'
 
 export default function Login() {
   const { status } = useSession()
@@ -63,7 +63,7 @@ export default function Login() {
         title="Sign in"
         subtitle="You can begin using Dotabod right away!"
       >
-        <UserAuthForm />
+        <LoginButton block size="large" />
       </AuthLayout>
     </>
   )

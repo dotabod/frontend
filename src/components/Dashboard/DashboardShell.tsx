@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { navigation } from '@/components/Dashboard/navigation'
 import clsx from 'clsx'
-import { UserAccountNav } from '@/components/UserAccountNav'
+import UserAccountNav from '@/components/UserAccountNav'
 import { DarkLogo } from '@/components/Logo'
 import { Layout, Menu, MenuProps, theme } from 'antd'
 import {
@@ -110,7 +110,7 @@ export default function DashboardShell({
               <div
                 className={clsx(
                   collapsed ? 'justify-center' : 'justify-between',
-                  'm-auto mb-4 flex h-12 w-full px-4 pt-4'
+                  'm-auto mb-4 flex h-12 w-full px-4 pt-4',
                 )}
               >
                 {!collapsed && (
@@ -160,7 +160,7 @@ export default function DashboardShell({
             className={clsx(
               '!bg-gray-900',
               broken && !collapsed && '!hidden',
-              'flex w-full items-center justify-between !p-8'
+              'flex w-full items-center justify-between !p-8',
             )}
           >
             <DisableToggle />

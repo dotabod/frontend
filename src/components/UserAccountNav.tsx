@@ -3,18 +3,13 @@ import { signOut, useSession } from 'next-auth/react'
 import { Dropdown, Space } from 'antd'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { Session } from 'next-auth'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
 import Image from 'next/image'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 
-interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
-  user: Session['user']
-  icon?: React.ReactNode
-}
-
-const UserButton = ({ user }: UserButtonProps) => {
+const UserAccountNav = () => {
+  const user = useSession()?.data?.user
   const { data } = useSWR('/api/settings', fetcher)
   const isLive = data?.stream_online
 
@@ -25,7 +20,7 @@ const UserButton = ({ user }: UserButtonProps) => {
           'text-gray-200',
           `outline:transparent group block h-full w-full cursor-pointer rounded-md border border-transparent px-3.5
             py-2 text-left text-sm transition-all
-            `
+            `,
         )}
       >
         <div className="flex h-full w-full items-center justify-between space-x-4">
@@ -54,15 +49,18 @@ const UserButton = ({ user }: UserButtonProps) => {
                   Offline
                 </span>
               )}
-              <Image
-                width={40}
-                height={40}
-                alt="User Avatar"
-                src={user?.image}
-                className={clsx(
-                  isLive && 'rounded-full border-2 border-solid border-red-500'
-                )}
-              />
+              {user?.image && (
+                <Image
+                  width={40}
+                  height={40}
+                  alt="User Avatar"
+                  src={user?.image}
+                  className={clsx(
+                    isLive &&
+                      'rounded-full border-2 border-solid border-red-500',
+                  )}
+                />
+              )}
               <ChevronDownIcon className="h-4 w-4" />
             </Space>
           </Dropdown>
@@ -71,11 +69,4 @@ const UserButton = ({ user }: UserButtonProps) => {
     </Link>
   )
 }
-
-UserButton.displayName = 'UserButton'
-
-export function UserAccountNav() {
-  const user = useSession()?.data?.user
-
-  return <UserButton user={user} />
-}
+export default UserAccountNav

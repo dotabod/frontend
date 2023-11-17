@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Account {
-  id                   String    @id @default(cuid())
+  id                   String    @id @default(dbgenerated("gen_random_uuid()"))
   userId               String    @unique
   type                 String
   provider             String
@@ -24,16 +24,36 @@ model Account {
   updatedAt            DateTime  @default(now()) @map("updated_at")
   obtainment_timestamp DateTime? @db.Timestamptz(6)
   expires_in           Int?
-  requires_refresh     Boolean?
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  requires_refresh     Boolean?  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
 
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
 model User {
-  id                                String         @id @default(cuid())
-  displayName                       String?        @unique(map: "users_name_key")
+  id                                String         @id @default(dbgenerated("gen_random_uuid()"))
+  displayName                       String?
   email                             String?        @unique
   image                             String?
   createdAt                         DateTime       @default(now()) @map("created_at")
@@ -42,13 +62,16 @@ model User {
   steam32Id                         Int?
   followers                         Int?
   stream_delay                      Int?           @default(0) @db.SmallInt
-  name                              String         @unique(map: "users_username_key") @default("")
+  name                              String?
   emailVerified                     DateTime?
   stream_online                     Boolean        @default(false)
   stream_start_date                 DateTime?      @db.Timestamp(6)
   beta_tester                       Boolean        @default(false)
   locale                            String         @default("en")
-  Account                           Account?
+  kick                              BigInt?        @unique
+  youtube                           String?        @unique
+  accounts                          Account[]
+  sessions                          Session[]
   Bet                               Bet[]
   mods_mods_mod_user_idTousers      mods[]         @relation("mods_mod_user_idTousers")
   mods_mods_streamer_user_idTousers mods[]         @relation("mods_streamer_user_idTousers")
@@ -60,20 +83,20 @@ model User {
 }
 
 model Setting {
-  id        String   @id @default(cuid())
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
   key       String
   value     Json?
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([key, userId])
   @@map("settings")
 }
 
 model SteamAccount {
-  id               String   @id @default(cuid())
+  id               String   @id @default(dbgenerated("gen_random_uuid()"))
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @default(now()) @map("updated_at")
   steam32Id        Int      @unique
@@ -88,7 +111,7 @@ model SteamAccount {
 }
 
 model Bet {
-  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @map("updated_at")
   matchId       String
@@ -105,7 +128,7 @@ model Bet {
   dire_score    Int?     @db.SmallInt
   kda           Json?
   hero_name     String?
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([matchId, userId])
   @@map("bets")
