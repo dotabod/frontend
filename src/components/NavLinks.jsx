@@ -9,10 +9,16 @@ import { Tooltip } from 'antd'
 export function NavLinks({ bottom = false }) {
   let [hoveredIndex, setHoveredIndex] = useState(null)
 
+  const additional = []
+  if (bottom) {additional.push(
+    ['Privacy Policy', '/privacy-policy'],
+  )}
+
   return [
     ['Features', '#features'],
     ['Pricing', '#pricing'],
     ['FAQs', '#faqs'],
+    ...additional,
     ['Github', 'https://github.com/dotabod', GithubSvg, 'Github'],
     ['Twitter', 'https://twitter.com/dotabod_', TwitterSvg, 'Twitter'],
     ['Discord', 'https://discord.dotabod.com', DiscordSvg, 'Discord'],

@@ -4,7 +4,6 @@ import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import { NavLinks } from 'src/components/NavLinks'
 import { QrCodeBorder } from './QrCodeBorder'
-import Image from 'next/image'
 
 export function Footer() {
   return (
@@ -43,28 +42,6 @@ export function Footer() {
             </div>
           </div>
         </div>
-
-        <div className="flex flex-col items-center border-t border-gray-500 pt-8 md:flex-row-reverse md:justify-between md:pt-6">
-          <p className="mt-6 text-xs text-gray-500 md:mt-0">
-            DOTA is a trademark of Valve Corporation and used under license. By
-            making use of the term &quot;DOTA&quot; in any content posted on any
-            Dotabod website, you agree that use of this trademark is subject to
-            Valve&apos;s trademark guidelines found at
-            https://store.steampowered.com/legal.
-          </p>
-        </div>
-        <Link
-          target="_blank"
-          href="https://vercel.com/?utm_source=ketodevs&utm_campaign=oss"
-        >
-          <Image
-            className="pb-8"
-            src="/images/vercel.svg"
-            alt="Vercel Logo"
-            width={132}
-            height={26}
-          />
-        </Link>
       </Container>
     </footer>
   )
