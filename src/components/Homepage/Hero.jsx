@@ -14,9 +14,19 @@ import { useTranslation } from 'next-i18next'
 
 const featuredUsers = [
   {
+    name: 'Arteezy',
+    supporter: false,
+    image: '/images/hero/arteezy.png',
+  },
+  {
     name: 'Gorgc',
     supporter: false,
     image: '/images/hero/gorgc.jpeg',
+  },
+  {
+    name: 'qojqva',
+    supporter: false,
+    image: '/images/hero/qojqva.jpeg',
   },
   {
     name: 'Grubby',
@@ -24,9 +34,9 @@ const featuredUsers = [
     image: '/images/hero/grubby.png',
   },
   {
-    name: 'admiralbulldog',
+    name: 'watsondoto',
     supporter: false,
-    image: '/images/hero/admiralbulldog.jpeg',
+    image: '/images/hero/watsondoto.jpg',
   },
   {
     name: 'limitlessqt',
@@ -34,9 +44,9 @@ const featuredUsers = [
     image: '/images/hero/limitlessqt.png',
   },
   {
-    name: 'watsondoto',
+    name: 'admiralbulldog',
     supporter: false,
-    image: '/images/hero/watsondoto.jpg',
+    image: '/images/hero/admiralbulldog.jpeg',
   },
   {
     name: 'TpaBoMaH',
@@ -67,11 +77,6 @@ const featuredUsers = [
     name: 'GunnarDotA2',
     supporter: false,
     image: '/images/hero/gunnar.png',
-  },
-  {
-    name: 'iannihilate',
-    supporter: false,
-    image: '/images/hero/iannihilate.jpeg',
   },
   {
     link: false,
@@ -232,7 +237,7 @@ export function Hero() {
           <div className="relative lg:col-span-7 xl:col-span-6">
             <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
               <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
-              <span>Featured in over 10,000 Twitch streamers</span>
+              <span>Featured in over 12,000 Twitch streamers</span>
             </div>
           </div>
           <ul
