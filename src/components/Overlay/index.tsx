@@ -54,7 +54,7 @@ const OverlayPage = (props) => {
       type: 'U',
     },
   ])
-  const [radiantWinChance, setRadiantWinChance] = useState({})
+  const [radiantWinChance, setRadiantWinChance] = useState(null)
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
