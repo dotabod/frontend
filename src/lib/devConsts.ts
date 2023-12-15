@@ -43,4 +43,5 @@ export const devWL = [
 export const devRadiantWinChance = {
   value: 45,
   time: 256,
+  visible: true,
 }

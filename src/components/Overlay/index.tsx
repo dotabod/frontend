@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { devRadiantWinChance, isDev } from '@/lib/devConsts'
-import { useSocket } from '@/lib/hooks/useSocket'
+import {useSocket, WinChance} from '@/lib/hooks/useSocket'
 import { useOBS } from '@/lib/hooks/useOBS'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
@@ -54,7 +54,7 @@ const OverlayPage = (props) => {
       type: 'U',
     },
   ])
-  const [radiantWinChance, setRadiantWinChance] = useState(null)
+  const [radiantWinChance, setRadiantWinChance] = useState<WinChance>(null)
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -219,6 +219,7 @@ const OverlayPage = (props) => {
           aegis={aegis}
           notablePlayers={notablePlayers}
           radiantWinChance={radiantWinChance}
+          setRadiantWinChance={setRadiantWinChance}
         />
 
         {isDev && (

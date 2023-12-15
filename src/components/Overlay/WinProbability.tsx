@@ -12,9 +12,11 @@ const BAR_HEIGHT_SIZE = 5
 const SEPARATOR_SIZE = 30
 const ANIMATION = '2s ease-in-out'
 
-const Bar = styled.div`
+const Bar = styled.div<any>`
+  opacity: ${(props) => (props.visible ? '1' : '0')};
   position: absolute;
-  top: 200px;
+  top: ${(props) => (props.visible ? '200' : '0')}px;
+  transition: top 0.2s ease-out;
   left: 0;
   right: 0;
   margin-left: auto;
@@ -117,23 +119,37 @@ const FillDire = styled.div<any>`
 `
 
 const UpperText = styled.div<any>`
+  display: flex;
+  flex-direction: column;
   position: absolute;
   text-align: center;
   left: ${(props) => Math.min(props.pos, 98)}%;
-  font-family: sans-serif Calibri;
   white-space: nowrap;
   transform: translateX(-50%);
   bottom: 10px;
   text-shadow: 1px 1px 1px #000;
   color: #cecece;
   transition: left ${ANIMATION};
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 `
+
+const TitleText = styled.span`
+  font-size: 1rem;
+  color: #fff881;
+`
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
 
 export const WinProbability = ({
   radiantWinChance,
+  setRadiantWinChance,
 }: {
   radiantWinChance: WinChance
+  setRadiantWinChance: any
 }) => {
   const { data: isEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
 
@@ -143,11 +159,12 @@ export const WinProbability = ({
 
   return (
     <div id="win-probability">
-      <Bar>
+      <Bar visible={radiantWinChance.visible}>
         <UpperText pos={radiantWinChance.value}>
-          {SecondsToDuration(radiantWinChance.time)} <ClockCircleOutlined />
-          <br />
-          WIN PROBABILITY
+          <span>
+            {SecondsToDuration(radiantWinChance.time)} <ClockCircleOutlined />
+          </span>
+          <TitleText>WIN PROBABILITY</TitleText>
         </UpperText>
         <BarFill>
           <FillRadiant width={radiantWinChance.value}>

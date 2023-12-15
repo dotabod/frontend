@@ -31,6 +31,7 @@ export let socket: Socket | null = null
 export type WinChance = {
   value: number
   time: number
+  visible: boolean
 }
 
 type wlType = {
@@ -198,7 +199,11 @@ export const useSocket = ({
 
     socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
       if (isDev) return
-      setRadiantWinChance(chanceDetails)
+      // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
+      if (!chanceDetails) {
+        return setRadiantWinChance((prev) => ({ ...prev, visible: false }))
+      }
+      setRadiantWinChance({...chanceDetails, visible: true})
     })
 
     socket.on('refresh', () => {
