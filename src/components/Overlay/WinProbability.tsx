@@ -1,11 +1,11 @@
 import React from 'react'
-import {Logomark} from 'src/components/Logo'
+import { Logomark } from 'src/components/Logo'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import styled from 'styled-components'
 import { WinChance } from '@/lib/hooks/useSocket'
 import { SecondsToDuration } from '@/ui/utils'
-import {ClockCircleOutlined} from "@ant-design/icons";
+import { ClockCircleOutlined } from '@ant-design/icons'
 
 const BAR_SIZE = 850
 const BAR_HEIGHT_SIZE = 5
@@ -137,7 +137,7 @@ export const WinProbability = ({
 }) => {
   const { data: isEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
 
-  if (!isEnabled) {
+  if (!isEnabled || !radiantWinChance) {
     return null
   }
 
@@ -151,7 +151,9 @@ export const WinProbability = ({
         </UpperText>
         <BarFill>
           <FillRadiant width={radiantWinChance.value}>
-            <AnimatedNumRadiant value={radiantWinChance.value}>%</AnimatedNumRadiant>
+            <AnimatedNumRadiant value={radiantWinChance.value}>
+              %
+            </AnimatedNumRadiant>
           </FillRadiant>
           <FillDire width={100 - radiantWinChance.value}>
             <AnimatedNumDire value={100 - radiantWinChance.value}>
