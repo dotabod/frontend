@@ -104,6 +104,8 @@ export const defaultSettings = {
   notablePlayersOverlay: true,
   notablePlayersOverlayFlags: true,
   notablePlayersOverlayFlagsCmd: true,
+  winProbabilityOverlay: true,
+  winProbabilityOverlayIntervalMinutes: 10,
   tellChatNewMMR: true,
   tellChatBets: true,
   queueBlocker: false,
@@ -111,5 +113,5 @@ export const defaultSettings = {
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
 Object.keys(defaultSettings).forEach((key) => {
-  Settings[key as SettingKeys] = key as SettingKeys
+    Settings[key as SettingKeys] = key as SettingKeys
 })

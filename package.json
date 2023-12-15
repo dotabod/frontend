@@ -58,6 +58,7 @@
     "redux-socket.io-middleware": "^1.0.4",
     "retry": "^0.13.1",
     "socket.io-client": "^4.7.2",
+    "styled-components": "^6.1.1",
     "swr": "^2.2.4",
     "tailwindcss": "^3.3.5",
     "tmi-emote-parse": "^2.0.0",

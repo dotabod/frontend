@@ -9,6 +9,7 @@ import { clsx } from 'clsx'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
+import { WinProbability } from '@/components/Overlay/WinProbability'
 import { MinimapBlocker } from './blocker/MinimapBlocker'
 
 export const InGameOverlays = ({
@@ -21,6 +22,7 @@ export const InGameOverlays = ({
   setAegis,
   aegis,
   notablePlayers,
+  radiantWinChance,
 }) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
@@ -65,12 +67,14 @@ export const InGameOverlays = ({
         block={block}
       />
 
+      <WinProbability radiantWinChance={radiantWinChance} />
+
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 
       <div
         className={clsx(
           'absolute flex items-end justify-end',
-          isRight && '!justify-start'
+          isRight && '!justify-start',
         )}
         style={{ ...wlPosition, width: res({ w: 215 }) }}
       >

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
-import { isDev } from '@/lib/devConsts'
+import { devRadiantWinChance, isDev } from '@/lib/devConsts'
 import { useSocket } from '@/lib/hooks/useSocket'
 import { useOBS } from '@/lib/hooks/useOBS'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
@@ -54,6 +54,7 @@ const OverlayPage = (props) => {
       type: 'U',
     },
   ])
+  const [radiantWinChance, setRadiantWinChance] = useState({})
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -74,6 +75,7 @@ const OverlayPage = (props) => {
     setPollData(devPoll)
     setBlock(devBlockTypes)
     setRankImageDetails(devRank)
+    setRadiantWinChance(devRadiantWinChance)
   }, [isDev])
 
   useSocket({
@@ -87,6 +89,7 @@ const OverlayPage = (props) => {
     setBetData,
     setNotablePlayers,
     setWL,
+    setRadiantWinChance,
   })
 
   useOBS({ block, connected })
@@ -160,7 +163,7 @@ const OverlayPage = (props) => {
           <div
             className={clsx(
               'hidden',
-              isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
+              isInIframe && rankImageDetails?.notLoaded ? '!block' : '',
             )}
           >
             <Center style={{ height }}>
@@ -215,6 +218,7 @@ const OverlayPage = (props) => {
           setAegis={setAegis}
           aegis={aegis}
           notablePlayers={notablePlayers}
+          radiantWinChance={radiantWinChance}
         />
 
         {isDev && (
