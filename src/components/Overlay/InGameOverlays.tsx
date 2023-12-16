@@ -23,7 +23,6 @@ export const InGameOverlays = ({
   aegis,
   notablePlayers,
   radiantWinChance,
-  setRadiantWinChance,
 }) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
@@ -68,7 +67,7 @@ export const InGameOverlays = ({
         block={block}
       />
 
-      <WinProbability radiantWinChance={radiantWinChance} setRadiantWinChance={setRadiantWinChance} />
+      <WinProbability radiantWinChance={radiantWinChance} />
 
       <MinimapBlocker block={block} key="minimap-blocker-class" />
 

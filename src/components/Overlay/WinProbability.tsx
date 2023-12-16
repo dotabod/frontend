@@ -16,7 +16,7 @@ const Bar = styled.div<any>`
   opacity: ${(props) => (props.visible ? '1' : '0')};
   position: absolute;
   top: ${(props) => (props.visible ? '200' : '0')}px;
-  transition: top 0.2s ease-out;
+  transition: top 0.2s ease-out, opacity 0.2s ease;
   left: 0;
   right: 0;
   margin-left: auto;
@@ -51,6 +51,7 @@ const AnimatedNumRadiant = styled.span<any>`
   margin-top: 15px;
   position: relative;
   font-size: 1rem;
+  text-shadow: 2px 2px 2px #000;
   z-index: 5;
 
   @property --radiant {
@@ -73,6 +74,7 @@ const AnimatedNumDire = styled.span<any>`
   margin-top: 15px;
   position: relative;
   font-size: 1rem;
+  text-shadow: 2px 2px 2px #000;
   z-index: 5;
 
   @property --dire {
@@ -127,8 +129,8 @@ const UpperText = styled.div<any>`
   white-space: nowrap;
   transform: translateX(-50%);
   bottom: 10px;
-  text-shadow: 1px 1px 1px #000;
-  color: #cecece;
+  text-shadow: 2px 2px 2px #000;
+  color: #ececec;
   transition: left ${ANIMATION};
   font-size: 0.85rem;
 `
@@ -162,7 +164,7 @@ export const WinProbability = ({
       <Bar visible={radiantWinChance.visible}>
         <UpperText pos={radiantWinChance.value}>
           <span>
-            {SecondsToDuration(radiantWinChance.time)} <ClockCircleOutlined />
+            <ClockCircleOutlined /> {SecondsToDuration(radiantWinChance.time)}
           </span>
           <TitleText>WIN PROBABILITY</TitleText>
         </UpperText>
