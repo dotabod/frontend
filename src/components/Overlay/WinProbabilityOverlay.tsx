@@ -21,8 +21,8 @@ export default function WinProbabilityOverlay() {
         Dotabod can display the current win percent chance.
       </div>
       <div>
-        Chatters can use their native Twitch channel points to bet on whether
-        you win or lose a match.
+        For top 100 immortal games, Dotabod can display the current win percent
+        chance.
       </div>
       <div className="mt-5 flex items-center space-x-2">
         <Switch loading={l2} onChange={updateWinProb} checked={showWinProb} />
