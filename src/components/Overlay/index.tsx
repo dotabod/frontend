@@ -94,9 +94,6 @@ const OverlayPage = (props) => {
 
   useOBS({ block, connected })
 
-  const { original } = useUpdateSetting()
-  const isLive = original?.stream_online
-
   if (isDotabodDisabled) {
     return isDev ? (
       <>
@@ -118,33 +115,6 @@ const OverlayPage = (props) => {
         />
       </>
     ) : null
-  }
-
-  // remove for now, !isLive
-  if (false) {
-    return (
-      <>
-        <motion.div
-          className={clsx('absolute right-0 mt-9 block max-w-xs')}
-          key="not-live"
-          {...motionProps}
-        >
-          <Alert message="Dotabod is disabled when stream is offline. Not offline? Type !online in chat" />
-        </motion.div>
-
-        {isDev && (
-          <Image
-            key="dev-image"
-            width={width}
-            height={height}
-            alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${
-              block.type === 'spectator' ? 'playing' : block.type
-            }.png`}
-          />
-        )}
-      </>
-    )
   }
 
   return (
@@ -190,6 +160,7 @@ const OverlayPage = (props) => {
           setBetData={setBetData}
           setPollData={setPollData}
           betData={betData}
+          radiantWinChance={radiantWinChance}
           key="poll-overlays"
         />
 
@@ -218,7 +189,6 @@ const OverlayPage = (props) => {
           setAegis={setAegis}
           aegis={aegis}
           notablePlayers={notablePlayers}
-          radiantWinChance={radiantWinChance}
         />
 
         {isDev && (

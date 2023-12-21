@@ -3,10 +3,12 @@ import { PollOverlay } from '@/components/Overlay/PollOverlay'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { AnimatePresence } from 'framer-motion'
+import { WinProbability } from './WinProbability'
 
 export const PollOverlays = ({
   pollData,
   betData,
+  radiantWinChance,
   setPollData,
   setBetData,
 }) => {
@@ -28,6 +30,8 @@ export const PollOverlays = ({
       }}
     >
       <AnimatePresence key="poll-primary">
+        <WinProbability radiantWinChance={radiantWinChance} />
+
         {pollData && (
           <PollOverlay
             key="poll-overlay"

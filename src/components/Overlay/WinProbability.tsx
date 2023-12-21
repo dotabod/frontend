@@ -4,10 +4,11 @@ import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import styled from 'styled-components'
 import { WinChance } from '@/lib/hooks/useSocket'
-import { SecondsToDuration } from '@/ui/utils'
-import { ClockCircleOutlined } from '@ant-design/icons'
+import { SecondsToDuration, motionProps } from '@/ui/utils'
+import { motion } from 'framer-motion'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { TextWithEmotes } from './TextWithEmotes'
 
-const BAR_SIZE = 850
 const BAR_HEIGHT_SIZE = 5
 const SEPARATOR_SIZE = 30
 const ANIMATION = '2s ease-in-out'
@@ -16,14 +17,14 @@ const Bar = styled.div<any>`
   opacity: ${(props) => (props.visible ? '1' : '0')};
   position: absolute;
   top: ${(props) => (props.visible ? '200' : '0')}px;
-  transition: top 0.2s ease-out, opacity 0.2s ease;
+  transition:
+    top 0.2s ease-out,
+    opacity 0.2s ease;
   left: 0;
   right: 0;
   margin-left: auto;
   margin-right: auto;
   height: ${BAR_HEIGHT_SIZE}px;
-  width: 70%;
-  max-width: ${BAR_SIZE}px;
   box-shadow: 0 0 3px 5px rgb(0 0 0 / 0.3);
   border-radius: 5px;
 `
@@ -135,40 +136,34 @@ const UpperText = styled.div<any>`
   font-size: 0.85rem;
 `
 
-const TitleText = styled.span`
-  font-size: 1rem;
-  color: #fff881;
-`
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 export const WinProbability = ({
   radiantWinChance,
-  setRadiantWinChance,
 }: {
   radiantWinChance: WinChance
-  setRadiantWinChance: any
 }) => {
   const { data: isEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
+  const res = useTransformRes()
 
   if (!isEnabled || !radiantWinChance) {
     return null
   }
 
   return (
-    <div id="win-probability">
+    <motion.div id="win-probability" key="poll-overlay-inner" {...motionProps}>
       <Bar visible={radiantWinChance.visible}>
         <UpperText pos={radiantWinChance.value}>
-          <span>
-            <ClockCircleOutlined /> {SecondsToDuration(radiantWinChance.time)}
-          </span>
-          <TitleText>WIN PROBABILITY</TitleText>
+          <span>{SecondsToDuration(radiantWinChance.time)}</span>
+
+          <h1
+            className="font-outline-2 text-center font-bold text-slate-50"
+            style={{
+              fontSize: res({ h: 20 }),
+            }}
+          >
+            <TextWithEmotes emotes={[]} text="Win probability" />
+          </h1>
         </UpperText>
-        <BarFill>
+        <BarFill className="space-x-3">
           <FillRadiant width={radiantWinChance.value}>
             <AnimatedNumRadiant value={radiantWinChance.value}>
               %
@@ -182,6 +177,6 @@ export const WinProbability = ({
         </BarFill>
         <SeparatorImg alt="logo" pos={radiantWinChance.value} />
       </Bar>
-    </div>
+    </motion.div>
   )
 }
