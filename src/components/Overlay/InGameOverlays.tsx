@@ -9,7 +9,6 @@ import { clsx } from 'clsx'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
-import { WinProbability } from '@/components/Overlay/WinProbability'
 import { MinimapBlocker } from './blocker/MinimapBlocker'
 
 export const InGameOverlays = ({

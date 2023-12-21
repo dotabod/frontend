@@ -15,8 +15,11 @@ export const PollOverlays = ({
   const res = useTransformRes()
 
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
+  const { data: isWinProbEnabled } = useUpdateSetting(
+    Settings.winProbabilityOverlay,
+  )
 
-  if (!isEnabled || (!pollData && !betData)) return null
+  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled)) return null
 
   return (
     <div
@@ -30,7 +33,9 @@ export const PollOverlays = ({
       }}
     >
       <AnimatePresence key="poll-primary">
-        <WinProbability radiantWinChance={radiantWinChance} />
+        {isWinProbEnabled && (
+          <WinProbability radiantWinChance={radiantWinChance} />
+        )}
 
         {pollData && (
           <PollOverlay
