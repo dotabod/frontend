@@ -1,10 +1,15 @@
 import TwitchProvider from 'next-auth/providers/twitch'
 import GoogleProvider from 'next-auth/providers/google'
-import { NextAuthOptions } from 'next-auth'
+import { NextAuthOptions, getServerSession } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/db'
 import fetchLiveChatId from './fetchYouTubeData'
+import {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from 'next'
 
 // Do not delete this declaration
 const chatBotTwitchScopes = [
@@ -25,157 +30,166 @@ const defaultTwitchScopes = [
   'channel:read:polls',
 ].join(' ')
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: 'jwt',
-  },
-  pages: {
-    signIn: '/login',
-  },
-  providers: [
-    GoogleProvider({
-      clientId: process.env.YOUTUBE_CLIENT_ID,
-      clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
-      authorization: {
-        params: {
-          scope:
-            'openid email profile https://www.googleapis.com/auth/youtube.readonly',
-          prompt: 'consent',
-          access_type: 'offline',
-          response_type: 'code',
-        },
-      },
-    }),
-    TwitchProvider({
-      allowDangerousEmailAccountLinking: true,
-      clientId: process.env.TWITCH_CLIENT_ID,
-      clientSecret: process.env.TWITCH_CLIENT_SECRET,
-      authorization: {
-        params: {
-          // when logging in with the chatbot, append the chatbot scopes
-          // scope: `${defaultScopes} ${chatBotScopes}`,
-          scope: defaultTwitchScopes,
-        },
-      },
-    }),
-  ],
-  callbacks: {
-    async session({ token, session }) {
-      if (token) {
-        session.user.locale = token.locale
-        session.user.twitchId = token.twitchId
-        session.user.id = token.id
-        session.user.name = token.name
-        session.user.email = token.email
-        session.user.image = token.picture
-      }
-
-      return session
+export const getNextAuthOptions = <Req extends Request, Res extends Response>(
+  req: NextApiRequest | GetServerSidePropsContext['req'],
+  res: NextApiResponse | GetServerSidePropsContext['res'],
+) => {
+  const extendedOptions: NextAuthOptions = {
+    adapter: PrismaAdapter(prisma),
+    session: {
+      strategy: 'jwt',
     },
-    // @ts-ignore
-    async jwt({ token, account, user, profile, isNewUser }) {
-      // Save a db lookup
-      if (token.id) return token
+    pages: {
+      signIn: '/login',
+    },
+    providers: [
+      GoogleProvider({
+        clientId: process.env.YOUTUBE_CLIENT_ID,
+        clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
+        authorization: {
+          params: {
+            scope:
+              'openid email profile https://www.googleapis.com/auth/youtube.readonly',
+            prompt: 'consent',
+            access_type: 'offline',
+            response_type: 'code',
+          },
+        },
+      }),
+      TwitchProvider({
+        allowDangerousEmailAccountLinking: true,
+        clientId: process.env.TWITCH_CLIENT_ID,
+        clientSecret: process.env.TWITCH_CLIENT_SECRET,
+        authorization: {
+          params: {
+            // when logging in with the chatbot, append the chatbot scopes
+            // scope: `${defaultScopes} ${chatBotScopes}`,
+            scope: defaultTwitchScopes,
+          },
+        },
+      }),
+    ],
+    callbacks: {
+      async session({ token, session }) {
+        if (token) {
+          session.user.locale = token.locale
+          session.user.twitchId = token.twitchId
+          session.user.id = token.id
+          session.user.name = token.name
+          session.user.email = token.email
+          session.user.image = token.picture
+        }
 
-      if (!user) {
-        token.id = token.sub
-        return token
-      }
+        return session
+      },
+      // @ts-ignore
+      async jwt({ token, account, user, profile }) {
+        // Save a db lookup
+        if (token.id) return token
 
-      const newUser = {
-        email: profile.email || user.email,
-        // @ts-ignore from twitch?
-        name: user.displayName || user.name || profile?.preferred_username,
-        displayName:
+        if (!user) {
+          token.id = token.sub
+          return token
+        }
+
+        const newUser = {
+          email: profile.email || user.email,
           // @ts-ignore from twitch?
-          profile?.preferred_username || user.displayName || user.name,
-        // @ts-ignore from twitch?
-        image: profile?.picture || user.image,
-      }
-
-      const provider = await prisma.user.findFirst({
-        where: {
-          id: token.id || user.id || profile.sub,
-        },
-        select: {
-          accounts: {
-            select: {
-              requires_refresh: true,
-              providerAccountId: true,
-              provider: true,
-            },
-          },
-          locale: true,
-        },
-      })
-
-      // The dotabod user shouldn't update because
-      // it has specific scopes that we don't want to overwrite
-      // see `chatBotScopes` above
-      const isDotabod =
-        (newUser.displayName || newUser.name) === 'dotabod' ||
-        (newUser.displayName || newUser.name) === 'dotabod_test'
-      if (account && !isDotabod) {
-        if (!user.youtube && account.provider === 'google') {
-          // save their broadcast id for youtube live
-          fetchLiveChatId(account.access_token, account.refresh_token)
-            .then(async (liveChatId) => {
-              if (liveChatId) {
-                console.log('Live Chat ID:', liveChatId)
-                await prisma.user.update({
-                  where: {
-                    id: user.id,
-                  },
-                  data: {
-                    youtube: liveChatId,
-                  },
-                })
-              } else {
-                console.log('No active live broadcasts found.')
-              }
-            })
-            .catch((error) => {
-              console.error('Error fetching Live Chat ID:', error)
-            })
+          name: user.displayName || user.name || profile?.preferred_username,
+          displayName:
+            // @ts-ignore from twitch?
+            profile?.preferred_username || user.displayName || user.name,
+          // @ts-ignore from twitch?
+          image: profile?.picture || user.image,
         }
 
-        // Refresh jwt account with potentially new scopes
-        const newData = {
-          refresh_token: account.refresh_token,
-          access_token: account.access_token,
-          expires_at: account.expires_at,
-          scope: account.scope,
-
-          // Set requires_refresh to false if the user is logging in
-          // Because this new token will be the fresh one we needed
-          requires_refresh: false,
-        }
-
-        await prisma.account.update({
+        const provider = await prisma.user.findFirst({
           where: {
-            provider_providerAccountId: {
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-            },
+            id: token.id || user.id || profile.sub,
           },
-          data: newData,
+          select: {
+            accounts: {
+              select: {
+                requires_refresh: true,
+                providerAccountId: true,
+                provider: true,
+              },
+            },
+            locale: true,
+          },
         })
-      }
 
-      const twitchId = Number(
-        provider.accounts.find((p) => p.provider === 'twitch')
-          ?.providerAccountId,
-      )
+        // The dotabod user shouldn't update because
+        // it has specific scopes that we don't want to overwrite
+        // see `chatBotScopes` above
+        const isDotabod =
+          (newUser.displayName || newUser.name) === 'dotabod' ||
+          (newUser.displayName || newUser.name) === 'dotabod_test'
 
-      return {
-        locale: provider.locale,
-        twitchId,
-        id: user.id,
-        name: newUser.displayName || newUser.name,
-        email: newUser.email,
-        picture: newUser.image,
-      }
+        // If there is an account for which we are generating JWT for (e.g on sign in)
+        // then attach our userId to the token
+        if (account && !isDotabod) {
+          if (account.provider === 'google') {
+            // save their broadcast id for youtube live
+            fetchLiveChatId(account.access_token, account.refresh_token)
+              .then(async (liveChatId) => {
+                if (liveChatId) {
+                  console.log('Live Chat ID:', liveChatId)
+                  await prisma.user.update({
+                    where: {
+                      id: user.id,
+                    },
+                    data: {
+                      youtube: liveChatId,
+                    },
+                  })
+                } else {
+                  console.log('No active live broadcasts found.')
+                }
+              })
+              .catch((error) => {
+                console.error('Error fetching Live Chat ID:', error)
+              })
+          }
+
+          // Refresh jwt account with potentially new scopes
+          const newData = {
+            refresh_token: account.refresh_token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            scope: account.scope,
+
+            // Set requires_refresh to false if the user is logging in
+            // Because this new token will be the fresh one we needed
+            requires_refresh: false,
+          }
+
+          await prisma.account.update({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
+            },
+            data: newData,
+          })
+        }
+
+        const twitchId = Number(
+          provider.accounts.find((p) => p.provider === 'twitch')
+            ?.providerAccountId,
+        )
+
+        return {
+          locale: provider.locale,
+          twitchId,
+          id: user.id,
+          name: newUser.displayName || newUser.name,
+          email: newUser.email,
+          picture: newUser.image,
+        }
+      },
     },
-  },
+  }
+  return extendedOptions
 }

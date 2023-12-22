@@ -1,4 +1,4 @@
-import { Github, Twitter } from 'lucide-react'
+import { Github, Twitter, YoutubeIcon } from 'lucide-react'
 import {
   BeakerIcon,
   SparklesIcon,
@@ -49,6 +49,11 @@ export const navigation = [
         name: 'Advanced',
         href: '/dashboard/features/advanced',
         icon: ScaleIcon,
+      },
+      {
+        name: 'Simulcast',
+        href: '/dashboard/features/simulcast',
+        icon: YoutubeIcon,
       },
     ],
   },

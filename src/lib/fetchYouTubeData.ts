@@ -28,6 +28,7 @@ async function fetchLiveChatId(accessToken: string, refreshToken: string) {
     })
 
     const broadcasts = response.data.items
+    console.log(broadcasts)
     if (broadcasts && broadcasts.length > 0) {
       // Assuming the first broadcast is the one we're interested in
       const liveChatId = broadcasts[0].snippet.liveChatId
