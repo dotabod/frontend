@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react'
+import React from 'react'
 import { Logomark } from 'src/components/Logo'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -9,10 +9,6 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { TextWithEmotes } from './TextWithEmotes'
 import { AnimatedNumber } from './AnimatedNumber'
 import clsx from 'clsx'
-
-interface CustomStyle extends CSSProperties {
-  '--value'?: number
-}
 
 const SeparatorImg = ({ pos, children, ...props }) => (
   <div
