@@ -40,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    return res.end()
+    return res.status(200).json({ status: 'ok' })
   }
 
   return res.status(500).end()
