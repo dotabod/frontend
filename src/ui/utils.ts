@@ -33,7 +33,7 @@ export const motionProps = {
   transition,
 }
 
-export const SecondsToDuration = (duration) => {
+export const secondsToDuration = (duration: number) => {
   // Hours, minutes and seconds
   const hrs = ~~(duration / 3600)
   const mins = ~~((duration % 3600) / 60)
@@ -43,11 +43,11 @@ export const SecondsToDuration = (duration) => {
   let ret = ''
 
   if (hrs > 0) {
-    ret += '' + hrs + ':' + (mins < 10 ? '0' : '')
+    ret += `${hrs}:${mins < 10 ? '0' : ''}`
   }
 
-  ret += '' + mins + ':' + (secs < 10 ? '0' : '')
-  ret += '' + secs
+  ret += `${mins}:${secs < 10 ? '0' : ''}`
+  ret += `${secs}`
 
   return ret
 }

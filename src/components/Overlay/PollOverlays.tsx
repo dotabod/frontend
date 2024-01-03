@@ -23,7 +23,7 @@ export const PollOverlays = ({
 
   return (
     <div
-      className="absolute"
+      className="absolute space-y-6"
       id="poll-and-bet-overlay"
       style={{
         right: res({ w: 1920 / 2 - 200 }),
@@ -36,7 +36,6 @@ export const PollOverlays = ({
         {isWinProbEnabled && (
           <WinProbability radiantWinChance={radiantWinChance} />
         )}
-
         {pollData && (
           <PollOverlay
             key="poll-overlay"

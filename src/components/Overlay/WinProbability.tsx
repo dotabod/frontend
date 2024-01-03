@@ -4,7 +4,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import styled from 'styled-components'
 import { WinChance } from '@/lib/hooks/useSocket'
-import { SecondsToDuration, motionProps } from '@/ui/utils'
+import { secondsToDuration, motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { TextWithEmotes } from './TextWithEmotes'
@@ -15,17 +15,11 @@ const ANIMATION = '2s ease-in-out'
 
 const Bar = styled.div<any>`
   opacity: ${(props) => (props.visible ? '1' : '0')};
-  position: absolute;
-  top: ${(props) => (props.visible ? '200' : '0')}px;
+  position: relative;
   transition:
     top 0.2s ease-out,
     opacity 0.2s ease;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  height: ${BAR_HEIGHT_SIZE}px;
-  box-shadow: 0 0 3px 5px rgb(0 0 0 / 0.3);
+  height: 100%;
   border-radius: 5px;
 `
 
@@ -45,6 +39,7 @@ const SeparatorImg = styled(Logomark)<any>`
 const BarFill = styled.div`
   display: flex;
   height: ${BAR_HEIGHT_SIZE}px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
 `
 
 const AnimatedNumRadiant = styled.span<any>`
@@ -121,10 +116,10 @@ const FillDire = styled.div<any>`
   color: #eb4b4b;
 `
 
-const UpperText = styled.div<any>`
+const Text = styled.div<any>`
   display: flex;
   flex-direction: column;
-  position: absolute;
+  position: relative;
   text-align: center;
   left: ${(props) => Math.min(props.pos, 98)}%;
   white-space: nowrap;
@@ -148,12 +143,18 @@ export const WinProbability = ({
     return null
   }
 
-  return (
-    <motion.div id="win-probability" key="poll-overlay-inner" {...motionProps}>
-      <Bar visible={radiantWinChance.visible}>
-        <UpperText pos={radiantWinChance.value}>
-          <span>{SecondsToDuration(radiantWinChance.time)}</span>
+  // Make sure radiantWinChance.value is between 0 and 100
+  radiantWinChance.value = Math.min(Math.max(radiantWinChance.value, 0), 100)
 
+  return (
+    <motion.div
+      id="win-probability"
+      key="poll-overlay-inner"
+      className="h-100"
+      {...motionProps}
+    >
+      <Bar visible={radiantWinChance.visible}>
+        <Text pos={radiantWinChance.value}>
           <h1
             className="font-outline-2 text-center font-bold text-slate-50"
             style={{
@@ -162,7 +163,7 @@ export const WinProbability = ({
           >
             <TextWithEmotes emotes={[]} text="Win probability" />
           </h1>
-        </UpperText>
+        </Text>
         <BarFill className="space-x-3">
           <FillRadiant width={radiantWinChance.value}>
             <AnimatedNumRadiant value={radiantWinChance.value}>
@@ -176,6 +177,11 @@ export const WinProbability = ({
           </FillDire>
         </BarFill>
         <SeparatorImg alt="logo" pos={radiantWinChance.value} />
+        <Text style={{ bottom: 0, top: 10 }} pos={radiantWinChance.value}>
+          <span className="font-outline-2 text-slate-50">
+            {secondsToDuration(radiantWinChance.time)} (2m delay)
+          </span>
+        </Text>
       </Bar>
     </motion.div>
   )
