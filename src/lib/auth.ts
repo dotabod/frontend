@@ -4,6 +4,8 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/db'
 
+const useBotScopes = false
+
 // Do not delete this declaration
 const chatBotScopes = [
   'channel:moderate',
@@ -11,6 +13,7 @@ const chatBotScopes = [
   'chat:read',
   'whispers:read',
   'whispers:edit',
+  'user:manage:whispers',
   'moderator:manage:chat_messages',
 ].join(' ')
 
@@ -38,9 +41,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          // when logging in with the chatbot, append the chatbot scopes
-          // scope: `${defaultScopes} ${chatBotScopes}`,
-          scope: defaultScopes,
+          scope: useBotScopes
+            ? `${defaultScopes} ${chatBotScopes}`
+            : defaultScopes,
         },
       },
     }),
@@ -95,14 +98,12 @@ export const authOptions: NextAuthOptions = {
       })
 
       const twitchId = Number(provider.Account.providerAccountId)
+      const isBotUser = twitchId === Number(process.env.TWITCH_BOT_PROVIDERID)
+      const shouldRefresh =
+        account &&
+        ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      // The dotabod user shouldn't update because
-      // it has specific scopes that we don't want to overwrite
-      // see `chatBotScopes` above
-      const isDotabod =
-        (newUser.displayName || newUser.name) === 'dotabod' ||
-        (newUser.displayName || newUser.name) === 'dotabod_test'
-      if (account && !isDotabod) {
+      if (shouldRefresh) {
         // Refresh jwt account with potentially new scopes
         const newData = {
           refresh_token: account.refresh_token,
