@@ -23,7 +23,7 @@ export const PollOverlays = ({
 
   return (
     <div
-      className="absolute space-y-6"
+      className="absolute"
       id="poll-and-bet-overlay"
       style={{
         right: res({ w: 1920 / 2 - 200 }),

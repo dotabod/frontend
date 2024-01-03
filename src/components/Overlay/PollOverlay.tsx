@@ -1,34 +1,12 @@
 import TwitchFetcher from 'twitch-fetcher'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Countdown, { zeroPad } from 'react-countdown'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { TextWithEmotes } from './TextWithEmotes'
-
-function AnimatedNumber({ from, to }) {
-  const ref = useRef(null)
-  const motionValue = useMotionValue(from)
-  const springValue = useSpring(motionValue)
-
-  useEffect(() => {
-    motionValue.set(to)
-  }, [motionValue, to])
-
-  useEffect(
-    () =>
-      springValue.onChange((latest) => {
-        if (ref.current) {
-          ref.current.textContent = latest.toFixed(0)
-        }
-      }),
-    [springValue],
-  )
-
-  return <span ref={ref} />
-}
 
 export type PollData = {
   title: string
