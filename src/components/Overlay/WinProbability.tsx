@@ -23,7 +23,7 @@ const SeparatorImg = ({ pos, children, ...props }) => (
   >
     <Logomark
       {...props}
-      className="rounded-full bg-black"
+      className="rounded-full bg-black shadow-[0_0_10px_0_rgba(0,0,0,0.5)]"
       style={{
         height: '30px',
         width: '30px',
@@ -96,14 +96,14 @@ export const WinProbability = ({
           <FillDire width={100 - radiantWinChance.value} />
         </div>
         <SeparatorImg alt="logo" pos={radiantWinChance.value}>
-          <Text className="!flex-row">
+          <Text className="font-outline-2 !flex-row text-center font-bold !text-green-400">
             <AnimatedNumber
               from={100 - radiantWinChance.value}
               to={radiantWinChance.value}
             />
             <span>%</span>
           </Text>
-          <Text className="!flex-row">
+          <Text className="font-outline-2 !flex-row text-center font-bold !text-red-400">
             <AnimatedNumber
               from={radiantWinChance.value}
               to={100 - radiantWinChance.value}
