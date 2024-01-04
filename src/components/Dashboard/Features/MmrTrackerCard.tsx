@@ -21,7 +21,7 @@ export default function MmrTrackerCard() {
         <h3>MMR tracker</h3>
       </div>
       <div className="subtitle">
-        <p>Give or take {onlyParty ? 20 : 30} MMR after every ranked match.</p>
+        <p>Give or take {onlyParty ? 20 : 25} MMR after every ranked match.</p>
       </div>
       <div>A list of accounts will show below as you play on them.</div>
 
