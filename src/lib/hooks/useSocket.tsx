@@ -158,9 +158,9 @@ export const useSocket = ({
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
     socket.on('connect', () => setConnected(true))
-    socket.on('connect_error', () => {
+    socket.on('connect_error', (err) => {
       setTimeout(() => {
-        console.log('Reconnecting due to connect error...')
+        console.log('Reconnecting due to connect error...', { err })
         socket.connect()
       }, 4000)
     })
@@ -203,7 +203,7 @@ export const useSocket = ({
       if (!chanceDetails) {
         return setRadiantWinChance((prev) => ({ ...prev, visible: false }))
       }
-      setRadiantWinChance({...chanceDetails, visible: true})
+      setRadiantWinChance({ ...chanceDetails, visible: true })
     })
 
     socket.on('refresh', () => {
