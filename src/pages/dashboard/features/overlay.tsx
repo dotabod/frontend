@@ -11,6 +11,7 @@ import Header from '@/components/Dashboard/Header'
 import QueueCard from '@/components/Dashboard/Features/QueueCard'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
 import BetsOverlay from '@/components/Overlay/BetsOverlay'
+import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
@@ -34,6 +35,7 @@ const FeaturesPage: NextPageWithLayout = () => {
         <RoshCard />
         <QueueCard />
         <NotablePlayersCard />
+        <WinProbabilityOverlay />
       </div>
     </>
   ) : null

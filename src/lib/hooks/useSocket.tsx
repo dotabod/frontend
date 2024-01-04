@@ -28,6 +28,12 @@ import {
 
 export let socket: Socket | null = null
 
+export type WinChance = {
+  value: number
+  time: number
+  visible: boolean
+}
+
 type wlType = {
   win: number
   lose: number
@@ -44,6 +50,7 @@ export const useSocket = ({
   setConnected,
   setRankImageDetails,
   setWL,
+  setRadiantWinChance,
 }) => {
   const router = useRouter()
   const { userId } = router.query
@@ -66,6 +73,7 @@ export const useSocket = ({
       socket?.off('channelPollOrBet')
       socket?.off('update-medal')
       socket?.off('update-wl')
+      socket?.off('update-radiant-win-chance')
       socket?.off('refresh')
       socket?.off('connect_error')
       socket?.disconnect()
@@ -108,7 +116,7 @@ export const useSocket = ({
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
           allTime ? '' : '&date=30'
-        }`
+        }`,
       )
 
       if (response) {
@@ -187,6 +195,15 @@ export const useSocket = ({
     socket.on('update-wl', (records: wlType) => {
       if (isDev) return
       setWL(records)
+    })
+
+    socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
+      if (isDev) return
+      // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
+      if (!chanceDetails) {
+        return setRadiantWinChance((prev) => ({ ...prev, visible: false }))
+      }
+      setRadiantWinChance({...chanceDetails, visible: true})
     })
 
     socket.on('refresh', () => {

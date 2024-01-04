@@ -3,18 +3,23 @@ import { PollOverlay } from '@/components/Overlay/PollOverlay'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 import { AnimatePresence } from 'framer-motion'
+import { WinProbability } from './WinProbability'
 
 export const PollOverlays = ({
   pollData,
   betData,
+  radiantWinChance,
   setPollData,
   setBetData,
 }) => {
   const res = useTransformRes()
 
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
+  const { data: isWinProbEnabled } = useUpdateSetting(
+    Settings.winProbabilityOverlay,
+  )
 
-  if (!isEnabled || (!pollData && !betData)) return null
+  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled)) return null
 
   return (
     <div
@@ -28,6 +33,9 @@ export const PollOverlays = ({
       }}
     >
       <AnimatePresence key="poll-primary">
+        {isWinProbEnabled && (
+          <WinProbability radiantWinChance={radiantWinChance} />
+        )}
         {pollData && (
           <PollOverlay
             key="poll-overlay"

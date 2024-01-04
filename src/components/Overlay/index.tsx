@@ -4,8 +4,8 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
-import { isDev } from '@/lib/devConsts'
-import { useSocket } from '@/lib/hooks/useSocket'
+import { devRadiantWinChance, isDev } from '@/lib/devConsts'
+import { useSocket, WinChance } from '@/lib/hooks/useSocket'
 import { useOBS } from '@/lib/hooks/useOBS'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
@@ -54,6 +54,7 @@ const OverlayPage = (props) => {
       type: 'U',
     },
   ])
+  const [radiantWinChance, setRadiantWinChance] = useState<WinChance>(null)
 
   const [rankImageDetails, setRankImageDetails] = useState({
     image: '0.png',
@@ -74,6 +75,7 @@ const OverlayPage = (props) => {
     setPollData(devPoll)
     setBlock(devBlockTypes)
     setRankImageDetails(devRank)
+    setRadiantWinChance(devRadiantWinChance)
   }, [isDev])
 
   useSocket({
@@ -87,12 +89,10 @@ const OverlayPage = (props) => {
     setBetData,
     setNotablePlayers,
     setWL,
+    setRadiantWinChance,
   })
 
   useOBS({ block, connected })
-
-  const { original } = useUpdateSetting()
-  const isLive = original?.stream_online
 
   if (isDotabodDisabled) {
     return isDev ? (
@@ -117,33 +117,6 @@ const OverlayPage = (props) => {
     ) : null
   }
 
-  // remove for now, !isLive
-  if (false) {
-    return (
-      <>
-        <motion.div
-          className={clsx('absolute right-0 mt-9 block max-w-xs')}
-          key="not-live"
-          {...motionProps}
-        >
-          <Alert message="Dotabod is disabled when stream is offline. Not offline? Type !online in chat" />
-        </motion.div>
-
-        {isDev && (
-          <Image
-            key="dev-image"
-            width={width}
-            height={height}
-            alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${
-              block.type === 'spectator' ? 'playing' : block.type
-            }.png`}
-          />
-        )}
-      </>
-    )
-  }
-
   return (
     <>
       <Head>
@@ -160,7 +133,7 @@ const OverlayPage = (props) => {
           <div
             className={clsx(
               'hidden',
-              isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
+              isInIframe && rankImageDetails?.notLoaded ? '!block' : '',
             )}
           >
             <Center style={{ height }}>
@@ -187,6 +160,7 @@ const OverlayPage = (props) => {
           setBetData={setBetData}
           setPollData={setPollData}
           betData={betData}
+          radiantWinChance={radiantWinChance}
           key="poll-overlays"
         />
 
