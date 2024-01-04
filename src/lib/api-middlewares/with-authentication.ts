@@ -9,7 +9,7 @@ export function withAuthentication(handler: NextApiHandler) {
     const userId = req.query.id as string
 
     if (!session && !userId) {
-      return res.status(403).end()
+      return res.status(403).json({ message: 'Unauthorized' })
     }
 
     return handler(req, res)
