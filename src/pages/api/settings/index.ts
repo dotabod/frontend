@@ -14,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.query.id as string
 
   if (!userId && !session?.user?.id) {
-    return res.status(403).end()
+    return res.status(403).json({ message: 'Unauthorized' })
   }
 
   if (req.method === 'GET') {
@@ -54,13 +54,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.json(data)
     } catch (error) {
-      return res.status(500).end()
+      return res.status(500)
     }
   }
 
   if (req.method === 'POST') {
     if (!session?.user?.id) {
-      return res.status(403).end()
+      return res.status(403).json({ message: 'Unauthorized' })
     }
 
     try {
@@ -83,7 +83,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(422).json(error.issues)
       }
 
-      return res.status(500).end()
+      return res.status(500)
     }
   }
 }

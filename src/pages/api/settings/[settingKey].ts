@@ -31,7 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    return setting
+    return res.status(200).json(setting)
   }
 
   if (req.method === 'PATCH') {
@@ -48,7 +48,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         })
 
-        return res.end()
+        return res.status(200).json({ status: 'ok' })
       }
 
       if (settingKey === Settings.streamDelay) {
@@ -77,7 +77,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      return res.end()
+      return res.status(200).json({ status: 'ok' })
     } catch (error) {
       console.log(error)
 
