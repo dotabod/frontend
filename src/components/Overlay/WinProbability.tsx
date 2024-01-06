@@ -110,7 +110,7 @@ export const WinProbability = ({
 
         <Text className="bottom-[20px]" pos={radiantWinChance.value}>
           <span className="font-outline-2 text-slate-50">
-            {secondsToDuration(radiantWinChance.time)} (2m delay)
+            (2m delay)
           </span>
         </Text>
       </div>
