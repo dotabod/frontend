@@ -1,10 +1,10 @@
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { useWindowSize } from '@/lib/hooks/useWindowSize'
-import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
-import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { FindMatch } from '@/components/Overlay/main/FindMatch'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
+import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { Settings } from '@/lib/defaultSettings'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useWindowSize } from '@/lib/hooks/useWindowSize'
 
 export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
   const res = useTransformRes()
@@ -26,6 +26,7 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
         className="absolute"
       >
         <div
+          id="main-screen-wl-mmr-card"
           className="absolute flex h-full items-center justify-center space-x-2 "
           style={{
             width: res({ w: 299 }),
