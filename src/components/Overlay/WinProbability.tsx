@@ -3,7 +3,7 @@ import { Logomark } from 'src/components/Logo'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { WinChance } from '@/lib/hooks/useSocket'
-import { secondsToDuration, motionProps } from '@/ui/utils'
+import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { TextWithEmotes } from './TextWithEmotes'
@@ -110,7 +110,7 @@ export const WinProbability = ({
 
         <Text className="bottom-[20px]" pos={radiantWinChance.value}>
           <span className="font-outline-2 text-slate-50">
-            {secondsToDuration(radiantWinChance.time)} (2m delay)
+            (2m delay)
           </span>
         </Text>
       </div>
