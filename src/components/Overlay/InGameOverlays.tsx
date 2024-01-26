@@ -1,14 +1,14 @@
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { SpectatorText } from '@/components/Overlay/SpectatorText'
-import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
-import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
-import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
-import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
-import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
-import { clsx } from 'clsx'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Settings } from '@/lib/defaultSettings'
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
+import { SpectatorText } from '@/components/Overlay/SpectatorText'
+import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
+import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
+import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
+import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
+import { Settings } from '@/lib/defaultSettings'
+import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { clsx } from 'clsx'
 import { MinimapBlocker } from './blocker/MinimapBlocker'
 
 export const InGameOverlays = ({
@@ -72,6 +72,7 @@ export const InGameOverlays = ({
           'absolute flex items-end justify-end',
           isRight && '!justify-start',
         )}
+        id="ingame-wl-mmr-card"
         style={{ ...wlPosition, width: res({ w: 215 }) }}
       >
         <AnimatedWL
