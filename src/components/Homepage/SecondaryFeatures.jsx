@@ -33,8 +33,8 @@ export function SecondaryFeatures() {
               className="flex space-x-1"
               onClick={(e) => e.preventDefault()}
             >
-              <SparklesIcon height={22} />
-              <span>Preview</span>
+              <SparklesIcon className="text-purple-200" height={22} />
+              <span className="text-purple-300">Preview</span>
             </Link>
           </Popover>
         </div>
@@ -79,8 +79,8 @@ export function SecondaryFeatures() {
           >
             <Link onClick={(e) => e.preventDefault()}>
               <span className="flex items-center space-x-1">
-                <SparklesIcon height={22} />
-                <span>Preview</span>
+                <SparklesIcon className="text-purple-200" height={22} />
+                <span className="text-purple-300">Preview</span>
               </span>
             </Link>
           </Popover>
@@ -164,8 +164,8 @@ export function SecondaryFeatures() {
               className="flex !items-center space-x-1"
               onClick={(e) => e.preventDefault()}
             >
-              <SparklesIcon height={22} />
-              <span>Preview</span>
+              <SparklesIcon className="text-purple-200" height={22} />
+              <span className="text-purple-300">Preview</span>
             </Link>
           </Popover>
         </div>

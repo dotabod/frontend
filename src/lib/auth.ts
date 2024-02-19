@@ -104,18 +104,8 @@ export const authOptions: NextAuthOptions = {
         ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
       if (shouldRefresh) {
-        // Refresh jwt account with potentially new scopes
-        const newData = {
-          refresh_token: account.refresh_token,
-          access_token: account.access_token,
-          expires_at: account.expires_at,
-          scope: account.scope,
-          requires_refresh: provider.Account.requires_refresh,
-        }
-
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
-        newData.requires_refresh = false
 
         await prisma.account.update({
           where: {
@@ -124,7 +114,13 @@ export const authOptions: NextAuthOptions = {
               providerAccountId: account.providerAccountId,
             },
           },
-          data: newData,
+          data: {
+            refresh_token: account.refresh_token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            scope: account.scope,
+            requires_refresh: false,
+          },
         })
       }
 

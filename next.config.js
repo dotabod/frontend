@@ -4,7 +4,6 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require('@sentry/nextjs')
-const { i18n } = require('./next-i18next.config')
 
 const moduleExports = {
   // Your existing module.exports
@@ -33,8 +32,6 @@ const moduleExports = {
     disableServerWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
     disableClientWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
-
-  i18n,
 }
 
 const sentryWebpackPluginOptions = {
