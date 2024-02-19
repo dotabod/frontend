@@ -70,7 +70,7 @@ const featuredUsers = [
 		image: "/images/hero/gunnar.png",
 	},
 	{
-		link: false,
+		link: "",
 		name: "You?",
 		supporter: false,
 		image: "/images/hero/default.png",
@@ -84,7 +84,10 @@ const grouped = featuredUsers.reduce((result, item) => {
 	}
 	result[key].push(item);
 	return result;
-}, {});
+}, {}) as {
+	supporters: typeof featuredUsers;
+	nonSupporters: typeof featuredUsers;
+};
 
 const TwitchUser = ({
 	image,
@@ -97,7 +100,7 @@ const TwitchUser = ({
 }: {
 	image: string;
 	last: boolean;
-	link: string | false;
+	link?: string;
 	name: string;
 	onClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 	session: any;
@@ -111,7 +114,7 @@ const TwitchUser = ({
 			<a
 				className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
 				rel="noreferrer"
-				href={link !== false ? `https://twitch.tv/${userName}` : "#"}
+				href={!link ? `https://twitch.tv/${userName}` : "#"}
 				target="_blank"
 			>
 				<Image
@@ -131,7 +134,7 @@ const TwitchUser = ({
 export function Hero() {
 	const session = useSession();
 	const name = session.data?.user?.name || "streamers";
-	const { supporters, nonSupporters } = grouped;
+	const { nonSupporters } = grouped;
 	// get users from api/featured-users
 	const { data: users, isLoading } = useSWR<{
 		randomLive: { name: string; image: string }[];
@@ -223,7 +226,7 @@ export function Hero() {
 										session={session}
 										name={name}
 										onClick={(e) => {
-											if (link === false) {
+											if (!link) {
 												e.preventDefault();
 											}
 										}}
