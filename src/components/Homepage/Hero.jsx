@@ -39,11 +39,6 @@ const featuredUsers = [
     image: '/images/hero/watsondoto.jpg',
   },
   {
-    name: 'limitlessqt',
-    supporter: false,
-    image: '/images/hero/limitlessqt.png',
-  },
-  {
     name: 'admiralbulldog',
     supporter: false,
     image: '/images/hero/admiralbulldog.jpeg',
@@ -52,11 +47,6 @@ const featuredUsers = [
     name: 'TpaBoMaH',
     image: '/images/hero/tpabomah.png',
     supporter: false,
-  },
-  {
-    name: 'leostyledota',
-    supporter: false,
-    image: '/images/hero/leostyledota.jpeg',
   },
   {
     name: 'XcaliburYe',
@@ -237,11 +227,10 @@ export function Hero() {
           <div className="relative lg:col-span-7 xl:col-span-6">
             <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
               <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
-              <span>Featured in over 12,000 Twitch streamers</span>
+              <span>Featured in over 15,000 Twitch streamers</span>
             </div>
           </div>
           <ul
-            role="list"
             className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start"
           >
             {nonSupporters?.map(({ name, image, link, supporter }) => {
