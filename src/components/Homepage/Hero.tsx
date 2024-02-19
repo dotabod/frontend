@@ -70,7 +70,6 @@ const featuredUsers = [
 		image: "/images/hero/gunnar.png",
 	},
 	{
-		link: "",
 		name: "You?",
 		supporter: false,
 		image: "/images/hero/default.png",
@@ -92,7 +91,6 @@ const grouped = featuredUsers.reduce((result, item) => {
 const TwitchUser = ({
 	image,
 	last,
-	link,
 	name,
 	onClick,
 	session,
@@ -100,7 +98,6 @@ const TwitchUser = ({
 }: {
 	image: string;
 	last: boolean;
-	link?: string;
 	name: string;
 	onClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 	session: any;
@@ -114,7 +111,7 @@ const TwitchUser = ({
 			<a
 				className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
 				rel="noreferrer"
-				href={!link ? `https://twitch.tv/${userName}` : "#"}
+				href={userName === "You?" ? "#" : `https://twitch.tv/${userName}`}
 				target="_blank"
 			>
 				<Image
@@ -215,18 +212,17 @@ export function Hero() {
 							</div>
 						</div>
 						<ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-							{nonSupporters?.map(({ name, image, link, supporter }) => {
+							{nonSupporters?.map(({ name, image, supporter }) => {
 								const isLast = name === "You?";
 								return (
 									<TwitchUser
 										key={name}
 										supporter={supporter}
-										link={link}
 										last={isLast}
 										session={session}
 										name={name}
 										onClick={(e) => {
-											if (!link) {
+											if (name === "You?") {
 												e.preventDefault();
 											}
 										}}
@@ -250,7 +246,6 @@ export function Hero() {
 									<TwitchUser
 										key={name}
 										supporter={false}
-										link={`https://twitch.tv/${name}`}
 										last={false}
 										session={session}
 										name={name}
@@ -269,7 +264,6 @@ export function Hero() {
 									<TwitchUser
 										key={name}
 										supporter={false}
-										link={`https://twitch.tv/${name}`}
 										last={false}
 										session={session}
 										name={name}
