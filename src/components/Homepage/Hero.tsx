@@ -116,6 +116,9 @@ const TwitchUser = ({
 			>
 				<Image
 					src={imagesrc}
+					onError={(e) => {
+						e.currentTarget.src = "/images/hero/default.png";
+					}}
 					width={50}
 					height={50}
 					alt={userName}
