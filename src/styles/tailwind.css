@@ -15,6 +15,25 @@
   src: url('/fonts/Inter-italic.var.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'RadianceM';
+  src: url('/fonts/radiancem_regular.otf') format('opentype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Radiance';
+  src: url('/fonts/radiance-regular.otf') format('opentype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Radiance';
+  src: url('/fonts/radiance-light.otf') format('opentype');
+  font-weight: thin;
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

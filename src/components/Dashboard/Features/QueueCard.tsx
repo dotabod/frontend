@@ -1,9 +1,12 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import clsx from 'clsx'
-import { Settings } from '@/lib/defaultSettings'
+import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import Image from 'next/image'
-import { Switch } from 'antd'
+import { Switch, Form, Spin, Button } from 'antd'
+import { useEffect } from 'react'
+import { Input } from '@/components/Input'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
 export default function QueueCard() {
   const {
@@ -11,6 +14,17 @@ export default function QueueCard() {
     loading,
     updateSetting,
   } = useUpdateSetting(Settings.queueBlocker)
+  const {
+    data: isFindingMatchEnabled,
+    loading: isFindingMatchLoading,
+    updateSetting: updateFindingMatchSetting,
+  } = useUpdateSetting(Settings.queueBlockerFindMatch)
+  const { data: findMatchText, updateSetting: updateFindMatchText } =
+    useUpdateSetting(Settings.queueBlockerFindMatchText)
+
+  const [form] = Form.useForm()
+  const res = useTransformRes()
+  useEffect(() => form.resetFields(), [findMatchText])
 
   return (
     <Card>
@@ -29,6 +43,46 @@ export default function QueueCard() {
         />
         <span>Enable queue blocker overlay</span>
       </div>
+      <div className="mb-5 mt-5 flex items-center space-x-2">
+        <Switch
+          onChange={updateFindingMatchSetting}
+          loading={isFindingMatchLoading}
+          checked={isFindingMatchEnabled}
+        />
+        <span>Show finding match</span>
+      </div>
+      <Spin spinning={loading} tip="Loading">
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ text: findMatchText }}
+          name="bets-form"
+          onFinish={updateFindMatchText}
+        >
+          <Form.Item colon={false} label="Custom find match text" name="text">
+            <Input
+              placeholder={defaultSettings.queueBlockerFindMatchText}
+              maxLength={45}
+            />
+          </Form.Item>
+          <Form.Item colon={false} shouldUpdate>
+            {() => (
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={
+                  !form.isFieldsTouched() ||
+                  !!form.getFieldsError().filter(({ errors }) => errors.length)
+                    .length
+                }
+              >
+                Save
+              </Button>
+            )}
+          </Form.Item>
+        </Form>
+      </Spin>
+
       <div>
         Both the &quot;PLAY DOTA&quot; in the bottom right, and the
         &quot;Finding match&quot; at the top left while in main menu will be
@@ -37,22 +91,35 @@ export default function QueueCard() {
       <div
         className={clsx(
           'mt-2 flex flex-col items-center space-y-12 transition-all',
-          !isEnabled && 'opacity-40'
+          !isEnabled && 'opacity-40',
         )}
       >
         <div className="flex flex-wrap items-center justify-center space-x-4">
+          {isFindingMatchEnabled ? (
+            <Image
+              className={clsx(
+                'mt-4 inline rounded-xl border-2 border-transparent transition-all',
+              )}
+              alt="queue blocker"
+              width={497}
+              height={208}
+              src="https://i.imgur.com/ZYHTWgq.png"
+            />
+          ) : (
+            <Image
+              className={clsx(
+                'mt-4 inline rounded-xl border-2 border-transparent transition-all',
+              )}
+              alt="queue blocker"
+              width={497}
+              height={208}
+              src="https://i.imgur.com/PmMjd4V.png"
+            />
+          )}
+
           <Image
             className={clsx(
-              'mt-4 inline rounded-xl border-2 border-transparent transition-all'
-            )}
-            alt="queue blocker"
-            width={497}
-            height={208}
-            src="https://i.imgur.com/PmMjd4V.png"
-          />
-          <Image
-            className={clsx(
-              'mt-4 inline rounded-xl border-2 border-transparent transition-all'
+              'mt-4 inline rounded-xl border-2 border-transparent transition-all',
             )}
             alt="queue blocker"
             width={204}

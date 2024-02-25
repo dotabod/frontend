@@ -109,6 +109,8 @@ export const defaultSettings = {
   tellChatNewMMR: true,
   tellChatBets: true,
   queueBlocker: false,
+  queueBlockerFindMatch: false,
+  queueBlockerFindMatchText: 'Ranked match / All pick / Europe East, Russia',
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
