@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { Switch, Form, Spin, Button } from 'antd'
 import { useEffect } from 'react'
 import { Input } from '@/components/Input'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
 export default function QueueCard() {
   const {
@@ -23,7 +22,6 @@ export default function QueueCard() {
     useUpdateSetting(Settings.queueBlockerFindMatchText)
 
   const [form] = Form.useForm()
-  const res = useTransformRes()
   useEffect(() => form.resetFields(), [findMatchText])
 
   return (
@@ -57,7 +55,7 @@ export default function QueueCard() {
           layout="vertical"
           initialValues={{ text: findMatchText }}
           name="bets-form"
-          onFinish={updateFindMatchText}
+          onFinish={(form) => updateFindMatchText(form.text)}
         >
           <Form.Item colon={false} label="Custom find match text" name="text">
             <Input
