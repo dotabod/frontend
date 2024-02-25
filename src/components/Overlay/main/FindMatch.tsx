@@ -83,7 +83,7 @@ export const FindMatch = () => {
         }}
         className="absolute"
       >
-        <MatchTimer res={res} />
+        {isFindingMatchEnabled && <MatchTimer res={res} />}
 
         <img
           id="find-match-queue-blocker-bg"
