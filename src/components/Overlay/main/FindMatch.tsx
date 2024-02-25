@@ -89,7 +89,9 @@ export const FindMatch = () => {
           id="find-match-queue-blocker-bg"
           width={res({ w: 840 })}
           height={res({ h: 355 })}
-          src="/images/overlay/finding-match.png"
+          src={`/images/overlay/finding-match${
+            !isFindingMatchEnabled ? '-old' : ''
+          }.png`}
           alt="Finding Match"
           className="rounded-lg"
         />
