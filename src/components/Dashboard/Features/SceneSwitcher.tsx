@@ -79,7 +79,7 @@ export default function SceneSwitcher(): JSX.Element {
         for different game states!
       </div>
       {isEnabled && (
-        <ul className="ml-4 mb-2 list-decimal space-y-2 text-sm">
+        <ul className="mb-2 ml-4 list-decimal space-y-2 text-sm">
           <li>
             Must put the dotabod browser source in the scenes you want to block
             hero picks or minimap in.

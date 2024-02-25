@@ -116,7 +116,7 @@ export const useSocket = ({
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
           allTime ? '' : '&date=30'
-        }`,
+        }`
       )
 
       if (response) {

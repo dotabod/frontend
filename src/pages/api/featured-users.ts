@@ -6,7 +6,7 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 // Helper function to fetch follower count for a user
 async function fetchFollowerCount(providerAccountId, accessToken) {
   const url = `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${Number(
-    providerAccountId,
+    providerAccountId
   )}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
@@ -17,7 +17,7 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
     const response = await fetch(url, { headers })
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch followers for providerAccountId ${providerAccountId}: ${response.statusText}`,
+        `Failed to fetch followers for providerAccountId ${providerAccountId}: ${response.statusText}`
       )
     }
     const data = await response.json()
@@ -54,7 +54,7 @@ async function updateFollows() {
 
       const totalFollowerCount = await fetchFollowerCount(
         user.Account.providerAccountId,
-        user.Account.access_token,
+        user.Account.access_token
       )
 
       if (totalFollowerCount !== null) {
@@ -63,7 +63,7 @@ async function updateFollows() {
           data: { followers: totalFollowerCount },
         })
         console.log(
-          `Updated followers for user ${user.name} to ${totalFollowerCount}`,
+          `Updated followers for user ${user.name} to ${totalFollowerCount}`
         )
       } else {
         // console.log(`Failed to update followers for user ${user.name}`)

@@ -95,13 +95,10 @@ export default function ExportCFG() {
         <>
           <div className="space-x-1">
             <span>Add</span>
-            <Typography.Text
-              code
-            >
-              -gamestateintegration
-            </Typography.Text>
-            <span>to your Dota 2 launch options in Steam. This allows the Dota 2 client to send
-              game data to Dotabod.
+            <Typography.Text code>-gamestateintegration</Typography.Text>
+            <span>
+              to your Dota 2 launch options in Steam. This allows the Dota 2
+              client to send game data to Dotabod.
             </span>
           </div>
 

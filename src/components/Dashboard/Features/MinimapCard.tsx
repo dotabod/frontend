@@ -74,7 +74,7 @@ export default function MinimapCard(): JSX.Element {
         Semi-transparent blocker that auto places itself over your minimap to
         deter people from farming your wards.
       </div>
-      <div className={clsx('pt-4 pb-12 transition-all')}>
+      <div className={clsx('pb-12 pt-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           {switches.map(({ loading, checked, onChange, label }, i) => (
             <div key={i} className="flex items-center space-x-2">

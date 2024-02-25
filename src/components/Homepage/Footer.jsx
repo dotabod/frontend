@@ -9,7 +9,7 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-500 bg-gray-900">
       <Container>
-        <div className="flex flex-col items-start justify-between gap-y-12 pt-16 pb-6 lg:flex-row lg:items-center lg:py-16">
+        <div className="flex flex-col items-start justify-between gap-y-12 pb-6 pt-16 lg:flex-row lg:items-center lg:py-16">
           <div>
             <div className="flex items-center text-gray-200">
               <Logomark className="h-10 w-auto flex-none fill-cyan-500" />

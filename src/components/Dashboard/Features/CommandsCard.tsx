@@ -53,7 +53,7 @@ export default function CommandsCard({
         <div className="py-1">
           <p className="ml-1">Command</p>
           <div className="flex flex-wrap">
-            <div className="mr-2 mb-2">
+            <div className="mb-2 mr-2">
               <Tag>{command.cmd}</Tag>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default function CommandsCard({
             <p className="ml-1">Alias</p>
             <div className="flex flex-wrap">
               {command.alias.map((alias) => (
-                <div key={`${alias}`} className="mr-2 mb-2">
+                <div key={`${alias}`} className="mb-2 mr-2">
                   <Tag>!{alias}</Tag>
                 </div>
               ))}

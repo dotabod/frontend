@@ -8,11 +8,11 @@ import MmrForm from './MmrForm'
 
 export default function MmrTrackerCard() {
   const { data: isEnabled, updateSetting } = useUpdateSetting(
-    Settings['mmr-tracker'],
+    Settings['mmr-tracker']
   )
 
   const { data: onlyParty, updateSetting: updateOnlyParty } = useUpdateSetting(
-    Settings.onlyParty,
+    Settings.onlyParty
   )
 
   return (
@@ -40,7 +40,7 @@ export default function MmrTrackerCard() {
           >
             <div
               className={clsx(
-                'mt-5 flex w-fit items-center space-x-2 transition-all',
+                'mt-5 flex w-fit items-center space-x-2 transition-all'
               )}
             >
               <div className="flex items-center space-x-2">

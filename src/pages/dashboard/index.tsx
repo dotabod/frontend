@@ -64,13 +64,9 @@ const SetupPage = () => {
             <div>
               <p>
                 Test it by joining a bot match. Visit the{' '}
-                <Link
-                  href="overlay"
-                >
-                  Live Preview page
-                </Link>{' '}
-                to confirm the overlay is showing. You should see the minimap
-                blocker overlay once you&apos;re in a match.
+                <Link href="overlay">Live Preview page</Link> to confirm the
+                overlay is showing. You should see the minimap blocker overlay
+                once you&apos;re in a match.
               </p>
               <p>Note: Dotabod will only work if your stream is online.</p>
             </div>

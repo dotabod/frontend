@@ -70,7 +70,7 @@ export const InGameOverlays = ({
       <div
         className={clsx(
           'absolute flex items-end justify-end',
-          isRight && '!justify-start',
+          isRight && '!justify-start'
         )}
         id="ingame-wl-mmr-card"
         style={{ ...wlPosition, width: res({ w: 215 }) }}

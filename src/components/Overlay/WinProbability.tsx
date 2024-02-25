@@ -47,7 +47,7 @@ const Text = ({ pos = null, className = '', children }) => (
   <div
     className={clsx(
       `text-shadow relative flex translate-x-[-50%] flex-col text-center text-sm text-white duration-[2s] ease-in-out`,
-      className,
+      className
     )}
     style={{ left: pos ? `${Math.min(pos, 98)}%` : 0 }}
   >
@@ -109,9 +109,7 @@ export const WinProbability = ({
         </SeparatorImg>
 
         <Text className="bottom-[20px]" pos={radiantWinChance.value}>
-          <span className="font-outline-2 text-slate-50">
-            (2m delay)
-          </span>
+          <span className="font-outline-2 text-slate-50">(2m delay)</span>
         </Text>
       </div>
     </motion.div>

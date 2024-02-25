@@ -36,7 +36,7 @@ export default function WinProbabilityOverlay() {
         height={436}
         className={clsx(
           !showWinProb && 'opacity-40',
-          'scale-90 rounded shadow',
+          'scale-90 rounded shadow'
         )}
       />
     </Card>

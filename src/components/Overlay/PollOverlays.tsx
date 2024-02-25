@@ -16,7 +16,7 @@ export const PollOverlays = ({
 
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
   const { data: isWinProbEnabled } = useUpdateSetting(
-    Settings.winProbabilityOverlay,
+    Settings.winProbabilityOverlay
   )
 
   if (!isEnabled || (!pollData && !betData && !isWinProbEnabled)) return null

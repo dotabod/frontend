@@ -1,7 +1,6 @@
 import React from 'react'
 
 export const LiveIcon = () => {
-
   return (
     <div className="flex items-center space-x-2">
       <svg

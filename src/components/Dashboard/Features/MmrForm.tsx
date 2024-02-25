@@ -80,7 +80,7 @@ const MmrForm = ({ hideText = false }) => {
                 values.accounts.map((act) => ({
                   ...act,
                   mmr: Number(act.mmr) || 0,
-                })),
+                }))
               )
               form.resetDirty()
             })}
@@ -89,7 +89,7 @@ const MmrForm = ({ hideText = false }) => {
             {form.values.accounts.map((account, index) => {
               const rankResponse = getRankDetail(
                 account.mmr,
-                account.leaderboard_rank,
+                account.leaderboard_rank
               )
               const rank = getRankImage(rankResponse as RankType)
 
@@ -100,7 +100,7 @@ const MmrForm = ({ hideText = false }) => {
               const removed =
                 form.isDirty() &&
                 form.values.accounts.findIndex(
-                  (act) => act.steam32Id === account.steam32Id && act.delete,
+                  (act) => act.steam32Id === account.steam32Id && act.delete
                 ) !== -1
               return (
                 <div key={account.steam32Id}>
@@ -110,7 +110,7 @@ const MmrForm = ({ hideText = false }) => {
                       multiUsedBy &&
                         'rounded border border-solid border-yellow-500/40 !p-4',
                       removed &&
-                        'rounded border border-dashed border-red-500/80 !p-4',
+                        'rounded border border-dashed border-red-500/80 !p-4'
                     )}
                     help={
                       multiUsedBy && (
@@ -135,7 +135,7 @@ const MmrForm = ({ hideText = false }) => {
                       <div
                         className={clsx(
                           'flex flex-col items-center sm:flex-row sm:items-start sm:justify-start sm:space-x-2',
-                          (removed || multiUsedBy) && 'opacity-40',
+                          (removed || multiUsedBy) && 'opacity-40'
                         )}
                       >
                         <div className="!h-12 !w-12">

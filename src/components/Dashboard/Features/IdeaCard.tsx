@@ -9,10 +9,8 @@ export default function IdeaCard() {
         <h3>Have an idea?</h3>
       </div>
       <div className="subtitle mb-2">
-        <a href="https://discord.dotabod.com">
-          Tell us on Discord
-        </a>{' '}
-        what you&apos;d like to see!
+        <a href="https://discord.dotabod.com">Tell us on Discord</a> what
+        you&apos;d like to see!
       </div>
       <div className="flex flex-col items-center space-y-4">
         <img
