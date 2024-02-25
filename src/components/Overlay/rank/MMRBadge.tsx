@@ -24,7 +24,7 @@ export const Numbers = ({
       <span
         className={clsx(
           leaderboard && 'text-base',
-          !rank && !leaderboard && 'hidden'
+          !rank && !leaderboard && 'hidden',
         )}
       >
         {rank && rank}
@@ -52,7 +52,7 @@ export const MMRBadge = ({
         {...props}
         className={clsx(
           'flex h-full items-center space-x-1 text-[#e4d98d]',
-          className
+          className,
         )}
       >
         <Badge
@@ -88,7 +88,7 @@ export const MMRBadge = ({
           !image && 'mt-0',
           (leaderboard || ['80.png', '91.png', '92.png'].includes(image)) &&
             '-mt-1',
-          image && rank && !leaderboard && '-mt-3'
+          image && rank && !leaderboard && '-mt-3',
         )}
       />
     </Card>

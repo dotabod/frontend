@@ -6,7 +6,7 @@ export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }) => (
   <div className="flex flex-col items-center" id="rosh-timer">
     {roshanCount > 0 ? (
       <div
-        className="absolute z-40 flex items-center justify-center rounded-full border border-slate-500 bg-black/60 text-white/90 shadow"
+        className="absolute z-40 flex items-center justify-center rounded-full border border-slate-500 bg-black/60 font-[RadianceM] text-white/90 shadow"
         style={{
           height: res({ h: 20 }),
           width: res({ w: 20 }),
