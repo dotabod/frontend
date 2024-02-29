@@ -5,20 +5,13 @@ import { zeroPad } from 'react-countdown'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 
-// random number between 15 minutes and maximum 99 minutes
-function getRandomNumber() {
-  return Math.floor(Math.random() * 99 * 60) + 15 * 60
-}
-
 export const MatchTimer = ({ res }) => {
   const [duration, setDuration] = useState(0)
   const { data: findMatchText } = useUpdateSetting(
-    Settings.queueBlockerFindMatchText,
+    Settings.queueBlockerFindMatchText
   )
 
   useEffect(() => {
-    setDuration(getRandomNumber())
-
     const timer = setInterval(() => {
       setDuration((duration) => duration + 1)
     }, 1000)
