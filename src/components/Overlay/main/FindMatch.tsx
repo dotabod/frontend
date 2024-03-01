@@ -20,7 +20,7 @@ export const FindMatch = () => {
             fontSize: res({ w: 14 }),
             height: res({ h: 24 }),
             width: res({ w: 120 }),
-            top: res({ h: 143 }),
+            top: res({ h: 144 }),
             left: res({ w: 108 }),
           }}
           className="font-outline-2 absolute flex items-center rounded-sm bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]"
@@ -34,7 +34,7 @@ export const FindMatch = () => {
             fontSize: res({ w: 14 }),
             height: res({ h: 24 }),
             width: res({ w: 120 }),
-            top: res({ h: 143 }),
+            top: res({ h: 144 }),
             left: res({ w: 108 }),
           }}
           className="font-outline-2 absolute flex items-center rounded-sm bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]"
