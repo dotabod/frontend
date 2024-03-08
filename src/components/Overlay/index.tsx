@@ -94,6 +94,10 @@ const OverlayPage = (props) => {
 
   useOBS({ block, connected })
 
+  if (!connected) {
+    return null
+  }
+
   if (isDotabodDisabled) {
     return isDev ? (
       <>
@@ -133,7 +137,7 @@ const OverlayPage = (props) => {
           <div
             className={clsx(
               'hidden',
-              isInIframe && rankImageDetails?.notLoaded ? '!block' : '',
+              isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
             )}
           >
             <Center style={{ height }}>
