@@ -5,20 +5,20 @@ import { useEffect, useState } from 'react'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { devRadiantWinChance, isDev } from '@/lib/devConsts'
-import { useSocket, WinChance } from '@/lib/hooks/useSocket'
+import { useSocket, type WinChance } from '@/lib/hooks/useSocket'
 import { useOBS } from '@/lib/hooks/useOBS'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import {
-  blockType,
+  type blockType,
   devBlockTypes,
   devPoll,
   devRank,
   devWL,
 } from '@/lib/devConsts'
-import { PollData } from '@/components/Overlay/PollOverlay'
+import type { PollData } from '@/components/Overlay/PollOverlay'
 import { Center } from '@mantine/core'
 import clsx from 'clsx'
 import { motionProps } from '@/ui/utils'
@@ -28,6 +28,8 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
 
 const OverlayPage = (props) => {
+  const [delayPassed, setDelayPassed] = useState(true)
+
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
@@ -66,6 +68,24 @@ const OverlayPage = (props) => {
   const [isInIframe, setIsInIframe] = useState(false)
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if (!connected) {
+      // Start the delay when connected becomes false
+      setDelayPassed(false)
+      timeoutId = setTimeout(() => {
+        // After 5 seconds, set delayPassed to true
+        setDelayPassed(true)
+      }, 5000)
+    } else {
+      // If connected becomes true again before the delay is over, cancel the delay
+      clearTimeout(timeoutId)
+      setDelayPassed(true)
+    }
+    // Clean up the timeout when the component unmounts or when connected changes
+    return () => clearTimeout(timeoutId)
+  }, [connected])
+
+  useEffect(() => {
     setIsInIframe(window.self !== window.top)
   }, [])
 
@@ -93,6 +113,10 @@ const OverlayPage = (props) => {
   })
 
   useOBS({ block, connected })
+
+  if (!delayPassed) {
+    return null
+  }
 
   if (isDotabodDisabled) {
     return isDev ? (
@@ -133,7 +157,7 @@ const OverlayPage = (props) => {
           <div
             className={clsx(
               'hidden',
-              isInIframe && rankImageDetails?.notLoaded ? '!block' : '',
+              isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
             )}
           >
             <Center style={{ height }}>
