@@ -1,0 +1,9 @@
+{
+  "schedule": "weekly",
+  "ignoredFiles": [
+    "public/images/overlay/*"
+  ],
+  "aggressiveCompression": "false",
+  "compressWiki": "false",
+  "minKBReduced": 500
+}
