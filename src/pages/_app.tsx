@@ -15,6 +15,7 @@ import type { ReactElement, ReactNode } from 'react'
 import 'antd/dist/reset.css'
 import { Provider } from 'react-redux'
 import store from '@/lib/redux/store'
+import { MantineProvider } from '@mantine/core'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -74,11 +75,13 @@ const App = ({
           <SentrySession />
           <VercelAnalytics />
           <GoogleAnalytics />
-          <AntProvider>
+          <MantineProvider>
             <Provider store={store}>
-              {getLayout(<Component {...pageProps} />)}
+              <AntProvider>
+                {getLayout(<Component {...pageProps} />)}
+              </AntProvider>
             </Provider>
-          </AntProvider>
+          </MantineProvider>
         </StyleProvider>
       </ConfigProvider>
     </SessionProvider>
