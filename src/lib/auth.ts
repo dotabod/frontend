@@ -1,6 +1,6 @@
-import TwitchProvider from 'next-auth/providers/twitch'
-import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import type { NextAuthOptions } from 'next-auth'
+import TwitchProvider from 'next-auth/providers/twitch'
 
 import prisma from '@/lib/db'
 
@@ -14,20 +14,29 @@ const chatBotScopes = [
   'whispers:read',
   'whispers:edit',
   'user:manage:whispers',
-  'moderator:manage:chat_messages',
 ].join(' ')
 
 const defaultScopes = [
   'openid',
   'user:read:email',
+  'clips:edit', // Rampage clips, funny deaths, etc
+  'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
+  'channel:manage:ads', // Run ads automatically when a game ends
+  'channel:read:ads', // Determine if an ad is running
+  'channel:edit:commercial', // Run more ads
   'channel:manage:predictions',
-  'channel:manage:polls',
   'channel:read:predictions',
+  'channel:manage:polls',
   'channel:read:polls',
+  'channel:read:vips', // Custom commands for VIPs
   'chat:read',
   'chat:edit',
   'user:read:chat',
   'user:write:chat',
+  'user:read:broadcast', // We can check if twitch tooltips extension is enabled
+  'moderator:manage:chat_messages', // For the !plebs command
+  'moderator:read:chat_settings', // To check follower mode, emoji mode, etc
+  'moderator:manage:chat_settings', // To update slow mode, follower mode, etc
 ].join(' ')
 
 export const authOptions: NextAuthOptions = {
