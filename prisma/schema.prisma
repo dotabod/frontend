@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Account {
-  id                   String    @id @default(cuid())
+  id                   String    @id @default(dbgenerated("gen_random_uuid()"))
   userId               String    @unique
   type                 String
   provider             String
@@ -25,15 +25,17 @@ model Account {
   updatedAt            DateTime  @default(now()) @map("updated_at")
   obtainment_timestamp DateTime? @db.Timestamptz(6)
   expires_in           Int?
-  requires_refresh     Boolean?
+  requires_refresh     Boolean?  @default(false)
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([provider, providerAccountId])
+  @@index([provider, providerAccountId, userId], map: "idx_accounts_on_provider_provideraccountid_userid")
   @@map("accounts")
 }
 
+/// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
 model User {
-  id                                String         @id @default(cuid())
+  id                                String         @id @default(dbgenerated("gen_random_uuid()"))
   displayName                       String?        @unique(map: "users_name_key")
   email                             String?        @unique
   image                             String?
@@ -49,6 +51,8 @@ model User {
   stream_start_date                 DateTime?      @db.Timestamp(6)
   beta_tester                       Boolean        @default(false)
   locale                            String         @default("en")
+  kick                              BigInt?        @unique
+  youtube                           String?        @unique
   Account                           Account?
   Bet                               Bet[]
   mods_mods_mod_user_idTousers      mods[]         @relation("mods_mod_user_idTousers")
@@ -57,24 +61,29 @@ model User {
   SteamAccount                      SteamAccount[]
   streams                           streams?
 
+  @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
+  @@index([id], map: "idx_users_on_id")
+  @@index([name], map: "idx_users_on_name")
   @@map("users")
 }
 
 model Setting {
-  id        String   @id @default(cuid())
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
   key       String
   value     Json?
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([key, userId])
+  @@index([userId], map: "idx_settings_on_userid")
+  @@index([userId], map: "idx_user_id_desc")
   @@map("settings")
 }
 
 model SteamAccount {
-  id               String   @id @default(cuid())
+  id               String   @id @default(dbgenerated("gen_random_uuid()"))
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @default(now()) @map("updated_at")
   steam32Id        Int      @unique
@@ -89,11 +98,11 @@ model SteamAccount {
 }
 
 model Bet {
-  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @map("updated_at")
   matchId       String
-  predictionId  String
+  predictionId  String?
   won           Boolean?
   myTeam        String
   userId        String
@@ -106,9 +115,10 @@ model Bet {
   dire_score    Int?     @db.SmallInt
   kda           Json?
   hero_name     String?
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([matchId, userId])
+  @@index([won, lobby_type, createdAt, id], map: "idx_bets_on_won_lobbytype_createdat_id")
   @@map("bets")
 }
 
