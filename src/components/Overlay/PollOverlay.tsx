@@ -1,11 +1,11 @@
-import TwitchFetcher from 'twitch-fetcher'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
 import { motion } from 'framer-motion'
-import Countdown, { zeroPad } from 'react-countdown'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useEffect, useState } from 'react'
-import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
+import Countdown, { zeroPad } from 'react-countdown'
+import TwitchFetcher from 'twitch-fetcher'
 import { TextWithEmotes } from './TextWithEmotes'
 
 export type PollData = {
@@ -79,20 +79,25 @@ export const PollOverlay = ({
       >
         <TextWithEmotes emotes={emotes} text={title} />
       </h1>
-      <Progress
+      <Progress.Root
         size={res({ w: 24 })}
         className="border border-slate-600 shadow-lg"
         radius="lg"
-        sections={choicesWithPercent.map((choice, i) => ({
-          label: `${choice.title}${
-            choice.totalVotes
-              ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})`
-              : ''
-          }`,
-          value: choice.percent,
-          color: PollColors[i] || PollColors[0],
-        }))}
-      />
+      >
+        {choicesWithPercent.map((choice, i) => (
+          <Progress.Section
+            key={choice.title}
+            value={choice.percent}
+            color={PollColors[i] || PollColors[0]}
+          >
+            <Progress.Label>{`${choice.title}${
+              choice.totalVotes
+                ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})`
+                : ''
+            }`}</Progress.Label>
+          </Progress.Section>
+        ))}
+      </Progress.Root>
       <Center>
         {endDate && (
           <Countdown
