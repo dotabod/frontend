@@ -24,6 +24,8 @@ const defaultScopes = [
   'channel:manage:polls',
   'channel:read:predictions',
   'channel:read:polls',
+  'chat:read',
+  'chat:edit',
 ].join(' ')
 
 export const authOptions: NextAuthOptions = {
