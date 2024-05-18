@@ -28,7 +28,7 @@
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@reduxjs/toolkit": "^2.2.5",
-    "@sentry/nextjs": "^8.2.1",
+    "@sentry/nextjs": "8",
     "@tailwindcss/forms": "^0.5.6",
     "@twurple/api": "^5.3.4",
     "@twurple/auth": "^5.3.4",
