@@ -14,6 +14,9 @@ const chatBotScopes = [
   'whispers:read',
   'whispers:edit',
   'user:manage:whispers',
+  'moderator:read:chat_settings', // To check follower mode, emoji mode, etc
+  'moderator:manage:chat_messages', // For the !plebs command
+  'moderator:manage:chat_settings', // To update slow mode, follower mode, etc
 ].join(' ')
 
 const defaultScopes = [
@@ -34,9 +37,6 @@ const defaultScopes = [
   'user:read:chat',
   'user:write:chat',
   'user:read:broadcast', // We can check if twitch tooltips extension is enabled
-  'moderator:manage:chat_messages', // For the !plebs command
-  'moderator:read:chat_settings', // To check follower mode, emoji mode, etc
-  'moderator:manage:chat_settings', // To update slow mode, follower mode, etc
 ].join(' ')
 
 export const authOptions: NextAuthOptions = {
