@@ -26,7 +26,6 @@ const defaultScopes = [
   'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
   'channel:manage:ads', // Run ads automatically when a game ends
   'channel:read:ads', // Determine if an ad is running
-  'channel:edit:commercial', // Run more ads
   'channel:manage:predictions',
   'channel:read:predictions',
   'channel:manage:polls',
