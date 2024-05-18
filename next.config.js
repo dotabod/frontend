@@ -31,8 +31,8 @@ module.exports = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  org: 'dotabod',
-  project: 'frontend',
+  org: 'mgates-llc',
+  project: 'dotabod-frontend',
 
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 
