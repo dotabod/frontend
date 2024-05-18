@@ -604,6 +604,63 @@ const CommandDetail = {
       />
     ),
   },
+  [Settings.commandVersion]: {
+    title: 'Version',
+    description: 'Tells chat the current running version of Dotabod.',
+    cmd: '!version',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!version"
+        response="Server running version {{version}}, here's what's missing compared to the latest version: {{- url}}"
+      />
+    ),
+  },
+  [Settings.commandOnline]: {
+    title: 'Online or offline status',
+    description:
+      'Updates the status of your stream that Dotabod sees to online or offline.',
+    cmd: '!online',
+    alias: ['offline', 'forceonline', 'forceoffline'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!online"
+        response="Dotabod will treat {{channel}} as offline. Type !online to undo"
+      />
+    ),
+  },
+  [Settings.commandResetwl]: {
+    title: 'Reset win loss',
+    description: 'Resets your win losses to 0-0.',
+    cmd: '!resetwl',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!resetwl"
+        response="Resetting win/loss to 0 for {{channel}}"
+      />
+    ),
+  },
+  [Settings.commandLocale]: {
+    title: 'Locale',
+    description: 'Tells chat the current locale of Dotabod.',
+    cmd: '!locale',
+    alias: ['translation', 'translatedby'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!locale"
+        response="Dotabod is translated by {{- translators}}. Want to help translate or see a mistake? {{- url}}"
+      />
+    ),
+  },
 }
 
 export default CommandDetail
