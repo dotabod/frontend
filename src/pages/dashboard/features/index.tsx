@@ -9,19 +9,21 @@ import { ReactElement } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Header from '@/components/Dashboard/Header'
 import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
+import { useTranslation } from 'react-i18next';
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
+  const { t } = useTranslation();
 
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Main features</title>
+        <title>{t('features.main.title')}</title>
       </Head>
 
       <Header
-        subtitle="Customize the options your stream receives."
-        title="Main features"
+        subtitle={t('features.main.subtitle')}
+        title={t('features.main.title')}
       />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">

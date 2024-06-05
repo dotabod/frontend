@@ -5,19 +5,21 @@ import Head from 'next/head'
 import { ReactElement } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Header from '@/components/Dashboard/Header'
+import { useTranslation } from 'react-i18next';
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
+  const { t } = useTranslation();
 
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Advanced features</title>
+        <title>{t('features.advanced.title')}</title>
       </Head>
 
       <Header
-        subtitle="Looking for even more? They'll be here 😎"
-        title="Advanced features"
+        subtitle={t('features.advanced.subtitle')}
+        title={t('features.advanced.title')}
       />
 
       <SceneSwitcher />

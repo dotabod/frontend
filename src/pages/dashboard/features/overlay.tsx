@@ -12,19 +12,21 @@ import QueueCard from '@/components/Dashboard/Features/QueueCard'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
 import BetsOverlay from '@/components/Overlay/BetsOverlay'
 import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
+import { useTranslation } from 'react-i18next';
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
+  const { t } = useTranslation();
 
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Overlay features</title>
+        <title>{t('features.overlay.title')}</title>
       </Head>
 
       <Header
-        subtitle="This stuff will show up on your stream"
-        title="Overlay"
+        subtitle={t('features.overlay.subtitle')}
+        title={t('features.overlay.title')}
       />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
