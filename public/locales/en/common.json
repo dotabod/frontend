@@ -4,5 +4,36 @@
         "title": "Welcome, streamer",
         "description": "Unlock the Ultimate Dota 2 Streaming Experience with Dotabod! Boost your stream's engagement, showcase real-time stats, and delight your audience with our all-in-one streaming toolkit. Elevate your game and become the streamer you were meant to be!"
     },
-    "live": "Live"
+    "live": "Live",
+    "setup": {
+        "title": "Setup",
+        "subtitle": "Let's get Dotabod working for you right away",
+        "step1": "Twitch",
+        "step2": "Dota 2",
+        "step3": "OBS",
+        "step4": "All done!",
+        "finalNote": "That's it! You're all set up."
+    },
+    "features": {
+        "main": {
+            "title": "Main features",
+            "subtitle": "Customize the options your stream receives."
+        },
+        "chat": {
+            "title": "Chatter",
+            "subtitle": "The bot can post some random messages as you play your game."
+        },
+        "advanced": {
+            "title": "Advanced features",
+            "subtitle": "Looking for even more? They'll be here 😎"
+        },
+        "overlay": {
+            "title": "Overlay",
+            "subtitle": "This stuff will show up on your stream"
+        }
+    },
+    "troubleshoot": {
+        "title": "Live preview",
+        "subtitle": "Take a peak to see if your OBS is showing the correct overlay. Try joining a bot match to have this preview show the pick blocker, for example."
+    }
 }

@@ -5,19 +5,21 @@ import Head from 'next/head'
 import { ReactElement } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Header from '@/components/Dashboard/Header'
+import { useTranslation } from 'react-i18next';
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()
+  const { t } = useTranslation();
 
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Chat features</title>
+        <title>{t('features.chat.title')}</title>
       </Head>
 
       <Header
-        subtitle="The bot can post some random messages as you play your game."
-        title="Chatter"
+        subtitle={t('features.chat.subtitle')}
+        title={t('features.chat.title')}
       />
 
       <ChatterCard />

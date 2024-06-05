@@ -10,9 +10,11 @@ import Link from 'next/link'
 import Header from '@/components/Dashboard/Header'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { Button, Steps } from 'antd'
+import { useTranslation } from 'react-i18next';
 
 const SetupPage = () => {
   const { status } = useSession()
+  const { t } = useTranslation();
 
   const [active, setActive] = useState(0)
   const nextStep = () =>
@@ -22,24 +24,24 @@ const SetupPage = () => {
 
   const steps = [
     {
-      title: 'Twitch',
+      title: t('setup.step1', 'Twitch'),
       content: <ChatBot />,
     },
     {
-      title: 'Dota 2',
+      title: t('setup.step2', 'Dota 2'),
       content: <ExportCFG />,
     },
     {
-      title: 'OBS',
+      title: t('setup.step3', 'OBS'),
       content: <OBSOverlay />,
     },
     {
-      title: 'All done!',
+      title: t('setup.step4', 'All done!'),
       content: (
         <Card>
           <div className="mb-4 space-x-2">
             <span>
-              <b>That&apos;s it!</b> You&apos;re all set up.
+              <b>{t('setup.finalNote', "That's it! You're all set up.")}</b>
             </span>
             <Image
               className="inline"
@@ -63,12 +65,10 @@ const SetupPage = () => {
             </div>
             <div>
               <p>
-                Test it by joining a bot match. Visit the{' '}
-                <Link href="overlay">Live Preview page</Link> to confirm the
-                overlay is showing. You should see the minimap blocker overlay
-                once you&apos;re in a match.
+                {t('setup.testInstruction', "Test it by joining a bot match. Visit the Live Preview page to confirm the overlay is showing. You should see the minimap blocker overlay once you're in a match.")}
+                <Link href="overlay">{t('setup.livePreview', 'Live Preview page')}</Link>
+                {t('setup.note', "Note: Dotabod will only work if your stream is online.")}
               </p>
-              <p>Note: Dotabod will only work if your stream is online.</p>
             </div>
           </div>
         </Card>
@@ -79,13 +79,13 @@ const SetupPage = () => {
   return status === 'authenticated' ? (
     <>
       <Head>
-        <title>Dotabod | Setup</title>
+        <title>{t('setup.title', 'Dotabod | Setup')}</title>
       </Head>
       <Header
         subtitle={
           <>
             <div>
-              Let&apos;s get Dotabod working for you right away{' '}
+              {t('setup.subtitle', "Let's get Dotabod working for you right away")}
               <Image
                 src="/images/emotes/peepoclap.webp"
                 width={30}
@@ -96,7 +96,7 @@ const SetupPage = () => {
             </div>
           </>
         }
-        title="Setup"
+        title={t('setup.title', 'Setup')}
       />
 
       <Steps current={active} onChange={setActive} items={steps} />
@@ -106,20 +106,20 @@ const SetupPage = () => {
       <div className="flex space-x-4 pb-10">
         {active > 0 && (
           <Button size="large" onClick={prevStep}>
-            Back
+            {t('setup.back', 'Back')}
           </Button>
         )}
 
         {active === steps.length - 1 && (
           <Link href="/dashboard/features">
             <Button size="large" type="primary">
-              View features
+              {t('setup.viewFeatures', 'View features')}
             </Button>
           </Link>
         )}
         {active < steps.length - 1 && (
           <Button size="large" type="primary" onClick={nextStep}>
-            Next step
+            {t('setup.nextStep', 'Next step')}
           </Button>
         )}
       </div>

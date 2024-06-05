@@ -1,5 +1,7 @@
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { SessionProvider } from 'next-auth/react'
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../i18n';
 
 import '@/styles/tailwind.css'
 import 'focus-visible'
@@ -38,53 +40,55 @@ const App = ({
 
   return (
     <SessionProvider session={session}>
-      <ConfigProvider
-        theme={{
-          algorithm: theme.darkAlgorithm,
-          components: {
-            Button: {
-              colorLink: 'var(--color-purple-300)',
-              colorPrimaryHover: 'var(--color-purple-300)',
+      <I18nextProvider i18n={i18n}>
+        <ConfigProvider
+          theme={{
+            algorithm: theme.darkAlgorithm,
+            components: {
+              Button: {
+                colorLink: 'var(--color-purple-300)',
+                colorPrimaryHover: 'var(--color-purple-300)',
+              },
+              Tabs: {
+                colorPrimary: 'var(--color-purple-400)',
+                itemHoverColor: 'var(--color-purple-300)',
+              },
+              Menu: {
+                colorSubItemBg: 'var(--color-gray-800)',
+                colorItemBgHover: 'var(--color-gray-700)',
+                colorItemBgSelected: 'var(--color-gray-600)',
+                colorItemTextSelected: 'var(--color-gray-200)',
+                colorItemText: 'var(--color-gray-300)',
+              },
+              Switch: {
+                colorPrimary: 'var(--color-purple-900)',
+              },
             },
-            Tabs: {
-              colorPrimary: 'var(--color-purple-400)',
-              itemHoverColor: 'var(--color-purple-300)',
+            token: {
+              colorPrimary: 'rgb(85, 24, 103)',
+              colorLink: 'var(--color-purple-500)',
+              colorLinkActive: 'var(--color-purple-300)',
+              colorLinkHover: 'var(--color-purple-300)',
+              colorText: 'var(--color-gray-200)',
+              colorBgLayout: 'var(--color-gray-900)',
+              colorBgContainer: 'var(--color-gray-800)',
             },
-            Menu: {
-              colorSubItemBg: 'var(--color-gray-800)',
-              colorItemBgHover: 'var(--color-gray-700)',
-              colorItemBgSelected: 'var(--color-gray-600)',
-              colorItemTextSelected: 'var(--color-gray-200)',
-              colorItemText: 'var(--color-gray-300)',
-            },
-            Switch: {
-              colorPrimary: 'var(--color-purple-900)',
-            },
-          },
-          token: {
-            colorPrimary: 'rgb(85, 24, 103)',
-            colorLink: 'var(--color-purple-500)',
-            colorLinkActive: 'var(--color-purple-300)',
-            colorLinkHover: 'var(--color-purple-300)',
-            colorText: 'var(--color-gray-200)',
-            colorBgLayout: 'var(--color-gray-900)',
-            colorBgContainer: 'var(--color-gray-800)',
-          },
-        }}
-      >
-        <StyleProvider hashPriority="high">
-          <SentrySession />
-          <VercelAnalytics />
-          <GoogleAnalytics />
-          <MantineProvider>
-            <Provider store={store}>
-              <AntProvider>
-                {getLayout(<Component {...pageProps} />)}
-              </AntProvider>
-            </Provider>
-          </MantineProvider>
-        </StyleProvider>
-      </ConfigProvider>
+          }}
+        >
+          <StyleProvider hashPriority="high">
+            <SentrySession />
+            <VercelAnalytics />
+            <GoogleAnalytics />
+            <MantineProvider>
+              <Provider store={store}>
+                <AntProvider>
+                  {getLayout(<Component {...pageProps} />)}
+                </AntProvider>
+              </Provider>
+            </MantineProvider>
+          </StyleProvider>
+        </ConfigProvider>
+      </I18nextProvider>
     </SessionProvider>
   )
 }
