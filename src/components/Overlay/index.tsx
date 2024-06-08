@@ -79,7 +79,7 @@ const OverlayPage = (props) => {
     )
 
     const rankDetails = {
-      image: rank.myRank.image,
+      image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
       leaderboard:
         'standing' in rank
