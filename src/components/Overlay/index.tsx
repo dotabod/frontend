@@ -78,6 +78,8 @@ const OverlayPage = (props) => {
       steamAccount?.leaderboard_rank
     )
 
+    if (!rank) return
+
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
