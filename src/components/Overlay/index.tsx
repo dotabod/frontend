@@ -26,11 +26,13 @@ import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { Alert, Spin } from 'antd'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
+import { getRankDetail } from '@/lib/ranks'
 
 const OverlayPage = (props) => {
   const [delayPassed, setDelayPassed] = useState(true)
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
+  const { original } = useUpdateSetting()
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
@@ -66,6 +68,28 @@ const OverlayPage = (props) => {
   })
 
   const [isInIframe, setIsInIframe] = useState(false)
+
+  useEffect(() => {
+    if (!original) return
+
+    const steamAccount = original.SteamAccount?.[0]
+    const rank = getRankDetail(
+      steamAccount?.mmr ?? original.mmr,
+      steamAccount?.leaderboard_rank
+    )
+
+    const rankDetails = {
+      image: rank.myRank.image,
+      rank: rank.mmr,
+      leaderboard:
+        'standing' in rank
+          ? rank.standing
+          : steamAccount?.leaderboard_rank ?? false,
+      notLoaded: false,
+    }
+
+    setRankImageDetails(rankDetails)
+  }, [original])
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
@@ -178,6 +202,18 @@ const OverlayPage = (props) => {
             </Center>
           </div>
         </motion.div>
+
+        {!original?.stream_online && (
+          <div>
+            <motion.div
+              className="absolute right-0 mt-9 block max-w-xs"
+              key="not-live"
+              {...motionProps}
+            >
+              <Alert message="Stream is offline! Dotabod won't respond to game events. Actually live? Type !online" />
+            </motion.div>
+          </div>
+        )}
 
         <PollOverlays
           pollData={pollData}

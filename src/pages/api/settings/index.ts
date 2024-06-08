@@ -37,6 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           SteamAccount: {
             select: {
               mmr: true,
+              leaderboard_rank: true,
               steam32Id: true,
             },
           },
