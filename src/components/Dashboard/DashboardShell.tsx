@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { navigation } from '@/components/Dashboard/navigation'
-import clsx from 'clsx'
-import { UserAccountNav } from '@/components/UserAccountNav'
 import { DarkLogo } from '@/components/Logo'
-import { Layout, Menu, MenuProps, theme } from 'antd'
+import { UserAccountNav } from '@/components/UserAccountNav'
 import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
 } from '@heroicons/react/24/outline'
-import { DisableToggle } from '@/components/Dashboard/DisableToggle'
+import { Layout, Menu, type MenuProps, theme } from 'antd'
+import clsx from 'clsx'
+import Link from 'next/link'
+import type React from 'react'
+import { useEffect, useState } from 'react'
 
 const { Header, Sider, Content } = Layout
 
@@ -61,32 +62,6 @@ export default function DashboardShell({
 
   return (
     <>
-      <style global jsx>{`
-        html,
-        body {
-          @apply !bg-gray-800;
-          scrollbar-width: thin;
-          scrollbar-color: #3e4155 transparent;
-        }
-
-        ::-webkit-scrollbar {
-          width: 6px;
-          outline: none;
-          border: none;
-          background: transparent;
-          padding: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          @apply bg-gray-500;
-          border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-          @apply bg-transparent/10;
-          border-radius: 6px;
-        }
-      `}</style>
       <Layout className="h-full bg-gray-800">
         <Sider
           breakpoint="md"
