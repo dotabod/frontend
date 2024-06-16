@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Courier = ({ data, team }) => {
   const isEnemy = data.teamP !== team
   const hasIcon = data.image !== 'plaincircle'

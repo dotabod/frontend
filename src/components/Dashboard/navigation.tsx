@@ -16,7 +16,6 @@ import Discord from '@/images/logos/Discord'
 import KofiIcon from '@/images/logos/Kofi'
 import Image from 'next/image'
 import BoostyLogo from '@/images/logos/BoostyIcon.png'
-import React from 'react'
 import clsx from 'clsx'
 
 export const navigation = [

@@ -28,7 +28,11 @@ export default function Login() {
           Oops. Unable to log you in. This usually happens if you already have
           an account on Dotabod under the same email. Try to change your email
           on twitch.tv to something new and login again. Reach out to us on{' '}
-          <a href="https://discord.dotabod.com" target="_blank">
+          <a
+            href="https://discord.dotabod.com"
+            target="_blank"
+            rel="noreferrer"
+          >
             Discord
           </a>{' '}
           for more help.

@@ -15,7 +15,7 @@ export default function BetsCard() {
   } = useUpdateSetting(Settings.bets)
   const {
     data: info,
-    loading: loading,
+    loading,
     updateSetting: updateInfo,
   } = useUpdateSetting(Settings.betsInfo)
 

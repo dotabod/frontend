@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 const BoostyIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={64} height={64} {...props}>
     <path

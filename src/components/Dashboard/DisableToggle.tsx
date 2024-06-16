@@ -1,6 +1,5 @@
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Settings } from '@/lib/defaultSettings'
-import React from 'react'
 import { Switch, Tooltip } from 'antd'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 

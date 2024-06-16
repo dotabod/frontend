@@ -34,7 +34,7 @@ export const useOBS = ({ connected, block }) => {
     if (!hasSceneSwitcher || typeof window !== 'object' || !window?.obsstudio)
       return
 
-    window.obsstudio.getCurrentScene(function (scene) {
+    window.obsstudio.getCurrentScene((scene) => {
       const myScenes = [minimapName, picksName, dcName]
 
       // Some people don't enable the permissions

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button } from 'antd'
 
 function JustButton({ url, data, user, extension = 'cfg', onClick = null }) {

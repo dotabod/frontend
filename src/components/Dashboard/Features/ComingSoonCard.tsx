@@ -1,5 +1,4 @@
 import { Card } from '@/ui/card'
-import React from 'react'
 import clsx from 'clsx'
 import { Tag } from 'antd'
 

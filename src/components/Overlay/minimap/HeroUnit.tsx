@@ -1,5 +1,3 @@
-import React from 'react'
-
 const HeroUnit = ({ data, team }) => {
   const isEnemy = data.teamP !== team
   const unitType = data.unitname

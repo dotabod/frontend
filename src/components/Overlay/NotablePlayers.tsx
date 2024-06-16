@@ -1,7 +1,6 @@
 import * as Flags from 'mantine-flagpack'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import React from 'react'
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import clsx from 'clsx'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'

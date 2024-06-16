@@ -30,14 +30,14 @@ export const useOverlayPositions = () => {
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const { data: isBp } = useUpdateSetting(Settings.battlepass)
 
-  let wlPosition = {
+  const wlPosition = {
     bottom: 0,
     right: res({ w: 311 }),
     left: null,
     fontSize: res({ w: 18 }),
   }
 
-  let roshPosition = {
+  const roshPosition = {
     left: isXL
       ? res({ w: isSimple ? 280 : 285 })
       : res({ w: isSimple ? 243 : 250 }),
@@ -45,7 +45,7 @@ export const useOverlayPositions = () => {
     right: null,
   }
 
-  let minimapPosition = {
+  const minimapPosition = {
     bottom: 0,
     left: 0,
     right: null,

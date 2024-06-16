@@ -1,4 +1,3 @@
-import React from 'react'
 import { Logomark } from 'src/components/Logo'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'

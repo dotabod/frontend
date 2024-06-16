@@ -6,7 +6,7 @@ export function CircleBackground({
   height = 558,
   ...props
 }) {
-  let id = useId()
+  const id = useId()
 
   return (
     <svg

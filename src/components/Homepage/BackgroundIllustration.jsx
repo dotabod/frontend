@@ -1,7 +1,7 @@
 import { useId } from 'react'
 
 export function BackgroundIllustration(props) {
-  let id = useId()
+  const id = useId()
 
   return (
     <div {...props}>

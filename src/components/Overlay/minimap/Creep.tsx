@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Creep = ({ data, team }) => {
   const isEnemy = data.teamP !== team
 

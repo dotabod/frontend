@@ -127,7 +127,7 @@ export default function PrivacyPolicy() {
                   <strong>Website</strong> refers to Dotabod, accessible from{' '}
                   <a
                     href="dotabod.com"
-                    rel="external nofollow noopener"
+                    rel="noreferrer external nofollow noopener"
                     target="_blank"
                   >
                     dotabod.com

@@ -209,7 +209,7 @@ function OBSScreen({ custom, animated = false }) {
 }
 
 function usePrevious(value) {
-  let ref = useRef()
+  const ref = useRef()
 
   useEffect(() => {
     ref.current = value
@@ -219,12 +219,12 @@ function usePrevious(value) {
 }
 
 function FeaturesDesktop() {
-  let [changeCount, setChangeCount] = useState(0)
-  let [selectedIndex, setSelectedIndex] = useState(0)
-  let prevIndex = usePrevious(selectedIndex)
-  let isForwards = prevIndex === undefined ? true : selectedIndex > prevIndex
+  const [changeCount, setChangeCount] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const prevIndex = usePrevious(selectedIndex)
+  const isForwards = prevIndex === undefined ? true : selectedIndex > prevIndex
 
-  let onChange = useDebouncedCallback(
+  const onChange = useDebouncedCallback(
     (selectedIndex) => {
       setSelectedIndex(selectedIndex)
       setChangeCount((changeCount) => changeCount + 1)
@@ -298,14 +298,14 @@ function FeaturesDesktop() {
 }
 
 function FeaturesMobile() {
-  let [activeIndex, setActiveIndex] = useState(0)
-  let slideContainerRef = useRef()
-  let slideRefs = useRef([])
+  const [activeIndex, setActiveIndex] = useState(0)
+  const slideContainerRef = useRef()
+  const slideRefs = useRef([])
 
   useEffect(() => {
-    let observer = new window.IntersectionObserver(
+    const observer = new window.IntersectionObserver(
       (entries) => {
-        for (let entry of entries) {
+        for (const entry of entries) {
           if (entry.isIntersecting) {
             setActiveIndex(slideRefs.current.indexOf(entry.target))
             break
@@ -318,7 +318,7 @@ function FeaturesMobile() {
       }
     )
 
-    for (let slide of slideRefs.current) {
+    for (const slide of slideRefs.current) {
       if (slide) {
         observer.observe(slide)
       }

@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import { UserAccountNav } from '../UserAccountNav'
 import { useState } from 'react'
-import * as React from 'react'
 import { Button } from 'antd'
 
 export function LoginButton({ className, ...props }) {

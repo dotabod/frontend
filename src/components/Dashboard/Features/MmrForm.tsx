@@ -7,7 +7,7 @@ import {
 import { Tag, Button, InputNumber, Form } from 'antd'
 import { useForm } from '@mantine/form'
 import { SteamAccount } from '@prisma/client'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
 import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'

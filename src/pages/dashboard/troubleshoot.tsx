@@ -135,7 +135,7 @@ const faqs = [
     answer: (
       <span>
         Get help in our{' '}
-        <a target="_blank" href="https://discord.dotabod.com">
+        <a target="_blank" href="https://discord.dotabod.com" rel="noreferrer">
           Discord
         </a>
         .

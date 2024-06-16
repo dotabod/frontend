@@ -2,7 +2,6 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Settings } from '@/lib/defaultSettings'
 import { Switch } from 'antd'
-import React from 'react'
 import Image from 'next/image'
 import clsx from 'clsx'
 
