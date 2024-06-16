@@ -20,22 +20,23 @@ const chatBotScopes = [
 ].join(' ')
 
 const defaultScopes = [
-  'openid',
-  'user:read:email',
-  'clips:edit', // Rampage clips, funny deaths, etc
-  'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
   'channel:manage:ads', // Run ads automatically when a game ends
-  'channel:read:ads', // Determine if an ad is running
-  'channel:manage:predictions',
-  'channel:read:predictions',
+  'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
+  'channel:manage:moderators', // To add Dotabod as a moderator (required)
   'channel:manage:polls',
+  'channel:manage:predictions',
+  'channel:read:ads', // Determine if an ad is running
   'channel:read:polls',
+  'channel:read:predictions',
   'channel:read:vips', // Custom commands for VIPs
-  'chat:read',
   'chat:edit',
-  'user:read:chat',
-  'user:write:chat',
+  'chat:read',
+  'clips:edit', // Rampage clips, funny deaths, etc
+  'openid',
   'user:read:broadcast', // We can check if twitch tooltips extension is enabled
+  'user:read:chat',
+  'user:read:email',
+  'user:write:chat',
 ].join(' ')
 
 export const authOptions: NextAuthOptions = {
