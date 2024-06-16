@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 
 const faqs = [
   {

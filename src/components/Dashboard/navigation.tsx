@@ -1,22 +1,22 @@
-import { Github, Info } from 'lucide-react'
-import {
-  BeakerIcon,
-  SparklesIcon,
-  CommandLineIcon,
-  HeartIcon,
-  QuestionMarkCircleIcon,
-  NewspaperIcon,
-  GlobeEuropeAfricaIcon,
-  MegaphoneIcon,
-  ScaleIcon,
-  TvIcon,
-  ShareIcon,
-} from '@heroicons/react/24/outline'
+import BoostyLogo from '@/images/logos/BoostyIcon.png'
 import Discord from '@/images/logos/Discord'
 import KofiIcon from '@/images/logos/Kofi'
-import Image from 'next/image'
-import BoostyLogo from '@/images/logos/BoostyIcon.png'
+import {
+  BeakerIcon,
+  CommandLineIcon,
+  GlobeEuropeAfricaIcon,
+  HeartIcon,
+  MegaphoneIcon,
+  NewspaperIcon,
+  QuestionMarkCircleIcon,
+  ScaleIcon,
+  ShareIcon,
+  SparklesIcon,
+  TvIcon,
+} from '@heroicons/react/24/outline'
 import clsx from 'clsx'
+import { Github, Info } from 'lucide-react'
+import Image from 'next/image'
 
 export const navigation = [
   {

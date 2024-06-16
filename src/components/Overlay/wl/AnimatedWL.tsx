@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion'
 import WinLossCard from '@/components/Overlay/wl/WinLossCard'
-import { motionProps } from '@/ui/utils'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
+import { motionProps } from '@/ui/utils'
+import { motion } from 'framer-motion'
 
 export const AnimatedWL = ({
   wl,

@@ -1,15 +1,15 @@
-import ExportCFG from '@/components/Dashboard/ExportCFG'
 import ChatBot from '@/components/Dashboard/ChatBot'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
+import ExportCFG from '@/components/Dashboard/ExportCFG'
+import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
+import { Card } from '@/ui/card'
+import { Button, Steps } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
-import { ReactElement, useState } from 'react'
-import { Card } from '@/ui/card'
 import Link from 'next/link'
-import Header from '@/components/Dashboard/Header'
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { Button, Steps } from 'antd'
+import { type ReactElement, useState } from 'react'
 
 const SetupPage = () => {
   const { status } = useSession()

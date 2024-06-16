@@ -1,5 +1,5 @@
 import 'next-auth/jwt'
-import { User } from 'next-auth'
+import type { User } from 'next-auth'
 
 type UserId = string
 

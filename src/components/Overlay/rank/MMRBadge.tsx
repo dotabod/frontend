@@ -1,6 +1,6 @@
-import { Badge } from '../../Badge'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import clsx from 'clsx'
+import { Badge } from '../../Badge'
 import { Card } from '../../Card'
 
 export const Numbers = ({

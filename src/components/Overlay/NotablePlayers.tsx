@@ -1,9 +1,9 @@
-import * as Flags from 'mantine-flagpack'
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
-import clsx from 'clsx'
+import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import clsx from 'clsx'
+import * as Flags from 'mantine-flagpack'
 
 export type NotablePlayer = {
   heroId: number

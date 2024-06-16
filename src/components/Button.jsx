@@ -1,6 +1,6 @@
-import { forwardRef } from 'react'
-import Link from 'next/link'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { forwardRef } from 'react'
 
 const baseStyles = {
   solid:

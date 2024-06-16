@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
 

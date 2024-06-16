@@ -1,9 +1,9 @@
 import { Settings } from '@/lib/defaultSettings'
-import { blockType, isDev } from '@/lib/devConsts'
+import { type blockType, isDev } from '@/lib/devConsts'
 import { fetcher } from '@/lib/fetcher'
 import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { RankType, getRankImage } from '@/lib/ranks'
+import { type RankType, getRankImage } from '@/lib/ranks'
 import {
   EventSubChannelPollBeginEvent,
   EventSubChannelPollEndEvent,
@@ -16,7 +16,7 @@ import {
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import io, { Socket } from 'socket.io-client'
+import io, { type Socket } from 'socket.io-client'
 import {
   setMinimapDataBuildings,
   setMinimapDataCouriers,

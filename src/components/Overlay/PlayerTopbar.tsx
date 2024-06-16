@@ -1,8 +1,8 @@
-import React from 'react'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { motion } from 'framer-motion'
-import { motionProps } from '@/ui/utils'
 import { usePlayerPositions } from '@/lib/hooks/useOverlayPositions'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { motionProps } from '@/ui/utils'
+import { motion } from 'framer-motion'
+import type React from 'react'
 
 export const PlayerTopbar = ({
   children,

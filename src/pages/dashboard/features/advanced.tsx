@@ -1,10 +1,10 @@
-import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
+import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
+import Header from '@/components/Dashboard/Header'
+import type { NextPageWithLayout } from '@/pages/_app'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { ReactElement } from 'react'
-import type { NextPageWithLayout } from '@/pages/_app'
-import Header from '@/components/Dashboard/Header'
+import type { ReactElement } from 'react'
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()

@@ -1,9 +1,9 @@
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch } from 'antd'
-import { Settings } from '@/lib/defaultSettings'
-import Image from 'next/image'
 import clsx from 'clsx'
+import Image from 'next/image'
 
 export default function WinProbabilityOverlay() {
   const {

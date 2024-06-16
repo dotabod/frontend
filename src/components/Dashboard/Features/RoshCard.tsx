@@ -1,9 +1,9 @@
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
-import { Settings } from '@/lib/defaultSettings'
 
 export default function RoshCard() {
   const {

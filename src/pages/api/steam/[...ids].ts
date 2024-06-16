@@ -1,8 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { getServerSession } from 'next-auth'
 
 function convertSteam32To64(steam32Id) {
   return BigInt(steam32Id) + BigInt(76561197960265728)

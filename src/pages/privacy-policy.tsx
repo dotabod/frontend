@@ -1,7 +1,7 @@
-import Head from 'next/head'
-import { Header } from '@/components/Homepage/Header'
 import { Container } from '@/components/Container'
 import { Footer } from '@/components/Homepage/Footer'
+import { Header } from '@/components/Homepage/Header'
+import Head from 'next/head'
 export default function PrivacyPolicy() {
   return (
     <>

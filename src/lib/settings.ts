@@ -1,4 +1,4 @@
-import { defaultSettings, SettingKeys } from '@/lib/defaultSettings'
+import { type SettingKeys, defaultSettings } from '@/lib/defaultSettings'
 
 export const getValueOrDefault = (
   key: SettingKeys,

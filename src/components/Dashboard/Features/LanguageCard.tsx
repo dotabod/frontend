@@ -1,5 +1,5 @@
 import useLanguageTranslations, {
-  CrowdinLanguage,
+  type CrowdinLanguage,
   getLanguageProgress,
 } from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'

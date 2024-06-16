@@ -1,6 +1,6 @@
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Settings } from '@/lib/defaultSettings'
 import { Form, Input, InputNumber } from 'antd'
 import { useDebouncedCallback } from 'use-debounce'
 

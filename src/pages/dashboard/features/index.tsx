@@ -1,14 +1,14 @@
-import BetsCard from '@/components/Dashboard/Features/BetsCard'
-import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
+import BetsCard from '@/components/Dashboard/Features/BetsCard'
+import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
+import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
+import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
+import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
+import Header from '@/components/Dashboard/Header'
+import type { NextPageWithLayout } from '@/pages/_app'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
-import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
-import { ReactElement } from 'react'
-import type { NextPageWithLayout } from '@/pages/_app'
-import Header from '@/components/Dashboard/Header'
-import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
+import type { ReactElement } from 'react'
 
 const FeaturesPage: NextPageWithLayout = () => {
   const { status } = useSession()

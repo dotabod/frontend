@@ -1,10 +1,10 @@
-import Image from 'next/image'
+import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch } from 'antd'
-import { Settings } from '@/lib/defaultSettings'
-import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import clsx from 'clsx'
+import Image from 'next/image'
 
 export default function MmrOverlay() {
   const { data: showRankMmr, updateSetting: updateHideMmr } = useUpdateSetting(

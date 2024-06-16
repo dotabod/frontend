@@ -1,12 +1,12 @@
 import Head from 'next/head'
 
-import { AuthLayout } from '@/components/Homepage/AuthLayout'
 import { UserAuthForm } from '@/components/Homepage/AuthForm'
-import { useEffect } from 'react'
+import { AuthLayout } from '@/components/Homepage/AuthLayout'
+import * as Sentry from '@sentry/nextjs'
+import { App } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { App } from 'antd'
-import * as Sentry from '@sentry/nextjs'
+import { useEffect } from 'react'
 
 export default function Login() {
   const { status } = useSession()

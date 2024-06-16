@@ -1,10 +1,10 @@
+import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+import { Switch, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from '../../Input'
-import { defaultSettings, Settings } from '@/lib/defaultSettings'
-import { Switch, Tag } from 'antd'
 
 export default function SceneSwitcher(): JSX.Element {
   const {

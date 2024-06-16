@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { Popover } from '@headlessui/react'
+import Link from 'next/link'
 
 export function MobileNavLink({ children, ...props }) {
   return (

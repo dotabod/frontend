@@ -1,12 +1,12 @@
-import { motion } from 'framer-motion'
 import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
-import { motionProps } from '@/ui/utils'
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
+import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
+import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { motionProps } from '@/ui/utils'
 import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
 
 export const PickScreenOverlays = ({
   rankImageDetails,

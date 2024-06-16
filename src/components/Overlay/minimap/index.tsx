@@ -1,21 +1,21 @@
-import Creep from './Creep'
-import { useSelector } from 'react-redux'
+import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import {
   selectBuildings,
   selectCouriers,
   selectCreeps,
-  selectHeroes,
   selectHeroUnits,
+  selectHeroes,
   selectIsPreview,
   selectSettings,
 } from '@/lib/redux/store'
+import { useSelector } from 'react-redux'
 import Building from './Building'
 import Courier from './Courier'
+import Creep from './Creep'
 import Hero from './Hero'
 import HeroUnit from './HeroUnit'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Settings } from '@/lib/defaultSettings'
-import { blockType } from '@/lib/devConsts'
 
 function Minimap({ block }: { block: blockType }) {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])

@@ -1,4 +1,4 @@
-import { defaultSettings, Settings } from '@/lib/defaultSettings'
+import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import { getValueOrDefault } from '@/lib/settings'
 
 export const getStreamerSettings = (data) => {

@@ -1,6 +1,6 @@
 import { Card } from '@/ui/card'
-import clsx from 'clsx'
 import { Tag } from 'antd'
+import clsx from 'clsx'
 
 export default function ComingSoonCard() {
   return (

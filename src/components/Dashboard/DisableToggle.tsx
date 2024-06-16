@@ -1,7 +1,7 @@
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Settings } from '@/lib/defaultSettings'
-import { Switch, Tooltip } from 'antd'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Switch, Tooltip } from 'antd'
 
 export function DisableToggle() {
   const {

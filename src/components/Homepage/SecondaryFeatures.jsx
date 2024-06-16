@@ -1,14 +1,14 @@
-import { Container } from 'src/components/Container'
-import Image from 'next/image'
+import { Settings } from '@/lib/defaultSettings'
 import { SparklesIcon } from '@heroicons/react/24/outline'
+import { Badge, Popover, Typography } from 'antd'
+import Image from 'next/image'
+import React from 'react'
+import { Container } from 'src/components/Container'
+import CommandDetail from 'src/components/Dashboard/CommandDetail'
+import { chatterInfo } from '../Dashboard/Features/ChatterCard'
 import { MMRBadge } from '../Overlay/rank/MMRBadge'
 import WinLossCard from '../Overlay/wl/WinLossCard'
 import TwitchChat from '../TwitchChat'
-import React from 'react'
-import CommandDetail from 'src/components/Dashboard/CommandDetail'
-import { chatterInfo } from '../Dashboard/Features/ChatterCard'
-import { Settings } from '@/lib/defaultSettings'
-import { Badge, Typography, Popover } from 'antd'
 
 const { Link } = Typography
 

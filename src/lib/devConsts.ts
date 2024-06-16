@@ -1,4 +1,4 @@
-import { PollData } from '@/components/Overlay/PollOverlay'
+import type { PollData } from '@/components/Overlay/PollOverlay'
 
 export const isDev = false //|| process.env.NODE_ENV === 'development'
 

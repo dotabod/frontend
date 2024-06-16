@@ -1,22 +1,22 @@
-import Image from 'next/image'
 import { Input } from '@/components/Input'
+import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
+import { Settings } from '@/lib/defaultSettings'
+import { fetcher } from '@/lib/fetcher'
 import {
   useUpdateAccount,
   useUpdateSetting,
 } from '@/lib/hooks/useUpdateSetting'
-import { Tag, Button, InputNumber, Form } from 'antd'
-import { useForm } from '@mantine/form'
-import { SteamAccount } from '@prisma/client'
-import { useEffect, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
-import { Settings } from '@/lib/defaultSettings'
+import { type RankType, getRankDetail, getRankImage } from '@/lib/ranks'
 import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { fetcher } from '@/lib/fetcher'
-import useSWR from 'swr'
-import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
-import { getRankDetail, getRankImage, RankType } from '@/lib/ranks'
+import { useForm } from '@mantine/form'
+import type { SteamAccount } from '@prisma/client'
+import { Button, Form, InputNumber, Tag } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import useSWR from 'swr'
+import { useDebouncedCallback } from 'use-debounce'
 
 const SteamAvatar = ({ data: response, id }) => {
   if (!response) return <p>Loading...</p>

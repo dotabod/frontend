@@ -1,13 +1,13 @@
-import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { getValueOrDefault } from '@/lib/settings'
+import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
+import Header from '@/components/Dashboard/Header'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
+import { getValueOrDefault } from '@/lib/settings'
+import { Empty, Input, Segmented } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import { ReactElement, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
-import Header from '@/components/Dashboard/Header'
-import { Empty, Input, Segmented } from 'antd'
 
 const CommandsPage = () => {
   const { status } = useSession()

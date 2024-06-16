@@ -1,14 +1,14 @@
-import Link from 'next/link'
 import { Popover } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
+import Link from 'next/link'
 
 import { Container } from 'src/components/Container'
 import { Logo } from 'src/components/Logo'
 import { NavLinks } from 'src/components/NavLinks'
-import { MenuIcon } from './MenuIcon'
-import { MobileNavLink } from './MobileNavLink'
 import { ChevronUpIcon } from '../ChevronUpIcon'
 import { LoginButton } from './LoginButton'
+import { MenuIcon } from './MenuIcon'
+import { MobileNavLink } from './MobileNavLink'
 
 export function Header() {
   return (

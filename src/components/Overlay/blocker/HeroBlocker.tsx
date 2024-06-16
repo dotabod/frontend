@@ -1,5 +1,5 @@
-import Image from 'next/image'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import Image from 'next/image'
 
 export function HeroBlocker({ teamName, type }) {
   const res = useTransformRes()

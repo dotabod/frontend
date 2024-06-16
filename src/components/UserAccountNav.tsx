@@ -1,13 +1,13 @@
 import { signOut, useSession } from 'next-auth/react'
 
+import { fetcher } from '@/lib/fetcher'
+import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { Dropdown, Space } from 'antd'
 import clsx from 'clsx'
-import Link from 'next/link'
-import { Session } from 'next-auth'
-import { fetcher } from '@/lib/fetcher'
-import useSWR from 'swr'
+import type { Session } from 'next-auth'
 import Image from 'next/image'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
+import useSWR from 'swr'
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   user: Session['user']

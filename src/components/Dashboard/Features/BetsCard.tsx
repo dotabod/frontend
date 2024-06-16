@@ -1,3 +1,4 @@
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Button, Form, Spin, Switch, Tag } from 'antd'
@@ -5,7 +6,6 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Input } from '../../Input'
-import { Settings } from '@/lib/defaultSettings'
 
 export default function BetsCard() {
   const {

@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
 
 const SentrySession = () => {
   const { data, status } = useSession()

@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import prisma from '@/lib/db'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {

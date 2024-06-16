@@ -1,18 +1,18 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
 
+import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { Settings } from '@/lib/defaultSettings'
 import {
   mmrPatchSchema,
   settingKeySchema,
   settingPatchSchema,
   streamDelaySchema,
 } from '@/lib/validations/setting'
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { Settings } from '@/lib/defaultSettings'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

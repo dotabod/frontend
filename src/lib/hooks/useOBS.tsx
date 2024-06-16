@@ -1,7 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
-import { useEffect } from 'react'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 export const useOBS = ({ connected, block }) => {
   const router = useRouter()

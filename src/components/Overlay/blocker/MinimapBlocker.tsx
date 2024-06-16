@@ -1,14 +1,14 @@
-import { motion } from 'framer-motion'
-import { motionProps } from '@/ui/utils'
 import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import type { blockType } from '@/lib/devConsts'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
-import Minimap from '../minimap'
-import { blockType } from '@/lib/devConsts'
-import Image from 'next/image'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { selectStatus } from '@/lib/redux/store'
+import { motionProps } from '@/ui/utils'
+import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { useSelector } from 'react-redux'
+import Minimap from '../minimap'
 
 export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])

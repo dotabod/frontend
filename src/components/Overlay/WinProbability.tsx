@@ -1,13 +1,13 @@
-import { Logomark } from 'src/components/Logo'
 import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { WinChance } from '@/lib/hooks/useSocket'
-import { motionProps } from '@/ui/utils'
-import { motion } from 'framer-motion'
+import type { WinChance } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { TextWithEmotes } from './TextWithEmotes'
-import { AnimatedNumber } from './AnimatedNumber'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { motionProps } from '@/ui/utils'
 import clsx from 'clsx'
+import { motion } from 'framer-motion'
+import { Logomark } from 'src/components/Logo'
+import { AnimatedNumber } from './AnimatedNumber'
+import { TextWithEmotes } from './TextWithEmotes'
 
 const SeparatorImg = ({ pos, children, ...props }) => (
   <div

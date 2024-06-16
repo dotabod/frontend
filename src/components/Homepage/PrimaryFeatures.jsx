@@ -1,14 +1,14 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
 import { Tab } from '@headlessui/react'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
-import { AppScreen } from 'src/components/Homepage/AppScreen'
+import Image from 'next/image'
 import { CircleBackground } from 'src/components/CircleBackground'
 import { Container } from 'src/components/Container'
+import { AppScreen } from 'src/components/Homepage/AppScreen'
 import { PhoneFrame } from 'src/components/Homepage/PhoneFrame'
-import Image from 'next/image'
 
 const MotionAppScreenHeader = motion(AppScreen.Header)
 const MotionAppScreenBody = motion(AppScreen.Body)

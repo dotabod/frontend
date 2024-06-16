@@ -1,9 +1,9 @@
-import useSWR, { MutatorOptions, useSWRConfig } from 'swr'
-import { getValueOrDefault } from '../settings'
-import { fetcher } from '../fetcher'
+import { type SettingKeys, Settings } from '@/lib/defaultSettings'
 import { App } from 'antd'
-import { SettingKeys, Settings } from '@/lib/defaultSettings'
 import { useRouter } from 'next/router'
+import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
+import { fetcher } from '../fetcher'
+import { getValueOrDefault } from '../settings'
 
 interface UpdateProps {
   path?: any

@@ -1,8 +1,8 @@
+import DashboardShell from '@/components/Dashboard/DashboardShell'
+import Header from '@/components/Dashboard/Header'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import Header from '@/components/Dashboard/Header'
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 
 const TroubleshootPage = () => {
   const { status, data } = useSession()

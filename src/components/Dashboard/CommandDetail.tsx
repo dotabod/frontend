@@ -1,7 +1,7 @@
-import TwitchChat from '@/components/TwitchChat'
-import Image from 'next/image'
-import { Settings } from '@/lib/defaultSettings'
 import { chatterInfo } from '@/components/Dashboard/Features/ChatterCard'
+import TwitchChat from '@/components/TwitchChat'
+import { Settings } from '@/lib/defaultSettings'
+import Image from 'next/image'
 
 const CommandDetail = {
   [Settings.commandDisable]: {

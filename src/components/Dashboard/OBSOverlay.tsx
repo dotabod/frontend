@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 
-import { Tag, Tabs, Button } from 'antd'
+import { Button, Tabs, Tag } from 'antd'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user

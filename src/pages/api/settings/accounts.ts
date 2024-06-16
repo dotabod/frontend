@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 
 const accountUpdateSchema = z.array(
   z.object({

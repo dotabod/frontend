@@ -1,6 +1,6 @@
+import type CommandDetail from '@/components/Dashboard/CommandDetail'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import CommandDetail from '@/components/Dashboard/CommandDetail'
-import { Tag, Switch, Collapse } from 'antd'
+import { Collapse, Switch, Tag } from 'antd'
 
 export default function CommandsCard({
   id,

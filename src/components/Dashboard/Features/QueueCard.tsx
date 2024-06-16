@@ -1,11 +1,11 @@
+import { Input } from '@/components/Input'
+import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+import { Button, Form, Spin, Switch } from 'antd'
 import clsx from 'clsx'
-import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import Image from 'next/image'
-import { Switch, Form, Spin, Button } from 'antd'
 import { useEffect } from 'react'
-import { Input } from '@/components/Input'
 
 export default function QueueCard() {
   const {

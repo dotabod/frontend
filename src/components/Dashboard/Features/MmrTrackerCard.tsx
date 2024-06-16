@@ -1,7 +1,7 @@
+import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Switch, Tooltip } from 'antd'
-import { Settings } from '@/lib/defaultSettings'
 import clsx from 'clsx'
 import MmrForm from './MmrForm'
 

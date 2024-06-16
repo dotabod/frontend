@@ -1,9 +1,9 @@
+import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { Settings } from '@/lib/defaultSettings'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 
 export const AnimatedAegis = ({
   aegis: { expireS, playerId },

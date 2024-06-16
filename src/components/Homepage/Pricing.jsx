@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 
 import { Button } from 'antd'
+import Image from 'next/image'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
-import Image from 'next/image'
 
 const plans = [
   {
