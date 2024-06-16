@@ -58,7 +58,7 @@ export default function CommandsCard({
             </div>
           </div>
         </div>
-        {command.alias && command.alias.length ? (
+        {command.alias?.length ? (
           <div className="py-1">
             <p className="ml-1">Alias</p>
             <div className="flex flex-wrap">

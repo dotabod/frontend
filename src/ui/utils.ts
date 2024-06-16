@@ -2,16 +2,16 @@
 export const ordinal = (count) => {
   const j = count % 10
   const k = count % 100
-  if (j == 1 && k != 11) {
-    return count + 'st'
+  if (j === 1 && k !== 11) {
+    return `${count}st`
   }
-  if (j == 2 && k != 12) {
-    return count + 'nd'
+  if (j === 2 && k !== 12) {
+    return `${count}nd`
   }
-  if (j == 3 && k != 13) {
-    return count + 'rd'
+  if (j === 3 && k !== 13) {
+    return `${count}rd`
   }
-  return count + 'th'
+  return `${count}th`
 }
 const heroPosition = (teamName: string, i: number) => ({
   top: 4,

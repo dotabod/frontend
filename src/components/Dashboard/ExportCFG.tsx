@@ -8,7 +8,7 @@ import DownloadButton from './DownloadButton'
 
 export default function ExportCFG() {
   const user = useSession()?.data?.user
-  const { data } = useUpdate({ path: `/api/settings` })
+  const { data } = useUpdate({ path: '/api/settings' })
   const [current, setCurrent] = useState(0)
 
   const fileData = `"Dotabod Configuration"

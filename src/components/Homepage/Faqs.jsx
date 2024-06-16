@@ -94,13 +94,10 @@ export function Faqs() {
             .
           </p>
         </div>
-        <ul
-          role="list"
-          className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:max-w-none lg:grid-cols-3"
-        >
+        <ul className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:max-w-none lg:grid-cols-3">
           {faqs.map((column, columnIndex) => (
             <li key={columnIndex}>
-              <ul role="list" className="space-y-10">
+              <ul className="space-y-10">
                 {column.map((faq, faqIndex) => (
                   <li key={faqIndex}>
                     <h3 className="text-lg font-semibold leading-6 text-gray-200">

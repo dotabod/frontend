@@ -45,7 +45,7 @@ const FillDire = ({ width }) => (
 const Text = ({ pos = null, className = '', children }) => (
   <div
     className={clsx(
-      `text-shadow relative flex translate-x-[-50%] flex-col text-center text-sm text-white duration-[2s] ease-in-out`,
+      'text-shadow relative flex translate-x-[-50%] flex-col text-center text-sm text-white duration-[2s] ease-in-out',
       className
     )}
     style={{ left: pos ? `${Math.min(pos, 98)}%` : 0 }}

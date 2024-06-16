@@ -179,7 +179,7 @@ export default function LanguageCard() {
       <div className="mt-4 flex flex-row items-center space-x-4">
         {languageProgress?.data?.translationProgress < 100 ? (
           <Link
-            href={`https://crowdin.com/project/dotabod`}
+            href={'https://crowdin.com/project/dotabod'}
             target="_blank"
             passHref
           >
@@ -187,7 +187,7 @@ export default function LanguageCard() {
           </Link>
         ) : (
           <Link
-            href={`https://crowdin.com/project/dotabod`}
+            href={'https://crowdin.com/project/dotabod'}
             target="_blank"
             passHref
           >

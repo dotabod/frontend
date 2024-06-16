@@ -17,17 +17,16 @@ const Building = ({ data, team }) => {
     const { image, unitname } = data
     if (image === 'miscbuilding') {
       return unitname === 'watch_tower' ? 'outpost' : 'filler'
-    } else {
-      return image
-        .replace('45', '')
-        .replace('90', '')
-        .replace('range', '')
-        .replace('melee', '')
-        .replace('top', '')
-        .replace('mid', '')
-        .replace('bottom', '')
-        .replace('_', '')
     }
+    return image
+      .replace('45', '')
+      .replace('90', '')
+      .replace('range', '')
+      .replace('melee', '')
+      .replace('top', '')
+      .replace('mid', '')
+      .replace('bottom', '')
+      .replace('_', '')
   }
 
   if (!data.image) return null

@@ -13,7 +13,7 @@ const CommandsPage = () => {
   const { status } = useSession()
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
-  const { data } = useUpdate({ path: `/api/settings` })
+  const { data } = useUpdate({ path: '/api/settings' })
 
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -25,7 +25,8 @@ const CommandsPage = () => {
       )
       if (enabled === 'Enabled' && CommandDetail[command].key) {
         return isEnabled === true
-      } else if (enabled === 'Disabled') {
+      }
+      if (enabled === 'Disabled') {
         return isEnabled === false
       }
       return true
@@ -33,7 +34,8 @@ const CommandsPage = () => {
     .filter((command) => {
       if (permission === 'Mods') {
         return CommandDetail[command].allowed === 'mods'
-      } else if (permission === 'Plebs') {
+      }
+      if (permission === 'Plebs') {
         return CommandDetail[command].allowed === 'all'
       }
       return true

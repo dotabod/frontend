@@ -26,7 +26,7 @@ Card.Footer = function CardFooter({
       className={clsx('block text-sm font-medium sm:rounded-b-lg', className)}
       {...props}
     >
-      <div className="grid w-full border-t border-solid border-gray-700  pt-4"></div>
+      <div className="grid w-full border-t border-solid border-gray-700  pt-4" />
       {children}
     </div>
   )

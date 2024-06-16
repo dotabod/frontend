@@ -137,7 +137,9 @@ function BlockScreen({ custom, animated = false }) {
             height={280}
             width={280}
             className="rounded-xl"
-            src={`/images/overlay/minimap/731-Complex-Large-AntiStreamSnipeMap.png`}
+            src={
+              '/images/overlay/minimap/731-Complex-Large-AntiStreamSnipeMap.png'
+            }
             style={{
               backgroundImage:
                 "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",

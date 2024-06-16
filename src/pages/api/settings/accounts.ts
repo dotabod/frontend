@@ -50,8 +50,8 @@ async function getAccounts(id: string) {
 
     accounts.forEach((account) => {
       if (account.user.id === id) {
-        delete account.connectedUserIds
-        delete account.user
+        account.connectedUserIds = undefined
+        account.user = undefined
         return
       }
 
@@ -63,7 +63,7 @@ async function getAccounts(id: string) {
       if (account.connectedUserIds.length) {
         account.connectedUserIds = [account.user.name]
       }
-      delete account.user
+      account.user = undefined
     })
 
     return accounts

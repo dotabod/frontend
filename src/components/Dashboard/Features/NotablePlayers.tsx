@@ -73,7 +73,7 @@ export default function NotablePlayersCard() {
           alt="minimap blocker"
           width={413}
           height={50}
-          src={`/images/dashboard/notable-players.png`}
+          src={'/images/dashboard/notable-players.png'}
         />
         <span>Players with their country flags</span>
       </div>

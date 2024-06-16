@@ -93,7 +93,7 @@ const MmrForm = ({ hideText = false }) => {
               )
               const rank = getRankImage(rankResponse as RankType)
 
-              const multiUsedBy = !!account.connectedUserIds?.length
+              const multiUsedBy = account.connectedUserIds?.length
                 ? account.connectedUserIds[0]
                 : false
 

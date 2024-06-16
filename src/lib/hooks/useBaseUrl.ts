@@ -5,7 +5,7 @@ export const useBaseUrl = (append?: string) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const base = window.location.protocol + '//' + window.location.host
+    const base = `${window.location.protocol}//${window.location.host}`
     setBaseUrl(append ? `${base}/${append}` : base)
   }, [append])
 
