@@ -1,8 +1,7 @@
-import ModImage from '@/components/ModImage'
 import { Card } from '@/ui/card'
-import { CheckIcon, ClipboardIcon } from '@heroicons/react/24/outline'
+import { CheckIcon } from '@heroicons/react/24/outline'
 import { useClipboard } from '@mantine/hooks'
-import { Badge, Button, Input, List, Tooltip } from 'antd'
+import { Badge, List, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon, XIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -82,67 +81,8 @@ export default function ChatBot() {
 
   return (
     <Card>
-      <div className="mb-4 space-x-2">
-        <span>
-          <b>Why?</b> The chat bot needs to be able to type in your chat in case
-          you ever turn on follower or subscriber only mode.
-        </span>
-        <Image
-          className="inline"
-          alt="ok emote"
-          unoptimized
-          src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
-          width={28}
-          height={28}
-        />
-      </div>
       <div>
         <ol className="ml-4 list-decimal space-y-4">
-          <li>
-            Type the following in{' '}
-            <Tooltip title="Open your chat in a new window">
-              <a
-                onClick={() => {
-                  window.open(
-                    `https://www.twitch.tv/popout/${session.data.user.name}/chat`,
-                    'mywindow',
-                    'menubar=1,resizable=1,width=350,height=250'
-                  )
-                }}
-              >
-                your stream
-              </a>
-            </Tooltip>{' '}
-            to add @dotabod as a moderator.
-          </li>
-          <Input
-            addonBefore={<ModImage />}
-            readOnly
-            color={clipboard.copied ? 'green' : ''}
-            className={clsx('max-w-sm transition-colors')}
-            value="/mod dotabod"
-            onClick={() => clipboard.copy('/mod dotabod')}
-            addonAfter={
-              <Tooltip
-                color={clipboard.copied ? 'green' : ''}
-                title={clipboard.copied ? 'Copied' : 'Copy'}
-              >
-                <Button
-                  type="text"
-                  block
-                  size="small"
-                  icon={
-                    clipboard.copied ? (
-                      <CheckIcon width={16} />
-                    ) : (
-                      <ClipboardIcon width={16} />
-                    )
-                  }
-                  onClick={() => clipboard.copy('/mod dotabod')}
-                />
-              </Tooltip>
-            }
-          />
           <li>
             Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it{' '}
             <span className="text-xs text-gray-500">

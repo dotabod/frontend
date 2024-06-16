@@ -56,7 +56,7 @@ export default function DashboardShell({
   }
 
   useEffect(() => {
-    const lastUpdate = localStorage.getItem('lastFollowersUpdate')
+    const lastUpdate = localStorage.getItem('lastSingleRunAPI')
     const now = new Date()
 
     if (
@@ -65,8 +65,12 @@ export default function DashboardShell({
     ) {
       fetch('/api/update-followers')
         .then(() => {
-          localStorage.setItem('lastFollowersUpdate', String(now.getTime()))
+          localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
         })
+        .catch((error) => console.error(error))
+
+      fetch('/api/make-dotabod-mod')
+        .then((data) => console.log(data))
         .catch((error) => console.error(error))
     }
   }, [])
