@@ -16,6 +16,7 @@ const faqs = [
             height={28}
             width={28}
             alt="peepofat"
+            unoptimized
           />
           . But also because dotabot was taken.
         </div>

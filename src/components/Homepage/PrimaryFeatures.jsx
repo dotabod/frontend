@@ -29,6 +29,7 @@ const features = [
         alt="peepogamba emote"
         height={32}
         width={32}
+        unoptimized
         src="/images/emotes/peepogamba.webp"
       />
     ),

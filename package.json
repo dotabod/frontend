@@ -2,6 +2,7 @@
   "name": "dotabod-frontend",
   "version": "1.0.0",
   "private": true,
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "doppler run -- next dev",
     "pull": "doppler run -- yarn prisma db pull",

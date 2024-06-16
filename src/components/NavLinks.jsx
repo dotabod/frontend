@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import DiscordSvg from '@/images/logos/discord.svg'
 import GithubSvg from '@/images/logos/github.svg'
 import StatusSvg from '@/images/logos/status.svg'
-import Image from 'next/image'
 import { Tooltip } from 'antd'
+import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
+import { useState } from 'react'
 
 export function NavLinks({ bottom = false }) {
   const [hoveredIndex, setHoveredIndex] = useState(null)

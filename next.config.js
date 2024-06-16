@@ -6,7 +6,6 @@
 const { withSentryConfig } = require('@sentry/nextjs')
 
 const nextConfig = {
-  // Your existing module.exports
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
   experimental: {
@@ -14,15 +13,39 @@ const nextConfig = {
   },
 
   images: {
-    domains: [
-      'avatars.steamstatic.com',
-      'static-cdn.jtvnw.net',
-      'i.imgur.com',
-      'cdn.7tv.app',
-      'cdn.frankerfacez.com',
-      'cdn.betterttv.net',
-      'avatars.akamai.steamstatic.com',
-      'avatars.cloudflare.steamstatic.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.steamstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static-cdn.jtvnw.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.7tv.app',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.frankerfacez.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.betterttv.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.akamai.steamstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.cloudflare.steamstatic.com',
+      },
     ],
   },
 }

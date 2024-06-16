@@ -112,6 +112,7 @@ export default function LanguageCard() {
         src="/images/emotes/peepofat.gif"
         height={28}
         width={28}
+        unoptimized
         alt="peepofat"
       />
     </span>

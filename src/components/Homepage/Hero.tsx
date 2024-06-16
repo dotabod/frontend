@@ -150,6 +150,7 @@ export function Hero() {
               <span>Welcome, {name}</span>
               <Image
                 src="/images/emotes/peepoclap.webp"
+                unoptimized
                 width={38}
                 height={38}
                 alt="peepoclap"

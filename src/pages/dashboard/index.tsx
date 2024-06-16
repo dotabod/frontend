@@ -89,6 +89,7 @@ const SetupPage = () => {
               <Image
                 src="/images/emotes/peepoclap.webp"
                 width={30}
+                unoptimized
                 className="inline"
                 height={30}
                 alt="peepo clap"
