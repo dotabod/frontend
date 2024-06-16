@@ -157,7 +157,9 @@ const MmrForm = ({ hideText = false }) => {
                               className="flex items-center space-x-2"
                             >
                               <span className="max-w-[90px] overflow-hidden overflow-ellipsis whitespace-nowrap">
-                                {steamData?.name || account.name || "Unknown steam name"}
+                                {steamData?.name ||
+                                  account.name ||
+                                  'Unknown steam name'}
                               </span>
                               <ExternalLinkIcon className="h-4 w-4" />
                             </a>

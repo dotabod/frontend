@@ -1,8 +1,8 @@
 {
-    "hero": {
-        "watch": "Watch me make Dotabod",
-        "title": "Welcome, streamer",
-        "description": "Unlock the Ultimate Dota 2 Streaming Experience with Dotabod! Boost your stream's engagement, showcase real-time stats, and delight your audience with our all-in-one streaming toolkit. Elevate your game and become the streamer you were meant to be!"
-    },
-    "live": "Live"
+  "hero": {
+    "watch": "Watch me make Dotabod",
+    "title": "Welcome, streamer",
+    "description": "Unlock the Ultimate Dota 2 Streaming Experience with Dotabod! Boost your stream's engagement, showcase real-time stats, and delight your audience with our all-in-one streaming toolkit. Elevate your game and become the streamer you were meant to be!"
+  },
+  "live": "Live"
 }

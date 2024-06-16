@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-import prisma from '@/lib/db'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import prisma from '@/lib/db'
 
 // Helper function to fetch follower count for a user
 async function fetchFollowerCount(providerAccountId, accessToken) {

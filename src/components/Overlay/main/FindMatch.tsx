@@ -8,7 +8,7 @@ import { Settings } from '@/lib/defaultSettings'
 export const FindMatch = () => {
   const res = useTransformRes()
   const { data: isFindingMatchEnabled } = useUpdateSetting(
-    Settings.queueBlockerFindMatch,
+    Settings.queueBlockerFindMatch
   )
 
   return (

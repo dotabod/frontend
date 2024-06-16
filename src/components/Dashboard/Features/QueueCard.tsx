@@ -89,14 +89,14 @@ export default function QueueCard() {
       <div
         className={clsx(
           'mt-2 flex flex-col items-center space-y-12 transition-all',
-          !isEnabled && 'opacity-40',
+          !isEnabled && 'opacity-40'
         )}
       >
         <div className="flex flex-wrap items-center justify-center space-x-4">
           {isFindingMatchEnabled ? (
             <Image
               className={clsx(
-                'mt-4 inline rounded-xl border-2 border-transparent transition-all',
+                'mt-4 inline rounded-xl border-2 border-transparent transition-all'
               )}
               alt="queue blocker"
               width={497}
@@ -106,7 +106,7 @@ export default function QueueCard() {
           ) : (
             <Image
               className={clsx(
-                'mt-4 inline rounded-xl border-2 border-transparent transition-all',
+                'mt-4 inline rounded-xl border-2 border-transparent transition-all'
               )}
               alt="queue blocker"
               width={497}
@@ -117,7 +117,7 @@ export default function QueueCard() {
 
           <Image
             className={clsx(
-              'mt-4 inline rounded-xl border-2 border-transparent transition-all',
+              'mt-4 inline rounded-xl border-2 border-transparent transition-all'
             )}
             alt="queue blocker"
             width={204}

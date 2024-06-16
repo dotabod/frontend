@@ -5,7 +5,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig = {
   productionBrowserSourceMaps: true,
@@ -14,60 +14,60 @@ const nextConfig = {
     forceSwcTransforms: false,
   },
   transpilePackages: [
-    "antd",
-    "@ant-design",
-    "rc-util",
-    "rc-pagination",
-    "rc-picker",
-    "rc-notification",
-    "rc-tooltip",
-    "rc-tree",
-    "rc-table",
+    'antd',
+    '@ant-design',
+    'rc-util',
+    'rc-pagination',
+    'rc-picker',
+    'rc-notification',
+    'rc-tooltip',
+    'rc-tree',
+    'rc-table',
   ],
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "avatars.steamstatic.com",
+        protocol: 'https',
+        hostname: 'avatars.steamstatic.com',
       },
       {
-        protocol: "https",
-        hostname: "static-cdn.jtvnw.net",
+        protocol: 'https',
+        hostname: 'static-cdn.jtvnw.net',
       },
       {
-        protocol: "https",
-        hostname: "i.imgur.com",
+        protocol: 'https',
+        hostname: 'i.imgur.com',
       },
       {
-        protocol: "https",
-        hostname: "cdn.7tv.app",
+        protocol: 'https',
+        hostname: 'cdn.7tv.app',
       },
       {
-        protocol: "https",
-        hostname: "cdn.frankerfacez.com",
+        protocol: 'https',
+        hostname: 'cdn.frankerfacez.com',
       },
       {
-        protocol: "https",
-        hostname: "cdn.betterttv.net",
+        protocol: 'https',
+        hostname: 'cdn.betterttv.net',
       },
       {
-        protocol: "https",
-        hostname: "avatars.akamai.steamstatic.com",
+        protocol: 'https',
+        hostname: 'avatars.akamai.steamstatic.com',
       },
       {
-        protocol: "https",
-        hostname: "avatars.cloudflare.steamstatic.com",
+        protocol: 'https',
+        hostname: 'avatars.cloudflare.steamstatic.com',
       },
     ],
   },
-};
+}
 
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  org: "mgates-llc",
-  project: "dotabod-frontend",
+  org: 'mgates-llc',
+  project: 'dotabod-frontend',
 
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 
@@ -87,7 +87,7 @@ export default withSentryConfig(nextConfig, {
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
-  tunnelRoute: "/monitoring",
+  tunnelRoute: '/monitoring',
 
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
@@ -100,4 +100,4 @@ export default withSentryConfig(nextConfig, {
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: true,
-});
+})
