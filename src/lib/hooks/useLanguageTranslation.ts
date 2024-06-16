@@ -133,7 +133,10 @@ const useLanguageTranslations = ({ languageId }: { languageId: string }) => {
     project: Project
     total: number | undefined
     percentage: number
-  }>(`/api/getLanguageProgress?languageId=${languageId}`, fetcher)
+  }>(
+    languageId ? `/api/getLanguageProgress?languageId=${languageId}` : null,
+    fetcher
+  )
 
   return { data, isLoading }
 }

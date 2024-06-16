@@ -56,6 +56,22 @@ export default function DashboardShell({
   }
 
   useEffect(() => {
+    const lastUpdate = localStorage.getItem('lastFollowersUpdate')
+    const now = new Date()
+
+    if (
+      !lastUpdate ||
+      now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000
+    ) {
+      fetch('/api/update-followers')
+        .then(() => {
+          localStorage.setItem('lastFollowersUpdate', String(now.getTime()))
+        })
+        .catch((error) => console.error(error))
+    }
+  }, [])
+
+  useEffect(() => {
     const { pathname } = window.location
     setCurrent(pathname)
   }, [])
