@@ -65,7 +65,6 @@ const connectWebSocket = async (broadcaster_id, setEmotes) => {
       },
     }
     ws.send(JSON.stringify(subscribe))
-    console.log('7TV WebSocket connected in channel')
   }
 
   ws.onmessage = (event) => handleMessages(event, setEmotes)
@@ -90,7 +89,6 @@ const handleMessages = (event, setEmotes) => {
     text = `emote ${emote} removed by ${editor}`
   }
 
-  console.log(text)
   // Update the emote state
   if (data.d.body.pushed) {
     setEmotes((prev) => [
@@ -122,8 +120,6 @@ export default function ChatBot() {
   const session = useSession()
   const [emotes, setEmotes] = useState([])
   const clipboard = useClipboard({ timeout: 2000 })
-
-  console.log(emotes)
 
   useEffect(() => {
     if (!session.data.user.twitchId) return
