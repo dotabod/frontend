@@ -29,21 +29,25 @@ export function DisableToggle() {
         content: (
           <span>
             Dotabod is disabled because you banned it from the channel.
-            <Button
-              size="small"
-              type="link"
-              onClick={() => {
-                window.open(
-                  `https://www.twitch.tv/popout/${user?.name}/viewercard/dotabod?popout=`,
-                  'mywindow',
-                  'menubar=1,resizable=1,width=350,height=250'
-                )
-              }}
-              target="_blank"
-            >
-              Click here
-            </Button>
-            to unban Dotabod
+            {user?.name && (
+              <>
+                <Button
+                  size="small"
+                  type="link"
+                  onClick={() => {
+                    window.open(
+                      `https://www.twitch.tv/popout/${user?.name}/viewercard/dotabod?popout=`,
+                      'mywindow',
+                      'menubar=1,resizable=1,width=350,height=250'
+                    )
+                  }}
+                  target="_blank"
+                >
+                  Click here
+                </Button>
+                to unban Dotabod
+              </>
+            )}
           </span>
         ),
       })
