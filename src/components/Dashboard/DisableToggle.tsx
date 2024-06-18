@@ -50,7 +50,7 @@ export function DisableToggle() {
     } else {
       message.destroy('dotabod-banned')
     }
-  }, [data?.banned, message, user.name])
+  }, [data?.banned, message, user?.name])
 
   return (
     <Tooltip
