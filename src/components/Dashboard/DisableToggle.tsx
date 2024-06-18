@@ -34,7 +34,7 @@ export function DisableToggle() {
               type="link"
               onClick={() => {
                 window.open(
-                  `https://www.twitch.tv/popout/${user.name}/viewercard/dotabod?popout=`,
+                  `https://www.twitch.tv/popout/${user?.name}/viewercard/dotabod?popout=`,
                   'mywindow',
                   'menubar=1,resizable=1,width=350,height=250'
                 )
