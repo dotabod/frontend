@@ -60,7 +60,6 @@ export default function LanguageCard() {
     languageId: localeOption?.locale,
   })
   const languageProgress = getLanguageProgress(data, localeOption?.locale)
-  console.log({ languageProgress, data, localeOption })
 
   const arr = (
     data?.languageProgress ? Object.values(data?.languageProgress) : []
