@@ -239,42 +239,51 @@ export function Hero() {
         ) : (
           <>
             <div className="relative lg:col-span-7 xl:col-span-6">
-              <div className="relative lg:col-span-7 xl:col-span-6">
-                <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
-                  <LiveIcon />
-                  <span>Top streamers using Dotabod:</span>
-                </div>
-              </div>
-              <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-                {users?.topLive.map(({ name, image }) => (
-                  <TwitchUser
-                    key={name}
-                    supporter={false}
-                    last={false}
-                    session={session}
-                    name={name}
-                    image={image}
-                  />
-                ))}
-              </ul>
-              <div className="relative lg:col-span-7 xl:col-span-6">
-                <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
-                  <LiveIcon />
-                  <span>Random Dotabod streamers:</span>
-                </div>
-              </div>
-              <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-                {users?.randomLive.map(({ name, image }) => (
-                  <TwitchUser
-                    key={name}
-                    supporter={false}
-                    last={false}
-                    session={session}
-                    name={name}
-                    image={image}
-                  />
-                ))}
-              </ul>
+              {users?.topLive?.length > 0 && (
+                <>
+                  <div className="relative lg:col-span-7 xl:col-span-6">
+                    <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
+                      <LiveIcon />
+                      <span>Top streamers using Dotabod:</span>
+                    </div>
+                  </div>
+                  <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
+                    {users?.topLive?.map(({ name, image }) => (
+                      <TwitchUser
+                        key={name}
+                        supporter={false}
+                        last={false}
+                        session={session}
+                        name={name}
+                        image={image}
+                      />
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {users?.randomLive?.length > 0 && (
+                <>
+                  <div className="relative lg:col-span-7 xl:col-span-6">
+                    <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
+                      <LiveIcon />
+                      <span>Random Dotabod streamers:</span>
+                    </div>
+                  </div>
+                  <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
+                    {users?.randomLive?.map(({ name, image }) => (
+                      <TwitchUser
+                        key={name}
+                        supporter={false}
+                        last={false}
+                        session={session}
+                        name={name}
+                        image={image}
+                      />
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           </>
         )}
