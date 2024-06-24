@@ -1,4 +1,4 @@
-import { Popover } from '@headlessui/react'
+import { Popover, PopoverButton } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -27,8 +27,8 @@ export function Header() {
             <Popover className="lg:hidden">
               {({ open }) => (
                 <>
-                  <Popover.Button
-                    className="relative z-10 -m-2 inline-flex items-center rounded-lg stroke-gray-900 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 [&:not(:focus-visible)]:focus:outline-none"
+                  <PopoverButton
+                    className="relative z-10 -m-2 inline-flex items-center rounded-lg stroke-slate-300 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 [&:not(:focus-visible)]:focus:outline-none"
                     aria-label="Toggle site navigation"
                   >
                     {({ open }) =>
@@ -38,7 +38,7 @@ export function Header() {
                         <MenuIcon className="h-6 w-6" />
                       )
                     }
-                  </Popover.Button>
+                  </PopoverButton>
                   <AnimatePresence initial={false}>
                     {open && (
                       <>
