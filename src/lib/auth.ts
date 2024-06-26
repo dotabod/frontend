@@ -4,6 +4,7 @@ import TwitchProvider from 'next-auth/providers/twitch'
 
 import prisma from '@/lib/db'
 
+// Manually toggle this when logging in as the bot if we need to update scopes
 const useBotScopes = false
 
 // Do not delete this declaration
@@ -12,6 +13,7 @@ const chatBotScopes = [
   'chat:edit',
   'chat:read',
   'whispers:read',
+  'user:bot',
   'whispers:edit',
   'user:manage:whispers',
   'moderator:read:chat_settings', // To check follower mode, emoji mode, etc
@@ -24,6 +26,7 @@ const defaultScopes = [
   'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
   'channel:manage:moderators', // To add Dotabod as a moderator (required)
   'channel:manage:polls',
+  'channel:bot', // Allows joining with Dotabod in the channel
   'channel:manage:predictions',
   'channel:read:ads', // Determine if an ad is running
   'channel:read:polls',
