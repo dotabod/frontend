@@ -8,6 +8,7 @@ declare module 'next-auth/jwt' {
     id: UserId
     twitchId: UserId
     locale: UserId
+    scope: string
   }
 }
 
@@ -17,6 +18,7 @@ declare module 'next-auth' {
       id: UserId
       twitchId: UserId
       locale: UserId
+      scope: string
     }
   }
 }

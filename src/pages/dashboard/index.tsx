@@ -5,11 +5,11 @@ import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { Card } from '@/ui/card'
 import { Button, Steps } from 'antd'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type ReactElement, useState } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 
 const SetupPage = () => {
   const { status } = useSession()
@@ -75,6 +75,15 @@ const SetupPage = () => {
       ),
     },
   ]
+
+  const { data: session } = useSession()
+
+  useEffect(() => {
+    // We want our users to have the latest scopes
+    if (session && !session.user?.scope?.includes('channel:bot')) {
+      signOut({ callbackUrl: '/login?setup-scopes' })
+    }
+  }, [session])
 
   return status === 'authenticated' ? (
     <>

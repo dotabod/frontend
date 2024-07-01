@@ -58,7 +58,7 @@ const UserButton = ({ user }: UserButtonProps) => {
                 width={40}
                 height={40}
                 alt="User Avatar"
-                src={user?.image}
+                src={user?.image || '/images/hero/default.png'}
                 className={clsx(
                   isLive && 'rounded-full border-2 border-solid border-red-500'
                 )}

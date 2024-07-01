@@ -74,6 +74,7 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name
         session.user.email = token.email
         session.user.image = token.picture
+        session.user.scope = token.scope
       }
 
       return session
@@ -148,6 +149,7 @@ export const authOptions: NextAuthOptions = {
         name: newUser.displayName || newUser.name,
         email: newUser.email,
         picture: newUser.image,
+        scope: account?.scope,
       }
     },
   },

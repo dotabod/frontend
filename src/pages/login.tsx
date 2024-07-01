@@ -53,6 +53,28 @@ export default function Login() {
       router.asPath.toLowerCase().includes('error')
     ) {
       showError()
+    } else if (
+      status !== 'authenticated' &&
+      router.asPath.toLowerCase().includes('setup-scopes')
+    ) {
+      message.info({
+        key: 'scope-setup',
+        duration: 50000,
+        content: (
+          <span>
+            You've been logged out. Please login again to receive the newest
+            Twitch scopes. Reach out to us on{' '}
+            <a
+              href="https://discord.dotabod.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Discord
+            </a>{' '}
+            for more help.
+          </span>
+        ),
+      })
     }
   }, [router.asPath, status])
 
