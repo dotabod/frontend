@@ -9,37 +9,29 @@ import BetsOverlay from '@/components/Overlay/BetsOverlay'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
 import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 
-const FeaturesPage: NextPageWithLayout = () => {
-  const { status } = useSession()
+const FeaturesPage: NextPageWithLayout = () => (
+  <>
+    <Head>
+      <title>Dotabod | Overlay features</title>
+    </Head>
 
-  return status === 'authenticated' ? (
-    <>
-      <Head>
-        <title>Dotabod | Overlay features</title>
-      </Head>
+    <Header subtitle="This stuff will show up on your stream" title="Overlay" />
 
-      <Header
-        subtitle="This stuff will show up on your stream"
-        title="Overlay"
-      />
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <MinimapCard />
-        <PicksCard />
-        <MmrOverlay />
-        <BetsOverlay />
-        <RoshCard />
-        <QueueCard />
-        <NotablePlayersCard />
-        <WinProbabilityOverlay />
-      </div>
-    </>
-  ) : null
-}
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
+      <MinimapCard />
+      <PicksCard />
+      <MmrOverlay />
+      <BetsOverlay />
+      <RoshCard />
+      <QueueCard />
+      <NotablePlayersCard />
+      <WinProbabilityOverlay />
+    </div>
+  </>
+)
 
 FeaturesPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>

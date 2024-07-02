@@ -2,12 +2,14 @@ import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { navigation } from '@/components/Dashboard/navigation'
 import { DarkLogo } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
+import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
 } from '@heroicons/react/24/outline'
 import { Layout, Menu, type MenuProps, theme } from 'antd'
 import clsx from 'clsx'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type React from 'react'
 import { useEffect, useState } from 'react'
@@ -43,6 +45,7 @@ export default function DashboardShell({
 }: {
   children: React.ReactElement
 }) {
+  const { status } = useSession()
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
   const {
@@ -54,6 +57,8 @@ export default function DashboardShell({
     setCurrent(e.key)
     if (broken) setCollapsed(true)
   }
+
+  useMaybeSignout()
 
   useEffect(() => {
     const lastUpdate = localStorage.getItem('lastSingleRunAPI')
@@ -79,6 +84,8 @@ export default function DashboardShell({
     const { pathname } = window.location
     setCurrent(pathname)
   }, [])
+
+  if (status !== 'authenticated') return null
 
   return (
     <>

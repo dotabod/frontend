@@ -1,7 +1,6 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { Card } from '@/ui/card'
-import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -144,36 +143,32 @@ const faqs = [
   },
 ]
 
-const TroubleshootPage = () => {
-  const { status } = useSession()
-
-  return status === 'authenticated' ? (
-    <>
-      <Head>
-        <title>Dotabod | Troubleshooting</title>
-      </Head>
-      <Header
-        subtitle="Try these steps in case something isn't working."
-        title="Troubleshooting"
-      />
-      <div className="mt-12 lg:col-span-2 lg:mt-0">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {faqs.map(
-            (faq) =>
-              faq.question && (
-                <Card key={faq.question}>
-                  <dt className="text-lg font-medium leading-6">
-                    {faq.question}
-                  </dt>
-                  <dd className="mt-2 text-base text-gray-300">{faq.answer}</dd>
-                </Card>
-              )
-          )}
-        </div>
+const TroubleshootPage = () => (
+  <>
+    <Head>
+      <title>Dotabod | Troubleshooting</title>
+    </Head>
+    <Header
+      subtitle="Try these steps in case something isn't working."
+      title="Troubleshooting"
+    />
+    <div className="mt-12 lg:col-span-2 lg:mt-0">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        {faqs.map(
+          (faq) =>
+            faq.question && (
+              <Card key={faq.question}>
+                <dt className="text-lg font-medium leading-6">
+                  {faq.question}
+                </dt>
+                <dd className="mt-2 text-base text-gray-300">{faq.answer}</dd>
+              </Card>
+            )
+        )}
       </div>
-    </>
-  ) : null
-}
+    </div>
+  </>
+)
 
 TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>

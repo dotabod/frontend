@@ -1,14 +1,16 @@
-import Head from 'next/head'
-
 import { Faqs } from '@/components/Homepage/Faqs'
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import { Hero } from '@/components/Homepage/Hero'
 import { PrimaryFeatures } from '@/components/Homepage/PrimaryFeatures'
 import { SecondaryFeatures } from '@/components/Homepage/SecondaryFeatures'
+import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
+import Head from 'next/head'
 import type { ReactNode } from 'react'
 
 const Home = ({ children }: { children?: ReactNode }) => {
+  useMaybeSignout()
+
   return (
     <>
       <Head>

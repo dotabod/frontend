@@ -4,10 +4,10 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 
-const TroubleshootPage = () => {
-  const { status, data } = useSession()
+const OverlayPage = () => {
+  const { data } = useSession()
 
-  return status === 'authenticated' ? (
+  return (
     <>
       <Head>
         <title>Dotabod | Troubleshooting</title>
@@ -19,6 +19,7 @@ const TroubleshootPage = () => {
       />
       <div className="mt-12 origin-top-left lg:col-span-2 lg:mt-0 ">
         <iframe
+          title="overlay"
           src={`/overlay/${data?.user?.id}`}
           className="rounded-lg border border-gray-500"
           style={{
@@ -29,11 +30,11 @@ const TroubleshootPage = () => {
         />
       </div>
     </>
-  ) : null
+  )
 }
 
-TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
+OverlayPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>
 }
 
-export default TroubleshootPage
+export default OverlayPage

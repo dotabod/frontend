@@ -4,13 +4,11 @@ import Header from '@/components/Dashboard/Header'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import { Empty, Input, Segmented } from 'antd'
-import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { type ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 
 const CommandsPage = () => {
-  const { status } = useSession()
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const { data } = useUpdate({ path: '/api/settings' })
@@ -62,7 +60,7 @@ const CommandsPage = () => {
       return !(searchTerm && !containsStringValue)
     })
 
-  return status === 'authenticated' ? (
+  return (
     <>
       <Head>
         <title>Dotabod | Commands</title>
@@ -103,7 +101,7 @@ const CommandsPage = () => {
         ))}
       </div>
     </>
-  ) : null
+  )
 }
 
 CommandsPage.getLayout = function getLayout(page: ReactElement) {
