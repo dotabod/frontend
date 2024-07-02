@@ -6,7 +6,8 @@ import Image from 'next/image'
 const CommandDetail = {
   [Settings.commandDisable]: {
     title: 'Disable Dotabod',
-    description: 'Toggle off to stop responding to game events and commands.',
+    description:
+      'Toggle to stop or start responding to game events and commands.',
     cmd: '!toggle',
     alias: ['enable', 'disable'],
     allowed: 'mods',

@@ -1,4 +1,3 @@
-import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -21,6 +20,23 @@ export function DisableToggle() {
   const checkBanOrDisable = isDotabodDisabled || data?.banned
 
   useEffect(() => {
+    if (isDotabodDisabled) {
+      message.open({
+        key: 'dotabod-disabled',
+        type: 'warning',
+        duration: 0,
+        content: (
+          <span>
+            Dotabod is currently disabled. Click the toggle to enable it.
+          </span>
+        ),
+      })
+    } else {
+      message.destroy('dotabod-disabled')
+    }
+  }, [isDotabodDisabled, message])
+
+  useEffect(() => {
     if (data?.banned) {
       message.open({
         key: 'dotabod-banned',
@@ -32,7 +48,6 @@ export function DisableToggle() {
             {user?.name && (
               <>
                 <Button
-                  size="small"
                   type="link"
                   onClick={() => {
                     window.open(
@@ -58,17 +73,19 @@ export function DisableToggle() {
 
   return (
     <Tooltip
-      placement="right"
-      title={!data?.banned && CommandDetail.commandDisable.description}
+      title={
+        !data?.banned && checkBanOrDisable
+          ? 'Click to enable Dotabod and start responding to game events and commands again.'
+          : 'Click to disable Dotabod and stop responding to game events and commands'
+      }
     >
       <label
         htmlFor="disable-toggle"
-        className="cursor-pointer space-x-2 rounded text-xs text-gray-300"
+        className="cursor-pointer space-x-2 rounded text-gray-300"
       >
         <Switch
           id="disable-toggle"
           loading={loading}
-          size="small"
           className="flex"
           disabled={data?.banned}
           checked={!checkBanOrDisable}
