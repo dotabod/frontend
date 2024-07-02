@@ -1,0 +1,36 @@
+import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/db'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from 'next-auth'
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method Not Allowed' })
+  }
+
+  const session = await getServerSession(req, res, authOptions)
+
+  if (!session?.user?.id) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  try {
+    const response = await prisma.account.findFirst({
+      select: {
+        requires_refresh: true,
+      },
+      where: {
+        userId: session.user.id,
+      },
+    })
+    return res.status(200).json(response.requires_refresh || false)
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: 'Failed to get info', error: error.message })
+  }
+}
+
+export default withMethods(['GET'], withAuthentication(handler))

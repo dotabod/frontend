@@ -3,6 +3,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
+import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
 import { Button, Steps } from 'antd'
 import { signOut, useSession } from 'next-auth/react'
@@ -10,9 +11,14 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { type ReactElement, useEffect, useState } from 'react'
+import useSWR from 'swr'
 
 const SetupPage = () => {
   const { status } = useSession()
+  const { data: requiresRefresh } = useSWR(
+    '/api/check-requires-refresh',
+    fetcher
+  )
 
   const [active, setActive] = useState(0)
   const nextStep = () =>
@@ -84,6 +90,12 @@ const SetupPage = () => {
       signOut({ callbackUrl: '/login?setup-scopes' })
     }
   }, [session])
+
+  useEffect(() => {
+    if (requiresRefresh) {
+      signOut({ callbackUrl: '/login?setup-scopes' })
+    }
+  }, [requiresRefresh])
 
   return status === 'authenticated' ? (
     <>

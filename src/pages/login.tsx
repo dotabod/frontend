@@ -62,8 +62,8 @@ export default function Login() {
         duration: 50000,
         content: (
           <span>
-            You've been logged out. Please login again to receive the newest
-            Twitch scopes. Reach out to us on{' '}
+            You've been logged out. Please login again to relink your account to
+            Twitch. Reach out to us on{' '}
             <a
               href="https://discord.dotabod.com"
               target="_blank"
