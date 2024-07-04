@@ -5,9 +5,15 @@ import { Collapse, Switch, Tag } from 'antd'
 export default function CommandsCard({
   id,
   command,
+  readonly,
+  publicIsEnabled,
+  publicLoading,
 }: {
+  readonly?: boolean
   id: string
   command: typeof CommandDetail.commandAPM
+  publicIsEnabled?: boolean
+  publicLoading?: boolean
 }): JSX.Element {
   const {
     data: isEnabled,
@@ -36,9 +42,14 @@ export default function CommandsCard({
             </div>
             {command.key && (
               <Switch
-                loading={loading}
-                checked={isEnabled}
-                onChange={updateSetting}
+                disabled={readonly}
+                loading={publicLoading || loading}
+                checked={
+                  typeof publicIsEnabled !== 'undefined'
+                    ? publicIsEnabled
+                    : isEnabled
+                }
+                onChange={!readonly ? updateSetting : undefined}
                 onClick={(v, e) => {
                   e.stopPropagation()
                 }}

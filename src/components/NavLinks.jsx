@@ -15,8 +15,8 @@ export function NavLinks({ bottom = false }) {
   }
 
   return [
-    ['Features', '#features'],
-    ['FAQs', '#faqs'],
+    ['Features', '/#features'],
+    ['FAQs', '/#faqs'],
     ...additional,
     ['Status', 'https://status.dotabod.com', StatusSvg, 'Status'],
     ['Github', 'https://github.com/dotabod', GithubSvg, 'Github'],

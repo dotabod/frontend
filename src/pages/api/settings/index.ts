@@ -11,7 +11,52 @@ import { getServerSession } from 'next-auth'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
-  const userId = req.query.id as string
+  const userId = req.query.id as string | undefined
+  const username = req.query.username as string | undefined
+
+  if (username) {
+    if (req.method === 'GET') {
+      try {
+        const data = await prisma.user.findFirstOrThrow({
+          select: {
+            settings: {
+              select: {
+                key: true,
+                value: true,
+              },
+            },
+          },
+          where: {
+            // and where setting key starts with "command"
+            settings: {
+              some: {
+                key: {
+                  startsWith: 'command',
+                },
+              },
+            },
+            name: username.toLowerCase(),
+          },
+        })
+
+        if (!data) {
+          return res.json({})
+        }
+
+        if (data?.settings) {
+          data.settings = data.settings.filter((setting) =>
+            setting.key.startsWith('command')
+          )
+        }
+
+        return res.json(data)
+      } catch (error) {
+        return res.status(404).json({
+          error: 'User not found',
+        })
+      }
+    }
+  }
 
   if (!userId && !session?.user?.id) {
     return res.status(403).json({ message: 'Unauthorized' })
