@@ -1,18 +1,20 @@
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
-import Header from '@/components/Dashboard/Header'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import { Empty, Input, Segmented } from 'antd'
+import { ExternalLinkIcon } from 'lucide-react'
 import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
 
 const CommandsPage = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
-  const { data, username, loading } = useGetSettingsByUsername()
+  const { data, loading } = useGetSettingsByUsername()
 
   const [searchTerm, setSearchTerm] = useState('')
   const router = useRouter()
@@ -91,10 +93,60 @@ const CommandsPage = () => {
         />
       </Head>
       <div className="p-6">
-        <Header
-          title={`Commands for ${loading || !data?.displayName ? '...' : data?.displayName}`}
-          subtitle={`Member since ${new Date(data?.createdAt).toLocaleDateString()}. An exhaustive list of all commands available using Twitch chat.`}
-        />
+        <div className="mb-12 space-y-4">
+          <div className="">
+            <div className="flex flex-row items-center space-x-2">
+              <Image
+                onError={(e) => {
+                  e.currentTarget.src = '/images/hero/default.png'
+                }}
+                src={data?.image || '/images/hero/default.png'}
+                alt="Profile Picture"
+                width={80}
+                height={80}
+                className="rounded-full flex"
+              />
+              <div>
+                <div className="flex flex-row items-center space-x-4">
+                  <Link
+                    target="_blank"
+                    href={
+                      !loading && data ? `https://twitch.tv/${data?.name}` : ''
+                    }
+                    passHref
+                    className="flex flex-row items-center space-x-2"
+                  >
+                    <h1 className="text-2xl font-bold leading-6">
+                      {loading || !data?.displayName
+                        ? 'Loading...'
+                        : data?.displayName}
+                    </h1>
+                    <ExternalLinkIcon className="flex" size={15} />
+                  </Link>
+                  {data?.stream_online ? (
+                    <span className="rounded-md bg-red-700 px-2 py-0.5 text-xs">
+                      Live
+                    </span>
+                  ) : (
+                    <span className="rounded-md bg-gray-700 px-2 py-0.5 text-xs">
+                      Offline
+                    </span>
+                  )}
+                </div>
+
+                <span>
+                  Using Dotabod since{' '}
+                  {loading || !data?.createdAt
+                    ? '...'
+                    : new Date(data?.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="text-gray-300">
+            All commands available to use in Twitch chat with Dotabod.
+          </div>
+        </div>
 
         <div className="flex items-baseline space-x-6 pb-6">
           <Segmented
@@ -121,7 +173,7 @@ const CommandsPage = () => {
           />
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10">
           {filteredCommands.map((key, i) => (
             <CommandsCard
               readonly

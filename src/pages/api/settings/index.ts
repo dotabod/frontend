@@ -21,6 +21,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         const data = await prisma.user.findFirstOrThrow({
           select: {
             displayName: true,
+            name: true,
+            stream_online: true,
+            image: true,
             createdAt: true,
             settings: {
               select: {

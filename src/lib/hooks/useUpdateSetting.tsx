@@ -145,5 +145,5 @@ export function useGetSettingsByUsername() {
   const { username } = router.query
   const url = `/api/settings${username ? `?username=${username}` : ''}`
   const { data, loading } = useUpdate({ path: url })
-  return { data, loading, username }
+  return { data, loading }
 }
