@@ -17,24 +17,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (username) {
     if (req.method === 'GET') {
       try {
+        // Attempt to find a user with the specified conditions
         const data = await prisma.user.findFirstOrThrow({
           select: {
+            name: true,
             settings: {
               select: {
                 key: true,
                 value: true,
               },
-            },
-          },
-          where: {
-            // and where setting key starts with "command"
-            settings: {
-              some: {
+              where: {
                 key: {
                   startsWith: 'command',
                 },
               },
             },
+          },
+          where: {
             name: username.toLowerCase(),
           },
         })
@@ -51,6 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         return res.json(data)
       } catch (error) {
+        console.error(error)
         return res.status(404).json({
           error: 'User not found',
         })
