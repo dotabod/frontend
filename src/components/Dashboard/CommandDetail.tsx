@@ -662,6 +662,67 @@ const CommandDetail = {
       />
     ),
   },
+  [Settings.commandFacet]: {
+    key: Settings.commandFacet,
+    title: 'Facet Information',
+    description: 'Provides information about the selected facet of a hero.',
+    cmd: '!facet jug 2',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!facet"
+        response="Juggernaut facet 2: Healing Ward · Summons a Healing Ward that heals all nearby allies."
+      />
+    ),
+  },
+  [Settings.commandWinProbability]: {
+    key: Settings.commandWinProbability,
+    title: 'Win Probability',
+    description: 'Shows the current win probability for the game.',
+    cmd: '!wp',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!wp"
+        response="75% win probability at 30:00 · Next update in 60s"
+      />
+    ),
+  },
+  [Settings.commandSpectators]: {
+    key: Settings.commandSpectators,
+    title: 'Spectator Count',
+    description:
+      'Displays the number of spectators currently watching the match live.',
+    cmd: '!spectators',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!spectators"
+        response="15 spectators watching this match live"
+      />
+    ),
+  },
+  [Settings.commandInnate]: {
+    key: Settings.commandInnate,
+    title: 'Innate Ability',
+    description: "Provides information about a hero's innate ability.",
+    cmd: '!innate 4',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!innate"
+        response="Juggernaut innate: Blade Dance · Juggernaut's attacks have a chance to deal critical damage."
+      />
+    ),
+  },
 }
 
 export default CommandDetail

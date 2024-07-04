@@ -115,6 +115,10 @@ export const defaultSettings = {
   queueBlocker: false,
   queueBlockerFindMatch: false,
   queueBlockerFindMatchText: 'Ranked match / All pick / Europe East, Russia',
+  commandSpectators: true,
+  commandFacet: true,
+  commandInnate: true,
+  commandWinProbability: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
