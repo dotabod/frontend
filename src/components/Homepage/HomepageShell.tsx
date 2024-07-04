@@ -4,13 +4,18 @@ import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import Head from 'next/head'
 import type { ReactNode } from 'react'
 
-const HomepageShell = ({ children }: { children?: ReactNode }) => {
+const HomepageShell = ({
+  title,
+  children,
+}: { title?: ReactNode; children?: ReactNode }) => {
   useMaybeSignout()
 
   return (
     <>
       <Head>
-        <title>Dotabod - Enhance Your Dota 2 Streaming Experience</title>
+        <title>
+          {title ?? 'Dotabod - Enhance Your Dota 2 Streaming Experience'}
+        </title>
         <meta
           name="title"
           content="Dotabod - Enhance Your Dota 2 Streaming Experience"

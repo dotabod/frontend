@@ -5,6 +5,7 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import { Empty, Input, Segmented } from 'antd'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
 
@@ -81,55 +82,73 @@ const CommandsPage = () => {
   }
 
   return (
-    <div className="p-6">
-      <Header
-        subtitle="An exhaustive list of all commands available using Twitch chat."
-        title={`Commands for ${loading || !username ? '...' : username}`}
-      />
+    <>
+      <Head>
+        <title>{`Commands for ${loading || !username ? '...' : username} - Dotabod`}</title>
+        <meta
+          name="description"
+          content="An exhaustive list of all commands available using Twitch chat."
+        />
+      </Head>
+      <div className="p-6">
+        <Header
+          subtitle="An exhaustive list of all commands available using Twitch chat."
+          title={`Commands for ${loading || !username ? '...' : username}`}
+        />
 
-      <div className="flex items-baseline space-x-6 pb-6">
-        <Segmented
-          value={enabled}
-          onChange={(v) => setEnabled(v as string)}
-          options={['All', 'Enabled', 'Disabled']}
-        />
-        <Segmented
-          value={permission}
-          onChange={(v) => setPermission(v as string)}
-          options={['All', 'Mods', 'Plebs']}
-        />
-        <Input
-          placeholder="Search commands..."
-          value={searchTerm}
-          style={{ width: 300 }}
-          onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
-        />
-      </div>
-      {filteredCommands.length < 1 && (
-        <Empty
-          description="Could not find any matching commands."
-          imageStyle={{ height: 60 }}
-        />
-      )}
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {filteredCommands.map((key, i) => (
-          <CommandsCard
-            readonly
-            key={i}
-            id={key}
-            publicLoading={loading}
-            publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
-            command={CommandDetail[key]}
+        <div className="flex items-baseline space-x-6 pb-6">
+          <Segmented
+            value={enabled}
+            onChange={(v) => setEnabled(v as string)}
+            options={['All', 'Enabled', 'Disabled']}
           />
-        ))}
+          <Segmented
+            value={permission}
+            onChange={(v) => setPermission(v as string)}
+            options={['All', 'Mods', 'Plebs']}
+          />
+          <Input
+            placeholder="Search commands..."
+            value={searchTerm}
+            style={{ width: 300 }}
+            onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
+          />
+        </div>
+        {filteredCommands.length < 1 && (
+          <Empty
+            description="Could not find any matching commands."
+            imageStyle={{ height: 60 }}
+          />
+        )}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {filteredCommands.map((key, i) => (
+            <CommandsCard
+              readonly
+              key={i}
+              id={key}
+              publicLoading={loading}
+              publicIsEnabled={
+                commands.find((c) => c.command === key)?.isEnabled
+              }
+              command={CommandDetail[key]}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
 CommandsPage.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell>{page}</HomepageShell>
+  const { username } = useRouter().query
+  return (
+    <HomepageShell
+      title={`Commands for ${!username ? '...' : username} - Dotabod`}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default CommandsPage
