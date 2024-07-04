@@ -84,7 +84,7 @@ const CommandsPage = () => {
   return (
     <>
       <Head>
-        <title>{`Commands for ${loading || !username ? '...' : username} - Dotabod`}</title>
+        <title>{`Commands for ${loading || !data?.displayName ? '...' : data?.displayName} - Dotabod`}</title>
         <meta
           name="description"
           content="An exhaustive list of all commands available using Twitch chat."
@@ -92,8 +92,8 @@ const CommandsPage = () => {
       </Head>
       <div className="p-6">
         <Header
-          subtitle="An exhaustive list of all commands available using Twitch chat."
-          title={`Commands for ${loading || !username ? '...' : username}`}
+          title={`Commands for ${loading || !data?.displayName ? '...' : data?.displayName}`}
+          subtitle={`Member since ${new Date(data?.createdAt).toLocaleDateString()}. An exhaustive list of all commands available using Twitch chat.`}
         />
 
         <div className="flex items-baseline space-x-6 pb-6">
@@ -141,14 +141,7 @@ const CommandsPage = () => {
 }
 
 CommandsPage.getLayout = function getLayout(page: ReactElement) {
-  const { username } = useRouter().query
-  return (
-    <HomepageShell
-      title={`Commands for ${!username ? '...' : username} - Dotabod`}
-    >
-      {page}
-    </HomepageShell>
-  )
+  return <HomepageShell dontUseTitle>{page}</HomepageShell>
 }
 
 export default CommandsPage

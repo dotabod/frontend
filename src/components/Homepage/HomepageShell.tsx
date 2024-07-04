@@ -6,16 +6,19 @@ import type { ReactNode } from 'react'
 
 const HomepageShell = ({
   title,
+  dontUseTitle,
   children,
-}: { title?: ReactNode; children?: ReactNode }) => {
+}: { dontUseTitle?: boolean; title?: ReactNode; children?: ReactNode }) => {
   useMaybeSignout()
 
   return (
     <>
       <Head>
-        <title>
-          {title ?? 'Dotabod - Enhance Your Dota 2 Streaming Experience'}
-        </title>
+        {dontUseTitle && (
+          <title>
+            {title ?? 'Dotabod - Enhance Your Dota 2 Streaming Experience'}
+          </title>
+        )}
         <meta
           name="title"
           content="Dotabod - Enhance Your Dota 2 Streaming Experience"

@@ -20,7 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         // Attempt to find a user with the specified conditions
         const data = await prisma.user.findFirstOrThrow({
           select: {
-            name: true,
+            displayName: true,
+            createdAt: true,
             settings: {
               select: {
                 key: true,
@@ -40,12 +41,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         if (!data) {
           return res.json({})
-        }
-
-        if (data?.settings) {
-          data.settings = data.settings.filter((setting) =>
-            setting.key.startsWith('command')
-          )
         }
 
         return res.json(data)
