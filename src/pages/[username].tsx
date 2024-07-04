@@ -14,9 +14,8 @@ import { type ReactElement, useEffect, useState } from 'react'
 const CommandsPage = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
-  const { data, loading } = useGetSettingsByUsername()
-
   const [searchTerm, setSearchTerm] = useState('')
+  const { data, loading } = useGetSettingsByUsername()
   const router = useRouter()
 
   useEffect(() => {
@@ -39,54 +38,40 @@ const CommandsPage = () => {
         CommandDetail[command].key,
         data?.settings
       )
-      if (enabled === 'Enabled' && CommandDetail[command].key) {
-        return isEnabled === true
-      }
-      if (enabled === 'Disabled') {
-        return isEnabled === false
-      }
+      if (enabled === 'Enabled') return isEnabled === true
+      if (enabled === 'Disabled') return isEnabled === false
       return true
     })
     .filter((command) => {
-      if (permission === 'Mods') {
+      if (permission === 'Mods')
         return CommandDetail[command].allowed === 'mods'
-      }
-      if (permission === 'Plebs') {
+      if (permission === 'Plebs')
         return CommandDetail[command].allowed === 'all'
-      }
       return true
     })
     .filter((command) => {
-      let containsStringValue = false
-      ;['alias', 'title', 'description', 'cmd'].forEach((key) => {
-        if (Array.isArray(CommandDetail[command][key])) {
-          CommandDetail[command][key].forEach((alias) => {
-            if (
+      const keysToSearch = ['alias', 'title', 'description', 'cmd']
+      return keysToSearch.some((key) => {
+        const value = CommandDetail[command][key]
+        if (Array.isArray(value)) {
+          return value.some(
+            (alias) =>
               alias.toLowerCase().includes(searchTerm) ||
               `!${alias.toLowerCase()}`.includes(searchTerm)
-            ) {
-              containsStringValue = true
-            }
-          })
-        } else if (
-          CommandDetail[command][key].toLowerCase().includes(searchTerm)
-        ) {
-          containsStringValue = true
+          )
         }
+        return value.toLowerCase().includes(searchTerm)
       })
-
-      return !(searchTerm && !containsStringValue)
     })
 
   if (data?.error) {
-    // Show the default nextjs 404 page
     return null
   }
 
   return (
     <>
       <Head>
-        <title>{`Commands for ${loading || !data?.displayName ? '...' : data?.displayName} - Dotabod`}</title>
+        <title>{`Commands for ${loading || !data?.displayName ? '...' : data.displayName} - Dotabod`}</title>
         <meta
           name="description"
           content="An exhaustive list of all commands available using Twitch chat."
@@ -94,60 +79,52 @@ const CommandsPage = () => {
       </Head>
       <div className="p-6">
         <div className="mb-12 space-y-4">
-          <div className="">
-            <div className="flex flex-row items-center space-x-2">
-              <Image
-                onError={(e) => {
-                  e.currentTarget.src = '/images/hero/default.png'
-                }}
-                src={data?.image || '/images/hero/default.png'}
-                alt="Profile Picture"
-                width={80}
-                height={80}
-                className="rounded-full flex"
-              />
-              <div>
-                <div className="flex flex-row items-center space-x-4">
-                  <Link
-                    target="_blank"
-                    href={
-                      !loading && data ? `https://twitch.tv/${data?.name}` : ''
-                    }
-                    passHref
-                    className="flex flex-row items-center space-x-2"
-                  >
-                    <h1 className="text-2xl font-bold leading-6">
-                      {loading || !data?.displayName
-                        ? 'Loading...'
-                        : data?.displayName}
-                    </h1>
-                    <ExternalLinkIcon className="flex" size={15} />
-                  </Link>
-                  {data?.stream_online ? (
-                    <span className="rounded-md bg-red-700 px-2 py-0.5 text-xs">
-                      Live
-                    </span>
-                  ) : (
-                    <span className="rounded-md bg-gray-700 px-2 py-0.5 text-xs">
-                      Offline
-                    </span>
-                  )}
-                </div>
-
-                <span>
-                  Using Dotabod since{' '}
-                  {loading || !data?.createdAt
-                    ? '...'
-                    : new Date(data?.createdAt).toLocaleDateString()}
+          <div className="flex flex-row items-center space-x-2">
+            <Image
+              onError={(e) => {
+                e.currentTarget.src = '/images/hero/default.png'
+              }}
+              src={data?.image || '/images/hero/default.png'}
+              alt="Profile Picture"
+              width={80}
+              height={80}
+              className="rounded-full flex"
+            />
+            <div>
+              <div className="flex flex-row items-center space-x-4">
+                <Link
+                  target="_blank"
+                  href={
+                    !loading && data ? `https://twitch.tv/${data?.name}` : ''
+                  }
+                  passHref
+                  className="flex flex-row items-center space-x-2"
+                >
+                  <h1 className="text-2xl font-bold leading-6">
+                    {loading || !data?.displayName
+                      ? 'Loading...'
+                      : data.displayName}
+                  </h1>
+                  <ExternalLinkIcon className="flex" size={15} />
+                </Link>
+                <span
+                  className={`rounded-md px-2 py-0.5 text-xs ${data?.stream_online ? 'bg-red-700' : 'bg-gray-700'}`}
+                >
+                  {data?.stream_online ? 'Live' : 'Offline'}
                 </span>
               </div>
+              <span>
+                Using Dotabod since{' '}
+                {loading || !data?.createdAt
+                  ? '...'
+                  : new Date(data.createdAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
           <div className="text-gray-300">
             All commands available to use in Twitch chat with Dotabod.
           </div>
         </div>
-
         <div className="flex items-baseline space-x-6 pb-6">
           <Segmented
             value={enabled}
@@ -163,7 +140,7 @@ const CommandsPage = () => {
             placeholder="Search commands..."
             value={searchTerm}
             style={{ width: 300 }}
-            onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
+            onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
           />
         </div>
         {filteredCommands.length < 1 && (
@@ -172,7 +149,6 @@ const CommandsPage = () => {
             imageStyle={{ height: 60 }}
           />
         )}
-
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10">
           {filteredCommands.map((key, i) => (
             <CommandsCard
