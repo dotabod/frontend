@@ -1,3 +1,4 @@
+import NumberTicker from '@/components/magicui/number-ticker'
 import useLanguageTranslations, {
   type CrowdinLanguage,
   getLanguageProgress,
@@ -94,16 +95,15 @@ export default function LanguageCard() {
   })
 
   const UsedBy = () => (
-    <span className="space-x-1">
+    <div className="space-x-1 flex flex-row items-center mb-2">
       <span>Used by</span>
       {isLoading ? (
-        <Spin size="small" className="!mr-2" />
+        <Spin size="small" />
       ) : (
-        <span>
-          {data?.total
-            ? `${data?.total.toLocaleString()}`
-            : `${data?.percentage?.toLocaleString()}% of`}
-        </span>
+        <>
+          <NumberTicker value={data?.total || data?.percentage || 0} />
+          {data?.percentage && '% of'}
+        </>
       )}
       <span>dotabods</span>
       <Image
@@ -114,7 +114,7 @@ export default function LanguageCard() {
         unoptimized
         alt="peepofat"
       />
-    </span>
+    </div>
   )
 
   return (
@@ -129,7 +129,10 @@ export default function LanguageCard() {
         <div className="mt-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <span>
-              {languageProgress?.data?.translationProgress}% translated
+              <NumberTicker
+                value={languageProgress?.data?.translationProgress || 0}
+              />
+              <span>% translated</span>
             </span>
             {data?.total === 1 && (
               <span>
@@ -175,24 +178,20 @@ export default function LanguageCard() {
         />
       </div>
 
-      <div className="mt-4 flex flex-row items-center space-x-4">
-        {languageProgress?.data?.translationProgress < 100 ? (
+      <div className="mt-2 flex flex-row items-center">
+        {
           <Link
             href={'https://crowdin.com/project/dotabod'}
             target="_blank"
             passHref
           >
-            <Button>Help finish translation</Button>
+            <Button loading={isLoading} className="!pl-0" type="link">
+              {languageProgress?.data?.translationProgress < 100
+                ? 'Help finish this translation on Crowdin'
+                : 'Found a translation error? Fix it on Crowdin'}
+            </Button>
           </Link>
-        ) : (
-          <Link
-            href={'https://crowdin.com/project/dotabod'}
-            target="_blank"
-            passHref
-          >
-            <Button>Found a translation error?</Button>
-          </Link>
-        )}
+        }
       </div>
     </Card>
   )

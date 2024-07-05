@@ -12,7 +12,7 @@ const FeaturesPage: NextPageWithLayout = () => (
     </Head>
 
     <Header
-      subtitle="The bot can post some random messages as you play your game."
+      subtitle="The bot reacts with chat messages to your game events as you play your match."
       title="Chatter"
     />
 

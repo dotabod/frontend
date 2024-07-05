@@ -51,9 +51,11 @@ export default function MmrTrackerCard() {
         </div>
       </div>
       <p className="text-xs">
-        Note: Since the 7.33 patch, Dotabod can no longer accurately estimate
-        the MMR from each game. You can either use !setmmr or update it here
-        after a game or after your stream. Mods can also use !setmmr
+        Note: Since the 7.33 patch released on{' '}
+        {new Date('2023-04-20').toLocaleDateString()}, Dotabod can no longer
+        accurately estimate the MMR from each game. You can either use !setmmr
+        or update it here after a game or after your stream. You can also have
+        your mods do it for you via !setmmr.
       </p>
     </Card>
   )

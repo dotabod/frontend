@@ -8,7 +8,8 @@ import { Button, Steps } from 'antd'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type ReactElement, useState } from 'react'
+import { useRouter } from 'next/router'
+import { type ReactElement, useEffect, useState } from 'react'
 
 const SetupPage = () => {
   const [active, setActive] = useState(0)
@@ -16,6 +17,21 @@ const SetupPage = () => {
     setActive((current) => (current < 3 ? current + 1 : current))
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current))
+
+  const router = useRouter()
+  const { step } = router.query
+
+  useEffect(() => {
+    // Assuming the maximum step index is 3 (for a total of 4 steps)
+    const maxStepIndex = 3
+    const parsedStep = Number.parseInt(step as string)
+
+    setActive(
+      !Number.isNaN(parsedStep) && parsedStep > 0
+        ? Math.min(parsedStep - 1, maxStepIndex)
+        : 0
+    )
+  }, [step]) // Dependency array, re-run effect when `step` changes
 
   const steps = [
     {

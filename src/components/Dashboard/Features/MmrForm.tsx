@@ -10,7 +10,7 @@ import { type RankType, getRankDetail, getRankImage } from '@/lib/ranks'
 import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { useForm } from '@mantine/form'
 import type { SteamAccount } from '@prisma/client'
-import { Button, Form, InputNumber, Tag } from 'antd'
+import { Alert, Button, Form, InputNumber } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import Image from 'next/image'
@@ -248,10 +248,11 @@ const MmrForm = ({ hideText = false }) => {
       {form.values.accounts.length === 0 && (
         <div className="mt-6">
           <div className={clsx('mb-4', hideText && 'hidden')}>
-            <Tag>INFO</Tag>
-            <span>
-              Play a bot game for Dotabod to detect your Steam account!
-            </span>
+            <Alert
+              type="warning"
+              showIcon
+              message="No steam account found yet. Play a bot match!"
+            />
           </div>
           <div className="flex space-x-4 transition-all">
             <MMRBadge
@@ -282,10 +283,7 @@ const MmrForm = ({ hideText = false }) => {
                   onChange={debouncedMmr}
                 />
               )}
-              <label
-                htmlFor="mmr"
-                className="mb-2 flex text-sm font-medium text-gray-400 "
-              >
+              <label htmlFor="mmr" className="mb-2 flex text-sm text-gray-400 ">
                 Enter your current MMR
               </label>
             </div>

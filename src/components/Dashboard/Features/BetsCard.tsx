@@ -52,8 +52,9 @@ export default function BetsCard() {
               label="Title"
               name="title"
               help={
-                <div className="my-2">
-                  <Tag>[heroname]</Tag> will be replaced with the hero name
+                <div className="my-2 text-xs flex flex-row items-center">
+                  <Tag>[heroname]</Tag>
+                  <span>will be replaced with the hero name</span>
                 </div>
               }
             >

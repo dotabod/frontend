@@ -42,6 +42,9 @@ const App = ({
         theme={{
           algorithm: theme.darkAlgorithm,
           components: {
+            Spin: {
+              colorPrimary: 'var(--color-purple-300)',
+            },
             Button: {
               colorLink: 'var(--color-purple-300)',
               colorPrimaryHover: 'var(--color-purple-300)',
@@ -59,6 +62,11 @@ const App = ({
             },
             Switch: {
               colorPrimary: 'var(--color-purple-900)',
+            },
+            Steps: {
+              colorPrimary: 'var(--color-purple-500)',
+              colorPrimaryHover: 'var(--color-purple-300)',
+              colorPrimaryActive: 'var(--color-purple-300)',
             },
           },
           token: {
