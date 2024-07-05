@@ -1,22 +1,27 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import * as z from 'zod'
-
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
+import * as z from 'zod'
 
 const accountUpdateSchema = z.array(
   z.object({
     steam32Id: z.number().min(0),
     mmr: z.number().min(0).max(20000),
-    name: z.string().optional(),
+    name: z
+      .string()
+      .regex(
+        /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
+        'Name must be alphanumeric or include allowed punctuation.'
+      )
+      .optional(),
     delete: z.boolean().optional(),
   })
 )
 
-async function getAccounts(id: string) {
+async function getAccounts(userId: string) {
   try {
     const accounts = await prisma.steamAccount.findMany({
       select: {
@@ -34,10 +39,10 @@ async function getAccounts(id: string) {
       },
       where: {
         OR: [
-          { userId: id },
+          { userId: userId },
           {
             connectedUserIds: {
-              has: id,
+              has: userId,
             },
           },
         ],
@@ -48,112 +53,101 @@ async function getAccounts(id: string) {
       return []
     }
 
-    accounts.forEach((account) => {
-      if (account.user.id === id) {
+    return accounts.map((account) => {
+      if (account.user?.id === userId) {
         account.connectedUserIds = undefined
         account.user = undefined
-        return
+      } else {
+        account.connectedUserIds = account.connectedUserIds?.filter(
+          (id) => id === userId
+        )
+        if (account.connectedUserIds?.length) {
+          account.connectedUserIds = [account.user?.name]
+        }
+        account.user = undefined
       }
-
-      // filter connectedUserIds to only show the current user
-      account.connectedUserIds = account.connectedUserIds.filter(
-        (userId) => userId === id
-      )
-      // add the user using this account to the connectedUserIds array
-      if (account.connectedUserIds.length) {
-        account.connectedUserIds = [account.user.name]
-      }
-      account.user = undefined
+      return account
     })
-
-    return accounts
   } catch (error) {
-    console.error(error, 'in getAccounts')
+    console.error('Error in getAccounts:', error)
     return null
+  }
+}
+
+async function handleGetRequest(res: NextApiResponse, userId: string) {
+  const accounts = await getAccounts(userId)
+  if (!accounts) {
+    return res.status(500).end()
+  }
+  return res.json({ accounts })
+}
+
+async function handlePatchRequest(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  userId: string
+) {
+  const accounts = await getAccounts(userId)
+  if (!accounts) {
+    return res.status(403).end()
+  }
+
+  try {
+    const accountUpdates = accountUpdateSchema.parse(JSON.parse(req.body))
+
+    const updatePromises = accountUpdates
+      .map((update) => {
+        if (update.delete) {
+          if (
+            accounts.some((account) => account.steam32Id === update.steam32Id)
+          ) {
+            return prisma.steamAccount.delete({
+              where: { steam32Id: update.steam32Id },
+            })
+          }
+        } else {
+          if (
+            accounts.some((account) => account.steam32Id === update.steam32Id)
+          ) {
+            return prisma.steamAccount.update({
+              data: { steam32Id: update.steam32Id, mmr: update.mmr },
+              where: { steam32Id: update.steam32Id },
+              select: { steam32Id: true, mmr: true, name: true },
+            })
+          }
+        }
+        return null
+      })
+      .filter(Boolean)
+
+    const updatedAccounts = await Promise.all(updatePromises)
+    return res.json({ accounts: updatedAccounts })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(422).json(error.issues)
+    }
+    console.error('Error in handlePatchRequest:', error)
+    return res.status(500).end()
   }
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  const userId = req.query.id as string
+  const userId = session?.user?.id || (req.query.id as string)
 
-  if (!userId && !session?.user?.id) {
+  if (!userId) {
     return res.status(403).end()
   }
 
-  const accounts = await getAccounts(session ? session?.user?.id : userId)
   if (req.method === 'GET') {
-    // Caught error
-    if (!accounts) {
-      return res.status(500).end()
-    }
-
-    return res.json({ accounts })
+    return await handleGetRequest(res, userId)
   }
 
   if (req.method === 'PATCH') {
-    if (!session?.user?.id) {
-      return res.status(403).end()
-    }
-
-    try {
-      const promises = []
-      const body = accountUpdateSchema.parse(JSON.parse(req.body))
-
-      body
-        .filter((a) => a.delete)
-        .forEach((account) => {
-          // Check if user has the steam accountid from body array
-          if (!accounts.find((obj) => obj.steam32Id === account.steam32Id)) {
-            return
-          }
-
-          promises.push(
-            prisma.steamAccount.delete({
-              where: {
-                steam32Id: account.steam32Id,
-              },
-            })
-          )
-        })
-
-      body
-        .filter((a) => !a.delete)
-        .forEach((account) => {
-          // Check if user has the steam accountid from body array
-          if (!accounts.find((obj) => obj.steam32Id === account.steam32Id)) {
-            return
-          }
-
-          promises.push(
-            prisma.steamAccount.update({
-              data: {
-                steam32Id: account.steam32Id,
-                mmr: account.mmr,
-              },
-              where: {
-                steam32Id: account.steam32Id,
-              },
-              select: {
-                steam32Id: true,
-                mmr: true,
-                name: true,
-              },
-            })
-          )
-        })
-
-      await Promise.all(promises).then((accounts) => {
-        return res.json({ accounts: accounts.filter((a) => a.delete) })
-      })
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(422).json(error.issues)
-      }
-
-      return res.status(500).end()
-    }
+    return await handlePatchRequest(req, res, userId)
   }
+
+  return res.status(405).end() // Method Not Allowed
 }
 
 export default withMethods(['GET', 'PATCH'], withAuthentication(handler))
