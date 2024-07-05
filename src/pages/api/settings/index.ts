@@ -5,7 +5,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { settingCreateSchema } from '@/lib/validations/setting'
+import { settingSchema } from '@/lib/validations/setting'
 import { getServerSession } from 'next-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -108,7 +108,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     try {
-      const body = settingCreateSchema.parse(JSON.parse(req.body))
+      const body = settingSchema.parse(JSON.parse(req.body))
 
       const post = await prisma.setting.create({
         data: {

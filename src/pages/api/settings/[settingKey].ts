@@ -6,18 +6,16 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
-import {
-  mmrPatchSchema,
-  settingKeySchema,
-  settingPatchSchema,
-  streamDelaySchema,
-} from '@/lib/validations/setting'
+import { settingKeySchema, settingSchema } from '@/lib/validations/setting'
 import { getServerSession } from 'next-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const settingKey = req.query.settingKey as string
-  settingKeySchema.parse(settingKey)
+
+  if (!settingKeySchema.safeParse(settingKey).success) {
+    return res.status(422).json({ error: 'Invalid setting key' })
+  }
 
   if (!session?.user?.id) {
     return res.status(500).end()
@@ -36,12 +34,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'PATCH') {
     try {
-      if (settingKey === Settings.mmr) {
-        const body = mmrPatchSchema.parse(JSON.parse(req.body))
+      const bodyJson = JSON.parse(req.body)
+      bodyJson.key = settingKey
 
+      const body = settingSchema.parse(bodyJson)
+      if (settingKey === Settings.mmr) {
         await prisma.user.update({
           data: {
-            mmr: body.value,
+            mmr: body.value as number,
           },
           where: {
             id: session?.user?.id,
@@ -50,15 +50,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         return res.status(200).json({ status: 'ok' })
       }
-
-      if (settingKey === Settings.streamDelay) {
-        streamDelaySchema.parse(JSON.parse(req.body))
-      }
-
-      const bodyJson = JSON.parse(req.body)
-      bodyJson.key = settingKey
-
-      const body = settingPatchSchema.parse(bodyJson)
 
       await prisma.setting.upsert({
         where: {

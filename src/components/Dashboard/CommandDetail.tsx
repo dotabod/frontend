@@ -20,6 +20,21 @@ const CommandDetail = {
       />
     ),
   },
+  [Settings.commandOnline]: {
+    title: 'Online or offline status',
+    description:
+      'Updates the status of your stream that Dotabod sees to online or offline.',
+    cmd: '!online',
+    alias: ['offline', 'forceonline', 'forceoffline'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command="!online"
+        response="Dotabod will treat <channel> as offline. Type !online to undo"
+      />
+    ),
+  },
   [Settings.chatter]: {
     title: 'Mute Dotabod',
     description:
@@ -615,22 +630,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!version"
-        response="Server running version {{version}}, here's what's missing compared to the latest version: {{- url}}"
-      />
-    ),
-  },
-  [Settings.commandOnline]: {
-    title: 'Online or offline status',
-    description:
-      'Updates the status of your stream that Dotabod sees to online or offline.',
-    cmd: '!online',
-    alias: ['offline', 'forceonline', 'forceoffline'],
-    allowed: 'all',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        command="!online"
-        response="Dotabod will treat {{channel}} as offline. Type !online to undo"
+        response="Server running version 2c4fa, here's what's missing compared to the latest version: https://github.com/dotabod/backend/compare/2c4fa...latest"
       />
     ),
   },
@@ -644,7 +644,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!resetwl"
-        response="Resetting win/loss to 0 for {{channel}}"
+        response="Resetting win/loss to 0 for <channel>"
       />
     ),
   },
@@ -658,7 +658,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!locale"
-        response="Dotabod is translated by {{- translators}}. Want to help translate or see a mistake? {{- url}}"
+        response="Dotabod is translated by Techleed. Want to help translate or see a mistake? https://crowdin.com/project/dotabod"
       />
     ),
   },
