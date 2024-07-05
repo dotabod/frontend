@@ -1,12 +1,14 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import * as z from 'zod'
-
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { settingSchema } from '@/lib/validations/setting'
+import {
+  dynamicSettingSchema,
+  settingKeySchema,
+} from '@/lib/validations/setting'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
+import { z } from 'zod'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -98,7 +100,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.json(data)
     } catch (error) {
-      return res.status(500)
+      console.error('Error fetching user:', error)
+      return res.status(500).end()
     }
   }
 
@@ -108,12 +111,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     try {
-      const body = settingSchema.parse(JSON.parse(req.body))
+      const parsedBody = JSON.parse(req.body)
+
+      const keyValidation = settingKeySchema.safeParse(parsedBody.key)
+      if (!keyValidation.success) {
+        return res.status(422).json({ error: 'Invalid setting key' })
+      }
+
+      const validKey = keyValidation.data
+      const schema = dynamicSettingSchema(validKey)
+      const validatedBody = schema.parse(parsedBody)
 
       const post = await prisma.setting.create({
         data: {
-          key: body.key,
-          value: body.value,
+          key: validatedBody.key,
+          value: validatedBody.value,
           userId: session.user.id,
         },
         select: {
@@ -123,11 +135,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.json(post)
     } catch (error) {
+      console.error('Error creating setting:', error)
+
       if (error instanceof z.ZodError) {
         return res.status(422).json(error.issues)
       }
 
-      return res.status(500)
+      return res.status(500).end()
     }
   }
 }

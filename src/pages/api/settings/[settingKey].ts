@@ -1,84 +1,115 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import * as z from 'zod'
-
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
-import { settingKeySchema, settingSchema } from '@/lib/validations/setting'
+import {
+  dynamicSettingSchema,
+  settingKeySchema,
+} from '@/lib/validations/setting'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
+import * as z from 'zod'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const settingKey = req.query.settingKey as string
 
-  if (!settingKeySchema.safeParse(settingKey).success) {
+  const keyValidation = settingKeySchema.safeParse(settingKey)
+  if (!keyValidation.success) {
     return res.status(422).json({ error: 'Invalid setting key' })
   }
+
+  const validKey = keyValidation.data as keyof typeof settingKeySchema.Values
 
   if (!session?.user?.id) {
     return res.status(500).end()
   }
 
   if (req.method === 'GET') {
+    return handleGetRequest(res, session.user.id, validKey)
+  }
+
+  if (req.method === 'PATCH') {
+    return handlePatchRequest(req, res, session.user.id, validKey)
+  }
+
+  return res.status(405).end() // Method Not Allowed
+}
+
+async function handleGetRequest(
+  res: NextApiResponse,
+  userId: string,
+  settingKey: string
+) {
+  try {
     const setting = await prisma.setting.findFirst({
       where: {
-        userId: session?.user?.id,
+        userId: userId,
         key: settingKey,
       },
     })
 
     return res.status(200).json(setting)
+  } catch (error) {
+    console.error('Error fetching setting:', error)
+    return res.status(500).end()
   }
+}
 
-  if (req.method === 'PATCH') {
-    try {
-      const bodyJson = JSON.parse(req.body)
-      bodyJson.key = settingKey
+async function handlePatchRequest(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  userId: string,
+  settingKey: keyof typeof settingKeySchema.Values
+) {
+  try {
+    const parsedBody = JSON.parse(req.body)
+    parsedBody.key = settingKey
 
-      const body = settingSchema.parse(bodyJson)
-      if (settingKey === Settings.mmr) {
-        await prisma.user.update({
-          data: {
-            mmr: body.value as number,
-          },
-          where: {
-            id: session?.user?.id,
-          },
-        })
+    const schema = dynamicSettingSchema(settingKey)
+    const validatedBody = schema.parse(parsedBody)
 
-        return res.status(200).json({ status: 'ok' })
-      }
-
-      await prisma.setting.upsert({
+    if (settingKey === Settings.mmr) {
+      await prisma.user.update({
+        data: {
+          mmr: validatedBody.value as number,
+        },
         where: {
-          key_userId: {
-            key: body.key,
-            userId: session?.user?.id,
-          },
-        },
-        update: {
-          value: body.value,
-        },
-        create: {
-          key: body.key,
-          value: body.value,
-          userId: session?.user?.id,
+          id: userId,
         },
       })
 
       return res.status(200).json({ status: 'ok' })
-    } catch (error) {
-      console.log(error)
-
-      if (error instanceof z.ZodError) {
-        return res.status(422).json(error.issues)
-      }
-
-      return res.status(422).end()
     }
+
+    await prisma.setting.upsert({
+      where: {
+        key_userId: {
+          key: validatedBody.key,
+          userId: userId,
+        },
+      },
+      update: {
+        value: validatedBody.value,
+      },
+      create: {
+        key: validatedBody.key,
+        value: validatedBody.value,
+        userId: userId,
+      },
+    })
+
+    return res.status(200).json({ status: 'ok' })
+  } catch (error) {
+    console.error('Error updating setting:', error)
+
+    if (error instanceof z.ZodError) {
+      return res.status(422).json(error.issues)
+    }
+
+    return res.status(500).end()
   }
 }
 
-export default withMethods(['PATCH'], withAuthentication(handler))
+export default withMethods(['GET', 'PATCH'], withAuthentication(handler))

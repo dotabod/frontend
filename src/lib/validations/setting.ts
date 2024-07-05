@@ -137,85 +137,17 @@ const settingsSchema = {
   commandWinProbability: z.boolean(),
 }
 
-const settingSchemas = z.object(settingsSchema)
+export const settingSchemas = z.object(settingsSchema)
 type SettingKeys = keyof typeof settingsSchema
 export const settingKeySchema = z.enum(
   Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]]
 )
 
-export const settingSchema = z.object({
-  key: settingKeySchema,
-  value: z.union([
-    settingSchemas.shape.aegis,
-    settingSchemas.shape.bets,
-    settingSchemas.shape.betsInfo,
-    settingSchemas.shape.battlepass,
-    settingSchemas.shape.chatter,
-    settingSchemas.shape.chatters,
-    settingSchemas.shape.commandAPM,
-    settingSchemas.shape.commandAvg,
-    settingSchemas.shape.commandCommands,
-    settingSchemas.shape.commandDisable,
-    settingSchemas.shape.commandDotabuff,
-    settingSchemas.shape.commandGM,
-    settingSchemas.shape.commandGPM,
-    settingSchemas.shape.commandHero,
-    settingSchemas.shape.commandLG,
-    settingSchemas.shape.commandModsonly,
-    settingSchemas.shape.commandNP,
-    settingSchemas.shape.commandOpendota,
-    settingSchemas.shape.commandPleb,
-    settingSchemas.shape.commandRanked,
-    settingSchemas.shape.commandSmurfs,
-    settingSchemas.shape.commandProfile,
-    settingSchemas.shape.commandLGS,
-    settingSchemas.shape.commandSteam,
-    settingSchemas.shape.commandWL,
-    settingSchemas.shape.commandXPM,
-    settingSchemas.shape['minimap-blocker'],
-    settingSchemas.shape.minimapRight,
-    settingSchemas.shape.mmr,
-    settingSchemas.shape['mmr-tracker'],
-    settingSchemas.shape['obs-scene-switcher'],
-    settingSchemas.shape['obs-dc'],
-    settingSchemas.shape['obs-minimap'],
-    settingSchemas.shape['obs-picks'],
-    settingSchemas.shape['only-block-ranked'],
-    settingSchemas.shape['picks-blocker'],
-    settingSchemas.shape.rosh,
-    settingSchemas.shape['minimap-simple'],
-    settingSchemas.shape['minimap-xl'],
-    settingSchemas.shape.onlyParty,
-    settingSchemas.shape.livePolls,
-    settingSchemas.shape.streamDelay,
-    settingSchemas.shape.commandDelay,
-    settingSchemas.shape.commandBuilds,
-    settingSchemas.shape.showRankMmr,
-    settingSchemas.shape.showRankImage,
-    settingSchemas.shape.showRankLeader,
-    settingSchemas.shape.commandMmr,
-    settingSchemas.shape.commandRosh,
-    settingSchemas.shape.commandItems,
-    settingSchemas.shape.commandVersion,
-    settingSchemas.shape.commandOnline,
-    settingSchemas.shape.commandResetwl,
-    settingSchemas.shape.commandLocale,
-    settingSchemas.shape.notablePlayersOverlay,
-    settingSchemas.shape.notablePlayersOverlayFlags,
-    settingSchemas.shape.notablePlayersOverlayFlagsCmd,
-    settingSchemas.shape.winProbabilityOverlay,
-    settingSchemas.shape.winProbabilityOverlayIntervalMinutes,
-    settingSchemas.shape.tellChatNewMMR,
-    settingSchemas.shape.tellChatBets,
-    settingSchemas.shape.queueBlocker,
-    settingSchemas.shape.queueBlockerFindMatch,
-    settingSchemas.shape.queueBlockerFindMatchText,
-    settingSchemas.shape.commandSpectators,
-    settingSchemas.shape.commandFacet,
-    settingSchemas.shape.commandInnate,
-    settingSchemas.shape.commandWinProbability,
-  ]),
-})
+export const dynamicSettingSchema = (key: SettingKeys) =>
+  z.object({
+    key: z.literal(key),
+    value: settingsSchema[key],
+  })
 
 export const localePatchSchema = z.enum([
   'af-ZA',
