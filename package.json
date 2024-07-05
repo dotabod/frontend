@@ -44,6 +44,7 @@
     "clsx": "^2.1.1",
     "focus-visible": "^5.2.0",
     "framer-motion": "^11.2.10",
+    "graphql-request": "^7.1.0",
     "lucide-react": "^0.395.0",
     "mantine-flagpack": "^4.0.1",
     "next": "14.2.4",

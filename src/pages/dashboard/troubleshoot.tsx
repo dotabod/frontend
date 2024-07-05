@@ -10,7 +10,7 @@ import { useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import useSWR from 'swr'
 
-const StepComponent: React.FC<{ steps: ReactNode[] }> = ({ steps }) => {
+export const StepComponent: React.FC<{ steps: ReactNode[] }> = ({ steps }) => {
   const [current, setCurrent] = useState(0)
 
   const onChange = (value: number) => {
@@ -18,18 +18,16 @@ const StepComponent: React.FC<{ steps: ReactNode[] }> = ({ steps }) => {
   }
 
   return (
-    <>
-      <Steps
-        size="small"
-        current={current}
-        onChange={onChange}
-        direction="vertical"
-        items={steps.map((step, index) => ({
-          title: `Step ${index + 1}`,
-          description: step,
-        }))}
-      />
-    </>
+    <Steps
+      size="small"
+      current={current}
+      onChange={onChange}
+      direction="vertical"
+      items={steps.map((step, index) => ({
+        title: `Step ${index + 1}`,
+        description: step,
+      }))}
+    />
   )
 }
 
@@ -37,79 +35,71 @@ const faqs = [
   {
     question: 'How do I test that it works?',
     answer: (
-      <div>
-        <StepComponent
-          steps={[
-            <span key={0}>
-              Try loading a solo bot match. If you can type <Tag>!facet</Tag> in
-              your chat, it works.
-            </span>,
-            <span key={1}>
-              Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can
-              type.
-            </span>,
-            <span key={2}>
-              Spectate a live pro match and type <Tag>!np</Tag> to confirm
-              Dotabod responds with the notable players.
-            </span>,
-          ]}
-        />
-      </div>
+      <StepComponent
+        steps={[
+          <span key={0}>
+            Try loading a solo bot match. If you can type <Tag>!facet</Tag> in
+            your chat, it works.
+          </span>,
+          <span key={1}>
+            Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can
+            type.
+          </span>,
+          <span key={2}>
+            Spectate a live pro match and type <Tag>!np</Tag> to confirm Dotabod
+            responds with the notable players.
+          </span>,
+        ]}
+      />
     ),
   },
   {
     question: "Overlay stuck, won't update?",
     answer: (
-      <div>
-        <StepComponent
-          steps={[
-            <span key={0}>
-              Press refresh on the dotabod overlay source in OBS
-            </span>,
-            'Restart OBS.',
-            'Confirm your stream is online.',
-            'Try the steps under "Overlay not showing anything?"',
-          ]}
-        />
-      </div>
+      <StepComponent
+        steps={[
+          <span key={0}>
+            Press refresh on the dotabod overlay source in OBS
+          </span>,
+          'Restart OBS.',
+          'Confirm your stream is online.',
+          'Try the steps under "Overlay not showing anything?"',
+        ]}
+      />
     ),
   },
   {
     question: 'Overlay not showing anything?',
     answer: (
-      <div>
-        <StepComponent
-          steps={[
-            'Try removing and re-adding your overlay.',
-            'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your screen.',
-            'Check your OBS version, you must be on v29 or higher.',
-            <span key={2}>
-              Check that you placed the cfg file in the correct folder. It goes
-              in <Tag>/gamestate_integration/</Tag> not in <Tag>/cfg/</Tag>
-            </span>,
-            'Restart the Dota client and Steam.',
-            "The Dotabod browser source in OBS might have to be moved up above your other sources so it doesn't get blocked.",
-          ]}
-        />
-      </div>
+      <StepComponent
+        steps={[
+          'Try removing and re-adding your overlay.',
+          'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your screen.',
+          'Check your OBS version, you must be on v29 or higher.',
+          <span key={2}>
+            Check that you placed the cfg file in the correct folder. It goes in{' '}
+            <Tag>/gamestate_integration/</Tag> not in <Tag>/cfg/</Tag>
+          </span>,
+          'Restart the Dota client and Steam.',
+          "The Dotabod browser source in OBS might have to be moved up above your other sources so it doesn't get blocked.",
+        ]}
+      />
     ),
   },
   {
     question: "Dotabod won't talk in chat?",
     answer: (
-      <div>
-        <StepComponent
-          steps={[
-            <span key={0}>
-              Type <Tag>/unban dotabod</Tag> in your chat
-            </span>,
-            'Try enabling and disabling Dotabod using the toggle in the top left of Dotabod dashboard. This will force Dotabod to rejoin your channel.',
-            <span key={2}>
-              Type <Tag>!ping</Tag> in chat to see if Dotabod can talk
-            </span>,
-          ]}
-        />
-      </div>
+      <StepComponent
+        steps={[
+          <span key={0}>
+            Type <Tag>/unban dotabod</Tag> in your chat
+          </span>,
+          'Try enabling and disabling Dotabod using the toggle in the top left of Dotabod dashboard. This will force Dotabod to rejoin your channel.',
+          <span key={2}>
+            Type <Tag>!ping</Tag> in chat to see if Dotabod can talk
+          </span>,
+        ]}
+      />
     ),
   },
   {

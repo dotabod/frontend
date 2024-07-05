@@ -68,15 +68,9 @@ export default function DashboardShell({
       !lastUpdate ||
       now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000
     ) {
-      fetch('/api/update-followers')
-        .then(() => {
-          localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
-        })
-        .catch((error) => console.error(error))
-
-      fetch('/api/make-dotabod-mod')
-        .then((data) => console.log(data))
-        .catch((error) => console.error(error))
+      localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
+      fetch('/api/update-followers').catch((error) => console.error(error))
+      fetch('/api/make-dotabod-mod').catch((error) => console.error(error))
     }
   }, [])
 
