@@ -1,133 +1,172 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
+import { Alert, Steps, Tag } from 'antd'
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link'
-import type { ReactElement } from 'react'
+import type React from 'react'
+import { useState } from 'react'
+import type { ReactElement, ReactNode } from 'react'
+import useSWR from 'swr'
+
+const StepComponent: React.FC<{ steps: ReactNode[] }> = ({ steps }) => {
+  const [current, setCurrent] = useState(0)
+
+  const onChange = (value: number) => {
+    setCurrent(value)
+  }
+
+  return (
+    <>
+      <Steps
+        size="small"
+        current={current}
+        onChange={onChange}
+        direction="vertical"
+        items={steps.map((step, index) => ({
+          title: `Step ${index + 1}`,
+          description: step,
+        }))}
+      />
+    </>
+  )
+}
 
 const faqs = [
   {
-    question: "Overlay stuck, won't update?",
+    question: 'How do I test that it works?',
     answer: (
       <div>
-        <p>Try the following steps:</p>
-        <ol className="list-inside list-decimal">
-          <li>Press refresh on the dotabod overlay source in OBS.</li>
-          <li>Restart OBS.</li>
-          <li>Dotabod will only work if your stream is online.</li>
-          <li>Try the steps under &quot;Overlay not showing anything?&quot;</li>
-        </ol>
-        <Image
-          src="https://i.imgur.com/d0qzlFa.png"
-          alt="OBS dotabod source"
-          width={589}
-          height={140}
+        <StepComponent
+          steps={[
+            <span key={0}>
+              Try loading a solo bot match. If you can type <Tag>!facet</Tag> in
+              your chat, it works.
+            </span>,
+            <span key={1}>
+              Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can
+              type.
+            </span>,
+            <span key={2}>
+              Spectate a live pro match and type <Tag>!np</Tag> to confirm
+              Dotabod responds with the notable players.
+            </span>,
+          ]}
         />
       </div>
     ),
   },
   {
-    question:
-      'Unable to open bets. Your Twitch account needs to be reconnected to Dotabod',
-    answer:
-      'Logout and login again on the Dotabod dashboard to reconnect your Twitch account. Press your picture in the top right and click Logout. If it still does not work after logging in again, join our Discord.',
-  },
-  {
-    question: "Dotabod won't talk in chat? Or accidentally banned Dotabod?",
-    answer:
-      'Try enabling and disabling Dotabod using the toggle in the top left of Dotabod dashboard. Then type !ping in chat to see if Dotabod can talk again.',
+    question: "Overlay stuck, won't update?",
+    answer: (
+      <div>
+        <StepComponent
+          steps={[
+            <span key={0}>
+              Press refresh on the dotabod overlay source in OBS
+            </span>,
+            'Restart OBS.',
+            'Confirm your stream is online.',
+            'Try the steps under "Overlay not showing anything?"',
+          ]}
+        />
+      </div>
+    ),
   },
   {
     question: 'Overlay not showing anything?',
     answer: (
       <div>
-        <p>Try the following steps:</p>
-        <ol className="list-inside list-decimal">
-          <li>
-            Make sure your stream is online. Dotabod will not work if you are
-            offline.
-          </li>
-          <li>
-            Update OBS to v29 or higher. Dotabod overlay will not show on v27
-            for example
-          </li>
-          <li>
-            Check that you placed the cfg file in the correct folder. It goes in
-            /gamestate_integration/, not in /cfg/.
-          </li>
-          <li>Add -gamestateintegration to Dota launch options.</li>
-          <li>Restart Dota.</li>
-          <li>
-            OBS dotabod browser source must be above your other sources so it
-            doesn&apos;t get blocked.
-          </li>
-          <li>
-            Right click the dotabod source in preview, click transform, and
-            click fit to content so it resizes and fills your screen.
-          </li>
-        </ol>
+        <StepComponent
+          steps={[
+            'Try removing and re-adding your overlay.',
+            'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your screen.',
+            'Check your OBS version, you must be on v29 or higher.',
+            <span key={2}>
+              Check that you placed the cfg file in the correct folder. It goes
+              in <Tag>/gamestate_integration/</Tag> not in <Tag>/cfg/</Tag>
+            </span>,
+            'Restart the Dota client and Steam.',
+            "The Dotabod browser source in OBS might have to be moved up above your other sources so it doesn't get blocked.",
+          ]}
+        />
+      </div>
+    ),
+  },
+  {
+    question: "Dotabod won't talk in chat?",
+    answer: (
+      <div>
+        <StepComponent
+          steps={[
+            <span key={0}>
+              Type <Tag>/unban dotabod</Tag> in your chat
+            </span>,
+            'Try enabling and disabling Dotabod using the toggle in the top left of Dotabod dashboard. This will force Dotabod to rejoin your channel.',
+            <span key={2}>
+              Type <Tag>!ping</Tag> in chat to see if Dotabod can talk
+            </span>,
+          ]}
+        />
       </div>
     ),
   },
   {
     question: 'Dotabod keeps saying play a match, no steam id?',
     answer: (
-      <ol className="list-inside list-decimal">
-        <li>
-          You probably placed the cfg file in the wrong folder. Follow Step 2 of
-          setup again. Reboot Dota after finding the right folder.
-        </li>
-        <li>Play a bot match to verify Dotabod can find your account.</li>
-        <li>
-          Still nothing? Could your Steam account be linked to another Dotabod
-          user? Only one person may have the Steam account linked. Dotabod will
-          tell you who is using your account from the MMR tracker in the{' '}
-          <Link href="/dashboard/features">Features page</Link>. You can then
-          ask them to remove it from their account.
-        </li>
-      </ol>
+      <StepComponent
+        steps={[
+          <span key={0}>
+            You probably placed the cfg file in the wrong folder.{' '}
+            <Link href="/dashboard?step=2">Follow Step 2</Link> of setup again.
+            Don't forget to reboot Dota after saving the cfg in the right
+            folder.
+          </span>,
+          'Play a bot match to verify Dotabod can find your account.',
+          <span key={2}>
+            Still nothing? Could your Steam account be linked to another Dotabod
+            user? Only one person may have the Steam account linked. Dotabod
+            will tell you who is using your account from{' '}
+            <Link href="/dashboard/features">
+              the MMR tracker in the Features page
+            </Link>
+            . You can then ask them to remove it from their account.
+          </span>,
+        ]}
+      />
     ),
   },
   {
     question: 'MMR not tracking?',
-    answer: 'Enter your current MMR in the dashboard so that it isnt 0.',
-  },
-  {
-    question: 'How do I test that it works?',
-    answer:
-      'Try loading a solo bot match. If OBS is showing your overlays, it works. Also type !ping in your Twitch chat to make sure dotabod can type. And you can spectate a live pro match and type !np to confirm again.',
-  },
-  {
-    question: 'Can I still use 9kmmrbot?',
     answer: (
-      <div>
-        9kmmrbot is no longer able to retrieve game data for accounts outside of
-        the high immortal bracket and for those with their Steam Profile &gt;
-        Privacy Settings &gt; Game Details setting set to private.
-        <br />
-        <br />
-        This is due to changes in the Valve rich presence system, which
-        previously had a bug that allowed the bot to retrieve private data
-        regardless of profile settings.
-        <br />
-        <br />
-        It&apos;s worth noting that this change does not affect Dotabod&apos;s
-        GSI integration, which is still operational and safe to use. If you are
-        unable to use 9kmmrbot due to these changes, we recommend trying out
-        Dotabod as it includes all the features 9kmmrbot had to offer and more.
-        <br />
-        <br />
-        We hope this information helps clarify why 9kmmrbot may no longer be
-        working for some users and encourage you to explore other aspects of
-        Dotabod&apos;s services.
-      </div>
+      <span>
+        <Link href="/dashboard/features">Enter your current MMR</Link> in the
+        dashboard so that it isnt 0.
+      </span>
     ),
   },
   {
     question: "Why do bets open right when I pick? Can't I get counter picked?",
     answer:
       'Bets open when its no longer possible to counter pick or counter ban your hero. That is to say, when the enemy can now see who you picked in-game.',
+  },
+  {
+    question: 'Can I still use 9kmmrbot?',
+    answer: (
+      <div className="flex flex-col space-y-4">
+        <div>
+          Using Dotabod and 9kmmrbot together will not cause any issues. But
+          your chat might not like the double bot spam.
+        </div>
+        <div>
+          Furthermore, 9kmmrbot is no longer able to retrieve game data for
+          accounts outside of the high immortal bracket (typically, the top 1000
+          players). Dotabod&apos;s game integration works for all players,
+          regardless of rank.
+        </div>
+      </div>
+    ),
   },
   {
     question: 'Still not working?',
@@ -143,32 +182,45 @@ const faqs = [
   },
 ]
 
-const TroubleshootPage = () => (
-  <>
-    <Head>
-      <title>Dotabod | Troubleshooting</title>
-    </Head>
-    <Header
-      subtitle="Try these steps in case something isn't working."
-      title="Troubleshooting"
-    />
-    <div className="mt-12 lg:col-span-2 lg:mt-0">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {faqs.map(
-          (faq) =>
-            faq.question && (
-              <Card key={faq.question}>
-                <dt className="text-lg font-medium leading-6">
-                  {faq.question}
-                </dt>
-                <dd className="mt-2 text-base text-gray-300">{faq.answer}</dd>
-              </Card>
-            )
-        )}
+const TroubleshootPage = () => {
+  const { data } = useSWR('/api/settings', fetcher)
+  const isLive = data?.stream_online
+
+  return (
+    <>
+      <Head>
+        <title>Dotabod | Troubleshooting</title>
+      </Head>
+      <Header
+        subtitle="Try these steps in case something isn't working."
+        title="Troubleshooting"
+      />
+      {!isLive && (
+        <Alert
+          message="Your stream is offline, and Dotabod will only work once you start streaming and go online."
+          type="warning"
+          showIcon
+          className="max-w-2xl"
+        />
+      )}
+      <div className="mt-12 lg:col-span-2 lg:mt-0">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {faqs.map(
+            (faq) =>
+              faq.question && (
+                <Card key={faq.question}>
+                  <dt className="text-lg font-medium leading-6">
+                    {faq.question}
+                  </dt>
+                  <dd className="mt-2 text-base text-gray-300">{faq.answer}</dd>
+                </Card>
+              )
+          )}
+        </div>
       </div>
-    </div>
-  </>
-)
+    </>
+  )
+}
 
 TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>
