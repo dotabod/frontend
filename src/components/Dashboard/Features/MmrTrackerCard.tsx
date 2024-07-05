@@ -1,7 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch, Tooltip } from 'antd'
+import { Switch, Tag, Tooltip } from 'antd'
 import clsx from 'clsx'
 import MmrForm from './MmrForm'
 
@@ -55,7 +55,7 @@ export default function MmrTrackerCard() {
         {new Date('2023-04-20').toLocaleDateString()}, Dotabod can no longer
         accurately estimate the MMR from each game. You can either use !setmmr
         or update it here after a game or after your stream. You can also have
-        your mods do it for you via !setmmr.
+        your mods do it for you via <Tag>!setmmr</Tag>
       </p>
     </Card>
   )
