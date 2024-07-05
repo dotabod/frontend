@@ -1,10 +1,9 @@
 import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch, Tag } from 'antd'
+import { Input, Switch, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
-import { Input } from '../../Input'
 
 export default function SceneSwitcher(): JSX.Element {
   const {
@@ -105,6 +104,7 @@ export default function SceneSwitcher(): JSX.Element {
                         defaultSettings['obs-scene-switcher'][sceneKey]
                       }
                       defaultValue={scene.value}
+                      maxLength={200}
                       name={sceneKey}
                       onChange={(e) =>
                         handleSceneName(e.target.value, scene.update)

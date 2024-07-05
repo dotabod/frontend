@@ -75,11 +75,12 @@ const settingsSchema = {
   commandXPM: z.boolean(),
   'minimap-blocker': z.boolean(),
   minimapRight: z.boolean(),
-  mmr: z.number().nullable(),
+  mmr: z.number().min(0).max(30000).nullable(),
   'mmr-tracker': z.boolean(),
   'obs-scene-switcher': z.boolean(),
   'obs-dc': z
     .string()
+    .max(200)
     .regex(
       /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
       'Title must be alphanumeric or include allowed punctuation.'
@@ -87,6 +88,7 @@ const settingsSchema = {
     .max(45),
   'obs-minimap': z
     .string()
+    .max(200)
     .regex(
       /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
       'Title must be alphanumeric or include allowed punctuation.'
@@ -94,6 +96,7 @@ const settingsSchema = {
     .max(45),
   'obs-picks': z
     .string()
+    .max(200)
     .regex(
       /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
       'Title must be alphanumeric or include allowed punctuation.'
@@ -123,13 +126,14 @@ const settingsSchema = {
   notablePlayersOverlayFlags: z.boolean(),
   notablePlayersOverlayFlagsCmd: z.boolean(),
   winProbabilityOverlay: z.boolean(),
-  winProbabilityOverlayIntervalMinutes: z.number().min(0),
+  winProbabilityOverlayIntervalMinutes: z.number().min(0).max(60),
   tellChatNewMMR: z.boolean(),
   tellChatBets: z.boolean(),
   queueBlocker: z.boolean(),
   queueBlockerFindMatch: z.boolean(),
   queueBlockerFindMatchText: z
     .string()
+    .max(45)
     .regex(/^[a-zA-Z0-9.,!?:;\s\/]*$/, 'Title must be alphanumeric.'),
   commandSpectators: z.boolean(),
   commandFacet: z.boolean(),

@@ -85,6 +85,7 @@ const CommandsPage = () => {
           placeholder="Search commands..."
           value={searchTerm}
           style={{ width: 300 }}
+          maxLength={200}
           onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
         />
       </div>
