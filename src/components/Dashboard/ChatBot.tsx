@@ -179,7 +179,7 @@ export default function ChatBot() {
           </span>,
           <div key={1} className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
-              <Spin size="small" spinning={loading} />
+              {loading && <Spin size="small" spinning={loading} />}
               {!user ? (
                 <>
                   <div>
@@ -223,7 +223,7 @@ export default function ChatBot() {
                   </div>
 
                   <div className="flex flex-row items-center space-x-3">
-                    <Spin size="small" spinning={true} />
+                    {loading && <Spin size="small" spinning={true} />}
                     <span>Waiting for Dotabod to become an editor...</span>
                   </div>
                 </div>
