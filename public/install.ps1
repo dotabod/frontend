@@ -1,5 +1,4 @@
 param (
-  [parameter(mandatory = $true)] [ValidateNotNullOrEmpty()] [string]$Token,
   [switch]$DebugMode
 )
 
@@ -10,17 +9,88 @@ function Write-Log {
   )
   $time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
   if ($DebugMode -or $Level -ne "DEBUG") {
-    Write-Host "[$time] [$Level] $Message"
+    if ($Level -eq "ERROR") {
+      Write-Error "[$time] [$Level] $Message"
+    }
+    else {
+      Write-Host "[$time] [$Level] $Message"
+    }
   }
 }
-# Craft the file URL from the token
-$fileUrl = "https://dotabod.com/api/download/$Token"
-Write-Log "Crafted file URL: $fileUrl"
+
+function Start-HttpListener {
+  param (
+    [int]$Port = 8089
+  )
+  $listener = New-Object System.Net.HttpListener
+  $listener.Prefixes.Add("http://localhost:$Port/")
+  $listener.Start()
+  Write-Log "HTTP Listener started on port $Port"
+  return $listener
+}
+
+function WaitForToken {
+  param (
+    [System.Net.HttpListener]$Listener
+  )
+  Write-Log "Waiting for token..."
+  while ($true) {
+    $context = $Listener.GetContext()
+    $request = $context.Request
+    $response = $context.Response
+    if ($DebugMode) {
+      $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+    }
+    else {
+      $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
+    }
+    $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
+    $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
+    if ($request.HttpMethod -eq "OPTIONS") {
+      $response.StatusCode = 204
+      $response.OutputStream.Close()
+      continue
+    }
+    if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/token") {
+      $token = $request.QueryString["token"]
+      if ($token) {
+        $responseString = "<html><body>Token received. You can close this window.</body></html>"
+        $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
+        $response.ContentLength64 = $buffer.Length
+        $response.OutputStream.Write($buffer, 0, $buffer.Length)
+        $response.OutputStream.Close()
+        Write-Log "Token received: $token" "DEBUG"
+        return $token
+      }
+    }
+    elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
+      $responseString = "OK"
+      $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
+      $response.ContentLength64 = $buffer.Length
+      $response.OutputStream.Write($buffer, 0, $buffer.Length)
+      $response.OutputStream.Close()
+      Write-Log "Status check responded with OK" "DEBUG"
+    }
+  }
+}
+
+$listener = Start-HttpListener -Port 8089
+if ($DebugMode) {
+  Start-Process "http://localhost:3000/install"
+}
+else {
+  Start-Process "https://dotabod.com/install"
+}
+$Token = WaitForToken -Listener $listener
+$listener.Stop()
 
 # Modify debug mode host if DebugMode is enabled
 if ($DebugMode) {
-  $fileUrl = "http://localhost:3000/api/download/$Token"
-  Write-Log "Modified file URL for debug mode: $fileUrl"
+  $fileUrl = "http://localhost:3000/api/install/$Token"
+  Write-Log "Modified file URL for debug mode: $fileUrl" "DEBUG"
+}
+else {
+  $fileUrl = "https://dotabod.com/api/install/$Token"
 }
 
 # Check and timeout after 5 seconds if the URL is unreachable
@@ -54,7 +124,6 @@ if ($disposition) {
     # Extract the filename
     if ($endIndex -gt 0) {
       $filename = $restOfString.Substring(0, $endIndex)
-      Write-Output $filename
     }
     else {
       Write-Error "Failed to extract filename: Closing quote not found."

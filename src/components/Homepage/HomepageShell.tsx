@@ -14,7 +14,7 @@ const HomepageShell = ({
   return (
     <>
       <Head>
-        {dontUseTitle && (
+        {!dontUseTitle && (
           <title>
             {title ?? 'Dotabod - Enhance Your Dota 2 Streaming Experience'}
           </title>
