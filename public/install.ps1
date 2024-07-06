@@ -34,7 +34,7 @@ try {
 catch [System.Net.WebException] {
   # Log the error
   Write-Log "URL is unreachable. Error: $($_.Exception.Message)" "ERROR"
-  exit 1
+  return
 }
 
 $response = Invoke-WebRequest -Uri $fileUrl -Method Head
@@ -73,7 +73,7 @@ Write-Log "Response headers: $disposition" "DEBUG"
 # If filename is empty, quit
 if (-not $fileName) {
   Write-Log "Filename is empty. Exiting script." "ERROR"
-  exit 1
+  return
 }
 
 # Detect STEAM Path from registry
@@ -89,12 +89,12 @@ if (Test-Path -Path $steamRegistryPath) {
   }
   else {
     Write-Log "Steam path is null. Exiting script." "ERROR"
-    exit 1
+    return
   }
 }
 else {
   Write-Log "Steam registry path not found. Please ensure Steam is installed correctly." "ERROR"
-  exit 1
+  return
 }
 
 # Detect DOTA2 Path from Steam library folders
