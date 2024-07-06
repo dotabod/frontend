@@ -42,7 +42,7 @@ $disposition = $response.Headers['Content-Disposition']
 
 # Check if the 'Content-Disposition' header is present and contains the filename
 if ($disposition) {
-  $dispositionValue = $disposition[0]
+  $dispositionValue = [string]$disposition
 
   if ($dispositionValue -and $dispositionValue.Contains('filename="')) {
     $startIndex = $dispositionValue.IndexOf('filename="') + 10
