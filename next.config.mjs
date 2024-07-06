@@ -8,6 +8,25 @@
 import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/install.ps1',
+        has: [
+          {
+            type: 'host',
+            value: 'dotabod.com',
+          },
+          {
+            type: 'protocol',
+            value: 'http',
+          },
+        ],
+        destination: 'https://dotabod.com/install.ps1',
+        permanent: true,
+      },
+    ]
+  },
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
   experimental: {
