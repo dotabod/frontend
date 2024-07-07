@@ -289,10 +289,30 @@ else {
   Write-Log "The gamestate_integration folder already exists in the Dota 2 directory."
 }
 
+# Before saving the new file, check for existing .cfg files with "dotabod" in the filename, excluding the current filename
+$existingDotabodFiles = Get-ChildItem -Path $gsi -Filter "*dotabod*.cfg" | Where-Object { $_.Name -ne $filename }
+
+if ($existingDotabodFiles.Count -gt 0) {
+    $fileNames = $existingDotabodFiles.Name -join ", "
+    $userResponse = Read-Host "The following Dotabod config file(s) exist: $fileNames. Dotabod should only be used with one cfg at a time. Delete them? (y/n)"
+    if ($userResponse -ieq "y") {
+        $existingDotabodFiles | ForEach-Object {
+            Remove-Item -Path $_.FullName
+            Write-Log "Deleted the existing Dotabod config file: $($_.Name)"
+        }
+        Write-Log "If you were using an OBS overlay, you may need to update the browser source URL."
+    }
+    else {
+        Write-Log "Exiting Dotabod setup."
+        return
+    }
+}
+
+# Continue with the logic to save the new file
 $response = Invoke-WebRequest -Uri $fileUrl -Method Get
 if ($null -eq $response) {
-  Write-Log "Failed to get a response from $fileUrl" "ERROR"
-  return
+    Write-Log "Failed to get a response from $fileUrl" "ERROR"
+    return
 }
 
 # Save the downloaded file into the gamestate_integration folder
