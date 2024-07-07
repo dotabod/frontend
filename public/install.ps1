@@ -109,10 +109,11 @@ function WaitForToken {
 
     $request = $context.Request
     $response = $context.Response
-    if ($DebugMode) {
+    if ($baseUrl -eq "http://localhost:3000") {
       $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+    } else {
+      $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
     }
-    $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
     $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
     $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
     if ($request.HttpMethod -eq "OPTIONS") {
@@ -121,6 +122,7 @@ function WaitForToken {
       continue
     }
     if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/token") {
+      Write-Log "Received token request." "DEBUG"
       $token = $request.QueryString["token"]
       if ($token) {
         $responseString = "<html><body>Token received. You can close this window.</body></html>"
@@ -148,6 +150,7 @@ function Test-Connection {
     [string]$Url
   )
   try {
+    Write-Log "Checking connectivity to $Url" "DEBUG"
     $request = [System.Net.WebRequest]::Create($Url)
     $request.Timeout = 2000 # Timeout in milliseconds
     $response = $request.GetResponse()
@@ -162,23 +165,28 @@ $listenerInfo = Start-HttpListener -Port 8089
 if ($listenerInfo -eq $null) {
   Write-Log "Failed to start Dotabod installer." "ERROR"
   return
+} else {
+  Write-Log "Dotabod installer started successfully." "DEBUG"
 }
 
 $listener = $listenerInfo.Listener
 $port = $listenerInfo.Port
 
 # Determine the base URL based on connectivity check
-$localHostUrl = "http://localhost:3000/install"
-$remoteHostUrl = "https://dotabod.com/install"
+$localHostUrl = "http://localhost:3000"
+$remoteHostUrl = "https://dotabod.com"
 if ($DebugMode -eq $true) {
-  $baseUrl = if (Test-Connection -Url "http://localhost:3000") { $localHostUrl } else { $remoteHostUrl }
+  $baseUrl = if (Test-Connection -Url "$localHostUrl") { $localHostUrl } else { $remoteHostUrl }
 } else {
   $baseUrl = $remoteHostUrl
 }
 
 # Initialize $url with $baseUrl
-$url = $baseUrl
-$fileUrl = "$url/api/install/$Token"
+$url = "$baseUrl/install"
+$fileUrl = "$baseUrl/api/install/$Token"
+
+Write-Log "Url: $url" "DEBUG"
+Write-Log "FileUrl: $fileUrl" "DEBUG"
 
 # Append the port query parameter only if the port is not 8089
 if ($port -ne 8089) {
@@ -191,6 +199,7 @@ Start-Process $url
 $Token = WaitForToken -Listener $listener
 $listener.Stop()
 
+Write-Log "Running the Dotabod installer with token" "DEBUG"
 
 # Check and timeout after 5 seconds if the URL is unreachable
 try {
@@ -204,14 +213,16 @@ catch [System.Net.WebException] {
   # Handle 308 Permanent Redirect and 301 Moved Permanently
   if ($_.Exception.Response.StatusCode -eq 308 -or $_.Exception.Response.StatusCode -eq 301) {
     $redirectUrl = $_.Exception.Response.Headers["Location"]
-    Write-Log "Following redirect to $redirectUrl" "DEBUG"
-    $fileUrl = $redirectUrl
+    Write-Log "Following redirect to $baseUrl$redirectUrl" "DEBUG"
+    $fileUrl = "$baseUrl$redirectUrl"
   }
   else {
     Write-Log "Failed to access the Dotabod config file: $($_.Exception.Message)" "ERROR"
     return
   }
 }
+
+Write-Log "FileUrl: $fileUrl" "DEBUG"
 
 $response = Invoke-WebRequest -Uri $fileUrl -Method Head
 if ($null -eq $response) {
