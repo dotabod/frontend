@@ -112,9 +112,7 @@ function WaitForToken {
     if ($DebugMode) {
       $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
     }
-    else {
-      $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
-    }
+    $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
     $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
     $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
     if ($request.HttpMethod -eq "OPTIONS") {
@@ -145,6 +143,21 @@ function WaitForToken {
   }
 }
 
+function Test-Connection {
+  param (
+    [string]$Url
+  )
+  try {
+    $request = [System.Net.WebRequest]::Create($Url)
+    $request.Timeout = 2000 # Timeout in milliseconds
+    $response = $request.GetResponse()
+    $response.Close()
+    return $true
+  } catch {
+    return $false
+  }
+}
+
 $listenerInfo = Start-HttpListener -Port 8089
 if ($listenerInfo -eq $null) {
   exit 1
@@ -153,11 +166,18 @@ if ($listenerInfo -eq $null) {
 $listener = $listenerInfo.Listener
 $port = $listenerInfo.Port
 
-# Determine the base URL based on the debug mode
-$baseUrl = if ($DebugMode) { "http://localhost:3000/install" } else { "https://dotabod.com/install" }
+# Determine the base URL based on connectivity check
+$localHostUrl = "http://localhost:3000/install"
+$remoteHostUrl = "https://dotabod.com/install"
+if ($DebugMode -eq $true) {
+  $baseUrl = if (Test-Connection -Url "http://localhost:3000") { $localHostUrl } else { $remoteHostUrl }
+} else {
+  $baseUrl = $remoteHostUrl
+}
 
 # Initialize $url with $baseUrl
 $url = $baseUrl
+$fileUrl = "$url/api/install/$Token"
 
 # Append the port query parameter only if the port is not 8089
 if ($port -ne 8089) {
@@ -170,14 +190,6 @@ Start-Process $url
 $Token = WaitForToken -Listener $listener
 $listener.Stop()
 
-# Modify debug mode host if DebugMode is enabled
-if ($DebugMode) {
-  $fileUrl = "http://localhost:3000/api/install/$Token"
-  Write-Log "Modified file URL for debug mode: $fileUrl" "DEBUG"
-}
-else {
-  $fileUrl = "https://dotabod.com/api/install/$Token"
-}
 
 # Check and timeout after 5 seconds if the URL is unreachable
 try {
