@@ -81,7 +81,7 @@ export function DisableToggle() {
     >
       <label
         htmlFor="disable-toggle"
-        className="cursor-pointer space-x-2 rounded text-gray-300"
+        className="cursor-pointer space-x-2 rounded flex flex-row items-center text-gray-300"
       >
         <Switch
           id="disable-toggle"
@@ -91,7 +91,9 @@ export function DisableToggle() {
           checked={!checkBanOrDisable}
           onChange={(checked) => updateSetting(!checked)}
         />
-        <span>Dotabod is {checkBanOrDisable ? 'disabled' : 'enabled'}</span>
+        <span className="text-clip text-nowrap">
+          Dotabod is {checkBanOrDisable ? 'disabled' : 'enabled'}
+        </span>
       </label>
     </Tooltip>
   )
