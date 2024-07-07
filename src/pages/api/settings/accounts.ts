@@ -9,14 +9,8 @@ import * as z from 'zod'
 const accountUpdateSchema = z.array(
   z.object({
     steam32Id: z.number().min(0),
-    mmr: z.number().min(0).max(20000),
-    name: z
-      .string()
-      .regex(
-        /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
-        'Name must be alphanumeric or include allowed punctuation.'
-      )
-      .optional(),
+    mmr: z.number().min(0).max(30_000),
+    name: z.string().max(500).optional(),
     delete: z.boolean().optional(),
   })
 )

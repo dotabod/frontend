@@ -5,27 +5,9 @@ const settingsSchema = {
   aegis: z.boolean(),
   bets: z.boolean(),
   betsInfo: z.object({
-    title: z
-      .string()
-      .max(45)
-      .regex(
-        /^(?:[a-zA-Z0-9.,!?:;\s]*|\[heroname\])*$/,
-        'Title must be alphanumeric, include punctuation, or contain [heroname].'
-      ),
-    yes: z
-      .string()
-      .max(25)
-      .regex(
-        /^[a-zA-Z0-9.,!?:;\s]*$/,
-        'Yes must be alphanumeric or include punctuation.'
-      ),
-    no: z
-      .string()
-      .max(25)
-      .regex(
-        /^[a-zA-Z0-9.,!?:;\s]*$/,
-        'No must be alphanumeric or include punctuation.'
-      ),
+    title: z.string().max(45),
+    yes: z.string().max(25),
+    no: z.string().max(25),
     duration: z
       .string()
       .regex(/^\d+$/, 'Duration must be a numeric string')
@@ -75,33 +57,12 @@ const settingsSchema = {
   commandXPM: z.boolean(),
   'minimap-blocker': z.boolean(),
   minimapRight: z.boolean(),
-  mmr: z.number().min(0).max(30000).nullable(),
+  mmr: z.number().min(0).max(30000),
   'mmr-tracker': z.boolean(),
   'obs-scene-switcher': z.boolean(),
-  'obs-dc': z
-    .string()
-    .max(200)
-    .regex(
-      /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
-      'Title must be alphanumeric or include allowed punctuation.'
-    )
-    .max(45),
-  'obs-minimap': z
-    .string()
-    .max(200)
-    .regex(
-      /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
-      'Title must be alphanumeric or include allowed punctuation.'
-    )
-    .max(45),
-  'obs-picks': z
-    .string()
-    .max(200)
-    .regex(
-      /^[a-zA-Z0-9.,!?:;\s\/\[\]]*$/,
-      'Title must be alphanumeric or include allowed punctuation.'
-    )
-    .max(45),
+  'obs-dc': z.string().max(200).max(45),
+  'obs-minimap': z.string().max(200).max(45),
+  'obs-picks': z.string().max(200).max(45),
   'only-block-ranked': z.boolean(),
   'picks-blocker': z.boolean(),
   rosh: z.boolean(),
@@ -131,10 +92,7 @@ const settingsSchema = {
   tellChatBets: z.boolean(),
   queueBlocker: z.boolean(),
   queueBlockerFindMatch: z.boolean(),
-  queueBlockerFindMatchText: z
-    .string()
-    .max(45)
-    .regex(/^[a-zA-Z0-9.,!?:;\s\/]*$/, 'Title must be alphanumeric.'),
+  queueBlockerFindMatchText: z.string().max(45),
   commandSpectators: z.boolean(),
   commandFacet: z.boolean(),
   commandInnate: z.boolean(),
