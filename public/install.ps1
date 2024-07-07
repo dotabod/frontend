@@ -214,7 +214,7 @@ catch [System.Net.WebException] {
   if ($_.Exception.Response.StatusCode -eq 308 -or $_.Exception.Response.StatusCode -eq 301) {
     $redirectUrl = $_.Exception.Response.Headers["Location"]
     Write-Log "Following redirect to $baseUrl$redirectUrl" "DEBUG"
-    $fileUrl = "$baseUrl$redirectUrl"
+    $fileUrl = "$baseUrl$redirectUrl/$Token"
   }
   else {
     Write-Log "Failed to access the Dotabod config file: $($_.Exception.Message)" "ERROR"
