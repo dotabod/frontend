@@ -164,10 +164,6 @@ if ($port -ne 8089) {
     $url += "?port=$port"
 }
 
-Write-Host "Base URL: $baseUrl"
-Write-Host "Port: $port"
-Write-Host "Url: $url"
-
 # Start the process with the constructed URL
 Start-Process $url
 
