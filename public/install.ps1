@@ -9,13 +9,13 @@ try {
       [ConsoleColor]$Color = [ConsoleColor]::White
     )
     $time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $formattedLevel = if ($Level -ne "INFO") { "[$Level]" } else { "" }
+    $formattedLevel = if ($Level -ne "INFO") { "[$Level] " } else { "" }
     if ($DebugMode -or $Level -ne "DEBUG") {
       if ($Level -eq "ERROR") {
-        Write-Host "$formattedLevel $Message" -ForegroundColor DarkRed
+        Write-Host "${formattedLevel}$Message" -ForegroundColor DarkRed
       }
       else {
-        Write-Host "$formattedLevel $Message" -ForegroundColor $Color
+        Write-Host "${formattedLevel}$Message" -ForegroundColor $Color
       }
     }
   }
