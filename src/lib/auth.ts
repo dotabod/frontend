@@ -95,7 +95,10 @@ export const authOptions: NextAuthOptions = {
         name: user.displayName || user.name || profile?.preferred_username,
         displayName:
           // @ts-ignore from twitch?
-          profile?.preferred_username || user.displayName || user.name,
+          token.name ||
+          profile?.preferred_username ||
+          user.displayName ||
+          user.name,
         // @ts-ignore from twitch?
         image: profile?.picture || user.image,
       }
@@ -105,6 +108,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id || user.id || profile.sub,
         },
         select: {
+          displayName: true,
           Account: {
             select: {
               requires_refresh: true,
@@ -114,6 +118,22 @@ export const authOptions: NextAuthOptions = {
           locale: true,
         },
       })
+
+      // Name change case. This case is further handled in the webhook utils for `twitch-events`
+      if (
+        provider.displayName &&
+        provider.displayName !== newUser.displayName &&
+        account
+      ) {
+        await prisma.user.update({
+          where: {
+            id: account.userId,
+          },
+          data: {
+            displayName: newUser.displayName,
+          },
+        })
+      }
 
       const twitchId = Number(provider.Account.providerAccountId)
       const isBotUser = twitchId === Number(process.env.TWITCH_BOT_PROVIDERID)
