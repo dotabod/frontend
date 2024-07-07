@@ -188,8 +188,8 @@ try {
   Write-Log "URL is reachable." "DEBUG"
 }
 catch [System.Net.WebException] {
-  # Handle 308 Permanent Redirect
-  if ($_.Exception.Response.StatusCode -eq 308) {
+  # Handle 308 Permanent Redirect and 301 Moved Permanently
+  if ($_.Exception.Response.StatusCode -eq 308 -or $_.Exception.Response.StatusCode -eq 301) {
     $redirectUrl = $_.Exception.Response.Headers["Location"]
     Write-Log "Following redirect to $redirectUrl" "DEBUG"
     $fileUrl = $redirectUrl
@@ -289,9 +289,15 @@ else {
   Write-Log "The gamestate_integration folder already exists in the Dota 2 directory."
 }
 
+$response = Invoke-WebRequest -Uri $fileUrl -Method Get
+if ($null -eq $response) {
+  Write-Log "Failed to get a response from $fileUrl" "ERROR"
+  return
+}
+
 # Save the downloaded file into the gamestate_integration folder
 $outputPath = Join-Path $gsi $filename
-$response.Content | Set-Content -Path $outputPath -Force
+$response.Content | Out-File -FilePath $outputPath -Force -Encoding UTF8
 Write-Log "Downloaded Dotabod config file to the Dota 2 directory."
 
 # Locate the localconfig.vdf file
