@@ -46,6 +46,7 @@ const InstallationSteps = ({ currentStep }) => {
 
 function InstallPage() {
   const router = useRouter()
+  const { port } = router.query
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
@@ -53,9 +54,10 @@ function InstallPage() {
   const [countdown, setCountdown] = useState(10)
 
   useEffect(() => {
+    if (!port) return
     const checkStatus = async () => {
       try {
-        const response = await fetch('http://localhost:8089/status')
+        const response = await fetch(`http://localhost:${port}/status`)
         if (!response.ok) {
           throw new Error('Status check failed')
         }
@@ -80,7 +82,7 @@ function InstallPage() {
           if (!statusOk) return
 
           const response = await fetch(
-            `http://localhost:8089/token?token=${token}`
+            `http://localhost:${port}/token?token=${token}`
           )
           if (!response.ok) {
             throw new Error('Network response was not ok')
@@ -98,13 +100,15 @@ function InstallPage() {
     }
 
     fetchToken()
-  }, [])
+  }, [port])
 
   useEffect(() => {
-    if (!success && !error) {
+    if (!success && !error && port) {
       const interval = setInterval(async () => {
         try {
-          const response = await fetch('http://localhost:8089/install_status')
+          const response = await fetch(
+            `http://localhost:${port}/install_status`
+          )
           if (response.ok) {
             const data = await response.json()
             if (data.status === 'success') {
@@ -122,7 +126,7 @@ function InstallPage() {
       }, 5000)
       return () => clearInterval(interval)
     }
-  }, [success, error])
+  }, [success, error, port])
 
   useEffect(() => {
     if (success) {

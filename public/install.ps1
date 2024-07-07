@@ -5,37 +5,108 @@ param (
 function Write-Log {
   param (
     [string]$Message,
-    [string]$Level = "INFO"
+    [string]$Level = ""
   )
   $time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  $formattedLevel = if ($Level) { "[$Level]" } else { "" }
   if ($DebugMode -or $Level -ne "DEBUG") {
     if ($Level -eq "ERROR") {
-      Write-Error "[$time] [$Level] $Message"
+      Write-Host "$formattedLevel $Message"  -f DarkRed
     }
     else {
-      Write-Host "[$time] [$Level] $Message"
+      Write-Host "[$time] $formattedLevel $Message"
     }
   }
 }
 
+function Check-Port {
+  param (
+    [int]$Port
+  )
+  try {
+    $tcpConnection = Get-NetTCPConnection -LocalPort $Port -ErrorAction Stop
+    $process = Get-Process -Id $tcpConnection.OwningProcess -ErrorAction Stop
+    return @{
+      ProcessId = $process.Id
+      Name = $process.Name
+      Path = $process.Path
+    }
+  } catch {
+    return $null
+  }
+}
+
+function Kill-Process {
+  param (
+    [int]$ProcessId
+  )
+  if ($ProcessId -eq 4) {
+    Write-Log "Cannot kill system process with PID $ProcessId." "ERROR"
+    return
+  }
+
+  $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+  if ($process) {
+    try {
+      $process | Stop-Process -Force
+      Write-Log "Killed process $($process.Name) with ProcessId $ProcessId." "DEBUG"
+    } catch {
+      Write-Log "Failed to kill process $ProcessId. Access denied." "ERROR"
+    }
+  } else {
+    Write-Log "No process found with ProcessId $ProcessId." "ERROR"
+  }
+}
+
+function Get-AvailablePort {
+  $minPort = 8000
+  $maxPort = 9000
+  do {
+    $port = Get-Random -Minimum $minPort -Maximum $maxPort
+  } while (Check-Port -Port $port)
+  return $port
+}
+
 function Start-HttpListener {
   param (
-    [int]$Port = 8089
+    [int]$Port
   )
+
+  $processInfo = Check-Port -Port $Port
+  if ($processInfo) {
+    Write-Log "Port $Port is in use by ProcessId $($processInfo.ProcessId)." "DEBUG"
+    $Port = Get-AvailablePort
+    Write-Log "Selected new port $Port." "DEBUG"
+  }
+
   $listener = New-Object System.Net.HttpListener
   $listener.Prefixes.Add("http://localhost:$Port/")
-  $listener.Start()
-  Write-Log "HTTP Listener started on port $Port"
-  return $listener
+  try {
+    $listener.Start()
+    Write-Log "HTTP Listener started on port $Port" "DEBUG"
+  } catch {
+    Write-Log "Failed to run Dotabod installer on port $Port." "ERROR"
+    return $null
+  }
+  return @{
+    Listener = $listener
+    Port = $Port
+  }
 }
 
 function WaitForToken {
   param (
     [System.Net.HttpListener]$Listener
   )
-  Write-Log "Waiting for token..."
+  Write-Log "Opening browser for authentication with Dotabod..."
   while ($true) {
-    $context = $Listener.GetContext()
+    try {
+      $context = $Listener.GetContext()
+    } catch {
+      Write-Log "Failed to get context from listener." "ERROR"
+      return
+    }
+
     $request = $context.Request
     $response = $context.Response
     if ($DebugMode) {
@@ -74,13 +145,21 @@ function WaitForToken {
   }
 }
 
-$listener = Start-HttpListener -Port 8089
+$listenerInfo = Start-HttpListener -Port 8089
+if ($listenerInfo -eq $null) {
+  exit 1
+}
+
+$listener = $listenerInfo.Listener
+$port = $listenerInfo.Port
+
 if ($DebugMode) {
-  Start-Process "http://localhost:3000/install"
+  Start-Process "http://localhost:3000/install?port=$port"
 }
 else {
-  Start-Process "https://dotabod.com/install"
+  Start-Process "https://dotabod.com/install?port=$port"
 }
+
 $Token = WaitForToken -Listener $listener
 $listener.Stop()
 
@@ -99,49 +178,53 @@ try {
   $webRequest.Timeout = 5000
   $response = $webRequest.GetResponse()
   $response.Close()
-  Write-Log "URL is reachable."
+  Write-Log "URL is reachable." "DEBUG"
 }
 catch [System.Net.WebException] {
-  # Log the error
-  Write-Log "URL is unreachable. Error: $($_.Exception.Message)" "ERROR"
-  return
+  # Handle 308 Permanent Redirect
+  if ($_.Exception.Response.StatusCode -eq 308) {
+    $redirectUrl = $_.Exception.Response.Headers["Location"]
+    Write-Log "Following redirect to $redirectUrl" "DEBUG"
+    $fileUrl = $redirectUrl
+  }
+  else {
+    Write-Log "Failed to access the Dotabod config file: $($_.Exception.Message)" "ERROR"
+    return
+  }
 }
 
 $response = Invoke-WebRequest -Uri $fileUrl -Method Head
-$disposition = $response.Headers['Content-Disposition']
+if ($null -eq $response) {
+  Write-Log "Failed to get a response from $fileUrl" "ERROR"
+  return
+}
+
+$disposition = [string]$response.Headers['Content-Disposition']
+Write-Log "Response headers: $disposition" "DEBUG"
 
 # Check if the 'Content-Disposition' header is present and contains the filename
-if ($disposition) {
-  $dispositionValue = [string]$disposition
+if ($disposition -and $disposition.Contains('filename="')) {
+  $startIndex = $disposition.IndexOf('filename="') + 10
 
-  if ($dispositionValue -and $dispositionValue.Contains('filename="')) {
-    $startIndex = $dispositionValue.IndexOf('filename="') + 10
+  # Use a substring to find the end index by looking for the next double quote after the start index
+  $restOfString = $disposition.Substring($startIndex)
+  $endIndex = $restOfString.IndexOf('"')
 
-    # Use a substring to find the end index by looking for the next double quote after the start index
-    $restOfString = $dispositionValue.Substring($startIndex)
-    $endIndex = $restOfString.IndexOf('"')
-
-    # Extract the filename
-    if ($endIndex -gt 0) {
-      $filename = $restOfString.Substring(0, $endIndex)
-    }
-    else {
-      Write-Error "Failed to extract filename: Closing quote not found."
-    }
+  # Extract the filename
+  if ($endIndex -gt 0) {
+    $filename = $restOfString.Substring(0, $endIndex)
   }
   else {
-    Write-Error "Failed to extract filename: 'Content-Disposition' header does not contain a filename."
+    Write-Log "Failed to understand config filename (closing quote not found)" "ERROR"
   }
 }
 else {
-  Write-Error "Failed to extract filename: 'Content-Disposition' header not found."
+  Write-Log "Failed to understand config filename (missing header data)" "ERROR"
 }
-
-Write-Log "Response headers: $disposition" "DEBUG"
 
 # If filename is empty, quit
 if (-not $fileName) {
-  Write-Log "Filename is empty. Exiting script." "ERROR"
+  Write-Log "Failed to retrieve Dotabod config filename." "ERROR"
   return
 }
 
@@ -154,15 +237,15 @@ if (Test-Path -Path $steamRegistryPath) {
     if (-not (Test-Path "$steam\steamapps\libraryfolders.vdf")) {
       $steam = (Get-Item -LiteralPath $steam).FullName
     }
-    Write-Log "Detected Steam installation path: $steam"
+    Write-Log "Detected Steam installation path: $steam" "DEBUG"
   }
   else {
-    Write-Log "Steam path is null. Exiting script." "ERROR"
+    Write-Log "Failed to find path to Steam." "ERROR"
     return
   }
 }
 else {
-  Write-Log "Steam registry path not found. Please ensure Steam is installed correctly." "ERROR"
+  Write-Log "Failed to find path to Steam. Please ensure Steam is installed correctly." "ERROR"
   return
 }
 
@@ -176,7 +259,7 @@ if ($null -ne $libraryFolders) {
       $libfsPath
     }
   }
-  Write-Log "Detected Dota 2 installation path: $libfs"
+  Write-Log "Detected Dota 2 installation path: $libfs" "DEBUG"
 }
 
 # Assign Paths
@@ -187,28 +270,28 @@ $steamapps = if ($null -ne $libfs) {
 else { Join-Path $steam 'steamapps' }
 $dota2 = Join-Path $steamapps 'common\dota 2 beta'
 $gsi = Join-Path $dota2 'game\dota\cfg\gamestate_integration'
-Write-Log "Assigned Dota 2 game path: $dota2"
-Write-Log "Assigned gamestate_integration path: $gsi"
+Write-Log "Assigned Dota 2 game path: $dota2" "DEBUG"
+Write-Log "Assigned gamestate_integration path: $gsi" "DEBUG"
 
 # Create the gamestate_integration folder if it doesn't exist
 if (-not (Test-Path -Path $gsi)) {
   New-Item -Path $gsi -ItemType Directory
-  Write-Log "Created gamestate_integration folder."
+  Write-Log "Created the gamestate_integration folder in the Dota 2 directory."
 }
 else {
-  Write-Log "gamestate_integration folder already exists."
+  Write-Log "The gamestate_integration folder already exists in the Dota 2 directory."
 }
 
 # Save the downloaded file into the gamestate_integration folder
 $outputPath = Join-Path $gsi $filename
 $response.Content | Set-Content -Path $outputPath -Force
-Write-Log "Downloaded file to $outputPath."
+Write-Log "Downloaded Dotabod config file to the Dota 2 directory."
 
 # Locate the localconfig.vdf file
 $localConfigFile = Get-ChildItem -Path (Join-Path $steam 'userdata') -Recurse -Filter 'localconfig.vdf' | Select-Object -First 1
 
 if ($localConfigFile) {
-  Write-Log "Found localconfig.vdf file at $($localConfigFile.FullName)."
+  Write-Log "Found localconfig.vdf file at $($localConfigFile.FullName)." "DEBUG"
   $content = Get-Content $localConfigFile.FullName
   $modified = $false
   $alreadyConfigured = $true
@@ -265,18 +348,17 @@ if ($localConfigFile) {
   if ($modified) {
     Write-Log "Saving modified localconfig.vdf." "DEBUG"
     $content | Set-Content -Path $localConfigFile.FullName
-    Write-Log "Updated localconfig.vdf with new LaunchOptions."
-    Write-Log "Launch Options: Added -gamestateintegration to all relevant instances." -f DarkGreen
+    Write-Log "Updated Dota 2 launch options with -gamestateintegration" -f DarkGreen
   }
   elseif ($alreadyConfigured) {
-    Write-Log "Launch Options: Already configured correctly." -f DarkGreen
+    Write-Log "Dota 2 already has the -gamestateintegration launch option." -f DarkGreen
   }
   else {
-    Write-Log "Launch Options: Unable to locate any instances to modify. Please verify your configuration." -f DarkRed
+    Write-Log "Failed to find launch option configuration." "ERROR" -f DarkRed
   }
 }
 else {
-  Write-Log "Launch Options: Unable to locate localconfig.vdf, please verify that you have -gamestateintegration in your launch options." -f DarkRed
+  Write-Log "Failed to find Dota 2 config file." "ERROR" -f DarkRed
 }
 
 Write-Log "Setup complete! Dota 2 is now configured with gamestate integration."
