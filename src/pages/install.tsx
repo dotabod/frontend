@@ -47,7 +47,7 @@ const InstallationSteps = ({ currentStep }) => {
 function InstallPage() {
   const router = useRouter()
   // Default to port 8089 if no port is specified in the query
-  const port = Number.parseInt(router.query.port, 10)
+  const port = Number.parseInt(router.query.port as string, 10)
   const sanitizedPort = Number.isNaN(port)
     ? 8089
     : Math.min(Math.max(port, 8000), 9000)
