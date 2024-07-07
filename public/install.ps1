@@ -153,12 +153,14 @@ if ($listenerInfo -eq $null) {
 $listener = $listenerInfo.Listener
 $port = $listenerInfo.Port
 
-if ($DebugMode) {
-  Start-Process "http://localhost:3000/install?port=$port"
-}
-else {
-  Start-Process "https://dotabod.com/install?port=$port"
-}
+# Determine the base URL based on the debug mode
+$baseUrl = if ($DebugMode) { "http://localhost:3000/install" } else { "https://dotabod.com/install" }
+
+# Append the port query parameter only if the port is not 8089
+$url = if ($port -eq 8089) { $baseUrl } else { "$baseUrl?port=$port" }
+
+# Start the process with the constructed URL
+Start-Process $url
 
 $Token = WaitForToken -Listener $listener
 $listener.Stop()

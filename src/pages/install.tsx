@@ -46,7 +46,7 @@ const InstallationSteps = ({ currentStep }) => {
 
 function InstallPage() {
   const router = useRouter()
-  const { port } = router.query
+  const { port } = router.query || { port: 8089 }
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
