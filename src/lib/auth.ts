@@ -128,7 +128,7 @@ export const authOptions: NextAuthOptions = {
       ) {
         await prisma.user.update({
           where: {
-            id: provider.Account.providerAccountId,
+            id: user.id,
           },
           data: {
             displayName: newUser.displayName,
