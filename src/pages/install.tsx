@@ -47,7 +47,10 @@ const InstallationSteps = ({ currentStep }) => {
 function InstallPage() {
   const router = useRouter()
   // Default to port 8089 if no port is specified in the query
-  const port = router.query.port || '8089'
+  const port = Number.parseInt(router.query.port, 10)
+  const sanitizedPort = Number.isNaN(port)
+    ? 8089
+    : Math.min(Math.max(port, 8000), 9000)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
@@ -57,7 +60,10 @@ function InstallPage() {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:${port}/status`)
+        const response = await fetch(
+          `http://localhost:${sanitizedPort}/status`,
+          { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+        )
         if (!response.ok) {
           throw new Error('Status check failed')
         }
@@ -82,7 +88,8 @@ function InstallPage() {
           if (!statusOk) return
 
           const response = await fetch(
-            `http://localhost:${port}/token?token=${token}`
+            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(token)}`,
+            { method: 'GET', headers: { 'Content-Type': 'application/json' } }
           )
           if (!response.ok) {
             throw new Error('Network response was not ok')
@@ -100,14 +107,15 @@ function InstallPage() {
     }
 
     fetchToken()
-  }, [port])
+  }, [sanitizedPort])
 
   useEffect(() => {
-    if (!success && !error && port) {
+    if (!success && !error && sanitizedPort) {
       const interval = setInterval(async () => {
         try {
           const response = await fetch(
-            `http://localhost:${port}/install_status`
+            `http://localhost:${sanitizedPort}/install_status`,
+            { method: 'GET', headers: { 'Content-Type': 'application/json' } }
           )
           if (response.ok) {
             const data = await response.json()
@@ -126,7 +134,7 @@ function InstallPage() {
       }, 5000)
       return () => clearInterval(interval)
     }
-  }, [success, error, port])
+  }, [success, error, sanitizedPort])
 
   useEffect(() => {
     if (success) {
