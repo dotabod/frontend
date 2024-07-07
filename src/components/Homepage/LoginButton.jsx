@@ -25,7 +25,10 @@ export function LoginButton({ className, ...props }) {
         return !user
           ? signIn('twitch', {
               redirect: false,
-              callbackUrl: searchParams.get('from') || '/dashboard',
+              callbackUrl:
+                searchParams.get('from') ||
+                searchParams.get('callbackUrl') ||
+                '/dashboard',
             })
               .then((e) => {
                 console.log(e)

@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+// @ts-check
 
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
@@ -7,26 +7,10 @@
 
 import { withSentryConfig } from '@sentry/nextjs'
 
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/install.ps1',
-        has: [
-          {
-            type: 'host',
-            value: 'dotabod.com',
-          },
-          {
-            type: 'protocol',
-            value: 'http',
-          },
-        ],
-        destination: 'https://dotabod.com/install.ps1',
-        permanent: true,
-      },
-    ]
-  },
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
   experimental: {

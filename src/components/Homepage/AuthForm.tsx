@@ -20,7 +20,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           setIsLoading(true)
           signIn('twitch', {
             redirect: false,
-            callbackUrl: searchParams.get('from') || '/dashboard',
+            callbackUrl:
+              searchParams.get('from') ||
+              searchParams.get('callbackUrl') ||
+              '/dashboard',
           })
             .catch((e) => {
               console.log(e)

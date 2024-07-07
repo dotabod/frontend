@@ -73,9 +73,7 @@ function InstallPage() {
     const fetchToken = async () => {
       setLoading(true)
       const session = await getSession()
-      if (!session) {
-        router.push('/api/auth/signin?callbackUrl=/install')
-      } else {
+      if (session) {
         const token = session.user.id
         try {
           const statusOk = await checkStatus()
