@@ -46,7 +46,8 @@ const InstallationSteps = ({ currentStep }) => {
 
 function InstallPage() {
   const router = useRouter()
-  const { port } = router.query || { port: 8089 }
+  // Default to port 8089 if no port is specified in the query
+  const port = router.query.port || '8089'
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
@@ -54,7 +55,6 @@ function InstallPage() {
   const [countdown, setCountdown] = useState(10)
 
   useEffect(() => {
-    if (!port) return
     const checkStatus = async () => {
       try {
         const response = await fetch(`http://localhost:${port}/status`)

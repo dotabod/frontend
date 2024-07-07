@@ -14,7 +14,7 @@ function Write-Log {
       Write-Host "$formattedLevel $Message"  -f DarkRed
     }
     else {
-      Write-Host "[$time] $formattedLevel $Message"
+      Write-Host "$formattedLevel $Message"
     }
   }
 }
@@ -156,8 +156,17 @@ $port = $listenerInfo.Port
 # Determine the base URL based on the debug mode
 $baseUrl = if ($DebugMode) { "http://localhost:3000/install" } else { "https://dotabod.com/install" }
 
+# Initialize $url with $baseUrl
+$url = $baseUrl
+
 # Append the port query parameter only if the port is not 8089
-$url = if ($port -eq 8089) { $baseUrl } else { "$baseUrl?port=$port" }
+if ($port -ne 8089) {
+    $url += "?port=$port"
+}
+
+Write-Host "Base URL: $baseUrl"
+Write-Host "Port: $port"
+Write-Host "Url: $url"
 
 # Start the process with the constructed URL
 Start-Process $url
