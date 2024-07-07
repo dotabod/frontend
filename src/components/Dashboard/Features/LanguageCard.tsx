@@ -102,7 +102,7 @@ export default function LanguageCard() {
       ) : (
         <>
           <NumberTicker value={data?.total || data?.percentage || 0} />
-          {data?.percentage && '% of'}
+          {!data?.total && data?.percentage && '% of'}
         </>
       )}
       <span>dotabods</span>
