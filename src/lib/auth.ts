@@ -94,9 +94,10 @@ export const authOptions: NextAuthOptions = {
         // @ts-ignore from twitch?
         name: user.displayName || user.name || profile?.preferred_username,
         displayName:
-          // @ts-ignore from twitch?
           token.name ||
+          // @ts-ignore from twitch?
           profile?.preferred_username ||
+          // @ts-ignore from twitch?
           user.displayName ||
           user.name,
         // @ts-ignore from twitch?
