@@ -497,3 +497,9 @@ body {
 a:not(.ant-btn) {
   @apply text-purple-400;
 }
+
+.command-line::before {
+  content: "> ";
+  color: white;
+  opacity: 0.5;
+}

@@ -186,16 +186,11 @@ try {
   $url = "$baseUrl/install"
   $fileUrl = "$baseUrl/api/install/$Token"
 
-  Write-Log "Url: $url" "DEBUG"
-  Write-Log "FileUrl: $fileUrl" "DEBUG"
-
   # Append the port query parameter only if the port is not 8089
   if ($port -ne 8089) {
-      $url += "?port=$port"
+    $url += "?port=$port"
+    Start-Process $url
   }
-
-  # Start the process with the constructed URL
-  Start-Process $url
 
   $Token = WaitForToken -Listener $listener
   $listener.Stop()
