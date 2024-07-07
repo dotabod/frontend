@@ -160,7 +160,8 @@ function Test-Connection {
 
 $listenerInfo = Start-HttpListener -Port 8089
 if ($listenerInfo -eq $null) {
-  exit 1
+  Write-Log "Failed to start Dotabod installer." "ERROR"
+  return
 }
 
 $listener = $listenerInfo.Listener
