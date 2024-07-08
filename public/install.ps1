@@ -29,10 +29,11 @@ try {
       $process = Get-Process -Id $tcpConnection.OwningProcess -ErrorAction Stop
       return @{
         ProcessId = $process.Id
-        Name = $process.Name
-        Path = $process.Path
+        Name      = $process.Name
+        Path      = $process.Path
       }
-    } catch {
+    }
+    catch {
       return $null
     }
   }
@@ -51,10 +52,12 @@ try {
       try {
         $process | Stop-Process -Force
         Write-Log "Killed process $($process.Name) with ProcessId $ProcessId." "DEBUG"
-      } catch {
+      }
+      catch {
         Write-Log "Failed to kill process $ProcessId. Access denied." "ERROR"
       }
-    } else {
+    }
+    else {
       Write-Log "No process found with ProcessId $ProcessId." "ERROR"
     }
   }
@@ -85,13 +88,14 @@ try {
     try {
       $listener.Start()
       Write-Log "HTTP Listener started on port $Port" "DEBUG"
-    } catch {
+    }
+    catch {
       Write-Log "Failed to run Dotabod installer on port $Port." "ERROR"
       return $null
     }
     return @{
       Listener = $listener
-      Port = $Port
+      Port     = $Port
     }
   }
 
@@ -111,16 +115,18 @@ try {
       }
 
       try {
-          $result = $Listener.BeginGetContext($null, $null)
-          $received = $result.AsyncWaitHandle.WaitOne(5000, $false)
-          if ($received) {
-              $context = $Listener.EndGetContext($result)
-              Write-Log "Context received" "DEBUG"
-          } else {
-              Write-Log "GetContext timed out after 5 seconds" "DEBUG"
-              continue
-          }
-      } catch {
+        $result = $Listener.BeginGetContext($null, $null)
+        $received = $result.AsyncWaitHandle.WaitOne(8000, $false)
+        if ($received) {
+          $context = $Listener.EndGetContext($result)
+          Write-Log "Context received" "DEBUG"
+        }
+        else {
+          Write-Log "GetContext timed out after 5 seconds" "DEBUG"
+          continue
+        }
+      }
+      catch {
         Write-Log "An unexpected exception occurred: $($_.Exception.Message)" "ERROR"
         return
       }
@@ -134,7 +140,8 @@ try {
       $response = $context.Response
       if ($baseUrl -eq "http://localhost:3000") {
         $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
-      } else {
+      }
+      else {
         $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
       }
       $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
@@ -146,8 +153,8 @@ try {
       }
       if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/token") {
         Write-Log "Received token request." "DEBUG"
-        $token = $request.QueryString["token"]
-        if ($token) {
+        $token = $request.QueryString["token"].Trim()
+        if ($token -ne "") {
           $responseString = "<html><body>Token received. You can close this window.</body></html>"
           $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
           $response.ContentLength64 = $buffer.Length
@@ -156,7 +163,11 @@ try {
           Write-Log "Token received: $token" "DEBUG"
           return $token
         }
-      } elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
+        else {
+          Write-Log "Token is empty after trimming." "DEBUG"
+        }
+      }
+      elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
         $responseString = "OK"
         $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
         $response.ContentLength64 = $buffer.Length
@@ -173,12 +184,18 @@ try {
     )
     try {
       Write-Log "Checking connectivity to $Url" "DEBUG"
-      $request = [System.Net.WebRequest]::Create($Url)
-      $request.Timeout = 2000 # Timeout in milliseconds
-      $response = $request.GetResponse()
-      $response.Close()
-      return $true
-    } catch {
+      $response = Invoke-WebRequest -Uri $Url -TimeoutSec 5
+      if ($response.StatusCode -eq 200) {
+        Write-Log "Successfully connected to $Url" "DEBUG"
+        return $true
+      }
+      else {
+        Write-Log "Received non-success status code $($response.StatusCode) from $Url" "DEBUG"
+        return $false
+      }
+    }
+    catch {
+      Write-Log "Failed to connect to $Url : $($_.Exception.Message)" "DEBUG"
       return $false
     }
   }
@@ -187,7 +204,8 @@ try {
   if ($listenerInfo -eq $null) {
     Write-Log "Failed to start Dotabod installer." "ERROR"
     return
-  } else {
+  }
+  else {
     Write-Log "Dotabod installer started successfully." "DEBUG"
   }
 
@@ -199,17 +217,22 @@ try {
   $remoteHostUrl = "https://dotabod.com"
   if ($DebugMode -eq $true) {
     $baseUrl = if (Test-Connection -Url "$localHostUrl") { $localHostUrl } else { $remoteHostUrl }
-  } else {
+  }
+  else {
     $baseUrl = $remoteHostUrl
   }
 
   # Initialize $url with $baseUrl
   $url = "$baseUrl/dashboard/?step=2"
-  $fileUrl = "$baseUrl/api/install/$Token"
 
   # Append the port query parameter only if the port is not 8089
   if ($port -ne 8089) {
-    $url += "?port=$port"
+    if ($url -like "*?*") {
+      $url += "&port=$port"
+    }
+    else {
+      $url += "?port=$port"
+    }
     Start-Process $url
   }
 
@@ -217,9 +240,12 @@ try {
   Write-Log "Stopping the listener" "DEBUG"
   $listener.Stop()
 
-  Write-Log "Running the Dotabod installer with token" "DEBUG"
+  # Trim the $Token to remove any leading or trailing spaces
+  $Token = $Token.Trim()
 
   # Check and timeout after 5 seconds if the URL is unreachable
+  $fileUrl = "$baseUrl/api/install/$Token"
+  Write-Log "Checking if the Dotabod config file is reachable at $fileUrl" "DEBUG"
   try {
     $webRequest = [System.Net.WebRequest]::Create($fileUrl)
     $webRequest.Timeout = 5000
@@ -235,7 +261,7 @@ try {
       $fileUrl = "$baseUrl$redirectUrl/$Token"
     }
     else {
-      Write-Log "Failed to access the Dotabod config file: $($_.Exception.Message)" "ERROR"
+      Write-Log "Failed to access the Dotabod config file at $fileUrl : $($_.Exception.Message)" "ERROR"
       return
     }
   }
@@ -325,36 +351,39 @@ try {
   # Create the gamestate_integration folder if it doesn't exist
   if (-not (Test-Path -Path $gsi)) {
     New-Item -Path $gsi -ItemType Directory
-    Write-Log "Created the gamestate_integration folder in the Dota 2 directory."
+    Write-Log "Created the gamestate_integration folder in the Dota 2 directory." "DEBUG"
   }
   else {
-    Write-Log "The gamestate_integration folder already exists in the Dota 2 directory."
+    Write-Log "The gamestate_integration folder already exists in the Dota 2 directory." "DEBUG"
   }
 
   # Before saving the new file, check for existing .cfg files with "dotabod" in the filename, excluding the current filename
   $existingDotabodFiles = Get-ChildItem -Path $gsi -Filter "*dotabod*.cfg" | Where-Object { $_.Name -ne $filename }
 
   if ($existingDotabodFiles.Count -gt 0) {
-      $fileNames = $existingDotabodFiles.Name -join ", "
-      $userResponse = Read-Host "The following Dotabod config file(s) exist: $fileNames. Dotabod should only be used with one cfg at a time. Delete them? (y/n)"
-      if ($userResponse -ieq "y") {
-          $existingDotabodFiles | ForEach-Object {
-              Remove-Item -Path $_.FullName
-              Write-Log "Deleted the existing Dotabod config file: $($_.Name)"
-          }
-          Write-Log "If you were using an OBS overlay, you may need to update the browser source URL."
+    $usernames = ($existingDotabodFiles.Name | ForEach-Object { "• " + ($_ -replace 'gamestate_integration_dotabod-(.+)\.cfg', '$1') }) -join "`n"
+    Write-Log "Dotabod should only be used with one cfg at a time. The other are for Twitch users:`n$usernames" "INFO" DarkYellow
+    $userResponse = Read-Host "Delete the others and continue? (y/n)"
+
+    if ($userResponse -ieq "y") {
+      $existingDotabodFiles | ForEach-Object {
+        Remove-Item -Path $_.FullName
+        $username = $_.Name -replace 'gamestate_integration_dotabod-(.+)\.cfg', '$1'
+        Write-Log "Deleted the existing Dotabod config file for user: $username"
       }
-      else {
-          Write-Log "Exiting Dotabod setup."
-          return
-      }
+      Write-Log "If you were using an OBS overlay, you may need to update the browser source URL."
+    }
+    else {
+      Write-Log "Exiting Dotabod setup."
+      return
+    }
   }
 
   # Continue with the logic to save the new file
   $response = Invoke-WebRequest -Uri $fileUrl -Method Get
   if ($null -eq $response) {
-      Write-Log "Failed to get a response from $fileUrl" "ERROR"
-      return
+    Write-Log "Failed to get a response from $fileUrl" "ERROR"
+    return
   }
 
   # Save the downloaded file into the gamestate_integration folder
@@ -429,14 +458,17 @@ try {
       Write-Log "Dota 2 already has the -gamestateintegration launch option." "INFO" DarkGreen
     }
     else {
-      Write-Log "Failed to find launch option configuration." "ERROR" DarkRed
+      Write-Log "Failed to find launch option configuration." "ERROR"
     }
   }
   else {
-    Write-Log "Failed to find Dota 2 config file." "ERROR" DarkRed
+    Write-Log "Failed to find Dota 2 config file." "ERROR"
   }
 
   Write-Log "Setup complete! Dota 2 is now configured with Dotabod." "INFO" DarkGreen
+}
+catch {
+  Write-Log "An error occurred: $_"
 }
 finally {
   Read-Host -Prompt "Press Enter to exit"
