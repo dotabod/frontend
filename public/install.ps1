@@ -99,13 +99,35 @@ try {
     param (
       [System.Net.HttpListener]$Listener
     )
-    Write-Log "Opening browser for authentication with Dotabod..."
+    Write-Log "Waiting for authentication with Dotabod..."
+
+    $timer = [Diagnostics.Stopwatch]::StartNew()
     while ($true) {
+      if ($timer.Elapsed.Seconds -ge 7) {
+        Write-Log "Have not authenticated with Dotabod yet..." "INFO" DarkYellow
+        Read-Host -Prompt "Press Enter to open the authentication page manually"
+        Start-Process $url
+        $timer.Restart()
+      }
+
       try {
-        $context = $Listener.GetContext()
+          $result = $Listener.BeginGetContext($null, $null)
+          $received = $result.AsyncWaitHandle.WaitOne(5000, $false)
+          if ($received) {
+              $context = $Listener.EndGetContext($result)
+              Write-Log "Context received" "DEBUG"
+          } else {
+              Write-Log "GetContext timed out after 5 seconds" "DEBUG"
+              continue
+          }
       } catch {
-        Write-Log "Failed to get context from listener." "ERROR"
+        Write-Log "An unexpected exception occurred: $($_.Exception.Message)" "ERROR"
         return
+      }
+
+      if ($null -eq $context) {
+        Write-Log "Context is null, continuing loop" "DEBUG"
+        continue
       }
 
       $request = $context.Request
@@ -134,8 +156,7 @@ try {
           Write-Log "Token received: $token" "DEBUG"
           return $token
         }
-      }
-      elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
+      } elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
         $responseString = "OK"
         $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
         $response.ContentLength64 = $buffer.Length
@@ -183,7 +204,7 @@ try {
   }
 
   # Initialize $url with $baseUrl
-  $url = "$baseUrl/install"
+  $url = "$baseUrl/dashboard/?step=2"
   $fileUrl = "$baseUrl/api/install/$Token"
 
   # Append the port query parameter only if the port is not 8089
@@ -193,6 +214,7 @@ try {
   }
 
   $Token = WaitForToken -Listener $listener
+  Write-Log "Stopping the listener" "DEBUG"
   $listener.Stop()
 
   Write-Log "Running the Dotabod installer with token" "DEBUG"
