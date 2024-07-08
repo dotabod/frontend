@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons'
-import { Alert, Spin } from 'antd'
+import { Alert } from 'antd'
 import { Steps } from 'antd'
 import { getSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
@@ -73,7 +73,6 @@ const WindowsInstaller = () => {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
-  const [elapsedTime, setElapsedTime] = useState(0)
   const errorWithoutSuccess = error && !success
 
   useEffect(() => {
@@ -109,10 +108,6 @@ const WindowsInstaller = () => {
         setCurrentStep(1)
         return true
       } catch (error) {
-        // console.error('Failed to check status:', error)
-        // setError(
-        //   'Could not connect to the Dotabod installer. Please try again, or reach out on Discord for more help.'
-        // )
         return false
       }
     }
@@ -133,14 +128,11 @@ const WindowsInstaller = () => {
           if (!response.ok) {
             throw new Error('Network response was not ok')
           }
+          setLoading(false)
           setCurrentStep(2)
           setSuccess(true)
         } catch (error) {
-          setError(
-            'Could not install Dotabod. Please try again, or reach out on Discord for more help.'
-          )
-        } finally {
-          setLoading(false)
+          // Do nothing
         }
       }
     }
@@ -167,15 +159,12 @@ const WindowsInstaller = () => {
         } catch (err) {
           console.error('Failed to check install status:', err)
         }
-
-        setElapsedTime((prevTime) => prevTime + 1)
       }, 1000)
     }
-
     return () => {
       clearInterval(interval)
     }
-  }, [success, error, sanitizedPort, elapsedTime])
+  }, [success, error, sanitizedPort])
 
   return (
     <>
@@ -188,17 +177,19 @@ const WindowsInstaller = () => {
           currentStep={currentStep}
         />
       </div>
-      {loading && !success && (
-        <div className="flex items-center space-x-4">
-          <Spin spinning={loading} />
-          <span>Waiting to connect to the Dotabod installer...</span>
-        </div>
-      )}
       {success && (
         <Alert
           className="max-w-2xl"
           message="The Dotabod installer is running!"
           type="success"
+          showIcon
+        />
+      )}
+      {error && (
+        <Alert
+          className="max-w-2xl"
+          message={`An error occurred: ${error}`}
+          type="error"
           showIcon
         />
       )}
