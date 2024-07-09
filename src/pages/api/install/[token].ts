@@ -7,7 +7,7 @@ import { getServerSession } from 'next-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  const token = req.query.token as string | undefined
+  const token = decodeURIComponent((req.query.token as string) || '').trim()
   const userId = token || session?.user?.id
 
   if (!userId) {

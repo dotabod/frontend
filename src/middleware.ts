@@ -8,7 +8,6 @@ import { NextResponse } from 'next/server'
 export const config = {
   matcher: [
     '/',
-    '/install',
     '/login',
     '/overlay/:path*',
     '/api/:path*',
@@ -41,10 +40,7 @@ export async function middleware(req: NextRequestWithAuth) {
     // but log the error to the console
     console.error(error)
   }
-  if (
-    req.nextUrl.pathname.startsWith('/dashboard') ||
-    req.nextUrl.pathname.startsWith('/install')
-  ) {
+  if (req.nextUrl.pathname.startsWith('/dashboard')) {
     // Proceed with the authentication middleware for /dashboard paths
     return withAuth(req)
   }
