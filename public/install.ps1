@@ -146,7 +146,7 @@ function Wait-ForToken {
         $response.ContentLength64 = $buffer.Length
         $response.OutputStream.Write($buffer, 0, $buffer.Length)
         $response.OutputStream.Close()
-        Write-Log "Token received: $token" "DEBUG"
+        Write-Log "Token received: '$token'" "DEBUG"
         return $token
       }
       else {
@@ -229,10 +229,11 @@ try {
   }
 
   $Token = Wait-ForToken -Listener $global:listener
+  $Token = $Token -replace '\s', ''
   Clear-ResourceAllocation
 
-  $Token = $Token.Trim()
   $fileUrl = "$baseUrl/api/install/$Token"
+
   Write-Log "Checking if the Dotabod config file is reachable at $fileUrl" "DEBUG"
 
   try {
@@ -455,5 +456,32 @@ catch {
 }
 finally {
   Clear-ResourceAllocation
-  Read-Host -Prompt "Press Enter to exit"
+
+  # Attempt to close Dota 2 if it's running
+  $dota2Process = Get-Process -Name "dota2" -ErrorAction SilentlyContinue
+  if ($null -ne $dota2Process) {
+    # Prompt to restart Dota 2
+    Read-Host -Prompt "Press Enter to restart the Dota 2 client, or Ctrl + C to exit"
+    Write-Log "Restarting the Dota 2 client..." "INFO"
+
+
+    $dota2Process | Stop-Process -Force
+    Start-Sleep -Seconds 5 # Wait for the process to fully exit
+
+
+    # Assuming Steam is installed in the default location on Windows
+    $steamPath = "C:\Program Files (x86)\Steam\steam.exe"
+    $dota2AppId = 570
+
+    # Start Dota 2 via Steam
+    if (Test-Path $steamPath) {
+      Start-Process $steamPath -ArgumentList "-applaunch $dota2AppId"
+      Write-Log "Dota 2 client is opening." "INFO"
+    }
+    else {
+      Write-Log "Steam not found. Please start Dota 2 manually." "ERROR"
+    }
+  }
+
+  Read-Host -Prompt "Dotabod is finished. Press Enter to exit"
 }

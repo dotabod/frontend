@@ -9,7 +9,7 @@ import CodeBlock from './CodeBlock'
 
 const { Step } = Steps
 
-const InstallationSteps = ({ currentStep, errorWithoutSuccess }) => {
+const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
   const steps = [
     {
       title: !errorWithoutSuccess
@@ -131,6 +131,9 @@ const WindowsInstaller = () => {
           setLoading(false)
           setCurrentStep(2)
           setSuccess(true)
+          setTimeout(() => {
+            setCurrentStep(3)
+          }, 3000)
         } catch (error) {
           // Do nothing
         }
@@ -147,7 +150,7 @@ const WindowsInstaller = () => {
       interval = setInterval(async () => {
         try {
           const response = await fetch(
-            `http://localhost:${sanitizedPort}/install_status`,
+            `http://localhost:${sanitizedPort}/status`,
             { method: 'GET', headers: { 'Content-Type': 'application/json' } }
           )
           if (response.ok) {
@@ -159,7 +162,7 @@ const WindowsInstaller = () => {
         } catch (err) {
           console.error('Failed to check install status:', err)
         }
-      }, 1000)
+      }, 3000)
     }
     return () => {
       clearInterval(interval)
@@ -188,6 +191,7 @@ const WindowsInstaller = () => {
       </div>
       <div className="mb-4">
         <InstallationSteps
+          success={success}
           errorWithoutSuccess={errorWithoutSuccess}
           currentStep={currentStep}
         />
@@ -195,7 +199,7 @@ const WindowsInstaller = () => {
       {success && (
         <Alert
           className="max-w-2xl"
-          message="The Dotabod installer is running!"
+          message="The Dotabod installer is running! You can continue on to the next step."
           type="success"
           showIcon
         />
