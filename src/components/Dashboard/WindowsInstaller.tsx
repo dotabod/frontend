@@ -76,24 +76,23 @@ const WindowsInstaller = () => {
   const errorWithoutSuccess = error && !success
 
   useEffect(() => {
-    const channel = new BroadcastChannel('port-check')
+    const channel = new BroadcastChannel('single-instance-check')
     const handleMessage = (event) => {
-      if (event.data === 'port' && !router.query.port) {
-        router.replace('/no-port') // a 404 page
+      if (event.data === 'instance-opened') {
+        router.replace('/404')
       }
     }
 
     channel.addEventListener('message', handleMessage)
-
-    if (router.query.port) {
-      channel.postMessage('port')
-    }
+    // Post a message as soon as the component mounts,
+    // indicating that an instance has been opened.
+    channel.postMessage('instance-opened')
 
     return () => {
       channel.removeEventListener('message', handleMessage)
       channel.close()
     }
-  }, [router.query.port, router.replace])
+  }, [router.replace])
 
   useEffect(() => {
     const checkStatus = async () => {

@@ -1,207 +1,216 @@
 param (
   [switch]$DebugMode
 )
-try {
-  function Write-Log {
-    param (
-      [string]$Message,
-      [string]$Level = "INFO",
-      [ConsoleColor]$Color = [ConsoleColor]::White
-    )
-    $time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $formattedLevel = if ($Level -ne "INFO") { "[$Level] " } else { "" }
-    if ($DebugMode -or $Level -ne "DEBUG") {
-      if ($Level -eq "ERROR") {
-        Write-Host "${formattedLevel}$Message" -ForegroundColor DarkRed
-      }
-      else {
-        Write-Host "${formattedLevel}$Message" -ForegroundColor $Color
-      }
+
+# Logging Functions
+function Write-Log {
+  param (
+    [string]$Message,
+    [string]$Level = "INFO",
+    [ConsoleColor]$Color = [ConsoleColor]::White
+  )
+  $formattedLevel = if ($Level -ne "INFO") { "[$Level] " } else { "" }
+  if ($DebugMode -or $Level -ne "DEBUG") {
+    if ($Level -eq "ERROR") {
+      Write-Host "${formattedLevel}$Message" -ForegroundColor DarkRed
+    }
+    else {
+      Write-Host "${formattedLevel}$Message" -ForegroundColor $Color
     }
   }
+}
 
-  function Check-Port {
-    param (
-      [int]$Port
-    )
+# Port Management Functions
+function Test-PortAvailability {
+  param ([int]$Port)
+  try {
+    $tcpConnection = Get-NetTCPConnection -LocalPort $Port -ErrorAction Stop
+    $process = Get-Process -Id $tcpConnection.OwningProcess -ErrorAction Stop
+    return @{
+      ProcessId = $process.Id
+      Name      = $process.Name
+      Path      = $process.Path
+    }
+  }
+  catch {
+    return $null
+  }
+}
+
+function Find-AvailablePort {
+  $minPort = 8000
+  $maxPort = 9000
+  do {
+    $port = Get-Random -Minimum $minPort -Maximum $maxPort
+  } while (Test-PortAvailability -Port $port)
+  return $port
+}
+
+# HTTP Listener Management
+function Start-HttpListener {
+  param ([int]$Port)
+
+  $processInfo = Test-PortAvailability -Port $Port
+  if ($processInfo) {
+    Write-Log "Port $Port is in use by ProcessId $($processInfo.ProcessId)." "DEBUG"
+    $Port = Find-AvailablePort
+    Write-Log "Selected new port $Port." "DEBUG"
+  }
+
+  $listener = New-Object System.Net.HttpListener
+  $listener.Prefixes.Add("http://localhost:$Port/")
+  try {
+    $listener.Start()
+    Write-Log "HTTP Listener started on port $Port" "DEBUG"
+  }
+  catch {
+    Write-Log "Failed to start HTTP listener on port $Port." "ERROR"
+    return $null
+  }
+  return @{
+    Listener = $listener
+    Port     = $Port
+  }
+}
+
+function Wait-ForToken {
+  param (
+    [System.Net.HttpListener]$Listener
+  )
+  Write-Log "Waiting for authentication with Dotabod..."
+
+  $timer = [Diagnostics.Stopwatch]::StartNew()
+  $authPageTimer = $null
+  $timerTriggered = $false
+
+  while ($true) {
+    if (-not $timerTriggered -and $timer.Elapsed.Seconds -ge 7) {
+      $timerTriggered = $true
+      Write-Log "Have not authenticated with Dotabod yet..." "INFO" DarkYellow
+      Read-Host -Prompt "Press Enter to open the authentication page manually"
+      Start-Process $url
+      Write-Log "Waiting for authentication again..."
+      if ($null -eq $authPageTimer) {
+        $authPageTimer = [Diagnostics.Stopwatch]::StartNew()
+      }
+    }
+
+    if ($null -ne $authPageTimer -and $authPageTimer.Elapsed.Seconds -ge 15) {
+      Write-Log "Authentication page never reached. Exiting script." "ERROR"
+      exit
+    }
+
     try {
-      $tcpConnection = Get-NetTCPConnection -LocalPort $Port -ErrorAction Stop
-      $process = Get-Process -Id $tcpConnection.OwningProcess -ErrorAction Stop
-      return @{
-        ProcessId = $process.Id
-        Name      = $process.Name
-        Path      = $process.Path
+      $result = $Listener.BeginGetContext($null, $null)
+      $received = $result.AsyncWaitHandle.WaitOne(8000, $false)
+      if ($received) {
+        $context = $Listener.EndGetContext($result)
+        Write-Log "Context received" "DEBUG"
+      }
+      else {
+        Write-Log "GetContext timed out after 5 seconds" "DEBUG"
+        continue
       }
     }
     catch {
-      return $null
-    }
-  }
-
-  function Kill-Process {
-    param (
-      [int]$ProcessId
-    )
-    if ($ProcessId -eq 4) {
-      Write-Log "Cannot kill system process with PID $ProcessId." "ERROR"
+      Write-Log "An unexpected exception occurred: $($_.Exception.Message)" "ERROR"
       return
     }
 
-    $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
-    if ($process) {
-      try {
-        $process | Stop-Process -Force
-        Write-Log "Killed process $($process.Name) with ProcessId $ProcessId." "DEBUG"
-      }
-      catch {
-        Write-Log "Failed to kill process $ProcessId. Access denied." "ERROR"
-      }
+    if ($null -eq $context) {
+      Write-Log "Context is null, continuing loop" "DEBUG"
+      continue
+    }
+
+    $request = $context.Request
+    $response = $context.Response
+    if ($baseUrl -eq "http://localhost:3000") {
+      $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
     }
     else {
-      Write-Log "No process found with ProcessId $ProcessId." "ERROR"
+      $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
     }
-  }
-
-  function Get-AvailablePort {
-    $minPort = 8000
-    $maxPort = 9000
-    do {
-      $port = Get-Random -Minimum $minPort -Maximum $maxPort
-    } while (Check-Port -Port $port)
-    return $port
-  }
-
-  function Start-HttpListener {
-    param (
-      [int]$Port
-    )
-
-    $processInfo = Check-Port -Port $Port
-    if ($processInfo) {
-      Write-Log "Port $Port is in use by ProcessId $($processInfo.ProcessId)." "DEBUG"
-      $Port = Get-AvailablePort
-      Write-Log "Selected new port $Port." "DEBUG"
+    $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
+    $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
+    if ($request.HttpMethod -eq "OPTIONS") {
+      $response.StatusCode = 204
+      $response.OutputStream.Close()
+      continue
     }
-
-    $listener = New-Object System.Net.HttpListener
-    $listener.Prefixes.Add("http://localhost:$Port/")
-    try {
-      $listener.Start()
-      Write-Log "HTTP Listener started on port $Port" "DEBUG"
-    }
-    catch {
-      Write-Log "Failed to run Dotabod installer on port $Port." "ERROR"
-      return $null
-    }
-    return @{
-      Listener = $listener
-      Port     = $Port
-    }
-  }
-
-  function WaitForToken {
-    param (
-      [System.Net.HttpListener]$Listener
-    )
-    Write-Log "Waiting for authentication with Dotabod..."
-
-    $timer = [Diagnostics.Stopwatch]::StartNew()
-    while ($true) {
-      if ($timer.Elapsed.Seconds -ge 7) {
-        Write-Log "Have not authenticated with Dotabod yet..." "INFO" DarkYellow
-        Read-Host -Prompt "Press Enter to open the authentication page manually"
-        Start-Process $url
-        $timer.Restart()
-      }
-
-      try {
-        $result = $Listener.BeginGetContext($null, $null)
-        $received = $result.AsyncWaitHandle.WaitOne(8000, $false)
-        if ($received) {
-          $context = $Listener.EndGetContext($result)
-          Write-Log "Context received" "DEBUG"
-        }
-        else {
-          Write-Log "GetContext timed out after 5 seconds" "DEBUG"
-          continue
-        }
-      }
-      catch {
-        Write-Log "An unexpected exception occurred: $($_.Exception.Message)" "ERROR"
-        return
-      }
-
-      if ($null -eq $context) {
-        Write-Log "Context is null, continuing loop" "DEBUG"
-        continue
-      }
-
-      $request = $context.Request
-      $response = $context.Response
-      if ($baseUrl -eq "http://localhost:3000") {
-        $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
-      }
-      else {
-        $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
-      }
-      $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
-      $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
-      if ($request.HttpMethod -eq "OPTIONS") {
-        $response.StatusCode = 204
-        $response.OutputStream.Close()
-        continue
-      }
-      if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/token") {
-        Write-Log "Received token request." "DEBUG"
-        $token = $request.QueryString["token"].Trim()
-        if ($token -ne "") {
-          $responseString = "<html><body>Token received. You can close this window.</body></html>"
-          $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
-          $response.ContentLength64 = $buffer.Length
-          $response.OutputStream.Write($buffer, 0, $buffer.Length)
-          $response.OutputStream.Close()
-          Write-Log "Token received: $token" "DEBUG"
-          return $token
-        }
-        else {
-          Write-Log "Token is empty after trimming." "DEBUG"
-        }
-      }
-      elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
-        $responseString = "OK"
+    if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/token") {
+      Write-Log "Received token request." "DEBUG"
+      $token = $request.QueryString["token"].Trim()
+      if ($token -ne "") {
+        $responseString = "<html><body>Token received. You can close this window.</body></html>"
         $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
         $response.ContentLength64 = $buffer.Length
         $response.OutputStream.Write($buffer, 0, $buffer.Length)
         $response.OutputStream.Close()
-        Write-Log "Status check responded with OK" "DEBUG"
-      }
-    }
-  }
-
-  function Test-Connection {
-    param (
-      [string]$Url
-    )
-    try {
-      Write-Log "Checking connectivity to $Url" "DEBUG"
-      $response = Invoke-WebRequest -Uri $Url -TimeoutSec 5
-      if ($response.StatusCode -eq 200) {
-        Write-Log "Successfully connected to $Url" "DEBUG"
-        return $true
+        Write-Log "Token received: $token" "DEBUG"
+        return $token
       }
       else {
-        Write-Log "Received non-success status code $($response.StatusCode) from $Url" "DEBUG"
-        return $false
+        Write-Log "Token is empty after trimming." "DEBUG"
       }
     }
-    catch {
-      Write-Log "Failed to connect to $Url : $($_.Exception.Message)" "DEBUG"
+    elseif ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/status") {
+      $responseString = "OK"
+      $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
+      $response.ContentLength64 = $buffer.Length
+      $response.OutputStream.Write($buffer, 0, $buffer.Length)
+      $response.OutputStream.Close()
+      Write-Log "Status check responded with OK" "DEBUG"
+    }
+  }
+}
+
+# Configuration Setup
+function Test-NetworkConnection {
+  param ([string]$Url)
+  try {
+    Write-Log "Checking connectivity to $Url" "DEBUG"
+    $response = Invoke-WebRequest -Uri $Url -TimeoutSec 5
+    if ($response.StatusCode -eq 200) {
+      Write-Log "Successfully connected to $Url" "DEBUG"
+      return $true
+    }
+    else {
+      Write-Log "Received non-success status code $($response.StatusCode) from $Url" "DEBUG"
       return $false
     }
   }
+  catch {
+    Write-Log "Failed to connect to $Url : $($_.Exception.Message)" "DEBUG"
+    return $false
+  }
+}
 
+function Get-BaseUri {
+  $localHostUrl = "http://localhost:3000"
+  $remoteHostUrl = "https://dotabod.com"
+  if ($DebugMode -eq $true) {
+    $baseUrl = if (Test-NetworkConnection -Url "$localHostUrl") { $localHostUrl } else { $remoteHostUrl }
+  }
+  else {
+    $baseUrl = $remoteHostUrl
+  }
+  return $baseUrl
+}
+
+function Clear-ResourceAllocation {
+  if ($null -ne $global:listener -and $global:listener.IsListening) {
+    Write-Log "Stopping the listener due to process exit." "DEBUG"
+    $global:listener.Stop()
+    $global:listener.Close()
+  }
+}
+
+# Main Logic
+Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation }
+
+try {
   $listenerInfo = Start-HttpListener -Port 8089
-  if ($listenerInfo -eq $null) {
+  if ($null -eq $listenerInfo) {
     Write-Log "Failed to start Dotabod installer." "ERROR"
     return
   }
@@ -209,43 +218,23 @@ try {
     Write-Log "Dotabod installer started successfully." "DEBUG"
   }
 
-  $listener = $listenerInfo.Listener
+  $global:listener = $listenerInfo.Listener
   $port = $listenerInfo.Port
 
-  # Determine the base URL based on connectivity check
-  $localHostUrl = "http://localhost:3000"
-  $remoteHostUrl = "https://dotabod.com"
-  if ($DebugMode -eq $true) {
-    $baseUrl = if (Test-Connection -Url "$localHostUrl") { $localHostUrl } else { $remoteHostUrl }
-  }
-  else {
-    $baseUrl = $remoteHostUrl
-  }
-
-  # Initialize $url with $baseUrl
+  $baseUrl = Get-BaseUri
   $url = "$baseUrl/dashboard/?step=2"
-
-  # Append the port query parameter only if the port is not 8089
   if ($port -ne 8089) {
-    if ($url -like "*?*") {
-      $url += "&port=$port"
-    }
-    else {
-      $url += "?port=$port"
-    }
+    $url += if ($url -like "*?*") { "&port=$port" } else { "?port=$port" }
     Start-Process $url
   }
 
-  $Token = WaitForToken -Listener $listener
-  Write-Log "Stopping the listener" "DEBUG"
-  $listener.Stop()
+  $Token = Wait-ForToken -Listener $global:listener
+  Clear-ResourceAllocation
 
-  # Trim the $Token to remove any leading or trailing spaces
   $Token = $Token.Trim()
-
-  # Check and timeout after 5 seconds if the URL is unreachable
   $fileUrl = "$baseUrl/api/install/$Token"
   Write-Log "Checking if the Dotabod config file is reachable at $fileUrl" "DEBUG"
+
   try {
     $webRequest = [System.Net.WebRequest]::Create($fileUrl)
     $webRequest.Timeout = 5000
@@ -254,7 +243,6 @@ try {
     Write-Log "URL is reachable." "DEBUG"
   }
   catch [System.Net.WebException] {
-    # Handle 308 Permanent Redirect and 301 Moved Permanently
     if ($_.Exception.Response.StatusCode -eq 308 -or $_.Exception.Response.StatusCode -eq 301) {
       $redirectUrl = $_.Exception.Response.Headers["Location"]
       Write-Log "Following redirect to $baseUrl$redirectUrl" "DEBUG"
@@ -277,15 +265,11 @@ try {
   $disposition = [string]$response.Headers['Content-Disposition']
   Write-Log "Response headers: $disposition" "DEBUG"
 
-  # Check if the 'Content-Disposition' header is present and contains the filename
   if ($disposition -and $disposition.Contains('filename="')) {
     $startIndex = $disposition.IndexOf('filename="') + 10
-
-    # Use a substring to find the end index by looking for the next double quote after the start index
     $restOfString = $disposition.Substring($startIndex)
     $endIndex = $restOfString.IndexOf('"')
 
-    # Extract the filename
     if ($endIndex -gt 0) {
       $filename = $restOfString.Substring(0, $endIndex)
     }
@@ -297,7 +281,6 @@ try {
     Write-Log "Failed to understand config filename (missing header data)" "ERROR"
   }
 
-  # If filename is empty, quit
   if (-not $fileName) {
     Write-Log "Failed to retrieve Dotabod config filename." "ERROR"
     return
@@ -471,5 +454,6 @@ catch {
   Write-Log "An error occurred: $_"
 }
 finally {
+  Clear-ResourceAllocation
   Read-Host -Prompt "Press Enter to exit"
 }
