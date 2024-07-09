@@ -435,10 +435,10 @@ try {
     if ($modified) {
       Write-Log "Saving modified localconfig.vdf." "DEBUG"
       $content | Set-Content -Path $localConfigFile.FullName
-      Write-Log "Updated Dota 2 launch options with -gamestateintegration" "INFO" DarkGreen
+      Write-Log "Updated Dota 2 launch options with -gamestateintegration" "INFO"
     }
     elseif ($alreadyConfigured) {
-      Write-Log "Dota 2 already has the -gamestateintegration launch option." "INFO" DarkGreen
+      Write-Log "Dota 2 already has the -gamestateintegration launch option." "INFO"
     }
     else {
       Write-Log "Failed to find launch option configuration." "ERROR"
