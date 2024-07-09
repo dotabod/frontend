@@ -1,5 +1,4 @@
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
-import { Card } from '@/ui/card'
 import { Button, Steps, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
@@ -128,7 +127,7 @@ export default function UnixInstaller() {
   ]
 
   return (
-    <Card>
+    <>
       <div className="mb-4 space-x-2">
         <span>
           <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
@@ -171,6 +170,6 @@ export default function UnixInstaller() {
         </div>
         <div>{items[current].content}</div>
       </div>
-    </Card>
+    </>
   )
 }

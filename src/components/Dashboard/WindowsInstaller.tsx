@@ -2,6 +2,7 @@ import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons'
 import { Alert } from 'antd'
 import { Steps } from 'antd'
 import { getSession } from 'next-auth/react'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { type ReactNode, useEffect, useState } from 'react'
 import CodeBlock from './CodeBlock'
@@ -167,6 +168,21 @@ const WindowsInstaller = () => {
 
   return (
     <>
+      <div className="mb-4 space-x-2">
+        <span>
+          <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
+          data Dotabod requires. It&apos;s a Valve approved way of getting game
+          data.
+        </span>
+        <Image
+          className="inline"
+          alt="ok emote"
+          unoptimized
+          src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
+          width={28}
+          height={28}
+        />
+      </div>
       <div className="flex flex-row justify-center pt-4">
         <CodeBlock />
       </div>
