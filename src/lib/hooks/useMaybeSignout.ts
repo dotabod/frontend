@@ -18,7 +18,9 @@ const useMaybeSignout = (skip = false) => {
   useEffect(() => {
     const shouldSignOut =
       status === 'authenticated' &&
-      (!session?.user?.scope?.includes('channel:bot') || requiresRefresh)
+      ((session?.user?.scope?.length > 10 &&
+        !session?.user?.scope?.includes('channel:bot')) ||
+        requiresRefresh)
 
     if (shouldSignOut) {
       signOut({ callbackUrl: '/login?setup-scopes' })
