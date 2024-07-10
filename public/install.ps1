@@ -124,12 +124,15 @@ function Wait-ForToken {
 
     $request = $context.Request
     $response = $context.Response
-    if ($baseUrl -eq "http://localhost:3000") {
-      $response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+    $origin = $request.Headers["Origin"]
+
+    if ($origin -eq "http://localhost:3000" -or $origin -eq "https://dotabod.com") {
+      $response.Headers.Add("Access-Control-Allow-Origin", $origin)
     }
     else {
-      $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com")
+      $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com") # default if no match
     }
+
     $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
     $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
     if ($request.HttpMethod -eq "OPTIONS") {
@@ -238,7 +241,7 @@ try {
   }
   Clear-ResourceAllocation
 
-  $fileUrl = "$baseUrl/api/install/$Token"
+  $fileUrl = "https://dotabod.com/api/install/$Token"
 
   Write-Log "Checking if the Dotabod config file is reachable at $fileUrl" "DEBUG"
 

@@ -1,7 +1,7 @@
 import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons'
 import { Alert } from 'antd'
 import { Steps } from 'antd'
-import { getSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { type ReactNode, useEffect, useState } from 'react'
@@ -66,6 +66,7 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
 
 const WindowsInstaller = () => {
   const router = useRouter()
+  const session = useSession()
   const port = Number.parseInt(router.query.port as string, 10)
   const sanitizedPort = Number.isNaN(port)
     ? 8089
@@ -96,33 +97,14 @@ const WindowsInstaller = () => {
   }, [router.replace])
 
   useEffect(() => {
-    const checkStatus = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:${sanitizedPort}/status`,
-          { method: 'GET', headers: { 'Content-Type': 'application/json' } }
-        )
-        if (!response.ok) {
-          throw new Error('Status check failed')
-        }
-        setCurrentStep(1)
-        return true
-      } catch (error) {
-        return false
-      }
-    }
+    let interval: NodeJS.Timeout
 
-    const fetchToken = async () => {
-      setLoading(true)
-      const session = await getSession()
-      if (session) {
-        const token = session.user.id
+    if (!success && !error && sanitizedPort) {
+      const fetchToken = async () => {
         try {
-          const statusOk = await checkStatus()
-          if (!statusOk) return
-
+          setLoading(true)
           const response = await fetch(
-            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(token)}`,
+            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user.id)}`,
             { method: 'GET', headers: { 'Content-Type': 'application/json' } }
           )
           if (!response.ok) {
@@ -138,15 +120,7 @@ const WindowsInstaller = () => {
           // Do nothing
         }
       }
-    }
 
-    fetchToken()
-  }, [sanitizedPort])
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-
-    if (!success && !error && sanitizedPort) {
       interval = setInterval(async () => {
         try {
           const response = await fetch(
@@ -154,20 +128,20 @@ const WindowsInstaller = () => {
             { method: 'GET', headers: { 'Content-Type': 'application/json' } }
           )
           if (response.ok) {
-            setCurrentStep(3)
-            setSuccess(true)
+            fetchToken()
             setError(null)
             clearInterval(interval)
           }
         } catch (err) {
-          console.error('Failed to check install status:', err)
+          // Do nothing
+          // console.error('Failed to check install status:', err)
         }
       }, 3000)
     }
     return () => {
       clearInterval(interval)
     }
-  }, [success, error, sanitizedPort])
+  }, [success, error, sanitizedPort, session?.data?.user?.id])
 
   return (
     <>
