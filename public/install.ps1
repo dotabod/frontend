@@ -82,9 +82,10 @@ function Wait-ForToken {
   $timer = [Diagnostics.Stopwatch]::StartNew()
   $authPageTimer = $null
   $timerTriggered = $false
+  $authenticated = $false
 
   while ($true) {
-    if (-not $timerTriggered -and $timer.Elapsed.Seconds -ge 7) {
+    if (-not $authenticated -and -not $timerTriggered -and $timer.Elapsed.Seconds -ge 7) {
       $timerTriggered = $true
       Write-Log "Have not authenticated with Dotabod yet..." "INFO" DarkYellow
       Read-Host -Prompt "Press Enter to open the authentication page manually"
@@ -95,9 +96,8 @@ function Wait-ForToken {
       }
     }
 
-    if ($null -ne $authPageTimer -and $authPageTimer.Elapsed.Seconds -ge 15) {
-      Write-Log "Authentication page never reached. Exiting script." "ERROR"
-      exit
+    if (-not $authenticated -and $null -ne $authPageTimer -and $authPageTimer.Elapsed.Seconds -ge 15) {
+      return
     }
 
     try {
@@ -108,7 +108,7 @@ function Wait-ForToken {
         Write-Log "Context received" "DEBUG"
       }
       else {
-        Write-Log "GetContext timed out after 5 seconds" "DEBUG"
+        Write-Log "GetContext timed out after 8 seconds" "DEBUG"
         continue
       }
     }
@@ -147,6 +147,7 @@ function Wait-ForToken {
         $response.OutputStream.Write($buffer, 0, $buffer.Length)
         $response.OutputStream.Close()
         Write-Log "Token received: '$token'" "DEBUG"
+        $authenticated = $true
         return $token
       }
       else {
@@ -160,6 +161,7 @@ function Wait-ForToken {
       $response.OutputStream.Write($buffer, 0, $buffer.Length)
       $response.OutputStream.Close()
       Write-Log "Status check responded with OK" "DEBUG"
+      $authenticated = $true
     }
   }
 }
@@ -206,7 +208,7 @@ function Clear-ResourceAllocation {
 }
 
 # Main Logic
-Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation }
+Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation } | Out-Null
 
 try {
   $listenerInfo = Start-HttpListener -Port 8089
@@ -230,6 +232,10 @@ try {
 
   $Token = Wait-ForToken -Listener $global:listener
   $Token = $Token -replace '\s', ''
+  if ([string]::IsNullOrEmpty($Token)) {
+    Write-Log "Failed to authenticate with Dotabod." "ERROR"
+    return
+  }
   Clear-ResourceAllocation
 
   $fileUrl = "$baseUrl/api/install/$Token"
@@ -464,10 +470,8 @@ finally {
     Read-Host -Prompt "Press Enter to restart the Dota 2 client, or Ctrl + C to exit"
     Write-Log "Restarting the Dota 2 client..." "INFO"
 
-
     $dota2Process | Stop-Process -Force
     Start-Sleep -Seconds 5 # Wait for the process to fully exit
-
 
     # Assuming Steam is installed in the default location on Windows
     $steamPath = "C:\Program Files (x86)\Steam\steam.exe"
@@ -483,5 +487,5 @@ finally {
     }
   }
 
-  Read-Host -Prompt "Dotabod is finished. Press Enter to exit"
+  Read-Host -Prompt "Press Enter to exit"
 }
