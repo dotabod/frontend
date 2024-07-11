@@ -10,15 +10,6 @@ import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // @ts-expect-error ?? this is what docs tell me to do
-  const authHeader = req?.headers?.get?.('authorization')
-  if (
-    !process.env.CRON_SECRET ||
-    authHeader !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
-    return res.status(401).json({ success: false })
-  }
-
   if (req.method !== 'GET') {
     console.log('Invalid method:', req.method)
     return res.status(405).json({ message: 'Method not allowed' })
