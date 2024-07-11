@@ -47,10 +47,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       user_id: userId,
       data: { name: 'Test Emote Set' },
     }
-    const createEmoteSetResult = await client.request(
+    const createEmoteSetResult = (await client.request(
       CREATE_EMOTE_SET,
       createEmoteSetVariables
-    )
+    )) as { createEmoteSet: { id: string } }
     const emoteSetId = createEmoteSetResult.createEmoteSet.id
     console.log('Created emote set ID:', emoteSetId)
 
@@ -71,14 +71,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Step 3: Verify the update
     console.log('Verifying emote set update...')
     const getUserEmoteSetsVariables = { id: userId }
-    const data = await client.request(
+    const data = (await client.request(
       GET_USER_EMOTE_SETS,
       getUserEmoteSetsVariables
-    )
+    )) as {
+      user: {
+        emote_sets: Array<{
+          id: string
+          name: string
+          origins: Array<{ id: string }>
+        }>
+      }
+    }
     const updatedEmoteSet = data.user.emote_sets.find(
       (set: any) => set.id === emoteSetId
     )
-    const originExists = updatedEmoteSet.origins.some(
+    const originExists = updatedEmoteSet?.origins.some(
       (origin: any) => origin.id === newOrigin.id
     )
 
