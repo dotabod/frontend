@@ -1,103 +1,15 @@
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
-import { GraphQLClient, gql } from 'graphql-request'
+import {
+  CREATE_EMOTE_SET,
+  GET_USER_EMOTE_SETS,
+  UPDATE_EMOTE_SET,
+  UPDATE_USER_CONNECTION,
+} from '@/lib/gql'
+import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
-
-const UPDATE_EMOTE_SET = gql`
-  mutation UpdateEmoteSet($id: ObjectID!, $data: UpdateEmoteSetInput!) {
-    emoteSet(id: $id) {
-      update(data: $data) {
-        id
-        name
-        __typename
-      }
-      __typename
-    }
-  }
-`
-
-const CREATE_EMOTE_SET = gql`
-  mutation CreateEmoteSet($user_id: ObjectID!, $data: CreateEmoteSetInput!) {
-    createEmoteSet(user_id: $user_id, data: $data) {
-      id
-      name
-      capacity
-      owner {
-        id
-        display_name
-        style {
-          color
-          __typename
-        }
-        avatar_url
-        __typename
-      }
-      emotes {
-        id
-        name
-        __typename
-      }
-      __typename
-    }
-  }
-`
-
-const UPDATE_USER_CONNECTION = gql`
-  mutation UpdateUserConnection($id: ObjectID!, $conn_id: String!, $d: UserConnectionUpdate!) {
-    user(id: $id) {
-      connections(id: $conn_id, data: $d) {
-        id
-        platform
-        display_name
-        emote_set_id
-        __typename
-      }
-      __typename
-    }
-  }
-`
-
-const GET_USER_EMOTE_SETS = gql`
-  query GetUserEmoteSets($id: ObjectID!) {
-    user(id: $id) {
-      id
-      emote_sets {
-        id
-        name
-        flags
-        capacity
-        emote_count
-        origins {
-          id
-          weight
-          __typename
-        }
-        owner {
-          id
-          display_name
-          style {
-            color
-            __typename
-          }
-          avatar_url
-          connections {
-            id
-            emote_capacity
-            emote_set_id
-            platform
-            display_name
-            __typename
-          }
-          __typename
-        }
-        __typename
-      }
-      __typename
-    }
-  }
-`
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
