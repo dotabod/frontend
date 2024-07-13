@@ -214,15 +214,6 @@ function Clear-ResourceAllocation {
 # Main Logic
 Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation } | Out-Null
 
-# Check if running as administrator
-if (!([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-  Write-Log "This script must be run as an administrator. Reopening as admin." "ERROR"
-  # Restart the script with administrator privileges
-  Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-  Read-Host -Prompt "Press Enter to exit"
-  return
-}
-
 try {
   $listenerInfo = Start-HttpListener -Port 8089
   if ($null -eq $listenerInfo) {
@@ -496,24 +487,33 @@ finally {
   $dota2Process = Get-Process -Name "dota2" -ErrorAction SilentlyContinue
   if ($null -ne $dota2Process) {
     # Prompt to restart Dota 2
-    Read-Host -Prompt "Press Enter to restart the Dota 2 client, or Ctrl + C to exit"
+    Read-Host -Prompt "(Required) You must restart Dota 2. Press Enter to restart the Dota 2 client, or Ctrl + C to exit"
     Write-Log "Restarting the Dota 2 client..." "INFO"
 
-    $dota2Process | Stop-Process -Force
-    Start-Sleep -Seconds 5 # Wait for the process to fully exit
+    try {
+      $dota2Process | Stop-Process -Force
+      Start-Sleep -Seconds 5 # Wait for the process to fully exit
 
-    # Assuming Steam is installed in the default location on Windows
-    $steamPath = "C:\Program Files (x86)\Steam\steam.exe"
-    $dota2AppId = 570
+      # Assuming Steam is installed in the default location on Windows
+      $steamPath = "C:\Program Files (x86)\Steam\steam.exe"
+      $dota2AppId = 570
 
-    # Start Dota 2 via Steam
-    if (Test-Path $steamPath) {
-      Start-Process $steamPath -ArgumentList "-applaunch $dota2AppId"
-      Write-Log "Dota 2 client is opening." "INFO"
+      # Start Dota 2 via Steam
+      if (Test-Path $steamPath) {
+        Start-Process $steamPath -ArgumentList "-applaunch $dota2AppId"
+        Write-Log "Dota 2 client is opening." "INFO"
+      }
+      else {
+        Write-Log "Steam not found. Please start Dota 2 manually." "ERROR"
+      }
     }
-    else {
-      Write-Log "Steam not found. Please start Dota 2 manually." "ERROR"
+    catch {
+      Write-Log "Failed to quit Dota 2. Please restart Dota 2 manually." "ERROR"
     }
+
+  }
+  else {
+    Write-Log "Dota 2 process not found. No action required." "INFO"
   }
 
   Read-Host -Prompt "Press Enter to exit"
