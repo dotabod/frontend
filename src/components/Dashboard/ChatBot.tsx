@@ -1,3 +1,4 @@
+import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
 import { Button, List, Spin, Tooltip } from 'antd'
@@ -29,6 +30,7 @@ const emotesRequired = [
 ]
 
 export default function ChatBot() {
+  const { data, loading: loadingAccounts } = useUpdateAccount()
   const session = useSession()
   const [emotes, setEmotes] = useState([])
   const [user, setUser] = useState(null)
@@ -88,22 +90,50 @@ export default function ChatBot() {
     }
   }, [user?.hasDotabodEmoteSet, user?.hasDotabodEditor])
 
+  const stepOneComplete = !loadingAccounts && data?.accounts?.length
+  const stepTwoComplete = user?.id
+  const stepThreeComplete = user?.hasDotabodEditor
+  const stepFourComplete = user?.hasDotabodEmoteSet
+  const initialStep = [
+    stepOneComplete,
+    stepTwoComplete,
+    stepThreeComplete,
+    stepFourComplete,
+  ].filter(Boolean).length
+
+  if (loading || loadingAccounts) {
+    return (
+      <Card>
+        <Spin size="large" />
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <StepComponent
+        initialStep={initialStep}
         steps={[
           <span className="flex flex-col space-y-4" key={0}>
-            <div>
-              <span>
-                Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell
-                it
-              </span>
-              <span className="text-xs text-gray-500">
-                {' '}
-                (you can change it later)
-              </span>
-            </div>
-            <MmrForm hideText={true} />
+            {!data?.accounts?.length ? (
+              <>
+                <div>
+                  <span>
+                    Dotabod doesn&apos;t know your MMR right now, so let&apos;s
+                    tell it
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {' '}
+                    (you can change it later)
+                  </span>
+                </div>
+                <MmrForm hideText={true} />
+              </>
+            ) : (
+              <div>
+                <span>Dotabod knows your MMR!</span>
+              </div>
+            )}
           </span>,
           <div key={1} className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">

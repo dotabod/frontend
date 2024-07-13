@@ -10,8 +10,11 @@ import { useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import useSWR from 'swr'
 
-export const StepComponent: React.FC<{ steps: ReactNode[] }> = ({ steps }) => {
-  const [current, setCurrent] = useState(0)
+export const StepComponent: React.FC<{
+  steps: ReactNode[]
+  initialStep?: number
+}> = ({ steps, initialStep = 0 }) => {
+  const [current, setCurrent] = useState(initialStep)
 
   const onChange = (value: number) => {
     setCurrent(value)
