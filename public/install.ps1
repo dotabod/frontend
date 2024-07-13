@@ -219,7 +219,8 @@ if (!([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]
   Write-Log "This script must be run as an administrator. Reopening as admin." "ERROR"
   # Restart the script with administrator privileges
   Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-  exit
+  Read-Host -Prompt "Press Enter to exit"
+  return
 }
 
 try {
