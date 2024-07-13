@@ -20,6 +20,7 @@ function Write-Log {
   }
 }
 
+
 # Port Management Functions
 function Test-PortAvailability {
   param ([int]$Port)
@@ -212,6 +213,14 @@ function Clear-ResourceAllocation {
 
 # Main Logic
 Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation } | Out-Null
+
+# Check if running as administrator
+if (!([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  Write-Log "This script must be run as an administrator. Reopening as admin." "ERROR"
+  # Restart the script with administrator privileges
+  Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+  exit
+}
 
 try {
   $listenerInfo = Start-HttpListener -Port 8089
