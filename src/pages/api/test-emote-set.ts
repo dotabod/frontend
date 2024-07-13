@@ -10,8 +10,7 @@ import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // @ts-expect-error ?? this is what docs tell me to do
-  const authHeader = req?.headers?.get?.('authorization')
+  const authHeader = req?.headers?.authorization
   if (
     !process.env.CRON_SECRET ||
     authHeader !== `Bearer ${process.env.CRON_SECRET}`
