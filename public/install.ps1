@@ -319,23 +319,39 @@ try {
 
   # Detect DOTA2 Path from Steam library folders
   $libraryFolders = Get-Content "$steam\steamapps\libraryfolders.vdf" -Raw
-  $libfs = $null
-  if ($null -ne $libraryFolders) {
-    $libfs = $libraryFolders | Select-String -Pattern '\"path\".+\"(.+?)\"' | ForEach-Object { $_.Matches.Groups[1].Value } | ForEach-Object {
-      $libfsPath = $_ -replace '\\\\', '\'
-      if ((Test-Path "$libfsPath\steamapps\appmanifest_570.acf") -and (Test-Path "$libfsPath\steamapps\common\dota 2 beta\game\core\pak01_dir.vpk")) {
-        $libfsPath
-      }
+  $content = Get-Content "$steam\steamapps\libraryfolders.vdf"
+
+  # Match the pattern in the VDF content
+  $pattern = '(?s)"(\d+)"\s*{\s*"path"\s*"([^"]+)"(?:.*?"apps"\s*{\s*(.*?)\s*})?'
+  $matchesList = [regex]::Matches($libraryFolders, $pattern)
+  Write-Log "Number of game folders found: $($matchesList.Count)" "DEBUG"
+
+  # Initialize the variable to store the path containing app ID 570
+  $appPath = ""
+
+  foreach ($match in $matchesList) {
+    $path = $match.Groups[2].Value
+    $apps = $match.Groups[3].Value
+
+    if ($apps -match '"570"') {
+      $appPath = $path
+      $appPath = $path -replace '\\\\', '\'
+      Write-Log "Found app 570 in path: $appPath" "DEBUG"
+      break
     }
-    Write-Log "Detected Dota 2 installation path: $libfs" "DEBUG"
   }
 
+  Write-Log "Detected Dota 2 installation path: $appPath" "DEBUG"
+
   # Assign Paths
-  $steamapps = if ($null -ne $libfs) {
-    $libfs = $libfs -replace '\\\\', '\'
-    Join-Path $libfs 'steamapps'
+  $steamapps = if ($null -ne $appPath) {
+    Write-Log "Assigned Dota 2 library folder: $appPath" "DEBUG"
+    Join-Path $appPath 'steamapps'
   }
-  else { Join-Path $steam 'steamapps' }
+  else {
+    Write-Log "Assigned default Steam library folder." "DEBUG"
+    Join-Path $steam 'steamapps'
+  }
   $dota2 = Join-Path $steamapps 'common\dota 2 beta'
   $gsi = Join-Path $dota2 'game\dota\cfg\gamestate_integration'
   Write-Log "Assigned Dota 2 game path: $dota2" "DEBUG"
