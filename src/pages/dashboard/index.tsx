@@ -5,13 +5,14 @@ import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
-import { Alert, Button, Steps, Tag } from 'antd'
+import { Alert, Button, Steps } from 'antd'
+import { Collapse } from 'antd'
 import confetti from 'canvas-confetti'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 const SetupPage = () => {
@@ -19,25 +20,45 @@ const SetupPage = () => {
   const isLive = data?.stream_online
 
   const [active, setActive] = useState(0)
+  const router = useRouter()
+
+  const updateStepInUrl = (newActiveStep) => {
+    // Update the URL without adding a new history entry
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, step: newActiveStep + 1 }, // +1 to make it 1-indexed for the URL
+      },
+      undefined,
+      { shallow: true }
+    ) // `shallow: true` to not trigger data fetching methods again
+  }
+
   const nextStep = () =>
-    setActive((current) => (current < 3 ? current + 1 : current))
+    setActive((current) => {
+      const nextStep = current < 3 ? current + 1 : current
+      updateStepInUrl(nextStep)
+      return nextStep
+    })
+
   const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current))
+    setActive((current) => {
+      const prevStep = current > 0 ? current - 1 : current
+      updateStepInUrl(prevStep)
+      return prevStep
+    })
+
   const maxStepIndex = 3
 
-  const router = useRouter()
-  const { step } = router.query
-
   useEffect(() => {
-    // Assuming the maximum step index is 3 (for a total of 4 steps)
-    const parsedStep = Number.parseInt(step as string)
+    const parsedStep = Number.parseInt(router.query.step as string)
 
     setActive(
       !Number.isNaN(parsedStep) && parsedStep > 0
         ? Math.min(parsedStep - 1, maxStepIndex)
         : 0
     )
-  }, [step]) // Dependency array, re-run effect when `step` changes
+  }, [router.query.step]) // Dependency array, re-run effect when `step` changes
 
   useEffect(() => {
     if (active === maxStepIndex) {
@@ -113,23 +134,48 @@ const SetupPage = () => {
           </div>
           <div>
             <p>
-              Test it by watching a live match. Type <Tag>!np</Tag> while
-              spectating and you should see Dotabod respond in your Twitch chat.
-              Visit the <Link href="overlay">Live Preview page</Link> to confirm
-              the overlay is showing. You should see the minimap blocker overlay
-              once you&apos;re in a match.
+              You can either hop into a match right away, or you can test
+              Dotabod first.
             </p>
-          </div>
-          <div className="flex flex-col items-center justify-center space-x-4">
-            <div>
-              <Image
-                alt="watch live match"
-                width={1320}
-                height={3161}
-                className="rounded-xl"
-                src="https://i.imgur.com/dwa1ie0.png"
-              />
-            </div>
+            <Collapse
+              accordion
+              items={[
+                {
+                  label: 'How to test Dotabod',
+                  children: (
+                    <>
+                      <ol className="list-decimal list-inside">
+                        <li>
+                          Demo any hero to get Dotabod to recognize your Steam
+                          account.
+                        </li>
+                        <li>
+                          While demoing, visit the{' '}
+                          <Link href="/overlay">Live Preview page</Link> to
+                          confirm the overlay is showing.
+                        </li>
+                        <li>
+                          Having trouble? Visit the{' '}
+                          <Link href="/dashboard/troubleshoot">
+                            Troubleshooting page
+                          </Link>{' '}
+                          to get help.
+                        </li>
+                      </ol>
+                      <div className="flex flex-col items-center justify-center space-x-4">
+                        <Image
+                          alt="crystsal maiden demo hero"
+                          width={2384}
+                          height={1506}
+                          className="rounded-xl"
+                          src="https://i.imgur.com/nJrBvdf.png"
+                        />
+                      </div>
+                    </>
+                  ),
+                },
+              ]}
+            />
           </div>
         </Card>
       ),
@@ -160,7 +206,14 @@ const SetupPage = () => {
         title="Setup"
       />
 
-      <Steps current={active} onChange={setActive} items={steps} />
+      <Steps
+        current={active}
+        onChange={(newActiveStep) => {
+          setActive(newActiveStep)
+          updateStepInUrl(newActiveStep)
+        }}
+        items={steps}
+      />
 
       {steps[active].content}
 

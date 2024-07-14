@@ -1,14 +1,14 @@
-import Head from 'next/head'
-
+import { Container } from '@/components/Container'
 import { UserAuthForm } from '@/components/Homepage/AuthForm'
-import { AuthLayout } from '@/components/Homepage/AuthLayout'
+import HomepageShell from '@/components/Homepage/HomepageShell'
+import type { NextPageWithLayout } from '@/pages/_app'
 import * as Sentry from '@sentry/nextjs'
 import { App } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { type ReactElement, useEffect } from 'react'
 
-export default function Login() {
+const Login: NextPageWithLayout = () => {
   const { status } = useSession()
   const { message } = App.useApp()
   const router = useRouter()
@@ -81,16 +81,26 @@ export default function Login() {
   if (status === 'authenticated') return null
 
   return (
-    <>
-      <Head>
-        <title>Sign In - Dotabod</title>
-      </Head>
-      <AuthLayout
-        title="Sign in"
-        subtitle="You can begin using Dotabod right away!"
-      >
-        <UserAuthForm />
-      </AuthLayout>
-    </>
+    <Container>
+      <div className="flex flex-col justify-center mx-auto w-full max-w-2xl px-4 sm:px-6 h-full">
+        <div className="sm:mt-16">
+          <h1 className="text-center text-2xl font-medium tracking-tight text-gray-200">
+            Sign in
+          </h1>
+          <p className="mt-3 text-center text-lg text-gray-300">
+            You can begin using Dotabod right away!
+          </p>
+        </div>
+        <div className="-mx-4 mt-10 flex-auto bg-gray-700 px-4 shadow-2xl shadow-gray-900/10 sm:mx-0 sm:flex-none sm:rounded-5xl sm:p-24">
+          <UserAuthForm />
+        </div>
+      </div>
+    </Container>
   )
 }
+
+Login.getLayout = function getLayout(page: ReactElement) {
+  return <HomepageShell title="Sign In | Dotabod">{page}</HomepageShell>
+}
+
+export default Login

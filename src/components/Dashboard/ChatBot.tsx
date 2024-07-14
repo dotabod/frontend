@@ -35,7 +35,7 @@ export default function ChatBot() {
   const [emotes, setEmotes] = useState([])
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const stvUrl = `https://7tv.io/v3/users/twitch/${session.data.user.twitchId}`
+  const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`
 
   useEffect(() => {
     const fetchUserData = async () => {
