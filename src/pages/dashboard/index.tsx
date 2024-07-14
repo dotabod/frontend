@@ -164,7 +164,7 @@ const SetupPage = () => {
                       </ol>
                       <div className="flex flex-col items-center justify-center space-x-4">
                         <Image
-                          alt="crystsal maiden demo hero"
+                          alt="crystal maiden demo hero"
                           width={2384}
                           height={1506}
                           className="rounded-xl"
