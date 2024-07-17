@@ -213,6 +213,13 @@ function Clear-ResourceAllocation {
 # Main Logic
 Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation } | Out-Null
 
+# Check connectivity to Dotabod GSI link
+$gsiUrl = "https://gsi.dotabod.com"
+if (-not (Test-NetworkConnection -Url $gsiUrl)) {
+  Write-Log "Your PC can't access the Dotabod GSI server. This is likely due to a firewall issue or your internet service provider blocking it. In certain places like China or Kazakhstan, it is blocked. You may have to use a VPN like https://1.1.1.1 to use Dotabod." "ERROR"
+  return
+}
+
 try {
   $listenerInfo = Start-HttpListener -Port 8089
   if ($null -eq $listenerInfo) {
