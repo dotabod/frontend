@@ -7,8 +7,9 @@ import clsx from 'clsx'
 type WLType = {
   mainScreen?: boolean
   wl: { win: number; lose: number; type: string }[]
+  className?: string
 }
-const WinLossCard = ({ mainScreen = false, wl, ...props }: WLType) => {
+const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
   const { data: isEnabled } = useUpdateSetting(Settings.commandWL)
   const res = useTransformRes()
 
@@ -18,11 +19,13 @@ const WinLossCard = ({ mainScreen = false, wl, ...props }: WLType) => {
   return (
     <Card
       className={clsx(
-        'rounded-r-none',
-        mainScreen && 'bg-transparent p-0 leading-none text-[#e4d98d]'
+        !className && 'rounded-r-none',
+        !className &&
+          mainScreen &&
+          'bg-transparent p-0 leading-none text-[#e4d98d]',
+        className
       )}
       id="win-loss-card"
-      {...props}
     >
       {wl.map(({ win, lose, type }) => (
         <div

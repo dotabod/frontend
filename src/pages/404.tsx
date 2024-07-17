@@ -1,6 +1,8 @@
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import type { NextPageWithLayout } from '@/pages/_app'
 import type { ReactElement } from 'react'
-function NotFound() {
+
+const NotFound: NextPageWithLayout = () => {
   // Opinionated: do not record an exception in Sentry for 404
   return (
     <div

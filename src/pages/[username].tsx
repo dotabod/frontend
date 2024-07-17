@@ -3,6 +3,7 @@ import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
+import type { NextPageWithLayout } from '@/pages/_app'
 import { Empty, Input, Segmented } from 'antd'
 import { ExternalLinkIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -11,7 +12,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
 
-const CommandsPage = () => {
+const CommandsPage: NextPageWithLayout = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')

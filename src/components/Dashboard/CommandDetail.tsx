@@ -11,7 +11,7 @@ const CommandDetail = {
     cmd: '!toggle',
     alias: ['enable', 'disable'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -27,7 +27,7 @@ const CommandDetail = {
     cmd: '!online',
     alias: ['offline', 'forceonline', 'forceoffline'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!online"
@@ -42,7 +42,7 @@ const CommandDetail = {
     cmd: '!mute',
     alias: ['unmute'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -58,7 +58,7 @@ const CommandDetail = {
     cmd: '!fixparty',
     alias: ['fixsolo'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!fixparty"
@@ -77,7 +77,7 @@ const CommandDetail = {
     cmd: '!refresh',
     alias: [],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -94,7 +94,7 @@ const CommandDetail = {
     cmd: '!steam',
     alias: ['steamid', 'account'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -109,7 +109,7 @@ const CommandDetail = {
     cmd: '!setmmr',
     alias: ['mmr=', 'mmrset'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -125,7 +125,7 @@ const CommandDetail = {
     cmd: '!beta',
     alias: ['joinbeta', 'leavebeta', 'betaoff', 'betaon'],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -142,7 +142,7 @@ const CommandDetail = {
     cmd: '!pleb',
     alias: [],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -159,7 +159,7 @@ const CommandDetail = {
     cmd: '!modsonly',
     alias: [],
     allowed: 'mods',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         modOnly
@@ -195,7 +195,7 @@ const CommandDetail = {
     cmd: '!commands',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!commands"
@@ -212,7 +212,7 @@ const CommandDetail = {
     cmd: '!ranked',
     alias: ['isranked'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!ranked"
@@ -228,7 +228,7 @@ const CommandDetail = {
     cmd: '!avg',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!avg"
@@ -244,7 +244,7 @@ const CommandDetail = {
     cmd: '!opendota',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!opendota"
@@ -261,7 +261,7 @@ const CommandDetail = {
     cmd: '!dotabuff',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!dotabuff"
@@ -276,7 +276,7 @@ const CommandDetail = {
     cmd: '!xpm',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat {...props} command="!xpm" response="Live XPM: 778" />
     ),
   },
@@ -288,7 +288,7 @@ const CommandDetail = {
     cmd: '!wl',
     alias: ['score', 'winrate', 'wr'],
     allowed: 'all',
-    response: (props, all = true) => (
+    response: (props: Record<string, any> = {}, all = true) => (
       <>
         <TwitchChat
           {...props}
@@ -313,7 +313,7 @@ const CommandDetail = {
     cmd: '!mmr',
     alias: ['rank', 'medal'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!mmr"
@@ -329,7 +329,7 @@ const CommandDetail = {
     cmd: '!gpm',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!gpm"
@@ -345,7 +345,7 @@ const CommandDetail = {
     cmd: '!apm',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat {...props} command="!apm" response="Live APM: 123" />
     ),
   },
@@ -357,7 +357,7 @@ const CommandDetail = {
     cmd: '!np',
     alias: ['who', 'players'],
     allowed: 'all',
-    response: (props, all = true) => (
+    response: (props: Record<string, any> = {}, all = true) => (
       <div className="space-y-6">
         <TwitchChat
           {...props}
@@ -432,7 +432,7 @@ const CommandDetail = {
     cmd: '!smurfs',
     alias: ['lifetimes', 'totals', 'games', 'smurf'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!smurfs"
@@ -447,7 +447,7 @@ const CommandDetail = {
     cmd: '!gm',
     alias: ['medals', 'ranks'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!gm"
@@ -462,7 +462,7 @@ const CommandDetail = {
     cmd: '!lg',
     alias: ['lastgame'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!lg"
@@ -477,7 +477,7 @@ const CommandDetail = {
     cmd: '!ping',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat {...props} command="!ping" response="Pong EZ Clap" />
     ),
   },
@@ -487,7 +487,7 @@ const CommandDetail = {
     cmd: '!dotabod',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!dotabod"
@@ -503,7 +503,7 @@ const CommandDetail = {
     cmd: '!lgs',
     alias: ['lastgamescore', 'lgscore', 'lgwl'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!lgs"
@@ -519,7 +519,7 @@ const CommandDetail = {
     cmd: '!profile',
     alias: ['stats', 'check'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <>
         <TwitchChat
           {...props}
@@ -542,7 +542,7 @@ const CommandDetail = {
     cmd: '!hero',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <>
         <TwitchChat
           {...props}
@@ -565,7 +565,7 @@ const CommandDetail = {
     cmd: '!builds',
     alias: ['dota2pt', 'build', 'd2pt', 'getbuild'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!builds"
@@ -581,7 +581,7 @@ const CommandDetail = {
     cmd: '!delay',
     alias: ['streamdelay'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!delay"
@@ -596,7 +596,7 @@ const CommandDetail = {
     cmd: '!rosh',
     alias: ['aegis'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!rosh"
@@ -612,7 +612,7 @@ const CommandDetail = {
     cmd: '!items',
     alias: ['item'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!items marci"
@@ -626,7 +626,7 @@ const CommandDetail = {
     cmd: '!version',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!version"
@@ -640,7 +640,7 @@ const CommandDetail = {
     cmd: '!resetwl',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!resetwl"
@@ -654,7 +654,7 @@ const CommandDetail = {
     cmd: '!locale',
     alias: ['translation', 'translatedby'],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!locale"
@@ -669,7 +669,7 @@ const CommandDetail = {
     cmd: '!facet jug 2',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!facet"
@@ -684,7 +684,7 @@ const CommandDetail = {
     cmd: '!wp',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!wp"
@@ -700,7 +700,7 @@ const CommandDetail = {
     cmd: '!spectators',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!spectators"
@@ -715,7 +715,7 @@ const CommandDetail = {
     cmd: '!innate 4',
     alias: [],
     allowed: 'all',
-    response: (props) => (
+    response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
         command="!innate"
