@@ -173,7 +173,7 @@ const WindowsInstaller = () => {
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
-          <Link target="_blank" href="https://discord.dotabod.com">
+          <Link target="_blank" href="https://help.dotabod.com">
             on Discord
           </Link>
           , and then try{' '}

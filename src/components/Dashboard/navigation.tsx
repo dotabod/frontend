@@ -118,7 +118,7 @@ export const navigation = [
   },
   {
     name: 'Changelog',
-    href: 'https://discord.com/channels/1039887907705593876/1069124160179163146',
+    href: 'https://updates.dotabod.com',
     icon: NewspaperIcon,
   },
 ]
