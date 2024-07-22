@@ -28,7 +28,9 @@ function InstallPage() {
 
   useEffect(() => {
     const parsedStep = router.query.gsiType as string
-    setActiveKey(parsedStep)
+    if (parsedStep === 'windows' || parsedStep === 'manual') {
+      setActiveKey(parsedStep)
+    }
   }, [router.query.gsiType])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only run this effect once on load
@@ -57,6 +59,7 @@ function InstallPage() {
   return (
     <Card>
       <Tabs
+        destroyInactiveTabPane
         defaultActiveKey={activeKey}
         activeKey={activeKey}
         onChange={updateUrlWithGsiType}
