@@ -6,12 +6,32 @@ import {
   WindowsOutlined,
 } from '@ant-design/icons'
 import { Tabs } from 'antd'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import WindowsInstaller from './WindowsInstaller'
 
 function InstallPage() {
   const [activeKey, setActiveKey] = useState('windows')
+  const router = useRouter()
 
+  const updateUrlWithGsiType = (newGsiType: 'windows' | 'manual') => {
+    // Update the URL without adding a new history entry
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, gsiType: newGsiType },
+      },
+      undefined,
+      { shallow: true }
+    ) // `shallow: true` to not trigger data fetching methods again
+  }
+
+  useEffect(() => {
+    const parsedStep = router.query.gsiType as string
+    setActiveKey(parsedStep)
+  }, [router.query.gsiType])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run this effect once on load
   useEffect(() => {
     const determinePlatform = () => {
       // @ts-expect-error userAgentData is not yet in the TS types
@@ -24,11 +44,13 @@ function InstallPage() {
       return navigator.userAgent.toLowerCase()
     }
 
-    const platform = determinePlatform()
-    if (platform.includes('win')) {
-      setActiveKey('windows')
-    } else {
-      setActiveKey('unix')
+    if (!router.query.gsiType) {
+      const platform = determinePlatform()
+      if (platform.includes('win')) {
+        updateUrlWithGsiType('windows')
+      } else {
+        updateUrlWithGsiType('manual')
+      }
     }
   }, [])
 
@@ -37,17 +59,17 @@ function InstallPage() {
       <Tabs
         defaultActiveKey={activeKey}
         activeKey={activeKey}
-        onChange={setActiveKey}
+        onChange={updateUrlWithGsiType}
         items={[
           {
             key: 'windows',
-            label: 'Windows',
+            label: 'Automatic',
             children: <WindowsInstaller />,
             icon: <WindowsOutlined />,
           },
           {
-            key: 'unix',
-            label: 'Unix',
+            key: 'manual',
+            label: 'Manual',
             children: <UnixInstaller />,
             icon: (
               <>

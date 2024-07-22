@@ -1,8 +1,12 @@
-import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons'
+import {
+  ExclamationCircleOutlined,
+  LoadingOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons'
 import { Alert } from 'antd'
 import { Steps } from 'antd'
 import { useSession } from 'next-auth/react'
-import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactNode, useEffect, useState } from 'react'
 import CodeBlock from './CodeBlock'
@@ -71,7 +75,6 @@ const WindowsInstaller = () => {
   const sanitizedPort = Number.isNaN(port)
     ? 8089
     : Math.min(Math.max(port, 8000), 9000)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
@@ -102,7 +105,6 @@ const WindowsInstaller = () => {
     if (!success && !error && sanitizedPort) {
       const fetchToken = async () => {
         try {
-          setLoading(true)
           const response = await fetch(
             `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user.id)}`,
             { method: 'GET', headers: { 'Content-Type': 'application/json' } }
@@ -110,7 +112,6 @@ const WindowsInstaller = () => {
           if (!response.ok) {
             throw new Error('Network response was not ok')
           }
-          setLoading(false)
           setCurrentStep(2)
           setSuccess(true)
           setTimeout(() => {
@@ -145,21 +146,11 @@ const WindowsInstaller = () => {
 
   return (
     <>
-      <div className="mb-4 space-x-2">
-        <span>
-          <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
-          data Dotabod requires. It&apos;s a Valve approved way of getting game
-          data.
-        </span>
-        <Image
-          className="inline"
-          alt="ok emote"
-          unoptimized
-          src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
-          width={28}
-          height={28}
-        />
-      </div>
+      <p>
+        <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
+        data Dotabod requires. It&apos;s a Valve approved way of getting game
+        data.
+      </p>
       <div className="flex flex-row justify-center pt-4">
         <CodeBlock />
       </div>
@@ -178,6 +169,17 @@ const WindowsInstaller = () => {
           showIcon
         />
       )}
+      <p className="space-x-2">
+        <QuestionCircleOutlined />
+        <span>
+          Having trouble? Let us know what happened{' '}
+          <Link target="_blank" href="https://discord.dotabod.com">
+            on Discord
+          </Link>
+          , and then try{' '}
+          <Link href="/dashboard?step=2&gsiType=manual">the manual steps</Link>.
+        </span>
+      </p>
       {error && (
         <Alert
           className="max-w-2xl"
