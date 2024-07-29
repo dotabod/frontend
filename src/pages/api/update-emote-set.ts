@@ -46,8 +46,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       GET_USER_EMOTE_SETS,
       getUserEmoteSetsVariables
     )
-    const existingEmoteSet = data?.user?.emote_sets?.[0] || null
-    let emoteSetId = existingEmoteSet?.id
+
+    // Find the emote set that has the twitch connection
+    const existingEmoteSet = data?.user?.emote_sets?.find(
+      (es) =>
+        es.owner?.connections?.find(
+          (c) => Number.parseInt(c.id, 10) === Number.parseInt(twitchId, 10)
+        ) !== undefined
+    )
+    let emoteSetId = stvResponse?.emote_set?.id || existingEmoteSet?.id
 
     if (!emoteSetId) {
       const createEmoteSetVariables = {
