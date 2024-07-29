@@ -11,7 +11,7 @@ import MmrForm from './Features/MmrForm'
 
 const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
-const emotesRequired = [
+export const emotesRequired = [
   { label: 'HECANT', id: '62978b4c441e9cea5e91f9e7' },
   { label: 'Okayeg', id: '603caa69faf3a00014dff0b1' },
   { label: 'Happi', id: '645defc42769a28df1a4487f' },
@@ -48,8 +48,8 @@ export default function ChatBot() {
           hasDotabodEditor: !!data.user?.editors?.find(
             (editor) => editor.id === '63d688c3a897cb667b7e601b'
           ),
-          hasDotabodEmoteSet: !!data.emote_set?.origins?.find(
-            (origin) => origin.id === '6685a8c5a3a3e500d5d42714'
+          hasDotabodEmoteSet: !!emotesRequired.every(
+            (emote) => data.emote_set?.emotes?.find((e) => e.name === emote.label)
           ),
         }
 

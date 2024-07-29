@@ -1,10 +1,12 @@
+import { emotesRequired } from '@/components/Dashboard/ChatBot'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import {
+  CHANGE_EMOTE_IN_SET,
   CREATE_EMOTE_SET,
+  GET_EMOTE_SET_FOR_CARD,
   GET_USER_EMOTE_SETS,
-  UPDATE_EMOTE_SET,
   UPDATE_USER_CONNECTION,
 } from '@/lib/gql'
 import { GraphQLClient } from 'graphql-request'
@@ -25,7 +27,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const twitchId = session?.user?.twitchId
 
   try {
-    // Step 1: Initialize GraphQL client
     const client = new GraphQLClient('https://7tv.io/v3/gql', {
       headers: {
         Cookie: `seventv-auth=${process.env.SEVENTV_AUTH}`,
@@ -37,7 +38,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     )
     const stvResponse = await response.json()
 
-    // Step 2: Fetch existing emote set data with GraphQL
     const getUserEmoteSetsVariables = {
       id: stvResponse?.user?.id,
     }
@@ -47,16 +47,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       getUserEmoteSetsVariables
     )
     const existingEmoteSet = data?.user?.emote_sets?.[0] || null
-    const existingOrigins = existingEmoteSet?.origins || []
-    const newOrigin = { id: '6685a8c5a3a3e500d5d42714', weight: 0 }
-
-    if (existingOrigins.find((origin) => origin.id === newOrigin.id)) {
-      return res.status(200).json({ message: 'Emote set already updated' })
-    }
-
     let emoteSetId = existingEmoteSet?.id
 
-    // Step 3: Create a new emote set if none exists
     if (!emoteSetId) {
       const createEmoteSetVariables = {
         user_id: stvResponse?.user?.id,
@@ -69,7 +61,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       emoteSetId = createEmoteSetResult.createEmoteSet.id
     }
 
-    // Step 4: Update the user connection with the new emote set ID
     const updateUserConnectionVariables = {
       id: stvResponse?.user?.id,
       conn_id: twitchId,
@@ -78,29 +69,116 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     await client.request(UPDATE_USER_CONNECTION, updateUserConnectionVariables)
 
-    // Step 5: Prepare the update data for the emote set
-    const updatedOrigins = [...existingOrigins, newOrigin]
-    const updateData = {
-      name: existingEmoteSet?.name,
-      capacity: existingEmoteSet?.capacity,
-      origins: updatedOrigins,
-    }
-
-    const updateEmoteSetVariables = {
+    console.log('Checking existing emotes in the emote set...')
+    const userEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
       id: emoteSetId,
-      data: updateData,
+      limit: 100,
+    })) as {
+      emoteSet: {
+        emote_count: number
+        capacity: number
+        flags: number
+        emotes: Array<{
+          id: string
+          name: string
+          data: {
+            id: string
+            name: string
+            host: {
+              url: string
+              files: Array<{
+                name: string
+                format: string
+              }>
+            }
+          }
+        }>
+      }
+    }
+    if (!userEmoteSet) {
+      throw new Error('Emote set not found')
     }
 
-    const result = await client.request(
-      UPDATE_EMOTE_SET,
-      updateEmoteSetVariables
+    const existingEmoteNames = userEmoteSet.emoteSet.emotes.map((e) => e.name)
+    const emotesAlreadyInSet = emotesRequired.every((emote) =>
+      existingEmoteNames.includes(emote.label)
     )
 
-    return res
-      .status(200)
-      .json({ message: 'Emote set updated successfully', result })
+    if (emotesAlreadyInSet) {
+      return res.status(200).json({ message: 'Emote set already updated' })
+    }
+
+    console.log('Adding emotes to emote set...')
+    for (const emote of emotesRequired) {
+      try {
+        await client.request(CHANGE_EMOTE_IN_SET, {
+          id: emoteSetId,
+          action: 'ADD',
+          name: emote.label,
+          emote_id: emote.id,
+        })
+      } catch (error) {
+        console.log(`Error adding emote ${emote.label}:`, error)
+        await client.request(CHANGE_EMOTE_IN_SET, {
+          id: emoteSetId,
+          action: 'REMOVE',
+          name: emote.label,
+          emote_id: userEmoteSet.emoteSet.emotes.find(
+            (e) => e.name === emote.label
+          )?.id,
+        })
+        await client.request(CHANGE_EMOTE_IN_SET, {
+          id: emoteSetId,
+          action: 'ADD',
+          name: emote.label,
+          emote_id: emote.id,
+        })
+      }
+    }
+
+    console.log('Verifying emote set update...')
+    const updatedEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
+      id: emoteSetId,
+      limit: 100,
+    })) as {
+      emoteSet: {
+        emote_count: number
+        capacity: number
+        flags: number
+        emotes: Array<{
+          id: string
+          name: string
+          data: {
+            id: string
+            name: string
+            host: {
+              url: string
+              files: Array<{
+                name: string
+                format: string
+              }>
+            }
+          }
+        }>
+      }
+    }
+    if (!updatedEmoteSet) {
+      throw new Error('Emote set not found')
+    }
+
+    for (const emote of emotesRequired) {
+      const emoteInSet = updatedEmoteSet.emoteSet.emotes.find(
+        (e) => e.name === emote.label
+      )
+      if (!emoteInSet) {
+        throw new Error(`Emote ${emote.label} not found in set`)
+      }
+    }
+
+    console.log('Emote set update verified successfully')
+    return res.status(200).json({ message: 'Emote set updated successfully' })
   } catch (error) {
-    console.error(error)
+    console.error('Error:', error)
     return res.status(500).json({ message: 'Internal server error', error })
   }
 }
