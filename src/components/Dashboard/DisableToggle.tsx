@@ -8,7 +8,7 @@ import useSWR from 'swr'
 
 export function DisableToggle() {
   const { data } = useSWR('/api/check-ban', fetcher)
-  const { message } = App.useApp()
+  const { notification } = App.useApp()
   const user = useSession()?.data?.user
 
   const {
@@ -21,55 +21,51 @@ export function DisableToggle() {
 
   useEffect(() => {
     if (isDotabodDisabled) {
-      message.open({
+      notification.open({
         key: 'dotabod-disabled',
         type: 'warning',
         duration: 0,
-        content: (
-          <span>
-            Dotabod is currently disabled. Click the toggle to enable it.
-          </span>
-        ),
+        placement: 'bottomLeft',
+        message: 'Dotabod is currently disabled.',
+        description:
+          'Click the toggle to enable it. You will not receive any game events or commands until you do.',
       })
     } else {
-      message.destroy('dotabod-disabled')
+      notification.destroy('dotabod-disabled')
     }
-  }, [isDotabodDisabled, message])
+  }, [isDotabodDisabled, notification])
 
   useEffect(() => {
     if (data?.banned) {
-      message.open({
+      notification.open({
         key: 'dotabod-banned',
+        placement: 'bottomLeft',
         type: 'error',
         duration: 0,
-        content: (
+        message: 'Dotabod is disabled because you banned it from the channel.',
+        description: user?.name && (
           <span>
-            Dotabod is disabled because you banned it from the channel.
-            {user?.name && (
-              <>
-                <Button
-                  type="link"
-                  onClick={() => {
-                    window.open(
-                      `https://www.twitch.tv/popout/${user?.name}/viewercard/dotabod?popout=`,
-                      'mywindow',
-                      'menubar=1,resizable=1,width=350,height=250'
-                    )
-                  }}
-                  target="_blank"
-                >
-                  Click here
-                </Button>
-                to unban Dotabod
-              </>
-            )}
+            <Button
+              type="link"
+              onClick={() => {
+                window.open(
+                  `https://www.twitch.tv/popout/${user?.name}/viewercard/dotabod?popout=`,
+                  'mywindow',
+                  'menubar=1,resizable=1,width=350,height=250'
+                )
+              }}
+              target="_blank"
+            >
+              Click here
+            </Button>
+            <span>to unban Dotabod</span>
           </span>
         ),
       })
     } else {
-      message.destroy('dotabod-banned')
+      notification.destroy('dotabod-banned')
     }
-  }, [data?.banned, message, user?.name])
+  }, [data?.banned, notification, user?.name])
 
   return (
     <Tooltip
