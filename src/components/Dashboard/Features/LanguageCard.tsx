@@ -8,7 +8,6 @@ import { Card } from '@/ui/card'
 import { Button, Progress, Select, Spin } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
-import Link from 'next/link'
 import { forwardRef } from 'react'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
@@ -178,20 +177,17 @@ export default function LanguageCard() {
         />
       </div>
 
-      <div className="mt-2 flex flex-row items-center">
-        {
-          <Link
-            href={'https://crowdin.com/project/dotabod'}
-            target="_blank"
-            passHref
-          >
-            <Button loading={isLoading} className="!pl-0" type="link">
-              {languageProgress?.data?.translationProgress < 100
-                ? 'Help finish this translation on Crowdin'
-                : 'Found a translation error? Fix it on Crowdin'}
-            </Button>
-          </Link>
-        }
+      <div className="mt-2">
+        <Button
+          loading={isLoading}
+          href="https://crowdin.com/project/dotabod"
+          target="_blank"
+          type="link"
+        >
+          {languageProgress?.data?.translationProgress < 100
+            ? 'Help complete on Crowdin'
+            : 'Fix locale issues on Crowdin'}
+        </Button>
       </div>
     </Card>
   )

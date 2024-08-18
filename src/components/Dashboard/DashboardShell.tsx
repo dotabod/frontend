@@ -94,7 +94,10 @@ export default function DashboardShell({
             background: colorBgLayout,
           }}
           width={250}
-          className="border-r border-r-gray-500"
+          className={clsx(
+            'border-r border-r-gray-500',
+            collapsed && '!min-w-11 !max-w-11'
+          )}
           trigger={null}
           collapsible
           collapsed={collapsed}

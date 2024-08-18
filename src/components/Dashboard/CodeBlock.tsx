@@ -16,7 +16,7 @@ const CodeBlock = () => {
   }
 
   return (
-    <div className="mb-4 mt-0 max-w-xs sm:max-w-sm lg:max-w-2xl">
+    <div className="mb-4 mt-0 max-w-xs sm:max-w-sm lg:max-w-2xl max-w-full">
       <div className="mb-1 flex p-5 sm:p-4 xs:p-3 justify-between items-center flex-row border-2 border-purple-400 rounded text-lg sm:text-base xs:text-sm">
         <pre className="bg-gray-900 overflow-hidden text-white rounded mb-0">
           <code>
