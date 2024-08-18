@@ -126,7 +126,7 @@ const CommandsPage: NextPageWithLayout = () => {
             All commands available to use in Twitch chat with Dotabod.
           </div>
         </div>
-        <div className="flex items-baseline space-x-6 pb-6">
+        <div className="flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap">
           <Segmented
             value={enabled}
             onChange={(v) => setEnabled(v as string)}

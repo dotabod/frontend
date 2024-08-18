@@ -69,7 +69,15 @@ export default function UnixInstaller() {
 
           <div className="space-y-4">
             <div className="flex flex-col items-center space-y-4">
-              <video width="508" height="504" controls autoPlay muted loop>
+              <video
+                playsInline
+                width="508"
+                height="504"
+                controls
+                autoPlay
+                muted
+                loop
+              >
                 <source
                   src="/images/setup/how-to-create-cfg.mp4"
                   type="video/mp4"
@@ -102,7 +110,15 @@ export default function UnixInstaller() {
           </div>
 
           <div className="flex flex-col items-center space-y-4">
-            <video width="482" height="392" controls autoPlay muted loop>
+            <video
+              playsInline
+              width="482"
+              height="392"
+              controls
+              autoPlay
+              muted
+              loop
+            >
               <source
                 src="/images/setup/how-to-gsi-properties.mp4"
                 type="video/mp4"

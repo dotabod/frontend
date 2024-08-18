@@ -36,7 +36,15 @@ export default function OBSOverlay() {
       <CopyInstructions />
       <p>Paste this into the URL field when making the browser source</p>
       <div className="flex flex-col items-center space-y-4">
-        <video width="630" height="766" controls autoPlay muted loop>
+        <video
+          playsInline
+          width="630"
+          height="766"
+          controls
+          autoPlay
+          muted
+          loop
+        >
           <source src="/images/setup/how-to-obs.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
