@@ -3,8 +3,7 @@ import {
   LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
-import { Alert } from 'antd'
-import { Steps } from 'antd'
+import { Alert, Steps } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,9 +18,29 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
       title: !errorWithoutSuccess
         ? 'Connection check'
         : 'Connection check failed',
-      description: errorWithoutSuccess
-        ? 'Please try again or reach out on Discord for more help.'
-        : 'Run the script above to connect to the Dotabod installer!',
+      description: errorWithoutSuccess ? (
+        'Please try again or reach out on Discord for more help.'
+      ) : (
+        <div>
+          <div>Run the script above to connect to the Dotabod installer!</div>
+          {currentStep === 0 && (
+            <video
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-auto max-w-3xl"
+            >
+              <source
+                src="/images/setup/how-to-automated-install.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          )}
+        </div>
+      ),
     },
     {
       title: 'Process Token',
