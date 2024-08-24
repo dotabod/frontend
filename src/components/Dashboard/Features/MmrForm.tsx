@@ -126,7 +126,15 @@ const MmrForm = ({ hideText = false }) => {
                             {multiUsedBy}
                             <ExternalLinkIcon className="inline h-4 w-4" />
                           </a>
-                          removes it from their dashboard.
+                          removes it from their dashboard. Or, join our{' '}
+                          <a
+                            target="_blank"
+                            href="https://help.dotabod.com"
+                            rel="noreferrer"
+                          >
+                            Discord server
+                          </a>{' '}
+                          and type /unlink-steam.
                         </p>
                       )
                     }

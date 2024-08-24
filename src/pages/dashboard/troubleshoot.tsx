@@ -124,7 +124,12 @@ const faqs = [
             <Link href="/dashboard/features">
               the MMR tracker in the Features page
             </Link>
-            . You can then ask them to remove it from their account.
+            . You can then ask them to remove it from their account. Or, join
+            our{' '}
+            <a target="_blank" href="https://help.dotabod.com" rel="noreferrer">
+              Discord server
+            </a>{' '}
+            and type /unlink-steam.
           </span>,
         ]}
       />
