@@ -22,11 +22,11 @@ const chatBotScopes = [
 ].join(' ')
 
 const defaultScopes = [
+  'channel:bot', // Allows joining with Dotabod in the channel (new requirement by twitch)
   'channel:manage:ads', // Run ads automatically when a game ends
   'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
   'channel:manage:moderators', // To add Dotabod as a moderator (required)
   'channel:manage:polls',
-  'channel:bot', // Allows joining with Dotabod in the channel
   'channel:manage:predictions',
   'channel:read:ads', // Determine if an ad is running
   'channel:read:polls',
@@ -40,6 +40,7 @@ const defaultScopes = [
   'user:read:broadcast', // We can check if twitch tooltips extension is enabled
   'user:read:chat',
   'user:read:email',
+  'user:read:moderated_channels', // Check where the user is a moderator, for dotabod mod dashboard (coming soon)
   'user:write:chat',
 ].join(' ')
 
