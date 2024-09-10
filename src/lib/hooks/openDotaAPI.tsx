@@ -5,6 +5,7 @@ export async function getMatchData(matchId: string, heroSlot: number) {
   let isParty = false
   let isPrivate = false
   let radiantWin = null
+  let lobbyType = null
 
   // Set up the retry operation
   const operation = retry.operation({
@@ -35,6 +36,10 @@ export async function getMatchData(matchId: string, heroSlot: number) {
           if (typeof opendotaMatch?.data?.radiant_win === 'boolean') {
             radiantWin = opendotaMatch?.data?.radiant_win
           }
+
+          if (typeof opendotaMatch?.data?.lobby_type === 'number') {
+            lobbyType = opendotaMatch?.data?.lobby_type
+          }
         } else {
           if (operation.retry(new Error('Match not found'))) {
             return
@@ -43,7 +48,7 @@ export async function getMatchData(matchId: string, heroSlot: number) {
           reject(new Error('Match not found'))
         }
 
-        resolve({ matchId, isParty, isPrivate, radiantWin })
+        resolve({ matchId, isParty, isPrivate, radiantWin, lobbyType })
       } catch (e) {
         if (operation.retry(new Error('Match not found'))) {
           return
