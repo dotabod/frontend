@@ -638,8 +638,8 @@ const CommandDetail = {
     title: 'Reset win loss',
     description: 'Resets your win losses to 0-0.',
     cmd: '!resetwl',
+    allowed: 'mods',
     alias: [],
-    allowed: 'all',
     response: (props: Record<string, any> = {}) => (
       <TwitchChat
         {...props}
