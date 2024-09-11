@@ -1,7 +1,7 @@
 import axios from 'axios'
 import retry from 'retry'
 
-export async function getMatchData(matchId: string, heroSlot: number) {
+export async function getMatchData(matchId: string, heroId: number) {
   let isParty = false
   let isPrivate = false
   let radiantWin = null
@@ -22,19 +22,34 @@ export async function getMatchData(matchId: string, heroSlot: number) {
           `https://api.opendota.com/api/matches/${matchId}`
         )
 
+        const moreData = {
+          radiantScore: 0,
+          direScore: 0,
+          kills: 0,
+          deaths: 0,
+          assists: 0,
+        }
+
         if (
           Array.isArray(opendotaMatch.data?.players) &&
-          typeof heroSlot === 'number'
+          typeof heroId === 'number'
         ) {
-          isPrivate = !opendotaMatch.data?.players[heroSlot]?.account_id
-
-          const partySize = opendotaMatch.data?.players[heroSlot]?.party_size
+          const player = opendotaMatch?.data?.players.find(
+            (p) => p.hero_id === heroId
+          )
+          isPrivate = !player?.account_id
+          const partySize = player?.party_size
           if (typeof partySize === 'number' && partySize > 1) {
             isParty = true
           }
 
           if (typeof opendotaMatch?.data?.radiant_win === 'boolean') {
             radiantWin = opendotaMatch?.data?.radiant_win
+            moreData.radiantScore = opendotaMatch?.data?.radiant_score
+            moreData.direScore = opendotaMatch?.data?.dire_score
+            moreData.kills = opendotaMatch?.data?.kills
+            moreData.deaths = opendotaMatch?.data?.deaths
+            moreData.assists = opendotaMatch?.data?.assists
           }
 
           if (typeof opendotaMatch?.data?.lobby_type === 'number') {
@@ -48,7 +63,14 @@ export async function getMatchData(matchId: string, heroSlot: number) {
           reject(new Error('Match not found'))
         }
 
-        resolve({ matchId, isParty, isPrivate, radiantWin, lobbyType })
+        resolve({
+          matchId,
+          isParty,
+          isPrivate,
+          radiantWin,
+          lobbyType,
+          ...moreData,
+        })
       } catch (e) {
         if (operation.retry(new Error('Match not found'))) {
           return
