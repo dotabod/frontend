@@ -22,3 +22,7 @@ body {
   @apply bg-transparent/10;
   border-radius: 6px;
 }
+
+a:not(.ant-btn) {
+  @apply text-purple-400;
+}
