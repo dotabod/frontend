@@ -1,21 +1,22 @@
-import UnixInstaller from '@/components/Dashboard/UnixInstaller'
-import { Card } from '@/ui/card'
+'use client'
+
 import {
   AppleOutlined,
   LinuxOutlined,
   WindowsOutlined,
 } from '@ant-design/icons'
-import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import WindowsInstaller from './WindowsInstaller'
+
+import UnixInstaller from '@/components/Dashboard/UnixInstaller'
+import WindowsInstaller from '@/components/Dashboard/WindowsInstaller'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 function InstallPage() {
   const [activeKey, setActiveKey] = useState('windows')
   const router = useRouter()
 
-  const updateUrlWithGsiType = (newGsiType: 'windows' | 'manual') => {
-    // Update the URL without adding a new history entry
+  const updateUrlWithGsiType = (newGsiType: string) => {
     router.replace(
       {
         pathname: router.pathname,
@@ -23,7 +24,7 @@ function InstallPage() {
       },
       undefined,
       { shallow: true }
-    ) // `shallow: true` to not trigger data fetching methods again
+    )
   }
 
   useEffect(() => {
@@ -33,16 +34,14 @@ function InstallPage() {
     }
   }, [router.query.gsiType])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run this effect once on load
   useEffect(() => {
     const determinePlatform = () => {
-      // @ts-expect-error userAgentData is not yet in the TS types
-      if (navigator.userAgentData?.platform) {
-        // @ts-expect-error userAgentData is not yet in the TS types
-        return navigator.userAgentData.platform.toLowerCase()
+      if (
+        'userAgentData' in navigator &&
+        'platform' in navigator.userAgentData
+      ) {
+        return (navigator.userAgentData as any).platform.toLowerCase()
       }
-
-      // Fallback to userAgent if userAgentData is not available
       return navigator.userAgent.toLowerCase()
     }
 
@@ -54,36 +53,34 @@ function InstallPage() {
         updateUrlWithGsiType('manual')
       }
     }
-  }, [])
+  }, [router])
 
   return (
-    <Card>
-      <Tabs
-        destroyInactiveTabPane
-        defaultActiveKey={activeKey}
-        activeKey={activeKey}
-        onChange={updateUrlWithGsiType}
-        items={[
-          {
-            key: 'windows',
-            label: 'Automatic',
-            children: <WindowsInstaller />,
-            icon: <WindowsOutlined />,
-          },
-          {
-            key: 'manual',
-            label: 'Manual',
-            children: <UnixInstaller />,
-            icon: (
-              <>
-                <AppleOutlined />
-                <LinuxOutlined />
-              </>
-            ),
-          },
-        ]}
-      />
-    </Card>
+    <Tabs
+      value={activeKey}
+      onValueChange={(value) => {
+        setActiveKey(value)
+        updateUrlWithGsiType(value)
+      }}
+    >
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="windows">
+          <WindowsOutlined className="mr-2 h-4 w-4" />
+          Automatic
+        </TabsTrigger>
+        <TabsTrigger value="manual">
+          <AppleOutlined className="mr-2 h-4 w-4" />
+          <LinuxOutlined className="mr-2 h-4 w-4" />
+          Manual
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="windows">
+        <WindowsInstaller />
+      </TabsContent>
+      <TabsContent value="manual">
+        <UnixInstaller />
+      </TabsContent>
+    </Tabs>
   )
 }
 

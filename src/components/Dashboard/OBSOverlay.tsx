@@ -1,5 +1,4 @@
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
-import { Card } from '@/ui/card'
 import { CopyButton } from '@mantine/core'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
@@ -128,7 +127,7 @@ export default function OBSOverlay() {
   )
 
   return (
-    <Card>
+    <>
       <div className="mb-4 space-x-2">
         <span>
           <b>Why?</b> Dotabod can show game related overlays on your stream.
@@ -160,6 +159,6 @@ export default function OBSOverlay() {
           ]}
         />
       </div>
-    </Card>
+    </>
   )
 }

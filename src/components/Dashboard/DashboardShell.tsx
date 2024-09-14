@@ -1,27 +1,40 @@
-import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { navigation } from '@/components/Dashboard/navigation'
-import { DarkLogo } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
-import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
-import { StyleProvider } from '@ant-design/cssinjs'
-import { Bars3Icon } from '@heroicons/react/24/outline'
-import '@mantine/core/styles.css'
 import {
-  App as AntProvider,
-  ConfigProvider,
-  Layout,
-  Menu,
-  type MenuProps,
-  theme,
-} from 'antd'
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { ThemeProvider } from '@/components/ui/theme-provider'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
+import { App as AntProvider } from 'antd'
 import clsx from 'clsx'
-import { ArrowLeft } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { PanelLeft, Settings } from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type React from 'react'
-import { useEffect, useState } from 'react'
-
-const { Header, Sider, Content } = Layout
+import { useEffect } from 'react'
+import { DarkLogo } from '../Logo'
+import { DisableToggle } from './DisableToggle'
 
 function getItem(item) {
   const props = item.onClick ? { onClick: item.onClick } : {}
@@ -53,14 +66,6 @@ export default function DashboardShell({
   children: React.ReactElement
 }) {
   const { status } = useSession()
-  const [collapsed, setCollapsed] = useState(false)
-  const [broken, setBroken] = useState(false)
-  const [current, setCurrent] = useState('/dashboard')
-
-  const onClick: MenuProps['onClick'] = (e) => {
-    setCurrent(e.key)
-    if (broken) setCollapsed(true)
-  }
 
   useMaybeSignout()
 
@@ -78,154 +83,158 @@ export default function DashboardShell({
     }
   }, [])
 
-  useEffect(() => {
-    const { pathname } = window.location
-    setCurrent(pathname)
-  }, [])
-
   if (status !== 'authenticated') return null
 
   return (
     <>
-      <ConfigProvider
-        theme={{
-          algorithm: theme.darkAlgorithm,
-          components: {
-            Spin: {
-              colorPrimary: 'var(--color-purple-300)',
-            },
-            Button: {
-              colorLink: 'var(--color-purple-300)',
-              colorPrimaryHover: 'var(--color-purple-300)',
-            },
-            Tabs: {
-              colorPrimary: 'var(--color-purple-400)',
-              itemHoverColor: 'var(--color-purple-300)',
-            },
-            Menu: {
-              subMenuItemBg: 'var(--color-gray-800)',
-              itemBg: 'var(--color-gray-900)',
-              itemHoverBg: 'var(--color-gray-700)',
-              itemSelectedBg: 'var(--color-gray-600)',
-              itemSelectedColor: 'var(--color-gray-200)',
-              itemColor: 'var(--color-gray-300)',
-            },
-            Switch: {
-              colorPrimary: 'var(--color-purple-900)',
-            },
-            Steps: {
-              colorPrimary: 'var(--color-purple-500)',
-              colorPrimaryHover: 'var(--color-purple-300)',
-              colorPrimaryActive: 'var(--color-purple-300)',
-            },
-            Layout: {
-              siderBg: 'var(--color-gray-900)',
-            },
-          },
-          token: {
-            colorPrimary: 'rgb(85, 24, 103)',
-            colorLink: 'var(--color-purple-500)',
-            colorLinkActive: 'var(--color-purple-300)',
-            colorLinkHover: 'var(--color-purple-300)',
-            colorText: 'var(--color-gray-200)',
-            colorBgLayout: 'var(--color-gray-900)',
-            colorBgContainer: 'var(--color-gray-800)',
-          },
-        }}
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem
+        disableTransitionOnChange
       >
-        <StyleProvider hashPriority="high">
-          <AntProvider>
-            <Layout className="h-full bg-gray-800">
-              <Sider
-                breakpoint="md"
-                onBreakpoint={(broken) => {
-                  setCollapsed(broken)
-                  setBroken(broken)
-                }}
-                width={250}
-                className={clsx(
-                  'border-r border-r-gray-500',
-                  collapsed && '!min-w-11 !max-w-11'
-                )}
-                trigger={null}
-                collapsible
-                collapsed={collapsed}
-              >
-                <div className="logo" />
-
-                <div className="flex flex-col items-end">
-                  <div className="w-full md:max-w-xs">
-                    <div
-                      className={clsx(
-                        collapsed ? 'justify-center' : 'justify-between',
-                        'm-auto mb-4 flex h-12 w-full px-4 pt-4'
-                      )}
-                    >
-                      {!collapsed && (
-                        <Link href="/">
-                          <DarkLogo className="h-full w-auto" />
-                        </Link>
-                      )}
-
-                      <button
-                        type="button"
-                        className="flex items-center text-gray-300 transition-all hover:scale-110 hover:text-gray-200"
-                        onClick={() => setCollapsed(!collapsed)}
-                      >
-                        {collapsed ? (
-                          <Bars3Icon className="h-6 w-6" />
-                        ) : (
-                          <ArrowLeft className="h-6 w-6" />
-                        )}
-                      </button>
-                    </div>
-
-                    <Menu
-                      onClick={onClick}
-                      selectedKeys={[current]}
-                      defaultOpenKeys={['/dashboard/features']}
-                      mode="inline"
-                      items={navigation.map((item, i) => {
-                        if (!item.name)
-                          return {
-                            key: item?.href || i,
-                            type: 'divider',
-                            className: '!m-6 !bg-gray-500',
-                          }
-
-                        return getItem(item)
-                      })}
+        <AntProvider>
+          <div className="flex min-h-screen w-full flex-col bg-muted/40">
+            <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
+              <TooltipProvider>
+                <nav className="flex flex-col items-center gap-4 px-2 py-4">
+                  <Link
+                    href="#"
+                    className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+                  >
+                    <DarkLogo
+                      hideText
+                      className="h-4 w-4 transition-all group-hover:scale-110"
                     />
-                  </div>
-                </div>
-              </Sider>
-              <Layout
-                className={clsx(
-                  '!bg-gray-800',
-                  broken && !collapsed && '!hidden'
-                )}
-              >
-                <Header
-                  className={clsx(
-                    '!bg-gray-900',
-                    broken && !collapsed && '!hidden',
-                    'flex w-full items-center justify-between !p-8'
-                  )}
-                >
-                  <DisableToggle />
+                    <span className="sr-only">Dotabod</span>
+                  </Link>
+                  {navigation.map((item) => {
+                    if (!item.name || !item.href) return null
 
-                  <div className="w-fit py-2">
-                    <UserAccountNav />
-                  </div>
-                </Header>
-                <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
-                  {children}
-                </Content>
-              </Layout>
-            </Layout>
-          </AntProvider>
-        </StyleProvider>
-      </ConfigProvider>
+                    return (
+                      <Tooltip key={item.name}>
+                        <TooltipTrigger asChild>
+                          <Link
+                            href={item.href}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                          >
+                            {item.icon && <item.icon className="h-5 w-5" />}
+                            <span className="sr-only">{item.name}</span>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          {item.name}
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  })}
+                </nav>
+                <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-4">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href="#"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                      >
+                        <Settings className="h-5 w-5" />
+                        <span className="sr-only">Settings</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Settings</TooltipContent>
+                  </Tooltip>
+                </nav>
+              </TooltipProvider>
+            </aside>
+            <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+              <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button size="icon" variant="outline" className="sm:hidden">
+                      <PanelLeft className="h-5 w-5" />
+                      <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="sm:max-w-xs">
+                    <nav className="grid gap-6 text-lg font-medium">
+                      {navigation.map((item) => {
+                        if (!item.name || !item.href) return null
+
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                          >
+                            {item.icon && <item.icon className="h-5 w-5" />}
+                            {item.name}
+                          </Link>
+                        )
+                      })}
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+                <Breadcrumb className="hidden md:flex">
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link href="#">Dashboard</Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link href="#">Features</Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Main</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+                <div className="relative ml-auto flex-1 md:grow-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="overflow-hidden rounded-full"
+                      >
+                        <UserAccountNav />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>Settings</DropdownMenuItem>
+                      <DropdownMenuItem>Support</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() =>
+                          signOut({
+                            callbackUrl: `${window.location.origin}/`,
+                          })
+                        }
+                      >
+                        Logout
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <DisableToggle />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </header>
+            </div>
+
+            <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+              <div className="mx-auto grid max-w-[59rem] flex-1 auto-rows-max gap-4">
+                {children}
+              </div>
+            </main>
+          </div>
+        </AntProvider>
+      </ThemeProvider>
     </>
   )
 }

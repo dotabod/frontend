@@ -1,16 +1,14 @@
-import {
-  ExclamationCircleOutlined,
-  LoadingOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons'
-import { Alert, Steps } from 'antd'
+'use client'
+
+import { AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { type ReactNode, useEffect, useState } from 'react'
-import CodeBlock from './CodeBlock'
+import { useEffect, useState } from 'react'
 
-const { Step } = Steps
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Stepper } from '@/components/ui/stepper'
+import CodeBlock from './CodeBlock'
 
 const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
   const steps = [
@@ -18,11 +16,11 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
       title: !errorWithoutSuccess
         ? 'Connection check'
         : 'Connection check failed',
-      description: errorWithoutSuccess ? (
-        'Please try again or reach out on Discord for more help.'
+      content: errorWithoutSuccess ? (
+        <p>Please try again or reach out on Discord for more help.</p>
       ) : (
         <div>
-          <div>Run the script above to connect to the Dotabod installer!</div>
+          <p>Run the script above to connect to the Dotabod installer!</p>
           {currentStep === 0 && (
             <video
               controls
@@ -44,47 +42,15 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
     },
     {
       title: 'Process Token',
-      description: 'Processing the provided token...',
+      content: <p>Processing the provided token...</p>,
     },
     {
       title: 'Install Dotabod',
-      description: 'Running the installer script',
+      content: <p>Running the installer script</p>,
     },
   ]
 
-  let icon: ReactNode = null
-
-  if (errorWithoutSuccess) {
-    icon = (
-      <ExclamationCircleOutlined style={{ color: 'var(--color-red-500)' }} />
-    )
-  }
-
-  return (
-    <Steps direction="vertical" current={currentStep}>
-      {steps.map((step, index) => (
-        <Step
-          key={index}
-          title={step.title}
-          description={step.description}
-          icon={
-            currentStep === index && icon ? (
-              icon
-            ) : currentStep === index ? (
-              <LoadingOutlined />
-            ) : null
-          }
-          status={
-            currentStep > index
-              ? 'finish'
-              : currentStep === index
-                ? 'process'
-                : 'wait'
-          }
-        />
-      ))}
-    </Steps>
-  )
+  return <Stepper steps={steps} currentStep={currentStep} onChange={() => {}} />
 }
 
 const WindowsInstaller = () => {
@@ -108,15 +74,13 @@ const WindowsInstaller = () => {
     }
 
     channel.addEventListener('message', handleMessage)
-    // Post a message as soon as the component mounts,
-    // indicating that an instance has been opened.
     channel.postMessage('instance-opened')
 
     return () => {
       channel.removeEventListener('message', handleMessage)
       channel.close()
     }
-  }, [router.replace])
+  }, [router])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -154,7 +118,6 @@ const WindowsInstaller = () => {
           }
         } catch (err) {
           // Do nothing
-          // console.error('Failed to check install status:', err)
         }
       }, 3000)
     }
@@ -164,13 +127,13 @@ const WindowsInstaller = () => {
   }, [success, error, sanitizedPort, session?.data?.user?.id])
 
   return (
-    <>
-      <p>
-        <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
-        data Dotabod requires. It&apos;s a Valve approved way of getting game
-        data.
+    <div className="space-y-6">
+      <p className="font-medium">
+        <strong>Why?</strong> This step is necessary to ensure that Dota 2 knows
+        which data Dotabod requires. It&apos;s a Valve approved way of getting
+        game data.
       </p>
-      <div className="flex flex-row justify-center pt-4">
+      <div className="flex justify-center">
         <CodeBlock />
       </div>
       <div className="mb-4">
@@ -181,33 +144,44 @@ const WindowsInstaller = () => {
         />
       </div>
       {success && (
-        <Alert
-          className="max-w-2xl"
-          message="The Dotabod installer is running! You can continue on to the next step."
-          type="success"
-          showIcon
-        />
+        <Alert variant="success">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>
+            The Dotabod installer is running! You can continue on to the next
+            step.
+          </AlertDescription>
+        </Alert>
       )}
-      <p className="space-x-2">
-        <QuestionCircleOutlined />
-        <span>
+      <div className="flex items-center space-x-2">
+        <HelpCircle className="h-4 w-4" />
+        <p>
           Having trouble? Let us know what happened{' '}
-          <Link target="_blank" href="https://help.dotabod.com">
+          <Link
+            href="https://help.dotabod.com"
+            className="font-medium underline"
+            target="_blank"
+          >
             on Discord
           </Link>
           , and then try{' '}
-          <Link href="/dashboard?step=2&gsiType=manual">the manual steps</Link>.
-        </span>
-      </p>
+          <Link
+            href="/dashboard?step=2&gsiType=manual"
+            className="font-medium underline"
+          >
+            the manual steps
+          </Link>
+          .
+        </p>
+      </div>
       {error && (
-        <Alert
-          className="max-w-2xl"
-          message={`An error occurred: ${error}`}
-          type="error"
-          showIcon
-        />
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>An error occurred: {error}</AlertDescription>
+        </Alert>
       )}
-    </>
+    </div>
   )
 }
 

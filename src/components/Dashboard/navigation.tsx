@@ -4,18 +4,16 @@ import KofiIcon from '@/images/logos/Kofi'
 import {
   BeakerIcon,
   CommandLineIcon,
-  GlobeEuropeAfricaIcon,
   HeartIcon,
   MegaphoneIcon,
   NewspaperIcon,
   QuestionMarkCircleIcon,
   ScaleIcon,
   ShareIcon,
-  SparklesIcon,
   TvIcon,
 } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
-import { Github, Info } from 'lucide-react'
+import { Github, Info, SparklesIcon } from 'lucide-react'
 import Image from 'next/image'
 
 export const navigation = [
@@ -28,28 +26,21 @@ export const navigation = [
     name: 'Features',
     href: '/dashboard/features',
     icon: SparklesIcon,
-    children: [
-      {
-        name: 'Main',
-        href: '/dashboard/features',
-        icon: GlobeEuropeAfricaIcon,
-      },
-      {
-        name: 'Overlay',
-        href: '/dashboard/features/overlay',
-        icon: TvIcon,
-      },
-      {
-        name: 'Chat',
-        href: '/dashboard/features/chat',
-        icon: MegaphoneIcon,
-      },
-      {
-        name: 'Advanced',
-        href: '/dashboard/features/advanced',
-        icon: ScaleIcon,
-      },
-    ],
+  },
+  {
+    name: 'Overlay',
+    href: '/dashboard/features/overlay',
+    icon: TvIcon,
+  },
+  {
+    name: 'Chat',
+    href: '/dashboard/features/chat',
+    icon: MegaphoneIcon,
+  },
+  {
+    name: 'Advanced',
+    href: '/dashboard/features/advanced',
+    icon: ScaleIcon,
   },
   {
     name: 'Commands',
@@ -60,11 +51,6 @@ export const navigation = [
     name: 'Troubleshoot',
     href: '/dashboard/troubleshoot',
     icon: QuestionMarkCircleIcon,
-  },
-  {
-    name: '',
-    href: '',
-    icon: null,
   },
   {
     name: 'Socials',

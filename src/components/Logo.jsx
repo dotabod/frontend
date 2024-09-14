@@ -47,7 +47,9 @@ export function DarkLogo(props) {
       <svg viewBox="0 0 45 40" aria-hidden="true" {...props}>
         <Logomark width="40" height="40" />
       </svg>
-      <span className="text-2xl font-medium text-gray-200">Dotabod</span>
+      {!props.hideText && (
+        <span className="text-2xl font-medium text-gray-200">Dotabod</span>
+      )}
     </div>
   )
 }

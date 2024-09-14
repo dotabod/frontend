@@ -1,6 +1,5 @@
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
-import { Card } from '@/ui/card'
 import { Button, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
@@ -48,8 +47,8 @@ export default function ChatBot() {
           hasDotabodEditor: !!data.user?.editors?.find(
             (editor) => editor.id === '63d688c3a897cb667b7e601b'
           ),
-          hasDotabodEmoteSet: !!emotesRequired.every(
-            (emote) => data.emote_set?.emotes?.find((e) => e.name === emote.label)
+          hasDotabodEmoteSet: !!emotesRequired.every((emote) =>
+            data.emote_set?.emotes?.find((e) => e.name === emote.label)
           ),
         }
 
@@ -102,150 +101,144 @@ export default function ChatBot() {
   ].filter(Boolean).length
 
   if (loading || loadingAccounts) {
-    return (
-      <Card>
-        <Spin size="large" />
-      </Card>
-    )
+    return <Spin size="large" />
   }
 
   return (
-    <Card>
-      <StepComponent
-        initialStep={initialStep}
-        steps={[
-          <span className="flex flex-col space-y-4" key={0}>
-            {!data?.accounts?.length ? (
+    <StepComponent
+      initialStep={initialStep}
+      steps={[
+        <span className="flex flex-col space-y-4" key={0}>
+          {!data?.accounts?.length ? (
+            <>
+              <div>
+                <span>
+                  Dotabod doesn&apos;t know your MMR right now, so let&apos;s
+                  tell it
+                </span>
+                <span className="text-xs text-gray-500">
+                  {' '}
+                  (you can change it later)
+                </span>
+              </div>
+              <MmrForm hideText={true} />
+            </>
+          ) : (
+            <div>
+              <span>Dotabod knows your MMR!</span>
+            </div>
+          )}
+        </span>,
+        <div key={1} className="flex flex-col space-y-2">
+          <div className="flex flex-row items-center space-x-2">
+            {loading && <Spin size="small" spinning={loading} />}
+            {!user ? (
               <>
                 <div>
-                  <span>
-                    Dotabod doesn&apos;t know your MMR right now, so let&apos;s
-                    tell it
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {' '}
-                    (you can change it later)
-                  </span>
+                  You don't have a 7TV account setup yet! Dotabod uses 7TV to
+                  display emotes in your chat.{' '}
                 </div>
-                <MmrForm hideText={true} />
+                <div>
+                  <Button
+                    target="_blank"
+                    type="primary"
+                    href="https://7tv.app/"
+                    icon={<ExternalLinkIcon size={14} />}
+                    iconPosition="end"
+                  >
+                    Login to 7TV
+                  </Button>
+                </div>
               </>
             ) : (
-              <div>
-                <span>Dotabod knows your MMR!</span>
-              </div>
+              <div>You have a 7TV account connected to Twitch.</div>
             )}
-          </span>,
-          <div key={1} className="flex flex-col space-y-2">
-            <div className="flex flex-row items-center space-x-2">
-              {loading && <Spin size="small" spinning={loading} />}
-              {!user ? (
-                <>
-                  <div>
-                    You don't have a 7TV account setup yet! Dotabod uses 7TV to
-                    display emotes in your chat.{' '}
-                  </div>
-                  <div>
-                    <Button
-                      target="_blank"
-                      type="primary"
-                      href="https://7tv.app/"
-                      icon={<ExternalLinkIcon size={14} />}
-                      iconPosition="end"
-                    >
-                      Login to 7TV
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div>You have a 7TV account connected to Twitch.</div>
-              )}
-            </div>
-          </div>,
+          </div>
+        </div>,
 
-          <div key={2}>
-            <div className="flex flex-row items-center space-x-2">
-              {!user?.hasDotabodEditor ? (
+        <div key={2}>
+          <div className="flex flex-row items-center space-x-2">
+            {!user?.hasDotabodEditor ? (
+              <div>
                 <div>
-                  <div>
-                    <span>You must add Dotabod as an editor </span>
-                    <Button
-                      className="!pl-0"
-                      target="_blank"
-                      type="link"
-                      href={`https://7tv.app/users/${user?.id}`}
-                      icon={<ExternalLinkIcon size={14} />}
-                      iconPosition="end"
-                    >
-                      on your 7TV account
-                    </Button>
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-3">
-                    {loading && <Spin size="small" spinning={true} />}
-                    <span>Waiting for Dotabod to become an editor...</span>
-                  </div>
+                  <span>You must add Dotabod as an editor </span>
+                  <Button
+                    className="!pl-0"
+                    target="_blank"
+                    type="link"
+                    href={`https://7tv.app/users/${user?.id}`}
+                    icon={<ExternalLinkIcon size={14} />}
+                    iconPosition="end"
+                  >
+                    on your 7TV account
+                  </Button>
                 </div>
-              ) : (
-                <div>Dotabod is an editor on your 7TV account.</div>
-              )}
-            </div>
-          </div>,
-          <div key={3}>
-            <div className="flex flex-row items-center space-x-2 mb-4">
-              <Spin size="small" spinning={!user?.hasDotabodEmoteSet} />
-              {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
-                <div>
-                  Dotabod will be able to use the following emotes after the
-                  previous steps are completed.
+
+                <div className="flex flex-row items-center space-x-3">
+                  {loading && <Spin size="small" spinning={true} />}
+                  <span>Waiting for Dotabod to become an editor...</span>
                 </div>
-              ) : (
-                <div>The following emotes are ready to use!</div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div>Dotabod is an editor on your 7TV account.</div>
+            )}
+          </div>
+        </div>,
+        <div key={3}>
+          <div className="flex flex-row items-center space-x-2 mb-4">
+            <Spin size="small" spinning={!user?.hasDotabodEmoteSet} />
+            {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
+              <div>
+                Dotabod will be able to use the following emotes after the
+                previous steps are completed.
+              </div>
+            ) : (
+              <div>The following emotes are ready to use!</div>
+            )}
+          </div>
 
-            <List
-              grid={{
-                xs: 3,
-                sm: 4,
-                md: 5,
-                lg: 6,
-                xl: 8,
-                xxl: 10,
-              }}
-              dataSource={emotesRequired.sort((a, b) => {
-                // if it's found in emotes, put it at the bottom
-                if (emotes.find((e) => e?.name === a.label)) return 1
-                if (emotes.find((e) => e?.name === b.label)) return -1
-                return 0
-              })}
-              renderItem={({ id, label }) => {
-                const added =
-                  user?.hasDotabodEmoteSet ||
-                  emotes.find((e) => e?.name === label)
+          <List
+            grid={{
+              xs: 3,
+              sm: 4,
+              md: 5,
+              lg: 6,
+              xl: 8,
+              xxl: 10,
+            }}
+            dataSource={emotesRequired.sort((a, b) => {
+              // if it's found in emotes, put it at the bottom
+              if (emotes.find((e) => e?.name === a.label)) return 1
+              if (emotes.find((e) => e?.name === b.label)) return -1
+              return 0
+            })}
+            renderItem={({ id, label }) => {
+              const added =
+                user?.hasDotabodEmoteSet ||
+                emotes.find((e) => e?.name === label)
 
-                return (
-                  <List.Item key={label}>
-                    <div className={clsx('flex items-center space-x-1')}>
-                      <Tooltip title={label}>
-                        <Image
-                          className={clsx(
-                            !added && 'grayscale group-hover:grayscale-0',
-                            'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
-                          )}
-                          height={60}
-                          width={60}
-                          src={SevenTVBaseEmoteURL(id)}
-                          alt={id}
-                        />
-                      </Tooltip>
-                    </div>
-                  </List.Item>
-                )
-              }}
-            />
-          </div>,
-        ]}
-      />
-    </Card>
+              return (
+                <List.Item key={label}>
+                  <div className={clsx('flex items-center space-x-1')}>
+                    <Tooltip title={label}>
+                      <Image
+                        className={clsx(
+                          !added && 'grayscale group-hover:grayscale-0',
+                          'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
+                        )}
+                        height={60}
+                        width={60}
+                        src={SevenTVBaseEmoteURL(id)}
+                        alt={id}
+                      />
+                    </Tooltip>
+                  </div>
+                </List.Item>
+              )
+            }}
+          />
+        </div>,
+      ]}
+    />
   )
 }
