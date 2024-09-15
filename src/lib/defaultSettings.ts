@@ -1,4 +1,6 @@
 export const defaultSettings = {
+  obsServerPassword: '',
+  obsServerPort: 4455,
   aegis: true,
   bets: true,
   betsInfo: {

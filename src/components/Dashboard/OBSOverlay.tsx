@@ -4,6 +4,7 @@ import { CopyButton } from '@mantine/core'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
+import { ObsSetup } from './ObsSetup'
 
 import { Button, Tabs, Tag } from 'antd'
 
@@ -151,6 +152,7 @@ export default function OBSOverlay() {
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <Tabs
           items={[
+            { label: 'Automatic (OBS)', key: 'auto', children: <ObsSetup /> },
             { label: 'Text instructions', key: 'text', children: <OBSText /> },
             {
               label: 'Video instructions',

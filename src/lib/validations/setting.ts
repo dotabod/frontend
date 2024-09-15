@@ -40,6 +40,8 @@ const settingsSchema = {
   commandCommands: z.boolean(),
   commandDisable: z.boolean(),
   commandDotabuff: z.boolean(),
+  obsServerPassword: z.string().max(45),
+  obsServerPort: z.number().min(1).max(65535),
   commandGM: z.boolean(),
   commandGPM: z.boolean(),
   commandHero: z.boolean(),
