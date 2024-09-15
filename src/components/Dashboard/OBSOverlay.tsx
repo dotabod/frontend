@@ -224,7 +224,7 @@ export default function OBSOverlay() {
             onClick={() => {
               sendGAEvent({
                 action: 'click',
-                category: 'setup',
+                category: 'OBS Overlay',
                 label: 'help_discord',
               })
             }}
@@ -236,7 +236,7 @@ export default function OBSOverlay() {
             onClick={() => {
               sendGAEvent({
                 action: 'click',
-                category: 'setup',
+                category: 'OBS Overlay',
                 label: 'manual_steps',
               })
             }}
