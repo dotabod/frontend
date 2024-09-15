@@ -31,7 +31,7 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
               muted
               loop
               playsInline
-              className="w-full h-auto max-w-3xl"
+              className="w-full h-auto max-w-3xl rounded-lg"
             >
               <source
                 src="/images/setup/how-to-automated-install.mp4"

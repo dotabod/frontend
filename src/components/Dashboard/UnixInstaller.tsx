@@ -70,6 +70,7 @@ export default function UnixInstaller() {
           <div className="space-y-4">
             <div className="flex flex-col items-center space-y-4">
               <video
+                className="rounded-lg"
                 playsInline
                 width="508"
                 height="504"
@@ -111,6 +112,7 @@ export default function UnixInstaller() {
 
           <div className="flex flex-col items-center space-y-4">
             <video
+              className="rounded-lg"
               playsInline
               width="482"
               height="392"

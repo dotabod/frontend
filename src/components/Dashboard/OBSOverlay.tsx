@@ -46,6 +46,7 @@ export default function OBSOverlay() {
       <p>Paste this into the URL field when making the browser source</p>
       <div className="flex flex-col items-center space-y-4">
         <video
+          className="rounded-lg"
           playsInline
           width="630"
           height="766"

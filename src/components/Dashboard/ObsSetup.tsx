@@ -299,8 +299,10 @@ const ObsSetup: React.FC = () => {
 
       {!connected && (
         <div className="space-y-4">
-          <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center space-y-2">
+            <div>Video guide to retrieve the server password</div>
             <video
+              className="rounded-lg"
               width="924"
               height="720"
               controls
@@ -315,7 +317,6 @@ const ObsSetup: React.FC = () => {
               />
               Your browser does not support the video tag.
             </video>
-            <div>Video guide to retrieve the server password</div>
           </div>
         </div>
       )}
