@@ -43,6 +43,8 @@ const ObsSetup: React.FC = () => {
     if (!formPassword && obsPort && obsPassword) {
       form.resetFields()
       setObs(new OBSWebSocket())
+    } else if (!obs && obsPort && obsPassword) {
+      setObs(new OBSWebSocket())
     }
   }, [obsPort, obsPassword])
 
