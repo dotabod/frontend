@@ -6,12 +6,44 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { ObsSetup } from './ObsSetup'
 
+import { QuestionCircleOutlined } from '@ant-design/icons'
 import { sendGAEvent } from '@next/third-parties/google'
 import { Button, Tabs, Tag } from 'antd'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
   const copyURL = useBaseUrl(`overlay/${user ? user.id : ''}`)
+
+  const [activeKey, setActiveKey] = useState('auto')
+  const router = useRouter()
+
+  const updateUrlWithOverlayType = (
+    newOverlayType: 'auto' | 'text' | 'video'
+  ) => {
+    // Update the URL without adding a new history entry
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, overlayType: newOverlayType },
+      },
+      undefined,
+      { shallow: true }
+    ) // `shallow: true` to not trigger data fetching methods again
+  }
+
+  useEffect(() => {
+    const parsedStep = router.query.overlayType as string
+    if (
+      parsedStep === 'auto' ||
+      parsedStep === 'text' ||
+      parsedStep === 'video'
+    ) {
+      setActiveKey(parsedStep)
+    }
+  }, [router.query.overlayType])
 
   const CopyInstructions = () => (
     <div className="flex flex-col items-center space-x-4 md:flex-row">
@@ -160,6 +192,9 @@ export default function OBSOverlay() {
       </div>
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <Tabs
+          defaultActiveKey={activeKey}
+          activeKey={activeKey}
+          destroyInactiveTabPane
           onTabClick={(key) => {
             sendGAEvent({
               action: 'click',
@@ -167,6 +202,7 @@ export default function OBSOverlay() {
               label: key,
             })
           }}
+          onChange={updateUrlWithOverlayType}
           items={[
             { label: 'Automatic (OBS)', key: 'auto', children: <ObsSetup /> },
             { label: 'Text instructions', key: 'text', children: <OBSText /> },
@@ -178,6 +214,39 @@ export default function OBSOverlay() {
           ]}
         />
       </div>
+      <p className="space-x-2">
+        <QuestionCircleOutlined />
+        <span>
+          Having trouble? Let us know what happened{' '}
+          <Link
+            target="_blank"
+            href="https://help.dotabod.com"
+            onClick={() => {
+              sendGAEvent({
+                action: 'click',
+                category: 'setup',
+                label: 'help_discord',
+              })
+            }}
+          >
+            on Discord
+          </Link>
+          , and then try{' '}
+          <Link
+            onClick={() => {
+              sendGAEvent({
+                action: 'click',
+                category: 'setup',
+                label: 'manual_steps',
+              })
+            }}
+            href="/dashboard?step=3&overlayType=text"
+          >
+            the manual steps
+          </Link>
+          .
+        </span>
+      </p>
     </Card>
   )
 }
