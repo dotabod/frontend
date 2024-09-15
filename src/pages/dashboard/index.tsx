@@ -5,8 +5,8 @@ import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
-import { Alert, Button, Steps } from 'antd'
-import { Collapse } from 'antd'
+import { sendGAEvent } from '@next/third-parties/google'
+import { Alert, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -38,6 +38,12 @@ const SetupPage = () => {
     setActive((current) => {
       const nextStep = current < 3 ? current + 1 : current
       updateStepInUrl(nextStep)
+      sendGAEvent({
+        action: 'click',
+        category: 'setup',
+        label: 'next_step',
+        step: nextStep,
+      })
       return nextStep
     })
 
@@ -45,6 +51,12 @@ const SetupPage = () => {
     setActive((current) => {
       const prevStep = current > 0 ? current - 1 : current
       updateStepInUrl(prevStep)
+      sendGAEvent({
+        action: 'click',
+        category: 'setup',
+        label: 'prev_step',
+        step: prevStep,
+      })
       return prevStep
     })
 
@@ -138,6 +150,13 @@ const SetupPage = () => {
               Dotabod first.
             </p>
             <Collapse
+              onChange={() => {
+                sendGAEvent({
+                  action: 'click',
+                  category: 'setup',
+                  label: 'collapse_test_dotabod',
+                })
+              }}
               accordion
               items={[
                 {

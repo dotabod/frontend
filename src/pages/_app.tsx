@@ -9,12 +9,12 @@ import store from '@/lib/redux/store'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { App as AntProvider, ConfigProvider, theme } from 'antd'
 import 'antd/dist/reset.css'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
-import { GoogleAnalytics } from 'nextjs-google-analytics'
 import type { ReactElement, ReactNode } from 'react'
 import { Provider } from 'react-redux'
 
@@ -83,7 +83,7 @@ const App = ({
         <StyleProvider hashPriority="high">
           <SentrySession />
           <VercelAnalytics />
-          <GoogleAnalytics />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
           <MantineProvider>
             <Provider store={store}>
               <AntProvider>

@@ -2,6 +2,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
+import { sendGAEvent } from '@next/third-parties/google'
 import { Alert, Button, Form, Input, Select, Space, Spin, message } from 'antd'
 import { useSession } from 'next-auth/react'
 import OBSWebSocket from 'obs-websocket-js'
@@ -37,7 +38,10 @@ const ObsSetup: React.FC = () => {
   }, 600)
 
   useEffect(() => {
-    if (obsPassword && obsPort) {
+    const formPassword = form.getFieldValue('password')
+    const formPort = form.getFieldValue('port')
+
+    if ((obsPort || obsPassword) && !formPassword && !formPort) {
       form.resetFields()
       setObs(new OBSWebSocket())
     }
@@ -67,6 +71,11 @@ const ObsSetup: React.FC = () => {
       } catch (err: any) {
         setError(err.message || 'Error connecting to OBS')
         console.error('Error:', err)
+        sendGAEvent({
+          label: 'connect_error',
+          action: 'click',
+          category: 'obs_overlay',
+        })
       }
     }
 
@@ -99,6 +108,11 @@ const ObsSetup: React.FC = () => {
     } catch (err: any) {
       setError('Error fetching scenes')
       console.error('Error:', err)
+      sendGAEvent({
+        label: 'fetch_scenes_error',
+        action: 'click',
+        category: 'obs_overlay',
+      })
     }
   }
 
@@ -130,10 +144,22 @@ const ObsSetup: React.FC = () => {
     setObs(new OBSWebSocket()) // Create a new OBSWebSocket instance
     updatePort(Number(form.getFieldValue('port')))
     updatePassword(`${form.getFieldValue('password')}`)
+
+    sendGAEvent({
+      label: 'connect',
+      action: 'click',
+      category: 'obs_overlay',
+    })
   }
 
   const handleSceneSelect = async () => {
     if (!obs || selectedScenes.length === 0) return
+
+    sendGAEvent({
+      label: 'add_to_scene',
+      action: 'click',
+      category: 'obs_overlay',
+    })
 
     const newScenes = selectedScenes.filter(
       (scene) => !scenesWithSource.includes(scene)
@@ -194,6 +220,11 @@ const ObsSetup: React.FC = () => {
       } catch (err: any) {
         setError(err.message || 'Error adding browser source to scene')
         console.error('Error:', err)
+        sendGAEvent({
+          label: 'add_to_scene_error',
+          action: 'click',
+          category: 'obs_overlay',
+        })
       }
     }
 
@@ -297,7 +328,14 @@ const ObsSetup: React.FC = () => {
                 <span>Scene(s) to add Dotabod to</span>
                 <Button
                   icon={<ReloadOutlined />}
-                  onClick={fetchScenes}
+                  onClick={() => {
+                    fetchScenes()
+                    sendGAEvent({
+                      label: 'refresh_scenes',
+                      action: 'click',
+                      category: 'obs_overlay',
+                    })
+                  }}
                   type="default"
                   shape="circle"
                   title="Refresh scenes"
@@ -310,7 +348,15 @@ const ObsSetup: React.FC = () => {
               mode="multiple"
               placeholder="Select scenes to add the overlay"
               value={selectedScenes}
-              onChange={(value) => setSelectedScenes(value)}
+              onChange={(value) => {
+                sendGAEvent({
+                  label: 'select_scene',
+                  action: 'click',
+                  category: 'obs_overlay',
+                  scene: value,
+                })
+                return setSelectedScenes(value)
+              }}
             >
               {scenes.map((scene) => (
                 <Select.Option

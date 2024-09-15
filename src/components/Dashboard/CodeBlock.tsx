@@ -1,4 +1,5 @@
 import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
+import { sendGAEvent } from '@next/third-parties/google'
 import { Button, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -7,6 +8,11 @@ const CodeBlock = () => {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
+    sendGAEvent({
+      action: 'click',
+      category: 'install',
+      label: 'copy_windows_installer',
+    })
     navigator.clipboard
       .writeText('powershell -c "irm dotabod.com/install.ps1 | iex"')
       .then(() => {

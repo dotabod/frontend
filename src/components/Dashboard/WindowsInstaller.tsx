@@ -3,6 +3,7 @@ import {
   LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
+import { sendGAEvent } from '@next/third-parties/google'
 import { Alert, Steps } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -135,6 +136,11 @@ const WindowsInstaller = () => {
           setSuccess(true)
           setTimeout(() => {
             setCurrentStep(3)
+            sendGAEvent({
+              action: 'click',
+              category: 'install',
+              label: 'windows_installer_success',
+            })
           }, 3000)
         } catch (error) {
           // Do nothing
@@ -150,6 +156,11 @@ const WindowsInstaller = () => {
           if (response.ok) {
             fetchToken()
             setError(null)
+            sendGAEvent({
+              action: 'click',
+              category: 'install',
+              label: 'windows_installer_check_success',
+            })
             clearInterval(interval)
           }
         } catch (err) {
@@ -192,11 +203,33 @@ const WindowsInstaller = () => {
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
-          <Link target="_blank" href="https://help.dotabod.com">
+          <Link
+            target="_blank"
+            href="https://help.dotabod.com"
+            onClick={() => {
+              sendGAEvent({
+                action: 'click',
+                category: 'setup',
+                label: 'help_discord',
+              })
+            }}
+          >
             on Discord
           </Link>
           , and then try{' '}
-          <Link href="/dashboard?step=2&gsiType=manual">the manual steps</Link>.
+          <Link
+            onClick={() => {
+              sendGAEvent({
+                action: 'click',
+                category: 'setup',
+                label: 'manual_steps',
+              })
+            }}
+            href="/dashboard?step=2&gsiType=manual"
+          >
+            the manual steps
+          </Link>
+          .
         </span>
       </p>
       {error && (

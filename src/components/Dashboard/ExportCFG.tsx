@@ -5,6 +5,7 @@ import {
   LinuxOutlined,
   WindowsOutlined,
 } from '@ant-design/icons'
+import { sendGAEvent } from '@next/third-parties/google'
 import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -59,6 +60,13 @@ function InstallPage() {
   return (
     <Card>
       <Tabs
+        onTabClick={(key) => {
+          sendGAEvent({
+            label: key,
+            action: 'click',
+            category: 'install_type',
+          })
+        }}
         destroyInactiveTabPane
         defaultActiveKey={activeKey}
         activeKey={activeKey}

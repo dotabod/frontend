@@ -1,6 +1,7 @@
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
+import { sendGAEvent } from '@next/third-parties/google'
 import { Button, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
@@ -48,8 +49,8 @@ export default function ChatBot() {
           hasDotabodEditor: !!data.user?.editors?.find(
             (editor) => editor.id === '63d688c3a897cb667b7e601b'
           ),
-          hasDotabodEmoteSet: !!emotesRequired.every(
-            (emote) => data.emote_set?.emotes?.find((e) => e.name === emote.label)
+          hasDotabodEmoteSet: !!emotesRequired.every((emote) =>
+            data.emote_set?.emotes?.find((e) => e.name === emote.label)
           ),
         }
 
@@ -151,6 +152,13 @@ export default function ChatBot() {
                       href="https://7tv.app/"
                       icon={<ExternalLinkIcon size={14} />}
                       iconPosition="end"
+                      onClick={() => {
+                        sendGAEvent({
+                          action: 'click',
+                          category: 'setup',
+                          label: '7tv_register',
+                        })
+                      }}
                     >
                       Login to 7TV
                     </Button>
@@ -175,6 +183,13 @@ export default function ChatBot() {
                       href={`https://7tv.app/users/${user?.id}`}
                       icon={<ExternalLinkIcon size={14} />}
                       iconPosition="end"
+                      onClick={() => {
+                        sendGAEvent({
+                          action: 'click',
+                          category: 'setup',
+                          label: '7tv_add_editor',
+                        })
+                      }}
                     >
                       on your 7TV account
                     </Button>

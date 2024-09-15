@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { ObsSetup } from './ObsSetup'
 
+import { sendGAEvent } from '@next/third-parties/google'
 import { Button, Tabs, Tag } from 'antd'
 
 export default function OBSOverlay() {
@@ -19,7 +20,14 @@ export default function OBSOverlay() {
           <Button
             type="dashed"
             className={clsx(copied && '!border-green-600 !text-green-600')}
-            onClick={copy}
+            onClick={() => {
+              copy()
+              sendGAEvent({
+                action: 'click',
+                category: 'OBS Overlay',
+                label: 'copy_url',
+              })
+            }}
           >
             {copied ? 'Copied to clipboard!' : 'Copy your browser source URL'}
           </Button>
@@ -151,6 +159,13 @@ export default function OBSOverlay() {
       </div>
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <Tabs
+          onTabClick={(key) => {
+            sendGAEvent({
+              action: 'click',
+              category: 'OBS Overlay',
+              label: key,
+            })
+          }}
           items={[
             { label: 'Automatic (OBS)', key: 'auto', children: <ObsSetup /> },
             { label: 'Text instructions', key: 'text', children: <OBSText /> },
