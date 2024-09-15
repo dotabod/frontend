@@ -39,9 +39,8 @@ const ObsSetup: React.FC = () => {
 
   useEffect(() => {
     const formPassword = form.getFieldValue('password')
-    const formPort = form.getFieldValue('port')
 
-    if ((obsPort || obsPassword) && !formPassword && !formPort) {
+    if (!formPassword && obsPort && obsPassword) {
       form.resetFields()
       setObs(new OBSWebSocket())
     }
@@ -295,39 +294,14 @@ const ObsSetup: React.FC = () => {
             />
           </Form.Item>
         </div>
-      </Spin>
 
-      {!connected && (
-        <div className="space-y-4">
-          <div className="flex flex-col items-center space-y-2">
-            <div>Video guide to retrieve the server password</div>
-            <video
-              className="rounded-lg"
-              width="924"
-              height="720"
-              controls
-              playsInline
-              autoPlay
-              muted
-              loop
-            >
-              <source
-                src="/images/setup/how-to-obs-websocket.mp4"
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
-      )}
-
-      {connected && (
         <div>
           <Form.Item
             label={
               <Space>
                 <span>Scene(s) to add Dotabod to</span>
                 <Button
+                  disabled={!connected}
                   icon={<ReloadOutlined />}
                   onClick={() => {
                     fetchScenes()
@@ -346,6 +320,7 @@ const ObsSetup: React.FC = () => {
             }
           >
             <Select
+              disabled={!connected}
               mode="multiple"
               placeholder="Select scenes to add the overlay"
               value={selectedScenes}
@@ -375,12 +350,37 @@ const ObsSetup: React.FC = () => {
             type="primary"
             onClick={handleSceneSelect}
             disabled={
+              !connected ||
               selectedScenes.length === 0 ||
               selectedScenes.every((scene) => scenesWithSource.includes(scene))
             }
           >
             Add to selected scenes
           </Button>
+        </div>
+      </Spin>
+
+      {!connected && (
+        <div className="space-y-4">
+          <div className="flex flex-col items-center space-y-2">
+            <div>Video guide to retrieve the server password</div>
+            <video
+              className="rounded-lg"
+              width="924"
+              height="720"
+              controls
+              playsInline
+              autoPlay
+              muted
+              loop
+            >
+              <source
+                src="/images/setup/how-to-obs-websocket.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
         </div>
       )}
     </Form>
