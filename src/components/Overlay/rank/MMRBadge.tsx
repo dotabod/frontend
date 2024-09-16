@@ -3,13 +3,7 @@ import clsx from 'clsx'
 import { Badge } from '../../Badge'
 import { Card } from '../../Card'
 
-export const Numbers = ({
-  hasImage,
-  leaderboard,
-  rank,
-  className = '',
-  ...props
-}) => {
+const Numbers = ({ hasImage, leaderboard, rank, className = '', ...props }) => {
   const res = useTransformRes()
 
   const fontSize = res({ h: 18 })
@@ -20,8 +14,9 @@ export const Numbers = ({
       className={clsx(className, 'flex flex-col items-center')}
       {...props}
     >
-      <span>{leaderboard && `#${leaderboard}`}</span>
+      <span key="leaderboard">{leaderboard && `#${leaderboard}`}</span>
       <span
+        key="rank"
         className={clsx(
           leaderboard && 'text-base',
           !rank && !leaderboard && 'hidden'
@@ -56,6 +51,7 @@ export const MMRBadge = ({
         )}
       >
         <Badge
+          key="main-badge"
           width={res({ w: 75 })}
           height={res({ h: 75 })}
           image={image}
@@ -75,6 +71,7 @@ export const MMRBadge = ({
       id="rank-card"
     >
       <Badge
+        key="card-badge"
         width={res({ w: 82 })}
         height={res({ h: 75 })}
         image={image}
