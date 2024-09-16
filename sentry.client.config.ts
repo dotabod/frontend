@@ -4,9 +4,15 @@
 
 import * as Sentry from '@sentry/nextjs'
 
-const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
+const SENTRY_DSN =
+  'process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN'
 
 if (SENTRY_DSN) {
+  const replay = Sentry.replayIntegration({
+    maskAllText: false,
+    blockAllMedia: false,
+  })
+
   Sentry.init({
     dsn: SENTRY_DSN,
 
@@ -14,20 +20,23 @@ if (SENTRY_DSN) {
     tracesSampleRate: 1,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
-    debug: false,
+    debug: true,
 
-    replaysOnErrorSampleRate: 1.0,
+    /**
+     * Initialize the Sentry SDK as normal.
+     *
+     * `replaysSessionSampleRate` and `replaysOnErrorSampleRate` are both set to
+     * "0" so that we have manual control over session-based replays
+     */
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0,
+    integrations: [replay],
+  })
 
-    // This sets the sample rate to be 10%. You may want this to be 100% while
-    // in development and sample at a lower rate in production
-    replaysSessionSampleRate: 0.1,
-
-    // You can remove this option if you're not planning to use the Sentry Session Replay feature:
-    integrations: [
-      Sentry.replayIntegration({
-        maskAllText: false,
-        blockAllMedia: false,
-      }),
-    ],
+  window.navigation.addEventListener('navigate', (event) => {
+    const url = new URL(event.destination.url)
+    if (!url.pathname.startsWith('/overlay')) {
+      replay.start()
+    }
   })
 }
