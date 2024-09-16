@@ -1,4 +1,4 @@
-import { track } from '@/lib/track'
+import { useTrack } from '@/lib/track'
 import {
   ExclamationCircleOutlined,
   LoadingOutlined,
@@ -89,6 +89,7 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
 }
 
 const WindowsInstaller = () => {
+  const track = useTrack()
   const router = useRouter()
   const session = useSession()
   const port = Number.parseInt(router.query.port as string, 10)

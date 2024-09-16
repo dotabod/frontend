@@ -4,7 +4,7 @@ import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
-import { track } from '@/lib/track'
+import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { Alert, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
@@ -16,6 +16,7 @@ import { type ReactElement, useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 const SetupPage = () => {
+  const track = useTrack()
   const { data } = useSWR('/api/settings', fetcher)
   const isLive = data?.stream_online
 

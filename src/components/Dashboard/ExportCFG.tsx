@@ -1,5 +1,5 @@
 import UnixInstaller from '@/components/Dashboard/UnixInstaller'
-import { track } from '@/lib/track'
+import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import {
   AppleOutlined,
@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import WindowsInstaller from './WindowsInstaller'
 
 function InstallPage() {
+  const track = useTrack()
   const [activeKey, setActiveKey] = useState('windows')
   const router = useRouter()
 

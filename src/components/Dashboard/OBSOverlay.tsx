@@ -1,20 +1,20 @@
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
+import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
+import { QuestionCircleOutlined } from '@ant-design/icons'
 import { CopyButton } from '@mantine/core'
+import { Button, Tabs, Tag } from 'antd'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import { ObsSetup } from './ObsSetup'
-
-import { track } from '@/lib/track'
-import { QuestionCircleOutlined } from '@ant-design/icons'
-import { Button, Tabs, Tag } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { ObsSetup } from './ObsSetup'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
+  const track = useTrack()
   const copyURL = useBaseUrl(`overlay/${user ? user.id : ''}`)
 
   const [activeKey, setActiveKey] = useState('auto')

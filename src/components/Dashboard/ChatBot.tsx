@@ -1,5 +1,5 @@
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
-import { track } from '@/lib/track'
+import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
 import { captureException } from '@sentry/nextjs'
@@ -38,6 +38,7 @@ export default function ChatBot() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`
+  const track = useTrack()
 
   useEffect(() => {
     const fetchUserData = async () => {

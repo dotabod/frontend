@@ -1,7 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { track } from '@/lib/track'
+import { useTrack } from '@/lib/track'
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, Select, Space, Spin, message } from 'antd'
@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 const ObsSetup: React.FC = () => {
+  const track = useTrack()
   const [connected, setConnected] = useState(false)
   const [baseWidth, setBaseWidth] = useState<number | null>(null)
   const [baseHeight, setBaseHeight] = useState<number | null>(null)
