@@ -70,6 +70,11 @@ export default function OBSOverlay() {
 
   const OBSVideo = () => (
     <div className="space-y-2">
+      <div className="flex items-center space-x-2">
+        <Tag className="!text-xs">Note</Tag>
+        <span>OBS and Streamlabs have the same instructions</span>
+      </div>
+
       <CopyInstructions />
       <p>Paste this into the URL field when making the browser source</p>
       <div className="flex flex-col items-center space-y-4">
@@ -91,7 +96,12 @@ export default function OBSOverlay() {
   )
 
   const OBSText = () => (
-    <div className="mt-4 space-y-4">
+    <div className="space-y-2">
+      <div className="flex items-center space-x-2">
+        <Tag className="!text-xs">Note</Tag>
+        <span>OBS and Streamlabs have the same instructions</span>
+      </div>
+
       <p>
         1. Let&apos;s see what our canvas resolution is set to. Open OBS Studio
         and go to File &gt; Settings
@@ -182,10 +192,6 @@ export default function OBSOverlay() {
           height={28}
         />
       </div>
-      <div className="mt-2 flex items-center space-x-2">
-        <Tag className="!text-xs">Note</Tag>
-        <span>OBS and Streamlabs have the same instructions</span>
-      </div>
       <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
         <Tabs
           defaultActiveKey={activeKey}
@@ -197,9 +203,9 @@ export default function OBSOverlay() {
           onChange={updateUrlWithOverlayType}
           items={[
             { label: 'Automatic (OBS)', key: 'auto', children: <ObsSetup /> },
-            { label: 'Text instructions', key: 'text', children: <OBSText /> },
+            { label: 'Manual (text)', key: 'text', children: <OBSText /> },
             {
-              label: 'Video instructions',
+              label: 'Manual (video)',
               key: 'video',
               children: <OBSVideo />,
             },

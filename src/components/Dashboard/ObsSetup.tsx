@@ -6,6 +6,7 @@ import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, Select, Space, Spin, message } from 'antd'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
@@ -229,12 +230,24 @@ const ObsSetup: React.FC = () => {
       style={{ maxWidth: 600, margin: '0 auto' }}
       className="space-y-2"
     >
+      {selectedScenes.length > 0 && (
+        <Alert
+          message="Overlay setup complete"
+          type="success"
+          showIcon
+          action={
+            <Link href="/dashboard?step=4">
+              <Button>Go to step 4</Button>
+            </Link>
+          }
+        />
+      )}
+
       {error && (
         <Alert
           message={`Error: ${error}`}
           type="error"
           showIcon
-          className=",b-4"
           action={
             <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
           }
