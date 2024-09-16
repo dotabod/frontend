@@ -19,7 +19,7 @@ if (SENTRY_DSN) {
     tracesSampleRate: 1,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
-    debug: true,
+    debug: false,
 
     /**
      * Initialize the Sentry SDK as normal.
