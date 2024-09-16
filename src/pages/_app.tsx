@@ -82,18 +82,7 @@ const App = ({
       >
         <StyleProvider hashPriority="high">
           <SentrySession />
-          <VercelAnalytics
-            debug
-            beforeSend={(event) => {
-              if (event.type === 'event') {
-                return {
-                  ...event,
-                  user: session?.user?.id,
-                }
-              }
-              return event
-            }}
-          />
+          <VercelAnalytics />
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
           <MantineProvider>
             <Provider store={store}>
