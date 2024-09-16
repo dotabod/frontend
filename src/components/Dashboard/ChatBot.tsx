@@ -1,9 +1,8 @@
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
+import { track } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
-import { sendGTMEvent } from '@next/third-parties/google'
 import { captureException } from '@sentry/nextjs'
-import { track } from '@vercel/analytics/react'
 import { Button, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
@@ -157,16 +156,7 @@ export default function ChatBot() {
                       icon={<ExternalLinkIcon size={14} />}
                       iconPosition="end"
                       onClick={() => {
-                        track('7TV Register', {
-                          action: 'click',
-                          category: 'setup',
-                          label: '7tv_register',
-                        })
-                        sendGTMEvent({
-                          action: 'click',
-                          category: 'setup',
-                          label: '7tv_register',
-                        })
+                        track('7TV Register')
                       }}
                     >
                       Login to 7TV
@@ -194,11 +184,6 @@ export default function ChatBot() {
                       iconPosition="end"
                       onClick={() => {
                         track('7TV Add Editor')
-                        sendGTMEvent({
-                          action: 'click',
-                          category: 'setup',
-                          label: '7tv_add_editor',
-                        })
                       }}
                     >
                       on your 7TV account

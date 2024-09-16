@@ -4,9 +4,8 @@ import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
+import { track } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { sendGTMEvent } from '@next/third-parties/google'
-import { track } from '@vercel/analytics/react'
 import { Alert, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import Head from 'next/head'
@@ -39,13 +38,7 @@ const SetupPage = () => {
     setActive((current) => {
       const nextStep = current < 3 ? current + 1 : current
       updateStepInUrl(nextStep)
-      track('setup/next_step', { step: nextStep })
-      sendGTMEvent({
-        action: 'click',
-        category: 'setup',
-        label: 'next_step',
-        step: nextStep,
-      })
+
       return nextStep
     })
 
@@ -53,13 +46,7 @@ const SetupPage = () => {
     setActive((current) => {
       const prevStep = current > 0 ? current - 1 : current
       updateStepInUrl(prevStep)
-      track('setup/prev_step', { step: prevStep })
-      sendGTMEvent({
-        action: 'click',
-        category: 'setup',
-        label: 'prev_step',
-        step: prevStep,
-      })
+
       return prevStep
     })
 
@@ -155,11 +142,6 @@ const SetupPage = () => {
             <Collapse
               onChange={() => {
                 track('setup/collapse_test_dotabod')
-                sendGTMEvent({
-                  action: 'click',
-                  category: 'setup',
-                  label: 'collapse_test_dotabod',
-                })
               }}
               accordion
               items={[
@@ -234,6 +216,7 @@ const SetupPage = () => {
         onChange={(newActiveStep) => {
           setActive(newActiveStep)
           updateStepInUrl(newActiveStep)
+          track('setup/change_step', { step: newActiveStep })
         }}
         items={steps}
       />

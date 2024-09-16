@@ -6,9 +6,8 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { ObsSetup } from './ObsSetup'
 
+import { track } from '@/lib/track'
 import { QuestionCircleOutlined } from '@ant-design/icons'
-import { sendGTMEvent } from '@next/third-parties/google'
-import { track } from '@vercel/analytics/react'
 import { Button, Tabs, Tag } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -56,11 +55,6 @@ export default function OBSOverlay() {
             onClick={() => {
               copy()
               track('overlay/copy_url')
-              sendGTMEvent({
-                action: 'click',
-                category: 'OBS Overlay',
-                label: 'copy_url',
-              })
             }}
           >
             {copied ? 'Copied to clipboard!' : 'Copy your browser source URL'}
@@ -199,11 +193,6 @@ export default function OBSOverlay() {
           destroyInactiveTabPane
           onTabClick={(key) => {
             track('overlay/change_tab', { tab: key })
-            sendGTMEvent({
-              action: 'click',
-              category: 'OBS Overlay',
-              label: key,
-            })
           }}
           onChange={updateUrlWithOverlayType}
           items={[
@@ -226,11 +215,6 @@ export default function OBSOverlay() {
             href="https://help.dotabod.com"
             onClick={() => {
               track('overlay/help_discord')
-              sendGTMEvent({
-                action: 'click',
-                category: 'OBS Overlay',
-                label: 'help_discord',
-              })
             }}
           >
             on Discord
@@ -239,11 +223,6 @@ export default function OBSOverlay() {
           <Link
             onClick={() => {
               track('overlay/manual_steps')
-              sendGTMEvent({
-                action: 'click',
-                category: 'OBS Overlay',
-                label: 'manual_steps',
-              })
             }}
             href="/dashboard?step=3&overlayType=text"
           >

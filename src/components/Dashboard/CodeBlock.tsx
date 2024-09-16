@@ -1,6 +1,5 @@
+import { track } from '@/lib/track'
 import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
-import { sendGTMEvent } from '@next/third-parties/google'
-import { track } from '@vercel/analytics/react'
 import { Button, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -10,11 +9,7 @@ const CodeBlock = () => {
 
   const handleCopy = () => {
     track('install/copy_windows_installer')
-    sendGTMEvent({
-      action: 'click',
-      category: 'install',
-      label: 'copy_windows_installer',
-    })
+
     navigator.clipboard
       .writeText('powershell -c "irm dotabod.com/install.ps1 | iex"')
       .then(() => {

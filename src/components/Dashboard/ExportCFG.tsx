@@ -1,12 +1,11 @@
 import UnixInstaller from '@/components/Dashboard/UnixInstaller'
+import { track } from '@/lib/track'
 import { Card } from '@/ui/card'
 import {
   AppleOutlined,
   LinuxOutlined,
   WindowsOutlined,
 } from '@ant-design/icons'
-import { sendGTMEvent } from '@next/third-parties/google'
-import { track } from '@vercel/analytics/react'
 import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -63,11 +62,6 @@ function InstallPage() {
       <Tabs
         onTabClick={(key) => {
           track('install_type/click', { label: key })
-          sendGTMEvent({
-            label: key,
-            action: 'click',
-            category: 'install_type',
-          })
         }}
         destroyInactiveTabPane
         defaultActiveKey={activeKey}

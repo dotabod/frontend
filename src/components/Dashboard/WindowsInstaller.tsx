@@ -1,10 +1,9 @@
+import { track } from '@/lib/track'
 import {
   ExclamationCircleOutlined,
   LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
-import { sendGTMEvent } from '@next/third-parties/google'
-import { track } from '@vercel/analytics/react'
 import { Alert, Steps } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -138,11 +137,6 @@ const WindowsInstaller = () => {
           setTimeout(() => {
             setCurrentStep(3)
             track('setup/installer_success')
-            sendGTMEvent({
-              action: 'click',
-              category: 'install',
-              label: 'windows_installer_success',
-            })
           }, 3000)
         } catch (error) {
           // Do nothing
@@ -159,11 +153,7 @@ const WindowsInstaller = () => {
             fetchToken()
             setError(null)
             track('setup/installer_check_success')
-            sendGTMEvent({
-              action: 'click',
-              category: 'install',
-              label: 'windows_installer_check_success',
-            })
+
             clearInterval(interval)
           }
         } catch (err) {
@@ -211,11 +201,6 @@ const WindowsInstaller = () => {
             href="https://help.dotabod.com"
             onClick={() => {
               track('setup/help_discord')
-              sendGTMEvent({
-                action: 'click',
-                category: 'setup',
-                label: 'help_discord',
-              })
             }}
           >
             on Discord
@@ -224,11 +209,6 @@ const WindowsInstaller = () => {
           <Link
             onClick={() => {
               track('setup/manual_steps')
-              sendGTMEvent({
-                action: 'click',
-                category: 'setup',
-                label: 'manual_steps',
-              })
             }}
             href="/dashboard?step=2&gsiType=manual"
           >
