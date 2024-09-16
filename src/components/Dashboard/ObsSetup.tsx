@@ -66,8 +66,9 @@ const ObsSetup: React.FC = () => {
           label: 'connect_success',
           action: 'click',
           category: 'obs_overlay',
+          user: user?.id,
         })
-        track('obs/connect_success')
+        track('obs/connect_success', { port: obsPort, user: user?.id })
 
         // Fetch the base canvas resolution
         const videoSettings = await obs.call('GetVideoSettings')
@@ -83,6 +84,7 @@ const ObsSetup: React.FC = () => {
         Sentry.captureException(err)
         track('obs/connection_error', { error: err.message })
         sendGAEvent({
+          user: user?.id,
           label: 'connect_error',
           action: 'click',
           category: 'obs_overlay',
@@ -170,7 +172,7 @@ const ObsSetup: React.FC = () => {
   const handleSceneSelect = async () => {
     if (!obs || selectedScenes.length === 0) return
 
-    track('obs/add_to_scene')
+    track('obs/add_to_scene', { user: user?.id })
     sendGAEvent({
       label: 'add_to_scene',
       action: 'click',
