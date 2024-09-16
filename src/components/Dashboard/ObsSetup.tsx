@@ -62,6 +62,12 @@ const ObsSetup: React.FC = () => {
         // Connect to OBS WebSocket
         await obs.connect(`ws://${obsHost}:${obsPort}`, obsPassword)
         setConnected(true)
+        sendGAEvent({
+          label: 'connect_success',
+          action: 'click',
+          category: 'obs_overlay',
+        })
+        track('obs/connect_success')
 
         // Fetch the base canvas resolution
         const videoSettings = await obs.call('GetVideoSettings')
