@@ -52,7 +52,6 @@ export const PollOverlay = ({
     const emoteFetcher = new TwitchFetcher()
     emoteFetcher
       .getEmotesByID(data?.Account?.providerAccountId, {
-        ffz: true,
         '7tv': true,
         bttv: true,
       })
