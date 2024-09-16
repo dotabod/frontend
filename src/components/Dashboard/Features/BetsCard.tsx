@@ -45,7 +45,11 @@ export default function BetsCard() {
             layout="vertical"
             initialValues={info}
             name="bets-form"
-            onFinish={updateInfo}
+            onFinish={(values) => {
+              const updatedValues = values
+              updatedValues.duration = `${values.duration}`
+              updateInfo(values)
+            }}
           >
             <Form.Item
               colon={false}
