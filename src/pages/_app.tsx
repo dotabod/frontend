@@ -83,6 +83,7 @@ const App = ({
         <StyleProvider hashPriority="high">
           <SentrySession />
           <VercelAnalytics
+            debug
             beforeSend={(event) => {
               if (event.type === 'event') {
                 return {

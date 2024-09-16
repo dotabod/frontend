@@ -5,7 +5,7 @@ import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from '@next/third-parties/google'
 import { track } from '@vercel/analytics/react'
 import { Alert, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
@@ -40,7 +40,7 @@ const SetupPage = () => {
       const nextStep = current < 3 ? current + 1 : current
       updateStepInUrl(nextStep)
       track('setup/next_step', { step: nextStep })
-      sendGAEvent({
+      sendGTMEvent({
         action: 'click',
         category: 'setup',
         label: 'next_step',
@@ -54,7 +54,7 @@ const SetupPage = () => {
       const prevStep = current > 0 ? current - 1 : current
       updateStepInUrl(prevStep)
       track('setup/prev_step', { step: prevStep })
-      sendGAEvent({
+      sendGTMEvent({
         action: 'click',
         category: 'setup',
         label: 'prev_step',
@@ -155,7 +155,7 @@ const SetupPage = () => {
             <Collapse
               onChange={() => {
                 track('setup/collapse_test_dotabod')
-                sendGAEvent({
+                sendGTMEvent({
                   action: 'click',
                   category: 'setup',
                   label: 'collapse_test_dotabod',

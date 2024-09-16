@@ -5,12 +5,12 @@ import {
   LinuxOutlined,
   WindowsOutlined,
 } from '@ant-design/icons'
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from '@next/third-parties/google'
+import { track } from '@vercel/analytics/react'
 import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import WindowsInstaller from './WindowsInstaller'
-import { track } from '@vercel/analytics/react'
 
 function InstallPage() {
   const [activeKey, setActiveKey] = useState('windows')
@@ -63,7 +63,7 @@ function InstallPage() {
       <Tabs
         onTabClick={(key) => {
           track('install_type/click', { label: key })
-          sendGAEvent({
+          sendGTMEvent({
             label: key,
             action: 'click',
             category: 'install_type',

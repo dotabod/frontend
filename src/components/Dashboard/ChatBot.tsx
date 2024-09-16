@@ -1,7 +1,7 @@
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from '@next/third-parties/google'
 import { captureException } from '@sentry/nextjs'
 import { track } from '@vercel/analytics/react'
 import { Button, List, Spin, Tooltip } from 'antd'
@@ -162,7 +162,7 @@ export default function ChatBot() {
                           category: 'setup',
                           label: '7tv_register',
                         })
-                        sendGAEvent({
+                        sendGTMEvent({
                           action: 'click',
                           category: 'setup',
                           label: '7tv_register',
@@ -194,7 +194,7 @@ export default function ChatBot() {
                       iconPosition="end"
                       onClick={() => {
                         track('7TV Add Editor')
-                        sendGAEvent({
+                        sendGTMEvent({
                           action: 'click',
                           category: 'setup',
                           label: '7tv_add_editor',

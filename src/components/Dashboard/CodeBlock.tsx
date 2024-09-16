@@ -1,5 +1,5 @@
 import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from '@next/third-parties/google'
 import { track } from '@vercel/analytics/react'
 import { Button, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
@@ -10,7 +10,7 @@ const CodeBlock = () => {
 
   const handleCopy = () => {
     track('install/copy_windows_installer')
-    sendGAEvent({
+    sendGTMEvent({
       action: 'click',
       category: 'install',
       label: 'copy_windows_installer',

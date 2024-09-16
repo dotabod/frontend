@@ -2,7 +2,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from '@next/third-parties/google'
 import * as Sentry from '@sentry/nextjs'
 import { track } from '@vercel/analytics/react'
 import { Alert, Button, Form, Input, Select, Space, Spin, message } from 'antd'
@@ -62,7 +62,7 @@ const ObsSetup: React.FC = () => {
         // Connect to OBS WebSocket
         await obs.connect(`ws://${obsHost}:${obsPort}`, obsPassword)
         setConnected(true)
-        sendGAEvent({
+        sendGTMEvent({
           label: 'connect_success',
           action: 'click',
           category: 'obs_overlay',
@@ -83,7 +83,7 @@ const ObsSetup: React.FC = () => {
         console.error('Error:', err)
         Sentry.captureException(err)
         track('obs/connection_error', { error: err.message })
-        sendGAEvent({
+        sendGTMEvent({
           user: user?.id,
           label: 'connect_error',
           action: 'click',
@@ -123,7 +123,7 @@ const ObsSetup: React.FC = () => {
       console.error('Error:', err)
       Sentry.captureException(err)
       track('obs/fetch_scenes_error', { error: err.message })
-      sendGAEvent({
+      sendGTMEvent({
         label: 'fetch_scenes_error',
         action: 'click',
         category: 'obs_overlay',
@@ -161,7 +161,7 @@ const ObsSetup: React.FC = () => {
     updatePassword(`${form.getFieldValue('password')}`)
 
     track('obs/connect', { port: form.getFieldValue('port') })
-    sendGAEvent({
+    sendGTMEvent({
       label: 'connect',
       action: 'click',
       category: 'obs_overlay',
@@ -173,7 +173,7 @@ const ObsSetup: React.FC = () => {
     if (!obs || selectedScenes.length === 0) return
 
     track('obs/add_to_scene', { user: user?.id })
-    sendGAEvent({
+    sendGTMEvent({
       label: 'add_to_scene',
       action: 'click',
       category: 'obs_overlay',
@@ -240,7 +240,7 @@ const ObsSetup: React.FC = () => {
         console.error('Error:', err)
         Sentry.captureException(err)
         track('obs/add_to_scene_error', { error: err.message })
-        sendGAEvent({
+        sendGTMEvent({
           label: 'add_to_scene_error',
           action: 'click',
           category: 'obs_overlay',
@@ -327,7 +327,7 @@ const ObsSetup: React.FC = () => {
                   onClick={() => {
                     fetchScenes()
                     track('obs/refresh_scenes')
-                    sendGAEvent({
+                    sendGTMEvent({
                       label: 'refresh_scenes',
                       action: 'click',
                       category: 'obs_overlay',
@@ -348,7 +348,7 @@ const ObsSetup: React.FC = () => {
               value={selectedScenes}
               onChange={(value) => {
                 track('obs/select_scene')
-                sendGAEvent({
+                sendGTMEvent({
                   label: 'select_scene',
                   action: 'click',
                   category: 'obs_overlay',

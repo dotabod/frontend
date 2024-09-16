@@ -3,7 +3,7 @@ import {
   LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
-import { sendGAEvent } from '@next/third-parties/google'
+import { sendGTMEvent } from '@next/third-parties/google'
 import { track } from '@vercel/analytics/react'
 import { Alert, Steps } from 'antd'
 import { useSession } from 'next-auth/react'
@@ -138,7 +138,7 @@ const WindowsInstaller = () => {
           setTimeout(() => {
             setCurrentStep(3)
             track('setup/installer_success')
-            sendGAEvent({
+            sendGTMEvent({
               action: 'click',
               category: 'install',
               label: 'windows_installer_success',
@@ -159,7 +159,7 @@ const WindowsInstaller = () => {
             fetchToken()
             setError(null)
             track('setup/installer_check_success')
-            sendGAEvent({
+            sendGTMEvent({
               action: 'click',
               category: 'install',
               label: 'windows_installer_check_success',
@@ -211,7 +211,7 @@ const WindowsInstaller = () => {
             href="https://help.dotabod.com"
             onClick={() => {
               track('setup/help_discord')
-              sendGAEvent({
+              sendGTMEvent({
                 action: 'click',
                 category: 'setup',
                 label: 'help_discord',
@@ -224,7 +224,7 @@ const WindowsInstaller = () => {
           <Link
             onClick={() => {
               track('setup/manual_steps')
-              sendGAEvent({
+              sendGTMEvent({
                 action: 'click',
                 category: 'setup',
                 label: 'manual_steps',
