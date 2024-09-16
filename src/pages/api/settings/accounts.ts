@@ -2,6 +2,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import * as z from 'zod'
@@ -63,6 +64,7 @@ async function getAccounts(userId: string) {
       return account
     })
   } catch (error) {
+    captureException(error)
     console.error('Error in getAccounts:', error)
     return null
   }
@@ -117,6 +119,7 @@ async function handlePatchRequest(
     const updatedAccounts = await Promise.all(updatePromises)
     return res.json({ accounts: updatedAccounts })
   } catch (error) {
+    captureException(error)
     if (error instanceof z.ZodError) {
       return res.status(422).json(error.issues)
     }

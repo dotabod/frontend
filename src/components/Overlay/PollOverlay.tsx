@@ -2,6 +2,7 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
+import { captureException } from '@sentry/nextjs'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
@@ -57,6 +58,7 @@ export const PollOverlay = ({
       })
       .then(setEmotes)
       .catch((e) => {
+        captureException(e)
         //
       })
   }, [data?.Account?.providerAccountId])

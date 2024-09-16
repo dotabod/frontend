@@ -7,6 +7,7 @@ import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
 } from '@heroicons/react/24/outline'
+import { captureException } from '@sentry/nextjs'
 import { Layout, Menu, type MenuProps, theme } from 'antd'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
@@ -69,8 +70,16 @@ export default function DashboardShell({
       now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000
     ) {
       localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
-      fetch('/api/update-followers').catch((error) => console.error(error))
-      fetch('/api/make-dotabod-mod').catch((error) => console.error(error))
+      fetch('/api/update-followers').catch((error) => {
+        captureException(error)
+
+        return console.error(error)
+      })
+      fetch('/api/make-dotabod-mod').catch((error) => {
+        captureException(error)
+
+        return console.error(error)
+      })
     }
   }, [])
 

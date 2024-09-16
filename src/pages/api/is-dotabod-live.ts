@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -22,9 +23,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.json(data?.stream_online || false)
       })
       .catch((e) => {
+        captureException(e)
         return res.status(500).end()
       })
   } catch (error) {
+    captureException(error)
     return res.status(500).end()
   }
 }

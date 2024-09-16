@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs'
 import { Button } from 'antd'
 import clsx from 'clsx'
 import { signIn } from 'next-auth/react'
@@ -26,6 +27,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               '/dashboard',
           })
             .catch((e) => {
+              captureException(e)
               console.log(e)
               setIsLoading(false)
             })

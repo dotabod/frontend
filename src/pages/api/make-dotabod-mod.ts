@@ -4,6 +4,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { captureException } from '@sentry/nextjs'
 import { getServerSession } from 'next-auth'
 
 async function addModerator(broadcasterId: string, accessToken: string) {
@@ -35,6 +36,7 @@ async function addModerator(broadcasterId: string, accessToken: string) {
       return { message: 'Success' }
     }
   } catch (error) {
+    captureException(error)
     console.error(error)
     return { message: 'Error', error: error.message } // Handle error gracefully
   }
@@ -58,6 +60,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const response = await addModerator(providerAccountId, accessToken)
     return res.status(200).json(response)
   } catch (error) {
+    captureException(error)
     console.error('Failed to update mod:', error)
     return res
       .status(500)

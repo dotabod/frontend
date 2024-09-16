@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
+import { captureException } from '@sentry/nextjs'
 import { getServerSession } from 'next-auth'
 
 function convertSteam32To64(steam32Id) {
@@ -45,6 +46,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })) || [],
     })
   } catch (error) {
+    captureException(error)
     console.error(error)
 
     // return the error message

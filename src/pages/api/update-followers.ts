@@ -4,6 +4,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 import { getServerSession } from 'next-auth'
 
 // Helper function to fetch follower count for a user
@@ -26,6 +27,7 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
     const data = await response.json()
     return data.total
   } catch (error) {
+    captureException(error)
     return null // Handle error gracefully, possibly returning null or a default value
   }
 }
@@ -74,6 +76,7 @@ async function updateFollows(userId: string) {
       }
     }
   } catch (error) {
+    captureException(error)
     console.error('Failed to update followers:', error)
   }
 }
@@ -93,6 +96,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await updateFollows(session.user.id)
     return res.status(200).end('Followers updated successfully')
   } catch (error) {
+    captureException(error)
     console.error('Failed to update followers:', error)
     return res.status(500).end('Failed to update followers')
   }

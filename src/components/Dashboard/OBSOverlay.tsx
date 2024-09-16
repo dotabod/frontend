@@ -8,6 +8,7 @@ import { ObsSetup } from './ObsSetup'
 
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { sendGAEvent } from '@next/third-parties/google'
+import { track } from '@vercel/analytics/react'
 import { Button, Tabs, Tag } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -54,6 +55,7 @@ export default function OBSOverlay() {
             className={clsx(copied && '!border-green-600 !text-green-600')}
             onClick={() => {
               copy()
+              track('overlay/copy_url')
               sendGAEvent({
                 action: 'click',
                 category: 'OBS Overlay',
@@ -196,6 +198,7 @@ export default function OBSOverlay() {
           activeKey={activeKey}
           destroyInactiveTabPane
           onTabClick={(key) => {
+            track('overlay/change_tab', { tab: key })
             sendGAEvent({
               action: 'click',
               category: 'OBS Overlay',
@@ -222,6 +225,7 @@ export default function OBSOverlay() {
             target="_blank"
             href="https://help.dotabod.com"
             onClick={() => {
+              track('overlay/help_discord')
               sendGAEvent({
                 action: 'click',
                 category: 'OBS Overlay',
@@ -234,6 +238,7 @@ export default function OBSOverlay() {
           , and then try{' '}
           <Link
             onClick={() => {
+              track('overlay/manual_steps')
               sendGAEvent({
                 action: 'click',
                 category: 'OBS Overlay',

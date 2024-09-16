@@ -2,6 +2,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 
@@ -27,6 +28,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
     return res.status(200).json(response.requires_refresh || false)
   } catch (error) {
+    captureException(error)
     return res
       .status(500)
       .json({ message: 'Failed to get info', error: error.message })

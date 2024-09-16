@@ -1,4 +1,5 @@
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 
 export async function getTwitchTokens(userId: string) {
   try {
@@ -30,6 +31,7 @@ export async function getTwitchTokens(userId: string) {
       accessToken: user.Account.access_token,
     }
   } catch (error) {
+    captureException(error)
     console.error('Failed to get info:', error)
     return { message: 'Failed to get info', error: error.message }
   }

@@ -6,6 +6,7 @@ import {
   dynamicSettingSchema,
   settingKeySchema,
 } from '@/lib/validations/setting'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
@@ -50,6 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         return res.json(data)
       } catch (error) {
+        captureException(error)
         console.error(error)
         return res.status(404).json({
           error: 'User not found',
@@ -100,6 +102,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.json(data)
     } catch (error) {
+      captureException(error)
       console.error('Error fetching user:', error)
       return res.status(500).end()
     }
@@ -135,6 +138,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.json(post)
     } catch (error) {
+      captureException(error)
       console.error('Error creating setting:', error)
 
       if (error instanceof z.ZodError) {

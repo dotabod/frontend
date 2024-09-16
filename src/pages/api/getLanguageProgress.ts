@@ -1,6 +1,7 @@
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 
@@ -20,6 +21,7 @@ async function getTotalUsersForLanguage(languageId: string) {
 
     return { percentage: Math.round((locales / total) * 100), total: locales }
   } catch (error) {
+    captureException(error)
     return { percentage: 0, total: 0 }
   }
 }
@@ -87,6 +89,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       project,
     })
   } catch (error) {
+    captureException(error)
     res.status(500).json({ error: error.message })
   }
 }

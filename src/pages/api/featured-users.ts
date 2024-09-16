@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -61,6 +62,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       randomLive: randomLive.map((bet) => bet.user),
     })
   } catch (error) {
+    captureException(error)
     return res.status(500).end()
   }
 }

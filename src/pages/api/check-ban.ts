@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
+import { captureException } from '@sentry/nextjs'
 import { getServerSession } from 'next-auth'
 import { getTwitchTokens } from '../../lib/getTwitchTokens'
 
@@ -24,6 +25,7 @@ async function checkBan(broadcasterId: string, accessToken: string) {
     }
     return { banned: false }
   } catch (error) {
+    captureException(error)
     return { message: 'Error', error: error.message }
   }
 }
@@ -46,6 +48,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const response = await checkBan(providerAccountId, accessToken)
     return res.status(200).json(response)
   } catch (error) {
+    captureException(error)
     return res
       .status(500)
       .json({ message: 'Failed to get ban info', error: error.message })

@@ -1,5 +1,6 @@
 import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import { sendGAEvent } from '@next/third-parties/google'
+import { track } from '@vercel/analytics/react'
 import { Button, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -8,6 +9,7 @@ const CodeBlock = () => {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
+    track('install/copy_windows_installer')
     sendGAEvent({
       action: 'click',
       category: 'install',

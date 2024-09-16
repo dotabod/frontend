@@ -6,6 +6,7 @@ import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
 import { sendGAEvent } from '@next/third-parties/google'
+import { track } from '@vercel/analytics/react'
 import { Alert, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import Head from 'next/head'
@@ -38,6 +39,7 @@ const SetupPage = () => {
     setActive((current) => {
       const nextStep = current < 3 ? current + 1 : current
       updateStepInUrl(nextStep)
+      track('setup/next_step', { step: nextStep })
       sendGAEvent({
         action: 'click',
         category: 'setup',
@@ -51,6 +53,7 @@ const SetupPage = () => {
     setActive((current) => {
       const prevStep = current > 0 ? current - 1 : current
       updateStepInUrl(prevStep)
+      track('setup/prev_step', { step: prevStep })
       sendGAEvent({
         action: 'click',
         category: 'setup',
@@ -151,6 +154,7 @@ const SetupPage = () => {
             </p>
             <Collapse
               onChange={() => {
+                track('setup/collapse_test_dotabod')
                 sendGAEvent({
                   action: 'click',
                   category: 'setup',

@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
@@ -43,6 +44,7 @@ export default async function handler(
 
     res.status(200).json({ ...languageProgress })
   } catch (error) {
+    captureException(error)
     res.status(500).json({ error: error.message })
   }
 }

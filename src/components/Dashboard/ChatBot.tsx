@@ -2,6 +2,8 @@ import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
 import { sendGAEvent } from '@next/third-parties/google'
+import { captureException } from '@sentry/nextjs'
+import { track } from '@vercel/analytics/react'
 import { Button, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
@@ -64,6 +66,7 @@ export default function ChatBot() {
           }
         }
       } catch (error) {
+        captureException(error)
         console.error('Error fetching user data:', error)
       } finally {
         setLoading(false)
@@ -87,6 +90,7 @@ export default function ChatBot() {
         })
         .catch((e) => {
           console.error(e)
+          captureException(e)
         })
     }
   }, [user?.hasDotabodEmoteSet, user?.hasDotabodEditor])
@@ -153,6 +157,11 @@ export default function ChatBot() {
                       icon={<ExternalLinkIcon size={14} />}
                       iconPosition="end"
                       onClick={() => {
+                        track('7TV Register', {
+                          action: 'click',
+                          category: 'setup',
+                          label: '7tv_register',
+                        })
                         sendGAEvent({
                           action: 'click',
                           category: 'setup',
@@ -184,6 +193,7 @@ export default function ChatBot() {
                       icon={<ExternalLinkIcon size={14} />}
                       iconPosition="end"
                       onClick={() => {
+                        track('7TV Add Editor')
                         sendGAEvent({
                           action: 'click',
                           category: 'setup',

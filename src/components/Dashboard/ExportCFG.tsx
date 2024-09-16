@@ -10,6 +10,7 @@ import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import WindowsInstaller from './WindowsInstaller'
+import { track } from '@vercel/analytics/react'
 
 function InstallPage() {
   const [activeKey, setActiveKey] = useState('windows')
@@ -61,6 +62,7 @@ function InstallPage() {
     <Card>
       <Tabs
         onTabClick={(key) => {
+          track('install_type/click', { label: key })
           sendGAEvent({
             label: key,
             action: 'click',

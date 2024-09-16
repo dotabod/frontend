@@ -7,6 +7,7 @@ import {
   dynamicSettingSchema,
   settingKeySchema,
 } from '@/lib/validations/setting'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import * as z from 'zod'
@@ -52,6 +53,7 @@ async function handleGetRequest(
 
     return res.status(200).json(setting)
   } catch (error) {
+    captureException(error)
     console.error('Error fetching setting:', error)
     return res.status(500).end()
   }
@@ -102,6 +104,7 @@ async function handlePatchRequest(
 
     return res.status(200).json({ status: 'ok' })
   } catch (error) {
+    captureException(error)
     console.error('Error updating setting:', error)
 
     if (error instanceof z.ZodError) {

@@ -1,8 +1,9 @@
 // middleware.ts
 
+import { captureException } from '@sentry/nextjs'
 import { get } from '@vercel/edge-config'
-import { withAuth } from 'next-auth/middleware'
 import type { NextRequestWithAuth } from 'next-auth/middleware'
+import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 
 export const config = {
@@ -36,6 +37,7 @@ export async function middleware(req: NextRequestWithAuth) {
       return NextResponse.rewrite(req.nextUrl)
     }
   } catch (error) {
+    captureException(error)
     // show the default page if EDGE_CONFIG env var is missing,
     // but log the error to the console
     console.error(error)

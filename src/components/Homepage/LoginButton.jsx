@@ -34,6 +34,7 @@ export function LoginButton({ className, ...props }) {
                 console.log(e)
               })
               .catch((e) => {
+                captureException(e)
                 console.log(e)
               })
               .finally(() => setLoading(false))
