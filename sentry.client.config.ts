@@ -34,8 +34,14 @@ if (SENTRY_DSN) {
 
   window.navigation.addEventListener('navigate', (event) => {
     const url = new URL(event.destination.url)
-    if (!url.pathname.startsWith('/overlay')) {
-      replay.start()
+    try {
+      if (url.pathname.startsWith('/overlay')) {
+        replay.stop()
+      } else {
+        replay.start()
+      }
+    } catch (e) {
+      Sentry.captureException(e)
     }
   })
 }
