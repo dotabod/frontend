@@ -4,7 +4,17 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
-import { Alert, Button, Form, Input, Select, Space, Spin, message } from 'antd'
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  Select,
+  Space,
+  Spin,
+  Tooltip,
+  message,
+} from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import OBSWebSocket from 'obs-websocket-js'
@@ -242,6 +252,9 @@ const ObsSetup: React.FC = () => {
           }
         />
       )}
+      {connected && selectedScenes.length <= 0 && (
+        <Alert message="Connected to OBS" type="success" showIcon />
+      )}
 
       {error && (
         <Alert
@@ -255,65 +268,68 @@ const ObsSetup: React.FC = () => {
       )}
 
       <Spin spinning={l0 || l1} tip="Loading">
-        <div className="flex flex-col items-center space-x-4 md:flex-row">
-          <Form.Item
-            name="password"
-            className="flex-1"
-            label="OBS WebSocket Password"
-            rules={[
-              {
-                required: true,
-                message: 'Please enter the OBS WebSocket password!',
-              },
-            ]}
-          >
-            <Input.Password
-              autoComplete="new-password"
-              placeholder="Enter the OBS WebSocket password"
-              onPressEnter={() => form.submit()}
-              onChange={debouncedFormSubmit}
-            />
-          </Form.Item>
+        {!connected && (
+          <div className="flex flex-col items-center space-x-4 md:flex-row">
+            <Form.Item
+              name="password"
+              className="flex-1"
+              label="OBS WebSocket Password"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter the OBS WebSocket password!',
+                },
+              ]}
+            >
+              <Input.Password
+                autoComplete="new-password"
+                placeholder="Enter the OBS WebSocket password"
+                onPressEnter={() => form.submit()}
+                onChange={debouncedFormSubmit}
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="port"
-            label="Port"
-            rules={[
-              {
-                required: true,
-                message: 'Please enter the OBS WebSocket port!',
-              },
-            ]}
-          >
-            <Input
-              autoComplete="off"
-              placeholder="4455"
-              type="number"
-              min={1}
-              max={65535}
-              onChange={debouncedFormSubmit}
-              onPressEnter={() => form.submit()}
-            />
-          </Form.Item>
-        </div>
-
+            <Form.Item
+              name="port"
+              label="Port"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter the OBS WebSocket port!',
+                },
+              ]}
+            >
+              <Input
+                autoComplete="off"
+                placeholder="4455"
+                type="number"
+                min={1}
+                max={65535}
+                onChange={debouncedFormSubmit}
+                onPressEnter={() => form.submit()}
+              />
+            </Form.Item>
+          </div>
+        )}
         <div>
           <Form.Item
             label={
               <Space>
-                <span>Scene(s) to add Dotabod to</span>
-                <Button
-                  disabled={!connected}
-                  icon={<ReloadOutlined />}
-                  onClick={() => {
-                    fetchScenes()
-                    track('obs/refresh_scenes')
-                  }}
-                  type="default"
-                  shape="circle"
-                  title="Refresh scenes"
-                  size="small"
-                />
+                <span>Select scene(s) to add Dotabod to</span>
+                <Tooltip title="Refresh scenes">
+                  <Button
+                    disabled={!connected}
+                    icon={<ReloadOutlined />}
+                    onClick={() => {
+                      fetchScenes()
+                      track('obs/refresh_scenes')
+                    }}
+                    type="default"
+                    shape="circle"
+                    title="Refresh scenes"
+                    size="small"
+                  />
+                </Tooltip>
               </Space>
             }
           >
@@ -349,7 +365,7 @@ const ObsSetup: React.FC = () => {
               selectedScenes.every((scene) => scenesWithSource.includes(scene))
             }
           >
-            Add to selected scenes
+            Add
           </Button>
         </div>
       </Spin>
