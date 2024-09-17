@@ -6,12 +6,24 @@ import * as Sentry from '@sentry/nextjs'
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 
-if (SENTRY_DSN) {
-  const replay = Sentry.replayIntegration({
-    maskAllText: false,
-    blockAllMedia: false,
-  })
+const replay = Sentry.replayIntegration({
+  maskAllText: false,
+  blockAllMedia: false,
+})
 
+function handleNavigation(url: URL) {
+  try {
+    if (url.pathname.startsWith('/overlay')) {
+      replay.stop()
+    } else {
+      replay.start()
+    }
+  } catch (e) {
+    // Sentry.captureException(e)
+  }
+}
+
+if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
 
@@ -32,16 +44,22 @@ if (SENTRY_DSN) {
     integrations: [replay],
   })
 
-  window?.navigation?.addEventListener('navigate', (event) => {
-    const url = new URL(event.destination.url)
-    try {
-      if (url.pathname.startsWith('/overlay')) {
-        replay.stop()
-      } else {
-        replay.start()
+  if (typeof window !== 'undefined') {
+    if (window.navigation) {
+      // Use the Navigation API if available
+      window.navigation.addEventListener('navigate', (event) => {
+        const url = new URL(event.destination.url)
+        handleNavigation(url)
+      })
+    } else {
+      // Fallback for browsers that do not support the Navigation API
+      const handleFallbackNavigation = () => {
+        const url = new URL(window.location.href)
+        handleNavigation(url)
       }
-    } catch (e) {
-      Sentry.captureException(e)
+
+      window.addEventListener('popstate', handleFallbackNavigation)
+      window.addEventListener('hashchange', handleFallbackNavigation)
     }
-  })
+  }
 }
