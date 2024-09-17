@@ -57,8 +57,7 @@ export const PollOverlay = ({
       })
       .then(setEmotes)
       .catch((e) => {
-        captureException(e)
-        //
+        // Don't need to report on users that don't have a 7tv or bttv account
       })
   }, [data?.Account?.providerAccountId])
 
