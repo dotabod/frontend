@@ -32,7 +32,7 @@ if (SENTRY_DSN) {
     integrations: [replay],
   })
 
-  window.navigation.addEventListener('navigate', (event) => {
+  window?.navigation?.addEventListener('navigate', (event) => {
     const url = new URL(event.destination.url)
     try {
       if (url.pathname.startsWith('/overlay')) {
