@@ -81,8 +81,8 @@ const ObsSetup: React.FC = () => {
         setBaseWidth(videoSettings.baseWidth)
         setBaseHeight(videoSettings.baseHeight)
 
-        // Fetch the list of scenes
-        fetchScenes()
+        // Fetch the list of scenes and handle auto-add if necessary
+        await fetchScenes()
         setError(null)
       } catch (err: any) {
         setError(err.message || 'Error connecting to OBS')
@@ -116,7 +116,21 @@ const ObsSetup: React.FC = () => {
       setScenes(sceneNames)
 
       // Check each scene for the existence of the browser source
-      checkScenesForSource(sceneNames)
+      const scenesWithOverlay = await checkScenesForSource(sceneNames)
+      setScenesWithSource(scenesWithOverlay)
+
+      if (sceneNames.length === 1) {
+        const singleScene = sceneNames[0]
+        if (!scenesWithOverlay.includes(singleScene)) {
+          // If there's only one scene and it doesn't have the overlay, auto-add
+          setSelectedScenes([singleScene])
+          await handleSceneSelect([singleScene])
+        } else {
+          // If the single scene already has the overlay, no action needed
+          setSelectedScenes(scenesWithOverlay)
+        }
+      }
+
       setError(null)
     } catch (err: any) {
       setError('Error fetching scenes')
@@ -126,28 +140,35 @@ const ObsSetup: React.FC = () => {
     }
   }
 
-  const checkScenesForSource = async (sceneNames: string[]) => {
-    if (!obs) return
+  const checkScenesForSource = async (
+    sceneNames: string[]
+  ): Promise<string[]> => {
+    if (!obs) return []
 
     const scenesWithOverlay: string[] = []
 
     // Check each scene for the existence of the browser source
     for (const scene of sceneNames) {
-      const sceneItemsResponse = await obs.call('GetSceneItemList', {
-        sceneName: scene,
-      })
+      try {
+        const sceneItemsResponse = await obs.call('GetSceneItemList', {
+          sceneName: scene,
+        })
 
-      const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-        (item: any) => item.sourceName === '[dotabod] main overlay'
-      )
+        const existingSourceInScene = sceneItemsResponse.sceneItems.find(
+          (item: any) => item.sourceName === '[dotabod] main overlay'
+        )
 
-      if (existingSourceInScene) {
-        scenesWithOverlay.push(scene)
+        if (existingSourceInScene) {
+          scenesWithOverlay.push(scene)
+        }
+      } catch (err: any) {
+        console.error(`Error checking scene "${scene}":`, err)
+        // Continue checking other scenes even if one fails
       }
     }
 
     setScenesWithSource(scenesWithOverlay)
-    setSelectedScenes(scenesWithOverlay) // Preselect scenes with the browser source
+    return scenesWithOverlay
   }
 
   const handleFormSubmit = () => {
@@ -158,14 +179,16 @@ const ObsSetup: React.FC = () => {
     track('obs/connect', { port: form.getFieldValue('port') })
   }
 
-  const handleSceneSelect = async () => {
-    if (!obs || selectedScenes.length === 0) return
+  const handleSceneSelect = async (scenesToAdd: string[]) => {
+    if (!obs || scenesToAdd.length === 0) return
 
     track('obs/add_to_scene')
 
-    const newScenes = selectedScenes.filter(
+    const newScenes = scenesToAdd.filter(
       (scene) => !scenesWithSource.includes(scene)
     )
+
+    let addedScenes = 0
 
     for (const selectedScene of newScenes) {
       try {
@@ -197,7 +220,7 @@ const ObsSetup: React.FC = () => {
             sourceName: '[dotabod] main overlay',
             sceneItemEnabled: true, // Enable the item by default
           })
-
+          addedScenes++
           message.success(`Existing source added to scene: ${selectedScene}`)
         } else {
           // If the input doesn't exist, create a new browser source using CreateInput
@@ -213,12 +236,11 @@ const ObsSetup: React.FC = () => {
               webpage_control_level: 4, // Allow OBS to control the webpage
             },
           })
-
+          addedScenes++
           message.success(
             `New browser source created and added to scene: ${selectedScene}`
           )
         }
-        setError(null)
       } catch (err: any) {
         setError(err.message || 'Error adding browser source to scene')
         console.error('Error:', err)
@@ -227,8 +249,12 @@ const ObsSetup: React.FC = () => {
       }
     }
 
+    if (addedScenes > 0) {
+      message.success(`Overlay added to ${addedScenes} scene(s).`)
+    }
+
     // Refetch the list of scenes after adding the source
-    fetchScenes()
+    await fetchScenes()
   }
 
   return (
@@ -240,9 +266,10 @@ const ObsSetup: React.FC = () => {
       style={{ maxWidth: 600, margin: '0 auto' }}
       className="space-y-2"
     >
-      {selectedScenes.length > 0 && (
+      {scenesWithSource.length > 0 && (
         <Alert
           message="Overlay setup complete"
+          description={`The overlay has been added to OBS on scene(s): ${scenesWithSource.join(', ')}`}
           type="success"
           showIcon
           action={
@@ -252,7 +279,7 @@ const ObsSetup: React.FC = () => {
           }
         />
       )}
-      {connected && selectedScenes.length <= 0 && (
+      {connected && scenesWithSource.length === 0 && (
         <Alert message="Connected to OBS" type="success" showIcon />
       )}
 
@@ -312,61 +339,68 @@ const ObsSetup: React.FC = () => {
           </div>
         )}
         <div>
-          <Form.Item
-            label={
-              <Space>
-                <span>Select scene(s) to add Dotabod to</span>
-                <Tooltip title="Refresh scenes">
-                  <Button
-                    disabled={!connected}
-                    icon={<ReloadOutlined />}
-                    onClick={() => {
-                      fetchScenes()
-                      track('obs/refresh_scenes')
-                    }}
-                    type="default"
-                    shape="circle"
-                    title="Refresh scenes"
-                    size="small"
-                  />
-                </Tooltip>
-              </Space>
-            }
-          >
-            <Select
-              disabled={!connected}
-              mode="multiple"
-              placeholder="Select scenes to add the overlay"
-              value={selectedScenes}
-              onChange={(value) => {
-                track('obs/select_scene', { scene: value.join(', ') })
-
-                return setSelectedScenes(value)
-              }}
+          {connected && scenes.length > 1 && (
+            <Form.Item
+              label={
+                <Space>
+                  <span>Select scene(s) to add Dotabod to</span>
+                  <Tooltip title="Refresh scenes">
+                    <Button
+                      disabled={!connected}
+                      icon={<ReloadOutlined />}
+                      onClick={async () => {
+                        await fetchScenes()
+                        track('obs/refresh_scenes')
+                      }}
+                      type="default"
+                      shape="circle"
+                      title="Refresh scenes"
+                      size="small"
+                    />
+                  </Tooltip>
+                </Space>
+              }
             >
-              {scenes.map((scene) => (
-                <Select.Option
-                  key={scene}
-                  value={scene}
-                  disabled={scenesWithSource.includes(scene)}
-                >
-                  {scene}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+              <Select
+                disabled={!connected}
+                mode="multiple"
+                placeholder="Select scenes to add the overlay"
+                value={selectedScenes}
+                onChange={(value) => {
+                  track('obs/select_scene', { scene: value.join(', ') })
 
-          <Button
-            type="primary"
-            onClick={handleSceneSelect}
-            disabled={
-              !connected ||
-              selectedScenes.length === 0 ||
-              selectedScenes.every((scene) => scenesWithSource.includes(scene))
-            }
-          >
-            Add
-          </Button>
+                  return setSelectedScenes(value)
+                }}
+              >
+                {scenes.map((scene) => (
+                  <Select.Option
+                    key={scene}
+                    value={scene}
+                    disabled={scenesWithSource.includes(scene)}
+                  >
+                    {scene}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+
+          {/* Show the Add button only if there are multiple scenes */}
+          {connected && scenes.length > 1 && (
+            <Button
+              type="primary"
+              onClick={() => handleSceneSelect(selectedScenes)}
+              disabled={
+                !connected ||
+                selectedScenes.length === 0 ||
+                selectedScenes.every((scene) =>
+                  scenesWithSource.includes(scene)
+                )
+              }
+            >
+              Add
+            </Button>
+          )}
         </div>
       </Spin>
 
