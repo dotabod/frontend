@@ -3,28 +3,56 @@ import clsx from 'clsx'
 import { Badge } from '../../Badge'
 import { Card } from '../../Card'
 
-const Numbers = ({ hasImage, leaderboard, rank, className = '', ...props }) => {
-  const res = useTransformRes()
+interface NumbersProps {
+  hasImage: boolean
+  leaderboardPosition?: number
+  playerRank?: number
+  className?: string
+}
 
-  const fontSize = res({ h: 18 })
+const Numbers: React.FC<NumbersProps> = ({
+  hasImage,
+  leaderboardPosition,
+  playerRank,
+  className = '',
+}) => {
+  const transformRes = useTransformRes()
+  const fontSize = transformRes({ h: 18 })
+
+  // Helper function to render leaderboard position
+  const renderLeaderboard = () => {
+    if (!leaderboardPosition) return null
+    return <span>{`#${leaderboardPosition}`}</span>
+  }
+
+  // Helper function to render rank
+  const renderRank = () => {
+    if (!playerRank && !leaderboardPosition) return null
+
+    if (playerRank && (leaderboardPosition || !hasImage || playerRank)) {
+      return (
+        <span
+          className={clsx(
+            leaderboardPosition ? 'text-base' : '',
+            !playerRank && 'hidden'
+          )}
+        >
+          {`${playerRank} MMR`}
+        </span>
+      )
+    }
+
+    return null
+  }
+
   return (
     <div
       id="rank-numbers"
       style={{ fontSize }}
       className={clsx(className, 'flex flex-col items-center')}
-      {...props}
     >
-      <span key="leaderboard">{leaderboard && `#${leaderboard}`}</span>
-      <span
-        key="rank"
-        className={clsx(
-          leaderboard && 'text-base',
-          !rank && !leaderboard && 'hidden'
-        )}
-      >
-        {rank && rank}
-        {rank && (leaderboard || !hasImage || rank) && ' MMR'}
-      </span>
+      {renderLeaderboard()}
+      {renderRank()}
     </div>
   )
 }
@@ -59,7 +87,11 @@ export const MMRBadge = ({
             marginTop: res({ h: 20 }),
           }}
         />
-        <Numbers hasImage={!!image} rank={rank} leaderboard={leaderboard} />
+        <Numbers
+          hasImage={!!image}
+          playerRank={rank}
+          leaderboardPosition={leaderboard}
+        />
       </div>
     )
   }
@@ -79,8 +111,8 @@ export const MMRBadge = ({
       />
       <Numbers
         hasImage={!!image}
-        rank={rank}
-        leaderboard={leaderboard}
+        playerRank={rank}
+        leaderboardPosition={leaderboard}
         className={clsx(
           !image && 'mt-0',
           (leaderboard || ['80.png', '91.png', '92.png'].includes(image)) &&
