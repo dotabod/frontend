@@ -442,7 +442,11 @@ const ObsSetup: React.FC = () => {
       {!connected && (
         <div className="space-y-4">
           <div className="flex flex-col items-center space-y-2">
-            <div>Video guide to retrieve the server password</div>
+            <div>
+              In OBS, go to Tools → Websocket Server → Enable → Apply → Show
+              connect info → Copy password. Make sure you press Apply or OK at
+              the end to enable the server.
+            </div>
             <video
               className="rounded-lg"
               width="924"
