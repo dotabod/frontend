@@ -82,6 +82,24 @@ const ObsSetup: React.FC = () => {
 
         track('obs/connect_success', { port: obsPortValue })
 
+        // Get the current OBS version
+        const getVersion = await obs.call('GetVersion')
+        const obsVersion = getVersion.obsVersion
+
+        // Make sure they are 30.2.3 or above
+        const [major, minor, patch] = obsVersion.split('.').map(Number)
+        if (
+          major < 30 ||
+          (major === 30 && minor < 2) ||
+          (major === 30 && minor === 2 && patch < 3)
+        ) {
+          setError('OBS version 30.2.3 or above is required')
+          console.error('Error: OBS version 30.2.3 or above is required')
+          Sentry.captureException('OBS version 30.2.3 or above is required')
+          track('obs/version_error', { version: obsVersion })
+          return
+        }
+
         // Fetch the base canvas resolution
         const videoSettings = await obs.call('GetVideoSettings')
         const fetchedBaseWidth = videoSettings.baseWidth
@@ -287,7 +305,7 @@ const ObsSetup: React.FC = () => {
       style={{ maxWidth: 600, margin: '0 auto' }}
       className="space-y-2"
     >
-      {scenesWithSource.length > 0 && (
+      {!error && scenesWithSource.length > 0 && (
         <Alert
           message="Overlay setup complete"
           type="success"
@@ -305,7 +323,7 @@ const ObsSetup: React.FC = () => {
           }
         />
       )}
-      {connected && scenesWithSource.length === 0 && (
+      {!error && connected && scenesWithSource.length === 0 && (
         <Alert message="Connected to OBS" type="success" showIcon />
       )}
 
@@ -315,7 +333,18 @@ const ObsSetup: React.FC = () => {
           type="error"
           showIcon
           action={
-            <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
+            <div className="space-x-4">
+              <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
+              {error.includes('OBS version') && (
+                <Button
+                  type="primary"
+                  href="https://obsproject.com/download"
+                  target="_blank"
+                >
+                  Update OBS
+                </Button>
+              )}
+            </div>
           }
         />
       )}
@@ -365,7 +394,7 @@ const ObsSetup: React.FC = () => {
           </div>
         )}
         <div>
-          {connected && scenes.length > 1 && (
+          {!error && connected && scenes.length > 1 && (
             <Form.Item
               label={
                 <Space>
@@ -415,7 +444,7 @@ const ObsSetup: React.FC = () => {
           )}
 
           {/* Show the Add button only if there are multiple scenes */}
-          {connected && scenes.length > 1 && (
+          {!error && connected && scenes.length > 1 && (
             <Button
               type="primary"
               onClick={async () => {
