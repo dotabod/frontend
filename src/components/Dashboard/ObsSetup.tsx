@@ -369,7 +369,7 @@ const ObsSetup: React.FC = () => {
             <Form.Item
               label={
                 <Space>
-                  <span>Select scene(s) to add Dotabod to</span>
+                  <span>Choose the scene where Dota 2 is captured</span>
                   <Tooltip title="Refresh scenes">
                     <Button
                       disabled={!connected}
@@ -392,26 +392,25 @@ const ObsSetup: React.FC = () => {
               }
             >
               <Select
+                className="notranslate"
                 disabled={!connected}
                 mode="multiple"
-                placeholder="Select scenes to add the overlay"
+                placeholder="Select scene(s)"
                 value={selectedScenes}
                 onChange={(value) => {
                   track('obs/select_scene', { scene: value.join(', ') })
-
-                  return setSelectedScenes(value)
+                  setSelectedScenes(value)
                 }}
-              >
-                {scenes.map((scene) => (
-                  <Select.Option
-                    key={scene.sceneUuid}
-                    value={scene.sceneUuid}
-                    disabled={scenesWithSource.includes(scene.sceneUuid)}
-                  >
-                    {scene.sceneName}
-                  </Select.Option>
-                ))}
-              </Select>
+                options={scenes.map((scene) => ({
+                  label: (
+                    <span translate="no" className="notranslate">
+                      {scene.sceneName}
+                    </span>
+                  ),
+                  value: scene.sceneUuid,
+                  disabled: scenesWithSource.includes(scene.sceneUuid),
+                }))}
+              />
             </Form.Item>
           )}
 
