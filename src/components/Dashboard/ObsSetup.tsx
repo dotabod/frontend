@@ -67,22 +67,24 @@ const ObsSetup: React.FC = () => {
 
       try {
         const obsHost = 'localhost'
-        const obsPort = form.getFieldValue('port') || 4455
-        const obsPassword = form.getFieldValue('password') || ''
+        const obsPortValue = form.getFieldValue('port') || 4455
+        const obsPasswordValue = form.getFieldValue('password') || ''
 
         // Connect to OBS WebSocket
-        await obs.connect(`ws://${obsHost}:${obsPort}`, obsPassword)
+        await obs.connect(`ws://${obsHost}:${obsPortValue}`, obsPasswordValue)
         setConnected(true)
 
-        track('obs/connect_success', { port: obsPort })
+        track('obs/connect_success', { port: obsPortValue })
 
         // Fetch the base canvas resolution
         const videoSettings = await obs.call('GetVideoSettings')
-        setBaseWidth(videoSettings.baseWidth)
-        setBaseHeight(videoSettings.baseHeight)
+        const fetchedBaseWidth = videoSettings.baseWidth
+        const fetchedBaseHeight = videoSettings.baseHeight
+        setBaseWidth(fetchedBaseWidth)
+        setBaseHeight(fetchedBaseHeight)
 
         // Fetch the list of scenes and handle auto-add if necessary
-        await fetchScenes()
+        await fetchScenes(fetchedBaseWidth, fetchedBaseHeight)
         setError(null)
       } catch (err: any) {
         setError(err.message || 'Error connecting to OBS')
@@ -104,7 +106,11 @@ const ObsSetup: React.FC = () => {
     }
   }, [obs])
 
-  const fetchScenes = async () => {
+  // Modify fetchScenes to accept baseWidth and baseHeight
+  const fetchScenes = async (
+    currentBaseWidth: number,
+    currentBaseHeight: number
+  ) => {
     if (!obs) return
 
     try {
@@ -124,7 +130,11 @@ const ObsSetup: React.FC = () => {
         if (!scenesWithOverlay.includes(singleScene)) {
           // If there's only one scene and it doesn't have the overlay, auto-add
           setSelectedScenes([singleScene])
-          await handleSceneSelect([singleScene])
+          await handleSceneSelect(
+            [singleScene],
+            currentBaseWidth,
+            currentBaseHeight
+          )
         } else {
           // If the single scene already has the overlay, no action needed
           setSelectedScenes(scenesWithOverlay)
@@ -140,46 +150,12 @@ const ObsSetup: React.FC = () => {
     }
   }
 
-  const checkScenesForSource = async (
-    sceneNames: string[]
-  ): Promise<string[]> => {
-    if (!obs) return []
-
-    const scenesWithOverlay: string[] = []
-
-    // Check each scene for the existence of the browser source
-    for (const scene of sceneNames) {
-      try {
-        const sceneItemsResponse = await obs.call('GetSceneItemList', {
-          sceneName: scene,
-        })
-
-        const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay'
-        )
-
-        if (existingSourceInScene) {
-          scenesWithOverlay.push(scene)
-        }
-      } catch (err: any) {
-        console.error(`Error checking scene "${scene}":`, err)
-        // Continue checking other scenes even if one fails
-      }
-    }
-
-    setScenesWithSource(scenesWithOverlay)
-    return scenesWithOverlay
-  }
-
-  const handleFormSubmit = () => {
-    setObs(new OBSWebSocket()) // Create a new OBSWebSocket instance
-    updatePort(Number(form.getFieldValue('port')))
-    updatePassword(`${form.getFieldValue('password')}`)
-
-    track('obs/connect', { port: form.getFieldValue('port') })
-  }
-
-  const handleSceneSelect = async (scenesToAdd: string[]) => {
+  // Modify handleSceneSelect to accept baseWidth and baseHeight
+  const handleSceneSelect = async (
+    scenesToAdd: string[],
+    currentBaseWidth: number,
+    currentBaseHeight: number
+  ) => {
     if (!obs || scenesToAdd.length === 0) return
 
     track('obs/add_to_scene')
@@ -231,8 +207,8 @@ const ObsSetup: React.FC = () => {
             inputSettings: {
               css: '',
               url: overlayUrl,
-              width: baseWidth,
-              height: baseHeight,
+              width: currentBaseWidth,
+              height: currentBaseHeight,
               webpage_control_level: 4, // Allow OBS to control the webpage
             },
           })
@@ -254,7 +230,46 @@ const ObsSetup: React.FC = () => {
     }
 
     // Refetch the list of scenes after adding the source
-    await fetchScenes()
+    await fetchScenes(currentBaseWidth, currentBaseHeight)
+  }
+
+  const checkScenesForSource = async (
+    sceneNames: string[]
+  ): Promise<string[]> => {
+    if (!obs) return []
+
+    const scenesWithOverlay: string[] = []
+
+    // Check each scene for the existence of the browser source
+    for (const scene of sceneNames) {
+      try {
+        const sceneItemsResponse = await obs.call('GetSceneItemList', {
+          sceneName: scene,
+        })
+
+        const existingSourceInScene = sceneItemsResponse.sceneItems.find(
+          (item: any) => item.sourceName === '[dotabod] main overlay'
+        )
+
+        if (existingSourceInScene) {
+          scenesWithOverlay.push(scene)
+        }
+      } catch (err: any) {
+        console.error(`Error checking scene "${scene}":`, err)
+        // Continue checking other scenes even if one fails
+      }
+    }
+
+    setScenesWithSource(scenesWithOverlay)
+    return scenesWithOverlay
+  }
+
+  const handleFormSubmit = () => {
+    setObs(new OBSWebSocket()) // Create a new OBSWebSocket instance
+    updatePort(Number(form.getFieldValue('port')))
+    updatePassword(`${form.getFieldValue('password')}`)
+
+    track('obs/connect', { port: form.getFieldValue('port') })
   }
 
   return (
@@ -349,8 +364,12 @@ const ObsSetup: React.FC = () => {
                       disabled={!connected}
                       icon={<ReloadOutlined />}
                       onClick={async () => {
-                        await fetchScenes()
-                        track('obs/refresh_scenes')
+                        if (baseWidth !== null && baseHeight !== null) {
+                          await fetchScenes(baseWidth, baseHeight)
+                          track('obs/refresh_scenes')
+                        } else {
+                          message.error('Video settings not loaded yet.')
+                        }
                       }}
                       type="default"
                       shape="circle"
@@ -389,7 +408,13 @@ const ObsSetup: React.FC = () => {
           {connected && scenes.length > 1 && (
             <Button
               type="primary"
-              onClick={() => handleSceneSelect(selectedScenes)}
+              onClick={async () => {
+                if (baseWidth !== null && baseHeight !== null) {
+                  await handleSceneSelect(selectedScenes, baseWidth, baseHeight)
+                } else {
+                  message.error('Video settings not loaded yet.')
+                }
+              }}
               disabled={
                 !connected ||
                 selectedScenes.length === 0 ||
