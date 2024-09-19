@@ -280,6 +280,7 @@ const ObsSetup: React.FC = () => {
         }
       } catch (err: any) {
         console.error(`Error checking scene "${scene}":`, err)
+        Sentry.captureException(err)
         // Continue checking other scenes even if one fails
       }
     }
