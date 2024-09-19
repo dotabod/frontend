@@ -21,12 +21,18 @@ import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
+interface Scene {
+  sceneIndex: number // Scene index
+  sceneUuid: string // Unique identifier
+  sceneName: string // Scene name
+}
+
 const ObsSetup: React.FC = () => {
   const track = useTrack()
   const [connected, setConnected] = useState(false)
   const [baseWidth, setBaseWidth] = useState<number | null>(null)
   const [baseHeight, setBaseHeight] = useState<number | null>(null)
-  const [scenes, setScenes] = useState<string[]>([])
+  const [scenes, setScenes] = useState<Scene[]>([])
   const [selectedScenes, setSelectedScenes] = useState<string[]>([])
   const [scenesWithSource, setScenesWithSource] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -116,17 +122,17 @@ const ObsSetup: React.FC = () => {
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
-      const sceneNames = sceneListResponse.scenes.map(
-        (scene: any) => scene.sceneName
+      const sceneUuids = sceneListResponse.scenes.map(
+        (scene: any) => (scene as Scene).sceneUuid
       )
-      setScenes(sceneNames)
+      setScenes(sceneListResponse.scenes as unknown as Scene[])
 
       // Check each scene for the existence of the browser source
-      const scenesWithOverlay = await checkScenesForSource(sceneNames)
+      const scenesWithOverlay = await checkScenesForSource(sceneUuids)
       setScenesWithSource(scenesWithOverlay)
 
-      if (sceneNames.length === 1) {
-        const singleScene = sceneNames[0]
+      if (sceneUuids.length === 1) {
+        const singleScene = sceneUuids[0]
         if (!scenesWithOverlay.includes(singleScene)) {
           // If there's only one scene and it doesn't have the overlay, auto-add
           setSelectedScenes([singleScene])
@@ -170,7 +176,7 @@ const ObsSetup: React.FC = () => {
       try {
         // Fetch the list of inputs for the selected scene
         const sceneItemsResponse = await obs.call('GetSceneItemList', {
-          sceneName: selectedScene,
+          sceneUuid: selectedScene,
         })
 
         // Check if the browser source already exists in the selected scene
@@ -192,7 +198,7 @@ const ObsSetup: React.FC = () => {
         if (existingInput) {
           // If the input exists globally, add it to the selected scene
           await obs.call('CreateSceneItem', {
-            sceneName: selectedScene,
+            sceneUuid: selectedScene,
             sourceName: '[dotabod] main overlay',
             sceneItemEnabled: true, // Enable the item by default
           })
@@ -201,7 +207,7 @@ const ObsSetup: React.FC = () => {
         } else {
           // If the input doesn't exist, create a new browser source using CreateInput
           await obs.call('CreateInput', {
-            sceneName: selectedScene,
+            sceneUuid: selectedScene,
             inputName: '[dotabod] main overlay',
             inputKind: 'browser_source',
             inputSettings: {
@@ -234,17 +240,17 @@ const ObsSetup: React.FC = () => {
   }
 
   const checkScenesForSource = async (
-    sceneNames: string[]
+    sceneUuids: string[]
   ): Promise<string[]> => {
     if (!obs) return []
 
     const scenesWithOverlay: string[] = []
 
     // Check each scene for the existence of the browser source
-    for (const scene of sceneNames) {
+    for (const scene of sceneUuids) {
       try {
         const sceneItemsResponse = await obs.call('GetSceneItemList', {
-          sceneName: scene,
+          sceneUuid: scene,
         })
 
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
@@ -284,8 +290,13 @@ const ObsSetup: React.FC = () => {
       {scenesWithSource.length > 0 && (
         <Alert
           message="Overlay setup complete"
-          description={`The overlay has been added to OBS on scene(s): ${scenesWithSource.join(', ')}`}
           type="success"
+          description={`The overlay has been added to OBS on scene(s): ${scenesWithSource
+            .map((sceneUuid) => {
+              const scene = scenes.find((s) => s.sceneUuid === sceneUuid)
+              return scene ? scene.sceneName : sceneUuid
+            })
+            .join(', ')}`}
           showIcon
           action={
             <Link href="/dashboard?step=4">
@@ -393,11 +404,11 @@ const ObsSetup: React.FC = () => {
               >
                 {scenes.map((scene) => (
                   <Select.Option
-                    key={scene}
-                    value={scene}
-                    disabled={scenesWithSource.includes(scene)}
+                    key={scene.sceneUuid}
+                    value={scene.sceneUuid}
+                    disabled={scenesWithSource.includes(scene.sceneUuid)}
                   >
-                    {scene}
+                    {scene.sceneName}
                   </Select.Option>
                 ))}
               </Select>
