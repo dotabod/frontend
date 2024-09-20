@@ -325,7 +325,11 @@ const ObsSetup: React.FC = () => {
         />
       )}
       {!error && connected && scenesWithSource.length === 0 && (
-        <Alert message="Connected to OBS" type="success" showIcon />
+        <Alert
+          message="Connected to OBS, now select your scenes below"
+          type="info"
+          showIcon
+        />
       )}
 
       {error && (
