@@ -310,7 +310,7 @@ const ObsSetup: React.FC = () => {
         <Alert
           message="Overlay setup complete"
           type="success"
-          description={`The overlay has been added to OBS on scene(s): ${scenesWithSource
+          description={`Added the Dotabod overlay on scene(s): ${scenesWithSource
             .map((sceneUuid) => {
               const scene = scenes.find((s) => s.sceneUuid === sceneUuid)
               return scene ? scene.sceneName : sceneUuid
@@ -415,35 +415,35 @@ const ObsSetup: React.FC = () => {
             </Form.Item>
           </div>
         )}
-        <div>
-          {!error && connected && scenes.length > 1 && (
-            <Form.Item
-              label={
-                <Space>
-                  <span>Choose the scene where Dota 2 is captured</span>
-                  <Tooltip title="Refresh scenes">
-                    <Button
-                      disabled={!connected}
-                      icon={<ReloadOutlined />}
-                      onClick={async () => {
-                        if (baseWidth !== null && baseHeight !== null) {
-                          await fetchScenes(baseWidth, baseHeight)
-                          track('obs/refresh_scenes')
-                        } else {
-                          message.error('Video settings not loaded yet.')
-                        }
-                      }}
-                      type="default"
-                      shape="circle"
-                      title="Refresh scenes"
-                      size="small"
-                    />
-                  </Tooltip>
-                </Space>
-              }
-            >
+        {!error && connected && scenes.length > 1 && (
+          <Form.Item
+            label={
+              <Space>
+                <span>Choose the scene where Dota 2 is captured</span>
+                <Tooltip title="Refresh scenes">
+                  <Button
+                    disabled={!connected}
+                    icon={<ReloadOutlined />}
+                    onClick={async () => {
+                      if (baseWidth !== null && baseHeight !== null) {
+                        await fetchScenes(baseWidth, baseHeight)
+                        track('obs/refresh_scenes')
+                      } else {
+                        message.error('Video settings not loaded yet.')
+                      }
+                    }}
+                    type="default"
+                    shape="circle"
+                    title="Refresh scenes"
+                    size="small"
+                  />
+                </Tooltip>
+              </Space>
+            }
+          >
+            <div className="flex flex-row items-center space-x-4">
               <Select
-                className="notranslate"
+                className="notranslate max-w-sm"
                 disabled={!connected}
                 mode="multiple"
                 defaultOpen
@@ -463,32 +463,34 @@ const ObsSetup: React.FC = () => {
                   disabled: scenesWithSource.includes(scene.sceneUuid),
                 }))}
               />
-            </Form.Item>
-          )}
-
-          {/* Show the Add button only if there are multiple scenes */}
-          {!error && connected && scenes.length > 1 && (
-            <Button
-              type="primary"
-              onClick={async () => {
-                if (baseWidth !== null && baseHeight !== null) {
-                  await handleSceneSelect(selectedScenes, baseWidth, baseHeight)
-                } else {
-                  message.error('Video settings not loaded yet.')
-                }
-              }}
-              disabled={
-                !connected ||
-                selectedScenes.length === 0 ||
-                selectedScenes.every((scene) =>
-                  scenesWithSource.includes(scene)
-                )
-              }
-            >
-              Add
-            </Button>
-          )}
-        </div>
+              {!error && connected && scenes.length > 1 && (
+                <Button
+                  type="primary"
+                  onClick={async () => {
+                    if (baseWidth !== null && baseHeight !== null) {
+                      await handleSceneSelect(
+                        selectedScenes,
+                        baseWidth,
+                        baseHeight
+                      )
+                    } else {
+                      message.error('Video settings not loaded yet.')
+                    }
+                  }}
+                  disabled={
+                    !connected ||
+                    selectedScenes.length === 0 ||
+                    selectedScenes.every((scene) =>
+                      scenesWithSource.includes(scene)
+                    )
+                  }
+                >
+                  Submit
+                </Button>
+              )}
+            </div>
+          </Form.Item>
+        )}
       </Spin>
 
       {!connected && (
