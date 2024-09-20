@@ -57,7 +57,7 @@ export const navigation = [
     icon: CommandLineIcon,
   },
   {
-    name: 'Troubleshoot',
+    name: 'Help',
     href: '/dashboard/troubleshoot',
     icon: QuestionMarkCircleIcon,
   },

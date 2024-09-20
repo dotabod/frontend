@@ -14,6 +14,7 @@ import { Alert, Button, Form, InputNumber } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useDebouncedCallback } from 'use-debounce'
@@ -259,7 +260,12 @@ const MmrForm = ({ hideText = false }) => {
             <Alert
               type="warning"
               showIcon
-              message="No steam account found yet. Play a bot match!"
+              message="No steam account found yet"
+              action={
+                <Link href="/dashboard/troubleshoot">
+                  <Button>Read help</Button>
+                </Link>
+              }
             />
           </div>
           <div className="flex space-x-4 transition-all">

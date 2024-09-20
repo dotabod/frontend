@@ -50,7 +50,7 @@ const OverlayPage = () => {
       </Head>
 
       <Header
-        subtitle="Take a peak to see if your OBS is showing the correct overlay. Try joining a bot match to have this preview show the pick blocker, for example."
+        subtitle="Take a peak to see if your OBS is showing the correct overlay. Try joining a live match to have this preview show some details."
         title="Live preview"
       />
       <Spin size="large" tip="Loading overlay..." spinning={isLoading}>

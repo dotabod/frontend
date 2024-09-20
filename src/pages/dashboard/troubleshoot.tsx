@@ -36,14 +36,28 @@ export const StepComponent: React.FC<{
 
 const faqs = [
   {
-    question: 'How do I test that it works?',
+    question: 'How to connect my steam account?',
     answer: (
       <StepComponent
         steps={[
           <span key={0}>
-            Try loading a solo bot match. If you can type <Tag>!facet</Tag> in
-            your chat, it works.
+            Demo any hero and type <Tag>!facet</Tag> in your chat to confirm
+            Dotabod can find you.
           </span>,
+          <span key={1}>
+            While demoing, visit the{' '}
+            <Link href="/overlay">Live Preview page</Link> to confirm the
+            overlay is showing.
+          </span>,
+        ]}
+      />
+    ),
+  },
+  {
+    question: 'How do I test that it works?',
+    answer: (
+      <StepComponent
+        steps={[
           <span key={1}>
             Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can
             type.
@@ -116,7 +130,6 @@ const faqs = [
             Don't forget to reboot Dota after saving the cfg in the right
             folder.
           </span>,
-          'Play a bot match to verify Dotabod can find your account.',
           <span key={2}>
             Still nothing? Could your Steam account be linked to another Dotabod
             user? Only one person may have the Steam account linked. Dotabod
