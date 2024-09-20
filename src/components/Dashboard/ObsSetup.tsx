@@ -330,7 +330,7 @@ const ObsSetup: React.FC = () => {
 
       {error && (
         <Alert
-          message={`Error: ${error}`}
+          message={`${error}. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.`}
           type="error"
           showIcon
           action={
@@ -346,6 +346,23 @@ const ObsSetup: React.FC = () => {
                 </Button>
               )}
             </div>
+          }
+        />
+      )}
+
+      {error && !error.includes('OBS version') && (
+        <Alert
+          message="Are you on the latest version of OBS? v30.2.3 or above is required."
+          type="warning"
+          showIcon
+          action={
+            <Button
+              type="primary"
+              href="https://obsproject.com/download"
+              target="_blank"
+            >
+              Update OBS
+            </Button>
           }
         />
       )}
