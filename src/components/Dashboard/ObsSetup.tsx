@@ -446,6 +446,7 @@ const ObsSetup: React.FC = () => {
                 className="notranslate"
                 disabled={!connected}
                 mode="multiple"
+                defaultOpen
                 placeholder="Select scene(s)"
                 value={selectedScenes}
                 onChange={(value) => {
