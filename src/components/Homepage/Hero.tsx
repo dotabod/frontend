@@ -1,6 +1,7 @@
 import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustration'
 import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { fetcher } from '@/lib/fetcher'
+import { useTrack } from '@/lib/track'
 import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
 import { Button } from 'antd'
 import { useSession } from 'next-auth/react'
@@ -112,6 +113,7 @@ const TwitchUser = ({
       <a
         className="flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-shadow hover:shadow-lg"
         rel="noreferrer"
+        onClick={onClick}
         href={userName === 'You?' ? '#' : `https://twitch.tv/${userName}`}
         target="_blank"
       >
@@ -141,6 +143,7 @@ export function Hero() {
     randomLive: { name: string; image: string }[]
     topLive: { name: string; image: string }[]
   }>('/api/featured-users', fetcher)
+  const track = useTrack()
 
   return (
     <div className="overflow-hidden py-15 sm:py-27 lg:pb-27 xl:pb-31">
@@ -224,7 +227,10 @@ export function Hero() {
                   height={18}
                   alt="twitch logo"
                 />
-                <span>Featured in over 20,000 Twitch streamers</span>
+                <span>
+                  Featured in over {new Intl.NumberFormat().format(20000)}{' '}
+                  Twitch streamers
+                </span>
               </div>
             </div>
             <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
@@ -241,6 +247,7 @@ export function Hero() {
                       if (name === 'You?') {
                         e.preventDefault()
                       }
+                      track('homepage - static twitch profile')
                     }}
                     image={image}
                   />
@@ -268,6 +275,9 @@ export function Hero() {
                         session={session}
                         name={name}
                         image={image}
+                        onClick={() => {
+                          track('homepage - top live twitch profile')
+                        }}
                       />
                     ))}
                   </ul>
@@ -291,6 +301,9 @@ export function Hero() {
                         session={session}
                         name={name}
                         image={image}
+                        onClick={() => {
+                          track('homepage - random twitch profile')
+                        }}
                       />
                     ))}
                   </ul>
