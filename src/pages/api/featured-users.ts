@@ -36,6 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const randomLive = await prisma.bet.findMany({
       take: 10,
+      distinct: ['userId'],
       select: {
         user: {
           select: {
