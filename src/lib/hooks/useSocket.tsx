@@ -4,6 +4,7 @@ import { fetcher } from '@/lib/fetcher'
 import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { type RankType, getRankImage } from '@/lib/ranks'
+import { captureException } from '@sentry/nextjs'
 import {
   EventSubChannelPollBeginEvent,
   EventSubChannelPollEndEvent,
@@ -25,7 +26,6 @@ import {
   setMinimapDataHeroes,
   setMinimapStatus,
 } from '../redux/store'
-import { captureException } from '@sentry/nextjs'
 
 export let socket: Socket | null = null
 
@@ -129,15 +129,30 @@ export const useSocket = ({
     })
 
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
+      console.log('[MMR] requestMatchData event received', {
+        matchId,
+        heroSlot,
+      })
       try {
         // Create a job to parse the match
+        console.log('[MMR] Creating job for matchId:', matchId)
         const jobId = await createJob(matchId)
+        console.log('[MMR] Job created with jobId:', jobId)
 
         // Wait for the job to finish
+        console.log('[MMR] Waiting for job to finish for jobId:', jobId)
         await getJobStatus(jobId)
+        console.log('[MMR] Job finished for jobId:', jobId)
 
         // Get match data once parsing is complete
+        console.log(
+          '[MMR] Fetching match data for matchId:',
+          matchId,
+          'and heroSlot:',
+          heroSlot
+        )
         const data = await getMatchData(matchId, heroSlot)
+        console.log('[MMR] Match data fetched:', data)
         cb(data)
       } catch (e) {
         captureException(e)

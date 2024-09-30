@@ -1,4 +1,3 @@
-import { captureException } from '@sentry/nextjs'
 import axios from 'axios'
 import retry from 'retry'
 
@@ -7,82 +6,55 @@ export async function getMatchData(matchId: string, heroId: number) {
   let isPrivate = false
   let radiantWin = null
   let lobbyType = null
+  const opendotaMatch = await axios(
+    `https://api.opendota.com/api/matches/${matchId}`
+  )
 
-  // Set up the retry operation
-  const operation = retry.operation({
-    retries: 8, // Number of retries
-    factor: 3, // Exponential backoff factor
-    minTimeout: 1 * 1000, // Minimum retry timeout (1 second)
-    maxTimeout: 60 * 1000, // Maximum retry timeout (60 seconds)
-  })
+  const moreData = {
+    radiantScore: 0,
+    direScore: 0,
+    kills: 0,
+    deaths: 0,
+    assists: 0,
+  }
 
-  return new Promise((resolve, reject) => {
-    operation.attempt(async () => {
-      try {
-        const opendotaMatch = await axios(
-          `https://api.opendota.com/api/matches/${matchId}`
-        )
+  if (
+    Array.isArray(opendotaMatch.data?.players) &&
+    typeof heroId === 'number'
+  ) {
+    const player = opendotaMatch?.data?.players.find(
+      (p) => p.hero_id === heroId
+    )
+    isPrivate = !player?.account_id
+    const partySize = player?.party_size
+    if (typeof partySize === 'number' && partySize > 1) {
+      isParty = true
+    }
 
-        const moreData = {
-          radiantScore: 0,
-          direScore: 0,
-          kills: 0,
-          deaths: 0,
-          assists: 0,
-        }
+    if (typeof opendotaMatch?.data?.radiant_win === 'boolean') {
+      radiantWin = opendotaMatch?.data?.radiant_win
+      moreData.radiantScore = opendotaMatch?.data?.radiant_score
+      moreData.direScore = opendotaMatch?.data?.dire_score
+      moreData.kills = opendotaMatch?.data?.kills
+      moreData.deaths = opendotaMatch?.data?.deaths
+      moreData.assists = opendotaMatch?.data?.assists
+    }
 
-        if (
-          Array.isArray(opendotaMatch.data?.players) &&
-          typeof heroId === 'number'
-        ) {
-          const player = opendotaMatch?.data?.players.find(
-            (p) => p.hero_id === heroId
-          )
-          isPrivate = !player?.account_id
-          const partySize = player?.party_size
-          if (typeof partySize === 'number' && partySize > 1) {
-            isParty = true
-          }
+    if (typeof opendotaMatch?.data?.lobby_type === 'number') {
+      lobbyType = opendotaMatch?.data?.lobby_type
+    }
+  } else {
+    new Error('Match not found')
+  }
 
-          if (typeof opendotaMatch?.data?.radiant_win === 'boolean') {
-            radiantWin = opendotaMatch?.data?.radiant_win
-            moreData.radiantScore = opendotaMatch?.data?.radiant_score
-            moreData.direScore = opendotaMatch?.data?.dire_score
-            moreData.kills = opendotaMatch?.data?.kills
-            moreData.deaths = opendotaMatch?.data?.deaths
-            moreData.assists = opendotaMatch?.data?.assists
-          }
-
-          if (typeof opendotaMatch?.data?.lobby_type === 'number') {
-            lobbyType = opendotaMatch?.data?.lobby_type
-          }
-        } else {
-          if (operation.retry(new Error('Match not found'))) {
-            return
-          }
-
-          reject(new Error('Match not found'))
-        }
-
-        resolve({
-          matchId,
-          isParty,
-          isPrivate,
-          radiantWin,
-          lobbyType,
-          ...moreData,
-        })
-      } catch (e) {
-        if (operation.retry(new Error('Match not found'))) {
-          return
-        }
-
-        captureException(e)
-
-        reject(e)
-      }
-    })
-  })
+  return {
+    matchId,
+    isParty,
+    isPrivate,
+    radiantWin,
+    lobbyType,
+    ...moreData,
+  }
 }
 
 export async function createJob(matchId: string): Promise<number> {
