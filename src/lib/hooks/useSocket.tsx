@@ -25,6 +25,7 @@ import {
   setMinimapDataHeroes,
   setMinimapStatus,
 } from '../redux/store'
+import { captureException } from '@sentry/nextjs'
 
 export let socket: Socket | null = null
 
@@ -139,6 +140,7 @@ export const useSocket = ({
         const data = await getMatchData(matchId, heroSlot)
         cb(data)
       } catch (e) {
+        captureException(e)
         console.log('[MMR] Error fetching match data', { e })
         cb(null)
       }
