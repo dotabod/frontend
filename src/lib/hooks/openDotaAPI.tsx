@@ -2,8 +2,6 @@ import axios from 'axios'
 import retry from 'retry'
 
 export async function getMatchData(matchId: string, heroId: number) {
-  let isParty = false
-  let isPrivate = false
   let radiantWin = null
   let lobbyType = null
   const opendotaMatch = await axios(
@@ -18,19 +16,7 @@ export async function getMatchData(matchId: string, heroId: number) {
     assists: 0,
   }
 
-  if (
-    Array.isArray(opendotaMatch.data?.players) &&
-    typeof heroId === 'number'
-  ) {
-    const player = opendotaMatch?.data?.players.find(
-      (p) => p.hero_id === heroId
-    )
-    isPrivate = !player?.account_id
-    const partySize = player?.party_size
-    if (typeof partySize === 'number' && partySize > 1) {
-      isParty = true
-    }
-
+  if (Array.isArray(opendotaMatch.data?.players)) {
     if (typeof opendotaMatch?.data?.radiant_win === 'boolean') {
       radiantWin = opendotaMatch?.data?.radiant_win
       moreData.radiantScore = opendotaMatch?.data?.radiant_score
@@ -49,8 +35,6 @@ export async function getMatchData(matchId: string, heroId: number) {
 
   return {
     matchId,
-    isParty,
-    isPrivate,
     radiantWin,
     lobbyType,
     ...moreData,
