@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs'
 import axios from 'axios'
 import retry from 'retry'
 
@@ -75,6 +76,8 @@ export async function getMatchData(matchId: string, heroId: number) {
         if (operation.retry(new Error('Match not found'))) {
           return
         }
+
+        captureException(e)
 
         reject(e)
       }
