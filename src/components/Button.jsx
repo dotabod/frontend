@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import Link from 'next/link'
 import { forwardRef } from 'react'
+import { useTranslation } from 'next-i18next'
 
 const baseStyles = {
   solid:
@@ -25,6 +26,7 @@ export const Button = forwardRef(function Button(
   { variant = 'solid', color = 'gray', className, href, ...props },
   ref
 ) {
+  const { t } = useTranslation('common')
   className = clsx(
     baseStyles[variant],
     variantStyles[variant][color],
@@ -32,8 +34,12 @@ export const Button = forwardRef(function Button(
   )
 
   return href ? (
-    <Link ref={ref} href={href} className={className} {...props} />
+    <Link ref={ref} href={href} className={className} {...props}>
+      {t(props.children)}
+    </Link>
   ) : (
-    <button ref={ref} className={className} {...props} />
+    <button ref={ref} className={className} {...props}>
+      {t(props.children)}
+    </button>
   )
 })

@@ -7,8 +7,10 @@ import { Empty, Input, Segmented } from 'antd'
 import Head from 'next/head'
 import { type ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
+import { useTranslation } from 'next-i18next'
 
 const CommandsPage = () => {
+  const { t } = useTranslation('common')
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const { data } = useUpdate({ path: '/api/settings' })
@@ -63,26 +65,26 @@ const CommandsPage = () => {
   return (
     <>
       <Head>
-        <title>Dotabod | Commands</title>
+        <title>Dotabod | {t('commands.title')}</title>
       </Head>
       <Header
-        subtitle="An exhaustive list of all commands available using Twitch chat."
-        title="Commands"
+        subtitle={t('commands.subtitle')}
+        title={t('commands.title')}
       />
 
       <div className="flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap">
         <Segmented
           value={enabled}
           onChange={(v) => setEnabled(v as string)}
-          options={['All', 'Enabled', 'Disabled']}
+          options={[t('commands.all'), t('commands.enabled'), t('commands.disabled')]}
         />
         <Segmented
           value={permission}
           onChange={(v) => setPermission(v as string)}
-          options={['All', 'Mods', 'Plebs']}
+          options={[t('commands.all'), t('commands.mods'), t('commands.plebs')]}
         />
         <Input
-          placeholder="Search commands..."
+          placeholder={t('commands.searchPlaceholder')}
           value={searchTerm}
           style={{ width: 300 }}
           maxLength={200}
@@ -91,7 +93,7 @@ const CommandsPage = () => {
       </div>
       {filteredCommands.length < 1 && (
         <Empty
-          description="Could not find any matching commands."
+          description={t('commands.noMatchingCommands')}
           imageStyle={{ height: 60 }}
         />
       )}

@@ -14,8 +14,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { useTranslation } from 'next-i18next'
 
 const SetupPage = () => {
+  const { t } = useTranslation('common')
   const track = useTrack()
   const { data } = useSWR('/api/settings', fetcher)
   const isLive = data?.stream_online
@@ -97,25 +99,25 @@ const SetupPage = () => {
 
   const steps = [
     {
-      title: 'Twitch',
+      title: t('dashboard.setup.twitch'),
       content: <ChatBot />,
     },
     {
-      title: 'Dota 2',
+      title: t('dashboard.setup.dota2'),
       content: <ExportCFG />,
     },
     {
-      title: 'OBS',
+      title: t('dashboard.setup.obs'),
       content: <OBSOverlay />,
     },
     {
-      title: 'All done!',
+      title: t('dashboard.setup.allDone'),
       content: (
         <Card>
           {!isLive && (
             <div className="flex flex-row items-center justify-center">
               <Alert
-                message="Your stream is offline, and Dotabod will only work once you start streaming and go online."
+                message={t('dashboard.setup.streamOfflineWarning')}
                 type="warning"
                 showIcon
                 className="max-w-2xl"
@@ -124,7 +126,7 @@ const SetupPage = () => {
           )}
           <div className="mb-4 space-x-2">
             <span>
-              <b>That&apos;s it!</b> You&apos;re all set up.
+              <b>{t('dashboard.setup.thatsIt')}</b>
             </span>
             <Image
               className="inline"
@@ -136,10 +138,7 @@ const SetupPage = () => {
             />
           </div>
           <div>
-            <p>
-              You can either hop into a match right away, or you can test
-              Dotabod first.
-            </p>
+            <p>{t('dashboard.setup.hopIntoMatch')}</p>
             <Collapse
               onChange={() => {
                 track('setup/collapse_test_dotabod')
@@ -147,25 +146,18 @@ const SetupPage = () => {
               accordion
               items={[
                 {
-                  label: 'How to test Dotabod',
+                  label: t('dashboard.setup.howToTest'),
                   children: (
                     <>
                       <ol className="list-decimal list-inside">
+                        <li>{t('dashboard.setup.demoHeroStep')}</li>
                         <li>
-                          Demo any hero to get Dotabod to recognize your Steam
-                          account.
+                          {t('dashboard.setup.livePreviewStep')}{' '}
+                          <Link href="/overlay">{t('dashboard.setup.livePreviewPage')}</Link>
                         </li>
                         <li>
-                          While demoing, visit the{' '}
-                          <Link href="/overlay">Live Preview page</Link> to
-                          confirm the overlay is showing.
-                        </li>
-                        <li>
-                          Having trouble? Visit the{' '}
-                          <Link href="/dashboard/troubleshoot">
-                            Troubleshooting page
-                          </Link>{' '}
-                          to get help.
+                          {t('dashboard.setup.troubleshootingStep')}{' '}
+                          <Link href="/dashboard/troubleshoot">{t('dashboard.setup.troubleshootingPage')}</Link>
                         </li>
                       </ol>
                       <div className="flex flex-col items-center justify-center space-x-4">
@@ -191,13 +183,13 @@ const SetupPage = () => {
   return (
     <>
       <Head>
-        <title>Dotabod | Setup</title>
+        <title>Dotabod | {t('dashboard.setup.title')}</title>
       </Head>
       <Header
         subtitle={
           <>
             <div>
-              Let&apos;s get Dotabod working for you right away{' '}
+              {t('dashboard.setup.subtitle')}{' '}
               <Image
                 src="/images/emotes/peepoclap.webp"
                 width={30}
@@ -209,7 +201,7 @@ const SetupPage = () => {
             </div>
           </>
         }
-        title="Setup"
+        title={t('dashboard.setup.title')}
       />
 
       <Steps
@@ -227,20 +219,20 @@ const SetupPage = () => {
       <div className="flex space-x-4 pb-10">
         {active > 0 && (
           <Button size="large" onClick={prevStep}>
-            Back
+            {t('dashboard.setup.back')}
           </Button>
         )}
 
         {active === steps.length - 1 && (
           <Link href="/dashboard/features">
             <Button size="large" type="primary">
-              View features
+              {t('dashboard.setup.viewFeatures')}
             </Button>
           </Link>
         )}
         {active < steps.length - 1 && (
           <Button size="large" type="primary" onClick={nextStep}>
-            Next step
+            {t('dashboard.setup.nextStep')}
           </Button>
         )}
       </div>
