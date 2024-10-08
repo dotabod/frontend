@@ -8,27 +8,32 @@ import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+import { useTranslation } from 'next-i18next'
 
-const FeaturesPage: NextPageWithLayout = () => (
-  <>
-    <Head>
-      <title>Dotabod | Main features</title>
-    </Head>
+const FeaturesPage: NextPageWithLayout = () => {
+  const { t } = useTranslation('common')
 
-    <Header
-      subtitle="Customize the options your stream receives."
-      title="Main features"
-    />
+  return (
+    <>
+      <Head>
+        <title>Dotabod | {t('dashboard.features.main.title')}</title>
+      </Head>
 
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
-      <LanguageCard />
-      <StreamDelayCard />
-      <MmrTrackerCard />
-      <BetsCard />
-      <IdeaCard />
-    </div>
-  </>
-)
+      <Header
+        subtitle={t('dashboard.features.main.subtitle')}
+        title={t('dashboard.features.main.title')}
+      />
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <LanguageCard />
+        <StreamDelayCard />
+        <MmrTrackerCard />
+        <BetsCard />
+        <IdeaCard />
+      </div>
+    </>
+  )
+}
 
 FeaturesPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>

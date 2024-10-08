@@ -14,6 +14,7 @@ import TwitchSvg from 'src/images/logos/twitch.svg'
 import useSWR from 'swr'
 import Particles from '../magicui/particles'
 import { LiveIcon } from './LiveIcon'
+import { useTranslation } from 'next-i18next'
 
 const featuredUsers = [
   {
@@ -144,6 +145,7 @@ export function Hero() {
     topLive: { name: string; image: string }[]
   }>('/api/featured-users', fetcher)
   const track = useTrack()
+  const { t } = useTranslation('common')
 
   return (
     <div className="overflow-hidden py-15 sm:py-27 lg:pb-27 xl:pb-31">
@@ -159,7 +161,7 @@ export function Hero() {
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
             <h1 className="flex items-center space-x-2 text-4xl font-medium tracking-tight text-gray-200">
-              <span>Welcome, {name}</span>
+              <span>{t('hero.title', { name })}</span>
               <Image
                 src="/images/emotes/peepoclap.webp"
                 unoptimized
@@ -169,10 +171,7 @@ export function Hero() {
               />
             </h1>
             <p className="mt-6 text-lg text-gray-300">
-              Unlock the Ultimate Dota 2 Streaming Experience with Dotabod!
-              Boost your stream&apos;s engagement, showcase real-time stats, and
-              delight your audience with our all-in-one streaming toolkit.
-              Elevate your game and become the streamer you were meant to be!
+              {t('hero.description')}
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
               <Link href="/dashboard">
@@ -180,9 +179,9 @@ export function Hero() {
                   <div className="flex items-center space-x-2">
                     <CursorArrowRaysIcon className="flex h-4 w-4" />
                     {session?.status === 'authenticated' ? (
-                      <span>Go to dashboard</span>
+                      <span>{t('button.goToDashboard')}</span>
                     ) : (
-                      <span>Get started</span>
+                      <span>{t('button.getStarted')}</span>
                     )}
                   </div>
                 </Button>
@@ -194,7 +193,7 @@ export function Hero() {
               >
                 <div className="flex items-center space-x-2">
                   <Image alt="discord" src={DiscordSvg} className="h-4 w-4" />
-                  <span>Join Discord</span>
+                  <span>{t('button.joinDiscord')}</span>
                 </div>
               </Button>
             </div>
@@ -228,8 +227,7 @@ export function Hero() {
                   alt="twitch logo"
                 />
                 <span>
-                  Featured in over {new Intl.NumberFormat().format(20000)}{' '}
-                  Twitch streamers
+                  {t('hero.featuredIn', { count: new Intl.NumberFormat().format(20000) })}
                 </span>
               </div>
             </div>
@@ -263,7 +261,7 @@ export function Hero() {
                   <div className="relative lg:col-span-7 xl:col-span-6">
                     <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
                       <LiveIcon />
-                      <span>Top streamers using Dotabod:</span>
+                      <span>{t('hero.topStreamers')}</span>
                     </div>
                   </div>
                   <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
@@ -289,7 +287,7 @@ export function Hero() {
                   <div className="relative lg:col-span-7 xl:col-span-6">
                     <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
                       <LiveIcon />
-                      <span>Random Dotabod streamers:</span>
+                      <span>{t('hero.randomStreamers')}</span>
                     </div>
                   </div>
                   <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">

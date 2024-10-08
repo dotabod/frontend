@@ -1,6 +1,9 @@
 import clsx from 'clsx'
+import { useTranslation } from 'next-i18next'
 
 export const Card = ({ children = null, className = '', ...props }) => {
+  const { t } = useTranslation('common')
+
   return (
     <div
       className={clsx(
@@ -9,7 +12,7 @@ export const Card = ({ children = null, className = '', ...props }) => {
       )}
       {...props}
     >
-      {children}
+      {t(children)}
     </div>
   )
 }

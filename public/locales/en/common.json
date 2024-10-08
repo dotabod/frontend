@@ -4,5 +4,55 @@
     "title": "Welcome, streamer",
     "description": "Unlock the Ultimate Dota 2 Streaming Experience with Dotabod! Boost your stream's engagement, showcase real-time stats, and delight your audience with our all-in-one streaming toolkit. Elevate your game and become the streamer you were meant to be!"
   },
-  "live": "Live"
+  "live": "Live",
+  "button": {
+    "getStarted": "Get started",
+    "goToDashboard": "Go to dashboard",
+    "joinDiscord": "Join Discord"
+  },
+  "languageCard": {
+    "title": "Language",
+    "subtitle": "The @dotabod Twitch chat bot will speak in this language.",
+    "usedBy": "Used by",
+    "dotabods": "dotabods",
+    "percentTranslated": "% translated",
+    "onlyOneUsing": "You're the only one using this language",
+    "helpComplete": "Help complete on Crowdin",
+    "fixLocaleIssues": "Fix locale issues on Crowdin"
+  },
+  "dashboard": {
+    "setup": {
+      "title": "Setup",
+      "subtitle": "Let's get Dotabod working for you right away",
+      "twitch": "Twitch",
+      "dota2": "Dota 2",
+      "obs": "OBS",
+      "allDone": "All done!",
+      "streamOfflineWarning": "Your stream is offline, and Dotabod will only work once you start streaming and go online.",
+      "thatsIt": "That's it! You're all set up.",
+      "hopIntoMatch": "You can either hop into a match right away, or you can test Dotabod first.",
+      "howToTest": "How to test Dotabod",
+      "demoHeroStep": "Demo any hero to get Dotabod to recognize your Steam account.",
+      "livePreviewStep": "While demoing, visit the Live Preview page to confirm the overlay is showing.",
+      "troubleshootingStep": "Having trouble? Visit the Troubleshooting page to get help."
+    },
+    "features": {
+      "main": {
+        "title": "Main features",
+        "subtitle": "Customize the options your stream receives."
+      },
+      "advanced": {
+        "title": "Advanced features",
+        "subtitle": "Looking for even more? They'll be here"
+      },
+      "chat": {
+        "title": "Chat features",
+        "subtitle": "The bot reacts with chat messages to your game events as you play your match."
+      },
+      "overlay": {
+        "title": "Overlay features",
+        "subtitle": "Enhance your stream with these overlay features"
+      }
+    }
+  }
 }

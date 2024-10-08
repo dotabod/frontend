@@ -2,727 +2,699 @@ import { chatterInfo } from '@/components/Dashboard/Features/ChatterCard'
 import TwitchChat from '@/components/TwitchChat'
 import { Settings } from '@/lib/defaultSettings'
 import Image from 'next/image'
+import { useTranslation } from 'next-i18next'
 
-const CommandDetail = {
-  [Settings.commandDisable]: {
-    title: 'Disable Dotabod',
-    description:
-      'Toggle to stop or start responding to game events and commands.',
-    cmd: '!toggle',
-    alias: ['enable', 'disable'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!toggle"
-        response="Will no longer watch game events nor respond to commands. Type !toggle again to enable."
-      />
-    ),
-  },
-  [Settings.commandOnline]: {
-    title: 'Online or offline status',
-    description:
-      'Updates the status of your stream that Dotabod sees to online or offline.',
-    cmd: '!online',
-    alias: ['offline', 'forceonline', 'forceoffline'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!online"
-        response="Dotabod will treat <channel> as offline. Type !online to undo"
-      />
-    ),
-  },
-  [Settings.chatter]: {
-    title: 'Mute Dotabod',
-    description:
-      'Will prevent Dotabod from auto sending chatters, but will still respond to commands.',
-    cmd: '!mute',
-    alias: ['unmute'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!mute"
-        response="Will no longer auto chat on game events, but will still respond to commands. Type !unmute to undo"
-      />
-    ),
-  },
-  fixparty: {
-    title: 'Fix party match',
-    description:
-      "Dotabod can't detect party games right now (sadge). So if it does 25 mmr for a completed match, use !fixparty to adjust it to 20. You must type this after every party match.",
-    cmd: '!fixparty',
-    alias: ['fixsolo'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!fixparty"
-        modOnly
-        responses={[
-          'Changing this match to party mmr: dotabuff.com/matches/1234567.',
-          'Updated MMR to 3090, -10',
-        ]}
-      />
-    ),
-  },
-  refresh: {
-    title: 'Refresh',
-    description:
-      'Refreshes your OBS overlay without having to do it from OBS. Used in case the overlay is messed up.',
-    cmd: '!refresh',
-    alias: [],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!refresh"
-        response="Refreshing overlay..."
-      />
-    ),
-  },
-  [Settings.commandSteam]: {
-    key: Settings.commandSteam,
-    title: 'Steam ID',
-    description:
-      "Retrieve the steam ID of the account you're currently playing on.",
-    cmd: '!steam',
-    alias: ['steamid', 'account'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!steam"
-        response="steamid.xyz/1234567"
-      />
-    ),
-  },
-  setmmr: {
-    title: 'Set MMR',
-    description: 'Manually set your MMR.',
-    cmd: '!setmmr',
-    alias: ['mmr=', 'mmrset'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!setmmr 1234"
-        response="Updated MMR to 1234"
-      />
-    ),
-  },
-  beta: {
-    title: 'Dotabod Beta',
-    description:
-      'Want to join the beta? You will get the latest features and updates before anyone else.',
-    cmd: '!beta',
-    alias: ['joinbeta', 'leavebeta', 'betaoff', 'betaon'],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!beta"
-        response="You are now a beta tester. Visit discord.dotabod.com to see the beta features. Type !beta to undo"
-      />
-    ),
-  },
-  [Settings.commandPleb]: {
-    key: Settings.commandPleb,
-    title: 'Pleb',
-    description:
-      'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
-    cmd: '!pleb',
-    alias: [],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!pleb"
-        response="One pleb IN 👇"
-      />
-    ),
-  },
-  [Settings.commandModsonly]: {
-    key: Settings.commandModsonly,
-    title: 'Mods only',
-    description:
-      'Only allow mods to send messages in chat. Turns sub only mode on and deletes messages from subs.',
-    cmd: '!modsonly',
-    alias: [],
-    allowed: 'mods',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        modOnly
-        command="!modsonly"
-        response={
-          <>
-            Mods only mode is now on
-            <Image
-              src="https://cdn.betterttv.net/emote/61e918ab06fd6a9f5be168f3/1x.webp"
-              width={24}
-              height={24}
-              alt="based"
-              className="ml-1 mr-1 inline"
-            />
-            <Image
-              src="https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/1x.webp"
-              width={24}
-              height={24}
-              alt="clap"
-              className="ml-1 mr-1 inline"
-            />
-            . Only mods can type.
-          </>
-        }
-      />
-    ),
-  },
-  [Settings.commandCommands]: {
-    key: Settings.commandCommands,
-    title: 'Command list',
-    description:
-      'All available commands with Dotabod. This list is filtered to only the commands you enabled. If a mod uses !commands, it will show mod only commands as well.',
-    cmd: '!commands',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!commands"
-        responses={[
-          'Everyone can use: command1 · command2 · command3 · etc...',
-        ]}
-      />
-    ),
-  },
-  [Settings.commandRanked]: {
-    key: Settings.commandRanked,
-    title: 'Ranked or not?',
-    description: 'Chatters can find out if this match is ranked or not.',
-    cmd: '!ranked',
-    alias: ['isranked'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!ranked"
-        response="Yes this game is ranked"
-      />
-    ),
-  },
-  [Settings.commandAvg]: {
-    key: Settings.commandAvg,
-    title: 'Average MMR',
-    description:
-      'For the current game, show the average MMR of all players. Only works if not immortal.',
-    cmd: '!avg',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!avg"
-        response="3311 · Legend☆2 - Average rank this game"
-      />
-    ),
-  },
-  [Settings.commandOpendota]: {
-    key: Settings.commandOpendota,
-    title: 'Opendota',
-    description:
-      'Shows the Opendota link for your currently logged in steam account.',
-    cmd: '!opendota',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!opendota"
-        response="Here's <streamername>: opendota.com/players/1234567"
-      />
-    ),
-  },
+const CommandDetail = () => {
+  const { t } = useTranslation('common')
 
-  [Settings.commandDotabuff]: {
-    key: Settings.commandDotabuff,
-    title: 'Dotabuff',
-    description:
-      'Shows the Dotabuff link for your currently logged in steam account.',
-    cmd: '!dotabuff',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!dotabuff"
-        response="Here's <streamername>: dotabuff.com/players/1234567"
-      />
-    ),
-  },
-  [Settings.commandXPM]: {
-    key: Settings.commandXPM,
-    title: 'XPM',
-    description: 'Live experience per minute for your chatters on demand.',
-    cmd: '!xpm',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat {...props} command="!xpm" response="Live XPM: 778" />
-    ),
-  },
-  [Settings.commandWL]: {
-    key: Settings.commandWL,
-    title: 'Win / Loss',
-    description:
-      'Says the total wins and losses for current stream duration. Disabling this command will hide these statistics in the stream overlay.',
-    cmd: '!wl',
-    alias: ['score', 'winrate', 'wr'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}, all = true) => (
-      <>
+  return {
+    [Settings.commandDisable]: {
+      title: t('commandDisable.title'),
+      description: t('commandDisable.description'),
+      cmd: '!toggle',
+      alias: ['enable', 'disable'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
         <TwitchChat
           {...props}
-          command="!wl"
-          response="Ranked 0 W - 9 L | -270 MMR"
+          modOnly
+          command="!toggle"
+          response={t('commandDisable.response')}
         />
-        {all && (
-          <TwitchChat
-            {...props}
-            command="!wl"
-            response="Ranked 0 W - 9 L | -270 MMR | Unranked 2 W - 1 L"
-          />
-        )}
-      </>
-    ),
-  },
-  [Settings.commandMmr]: {
-    key: Settings.commandMmr,
-    title: 'MMR',
-    description:
-      'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
-    cmd: '!mmr',
-    alias: ['rank', 'medal'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!mmr"
-        response="2720 | Archon☆3 | Next rank at 2772 in 2 wins"
-      />
-    ),
-  },
-  [Settings.commandGPM]: {
-    key: Settings.commandGPM,
-    title: 'GPM',
-    description:
-      'At any time, chatters can request your live gold per minute with !gpm. Playing alch or anti-mage? Show off your gpm!',
-    cmd: '!gpm',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!gpm"
-        response="Live GPM: 660. 5270 from hero kills, 9295 from creep kills."
-      />
-    ),
-  },
-  [Settings.commandAPM]: {
-    key: Settings.commandAPM,
-    title: 'APM',
-    description:
-      'Actions per minute. A good indicator of speed and efficiency.',
-    cmd: '!apm',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat {...props} command="!apm" response="Live APM: 123" />
-    ),
-  },
-
-  [Settings.commandNP]: {
-    key: Settings.commandNP,
-    title: 'Notable players',
-    description: 'Find out if your match has any pros.',
-    cmd: '!np',
-    alias: ['who', 'players'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}, all = true) => (
-      <div className="space-y-6">
+      ),
+    },
+    [Settings.commandOnline]: {
+      title: t('commandOnline.title'),
+      description: t('commandOnline.description'),
+      cmd: '!online',
+      alias: ['offline', 'forceonline', 'forceoffline'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
         <TwitchChat
           {...props}
-          command="!np"
+          command="!online"
+          response={t('commandOnline.response')}
+        />
+      ),
+    },
+    [Settings.chatter]: {
+      title: t('chatter.title'),
+      description: t('chatter.description'),
+      cmd: '!mute',
+      alias: ['unmute'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!mute"
+          response={t('chatter.response')}
+        />
+      ),
+    },
+    fixparty: {
+      title: t('fixparty.title'),
+      description: t('fixparty.description'),
+      cmd: '!fixparty',
+      alias: ['fixsolo'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!fixparty"
+          modOnly
+          responses={t('fixparty.responses')}
+        />
+      ),
+    },
+    refresh: {
+      title: t('refresh.title'),
+      description: t('refresh.description'),
+      cmd: '!refresh',
+      alias: [],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!refresh"
+          response={t('refresh.response')}
+        />
+      ),
+    },
+    [Settings.commandSteam]: {
+      key: Settings.commandSteam,
+      title: t('commandSteam.title'),
+      description: t('commandSteam.description'),
+      cmd: '!steam',
+      alias: ['steamid', 'account'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!steam"
+          response={t('commandSteam.response')}
+        />
+      ),
+    },
+    setmmr: {
+      title: t('setmmr.title'),
+      description: t('setmmr.description'),
+      cmd: '!setmmr',
+      alias: ['mmr=', 'mmrset'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!setmmr 1234"
+          response={t('setmmr.response')}
+        />
+      ),
+    },
+    beta: {
+      title: t('beta.title'),
+      description: t('beta.description'),
+      cmd: '!beta',
+      alias: ['joinbeta', 'leavebeta', 'betaoff', 'betaon'],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!beta"
+          response={t('beta.response')}
+        />
+      ),
+    },
+    [Settings.commandPleb]: {
+      key: Settings.commandPleb,
+      title: t('commandPleb.title'),
+      description: t('commandPleb.description'),
+      cmd: '!pleb',
+      alias: [],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!pleb"
+          response={t('commandPleb.response')}
+        />
+      ),
+    },
+    [Settings.commandModsonly]: {
+      key: Settings.commandModsonly,
+      title: t('commandModsonly.title'),
+      description: t('commandModsonly.description'),
+      cmd: '!modsonly',
+      alias: [],
+      allowed: 'mods',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          modOnly
+          command="!modsonly"
           response={
             <>
-              All Pick:
+              {t('commandModsonly.response')}
               <Image
-                src="/images/flags/south-korea.png"
+                src="https://cdn.betterttv.net/emote/61e918ab06fd6a9f5be168f3/1x.webp"
                 width={24}
                 height={24}
-                alt="south korea"
+                alt="based"
                 className="ml-1 mr-1 inline"
               />
-              DuBu (Shadow Shaman) ·
               <Image
-                src="/images/flags/russia.png"
+                src="https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/1x.webp"
                 width={24}
                 height={24}
-                alt="russia"
+                alt="clap"
                 className="ml-1 mr-1 inline"
               />
-              Collapse (Magnus) ·
-              <Image
-                src="/images/flags/estonia.png"
-                width={24}
-                height={24}
-                alt="estonia"
-                className="ml-1 mr-1 inline"
-              />
-              Puppy (Chen) ·
-              <Image
-                src="/images/flags/usa.png"
-                width={24}
-                height={24}
-                alt="usa"
-                className="ml-1 mr-1 inline"
-              />
-              PPD (Tusk) ·
-              <Image
-                src="/images/flags/lebanon.png"
-                width={24}
-                height={24}
-                alt="usa"
-                className="ml-1 mr-1 inline"
-              />
-              Rajjix (Timbersaw)
             </>
           }
         />
-        {all && (
-          <>
+      ),
+    },
+    [Settings.commandCommands]: {
+      key: Settings.commandCommands,
+      title: t('commandCommands.title'),
+      description: t('commandCommands.description'),
+      cmd: '!commands',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!commands"
+          responses={t('commandCommands.responses')}
+        />
+      ),
+    },
+    [Settings.commandRanked]: {
+      key: Settings.commandRanked,
+      title: t('commandRanked.title'),
+      description: t('commandRanked.description'),
+      cmd: '!ranked',
+      alias: ['isranked'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!ranked"
+          response={t('commandRanked.response')}
+        />
+      ),
+    },
+    [Settings.commandAvg]: {
+      key: Settings.commandAvg,
+      title: t('commandAvg.title'),
+      description: t('commandAvg.description'),
+      cmd: '!avg',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!avg"
+          response={t('commandAvg.response')}
+        />
+      ),
+    },
+    [Settings.commandOpendota]: {
+      key: Settings.commandOpendota,
+      title: t('commandOpendota.title'),
+      description: t('commandOpendota.description'),
+      cmd: '!opendota',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!opendota"
+          response={t('commandOpendota.response')}
+        />
+      ),
+    },
+    [Settings.commandDotabuff]: {
+      key: Settings.commandDotabuff,
+      title: t('commandDotabuff.title'),
+      description: t('commandDotabuff.description'),
+      cmd: '!dotabuff',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!dotabuff"
+          response={t('commandDotabuff.response')}
+        />
+      ),
+    },
+    [Settings.commandXPM]: {
+      key: Settings.commandXPM,
+      title: t('commandXPM.title'),
+      description: t('commandXPM.description'),
+      cmd: '!xpm',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat {...props} command="!xpm" response={t('commandXPM.response')} />
+      ),
+    },
+    [Settings.commandWL]: {
+      key: Settings.commandWL,
+      title: t('commandWL.title'),
+      description: t('commandWL.description'),
+      cmd: '!wl',
+      alias: ['score', 'winrate', 'wr'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}, all = true) => (
+        <>
+          <TwitchChat
+            {...props}
+            command="!wl"
+            response={t('commandWL.response1')}
+          />
+          {all && (
             <TwitchChat
               {...props}
-              command="!np add"
-              response="Try !np add <steam32id> <playername>"
+              command="!wl"
+              response={t('commandWL.response2')}
             />
-            <TwitchChat
-              {...props}
-              command="!np remove"
-              response="Try !np remove <steam32id>"
-            />
-          </>
-        )}
-      </div>
-    ),
-  },
-  [Settings.commandSmurfs]: {
-    key: Settings.commandSmurfs,
-    title: 'Smurfs',
-    description: 'Shows total games played for each player in the match.',
-    cmd: '!smurfs',
-    alias: ['lifetimes', 'totals', 'games', 'smurf'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!smurfs"
-        response="Lifetime games: Viper: 408 · Doom: 657 · Hoodwink: 2,243 · Lina: 2,735 · Sniper: 2,850 · Drow Ranger: 3,136 · Clinkz: 3,384 · Tusk: 4,202 · Pugna: 4,466 · Dazzle: 6,626"
-      />
-    ),
-  },
-  [Settings.commandGM]: {
-    key: Settings.commandGM,
-    title: 'Game medals',
-    description: 'Return the rankings for each players in the game.',
-    cmd: '!gm',
-    alias: ['medals', 'ranks'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!gm"
-        response="Legion Commander: #856 · Dark Willow: #402 · Crystal Maiden: #321 · Weaver: #553 · Storm Spirit: #794 · Doom: #536 · Rubick: #524 · Dawnbreaker: #946 · Venomancer: #631 · Lifestealer: #294"
-      />
-    ),
-  },
-  [Settings.commandLG]: {
-    key: Settings.commandLG,
-    title: 'Last game',
-    description: "Find out if you're playing with anyone from your last match.",
-    cmd: '!lg',
-    alias: ['lastgame'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!lg"
-        response="Rubick played as Crystal Maiden"
-      />
-    ),
-  },
-  ping: {
-    title: 'Ping',
-    description:
-      'If Dotabod responds with Pong, that means the servers are operating normally.',
-    cmd: '!ping',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat {...props} command="!ping" response="Pong EZ Clap" />
-    ),
-  },
-  dotabod: {
-    title: 'About',
-    description: "Tell everyone about the new bot you're using!",
-    cmd: '!dotabod',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!dotabod"
-        response="I'm an open source bot made by @techleed. More info: https://dotabod.com"
-      />
-    ),
-  },
-  [Settings.commandLGS]: {
-    key: Settings.commandLGS,
-    title: 'Last game score',
-    description:
-      'Quickly see whether or not you won last game, duration, how long ago',
-    cmd: '!lgs',
-    alias: ['lastgamescore', 'lgscore', 'lgwl'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!lgs"
-        response="Last game: won · 47m long · Ended 4m ago · dotabuff.com/matches/6945205"
-      />
-    ),
-  },
-  [Settings.commandProfile]: {
-    key: Settings.commandProfile,
-    title: 'Profile',
-    description:
-      'Shows the profile link for the hero color you specify during a live match.',
-    cmd: '!profile',
-    alias: ['stats', 'check'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <>
+          )}
+        </>
+      ),
+    },
+    [Settings.commandMmr]: {
+      key: Settings.commandMmr,
+      title: t('commandMmr.title'),
+      description: t('commandMmr.description'),
+      cmd: '!mmr',
+      alias: ['rank', 'medal'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
         <TwitchChat
           {...props}
-          command="!profile blue"
-          response="Here's blue: dotabuff.com/matches/1234567."
+          command="!mmr"
+          response={t('commandMmr.response')}
         />
+      ),
+    },
+    [Settings.commandGPM]: {
+      key: Settings.commandGPM,
+      title: t('commandGPM.title'),
+      description: t('commandGPM.description'),
+      cmd: '!gpm',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
         <TwitchChat
           {...props}
-          command="!profile ?"
-          response="Invalid hero color. Must be 1-10 or one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown"
+          command="!gpm"
+          response={t('commandGPM.response')}
         />
-      </>
-    ),
-  },
-  [Settings.commandHero]: {
-    key: Settings.commandHero,
-    title: 'Hero',
-    description:
-      "Shows currently playing hero's score in the last 30 days. Uses OpenDota API, so your profile must be public for this to work.",
-    cmd: '!hero',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <>
+      ),
+    },
+    [Settings.commandAPM]: {
+      key: Settings.commandAPM,
+      title: t('commandAPM.title'),
+      description: t('commandAPM.description'),
+      cmd: '!apm',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat {...props} command="!apm" response={t('commandAPM.response')} />
+      ),
+    },
+    [Settings.commandNP]: {
+      key: Settings.commandNP,
+      title: t('commandNP.title'),
+      description: t('commandNP.description'),
+      cmd: '!np',
+      alias: ['who', 'players'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}, all = true) => (
+        <div className="space-y-6">
+          <TwitchChat
+            {...props}
+            command="!np"
+            response={
+              <>
+                {t('commandNP.response1')}
+                <Image
+                  src="/images/flags/south-korea.png"
+                  width={24}
+                  height={24}
+                  alt="south korea"
+                  className="ml-1 mr-1 inline"
+                />
+                {t('commandNP.response2')}
+                <Image
+                  src="/images/flags/russia.png"
+                  width={24}
+                  height={24}
+                  alt="russia"
+                  className="ml-1 mr-1 inline"
+                />
+                {t('commandNP.response3')}
+                <Image
+                  src="/images/flags/estonia.png"
+                  width={24}
+                  height={24}
+                  alt="estonia"
+                  className="ml-1 mr-1 inline"
+                />
+                {t('commandNP.response4')}
+                <Image
+                  src="/images/flags/usa.png"
+                  width={24}
+                  height={24}
+                  alt="usa"
+                  className="ml-1 mr-1 inline"
+                />
+                {t('commandNP.response5')}
+                <Image
+                  src="/images/flags/lebanon.png"
+                  width={24}
+                  height={24}
+                  alt="usa"
+                  className="ml-1 mr-1 inline"
+                />
+                {t('commandNP.response6')}
+              </>
+            }
+          />
+          {all && (
+            <>
+              <TwitchChat
+                {...props}
+                command="!np add"
+                response={t('commandNP.responseAdd')}
+              />
+              <TwitchChat
+                {...props}
+                command="!np remove"
+                response={t('commandNP.responseRemove')}
+              />
+            </>
+          )}
+        </div>
+      ),
+    },
+    [Settings.commandSmurfs]: {
+      key: Settings.commandSmurfs,
+      title: t('commandSmurfs.title'),
+      description: t('commandSmurfs.description'),
+      cmd: '!smurfs',
+      alias: ['lifetimes', 'totals', 'games', 'smurf'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
         <TwitchChat
           {...props}
-          command="!hero"
-          response="No matches played as Pudge in 30d"
+          command="!smurfs"
+          response={t('commandSmurfs.response')}
         />
+      ),
+    },
+    [Settings.commandGM]: {
+      key: Settings.commandGM,
+      title: t('commandGM.title'),
+      description: t('commandGM.description'),
+      cmd: '!gm',
+      alias: ['medals', 'ranks'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
         <TwitchChat
           {...props}
-          command="!hero"
-          response="Winrate: 53% as Pudge in 30d of 41 matches. "
+          command="!gm"
+          response={t('commandGM.response')}
         />
-      </>
-    ),
-  },
-  [Settings.commandBuilds]: {
-    key: Settings.commandBuilds,
-    title: 'Dota 2 Pro Tracker',
-    description:
-      'Get a quick link to pro builds and guides for your currently playing hero.',
-    cmd: '!builds',
-    alias: ['dota2pt', 'build', 'd2pt', 'getbuild'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!builds"
-        response="Need pro build ideas for Pudge? Check here dota2protracker.com/hero/Pudge "
-      />
-    ),
-  },
-  [Settings.commandDelay]: {
-    key: Settings.commandDelay,
-    title: 'Stream delay',
-    description:
-      'Tells chat the Dotabod bot delay you configured from the features page.',
-    cmd: '!delay',
-    alias: ['streamdelay'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!delay"
-        response="Stream delay: 3 seconds"
-      />
-    ),
-  },
-  [Settings.commandRosh]: {
-    key: Settings.commandRosh,
-    title: 'Roshan and aegis',
-    description: 'Tells chat the current roshan and aegis status.',
-    cmd: '!rosh',
-    alias: ['aegis'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!rosh"
-        response={chatterInfo.roshanKilled.message}
-      />
-    ),
-  },
-  [Settings.commandItems]: {
-    key: Settings.commandItems,
-    title: 'Get items',
-    description:
-      'Want to know what a hero, enemy or ally, has in their inventory?',
-    cmd: '!items',
-    alias: ['item'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!items marci"
-        response="(2m delay) Marci has: Power Treads · Blink Dagger · Black King Bar · Skull Basher · Aegis of the Immortal · Battle Fury · Iron Branch · Magic Stick"
-      />
-    ),
-  },
-  [Settings.commandVersion]: {
-    title: 'Version',
-    description: 'Tells chat the current running version of Dotabod.',
-    cmd: '!version',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!version"
-        response="Server running version 2c4fa, here's what's missing compared to the latest version: https://github.com/dotabod/backend/compare/2c4fa...latest"
-      />
-    ),
-  },
-  [Settings.commandResetwl]: {
-    title: 'Reset win loss',
-    description: 'Resets your win losses to 0-0.',
-    cmd: '!resetwl',
-    allowed: 'mods',
-    alias: [],
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!resetwl"
-        response="Resetting win/loss to 0 for <channel>"
-      />
-    ),
-  },
-  [Settings.commandLocale]: {
-    title: 'Locale',
-    description: 'Tells chat the current locale of Dotabod.',
-    cmd: '!locale',
-    alias: ['translation', 'translatedby'],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!locale"
-        response="Dotabod is translated by Techleed. Want to help translate or see a mistake? https://crowdin.com/project/dotabod"
-      />
-    ),
-  },
-  [Settings.commandFacet]: {
-    key: Settings.commandFacet,
-    title: 'Facet Information',
-    description: 'Provides information about the selected facet of a hero.',
-    cmd: '!facet jug 2',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!facet"
-        response="Juggernaut facet 2: Healing Ward · Summons a Healing Ward that heals all nearby allies."
-      />
-    ),
-  },
-  [Settings.commandWinProbability]: {
-    key: Settings.commandWinProbability,
-    title: 'Win Probability',
-    description: 'Shows the current win probability for the game.',
-    cmd: '!wp',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!wp"
-        response="75% win probability at 30:00 · Next update in 60s"
-      />
-    ),
-  },
-  [Settings.commandSpectators]: {
-    key: Settings.commandSpectators,
-    title: 'Spectator Count',
-    description:
-      'Displays the number of spectators currently watching the match live.',
-    cmd: '!spectators',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!spectators"
-        response="15 spectators watching this match live"
-      />
-    ),
-  },
-  [Settings.commandInnate]: {
-    key: Settings.commandInnate,
-    title: 'Innate Ability',
-    description: "Provides information about a hero's innate ability.",
-    cmd: '!innate 4',
-    alias: [],
-    allowed: 'all',
-    response: (props: Record<string, any> = {}) => (
-      <TwitchChat
-        {...props}
-        command="!innate"
-        response="Juggernaut innate: Blade Dance · Juggernaut's attacks have a chance to deal critical damage."
-      />
-    ),
-  },
+      ),
+    },
+    [Settings.commandLG]: {
+      key: Settings.commandLG,
+      title: t('commandLG.title'),
+      description: t('commandLG.description'),
+      cmd: '!lg',
+      alias: ['lastgame'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!lg"
+          response={t('commandLG.response')}
+        />
+      ),
+    },
+    ping: {
+      title: t('ping.title'),
+      description: t('ping.description'),
+      cmd: '!ping',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat {...props} command="!ping" response={t('ping.response')} />
+      ),
+    },
+    dotabod: {
+      title: t('dotabod.title'),
+      description: t('dotabod.description'),
+      cmd: '!dotabod',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!dotabod"
+          response={t('dotabod.response')}
+        />
+      ),
+    },
+    [Settings.commandLGS]: {
+      key: Settings.commandLGS,
+      title: t('commandLGS.title'),
+      description: t('commandLGS.description'),
+      cmd: '!lgs',
+      alias: ['lastgamescore', 'lgscore', 'lgwl'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!lgs"
+          response={t('commandLGS.response')}
+        />
+      ),
+    },
+    [Settings.commandProfile]: {
+      key: Settings.commandProfile,
+      title: t('commandProfile.title'),
+      description: t('commandProfile.description'),
+      cmd: '!profile',
+      alias: ['stats', 'check'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <>
+          <TwitchChat
+            {...props}
+            command="!profile blue"
+            response={t('commandProfile.response1')}
+          />
+          <TwitchChat
+            {...props}
+            command="!profile ?"
+            response={t('commandProfile.response2')}
+          />
+        </>
+      ),
+    },
+    [Settings.commandHero]: {
+      key: Settings.commandHero,
+      title: t('commandHero.title'),
+      description: t('commandHero.description'),
+      cmd: '!hero',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <>
+          <TwitchChat
+            {...props}
+            command="!hero"
+            response={t('commandHero.response1')}
+          />
+          <TwitchChat
+            {...props}
+            command="!hero"
+            response={t('commandHero.response2')}
+          />
+        </>
+      ),
+    },
+    [Settings.commandBuilds]: {
+      key: Settings.commandBuilds,
+      title: t('commandBuilds.title'),
+      description: t('commandBuilds.description'),
+      cmd: '!builds',
+      alias: ['dota2pt', 'build', 'd2pt', 'getbuild'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!builds"
+          response={t('commandBuilds.response')}
+        />
+      ),
+    },
+    [Settings.commandDelay]: {
+      key: Settings.commandDelay,
+      title: t('commandDelay.title'),
+      description: t('commandDelay.description'),
+      cmd: '!delay',
+      alias: ['streamdelay'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!delay"
+          response={t('commandDelay.response')}
+        />
+      ),
+    },
+    [Settings.commandRosh]: {
+      key: Settings.commandRosh,
+      title: t('commandRosh.title'),
+      description: t('commandRosh.description'),
+      cmd: '!rosh',
+      alias: ['aegis'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!rosh"
+          response={chatterInfo.roshanKilled.message}
+        />
+      ),
+    },
+    [Settings.commandItems]: {
+      key: Settings.commandItems,
+      title: t('commandItems.title'),
+      description: t('commandItems.description'),
+      cmd: '!items',
+      alias: ['item'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!items marci"
+          response={t('commandItems.response')}
+        />
+      ),
+    },
+    [Settings.commandVersion]: {
+      title: t('commandVersion.title'),
+      description: t('commandVersion.description'),
+      cmd: '!version',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!version"
+          response={t('commandVersion.response')}
+        />
+      ),
+    },
+    [Settings.commandResetwl]: {
+      title: t('commandResetwl.title'),
+      description: t('commandResetwl.description'),
+      cmd: '!resetwl',
+      allowed: 'mods',
+      alias: [],
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!resetwl"
+          response={t('commandResetwl.response')}
+        />
+      ),
+    },
+    [Settings.commandLocale]: {
+      title: t('commandLocale.title'),
+      description: t('commandLocale.description'),
+      cmd: '!locale',
+      alias: ['translation', 'translatedby'],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!locale"
+          response={t('commandLocale.response')}
+        />
+      ),
+    },
+    [Settings.commandFacet]: {
+      key: Settings.commandFacet,
+      title: t('commandFacet.title'),
+      description: t('commandFacet.description'),
+      cmd: '!facet jug 2',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!facet"
+          response={t('commandFacet.response')}
+        />
+      ),
+    },
+    [Settings.commandWinProbability]: {
+      key: Settings.commandWinProbability,
+      title: t('commandWinProbability.title'),
+      description: t('commandWinProbability.description'),
+      cmd: '!wp',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!wp"
+          response={t('commandWinProbability.response')}
+        />
+      ),
+    },
+    [Settings.commandSpectators]: {
+      key: Settings.commandSpectators,
+      title: t('commandSpectators.title'),
+      description: t('commandSpectators.description'),
+      cmd: '!spectators',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!spectators"
+          response={t('commandSpectators.response')}
+        />
+      ),
+    },
+    [Settings.commandInnate]: {
+      key: Settings.commandInnate,
+      title: t('commandInnate.title'),
+      description: t('commandInnate.description'),
+      cmd: '!innate 4',
+      alias: [],
+      allowed: 'all',
+      response: (props: Record<string, any> = {}) => (
+        <TwitchChat
+          {...props}
+          command="!innate"
+          response={t('commandInnate.response')}
+        />
+      ),
+    },
+  }
 }
 
 export default CommandDetail
