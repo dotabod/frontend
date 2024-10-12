@@ -1,3 +1,4 @@
+import NumberTicker from '@/components/magicui/number-ticker'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import clsx from 'clsx'
 import { Badge } from '../../Badge'
@@ -37,7 +38,8 @@ const Numbers: React.FC<NumbersProps> = ({
             !playerRank && 'hidden'
           )}
         >
-          {`${playerRank} MMR`}
+          <NumberTicker value={playerRank} />
+          {' MMR'}
         </span>
       )
     }
