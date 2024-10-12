@@ -1,12 +1,8 @@
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { navigation } from '@/components/Dashboard/navigation'
-import { DarkLogo } from '@/components/Logo'
+import { DarkLogo, Logomark } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
-import {
-  ArrowLeftOnRectangleIcon,
-  Bars3Icon,
-} from '@heroicons/react/24/outline'
 import { captureException } from '@sentry/nextjs'
 import { Layout, Menu, type MenuProps, theme } from 'antd'
 import clsx from 'clsx'
@@ -14,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type React from 'react'
 import { useEffect, useState } from 'react'
+import ModeratedChannelsSelect from './ModeratedChannels'
 
 const { Header, Sider, Content } = Layout
 
@@ -70,6 +67,7 @@ export default function DashboardShell({
       now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000
     ) {
       localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
+
       fetch('/api/update-followers').catch((error) => {
         captureException(error)
 
@@ -104,7 +102,7 @@ export default function DashboardShell({
           }}
           width={250}
           className={clsx(
-            'border-r border-r-gray-500',
+            'border-r-transparent',
             collapsed && '!min-w-11 !max-w-11'
           )}
           trigger={null}
@@ -115,28 +113,20 @@ export default function DashboardShell({
 
           <div className="flex flex-col items-end">
             <div className="w-full md:max-w-xs">
-              <div
-                className={clsx(
-                  collapsed ? 'justify-center' : 'justify-between',
-                  'm-auto mb-4 flex h-12 w-full px-4 pt-4'
-                )}
-              >
-                {!collapsed && (
+              <div className="m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center">
+                {!collapsed ? (
                   <Link href="/">
                     <DarkLogo className="h-full w-auto" />
                   </Link>
+                ) : (
+                  <Link href="/">
+                    <Logomark className="h-full w-auto" aria-hidden="true" />
+                  </Link>
                 )}
+              </div>
 
-                <button
-                  className="flex items-center text-gray-300 transition-all hover:scale-110 hover:text-gray-200"
-                  onClick={() => setCollapsed(!collapsed)}
-                >
-                  {collapsed ? (
-                    <Bars3Icon className="h-6 w-6" />
-                  ) : (
-                    <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-                  )}
-                </button>
+              <div className="flex justify-center py-4">
+                <ModeratedChannelsSelect />
               </div>
 
               <Menu
@@ -145,6 +135,7 @@ export default function DashboardShell({
                 defaultOpenKeys={['/dashboard/features']}
                 style={{
                   background: colorBgLayout,
+                  borderInlineEnd: 'none',
                 }}
                 mode="inline"
                 items={navigation.map((item, i) => {
