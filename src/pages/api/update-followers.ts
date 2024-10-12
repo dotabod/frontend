@@ -4,6 +4,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { captureException } from '@sentry/nextjs'
 import { getServerSession } from 'next-auth'
 
@@ -34,50 +35,22 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
 
 // Main function to update followers count
 async function updateFollows(userId: string) {
-  try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        Account: {
-          select: {
-            providerAccountId: true,
-            access_token: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      where: {
-        id: userId,
-      },
+  const { providerAccountId, accessToken } = await getTwitchTokens(userId)
+
+  const totalFollowerCount = await fetchFollowerCount(
+    providerAccountId,
+    accessToken
+  )
+
+  if (totalFollowerCount !== null) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { followers: totalFollowerCount },
     })
-
-    for (const user of users) {
-      if (!user.Account?.providerAccountId) continue
-
-      const totalFollowerCount = await fetchFollowerCount(
-        user.Account.providerAccountId,
-        user.Account.access_token
-      )
-
-      if (totalFollowerCount !== null) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { followers: totalFollowerCount },
-        })
-        console.log(
-          `Updated followers for user ${user.name} to ${totalFollowerCount}`
-        )
-      } else {
-        // console.log(`Failed to update followers for user ${user.name}`)
-        // do nothing
-      }
-    }
-  } catch (error) {
-    captureException(error)
-    console.error('Failed to update followers:', error)
+    console.log(`Updated followers for user ${userId} to ${totalFollowerCount}`)
+  } else {
+    // console.log(`Failed to update followers for user ${user.name}`)
+    // do nothing
   }
 }
 
