@@ -10,7 +10,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type React from 'react'
 import { useEffect, useState } from 'react'
-import ModeratedChannelsSelect from './ModeratedChannels'
+import ModeratedChannels from './ModeratedChannels'
 
 const { Header, Sider, Content } = Layout
 
@@ -126,7 +126,7 @@ export default function DashboardShell({
               </div>
 
               <div className="flex justify-center py-4">
-                <ModeratedChannelsSelect />
+                <ModeratedChannels />
               </div>
 
               <Menu

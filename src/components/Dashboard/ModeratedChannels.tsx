@@ -2,76 +2,71 @@ import { useTrack } from '@/lib/track'
 import { captureException } from '@sentry/nextjs'
 import { Select, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-export default function ModeratedChannelsSelect() {
+export default function ModeratedChannels() {
   const { data } = useSession()
   const [moderatedChannels, setModeratedChannels] = useState([])
   const [loading, setLoading] = useState(true)
   const track = useTrack()
 
-  useEffect(() => {
-    fetch('/api/get-moderated-channels')
-      .then((res) => res.json())
-      .then((data) => {
-        setModeratedChannels(data)
-        setLoading(false)
-      })
-      .catch((error) => {
-        captureException(error)
-        console.error(error)
-        setLoading(false)
-      })
+  const fetchModeratedChannels = useCallback(async () => {
+    try {
+      const res = await fetch('/api/get-moderated-channels')
+      const channels = await res.json()
+      setModeratedChannels(channels)
+    } catch (error) {
+      captureException(error)
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    fetchModeratedChannels()
+  }, [fetchModeratedChannels])
+
+  const handleOnClick = useCallback(() => {
+    track('selected_moderated_channel')
+  }, [track])
+
+  const renderOptionLabel = (imageSrc, name) => (
+    <div className="flex flex-row items-center gap-2">
+      <img
+        alt="User Profile"
+        width={30}
+        height={30}
+        className="rounded-full flex"
+        onError={(e) => {
+          e.currentTarget.src = '/images/hero/default.png'
+        }}
+        src={imageSrc || '/images/hero/default.png'}
+      />
+      <span>{name}</span>
+    </div>
+  )
+
+  const options = [
+    {
+      value: data?.user?.name,
+      label: renderOptionLabel(data?.user?.image, data?.user?.name),
+    },
+    ...moderatedChannels.map((channel) => ({
+      value: channel.providerAccountId,
+      label: renderOptionLabel(channel.image, channel.name),
+    })),
+  ]
 
   return (
     <Tooltip title="Select a channel to moderate">
       <Select
-        onClick={() => {
-          track('selected_moderated_channel')
-        }}
+        onClick={handleOnClick}
         loading={loading}
         defaultValue={data?.user?.name}
         style={{ width: '90%' }}
         size="large"
-        options={[
-          {
-            value: data?.user?.name,
-            label: (
-              <div className="flex flex-row items-center gap-2">
-                <img
-                  alt="User Profile"
-                  width={30}
-                  height={30}
-                  className="rounded-full flex"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/hero/default.png'
-                  }}
-                  src={data?.user?.image || '/images/hero/default.png'}
-                />
-                <span>{data?.user?.name}</span>
-              </div>
-            ),
-          },
-          ...moderatedChannels.map((channel) => ({
-            value: channel.providerAccountId,
-            label: (
-              <div className="flex flex-row items-center gap-2">
-                <img
-                  alt="User Profile"
-                  width={30}
-                  height={30}
-                  className="rounded-full flex"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/hero/default.png'
-                  }}
-                  src={channel.image || '/images/hero/default.png'}
-                />
-                <span>{channel.name}</span>
-              </div>
-            ),
-          })),
-        ]}
+        options={options}
       />
     </Tooltip>
   )
