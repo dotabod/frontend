@@ -35,6 +35,7 @@ const defaultScopes = [
   'chat:edit',
   'chat:read',
   'clips:edit', // Rampage clips, funny deaths, etc
+  'moderator:read:followers', // Save total followers for the user
   'moderation:read', // Check if Dotabod is banned so we can disable it
   'openid',
   'user:read:broadcast', // We can check if twitch tooltips extension is enabled
