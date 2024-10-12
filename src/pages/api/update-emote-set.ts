@@ -126,22 +126,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           emote_id: emote.id,
         })
       } catch (error) {
-        captureException(error)
-        console.log(`Error adding emote ${emote.label}:`, error)
-        await client.request(CHANGE_EMOTE_IN_SET, {
-          id: emoteSetId,
-          action: 'REMOVE',
-          name: emote.label,
-          emote_id: userEmoteSet.emoteSet.emotes.find(
-            (e) => e.name === emote.label
-          )?.id,
-        })
-        await client.request(CHANGE_EMOTE_IN_SET, {
-          id: emoteSetId,
-          action: 'ADD',
-          name: emote.label,
-          emote_id: emote.id,
-        })
+        // console.log(`Error adding emote ${emote.label}:`, error)
+        // Do nothing, probably already added
       }
     }
 
