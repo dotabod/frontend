@@ -69,6 +69,7 @@ export default function ModeratedChannels() {
 
       signIn('impersonate', {
         channelToImpersonate: value,
+        callbackUrl: '/dashboard/features',
       })
     },
     [user, track]
@@ -96,6 +97,7 @@ export default function ModeratedChannels() {
         <Select
           onClick={handleOnClick}
           onChange={handleOnChange}
+          labelRender={() => renderOptionLabel(user?.image, user.name)}
           loading={loading}
           defaultValue={user?.name}
           style={{ width: '90%' }}
