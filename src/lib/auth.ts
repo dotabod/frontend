@@ -1,10 +1,12 @@
+import prisma from '@/lib/db'
+import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { captureException } from '@sentry/nextjs'
 import type { NextAuthOptions } from 'next-auth'
+import { decode, encode } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
-
-import prisma from '@/lib/db'
-import { encode } from 'next-auth/jwt'
 
 // Manually toggle this when logging in as the bot if we need to update scopes
 const useBotScopes = false
@@ -47,6 +49,13 @@ const defaultScopes = [
   'user:write:chat',
 ].join(' ')
 
+const extractCookieValue = (cookieHeader: string | string[], name: string) => {
+  const cookieStringFull = Array.isArray(cookieHeader)
+    ? cookieHeader.find((header) => header.includes(name))
+    : cookieHeader
+  return name + cookieStringFull?.split(name)[1].split(';')[0]
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -67,12 +76,52 @@ export const authOptions: NextAuthOptions = {
         },
       },
 
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const channelToImpersonate = credentials?.channelToImpersonate
+        if (!channelToImpersonate || !Number.parseInt(channelToImpersonate)) {
+          throw new Error('Access denied')
+        }
+
+        const headerCookies = req.headers?.cookie
+        let currentLoggedInUserId: string | undefined
+
+        try {
+          const secureCookie =
+            process.env.NEXTAUTH_URL?.startsWith('https://') ??
+            !!process.env.VERCEL
+          const cookieName = secureCookie
+            ? '__Secure-next-auth.session-token'
+            : 'next-auth.session-token'
+          const sessionToken = extractCookieValue(headerCookies, cookieName)
+          const actualToken = await decode({
+            secret: process.env.NEXTAUTH_SECRET,
+            token: sessionToken.replace(`${cookieName}=`, ''),
+          })
+          currentLoggedInUserId = actualToken.id
+        } catch (e) {
+          console.error(e)
+          captureException(e)
+        }
+
+        if (!currentLoggedInUserId) {
+          throw new Error('Access denied')
+        }
+
+        const { providerAccountId, accessToken } = await getTwitchTokens(
+          currentLoggedInUserId
+        )
+        const response = await getModeratedChannels(
+          providerAccountId,
+          accessToken
+        )
+
         if (
-          !credentials?.channelToImpersonate ||
-          !Number.parseInt(credentials.channelToImpersonate)
+          Array.isArray(response) &&
+          !response.find(
+            (channel) => channel.providerAccountId === channelToImpersonate
+          )
         ) {
-          throw new Error('No channel ID provided')
+          throw new Error('Access denied')
         }
 
         const data = await prisma.account.findUnique({
@@ -80,7 +129,7 @@ export const authOptions: NextAuthOptions = {
             user: true,
           },
           where: {
-            providerAccountId: credentials.channelToImpersonate,
+            providerAccountId: channelToImpersonate,
           },
         })
 
@@ -88,7 +137,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Access denied')
         }
 
-        return data?.user
+        return { ...data?.user, currentLoggedInUserId }
       },
     }),
     TwitchProvider({

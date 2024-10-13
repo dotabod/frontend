@@ -11,7 +11,10 @@ import fetch from 'node-fetch'
 const TWITCH_MODERATED_CHANNELS_URL =
   'https://api.twitch.tv/helix/moderation/channels'
 
-async function getModeratedChannels(userId: string, accessToken: string) {
+export async function getModeratedChannels(
+  userId: string,
+  accessToken: string
+) {
   try {
     const url = `${TWITCH_MODERATED_CHANNELS_URL}?user_id=${userId}`
     const response = await fetch(url, {

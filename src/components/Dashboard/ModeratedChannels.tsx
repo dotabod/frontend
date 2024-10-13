@@ -64,6 +64,7 @@ export default function ModeratedChannels() {
       if (value === user?.twitchId) {
         return
       }
+      setLoading(true)
       track('changed_moderated_channel')
 
       signIn('impersonate', {
