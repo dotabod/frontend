@@ -10,7 +10,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import type React from 'react'
 import { useEffect, useState } from 'react'
-import ModeratedChannelsSelect from './ModeratedChannels'
+import ModeratedChannels from './ModeratedChannels'
 
 const { Header, Sider, Content } = Layout
 
@@ -43,7 +43,7 @@ export default function DashboardShell({
 }: {
   children: React.ReactElement
 }) {
-  const { status } = useSession()
+  const { status, data } = useSession()
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
   const {
@@ -126,7 +126,7 @@ export default function DashboardShell({
               </div>
 
               <div className="flex justify-center py-4">
-                <ModeratedChannelsSelect />
+                <ModeratedChannels />
               </div>
 
               <Menu
@@ -139,6 +139,9 @@ export default function DashboardShell({
                 }}
                 mode="inline"
                 items={navigation.map((item, i) => {
+                  if (data?.user?.isImpersonating && item.name === 'Setup')
+                    return null
+
                   if (!item.name)
                     return {
                       key: item?.href || i,

@@ -1,16 +1,18 @@
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from 'next-auth'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const token = decodeURIComponent((req.query.token as string) || '').trim()
   const userId = token || session?.user?.id
-
+  if (session?.user?.isImpersonating) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
   if (!userId) {
     return res.status(403).json({ message: 'Unauthorized' })
   }

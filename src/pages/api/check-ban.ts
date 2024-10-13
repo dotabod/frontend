@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { captureException } from '@sentry/nextjs'
-import { getServerSession } from 'next-auth'
 import { getTwitchTokens } from '../../lib/getTwitchTokens'
 
 async function checkBan(broadcasterId: string, accessToken: string) {

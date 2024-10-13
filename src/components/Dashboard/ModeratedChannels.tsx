@@ -1,78 +1,120 @@
 import { useTrack } from '@/lib/track'
 import { captureException } from '@sentry/nextjs'
-import { Select, Tooltip } from 'antd'
-import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { Button, Select, Tooltip } from 'antd'
+import { StopCircleIcon } from 'lucide-react'
+import { signIn, signOut, useSession } from 'next-auth/react'
+import { useCallback, useEffect, useState } from 'react'
 
-export default function ModeratedChannelsSelect() {
-  const { data } = useSession()
-  const [moderatedChannels, setModeratedChannels] = useState([])
+export default function ModeratedChannels() {
+  const {
+    data: { user },
+  } = useSession()
+  const [moderatedChannels, setModeratedChannels] = useState<
+    {
+      providerAccountId: string
+      name: string
+      image: string
+    }[]
+  >([])
   const [loading, setLoading] = useState(true)
+  const [isSigningOut, setIsSigningOut] = useState(false)
   const track = useTrack()
 
-  useEffect(() => {
-    fetch('/api/get-moderated-channels')
-      .then((res) => res.json())
-      .then((data) => {
-        setModeratedChannels(data)
-        setLoading(false)
-      })
-      .catch((error) => {
-        captureException(error)
-        console.error(error)
-        setLoading(false)
-      })
+  const fetchModeratedChannels = useCallback(async () => {
+    try {
+      const res = await fetch('/api/get-moderated-channels')
+      const channels = await res.json()
+      if (Array.isArray(channels)) {
+        setModeratedChannels(channels)
+      }
+    } catch (error) {
+      captureException(error)
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  return (
-    <Tooltip title="Select a channel to moderate">
-      <Select
-        onClick={() => {
-          track('selected_moderated_channel')
+  useEffect(() => {
+    fetchModeratedChannels()
+  }, [fetchModeratedChannels])
+
+  const handleOnClick = useCallback(() => {
+    track('selected_moderated_channel')
+  }, [track])
+
+  const renderOptionLabel = (imageSrc, name) => (
+    <div className="flex flex-row items-center gap-2">
+      <img
+        alt="User Profile"
+        width={30}
+        height={30}
+        className="rounded-full flex"
+        onError={(e) => {
+          e.currentTarget.src = '/images/hero/default.png'
         }}
-        loading={loading}
-        defaultValue={data?.user?.name}
-        style={{ width: '90%' }}
-        size="large"
-        options={[
-          {
-            value: data?.user?.name,
-            label: (
-              <div className="flex flex-row items-center gap-2">
-                <img
-                  alt="User Profile"
-                  width={30}
-                  height={30}
-                  className="rounded-full flex"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/hero/default.png'
-                  }}
-                  src={data?.user?.image || '/images/hero/default.png'}
-                />
-                <span>{data?.user?.name}</span>
-              </div>
-            ),
-          },
-          ...moderatedChannels.map((channel) => ({
-            value: channel.providerAccountId,
-            label: (
-              <div className="flex flex-row items-center gap-2">
-                <img
-                  alt="User Profile"
-                  width={30}
-                  height={30}
-                  className="rounded-full flex"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/hero/default.png'
-                  }}
-                  src={channel.image || '/images/hero/default.png'}
-                />
-                <span>{channel.name}</span>
-              </div>
-            ),
-          })),
-        ]}
+        src={imageSrc || '/images/hero/default.png'}
       />
-    </Tooltip>
+      <span>{name}</span>
+    </div>
+  )
+
+  const handleOnChange = useCallback(
+    (value) => {
+      if (value === user?.twitchId) {
+        return
+      }
+      setLoading(true)
+      track('changed_moderated_channel')
+
+      signIn('impersonate', {
+        channelToImpersonate: value,
+        callbackUrl: '/dashboard/features',
+      })
+    },
+    [user, track]
+  )
+
+  const handleSignOut = useCallback(() => {
+    setIsSigningOut(true)
+    signOut()
+  }, [])
+
+  const options = [
+    {
+      value: user?.twitchId,
+      label: renderOptionLabel(user?.image, user?.name),
+    },
+    ...moderatedChannels.map((channel) => ({
+      value: channel.providerAccountId,
+      label: renderOptionLabel(channel.image, channel.name),
+    })),
+  ]
+
+  return (
+    <div className="flex flex-col flex-grow items-center">
+      <Tooltip title="Select a channel to moderate">
+        <Select
+          onClick={handleOnClick}
+          onChange={handleOnChange}
+          labelRender={() => renderOptionLabel(user?.image, user.name)}
+          loading={loading}
+          defaultValue={user?.name}
+          style={{ width: '90%' }}
+          size="large"
+          options={options}
+        />
+      </Tooltip>
+      {user?.isImpersonating && (
+        <Button
+          onClick={handleSignOut}
+          loading={isSigningOut}
+          style={{ marginTop: '10px' }}
+        >
+          <StopCircleIcon size={16} />
+          <span>Stop moderating</span>
+        </Button>
+      )}
+    </div>
   )
 }

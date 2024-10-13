@@ -2,11 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { captureException } from '@sentry/nextjs'
-import { getServerSession } from 'next-auth'
 
 // Helper function to fetch follower count for a user
 async function fetchFollowerCount(providerAccountId, accessToken) {
@@ -60,7 +60,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const session = await getServerSession(req, res, authOptions)
-
+  if (session?.user?.isImpersonating) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
   if (!session?.user?.id) {
     return res.status(403).end()
   }

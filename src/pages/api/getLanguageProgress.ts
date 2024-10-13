@@ -1,9 +1,9 @@
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from 'next-auth'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
 const token = process.env.CROWDIN_TOKEN
