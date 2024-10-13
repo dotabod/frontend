@@ -10,18 +10,21 @@ export const getServerSession = async (
   ...args: [NextApiRequest, NextApiResponse, AuthOptions]
 ) => {
   const session: Session = await getNextServerSession(...args)
-  let userId = session?.user?.id
+  let authenticatedUserId = session?.user?.id
   if (session?.user?.isImpersonating) {
     const decryptedId = await decode({
       token: session?.user?.id,
       secret: process.env.NEXTAUTH_SECRET,
     })
-    userId = decryptedId.id
+    authenticatedUserId = decryptedId.id
   }
 
-  if (!userId) {
-    throw new Error('No user ID found in session')
+  if (!authenticatedUserId) {
+    return null
   }
 
-  return { ...session, user: { ...session.user, id: userId } }
+  return {
+    ...session,
+    user: { ...session.user, id: authenticatedUserId },
+  }
 }
