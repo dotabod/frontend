@@ -35,36 +35,52 @@ model Account {
 
 /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
 model User {
-  id                                String         @id @default(dbgenerated("gen_random_uuid()"))
-  displayName                       String?        @unique(map: "users_name_key")
-  email                             String?        @unique
+  id                                String              @id @default(dbgenerated("gen_random_uuid()"))
+  displayName                       String?             @unique(map: "users_name_key")
+  email                             String?             @unique
   image                             String?
-  createdAt                         DateTime       @default(now()) @map("created_at")
-  updatedAt                         DateTime       @default(now()) @map("updated_at")
-  mmr                               Int            @default(0) @db.SmallInt
+  createdAt                         DateTime            @default(now()) @map("created_at")
+  updatedAt                         DateTime            @default(now()) @map("updated_at")
+  mmr                               Int                 @default(0) @db.SmallInt
   steam32Id                         Int?
   followers                         Int?
-  stream_delay                      Int?           @default(0) @db.SmallInt
-  name                              String         @unique(map: "users_username_key") @default("")
+  stream_delay                      Int?                @default(0) @db.SmallInt
+  name                              String              @unique(map: "users_username_key") @default("")
   emailVerified                     DateTime?
-  stream_online                     Boolean        @default(false)
-  stream_start_date                 DateTime?      @db.Timestamp(6)
-  beta_tester                       Boolean        @default(false)
-  locale                            String         @default("en")
-  kick                              BigInt?        @unique
-  youtube                           String?        @unique
+  stream_online                     Boolean             @default(false)
+  stream_start_date                 DateTime?           @db.Timestamp(6)
+  beta_tester                       Boolean             @default(false)
+  locale                            String              @default("en")
+  kick                              BigInt?             @unique
+  youtube                           String?             @unique
   Account                           Account?
   Bet                               Bet[]
-  mods_mods_mod_user_idTousers      mods[]         @relation("mods_mod_user_idTousers")
-  mods_mods_streamer_user_idTousers mods[]         @relation("mods_streamer_user_idTousers")
+  mods_mods_mod_user_idTousers      mods[]              @relation("mods_mod_user_idTousers")
+  mods_mods_streamer_user_idTousers mods[]              @relation("mods_streamer_user_idTousers")
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
+  approvedModerators                ApprovedModerator[] @relation("UserApprovedModerators")
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
   @@index([name], map: "idx_users_on_name")
   @@map("users")
+}
+
+model ApprovedModerator {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId             String
+  moderatorChannelId String
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @map("updated_at")
+
+  user User @relation("UserApprovedModerators", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userId, moderatorChannelId])
+  @@index([userId], map: "idx_approved_moderators_on_userid")
+  @@index([moderatorChannelId], map: "idx_approved_moderators_on_moderatorChannelId")
+  @@map("approved_moderators")
 }
 
 model Setting {

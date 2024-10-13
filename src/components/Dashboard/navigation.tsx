@@ -15,7 +15,7 @@ import {
   TvIcon,
 } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
-import { Github, Info } from 'lucide-react'
+import { Github, Info, ShieldCheck } from 'lucide-react'
 import Image from 'next/image'
 
 export const navigation = [
@@ -50,6 +50,11 @@ export const navigation = [
         icon: ScaleIcon,
       },
     ],
+  },
+  {
+    name: 'Moderators',
+    href: '/dashboard/moderators',
+    icon: ShieldCheck,
   },
   {
     name: 'Commands',

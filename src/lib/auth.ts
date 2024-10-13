@@ -107,6 +107,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Access denied')
         }
 
+        // check to make sure they're still a moderator on twitch
         const { providerAccountId, accessToken } = await getTwitchTokens(
           currentLoggedInUserId
         )
@@ -121,7 +122,23 @@ export const authOptions: NextAuthOptions = {
             (channel) => channel.providerAccountId === channelToImpersonate
           )
         ) {
-          throw new Error('Access denied')
+          throw new Error('You are not a moderator for this channel')
+        }
+
+        // check to make sure they're an approved moderator on dotabod
+        const moderator = await prisma.approvedModerator.findFirst({
+          select: {
+            moderatorChannelId: true,
+            createdAt: true,
+          },
+          where: {
+            moderatorChannelId: channelToImpersonate,
+            userId: currentLoggedInUserId,
+          },
+        })
+
+        if (!moderator) {
+          throw new Error('You are not an approved moderator for this channel')
         }
 
         const data = await prisma.account.findUnique({
