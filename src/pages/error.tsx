@@ -24,6 +24,12 @@ const AuthErrorPage: NextPageWithLayout = () => {
       const sanitizedError = DOMPurify.sanitize(decodedError, {
         USE_PROFILES: { html: false },
       })
+      if (sanitizedError === 'NOT_APPROVED') {
+        setErrorMessage(
+          'Your account has not been approved to manage this stream. Contact the streamer to get approved.'
+        )
+        return
+      }
       setErrorMessage(sanitizedError)
     }
   }, [router.query.error])

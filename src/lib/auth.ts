@@ -139,7 +139,7 @@ export const authOptions: NextAuthOptions = {
         })
 
         if (!moderator) {
-          throw new Error('You are not an approved moderator for this channel')
+          throw new Error('NOT_APPROVED')
         }
 
         const data = await prisma.account.findUnique({
