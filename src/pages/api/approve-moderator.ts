@@ -4,31 +4,50 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
-async function approveModerator(
+
+async function approveModerators(
   userId: string,
-  moderatorChannelId: string,
-  isModeratorApproved: boolean
+  newModeratorChannelIds: string[]
 ) {
   try {
-    if (isModeratorApproved) {
-      // Delete the moderator's approval record from the database
+    // Fetch the current list of approved moderator channel IDs
+    const currentModerators = await prisma.approvedModerator.findMany({
+      where: { userId },
+      select: { moderatorChannelId: true },
+    })
+    const currentModeratorChannelIds = currentModerators.map(
+      (mod) => mod.moderatorChannelId
+    )
+
+    // Determine which moderators to add and which to remove
+    const moderatorsToAdd = newModeratorChannelIds.filter(
+      (id) => !currentModeratorChannelIds.includes(id)
+    )
+    const moderatorsToRemove = currentModeratorChannelIds.filter(
+      (id) => !newModeratorChannelIds.includes(id)
+    )
+
+    // Remove moderators
+    if (moderatorsToRemove.length > 0) {
       await prisma.approvedModerator.deleteMany({
         where: {
           userId,
-          moderatorChannelId,
-        },
-      })
-    } else {
-      // Create a new approval record in the database
-      await prisma.approvedModerator.create({
-        data: {
-          userId,
-          moderatorChannelId,
+          moderatorChannelId: { in: moderatorsToRemove },
         },
       })
     }
+
+    // Add new moderators
+    if (moderatorsToAdd.length > 0) {
+      await prisma.approvedModerator.createMany({
+        data: moderatorsToAdd.map((moderatorChannelId) => ({
+          userId,
+          moderatorChannelId,
+        })),
+      })
+    }
   } catch (error) {
-    throw new Error(`Failed to approve moderator: ${error.message}`)
+    throw new Error(`Failed to approve moderators: ${error.message}`)
   }
 }
 
@@ -46,26 +65,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (method === 'POST') {
-    const { moderatorChannelId, isModeratorApproved } = req.body
+    const { moderatorChannelIds } = req.body
 
-    if (!moderatorChannelId) {
-      return res.status(400).json({ message: 'Missing moderatorChannelId' })
+    if (!Array.isArray(moderatorChannelIds)) {
+      return res
+        .status(400)
+        .json({ message: 'moderatorChannelIds must be an array' })
     }
 
     try {
-      await approveModerator(
-        session?.user?.id,
-        moderatorChannelId,
-        isModeratorApproved
-      )
+      await approveModerators(session?.user?.id, moderatorChannelIds)
       return res
         .status(200)
-        .json({ message: 'Moderator approved successfully' })
+        .json({ message: 'Moderators approved successfully' })
     } catch (error) {
-      console.error('Failed to approve moderator:', error)
+      console.error('Failed to approve moderators:', error)
       return res
         .status(500)
-        .json({ message: 'Error approving moderator', error })
+        .json({ message: 'Error approving moderators', error })
     }
   } else {
     res.setHeader('Allow', ['POST'])

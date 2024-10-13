@@ -3,24 +3,25 @@ import Header from '@/components/Dashboard/Header'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { Button, notification } from 'antd'
-import { ExternalLinkIcon, Trash } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { Button, Select, notification } from 'antd'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 const ModeratorsPage = () => {
   const track = useTrack()
-  const { data: approvedMods, mutate } = useSWR<
+  const {
+    data: approvedMods,
+    isLoading: loadingApprovedMods,
+    mutate,
+  } = useSWR<
     {
       moderatorChannelId: string
       createdAt: string
     }[]
   >('/api/get-approved-moderators', fetcher)
-  const session = useSession()
-  const { data: moderatorList } = useSWR<
+  const { data: moderatorList, isLoading: loadingModList } = useSWR<
     {
       user_id: string
       user_login: string
@@ -28,13 +29,20 @@ const ModeratorsPage = () => {
     }[]
   >('/api/get-moderators', fetcher)
 
-  const [loading, setLoading] = useState<string | null>(null) // Loading state
+  const [loading, setLoading] = useState<boolean>(false) // Loading state
+  const [selectedModerators, setSelectedModerators] = useState<string[]>([]) // Selected moderators
 
-  const handleApprove = async (
-    moderatorChannelId: string,
-    isModeratorApproved: boolean
-  ) => {
-    setLoading(moderatorChannelId) // Set loading state
+  useEffect(() => {
+    if (!loadingApprovedMods) {
+      setSelectedModerators(
+        approvedMods?.map((mod) => mod.moderatorChannelId) || []
+      )
+    }
+  }, [approvedMods, loadingApprovedMods])
+
+  const handleApprove = async () => {
+    setLoading(true) // Set loading state
+    track('approve_moderators_start')
 
     try {
       const data = await fetch('/api/approve-moderator', {
@@ -43,8 +51,7 @@ const ModeratorsPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          isModeratorApproved,
-          moderatorChannelId,
+          moderatorChannelIds: selectedModerators,
         }),
       })
       const body = await data.json()
@@ -55,18 +62,19 @@ const ModeratorsPage = () => {
       mutate()
       notification.success({
         message: 'Success',
-        description: isModeratorApproved
-          ? 'Moderator removed successfully!'
-          : 'Moderator approved successfully!',
+        description: 'Moderators updated successfully!',
       })
+      track('approve_moderators_success')
     } catch (error) {
-      console.error('Failed to approve moderator:', error)
+      console.error('Failed to approve moderators:', error)
       notification.error({
         message: 'Error',
-        description: 'Failed to approve moderator.',
+        description: 'Failed to approve moderators.',
       })
+      track('approve_moderators_failure', { error: error.message })
     } finally {
-      setLoading(null) // Reset loading state
+      setLoading(false)
+      setSelectedModerators([])
     }
   }
 
@@ -80,58 +88,37 @@ const ModeratorsPage = () => {
         title="Moderators"
       />
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
-        {moderatorList?.map((moderator) => {
-          const isModeratorApproved = !!approvedMods?.find(
-            (mod) => mod.moderatorChannelId === moderator.user_id
-          )
-          return (
-            <div key={moderator.user_id}>
-              <Card>
-                <div className="title">
-                  <h3>
-                    <Button
-                      iconPosition="end"
-                      className="!pl-0"
-                      type="link"
-                      size="large"
-                      icon={<ExternalLinkIcon size={14} />}
-                      onClick={() => {
-                        track('Twitch Viewercard', {
-                          user: session?.data?.user?.name,
-                          target: moderator.user_login,
-                        })
-                        window.open(
-                          `https://www.twitch.tv/popout/${session?.data?.user?.name}/viewercard/${moderator.user_login}?popout=`,
-                          'mywindow',
-                          'menubar=1,resizable=1,width=350,height=550'
-                        )
-                      }}
-                      target="_blank"
-                    >
-                      {moderator.user_name}
-                    </Button>
-                  </h3>
-                </div>
+      <Card>
+        <div className="title">
+          <h3>Approve list</h3>
+        </div>
+        <div className="subtitle">
+          Approved moderators will have the ability to change any of your
+          Dotabod settings on your behalf. They can toggle commands, change
+          features, and more. They will not be able to see the Setup screen or
+          view your overlay URL.
+        </div>
 
-                <div className="flex items-center space-x-4">
-                  <Button
-                    icon={isModeratorApproved ? <Trash size={16} /> : undefined}
-                    color={isModeratorApproved ? 'danger' : 'primary'}
-                    type={isModeratorApproved ? 'default' : 'primary'}
-                    onClick={() =>
-                      handleApprove(moderator.user_id, isModeratorApproved)
-                    }
-                    loading={loading === moderator.user_id} // Loading state for the specific button
-                  >
-                    {isModeratorApproved ? 'Remove' : 'Approve'}
-                  </Button>
-                </div>
-              </Card>
-            </div>
-          )
-        })}
-      </div>
+        <div className="max-w-sm flex flex-col gap-4">
+          <Select
+            optionFilterProp="label"
+            loading={loadingModList || loadingApprovedMods}
+            mode="multiple"
+            style={{ width: '100%' }}
+            placeholder="Select moderators"
+            value={selectedModerators}
+            defaultValue={approvedMods?.map((mod) => mod.moderatorChannelId)}
+            onChange={setSelectedModerators}
+            options={moderatorList?.map((moderator) => ({
+              label: moderator.user_name,
+              value: moderator.user_id,
+            }))}
+          />
+          <Button type="primary" onClick={handleApprove} loading={loading}>
+            Submit
+          </Button>
+        </div>
+      </Card>
     </>
   )
 }
