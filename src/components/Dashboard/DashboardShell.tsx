@@ -43,7 +43,7 @@ export default function DashboardShell({
 }: {
   children: React.ReactElement
 }) {
-  const { status } = useSession()
+  const { status, data } = useSession()
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
   const {
@@ -139,6 +139,9 @@ export default function DashboardShell({
                 }}
                 mode="inline"
                 items={navigation.map((item, i) => {
+                  if (data?.user?.isImpersonating && item.name === 'Setup')
+                    return null
+
                   if (!item.name)
                     return {
                       key: item?.href || i,

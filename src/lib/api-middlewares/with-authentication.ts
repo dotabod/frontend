@@ -1,5 +1,5 @@
+import { getServerSession } from '@/lib/api/getServerSession'
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from 'next-auth/next'
 
 import { authOptions } from '@/lib/auth'
 

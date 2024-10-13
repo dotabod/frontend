@@ -2,10 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { captureException } from '@sentry/nextjs'
-import { getServerSession } from 'next-auth'
 
 async function addModerator(broadcasterId: string, accessToken: string) {
   const checkUrl = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${broadcasterId}&user_id=${process.env.TWITCH_BOT_PROVIDERID}`
@@ -48,7 +48,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const session = await getServerSession(req, res, authOptions)
-
+  if (session?.user?.isImpersonating) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
   if (!session?.user?.id) {
     return res.status(403).json({ message: 'Forbidden' })
   }

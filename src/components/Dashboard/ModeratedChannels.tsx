@@ -1,20 +1,32 @@
 import { useTrack } from '@/lib/track'
 import { captureException } from '@sentry/nextjs'
-import { Select, Tooltip } from 'antd'
-import { useSession } from 'next-auth/react'
+import { Button, Select, Tooltip } from 'antd'
+import { StopCircleIcon } from 'lucide-react'
+import { signIn, signOut, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useState } from 'react'
 
 export default function ModeratedChannels() {
-  const { data } = useSession()
-  const [moderatedChannels, setModeratedChannels] = useState([])
+  const {
+    data: { user },
+  } = useSession()
+  const [moderatedChannels, setModeratedChannels] = useState<
+    {
+      providerAccountId: string
+      name: string
+      image: string
+    }[]
+  >([])
   const [loading, setLoading] = useState(true)
+  const [isSigningOut, setIsSigningOut] = useState(false)
   const track = useTrack()
 
   const fetchModeratedChannels = useCallback(async () => {
     try {
       const res = await fetch('/api/get-moderated-channels')
       const channels = await res.json()
-      setModeratedChannels(channels)
+      if (Array.isArray(channels)) {
+        setModeratedChannels(channels)
+      }
     } catch (error) {
       captureException(error)
       console.error(error)
@@ -47,10 +59,29 @@ export default function ModeratedChannels() {
     </div>
   )
 
+  const handleOnChange = useCallback(
+    (value) => {
+      if (value === user?.twitchId) {
+        return
+      }
+      track('changed_moderated_channel')
+
+      signIn('impersonate', {
+        channelToImpersonate: value,
+      })
+    },
+    [user, track]
+  )
+
+  const handleSignOut = useCallback(() => {
+    setIsSigningOut(true)
+    signOut()
+  }, [])
+
   const options = [
     {
-      value: data?.user?.name,
-      label: renderOptionLabel(data?.user?.image, data?.user?.name),
+      value: user?.twitchId,
+      label: renderOptionLabel(user?.image, user?.name),
     },
     ...moderatedChannels.map((channel) => ({
       value: channel.providerAccountId,
@@ -59,15 +90,28 @@ export default function ModeratedChannels() {
   ]
 
   return (
-    <Tooltip title="Select a channel to moderate">
-      <Select
-        onClick={handleOnClick}
-        loading={loading}
-        defaultValue={data?.user?.name}
-        style={{ width: '90%' }}
-        size="large"
-        options={options}
-      />
-    </Tooltip>
+    <div className="flex flex-col flex-grow items-center">
+      <Tooltip title="Select a channel to moderate">
+        <Select
+          onClick={handleOnClick}
+          onChange={handleOnChange}
+          loading={loading}
+          defaultValue={user?.name}
+          style={{ width: '90%' }}
+          size="large"
+          options={options}
+        />
+      </Tooltip>
+      {user?.isImpersonating && (
+        <Button
+          onClick={handleSignOut}
+          loading={isSigningOut}
+          style={{ marginTop: '10px' }}
+        >
+          <StopCircleIcon size={16} />
+          <span>Stop moderating</span>
+        </Button>
+      )}
+    </div>
   )
 }

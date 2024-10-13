@@ -1,8 +1,10 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import type { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 
 import prisma from '@/lib/db'
+import { encode } from 'next-auth/jwt'
 
 // Manually toggle this when logging in as the bot if we need to update scopes
 const useBotScopes = false
@@ -54,6 +56,41 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   providers: [
+    CredentialsProvider({
+      name: 'impersonate',
+      id: 'impersonate',
+      credentials: {
+        channelToImpersonate: {
+          label: 'Channel ID',
+          type: 'text',
+          placeholder: '1234',
+        },
+      },
+
+      async authorize(credentials) {
+        if (
+          !credentials?.channelToImpersonate ||
+          !Number.parseInt(credentials.channelToImpersonate)
+        ) {
+          throw new Error('No channel ID provided')
+        }
+
+        const data = await prisma.account.findUnique({
+          select: {
+            user: true,
+          },
+          where: {
+            providerAccountId: credentials.channelToImpersonate,
+          },
+        })
+
+        if (!data) {
+          throw new Error('Access denied')
+        }
+
+        return data?.user
+      },
+    }),
     TwitchProvider({
       allowDangerousEmailAccountLinking: true,
       clientId: process.env.TWITCH_CLIENT_ID,
@@ -68,13 +105,25 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ token, session }) {
+    async session({ token, session, ...rest }) {
       if (token) {
+        const encryptedId = await encode({
+          token: {
+            name: '',
+            id: token.id,
+            isImpersonating: token.isImpersonating,
+            twitchId: '',
+            locale: '',
+            scope: '',
+          },
+          secret: process.env.NEXTAUTH_SECRET,
+        })
+        session.user.isImpersonating = token.isImpersonating
         session.user.locale = token.locale
         session.user.twitchId = token.twitchId
-        session.user.id = token.id
+        session.user.id = token?.isImpersonating ? encryptedId : token.id
         session.user.name = token.name
-        session.user.email = token.email
+        session.user.email = token?.isImpersonating ? '' : token.email
         session.user.image = token.picture
         session.user.scope = token.scope
       }
@@ -82,7 +131,7 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     // @ts-ignore
-    async jwt({ token, account, user, profile, isNewUser }) {
+    async jwt({ token, account, user, profile }) {
       // Save a db lookup
       if (token.id) return token
 
@@ -92,15 +141,15 @@ export const authOptions: NextAuthOptions = {
       }
 
       const newUser = {
-        email: profile.email || user.email,
+        email: profile?.email || user.email,
         // @ts-ignore from twitch?
         name: user.displayName || user.name || profile?.preferred_username,
         displayName:
+          // @ts-ignore from twitch?
+          user.displayName ||
           token.name ||
           // @ts-ignore from twitch?
           profile?.preferred_username ||
-          // @ts-ignore from twitch?
-          user.displayName ||
           user.name,
         // @ts-ignore from twitch?
         image: profile?.picture || user.image,
@@ -121,9 +170,11 @@ export const authOptions: NextAuthOptions = {
           locale: true,
         },
       })
+      const isImpersonating = account?.provider === 'impersonate'
 
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
       if (
+        !isImpersonating &&
         provider.displayName &&
         provider.displayName !== newUser.displayName &&
         account
@@ -144,7 +195,7 @@ export const authOptions: NextAuthOptions = {
         account &&
         ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if (shouldRefresh) {
+      if (shouldRefresh && !isImpersonating) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
 
@@ -172,6 +223,7 @@ export const authOptions: NextAuthOptions = {
         name: newUser.displayName || newUser.name,
         email: newUser.email,
         picture: newUser.image,
+        isImpersonating,
         scope: account?.scope,
       }
     },
