@@ -33,7 +33,7 @@ const ModeratorsPage = () => {
   const [selectedModerators, setSelectedModerators] = useState<string[]>([]) // Selected moderators
 
   useEffect(() => {
-    if (!loadingApprovedMods) {
+    if (!loadingApprovedMods && Array.isArray(approvedMods)) {
       setSelectedModerators(
         approvedMods?.map((mod) => mod.moderatorChannelId) || []
       )
@@ -107,7 +107,10 @@ const ModeratorsPage = () => {
             style={{ width: '100%' }}
             placeholder="Select moderators"
             value={selectedModerators}
-            defaultValue={approvedMods?.map((mod) => mod.moderatorChannelId)}
+            defaultValue={
+              Array.isArray(approvedMods) &&
+              approvedMods.map((mod) => mod.moderatorChannelId)
+            }
             onChange={setSelectedModerators}
             options={moderatorList?.map((moderator) => ({
               label: moderator.user_name,
