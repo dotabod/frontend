@@ -4,7 +4,7 @@ import { DarkLogo, Logomark } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import { captureException } from '@sentry/nextjs'
-import { Layout, Menu, type MenuProps, theme } from 'antd'
+import { Layout, Menu, type MenuProps, Tag, theme } from 'antd'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -26,10 +26,11 @@ function getItem(item) {
       <Link
         {...props}
         href={item.href}
-        className="!text-gray-200"
+        className="!text-gray-200 flex flex-row gap-2 items-center"
         target={item.href.startsWith('http') ? '_blank' : '_self'}
       >
         {item.name}
+        {item.new && <Tag color="green">New</Tag>}
       </Link>
     ) : (
       item.name

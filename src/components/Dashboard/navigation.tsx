@@ -55,6 +55,7 @@ export const navigation = [
     name: 'Moderators',
     href: '/dashboard/moderators',
     icon: ShieldCheck,
+    new: true,
   },
   {
     name: 'Commands',

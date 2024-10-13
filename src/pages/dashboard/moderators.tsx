@@ -112,10 +112,13 @@ const ModeratorsPage = () => {
               approvedMods.map((mod) => mod.moderatorChannelId)
             }
             onChange={setSelectedModerators}
-            options={moderatorList?.map((moderator) => ({
-              label: moderator.user_name,
-              value: moderator.user_id,
-            }))}
+            options={
+              Array.isArray(moderatorList) &&
+              moderatorList?.map((moderator) => ({
+                label: moderator.user_name,
+                value: moderator.user_id,
+              }))
+            }
           />
           <Button type="primary" onClick={handleApprove} loading={loading}>
             Submit
