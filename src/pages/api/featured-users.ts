@@ -34,33 +34,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    const randomLive = await prisma.bet.findMany({
-      take: 10,
-      distinct: ['userId'],
-      select: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-          },
-        },
-      },
-      where: {
-        updatedAt: {
-          gte: new Date(new Date().getTime() - 60 * 60 * 1000), // 1 hour ago
-        },
-        user: {
-          name: {
-            notIn: topLive.map((bet) => bet.name),
-          },
-          stream_online: true,
-        },
-      },
-    })
-
     return res.status(200).json({
       topLive,
-      randomLive: randomLive.map((bet) => bet.user),
     })
   } catch (error) {
     captureException(error)
