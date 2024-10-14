@@ -95,16 +95,13 @@ const TwitchUser = ({
   last,
   name,
   onClick,
-  session,
-  supporter,
 }: {
   image: string
   last: boolean
   name: string
   onClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
-  session: any
-  supporter: boolean
 }) => {
+  const session = useSession()
   const userName = last ? session?.data?.user?.name || name : name
   const imagesrc = last ? session?.data?.user?.image || image : image
 
@@ -217,101 +214,45 @@ export function Hero() {
             </div>
           </div>
         </div>
-        {isLoading || !users?.topLive?.length || !users?.randomLive?.length ? (
-          <>
-            <div className="relative lg:col-span-7 xl:col-span-6">
-              <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
-                <Image
-                  src={TwitchSvg}
-                  width={18}
-                  height={18}
-                  alt="twitch logo"
-                />
-                <span>
-                  Featured in over {new Intl.NumberFormat().format(20000)}{' '}
-                  Twitch streamers
-                </span>
-              </div>
-            </div>
-            <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-              {nonSupporters?.map(({ name, image, supporter }) => {
-                const isLast = name === 'You?'
-                return (
-                  <TwitchUser
-                    key={name}
-                    supporter={supporter}
-                    last={isLast}
-                    session={session}
-                    name={name}
-                    onClick={(e) => {
-                      if (name === 'You?') {
-                        e.preventDefault()
-                      }
-                      track('homepage - static twitch profile')
-                    }}
-                    image={image}
-                  />
-                )
-              })}
-            </ul>
-          </>
-        ) : (
-          <>
-            <div className="relative lg:col-span-7 xl:col-span-6">
-              {users?.topLive?.length > 0 && (
-                <>
-                  <div className="relative lg:col-span-7 xl:col-span-6">
-                    <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
-                      <LiveIcon />
-                      <span>Top streamers using Dotabod:</span>
-                    </div>
-                  </div>
-                  <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-                    {users?.topLive?.map(({ name, image }) => (
-                      <TwitchUser
-                        key={name}
-                        supporter={false}
-                        last={false}
-                        session={session}
-                        name={name}
-                        image={image}
-                        onClick={() => {
-                          track('homepage - top live twitch profile')
-                        }}
-                      />
-                    ))}
-                  </ul>
-                </>
-              )}
 
-              {users?.randomLive?.length > 0 && (
-                <>
-                  <div className="relative lg:col-span-7 xl:col-span-6">
-                    <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
-                      <LiveIcon />
-                      <span>Random Dotabod streamers:</span>
-                    </div>
-                  </div>
-                  <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-                    {users?.randomLive?.map(({ name, image }) => (
-                      <TwitchUser
-                        key={name}
-                        supporter={false}
-                        last={false}
-                        session={session}
-                        name={name}
-                        image={image}
-                        onClick={() => {
-                          track('homepage - random twitch profile')
-                        }}
-                      />
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-          </>
-        )}
+        <div className="relative lg:col-span-7 xl:col-span-6">
+          <div className="flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left">
+            <Image src={TwitchSvg} width={18} height={18} alt="twitch logo" />
+            <span>
+              Featured in over {new Intl.NumberFormat().format(20000)} Twitch
+              streamers
+            </span>
+            <LiveIcon />
+          </div>
+        </div>
+
+        <div className="relative lg:col-span-7 xl:col-span-6">
+          {users?.topLive?.length > 0 && (
+            <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
+              {users?.topLive?.map(({ name, image }) => (
+                <TwitchUser
+                  key={name}
+                  last={false}
+                  name={name}
+                  image={image}
+                  onClick={() => {
+                    track('homepage - top live twitch profile')
+                  }}
+                />
+              ))}
+              <TwitchUser
+                key="You?"
+                last={true}
+                name="You?"
+                onClick={(e) => {
+                  e.preventDefault()
+                  track('homepage - static twitch profile')
+                }}
+                image="/images/hero/default.png"
+              />
+            </ul>
+          )}
+        </div>
       </Container>
     </div>
   )
