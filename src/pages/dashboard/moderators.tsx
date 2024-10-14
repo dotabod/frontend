@@ -17,7 +17,7 @@ const ModeratorsPage = () => {
     mutate,
   } = useSWR<
     {
-      moderatorChannelId: string
+      moderatorChannelId: number
       createdAt: string
     }[]
   >('/api/get-approved-moderators', fetcher)
@@ -35,7 +35,7 @@ const ModeratorsPage = () => {
   useEffect(() => {
     if (!loadingApprovedMods && Array.isArray(approvedMods)) {
       setSelectedModerators(
-        approvedMods?.map((mod) => mod.moderatorChannelId) || []
+        approvedMods?.map((mod) => `${mod.moderatorChannelId}`) || []
       )
     }
   }, [approvedMods, loadingApprovedMods])
@@ -109,7 +109,7 @@ const ModeratorsPage = () => {
             value={selectedModerators}
             defaultValue={
               Array.isArray(approvedMods) &&
-              approvedMods.map((mod) => mod.moderatorChannelId)
+              approvedMods.map((mod) => `${mod.moderatorChannelId}`)
             }
             onChange={setSelectedModerators}
             options={
