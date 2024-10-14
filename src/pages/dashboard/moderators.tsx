@@ -115,11 +115,7 @@ const ModeratorsPage = () => {
             options={
               Array.isArray(moderatorList) &&
               moderatorList
-                ?.filter(
-                  (m) =>
-                    Number(m.user_id) !==
-                    Number(process.env.TWITCH_BOT_PROVIDERID)
-                )
+                ?.filter((m) => m.user_id !== '843245458')
                 .map((moderator) => ({
                   label: moderator.user_name,
                   value: moderator.user_id,
