@@ -78,8 +78,10 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials, req) {
-        const channelToImpersonate = credentials?.channelToImpersonate
-        if (!channelToImpersonate || !Number.parseInt(channelToImpersonate)) {
+        const channelToImpersonate = Number.parseInt(
+          credentials?.channelToImpersonate
+        )
+        if (!channelToImpersonate) {
           captureException(new Error('Invalid channel ID'))
           throw new Error('ACCESS_DENIED')
         }
@@ -131,7 +133,9 @@ export const authOptions: NextAuthOptions = {
         if (
           Array.isArray(response) &&
           !response.find(
-            (channel) => channel.providerAccountId === channelToImpersonate
+            (channel) =>
+              Number.parseInt(channel.providerAccountId, 10) ===
+              channelToImpersonate
           )
         ) {
           captureException(
@@ -173,7 +177,7 @@ export const authOptions: NextAuthOptions = {
             user: true,
           },
           where: {
-            providerAccountId: channelToImpersonate,
+            providerAccountId: `${channelToImpersonate}`,
           },
         })
 
