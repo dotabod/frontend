@@ -88,6 +88,7 @@ export const authOptions: NextAuthOptions = {
 
         const headerCookies = req.headers?.cookie
         let currentLoggedInUserId: string | undefined
+        let currentProviderId: string | undefined
 
         try {
           const secureCookie =
@@ -102,6 +103,7 @@ export const authOptions: NextAuthOptions = {
             token: sessionToken.replace(`${cookieName}=`, ''),
           })
           currentLoggedInUserId = actualToken.id
+          currentProviderId = actualToken.twitchId
         } catch (e) {
           console.error(e)
           captureException(e, {
@@ -150,15 +152,34 @@ export const authOptions: NextAuthOptions = {
           throw new Error('MODERATOR_ACCESS_DENIED')
         }
 
-        // check to make sure they're an approved moderator on dotabod
+        const userToImpersonate = await prisma.account.findFirst({
+          select: {
+            userId: true,
+          },
+          where: {
+            providerAccountId: `${channelToImpersonate}`,
+          },
+        })
+
+        if (!userToImpersonate) {
+          captureException(new Error('Channel not found'), {
+            extra: {
+              userId: currentLoggedInUserId,
+              channelToImpersonate,
+            },
+          })
+          throw new Error('ACCESS_DENIED')
+        }
+
+        // check to make sure they're an approved moderator for this user
         const moderator = await prisma.approvedModerator.findFirst({
           select: {
             moderatorChannelId: true,
             createdAt: true,
           },
           where: {
-            moderatorChannelId: channelToImpersonate,
-            userId: currentLoggedInUserId,
+            moderatorChannelId: Number.parseInt(currentProviderId, 10),
+            userId: userToImpersonate.userId,
           },
         })
 
