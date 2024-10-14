@@ -12,7 +12,6 @@ import DiscordSvg from 'src/images/logos/discord.svg'
 import dotaLogo from 'src/images/logos/dota.svg'
 import TwitchSvg from 'src/images/logos/twitch.svg'
 import useSWR from 'swr'
-import Particles from '../magicui/particles'
 import { LiveIcon } from './LiveIcon'
 
 const TwitchUser = ({
@@ -69,14 +68,6 @@ export function Hero() {
   return (
     <div className="overflow-hidden py-15 sm:py-27 lg:pb-27 xl:pb-31">
       <Container>
-        <Particles
-          className="absolute inset-0"
-          quantity={50}
-          ease={70}
-          size={0.05}
-          staticity={40}
-          color={'#ffffff'}
-        />
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
             <h1 className="flex items-center space-x-2 text-4xl font-medium tracking-tight text-gray-200">

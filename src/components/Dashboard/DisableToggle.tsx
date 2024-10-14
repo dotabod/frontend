@@ -1,6 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useTrack } from '@/lib/track'
 import { App, Button, Switch, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
@@ -50,6 +51,7 @@ export function DisableToggle() {
   const user = useSession()?.data?.user
   const { data: settingsData } = useSWR('/api/settings', fetcher)
   const isLive = settingsData?.stream_online
+  const track = useTrack()
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
 
@@ -123,6 +125,36 @@ export function DisableToggle() {
       notification.destroy('dotabod-banned')
     }
   }, [data?.banned, notification, user?.name])
+
+  useEffect(() => {
+    notification.open({
+      key: 'important-update',
+      type: 'error',
+      duration: 0,
+      placement: 'bottomLeft',
+      message: 'Important Update for users who signed up after April 2024',
+      description: (
+        <div>
+          <p>
+            We recently experienced a database issue that impacted over 6,000
+            users. If your Dotabod is not functioning correctly (incorrect
+            win/loss calculations, overlay showing your stream as offline), you
+            need to log in again and set up your account as if it's your first
+            time.
+          </p>
+          <Button
+            target="_blank"
+            onClick={() => {
+              track('important_update_read_more', { page: 'dashboard' })
+            }}
+            href="https://x.com/dotabod_/status/1845898112054730842"
+          >
+            Read more
+          </Button>
+        </div>
+      ),
+    })
+  }, [notification, track])
 
   return <Toggle />
 }
