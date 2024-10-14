@@ -4,10 +4,13 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import * as z from 'zod'
+
+const approvedModeratorSchema = z.array(z.number())
 
 async function approveModerators(
   userId: string,
-  newModeratorChannelIds: string[]
+  newModeratorChannelIds: number[]
 ) {
   try {
     // Fetch the current list of approved moderator channel IDs
@@ -73,8 +76,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         .json({ message: 'moderatorChannelIds must be an array' })
     }
 
+    const parsedModeratorChannelIds = moderatorChannelIds.map((id) =>
+      Number.parseInt(id, 10)
+    )
+
+    const parseResult = approvedModeratorSchema.safeParse(
+      parsedModeratorChannelIds
+    )
+    if (!parseResult.success) {
+      return res.status(400).json({
+        message: 'Invalid moderatorChannelIds',
+        errors: parseResult.error.errors,
+      })
+    }
+
     try {
-      await approveModerators(session?.user?.id, moderatorChannelIds)
+      await approveModerators(session?.user?.id, parsedModeratorChannelIds)
       return res
         .status(200)
         .json({ message: 'Moderators approved successfully' })
