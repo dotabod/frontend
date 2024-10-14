@@ -114,10 +114,16 @@ const ModeratorsPage = () => {
             onChange={setSelectedModerators}
             options={
               Array.isArray(moderatorList) &&
-              moderatorList?.map((moderator) => ({
-                label: moderator.user_name,
-                value: moderator.user_id,
-              }))
+              moderatorList
+                ?.filter(
+                  (m) =>
+                    Number(m.user_id) !==
+                    Number(process.env.TWITCH_BOT_PROVIDERID)
+                )
+                .map((moderator) => ({
+                  label: moderator.user_name,
+                  value: moderator.user_id,
+                }))
             }
           />
           <Button type="primary" onClick={handleApprove} loading={loading}>
