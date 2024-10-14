@@ -44,7 +44,6 @@
     "axios": "^1.7.7",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
-    "dompurify": "^3.1.7",
     "focus-visible": "^5.2.1",
     "framer-motion": "^11.11.8",
     "graphql-request": "^7.1.0",

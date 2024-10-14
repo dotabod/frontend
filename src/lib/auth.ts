@@ -80,7 +80,8 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         const channelToImpersonate = credentials?.channelToImpersonate
         if (!channelToImpersonate || !Number.parseInt(channelToImpersonate)) {
-          throw new Error('Access denied')
+          captureException(new Error('Invalid channel ID'))
+          throw new Error('ACCESS_DENIED')
         }
 
         const headerCookies = req.headers?.cookie
@@ -101,11 +102,21 @@ export const authOptions: NextAuthOptions = {
           currentLoggedInUserId = actualToken.id
         } catch (e) {
           console.error(e)
-          captureException(e)
+          captureException(e, {
+            extra: {
+              userId: currentLoggedInUserId,
+              channelToImpersonate: credentials?.channelToImpersonate,
+            },
+          })
         }
 
         if (!currentLoggedInUserId) {
-          throw new Error('Access denied')
+          captureException(new Error('Invalid session token'), {
+            extra: {
+              userId: currentLoggedInUserId,
+            },
+          })
+          throw new Error('ACCESS_DENIED')
         }
 
         // check to make sure they're still a moderator on twitch
@@ -123,7 +134,16 @@ export const authOptions: NextAuthOptions = {
             (channel) => channel.providerAccountId === channelToImpersonate
           )
         ) {
-          throw new Error('You are not a moderator for this channel')
+          captureException(
+            new Error('You are not a moderator for this channel'),
+            {
+              extra: {
+                userId: currentLoggedInUserId,
+                channelToImpersonate,
+              },
+            }
+          )
+          throw new Error('MODERATOR_ACCESS_DENIED')
         }
 
         // check to make sure they're an approved moderator on dotabod
@@ -139,6 +159,12 @@ export const authOptions: NextAuthOptions = {
         })
 
         if (!moderator) {
+          captureException(new Error('NOT_APPROVED'), {
+            extra: {
+              userId: currentLoggedInUserId,
+              channelToImpersonate,
+            },
+          })
           throw new Error('NOT_APPROVED')
         }
 
@@ -152,7 +178,13 @@ export const authOptions: NextAuthOptions = {
         })
 
         if (!data) {
-          throw new Error('Access denied')
+          captureException(new Error('Channel not found'), {
+            extra: {
+              userId: currentLoggedInUserId,
+              channelToImpersonate,
+            },
+          })
+          throw new Error('ACCESS_DENIED')
         }
 
         return { ...data?.user, currentLoggedInUserId }

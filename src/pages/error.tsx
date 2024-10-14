@@ -1,7 +1,6 @@
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useTrack } from '@/lib/track'
 import type { NextPageWithLayout } from '@/pages/_app'
-import DOMPurify from 'dompurify'
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
@@ -21,16 +20,29 @@ const AuthErrorPage: NextPageWithLayout = () => {
         ? router.query.error[0]
         : router.query.error
       const decodedError = decodeURIComponent(errorParam)
-      const sanitizedError = DOMPurify.sanitize(decodedError, {
-        USE_PROFILES: { html: false },
-      })
-      if (sanitizedError === 'NOT_APPROVED') {
+
+      if (decodedError === 'ACCESS_DENIED') {
+        setErrorMessage(
+          'Something went wrong. You do not have permission to view this page.'
+        )
+        return
+      }
+      if (decodedError === 'MODERATOR_ACCESS_DENIED') {
+        setErrorMessage(
+          'You do not have permission to view this page. Only approved moderators for this streamer can access this page.'
+        )
+        return
+      }
+      if (decodedError === 'NOT_APPROVED') {
         setErrorMessage(
           'Your account has not been approved to manage this stream. Contact the streamer to get approved.'
         )
         return
       }
-      setErrorMessage(sanitizedError)
+
+      setErrorMessage(
+        'Something went wrong. Please try again or contact support.'
+      )
     }
   }, [router.query.error])
 
@@ -47,10 +59,7 @@ const AuthErrorPage: NextPageWithLayout = () => {
             Error
           </h1>
           {errorMessage && (
-            <p
-              className="mt-6 text-base leading-7"
-              dangerouslySetInnerHTML={{ __html: errorMessage }}
-            />
+            <p className="mt-6 text-base leading-7">{errorMessage}</p>
           )}
           <div className="mt-10">
             <a href="/" className="text-sm font-semibold leading-7">
