@@ -15,81 +15,6 @@ import useSWR from 'swr'
 import Particles from '../magicui/particles'
 import { LiveIcon } from './LiveIcon'
 
-const featuredUsers = [
-  {
-    name: 'Arteezy',
-    supporter: false,
-    image: '/images/hero/arteezy.png',
-  },
-  {
-    name: 'Gorgc',
-    supporter: false,
-    image: '/images/hero/gorgc.jpeg',
-  },
-  {
-    name: 'qojqva',
-    supporter: false,
-    image: '/images/hero/qojqva.jpeg',
-  },
-  {
-    name: 'Grubby',
-    supporter: false,
-    image: '/images/hero/grubby.png',
-  },
-  {
-    name: 'watsondoto',
-    supporter: false,
-    image: '/images/hero/watsondoto.jpg',
-  },
-  {
-    name: 'admiralbulldog',
-    supporter: false,
-    image: '/images/hero/admiralbulldog.jpeg',
-  },
-  {
-    name: 'TpaBoMaH',
-    image: '/images/hero/tpabomah.png',
-    supporter: false,
-  },
-  {
-    name: 'XcaliburYe',
-    supporter: false,
-    image: '/images/hero/xcaliburye.png',
-  },
-  {
-    name: 'Cr1tdota',
-    supporter: false,
-    image: '/images/hero/crit.jpeg',
-  },
-  {
-    name: 'canceldota',
-    supporter: false,
-    image: '/images/hero/cancel.png',
-  },
-  {
-    name: 'GunnarDotA2',
-    supporter: false,
-    image: '/images/hero/gunnar.png',
-  },
-  {
-    name: 'You?',
-    supporter: false,
-    image: '/images/hero/default.png',
-  },
-]
-
-const grouped = featuredUsers.reduce((result, item) => {
-  const key = item.supporter ? 'supporters' : 'nonSupporters'
-  if (!result[key]) {
-    result[key] = []
-  }
-  result[key].push(item)
-  return result
-}, {}) as {
-  supporters: typeof featuredUsers
-  nonSupporters: typeof featuredUsers
-}
-
 const TwitchUser = ({
   image,
   last,
@@ -134,7 +59,6 @@ const TwitchUser = ({
 export function Hero() {
   const session = useSession()
   const name = session.data?.user?.name || 'streamers'
-  const { nonSupporters } = grouped
   // get users from api/featured-users
   const { data: users, isLoading } = useSWR<{
     randomLive: { name: string; image: string }[]
