@@ -102,8 +102,9 @@ const OverlayPage = (props) => {
         type: 'error',
         duration: 0,
         placement: 'bottomLeft',
-        message:
-          "Stream is offline! Dotabod won't respond to game events. Actually live? Type !online",
+        message: 'Stream is offline!',
+        description:
+          "Dotabod won't respond to game events. Actually live? Type !online",
       })
     } else {
       notification.destroy('stream-offline')
