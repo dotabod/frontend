@@ -16,10 +16,9 @@ export const useUpdate = ({
   revalidate = false,
   dataTransform = (data, newValue) => newValue,
 }: UpdateProps) => {
-  const { data } = useSWR(path, fetcher)
+  const { data, error } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
   const { message } = App.useApp()
-
   const loading = data === undefined
 
   const updateSetting = (newValue, customPath = '') => {
@@ -53,7 +52,7 @@ export const useUpdate = ({
     mutate(path, updateFn(data), options)
   }
 
-  return { data, loading, updateSetting, mutate }
+  return { data, loading, updateSetting, mutate, error }
 }
 
 export function useUpdateAccount() {
@@ -88,6 +87,7 @@ export function useUpdateSetting(key?: SettingKeys) {
     data,
     mutate,
     loading,
+    error,
     updateSetting: update,
   } = useUpdate({
     path: url,
@@ -123,6 +123,7 @@ export function useUpdateSetting(key?: SettingKeys) {
   return {
     data: value,
     original: data,
+    error,
     loading,
     updateSetting,
     mutate: () => mutate(url),

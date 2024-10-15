@@ -1,13 +1,12 @@
-import { captureException } from '@sentry/nextjs'
 export const fetcher = (url: string, param = null) =>
-  fetch(url + (param || '')).then((r) => {
-    try {
-      return r.json().catch((e) => {
-        captureException(e)
-        return ''
-      })
-    } catch (e) {
-      captureException(e)
-      return ''
+  fetch(url + (param || '')).then(async (r) => {
+    if (!r.ok) {
+      const error = new Error(
+        'An error occurred while fetching the data.'
+      ) as Error & { info?: any; status?: number }
+      error.info = await r.json().catch(() => null)
+      error.status = r.status
+      throw error
     }
+    return r.json()
   })

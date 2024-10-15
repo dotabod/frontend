@@ -22,7 +22,7 @@ import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 import { Center } from '@mantine/core'
-import { Alert, Spin } from 'antd'
+import { Alert, App, Spin } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
@@ -31,9 +31,10 @@ import { useEffect, useState } from 'react'
 
 const OverlayPage = (props) => {
   const [delayPassed, setDelayPassed] = useState(true)
+  const { notification } = App.useApp()
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
-  const { original } = useUpdateSetting()
+  const { original, error } = useUpdateSetting()
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
 
@@ -87,12 +88,27 @@ const OverlayPage = (props) => {
       leaderboard:
         'standing' in rank
           ? rank.standing
-          : steamAccount?.leaderboard_rank ?? false,
+          : (steamAccount?.leaderboard_rank ?? false),
       notLoaded: false,
     }
 
     setRankImageDetails(rankDetails)
   }, [original])
+
+  useEffect(() => {
+    if (!original?.stream_online) {
+      notification.open({
+        key: 'stream-offline',
+        type: 'error',
+        duration: 0,
+        placement: 'bottomLeft',
+        message:
+          "Stream is offline! Dotabod won't respond to game events. Actually live? Type !online",
+      })
+    } else {
+      notification.destroy('stream-offline')
+    }
+  }, [notification, original?.stream_online])
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
@@ -115,6 +131,22 @@ const OverlayPage = (props) => {
   useEffect(() => {
     setIsInIframe(window.self !== window.top)
   }, [])
+
+  useEffect(() => {
+    if (error) {
+      notification.open({
+        key: 'auth-error',
+        type: 'error',
+        duration: 0,
+        placement: 'bottomLeft',
+        message: 'Authentication failed',
+        description:
+          'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+      })
+    } else {
+      notification.destroy('auth-error')
+    }
+  }, [error, notification])
 
   useEffect(() => {
     if (!isDev) return
@@ -205,18 +237,6 @@ const OverlayPage = (props) => {
             </Center>
           </div>
         </motion.div>
-
-        {!original?.stream_online && (
-          <div>
-            <motion.div
-              className="absolute right-0 mt-9 block max-w-xs"
-              key="not-live"
-              {...motionProps}
-            >
-              <Alert message="Stream is offline! Dotabod won't respond to game events. Actually live? Type !online" />
-            </motion.div>
-          </div>
-        )}
 
         <PollOverlays
           pollData={pollData}

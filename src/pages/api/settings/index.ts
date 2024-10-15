@@ -97,7 +97,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
 
       if (!data) {
-        return res.json({})
+        return res.status(403).json({ message: 'Unauthorized' })
       }
 
       return res.json(data)

@@ -61,7 +61,6 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
-  const [authError, setAuthError] = useState(false)
   // on react unmount. mainly used for hot reloads so it doesnt register 900 .on()'s
   useEffect(() => {
     return () => {
@@ -82,22 +81,6 @@ export const useSocket = ({
       socket?.disconnect()
     }
   }, [])
-
-  useEffect(() => {
-    if (authError) {
-      notification.open({
-        key: 'auth-error',
-        type: 'error',
-        duration: 0,
-        placement: 'bottomLeft',
-        message: 'Authentication failed',
-        description:
-          'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
-      })
-    } else {
-      notification.destroy('auth-error')
-    }
-  }, [authError, notification])
 
   useEffect(() => {
     if (!userId) return
@@ -193,7 +176,6 @@ export const useSocket = ({
     socket.on('aegis-picked-up', setAegis)
     socket.on('roshan-killed', setRoshan)
     socket.on('auth_error', (message) => {
-      setAuthError(true)
       console.error('Authentication failed:', message)
       socket.close()
     })
