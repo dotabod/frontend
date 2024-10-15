@@ -50,7 +50,7 @@ async function approveModerators(
       })
     }
   } catch (error) {
-    throw new Error(`Failed to approve moderators: ${error.message}`)
+    throw new Error(`Failed to approve managers: ${error.message}`)
   }
 }
 
@@ -92,14 +92,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     try {
       await approveModerators(session?.user?.id, parsedModeratorChannelIds)
-      return res
-        .status(200)
-        .json({ message: 'Moderators approved successfully' })
+      return res.status(200).json({ message: 'Managers approved successfully' })
     } catch (error) {
-      console.error('Failed to approve moderators:', error)
+      console.error('Failed to approve managers:', error)
       return res
         .status(500)
-        .json({ message: 'Error approving moderators', error })
+        .json({ message: 'Error approving managers', error })
     }
   } else {
     res.setHeader('Allow', ['POST'])

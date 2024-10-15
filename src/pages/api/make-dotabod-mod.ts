@@ -23,7 +23,7 @@ async function addModerator(broadcasterId: string, accessToken: string) {
     const checkData = await checkResponse.json()
     if (checkData.data && checkData.data.length > 0) {
       // The user is already a moderator
-      return { message: 'User is already a moderator' }
+      return { status: 'OK', message: 'User is already a moderator' }
     }
 
     // If the user is not a moderator, add them as a moderator
@@ -33,12 +33,12 @@ async function addModerator(broadcasterId: string, accessToken: string) {
       throw new Error(`Failed to add moderator: ${response.statusText}`)
     }
     if (response.status === 204) {
-      return { message: 'Success' }
+      return { status: 'OK', message: 'Added Dotabod as moderator' }
     }
   } catch (error) {
     captureException(error)
     console.error(error)
-    return { message: 'Error', error: error.message } // Handle error gracefully
+    return { status: 'ERROR', message: 'Error', error: error.message } // Handle error gracefully
   }
 }
 

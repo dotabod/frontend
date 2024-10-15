@@ -6,6 +6,7 @@ import { Card } from '@/ui/card'
 import { Button, Select, notification } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import Image from 'next/image'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
@@ -64,7 +65,7 @@ const ModeratorsPage = () => {
       mutate()
       notification.success({
         message: 'Success',
-        description: 'Moderators updated successfully!',
+        description: 'Managers updated successfully!',
       })
       track('approve_moderators_success')
     } catch (error) {
@@ -87,28 +88,27 @@ const ModeratorsPage = () => {
   return (
     <>
       <Head>
-        <title>Dotabod | Moderators</title>
+        <title>Dotabod | Managers</title>
       </Head>
       <Header
         subtitle="Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings."
-        title="Moderators"
+        title="Managers"
       />
 
       <Card>
         <div className="title">
-          <h3>Approve Moderators</h3>
+          <h3>Approve Managers</h3>
         </div>
         <div className="subtitle">
-          By approving a moderator, you're allowing them to access and modify
-          your Dotabod dashboard. Approved moderators can manage features,
-          toggle commands, and update settings on your behalf.
-          <strong>
-            {' '}
+          <p>
+            By approving a user, you're allowing them to access and modify your
+            Dotabod dashboard. Approved managers can manage features, toggle
+            commands, and update settings on your behalf.
+          </p>
+          <p>
             Note: They will not have access to your personal account settings or
             critical controls like the Setup screen or overlay URL.
-          </strong>{' '}
-          This feature allows trusted users to assist in managing your account
-          without full control.
+          </p>
         </div>
 
         <div className="max-w-sm flex flex-col gap-4">
@@ -126,18 +126,33 @@ const ModeratorsPage = () => {
             onChange={setSelectedModerators}
             options={
               Array.isArray(moderatorList) &&
-              moderatorList
-                ?.filter((m) => m.user_id !== '843245458')
-                .map((moderator) => ({
-                  label: moderator.user_name,
-                  value: moderator.user_id,
-                }))
+              moderatorList.map((moderator) => ({
+                label: moderator.user_name,
+                value: moderator.user_id,
+                disabled: moderator.user_id === '843245458',
+              }))
             }
           />
           <Button type="primary" onClick={handleApprove} loading={loading}>
             Submit
           </Button>
         </div>
+      </Card>
+
+      <Card>
+        <div className="title">
+          <h3>What is this?</h3>
+        </div>
+        <div className="">
+          Once you approve a user, they will login to dotabod.com and be able to
+          access your dashboard by using this selectbox:
+        </div>
+        <Image
+          src="https://i.imgur.com/GSRVXFz.png"
+          alt="Managers selectbox"
+          width={1245}
+          height={829}
+        />
       </Card>
     </>
   )

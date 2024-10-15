@@ -1,8 +1,9 @@
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
+import { APRIL_2024_MSG } from '@/lib/constants'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import { useTrack } from '@/lib/track'
-import { App, Button } from 'antd'
+import { App } from 'antd'
 import Head from 'next/head'
 import { type ReactNode, useEffect } from 'react'
 
@@ -16,33 +17,7 @@ const HomepageShell = ({
   const { notification } = App.useApp()
 
   useEffect(() => {
-    notification.open({
-      key: 'important-update',
-      type: 'error',
-      duration: 0,
-      placement: 'bottomLeft',
-      message: 'Important Update for users who signed up after April 2024',
-      description: (
-        <div>
-          <p>
-            We recently experienced a database issue that impacted over 6,000
-            users. If your Dotabod is not functioning correctly (incorrect
-            win/loss calculations, overlay showing your stream as offline), you
-            need to log in again and set up your account as if it's your first
-            time.
-          </p>
-          <Button
-            target="_blank"
-            onClick={() => {
-              track('important_update_read_more', { page: 'homepage' })
-            }}
-            href="https://x.com/dotabod_/status/1845898112054730842"
-          >
-            Read more
-          </Button>
-        </div>
-      ),
-    })
+    notification.open(APRIL_2024_MSG(track))
   }, [notification, track])
 
   return (

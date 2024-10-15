@@ -93,7 +93,7 @@ export default function ModeratedChannels() {
 
   return (
     <div className="flex flex-col flex-grow items-center">
-      <Tooltip title="Select a streamer account to manage">
+      <Tooltip title="Select a streamer account to manage" placement="right">
         <Select
           onClick={handleOnClick}
           onChange={handleOnChange}

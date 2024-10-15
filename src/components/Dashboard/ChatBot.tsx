@@ -1,14 +1,20 @@
-import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/defaultSettings'
+import { fetcher } from '@/lib/fetcher'
+import {
+  useUpdateAccount,
+  useUpdateSetting,
+} from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
 import { captureException } from '@sentry/nextjs'
-import { Button, List, Spin, Tooltip } from 'antd'
+import { Button, Divider, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import MmrForm from './Features/MmrForm'
 
 const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
@@ -39,6 +45,8 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(true)
   const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`
   const track = useTrack()
+  const { error: makeDotabodModError, isLoading: makeDotabodModLoading } =
+    useSWR('/api/make-dotabod-mod', fetcher)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -95,12 +103,15 @@ export default function ChatBot() {
     }
   }, [user?.hasDotabodEmoteSet, user?.hasDotabodEditor])
 
-  const stepOneComplete = !loadingAccounts && data?.accounts?.length
+  const { data: mmr, loading: loadingMmr } = useUpdateSetting(Settings.mmr)
+
+  const stepOneComplete = !!mmr
+  const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
+
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor
   const stepFourComplete = user?.hasDotabodEmoteSet
   const initialStep = [
-    stepOneComplete,
     stepTwoComplete,
     stepThreeComplete,
     stepFourComplete,
@@ -116,11 +127,12 @@ export default function ChatBot() {
 
   return (
     <Card>
+      <h1>Twitch</h1>
       <StepComponent
-        initialStep={initialStep}
+        initialStep={[stepOneComplete, stepModComplete].filter(Boolean).length}
         steps={[
-          <span className="flex flex-col space-y-4" key={0}>
-            {!data?.accounts?.length ? (
+          <span className="flex flex-col space-y-4" key={1}>
+            {!mmr ? (
               <>
                 <div>
                   <span>
@@ -140,6 +152,29 @@ export default function ChatBot() {
               </div>
             )}
           </span>,
+          // Check if dotabod is a moderator of the channel
+          <div key={2} className="flex flex-col space-y-2">
+            <div className="flex flex-row items-center space-x-2">
+              {makeDotabodModLoading && (
+                <Spin size="small" spinning={loading} />
+              )}
+              {makeDotabodModError ? (
+                <div>
+                  Dotabod needs to be a moderator in your Twitch channel to
+                  function properly.
+                </div>
+              ) : (
+                <div>Dotabod is a moderator in your Twitch channel.</div>
+              )}
+            </div>
+          </div>,
+        ]}
+      />
+      <Divider />
+      <h1>7TV</h1>
+      <StepComponent
+        initialStep={initialStep}
+        steps={[
           <div key={1} className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
               {loading && <Spin size="small" spinning={loading} />}
@@ -203,7 +238,9 @@ export default function ChatBot() {
           </div>,
           <div key={3}>
             <div className="flex flex-row items-center space-x-2 mb-4">
-              <Spin size="small" spinning={!user?.hasDotabodEmoteSet} />
+              {!user?.hasDotabodEmoteSet && (
+                <Spin size="small" spinning={!user?.hasDotabodEmoteSet} />
+              )}
               {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
                 <div>
                   Dotabod will be able to use the following emotes after the

@@ -52,8 +52,8 @@ export const navigation = [
     ],
   },
   {
-    name: 'Moderators',
-    href: '/dashboard/moderators',
+    name: 'Managers',
+    href: '/dashboard/managers',
     icon: ShieldCheck,
     new: true,
   },
