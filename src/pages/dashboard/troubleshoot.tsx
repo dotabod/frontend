@@ -2,7 +2,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
-import { Alert, Steps, Tag } from 'antd'
+import { Alert, Steps, type StepsProps, Tag } from 'antd'
 import Head from 'next/head'
 import Link from 'next/link'
 import type React from 'react'
@@ -13,7 +13,9 @@ import useSWR from 'swr'
 export const StepComponent: React.FC<{
   steps: ReactNode[]
   initialStep?: number
-}> = ({ steps, initialStep = 0 }) => {
+  status?: StepsProps['status']
+  hideTitle?: boolean
+}> = ({ steps, initialStep = 0, status, hideTitle }) => {
   const [current, setCurrent] = useState(initialStep)
 
   const onChange = (value: number) => {
@@ -22,12 +24,13 @@ export const StepComponent: React.FC<{
 
   return (
     <Steps
+      status={status}
       size="small"
       current={current}
       onChange={onChange}
       direction="vertical"
       items={steps.map((step, index) => ({
-        title: `Step ${index + 1}`,
+        title: hideTitle ? undefined : `Step ${index + 1}`,
         description: step,
       }))}
     />

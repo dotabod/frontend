@@ -129,7 +129,8 @@ export default function ChatBot() {
     <Card>
       <h1>Twitch</h1>
       <StepComponent
-        initialStep={[stepOneComplete, stepModComplete].filter(Boolean).length}
+        hideTitle={true}
+        status={stepOneComplete ? 'finish' : undefined}
         steps={[
           <span className="flex flex-col space-y-4" key={1}>
             {!mmr ? (
@@ -152,6 +153,12 @@ export default function ChatBot() {
               </div>
             )}
           </span>,
+        ]}
+      />
+      <StepComponent
+        hideTitle={true}
+        status={stepModComplete ? 'finish' : undefined}
+        steps={[
           // Check if dotabod is a moderator of the channel
           <div key={2} className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
