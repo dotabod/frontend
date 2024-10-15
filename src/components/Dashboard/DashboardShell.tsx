@@ -140,8 +140,12 @@ export default function DashboardShell({
                 }}
                 mode="inline"
                 items={navigation.map((item, i) => {
-                  if (data?.user?.isImpersonating && item.name === 'Setup')
+                  if (
+                    data?.user?.isImpersonating &&
+                    ['Setup', 'Moderators'].includes(item.name)
+                  ) {
                     return null
+                  }
 
                   if (!item.name)
                     return {

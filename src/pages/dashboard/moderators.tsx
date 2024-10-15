@@ -4,6 +4,7 @@ import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { Button, Select, notification } from 'antd'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
@@ -11,6 +12,7 @@ import useSWR from 'swr'
 
 const ModeratorsPage = () => {
   const track = useTrack()
+  const session = useSession()
   const {
     data: approvedMods,
     isLoading: loadingApprovedMods,
@@ -78,25 +80,35 @@ const ModeratorsPage = () => {
     }
   }
 
+  if (session?.data?.user?.isImpersonating) {
+    return null
+  }
+
   return (
     <>
       <Head>
         <title>Dotabod | Moderators</title>
       </Head>
       <Header
-        subtitle="A list of all moderators for your channel. You can approve them to modify your Dotabod settings."
+        subtitle="Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings."
         title="Moderators"
       />
 
       <Card>
         <div className="title">
-          <h3>Approve list</h3>
+          <h3>Approve Moderators</h3>
         </div>
         <div className="subtitle">
-          Approved moderators will have the ability to change any of your
-          Dotabod settings on your behalf. They can toggle commands, change
-          features, and more. They will not be able to see the Setup screen or
-          view your overlay URL.
+          By approving a moderator, you're allowing them to access and modify
+          your Dotabod dashboard. Approved moderators can manage features,
+          toggle commands, and update settings on your behalf.
+          <strong>
+            {' '}
+            Note: They will not have access to your personal account settings or
+            critical controls like the Setup screen or overlay URL.
+          </strong>{' '}
+          This feature allows trusted users to assist in managing your account
+          without full control.
         </div>
 
         <div className="max-w-sm flex flex-col gap-4">

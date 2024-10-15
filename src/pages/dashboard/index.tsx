@@ -8,6 +8,7 @@ import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { Alert, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,6 +17,7 @@ import { type ReactElement, useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 const SetupPage = () => {
+  const session = useSession()
   const track = useTrack()
   const { data } = useSWR('/api/settings', fetcher)
   const isLive = data?.stream_online
@@ -94,6 +96,10 @@ const SetupPage = () => {
       frame()
     }
   }, [active])
+
+  if (session?.data?.user?.isImpersonating) {
+    return null
+  }
 
   const steps = [
     {

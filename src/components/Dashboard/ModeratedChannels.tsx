@@ -93,7 +93,7 @@ export default function ModeratedChannels() {
 
   return (
     <div className="flex flex-col flex-grow items-center">
-      <Tooltip title="Select a channel to moderate">
+      <Tooltip title="Select a streamer account to manage">
         <Select
           onClick={handleOnClick}
           onChange={handleOnChange}
@@ -112,7 +112,7 @@ export default function ModeratedChannels() {
           style={{ marginTop: '10px' }}
         >
           <StopCircleIcon size={16} />
-          <span>Stop moderating</span>
+          <span>Stop managing</span>
         </Button>
       )}
     </div>
