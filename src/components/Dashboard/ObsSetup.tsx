@@ -287,12 +287,16 @@ const ObsSetup: React.FC = () => {
     return scenesWithOverlay
   }
 
-  const handleFormSubmit = () => {
-    setObs(new OBSWebSocket()) // Create a new OBSWebSocket instance
-    updatePort(Number(form.getFieldValue('port')))
-    updatePassword(`${form.getFieldValue('password')}`)
+  const handleFormSubmit = (values) => {
+    if (values.password.length > 45) {
+      message.error('Password is too long')
+      return
+    }
+    setObs(new OBSWebSocket())
+    updatePort(Number(values.port))
+    updatePassword(`${values.password}`)
 
-    track('obs/connect', { port: form.getFieldValue('port') })
+    track('obs/connect', { port: values.port })
   }
 
   return (
@@ -381,9 +385,13 @@ const ObsSetup: React.FC = () => {
                   required: true,
                   message: 'Please enter the OBS WebSocket password!',
                 },
+                {
+                  max: 45,
+                  message: 'Password is too long',
+                },
               ]}
             >
-              <Input.Password
+              <Input
                 autoComplete="new-password"
                 placeholder="Enter the OBS WebSocket password"
                 onPressEnter={() => form.submit()}
