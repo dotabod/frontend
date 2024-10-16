@@ -95,7 +95,6 @@ const ObsSetup: React.FC = () => {
         ) {
           setError('OBS version 30.2.3 or above is required')
           console.error('Error: OBS version 30.2.3 or above is required')
-          Sentry.captureException('OBS version 30.2.3 or above is required')
           track('obs/version_error', { version: obsVersion })
           return
         }
@@ -113,7 +112,6 @@ const ObsSetup: React.FC = () => {
       } catch (err: any) {
         setError(err.message || 'Error connecting to OBS')
         console.error('Error:', err)
-        Sentry.captureException(err)
         track('obs/connection_error', { error: err.message })
       }
     }
