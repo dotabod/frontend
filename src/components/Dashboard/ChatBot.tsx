@@ -38,7 +38,7 @@ export const emotesRequired = [
 ]
 
 export default function ChatBot() {
-  const { data, loading: loadingAccounts } = useUpdateAccount()
+  const { data: accountData, loading: loadingAccounts } = useUpdateAccount()
   const session = useSession()
   const [emotes, setEmotes] = useState([])
   const [user, setUser] = useState(null)
@@ -105,7 +105,10 @@ export default function ChatBot() {
 
   const { data: mmr, loading: loadingMmr } = useUpdateSetting(Settings.mmr)
 
-  const stepOneComplete = !!mmr
+  const stepOneComplete =
+    accountData?.accounts?.length > 0
+      ? accountData?.accounts?.filter((a) => a.mmr > 0).length > 0
+      : !!mmr
   const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
 
   const stepTwoComplete = user?.id
@@ -133,7 +136,7 @@ export default function ChatBot() {
         status={stepOneComplete ? 'finish' : undefined}
         steps={[
           <span className="flex flex-col space-y-4" key={1}>
-            {!mmr ? (
+            {!stepOneComplete ? (
               <>
                 <div>
                   <span>
