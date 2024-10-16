@@ -1,4 +1,5 @@
 import prisma from '@/lib/db'
+import { captureException } from '@sentry/nextjs'
 import fetch from 'node-fetch'
 
 const TWITCH_VALIDATE_URL = 'https://id.twitch.tv/oauth2/validate'
@@ -98,6 +99,7 @@ export async function getTwitchTokens(userId: string) {
       error: await validateResponse.json(),
     }
   } catch (error) {
+    captureException(error)
     return { message: 'Failed to get info', error: error.message }
   }
 }
