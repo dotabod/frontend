@@ -28,7 +28,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         userId: session.user.id,
       },
     })
-    return res.status(200).json(response.requires_refresh || false)
+    return res.status(200).json(!response ? true : response.requires_refresh)
   } catch (error) {
     captureException(error)
     return res
