@@ -10,7 +10,6 @@ import {
   GET_USER_EMOTE_SETS,
   UPDATE_USER_CONNECTION,
 } from '@/lib/gql'
-import { captureException } from '@sentry/nextjs'
 import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -175,7 +174,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log('Emote set update verified successfully')
     return res.status(200).json({ message: 'Emote set updated successfully' })
   } catch (error) {
-    captureException(error)
     console.error('Error:', error)
     return res.status(500).json({ message: 'Internal server error', error })
   }
