@@ -35,7 +35,11 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
 
 // Main function to update followers count
 async function updateFollows(userId: string) {
-  const { providerAccountId, accessToken } = await getTwitchTokens(userId)
+  const { providerAccountId, accessToken, error } =
+    await getTwitchTokens(userId)
+  if (error) {
+    return
+  }
 
   const totalFollowerCount = await fetchFollowerCount(
     providerAccountId,

@@ -56,7 +56,10 @@ export async function getTwitchTokens(userId: string) {
     })
 
     if (!user.Account?.providerAccountId) {
-      return { message: 'No provider account ID found' }
+      return {
+        message: 'No provider account ID found',
+        error: true,
+      }
     }
 
     const validateResponse = await validateToken(user.Account.access_token)

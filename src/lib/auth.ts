@@ -124,9 +124,12 @@ export const authOptions: NextAuthOptions = {
         }
 
         // check to make sure they're still a moderator on twitch
-        const { providerAccountId, accessToken } = await getTwitchTokens(
+        const { providerAccountId, accessToken, error } = await getTwitchTokens(
           currentLoggedInUserId
         )
+        if (error) {
+          throw new Error('MODERATOR_ACCESS_DENIED')
+        }
         const response = await getModeratedChannels(
           providerAccountId,
           accessToken

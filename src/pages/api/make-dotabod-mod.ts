@@ -56,9 +56,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { providerAccountId, accessToken } = await getTwitchTokens(
+    const { providerAccountId, accessToken, error } = await getTwitchTokens(
       session.user.id
     )
+    if (error) {
+      return res.status(403).json({ message: 'Forbidden' })
+    }
     const response = await addModerator(providerAccountId, accessToken)
     return res.status(200).json(response)
   } catch (error) {
