@@ -55,7 +55,7 @@ export async function getTwitchTokens(userId: string) {
       },
     })
 
-    if (!user.Account?.providerAccountId) {
+    if (!user?.Account?.providerAccountId) {
       return {
         message: 'No provider account ID found',
         error: true,
