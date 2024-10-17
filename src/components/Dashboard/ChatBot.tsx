@@ -56,11 +56,18 @@ export default function ChatBot() {
         const user = {
           id: data?.user?.id,
           personalSet: data?.emote_set?.id,
-          hasDotabodEditor: !!data.user?.editors?.find(
-            (editor) => editor.id === '63d688c3a897cb667b7e601b'
-          ),
-          hasDotabodEmoteSet: !!emotesRequired.every((emote) =>
-            data.emote_set?.emotes?.find((e) => e.name === emote.label)
+          hasDotabodEditor:
+            Array.isArray(data.user?.editors) &&
+            !!data.user?.editors?.find(
+              (editor: { id: string }) =>
+                editor.id === '63d688c3a897cb667b7e601b'
+            ),
+          hasDotabodEmoteSet: !!emotesRequired.every(
+            (emote) =>
+              Array.isArray(data.emote_set?.emotes) &&
+              data.emote_set?.emotes?.find(
+                (e: { name: string }) => e.name === emote.label
+              )
           ),
         }
 
