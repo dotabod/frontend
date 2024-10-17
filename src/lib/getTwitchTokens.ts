@@ -41,6 +41,7 @@ export async function getTwitchTokens(userId: string) {
         name: true,
         Account: {
           select: {
+            scope: true,
             providerAccountId: true,
             access_token: true,
             refresh_token: true,
@@ -51,6 +52,12 @@ export async function getTwitchTokens(userId: string) {
         createdAt: 'desc',
       },
       where: {
+        Account: {
+          scope: {
+            // Their latest token should have scopes required for calling the Twitch API
+            contains: 'moderator:read:followers',
+          },
+        },
         id: userId,
       },
     })
