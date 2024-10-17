@@ -1,8 +1,6 @@
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
-import { useTrack } from '@/lib/track'
-import { App } from 'antd'
 import Head from 'next/head'
 import type { ReactNode } from 'react'
 
@@ -12,8 +10,6 @@ const HomepageShell = ({
   children,
 }: { dontUseTitle?: boolean; title?: ReactNode; children?: ReactNode }) => {
   useMaybeSignout()
-  const track = useTrack()
-  const { notification } = App.useApp()
 
   return (
     <>

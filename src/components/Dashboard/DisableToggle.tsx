@@ -1,7 +1,6 @@
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useTrack } from '@/lib/track'
 import { App, Button, Switch, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
@@ -51,7 +50,6 @@ export function DisableToggle() {
   const user = useSession()?.data?.user
   const { data: settingsData } = useSWR('/api/settings', fetcher)
   const isLive = settingsData?.stream_online
-  const track = useTrack()
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
 
