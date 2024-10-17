@@ -14,6 +14,7 @@ const SentrySession = () => {
         email: data?.user?.email,
         twitchId: data?.user?.twitchId,
         locale: data?.user?.locale,
+        isImpersonating: data?.user?.isImpersonating,
       })
     }
   }, [status])
