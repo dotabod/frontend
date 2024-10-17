@@ -41,7 +41,6 @@ export async function getTwitchTokens(userId: string) {
         name: true,
         Account: {
           select: {
-            scope: true,
             providerAccountId: true,
             access_token: true,
             refresh_token: true,
