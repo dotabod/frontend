@@ -9,7 +9,8 @@ export const APRIL_2024_MSG = (
   type: 'error',
   duration: 0,
   placement: 'bottomLeft',
-  message: 'Important Update for users who signed up after April 2024',
+  message:
+    'Important Update for users who signed up between April 6 2024 and October 14 2024',
   btn: (
     <Button
       target="_blank"

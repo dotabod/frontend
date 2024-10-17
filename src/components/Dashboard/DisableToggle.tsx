@@ -1,4 +1,3 @@
-import { APRIL_2024_MSG } from '@/lib/constants'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -126,10 +125,6 @@ export function DisableToggle() {
       notification.destroy('dotabod-banned')
     }
   }, [data?.banned, notification, user?.name])
-
-  useEffect(() => {
-    notification.open(APRIL_2024_MSG(track))
-  }, [notification, track])
 
   return <Toggle />
 }

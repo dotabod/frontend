@@ -1,11 +1,10 @@
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
-import { APRIL_2024_MSG } from '@/lib/constants'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import { useTrack } from '@/lib/track'
 import { App } from 'antd'
 import Head from 'next/head'
-import { type ReactNode, useEffect } from 'react'
+import type { ReactNode } from 'react'
 
 const HomepageShell = ({
   title,
@@ -15,10 +14,6 @@ const HomepageShell = ({
   useMaybeSignout()
   const track = useTrack()
   const { notification } = App.useApp()
-
-  useEffect(() => {
-    notification.open(APRIL_2024_MSG(track))
-  }, [notification, track])
 
   return (
     <>
