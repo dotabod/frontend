@@ -2,7 +2,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
-import { Alert, Steps, type StepsProps, Tag } from 'antd'
+import { Alert, type StepProps, Steps, type StepsProps, Tag } from 'antd'
 import Head from 'next/head'
 import Link from 'next/link'
 import type React from 'react'
@@ -15,7 +15,8 @@ export const StepComponent: React.FC<{
   initialStep?: number
   status?: StepsProps['status']
   hideTitle?: boolean
-}> = ({ steps, initialStep = 0, status, hideTitle }) => {
+  stepProps?: StepProps[]
+}> = ({ steps, initialStep = 0, status, hideTitle, stepProps }) => {
   const [current, setCurrent] = useState(initialStep)
 
   const onChange = (value: number) => {
@@ -32,6 +33,7 @@ export const StepComponent: React.FC<{
       items={steps.map((step, index) => ({
         title: hideTitle ? undefined : `Step ${index + 1}`,
         description: step,
+        ...stepProps?.[index],
       }))}
     />
   )

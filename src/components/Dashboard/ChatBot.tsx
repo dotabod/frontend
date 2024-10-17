@@ -81,7 +81,6 @@ export default function ChatBot() {
           }
         }
       } catch (error) {
-        captureException(error)
         console.error('Error fetching user data:', error)
       } finally {
         setLoading(false)
@@ -191,6 +190,11 @@ export default function ChatBot() {
       <h1>7TV</h1>
       <StepComponent
         initialStep={initialStep}
+        stepProps={[
+          { status: stepTwoComplete ? 'finish' : undefined },
+          { status: stepThreeComplete ? 'finish' : undefined },
+          { status: stepFourComplete ? 'finish' : undefined },
+        ]}
         steps={[
           <div key={1} className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
