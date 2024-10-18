@@ -22,13 +22,33 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const response = await prisma.account.findFirst({
       select: {
+        user: {
+          select: {
+            name: true,
+            displayName: true,
+          },
+        },
         requires_refresh: true,
       },
       where: {
         userId: session.user.id,
       },
     })
-    return res.status(200).json(!response ? true : response.requires_refresh)
+
+    let requiresRefresh = false
+
+    if (!response) {
+      requiresRefresh = true
+    }
+    if (response?.requires_refresh) {
+      requiresRefresh = true
+    }
+
+    if (session?.user?.name !== response?.user?.displayName) {
+      requiresRefresh = true
+    }
+
+    return res.status(200).json(requiresRefresh)
   } catch (error) {
     captureException(error)
     return res

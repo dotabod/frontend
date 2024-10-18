@@ -270,13 +270,13 @@ export const authOptions: NextAuthOptions = {
       const newUser = {
         email: profile?.email || user.email,
         // @ts-ignore from twitch?
-        name: user.displayName || user.name || profile?.preferred_username,
+        name: profile?.preferred_username || user.name || user.displayName,
         displayName:
+          // @ts-ignore from twitch?
+          profile?.preferred_username ||
           // @ts-ignore from twitch?
           user.displayName ||
           token.name ||
-          // @ts-ignore from twitch?
-          profile?.preferred_username ||
           user.name,
         // @ts-ignore from twitch?
         image: profile?.picture || user.image,
