@@ -5,7 +5,9 @@ import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useState } from 'react'
 
-export default function ModeratedChannels() {
+export default function ModeratedChannels({
+  collapsed,
+}: { collapsed?: boolean }) {
   const {
     data: { user },
   } = useSession()
@@ -91,8 +93,10 @@ export default function ModeratedChannels() {
     })),
   ]
 
+  if (collapsed) return null
+
   return (
-    <div className="flex flex-col flex-grow items-center">
+    <div className="flex flex-col flex-grow items-center moderated-channels">
       <Tooltip title="Select a streamer account to manage" placement="right">
         <Select
           onClick={handleOnClick}

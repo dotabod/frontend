@@ -127,7 +127,7 @@ export default function DashboardShell({
               </div>
 
               <div className="flex justify-center py-4">
-                <ModeratedChannels />
+                <ModeratedChannels collapsed={collapsed} />
               </div>
 
               <Menu
