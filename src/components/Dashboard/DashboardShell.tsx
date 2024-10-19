@@ -126,9 +126,11 @@ export default function DashboardShell({
                 )}
               </div>
 
-              <div className="flex justify-center py-4">
-                <ModeratedChannels collapsed={collapsed} />
-              </div>
+              {!collapsed && (
+                <div className="flex justify-center py-4">
+                  <ModeratedChannels />
+                </div>
+              )}
 
               <Menu
                 onClick={onClick}

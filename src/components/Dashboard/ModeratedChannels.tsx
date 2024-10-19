@@ -5,9 +5,7 @@ import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useState } from 'react'
 
-export default function ModeratedChannels({
-  collapsed,
-}: { collapsed?: boolean }) {
+export default function ModeratedChannels() {
   const {
     data: { user },
   } = useSession()
@@ -92,8 +90,6 @@ export default function ModeratedChannels({
       label: renderOptionLabel(channel.image, channel.name),
     })),
   ]
-
-  if (collapsed) return null
 
   return (
     <div className="flex flex-col flex-grow items-center moderated-channels">
