@@ -12,6 +12,7 @@ const Login: NextPageWithLayout = () => {
   const { status } = useSession()
   const { message } = App.useApp()
   const router = useRouter()
+  const { notification } = App.useApp()
 
   const showError = () => {
     Sentry.captureMessage('Login error', {
@@ -20,18 +21,27 @@ const Login: NextPageWithLayout = () => {
       },
     })
 
-    message.error({
+    notification.error({
       key: 'login-error',
       duration: 50000,
-      content: (
+      message: 'Login error',
+      description: (
         <span>
-          Oops. Unable to log you in. This usually happens if you already have
-          an account on Dotabod under the same email. Try to change your email
-          on twitch.tv to something new and login again. Reach out to us on{' '}
+          We couldn't log you in. It looks like you already have an account on
+          Dotabod with this email. Please update your email on{' '}
+          <a
+            href="https://www.twitch.tv/settings/security"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Twitch
+          </a>{' '}
+          to a new one and try logging in again. If you need more help, reach
+          out to us on{' '}
           <a href="https://help.dotabod.com" target="_blank" rel="noreferrer">
             Discord
-          </a>{' '}
-          for more help.
+          </a>
+          .
         </span>
       ),
     })
@@ -53,10 +63,11 @@ const Login: NextPageWithLayout = () => {
       status !== 'authenticated' &&
       router.asPath.toLowerCase().includes('setup-scopes')
     ) {
-      message.info({
+      notification.info({
         key: 'scope-setup',
         duration: 50000,
-        content: (
+        message: 'Relink account',
+        description: (
           <span>
             You've been logged out. Please login again to relink your account to
             Twitch. Reach out to us on{' '}
