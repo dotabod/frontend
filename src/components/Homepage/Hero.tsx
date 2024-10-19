@@ -3,7 +3,7 @@ import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
-import { Button } from 'antd'
+import { Button, Skeleton } from 'antd'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -60,7 +60,6 @@ export function Hero() {
   const name = session.data?.user?.name || 'streamers'
   // get users from api/featured-users
   const { data: users, isLoading } = useSWR<{
-    randomLive: { name: string; image: string }[]
     topLive: { name: string; image: string }[]
   }>('/api/featured-users', fetcher)
   const track = useTrack()
@@ -142,30 +141,53 @@ export function Hero() {
         </div>
 
         <div className="relative lg:col-span-7 xl:col-span-6">
-          {users?.topLive?.length > 0 && (
-            <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
-              {users?.topLive?.map(({ name, image }) => (
-                <TwitchUser
-                  key={name}
-                  last={false}
-                  name={name}
-                  image={image}
-                  onClick={() => {
-                    track('homepage - top live twitch profile')
-                  }}
-                />
+          {isLoading ? (
+            <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start pt-4">
+              {[...Array(10)].map((_, index) => (
+                <li key={index} className="relative">
+                  <div className="flex flex-col items-center space-y-2 px-4 py-2">
+                    <Skeleton.Avatar
+                      active
+                      size={50}
+                      shape="square"
+                      style={{ borderRadius: 8 }}
+                    />
+                    <Skeleton.Input
+                      block={false}
+                      active
+                      size="small"
+                      style={{ height: 5, minWidth: 55, width: 55 }}
+                    />
+                  </div>
+                </li>
               ))}
-              <TwitchUser
-                key="You?"
-                last={true}
-                name="You?"
-                onClick={(e) => {
-                  e.preventDefault()
-                  track('homepage - static twitch profile')
-                }}
-                image="/images/hero/default.png"
-              />
             </ul>
+          ) : (
+            users?.topLive?.length > 0 && (
+              <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
+                {users?.topLive?.map(({ name, image }) => (
+                  <TwitchUser
+                    key={name}
+                    last={false}
+                    name={name}
+                    image={image}
+                    onClick={() => {
+                      track('homepage - top live twitch profile')
+                    }}
+                  />
+                ))}
+                <TwitchUser
+                  key="You?"
+                  last={true}
+                  name="You?"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    track('homepage - static twitch profile')
+                  }}
+                  image="/images/hero/default.png"
+                />
+              </ul>
+            )
           )}
         </div>
       </Container>
