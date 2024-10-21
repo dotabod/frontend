@@ -60,7 +60,8 @@ export default function ChatBot() {
             Array.isArray(data.user?.editors) &&
             !!data.user?.editors?.find(
               (editor: { id: string }) =>
-                editor.id === '63d688c3a897cb667b7e601b'
+                editor.id?.toLowerCase() ===
+                '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase()
             ),
           hasDotabodEmoteSet: !!emotesRequired.every(
             (emote) =>
@@ -125,14 +126,6 @@ export default function ChatBot() {
     stepThreeComplete,
     stepFourComplete,
   ].filter(Boolean).length
-
-  if (loading || loadingAccounts) {
-    return (
-      <Card>
-        <Spin size="large" />
-      </Card>
-    )
-  }
 
   return (
     <Card>
