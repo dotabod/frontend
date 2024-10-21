@@ -94,7 +94,6 @@ model Setting {
 
   @@unique([key, userId])
   @@index([userId], map: "idx_settings_on_userid")
-  @@index([userId], map: "idx_user_id_desc")
   @@map("settings")
 }
 
