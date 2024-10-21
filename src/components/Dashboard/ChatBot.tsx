@@ -19,21 +19,21 @@ import MmrForm from './Features/MmrForm'
 const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
 export const emotesRequired = [
-  { label: 'HECANT', id: '62978b4c441e9cea5e91f9e7' },
-  { label: 'Okayeg', id: '603caa69faf3a00014dff0b1' },
-  { label: 'Happi', id: '645defc42769a28df1a4487f' },
-  { label: 'Madge', id: '60a95f109d598ea72fad13bd' },
-  { label: 'POGGIES', id: '60af1b5a35c50a77926314ad' },
-  { label: 'PepeLaugh', id: '60420e3f77137b000de9e675' },
-  { label: 'ICANT', id: '61e2d59077175547b4254999' },
-  { label: 'BASED', id: '6043181d1d4963000d9dae39' },
-  { label: 'Chatting', id: '60ef410f48cde2fcc3eb5caa' },
-  { label: 'massivePIDAS', id: '6257e7a3131d4588262a7505' },
-  { label: 'Sadge', id: '61630205c1ff9a17cc396522' },
-  { label: 'EZ', id: '63071b80942ffb69e13d700f' },
-  { label: 'Clap', id: '60aed217c9cf495e5be86812' },
-  { label: 'peepoGamble', id: '60d83a6277324757d60ae099' },
-  { label: 'PauseChamp', id: '60b012a8e5a579561100b67f' },
+  { label: 'HECANT', id: '01G4FZG870000487MWX9F93YF7' },
+  { label: 'Okayeg', id: '01EZPFKAH8000FNWX000ADZW5H' },
+  { label: 'Happi', id: '01H07F15D00002ETD2HQRT8J3Z' },
+  { label: 'Madge', id: '01F6ASPNM00009TPCEMWQTT4XX' },
+  { label: 'POGGIES', id: '01F6P05NWG0003BH8AEY96655D' },
+  { label: 'PepeLaugh', id: '01F010F9GR0007E4VV006YKSKN' },
+  { label: 'ICANT', id: '01FSF14EM00007E5TN8YT2AJCS' },
+  { label: 'BASED', id: '01F031CCA80001TJB3006SVBHS' },
+  { label: 'Chatting', id: '01FAK9C8MR0004HKF2ZK1YPQ5A' },
+  { label: 'massivePIDAS', id: '01G0KP1N5R000167A5H0K2MX85' },
+  { label: 'Sadge', id: '01FHNBZRW8000C3ZWT2Z63JS92' },
+  { label: 'EZ', id: '01GB9W6V0000098BZVD7GKTW0F' },
+  { label: 'Clap', id: '01F6NE9AER000CKKT9BSDYGT0J' },
+  { label: 'peepoGamble', id: '01F96A83PG0007ECJ7AZB0NR4S' },
+  { label: 'PauseChamp', id: '01F6QWHR20000EB9BSAR8G1DKZ' },
 ]
 
 export default function ChatBot() {

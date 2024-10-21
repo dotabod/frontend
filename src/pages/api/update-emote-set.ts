@@ -70,7 +70,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       emoteSetId = createEmoteSetResult.createEmoteSet.id
     }
 
-    const updateUserConnectionVariables = {
+  const updateUserConnectionVariables = {
       id: stvResponse?.user?.id,
       conn_id: `${twitchId}`,
       d: { emote_set_id: emoteSetId },
