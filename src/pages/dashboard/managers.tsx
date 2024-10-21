@@ -106,8 +106,8 @@ const ModeratorsPage = () => {
             commands, and update settings on your behalf.
           </p>
           <p>
-            Note: They will not have access to your personal account settings or
-            critical controls like the Setup screen or overlay URL.
+            Note: They will not have access to your setup page, downloading the
+            GSI cfg, nor overlay URL.
           </p>
         </div>
 
