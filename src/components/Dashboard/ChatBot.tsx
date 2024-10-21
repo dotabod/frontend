@@ -7,8 +7,7 @@ import {
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
-import { captureException } from '@sentry/nextjs'
-import { Button, Divider, List, Spin, Tooltip } from 'antd'
+import { Alert, Button, Divider, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -47,6 +46,10 @@ export default function ChatBot() {
   const track = useTrack()
   const { error: makeDotabodModError, isLoading: makeDotabodModLoading } =
     useSWR('/api/make-dotabod-mod', fetcher)
+  const { error: updateEmoteSetError, data: updateEmoteSetData } = useSWR(
+    '/api/update-emote-set',
+    fetcher
+  )
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -72,6 +75,11 @@ export default function ChatBot() {
           ),
         }
 
+        if (updateEmoteSetError) {
+          setUser((prev) => ({ ...prev, hasDotabodEmoteSet: false }))
+          clearInterval(intervalId)
+        }
+
         if (user?.id) {
           setUser(user)
           if (user.hasDotabodEditor && user.hasDotabodEmoteSet) {
@@ -95,20 +103,7 @@ export default function ChatBot() {
     const intervalId = setInterval(fetchUserData, 5000)
 
     return () => clearInterval(intervalId)
-  }, [stvUrl])
-
-  useEffect(() => {
-    if (!user?.hasDotabodEmoteSet && user?.hasDotabodEditor) {
-      fetch('/api/update-emote-set')
-        .then(() => {
-          setUser((prev) => ({ ...prev, hasDotabodEmoteSet: true }))
-        })
-        .catch((e) => {
-          console.error(e)
-          captureException(e)
-        })
-    }
-  }, [user?.hasDotabodEmoteSet, user?.hasDotabodEditor])
+  }, [stvUrl, updateEmoteSetError])
 
   const { data: mmr, loading: loadingMmr } = useUpdateSetting(Settings.mmr)
 
@@ -186,7 +181,13 @@ export default function ChatBot() {
         stepProps={[
           { status: stepTwoComplete ? 'finish' : undefined },
           { status: stepThreeComplete ? 'finish' : undefined },
-          { status: stepFourComplete ? 'finish' : undefined },
+          {
+            status: stepFourComplete
+              ? 'finish'
+              : updateEmoteSetError
+                ? 'error'
+                : undefined,
+          },
         ]}
         steps={[
           <div key={1} className="flex flex-col space-y-2">
@@ -252,17 +253,31 @@ export default function ChatBot() {
           </div>,
           <div key={3}>
             <div className="flex flex-row items-center space-x-2 mb-4">
-              {!user?.hasDotabodEmoteSet && (
-                <Spin size="small" spinning={!user?.hasDotabodEmoteSet} />
-              )}
-              {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
-                <div>
-                  Dotabod will be able to use the following emotes after the
-                  previous steps are completed.
-                </div>
-              ) : (
-                <div>The following emotes are ready to use!</div>
-              )}
+              <div className="flex flex-col">
+                {updateEmoteSetError ? (
+                  <div className="m-4">
+                    <Alert
+                      message="There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually."
+                      type="error"
+                      showIcon
+                    />
+                  </div>
+                ) : (
+                  <>
+                    {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
+                      <div className="flex flex-row space-x-4">
+                        <Spin size="small" spinning={true} />
+                        <p>
+                          Dotabod will be able to use the following emotes after
+                          the previous steps are completed.
+                        </p>
+                      </div>
+                    ) : (
+                      <div>The following emotes are ready to use!</div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
             <List
@@ -289,16 +304,22 @@ export default function ChatBot() {
                   <List.Item key={label}>
                     <div className={clsx('flex items-center space-x-1')}>
                       <Tooltip title={label}>
-                        <Image
-                          className={clsx(
-                            !added && 'grayscale group-hover:grayscale-0',
-                            'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
-                          )}
-                          height={60}
-                          width={60}
-                          src={SevenTVBaseEmoteURL(id)}
-                          alt={id}
-                        />
+                        <a
+                          href={`https://7tv.app/emotes/${id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Image
+                            className={clsx(
+                              !added && 'grayscale group-hover:grayscale-0',
+                              'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
+                            )}
+                            height={60}
+                            width={60}
+                            src={SevenTVBaseEmoteURL(id)}
+                            alt={id}
+                          />
+                        </a>
                       </Tooltip>
                     </div>
                   </List.Item>
