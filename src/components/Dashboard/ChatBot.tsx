@@ -48,7 +48,10 @@ export default function ChatBot() {
     useSWR('/api/make-dotabod-mod', fetcher)
   const { error: updateEmoteSetError, data: updateEmoteSetData } = useSWR(
     '/api/update-emote-set',
-    fetcher
+    (url) => {
+      track('updateEmoteSet called')
+      return fetcher(url)
+    }
   )
 
   useEffect(() => {
