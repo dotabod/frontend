@@ -88,9 +88,9 @@ export async function getModeratedChannels(
     return { message: 'Failed to get moderated channels', error: error.message }
   }
 }
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
+  const search = req.query.search as string | undefined
 
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
@@ -98,6 +98,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!session?.user?.id) {
     return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  if (search && (!session?.user?.role || !session.user.role.includes('admin'))) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  if (search !== undefined && !search.trim()) {
+    return res.status(200).json([])
+  }
+
+  if (search?.trim()) {
+    const users = await prisma.account.findMany({
+      select: {
+        providerAccountId: true,
+        user: {
+          select: {
+            image: true,
+            name: true,
+          },
+        },
+      },
+      where: {
+        OR: [
+          { providerAccountId: { contains: search.toLowerCase().trim() } },
+          { user: { name: { contains: search.toLowerCase().trim() } } },
+        ],
+      },
+      take: 10,
+    })
+    return res.status(200).json(users.map((user) => ({
+      value: user.providerAccountId,
+      label: user.user.name,
+      image: user.user.image,
+    })))
   }
 
   const { providerAccountId, accessToken, error } = await getTwitchTokens(

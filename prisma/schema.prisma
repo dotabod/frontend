@@ -61,7 +61,7 @@ model User {
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
-  Admin                             Admin?
+  admin                             admin?
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -182,7 +182,7 @@ model discord_accounts {
   @@id([id, providerAccountId])
 }
 
-model Admin {
+model admin {
   id        String   @id @default(dbgenerated("gen_random_uuid()"))
   userId    String   @unique
   role      String   @default("admin")

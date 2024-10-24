@@ -123,36 +123,48 @@ export const authOptions: NextAuthOptions = {
           throw new Error('ACCESS_DENIED')
         }
 
-        // check to make sure they're still a moderator on twitch
         const { providerAccountId, accessToken, error } = await getTwitchTokens(
           currentLoggedInUserId
         )
         if (error) {
           throw new Error('MODERATOR_ACCESS_DENIED')
         }
-        const response = await getModeratedChannels(
-          providerAccountId,
-          accessToken
-        )
 
-        if (
-          Array.isArray(response) &&
-          !response.find(
-            (channel) =>
-              Number.parseInt(channel.providerAccountId, 10) ===
-              channelToImpersonate
+        const isAdmin = await prisma.user.findFirst({
+          where: {
+            id: currentLoggedInUserId,
+            admin: {
+              role: 'admin',
+            },
+          },
+        })
+
+        if (!isAdmin) {
+          // check to make sure they're still a moderator on twitch
+          const response = await getModeratedChannels(
+            providerAccountId,
+            accessToken
           )
-        ) {
-          captureException(
-            new Error('You are not a moderator for this channel'),
-            {
-              extra: {
-                userId: currentLoggedInUserId,
-                channelToImpersonate,
-              },
-            }
-          )
-          throw new Error('MODERATOR_ACCESS_DENIED')
+
+          if (
+            Array.isArray(response) &&
+            !response.find(
+              (channel) =>
+                Number.parseInt(channel.providerAccountId, 10) ===
+                channelToImpersonate
+            )
+          ) {
+            captureException(
+              new Error('You are not a moderator for this channel'),
+              {
+                extra: {
+                  userId: currentLoggedInUserId,
+                  channelToImpersonate,
+                },
+              }
+            )
+            throw new Error('MODERATOR_ACCESS_DENIED')
+          }
         }
 
         const userToImpersonate = await prisma.account.findFirst({
@@ -174,26 +186,28 @@ export const authOptions: NextAuthOptions = {
           throw new Error('ACCESS_DENIED')
         }
 
-        // check to make sure they're an approved moderator for this user
-        const moderator = await prisma.approvedModerator.findFirst({
-          select: {
-            moderatorChannelId: true,
-            createdAt: true,
-          },
-          where: {
-            moderatorChannelId: Number.parseInt(currentProviderId, 10),
-            userId: userToImpersonate.userId,
-          },
-        })
-
-        if (!moderator) {
-          captureException(new Error('NOT_APPROVED'), {
-            extra: {
-              userId: currentLoggedInUserId,
-              channelToImpersonate,
+        if (!isAdmin) {
+          // check to make sure they're an approved moderator for this user
+          const moderator = await prisma.approvedModerator.findFirst({
+            select: {
+              moderatorChannelId: true,
+              createdAt: true,
+            },
+            where: {
+              moderatorChannelId: Number.parseInt(currentProviderId, 10),
+              userId: userToImpersonate.userId,
             },
           })
-          throw new Error('NOT_APPROVED')
+
+          if (!moderator) {
+            captureException(new Error('NOT_APPROVED'), {
+              extra: {
+                userId: currentLoggedInUserId,
+                channelToImpersonate,
+              },
+            })
+            throw new Error('NOT_APPROVED')
+          }
         }
 
         const data = await prisma.account.findUnique({
@@ -248,6 +262,7 @@ export const authOptions: NextAuthOptions = {
         session.user.isImpersonating = token.isImpersonating
         session.user.locale = token.locale
         session.user.twitchId = token.twitchId
+        session.user.role = token.role
         session.user.id = token?.isImpersonating ? encryptedId : token.id
         session.user.name = token.name
         session.user.email = token?.isImpersonating ? '' : token.email
@@ -287,6 +302,11 @@ export const authOptions: NextAuthOptions = {
           id: token.id || user.id || profile.sub,
         },
         select: {
+          admin: {
+            select: {
+              role: true,
+            },
+          },
           displayName: true,
           Account: {
             select: {
@@ -351,6 +371,7 @@ export const authOptions: NextAuthOptions = {
         email: newUser.email,
         picture: newUser.image,
         isImpersonating,
+        role: provider.admin?.role,
         scope: account?.scope,
       }
     },
