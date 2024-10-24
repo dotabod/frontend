@@ -61,6 +61,7 @@ model User {
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
+  Admin                             Admin?
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -179,4 +180,13 @@ model discord_accounts {
   providerAccountId BigInt   @unique
 
   @@id([id, providerAccountId])
+}
+
+model Admin {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String   @unique
+  role      String   @default("admin")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
 }
