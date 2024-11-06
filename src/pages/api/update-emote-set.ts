@@ -40,6 +40,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     )
     const stvResponse = await response.json()
 
+    if (!stvResponse?.user?.id) {
+      throw new Error('7tv user not found')
+    }
+
     const getUserEmoteSetsVariables = {
       id: stvResponse?.user?.id,
     }
