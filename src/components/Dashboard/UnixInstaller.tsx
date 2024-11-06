@@ -1,14 +1,12 @@
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
-import { Button, Steps, Typography } from 'antd'
+import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import { useState } from 'react'
 import DownloadButton from './DownloadButton'
 
 export default function UnixInstaller() {
   const user = useSession()?.data?.user
   const { data } = useUpdate({ path: '/api/settings' })
-  const [current, setCurrent] = useState(0)
 
   const fileData = `"Dotabod Configuration"
 {
@@ -38,112 +36,6 @@ export default function UnixInstaller() {
   const blob = new Blob([fileData], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
 
-  const items = [
-    {
-      title: 'Save the file',
-      content: (
-        <>
-          <ol className="ml-4 list-decimal space-y-2">
-            <li>Open Steam and go to your game library.</li>
-            <li>Right-click on Dota 2 and select &quot;Manage&quot;.</li>
-            <li>
-              From there, click on &quot;Browse local files&quot;. This will
-              open the Dota 2 game folder.
-            </li>
-            <li>
-              Navigate to the &quot;gamestate_integration&quot; folder within
-              the &quot;\game\dota\cfg&quot; directory.
-              <p className="text-xs">
-                If you don&apos;t already have a
-                &quot;gamestate_integration&quot; folder, you&apos;ll need to
-                create it.
-              </p>
-            </li>
-            <li>
-              Download the file and drag it into the
-              &quot;gamestate_integration&quot; folder.
-            </li>
-          </ol>
-
-          <DownloadButton url={url} user={user} data={data} />
-
-          <div className="space-y-4">
-            <div className="flex flex-col items-center space-y-4">
-              <video
-                className="rounded-lg"
-                playsInline
-                width="508"
-                height="504"
-                controls
-                autoPlay
-                muted
-                loop
-              >
-                <source
-                  src="/images/setup/how-to-create-cfg.mp4"
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
-              <div>
-                <div>Full path to save config file to:</div>
-                <Typography.Text code className="whitespace-pre-wrap break-all">
-                  .../Steam/steamapps/common/dota 2
-                  beta/game/dota/cfg/gamestate_integration/
-                </Typography.Text>
-              </div>
-            </div>
-          </div>
-        </>
-      ),
-    },
-    {
-      title: 'Add launch option',
-      content: (
-        <>
-          <div className="space-x-1">
-            <span>Add</span>
-            <Typography.Text code>-gamestateintegration</Typography.Text>
-            <span>
-              to your Dota 2 launch options in Steam. This allows the Dota 2
-              client to send game data to Dotabod.
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center space-y-4">
-            <video
-              className="rounded-lg"
-              playsInline
-              width="482"
-              height="392"
-              controls
-              autoPlay
-              muted
-              loop
-            >
-              <source
-                src="/images/setup/how-to-gsi-properties.mp4"
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </>
-      ),
-    },
-    {
-      title: 'Restart Dota 2',
-      content: (
-        <>
-          <div>
-            After you&apos;ve added the launch option, restart Dota 2 to ensure
-            that the changes take effect.
-          </div>
-        </>
-      ),
-    },
-  ]
-
   return (
     <>
       <div className="mb-4 space-x-2">
@@ -163,30 +55,91 @@ export default function UnixInstaller() {
       </div>
       <div className="space-y-4">
         <div className="flex flex-col items-center space-y-4">
-          <Steps
-            type="inline"
-            onChange={(i) => setCurrent(i)}
-            current={current}
-            items={items}
-            className="!text-red-500"
-          />
-          <div className="space-x-2">
-            <Button
-              type="link"
-              onClick={() => setCurrent(current - 1)}
-              disabled={current === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() => setCurrent(current + 1)}
-              disabled={current === items.length - 1}
-            >
-              Next
-            </Button>
-          </div>
+          <ol className="ml-4 list-decimal space-y-2">
+            <li>Open Steam and go to your game library.</li>
+            <li>Right-click on Dota 2 and select &quot;Manage&quot;.</li>
+            <li>
+              From there, click on &quot;Browse local files&quot;. This will
+              open the Dota 2 game folder.
+            </li>
+            <li>
+              Navigate to the &quot;gamestate_integration&quot; folder within
+              the &quot;\game\dota\cfg&quot; directory.
+              <p className="text-xs">
+                If you don&apos;t already have a
+                &quot;gamestate_integration&quot; folder, you&apos;ll need to
+                create it.
+              </p>
+            </li>
+            <li>
+              <p>Download the file and drag it into the
+              &quot;gamestate_integration&quot; folder.</p>
+              <DownloadButton url={url} user={user} data={data} />
+            </li>
+            <div className="space-y-4">
+              <div className="flex flex-col items-center space-y-4">
+                <video
+                  className="rounded-lg"
+                  playsInline
+                  width="508"
+                  height="504"
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                >
+                  <source
+                    src="/images/setup/how-to-create-cfg.mp4"
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+                <div>
+                  <div>Full path to save config file to:</div>
+                  <Typography.Text
+                    code
+                    className="whitespace-pre-wrap break-all"
+                  >
+                    .../Steam/steamapps/common/dota 2
+                    beta/game/dota/cfg/gamestate_integration/
+                  </Typography.Text>
+                </div>
+              </div>
+            </div>
+            <li className="space-x-1">
+              <p>
+              <span>Add</span>
+              <Typography.Text code>-gamestateintegration</Typography.Text>
+              <span>
+                to your Dota 2 launch options in Steam.
+              </span></p>
+              <p>This allows the Dota 2
+              client to send game data to Dotabod.</p>
+            </li>
+
+            <div className="flex flex-col items-center space-y-4">
+              <video
+                className="rounded-lg"
+                playsInline
+                width="482"
+                height="392"
+                controls
+                autoPlay
+                muted
+                loop
+              >
+                <source
+                  src="/images/setup/how-to-gsi-properties.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <li>
+              Restart Dota 2 to ensure that the changes take effect.
+            </li>
+          </ol>
         </div>
-        <div>{items[current].content}</div>
       </div>
     </>
   )
