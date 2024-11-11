@@ -12,24 +12,46 @@ const TWITCH_MODERATED_CHANNELS_URL =
 
 export async function getModerators(userId: string, accessToken: string) {
   try {
-    const url = `${TWITCH_MODERATED_CHANNELS_URL}?broadcaster_id=${userId}`
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Client-Id': process.env.TWITCH_CLIENT_ID,
-      },
-    })
+    const allModerators: {
+      user_id: string
+      user_login: string
+      user_name: string
+    }[] = []
+    let after: string | undefined = undefined
+    const first = 100 // Maximum items per page
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch moderated channels: ${response.statusText}`
-      )
-    }
+    do {
+      const url = new URL(TWITCH_MODERATED_CHANNELS_URL)
+      url.searchParams.append('broadcaster_id', userId)
+      url.searchParams.append('first', first.toString())
+      if (after) {
+        url.searchParams.append('after', after)
+      }
 
-    const data = await response.json()
-    return data.data
-  } catch (error) {
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Client-Id': process.env.TWITCH_CLIENT_ID || '',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch moderated channels: ${response.statusText}`
+        )
+      }
+
+      const data = await response.json()
+      if (Array.isArray(data.data)) {
+        allModerators.push(...data.data)
+      }
+
+      after = data.pagination?.cursor
+    } while (after)
+
+    return allModerators
+  } catch (error: any) {
     captureException(error)
     console.error('Failed to get moderated channels:', error)
     return { message: 'Failed to get moderated channels', error: error.message }

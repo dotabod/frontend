@@ -201,19 +201,17 @@ const SetupPage = () => {
       </Head>
       <Header
         subtitle={
-          <>
-            <div>
-              Let&apos;s get Dotabod working for you right away{' '}
-              <Image
-                src="/images/emotes/peepoclap.webp"
-                width={30}
-                unoptimized
-                className="inline"
-                height={30}
-                alt="peepo clap"
-              />
-            </div>
-          </>
+          <div>
+            Let&apos;s get Dotabod working for you right away{' '}
+            <Image
+              src="/images/emotes/peepoclap.webp"
+              width={30}
+              unoptimized
+              className="inline"
+              height={30}
+              alt="peepo clap"
+            />
+          </div>
         }
         title="Setup"
       />

@@ -7,8 +7,7 @@ import {
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
-import { captureException } from '@sentry/nextjs'
-import { Button, Divider, List, Spin, Tooltip } from 'antd'
+import { Alert, Button, Divider, List, Spin, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -20,21 +19,21 @@ import MmrForm from './Features/MmrForm'
 const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
 export const emotesRequired = [
-  { label: 'HECANT', id: '62978b4c441e9cea5e91f9e7' },
-  { label: 'Okayeg', id: '603caa69faf3a00014dff0b1' },
-  { label: 'Happi', id: '645defc42769a28df1a4487f' },
-  { label: 'Madge', id: '60a95f109d598ea72fad13bd' },
-  { label: 'POGGIES', id: '60af1b5a35c50a77926314ad' },
-  { label: 'PepeLaugh', id: '60420e3f77137b000de9e675' },
-  { label: 'ICANT', id: '61e2d59077175547b4254999' },
-  { label: 'BASED', id: '6043181d1d4963000d9dae39' },
-  { label: 'Chatting', id: '60ef410f48cde2fcc3eb5caa' },
-  { label: 'massivePIDAS', id: '6257e7a3131d4588262a7505' },
-  { label: 'Sadge', id: '61630205c1ff9a17cc396522' },
-  { label: 'EZ', id: '63071b80942ffb69e13d700f' },
-  { label: 'Clap', id: '60aed217c9cf495e5be86812' },
-  { label: 'peepoGamble', id: '60d83a6277324757d60ae099' },
-  { label: 'PauseChamp', id: '60b012a8e5a579561100b67f' },
+  { label: 'HECANT', id: '01G4FZG870000487MWX9F93YF7' },
+  { label: 'Okayeg', id: '01EZPFKAH8000FNWX000ADZW5H' },
+  { label: 'Happi', id: '01H07F15D00002ETD2HQRT8J3Z' },
+  { label: 'Madge', id: '01F6ASPNM00009TPCEMWQTT4XX' },
+  { label: 'POGGIES', id: '01F6P05NWG0003BH8AEY96655D' },
+  { label: 'PepeLaugh', id: '01F010F9GR0007E4VV006YKSKN' },
+  { label: 'ICANT', id: '01FSF14EM00007E5TN8YT2AJCS' },
+  { label: 'BASED', id: '01F031CCA80001TJB3006SVBHS' },
+  { label: 'Chatting', id: '01FAK9C8MR0004HKF2ZK1YPQ5A' },
+  { label: 'massivePIDAS', id: '01G0KP1N5R000167A5H0K2MX85' },
+  { label: 'Sadge', id: '01FHNBZRW8000C3ZWT2Z63JS92' },
+  { label: 'EZ', id: '01GB9W6V0000098BZVD7GKTW0F' },
+  { label: 'Clap', id: '01F6NE9AER000CKKT9BSDYGT0J' },
+  { label: 'peepoGamble', id: '01F96A83PG0007ECJ7AZB0NR4S' },
+  { label: 'PauseChamp', id: '01F6QWHR20000EB9BSAR8G1DKZ' },
 ]
 
 export default function ChatBot() {
@@ -47,6 +46,13 @@ export default function ChatBot() {
   const track = useTrack()
   const { error: makeDotabodModError, isLoading: makeDotabodModLoading } =
     useSWR('/api/make-dotabod-mod', fetcher)
+  const { error: updateEmoteSetError, data: updateEmoteSetData } = useSWR(
+    '/api/update-emote-set',
+    (url) => {
+      track('updateEmoteSet called')
+      return fetcher(url)
+    }
+  )
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -60,7 +66,8 @@ export default function ChatBot() {
             Array.isArray(data.user?.editors) &&
             !!data.user?.editors?.find(
               (editor: { id: string }) =>
-                editor.id === '63d688c3a897cb667b7e601b'
+                editor.id?.toLowerCase() ===
+                '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase()
             ),
           hasDotabodEmoteSet: !!emotesRequired.every(
             (emote) =>
@@ -69,6 +76,11 @@ export default function ChatBot() {
                 (e: { name: string }) => e.name === emote.label
               )
           ),
+        }
+
+        if (updateEmoteSetError) {
+          setUser((prev) => ({ ...prev, hasDotabodEmoteSet: false }))
+          clearInterval(intervalId)
         }
 
         if (user?.id) {
@@ -94,20 +106,7 @@ export default function ChatBot() {
     const intervalId = setInterval(fetchUserData, 5000)
 
     return () => clearInterval(intervalId)
-  }, [stvUrl])
-
-  useEffect(() => {
-    if (!user?.hasDotabodEmoteSet && user?.hasDotabodEditor) {
-      fetch('/api/update-emote-set')
-        .then(() => {
-          setUser((prev) => ({ ...prev, hasDotabodEmoteSet: true }))
-        })
-        .catch((e) => {
-          console.error(e)
-          captureException(e)
-        })
-    }
-  }, [user?.hasDotabodEmoteSet, user?.hasDotabodEditor])
+  }, [stvUrl, updateEmoteSetError])
 
   const { data: mmr, loading: loadingMmr } = useUpdateSetting(Settings.mmr)
 
@@ -125,14 +124,6 @@ export default function ChatBot() {
     stepThreeComplete,
     stepFourComplete,
   ].filter(Boolean).length
-
-  if (loading || loadingAccounts) {
-    return (
-      <Card>
-        <Spin size="large" />
-      </Card>
-    )
-  }
 
   return (
     <Card>
@@ -193,7 +184,13 @@ export default function ChatBot() {
         stepProps={[
           { status: stepTwoComplete ? 'finish' : undefined },
           { status: stepThreeComplete ? 'finish' : undefined },
-          { status: stepFourComplete ? 'finish' : undefined },
+          {
+            status: stepFourComplete
+              ? 'finish'
+              : updateEmoteSetError
+                ? 'error'
+                : undefined,
+          },
         ]}
         steps={[
           <div key={1} className="flex flex-col space-y-2">
@@ -259,17 +256,31 @@ export default function ChatBot() {
           </div>,
           <div key={3}>
             <div className="flex flex-row items-center space-x-2 mb-4">
-              {!user?.hasDotabodEmoteSet && (
-                <Spin size="small" spinning={!user?.hasDotabodEmoteSet} />
-              )}
-              {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
-                <div>
-                  Dotabod will be able to use the following emotes after the
-                  previous steps are completed.
-                </div>
-              ) : (
-                <div>The following emotes are ready to use!</div>
-              )}
+              <div className="flex flex-col">
+                {updateEmoteSetError ? (
+                  <div className="m-4">
+                    <Alert
+                      message="There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually."
+                      type="error"
+                      showIcon
+                    />
+                  </div>
+                ) : (
+                  <>
+                    {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
+                      <div className="flex flex-row space-x-4">
+                        <Spin size="small" spinning={true} />
+                        <p>
+                          Dotabod will be able to use the following emotes after
+                          the previous steps are completed.
+                        </p>
+                      </div>
+                    ) : (
+                      <div>The following emotes are ready to use!</div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
             <List
@@ -296,16 +307,22 @@ export default function ChatBot() {
                   <List.Item key={label}>
                     <div className={clsx('flex items-center space-x-1')}>
                       <Tooltip title={label}>
-                        <Image
-                          className={clsx(
-                            !added && 'grayscale group-hover:grayscale-0',
-                            'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
-                          )}
-                          height={60}
-                          width={60}
-                          src={SevenTVBaseEmoteURL(id)}
-                          alt={id}
-                        />
+                        <a
+                          href={`https://7tv.app/emotes/${id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Image
+                            className={clsx(
+                              !added && 'grayscale group-hover:grayscale-0',
+                              'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
+                            )}
+                            height={60}
+                            width={60}
+                            src={SevenTVBaseEmoteURL(id)}
+                            alt={id}
+                          />
+                        </a>
                       </Tooltip>
                     </div>
                   </List.Item>

@@ -54,28 +54,30 @@ model User {
   kick                              BigInt?             @unique
   youtube                           String?             @unique
   Account                           Account?
+  approvedModerators                ApprovedModerator[] @relation("UserApprovedModerators")
   Bet                               Bet[]
   mods_mods_mod_user_idTousers      mods[]              @relation("mods_mod_user_idTousers")
   mods_mods_streamer_user_idTousers mods[]              @relation("mods_streamer_user_idTousers")
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
-  approvedModerators                ApprovedModerator[] @relation("UserApprovedModerators")
+  admin                             admin?
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
   @@index([name], map: "idx_users_on_name")
+  @@index([locale])
+  @@index([stream_online])
   @@map("users")
 }
 
 model ApprovedModerator {
   id                 String   @id @default(dbgenerated("gen_random_uuid()"))
   userId             String
-  moderatorChannelId Int
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @default(now()) @map("updated_at")
-
-  user User @relation("UserApprovedModerators", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  moderatorChannelId Int
+  user               User     @relation("UserApprovedModerators", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([userId, moderatorChannelId])
   @@index([userId], map: "idx_approved_moderators_on_userid")
@@ -94,7 +96,6 @@ model Setting {
 
   @@unique([key, userId])
   @@index([userId], map: "idx_settings_on_userid")
-  @@index([userId], map: "idx_user_id_desc")
   @@map("settings")
 }
 
@@ -110,6 +111,7 @@ model SteamAccount {
   connectedUserIds String[]
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("steam_accounts")
 }
 
@@ -136,6 +138,7 @@ model Bet {
 
   @@unique([matchId, userId])
   @@index([won, lobby_type, createdAt, id], map: "idx_bets_on_won_lobbytype_createdat_id")
+  @@index([updatedAt])
   @@map("bets")
 }
 
@@ -177,4 +180,13 @@ model discord_accounts {
   providerAccountId BigInt   @unique
 
   @@id([id, providerAccountId])
+}
+
+model admin {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String   @unique
+  role      String   @default("admin")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
 }

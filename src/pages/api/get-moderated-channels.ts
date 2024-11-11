@@ -16,28 +16,52 @@ export async function getModeratedChannels(
   accessToken: string
 ) {
   try {
-    const url = `${TWITCH_MODERATED_CHANNELS_URL}?user_id=${userId}`
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Client-Id': process.env.TWITCH_CLIENT_ID,
-      },
-    })
+    const moderatedChannels: {
+      broadcaster_id: string
+      broadcaster_login: string
+      broadcaster_name: string
+    }[] = []
+    let after: string | undefined = undefined
+    const first = 100 // Maximum items per page
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch moderated channels: ${response.statusText}`
-      )
-    }
+    do {
+      const url = new URL(TWITCH_MODERATED_CHANNELS_URL)
+      url.searchParams.append('user_id', userId)
+      url.searchParams.append('first', first.toString())
+      if (after) {
+        url.searchParams.append('after', after)
+      }
 
-    const data = await response.json()
-    const moderatedChannels = data.data
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Client-Id': process.env.TWITCH_CLIENT_ID || '',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch moderated channels: ${response.statusText}`
+        )
+      }
+
+      const data = await response.json()
+      if (Array.isArray(data.data)) {
+        moderatedChannels.push(...data.data)
+      }
+
+      after = data.pagination?.cursor
+    } while (after)
+
+    const broadcasterIds = moderatedChannels.map(
+      (channel) => channel.broadcaster_id
+    )
 
     const userModeratedChannels = await prisma.account.findMany({
       where: {
         providerAccountId: {
-          in: moderatedChannels.map((channel) => channel.broadcaster_id),
+          in: broadcasterIds,
         },
       },
       select: {
@@ -58,15 +82,15 @@ export async function getModeratedChannels(
     }))
 
     return flattenedResponse
-  } catch (error) {
+  } catch (error: any) {
     captureException(error)
     console.error('Failed to get moderated channels:', error)
     return { message: 'Failed to get moderated channels', error: error.message }
   }
 }
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
+  const search = req.query.search as string | undefined
 
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
@@ -74,6 +98,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!session?.user?.id) {
     return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  if (search && (!session?.user?.role || !session.user.role.includes('admin'))) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  if (search !== undefined && !search.trim()) {
+    return res.status(200).json([])
+  }
+
+  if (search?.trim()) {
+    const users = await prisma.account.findMany({
+      select: {
+        providerAccountId: true,
+        user: {
+          select: {
+            image: true,
+            name: true,
+          },
+        },
+      },
+      where: {
+        OR: [
+          { providerAccountId: { contains: search.toLowerCase().trim() } },
+          { user: { name: { contains: search.toLowerCase().trim() } } },
+        ],
+      },
+      take: 10,
+    })
+    return res.status(200).json(users.map((user) => ({
+      value: user.providerAccountId,
+      label: user.user.name,
+      image: user.user.image,
+    })))
   }
 
   const { providerAccountId, accessToken, error } = await getTwitchTokens(

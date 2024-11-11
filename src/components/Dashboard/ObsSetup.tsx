@@ -6,6 +6,7 @@ import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import {
   Alert,
+  App,
   Button,
   Form,
   Input,
@@ -21,13 +22,50 @@ import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
-interface Scene {
+export interface Scene {
   sceneIndex: number // Scene index
   sceneUuid: string // Unique identifier
   sceneName: string // Scene name
 }
 
+export interface SceneItemResponse {
+  inputKind: string
+  isGroup: null
+  sceneItemBlendMode: string
+  sceneItemEnabled: boolean
+  sceneItemId: number
+  sceneItemIndex: number
+  sceneItemLocked: boolean
+  sceneItemTransform: SceneItemTransform
+  sourceName: string
+  sourceType: string
+  sourceUuid: string
+}
+
+export interface SceneItemTransform {
+  alignment: number
+  boundsAlignment: number
+  boundsHeight: number
+  boundsType: string
+  boundsWidth: number
+  cropBottom: number
+  cropLeft: number
+  cropRight: number
+  cropToBounds: boolean
+  cropTop: number
+  height: number
+  positionX: number
+  positionY: number
+  rotation: number
+  scaleX: number
+  scaleY: number
+  sourceHeight: number
+  sourceWidth: number
+  width: number
+}
+
 const ObsSetup: React.FC = () => {
+  const { notification } = App.useApp()
   const track = useTrack()
   const [connected, setConnected] = useState(false)
   const [baseWidth, setBaseWidth] = useState<number | null>(null)
@@ -213,16 +251,21 @@ const ObsSetup: React.FC = () => {
 
         if (existingInput) {
           // If the input exists globally, add it to the selected scene
-          await obs.call('CreateSceneItem', {
+          const createSceneItemResponse = await obs.call('CreateSceneItem', {
             sceneUuid: selectedScene,
             sourceName: '[dotabod] main overlay',
             sceneItemEnabled: true, // Enable the item by default
+          })
+          await obs.call('SetSceneItemLocked', {
+            sceneUuid: selectedScene,
+            sceneItemId: createSceneItemResponse.sceneItemId,
+            sceneItemLocked: true,
           })
           addedScenes++
           message.success(`Existing source added to scene: ${selectedScene}`)
         } else {
           // If the input doesn't exist, create a new browser source using CreateInput
-          await obs.call('CreateInput', {
+          const createInputResponse = await obs.call('CreateInput', {
             sceneUuid: selectedScene,
             inputName: '[dotabod] main overlay',
             inputKind: 'browser_source',
@@ -233,6 +276,11 @@ const ObsSetup: React.FC = () => {
               height: currentBaseHeight,
               webpage_control_level: 4, // Allow OBS to control the webpage
             },
+          })
+          await obs.call('SetSceneItemLocked', {
+            sceneUuid: selectedScene,
+            sceneItemId: createInputResponse.sceneItemId,
+            sceneItemLocked: true,
           })
           addedScenes++
           message.success(
@@ -298,6 +346,68 @@ const ObsSetup: React.FC = () => {
 
     track('obs/connect', { port: values.port })
   }
+
+  useEffect(() => {
+    if (!connected || !obs || scenesWithSource.length === 0) return
+
+    const checkOverlayFit = async () => {
+      try {
+        const sceneItem = (await obs.call('GetSceneItemList', {
+          sceneUuid: scenesWithSource[0],
+        })) as unknown as { sceneItems: SceneItemResponse[] }
+
+        const transform = sceneItem.sceneItems[0].sceneItemTransform
+        const overlayDimensions = {
+          width: transform.width * transform.scaleX,
+          height: transform.height * transform.scaleY,
+          x: transform.positionX,
+          y: transform.positionY,
+        }
+
+        const isCorrectlyPositioned =
+          overlayDimensions.x === 0 &&
+          overlayDimensions.y === 0 &&
+          overlayDimensions.width === baseWidth &&
+          overlayDimensions.height === baseHeight
+
+        if (!isCorrectlyPositioned) {
+          notification.open({
+            key: 'overlay-fit',
+            type: 'error',
+            duration: 0,
+            placement: 'bottomLeft',
+            message: 'Overlay does not fit the scene',
+            description: (
+              <div>
+                The overlay dimensions or position are incorrect. Delete the
+                overlay and add it again.
+              </div>
+            ),
+          })
+        } else {
+          notification.destroy('overlay-fit')
+        }
+      } catch (err) {
+        console.error('Error checking overlay fit:', err)
+      }
+    }
+
+    // Initial check
+    checkOverlayFit()
+
+    // Check every 2 seconds
+    const intervalId = setInterval(checkOverlayFit, 2000)
+
+    return () => clearInterval(intervalId)
+  }, [
+    connected,
+    baseWidth,
+    baseHeight,
+    scenesWithSource,
+    obs,
+    notification.destroy,
+    notification.open,
+  ])
 
   return (
     <Form
