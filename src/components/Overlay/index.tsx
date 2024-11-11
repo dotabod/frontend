@@ -88,7 +88,7 @@ const OverlayPage = (props) => {
       leaderboard:
         'standing' in rank
           ? rank.standing
-          : (steamAccount?.leaderboard_rank ?? false),
+          : steamAccount?.leaderboard_rank ?? false,
       notLoaded: false,
     }
 
@@ -102,9 +102,9 @@ const OverlayPage = (props) => {
         type: 'error',
         duration: 0,
         placement: 'bottomLeft',
-        message: 'Stream is offline!',
+        message: 'Twitch stream is offline',
         description:
-          "Dotabod won't respond to game events. Actually live? Type !online",
+          'Dotabod is disabled until you go live on Twitch. Not streaming on Twitch? Type !online in your Twitch chat to enable Dotabod.',
       })
     } else {
       notification.destroy('stream-offline')
