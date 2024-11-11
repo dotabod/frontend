@@ -6,7 +6,6 @@ import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import {
   Alert,
-  App,
   Button,
   Form,
   Input,
@@ -65,7 +64,6 @@ export interface SceneItemTransform {
 }
 
 const ObsSetup: React.FC = () => {
-  const { notification } = App.useApp()
   const track = useTrack()
   const [connected, setConnected] = useState(false)
   const [baseWidth, setBaseWidth] = useState<number | null>(null)
@@ -346,68 +344,6 @@ const ObsSetup: React.FC = () => {
 
     track('obs/connect', { port: values.port })
   }
-
-  useEffect(() => {
-    if (!connected || !obs || scenesWithSource.length === 0) return
-
-    const checkOverlayFit = async () => {
-      try {
-        const sceneItem = (await obs.call('GetSceneItemList', {
-          sceneUuid: scenesWithSource[0],
-        })) as unknown as { sceneItems: SceneItemResponse[] }
-
-        const transform = sceneItem.sceneItems[0].sceneItemTransform
-        const overlayDimensions = {
-          width: transform.width * transform.scaleX,
-          height: transform.height * transform.scaleY,
-          x: transform.positionX,
-          y: transform.positionY,
-        }
-
-        const isCorrectlyPositioned =
-          overlayDimensions.x === 0 &&
-          overlayDimensions.y === 0 &&
-          overlayDimensions.width === baseWidth &&
-          overlayDimensions.height === baseHeight
-
-        if (!isCorrectlyPositioned) {
-          notification.open({
-            key: 'overlay-fit',
-            type: 'error',
-            duration: 0,
-            placement: 'bottomLeft',
-            message: 'Overlay does not fit the scene',
-            description: (
-              <div>
-                The overlay dimensions or position are incorrect. Delete the
-                overlay and add it again.
-              </div>
-            ),
-          })
-        } else {
-          notification.destroy('overlay-fit')
-        }
-      } catch (err) {
-        console.error('Error checking overlay fit:', err)
-      }
-    }
-
-    // Initial check
-    checkOverlayFit()
-
-    // Check every 2 seconds
-    const intervalId = setInterval(checkOverlayFit, 2000)
-
-    return () => clearInterval(intervalId)
-  }, [
-    connected,
-    baseWidth,
-    baseHeight,
-    scenesWithSource,
-    obs,
-    notification.destroy,
-    notification.open,
-  ])
 
   return (
     <Form
