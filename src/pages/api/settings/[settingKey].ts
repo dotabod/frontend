@@ -28,7 +28,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === 'GET') {
-    return handleGetRequest(res, session.user.id, validKey)
+    return handleGetRequest(req, res, session.user.id, validKey)
   }
 
   if (req.method === 'PATCH') {
@@ -39,10 +39,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGetRequest(
+  req: NextApiRequest,
   res: NextApiResponse,
   userId: string,
   settingKey: string
 ) {
+  const session = await getServerSession(req, res, authOptions)
+
   try {
     const setting = await prisma.setting.findFirst({
       where: {
@@ -50,6 +53,13 @@ async function handleGetRequest(
         key: settingKey,
       },
     })
+
+    if (session?.user?.isImpersonating) {
+      // Filter out obsServerPassword
+      if (setting?.key === Settings.obsServerPassword) {
+        setting.value = ''
+      }
+    }
 
     return res.status(200).json(setting)
   } catch (error) {
@@ -65,6 +75,14 @@ async function handlePatchRequest(
   userId: string,
   settingKey: keyof typeof settingKeySchema.Values
 ) {
+  const session = await getServerSession(req, res, authOptions)
+  if (session?.user?.isImpersonating) {
+    // Filter out obsServerPassword
+    if (settingKey === Settings.obsServerPassword) {
+      return res.status(403).json({ message: 'Forbidden' })
+    }
+  }
+
   try {
     const parsedBody = JSON.parse(req.body)
     parsedBody.key = settingKey

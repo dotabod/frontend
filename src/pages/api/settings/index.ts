@@ -3,6 +3,7 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { Settings } from '@/lib/defaultSettings'
 import {
   dynamicSettingSchema,
   settingKeySchema,
@@ -100,6 +101,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(403).json({ message: 'Unauthorized' })
       }
 
+      if (session?.user?.isImpersonating) {
+        // Filter out obsServerPassword
+        data.settings = data.settings.filter(
+          (setting) => setting.key !== Settings.obsServerPassword
+        )
+      }
+
       return res.json(data)
     } catch (error) {
       captureException(error)
@@ -124,6 +132,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const validKey = keyValidation.data
       const schema = dynamicSettingSchema(validKey)
       const validatedBody = schema.parse(parsedBody)
+
+      if (session.user.isImpersonating) {
+        if (validatedBody.key === Settings.obsServerPassword) {
+          return res.status(403).json({ message: 'Forbidden' })
+        }
+      }
 
       const post = await prisma.setting.create({
         data: {
