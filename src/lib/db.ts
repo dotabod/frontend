@@ -9,7 +9,7 @@ declare let global: { prisma: PrismaClient }
 
 let prisma: PrismaClient
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.VERCEL_ENV === 'production') {
   prisma = new PrismaClient()
 } else {
   if (!global.prisma) {
