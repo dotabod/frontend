@@ -9,7 +9,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 
 // Manually toggle this when logging in as the bot if we need to update scopes
-const useBotScopes = false
+const useBotScopes = process.env.NODE_ENV !== 'production'
 
 // Do not delete this declaration
 const chatBotScopes = [
