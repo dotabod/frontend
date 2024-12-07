@@ -491,7 +491,7 @@ const CommandDetail = {
       <TwitchChat
         {...props}
         command="!dotabod"
-        response="I'm an open source bot made by @techleed. More info: https://dotabod.com"
+        response={`I'm an open source bot made by @techleed. More info: https://${process.env.NEXT_PUBLIC_VERCEL_URL}/dotabod.com`}
       />
     ),
   },
