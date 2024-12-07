@@ -3,6 +3,7 @@ import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import Head from 'next/head'
 import type { ReactNode } from 'react'
+import KofiButton from './Kofi'
 
 const HomepageShell = ({
   title,
@@ -71,6 +72,7 @@ const HomepageShell = ({
       >
         {children}
       </main>
+      <KofiButton />
       <Footer />
     </>
   )
