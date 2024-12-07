@@ -13,7 +13,7 @@ const CodeBlock = () => {
 
     navigator.clipboard
       .writeText(
-        `powershell -c "irm ${process.env.NEXT_PUBLIC_VERCEL_ENV}/install.ps1 | iex"`
+        `powershell -c "irm ${process.env.NEXT_PUBLIC_VERCEL_URL}/install.ps1 | iex"`
       )
       .then(() => {
         setCopied(true)
@@ -32,7 +32,7 @@ const CodeBlock = () => {
               <span style={{ color: '#F8F8F2' }}> </span>
               <span style={{ color: '#E9F284' }}>"</span>
               <span style={{ color: '#F1FA8C' }}>
-                irm ${process.env.NEXT_PUBLIC_VERCEL_ENV}/install.ps1 | iex
+                irm ${process.env.NEXT_PUBLIC_VERCEL_URL}/install.ps1 | iex
               </span>
               <span style={{ color: '#E9F284' }}>"</span>
             </span>

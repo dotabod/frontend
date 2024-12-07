@@ -35,7 +35,7 @@ const HomepageShell = ({
         <meta property="og:type" content="website" />
         <meta
           property="og:url"
-          content={`https://${process.env.NEXT_PUBLIC_VERCEL_ENV}`}
+          content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}
         />
         <meta
           property="og:title"
@@ -47,13 +47,13 @@ const HomepageShell = ({
         />
         <meta
           property="og:image"
-          content={`https://${process.env.NEXT_PUBLIC_VERCEL_ENV}/images/welcome.png`}
+          content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/images/welcome.png`}
         />
 
         <meta property="twitter:card" content="summary_large_image" />
         <meta
           property="twitter:url"
-          content={`https://${process.env.NEXT_PUBLIC_VERCEL_ENV}`}
+          content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}
         />
         <meta
           property="twitter:title"
@@ -65,7 +65,7 @@ const HomepageShell = ({
         />
         <meta
           property="twitter:image"
-          content={`https://${process.env.NEXT_PUBLIC_VERCEL_ENV}/images/welcome.png`}
+          content={`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/images/welcome.png`}
         />
       </Head>
 
