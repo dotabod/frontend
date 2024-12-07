@@ -13,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.headers.host) {
       updatedScriptContent = updatedScriptContent.replace(
         /\/dotabod\.com/g,
-        `${req.headers.host}`
+        `/${req.headers.host}`
       )
     }
 
