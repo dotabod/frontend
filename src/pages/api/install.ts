@@ -10,11 +10,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const scriptContent = await fs.readFile(scriptPath, 'utf8')
     let updatedScriptContent = scriptContent
 
-    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-      // Replace all `/dotabod.com` with `/${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    if (req.headers.host) {
       updatedScriptContent = updatedScriptContent.replace(
         /\/dotabod\.com/g,
-        `/${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        `/${req.headers.host}`
       )
     }
 
