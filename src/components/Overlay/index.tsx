@@ -281,14 +281,14 @@ const OverlayPage = (props) => {
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${
-              block.type === 'spectator' ? 'playing' : block.type
-            }.png`}
+            src={`/images/dev/21-9-playing.png`}
           />
         )}
       </AnimatePresence>
     </>
   )
 }
+
+OverlayPage.whyDidYouRender = true
 
 export default OverlayPage
