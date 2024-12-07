@@ -13,10 +13,15 @@ export const config = {
     '/overlay/:path*',
     '/api/:path*',
     '/dashboard/:path*',
+    '/install',
   ],
 }
 
 export async function middleware(req: NextRequestWithAuth) {
+  if (req.nextUrl.pathname === '/install') {
+    return NextResponse.redirect(new URL('/api/install', req.url))
+  }
+
   if (!process.env.EDGE_CONFIG) {
     req.nextUrl.pathname = '/missing-edge-config'
     return NextResponse.rewrite(req.nextUrl)
