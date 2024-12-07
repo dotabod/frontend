@@ -1,8 +1,10 @@
+import { useTrack } from '@/lib/track'
 import { Modal } from 'antd'
 import { App } from 'antd'
 import { useEffect, useState } from 'react'
 
 const KofiButton = () => {
+  const track = useTrack()
   const { notification } = App.useApp()
   const [isKofiModalOpen, setIsKofiModalOpen] = useState(false)
 
@@ -18,6 +20,7 @@ const KofiButton = () => {
         <button
           type="button"
           onClick={() => {
+            track('kofi_donate_button_clicked')
             setIsKofiModalOpen(true)
             notification.destroy('donate')
           }}
@@ -31,7 +34,7 @@ const KofiButton = () => {
         </button>
       ),
     })
-  }, [notification])
+  }, [notification, track])
 
   return (
     <Modal
