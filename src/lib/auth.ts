@@ -340,7 +340,10 @@ export const authOptions: NextAuthOptions = {
         account &&
         ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if (shouldRefresh && !isImpersonating) {
+      if (
+        (shouldRefresh || process.env.VERCEL_ENV !== 'production') &&
+        !isImpersonating
+      ) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
 
