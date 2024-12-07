@@ -1,6 +1,6 @@
 import type { PollData } from '@/components/Overlay/PollOverlay'
 
-export const isDev = false //|| process.env.NODE_ENV === 'development'
+export const isDev = false //|| process.env.VERCEL_ENV === 'development'
 
 export type blockType = {
   matchId: number | null

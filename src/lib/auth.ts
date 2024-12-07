@@ -9,13 +9,11 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 
 // Manually toggle this when logging in as the bot if we need to update scopes
-const useBotScopes = process.env.NODE_ENV !== 'production'
+const useBotScopes = process.env.VERCEL_ENV !== 'production'
 
 // Do not delete this declaration
 const chatBotScopes = [
   'channel:moderate',
-  'chat:edit',
-  'chat:read',
   'whispers:read',
   'user:bot',
   'whispers:edit',
