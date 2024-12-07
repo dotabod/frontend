@@ -1,5 +1,6 @@
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { navigation } from '@/components/Dashboard/navigation'
+import KofiButton from '@/components/Homepage/Kofi'
 import { DarkLogo, Logomark } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
@@ -183,6 +184,7 @@ export default function DashboardShell({
           </Content>
         </Layout>
       </Layout>
+      <KofiButton />
     </>
   )
 }
