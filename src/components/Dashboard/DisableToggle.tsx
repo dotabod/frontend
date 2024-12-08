@@ -95,7 +95,7 @@ export function DisableToggle() {
   const botuser =
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
       ? 'dotabod'
-      : 'dotabod-dev'
+      : 'dotabod_dev'
 
   useEffect(() => {
     if (data?.banned) {
