@@ -9,13 +9,11 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 
 // Manually toggle this when logging in as the bot if we need to update scopes
-const useBotScopes = process.env.NODE_ENV !== 'production'
+const useBotScopes = process.env.VERCEL_ENV !== 'production'
 
 // Do not delete this declaration
 const chatBotScopes = [
   'channel:moderate',
-  'chat:edit',
-  'chat:read',
   'whispers:read',
   'user:bot',
   'whispers:edit',
@@ -342,7 +340,10 @@ export const authOptions: NextAuthOptions = {
         account &&
         ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if (shouldRefresh && !isImpersonating) {
+      if (
+        (shouldRefresh || process.env.VERCEL_ENV !== 'production') &&
+        !isImpersonating
+      ) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
 
