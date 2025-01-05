@@ -73,10 +73,20 @@ const OverlayPage = () => {
 
   // Refresh the page every 5 minutes if the socket is disconnected
   useEffect(() => {
+    let reloadTimeout: NodeJS.Timeout | null = null
+
     if (!connected) {
-      setTimeout(() => {
+      reloadTimeout = setTimeout(() => {
         window.location.reload()
       }, 300000)
+    } else if (reloadTimeout) {
+      clearTimeout(reloadTimeout)
+    }
+
+    return () => {
+      if (reloadTimeout) {
+        clearTimeout(reloadTimeout)
+      }
     }
   }, [connected])
 
@@ -105,6 +115,8 @@ const OverlayPage = () => {
   }, [original])
 
   useEffect(() => {
+    let reloadTimeout: NodeJS.Timeout | null = null
+
     if (!original?.stream_online) {
       notification.open({
         key: 'stream-offline',
@@ -117,11 +129,20 @@ const OverlayPage = () => {
       })
 
       // Refresh page every 5 minutes to check if stream is online
-      setTimeout(() => {
+      reloadTimeout = setTimeout(() => {
         window.location.reload()
       }, 300000)
     } else {
       notification.destroy('stream-offline')
+      if (reloadTimeout) {
+        clearTimeout(reloadTimeout)
+      }
+    }
+
+    return () => {
+      if (reloadTimeout) {
+        clearTimeout(reloadTimeout)
+      }
     }
   }, [notification, original?.stream_online])
 
