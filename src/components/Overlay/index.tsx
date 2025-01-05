@@ -106,6 +106,11 @@ const OverlayPage = (props) => {
         description:
           'Dotabod is disabled until you go live on Twitch. Not streaming on Twitch? Type !online in your Twitch chat to enable Dotabod.',
       })
+
+      // Refresh page every 5 minutes to check if stream is online
+      setTimeout(() => {
+        window.location.reload()
+      }, 300000)
     } else {
       notification.destroy('stream-offline')
     }
