@@ -14,9 +14,8 @@ import {
   EventSubChannelPredictionLockEvent,
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
-import { App } from 'antd'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
 import {
@@ -54,7 +53,6 @@ export const useSocket = ({
   setWL,
   setRadiantWinChance,
 }) => {
-  const { notification } = App.useApp()
   const router = useRouter()
   const { userId } = router.query
   const dispatch = useDispatch()

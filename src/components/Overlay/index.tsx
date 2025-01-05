@@ -29,7 +29,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
-const OverlayPage = (props) => {
+const OverlayPage = () => {
   const [delayPassed, setDelayPassed] = useState(true)
   const { notification } = App.useApp()
 
@@ -70,6 +70,15 @@ const OverlayPage = (props) => {
   })
 
   const [isInIframe, setIsInIframe] = useState(false)
+
+  // Refresh the page every 5 minutes if the socket is disconnected
+  useEffect(() => {
+    if (!connected) {
+      setTimeout(() => {
+        window.location.reload()
+      }, 300000)
+    }
+  }, [connected])
 
   useEffect(() => {
     if (!original) return
