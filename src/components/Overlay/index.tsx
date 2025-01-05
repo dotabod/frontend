@@ -29,7 +29,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
-const OverlayPage = (props) => {
+const OverlayPage = () => {
   const [delayPassed, setDelayPassed] = useState(true)
   const { notification } = App.useApp()
 
@@ -71,6 +71,15 @@ const OverlayPage = (props) => {
 
   const [isInIframe, setIsInIframe] = useState(false)
 
+  // Refresh the page every 5 minutes if the socket is disconnected
+  useEffect(() => {
+    if (!connected) {
+      setTimeout(() => {
+        window.location.reload()
+      }, 300000)
+    }
+  }, [connected])
+
   useEffect(() => {
     if (!original) return
 
@@ -106,6 +115,11 @@ const OverlayPage = (props) => {
         description:
           'Dotabod is disabled until you go live on Twitch. Not streaming on Twitch? Type !online in your Twitch chat to enable Dotabod.',
       })
+
+      // Refresh page every 5 minutes to check if stream is online
+      setTimeout(() => {
+        window.location.reload()
+      }, 300000)
     } else {
       notification.destroy('stream-offline')
     }

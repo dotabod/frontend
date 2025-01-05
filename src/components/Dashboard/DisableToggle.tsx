@@ -92,6 +92,11 @@ export function DisableToggle() {
     }
   }, [isDotabodDisabled, notification])
 
+  const botuser =
+    process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+      ? 'dotabod'
+      : 'dotabod_test'
+
   useEffect(() => {
     if (data?.banned) {
       notification.open({
@@ -106,7 +111,7 @@ export function DisableToggle() {
               type="link"
               onClick={() => {
                 window.open(
-                  `https://www.twitch.tv/popout/${user?.name}/viewercard/dotabod?popout=`,
+                  `https://www.twitch.tv/popout/${user?.name}/viewercard/${botuser}?popout=`,
                   'mywindow',
                   'menubar=1,resizable=1,width=350,height=250'
                 )
