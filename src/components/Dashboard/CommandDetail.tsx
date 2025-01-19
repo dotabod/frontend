@@ -723,6 +723,38 @@ const CommandDetail = {
       />
     ),
   },
+  [Settings.commandShard]: {
+    key: Settings.commandShard,
+    title: "Aghanim's Shard",
+    description:
+      "Provides information about the Aghanim's Shard upgrade for a hero.",
+    cmd: '!shard jug',
+    alias: [],
+    allowed: 'all',
+    response: (props: Record<string, any> = {}) => (
+      <TwitchChat
+        {...props}
+        command="!shard"
+        response="Juggernaut shard: Blade Fury · Increases Blade Fury radius, and slows enemies by 35%."
+      />
+    ),
+  },
+  [Settings.commandAghs]: {
+    key: Settings.commandAghs,
+    title: "Aghanim's Scepter",
+    description:
+      "Provides information about the Aghanim's Scepter upgrade for a hero.",
+    cmd: '!aghs jug',
+    alias: [],
+    allowed: 'all',
+    response: (props: Record<string, any> = {}) => (
+      <TwitchChat
+        {...props}
+        command="!aghs"
+        response="Juggernaut aghs: Swiftslash · Performs a short Omnislash for 1 seconds."
+      />
+    ),
+  },
 }
 
 export default CommandDetail

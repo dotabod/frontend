@@ -120,6 +120,8 @@ export const defaultSettings = {
   commandSpectators: true,
   commandFacet: true,
   commandInnate: true,
+  commandShard: true,
+  commandAghs: true,
   commandWinProbability: true,
 }
 export type SettingKeys = keyof typeof defaultSettings
