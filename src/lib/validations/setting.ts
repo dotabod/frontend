@@ -98,6 +98,8 @@ const settingsSchema = {
   commandSpectators: z.boolean(),
   commandFacet: z.boolean(),
   commandInnate: z.boolean(),
+  commandShard: z.boolean(),
+  commandAghs: z.boolean(),
   commandWinProbability: z.boolean(),
 }
 
