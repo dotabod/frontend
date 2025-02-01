@@ -65,7 +65,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!emoteSetId) {
       const createEmoteSetVariables = {
         user_id: stvResponse?.user?.id,
-        data: { name: 'Dotabod Emotes' },
+        data: { name: 'DotabodEmotes' },
       }
 
       const createEmoteSetResult: {
