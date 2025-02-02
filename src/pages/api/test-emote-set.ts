@@ -72,7 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log('Creating new emote set...')
     const createEmoteSetVariables = {
       user_id: userId,
-      data: { name: `Test Emote Set ${Date.now()}` },
+      data: { name: `TestEmoteSet${Date.now()}` },
     }
     const createEmoteSetResult = (await client.request(
       CREATE_EMOTE_SET,
