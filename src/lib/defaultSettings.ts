@@ -57,6 +57,9 @@ export const defaultSettings = {
     commandsReady: {
       enabled: true,
     },
+    neutralItems: {
+      enabled: false,
+    },
   },
   commandAPM: true,
   commandAvg: true,

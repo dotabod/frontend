@@ -295,6 +295,17 @@ export const chatterInfo = {
       </span>
     ),
   },
+  neutralItems: {
+    tooltip:
+      'Depending on whether you\'re playing turbo or normal, neutral items will be available at different times.',
+    category: CATEGORIES.Event,
+    message: (
+      <span>
+        Tier 5 neutral items are now available! Time to check the jungle
+        PogChamp
+      </span>
+    ),
+  },
 }
 
 const groupedChatterInfo = Object.entries(chatterInfo).reduce(
