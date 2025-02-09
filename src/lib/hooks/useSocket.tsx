@@ -34,16 +34,14 @@ export type WinChance = {
   visible: boolean
 }
 
-const PING_INTERVAL_MS = 30000 // 30,000 ms = 30 seconds
-const RECONNECT_DELAY_MS = 1000 // 1,000 ms = 1 second
-const ERROR_RECONNECT_DELAY_MS = 2000 // 2,000 ms = 2 seconds
+// Add heartbeat/ping mechanism
+const PING_INTERVAL = 30000 // 30 seconds
 
 type wlType = {
   win: number
   lose: number
   type: string
 }[]
-
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -56,20 +54,6 @@ export const useSocket = ({
   setRankImageDetails,
   setWL,
   setRadiantWinChance,
-}: {
-  setPollData: (data: any) => void
-  setBetData: (data: any) => void
-  setBlock: (data: blockType) => void
-  setPaused: (paused: boolean) => void
-  setAegis: (data: any) => void
-  setNotablePlayers: (data: any) => void
-  setRoshan: (data: any) => void
-  setConnected: (connected: boolean) => void
-  setRankImageDetails: (details: any) => void
-  setWL: (records: wlType) => void
-  setRadiantWinChance: (
-    chance: WinChance | ((prev: WinChance) => WinChance)
-  ) => void
 }) => {
   const router = useRouter()
   const { userId } = router.query
@@ -78,9 +62,11 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
+
+  // Convert the external socket to component state
   const [socket, setSocketInstance] = useState<Socket | null>(null)
 
-  // Notify user about connection status changes with exact details
+  // Update the connection status effect
   useEffect(() => {
     if (!socket?.connected) {
       notification.open({
@@ -96,115 +82,134 @@ export const useSocket = ({
     }
   }, [socket?.connected, notification])
 
-  // Ping mechanism: emit 'ping' every 30,000 ms and listen for 'pong'
   useEffect(() => {
     if (!socket) return
+
     const pingInterval = setInterval(() => {
       if (socket.connected) {
         socket.emit('ping')
       }
-    }, PING_INTERVAL_MS)
+    }, PING_INTERVAL)
 
-    const handlePong = () => setConnected(true)
-    socket.on('pong', handlePong)
-    socket.on('disconnect', () => clearInterval(pingInterval))
+    socket.on('pong', () => {
+      setConnected(true)
+    })
+
+    socket.on('disconnect', () => {
+      // Clear interval on disconnect to prevent pings during reconnection attempts
+      clearInterval(pingInterval)
+    })
 
     return () => {
       clearInterval(pingInterval)
-      socket.off('pong', handlePong)
     }
-  }, [socket, setConnected])
+  }, [setConnected])
 
-  // Cleanup all event listeners on unmount or when socket changes
+  // on react unmount. mainly used for hot reloads so it doesnt register 900 .on()'s
   useEffect(() => {
     return () => {
-      if (socket) {
-        socket.off('block')
-        socket.off('paused')
-        socket.off('aegis-picked-up')
-        socket.off('roshan-killed')
-        socket.off('connect')
-        socket.off('disconnect')
-        socket.off('refresh-settings')
-        socket.off('notable-players')
-        socket.off('channelPollOrBet')
-        socket.off('update-medal')
-        socket.off('update-wl')
-        socket.off('update-radiant-win-chance')
-        socket.off('refresh')
-        socket.off('connect_error')
-        socket.disconnect()
-      }
+      socket?.off('block')
+      socket?.off('paused')
+      socket?.off('aegis-picked-up')
+      socket?.off('roshan-killed')
+      socket?.off('connect')
+      socket?.off('disconnect')
+      socket?.off('refresh-settings')
+      socket?.off('notable-players')
+      socket?.off('channelPollOrBet')
+      socket?.off('update-medal')
+      socket?.off('update-wl')
+      socket?.off('update-radiant-win-chance')
+      socket?.off('refresh')
+      socket?.off('connect_error')
+      socket?.disconnect()
     }
-  }, [socket])
+  }, [])
 
-  // Initialize socket and register events; all timeouts and reconnects are quantified
+  // Update socket initialization
   useEffect(() => {
     if (!userId) return
 
-    const socketInstance: Socket = io(
-      process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL,
-      {
-        auth: { token: userId },
-      }
-    )
-    setSocketInstance(socketInstance)
+    console.log('Connecting to socket init...')
 
-    // Minimap data event handlers
-    const handleDataBuildings = (data: any) =>
+    const socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
+      auth: { token: userId },
+    })
+
+    setSocketInstance(socket)
+
+    socket.on('DATA_buildings', (data: any) => {
       dispatch(setMinimapDataBuildings(data))
-    const handleDataHeroes = (data: any) => dispatch(setMinimapDataHeroes(data))
-    const handleDataCouriers = (data: any) =>
+    })
+
+    socket.on('DATA_heroes', (data: any) => {
+      dispatch(setMinimapDataHeroes(data))
+    })
+
+    socket.on('DATA_couriers', (data: any) => {
       dispatch(setMinimapDataCouriers(data))
-    const handleDataCreeps = (data: any) => dispatch(setMinimapDataCreeps(data))
-    const handleDataHeroUnits = (data: any) =>
+    })
+
+    socket.on('DATA_creeps', (data: any) => {
+      dispatch(setMinimapDataCreeps(data))
+    })
+    socket.on('DATA_hero_units', (data: any) => {
       dispatch(setMinimapDataHeroUnits(data))
-    const handleStatus = (data: any) => dispatch(setMinimapStatus(data))
+    })
+    socket.on('STATUS', (data: any) => {
+      dispatch(setMinimapStatus(data))
+    })
 
-    socketInstance.on('DATA_buildings', handleDataBuildings)
-    socketInstance.on('DATA_heroes', handleDataHeroes)
-    socketInstance.on('DATA_couriers', handleDataCouriers)
-    socketInstance.on('DATA_creeps', handleDataCreeps)
-    socketInstance.on('DATA_hero_units', handleDataHeroUnits)
-    socketInstance.on('STATUS', handleStatus)
+    socket.on('requestHeroData', async ({ allTime, heroId, steam32Id }, cb) => {
+      const wl = { win: 0, lose: 0 }
+      const response = await fetcher(
+        `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
+          allTime ? '' : '&date=30'
+        }`
+      )
 
-    // requestHeroData: fetch win/lose data with exact query parameters
-    socketInstance.on(
-      'requestHeroData',
-      async (
-        { allTime, heroId, steam32Id },
-        cb: (wl: { win: number; lose: number }) => void
-      ) => {
-        const wl = { win: 0, lose: 0 }
-        const dateParam = allTime ? '' : '&date=30'
-        const url = `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${dateParam}`
-        const response = await fetcher(url)
-        if (response) {
-          wl.win = response.win
-          wl.lose = response.lose
-        }
-        cb(wl)
+      if (response) {
+        wl.win = response.win
+        wl.lose = response.lose
       }
-    )
 
-    // requestMatchData: create and monitor job with explicit logging intervals
-    socketInstance.on(
-      'requestMatchData',
-      async ({ matchId, heroSlot }, cb: (data: any) => void) => {
-        try {
-          const jobId = await createJob(matchId)
-          await getJobStatus(jobId)
-          const data = await getMatchData(matchId, heroSlot)
-          cb(data)
-        } catch (error) {
-          captureException(error)
-          cb(null)
-        }
+      cb(wl)
+    })
+
+    socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
+      console.log('[MMR] requestMatchData event received', {
+        matchId,
+        heroSlot,
+      })
+      try {
+        // Create a job to parse the match
+        console.log('[MMR] Creating job for matchId:', matchId)
+        const jobId = await createJob(matchId)
+        console.log('[MMR] Job created with jobId:', jobId)
+
+        // Wait for the job to finish
+        console.log('[MMR] Waiting for job to finish for jobId:', jobId)
+        await getJobStatus(jobId)
+        console.log('[MMR] Job finished for jobId:', jobId)
+
+        // Get match data once parsing is complete
+        console.log(
+          '[MMR] Fetching match data for matchId:',
+          matchId,
+          'and heroSlot:',
+          heroSlot
+        )
+        const data = await getMatchData(matchId, heroSlot)
+        console.log('[MMR] Match data fetched:', data)
+        cb(data)
+      } catch (e) {
+        captureException(e)
+        console.log('[MMR] Error fetching match data', { e })
+        cb(null)
       }
-    )
+    })
 
-    // Block event: add a 5,000 ms delay if type is 'playing'
-    socketInstance.on('block', (data: blockType) => {
+    socket.on('block', (data: blockType) => {
       if (data?.type === 'playing') {
         setTimeout(() => {
           setBlock(data)
@@ -213,125 +218,96 @@ export const useSocket = ({
         setBlock(data)
       }
     })
-
-    socketInstance.on('paused', setPaused)
-    socketInstance.on('notable-players', setNotablePlayers)
-    socketInstance.on('aegis-picked-up', setAegis)
-    socketInstance.on('roshan-killed', setRoshan)
-
-    // Authentication error: log and close connection
-    socketInstance.on('auth_error', (message: string) => {
+    socket.on('paused', setPaused)
+    socket.on('notable-players', setNotablePlayers)
+    socket.on('aegis-picked-up', setAegis)
+    socket.on('roshan-killed', setRoshan)
+    socket.on('auth_error', (message) => {
       console.error('Authentication failed:', message)
-      socketInstance.close()
+      socket.close()
     })
-
-    socketInstance.on('connect', () => setConnected(true))
-    socketInstance.on('disconnect', (reason: string) => {
+    socket.on('connect', () => setConnected(true))
+    socket.on('disconnect', (reason) => {
       setConnected(false)
+      console.log('Disconnected from socket', { reason })
+
+      // Add more comprehensive reconnection logic
       if (
-        ['io server disconnect', 'transport close', 'ping timeout'].includes(
-          reason
-        )
+        reason === 'io server disconnect' ||
+        reason === 'transport close' ||
+        reason === 'ping timeout'
       ) {
-        setTimeout(() => socketInstance.connect(), RECONNECT_DELAY_MS)
+        console.log('Attempting to reconnect...')
+        setTimeout(() => socket.connect(), 1000)
       }
     })
 
-    socketInstance.on('refresh-settings', (key: typeof Settings) => {
+    socket.on('refresh-settings', (key: typeof Settings) => {
       mutate()
     })
 
-    // Handle channelPollOrBet events based on event name with precise logic
-    socketInstance.on('channelPollOrBet', (data: any, eventName: string) => {
-      const handler = eventName.includes('Poll') ? setPollData : setBetData
+    socket.on('channelPollOrBet', (data: any, eventName: string) => {
+      console.log('twitchEvent', { eventName, data })
+      const func = eventName.includes('Poll') ? setPollData : setBetData
       const newData =
         eventName.includes('End') || eventName.includes('Lock') ? null : data
-      handler(newData)
+      func(newData)
     })
 
-    // Update medal only in non-dev mode with explicit rank image mapping
-    socketInstance.on('update-medal', (deets: RankType) => {
-      if (!isDev) {
-        setRankImageDetails(getRankImage(deets))
-      }
+    socket.on('update-medal', (deets: RankType) => {
+      if (isDev) return
+      setRankImageDetails(getRankImage(deets))
     })
 
-    // Update win/loss records only in non-dev mode
-    socketInstance.on('update-wl', (records: wlType) => {
-      if (!isDev) {
-        setWL(records)
-      }
+    socket.on('update-wl', (records: wlType) => {
+      if (isDev) return
+      setWL(records)
     })
 
-    // Update Radiant win chance with quantified state visibility changes
-    socketInstance.on(
-      'update-radiant-win-chance',
-      (chanceDetails: WinChance) => {
-        if (!isDev) {
-          if (!chanceDetails) {
-            setRadiantWinChance((prev) => ({ ...prev, visible: false }))
-          } else {
-            setRadiantWinChance({ ...chanceDetails, visible: true })
-          }
-        }
+    socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
+      if (isDev) return
+      // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
+      if (!chanceDetails) {
+        return setRadiantWinChance((prev) => ({ ...prev, visible: false }))
       }
-    )
+      setRadiantWinChance({ ...chanceDetails, visible: true })
+    })
 
-    // Reload page on refresh event
-    socketInstance.on('refresh', () => {
+    socket.on('refresh', () => {
       router.reload()
     })
 
-    // On error: log exception and attempt reconnect after 2,000 ms if not connected
-    socketInstance.on('error', (error: any) => {
+    socket.on('error', (error) => {
+      console.error('Socket error:', error)
       captureException(error)
+
+      // Attempt to reconnect on error
       setTimeout(() => {
-        if (!socketInstance.connected) {
-          socketInstance.connect()
+        if (!socket.connected) {
+          console.log('Attempting to reconnect after error...')
+          socket.connect()
         }
-      }, ERROR_RECONNECT_DELAY_MS)
+      }, 2000)
     })
 
-    // On connect error: mark as disconnected and reconnect after 1,000 ms
-    socketInstance.on('connect_error', (error: any) => {
+    socket.on('connect_error', (error) => {
+      console.error('Connection error:', error)
       setConnected(false)
+
+      // More aggressive reconnection on connection errors
       setTimeout(() => {
-        socketInstance.connect()
-      }, RECONNECT_DELAY_MS)
+        console.log('Attempting to reconnect after connection error...')
+        socket.connect()
+      }, 1000)
     })
 
-    // Cleanup: Remove registered handlers and disconnect socket
     return () => {
-      socketInstance.off('DATA_buildings', handleDataBuildings)
-      socketInstance.off('DATA_heroes', handleDataHeroes)
-      socketInstance.off('DATA_couriers', handleDataCouriers)
-      socketInstance.off('DATA_creeps', handleDataCreeps)
-      socketInstance.off('DATA_hero_units', handleDataHeroUnits)
-      socketInstance.off('STATUS', handleStatus)
-      socketInstance.disconnect()
+      socket?.disconnect()
       setSocketInstance(null)
     }
-  }, [
-    userId,
-    dispatch,
-    mutate,
-    router,
-    setBlock,
-    setPaused,
-    setAegis,
-    setNotablePlayers,
-    setRoshan,
-    setConnected,
-    setRankImageDetails,
-    setWL,
-    setRadiantWinChance,
-    notification,
-  ])
-
-  return socket
+  }, [userId])
 }
 
-// Export events with explicit mappings for subscribing to prediction and poll events.
 const events = {
   subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
   subscribeToChannelPredictionProgressEvents:
