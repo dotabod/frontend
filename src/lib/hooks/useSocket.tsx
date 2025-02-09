@@ -14,9 +14,8 @@ import {
   EventSubChannelPredictionLockEvent,
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
-import { App } from 'antd'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
 import {
@@ -27,6 +26,8 @@ import {
   setMinimapDataHeroes,
   setMinimapStatus,
 } from '../redux/store'
+
+export let socket: Socket | null = null
 
 export type WinChance = {
   value: number
@@ -58,46 +59,20 @@ export const useSocket = ({
   const router = useRouter()
   const { userId } = router.query
   const dispatch = useDispatch()
-  const { notification } = App.useApp()
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
-
-  // Convert the external socket to component state
-  const [socket, setSocketInstance] = useState<Socket | null>(null)
-
-  // Update the connection status effect
-  useEffect(() => {
-    if (!socket?.connected) {
-      notification.open({
-        placement: 'bottomLeft',
-        key: 'connection-status',
-        type: 'warning',
-        message: 'Reconnecting...',
-        description: 'Lost connection to server. Attempting to reconnect...',
-        duration: 0,
-      })
-    } else {
-      notification.destroy('connection-status')
-    }
-  }, [socket?.connected, notification])
 
   useEffect(() => {
     if (!socket) return
 
     const pingInterval = setInterval(() => {
-      if (socket.connected) {
-        socket.emit('ping')
-      }
+      socket.emit('ping')
     }, PING_INTERVAL)
 
     socket.on('pong', () => {
+      // Connection is still alive
       setConnected(true)
-    })
-
-    socket.on('disconnect', () => {
-      // Clear interval on disconnect to prevent pings during reconnection attempts
-      clearInterval(pingInterval)
     })
 
     return () => {
@@ -126,17 +101,14 @@ export const useSocket = ({
     }
   }, [])
 
-  // Update socket initialization
   useEffect(() => {
     if (!userId) return
 
     console.log('Connecting to socket init...')
 
-    const socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
+    socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
     })
-
-    setSocketInstance(socket)
 
     socket.on('DATA_buildings', (data: any) => {
       dispatch(setMinimapDataBuildings(data))
@@ -300,11 +272,6 @@ export const useSocket = ({
         socket.connect()
       }, 1000)
     })
-
-    return () => {
-      socket?.disconnect()
-      setSocketInstance(null)
-    }
   }, [userId])
 }
 
