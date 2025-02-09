@@ -35,9 +35,6 @@ export type WinChance = {
   visible: boolean
 }
 
-// Add heartbeat/ping mechanism
-const PING_INTERVAL = 30000 // 30 seconds
-
 type wlType = {
   win: number
   lose: number
@@ -62,24 +59,6 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
-
-  useEffect(() => {
-    if (!socket) return
-
-    const pingInterval = setInterval(() => {
-      socket.emit('ping')
-    }, PING_INTERVAL)
-
-    socket.on('pong', () => {
-      // Connection is still alive
-      setConnected(true)
-    })
-
-    return () => {
-      clearInterval(pingInterval)
-    }
-  }, [setConnected])
-
   // on react unmount. mainly used for hot reloads so it doesnt register 900 .on()'s
   useEffect(() => {
     return () => {
@@ -199,18 +178,20 @@ export const useSocket = ({
       socket.close()
     })
     socket.on('connect', () => setConnected(true))
+    socket.on('connect_error', (err) => {
+      setTimeout(() => {
+        console.log('Reconnecting due to connect error...', { err })
+        socket.connect()
+      }, 4000)
+    })
     socket.on('disconnect', (reason) => {
       setConnected(false)
       console.log('Disconnected from socket', { reason })
 
-      // Add more comprehensive reconnection logic
-      if (
-        reason === 'io server disconnect' ||
-        reason === 'transport close' ||
-        reason === 'ping timeout'
-      ) {
-        console.log('Attempting to reconnect...')
-        setTimeout(() => socket.connect(), 1000)
+      if (reason === 'io server disconnect') {
+        console.log('Reconnecting...')
+        // the disconnection was initiated by the server, need to reconnect manually
+        socket.connect()
       }
     })
 
@@ -247,30 +228,6 @@ export const useSocket = ({
 
     socket.on('refresh', () => {
       router.reload()
-    })
-
-    socket.on('error', (error) => {
-      console.error('Socket error:', error)
-      captureException(error)
-
-      // Attempt to reconnect on error
-      setTimeout(() => {
-        if (!socket.connected) {
-          console.log('Attempting to reconnect after error...')
-          socket.connect()
-        }
-      }, 2000)
-    })
-
-    socket.on('connect_error', (error) => {
-      console.error('Connection error:', error)
-      setConnected(false)
-
-      // More aggressive reconnection on connection errors
-      setTimeout(() => {
-        console.log('Attempting to reconnect after connection error...')
-        socket.connect()
-      }, 1000)
     })
   }, [userId])
 }

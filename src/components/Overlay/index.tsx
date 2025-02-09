@@ -71,6 +71,25 @@ const OverlayPage = () => {
 
   const [isInIframe, setIsInIframe] = useState(false)
 
+  // Refresh the page every 5 minutes if the socket is disconnected
+  useEffect(() => {
+    let reloadTimeout: NodeJS.Timeout | null = null
+
+    if (!connected) {
+      reloadTimeout = setTimeout(() => {
+        window.location.reload()
+      }, 300000)
+    } else if (reloadTimeout) {
+      clearTimeout(reloadTimeout)
+    }
+
+    return () => {
+      if (reloadTimeout) {
+        clearTimeout(reloadTimeout)
+      }
+    }
+  }, [connected])
+
   useEffect(() => {
     if (!original) return
 
@@ -96,6 +115,8 @@ const OverlayPage = () => {
   }, [original])
 
   useEffect(() => {
+    let reloadTimeout: NodeJS.Timeout | null = null
+
     if (!original?.stream_online) {
       notification.open({
         key: 'stream-offline',
@@ -106,8 +127,22 @@ const OverlayPage = () => {
         description:
           'Dotabod is disabled until you go live on Twitch. Not streaming on Twitch? Type !online in your Twitch chat to enable Dotabod.',
       })
+
+      // Refresh page every 5 minutes to check if stream is online
+      reloadTimeout = setTimeout(() => {
+        window.location.reload()
+      }, 300000)
     } else {
       notification.destroy('stream-offline')
+      if (reloadTimeout) {
+        clearTimeout(reloadTimeout)
+      }
+    }
+
+    return () => {
+      if (reloadTimeout) {
+        clearTimeout(reloadTimeout)
+      }
     }
   }, [notification, original?.stream_online])
 
