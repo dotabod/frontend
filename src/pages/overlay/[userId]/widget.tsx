@@ -6,7 +6,7 @@ import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions';
 import { useTransformRes } from '@/lib/hooks/useTransformRes';
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting';
 import { useState, useEffect } from 'react';
-import { getRankDetail } from '@/lib/ranks';
+import { getRankDetail, RankType, getRankImage } from '@/lib/ranks';
 import { isDev } from '@/lib/devConsts';
 import { wlType } from '@/lib/hooks/useSocket';
 import io from 'socket.io-client';
@@ -15,6 +15,7 @@ import { Socket } from 'socket.io-client';
 
 let socket: Socket | null = null
 function WidgetPage() {
+  const { mutate } = useUpdateSetting(Settings.commandWL)
   const router = useRouter()
   const { userId } = router.query
   const { original } = useUpdateSetting()
@@ -45,16 +46,33 @@ function WidgetPage() {
       auth: { token: userId },
     })
 
-
     socket.on('update-wl', (records: wlType) => {
       if (isDev) return
       setWL(records)
     })
+
+    socket.on('refresh-settings', (key: typeof Settings) => {
+      mutate()
+    })
+
+    socket.on('update-medal', (deets: RankType) => {
+      if (isDev) return
+      const rankDetails = getRankImage(deets)
+      setRankImageDetails({
+        image: rankDetails.image,
+        rank: rankDetails.rank,
+        leaderboard: Boolean(rankDetails.leaderboard),
+        notLoaded: false
+      })
+    })
+
   }, [userId])
 
   useEffect(() => {
     return () => {
       socket?.off('update-wl')
+      socket?.off('refresh-settings')
+      socket?.off('update-medal')
     }
   }, [])
 
