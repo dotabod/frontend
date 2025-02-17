@@ -35,7 +35,7 @@ export type WinChance = {
   visible: boolean
 }
 
-type wlType = {
+export type wlType = {
   win: number
   lose: number
   type: string
