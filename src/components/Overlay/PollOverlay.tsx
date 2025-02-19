@@ -2,9 +2,8 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
-import { captureException } from '@sentry/nextjs'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
 import TwitchFetcher from 'twitch-fetcher'
 import { TextWithEmotes } from './TextWithEmotes'
@@ -27,6 +26,7 @@ const PollColors = [
   '#c46300',
   '#c60000',
 ]
+
 const PollTimer = ({ minutes, seconds, completed }) =>
   completed ? (
     <></>
@@ -46,12 +46,17 @@ export const PollOverlay = ({
   const { data } = useGetSettings()
   const res = useTransformRes()
 
+  const providerAccountId = useMemo(
+    () => data?.Account?.providerAccountId,
+    [data?.Account?.providerAccountId]
+  )
+
   useEffect(() => {
-    if (!data?.Account?.providerAccountId) return
+    if (!providerAccountId) return
 
     const emoteFetcher = new TwitchFetcher()
     emoteFetcher
-      .getEmotesByID(data?.Account?.providerAccountId, {
+      .getEmotesByID(providerAccountId, {
         '7tv': true,
         bttv: true,
       })
@@ -59,9 +64,12 @@ export const PollOverlay = ({
       .catch((e) => {
         // Don't need to report on users that don't have a 7tv or bttv account
       })
-  }, [data?.Account?.providerAccountId])
+  }, [providerAccountId])
 
-  const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
+  const totalVotes = choices.reduce(
+    (acc, choice) => acc + (choice.totalVotes || 0),
+    0
+  )
   const choicesWithPercent = choices.map((choice) => {
     const percent = !totalVotes
       ? Math.round(100 / choices.length)
