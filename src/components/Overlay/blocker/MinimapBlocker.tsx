@@ -39,7 +39,7 @@ export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
               h: 240,
             })
       }
-      src={`/images/overlay/minimap/731-${isSimple ? 'Simple' : 'Complex'}-${
+      src={`/images/overlay/minimap/738-${isSimple ? 'Simple' : 'Complex'}-${
         isXL ? 'X' : ''
       }Large-AntiStreamSnipeMap.png`}
     />
