@@ -101,7 +101,7 @@ export default function MinimapCard(): JSX.Element {
             alt="minimap blocker"
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
-            src={`/images/overlay/minimap/731-${'Complex'}-${
+            src={`/images/overlay/minimap/738-${'Complex'}-${
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
@@ -117,7 +117,7 @@ export default function MinimapCard(): JSX.Element {
             alt="minimap blocker"
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
-            src={`/images/overlay/minimap/731-${'Simple'}-${
+            src={`/images/overlay/minimap/738-${'Simple'}-${
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
