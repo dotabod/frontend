@@ -65,7 +65,6 @@ export const useSocket = ({
 
     // Add ping interval and last received time tracking
     let lastReceivedTime = Date.now()
-    let pingInterval: NodeJS.Timeout
     let reconnectTimeout: NodeJS.Timeout
 
     console.log('Connecting to socket init...')
@@ -79,29 +78,25 @@ export const useSocket = ({
       timeout: 20000,
     })
 
-    // Setup ping/pong to detect stale connections
-    const setupHeartbeat = () => {
-      pingInterval = setInterval(() => {
-        // If we haven't received any data for 30 seconds, reconnect
-        if (Date.now() - lastReceivedTime > 30000) {
-          console.log('No data received for 30s, reconnecting...')
-          socket?.disconnect()
-          socket?.connect()
-        }
+    // Use socket.io's built-in ping event to track connection health
+    socket.io.on('ping', () => {
+      lastReceivedTime = Date.now()
+    })
 
-        // Send ping
-        socket?.emit('ping')
-      }, 15000)
-    }
+    // Monitor for stale connections
+    const connectionMonitor = setInterval(() => {
+      if (Date.now() - lastReceivedTime > 45000) {
+        // 45s = 3 missed pings
+        console.log('Connection appears stale, reconnecting...')
+        socket?.disconnect()
+        socket?.connect()
+      }
+    }, 15000)
 
     // Update lastReceivedTime whenever we get any data
     const updateLastReceived = () => {
       lastReceivedTime = Date.now()
     }
-
-    socket.on('pong', () => {
-      updateLastReceived()
-    })
 
     // Add handlers for all existing events
     socket.on('DATA_buildings', (data) => {
@@ -138,7 +133,7 @@ export const useSocket = ({
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
           allTime ? '' : '&date=30'
-        }`
+        }`,
       )
 
       if (response) {
@@ -167,12 +162,7 @@ export const useSocket = ({
         console.log('[MMR] Job finished for jobId:', jobId)
 
         // Get match data once parsing is complete
-        console.log(
-          '[MMR] Fetching match data for matchId:',
-          matchId,
-          'and heroSlot:',
-          heroSlot
-        )
+        console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
         cb(data)
@@ -216,7 +206,6 @@ export const useSocket = ({
     socket.on('connect', () => {
       console.log('Socket connected')
       setConnected(true)
-      setupHeartbeat()
     })
     socket.on('connect_error', (error) => {
       console.error('Connection error:', error)
@@ -225,15 +214,6 @@ export const useSocket = ({
     socket.on('disconnect', (reason) => {
       console.log('Socket disconnected:', reason)
       setConnected(false)
-      clearInterval(pingInterval)
-
-      // If server initiated disconnect, try to reconnect
-      if (reason === 'io server disconnect' || reason === 'transport close') {
-        reconnectTimeout = setTimeout(() => {
-          console.log('Attempting to reconnect...')
-          socket?.connect()
-        }, 1000)
-      }
     })
 
     socket.on('refresh-settings', (key: typeof Settings) => {
@@ -245,8 +225,7 @@ export const useSocket = ({
       updateLastReceived()
       console.log('twitchEvent', { eventName, data })
       const func = eventName.includes('Poll') ? setPollData : setBetData
-      const newData =
-        eventName.includes('End') || eventName.includes('Lock') ? null : data
+      const newData = eventName.includes('End') || eventName.includes('Lock') ? null : data
       func(newData)
     })
 
@@ -279,7 +258,7 @@ export const useSocket = ({
 
     // Clean up
     return () => {
-      clearInterval(pingInterval)
+      clearInterval(connectionMonitor)
       clearTimeout(reconnectTimeout)
       socket?.disconnect()
       socket = null
@@ -289,8 +268,7 @@ export const useSocket = ({
 
 const events = {
   subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
-  subscribeToChannelPredictionProgressEvents:
-    EventSubChannelPredictionProgressEvent,
+  subscribeToChannelPredictionProgressEvents: EventSubChannelPredictionProgressEvent,
   subscribeToChannelPredictionLockEvents: EventSubChannelPredictionLockEvent,
   subscribeToChannelPredictionEndEvents: EventSubChannelPredictionEndEvent,
   subscribeToChannelPollBeginEvents: EventSubChannelPollBeginEvent,
