@@ -13,6 +13,9 @@ All exist as manual steps too
 - Stream delay (in seconds) Increase the delay that Dotabod responds to game events.
 - MMR tracker. Give or take 25 MMR after every ranked match.
 - Twitch predictions. Let your chatters bet on your matches. Chatters can use their native Twitch channel points to bet on whether you win or lose a match.
+- Party queue only option for MMR tracking
+- Enable auto gamba for predictions
+- Customizable prediction titles and durations
 
 # Overlay features
 
@@ -25,6 +28,7 @@ Semi-transparent blocker that auto places itself over your minimap to deter peop
 - Extra large minimap
 - Right side minimap
 - Battlepass hud
+- Complex minimap option
 
 ## Picks
 
@@ -37,6 +41,7 @@ Prevent stream snipers from seeing your picks.
 - When you pick early, and it isn't locked in yet. While the enemy can still pick ban your pick. Heroes are fully covered
 - When your hero is locked in and can no longer be banned. Your hero will be shown, but your teammate's heroes are still fully covered.
 - When you enter strategy phase, the overlay is removed.
+- When all heroes are locked and can no longer be banned, all heroes will be shown
 
 ## Rank and mmr
 
@@ -129,7 +134,7 @@ Looking for even more? They'll be here.
 
 Auto switch scenes in OBS depending on game state. Your blockers will still work without this.
 
-> Note: Does not work with Streamlabs
+> Note: OBS and Streamlabs have the same instructions (clarification from screenshots)
 
 This is optional but useful if you want to make your stream look unique for different game states!
 
@@ -167,6 +172,15 @@ By approving a user, you're allowing them to access and modify your Dotabod dash
 ### How it works
 
 Once you approve a user, they will login to dotabod.com and be able to access your dashboard by using the channel selector.
+
+## Troubleshooting Tools (New Section)
+
+- Built-in connection testing with !ping command
+- Steam account verification steps
+- OBS setup assistance with visual guides
+- Comprehensive help documentation
+- Automatic error detection and suggestions
+- Step-by-step setup verification
 
 # Commands
 
