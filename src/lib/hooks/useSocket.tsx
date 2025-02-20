@@ -59,41 +59,54 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
-  // on react unmount. mainly used for hot reloads so it doesnt register 900 .on()'s
-  useEffect(() => {
-    return () => {
-      socket?.off('block')
-      socket?.off('paused')
-      socket?.off('aegis-picked-up')
-      socket?.off('roshan-killed')
-      socket?.off('connect')
-      socket?.off('disconnect')
-      socket?.off('refresh-settings')
-      socket?.off('notable-players')
-      socket?.off('channelPollOrBet')
-      socket?.off('update-medal')
-      socket?.off('update-wl')
-      socket?.off('update-radiant-win-chance')
-      socket?.off('refresh')
-      socket?.off('connect_error')
-      socket?.disconnect()
-    }
-  }, [])
 
   useEffect(() => {
     if (!userId) return
+
+    // Add ping interval and last received time tracking
+    let lastReceivedTime = Date.now()
+    let pingInterval: NodeJS.Timeout
+    let reconnectTimeout: NodeJS.Timeout
 
     console.log('Connecting to socket init...')
 
     socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
     })
 
-    socket.on('DATA_buildings', (data: any) => {
+    // Setup ping/pong to detect stale connections
+    const setupHeartbeat = () => {
+      pingInterval = setInterval(() => {
+        // If we haven't received any data for 30 seconds, reconnect
+        if (Date.now() - lastReceivedTime > 30000) {
+          console.log('No data received for 30s, reconnecting...')
+          socket?.disconnect()
+          socket?.connect()
+        }
+
+        // Send ping
+        socket?.emit('ping')
+      }, 15000)
+    }
+
+    // Update lastReceivedTime whenever we get any data
+    const updateLastReceived = () => {
+      lastReceivedTime = Date.now()
+    }
+
+    // Add handlers for all existing events
+    socket.on('DATA_buildings', (data) => {
+      updateLastReceived()
       dispatch(setMinimapDataBuildings(data))
     })
 
-    socket.on('DATA_heroes', (data: any) => {
+    socket.on('DATA_heroes', (data) => {
+      updateLastReceived()
       dispatch(setMinimapDataHeroes(data))
     })
 
@@ -177,21 +190,26 @@ export const useSocket = ({
       console.error('Authentication failed:', message)
       socket.close()
     })
-    socket.on('connect', () => setConnected(true))
-    socket.on('connect_error', (err) => {
-      setTimeout(() => {
-        console.log('Reconnecting due to connect error...', { err })
-        socket.connect()
-      }, 4000)
+    socket.on('connect', () => {
+      console.log('Socket connected')
+      setConnected(true)
+      setupHeartbeat()
+    })
+    socket.on('connect_error', (error) => {
+      console.error('Connection error:', error)
+      setConnected(false)
     })
     socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason)
       setConnected(false)
-      console.log('Disconnected from socket', { reason })
+      clearInterval(pingInterval)
 
-      if (reason === 'io server disconnect') {
-        console.log('Reconnecting...')
-        // the disconnection was initiated by the server, need to reconnect manually
-        socket.connect()
+      // If server initiated disconnect, try to reconnect
+      if (reason === 'io server disconnect' || reason === 'transport close') {
+        reconnectTimeout = setTimeout(() => {
+          console.log('Attempting to reconnect...')
+          socket?.connect()
+        }, 1000)
       }
     })
 
@@ -229,6 +247,14 @@ export const useSocket = ({
     socket.on('refresh', () => {
       router.reload()
     })
+
+    // Clean up
+    return () => {
+      clearInterval(pingInterval)
+      clearTimeout(reconnectTimeout)
+      socket?.disconnect()
+      socket = null
+    }
   }, [userId])
 }
 

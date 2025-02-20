@@ -107,7 +107,7 @@ const OverlayPage = () => {
       leaderboard:
         'standing' in rank
           ? rank.standing
-          : steamAccount?.leaderboard_rank ?? false,
+          : (steamAccount?.leaderboard_rank ?? false),
       notLoaded: false,
     }
 
@@ -191,7 +191,7 @@ const OverlayPage = () => {
     setBlock(devBlockTypes)
     setRankImageDetails(devRank)
     setRadiantWinChance(devRadiantWinChance)
-  }, [isDev])
+  }, [])
 
   useSocket({
     setAegis,
