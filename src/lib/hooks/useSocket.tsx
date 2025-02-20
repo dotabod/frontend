@@ -99,6 +99,10 @@ export const useSocket = ({
       lastReceivedTime = Date.now()
     }
 
+    socket.on('pong', () => {
+      updateLastReceived()
+    })
+
     // Add handlers for all existing events
     socket.on('DATA_buildings', (data) => {
       updateLastReceived()
@@ -111,20 +115,25 @@ export const useSocket = ({
     })
 
     socket.on('DATA_couriers', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapDataCouriers(data))
     })
 
     socket.on('DATA_creeps', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapDataCreeps(data))
     })
     socket.on('DATA_hero_units', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapDataHeroUnits(data))
     })
     socket.on('STATUS', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapStatus(data))
     })
 
     socket.on('requestHeroData', async ({ allTime, heroId, steam32Id }, cb) => {
+      updateLastReceived()
       const wl = { win: 0, lose: 0 }
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
@@ -141,6 +150,7 @@ export const useSocket = ({
     })
 
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
+      updateLastReceived()
       console.log('[MMR] requestMatchData event received', {
         matchId,
         heroSlot,
@@ -174,6 +184,7 @@ export const useSocket = ({
     })
 
     socket.on('block', (data: blockType) => {
+      updateLastReceived()
       if (data?.type === 'playing') {
         setTimeout(() => {
           setBlock(data)
@@ -182,10 +193,22 @@ export const useSocket = ({
         setBlock(data)
       }
     })
-    socket.on('paused', setPaused)
-    socket.on('notable-players', setNotablePlayers)
-    socket.on('aegis-picked-up', setAegis)
-    socket.on('roshan-killed', setRoshan)
+    socket.on('paused', () => {
+      updateLastReceived()
+      setPaused()
+    })
+    socket.on('notable-players', () => {
+      updateLastReceived()
+      setNotablePlayers()
+    })
+    socket.on('aegis-picked-up', () => {
+      updateLastReceived()
+      setAegis()
+    })
+    socket.on('roshan-killed', () => {
+      updateLastReceived()
+      setRoshan()
+    })
     socket.on('auth_error', (message) => {
       console.error('Authentication failed:', message)
       socket.close()
@@ -214,10 +237,12 @@ export const useSocket = ({
     })
 
     socket.on('refresh-settings', (key: typeof Settings) => {
+      updateLastReceived()
       mutate()
     })
 
     socket.on('channelPollOrBet', (data: any, eventName: string) => {
+      updateLastReceived()
       console.log('twitchEvent', { eventName, data })
       const func = eventName.includes('Poll') ? setPollData : setBetData
       const newData =
@@ -226,16 +251,19 @@ export const useSocket = ({
     })
 
     socket.on('update-medal', (deets: RankType) => {
+      updateLastReceived()
       if (isDev) return
       setRankImageDetails(getRankImage(deets))
     })
 
     socket.on('update-wl', (records: wlType) => {
+      updateLastReceived()
       if (isDev) return
       setWL(records)
     })
 
     socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
+      updateLastReceived()
       if (isDev) return
       // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
       if (!chanceDetails) {
@@ -245,6 +273,7 @@ export const useSocket = ({
     })
 
     socket.on('refresh', () => {
+      updateLastReceived()
       router.reload()
     })
 
