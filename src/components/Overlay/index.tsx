@@ -30,7 +30,6 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 const OverlayPage = () => {
-  const [delayPassed, setDelayPassed] = useState(true)
   const { notification } = App.useApp()
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
@@ -147,24 +146,6 @@ const OverlayPage = () => {
   }, [notification, original?.stream_online])
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-    if (!connected) {
-      // Start the delay when connected becomes false
-      setDelayPassed(false)
-      timeoutId = setTimeout(() => {
-        // After 5 seconds, set delayPassed to true
-        setDelayPassed(true)
-      }, 5000)
-    } else {
-      // If connected becomes true again before the delay is over, cancel the delay
-      clearTimeout(timeoutId)
-      setDelayPassed(true)
-    }
-    // Clean up the timeout when the component unmounts or when connected changes
-    return () => clearTimeout(timeoutId)
-  }, [connected])
-
-  useEffect(() => {
     setIsInIframe(window.self !== window.top)
   }, [])
 
@@ -208,10 +189,6 @@ const OverlayPage = () => {
   })
 
   useOBS({ block, connected })
-
-  if (!delayPassed) {
-    return null
-  }
 
   if (isDotabodDisabled) {
     return isDev ? (
