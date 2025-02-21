@@ -1,9 +1,8 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import type { SubscriptionTier } from '@/types/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
-
+import type { SubscriptionTier } from '@/utils/subscription'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse

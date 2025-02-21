@@ -1,8 +1,7 @@
-import type { SubscriptionInfo } from '@/types/subscription'
 import { useQuery } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
-
-async function fetchSubscription(userId: string): Promise<SubscriptionInfo> {
+import type { SubscriptionStatus } from '@/utils/subscription'
+async function fetchSubscription(userId: string): Promise<SubscriptionStatus> {
   const response = await fetch(`/api/subscriptions/${userId}`)
   if (!response.ok) {
     throw new Error('Failed to fetch subscription status')

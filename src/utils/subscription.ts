@@ -1,8 +1,28 @@
-import type { SubscriptionInfo, SubscriptionTier } from '@/types/subscription'
+export function calculateSavings(
+  monthlyPrice: string,
+  annualPrice: string
+): number {
+  const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
+  const annual = Number.parseFloat(annualPrice.replace('$', ''))
+  return Math.round(((monthly - annual) / monthly) * 100)
+}
+
+export type SubscriptionTier = 'free' | 'starter' | 'pro'
+export type SubscriptionTierStatus =
+  | 'active'
+  | 'inactive'
+  | 'past_due'
+  | 'canceled'
+
+export interface SubscriptionPriceId {
+  tier: SubscriptionTier
+  monthly: string
+  annual: string
+}
 
 export type SubscriptionStatus = {
   tier: SubscriptionTier
-  status: string
+  status: SubscriptionTierStatus
   currentPeriodEnd?: Date
   cancelAtPeriodEnd?: boolean
   stripePriceId: string
@@ -26,12 +46,6 @@ export const PRICE_PERIODS = {
 } as const
 
 export type PricePeriod = (typeof PRICE_PERIODS)[keyof typeof PRICE_PERIODS]
-export type SubscriptionPriceId = {
-  tier: Exclude<SubscriptionTier, 'free'>
-  monthly: string
-  annual: string
-}
-
 export const PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: 'starter',
@@ -58,7 +72,7 @@ const FEATURE_TIERS: Record<string, SubscriptionTier> = {
 // Utility functions
 export function canAccessFeature(
   feature: string,
-  subscription: SubscriptionInfo | null
+  subscription: SubscriptionStatus | null
 ): boolean {
   if (!subscription || subscription.status !== 'active') {
     return FEATURE_TIERS[feature] === 'free'

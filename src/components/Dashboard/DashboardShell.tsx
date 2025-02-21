@@ -144,7 +144,7 @@ export default function DashboardShell({
                 items={navigation.map((item, i) => {
                   if (
                     data?.user?.isImpersonating &&
-                    ['Setup', 'Managers'].includes(item.name)
+                    ['Setup', 'Managers', 'Billing'].includes(item.name)
                   ) {
                     return null
                   }
