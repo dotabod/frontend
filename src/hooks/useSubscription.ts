@@ -32,8 +32,15 @@ export function useSubscription() {
   }
 }
 
-export function useFeatureAccess(feature: FeatureTier) {
+export function useFeatureAccess(feature?: FeatureTier) {
   const { subscription, isLoading } = useSubscription()
+
+  if (!feature) {
+    return {
+      hasAccess: true,
+      requiredTier: null,
+    }
+  }
 
   return {
     ...canAccessFeature(feature, subscription),

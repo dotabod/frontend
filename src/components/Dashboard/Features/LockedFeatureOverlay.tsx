@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { SubscriptionTier } from '@/utils/subscription'
 
 interface LockedFeatureOverlayProps {
-  requiredTier: SubscriptionTier
+  requiredTier?: SubscriptionTier | null
   message?: string
 }
 
@@ -12,6 +12,10 @@ export function LockedFeatureOverlay({
   requiredTier,
   message = `This feature is available on the ${requiredTier} plan`,
 }: LockedFeatureOverlayProps) {
+  if (!requiredTier) {
+    return null
+  }
+
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/1 rounded-lg backdrop-blur-sm z-10">
       <LockOutlined className="text-4xl text-white mb-4" />
