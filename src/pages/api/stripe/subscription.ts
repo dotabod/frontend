@@ -5,8 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
-  { params }: { params: { userId: string } }
+  res: NextApiResponse
 ) {
   try {
     const session = await getServerSession(req, res, authOptions)
@@ -15,7 +14,7 @@ export default async function handler(
     }
 
     const subscription = await prisma.subscription.findUnique({
-      where: { userId: params.userId },
+      where: { userId: session.user.id },
       select: {
         tier: true,
         status: true,

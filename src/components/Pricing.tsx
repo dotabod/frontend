@@ -13,7 +13,7 @@ import { Button, Table, Tooltip, notification } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import clsx from 'clsx'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { signIn } from 'next-auth/react'
 import { getPriceId } from '@/lib/stripe'
@@ -645,10 +645,34 @@ function FeatureComparison() {
   )
 }
 
+type SubscriptionStatus = {
+  tier: 'free' | 'starter' | 'pro'
+  status: string
+  currentPeriodEnd?: Date
+  cancelAtPeriodEnd?: boolean
+}
+
 export function Pricing() {
   const [activePeriod, setActivePeriod] = useState<'Monthly' | 'Annually'>(
     'Monthly'
   )
+  const { data: session } = useSession()
+  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
+    null
+  )
+  useEffect(() => {
+    async function getSubscription() {
+      if (session?.user?.id) {
+        const response = await fetch('/api/stripe/subscription')
+        if (response.ok) {
+          const data = await response.json()
+          setSubscription(data)
+        }
+      }
+    }
+
+    getSubscription()
+  }, [session])
 
   return (
     <section
@@ -664,6 +688,16 @@ export function Pricing() {
           >
             Simple pricing for every Dota 2 streamer
           </h2>
+          {subscription && subscription.status === 'active' && (
+            <p className="mt-2 text-lg text-purple-400">
+              You are currently on the{' '}
+              {subscription.tier.charAt(0).toUpperCase() +
+                subscription.tier.slice(1)}{' '}
+              plan
+              {subscription.cancelAtPeriodEnd &&
+                ` (cancels ${new Date(subscription.currentPeriodEnd!).toLocaleDateString()})`}
+            </p>
+          )}
           <p className="mt-2 text-lg text-gray-400">
             Whether you're just starting out or running a major channel, we have
             the tools to enhance your stream.
