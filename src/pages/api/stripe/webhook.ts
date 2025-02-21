@@ -15,9 +15,14 @@ const relevantEvents = new Set([
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
+  'invoice.payment_succeeded',
+  'invoice.payment_failed',
 ])
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -54,6 +59,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case 'customer.subscription.deleted': {
           const subscription = event.data.object as Stripe.Subscription
           await updateSubscriptionInDatabase(subscription)
+          break
+        }
+        case 'invoice.payment_succeeded': {
+          const invoice = event.data.object as Stripe.Invoice
+          if (invoice.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(
+              invoice.subscription as string
+            )
+            await updateSubscriptionInDatabase(subscription)
+          }
+          break
+        }
+        case 'invoice.payment_failed': {
+          const invoice = event.data.object as Stripe.Invoice
+          if (invoice.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(
+              invoice.subscription as string
+            )
+            await updateSubscriptionInDatabase(subscription)
+          }
           break
         }
         default:

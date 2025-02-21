@@ -305,6 +305,13 @@ function CheckIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
+type SubscriptionStatus = {
+  tier: 'free' | 'starter' | 'pro'
+  status: string
+  currentPeriodEnd?: Date
+  cancelAtPeriodEnd?: boolean
+}
+
 function Plan({
   name,
   price,
@@ -315,6 +322,7 @@ function Plan({
   logo,
   logomarkClassName,
   featured = false,
+  subscription,
 }: {
   name: string
   price: {
@@ -331,10 +339,36 @@ function Plan({
   activePeriod: 'Monthly' | 'Annually'
   logomarkClassName?: string
   featured?: boolean
+  subscription: SubscriptionStatus | null
 }) {
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.Monthly, price.Annually)
+
+  // Get button text based on subscription status
+  const getButtonText = () => {
+    if (!subscription || subscription.status !== 'active') {
+      return button.label
+    }
+
+    const currentTier = subscription.tier
+    const targetTier = name.toLowerCase() as 'free' | 'starter' | 'pro'
+
+    if (currentTier === targetTier) {
+      return subscription.cancelAtPeriodEnd ? 'Reactivate' : 'Current plan'
+    }
+
+    const tierLevels = { free: 0, starter: 1, pro: 2 }
+    return tierLevels[targetTier] > tierLevels[currentTier]
+      ? 'Upgrade'
+      : 'Downgrade'
+  }
+
+  // Disable button if it's current non-cancelled plan
+  const isButtonDisabled =
+    subscription?.status === 'active' &&
+    subscription.tier === name.toLowerCase() &&
+    !subscription.cancelAtPeriodEnd
 
   const handleSubscribe = async () => {
     setRedirectingToCheckout(true)
@@ -346,7 +380,29 @@ function Plan({
         return
       }
 
-      // Already logged in - go straight to checkout
+      // If user has an active subscription, update it instead of creating new checkout
+      if (subscription?.status === 'active') {
+        const priceId = getPriceId(
+          name.toLowerCase() as 'starter' | 'pro',
+          activePeriod.toLowerCase() as 'monthly' | 'annual'
+        )
+
+        const response = await fetch('/api/stripe/update-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priceId }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to update subscription')
+        }
+
+        // Refresh the page to show updated subscription
+        window.location.reload()
+        return
+      }
+
+      // Otherwise, create new checkout session for new subscribers
       const priceId = getPriceId(
         name.toLowerCase() as 'starter' | 'pro',
         activePeriod.toLowerCase() as 'monthly' | 'annual'
@@ -363,7 +419,7 @@ function Plan({
       notification.error({
         message: 'Subscription Error',
         description:
-          'Failed to start subscription process. Please try again later.',
+          'Failed to process subscription change. Please try again later.',
         placement: 'bottomRight',
       })
     } finally {
@@ -374,7 +430,7 @@ function Plan({
   return (
     <section
       className={clsx(
-        'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5 transition-all duration-300 hover:scale-105',
+        'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5',
         featured
           ? 'order-first bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
           : 'bg-gray-800/50 backdrop-blur-xl'
@@ -473,15 +529,17 @@ function Plan({
         onClick={handleSubscribe}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
+        disabled={isButtonDisabled}
         className={clsx(
           'mt-6',
           featured
             ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-            : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+            : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+          isButtonDisabled && 'opacity-50 cursor-not-allowed'
         )}
         aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
       >
-        {button.label}
+        {getButtonText()}
       </Button>
     </section>
   )
@@ -645,13 +703,6 @@ function FeatureComparison() {
   )
 }
 
-type SubscriptionStatus = {
-  tier: 'free' | 'starter' | 'pro'
-  status: string
-  currentPeriodEnd?: Date
-  cancelAtPeriodEnd?: boolean
-}
-
 export function Pricing() {
   const [activePeriod, setActivePeriod] = useState<'Monthly' | 'Annually'>(
     'Monthly'
@@ -756,7 +807,12 @@ export function Pricing() {
 
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-3">
           {plans.map((plan) => (
-            <Plan key={plan.name} {...plan} activePeriod={activePeriod} />
+            <Plan
+              key={plan.name}
+              {...plan}
+              activePeriod={activePeriod}
+              subscription={subscription}
+            />
           ))}
         </div>
       </Container>
