@@ -1,9 +1,10 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Form, Input, InputNumber } from 'antd'
+import { Form, Input, InputNumber, Tag } from 'antd'
 import { useDebouncedCallback } from 'use-debounce'
 import { useFeatureAccess } from '@/hooks/useSubscription'
+import { CrownIcon } from 'lucide-react'
 
 export default function StreamDelayCard() {
   const {
@@ -18,9 +19,18 @@ export default function StreamDelayCard() {
   }, 500)
 
   return (
-    <Card>
+    <Card
+      className="relative transition-all duration-200"
+      requiredTier={hasAccess ? undefined : requiredTier}
+    >
       <div className="title">
         <h3>Stream delay</h3>
+        <Tag color="gold">
+          <div className="flex items-center gap-2">
+            <CrownIcon className="w-4 h-4" />
+            <span className="first-letter:uppercase">{requiredTier}</span>
+          </div>
+        </Tag>
       </div>
       <div className="subtitle mb-2">
         Increase the delay that Dotabod responds to game events.
