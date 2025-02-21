@@ -1,6 +1,6 @@
 import type { SubscriptionPriceId } from '@/types/subscription'
 
-const PRICE_IDS: SubscriptionPriceId[] = [
+export const PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: 'starter',
     monthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_MONTHLY_PRICE_ID || '',
@@ -14,7 +14,7 @@ const PRICE_IDS: SubscriptionPriceId[] = [
 ]
 
 // Add validation
-if (PRICE_IDS.some(price => !price.monthly || !price.annual)) {
+if (PRICE_IDS.some((price) => !price.monthly || !price.annual)) {
   throw new Error('Missing required Stripe price IDs in environment variables')
 }
 

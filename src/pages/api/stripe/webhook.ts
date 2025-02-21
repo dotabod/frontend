@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe-server'
 import type { NextApiResponse } from 'next'
 import type { NextApiRequest } from 'next'
 import type Stripe from 'stripe'
+import { PRICE_IDS } from '@/lib/stripe'
 
 // Disable the default body parser
 export const config = {
@@ -97,8 +98,18 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
   const priceId = subscription.items.data[0].price.id
   const customerId = subscription.customer as string
 
-  // Map price IDs to tiers
-  const tier = priceId.includes('starter') ? 'starter' : 'pro'
+  // Find matching price ID configuration
+  const priceTier = PRICE_IDS.find(
+    (price) => price.monthly === priceId || price.annual === priceId
+  )
+  const tier = priceTier?.tier || 'free'
+
+  console.log('Updating subscription:', {
+    customerId,
+    priceId,
+    tier,
+    status: subscription.status,
+  })
 
   await prisma.subscription.update({
     where: { stripeCustomerId: customerId },
