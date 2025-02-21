@@ -328,6 +328,7 @@ function Plan({
   logomarkClassName?: string
   featured?: boolean
 }) {
+  const savings = calculateSavings(price.Monthly, price.Annually)
   return (
     <section
       className={clsx(
@@ -385,14 +386,14 @@ function Plan({
           </>
         )}
       </p>
-      {activePeriod === 'Annually' && (
+      {activePeriod === 'Annually' && !Number.isNaN(savings) && (
         <p
           className={clsx(
             '-mt-10 text-sm',
             featured ? 'text-purple-200' : 'text-gray-400'
           )}
         >
-          Save {calculateSavings(price.Monthly, price.Annually)}%
+          Saving {savings}%
         </p>
       )}
       <p
@@ -489,8 +490,8 @@ function FeatureComparison() {
       dataIndex: 'free',
       key: 'free',
       align: 'center',
-      render: (value: React.ReactNode | FeatureValue) =>
-        typeof value === 'object' && 'value' in value ? (
+      render: (value: React.ReactNode | FeatureValue | null) =>
+        value && typeof value === 'object' && 'value' in value ? (
           <Tooltip title={value.tooltip}>
             <span className="cursor-help">{value.value}</span>
           </Tooltip>
@@ -503,8 +504,8 @@ function FeatureComparison() {
       dataIndex: 'starter',
       key: 'starter',
       align: 'center',
-      render: (value: React.ReactNode | FeatureValue) =>
-        typeof value === 'object' && 'value' in value ? (
+      render: (value: React.ReactNode | FeatureValue | null) =>
+        value && typeof value === 'object' && 'value' in value ? (
           <Tooltip title={value.tooltip}>
             <span className="cursor-help">{value.value}</span>
           </Tooltip>
@@ -517,8 +518,8 @@ function FeatureComparison() {
       dataIndex: 'pro',
       key: 'pro',
       align: 'center',
-      render: (value: React.ReactNode | FeatureValue) =>
-        typeof value === 'object' && 'value' in value ? (
+      render: (value: React.ReactNode | FeatureValue | null) =>
+        value && typeof value === 'object' && 'value' in value ? (
           <Tooltip title={value.tooltip}>
             <span className="cursor-help">{value.value}</span>
           </Tooltip>
@@ -681,8 +682,6 @@ export function Pricing() {
             <Plan key={plan.name} {...plan} activePeriod={activePeriod} />
           ))}
         </div>
-
-        <FeatureComparison />
       </Container>
     </section>
   )

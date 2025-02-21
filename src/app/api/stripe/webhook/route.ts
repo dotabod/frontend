@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma'
+import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { headers } from 'next/headers'
 import type Stripe from 'stripe'
@@ -33,10 +33,11 @@ export async function POST(req: Request) {
       switch (event.type) {
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
-        case 'customer.subscription.deleted':
+        case 'customer.subscription.deleted': {
           const subscription = event.data.object as Stripe.Subscription
           await updateSubscriptionInDatabase(subscription)
           break
+        }
         default:
           throw new Error(`Unhandled relevant event: ${event.type}`)
       }
