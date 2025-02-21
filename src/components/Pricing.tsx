@@ -1,10 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { Radio, RadioGroup } from '@headlessui/react'
-import clsx from 'clsx'
-import Image from 'next/image'
-import { Button, Tooltip, Table } from 'antd'
 import { Container } from '@/components/Container'
 import { Logomark } from '@/components/Logo'
 import {
@@ -13,7 +8,12 @@ import {
   InfoCircleOutlined,
   StarOutlined,
 } from '@ant-design/icons'
+import { Radio, RadioGroup } from '@headlessui/react'
+import { Button, Table, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import clsx from 'clsx'
+import Image from 'next/image'
+import { useState } from 'react'
 
 const featureCategories = [
   {
@@ -200,7 +200,10 @@ const plans = [
   {
     name: 'Starter',
     featured: false,
-    price: { Monthly: '$3.99', Annually: '$40' },
+    price: {
+      Monthly: '$3',
+      Annually: '$30',
+    },
     description:
       'Essential features for growing streamers who want core Dota 2 integration.',
     button: {
@@ -231,7 +234,10 @@ const plans = [
   {
     name: 'Pro',
     featured: true,
-    price: { Monthly: '$6.99', Annually: '$70' },
+    price: {
+      Monthly: '$6',
+      Annually: '$57',
+    },
     description:
       'Complete toolkit for serious streamers who need advanced features and automation.',
     button: {
@@ -265,6 +271,15 @@ const plans = [
     logomarkClassName: 'fill-purple-500',
   },
 ]
+
+// Add this before the Plan component definition
+
+function calculateSavings(monthlyPrice: string, annualPrice: string): number {
+  const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
+  const annual = Number.parseFloat(annualPrice.replace('$', ''))
+  return Math.round(((monthly - annual) / monthly) * 100)
+}
+
 function CheckIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -354,6 +369,7 @@ function Plan({
               )}
             >
               {price.Monthly}
+              <span className="text-sm"> / month</span>
             </span>
             <span
               aria-hidden={activePeriod === 'Monthly'}
@@ -364,10 +380,21 @@ function Plan({
               )}
             >
               {price.Annually}
+              <span className="text-sm"> / year</span>
             </span>
           </>
         )}
       </p>
+      {activePeriod === 'Annually' && (
+        <p
+          className={clsx(
+            '-mt-10 text-sm',
+            featured ? 'text-purple-200' : 'text-gray-400'
+          )}
+        >
+          Save {calculateSavings(price.Monthly, price.Annually)}%
+        </p>
+      )}
       <p
         className={clsx(
           'mt-3 text-sm',
@@ -598,7 +625,6 @@ export function Pricing() {
             the tools to enhance your stream.
           </p>
         </div>
-
         <div className="mt-8 flex justify-center">
           <div className="relative">
             <RadioGroup
@@ -611,14 +637,39 @@ export function Pricing() {
                   key={period}
                   value={period}
                   className={clsx(
-                    'cursor-pointer px-8 py-2 text-sm transition-colors rounded-md',
+                    'cursor-pointer px-8 py-2 text-sm transition-colors rounded-md flex items-center gap-2',
                     'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900',
                     activePeriod === period
                       ? 'bg-purple-500 text-gray-900 font-semibold shadow-lg'
                       : 'text-gray-300 hover:bg-gray-700/50'
                   )}
                 >
-                  {period}
+                  <div className="flex flex-col items-center gap-1">
+                    {period}
+                    {period === 'Annually' && (
+                      <div
+                        className={clsx(
+                          'absolute -bottom-6 text-xs whitespace-nowrap',
+                          activePeriod === period
+                            ? 'text-purple-400'
+                            : 'text-purple-300'
+                        )}
+                      >
+                        Save up to{' '}
+                        {Math.max(
+                          ...plans
+                            .filter((plan) => plan.price.Monthly !== '$0')
+                            .map((plan) =>
+                              calculateSavings(
+                                plan.price.Monthly,
+                                plan.price.Annually
+                              )
+                            )
+                        )}
+                        %
+                      </div>
+                    )}
+                  </div>
                 </Radio>
               ))}
             </RadioGroup>
