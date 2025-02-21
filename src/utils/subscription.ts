@@ -1,4 +1,10 @@
-import { SettingKeys } from '@/lib/defaultSettings'
+import type { SettingKeys } from '@/lib/defaultSettings'
+import type { defaultSettings } from '@/lib/defaultSettings'
+
+// Add type safety for chatters
+type ChatterKeys = keyof typeof defaultSettings.chatters
+type ChatterSettingKeys = `chatters.${ChatterKeys}`
+
 export function calculateSavings(
   monthlyPrice: string,
   annualPrice: string
@@ -60,7 +66,10 @@ export const PRICE_IDS: SubscriptionPriceId[] = [
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
   },
 ]
-export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
+export const FEATURE_TIERS: Record<
+  SettingKeys | ChatterSettingKeys,
+  SubscriptionTier
+> = {
   // Free Tier Features
   'minimap-blocker': SUBSCRIPTION_TIERS.FREE,
   chatter: SUBSCRIPTION_TIERS.FREE,
@@ -69,6 +78,7 @@ export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
   commandMmr: SUBSCRIPTION_TIERS.FREE,
   commandDisable: SUBSCRIPTION_TIERS.FREE,
   mmr: SUBSCRIPTION_TIERS.FREE,
+  chatters: SUBSCRIPTION_TIERS.FREE,
 
   // Starter Tier Features
   'mmr-tracker': SUBSCRIPTION_TIERS.STARTER,
@@ -80,8 +90,22 @@ export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
   commandWL: SUBSCRIPTION_TIERS.STARTER,
   commandRanked: SUBSCRIPTION_TIERS.STARTER,
   commandRosh: SUBSCRIPTION_TIERS.STARTER,
-  // TODO: This is all basic chat interactions, but we should probably split this out into more granular features
-  chatters: SUBSCRIPTION_TIERS.STARTER,
+  'chatters.midas': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.pause': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.smoke': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.passiveDeath': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.roshPickup': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.roshDeny': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.roshanKilled': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.tip': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.bounties': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.powerTreads': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.killstreak': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.firstBloodDeath': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.noTp': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.matchOutcome': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.commandsReady': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.neutralItems': SUBSCRIPTION_TIERS.STARTER,
   aegis: SUBSCRIPTION_TIERS.STARTER,
   betsInfo: SUBSCRIPTION_TIERS.STARTER,
   customMmr: SUBSCRIPTION_TIERS.STARTER,

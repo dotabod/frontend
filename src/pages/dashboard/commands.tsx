@@ -39,25 +39,28 @@ const CommandsPage = () => {
       return true
     })
     .filter((command) => {
-      let containsStringValue = false
-      ;['alias', 'title', 'description', 'cmd'].forEach((key) => {
-        if (Array.isArray(CommandDetail[command][key])) {
-          CommandDetail[command][key].forEach((alias) => {
+      if (!searchTerm) return true
+
+      const searchableKeys = ['alias', 'title', 'description', 'cmd']
+
+      for (const key of searchableKeys) {
+        const value = CommandDetail[command][key]
+
+        if (Array.isArray(value)) {
+          for (const alias of value) {
             if (
               alias.toLowerCase().includes(searchTerm) ||
               `!${alias.toLowerCase()}`.includes(searchTerm)
             ) {
-              containsStringValue = true
+              return true
             }
-          })
-        } else if (
-          CommandDetail[command][key].toLowerCase().includes(searchTerm)
-        ) {
-          containsStringValue = true
+          }
+        } else if (value.toLowerCase().includes(searchTerm)) {
+          return true
         }
-      })
+      }
 
-      return !(searchTerm && !containsStringValue)
+      return false
     })
 
   return (
@@ -97,8 +100,8 @@ const CommandsPage = () => {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {filteredCommands.map((key, i) => (
-          <CommandsCard key={i} id={key} command={CommandDetail[key]} />
+        {filteredCommands.map((key) => (
+          <CommandsCard key={key} id={key} command={CommandDetail[key]} />
         ))}
       </div>
     </>

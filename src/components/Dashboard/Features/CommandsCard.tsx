@@ -11,7 +11,7 @@ export default function CommandsCard({
 }: {
   readonly?: boolean
   id: string
-  command: typeof CommandDetail.commandAPM
+  command: (typeof CommandDetail)[keyof typeof CommandDetail]
   publicIsEnabled?: boolean
   publicLoading?: boolean
 }): JSX.Element {
