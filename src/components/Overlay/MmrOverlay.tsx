@@ -49,14 +49,14 @@ export default function MmrOverlay() {
         <MMRBadge
           leaderboard={null}
           image={showRankImage ? '11.png' : null}
-          rank={showRankMmr ? '130' : null}
+          rank={showRankMmr ? 130 : undefined}
           className="self-center !rounded-md bg-transparent"
           style={{ fontSize: 11 }}
         />
         <MMRBadge
-          leaderboard={showRankLeader ? '1' : null}
+          leaderboard={showRankLeader ? 1 : undefined}
           image={showRankImage ? '92.png' : null}
-          rank={showRankMmr ? '13150' : null}
+          rank={showRankMmr ? 13150 : undefined}
           className="self-center !rounded-md bg-transparent"
           style={{ fontSize: 11 }}
         />

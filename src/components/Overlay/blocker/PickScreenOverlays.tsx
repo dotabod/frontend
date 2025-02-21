@@ -20,7 +20,14 @@ export const PickScreenOverlays = ({
 
   if (!hasPickScreen) return null
 
-  const styles = {
+  const styles: {
+    width: number
+    height: number
+    bottom: number
+    right: number | undefined
+    left: number | undefined
+    zIndex: number
+  } = {
     width: res({ w: 381 }),
     height: res({ h: 200 }),
     bottom: res({ h: 16 }),

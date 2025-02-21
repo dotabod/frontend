@@ -65,7 +65,7 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
     <Steps direction="vertical" current={currentStep}>
       {steps.map((step, index) => (
         <Step
-          key={index}
+          key={step.title}
           title={step.title}
           description={step.description}
           icon={
@@ -127,7 +127,7 @@ const WindowsInstaller = () => {
       const fetchToken = async () => {
         try {
           const response = await fetch(
-            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user.id)}`,
+            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user?.id ?? '')}`,
             { method: 'GET', headers: { 'Content-Type': 'application/json' } }
           )
           if (!response.ok) {

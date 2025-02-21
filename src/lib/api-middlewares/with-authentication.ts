@@ -17,7 +17,7 @@ export function withAuthentication(handler: NextApiHandler) {
       Sentry.setUser({
         id: session?.user?.id,
         username: session?.user?.name,
-        email: session?.user?.email,
+        email: session?.user?.email ?? undefined,
         twitchId: session?.user?.twitchId,
         locale: session?.user?.locale,
         isImpersonating: session?.user?.isImpersonating,

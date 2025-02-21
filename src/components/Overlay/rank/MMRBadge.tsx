@@ -6,8 +6,8 @@ import { Card } from '../../Card'
 
 interface NumbersProps {
   hasImage: boolean
-  leaderboardPosition?: number
-  playerRank?: number
+  leaderboardPosition?: number | null
+  playerRank?: number | null
   className?: string
 }
 
@@ -66,7 +66,16 @@ export const MMRBadge = ({
   mainScreen = false,
   className = '',
   notLoaded = undefined,
+  style,
   ...props
+}: {
+  image?: string | null
+  leaderboard?: number | null
+  rank?: number | null
+  mainScreen?: boolean
+  className?: string
+  notLoaded?: boolean
+  style?: React.CSSProperties
 }) => {
   const res = useTransformRes()
   if (!image && !leaderboard && !rank) return null
@@ -75,6 +84,7 @@ export const MMRBadge = ({
     return (
       <div
         {...props}
+        style={style}
         className={clsx(
           'flex h-full items-center space-x-1 text-[#e4d98d]',
           className
@@ -101,6 +111,7 @@ export const MMRBadge = ({
   return (
     <Card
       {...props}
+      style={style}
       className={clsx(className, 'rounded-bl-none')}
       id="rank-card"
     >
@@ -117,7 +128,8 @@ export const MMRBadge = ({
         leaderboardPosition={leaderboard}
         className={clsx(
           !image && 'mt-0',
-          (leaderboard || ['80.png', '91.png', '92.png'].includes(image)) &&
+          (leaderboard ||
+            ['80.png', '91.png', '92.png'].includes(image ?? '')) &&
             '-mt-1',
           image && rank && !leaderboard && '-mt-3'
         )}

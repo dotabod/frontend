@@ -60,7 +60,11 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
     <motion.div
       key="minimap-blocker"
       {...motionProps}
-      style={minimapPosition}
+      style={{
+        ...minimapPosition,
+        left: minimapPosition.left ?? undefined,
+        right: minimapPosition.right ?? undefined,
+      }}
       className="absolute"
     >
       {status && original?.beta_tester ? (

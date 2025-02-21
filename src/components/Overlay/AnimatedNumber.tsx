@@ -2,7 +2,7 @@ import { useMotionValue, useSpring } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 
 export function AnimatedNumber({ from, to }) {
-  const ref = useRef(null)
+  const ref = useRef<HTMLSpanElement>(null)
   const motionValue = useMotionValue(from)
   const springValue = useSpring(motionValue)
 

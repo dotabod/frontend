@@ -19,6 +19,18 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useDebouncedCallback } from 'use-debounce'
 
+// Add type for form values
+interface FormValues {
+  accounts: Array<{
+    steam32Id: number
+    mmr: number
+    name: string | null
+    leaderboard_rank: number | null
+    connectedUserIds: string[]
+    delete?: boolean
+  }>
+}
+
 const SteamAvatar = ({ data: response, id }) => {
   if (!response) return <p>Loading...</p>
   return (
@@ -38,7 +50,7 @@ const SteamAvatar = ({ data: response, id }) => {
 const MmrForm = ({ hideText = false }) => {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
   const [accounts, setAccounts] = useState<SteamAccount[]>([])
-  const form = useForm({
+  const form = useForm<FormValues>({
     initialValues: {
       accounts: [],
     },
@@ -46,15 +58,15 @@ const MmrForm = ({ hideText = false }) => {
 
   const steamIds = accounts.map((a) => a.steam32Id)
   const path = `/api/steam/${steamIds.join('/')}`
-  const { data: steamData } = useSWR(path, steamIds.length && fetcher)
+  const { data: steamData } = useSWR(steamIds.length ? path : null, fetcher)
 
   useEffect(() => {
     if (data?.accounts) {
-      setAccounts(data?.accounts || [])
-      form.setValues({ accounts: data?.accounts })
-      form.resetDirty({ accounts: data?.accounts })
+      setAccounts(data.accounts)
+      form.setValues({ accounts: data.accounts })
+      form.resetDirty({ accounts: data.accounts })
     }
-  }, [data])
+  }, [data, form.setValues, form.resetDirty])
 
   const {
     data: mmr,
@@ -175,7 +187,7 @@ const MmrForm = ({ hideText = false }) => {
                           }
                         >
                           <InputNumber
-                            disabled={removed || multiUsedBy}
+                            disabled={Boolean(removed || multiUsedBy)}
                             id={`${account.steam32Id}-mmr`}
                             placeholder="9000"
                             type="number"
@@ -187,7 +199,7 @@ const MmrForm = ({ hideText = false }) => {
                         </Form.Item>
 
                         <Button
-                          disabled={removed || multiUsedBy}
+                          disabled={Boolean(removed || multiUsedBy)}
                           danger
                           onClick={() => {
                             form.setValues({
@@ -276,15 +288,13 @@ const MmrForm = ({ hideText = false }) => {
               className="bg-transparent"
             />
             <div className="flex flex-col">
-              {loading &&
-                !(
-                  <Input
-                    placeholder="Loading..."
-                    className="!w-[200px]"
-                    disabled
-                  />
-                )}
-              {!loading && (
+              {loading ? (
+                <Input
+                  placeholder="Loading..."
+                  className="!w-[200px]"
+                  disabled
+                />
+              ) : (
                 <InputNumber
                   placeholder="9000"
                   className="!w-[200px]"

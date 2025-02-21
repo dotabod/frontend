@@ -6,7 +6,8 @@ const HeroUnit = ({ data, team }) => {
   const getBrewlingIcon = () => {
     if (isBrewling) {
       const regex = /brewmaster_(\w+)_\d+/
-      const type = regex.exec(unitType)[1]
+      const match = regex.exec(unitType)
+      const type = match?.[1] ?? 'unknown'
       return `/images/overlay/minimap/blocker/icons/units/${type}_brewling.png`
     }
     return ''
@@ -27,6 +28,7 @@ const HeroUnit = ({ data, team }) => {
         <img
           className={`icon ${isEnemy ? 'enemy' : ''}`}
           src={getBrewlingIcon()}
+          alt={`Brewling icon for ${unitType}`}
         />
       )}
     </div>

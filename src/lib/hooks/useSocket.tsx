@@ -206,7 +206,7 @@ export const useSocket = ({
     })
     socket.on('auth_error', (message) => {
       console.error('Authentication failed:', message)
-      socket.close()
+      socket?.disconnect()
     })
     socket.on('connect', () => {
       console.log('Socket connected')

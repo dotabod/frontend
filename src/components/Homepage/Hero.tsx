@@ -165,7 +165,7 @@ export function Hero() {
               ))}
             </ul>
           ) : (
-            users?.topLive?.length > 0 && (
+            users?.topLive?.length && (
               <ul className="mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start">
                 {users?.topLive?.map(({ name, image }) => (
                   <TwitchUser

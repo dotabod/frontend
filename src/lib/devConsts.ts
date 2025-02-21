@@ -29,8 +29,7 @@ export const devPoll: PollData = {
 export const devRank = {
   image: '55.png',
   rank: 5500,
-  leaderboard: false,
-  notLoaded: null,
+  leaderboard: 0,
 }
 export const devWL = [
   {

@@ -59,12 +59,19 @@ const OverlayPage = () => {
       type: 'U',
     },
   ])
-  const [radiantWinChance, setRadiantWinChance] = useState<WinChance>(null)
+  const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(
+    null
+  )
 
-  const [rankImageDetails, setRankImageDetails] = useState({
+  const [rankImageDetails, setRankImageDetails] = useState<{
+    image: string | null
+    rank: number | null
+    leaderboard: number | null
+    notLoaded?: boolean
+  }>({
     image: '0.png',
     rank: 0,
-    leaderboard: false,
+    leaderboard: 0,
     notLoaded: true,
   })
 

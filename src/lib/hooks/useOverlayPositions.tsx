@@ -2,6 +2,12 @@ import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
+interface Position {
+  bottom: number
+  left: number | null
+  right: number | null
+}
+
 export const usePlayerPositions = () => {
   const res = useTransformRes()
 
@@ -30,14 +36,14 @@ export const useOverlayPositions = () => {
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const { data: isBp } = useUpdateSetting(Settings.battlepass)
 
-  const wlPosition = {
+  const wlPosition: Position & { fontSize: number } = {
     bottom: 0,
     right: res({ w: 311 }),
     left: null,
     fontSize: res({ w: 18 }),
   }
 
-  const roshPosition = {
+  const roshPosition: Position = {
     left: isXL
       ? res({ w: isSimple ? 280 : 285 })
       : res({ w: isSimple ? 243 : 250 }),
@@ -45,7 +51,7 @@ export const useOverlayPositions = () => {
     right: null,
   }
 
-  const minimapPosition = {
+  const minimapPosition: Position = {
     bottom: 0,
     left: 0,
     right: null,
@@ -53,28 +59,44 @@ export const useOverlayPositions = () => {
 
   if (isBp) {
     minimapPosition.bottom += res({ h: 9 })
-    minimapPosition.left += res({ w: 9 })
+    if (minimapPosition.left === null) {
+      minimapPosition.left = res({ w: 9 })
+    } else {
+      minimapPosition.left += res({ w: 9 })
+    }
     roshPosition.left = isXL ? res({ w: 290 }) : res({ w: 255 })
   }
 
   if (isRight) {
-    roshPosition.right = roshPosition.left
+    roshPosition.right = roshPosition.left ?? 0
     roshPosition.left = null
 
-    minimapPosition.right = minimapPosition.left
+    minimapPosition.right = minimapPosition.left ?? 0
     minimapPosition.left = null
 
-    wlPosition.left = wlPosition.right
+    wlPosition.left = wlPosition.right ?? 0
     wlPosition.right = null
 
-    if (isBp) {
+    if (isBp && minimapPosition.right !== null) {
       minimapPosition.right += res({ w: -3 })
       minimapPosition.bottom += res({ h: -5 })
     }
   }
   return {
-    wlPosition,
-    roshPosition,
-    minimapPosition,
+    wlPosition: {
+      ...wlPosition,
+      left: wlPosition.left ?? undefined,
+      right: wlPosition.right ?? undefined,
+    },
+    roshPosition: {
+      ...roshPosition,
+      left: roshPosition.left ?? undefined,
+      right: roshPosition.right ?? undefined,
+    },
+    minimapPosition: {
+      ...minimapPosition,
+      left: minimapPosition.left ?? undefined,
+      right: minimapPosition.right ?? undefined,
+    },
   }
 }

@@ -8,7 +8,7 @@ export default function TwitchChat({
   responses = [],
   response = '',
 }: {
-  command: string
+  command?: string
   className?: string
   modOnly?: boolean
   responses?: React.ReactNode[]

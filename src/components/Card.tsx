@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-export const Card = ({ children = null, className = '', ...props }) => {
+export const Card = ({ children, className = '', ...props }) => {
   return (
     <div
       className={clsx(

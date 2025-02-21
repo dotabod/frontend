@@ -12,10 +12,14 @@ const TWITCH_MODERATED_CHANNELS_URL =
   'https://api.twitch.tv/helix/moderation/channels'
 
 export async function getModeratedChannels(
-  userId: string,
+  userId: string | undefined,
   accessToken: string
 ) {
   try {
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
+
     const moderatedChannels: {
       broadcaster_id: string
       broadcaster_login: string
@@ -100,7 +104,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
-  if (search && (!session?.user?.role || !session.user.role.includes('admin'))) {
+  if (
+    search &&
+    (!session?.user?.role || !session.user.role.includes('admin'))
+  ) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
@@ -127,11 +134,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
       take: 10,
     })
-    return res.status(200).json(users.map((user) => ({
-      value: user.providerAccountId,
-      label: user.user.name,
-      image: user.user.image,
-    })))
+    return res.status(200).json(
+      users.map((user) => ({
+        value: user.providerAccountId,
+        label: user.user.name,
+        image: user.user.image,
+      }))
+    )
   }
 
   const { providerAccountId, accessToken, error } = await getTwitchTokens(

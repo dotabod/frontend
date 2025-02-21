@@ -6,6 +6,12 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 
+interface Position {
+  bottom: number
+  left?: number | null
+  right?: number | null
+}
+
 export const SpectatorText = ({ block }: { block: blockType }) => {
   const res = useTransformRes()
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
@@ -13,7 +19,7 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
 
   if (block?.type !== 'spectator') return null
 
-  const styles = {
+  const styles: Position = {
     bottom: isXL
       ? res({
           h: 300,
@@ -36,7 +42,11 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
       {...motionProps}
       className="absolute"
       id="spectator-text"
-      style={styles}
+      style={{
+        bottom: styles.bottom,
+        left: styles.left ?? undefined,
+        right: styles.right ?? undefined,
+      }}
     >
       <Card
         style={{

@@ -2,7 +2,6 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
-import { captureException } from '@sentry/nextjs'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
@@ -61,11 +60,14 @@ export const PollOverlay = ({
       })
   }, [data?.Account?.providerAccountId])
 
-  const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
+  const totalVotes = choices.reduce(
+    (acc, choice) => acc + (choice.totalVotes ?? 0),
+    0
+  )
   const choicesWithPercent = choices.map((choice) => {
     const percent = !totalVotes
       ? Math.round(100 / choices.length)
-      : Math.round((choice.totalVotes / totalVotes) * 100)
+      : Math.round(((choice.totalVotes ?? 0) / totalVotes) * 100)
     return { ...choice, percent }
   })
 

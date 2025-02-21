@@ -77,5 +77,7 @@ UserButton.displayName = 'UserButton'
 export function UserAccountNav() {
   const user = useSession()?.data?.user
 
+  if (!user) return null
+
   return <UserButton user={user} />
 }
