@@ -1,5 +1,3 @@
-'use client'
-
 import { Container } from '@/components/Container'
 import { Logomark } from '@/components/Logo'
 import {
@@ -23,6 +21,7 @@ import {
   isButtonDisabled,
   getPriceId,
 } from '@/utils/subscription'
+import type { SubscriptionTier } from '@/types/subscription'
 
 const featureCategories = [
   {
@@ -348,22 +347,22 @@ function Plan({
   const targetTier = name.toLowerCase() as SubscriptionTier
   const buttonText = getButtonText(subscription, targetTier, button.label)
   const disabled = isButtonDisabled(subscription, targetTier)
+  const period = activePeriod.toLowerCase() as 'monthly' | 'annual'
 
   const handleSubscribe = async () => {
     setRedirectingToCheckout(true)
     try {
       if (!session) {
         await signIn('twitch', {
-          callbackUrl: `/register?plan=${name.toLowerCase()}&period=${activePeriod.toLowerCase()}`,
+          callbackUrl: `/register?plan=${name.toLowerCase()}&period=${period}`,
         })
         return
       }
 
-      // If user has an active subscription, update it instead of creating new checkout
       if (subscription?.status === 'active') {
         const priceId = getPriceId(
           name.toLowerCase() as 'starter' | 'pro',
-          activePeriod.toLowerCase() as 'monthly' | 'annual'
+          period
         )
 
         const response = await fetch('/api/stripe/update-subscription', {
@@ -396,7 +395,7 @@ function Plan({
       // Otherwise, create new checkout session for new subscribers
       const priceId = getPriceId(
         name.toLowerCase() as 'starter' | 'pro',
-        activePeriod.toLowerCase() as 'monthly' | 'annual'
+        period
       )
       const response = await createCheckoutSession(priceId, session.user.id)
 
@@ -516,23 +515,34 @@ function Plan({
           ))}
         </ol>
       </div>
-      <Button
-        loading={redirectingToCheckout}
-        onClick={handleSubscribe}
-        size={featured ? 'large' : 'middle'}
-        color={featured ? 'danger' : 'default'}
-        disabled={disabled}
-        className={clsx(
-          'mt-6',
-          featured
-            ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-            : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-          disabled && 'opacity-50 cursor-not-allowed'
-        )}
-        aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+
+      <Tooltip
+        title={
+          !disabled &&
+          subscription?.status === 'active' &&
+          subscription.tier !== targetTier
+            ? 'You will receive a credit for the difference'
+            : 'You will be charged the difference'
+        }
       >
-        {buttonText}
-      </Button>
+        <Button
+          loading={redirectingToCheckout}
+          onClick={handleSubscribe}
+          size={featured ? 'large' : 'middle'}
+          color={featured ? 'danger' : 'default'}
+          disabled={disabled}
+          className={clsx(
+            'mt-6',
+            featured
+              ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+              : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+            disabled && 'opacity-50 cursor-not-allowed'
+          )}
+          aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+        >
+          {buttonText}
+        </Button>
+      </Tooltip>
     </section>
   )
 }
