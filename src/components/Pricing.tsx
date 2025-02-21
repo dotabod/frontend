@@ -178,7 +178,7 @@ const plans = [
       'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
     button: {
       label: 'Get started for free',
-      href: '/register',
+      href: '/register?plan=free',
     },
     features: [
       'Multi-language support',
@@ -208,7 +208,7 @@ const plans = [
       'Essential features for growing streamers who want core Dota 2 integration.',
     button: {
       label: 'Subscribe',
-      href: '/register',
+      href: '/register?plan=starter',
     },
     features: [
       'All Free features',
@@ -242,7 +242,7 @@ const plans = [
       'Complete toolkit for serious streamers who need advanced features and automation.',
     button: {
       label: 'Subscribe',
-      href: '/register',
+      href: '/register?plan=pro',
     },
     features: [
       'All Starter features',
@@ -328,6 +328,7 @@ function Plan({
   logomarkClassName?: string
   featured?: boolean
 }) {
+  const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.Monthly, price.Annually)
   return (
     <section
@@ -427,9 +428,11 @@ function Plan({
         </ol>
       </div>
       <Button
+        loading={redirectingToCheckout}
         href={button.href}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
+        onClick={() => setRedirectingToCheckout(true)}
         className={clsx(
           'mt-6',
           featured
