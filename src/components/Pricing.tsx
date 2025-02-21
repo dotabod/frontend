@@ -524,10 +524,8 @@ function FeatureComparison() {
           ),
           rowExpandable: () => true,
         }}
-        groups={featureCategories.map((category) => ({
-          title: category.name,
-          key: category.name,
-        }))}
+        showHeader={true}
+        rowKey="key"
       />
     </div>
   )
