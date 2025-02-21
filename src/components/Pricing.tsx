@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Radio, RadioGroup } from '@headlessui/react'
 import clsx from 'clsx'
 import Image from 'next/image'
-import { Button, Tooltip } from 'antd'
+import { Button, Tooltip, Table } from 'antd'
 import { Container } from '@/components/Container'
 import { Logomark } from '@/components/Logo'
 import {
@@ -13,6 +13,161 @@ import {
   InfoCircleOutlined,
   StarOutlined,
 } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
+
+const featureCategories = [
+  {
+    name: 'Setup & Configuration',
+    features: [
+      {
+        name: 'Automated Setup',
+        tooltip: 'Automatic configuration of various integrations',
+        free: {
+          value: 'Manual only',
+          tooltip: 'Step-by-step setup guide provided',
+        },
+        starter: {
+          value: 'Mod setup',
+          tooltip: 'Automated Twitch moderator setup and basic configurations',
+        },
+        pro: {
+          value: 'Full automation',
+          tooltip:
+            'Complete automated setup of Twitch, OBS, 7TV, and Dota 2 integration',
+        },
+      },
+      {
+        name: '7TV Integration',
+        tooltip: 'Automatic emote setup with 7TV',
+        free: <CloseOutlined className="text-red-500" />,
+        starter: <CloseOutlined className="text-red-500" />,
+        pro: <CheckOutlined className="text-green-500" />,
+      },
+      {
+        name: 'OBS Integration',
+        tooltip: 'Automatic OBS scene setup and configuration',
+        free: <CloseOutlined className="text-red-500" />,
+        starter: <CloseOutlined className="text-red-500" />,
+        pro: <CheckOutlined className="text-green-500" />,
+      },
+    ],
+  },
+  {
+    name: 'Stream Protection',
+    features: [
+      {
+        name: 'Minimap Blocker',
+        tooltip: 'Prevents stream sniping via minimap',
+        free: {
+          value: 'Basic',
+          tooltip: 'Simple semi-transparent overlay',
+        },
+        starter: {
+          value: 'Enhanced',
+          tooltip: 'Customizable opacity and background options',
+        },
+        pro: {
+          value: 'Advanced + Custom',
+          tooltip:
+            'Full customization with multiple styles, positions, and automatic game state detection',
+        },
+      },
+      {
+        name: 'Pick Blocker',
+        tooltip: 'Hides hero picks during draft phase',
+        free: <CloseOutlined className="text-red-500" />,
+        starter: {
+          value: 'Basic',
+          tooltip: 'Simple pick phase blocking',
+        },
+        pro: {
+          value: 'Full phase control',
+          tooltip:
+            'Automatic phase detection with customizable overlays for each draft stage',
+        },
+      },
+      {
+        name: 'Stream Delay',
+        tooltip: 'Customizable stream delay integration',
+        free: <CloseOutlined className="text-red-500" />,
+        starter: <CloseOutlined className="text-red-500" />,
+        pro: 'Up to 30s',
+      },
+    ],
+  },
+  {
+    name: 'Twitch Integration',
+    features: [
+      {
+        name: 'Predictions',
+        tooltip: 'Automated Twitch channel point predictions',
+        free: <CloseOutlined className="text-red-500" />,
+        starter: 'Basic',
+        pro: 'Advanced + Overlay',
+      },
+      {
+        name: 'Chat Features',
+        tooltip: 'Interactive chat messages and events',
+        free: {
+          value: 'Basic',
+          tooltip: 'Essential chat commands and match results',
+        },
+        starter: {
+          value: 'Enhanced',
+          tooltip:
+            'Additional interactions: Bets, midas timing, first blood, aegis events',
+        },
+        pro: {
+          value: 'Full features',
+          tooltip:
+            'Complete chat integration with all game events, items, and hero interactions',
+        },
+      },
+      {
+        name: 'MMR Tracking',
+        tooltip: 'Track and display MMR changes',
+        free: {
+          value: 'Basic command',
+          tooltip: 'Simple !mmr command to check current MMR',
+        },
+        starter: <CheckOutlined className="text-green-500" />,
+        pro: {
+          value: 'Advanced + Overlay',
+          tooltip:
+            'Live MMR tracking with customizable overlay and historical data',
+        },
+      },
+    ],
+  },
+  {
+    name: 'Additional Benefits',
+    features: [
+      {
+        name: 'Beta Features Access',
+        tooltip:
+          'Get early access to new features and updates before they go live',
+        free: <CloseOutlined className="text-red-500" />,
+        starter: <CloseOutlined className="text-red-500" />,
+        pro: (
+          <span className="flex justify-center items-center gap-1">
+            <StarOutlined className="text-yellow-500" /> Priority access
+          </span>
+        ),
+      },
+      {
+        name: 'Feature Updates',
+        tooltip: 'Automatic access to new features as they are released',
+        free: 'Basic only',
+        starter: 'Standard',
+        pro: (
+          <span className="flex justify-center items-center gap-1">
+            <StarOutlined className="text-yellow-500" /> All features
+          </span>
+        ),
+      },
+    ],
+  },
+]
 
 const plans = [
   {
@@ -261,247 +416,119 @@ function Plan({
   )
 }
 
-// Update the FeatureComparison component with more detailed categories
 function FeatureComparison() {
-  const featureCategories = [
+  interface FeatureValue {
+    value: string
+    tooltip: string
+  }
+
+  interface Feature {
+    name: string
+    tooltip: string
+    free: React.ReactNode | FeatureValue
+    starter: React.ReactNode | FeatureValue
+    pro: React.ReactNode | FeatureValue
+  }
+
+  interface TableItem extends Feature {
+    key: string
+    category: string
+  }
+
+  const flattenedData: TableItem[] = featureCategories.flatMap((category) =>
+    category.features.map((feature) => ({
+      key: `${category.name}-${feature.name}`,
+      category: category.name,
+      ...feature,
+    }))
+  )
+
+  const columns: ColumnsType<TableItem> = [
     {
-      name: 'Setup & Configuration',
-      features: [
-        {
-          name: 'Automated Setup',
-          tooltip: 'Automatic configuration of various integrations',
-          free: {
-            value: 'Manual only',
-            tooltip: 'Step-by-step setup guide provided',
-          },
-          starter: {
-            value: 'Mod setup',
-            tooltip:
-              'Automated Twitch moderator setup and basic configurations',
-          },
-          pro: {
-            value: 'Full automation',
-            tooltip:
-              'Complete automated setup of Twitch, OBS, 7TV, and Dota 2 integration',
-          },
-        },
-        {
-          name: '7TV Integration',
-          tooltip: 'Automatic emote setup with 7TV',
-          free: <CloseOutlined className="text-red-500" />,
-          starter: <CloseOutlined className="text-red-500" />,
-          pro: <CheckOutlined className="text-green-500" />,
-        },
-        {
-          name: 'OBS Integration',
-          tooltip: 'Automatic OBS scene setup and configuration',
-          free: <CloseOutlined className="text-red-500" />,
-          starter: <CloseOutlined className="text-red-500" />,
-          pro: <CheckOutlined className="text-green-500" />,
-        },
-      ],
+      title: 'Feature',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text: string, record: TableItem) => (
+        <div className="flex items-center">
+          {text}
+          <Tooltip title={record.tooltip}>
+            <InfoCircleOutlined className="ml-2 text-gray-500 hover:text-gray-300" />
+          </Tooltip>
+        </div>
+      ),
     },
     {
-      name: 'Stream Protection',
-      features: [
-        {
-          name: 'Minimap Blocker',
-          tooltip: 'Prevents stream sniping via minimap',
-          free: {
-            value: 'Basic',
-            tooltip: 'Simple semi-transparent overlay',
-          },
-          starter: {
-            value: 'Enhanced',
-            tooltip: 'Customizable opacity and background options',
-          },
-          pro: {
-            value: 'Advanced + Custom',
-            tooltip:
-              'Full customization with multiple styles, positions, and automatic game state detection',
-          },
-        },
-        {
-          name: 'Pick Blocker',
-          tooltip: 'Hides hero picks during draft phase',
-          free: <CloseOutlined className="text-red-500" />,
-          starter: {
-            value: 'Basic',
-            tooltip: 'Simple pick phase blocking',
-          },
-          pro: {
-            value: 'Full phase control',
-            tooltip:
-              'Automatic phase detection with customizable overlays for each draft stage',
-          },
-        },
-        {
-          name: 'Stream Delay',
-          tooltip: 'Customizable stream delay integration',
-          free: <CloseOutlined className="text-red-500" />,
-          starter: <CloseOutlined className="text-red-500" />,
-          pro: 'Up to 30s',
-        },
-      ],
+      title: 'Free',
+      dataIndex: 'free',
+      key: 'free',
+      align: 'center',
+      render: (value: React.ReactNode | FeatureValue) =>
+        typeof value === 'object' && 'value' in value ? (
+          <Tooltip title={value.tooltip}>
+            <span className="cursor-help">{value.value}</span>
+          </Tooltip>
+        ) : (
+          value
+        ),
     },
     {
-      name: 'Twitch Integration',
-      features: [
-        {
-          name: 'Predictions',
-          tooltip: 'Automated Twitch channel point predictions',
-          free: <CloseOutlined className="text-red-500" />,
-          starter: 'Basic',
-          pro: 'Advanced + Overlay',
-        },
-        {
-          name: 'Chat Features',
-          tooltip: 'Interactive chat messages and events',
-          free: {
-            value: 'Basic',
-            tooltip: 'Essential chat commands and match results',
-          },
-          starter: {
-            value: 'Enhanced',
-            tooltip:
-              'Additional interactions: Bets, midas timing, first blood, aegis events',
-          },
-          pro: {
-            value: 'Full features',
-            tooltip:
-              'Complete chat integration with all game events, items, and hero interactions',
-          },
-        },
-        {
-          name: 'MMR Tracking',
-          tooltip: 'Track and display MMR changes',
-          free: {
-            value: 'Basic command',
-            tooltip: 'Simple !mmr command to check current MMR',
-          },
-          starter: <CheckOutlined className="text-green-500" />,
-          pro: {
-            value: 'Advanced + Overlay',
-            tooltip:
-              'Live MMR tracking with customizable overlay and historical data',
-          },
-        },
-      ],
+      title: 'Starter',
+      dataIndex: 'starter',
+      key: 'starter',
+      align: 'center',
+      render: (value: React.ReactNode | FeatureValue) =>
+        typeof value === 'object' && 'value' in value ? (
+          <Tooltip title={value.tooltip}>
+            <span className="cursor-help">{value.value}</span>
+          </Tooltip>
+        ) : (
+          value
+        ),
     },
     {
-      name: 'Additional Benefits',
-      features: [
-        {
-          name: 'Beta Features Access',
-          tooltip:
-            'Get early access to new features and updates before they go live',
-          free: <CloseOutlined className="text-red-500" />,
-          starter: <CloseOutlined className="text-red-500" />,
-          pro: (
-            <span className="flex justify-center items-center gap-1">
-              <StarOutlined className="text-yellow-500" /> Priority access
-            </span>
-          ),
-        },
-        {
-          name: 'Feature Updates',
-          tooltip: 'Automatic access to new features as they are released',
-          free: 'Basic only',
-          starter: 'Standard',
-          pro: (
-            <span className="flex justify-center items-center gap-1">
-              <StarOutlined className="text-yellow-500" /> All features
-            </span>
-          ),
-        },
-      ],
+      title: 'Pro',
+      dataIndex: 'pro',
+      key: 'pro',
+      align: 'center',
+      render: (value: React.ReactNode | FeatureValue) =>
+        typeof value === 'object' && 'value' in value ? (
+          <Tooltip title={value.tooltip}>
+            <span className="cursor-help">{value.value}</span>
+          </Tooltip>
+        ) : (
+          value
+        ),
     },
   ]
 
   return (
-    <div className="mt-16 overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-xl">
-      <div className="px-6 py-4 bg-gray-900/50">
+    <div className="mt-16">
+      <div className="px-6 py-4 bg-gray-900/50 rounded-t-lg">
         <h3 className="text-xl font-semibold text-gray-100">
           Feature Comparison
         </h3>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-700/50">
-              <th className="py-4 px-6 text-left text-gray-300">Feature</th>
-              <th className="py-4 px-6 text-center text-gray-300">Free</th>
-              <th className="py-4 px-6 text-center text-gray-300">Starter</th>
-              <th className="py-4 px-6 text-center text-gray-300">Pro</th>
-            </tr>
-          </thead>
-          <tbody>
-            {featureCategories.map((category) => (
-              <>
-                <tr key={category.name} className="bg-gray-900/30">
-                  <td
-                    colSpan={4}
-                    className="py-2 px-6 font-medium text-purple-400"
-                  >
-                    {category.name}
-                  </td>
-                </tr>
-                {category.features.map((feature) => (
-                  <tr
-                    key={feature.name}
-                    className="border-b border-gray-700/30 hover:bg-gray-700/20"
-                  >
-                    <td className="py-3 px-6 text-gray-300">
-                      <div className="flex items-center">
-                        {feature.name}
-                        <Tooltip title={feature.tooltip}>
-                          <InfoCircleOutlined className="ml-2 text-gray-500 hover:text-gray-300" />
-                        </Tooltip>
-                      </div>
-                    </td>
-                    <td className="py-3 px-6 text-center text-gray-300">
-                      {typeof feature.free === 'object' &&
-                      'value' in feature.free ? (
-                        <Tooltip title={feature.free.tooltip}>
-                          <span className="cursor-help">
-                            {feature.free.value}
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        feature.free
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-center text-gray-300">
-                      {typeof feature.starter === 'object' &&
-                      'value' in feature.starter ? (
-                        <Tooltip title={feature.starter.tooltip}>
-                          <span className="cursor-help">
-                            {feature.starter.value}
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        feature.starter
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-center text-gray-300">
-                      {typeof feature.pro === 'object' &&
-                      'value' in feature.pro ? (
-                        <Tooltip title={feature.pro.tooltip}>
-                          <span className="cursor-help">
-                            {feature.pro.value}
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        feature.pro
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={columns}
+        dataSource={flattenedData}
+        pagination={false}
+        className="pricing-table"
+        rowClassName={(record) =>
+          `pricing-table-row category-${record.category}`
+        }
+        size="middle"
+        bordered
+        expandable={{
+          expandedRowRender: (record) => (
+            <p className="px-4 py-2 text-gray-400">{record.tooltip}</p>
+          ),
+          rowExpandable: () => true,
+        }}
+        groups={featureCategories.map((category) => ({
+          title: category.name,
+          key: category.name,
+        }))}
+      />
     </div>
   )
 }
