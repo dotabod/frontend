@@ -1,4 +1,4 @@
-import { Button, notification, Tooltip } from 'antd'
+import { Button, notification } from 'antd'
 import { useState } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import {
@@ -49,17 +49,19 @@ function Plan({
   const targetTier = name.toLowerCase() as SubscriptionTier
   const period = activePeriod.toLowerCase() as 'monthly' | 'annual'
 
-  // Simplify button text logic
+  // Update button text logic
   const getSimplifiedButtonText = () => {
     if (!subscription || subscription.status !== 'active') {
       return button.label
     }
 
     if (subscription.tier === targetTier) {
-      return 'Current plan'
+      return 'Manage current plan'
     }
 
-    return 'Manage subscription'
+    return TIER_LEVELS[targetTier] > TIER_LEVELS[subscription.tier]
+      ? 'Upgrade via portal'
+      : 'Change via portal'
   }
 
   const buttonText = getSimplifiedButtonText()
@@ -112,29 +114,6 @@ function Plan({
     } finally {
       setRedirectingToCheckout(false)
     }
-  }
-
-  // Simplify disabled logic
-  const isDisabled =
-    subscription?.status === 'active' && subscription.tier === targetTier
-
-  const getTooltipText = () => {
-    if (
-      !subscription ||
-      subscription.status !== 'active' ||
-      subscription.tier === targetTier
-    ) {
-      return 'Initial subscription payment'
-    }
-
-    const isUpgrade = TIER_LEVELS[targetTier] > TIER_LEVELS[subscription.tier]
-    const periodText = period === 'monthly' ? 'month' : 'year'
-
-    if (isUpgrade) {
-      return `You'll be charged the prorated difference for the remainder of your ${periodText}`
-    }
-
-    return `You'll receive a prorated credit for the remainder of your ${periodText}`
   }
 
   return (
@@ -236,30 +215,21 @@ function Plan({
         </ol>
       </div>
 
-      <Tooltip
-        title={
-          !isDisabled && subscription?.status === 'active'
-            ? getTooltipText()
-            : undefined
-        }
+      <Button
+        loading={redirectingToCheckout}
+        onClick={handleSubscribe}
+        size={featured ? 'large' : 'middle'}
+        color={featured ? 'danger' : 'default'}
+        className={clsx(
+          'mt-6',
+          featured
+            ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+            : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+        )}
+        aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
       >
-        <Button
-          loading={redirectingToCheckout}
-          onClick={handleSubscribe}
-          size={featured ? 'large' : 'middle'}
-          color={featured ? 'danger' : 'default'}
-          disabled={isDisabled}
-          className={clsx(
-            'mt-6',
-            featured
-              ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-              : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
-          )}
-          aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
-        >
-          {buttonText}
-        </Button>
-      </Tooltip>
+        {buttonText}
+      </Button>
     </section>
   )
 }

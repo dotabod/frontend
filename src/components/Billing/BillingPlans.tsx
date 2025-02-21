@@ -134,13 +134,6 @@ export function BillingPlans({
               {subscription.tier.charAt(0).toUpperCase() +
                 subscription.tier.slice(1)}{' '}
               plan
-              {' • '}
-              <a
-                href="/api/stripe/portal"
-                className="text-purple-400 underline hover:text-purple-300"
-              >
-                Manage subscription
-              </a>
             </p>
           )}
         </div>
