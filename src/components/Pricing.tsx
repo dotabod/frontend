@@ -270,9 +270,20 @@ function FeatureComparison() {
         {
           name: 'Automated Setup',
           tooltip: 'Automatic configuration of various integrations',
-          free: 'Manual only',
-          starter: 'Mod setup',
-          pro: 'Full automation',
+          free: {
+            value: 'Manual only',
+            tooltip: 'Step-by-step setup guide provided',
+          },
+          starter: {
+            value: 'Mod setup',
+            tooltip:
+              'Automated Twitch moderator setup and basic configurations',
+          },
+          pro: {
+            value: 'Full automation',
+            tooltip:
+              'Complete automated setup of Twitch, OBS, 7TV, and Dota 2 integration',
+          },
         },
         {
           name: '7TV Integration',
@@ -296,16 +307,33 @@ function FeatureComparison() {
         {
           name: 'Minimap Blocker',
           tooltip: 'Prevents stream sniping via minimap',
-          free: 'Basic',
-          starter: 'Enhanced',
-          pro: 'Advanced + Custom',
+          free: {
+            value: 'Basic',
+            tooltip: 'Simple semi-transparent overlay',
+          },
+          starter: {
+            value: 'Enhanced',
+            tooltip: 'Customizable opacity and background options',
+          },
+          pro: {
+            value: 'Advanced + Custom',
+            tooltip:
+              'Full customization with multiple styles, positions, and automatic game state detection',
+          },
         },
         {
           name: 'Pick Blocker',
           tooltip: 'Hides hero picks during draft phase',
           free: <CloseOutlined className="text-red-500" />,
-          starter: 'Basic',
-          pro: 'Full phase control',
+          starter: {
+            value: 'Basic',
+            tooltip: 'Simple pick phase blocking',
+          },
+          pro: {
+            value: 'Full phase control',
+            tooltip:
+              'Automatic phase detection with customizable overlays for each draft stage',
+          },
         },
         {
           name: 'Stream Delay',
@@ -329,16 +357,34 @@ function FeatureComparison() {
         {
           name: 'Chat Features',
           tooltip: 'Interactive chat messages and events',
-          free: 'Basic',
-          starter: 'Enhanced',
-          pro: 'Full features',
+          free: {
+            value: 'Basic',
+            tooltip: 'Essential chat commands and match results',
+          },
+          starter: {
+            value: 'Enhanced',
+            tooltip:
+              'Additional interactions: Bets, midas timing, first blood, aegis events',
+          },
+          pro: {
+            value: 'Full features',
+            tooltip:
+              'Complete chat integration with all game events, items, and hero interactions',
+          },
         },
         {
           name: 'MMR Tracking',
           tooltip: 'Track and display MMR changes',
-          free: 'Basic command',
+          free: {
+            value: 'Basic command',
+            tooltip: 'Simple !mmr command to check current MMR',
+          },
           starter: <CheckOutlined className="text-green-500" />,
-          pro: 'Advanced + Overlay',
+          pro: {
+            value: 'Advanced + Overlay',
+            tooltip:
+              'Live MMR tracking with customizable overlay and historical data',
+          },
         },
       ],
     },
@@ -414,13 +460,40 @@ function FeatureComparison() {
                       </div>
                     </td>
                     <td className="py-3 px-6 text-center text-gray-300">
-                      {feature.free}
+                      {typeof feature.free === 'object' &&
+                      'value' in feature.free ? (
+                        <Tooltip title={feature.free.tooltip}>
+                          <span className="cursor-help">
+                            {feature.free.value}
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        feature.free
+                      )}
                     </td>
                     <td className="py-3 px-6 text-center text-gray-300">
-                      {feature.starter}
+                      {typeof feature.starter === 'object' &&
+                      'value' in feature.starter ? (
+                        <Tooltip title={feature.starter.tooltip}>
+                          <span className="cursor-help">
+                            {feature.starter.value}
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        feature.starter
+                      )}
                     </td>
                     <td className="py-3 px-6 text-center text-gray-300">
-                      {feature.pro}
+                      {typeof feature.pro === 'object' &&
+                      'value' in feature.pro ? (
+                        <Tooltip title={feature.pro.tooltip}>
+                          <span className="cursor-help">
+                            {feature.pro.value}
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        feature.pro
+                      )}
                     </td>
                   </tr>
                 ))}
