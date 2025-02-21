@@ -323,6 +323,7 @@ function Plan({
   logomarkClassName,
   featured = false,
   subscription,
+  onSubscriptionUpdate,
 }: {
   name: string
   price: {
@@ -340,6 +341,7 @@ function Plan({
   logomarkClassName?: string
   featured?: boolean
   subscription: SubscriptionStatus | null
+  onSubscriptionUpdate: (newSubscription: SubscriptionStatus) => void
 }) {
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
@@ -397,8 +399,20 @@ function Plan({
           throw new Error('Failed to update subscription')
         }
 
-        // Refresh the page to show updated subscription
-        window.location.reload()
+        // Get updated subscription data
+        const subscriptionResponse = await fetch('/api/stripe/subscription')
+        if (subscriptionResponse.ok) {
+          const updatedSubscription = await subscriptionResponse.json()
+          onSubscriptionUpdate(updatedSubscription)
+        }
+
+        notification.success({
+          message: 'Subscription Updated',
+          description: `Successfully ${
+            subscription.tier === 'pro' ? 'downgraded to' : 'upgraded to'
+          } ${name} plan.`,
+          placement: 'bottomRight',
+        })
         return
       }
 
@@ -512,6 +526,7 @@ function Plan({
           )}
         >
           {features.map((feature, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             <li key={index} className="flex py-2">
               <CheckIcon
                 className={clsx(
@@ -711,6 +726,7 @@ export function Pricing() {
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
     null
   )
+
   useEffect(() => {
     async function getSubscription() {
       if (session?.user?.id) {
@@ -724,6 +740,10 @@ export function Pricing() {
 
     getSubscription()
   }, [session])
+
+  const handleSubscriptionUpdate = (newSubscription: SubscriptionStatus) => {
+    setSubscription(newSubscription)
+  }
 
   return (
     <section
@@ -746,7 +766,8 @@ export function Pricing() {
                 subscription.tier.slice(1)}{' '}
               plan
               {subscription.cancelAtPeriodEnd &&
-                ` (cancels ${new Date(subscription.currentPeriodEnd!).toLocaleDateString()})`}
+                subscription.currentPeriodEnd &&
+                ` (cancels ${new Date(subscription.currentPeriodEnd).toLocaleDateString()})`}
             </p>
           )}
           <p className="mt-2 text-lg text-gray-400">
@@ -812,6 +833,7 @@ export function Pricing() {
               {...plan}
               activePeriod={activePeriod}
               subscription={subscription}
+              onSubscriptionUpdate={handleSubscriptionUpdate}
             />
           ))}
         </div>
