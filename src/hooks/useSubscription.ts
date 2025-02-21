@@ -1,4 +1,8 @@
-import { canAccessFeature, type SubscriptionStatus } from '@/utils/subscription'
+import {
+  canAccessFeature,
+  SubscriptionStatus,
+  FeatureTier,
+} from '@/utils/subscription'
 import { useEffect, useState } from 'react'
 
 export function useSubscription() {
@@ -28,11 +32,11 @@ export function useSubscription() {
   }
 }
 
-export function useFeatureAccess(feature: string) {
+export function useFeatureAccess(feature: FeatureTier) {
   const { subscription, isLoading } = useSubscription()
 
   return {
-    hasAccess: canAccessFeature(feature, subscription),
+    ...canAccessFeature(feature, subscription),
     isLoading,
   }
 }

@@ -59,28 +59,35 @@ export const PRICE_IDS: SubscriptionPriceId[] = [
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
   },
 ]
-
-const FEATURE_TIERS: Record<string, SubscriptionTier> = {
+export const FEATURE_TIERS = {
   'minimap-blocker': SUBSCRIPTION_TIERS.FREE,
   'pick-blocker': SUBSCRIPTION_TIERS.STARTER,
   'obs-integration': SUBSCRIPTION_TIERS.PRO,
   'mmr-tracking': SUBSCRIPTION_TIERS.STARTER,
   predictions: SUBSCRIPTION_TIERS.STARTER,
   'stream-delay': SUBSCRIPTION_TIERS.PRO,
-  // Add more features and their required tiers
-}
+} as const
+
+export type FeatureTier = keyof typeof FEATURE_TIERS
 
 // Utility functions
 export function canAccessFeature(
-  feature: string,
+  feature: FeatureTier,
   subscription: SubscriptionStatus | null
-): boolean {
+): { hasAccess: boolean; requiredTier: SubscriptionTier } {
+  const requiredTier = FEATURE_TIERS[feature] || SUBSCRIPTION_TIERS.PRO
+
   if (!subscription || subscription.status !== 'active') {
-    return FEATURE_TIERS[feature] === SUBSCRIPTION_TIERS.FREE
+    return {
+      hasAccess: FEATURE_TIERS[feature] === SUBSCRIPTION_TIERS.FREE,
+      requiredTier,
+    }
   }
 
-  const requiredTier = FEATURE_TIERS[feature] || SUBSCRIPTION_TIERS.PRO
-  return TIER_LEVELS[subscription.tier] >= TIER_LEVELS[requiredTier]
+  return {
+    hasAccess: TIER_LEVELS[subscription.tier] >= TIER_LEVELS[requiredTier],
+    requiredTier,
+  }
 }
 
 export function isSubscriptionActive(

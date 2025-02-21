@@ -47,9 +47,6 @@ function Plan({
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
 
-  const targetTier = name.toLowerCase() as SubscriptionTier
-  const period = activePeriod
-
   // Update button text logic
   const getSimplifiedButtonText = () => {
     if (!subscription || subscription.status !== 'active') {
@@ -66,7 +63,7 @@ function Plan({
     try {
       if (!session) {
         await signIn('twitch', {
-          callbackUrl: `/register?plan=${name.toLowerCase()}&period=${period}`,
+          callbackUrl: `/register?plan=${name.toLowerCase()}&period=${activePeriod}`,
         })
         return
       }
@@ -92,7 +89,7 @@ function Plan({
           SubscriptionTier,
           typeof SUBSCRIPTION_TIERS.FREE
         >,
-        period
+        activePeriod
       )
       const response = await createCheckoutSession(priceId, session.user.id)
 

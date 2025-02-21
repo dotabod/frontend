@@ -3,6 +3,7 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Form, Input, InputNumber } from 'antd'
 import { useDebouncedCallback } from 'use-debounce'
+import { useFeatureAccess } from '@/hooks/useSubscription'
 
 export default function StreamDelayCard() {
   const {
@@ -10,6 +11,7 @@ export default function StreamDelayCard() {
     loading,
     updateSetting,
   } = useUpdateSetting(Settings.streamDelay)
+  const { hasAccess, requiredTier } = useFeatureAccess('stream-delay')
 
   const debouncedUpdate = useDebouncedCallback((value) => {
     updateSetting(value * 1000)
