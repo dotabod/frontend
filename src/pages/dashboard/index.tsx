@@ -6,7 +6,7 @@ import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { Alert, Button, Collapse, Steps } from 'antd'
+import { Alert, Button, Collapse, notification, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -24,6 +24,7 @@ const SetupPage = () => {
 
   const [active, setActive] = useState(0)
   const router = useRouter()
+  const didJustPay = router.query.paid === 'true'
 
   const updateStepInUrl = (newActiveStep) => {
     // Update the URL without adding a new history entry
@@ -66,9 +67,23 @@ const SetupPage = () => {
   }, [router.query.step]) // Dependency array, re-run effect when `step` changes
 
   useEffect(() => {
-    if (active === maxStepIndex) {
+    if (active === maxStepIndex || didJustPay) {
       const end = Date.now() + 1 * 1000
       const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
+
+      if (didJustPay) {
+        notification.success({
+          key: 'paid',
+          message: 'Payment successful',
+          description: 'Thank you for supporting Dotabod!',
+          duration: 55,
+        })
+        // Clear the query params
+        router.replace({
+          pathname: router.pathname,
+          query: { ...router.query, paid: undefined },
+        })
+      }
 
       const frame = () => {
         if (Date.now() > end) return
@@ -95,7 +110,7 @@ const SetupPage = () => {
 
       frame()
     }
-  }, [active])
+  }, [active, didJustPay, router.pathname, router.query, router.replace])
 
   if (session?.data?.user?.isImpersonating) {
     return null
