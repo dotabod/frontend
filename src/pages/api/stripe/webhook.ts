@@ -4,26 +4,43 @@ import type { NextApiResponse } from 'next'
 import type { NextApiRequest } from 'next'
 import type Stripe from 'stripe'
 
+// Disable the default body parser
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 const relevantEvents = new Set([
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
 ])
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const body = await req.body
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
   const signature = req.headers['stripe-signature'] as string
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+
+  if (!signature || !webhookSecret) {
+    return res.status(400).json({ error: 'Missing stripe webhook secret' })
+  }
 
   let event: Stripe.Event
 
   try {
-    if (!signature || !webhookSecret)
-      throw new Error('Missing stripe webhook secret')
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
+    const chunks: Uint8Array[] = []
+
+    for await (const chunk of req) {
+      chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
+    }
+
+    const rawBody = Buffer.concat(chunks).toString()
+
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
   } catch (err) {
     console.error('Error verifying webhook:', err)
     return res.status(400).json({ error: 'Webhook error' })

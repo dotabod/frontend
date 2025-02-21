@@ -21,22 +21,53 @@ export default async function handler(
       return res.status(400).json({ error: 'Price ID is required' })
     }
 
-    // Create or get customer
-    const customer = await prisma.subscription.findUnique({
+    // First check if user has a subscription record
+    const subscription = await prisma.subscription.findUnique({
       where: { userId: session.user.id },
       select: { stripeCustomerId: true },
     })
 
-    let customerId = customer?.stripeCustomerId
+    let customerId = subscription?.stripeCustomerId
 
-    if (!customerId) {
-      const newCustomer = await stripe.customers.create({
-        email: session.user.email || undefined,
-        metadata: {
+    if (!customerId && session.user.email) {
+      // If no subscription record, check if customer exists in Stripe by email
+      const existingCustomers = await stripe.customers.list({
+        email: session.user.email,
+        limit: 1,
+      })
+
+      if (existingCustomers.data.length > 0) {
+        // Use existing customer
+        customerId = existingCustomers.data[0].id
+      } else {
+        // Create new customer
+        const newCustomer = await stripe.customers.create({
+          email: session.user.email,
+          metadata: {
+            userId: session.user.id,
+          },
+        })
+        customerId = newCustomer.id
+      }
+
+      // Create or update subscription record
+      await prisma.subscription.upsert({
+        where: { userId: session.user.id },
+        create: {
           userId: session.user.id,
+          stripeCustomerId: customerId,
+          tier: 'free',
+        },
+        update: {
+          stripeCustomerId: customerId,
         },
       })
-      customerId = newCustomer.id
+    }
+
+    if (!customerId) {
+      return res
+        .status(400)
+        .json({ error: 'Could not create or find customer' })
     }
 
     // Create checkout session
