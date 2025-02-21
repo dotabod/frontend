@@ -15,7 +15,7 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
   )}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    'Client-Id': process.env.TWITCH_CLIENT_ID,
+    'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
   }
 
   try {

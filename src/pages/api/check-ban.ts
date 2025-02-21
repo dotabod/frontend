@@ -7,11 +7,17 @@ import { authOptions } from '@/lib/auth'
 import { captureException } from '@sentry/nextjs'
 import { getTwitchTokens } from '../../lib/getTwitchTokens'
 
-async function checkBan(broadcasterId: string, accessToken: string) {
+async function checkBan(
+  broadcasterId: string | undefined,
+  accessToken: string
+) {
+  if (!broadcasterId) {
+    throw new Error('Broadcaster ID is required')
+  }
   const checkUrl = `https://api.twitch.tv/helix/moderation/banned?broadcaster_id=${broadcasterId}&user_id=${process.env.TWITCH_BOT_PROVIDERID}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    'Client-Id': process.env.TWITCH_CLIENT_ID,
+    'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
   }
 
   try {

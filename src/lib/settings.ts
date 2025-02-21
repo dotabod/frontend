@@ -1,9 +1,13 @@
 import { type SettingKeys, defaultSettings } from '@/lib/defaultSettings'
 
 export const getValueOrDefault = (
-  key: SettingKeys,
+  key?: SettingKeys,
   data?: { key: string; value: any }[]
 ) => {
+  if (!key) {
+    return
+  }
+
   if (!Array.isArray(data) || !data.length || !data.filter(Boolean).length) {
     return defaultSettings[key]
   }

@@ -6,7 +6,7 @@ const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
 async function fetchLanguageProgress(
   projectId: string,
   languageId: string,
-  token: string
+  token: string | undefined
 ) {
   const url = `${CROWDIN_API_BASE_URL}/projects/${projectId}/languages/${languageId}/progress?limit=1&offset=0`
   console.log(`Fetching language progress from ${url} ...`)

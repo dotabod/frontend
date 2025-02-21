@@ -83,7 +83,9 @@ const App = ({
         <StyleProvider hashPriority="high">
           <SentrySession />
           <VercelAnalytics />
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+          <GoogleAnalytics
+            gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''}
+          />
           <MantineProvider>
             <Provider store={store}>
               <AntProvider>

@@ -10,7 +10,14 @@ import fetch from 'node-fetch'
 const TWITCH_MODERATED_CHANNELS_URL =
   'https://api.twitch.tv/helix/moderation/moderators'
 
-export async function getModerators(userId: string, accessToken: string) {
+export async function getModerators(
+  userId: string | undefined,
+  accessToken: string
+) {
+  if (!userId) {
+    throw new Error('User ID is required')
+  }
+
   try {
     const allModerators: {
       user_id: string
