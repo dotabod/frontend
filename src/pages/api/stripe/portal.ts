@@ -32,10 +32,16 @@ export default async function handler(
       return res.status(400).json({ error: 'No Stripe customer found' })
     }
 
+    // Ensure return URL has explicit https:// scheme
+    const baseUrl = process.env.NEXTAUTH_URL || ''
+    const returnUrl = baseUrl.startsWith('http')
+      ? baseUrl
+      : `https://${baseUrl}`
+
     // Create customer portal session
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
+      return_url: `${returnUrl}/dashboard/billing`,
     })
 
     return res.status(200).json({ url: portalSession.url })
