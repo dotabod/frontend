@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import {
   type SubscriptionStatus,
   isSubscriptionActive,
+  getCurrentPeriod,
 } from '@/utils/subscription'
 import { Button } from 'antd'
 
@@ -15,6 +16,7 @@ const BillingPage = () => {
     null
   )
   const [isLoading, setIsLoading] = useState(false)
+  const period = getCurrentPeriod(subscription?.stripePriceId)
 
   useEffect(() => {
     async function getSubscription() {
@@ -54,6 +56,15 @@ const BillingPage = () => {
         <title>Dotabod | Billing</title>
       </Head>
       <Header subtitle="Manage your billing information." title="Billing" />
+
+      {subscription && subscription.status === 'active' && (
+        <p>
+          You are currently on the{' '}
+          {subscription.tier.charAt(0).toUpperCase() +
+            subscription.tier.slice(1)}{' '}
+          plan ({period})
+        </p>
+      )}
 
       {isSubscriptionActive(subscription) && (
         <div className="mt-6">

@@ -4,7 +4,6 @@ import { signIn, useSession } from 'next-auth/react'
 import {
   getPriceId,
   type SubscriptionStatus,
-  TIER_LEVELS,
   type SubscriptionTier,
   calculateSavings,
 } from '@/utils/subscription'
@@ -55,13 +54,7 @@ function Plan({
       return button.label
     }
 
-    if (subscription.tier === targetTier) {
-      return 'Manage current plan'
-    }
-
-    return TIER_LEVELS[targetTier] > TIER_LEVELS[subscription.tier]
-      ? 'Upgrade via portal'
-      : 'Change via portal'
+    return 'Manage plan'
   }
 
   const buttonText = getSimplifiedButtonText()

@@ -2,13 +2,31 @@ import clsx from 'clsx'
 import { Radio, RadioGroup } from '@headlessui/react'
 import { calculateSavings } from '@/utils/subscription'
 import { plans } from '@/components/Billing/BillingPlans'
+import { useEffect } from 'react'
+import { type SubscriptionStatus, PRICE_IDS } from '@/utils/subscription'
 
 interface PeriodToggleProps {
   activePeriod: 'Monthly' | 'Annually'
   onChange: (period: 'Monthly' | 'Annually') => void
+  subscription: SubscriptionStatus | null
 }
 
-export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
+export function PeriodToggle({
+  activePeriod,
+  onChange,
+  subscription,
+}: PeriodToggleProps) {
+  // Set initial period based on subscription
+  useEffect(() => {
+    if (subscription?.status === 'active') {
+      const isMonthly = PRICE_IDS.some(
+        (price) => price.monthly === subscription.stripePriceId
+      )
+      const period = isMonthly ? 'Monthly' : 'Annually'
+      onChange(period)
+    }
+  }, [subscription, onChange])
+
   return (
     <RadioGroup
       value={activePeriod}

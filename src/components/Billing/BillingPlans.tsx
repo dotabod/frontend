@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PeriodToggle } from './PeriodToggle'
-import type { SubscriptionStatus } from '@/utils/subscription'
+import { type SubscriptionStatus, getCurrentPeriod } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
 import Image from 'next/image'
 import Plan from '../Plan'
@@ -121,6 +121,8 @@ export function BillingPlans({
     'Monthly'
   )
 
+  const period = getCurrentPeriod(subscription?.stripePriceId)
+
   return (
     <div>
       {showTitle && (
@@ -133,14 +135,18 @@ export function BillingPlans({
               You are currently on the{' '}
               {subscription.tier.charAt(0).toUpperCase() +
                 subscription.tier.slice(1)}{' '}
-              plan
+              plan ({period})
             </p>
           )}
         </div>
       )}
 
       <div className="mt-8 flex justify-center">
-        <PeriodToggle activePeriod={activePeriod} onChange={setActivePeriod} />
+        <PeriodToggle
+          activePeriod={activePeriod}
+          onChange={setActivePeriod}
+          subscription={subscription}
+        />
       </div>
 
       <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-3">
