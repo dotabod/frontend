@@ -1,3 +1,4 @@
+import { SettingKeys } from '@/lib/defaultSettings'
 export function calculateSavings(
   monthlyPrice: string,
   annualPrice: string
@@ -59,13 +60,70 @@ export const PRICE_IDS: SubscriptionPriceId[] = [
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
   },
 ]
-export const FEATURE_TIERS = {
+export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
+  // Free Tier Features
   'minimap-blocker': SUBSCRIPTION_TIERS.FREE,
-  'pick-blocker': SUBSCRIPTION_TIERS.STARTER,
-  'obs-integration': SUBSCRIPTION_TIERS.PRO,
-  'mmr-tracking': SUBSCRIPTION_TIERS.STARTER,
-  predictions: SUBSCRIPTION_TIERS.STARTER,
-  'stream-delay': SUBSCRIPTION_TIERS.PRO,
+  chatter: SUBSCRIPTION_TIERS.FREE,
+  'only-block-ranked': SUBSCRIPTION_TIERS.FREE,
+  commandCommands: SUBSCRIPTION_TIERS.FREE,
+  commandMmr: SUBSCRIPTION_TIERS.FREE,
+  commandDisable: SUBSCRIPTION_TIERS.FREE,
+
+  // Starter Tier Features
+  'mmr-tracker': SUBSCRIPTION_TIERS.STARTER,
+  bets: SUBSCRIPTION_TIERS.STARTER,
+  'picks-blocker': SUBSCRIPTION_TIERS.STARTER,
+  rosh: SUBSCRIPTION_TIERS.STARTER,
+  commandDelay: SUBSCRIPTION_TIERS.STARTER,
+  commandOnline: SUBSCRIPTION_TIERS.STARTER,
+  commandWL: SUBSCRIPTION_TIERS.STARTER,
+  commandRanked: SUBSCRIPTION_TIERS.STARTER,
+  commandRosh: SUBSCRIPTION_TIERS.STARTER,
+  chatters: SUBSCRIPTION_TIERS.STARTER, // All basic chat interactions
+  aegis: SUBSCRIPTION_TIERS.STARTER,
+
+  // Pro Tier Features
+  'obs-scene-switcher': SUBSCRIPTION_TIERS.PRO,
+  streamDelay: SUBSCRIPTION_TIERS.PRO,
+  livePolls: SUBSCRIPTION_TIERS.PRO,
+  'minimap-simple': SUBSCRIPTION_TIERS.PRO,
+  'minimap-xl': SUBSCRIPTION_TIERS.PRO,
+  notablePlayersOverlay: SUBSCRIPTION_TIERS.PRO,
+  notablePlayersOverlayFlags: SUBSCRIPTION_TIERS.PRO,
+  notablePlayersOverlayFlagsCmd: SUBSCRIPTION_TIERS.PRO,
+  winProbabilityOverlay: SUBSCRIPTION_TIERS.PRO,
+  queueBlocker: SUBSCRIPTION_TIERS.PRO,
+  queueBlockerFindMatch: SUBSCRIPTION_TIERS.PRO,
+  commandSpectators: SUBSCRIPTION_TIERS.PRO,
+  commandFacet: SUBSCRIPTION_TIERS.PRO,
+  commandInnate: SUBSCRIPTION_TIERS.PRO,
+  commandShard: SUBSCRIPTION_TIERS.PRO,
+  commandAghs: SUBSCRIPTION_TIERS.PRO,
+  commandWinProbability: SUBSCRIPTION_TIERS.PRO,
+  commandAPM: SUBSCRIPTION_TIERS.PRO,
+  commandAvg: SUBSCRIPTION_TIERS.PRO,
+  commandDotabuff: SUBSCRIPTION_TIERS.PRO,
+  commandGM: SUBSCRIPTION_TIERS.PRO,
+  commandGPM: SUBSCRIPTION_TIERS.PRO,
+  commandHero: SUBSCRIPTION_TIERS.PRO,
+  commandLG: SUBSCRIPTION_TIERS.PRO,
+  commandModsonly: SUBSCRIPTION_TIERS.PRO,
+  commandNP: SUBSCRIPTION_TIERS.PRO,
+  commandOpendota: SUBSCRIPTION_TIERS.PRO,
+  commandPleb: SUBSCRIPTION_TIERS.PRO,
+  commandSmurfs: SUBSCRIPTION_TIERS.PRO,
+  commandProfile: SUBSCRIPTION_TIERS.PRO,
+  commandLGS: SUBSCRIPTION_TIERS.PRO,
+  commandSteam: SUBSCRIPTION_TIERS.PRO,
+  commandXPM: SUBSCRIPTION_TIERS.PRO,
+  commandBuilds: SUBSCRIPTION_TIERS.PRO,
+  commandItems: SUBSCRIPTION_TIERS.PRO,
+  commandVersion: SUBSCRIPTION_TIERS.PRO,
+  commandResetwl: SUBSCRIPTION_TIERS.PRO,
+  commandLocale: SUBSCRIPTION_TIERS.PRO,
+  showRankMmr: SUBSCRIPTION_TIERS.PRO,
+  showRankImage: SUBSCRIPTION_TIERS.PRO,
+  showRankLeader: SUBSCRIPTION_TIERS.PRO,
 } as const
 
 export type FeatureTier = keyof typeof FEATURE_TIERS
