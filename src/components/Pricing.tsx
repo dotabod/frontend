@@ -16,8 +16,13 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { signIn } from 'next-auth/react'
-import { getPriceId } from '@/lib/stripe'
 import { createCheckoutSession } from '@/lib/stripe'
+import {
+  type SubscriptionStatus,
+  getButtonText,
+  isButtonDisabled,
+  getPriceId,
+} from '@/utils/subscription'
 
 const featureCategories = [
   {
@@ -305,13 +310,6 @@ function CheckIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
-type SubscriptionStatus = {
-  tier: 'free' | 'starter' | 'pro'
-  status: string
-  currentPeriodEnd?: Date
-  cancelAtPeriodEnd?: boolean
-}
-
 function Plan({
   name,
   price,
@@ -347,30 +345,9 @@ function Plan({
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.Monthly, price.Annually)
 
-  // Get button text based on subscription status
-  const getButtonText = () => {
-    if (!subscription || subscription.status !== 'active') {
-      return button.label
-    }
-
-    const currentTier = subscription.tier
-    const targetTier = name.toLowerCase() as 'free' | 'starter' | 'pro'
-
-    if (currentTier === targetTier) {
-      return subscription.cancelAtPeriodEnd ? 'Reactivate' : 'Current plan'
-    }
-
-    const tierLevels = { free: 0, starter: 1, pro: 2 }
-    return tierLevels[targetTier] > tierLevels[currentTier]
-      ? 'Upgrade'
-      : 'Downgrade'
-  }
-
-  // Disable button if it's current non-cancelled plan
-  const isButtonDisabled =
-    subscription?.status === 'active' &&
-    subscription.tier === name.toLowerCase() &&
-    !subscription.cancelAtPeriodEnd
+  const targetTier = name.toLowerCase() as SubscriptionTier
+  const buttonText = getButtonText(subscription, targetTier, button.label)
+  const disabled = isButtonDisabled(subscription, targetTier)
 
   const handleSubscribe = async () => {
     setRedirectingToCheckout(true)
@@ -544,17 +521,17 @@ function Plan({
         onClick={handleSubscribe}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
-        disabled={isButtonDisabled}
+        disabled={disabled}
         className={clsx(
           'mt-6',
           featured
             ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
             : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-          isButtonDisabled && 'opacity-50 cursor-not-allowed'
+          disabled && 'opacity-50 cursor-not-allowed'
         )}
         aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
       >
-        {getButtonText()}
+        {buttonText}
       </Button>
     </section>
   )

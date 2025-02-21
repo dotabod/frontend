@@ -1,7 +1,8 @@
 'use client'
 
 import { Container } from '@/components/Container'
-import { createCheckoutSession, getPriceId } from '@/lib/stripe'
+import { getPriceId } from '@/utils/subscription'
+import { createCheckoutSession } from '@/lib/stripe'
 import { Button } from 'antd'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
@@ -9,6 +10,7 @@ import { useSearchParams } from 'next/navigation'
 import { useState, type ReactElement, useEffect } from 'react'
 import type { NextPageWithLayout } from '@/pages/_app'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { notification } from 'antd'
 
 const RegisterPage: NextPageWithLayout = () => {
   const { data: session } = useSession()
@@ -40,7 +42,11 @@ const RegisterPage: NextPageWithLayout = () => {
       window.location.href = response.url
     } catch (error) {
       console.error('Subscription error:', error)
-      message.error('Failed to start subscription. Please try again.')
+      notification.error({
+        message: 'Subscription Error',
+        description: 'Failed to start subscription. Please try again.',
+        placement: 'bottomRight',
+      })
     } finally {
       setIsLoading(false)
     }
@@ -48,10 +54,14 @@ const RegisterPage: NextPageWithLayout = () => {
 
   // If user is already logged in, redirect to checkout immediately
   useEffect(() => {
-    if (session && plan && period) {
-      handleSubscribe()
+    const handleInitialSubscribe = async () => {
+      if (session && plan && period) {
+        await handleSubscribe()
+      }
     }
-  }, [session, plan, period, handleSubscribe])
+
+    handleInitialSubscribe()
+  }, [session, plan, period])
 
   // Show loading state if we're about to redirect
   if (session) {
