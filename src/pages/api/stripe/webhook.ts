@@ -1,6 +1,7 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { headers } from 'next/headers'
+import type { NextApiResponse } from 'next'
+import type { NextApiRequest } from 'next'
 import type Stripe from 'stripe'
 
 const relevantEvents = new Set([
@@ -9,9 +10,12 @@ const relevantEvents = new Set([
   'customer.subscription.deleted',
 ])
 
-export async function POST(req: Request) {
-  const body = await req.text()
-  const signature = headers().get('Stripe-Signature') as string
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const body = await req.body
+  const signature = req.headers['stripe-signature'] as string
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
   let event: Stripe.Event
@@ -22,10 +26,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err) {
     console.error('Error verifying webhook:', err)
-    return new Response(
-      `Webhook Error: ${err instanceof Error ? err.message : 'Unknown Error'}`,
-      { status: 400 }
-    )
+    return res.status(400).json({ error: 'Webhook error' })
   }
 
   if (relevantEvents.has(event.type)) {
@@ -43,11 +44,11 @@ export async function POST(req: Request) {
       }
     } catch (error) {
       console.error('Error processing webhook event:', error)
-      return new Response('Webhook handler failed', { status: 500 })
+      return res.status(500).json({ error: 'Webhook handler failed' })
     }
   }
 
-  return new Response(JSON.stringify({ received: true }))
+  return res.status(200).json({ received: true })
 }
 
 async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {

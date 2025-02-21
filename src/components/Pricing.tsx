@@ -9,11 +9,15 @@ import {
   StarOutlined,
 } from '@ant-design/icons'
 import { Radio, RadioGroup } from '@headlessui/react'
-import { Button, Table, Tooltip } from 'antd'
+import { Button, Table, Tooltip, notification } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
+import { getPriceId } from '@/lib/stripe'
+import { createCheckoutSession } from '@/lib/stripe'
 
 const featureCategories = [
   {
@@ -328,8 +332,45 @@ function Plan({
   logomarkClassName?: string
   featured?: boolean
 }) {
+  const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.Monthly, price.Annually)
+
+  const handleSubscribe = async () => {
+    setRedirectingToCheckout(true)
+    try {
+      if (!session) {
+        await signIn('twitch', {
+          callbackUrl: `/register?plan=${name.toLowerCase()}&period=${activePeriod.toLowerCase()}`,
+        })
+        return
+      }
+
+      // Already logged in - go straight to checkout
+      const priceId = getPriceId(
+        name.toLowerCase() as 'starter' | 'pro',
+        activePeriod.toLowerCase() as 'monthly' | 'annual'
+      )
+      const response = await createCheckoutSession(priceId, session.user.id)
+
+      if (!response.url) {
+        throw new Error('Failed to create checkout session')
+      }
+
+      window.location.href = response.url
+    } catch (error) {
+      console.error('Subscription error:', error)
+      notification.error({
+        message: 'Subscription Error',
+        description:
+          'Failed to start subscription process. Please try again later.',
+        placement: 'bottomRight',
+      })
+    } finally {
+      setRedirectingToCheckout(false)
+    }
+  }
+
   return (
     <section
       className={clsx(
@@ -429,17 +470,16 @@ function Plan({
       </div>
       <Button
         loading={redirectingToCheckout}
-        href={button.href}
+        onClick={handleSubscribe}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
-        onClick={() => setRedirectingToCheckout(true)}
         className={clsx(
           'mt-6',
           featured
             ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
             : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
         )}
-        aria-label={`Get started with the ${name} plan for ${price}`}
+        aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
       >
         {button.label}
       </Button>

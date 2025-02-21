@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export async function GET(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
   { params }: { params: { userId: string } }
@@ -11,7 +11,7 @@ export async function GET(
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) {
-      return new Response('Unauthorized', { status: 401 })
+      return res.status(401).json({ error: 'Unauthorized' })
     }
 
     const subscription = await prisma.subscription.findUnique({
@@ -25,17 +25,15 @@ export async function GET(
     })
 
     if (!subscription) {
-      return new Response(
-        JSON.stringify({
-          tier: 'free',
-          status: 'inactive',
-        })
-      )
+      return res.status(200).json({
+        tier: 'free',
+        status: 'inactive',
+      })
     }
 
-    return new Response(JSON.stringify(subscription))
+    return res.status(200).json(subscription)
   } catch (error) {
     console.error('Error in subscription route:', error)
-    return new Response('Internal Server Error', { status: 500 })
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 }
