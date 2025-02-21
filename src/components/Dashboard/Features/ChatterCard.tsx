@@ -297,11 +297,13 @@ export const chatterInfo = {
   },
   neutralItems: {
     tooltip:
-      'Depending on whether you\'re playing turbo or normal, neutral items will be available at different times.',
+      "Depending on whether you're playing turbo or normal, neutral items will be available at different times.",
     category: CATEGORIES.Event,
     message: (
       <span className="inline space-x-2">
-        <span>Tier 5 neutral items are now available! Time to check the jungle</span>
+        <span>
+          Tier 5 neutral items are now available! Time to check the jungle
+        </span>
         <Image
           width={22}
           height={22}

@@ -113,7 +113,7 @@ const OverlayPage = () => {
       leaderboard:
         'standing' in rank
           ? rank.standing
-          : (steamAccount?.leaderboard_rank ?? false),
+          : steamAccount?.leaderboard_rank ?? false,
       notLoaded: false,
     }
 

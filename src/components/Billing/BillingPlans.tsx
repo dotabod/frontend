@@ -35,10 +35,10 @@ export const plans = [
     ],
     logo: (
       <Image
-        src='https://cdn.betterttv.net/emote/58cd3345994bb43c8d300b82/3x.webp'
+        src="https://cdn.betterttv.net/emote/58cd3345994bb43c8d300b82/3x.webp"
         width={24}
         height={24}
-        alt='Free'
+        alt="Free"
       />
     ),
     logomarkClassName: 'fill-gray-300',
@@ -50,7 +50,8 @@ export const plans = [
       monthly: '$3',
       annual: '$30',
     },
-    description: 'Essential features for growing streamers who want core Dota 2 integration.',
+    description:
+      'Essential features for growing streamers who want core Dota 2 integration.',
     button: {
       label: 'Subscribe',
       href: `/register?plan=${SUBSCRIPTION_TIERS.STARTER}`,
@@ -67,11 +68,11 @@ export const plans = [
     ],
     logo: (
       <Image
-        src='https://cdn.betterttv.net/emote/61f2f17c06fd6a9f5be2630a/3x.webp'
+        src="https://cdn.betterttv.net/emote/61f2f17c06fd6a9f5be2630a/3x.webp"
         width={24}
         height={24}
-        className='rounded'
-        alt='Starter'
+        className="rounded"
+        alt="Starter"
       />
     ),
     logomarkClassName: 'fill-gray-500',
@@ -99,24 +100,28 @@ export const plans = [
       'OBS scene switcher',
       'Manager access',
       'All commands and features unlocked',
-      <span key='beta-features' className='flex items-center gap-1'>
-        <StarOutlined className='text-yellow-500' /> Early access to beta features and updates
+      <span key="beta-features" className="flex items-center gap-1">
+        <StarOutlined className="text-yellow-500" /> Early access to beta
+        features and updates
       </span>,
     ],
     logo: (
       <Image
-        src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+        src="https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp"
         width={24}
         height={24}
-        className='rounded'
-        alt='Pro'
+        className="rounded"
+        alt="Pro"
       />
     ),
     logomarkClassName: 'fill-purple-500',
   },
 ]
 
-export function BillingPlans({ subscription, showTitle = true }: BillingPlansProps) {
+export function BillingPlans({
+  subscription,
+  showTitle = true,
+}: BillingPlansProps) {
   const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const { data: session } = useSession()
 
@@ -129,21 +134,22 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
   return (
     <div>
       {showTitle && (
-        <div className='mx-auto max-w-2xl text-center'>
-          <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-medium tracking-tight text-gray-100">
             Simple pricing for every Dota 2 streamer
           </h2>
           {subscription && subscription.status === 'active' && (
-            <p className='mt-2 text-lg text-purple-400'>
+            <p className="mt-2 text-lg text-purple-400">
               You are currently on the{' '}
-              {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
-              {period})
+              {subscription.tier.charAt(0).toUpperCase() +
+                subscription.tier.slice(1)}{' '}
+              plan ({period})
             </p>
           )}
         </div>
       )}
 
-      <div className='mt-8 flex justify-center'>
+      <div className="mt-8 flex justify-center">
         <PeriodToggle
           activePeriod={activePeriod}
           onChange={setActivePeriod}
@@ -151,9 +157,14 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
         />
       </div>
 
-      <div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-3'>
+      <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-3">
         {plans.map((plan) => (
-          <Plan key={plan.name} {...plan} activePeriod={activePeriod} subscription={subscription} />
+          <Plan
+            key={plan.name}
+            {...plan}
+            activePeriod={activePeriod}
+            subscription={subscription}
+          />
         ))}
       </div>
     </div>

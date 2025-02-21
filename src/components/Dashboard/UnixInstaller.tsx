@@ -72,8 +72,10 @@ export default function UnixInstaller() {
               </p>
             </li>
             <li>
-              <p>Download the file and drag it into the
-              &quot;gamestate_integration&quot; folder.</p>
+              <p>
+                Download the file and drag it into the
+                &quot;gamestate_integration&quot; folder.
+              </p>
               <DownloadButton url={url} user={user} data={data} />
             </li>
             <div className="space-y-4">
@@ -108,13 +110,11 @@ export default function UnixInstaller() {
             </div>
             <li className="space-x-1">
               <p>
-              <span>Add</span>
-              <Typography.Text code>-gamestateintegration</Typography.Text>
-              <span>
-                to your Dota 2 launch options in Steam.
-              </span></p>
-              <p>This allows the Dota 2
-              client to send game data to Dotabod.</p>
+                <span>Add</span>
+                <Typography.Text code>-gamestateintegration</Typography.Text>
+                <span>to your Dota 2 launch options in Steam.</span>
+              </p>
+              <p>This allows the Dota 2 client to send game data to Dotabod.</p>
             </li>
 
             <div className="flex flex-col items-center space-y-4">
@@ -135,9 +135,7 @@ export default function UnixInstaller() {
                 Your browser does not support the video tag.
               </video>
             </div>
-            <li>
-              Restart Dota 2 to ensure that the changes take effect.
-            </li>
+            <li>Restart Dota 2 to ensure that the changes take effect.</li>
           </ol>
         </div>
       </div>
