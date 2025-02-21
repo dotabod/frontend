@@ -2,11 +2,17 @@ import clsx from 'clsx'
 import ModImage from './ModImage'
 
 export default function TwitchChat({
-  command = null,
+  command = '',
   className = '',
   modOnly = false,
   responses = [],
-  response = null,
+  response = '',
+}: {
+  command: string
+  className?: string
+  modOnly?: boolean
+  responses?: React.ReactNode[]
+  response?: React.ReactNode
 }) {
   if (response) responses.push(response)
   return (

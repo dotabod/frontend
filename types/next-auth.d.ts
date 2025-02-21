@@ -7,6 +7,8 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: UserId
     isImpersonating: boolean
+    image: string
+    name: string
     twitchId: UserId
     locale: UserId
     scope: string
@@ -17,6 +19,8 @@ declare module 'next-auth' {
   interface Session {
     user: User & {
       id: UserId
+      image: string
+      name: string
       isImpersonating: boolean
       twitchId: UserId
       role: UserRole

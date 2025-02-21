@@ -1,6 +1,12 @@
 import { Button } from 'antd'
 
-function JustButton({ url, data, user, extension = 'cfg', onClick = null }) {
+function JustButton({
+  url,
+  data,
+  user,
+  extension = 'cfg',
+  onClick = undefined,
+}) {
   return (
     <div>
       <a

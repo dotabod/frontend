@@ -36,11 +36,24 @@ export const emotesRequired = [
   { label: 'PauseChamp', id: '01F6QWHR20000EB9BSAR8G1DKZ' },
 ]
 
+// Add type at the top
+type User = {
+  id?: string
+  personalSet?: string
+  hasDotabodEditor: boolean
+  hasDotabodEmoteSet: boolean
+}
+
+type Emote = {
+  name: string
+  id: string
+}
+
 export default function ChatBot() {
   const { data: accountData, loading: loadingAccounts } = useUpdateAccount()
   const session = useSession()
-  const [emotes, setEmotes] = useState([])
-  const [user, setUser] = useState(null)
+  const [emotes, setEmotes] = useState<Emote[]>([])
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`
   const track = useTrack()
@@ -79,7 +92,9 @@ export default function ChatBot() {
         }
 
         if (updateEmoteSetError) {
-          setUser((prev) => ({ ...prev, hasDotabodEmoteSet: false }))
+          setUser((prev) =>
+            prev ? { ...prev, hasDotabodEmoteSet: false } : null
+          )
           clearInterval(intervalId)
         }
 

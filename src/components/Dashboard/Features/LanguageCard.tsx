@@ -30,10 +30,13 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
             className={clsx(
               'w-11',
               !translation?.data?.translationProgress && 'text-gray-600',
-              translation?.data?.translationProgress > 0 &&
+              translation?.data?.translationProgress &&
+                translation?.data?.translationProgress > 0 &&
                 translation?.data?.translationProgress < 80 &&
                 'text-amber-600',
-              translation?.data?.translationProgress > 80 && 'text-green-400'
+              translation?.data?.translationProgress &&
+                translation?.data?.translationProgress > 80 &&
+                'text-green-400'
             )}
           >
             <Progress
