@@ -32,7 +32,7 @@ function WidgetPage() {
   const [rankImageDetails, setRankImageDetails] = useState<{
     image: string | null
     rank: number | null
-    leaderboard: number | null
+    leaderboard: number | null | undefined
     notLoaded?: boolean
   }>({
     image: '0.png',

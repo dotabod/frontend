@@ -123,14 +123,19 @@ const ModeratorsPage = () => {
               Array.isArray(approvedMods) &&
               approvedMods.map((mod) => `${mod.moderatorChannelId}`)
             }
-            onChange={setSelectedModerators}
+            onChange={(value: string[] | false) => {
+              if (Array.isArray(value)) {
+                setSelectedModerators(value)
+              }
+            }}
             options={
-              Array.isArray(moderatorList) &&
-              moderatorList.map((moderator) => ({
-                label: moderator.user_name,
-                value: moderator.user_id,
-                disabled: moderator.user_id === '843245458',
-              }))
+              Array.isArray(moderatorList)
+                ? moderatorList.map((moderator) => ({
+                    label: moderator.user_name,
+                    value: moderator.user_id,
+                    disabled: moderator.user_id === '843245458',
+                  }))
+                : []
             }
           />
           <Button type="primary" onClick={handleApprove} loading={loading}>

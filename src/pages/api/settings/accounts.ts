@@ -49,19 +49,23 @@ async function getAccounts(userId: string) {
     }
 
     return accounts.map((account) => {
-      if (account.user?.id === userId) {
-        account.connectedUserIds = undefined
-        account.user = undefined
-      } else {
-        account.connectedUserIds = account.connectedUserIds?.filter(
-          (id) => id === userId
-        )
-        if (account.connectedUserIds?.length) {
-          account.connectedUserIds = [account.user?.name]
-        }
-        account.user = undefined
+      const { user, connectedUserIds, ...accountData } = account
+
+      if (user?.id === userId) {
+        return accountData
       }
-      return account
+
+      const filteredConnections = connectedUserIds?.filter(
+        (id) => id === userId
+      )
+      if (filteredConnections?.length) {
+        return {
+          ...accountData,
+          connectedUserIds: user?.name ? [user.name] : [],
+        }
+      }
+
+      return accountData
     })
   } catch (error) {
     captureException(error)
