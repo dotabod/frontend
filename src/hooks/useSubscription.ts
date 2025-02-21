@@ -1,14 +1,8 @@
-import {
-  canAccessFeature,
-  SubscriptionStatus,
-  FeatureTier,
-} from '@/utils/subscription'
+import { canAccessFeature, type SubscriptionStatus, type FeatureTier } from '@/utils/subscription'
 import { useEffect, useState } from 'react'
 
 export function useSubscription() {
-  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
-    null
-  )
+  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {

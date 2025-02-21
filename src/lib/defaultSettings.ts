@@ -40,7 +40,9 @@ export const commands = {
   commandBeta: true,
   commandPing: true,
   commandDotabod: true,
+  commandMute: true,
 }
+export type CommandKeys = keyof typeof commands
 
 export const defaultSettings = {
   obsServerPassword: '',
