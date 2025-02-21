@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PeriodToggle } from './PeriodToggle'
 import {
+  type PricePeriod,
   SUBSCRIPTION_TIERS,
   type SubscriptionStatus,
   getCurrentPeriod,
@@ -18,7 +19,7 @@ export const plans = [
   {
     name: 'Free',
     featured: false,
-    price: { Monthly: '$0', Annually: '$0' },
+    price: { monthly: '$0', annual: '$0' },
     description:
       'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
     button: {
@@ -46,8 +47,8 @@ export const plans = [
     name: 'Starter',
     featured: false,
     price: {
-      Monthly: '$3',
-      Annually: '$30',
+      monthly: '$3',
+      annual: '$30',
     },
     description:
       'Essential features for growing streamers who want core Dota 2 integration.',
@@ -80,8 +81,8 @@ export const plans = [
     name: 'Pro',
     featured: true,
     price: {
-      Monthly: '$6',
-      Annually: '$57',
+      monthly: '$6',
+      annual: '$57',
     },
     description:
       'Complete toolkit for serious streamers who need advanced features and automation.',
@@ -121,9 +122,7 @@ export function BillingPlans({
   subscription,
   showTitle = true,
 }: BillingPlansProps) {
-  const [activePeriod, setActivePeriod] = useState<'Monthly' | 'Annually'>(
-    'Monthly'
-  )
+  const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
 
   const period = getCurrentPeriod(subscription?.stripePriceId)
 

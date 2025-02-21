@@ -7,6 +7,7 @@ import {
   type SubscriptionTier,
   calculateSavings,
   type SUBSCRIPTION_TIERS,
+  type PricePeriod,
 } from '@/utils/subscription'
 import { createCheckoutSession } from '@/lib/stripe'
 import clsx from 'clsx'
@@ -27,8 +28,8 @@ function Plan({
 }: {
   name: string
   price: {
-    Monthly: string
-    Annually: string
+    monthly: string
+    annual: string
   }
   logo: React.ReactNode
   description: string
@@ -37,17 +38,17 @@ function Plan({
     href: string
   }
   features: Array<React.ReactNode>
-  activePeriod: 'Monthly' | 'Annually'
+  activePeriod: PricePeriod
   logomarkClassName?: string
   featured?: boolean
   subscription: SubscriptionStatus | null
 }) {
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
-  const savings = calculateSavings(price.Monthly, price.Annually)
+  const savings = calculateSavings(price.monthly, price.annual)
 
   const targetTier = name.toLowerCase() as SubscriptionTier
-  const period = activePeriod.toLowerCase() as 'monthly' | 'annual'
+  const period = activePeriod
 
   // Update button text logic
   const getSimplifiedButtonText = () => {
@@ -141,36 +142,37 @@ function Plan({
           featured ? 'text-white' : 'text-gray-100'
         )}
       >
-        {price.Monthly === price.Annually ? (
-          price.Monthly
+        {price.monthly === price.annual ? (
+          price.monthly
         ) : (
           <>
             <span
-              aria-hidden={activePeriod === 'Annually'}
+              aria-hidden={activePeriod === 'annual'}
               className={clsx(
                 'transition duration-300',
-                activePeriod === 'Annually' &&
+                activePeriod === 'annual' &&
                   'pointer-events-none translate-x-6 opacity-0 select-none'
               )}
             >
-              {price.Monthly}
+              {price.monthly}
               <span className="text-sm"> / month</span>
             </span>
             <span
-              aria-hidden={activePeriod === 'Monthly'}
+              aria-hidden={activePeriod === 'annual'}
               className={clsx(
                 'absolute top-0 left-0 transition duration-300',
-                activePeriod === 'Monthly' &&
-                  'pointer-events-none -translate-x-6 opacity-0 select-none'
+                activePeriod === 'annual'
+                  ? 'translate-x-0 opacity-100'
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none'
               )}
             >
-              {price.Annually}
+              {price.annual}
               <span className="text-sm"> / year</span>
             </span>
           </>
         )}
       </p>
-      {activePeriod === 'Annually' && !Number.isNaN(savings) && (
+      {activePeriod === 'annual' && !Number.isNaN(savings) && (
         <p
           className={clsx(
             '-mt-10 text-sm',

@@ -1,13 +1,17 @@
 import clsx from 'clsx'
 import { Radio, RadioGroup } from '@headlessui/react'
-import { calculateSavings } from '@/utils/subscription'
+import {
+  calculateSavings,
+  type PricePeriod,
+  type SubscriptionStatus,
+} from '@/utils/subscription'
 import { plans } from '@/components/Billing/BillingPlans'
 import { useEffect } from 'react'
-import { type SubscriptionStatus, PRICE_IDS } from '@/utils/subscription'
+import { getCurrentPeriod } from '@/utils/subscription'
 
 interface PeriodToggleProps {
-  activePeriod: 'Monthly' | 'Annually'
-  onChange: (period: 'Monthly' | 'Annually') => void
+  activePeriod: PricePeriod
+  onChange: (period: PricePeriod) => void
   subscription: SubscriptionStatus | null
 }
 
@@ -19,10 +23,7 @@ export function PeriodToggle({
   // Set initial period based on subscription
   useEffect(() => {
     if (subscription?.status === 'active') {
-      const isMonthly = PRICE_IDS.some(
-        (price) => price.monthly === subscription.stripePriceId
-      )
-      const period = isMonthly ? 'Monthly' : 'Annually'
+      const period = getCurrentPeriod(subscription.stripePriceId)
       onChange(period)
     }
   }, [subscription, onChange])
@@ -33,7 +34,7 @@ export function PeriodToggle({
       onChange={onChange}
       className="grid grid-cols-2 bg-gray-800/50 p-1 rounded-lg"
     >
-      {['Monthly', 'Annually'].map((period) => (
+      {['monthly', 'annual'].map((period) => (
         <Radio
           key={period}
           value={period}
@@ -45,12 +46,12 @@ export function PeriodToggle({
               : 'text-gray-300 hover:bg-gray-700/50'
           )}
         >
-          <div className="flex flex-col items-center gap-1">
-            {period}
-            {period === 'Annually' && (
+          <div className="relative flex flex-col items-center gap-1">
+            <span className="first-letter:uppercase">{period}</span>
+            {period === 'annual' && (
               <div
                 className={clsx(
-                  'absolute -bottom-6 text-xs whitespace-nowrap',
+                  'absolute -bottom-8 text-xs whitespace-nowrap',
                   activePeriod === period
                     ? 'text-purple-400'
                     : 'text-purple-300'
@@ -59,9 +60,9 @@ export function PeriodToggle({
                 Save up to{' '}
                 {Math.max(
                   ...plans
-                    .filter((plan) => plan.price.Monthly !== '$0')
+                    .filter((plan) => plan.price.monthly !== '$0')
                     .map((plan) =>
-                      calculateSavings(plan.price.Monthly, plan.price.Annually)
+                      calculateSavings(plan.price.monthly, plan.price.annual)
                     )
                 )}
                 %
