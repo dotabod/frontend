@@ -3,6 +3,8 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { SubscriptionTier } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -26,7 +28,7 @@ export default async function handler(
 
     if (!subscription) {
       return res.status(200).json({
-        tier: 'free' as const,
+        tier: SUBSCRIPTION_TIERS.FREE,
         status: 'inactive',
         stripePriceId: '',
       })

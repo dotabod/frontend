@@ -7,7 +7,14 @@ export function calculateSavings(
   return Math.round(((monthly - annual) / monthly) * 100)
 }
 
-export type SubscriptionTier = 'free' | 'starter' | 'pro'
+export const SUBSCRIPTION_TIERS = {
+  FREE: 'free',
+  STARTER: 'starter',
+  PRO: 'pro',
+} as const
+
+export type SubscriptionTier =
+  (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
 export type SubscriptionTierStatus =
   | 'active'
   | 'inactive'
@@ -28,16 +35,10 @@ export type SubscriptionStatus = {
   stripePriceId: string
 }
 
-export const SUBSCRIPTION_TIERS = {
-  FREE: 'free',
-  STARTER: 'starter',
-  PRO: 'pro',
-} as const
-
 export const TIER_LEVELS: Record<SubscriptionTier, number> = {
-  free: 0,
-  starter: 1,
-  pro: 2,
+  [SUBSCRIPTION_TIERS.FREE]: 0,
+  [SUBSCRIPTION_TIERS.STARTER]: 1,
+  [SUBSCRIPTION_TIERS.PRO]: 2,
 }
 
 export const PRICE_PERIODS = {
@@ -48,24 +49,24 @@ export const PRICE_PERIODS = {
 export type PricePeriod = (typeof PRICE_PERIODS)[keyof typeof PRICE_PERIODS]
 export const PRICE_IDS: SubscriptionPriceId[] = [
   {
-    tier: 'starter',
+    tier: SUBSCRIPTION_TIERS.STARTER,
     monthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_MONTHLY_PRICE_ID || '',
     annual: process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || '',
   },
   {
-    tier: 'pro',
+    tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
   },
 ]
 
 const FEATURE_TIERS: Record<string, SubscriptionTier> = {
-  'minimap-blocker': 'free',
-  'pick-blocker': 'starter',
-  'obs-integration': 'pro',
-  'mmr-tracking': 'starter',
-  predictions: 'starter',
-  'stream-delay': 'pro',
+  'minimap-blocker': SUBSCRIPTION_TIERS.FREE,
+  'pick-blocker': SUBSCRIPTION_TIERS.STARTER,
+  'obs-integration': SUBSCRIPTION_TIERS.PRO,
+  'mmr-tracking': SUBSCRIPTION_TIERS.STARTER,
+  predictions: SUBSCRIPTION_TIERS.STARTER,
+  'stream-delay': SUBSCRIPTION_TIERS.PRO,
   // Add more features and their required tiers
 }
 
@@ -75,10 +76,10 @@ export function canAccessFeature(
   subscription: SubscriptionStatus | null
 ): boolean {
   if (!subscription || subscription.status !== 'active') {
-    return FEATURE_TIERS[feature] === 'free'
+    return FEATURE_TIERS[feature] === SUBSCRIPTION_TIERS.FREE
   }
 
-  const requiredTier = FEATURE_TIERS[feature] || 'pro'
+  const requiredTier = FEATURE_TIERS[feature] || SUBSCRIPTION_TIERS.PRO
   return TIER_LEVELS[subscription.tier] >= TIER_LEVELS[requiredTier]
 }
 
@@ -93,12 +94,13 @@ export function isTrialEligible(
 ): boolean {
   return (
     !subscription ||
-    (subscription.tier === 'free' && subscription.status === 'inactive')
+    (subscription.tier === SUBSCRIPTION_TIERS.FREE &&
+      subscription.status === 'inactive')
   )
 }
 
 export function getPriceId(
-  tier: Exclude<SubscriptionTier, 'free'>,
+  tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod
 ): string {
   const price = PRICE_IDS.find((p) => p.tier === tier)
@@ -147,20 +149,18 @@ export function isButtonDisabled(
   targetPeriod: PricePeriod
 ): boolean {
   // Free tier button should never be disabled
-  if (targetTier === 'free') return false
+  if (targetTier === SUBSCRIPTION_TIERS.FREE) return false
 
   if (!subscription || subscription.status !== 'active') return false
 
-  // Only get price ID for paid tiers
-  if (targetTier !== 'free') {
-    const targetPriceId = getPriceId(targetTier, targetPeriod)
-    return (
-      subscription.stripePriceId === targetPriceId &&
-      !subscription.cancelAtPeriodEnd
-    )
-  }
-
-  return false
+  const targetPriceId = getPriceId(
+    targetTier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
+    targetPeriod
+  )
+  return (
+    subscription.stripePriceId === targetPriceId &&
+    !subscription.cancelAtPeriodEnd
+  )
 }
 
 // Validation

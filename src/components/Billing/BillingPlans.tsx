@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { PeriodToggle } from './PeriodToggle'
-import { type SubscriptionStatus, getCurrentPeriod } from '@/utils/subscription'
+import {
+  SUBSCRIPTION_TIERS,
+  type SubscriptionStatus,
+  getCurrentPeriod,
+} from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
 import Image from 'next/image'
 import Plan from '../Plan'
@@ -19,7 +23,7 @@ export const plans = [
       'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
     button: {
       label: 'Get started for free',
-      href: '/register?plan=free',
+      href: `/register?plan=${SUBSCRIPTION_TIERS.FREE}`,
     },
     features: [
       'Multi-language support',
@@ -49,7 +53,7 @@ export const plans = [
       'Essential features for growing streamers who want core Dota 2 integration.',
     button: {
       label: 'Subscribe',
-      href: '/register?plan=starter',
+      href: `/register?plan=${SUBSCRIPTION_TIERS.STARTER}`,
     },
     features: [
       'All Free features',
@@ -83,7 +87,7 @@ export const plans = [
       'Complete toolkit for serious streamers who need advanced features and automation.',
     button: {
       label: 'Subscribe',
-      href: '/register?plan=pro',
+      href: `/register?plan=${SUBSCRIPTION_TIERS.PRO}`,
     },
     features: [
       'All Starter features',

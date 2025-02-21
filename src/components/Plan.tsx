@@ -6,6 +6,7 @@ import {
   type SubscriptionStatus,
   type SubscriptionTier,
   calculateSavings,
+  type SUBSCRIPTION_TIERS,
 } from '@/utils/subscription'
 import { createCheckoutSession } from '@/lib/stripe'
 import clsx from 'clsx'
@@ -86,7 +87,10 @@ function Plan({
 
       // For new subscriptions, create checkout session
       const priceId = getPriceId(
-        name.toLowerCase() as 'starter' | 'pro',
+        name.toLowerCase() as Exclude<
+          SubscriptionTier,
+          typeof SUBSCRIPTION_TIERS.FREE
+        >,
         period
       )
       const response = await createCheckoutSession(priceId, session.user.id)

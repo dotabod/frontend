@@ -10,6 +10,7 @@ import type { ColumnsType } from 'antd/es/table'
 import Image from 'next/image'
 import { BillingPlans } from './Billing/BillingPlans'
 import { useSubscription } from '@/hooks/useSubscription'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 const featureCategories = [
   {
@@ -208,8 +209,8 @@ function FeatureComparison() {
     },
     {
       title: 'Free',
-      dataIndex: 'free',
-      key: 'free',
+      dataIndex: SUBSCRIPTION_TIERS.FREE,
+      key: SUBSCRIPTION_TIERS.FREE,
       align: 'center',
       render: (value: React.ReactNode | FeatureValue | null) =>
         value && typeof value === 'object' && 'value' in value ? (
@@ -222,8 +223,8 @@ function FeatureComparison() {
     },
     {
       title: 'Starter',
-      dataIndex: 'starter',
-      key: 'starter',
+      dataIndex: SUBSCRIPTION_TIERS.STARTER,
+      key: SUBSCRIPTION_TIERS.STARTER,
       align: 'center',
       render: (value: React.ReactNode | FeatureValue | null) =>
         value && typeof value === 'object' && 'value' in value ? (
@@ -236,8 +237,8 @@ function FeatureComparison() {
     },
     {
       title: 'Pro',
-      dataIndex: 'pro',
-      key: 'pro',
+      dataIndex: SUBSCRIPTION_TIERS.PRO,
+      key: SUBSCRIPTION_TIERS.PRO,
       align: 'center',
       render: (value: React.ReactNode | FeatureValue | null) =>
         value && typeof value === 'object' && 'value' in value ? (

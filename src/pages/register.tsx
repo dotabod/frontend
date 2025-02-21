@@ -1,7 +1,12 @@
 'use client'
 
 import { Container } from '@/components/Container'
-import { getPriceId } from '@/utils/subscription'
+import {
+  getPriceId,
+  SUBSCRIPTION_TIERS,
+  type PricePeriod,
+  type SubscriptionTier,
+} from '@/utils/subscription'
 import { createCheckoutSession } from '@/lib/stripe'
 import { Button } from 'antd'
 import { signIn, useSession } from 'next-auth/react'
@@ -16,7 +21,7 @@ const RegisterPage: NextPageWithLayout = () => {
   const user = useSession()?.data?.user
   const [isLoading, setIsLoading] = useState(false)
   const searchParams = useSearchParams()
-  const plan = searchParams?.get('plan') || 'starter'
+  const plan = searchParams?.get('plan') || SUBSCRIPTION_TIERS.STARTER
   const period = searchParams?.get('period') || 'monthly'
 
   const handleSubscribe = useCallback(async () => {
@@ -30,8 +35,8 @@ const RegisterPage: NextPageWithLayout = () => {
       }
 
       const priceId = getPriceId(
-        plan as 'starter' | 'pro',
-        period as 'monthly' | 'annual'
+        plan as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
+        period as PricePeriod
       )
       const response = await createCheckoutSession(priceId, user.id)
 

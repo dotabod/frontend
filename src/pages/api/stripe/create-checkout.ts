@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe-server'
 import prisma from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 export default async function handler(
   req: NextApiRequest,
@@ -56,7 +57,7 @@ export default async function handler(
         create: {
           userId: session.user.id,
           stripeCustomerId: customerId,
-          tier: 'free',
+          tier: SUBSCRIPTION_TIERS.FREE,
         },
         update: {
           stripeCustomerId: customerId,

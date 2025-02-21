@@ -4,6 +4,7 @@ import type { NextApiResponse } from 'next'
 import type { NextApiRequest } from 'next'
 import type Stripe from 'stripe'
 import { PRICE_IDS } from '@/lib/stripe'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 // Disable the default body parser
 export const config = {
@@ -102,7 +103,7 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
   const priceTier = PRICE_IDS.find(
     (price) => price.monthly === priceId || price.annual === priceId
   )
-  const tier = priceTier?.tier || 'free'
+  const tier = priceTier?.tier || SUBSCRIPTION_TIERS.FREE
 
   console.log('Updating subscription:', {
     customerId,
@@ -115,7 +116,7 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
     where: { stripeCustomerId: customerId },
     data: {
       status: subscription.status,
-      tier: subscription.status === 'active' ? tier : 'free',
+      tier: subscription.status === 'active' ? tier : SUBSCRIPTION_TIERS.FREE,
       stripePriceId: priceId,
       stripeSubscriptionId: subscription.id,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
