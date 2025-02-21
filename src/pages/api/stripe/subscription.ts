@@ -1,6 +1,7 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import type { SubscriptionTier } from '@/types/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
@@ -20,17 +21,22 @@ export default async function handler(
         status: true,
         currentPeriodEnd: true,
         cancelAtPeriodEnd: true,
+        stripePriceId: true,
       },
     })
 
     if (!subscription) {
       return res.status(200).json({
-        tier: 'free',
+        tier: 'free' as const,
         status: 'inactive',
+        stripePriceId: '',
       })
     }
 
-    return res.status(200).json(subscription)
+    return res.status(200).json({
+      ...subscription,
+      tier: subscription.tier as SubscriptionTier,
+    })
   } catch (error) {
     console.error('Error in subscription route:', error)
     return res.status(500).json({ error: 'Internal Server Error' })

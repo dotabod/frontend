@@ -21,6 +21,7 @@ import {
   isButtonDisabled,
   getPriceId,
   TIER_LEVELS,
+  getCurrentPeriod,
 } from '@/utils/subscription'
 import type { SubscriptionTier } from '@/types/subscription'
 
@@ -346,9 +347,14 @@ function Plan({
   const savings = calculateSavings(price.Monthly, price.Annually)
 
   const targetTier = name.toLowerCase() as SubscriptionTier
-  const buttonText = getButtonText(subscription, targetTier, button.label)
-  const disabled = isButtonDisabled(subscription, targetTier)
   const period = activePeriod.toLowerCase() as 'monthly' | 'annual'
+  const buttonText = getButtonText(
+    subscription,
+    targetTier,
+    period,
+    button.label
+  )
+  const disabled = isButtonDisabled(subscription, targetTier, period)
 
   const handleSubscribe = async () => {
     setRedirectingToCheckout(true)
@@ -776,7 +782,7 @@ export function Pricing() {
               You are currently on the{' '}
               {subscription.tier.charAt(0).toUpperCase() +
                 subscription.tier.slice(1)}{' '}
-              plan
+              plan ({getCurrentPeriod(subscription.stripePriceId)})
               {subscription.cancelAtPeriodEnd &&
                 subscription.currentPeriodEnd &&
                 ` (cancels ${new Date(subscription.currentPeriodEnd).toLocaleDateString()})`}

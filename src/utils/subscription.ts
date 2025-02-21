@@ -5,6 +5,7 @@ export type SubscriptionStatus = {
   status: string
   currentPeriodEnd?: Date
   cancelAtPeriodEnd?: boolean
+  stripePriceId: string
 }
 
 export const SUBSCRIPTION_TIERS = {
@@ -91,9 +92,16 @@ export function getPriceId(
   return period === 'monthly' ? price.monthly : price.annual
 }
 
+export function getCurrentPeriod(priceId?: string): PricePeriod {
+  return PRICE_IDS.some((price) => price.monthly === priceId)
+    ? 'monthly'
+    : 'annual'
+}
+
 export function getButtonText(
   currentSubscription: SubscriptionStatus | null,
   targetTier: SubscriptionTier,
+  targetPeriod: PricePeriod,
   defaultLabel: string
 ): string {
   if (!currentSubscription || currentSubscription.status !== 'active') {
@@ -101,11 +109,19 @@ export function getButtonText(
   }
 
   const currentTier = currentSubscription.tier
+  const currentPeriod = getCurrentPeriod(currentSubscription.stripePriceId)
 
-  if (currentTier === targetTier) {
+  // If same tier but different period
+  if (currentTier === targetTier && currentPeriod !== targetPeriod) {
+    return `Switch to ${targetPeriod}`
+  }
+
+  // If same tier and period
+  if (currentTier === targetTier && currentPeriod === targetPeriod) {
     return currentSubscription.cancelAtPeriodEnd ? 'Reactivate' : 'Current plan'
   }
 
+  // If different tier
   return TIER_LEVELS[targetTier] > TIER_LEVELS[currentTier]
     ? 'Upgrade'
     : 'Downgrade'
@@ -113,11 +129,21 @@ export function getButtonText(
 
 export function isButtonDisabled(
   subscription: SubscriptionStatus | null,
-  targetTier: SubscriptionTier
+  targetTier: SubscriptionTier,
+  targetPeriod: PricePeriod
 ): boolean {
+  // Free tier button should never be disabled
+  if (targetTier === 'free') return false
+
+  if (!subscription || subscription.status !== 'active') return false
+
+  const targetPriceId = getPriceId(
+    targetTier === 'free' ? 'starter' : targetTier,
+    targetPeriod
+  )
+
   return (
-    subscription?.status === 'active' &&
-    subscription.tier === targetTier &&
+    subscription.stripePriceId === targetPriceId &&
     !subscription.cancelAtPeriodEnd
   )
 }
