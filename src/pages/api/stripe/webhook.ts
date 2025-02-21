@@ -17,6 +17,7 @@ const relevantEvents = new Set([
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
+  'customer.deleted',
   'invoice.payment_succeeded',
   'invoice.payment_failed',
 ])
@@ -56,6 +57,11 @@ export default async function handler(
   if (relevantEvents.has(event.type)) {
     try {
       switch (event.type) {
+        case 'customer.deleted': {
+          const customer = event.data.object as Stripe.Customer
+          await handleCustomerDeleted(customer)
+          break
+        }
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted': {
@@ -95,6 +101,32 @@ export default async function handler(
   return res.status(200).json({ received: true })
 }
 
+async function handleCustomerDeleted(customer: Stripe.Customer) {
+  // First find the subscription by customer ID to get the userId
+  const existingSubscription = await prisma.subscription.findFirst({
+    where: { stripeCustomerId: customer.id },
+  })
+
+  if (!existingSubscription) {
+    console.warn(`No subscription found for deleted customer: ${customer.id}`)
+    return
+  }
+
+  // Update using userId instead of stripeCustomerId
+  await prisma.subscription.update({
+    where: { userId: existingSubscription.userId },
+    data: {
+      stripeCustomerId: null,
+      stripePriceId: null,
+      stripeSubscriptionId: null,
+      status: 'inactive',
+      tier: SUBSCRIPTION_TIERS.FREE,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+    },
+  })
+}
+
 async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
   const priceId = subscription.items.data[0].price.id
   const customerId = subscription.customer as string
@@ -112,8 +144,19 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
     status: subscription.status,
   })
 
-  await prisma.subscription.update({
+  // First find the subscription by customer ID
+  const existingSubscription = await prisma.subscription.findFirst({
     where: { stripeCustomerId: customerId },
+  })
+
+  if (!existingSubscription) {
+    console.warn(`No subscription found for Stripe customer: ${customerId}`)
+    return
+  }
+
+  // Update using userId instead of stripeCustomerId
+  await prisma.subscription.update({
+    where: { userId: existingSubscription.userId },
     data: {
       status: subscription.status,
       tier: subscription.status === 'active' ? tier : SUBSCRIPTION_TIERS.FREE,

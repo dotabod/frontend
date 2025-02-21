@@ -30,8 +30,30 @@ export default async function handler(
 
     let customerId = subscription?.stripeCustomerId
 
+    if (customerId) {
+      // Verify if customer still exists in Stripe
+      try {
+        await stripe.customers.retrieve(customerId)
+      } catch (error) {
+        // Customer was deleted in Stripe dashboard, clear the ID
+        customerId = null
+
+        // Update database to clear the invalid customer ID
+        await prisma.subscription.update({
+          where: { userId: session.user.id },
+          data: {
+            stripeCustomerId: null,
+            stripePriceId: null,
+            stripeSubscriptionId: null,
+            status: 'inactive',
+            tier: SUBSCRIPTION_TIERS.FREE,
+          },
+        })
+      }
+    }
+
     if (!customerId && session.user.email) {
-      // If no subscription record, check if customer exists in Stripe by email
+      // If no valid customer ID, check if customer exists in Stripe by email
       const existingCustomers = await stripe.customers.list({
         email: session.user.email,
         limit: 1,
@@ -51,7 +73,7 @@ export default async function handler(
         customerId = newCustomer.id
       }
 
-      // Create or update subscription record
+      // Create or update subscription record with new customer ID
       await prisma.subscription.upsert({
         where: { userId: session.user.id },
         create: {
@@ -61,6 +83,9 @@ export default async function handler(
         },
         update: {
           stripeCustomerId: customerId,
+          stripePriceId: null,
+          stripeSubscriptionId: null,
+          status: 'inactive',
         },
       })
     }
