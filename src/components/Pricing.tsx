@@ -8,10 +8,8 @@ import {
 import { Table, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import type { SubscriptionStatus } from '@/utils/subscription'
 import { BillingPlans } from './Billing/BillingPlans'
+import { useSubscription } from '@/hooks/useSubscription'
 
 const featureCategories = [
   {
@@ -326,24 +324,7 @@ function FeatureComparison() {
 }
 
 export function Pricing() {
-  const { data: session } = useSession()
-  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
-    null
-  )
-
-  useEffect(() => {
-    async function getSubscription() {
-      if (session?.user?.id) {
-        const response = await fetch('/api/stripe/subscription')
-        if (response.ok) {
-          const data = await response.json()
-          setSubscription(data)
-        }
-      }
-    }
-
-    getSubscription()
-  }, [session])
+  const { subscription } = useSubscription()
 
   return (
     <section
@@ -352,10 +333,7 @@ export function Pricing() {
       className="border-t border-gray-800 bg-gradient-to-b from-gray-900 to-black py-20 sm:py-32"
     >
       <Container>
-        <BillingPlans
-          subscription={subscription}
-          onSubscriptionUpdate={setSubscription}
-        />
+        <BillingPlans subscription={subscription} />
       </Container>
     </section>
   )

@@ -3,32 +3,15 @@ import Header from '@/components/Dashboard/Header'
 import { BillingPlans } from '@/components/Billing/BillingPlans'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
-import { useState, useEffect } from 'react'
-import {
-  type SubscriptionStatus,
-  isSubscriptionActive,
-  getCurrentPeriod,
-} from '@/utils/subscription'
+import { useState } from 'react'
+import { isSubscriptionActive, getCurrentPeriod } from '@/utils/subscription'
 import { Button } from 'antd'
+import { useSubscription } from '@/hooks/useSubscription'
 
 const BillingPage = () => {
-  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
-    null
-  )
   const [isLoading, setIsLoading] = useState(false)
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription()
   const period = getCurrentPeriod(subscription?.stripePriceId)
-
-  useEffect(() => {
-    async function getSubscription() {
-      const response = await fetch('/api/stripe/subscription')
-      if (response.ok) {
-        const data = await response.json()
-        setSubscription(data)
-      }
-    }
-
-    getSubscription()
-  }, [])
 
   const handlePortalAccess = async () => {
     try {

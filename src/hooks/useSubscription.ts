@@ -1,23 +1,25 @@
-import { useQuery } from '@tanstack/react-query'
-import { useSession } from 'next-auth/react'
-import type { SubscriptionStatus } from '@/utils/subscription'
-async function fetchSubscription(userId: string): Promise<SubscriptionStatus> {
-  const response = await fetch(`/api/subscriptions/${userId}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch subscription status')
-  }
-  return response.json()
-}
+import { canAccessFeature, type SubscriptionStatus } from '@/utils/subscription'
+import { useEffect, useState } from 'react'
 
 export function useSubscription() {
-  const { data: session } = useSession()
-  const userId = session?.user?.id
+  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
+    null
+  )
+  const [isLoading, setIsLoading] = useState(false)
 
-  const { data: subscription, isLoading } = useQuery({
-    queryKey: ['subscription', userId],
-    queryFn: () => fetchSubscription(userId!),
-    enabled: !!userId,
-  })
+  useEffect(() => {
+    async function getSubscription() {
+      setIsLoading(true)
+      const response = await fetch('/api/stripe/subscription')
+      if (response.ok) {
+        const data = await response.json()
+        setSubscription(data)
+      }
+      setIsLoading(false)
+    }
+
+    getSubscription()
+  }, [])
 
   return {
     subscription,
@@ -28,7 +30,6 @@ export function useSubscription() {
 
 export function useFeatureAccess(feature: string) {
   const { subscription, isLoading } = useSubscription()
-  const { canAccessFeature } = require('@/utils/subscription')
 
   return {
     hasAccess: canAccessFeature(feature, subscription),
