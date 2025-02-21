@@ -14,7 +14,9 @@ export default async function handler(
     if (!session?.user?.id) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
-
+    if (session?.user?.isImpersonating) {
+      return res.status(403).json({ message: 'Unauthorized' })
+    }
     const subscription = await prisma.subscription.findUnique({
       where: { userId: session.user.id },
       select: {

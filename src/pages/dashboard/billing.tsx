@@ -7,11 +7,13 @@ import { useState } from 'react'
 import { isSubscriptionActive, getCurrentPeriod } from '@/utils/subscription'
 import { Button } from 'antd'
 import { useSubscription } from '@/hooks/useSubscription'
+import { useSession } from 'next-auth/react'
 
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { subscription, isLoading: isLoadingSubscription } = useSubscription()
   const period = getCurrentPeriod(subscription?.stripePriceId)
+  const { data: session } = useSession()
 
   const handlePortalAccess = async () => {
     try {
@@ -31,6 +33,10 @@ const BillingPage = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (session?.user?.isImpersonating) {
+    return null
   }
 
   return (
