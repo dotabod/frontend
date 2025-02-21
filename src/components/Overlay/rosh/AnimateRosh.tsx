@@ -1,10 +1,10 @@
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
 import { Settings } from '@/lib/defaultSettings'
-import { isDev } from '@/lib/devConsts'
+import { isDev, type blockType } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 interface AnimateRoshProps {
-  block: any
+  block: blockType
   roshan: {
     minS: number
     count: number
@@ -18,12 +18,14 @@ export const AnimateRosh = ({
   onComplete,
   paused,
   block,
-  roshan: { count, maxS, minS },
+  roshan,
 }: AnimateRoshProps) => {
+  if (!roshan) return null
+
   const props = {
-    color: minS ? 'red' : 'yellow',
-    count,
-    duration: minS || maxS,
+    color: roshan.minS ? 'red' : 'yellow',
+    count: roshan.count,
+    duration: roshan.minS || roshan.maxS,
     onComplete,
     paused,
   }
@@ -37,8 +39,8 @@ export const AnimateRosh = ({
   return (
     <div>
       {/*We have to create two counters, because the other one doesn't start unless the first one is unmounted */}
-      {minS ? <RoshCounter {...props} /> : null}
-      {!minS && maxS ? <RoshCounter {...props} /> : null}
+      {roshan.minS ? <RoshCounter {...props} /> : null}
+      {!roshan.minS && roshan.maxS ? <RoshCounter {...props} /> : null}
     </div>
   )
 }

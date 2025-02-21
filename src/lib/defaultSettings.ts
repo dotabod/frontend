@@ -129,6 +129,6 @@ export const defaultSettings = {
 }
 export type SettingKeys = keyof typeof defaultSettings
 export const Settings = {} as Record<SettingKeys, SettingKeys>
-Object.keys(defaultSettings).forEach((key) => {
+for (const key of Object.keys(defaultSettings)) {
   Settings[key as SettingKeys] = key as SettingKeys
-})
+}
