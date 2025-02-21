@@ -20,6 +20,7 @@ import {
   getButtonText,
   isButtonDisabled,
   getPriceId,
+  TIER_LEVELS,
 } from '@/utils/subscription'
 import type { SubscriptionTier } from '@/types/subscription'
 
@@ -361,7 +362,7 @@ function Plan({
 
       if (subscription?.status === 'active') {
         const priceId = getPriceId(
-          name.toLowerCase() as 'starter' | 'pro',
+          targetTier === 'free' ? 'starter' : targetTier,
           period
         )
 
@@ -375,20 +376,28 @@ function Plan({
           throw new Error('Failed to update subscription')
         }
 
-        // Get updated subscription data
-        const subscriptionResponse = await fetch('/api/stripe/subscription')
-        if (subscriptionResponse.ok) {
-          const updatedSubscription = await subscriptionResponse.json()
-          onSubscriptionUpdate(updatedSubscription)
+        // Poll for subscription update
+        let attempts = 0
+        const maxAttempts = 10
+        while (attempts < maxAttempts) {
+          const subscriptionResponse = await fetch('/api/stripe/subscription')
+          if (subscriptionResponse.ok) {
+            const updatedSubscription = await subscriptionResponse.json()
+            if (updatedSubscription.stripePriceId === priceId) {
+              onSubscriptionUpdate(updatedSubscription)
+              notification.success({
+                message: 'Subscription Updated',
+                description: `Successfully ${
+                  subscription.tier === 'pro' ? 'downgraded to' : 'upgraded to'
+                } ${name} plan.`,
+                placement: 'bottomRight',
+              })
+              break
+            }
+          }
+          attempts++
+          await new Promise((resolve) => setTimeout(resolve, 200))
         }
-
-        notification.success({
-          message: 'Subscription Updated',
-          description: `Successfully ${
-            subscription.tier === 'pro' ? 'downgraded to' : 'upgraded to'
-          } ${name} plan.`,
-          placement: 'bottomRight',
-        })
         return
       }
 
@@ -415,6 +424,25 @@ function Plan({
     } finally {
       setRedirectingToCheckout(false)
     }
+  }
+
+  const getTooltipText = () => {
+    if (
+      !subscription ||
+      subscription.status !== 'active' ||
+      subscription.tier === targetTier
+    ) {
+      return 'Initial subscription payment'
+    }
+
+    const isUpgrade = TIER_LEVELS[targetTier] > TIER_LEVELS[subscription.tier]
+    const periodText = period === 'monthly' ? 'month' : 'year'
+
+    if (isUpgrade) {
+      return `You'll be charged the prorated difference for the remainder of your ${periodText}`
+    }
+
+    return `You'll receive a prorated credit for the remainder of your ${periodText}`
   }
 
   return (
@@ -518,11 +546,9 @@ function Plan({
 
       <Tooltip
         title={
-          !disabled &&
-          subscription?.status === 'active' &&
-          subscription.tier !== targetTier
-            ? 'You will receive a credit for the difference'
-            : 'You will be charged the difference'
+          !disabled && subscription?.status === 'active'
+            ? getTooltipText()
+            : undefined
         }
       >
         <Button
@@ -535,8 +561,7 @@ function Plan({
             'mt-6',
             featured
               ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-              : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-            disabled && 'opacity-50 cursor-not-allowed'
+              : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
           )}
           aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
         >
