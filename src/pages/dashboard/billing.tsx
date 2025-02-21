@@ -51,7 +51,14 @@ const BillingPage = () => {
           You are currently on the{' '}
           {subscription.tier.charAt(0).toUpperCase() +
             subscription.tier.slice(1)}{' '}
-          plan ({period})
+          plan ({period}).{' '}
+          {subscription.cancelAtPeriodEnd
+            ? 'Your subscription will end'
+            : 'Your subscription will renew'}{' '}
+          on{' '}
+          {subscription.currentPeriodEnd
+            ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+            : 'unknown'}
         </p>
       )}
 
