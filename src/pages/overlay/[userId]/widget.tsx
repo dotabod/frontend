@@ -126,7 +126,10 @@ function WidgetPage() {
         <AnimatedRankBadge
           className={clsx('block', isRight && 'order-1')}
           key="animate-rank-badge-class"
-          rankImageDetails={rankImageDetails}
+          rankImageDetails={{
+            ...rankImageDetails,
+            leaderboard: rankImageDetails.leaderboard ?? null,
+          }}
         />
       </div>
     </div>
