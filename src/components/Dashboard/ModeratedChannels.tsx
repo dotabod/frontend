@@ -2,7 +2,7 @@ import { useSubscription } from '@/hooks/useSubscription'
 import { useTrack } from '@/lib/track'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
-import { Button, Select, Spin, Tag, Tooltip, Typography } from 'antd'
+import { Button, Select, Spin, Tag, Tooltip } from 'antd'
 import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -143,28 +143,25 @@ export default function ModeratedChannels() {
 
   return (
     <div className="flex flex-col flex-grow items-center moderated-channels">
-      <div className="mb-2 flex items-center gap-2">
-        <Tag
-          color={
-            subscription?.tier === SUBSCRIPTION_TIERS.PRO
-              ? 'purple'
+      {!user?.isImpersonating && (
+        <div className="mb-2 flex items-center gap-2">
+          <Tag
+            color={
+              subscription?.tier === SUBSCRIPTION_TIERS.PRO
+                ? 'purple'
+                : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
+                  ? 'blue'
+                  : 'default'
+            }
+          >
+            {subscription?.tier === SUBSCRIPTION_TIERS.PRO
+              ? 'Pro Plan'
               : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
-                ? 'blue'
-                : 'default'
-          }
-        >
-          {subscription?.tier === SUBSCRIPTION_TIERS.PRO
-            ? 'Pro Plan'
-            : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
-              ? 'Starter Plan'
-              : 'Free Plan'}
-        </Tag>
-        {subscription?.status === 'inactive' && (
-          <Typography.Text type="secondary">
-            Upgrade to manage more channels
-          </Typography.Text>
-        )}
-      </div>
+                ? 'Starter Plan'
+                : 'Free Plan'}
+          </Tag>
+        </div>
+      )}
       <Tooltip title="Select a streamer account to manage" placement="right">
         <Select
           onClick={handleOnClick}
