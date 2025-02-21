@@ -7,7 +7,6 @@ import Plan from '../Plan'
 
 interface BillingPlansProps {
   subscription: SubscriptionStatus | null
-  onSubscriptionUpdate: (newSubscription: SubscriptionStatus) => void
   showTitle?: boolean
 }
 
@@ -116,7 +115,6 @@ export const plans = [
 
 export function BillingPlans({
   subscription,
-  onSubscriptionUpdate,
   showTitle = true,
 }: BillingPlansProps) {
   const [activePeriod, setActivePeriod] = useState<'Monthly' | 'Annually'>(
@@ -136,6 +134,13 @@ export function BillingPlans({
               {subscription.tier.charAt(0).toUpperCase() +
                 subscription.tier.slice(1)}{' '}
               plan
+              {' • '}
+              <a
+                href="/api/stripe/portal"
+                className="text-purple-400 underline hover:text-purple-300"
+              >
+                Manage subscription
+              </a>
             </p>
           )}
         </div>
@@ -152,7 +157,6 @@ export function BillingPlans({
             {...plan}
             activePeriod={activePeriod}
             subscription={subscription}
-            onSubscriptionUpdate={onSubscriptionUpdate}
           />
         ))}
       </div>

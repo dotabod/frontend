@@ -151,15 +151,16 @@ export function isButtonDisabled(
 
   if (!subscription || subscription.status !== 'active') return false
 
-  const targetPriceId = getPriceId(
-    targetTier === 'free' ? 'starter' : targetTier,
-    targetPeriod
-  )
+  // Only get price ID for paid tiers
+  if (targetTier !== 'free') {
+    const targetPriceId = getPriceId(targetTier, targetPeriod)
+    return (
+      subscription.stripePriceId === targetPriceId &&
+      !subscription.cancelAtPeriodEnd
+    )
+  }
 
-  return (
-    subscription.stripePriceId === targetPriceId &&
-    !subscription.cancelAtPeriodEnd
-  )
+  return false
 }
 
 // Validation

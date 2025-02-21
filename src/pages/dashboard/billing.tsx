@@ -64,11 +64,7 @@ const BillingPage = () => {
       )}
 
       <div className="mt-12">
-        <BillingPlans
-          subscription={subscription}
-          onSubscriptionUpdate={setSubscription}
-          showTitle={false}
-        />
+        <BillingPlans subscription={subscription} showTitle={false} />
       </div>
     </>
   )

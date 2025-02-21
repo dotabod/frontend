@@ -2,9 +2,7 @@ import { Button, notification, Tooltip } from 'antd'
 import { useState } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import {
-  getButtonText,
   getPriceId,
-  isButtonDisabled,
   type SubscriptionStatus,
   TIER_LEVELS,
   type SubscriptionTier,
@@ -26,7 +24,6 @@ function Plan({
   logomarkClassName,
   featured = false,
   subscription,
-  onSubscriptionUpdate,
 }: {
   name: string
   price: {
@@ -44,7 +41,6 @@ function Plan({
   logomarkClassName?: string
   featured?: boolean
   subscription: SubscriptionStatus | null
-  onSubscriptionUpdate: (newSubscription: SubscriptionStatus) => void
 }) {
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
@@ -52,13 +48,21 @@ function Plan({
 
   const targetTier = name.toLowerCase() as SubscriptionTier
   const period = activePeriod.toLowerCase() as 'monthly' | 'annual'
-  const buttonText = getButtonText(
-    subscription,
-    targetTier,
-    period,
-    button.label
-  )
-  const disabled = isButtonDisabled(subscription, targetTier, period)
+
+  // Simplify button text logic
+  const getSimplifiedButtonText = () => {
+    if (!subscription || subscription.status !== 'active') {
+      return button.label
+    }
+
+    if (subscription.tier === targetTier) {
+      return 'Current plan'
+    }
+
+    return 'Manage subscription'
+  }
+
+  const buttonText = getSimplifiedButtonText()
 
   const handleSubscribe = async () => {
     setRedirectingToCheckout(true)
@@ -70,48 +74,22 @@ function Plan({
         return
       }
 
+      // If user has an active subscription, redirect to portal
       if (subscription?.status === 'active') {
-        const priceId = getPriceId(
-          targetTier === 'free' ? 'starter' : targetTier,
-          period
-        )
-
-        const response = await fetch('/api/stripe/update-subscription', {
+        const response = await fetch('/api/stripe/portal', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ priceId }),
         })
 
         if (!response.ok) {
-          throw new Error('Failed to update subscription')
+          throw new Error('Failed to create portal session')
         }
 
-        // Poll for subscription update
-        let attempts = 0
-        const maxAttempts = 10
-        while (attempts < maxAttempts) {
-          const subscriptionResponse = await fetch('/api/stripe/subscription')
-          if (subscriptionResponse.ok) {
-            const updatedSubscription = await subscriptionResponse.json()
-            if (updatedSubscription.stripePriceId === priceId) {
-              onSubscriptionUpdate(updatedSubscription)
-              notification.success({
-                message: 'Subscription Updated',
-                description: `Successfully ${
-                  subscription.tier === 'pro' ? 'downgraded to' : 'upgraded to'
-                } ${name} plan.`,
-                placement: 'bottomRight',
-              })
-              break
-            }
-          }
-          attempts++
-          await new Promise((resolve) => setTimeout(resolve, 200))
-        }
+        const { url } = await response.json()
+        window.location.href = url
         return
       }
 
-      // Otherwise, create new checkout session for new subscribers
+      // For new subscriptions, create checkout session
       const priceId = getPriceId(
         name.toLowerCase() as 'starter' | 'pro',
         period
@@ -128,13 +106,17 @@ function Plan({
       notification.error({
         message: 'Subscription Error',
         description:
-          'Failed to process subscription change. Please try again later.',
+          'Failed to process subscription request. Please try again later.',
         placement: 'bottomRight',
       })
     } finally {
       setRedirectingToCheckout(false)
     }
   }
+
+  // Simplify disabled logic
+  const isDisabled =
+    subscription?.status === 'active' && subscription.tier === targetTier
 
   const getTooltipText = () => {
     if (
@@ -256,7 +238,7 @@ function Plan({
 
       <Tooltip
         title={
-          !disabled && subscription?.status === 'active'
+          !isDisabled && subscription?.status === 'active'
             ? getTooltipText()
             : undefined
         }
@@ -266,7 +248,7 @@ function Plan({
           onClick={handleSubscribe}
           size={featured ? 'large' : 'middle'}
           color={featured ? 'danger' : 'default'}
-          disabled={disabled}
+          disabled={isDisabled}
           className={clsx(
             'mt-6',
             featured
