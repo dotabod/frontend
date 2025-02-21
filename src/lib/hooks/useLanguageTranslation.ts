@@ -108,18 +108,19 @@ export interface TranslationData {
 }
 
 export const getLanguageProgress = (
-  data: {
-    languageProgress: CrowdinLanguage[]
-    project: Project
-    total: number
-    percentage: number
-  },
+  data:
+    | {
+        languageProgress: CrowdinLanguage[]
+        project: Project
+        total: number
+        percentage: number
+      }
+    | undefined,
   locale: string
 ) => {
-  const language = data
-    ? data?.project?.targetLanguages?.find((x) => x.locale === locale)
-    : null
-
+  const language = data?.project?.targetLanguages?.find(
+    (x) => x.locale === locale
+  )
   const progress = data?.languageProgress?.find(
     (x) => x.data.languageId === language?.id
   )

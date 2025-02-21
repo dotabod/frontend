@@ -12,7 +12,7 @@ import { forwardRef } from 'react'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   label: string
-  translation?: CrowdinLanguage
+  translation?: CrowdinLanguage | undefined
   code: string
 }
 
@@ -24,7 +24,7 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
       {...others}
     >
       <span>{label}</span>
-      {!isNaN(translation?.data?.translationProgress) && (
+      {!Number.isNaN(Number(translation?.data?.translationProgress)) && (
         <div style={{ width: 170 }} className="min-w-fit">
           <span
             className={clsx(
@@ -62,14 +62,28 @@ export default function LanguageCard() {
   const { isLoading, data } = useLanguageTranslations({
     languageId: localeOption?.locale,
   })
-  const languageProgress = getLanguageProgress(data, localeOption?.locale)
+  const languageProgress = getLanguageProgress(
+    data && {
+      ...data,
+      total: data.total ?? 0, // Provide default value of 0 for undefined total
+    },
+    localeOption?.locale
+  )
 
   const arr = (
-    data?.languageProgress ? Object.values(data?.languageProgress) : []
+    data?.languageProgress ? Object.values(data.languageProgress) : []
   ).map((x) => {
-    const fullLanguage = Object.values(data?.project?.targetLanguages).find(
+    const fullLanguage = data?.project?.targetLanguages?.find(
       (t) => t.id === x.data.languageId
     )
+
+    if (!fullLanguage) {
+      return {
+        value: 'en',
+        id: 'en-US',
+        label: 'English',
+      }
+    }
 
     return {
       value: fullLanguage.locale,
@@ -158,9 +172,11 @@ export default function LanguageCard() {
         <Select
           showSearch
           filterOption={(input, option) =>
-            (arr.find((a) => a.value === option.value)?.label ?? '')
-              .toLowerCase()
-              .includes(input?.toLowerCase())
+            option
+              ? (arr.find((a) => a.value === option.value)?.label ?? '')
+                  .toLowerCase()
+                  .includes(input?.toLowerCase() ?? '')
+              : false
           }
           loading={loadingLocale || isLoading}
           placeholder="Language selector"
@@ -171,7 +187,13 @@ export default function LanguageCard() {
               <SelectItem
                 label={x.label}
                 code={x.id}
-                translation={getLanguageProgress(data, x.value)}
+                translation={getLanguageProgress(
+                  data && {
+                    ...data,
+                    total: data.total ?? 0,
+                  },
+                  x.value
+                )}
               />
             ),
           }))}
@@ -187,7 +209,8 @@ export default function LanguageCard() {
           target="_blank"
           type="link"
         >
-          {languageProgress?.data?.translationProgress < 100
+          {languageProgress?.data?.translationProgress != null &&
+          languageProgress.data.translationProgress < 100
             ? 'Help complete on Crowdin'
             : 'Fix locale issues on Crowdin'}
         </Button>

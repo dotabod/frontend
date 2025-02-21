@@ -9,9 +9,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 export default function ModeratedChannels() {
-  const {
-    data: { user },
-  } = useSession()
+  const { data } = useSession()
+  const user = data?.user
   const [moderatedChannels, setModeratedChannels] = useState<
     {
       providerAccountId: string
@@ -174,7 +173,7 @@ export default function ModeratedChannels() {
           onChange={handleOnChange}
           onSearch={debounceFetcher}
           notFoundContent={fetching ? <Spin size="small" /> : null}
-          labelRender={() => renderOptionLabel(user?.image, user.name)}
+          labelRender={() => renderOptionLabel(user?.image, user?.name)}
           loading={loading}
           defaultValue={user?.name}
           style={{ width: '90%' }}
