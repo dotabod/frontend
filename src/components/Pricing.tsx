@@ -27,11 +27,11 @@ const featureCategories = [
           tooltip: 'Step-by-step setup guide provided',
         },
         starter: {
-          value: 'Mod setup',
+          value: 'Moderator setup (1)',
           tooltip: 'Automated Twitch moderator setup and basic configurations',
         },
         pro: {
-          value: 'Full automation',
+          value: 'Full automation (4)',
           tooltip:
             'Complete automated setup of Twitch, OBS, 7TV, and Dota 2 integration',
         },
@@ -501,6 +501,33 @@ function FeatureComparison() {
     },
   ]
 
+  const demoImages = {
+    'Minimap Blocker': {
+      image: '/images/overlay/minimap/738-Complex-Large-AntiStreamSnipeMap.png',
+      width: 240,
+      height: 240,
+      caption: 'Minimap blocker overlay example',
+    },
+    'Pick Blocker': {
+      image: '/images/overlay/picks/block-radiant-picks.png',
+      width: 600,
+      height: 600,
+      caption: 'Pick blocker during draft phase',
+    },
+    'Twitch Predictions': {
+      image: 'https://i.imgur.com/8ZsUxJR.png',
+      width: 425,
+      height: 168,
+      caption: 'Twitch predictions integration',
+    },
+    'Roshan Timer': {
+      image: '/images/dashboard/rosh-timer.png',
+      width: 336,
+      height: 249,
+      caption: 'Roshan timer overlay',
+    },
+  }
+
   return (
     <div className="mt-16">
       <div className="px-6 py-4 bg-gray-900/50 rounded-t-lg">
@@ -520,9 +547,25 @@ function FeatureComparison() {
         bordered
         expandable={{
           expandedRowRender: (record) => (
-            <p className="px-4 py-2 text-gray-400">{record.tooltip}</p>
+            <div className="px-4 py-6 space-y-4">
+              <p className="text-gray-400">{record.tooltip}</p>
+              {demoImages[record.name] && (
+                <div className="flex flex-col items-center space-y-2">
+                  <Image
+                    src={demoImages[record.name].image}
+                    width={demoImages[record.name].width}
+                    height={demoImages[record.name].height}
+                    alt={record.name}
+                    className="rounded-lg"
+                  />
+                  <span className="text-sm text-gray-500">
+                    {demoImages[record.name].caption}
+                  </span>
+                </div>
+              )}
+            </div>
           ),
-          rowExpandable: () => true,
+          rowExpandable: (record) => true,
         }}
         showHeader={true}
         rowKey="key"
