@@ -26,7 +26,7 @@ const plans = [
       href: '/register',
     },
     features: [
-      'Multi-language support (English)',
+      'Multi-language support',
       'Basic minimap blocker',
       'Basic chat features: Turn off all chatters, match results',
       'Essential commands: !toggle, !mmr, !commands, !dotabod',
@@ -55,7 +55,6 @@ const plans = [
     features: [
       'All Free features',
       'Automated moderator setup',
-      'Expanded language support (3 languages)',
       'MMR tracking',
       'Basic Twitch predictions',
       'Enhanced minimap and picks blockers',
@@ -87,7 +86,6 @@ const plans = [
     features: [
       'All Starter features',
       'Automated 7tv, OBS, and Dota 2 setup',
-      'Full language support (5 languages or custom)',
       'Stream delay customization',
       'Advanced Twitch predictions with live overlay',
       'Advanced overlays: Minimap, picks, queue, notable players',
@@ -95,7 +93,10 @@ const plans = [
       'OBS scene switcher',
       'Manager access',
       'All commands and features unlocked',
-      `${<StarOutlined className="text-yellow-500" />} Early access to beta features and updates`,
+      <span key="beta-features" className="flex items-center gap-1">
+        <StarOutlined className="text-yellow-500" /> Early access to beta
+        features and updates
+      </span>,
     ],
     logo: (
       <Image
@@ -229,8 +230,8 @@ function Plan({
               : 'divide-gray-700/30 text-gray-300'
           )}
         >
-          {features.map((feature) => (
-            <li key={feature} className="flex py-2">
+          {features.map((feature, index) => (
+            <li key={index} className="flex py-2">
               <CheckIcon
                 className={clsx(
                   'h-6 w-6 flex-none',
@@ -351,7 +352,7 @@ function FeatureComparison() {
           free: <CloseOutlined className="text-red-500" />,
           starter: <CloseOutlined className="text-red-500" />,
           pro: (
-            <span className="flex items-center gap-1">
+            <span className="flex justify-center items-center gap-1">
               <StarOutlined className="text-yellow-500" /> Priority access
             </span>
           ),
@@ -362,7 +363,7 @@ function FeatureComparison() {
           free: 'Basic only',
           starter: 'Standard',
           pro: (
-            <span className="flex items-center gap-1">
+            <span className="flex justify-center items-center gap-1">
               <StarOutlined className="text-yellow-500" /> All features
             </span>
           ),
