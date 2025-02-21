@@ -68,6 +68,7 @@ export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
   commandCommands: SUBSCRIPTION_TIERS.FREE,
   commandMmr: SUBSCRIPTION_TIERS.FREE,
   commandDisable: SUBSCRIPTION_TIERS.FREE,
+  mmr: SUBSCRIPTION_TIERS.FREE,
 
   // Starter Tier Features
   'mmr-tracker': SUBSCRIPTION_TIERS.STARTER,
@@ -79,8 +80,13 @@ export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
   commandWL: SUBSCRIPTION_TIERS.STARTER,
   commandRanked: SUBSCRIPTION_TIERS.STARTER,
   commandRosh: SUBSCRIPTION_TIERS.STARTER,
-  chatters: SUBSCRIPTION_TIERS.STARTER, // All basic chat interactions
+  // TODO: This is all basic chat interactions, but we should probably split this out into more granular features
+  chatters: SUBSCRIPTION_TIERS.STARTER,
   aegis: SUBSCRIPTION_TIERS.STARTER,
+  betsInfo: SUBSCRIPTION_TIERS.STARTER,
+  customMmr: SUBSCRIPTION_TIERS.STARTER,
+  tellChatNewMMR: SUBSCRIPTION_TIERS.STARTER,
+  tellChatBets: SUBSCRIPTION_TIERS.STARTER,
 
   // Pro Tier Features
   'obs-scene-switcher': SUBSCRIPTION_TIERS.PRO,
@@ -124,6 +130,16 @@ export const FEATURE_TIERS: Record<SettingKeys, SubscriptionTier> = {
   showRankMmr: SUBSCRIPTION_TIERS.PRO,
   showRankImage: SUBSCRIPTION_TIERS.PRO,
   showRankLeader: SUBSCRIPTION_TIERS.PRO,
+  obsServerPassword: SUBSCRIPTION_TIERS.PRO,
+  obsServerPort: SUBSCRIPTION_TIERS.PRO,
+  battlepass: SUBSCRIPTION_TIERS.PRO,
+  minimapRight: SUBSCRIPTION_TIERS.PRO,
+  onlyParty: SUBSCRIPTION_TIERS.PRO,
+  'obs-dc': SUBSCRIPTION_TIERS.PRO,
+  'obs-minimap': SUBSCRIPTION_TIERS.PRO,
+  'obs-picks': SUBSCRIPTION_TIERS.PRO,
+  queueBlockerFindMatchText: SUBSCRIPTION_TIERS.PRO,
+  winProbabilityOverlayIntervalMinutes: SUBSCRIPTION_TIERS.PRO,
 } as const
 
 export type FeatureTier = keyof typeof FEATURE_TIERS
