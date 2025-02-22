@@ -97,7 +97,7 @@ export const FEATURE_TIERS: Record<
   commandWL: SUBSCRIPTION_TIERS.STARTER,
   commandRanked: SUBSCRIPTION_TIERS.STARTER,
   commandRosh: SUBSCRIPTION_TIERS.STARTER,
-  'chatters.midas': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.midas': SUBSCRIPTION_TIERS.FREE,
   'chatters.pause': SUBSCRIPTION_TIERS.STARTER,
   'chatters.smoke': SUBSCRIPTION_TIERS.STARTER,
   'chatters.passiveDeath': SUBSCRIPTION_TIERS.STARTER,

@@ -8,6 +8,7 @@ import {
   canAccessFeature,
   type FeatureTier,
   type SubscriptionTier,
+  type ChatterSettingKeys,
 } from '@/utils/subscription'
 import { useSubscription } from '@/hooks/useSubscription'
 
@@ -82,12 +83,12 @@ export const useUpdateLocale = (props?: UpdateProps) => {
   return { data, loading, update: updateSetting }
 }
 
-interface UpdateSettingResult {
-  data: any
-  original: any
-  error: any
+interface UpdateSettingResult<T = boolean> {
+  data: T
+  original: unknown
+  error: unknown
   loading: boolean
-  updateSetting: (newValue: any) => void
+  updateSetting: (newValue: T) => void
   mutate: () => void
   tierAccess: {
     hasAccess: boolean
@@ -95,7 +96,9 @@ interface UpdateSettingResult {
   }
 }
 
-export function useUpdateSetting(key?: SettingKeys): UpdateSettingResult {
+export function useUpdateSetting(
+  key?: SettingKeys | ChatterSettingKeys
+): UpdateSettingResult {
   const router = useRouter()
   const { subscription } = useSubscription()
 
@@ -116,7 +119,29 @@ export function useUpdateSetting(key?: SettingKeys): UpdateSettingResult {
         return { ...data, mmr: newValue.value }
       }
 
-      // find the key in data, then update the value to be new
+      // Handle chatter settings differently
+      if (key?.startsWith('chatters.')) {
+        const chattersData = data?.settings?.find(
+          (s) => s.key === Settings.chatters
+        )
+        return {
+          ...data,
+          settings: data?.settings?.map((setting) => {
+            if (setting.key === Settings.chatters) {
+              return {
+                ...setting,
+                value: {
+                  ...chattersData?.value,
+                  ...newValue,
+                },
+              }
+            }
+            return setting
+          }),
+        }
+      }
+
+      // Regular settings
       const newData =
         data?.settings?.map((setting) => {
           if (setting.key === key) {
@@ -135,11 +160,28 @@ export function useUpdateSetting(key?: SettingKeys): UpdateSettingResult {
 
   let value = getValueOrDefault(key, data?.settings)
   if (key === Settings.mmr) value = data?.mmr || 0
+  if (key?.startsWith('chatters.')) {
+    const chattersData = data?.settings?.find(
+      (s) => s.key === Settings.chatters
+    )
+    const chatterKey = key.split('.')[1]
+    value = chattersData?.value?.[chatterKey]?.enabled ?? false
+  }
 
   const tierAccess = canAccessFeature(key as FeatureTier, subscription)
 
-  const updateSetting = (newValue) => {
+  const updateSetting = (newValue: unknown) => {
     if (!tierAccess.hasAccess) return
+
+    if (key?.startsWith('chatters.')) {
+      const chatterKey = key.split('.')[1]
+      update(
+        { value: { [chatterKey]: { enabled: newValue } } },
+        `/api/settings/${Settings.chatters}`
+      )
+      return
+    }
+
     update({ value: newValue }, `/api/settings/${key}`)
   }
 

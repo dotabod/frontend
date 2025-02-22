@@ -1,10 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch, Tooltip } from 'antd'
+import { Tooltip } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import DotabodChatter from './DotabodChatter'
+import { TierSwitch } from './TierSwitch'
+import type { ChatterSettingKeys } from '@/utils/subscription'
 
 enum CATEGORIES {
   General = 'General',
@@ -329,16 +331,10 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce(
 )
 
 export default function ChatterCard() {
-  const {
-    data: isEnabled,
-    loading,
-    updateSetting,
-  } = useUpdateSetting(Settings.chatter)
-  const {
-    data: dbChatters,
-    loading: loadingChatters,
-    updateSetting: updateChatters,
-  } = useUpdateSetting(Settings.chatters)
+  const { data: isEnabled } = useUpdateSetting(Settings.chatter)
+  const { data: dbChatters, updateSetting: updateChatters } = useUpdateSetting(
+    Settings.chatters
+  )
 
   return (
     <>
@@ -348,14 +344,10 @@ export default function ChatterCard() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Switch
-            loading={loading}
-            checkedChildren="All"
-            unCheckedChildren="All"
-            onChange={updateSetting}
-            checked={isEnabled}
+          <TierSwitch
+            settingKey={Settings.chatter}
+            label="Turn off every chatter"
           />
-          <span>Turn off every chatter</span>
         </div>
       </Card>
 
@@ -377,10 +369,13 @@ export default function ChatterCard() {
                   <div key={value.id}>
                     <Tooltip title={value?.tooltip} placement="left">
                       <div className="flex items-center space-x-3">
-                        <Switch
-                          disabled={!isEnabled || loadingChatters}
+                        <TierSwitch
+                          settingKey={
+                            `chatters.${value.id}` as ChatterSettingKeys
+                          }
+                          disabled={!isEnabled}
                           checked={dbChatters[value.id]?.enabled}
-                          onChange={(checked, e) => {
+                          onChange={(checked) => {
                             updateChatters({
                               ...dbChatters,
                               [value.id]: {
