@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ message: 'Unauthorized' })
     }
     const body = await req.body
-    const { priceId } = body
+    const { priceId, period } = body
 
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID is required' })
@@ -93,10 +93,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Could not create or find customer' })
     }
 
-    // Create checkout session
+    // Verify price type before creating checkout
+    const price = await stripe.prices.retrieve(priceId)
+    const isRecurring = price.type === 'recurring'
+
+    // Create checkout session with different configuration based on price type
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
-      mode: 'subscription',
+      mode: isRecurring ? 'subscription' : 'payment',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?paid=true`,

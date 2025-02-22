@@ -70,8 +70,14 @@ function Plan({
     try {
       if (!session) {
         await signIn('twitch', {
-          callbackUrl: `/register?plan=${name.toLowerCase()}&period=${activePeriod}`,
+          callbackUrl: `/register?plan=${tier}&period=${activePeriod}`,
         })
+        return
+      }
+
+      // If free plan, redirect to dashboard
+      if (tier === 'free') {
+        window.location.href = '/dashboard'
         return
       }
 
@@ -92,7 +98,7 @@ function Plan({
 
       // For new subscriptions, create checkout session
       const priceId = getPriceId(
-        name.toLowerCase() as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
+        tier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
         activePeriod,
       )
       const response = await createCheckoutSession(priceId, session.user.id)
@@ -130,7 +136,7 @@ function Plan({
         )}
       >
         {logo ? (
-          activePeriod === 'lifetime' && name === 'Pro' ? (
+          activePeriod === 'lifetime' && tier === 'pro' ? (
             <Image
               src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
               width={24}

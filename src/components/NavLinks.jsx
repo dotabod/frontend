@@ -16,6 +16,7 @@ export function NavLinks({ bottom = false }) {
 
   return [
     ['Features', '/#features'],
+    ['Pricing', '/#pricing'],
     ['FAQs', '/#faqs'],
     ...additional,
     ['Status', 'https://status.dotabod.com', StatusSvg, 'Status'],
