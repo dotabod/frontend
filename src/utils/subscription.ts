@@ -112,7 +112,7 @@ export const FEATURE_TIERS: Record<
   'chatters.noTp': SUBSCRIPTION_TIERS.STARTER,
   'chatters.matchOutcome': SUBSCRIPTION_TIERS.STARTER,
   'chatters.commandsReady': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.neutralItems': SUBSCRIPTION_TIERS.STARTER,
+  'chatters.neutralItems': SUBSCRIPTION_TIERS.PRO,
   aegis: SUBSCRIPTION_TIERS.STARTER,
   betsInfo: SUBSCRIPTION_TIERS.STARTER,
   customMmr: SUBSCRIPTION_TIERS.STARTER,

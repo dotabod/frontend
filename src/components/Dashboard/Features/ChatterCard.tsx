@@ -304,7 +304,7 @@ export const chatterInfo = {
     message: (
       <span className="inline space-x-2">
         <span>
-          Tier 5 neutral items are now available! Time to check the jungle
+          Tier 1 neutral items are now available! Time to check the jungle
         </span>
         <Image
           width={22}

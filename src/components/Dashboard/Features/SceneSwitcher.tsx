@@ -4,13 +4,12 @@ import { Card } from '@/ui/card'
 import { Input, Switch, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
+import { TierSwitch } from './TierSwitch'
 
 export default function SceneSwitcher(): JSX.Element {
-  const {
-    data: isEnabled,
-    loading: l0,
-    updateSetting,
-  } = useUpdateSetting(Settings['obs-scene-switcher'])
+  const { data: isEnabled, loading: l0 } = useUpdateSetting(
+    Settings['obs-scene-switcher']
+  )
   const {
     data: obsDc,
     loading: l1,
@@ -63,7 +62,7 @@ export default function SceneSwitcher(): JSX.Element {
           OBS scene switcher <Tag>Optional</Tag>
         </h3>
         {l0 && <Switch disabled />}
-        {!l0 && <Switch onChange={updateSetting} checked={isEnabled} />}
+        {!l0 && <TierSwitch settingKey={Settings['obs-scene-switcher']} />}
       </div>
       <div className="subtitle">
         Auto switch scenes in OBS depending on game state. Your blockers will
