@@ -1,7 +1,9 @@
+import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
+import { FeatureWrapper } from '@/ui/card'
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, Select, Space, Spin, Tooltip, message } from 'antd'
@@ -10,7 +12,6 @@ import Link from 'next/link'
 import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
-import { FeatureWrapper } from '@/ui/card'
 
 export interface Scene {
   sceneIndex: number // Scene index
@@ -67,6 +68,7 @@ const ObsSetup: React.FC = () => {
   const [obs, setObs] = useState<OBSWebSocket | null>(null)
   const user = useSession()?.data?.user
   const overlayUrl = useBaseUrl(`overlay/${user ? user.id : ''}`)
+  const { hasAccess } = useFeatureAccess('autoOBS')
 
   const {
     data: obsPort,
@@ -96,7 +98,7 @@ const ObsSetup: React.FC = () => {
 
   useEffect(() => {
     const connectObs = async () => {
-      if (!obs) return
+      if (!obs || !hasAccess) return
 
       try {
         const obsHost = 'localhost'
@@ -143,7 +145,7 @@ const ObsSetup: React.FC = () => {
       }
     }
 
-    if (obs) {
+    if (obs && hasAccess) {
       connectObs()
     }
 
@@ -153,11 +155,11 @@ const ObsSetup: React.FC = () => {
         setConnected(false)
       }
     }
-  }, [obs])
+  }, [obs, hasAccess])
 
   // Modify fetchScenes to accept baseWidth and baseHeight
   const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
-    if (!obs) return
+    if (!obs || !hasAccess) return
 
     try {
       // Fetch the list of scenes
@@ -196,7 +198,7 @@ const ObsSetup: React.FC = () => {
     currentBaseWidth: number,
     currentBaseHeight: number,
   ) => {
-    if (!obs || scenesToAdd.length === 0) return
+    if (!obs || scenesToAdd.length === 0 || !hasAccess) return
 
     track('obs/add_to_scene')
 
@@ -310,10 +312,16 @@ const ObsSetup: React.FC = () => {
   }
 
   const handleFormSubmit = (values) => {
+    if (!hasAccess) {
+      message.error('Pro subscription required for this feature')
+      return
+    }
+
     if (values.password.length > 45) {
       message.error('Password is too long')
       return
     }
+
     setObs(new OBSWebSocket())
     updatePort(Number(values.port))
     updatePassword(`${values.password}`)
