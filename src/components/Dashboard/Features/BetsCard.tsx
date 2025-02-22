@@ -1,11 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Form, Spin, Switch, Tag } from 'antd'
+import { Button, Form, Spin, Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Input } from '../../Input'
+import { TierSwitch } from './TierSwitch'
 
 export default function BetsCard() {
   const {
@@ -34,8 +35,7 @@ export default function BetsCard() {
         you win or lose a match.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        <Switch onChange={updateSetting} checked={isEnabled} />
-        <span>Enable auto gamba</span>
+        <TierSwitch settingKey={Settings.bets} label="Enable auto gamba" />
       </div>
 
       <div className={clsx(!isEnabled && 'opacity-40', 'mt-6')}>

@@ -4,6 +4,12 @@ import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
 import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
+import {
+  canAccessFeature,
+  type FeatureTier,
+  type SubscriptionTier,
+} from '@/utils/subscription'
+import { useSubscription } from '@/hooks/useSubscription'
 
 interface UpdateProps {
   path?: any
@@ -76,8 +82,22 @@ export const useUpdateLocale = (props?: UpdateProps) => {
   return { data, loading, update: updateSetting }
 }
 
-export function useUpdateSetting(key?: SettingKeys) {
+interface UpdateSettingResult {
+  data: any
+  original: any
+  error: any
+  loading: boolean
+  updateSetting: (newValue: any) => void
+  mutate: () => void
+  tierAccess: {
+    hasAccess: boolean
+    requiredTier: SubscriptionTier
+  }
+}
+
+export function useUpdateSetting(key?: SettingKeys): UpdateSettingResult {
   const router = useRouter()
+  const { subscription } = useSubscription()
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
@@ -116,7 +136,10 @@ export function useUpdateSetting(key?: SettingKeys) {
   let value = getValueOrDefault(key, data?.settings)
   if (key === Settings.mmr) value = data?.mmr || 0
 
+  const tierAccess = canAccessFeature(key as FeatureTier, subscription)
+
   const updateSetting = (newValue) => {
+    if (!tierAccess.hasAccess) return
     update({ value: newValue }, `/api/settings/${key}`)
   }
 
@@ -127,6 +150,7 @@ export function useUpdateSetting(key?: SettingKeys) {
     loading,
     updateSetting,
     mutate: () => mutate(url),
+    tierAccess,
   }
 }
 
