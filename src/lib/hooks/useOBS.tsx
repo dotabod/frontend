@@ -11,9 +11,11 @@ export const useOBS = ({ connected, block }) => {
     Settings['obs-scene-switcher']
   )
 
-  const { data: minimapName } = useUpdateSetting(Settings['obs-minimap'])
-  const { data: picksName } = useUpdateSetting(Settings['obs-picks'])
-  const { data: dcName } = useUpdateSetting(Settings['obs-dc'])
+  const { data: minimapName } = useUpdateSetting<string>(
+    Settings['obs-minimap']
+  )
+  const { data: picksName } = useUpdateSetting<string>(Settings['obs-picks'])
+  const { data: dcName } = useUpdateSetting<string>(Settings['obs-dc'])
 
   useEffect(() => {
     if (!userId || !hasSceneSwitcher) {

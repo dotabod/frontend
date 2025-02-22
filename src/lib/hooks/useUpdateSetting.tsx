@@ -98,6 +98,7 @@ interface UpdateSettingResult<T = boolean> {
       leaderboard_rank: number | null
       connectedUserIds: string[]
     }
+    stream_online?: boolean
     mmr?: number
   }
   error: unknown
