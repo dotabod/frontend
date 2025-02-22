@@ -79,6 +79,13 @@ export const FEATURE_TIERS: Record<
   commandDisable: SUBSCRIPTION_TIERS.FREE,
   mmr: SUBSCRIPTION_TIERS.FREE,
   chatters: SUBSCRIPTION_TIERS.FREE,
+  commandFixparty: SUBSCRIPTION_TIERS.FREE,
+  commandRefresh: SUBSCRIPTION_TIERS.FREE,
+  commandSetmmr: SUBSCRIPTION_TIERS.FREE,
+  commandBeta: SUBSCRIPTION_TIERS.FREE,
+  commandMute: SUBSCRIPTION_TIERS.FREE,
+  commandPing: SUBSCRIPTION_TIERS.FREE,
+  commandDotabod: SUBSCRIPTION_TIERS.FREE,
 
   // Starter Tier Features
   'mmr-tracker': SUBSCRIPTION_TIERS.STARTER,

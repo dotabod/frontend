@@ -1,6 +1,8 @@
 import type CommandDetail from '@/components/Dashboard/CommandDetail'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Collapse, Switch, Tag } from 'antd'
+import { useFeatureAccess } from '@/hooks/useSubscription'
+import { TierBadge } from './TierBadge'
 
 export default function CommandsCard({
   id,
@@ -20,6 +22,7 @@ export default function CommandsCard({
     loading,
     updateSetting,
   } = useUpdateSetting(command.key)
+  const { hasAccess, requiredTier } = useFeatureAccess(command.key)
 
   return (
     <Collapse bordered={false} className="!bg-transparent">
@@ -29,6 +32,7 @@ export default function CommandsCard({
         header={
           <div className="flex justify-between">
             <div className="flex space-x-2">
+              <TierBadge requiredTier={requiredTier} />
               <span>{command.title}</span>
               <div>
                 {command.allowed === 'mods' && (
@@ -42,14 +46,14 @@ export default function CommandsCard({
             </div>
             {command.key && (
               <Switch
-                disabled={readonly}
+                disabled={readonly || !hasAccess}
                 loading={publicLoading || loading}
                 checked={
                   typeof publicIsEnabled !== 'undefined'
                     ? publicIsEnabled
                     : isEnabled
                 }
-                onChange={!readonly ? updateSetting : undefined}
+                onChange={!readonly && hasAccess ? updateSetting : undefined}
                 onClick={(v, e) => {
                   e.stopPropagation()
                 }}

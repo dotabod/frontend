@@ -148,9 +148,9 @@ export default function ModeratedChannels() {
           <Tag
             color={
               subscription?.tier === SUBSCRIPTION_TIERS.PRO
-                ? 'purple'
+                ? undefined
                 : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
-                  ? 'blue'
+                  ? 'cyan'
                   : 'default'
             }
           >

@@ -1,10 +1,9 @@
 import clsx from 'clsx'
 import { useState } from 'react'
 import { LockedFeatureOverlay } from '@/components/Dashboard/Features/LockedFeatureOverlay'
-import { Tag } from 'antd'
-import { CrownIcon } from 'lucide-react'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import type { FeatureTier } from '@/utils/subscription'
+import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
   feature?: FeatureTier
@@ -33,14 +32,7 @@ export function Card({
       {title && (
         <div className="title">
           <h3>{title}</h3>
-          {requiredTier && (
-            <Tag color="gold">
-              <div className="flex items-center gap-2">
-                <CrownIcon className="w-4 h-4" />
-                <span className="first-letter:uppercase">{requiredTier}</span>
-              </div>
-            </Tag>
-          )}
+          {requiredTier && <TierBadge requiredTier={requiredTier} />}
         </div>
       )}
       {children}
