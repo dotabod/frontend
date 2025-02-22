@@ -224,7 +224,7 @@ export default function ChatBot() {
       : !!mmr
   const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
   const stepTwoComplete = user?.id
-  const stepThreeComplete = hasAuto7TVAccess ? user?.hasDotabodEditor : true
+  const stepThreeComplete = user?.hasDotabodEditor
   const stepFourComplete = user?.hasDotabodEmoteSet
   const initialStep = [stepTwoComplete, stepThreeComplete, stepFourComplete].filter(Boolean).length
 
