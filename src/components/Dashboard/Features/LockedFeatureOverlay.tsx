@@ -1,3 +1,4 @@
+import { plans } from '@/components/Billing/BillingPlans'
 import type { SubscriptionTier } from '@/utils/subscription'
 import { Button } from 'antd'
 import Image from 'next/image'
@@ -27,7 +28,7 @@ export function LockedFeatureOverlay({
       <div className='flex flex-col items-center gap-6 p-8 max-w-lg'>
         {requiredTier !== 'free' && (
           <Image
-            src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+            src={plans.find((plan) => plan.tier === requiredTier)?.logo.props.src}
             width={84}
             height={84}
             className='rounded-lg shadow-lg hover:scale-110 transition-transform duration-200'

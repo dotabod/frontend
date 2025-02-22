@@ -1,6 +1,10 @@
 import { plans } from '@/components/Billing/BillingPlans'
-import { type PricePeriod, type SubscriptionStatus, calculateSavings } from '@/utils/subscription'
-import { getCurrentPeriod } from '@/utils/subscription'
+import {
+  type PricePeriod,
+  type SubscriptionStatus,
+  calculateSavings,
+  getCurrentPeriod,
+} from '@/utils/subscription'
 import { Radio, RadioGroup } from '@headlessui/react'
 import clsx from 'clsx'
 import { useEffect } from 'react'
@@ -24,9 +28,9 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
     <RadioGroup
       value={activePeriod}
       onChange={onChange}
-      className='grid grid-cols-2 bg-gray-800/50 p-1 rounded-lg'
+      className='grid grid-cols-3 bg-gray-800/50 p-1 rounded-lg'
     >
-      {['monthly', 'annual'].map((period) => (
+      {['monthly', 'annual', 'lifetime'].map((period) => (
         <Radio
           key={period}
           value={period}
@@ -54,6 +58,16 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
                     .map((plan) => calculateSavings(plan.price.monthly, plan.price.annual)),
                 )}
                 %
+              </div>
+            )}
+            {period === 'lifetime' && (
+              <div
+                className={clsx(
+                  'absolute -bottom-8 text-xs whitespace-nowrap',
+                  activePeriod === period ? 'text-purple-400' : 'text-purple-300',
+                )}
+              >
+                Pay once, use forever
               </div>
             )}
           </div>

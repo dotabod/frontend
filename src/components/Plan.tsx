@@ -11,11 +11,13 @@ import { Button, notification } from 'antd'
 import clsx from 'clsx'
 import { CheckIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
+import Image from 'next/image'
 import { useState } from 'react'
 import { Logomark } from './Logo'
 
 function Plan({
   name,
+  tier,
   price,
   description,
   button,
@@ -27,9 +29,11 @@ function Plan({
   subscription,
 }: {
   name: string
+  tier: SubscriptionTier
   price: {
     monthly: string
     annual: string
+    lifetime: string
   }
   logo: React.ReactNode
   description: string
@@ -50,6 +54,9 @@ function Plan({
   // Update button text logic
   const getSimplifiedButtonText = () => {
     if (!subscription || subscription.status !== 'active') {
+      if (tier === 'pro' && activePeriod === 'lifetime') {
+        return 'Get lifetime access'
+      }
       return button.label
     }
 
@@ -122,7 +129,21 @@ function Plan({
           featured ? 'text-purple-400' : 'text-gray-100',
         )}
       >
-        {logo ? logo : <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />}
+        {logo ? (
+          activePeriod === 'lifetime' && name === 'Pro' ? (
+            <Image
+              src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+              width={24}
+              height={24}
+              alt='Lifetime'
+              className='rounded'
+            />
+          ) : (
+            logo
+          )
+        ) : (
+          <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
+        )}
         <span className='ml-4'>{name}</span>
       </h3>
       <p
@@ -136,10 +157,10 @@ function Plan({
         ) : (
           <>
             <span
-              aria-hidden={activePeriod === 'annual'}
+              aria-hidden={activePeriod === 'annual' || activePeriod === 'lifetime'}
               className={clsx(
                 'transition duration-300',
-                activePeriod === 'annual' &&
+                (activePeriod === 'annual' || activePeriod === 'lifetime') &&
                   'pointer-events-none translate-x-6 opacity-0 select-none',
               )}
             >
@@ -147,7 +168,7 @@ function Plan({
               <span className='text-sm'> / month</span>
             </span>
             <span
-              aria-hidden={activePeriod === 'annual'}
+              aria-hidden={activePeriod !== 'annual'}
               className={clsx(
                 'absolute top-0 left-0 transition duration-300',
                 activePeriod === 'annual'
@@ -157,6 +178,18 @@ function Plan({
             >
               {price.annual}
               <span className='text-sm'> / year</span>
+            </span>
+            <span
+              aria-hidden={activePeriod !== 'lifetime'}
+              className={clsx(
+                'absolute top-0 left-0 transition duration-300',
+                activePeriod === 'lifetime'
+                  ? 'translate-x-0 opacity-100'
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+              )}
+            >
+              {price.lifetime}
+              <span className='text-sm'> one-time</span>
             </span>
           </>
         )}

@@ -23,6 +23,7 @@ export interface SubscriptionPriceId {
   tier: SubscriptionTier
   monthly: string
   annual: string
+  lifetime: string
 }
 
 export type SubscriptionStatus = {
@@ -41,6 +42,7 @@ export const TIER_LEVELS: Record<SubscriptionTier, number> = {
 export const PRICE_PERIODS = {
   MONTHLY: 'monthly',
   ANNUAL: 'annual',
+  LIFETIME: 'lifetime',
 } as const
 
 export type PricePeriod = (typeof PRICE_PERIODS)[keyof typeof PRICE_PERIODS]
@@ -49,6 +51,7 @@ export const PRICE_IDS: SubscriptionPriceId[] = [
     tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
+    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID || '',
   },
 ]
 export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, SubscriptionTier> = {
@@ -206,18 +209,22 @@ export function isTrialEligible(subscription: SubscriptionStatus | null): boolea
     (subscription.tier === SUBSCRIPTION_TIERS.FREE && subscription.status === 'inactive')
   )
 }
-
 export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,
 ): string {
   const price = PRICE_IDS.find((p) => p.tier === tier)
   if (!price) throw new Error(`No price found for tier ${tier}`)
-  return period === 'monthly' ? price.monthly : price.annual
+  if (period === 'monthly') return price.monthly
+  if (period === 'annual') return price.annual
+  return price.lifetime
 }
 
 export function getCurrentPeriod(priceId?: string): PricePeriod {
-  return PRICE_IDS.some((price) => price.monthly === priceId) ? 'monthly' : 'annual'
+  if (PRICE_IDS.some((price) => price.monthly === priceId)) return 'monthly'
+  if (PRICE_IDS.some((price) => price.annual === priceId)) return 'annual'
+  if (PRICE_IDS.some((price) => price.lifetime === priceId)) return 'lifetime'
+  return 'annual' // Default to annual if no match found
 }
 
 export function getButtonText(
@@ -265,7 +272,7 @@ export function isButtonDisabled(
 }
 
 // Validation
-if (PRICE_IDS.some((price) => !price.monthly || !price.annual)) {
+if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
   throw new Error('Missing required Stripe price IDs in environment variables')
 }
 

@@ -1,3 +1,4 @@
+import { Card } from '@/ui/card'
 import {
   type PricePeriod,
   SUBSCRIPTION_TIERS,
@@ -19,13 +20,14 @@ export const plans = [
   {
     name: 'Free',
     featured: false,
-    price: { monthly: '$0', annual: '$0' },
+    price: { monthly: '$0', annual: '$0', lifetime: '$0' },
     description:
       'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
     button: {
       label: 'Get started for free',
       href: `/register?plan=${SUBSCRIPTION_TIERS.FREE}`,
     },
+    tier: SUBSCRIPTION_TIERS.FREE,
     features: [
       'Multi-language support',
       'Basic minimap blocker',
@@ -49,7 +51,9 @@ export const plans = [
     price: {
       monthly: '$6',
       annual: '$57',
+      lifetime: '$99',
     },
+    tier: SUBSCRIPTION_TIERS.PRO,
     description:
       'Complete toolkit for serious streamers who need advanced features and automation.',
     button: {
@@ -75,7 +79,7 @@ export const plans = [
     ],
     logo: (
       <Image
-        src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+        src='https://cdn.betterttv.net/emote/5ff1bbbf9d7d952e405a2edc/3x.webp'
         width={24}
         height={24}
         className='rounded'
@@ -96,36 +100,42 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
     return null
   }
 
+  const Wrapper = showTitle ? 'div' : Card
+
   return (
     <div>
-      {showTitle && (
-        <div className='mx-auto max-w-2xl text-center'>
-          <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
-            Simple pricing for every Dota 2 streamer
-          </h2>
-          {subscription && subscription.status === 'active' && (
-            <p className='mt-2 text-lg text-purple-400'>
-              You are currently on the{' '}
-              {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
-              {period})
-            </p>
-          )}
+      <div className='mx-auto max-w-2xl text-center'>
+        <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
+          Simple pricing for every Dota 2 streamer
+        </h2>
+        {subscription && subscription.status === 'active' && (
+          <p className='mt-2 text-lg text-purple-400'>
+            You are currently on the{' '}
+            {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period})
+          </p>
+        )}
+      </div>
+
+      <Wrapper>
+        <div className='mt-8 flex justify-center'>
+          <PeriodToggle
+            activePeriod={activePeriod}
+            onChange={setActivePeriod}
+            subscription={subscription}
+          />
         </div>
-      )}
 
-      <div className='mt-8 flex justify-center'>
-        <PeriodToggle
-          activePeriod={activePeriod}
-          onChange={setActivePeriod}
-          subscription={subscription}
-        />
-      </div>
-
-      <div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-2'>
-        {plans.map((plan) => (
-          <Plan key={plan.name} {...plan} activePeriod={activePeriod} subscription={subscription} />
-        ))}
-      </div>
+        <div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-2'>
+          {plans.map((plan) => (
+            <Plan
+              key={plan.name}
+              {...plan}
+              activePeriod={activePeriod}
+              subscription={subscription}
+            />
+          ))}
+        </div>
+      </Wrapper>
     </div>
   )
 }
