@@ -26,7 +26,7 @@ export function TierInput({
     data: rawValue,
     updateSetting,
     tierAccess,
-  } = useUpdateSetting(settingKey)
+  } = useUpdateSetting<string>(settingKey)
 
   const isDisabled = externalDisabled || !tierAccess.hasAccess
   const inputValue = (externalValue ?? rawValue)?.toString() || ''
@@ -39,17 +39,22 @@ export function TierInput({
     }
   }
 
+  const inputId = `input-${settingKey}`
+
   return (
     <div className={`space-y-1 ${className}`}>
       {label && (
-        <label className="block text-sm">
+        <label htmlFor={inputId} className="block text-sm">
           {label}
           {!tierAccess.hasAccess && (
-            <TierBadge requiredTier={tierAccess.requiredTier} />
+            <span className="ml-2">
+              <TierBadge requiredTier={tierAccess.requiredTier} />
+            </span>
           )}
         </label>
       )}
       <Input
+        id={inputId}
         value={inputValue}
         onChange={handleChange}
         disabled={isDisabled}

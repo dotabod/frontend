@@ -1,4 +1,3 @@
-import { Input } from '@/components/Input'
 import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
@@ -7,6 +6,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { TierSwitch } from './TierSwitch'
+import { TierInput } from './TierInput'
 
 export default function QueueCard() {
   const {
@@ -55,9 +55,11 @@ export default function QueueCard() {
           onFinish={(form) => updateFindMatchText(form.text)}
         >
           <Form.Item colon={false} label="Custom find match text" name="text">
-            <Input
+            <TierInput
+              settingKey={Settings.queueBlockerFindMatchText}
               placeholder={defaultSettings.queueBlockerFindMatchText}
               maxLength={45}
+              helpText="Max 45 characters"
             />
           </Form.Item>
           <Form.Item colon={false} shouldUpdate>

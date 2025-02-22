@@ -96,9 +96,9 @@ interface UpdateSettingResult<T = boolean> {
   }
 }
 
-export function useUpdateSetting(
+export function useUpdateSetting<T = boolean>(
   key?: SettingKeys | ChatterSettingKeys
-): UpdateSettingResult {
+): UpdateSettingResult<T> {
   const router = useRouter()
   const { subscription } = useSubscription()
 
