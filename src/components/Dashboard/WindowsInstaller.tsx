@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactNode, useEffect, useState } from 'react'
 import CodeBlock from './CodeBlock'
+import { FeatureWrapper } from '@/ui/card'
 
 const { Step } = Steps
 
@@ -154,7 +155,7 @@ const WindowsInstaller = () => {
   }, [success, error, sanitizedPort, session?.data?.user?.id])
 
   return (
-    <>
+    <FeatureWrapper feature='autoInstaller'>
       <p>
         <b>Why?</b> This step is necessary to ensure that Dota 2 knows which data Dotabod requires.
         It&apos;s a Valve approved way of getting game data.
@@ -210,7 +211,7 @@ const WindowsInstaller = () => {
           showIcon
         />
       )}
-    </>
+    </FeatureWrapper>
   )
 }
 

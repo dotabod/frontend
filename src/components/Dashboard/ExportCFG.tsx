@@ -6,6 +6,7 @@ import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import WindowsInstaller from './WindowsInstaller'
+import { TierBadge } from './Features/TierBadge'
 
 function InstallPage() {
   const track = useTrack()
@@ -67,7 +68,11 @@ function InstallPage() {
         items={[
           {
             key: 'windows',
-            label: 'Automatic',
+            label: (
+              <span>
+                Automatic <TierBadge feature='autoInstaller' />
+              </span>
+            ),
             children: <WindowsInstaller />,
             icon: <WindowsOutlined />,
           },

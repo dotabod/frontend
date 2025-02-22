@@ -165,24 +165,32 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
 
 export type FeatureTier = keyof typeof FEATURE_TIERS
 
-// Add new type for generic features
-export type GenericFeature = 'managers' | 'other_future_feature'
-
 // Add new mapping for generic features
-export const GENERIC_FEATURE_TIERS: Record<GenericFeature, SubscriptionTier> = {
+export const GENERIC_FEATURE_TIERS = {
   managers: SUBSCRIPTION_TIERS.PRO,
+  autoOBS: SUBSCRIPTION_TIERS.PRO,
+  autoInstaller: SUBSCRIPTION_TIERS.PRO,
   other_future_feature: SUBSCRIPTION_TIERS.PRO,
 } as const
 
+export type GenericFeature = keyof typeof GENERIC_FEATURE_TIERS
+
 // Update canAccessFeature to handle both types of features
+export function getRequiredTier(feature?: FeatureTier | GenericFeature): SubscriptionTier {
+  if (!feature) return SUBSCRIPTION_TIERS.PRO
+
+  return (
+    FEATURE_TIERS[feature as FeatureTier] ||
+    GENERIC_FEATURE_TIERS[feature as GenericFeature] ||
+    SUBSCRIPTION_TIERS.PRO
+  )
+}
+
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
   subscription: SubscriptionStatus | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
-  const requiredTier =
-    FEATURE_TIERS[feature as FeatureTier] ||
-    GENERIC_FEATURE_TIERS[feature as GenericFeature] ||
-    SUBSCRIPTION_TIERS.PRO
+  const requiredTier = getRequiredTier(feature)
 
   if (!subscription || subscription.status !== 'active') {
     return {

@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { ObsSetup } from './ObsSetup'
+import { TierBadge } from './Features/TierBadge'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -191,7 +192,15 @@ export default function OBSOverlay() {
           }}
           onChange={updateUrlWithOverlayType}
           items={[
-            { label: 'Automatic (OBS)', key: 'auto', children: <ObsSetup /> },
+            {
+              label: (
+                <span>
+                  Automatic (OBS) <TierBadge feature='autoOBS' />
+                </span>
+              ),
+              key: 'auto',
+              children: <ObsSetup />,
+            },
             { label: 'Manual (text)', key: 'text', children: <OBSText /> },
             {
               label: 'Manual (video)',

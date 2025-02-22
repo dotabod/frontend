@@ -8,20 +8,38 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
   feature?: FeatureTier | GenericFeature
 }
+interface FeatureWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
+  feature?: FeatureTier | GenericFeature
+}
 
-export function Card({ className, feature, title, children, ...props }: CardProps) {
+export function FeatureWrapper({ feature, children, className, ...props }: FeatureWrapperProps) {
   const [isHovered, setIsHovered] = useState(false)
   const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
   return (
     <div
+      className={clsx('relative', className)}
+      onMouseEnter={() => !hasAccess && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      {...props}
+    >
+      {children}
+      {!hasAccess && isHovered && <LockedFeatureOverlay requiredTier={requiredTier} />}
+    </div>
+  )
+}
+
+export function Card({ className, feature, title, children, ...props }: CardProps) {
+  const { requiredTier } = useFeatureAccess(feature)
+
+  return (
+    <FeatureWrapper
+      feature={feature}
       className={clsx(
-        'relative duration-200',
+        'duration-200',
         'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
         className,
       )}
-      onMouseEnter={() => !hasAccess && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       {...props}
     >
       {title && (
@@ -31,8 +49,7 @@ export function Card({ className, feature, title, children, ...props }: CardProp
         </div>
       )}
       {children}
-      {!hasAccess && isHovered && <LockedFeatureOverlay requiredTier={requiredTier} />}
-    </div>
+    </FeatureWrapper>
   )
 }
 
