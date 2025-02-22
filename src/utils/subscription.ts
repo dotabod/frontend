@@ -175,7 +175,6 @@ export const GENERIC_FEATURE_TIERS = {
 
 export type GenericFeature = keyof typeof GENERIC_FEATURE_TIERS
 
-// Update canAccessFeature to handle both types of features
 export function getRequiredTier(feature?: FeatureTier | GenericFeature): SubscriptionTier {
   if (!feature) return SUBSCRIPTION_TIERS.PRO
 
