@@ -85,18 +85,33 @@ export default function ChatBot() {
   const router = useRouter()
 
   useEffect(() => {
-    const parsedStep = router.query.chatbotType as string
-    if (parsedStep === 'auto' || parsedStep === 'manual') {
-      setActiveKey7TV(parsedStep)
-      setActiveKeyMod(parsedStep)
-    }
-  }, [router.query.chatbotType])
+    const parsedMod = router.query.modType as string
+    const parsed7TV = router.query.sevenTvType as string
 
-  const updateUrlWithType = (newType: 'auto' | 'manual') => {
+    if (parsedMod === 'auto' || parsedMod === 'manual') {
+      setActiveKeyMod(parsedMod)
+    }
+    if (parsed7TV === 'auto' || parsed7TV === 'manual') {
+      setActiveKey7TV(parsed7TV)
+    }
+  }, [router.query.modType, router.query.sevenTvType])
+
+  const updateUrlWithModType = (newType: 'auto' | 'manual') => {
     router.replace(
       {
         pathname: router.pathname,
-        query: { ...router.query, chatbotType: newType },
+        query: { ...router.query, modType: newType },
+      },
+      undefined,
+      { shallow: true },
+    )
+  }
+
+  const updateUrlWith7TVType = (newType: 'auto' | 'manual') => {
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, sevenTvType: newType },
       },
       undefined,
       { shallow: true },
@@ -199,7 +214,7 @@ export default function ChatBot() {
           onTabClick={(key) => {
             track('chatbot/change_mod_tab', { tab: key })
           }}
-          onChange={updateUrlWithType}
+          onChange={updateUrlWithModType}
           items={[
             {
               label: (
@@ -249,7 +264,7 @@ export default function ChatBot() {
           onTabClick={(key) => {
             track('chatbot/change_7tv_tab', { tab: key })
           }}
-          onChange={updateUrlWithType}
+          onChange={updateUrlWith7TVType}
           items={[
             {
               label: (
