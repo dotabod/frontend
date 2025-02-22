@@ -25,7 +25,7 @@ export const plans = [
       'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
     button: {
       label: 'Get started for free',
-      href: `/register?plan=${SUBSCRIPTION_TIERS.FREE}`,
+      href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.FREE}`,
     },
     tier: SUBSCRIPTION_TIERS.FREE,
     features: [
@@ -58,7 +58,7 @@ export const plans = [
       'Complete toolkit for serious streamers who need advanced features and automation.',
     button: {
       label: 'Subscribe',
-      href: `/register?plan=${SUBSCRIPTION_TIERS.PRO}`,
+      href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.PRO}`,
     },
     features: [
       'All Free features',

@@ -70,7 +70,7 @@ function Plan({
     try {
       if (!session) {
         await signIn('twitch', {
-          callbackUrl: `/register?plan=${tier}&period=${activePeriod}`,
+          callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}`,
         })
         return
       }
