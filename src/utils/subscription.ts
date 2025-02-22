@@ -5,12 +5,6 @@ import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
 export type ChatterKeys = keyof typeof defaultSettings.chatters
 export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
-export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
-  const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
-  const annual = Number.parseFloat(annualPrice.replace('$', ''))
-  return Math.round(((monthly - annual) / monthly) * 100)
-}
-
 export const SUBSCRIPTION_TIERS = {
   FREE: 'free',
   PRO: 'pro',
@@ -18,13 +12,6 @@ export const SUBSCRIPTION_TIERS = {
 
 export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
 export type SubscriptionTierStatus = 'active' | 'inactive' | 'past_due' | 'canceled'
-
-export interface SubscriptionPriceId {
-  tier: SubscriptionTier
-  monthly: string
-  annual: string
-  lifetime: string
-}
 
 export type SubscriptionStatus = {
   tier: SubscriptionTier
@@ -46,14 +33,6 @@ export const PRICE_PERIODS = {
 } as const
 
 export type PricePeriod = (typeof PRICE_PERIODS)[keyof typeof PRICE_PERIODS]
-export const PRICE_IDS: SubscriptionPriceId[] = [
-  {
-    tier: SUBSCRIPTION_TIERS.PRO,
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
-    annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
-    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID || '',
-  },
-]
 
 export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, SubscriptionTier> = {
   // Free Tier Features
@@ -204,12 +183,22 @@ export function isSubscriptionActive(subscription: SubscriptionStatus | null): b
   return subscription?.status === 'active'
 }
 
-export function isTrialEligible(subscription: SubscriptionStatus | null): boolean {
-  return (
-    !subscription ||
-    (subscription.tier === SUBSCRIPTION_TIERS.FREE && subscription.status === 'inactive')
-  )
+export interface SubscriptionPriceId {
+  tier: SubscriptionTier
+  monthly: string
+  annual: string
+  lifetime: string
 }
+
+export const PRICE_IDS: SubscriptionPriceId[] = [
+  {
+    tier: SUBSCRIPTION_TIERS.PRO,
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
+    annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
+    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID || '',
+  },
+]
+
 export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,
@@ -291,4 +280,10 @@ export async function getSubscription(userId: string) {
   })) as SubscriptionStatus | null
 
   return subscription
+}
+
+export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
+  const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
+  const annual = Number.parseFloat(annualPrice.replace('$', ''))
+  return Math.round(((monthly - annual) / monthly) * 100)
 }
