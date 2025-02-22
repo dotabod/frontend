@@ -1,20 +1,21 @@
+import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
+import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
-import { Alert, Button, Divider, List, Spin, Tooltip, Tabs } from 'antd'
+import { Alert, Button, Divider, List, Spin, Tabs, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import MmrForm from './Features/MmrForm'
-import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
-import { useFeatureAccess } from '@/hooks/useSubscription'
-import { useRouter } from 'next/router'
 
 const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
@@ -48,6 +49,52 @@ type Emote = {
   name: string
   id: string
 }
+
+const EmoteList: React.FC<{
+  emotes: Emote[]
+  user: User | null
+}> = ({ emotes, user }) => (
+  <List
+    grid={{
+      xs: 3,
+      sm: 4,
+      md: 5,
+      lg: 6,
+      xl: 8,
+      xxl: 10,
+    }}
+    dataSource={emotesRequired.sort((a, b) => {
+      // if it's found in emotes, put it at the bottom
+      if (emotes.find((e) => e?.name === a.label)) return 1
+      if (emotes.find((e) => e?.name === b.label)) return -1
+      return 0
+    })}
+    renderItem={({ id, label }) => {
+      const added = user?.hasDotabodEmoteSet || emotes.find((e) => e?.name === label)
+
+      return (
+        <List.Item key={label}>
+          <div className={clsx('flex items-center space-x-1')}>
+            <Tooltip title={label}>
+              <a href={`https://7tv.app/emotes/${id}`} target='_blank' rel='noreferrer'>
+                <Image
+                  className={clsx(
+                    !added && 'grayscale group-hover:grayscale-0',
+                    'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
+                  )}
+                  height={60}
+                  width={60}
+                  src={SevenTVBaseEmoteURL(id)}
+                  alt={id}
+                />
+              </a>
+            </Tooltip>
+          </div>
+        </List.Item>
+      )
+    }}
+  />
+)
 
 export default function ChatBot() {
   const { data: accountData } = useUpdateAccount()
@@ -176,7 +223,6 @@ export default function ChatBot() {
       ? accountData?.accounts?.filter((a) => a.mmr > 0).length > 0
       : !!mmr
   const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
-
   const stepTwoComplete = user?.id
   const stepThreeComplete = hasAuto7TVAccess ? user?.hasDotabodEditor : true
   const stepFourComplete = user?.hasDotabodEmoteSet
@@ -184,28 +230,7 @@ export default function ChatBot() {
 
   return (
     <Card>
-      <h1>Twitch</h1>
-      <StepComponent
-        hideTitle={true}
-        status={stepOneComplete ? 'finish' : undefined}
-        steps={[
-          <span className='flex flex-col space-y-4' key={1}>
-            {!stepOneComplete ? (
-              <>
-                <div>
-                  <span>Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it</span>
-                  <span className='text-xs text-gray-500'> (you can change it later)</span>
-                </div>
-                <MmrForm hideText={true} />
-              </>
-            ) : (
-              <div>
-                <span>Dotabod knows your MMR!</span>
-              </div>
-            )}
-          </span>,
-        ]}
-      />
+      <h1 className='text-xl font-bold'>Twitch</h1>
       <div className='space-y-4 pb-8 text-sm text-gray-300'>
         <Tabs
           defaultActiveKey={activeKeyMod}
@@ -219,25 +244,71 @@ export default function ChatBot() {
             {
               label: (
                 <span>
-                  Automatic (Mod) <TierBadge feature='autoModerator' />
+                  Automatic <TierBadge feature='autoModerator' />
                 </span>
               ),
               key: 'auto',
               children: (
-                <div className='flex flex-row items-center space-x-2'>
-                  {makeDotabodModLoading && <Spin size='small' spinning={loading} />}
-                  {makeDotabodModError ? (
-                    <div>
-                      Dotabod needs to be a moderator in your Twitch channel to function properly.
-                    </div>
-                  ) : (
-                    <div>Dotabod is a moderator in your Twitch channel.</div>
-                  )}
-                </div>
+                <>
+                  <StepComponent
+                    hideTitle={true}
+                    status={stepOneComplete ? 'finish' : undefined}
+                    steps={[
+                      <span className='flex flex-col space-y-4' key={1}>
+                        {!stepOneComplete ? (
+                          <>
+                            <div>
+                              <span>
+                                Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
+                              </span>
+                              <span className='text-xs text-gray-500'>
+                                {' '}
+                                (you can change it later)
+                              </span>
+                            </div>
+                            <MmrForm hideText={true} />
+                          </>
+                        ) : (
+                          <div>
+                            <span>
+                              Dotabod knows your MMR.{' '}
+                              <Link
+                                href='/dashboard/features'
+                                onClick={() => {
+                                  track('chatbot/change_mmr')
+                                }}
+                              >
+                                Change it
+                              </Link>
+                            </span>
+                          </div>
+                        )}
+                      </span>,
+                    ]}
+                  />
+
+                  <StepComponent
+                    hideTitle={true}
+                    status={stepModComplete ? 'finish' : undefined}
+                    steps={[
+                      <span className='flex flex-row items-center space-x-2' key={1}>
+                        {makeDotabodModLoading && <Spin size='small' spinning={loading} />}
+                        {!stepModComplete ? (
+                          <div>
+                            Dotabod needs to be a moderator in your Twitch channel to function
+                            properly.
+                          </div>
+                        ) : (
+                          <div>Dotabod is a moderator in your Twitch channel.</div>
+                        )}
+                      </span>,
+                    ]}
+                  />
+                </>
               ),
             },
             {
-              label: 'Manual (Mod)',
+              label: 'Manual',
               key: 'manual',
               children: (
                 <div>
@@ -254,7 +325,7 @@ export default function ChatBot() {
       </div>
       <Divider />
       <div className='flex items-center gap-2'>
-        <h1>7TV</h1>
+        <h1 className='text-xl font-bold'>7TV</h1>
       </div>
       <div className='space-y-4 pb-8 text-sm text-gray-300'>
         <Tabs
@@ -269,7 +340,7 @@ export default function ChatBot() {
             {
               label: (
                 <span>
-                  Automatic (7TV) <TierBadge feature='auto7TV' />
+                  Automatic <TierBadge feature='auto7TV' />
                 </span>
               ),
               key: 'auto',
@@ -320,41 +391,32 @@ export default function ChatBot() {
 
                     <div key={2}>
                       <div className='flex flex-row items-center space-x-2'>
-                        {hasAuto7TVAccess ? (
-                          !user?.hasDotabodEditor ? (
-                            <div>
-                              <div>
-                                <span>You must add Dotabod as an editor </span>
-                                <Button
-                                  className='!pl-0'
-                                  target='_blank'
-                                  type='link'
-                                  href={`https://7tv.app/users/${user?.id}`}
-                                  icon={<ExternalLinkIcon size={14} />}
-                                  iconPosition='end'
-                                  onClick={() => {
-                                    track('7TV Add Editor')
-                                  }}
-                                >
-                                  on your 7TV account
-                                </Button>
-                              </div>
-
-                              <div className='flex flex-row items-center space-x-3'>
-                                {loading && <Spin size='small' spinning={true} />}
-                                <span>Waiting for Dotabod to become an editor...</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div>Dotabod is an editor on your 7TV account.</div>
-                          )
-                        ) : (
+                        {!hasAuto7TVAccess || !user?.hasDotabodEditor ? (
                           <div>
-                            <p>
-                              You can add the required emotes manually to your emote set. Click each
-                              emote below to add it to your set.
-                            </p>
+                            <div>
+                              <span>You must add Dotabod as an editor </span>
+                              <Button
+                                className='!pl-0'
+                                target='_blank'
+                                type='link'
+                                href='https://7tv.app/settings/editors'
+                                icon={<ExternalLinkIcon size={14} />}
+                                iconPosition='end'
+                                onClick={() => {
+                                  track('7TV Add Editor')
+                                }}
+                              >
+                                on your 7TV account
+                              </Button>
+                            </div>
+
+                            <div className='flex flex-row items-center space-x-3'>
+                              {loading && <Spin size='small' spinning={true} />}
+                              <span>Waiting for Dotabod to become an editor...</span>
+                            </div>
                           </div>
+                        ) : (
+                          <div>Dotabod is an editor on your 7TV account.</div>
                         )}
                       </div>
                     </div>,
@@ -393,104 +455,36 @@ export default function ChatBot() {
                         </div>
                       </div>
 
-                      <List
-                        grid={{
-                          xs: 3,
-                          sm: 4,
-                          md: 5,
-                          lg: 6,
-                          xl: 8,
-                          xxl: 10,
-                        }}
-                        dataSource={emotesRequired.sort((a, b) => {
-                          // if it's found in emotes, put it at the bottom
-                          if (emotes.find((e) => e?.name === a.label)) return 1
-                          if (emotes.find((e) => e?.name === b.label)) return -1
-                          return 0
-                        })}
-                        renderItem={({ id, label }) => {
-                          const added =
-                            user?.hasDotabodEmoteSet || emotes.find((e) => e?.name === label)
-
-                          return (
-                            <List.Item key={label}>
-                              <div className={clsx('flex items-center space-x-1')}>
-                                <Tooltip title={label}>
-                                  <a
-                                    href={`https://7tv.app/emotes/${id}`}
-                                    target='_blank'
-                                    rel='noreferrer'
-                                  >
-                                    <Image
-                                      className={clsx(
-                                        !added && 'grayscale group-hover:grayscale-0',
-                                        'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
-                                      )}
-                                      height={60}
-                                      width={60}
-                                      src={SevenTVBaseEmoteURL(id)}
-                                      alt={id}
-                                    />
-                                  </a>
-                                </Tooltip>
-                              </div>
-                            </List.Item>
-                          )
-                        }}
-                      />
+                      <EmoteList emotes={emotes} user={user} />
                     </div>,
                   ]}
                 />
               ),
             },
             {
-              label: 'Manual (7TV)',
+              label: 'Manual',
               key: 'manual',
               children: (
                 <div>
                   <p>To manually add the required emotes:</p>
-                  <ol className='list-decimal pl-4'>
-                    <li>Make sure you have a 7TV account and it's connected to your Twitch</li>
-                    <li>Click each emote below to open it on 7TV</li>
-                    <li>Click the "Add to My Emotes" button for each emote</li>
-                  </ol>
-
-                  <List
-                    grid={{
-                      xs: 3,
-                      sm: 4,
-                      md: 5,
-                      lg: 6,
-                      xl: 8,
-                      xxl: 10,
-                    }}
-                    dataSource={emotesRequired}
-                    renderItem={({ id, label }) => (
-                      <List.Item key={label}>
-                        <div className={clsx('flex items-center space-x-1')}>
-                          <Tooltip title={label}>
-                            <a
-                              href={`https://7tv.app/emotes/${id}`}
-                              target='_blank'
-                              rel='noreferrer'
-                            >
-                              <Image
-                                className={clsx(
-                                  !emotes.find((e) => e?.name === label) &&
-                                    'grayscale group-hover:grayscale-0',
-                                  'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
-                                )}
-                                height={60}
-                                width={60}
-                                src={SevenTVBaseEmoteURL(id)}
-                                alt={id}
-                              />
-                            </a>
-                          </Tooltip>
+                  <StepComponent
+                    hideTitle={true}
+                    steps={[
+                      <span key={1}>
+                        <div>
+                          Make sure you have a 7TV account and it's connected to your Twitch
                         </div>
-                      </List.Item>
-                    )}
+                      </span>,
+                      <span key={2}>
+                        <div>Click each emote below to open it on 7TV</div>
+                      </span>,
+                      <span key={3}>
+                        <div>Click the "Add to..." button for each emote</div>
+                      </span>,
+                    ]}
                   />
+
+                  <EmoteList emotes={emotes} user={user} />
                 </div>
               ),
             },

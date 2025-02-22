@@ -120,7 +120,7 @@ const SetupPage = () => {
 
   const steps = [
     {
-      title: 'Twitch',
+      title: 'Stream',
       content: <ChatBot />,
     },
     {
