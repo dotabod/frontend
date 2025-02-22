@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
+import { getSubscription, canAccessFeature } from '@/utils/subscription'
 
 const approvedModeratorSchema = z.array(z.number())
 
@@ -61,6 +62,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!session?.user?.id) {
     return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  const subscription = await getSubscription(session.user.id)
+  const tierAccess = canAccessFeature('managers', subscription)
+
+  if (!tierAccess.hasAccess) {
+    return res.status(403).json({
+      error: true,
+      message: 'This feature requires Pro subscription',
+    })
   }
 
   if (session?.user?.isImpersonating) {

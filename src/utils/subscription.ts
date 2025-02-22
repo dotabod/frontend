@@ -1,14 +1,12 @@
 import type { SettingKeys } from '@/lib/defaultSettings'
 import type { defaultSettings } from '@/lib/defaultSettings'
+import prisma from '@/lib/db'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
 export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
-export function calculateSavings(
-  monthlyPrice: string,
-  annualPrice: string
-): number {
+export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
   const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
   const annual = Number.parseFloat(annualPrice.replace('$', ''))
   return Math.round(((monthly - annual) / monthly) * 100)
@@ -20,13 +18,8 @@ export const SUBSCRIPTION_TIERS = {
   PRO: 'pro',
 } as const
 
-export type SubscriptionTier =
-  (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
-export type SubscriptionTierStatus =
-  | 'active'
-  | 'inactive'
-  | 'past_due'
-  | 'canceled'
+export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
+export type SubscriptionTierStatus = 'active' | 'inactive' | 'past_due' | 'canceled'
 
 export interface SubscriptionPriceId {
   tier: SubscriptionTier
@@ -66,10 +59,7 @@ export const PRICE_IDS: SubscriptionPriceId[] = [
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
   },
 ]
-export const FEATURE_TIERS: Record<
-  SettingKeys | ChatterSettingKeys,
-  SubscriptionTier
-> = {
+export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, SubscriptionTier> = {
   // Free Tier Features
   'minimap-blocker': SUBSCRIPTION_TIERS.FREE,
   chatter: SUBSCRIPTION_TIERS.FREE,
@@ -181,12 +171,13 @@ export type GenericFeature = 'managers' | 'other_future_feature'
 // Add new mapping for generic features
 export const GENERIC_FEATURE_TIERS: Record<GenericFeature, SubscriptionTier> = {
   managers: SUBSCRIPTION_TIERS.PRO,
+  other_future_feature: SUBSCRIPTION_TIERS.PRO,
 } as const
 
 // Update canAccessFeature to handle both types of features
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
-  subscription: SubscriptionStatus | null
+  subscription: SubscriptionStatus | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier =
     FEATURE_TIERS[feature as FeatureTier] ||
@@ -206,25 +197,20 @@ export function canAccessFeature(
   }
 }
 
-export function isSubscriptionActive(
-  subscription: SubscriptionStatus | null
-): boolean {
+export function isSubscriptionActive(subscription: SubscriptionStatus | null): boolean {
   return subscription?.status === 'active'
 }
 
-export function isTrialEligible(
-  subscription: SubscriptionStatus | null
-): boolean {
+export function isTrialEligible(subscription: SubscriptionStatus | null): boolean {
   return (
     !subscription ||
-    (subscription.tier === SUBSCRIPTION_TIERS.FREE &&
-      subscription.status === 'inactive')
+    (subscription.tier === SUBSCRIPTION_TIERS.FREE && subscription.status === 'inactive')
   )
 }
 
 export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
-  period: PricePeriod
+  period: PricePeriod,
 ): string {
   const price = PRICE_IDS.find((p) => p.tier === tier)
   if (!price) throw new Error(`No price found for tier ${tier}`)
@@ -232,16 +218,14 @@ export function getPriceId(
 }
 
 export function getCurrentPeriod(priceId?: string): PricePeriod {
-  return PRICE_IDS.some((price) => price.monthly === priceId)
-    ? 'monthly'
-    : 'annual'
+  return PRICE_IDS.some((price) => price.monthly === priceId) ? 'monthly' : 'annual'
 }
 
 export function getButtonText(
   currentSubscription: SubscriptionStatus | null,
   targetTier: SubscriptionTier,
   targetPeriod: PricePeriod,
-  defaultLabel: string
+  defaultLabel: string,
 ): string {
   if (!currentSubscription || currentSubscription.status !== 'active') {
     return defaultLabel
@@ -261,15 +245,13 @@ export function getButtonText(
   }
 
   // If different tier
-  return TIER_LEVELS[targetTier] > TIER_LEVELS[currentTier]
-    ? 'Upgrade'
-    : 'Downgrade'
+  return TIER_LEVELS[targetTier] > TIER_LEVELS[currentTier] ? 'Upgrade' : 'Downgrade'
 }
 
 export function isButtonDisabled(
   subscription: SubscriptionStatus | null,
   targetTier: SubscriptionTier,
-  targetPeriod: PricePeriod
+  targetPeriod: PricePeriod,
 ): boolean {
   // Free tier button should never be disabled
   if (targetTier === SUBSCRIPTION_TIERS.FREE) return false
@@ -278,15 +260,28 @@ export function isButtonDisabled(
 
   const targetPriceId = getPriceId(
     targetTier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
-    targetPeriod
+    targetPeriod,
   )
-  return (
-    subscription.stripePriceId === targetPriceId &&
-    !subscription.cancelAtPeriodEnd
-  )
+  return subscription.stripePriceId === targetPriceId && !subscription.cancelAtPeriodEnd
 }
 
 // Validation
 if (PRICE_IDS.some((price) => !price.monthly || !price.annual)) {
   throw new Error('Missing required Stripe price IDs in environment variables')
+}
+
+export async function getSubscription(userId: string) {
+  const subscription = (await prisma.subscription.findUnique({
+    where: { userId },
+    select: {
+      tier: true,
+      status: true,
+      currentPeriodEnd: true,
+      cancelAtPeriodEnd: true,
+      stripePriceId: true,
+      stripeCustomerId: true,
+    },
+  })) as SubscriptionStatus | null
+
+  return subscription
 }

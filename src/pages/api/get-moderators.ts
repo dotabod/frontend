@@ -6,6 +6,7 @@ import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 const TWITCH_MODERATED_CHANNELS_URL =
   'https://api.twitch.tv/helix/moderation/moderators'
@@ -74,6 +75,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!session?.user?.id) {
     return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  const subscription = await getSubscription(session.user.id)
+  const tierAccess = canAccessFeature('managers', subscription)
+
+  if (!tierAccess.hasAccess) {
+    return res.status(403).json({
+      error: true,
+      message: 'This feature requires a subscription',
+    })
   }
 
   const { providerAccountId, accessToken, error } = await getTwitchTokens(

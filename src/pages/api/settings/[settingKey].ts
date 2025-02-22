@@ -8,7 +8,7 @@ import {
   dynamicSettingSchema,
   settingKeySchema,
 } from '@/lib/validations/setting'
-import type { SubscriptionStatus } from '@/utils/subscription'
+import { getSubscription } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
@@ -86,16 +86,7 @@ async function handlePatchRequest(
 
   try {
     // Get user's subscription
-    const subscription = (await prisma.subscription.findUnique({
-      where: { userId },
-      select: {
-        tier: true,
-        status: true,
-        currentPeriodEnd: true,
-        cancelAtPeriodEnd: true,
-        stripePriceId: true,
-      },
-    })) as SubscriptionStatus | null
+    const subscription = await getSubscription(userId)
 
     const parsedBody = JSON.parse(req.body)
     parsedBody.key = settingKey

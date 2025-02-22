@@ -1,4 +1,8 @@
-import { canAccessFeature, type FeatureTier } from '@/utils/subscription'
+import {
+  canAccessFeature,
+  type FeatureTier,
+  type GenericFeature,
+} from '@/utils/subscription'
 import { useContext } from 'react'
 import { SubscriptionContext } from '@/hooks/SubscriptionProvider'
 
@@ -9,7 +13,7 @@ export function useSubscription() {
   return context
 }
 
-export function useFeatureAccess(feature?: FeatureTier) {
+export function useFeatureAccess(feature?: FeatureTier | GenericFeature) {
   const { subscription, isLoading } = useSubscription()
 
   if (!feature) {

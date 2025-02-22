@@ -1,9 +1,8 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { SubscriptionTier } from '@/utils/subscription'
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,17 +16,7 @@ export default async function handler(
     if (session?.user?.isImpersonating) {
       return res.status(403).json({ message: 'Unauthorized' })
     }
-    const subscription = await prisma.subscription.findUnique({
-      where: { userId: session.user.id },
-      select: {
-        tier: true,
-        status: true,
-        currentPeriodEnd: true,
-        cancelAtPeriodEnd: true,
-        stripePriceId: true,
-      },
-    })
-
+    const subscription = await getSubscription(session.user.id)
     if (!subscription) {
       return res.status(200).json({
         tier: SUBSCRIPTION_TIERS.FREE,

@@ -2,11 +2,11 @@ import clsx from 'clsx'
 import { useState } from 'react'
 import { LockedFeatureOverlay } from '@/components/Dashboard/Features/LockedFeatureOverlay'
 import { useFeatureAccess } from '@/hooks/useSubscription'
-import type { FeatureTier } from '@/utils/subscription'
+import type { FeatureTier, GenericFeature } from '@/utils/subscription'
 import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
-  feature?: FeatureTier
+  feature?: FeatureTier | GenericFeature
 }
 
 export function Card({

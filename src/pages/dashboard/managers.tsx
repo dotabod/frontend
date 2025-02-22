@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { canAccessFeature } from '@/utils/subscription'
 import { useSubscription } from '@/hooks/useSubscription'
-import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 
 const ModeratorsPage = () => {
   const track = useTrack()
@@ -98,20 +97,10 @@ const ModeratorsPage = () => {
       </Head>
       <Header
         subtitle="Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings."
-        title={
-          <div className="flex items-center gap-2">
-            Managers
-            {!tierAccess.hasAccess && (
-              <TierBadge requiredTier={tierAccess.requiredTier} />
-            )}
-          </div>
-        }
+        title="Managers"
       />
 
-      <Card>
-        <div className="title">
-          <h3>Approve Managers</h3>
-        </div>
+      <Card title="Approve Managers" feature="managers">
         <div className="subtitle">
           <p>
             By approving a user, you're allowing them to access and modify your

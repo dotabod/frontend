@@ -11,7 +11,7 @@ import {
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { FEATURE_TIERS, type SubscriptionStatus } from '@/utils/subscription'
+import { FEATURE_TIERS, getSubscription } from '@/utils/subscription'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -131,17 +131,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       // Get user's subscription
-      const subscription = (await prisma.subscription.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          tier: true,
-          status: true,
-          currentPeriodEnd: true,
-          cancelAtPeriodEnd: true,
-          stripePriceId: true,
-        },
-      })) as SubscriptionStatus | null
-
+      const subscription = await getSubscription(session.user.id)
       const validKey = keyValidation.data
       const schema = dynamicSettingSchema(validKey, subscription)
 

@@ -55,12 +55,12 @@ export const navigation = [
     name: 'Managers',
     href: '/dashboard/managers',
     icon: ShieldCheck,
-    new: true,
   },
   {
     name: 'Billing',
     href: '/dashboard/billing',
     icon: CreditCardIcon,
+    new: true,
   },
   {
     name: 'Commands',
