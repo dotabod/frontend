@@ -116,7 +116,7 @@ interface UpdateSettingResult<T = boolean> {
 }
 
 export function useUpdateSetting<T = boolean>(
-  key?: SettingKeys | ChatterSettingKeys
+  key?: SettingKeys | ChatterSettingKeys,
 ): UpdateSettingResult<T> {
   const router = useRouter()
   const { subscription } = useSubscription()
@@ -140,9 +140,7 @@ export function useUpdateSetting<T = boolean>(
 
       // Handle chatter settings differently
       if (key?.startsWith('chatters.')) {
-        const chattersData = data?.settings?.find(
-          (s) => s.key === Settings.chatters
-        )
+        const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
         return {
           ...data,
           settings: data?.settings?.map((setting) => {
@@ -180,9 +178,7 @@ export function useUpdateSetting<T = boolean>(
   let value = getValueOrDefault(key, data?.settings)
   if (key === Settings.mmr) value = data?.mmr || 0
   if (key?.startsWith('chatters.')) {
-    const chattersData = data?.settings?.find(
-      (s) => s.key === Settings.chatters
-    )
+    const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
     const chatterKey = key.split('.')[1]
     value = chattersData?.value?.[chatterKey]?.enabled ?? false
   }
@@ -196,7 +192,7 @@ export function useUpdateSetting<T = boolean>(
       const chatterKey = key.split('.')[1]
       update(
         { value: { [chatterKey]: { enabled: newValue } } },
-        `/api/settings/${Settings.chatters}`
+        `/api/settings/${Settings.chatters}`,
       )
       return
     }
