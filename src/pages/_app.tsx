@@ -89,11 +89,11 @@ const App = ({
           />
           <MantineProvider>
             <Provider store={store}>
-              <AntProvider>
-                <SubscriptionProvider>
+              <SubscriptionProvider>
+                <AntProvider>
                   {getLayout(<Component {...pageProps} />)}
-                </SubscriptionProvider>
-              </AntProvider>
+                </AntProvider>
+              </SubscriptionProvider>
             </Provider>
           </MantineProvider>
         </StyleProvider>

@@ -10,11 +10,13 @@ interface TierInputProps extends Omit<InputProps, 'onChange'> {
   className?: string
   onChange?: (value: string) => void
   helpText?: string
+  hideTierBadge?: boolean
 }
 
 export function TierInput({
   settingKey,
   label,
+  hideTierBadge,
   className,
   disabled: externalDisabled,
   value: externalValue,
@@ -22,11 +24,7 @@ export function TierInput({
   helpText,
   ...inputProps
 }: TierInputProps) {
-  const {
-    data: rawValue,
-    updateSetting,
-    tierAccess,
-  } = useUpdateSetting<string>(settingKey)
+  const { data: rawValue, updateSetting, tierAccess } = useUpdateSetting<string>(settingKey)
 
   const isDisabled = externalDisabled || !tierAccess.hasAccess
   const inputValue = (externalValue ?? rawValue)?.toString() || ''
@@ -44,10 +42,10 @@ export function TierInput({
   return (
     <div className={`space-y-1 ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="block text-sm">
+        <label htmlFor={inputId} className='block text-sm'>
           {label}
-          {!tierAccess.hasAccess && (
-            <span className="ml-2">
+          {!tierAccess.hasAccess && !hideTierBadge && (
+            <span className='ml-2'>
               <TierBadge requiredTier={tierAccess.requiredTier} />
             </span>
           )}
@@ -60,7 +58,7 @@ export function TierInput({
         disabled={isDisabled}
         {...inputProps}
       />
-      {helpText && <span className="block text-xs italic">{helpText}</span>}
+      {helpText && <span className='block text-xs italic'>{helpText}</span>}
     </div>
   )
 }

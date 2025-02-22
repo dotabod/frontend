@@ -25,10 +25,7 @@ export default function BetsCard() {
   useEffect(() => form.resetFields(), [info])
 
   return (
-    <Card>
-      <div className="title">
-        <h3>Twitch predictions</h3>
-      </div>
+    <Card title="Twitch predictions" feature="bets">
       <div className="subtitle">Let your chatters bet on your matches.</div>
       <div>
         Chatters can use their native Twitch channel points to bet on whether

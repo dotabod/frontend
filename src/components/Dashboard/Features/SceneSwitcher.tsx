@@ -5,7 +5,7 @@ import {
 } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Input, Switch, Tag } from 'antd'
+import { Input, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { TierSwitch } from './TierSwitch'
@@ -61,14 +61,7 @@ export default function SceneSwitcher(): JSX.Element {
   }
 
   return (
-    <Card>
-      <div className="title">
-        <h3>
-          OBS scene switcher <Tag>Optional</Tag>
-        </h3>
-        {l0 && <Switch disabled />}
-        {!l0 && <TierSwitch settingKey={Settings['obs-scene-switcher']} />}
-      </div>
+    <Card title="OBS scene switcher" feature="obs-scene-switcher">
       <div className="subtitle">
         Auto switch scenes in OBS depending on game state. Your blockers will
         still work without this.
@@ -78,9 +71,18 @@ export default function SceneSwitcher(): JSX.Element {
       </div>
 
       <div className="mb-4">
+        <TierSwitch
+          label="Enable OBS scene switcher"
+          hideTierBadge
+          settingKey={Settings['obs-scene-switcher']}
+        />
+      </div>
+
+      <div className="mb-4">
         This is optional but useful if you want to make your stream look unique
         for different game states!
       </div>
+
       {isEnabled && (
         <ul className="mb-2 ml-4 list-decimal space-y-2 text-sm">
           <li>
@@ -100,6 +102,7 @@ export default function SceneSwitcher(): JSX.Element {
                   {loading && <Input placeholder="Loading..." disabled />}
                   {!loading && (
                     <TierInput
+                      hideTierBadge
                       settingKey={sceneKey as SettingKeys}
                       label={scene.label}
                       placeholder={

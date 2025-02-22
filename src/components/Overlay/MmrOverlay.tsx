@@ -12,10 +12,7 @@ export default function MmrOverlay() {
   const { data: showRankLeader } = useUpdateSetting(Settings.showRankLeader)
 
   return (
-    <Card>
-      <div className="title">
-        <h3>Rank and mmr</h3>
-      </div>
+    <Card title="Rank and mmr" feature="showRankMmr">
       <div className="subtitle">
         Wouldn&apos;t it be nice to show your friends how good you are?
       </div>
@@ -23,11 +20,16 @@ export default function MmrOverlay() {
       <div className={clsx('py-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <div className="flex items-center space-x-2">
-            <TierSwitch settingKey={Settings.showRankMmr} label="Show MMR" />
+            <TierSwitch
+              hideTierBadge
+              settingKey={Settings.showRankMmr}
+              label="Show MMR"
+            />
           </div>
 
           <div className="flex items-center space-x-2">
             <TierSwitch
+              hideTierBadge
               settingKey={Settings.showRankLeader}
               label="Show leaderboard ranking"
             />
@@ -35,6 +37,7 @@ export default function MmrOverlay() {
 
           <div className="flex items-center space-x-2">
             <TierSwitch
+              hideTierBadge
               settingKey={Settings.showRankImage}
               label="Show rank badge"
             />

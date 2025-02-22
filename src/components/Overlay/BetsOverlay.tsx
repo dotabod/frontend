@@ -9,10 +9,7 @@ export default function BetsOverlay() {
   const { data: showLivePolls } = useUpdateSetting(Settings.livePolls)
 
   return (
-    <Card>
-      <div className="title">
-        <h3>Twitch predictions</h3>
-      </div>
+    <Card title="Twitch predictions" feature="livePolls">
       <div className="subtitle">Let your chatters bet on your matches.</div>
       <div>
         Chatters can use their native Twitch channel points to bet on whether
@@ -20,6 +17,7 @@ export default function BetsOverlay() {
       </div>
       <div className="mt-5 flex items-center space-x-2">
         <TierSwitch
+          hideTierBadge
           settingKey={Settings.livePolls}
           label="Show live betting / polls overlay"
         />

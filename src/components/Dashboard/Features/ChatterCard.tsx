@@ -332,9 +332,9 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce(
 
 export default function ChatterCard() {
   const { data: isEnabled } = useUpdateSetting(Settings.chatter)
-  const { data: dbChatters, updateSetting: updateChatters } = useUpdateSetting(
-    Settings.chatters
-  )
+  const { data: dbChatters, updateSetting: updateChatters } = useUpdateSetting<
+    Record<string, { enabled: boolean }>
+  >(Settings.chatters)
 
   return (
     <>
@@ -360,10 +360,7 @@ export default function ChatterCard() {
         <DotabodChatter />
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
           return (
-            <Card key={categoryName}>
-              <div className="title">
-                <h3>{categoryName}</h3>
-              </div>
+            <Card key={categoryName} title={categoryName}>
               <div className="ml-4 flex flex-col space-y-3">
                 {(groupedChatterInfo[categoryName] || []).map((value) => (
                   <div key={value.id}>

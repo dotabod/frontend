@@ -11,6 +11,7 @@ interface TierSwitchProps {
   disabled?: boolean
   checked?: boolean
   onChange?: (checked: boolean) => void
+  hideTierBadge?: boolean
 }
 
 export function TierSwitch({
@@ -20,12 +21,9 @@ export function TierSwitch({
   disabled: externalDisabled,
   checked: externalChecked,
   onChange: externalOnChange,
+  hideTierBadge,
 }: TierSwitchProps) {
-  const {
-    data: enabled,
-    updateSetting,
-    tierAccess,
-  } = useUpdateSetting(settingKey)
+  const { data: enabled, updateSetting, tierAccess } = useUpdateSetting(settingKey)
 
   const isDisabled = externalDisabled || !tierAccess.hasAccess
   const isChecked = externalChecked ?? enabled
@@ -33,13 +31,9 @@ export function TierSwitch({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <Switch
-        checked={isChecked}
-        onChange={handleChange}
-        disabled={isDisabled}
-      />
+      <Switch checked={isChecked} onChange={handleChange} disabled={isDisabled} />
       {label && <span>{label}</span>}
-      {!tierAccess.hasAccess && (
+      {!tierAccess.hasAccess && !hideTierBadge && (
         <TierBadge requiredTier={tierAccess.requiredTier} />
       )}
     </div>

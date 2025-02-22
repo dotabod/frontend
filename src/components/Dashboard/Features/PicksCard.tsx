@@ -1,9 +1,9 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from './TierSwitch'
 
 export default function PicksCard() {
   const {
@@ -13,20 +13,16 @@ export default function PicksCard() {
   } = useUpdateSetting(Settings['picks-blocker'])
 
   return (
-    <Card>
-      <div className="title">
-        <h3>Picks</h3>
-      </div>
+    <Card title="Picks" feature="picks-blocker">
       <div className="subtitle">
         Prevent stream snipers from seeing your picks.
       </div>
       <div className="mb-4 flex items-center space-x-2">
-        <Switch
-          onChange={updateSetting}
-          loading={loading}
-          checked={isEnabled}
+        <TierSwitch
+          hideTierBadge
+          settingKey={Settings['picks-blocker']}
+          label="Enable pick blocker"
         />
-        <span>Enable pick blocker</span>
       </div>
       <div className={clsx(' transition-all', !isEnabled && 'opacity-40')}>
         <p>

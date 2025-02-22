@@ -1,10 +1,11 @@
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { App, Button, Switch, Tooltip } from 'antd'
+import { App, Button, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import useSWR from 'swr'
+import { TierSwitch } from './Features/TierSwitch'
 
 const Toggle = () => {
   const { data } = useSWR('/api/check-ban', fetcher)
@@ -24,22 +25,14 @@ const Toggle = () => {
           : 'Click to disable Dotabod and stop responding to game events and commands'
       }
     >
-      <label
-        htmlFor="disable-toggle"
-        className="cursor-pointer space-x-2 rounded flex flex-row items-center text-gray-300"
-      >
-        <Switch
-          id="disable-toggle"
-          loading={loading}
-          className="flex"
-          disabled={data?.banned}
-          checked={!checkBanOrDisable}
-          onChange={(checked) => updateSetting(!checked)}
-        />
-        <span className="text-clip text-nowrap">
-          Dotabod is {checkBanOrDisable ? 'disabled' : 'enabled'}
-        </span>
-      </label>
+      <TierSwitch
+        hideTierBadge
+        settingKey={Settings.commandDisable}
+        label={`Dotabod is ${checkBanOrDisable ? 'disabled' : 'enabled'}`}
+        disabled={data?.banned}
+        checked={!checkBanOrDisable}
+        onChange={(checked) => updateSetting(!checked)}
+      />
     </Tooltip>
   )
 }

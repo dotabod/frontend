@@ -22,6 +22,7 @@ export function Card({
   return (
     <div
       className={clsx(
+        'relative duration-200',
         'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
         className
       )}
