@@ -72,7 +72,7 @@ const MmrForm = ({ hideText = false }) => {
     data: mmr,
     updateSetting: updateMmr,
     loading: l1,
-  } = useUpdateSetting(Settings.mmr)
+  } = useUpdateSetting<number>(Settings.mmr)
 
   const loading = l1
 

@@ -81,12 +81,12 @@ const ObsSetup: React.FC = () => {
     data: obsPort,
     loading: l0,
     updateSetting: updatePort,
-  } = useUpdateSetting(Settings.obsServerPort)
+  } = useUpdateSetting<number>(Settings.obsServerPort)
   const {
     data: obsPassword,
     loading: l1,
     updateSetting: updatePassword,
-  } = useUpdateSetting(Settings.obsServerPassword)
+  } = useUpdateSetting<string>(Settings.obsServerPassword)
 
   const debouncedFormSubmit = useDebouncedCallback((value) => {
     form.submit()

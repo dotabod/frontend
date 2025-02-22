@@ -9,7 +9,7 @@ export default function StreamDelayCard() {
     data: delay,
     loading,
     updateSetting,
-  } = useUpdateSetting(Settings.streamDelay)
+  } = useUpdateSetting<number>(Settings.streamDelay)
 
   const debouncedUpdate = useDebouncedCallback((value) => {
     updateSetting(value * 1000)

@@ -9,16 +9,17 @@ import { Input } from '../../Input'
 import { TierSwitch } from './TierSwitch'
 
 export default function BetsCard() {
-  const {
-    data: isEnabled,
-    loading: l0,
-    updateSetting,
-  } = useUpdateSetting(Settings.bets)
+  const { data: isEnabled } = useUpdateSetting<boolean>(Settings.bets)
   const {
     data: info,
     loading,
     updateSetting: updateInfo,
-  } = useUpdateSetting(Settings.betsInfo)
+  } = useUpdateSetting<{
+    title: string
+    yes: string
+    no: string
+    duration: number
+  }>(Settings.betsInfo)
 
   const [form] = Form.useForm()
 
