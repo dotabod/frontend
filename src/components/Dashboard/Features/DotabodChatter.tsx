@@ -1,20 +1,9 @@
 import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Tooltip } from 'antd'
 import { TierSwitch } from './TierSwitch'
 
 export default function DotabodChatter() {
-  const {
-    data: tellChatBets,
-    updateSetting: updateTellChatBets,
-    loading: l3,
-  } = useUpdateSetting(Settings.tellChatBets)
-
-  const { data: tellChatNewMMR, updateSetting: updateChatNewMmr } = useUpdateSetting(
-    Settings.tellChatNewMMR,
-  )
-
   return (
     <Card>
       <div className='title'>

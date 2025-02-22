@@ -12,7 +12,7 @@ export default function MmrOverlay() {
   const { data: showRankLeader } = useUpdateSetting(Settings.showRankLeader)
 
   return (
-    <Card title='Rank and mmr' feature='showRankMmr'>
+    <Card title='Rank and mmr'>
       <div className='subtitle'>
         Wouldn&apos;t it be nice to show your friends how good you are?
       </div>
@@ -20,19 +20,15 @@ export default function MmrOverlay() {
       <div className={clsx('py-4 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           <div className='flex items-center space-x-2'>
-            <TierSwitch hideTierBadge settingKey={Settings.showRankMmr} label='Show MMR' />
+            <TierSwitch settingKey={Settings.showRankMmr} label='Show MMR' />
           </div>
 
           <div className='flex items-center space-x-2'>
-            <TierSwitch
-              hideTierBadge
-              settingKey={Settings.showRankLeader}
-              label='Show leaderboard ranking'
-            />
+            <TierSwitch settingKey={Settings.showRankLeader} label='Show leaderboard ranking' />
           </div>
 
           <div className='flex items-center space-x-2'>
-            <TierSwitch hideTierBadge settingKey={Settings.showRankImage} label='Show rank badge' />
+            <TierSwitch settingKey={Settings.showRankImage} label='Show rank badge' />
           </div>
         </div>
       </div>
@@ -42,15 +38,11 @@ export default function MmrOverlay() {
           leaderboard={null}
           image={showRankImage ? '11.png' : null}
           rank={showRankMmr ? 130 : undefined}
-          className='self-center !rounded-md bg-transparent'
-          style={{ fontSize: 11 }}
         />
         <MMRBadge
           leaderboard={showRankLeader ? 1 : undefined}
           image={showRankImage ? '92.png' : null}
           rank={showRankMmr ? 13150 : undefined}
-          className='self-center !rounded-md bg-transparent'
-          style={{ fontSize: 11 }}
         />
       </div>
 

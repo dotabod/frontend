@@ -10,10 +10,7 @@ export default function RoshCard() {
   const { data: hasRosh } = useUpdateSetting(Settings.rosh)
 
   return (
-    <Card>
-      <div className='title'>
-        <h3>Roshan timers</h3>
-      </div>
+    <Card title='Roshan timers' feature='rosh'>
       <div className='subtitle'>
         Dotabod can detect when roshan is killed or aegis is picked up.
       </div>
@@ -21,13 +18,17 @@ export default function RoshCard() {
       <div className={clsx('py-4 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           <div className='flex items-center'>
-            <TierSwitch settingKey={Settings.rosh} label='Roshan timer' />
+            <TierSwitch hideTierBadge settingKey={Settings.rosh} label='Roshan timer' />
           </div>
           <div className='flex items-center'>
-            <TierSwitch settingKey={Settings.aegis} label='Aegis timer' />
+            <TierSwitch hideTierBadge settingKey={Settings.aegis} label='Aegis timer' />
           </div>
           <div className='flex items-center'>
-            <TierSwitch settingKey={Settings['minimap-xl']} label='Use extra large minimap' />
+            <TierSwitch
+              hideTierBadge
+              settingKey={Settings['minimap-xl']}
+              label='Use extra large minimap'
+            />
           </div>
         </div>
       </div>

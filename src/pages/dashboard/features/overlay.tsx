@@ -7,6 +7,7 @@ import RoshCard from '@/components/Dashboard/Features/RoshCard'
 import Header from '@/components/Dashboard/Header'
 import BetsOverlay from '@/components/Overlay/BetsOverlay'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
+import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Head from 'next/head'
@@ -23,12 +24,13 @@ const FeaturesPage: NextPageWithLayout = () => (
     <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
       <MinimapCard />
       <PicksCard />
+      <WinLossOverlay />
+      <WinProbabilityOverlay />
       <MmrOverlay />
       <BetsOverlay />
       <RoshCard />
       <QueueCard />
       <NotablePlayersCard />
-      <WinProbabilityOverlay />
     </div>
   </>
 )
