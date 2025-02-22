@@ -1,4 +1,6 @@
+import { useFeatureAccess } from '@/hooks/useSubscription'
 import { useTrack } from '@/lib/track'
+import { FeatureWrapper } from '@/ui/card'
 import {
   ExclamationCircleOutlined,
   LoadingOutlined,
@@ -10,7 +12,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactNode, useEffect, useState } from 'react'
 import CodeBlock from './CodeBlock'
-import { FeatureWrapper } from '@/ui/card'
 
 const { Step } = Steps
 
@@ -77,19 +78,21 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
 }
 
 const WindowsInstaller = () => {
+  const { hasAccess } = useFeatureAccess('autoInstaller')
   const track = useTrack()
   const router = useRouter()
   const session = useSession()
   const port = Number.parseInt(router.query.port as string, 10)
   const sanitizedPort = Number.isNaN(port) ? 8089 : Math.min(Math.max(port, 8000), 9000)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const errorWithoutSuccess = error && !success
 
+  // Single instance check effect
   useEffect(() => {
     const channel = new BroadcastChannel('single-instance-check')
-    const handleMessage = (event) => {
+    const handleMessage = (event: MessageEvent) => {
       if (event.data === 'instance-opened') {
         router.replace('/404')
       }
@@ -104,55 +107,64 @@ const WindowsInstaller = () => {
       channel.removeEventListener('message', handleMessage)
       channel.close()
     }
-  }, [router.replace])
+  }, [router])
 
+  // Status check effect
   useEffect(() => {
     let interval: NodeJS.Timeout
 
-    if (!success && !error && sanitizedPort) {
-      const fetchToken = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user?.id ?? '')}`,
-            { method: 'GET', headers: { 'Content-Type': 'application/json' } },
-          )
-          if (!response.ok) {
-            throw new Error('Network response was not ok')
-          }
-          setCurrentStep(2)
-          setSuccess(true)
-          setTimeout(() => {
-            setCurrentStep(3)
-            track('setup/installer_success')
-          }, 3000)
-        } catch (error) {
-          // Do nothing
+    const checkStatus = async () => {
+      if (!hasAccess || success || error || !sanitizedPort) return
+
+      try {
+        const response = await fetch(`http://localhost:${sanitizedPort}/status`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
+
+        if (response.ok) {
+          track('setup/installer_check_success')
+          await fetchToken()
+          setError(null)
+          clearInterval(interval)
         }
+      } catch (err) {
+        // Silent fail - we'll retry
       }
-
-      interval = setInterval(async () => {
-        try {
-          const response = await fetch(`http://localhost:${sanitizedPort}/status`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          })
-          if (response.ok) {
-            fetchToken()
-            setError(null)
-            track('setup/installer_check_success')
-
-            clearInterval(interval)
-          }
-        } catch (err) {
-          // Do nothing
-          // console.error('Failed to check install status:', err)
-        }
-      }, 3000)
     }
+
+    const fetchToken = async () => {
+      if (!session?.data?.user?.id) return
+
+      try {
+        const response = await fetch(
+          `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data.user.id)}`,
+          { method: 'GET', headers: { 'Content-Type': 'application/json' } },
+        )
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        setCurrentStep(2)
+        setSuccess(true)
+        setTimeout(() => {
+          setCurrentStep(3)
+          track('setup/installer_success')
+        }, 3000)
+      } catch (err) {
+        // Silent fail - we'll retry
+      }
+    }
+
+    if (hasAccess && !success && !error && sanitizedPort) {
+      interval = setInterval(checkStatus, 3000)
+    }
+
     return () => {
       clearInterval(interval)
     }
-  }, [success, error, sanitizedPort, session?.data?.user?.id])
+  }, [success, error, sanitizedPort, session?.data?.user?.id, hasAccess, track])
 
   return (
     <FeatureWrapper feature='autoInstaller'>
@@ -185,19 +197,12 @@ const WindowsInstaller = () => {
           <Link
             target='_blank'
             href='https://help.dotabod.com'
-            onClick={() => {
-              track('setup/help_discord')
-            }}
+            onClick={() => track('setup/help_discord')}
           >
             on Discord
           </Link>
           , and then try{' '}
-          <Link
-            onClick={() => {
-              track('setup/manual_steps')
-            }}
-            href='/dashboard?step=2&gsiType=manual'
-          >
+          <Link onClick={() => track('setup/manual_steps')} href='/dashboard?step=2&gsiType=manual'>
             the manual steps
           </Link>
           .
