@@ -17,6 +17,10 @@ function serializeData(data: unknown): JsonValue {
     return null
   }
 
+  if (data instanceof Date) {
+    return data.toISOString()
+  }
+
   if (typeof data === 'bigint') {
     return data.toString()
   }
