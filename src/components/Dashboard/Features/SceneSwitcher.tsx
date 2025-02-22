@@ -1,10 +1,15 @@
-import { Settings, defaultSettings } from '@/lib/defaultSettings'
+import {
+  Settings,
+  defaultSettings,
+  type SettingKeys,
+} from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Input, Switch, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
 import { TierSwitch } from './TierSwitch'
+import { TierInput } from './TierInput'
 
 export default function SceneSwitcher(): JSX.Element {
   const { data: isEnabled, loading: l0 } = useUpdateSetting(
@@ -91,27 +96,21 @@ export default function SceneSwitcher(): JSX.Element {
             {Object.keys(scenes).map((sceneKey: string) => {
               const scene = scenes[sceneKey]
               return (
-                <li key={sceneKey} className="space-y-1">
-                  <label htmlFor={sceneKey} className="block text-sm">
-                    {scene.label}
-                  </label>
+                <li key={sceneKey}>
                   {loading && <Input placeholder="Loading..." disabled />}
                   {!loading && (
-                    <Input
-                      id={sceneKey}
+                    <TierInput
+                      settingKey={sceneKey as SettingKeys}
+                      label={scene.label}
                       placeholder={
                         defaultSettings['obs-scene-switcher'][sceneKey]
                       }
-                      defaultValue={scene.value}
+                      value={scene.value}
                       maxLength={200}
-                      name={sceneKey}
-                      onChange={(e) =>
-                        handleSceneName(e.target.value, scene.update)
-                      }
+                      onChange={(value) => handleSceneName(value, scene.update)}
+                      helpText={scene.helpText}
                     />
                   )}
-
-                  <span className="block text-xs italic">{scene.helpText}</span>
                 </li>
               )
             })}
