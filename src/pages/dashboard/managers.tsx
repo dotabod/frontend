@@ -10,10 +10,16 @@ import Image from 'next/image'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { canAccessFeature } from '@/utils/subscription'
+import { useSubscription } from '@/hooks/useSubscription'
+import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 
 const ModeratorsPage = () => {
   const track = useTrack()
   const session = useSession()
+  const { subscription } = useSubscription()
+  const tierAccess = canAccessFeature('managers', subscription)
+
   const {
     data: approvedMods,
     isLoading: loadingApprovedMods,
@@ -92,7 +98,14 @@ const ModeratorsPage = () => {
       </Head>
       <Header
         subtitle="Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings."
-        title="Managers"
+        title={
+          <div className="flex items-center gap-2">
+            Managers
+            {!tierAccess.hasAccess && (
+              <TierBadge requiredTier={tierAccess.requiredTier} />
+            )}
+          </div>
+        }
       />
 
       <Card>
@@ -113,6 +126,7 @@ const ModeratorsPage = () => {
 
         <div className="max-w-sm flex flex-col gap-4">
           <Select
+            disabled={!tierAccess.hasAccess}
             optionFilterProp="label"
             loading={loadingModList || loadingApprovedMods}
             mode="multiple"
@@ -138,7 +152,12 @@ const ModeratorsPage = () => {
                 : []
             }
           />
-          <Button type="primary" onClick={handleApprove} loading={loading}>
+          <Button
+            type="primary"
+            onClick={handleApprove}
+            loading={loading}
+            disabled={!tierAccess.hasAccess}
+          >
             Submit
           </Button>
         </div>

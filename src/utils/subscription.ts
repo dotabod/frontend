@@ -175,16 +175,27 @@ export const FEATURE_TIERS: Record<
 
 export type FeatureTier = keyof typeof FEATURE_TIERS
 
-// Utility functions
+// Add new type for generic features
+export type GenericFeature = 'managers' | 'other_future_feature'
+
+// Add new mapping for generic features
+export const GENERIC_FEATURE_TIERS: Record<GenericFeature, SubscriptionTier> = {
+  managers: SUBSCRIPTION_TIERS.PRO,
+} as const
+
+// Update canAccessFeature to handle both types of features
 export function canAccessFeature(
-  feature: FeatureTier,
+  feature: FeatureTier | GenericFeature,
   subscription: SubscriptionStatus | null
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
-  const requiredTier = FEATURE_TIERS[feature] || SUBSCRIPTION_TIERS.PRO
+  const requiredTier =
+    FEATURE_TIERS[feature as FeatureTier] ||
+    GENERIC_FEATURE_TIERS[feature as GenericFeature] ||
+    SUBSCRIPTION_TIERS.PRO
 
   if (!subscription || subscription.status !== 'active') {
     return {
-      hasAccess: FEATURE_TIERS[feature] === SUBSCRIPTION_TIERS.FREE,
+      hasAccess: requiredTier === SUBSCRIPTION_TIERS.FREE,
       requiredTier,
     }
   }
