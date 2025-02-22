@@ -12,6 +12,8 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import MmrForm from './Features/MmrForm'
+import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
+import { useFeatureAccess } from '@/hooks/useSubscription'
 
 const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
@@ -75,6 +77,7 @@ export default function ChatBot() {
       revalidateOnReconnect: false,
     },
   )
+  const { hasAccess: hasAuto7TVAccess, requiredTier } = useFeatureAccess('auto7TV')
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -136,7 +139,7 @@ export default function ChatBot() {
   const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
 
   const stepTwoComplete = user?.id
-  const stepThreeComplete = user?.hasDotabodEditor
+  const stepThreeComplete = hasAuto7TVAccess ? user?.hasDotabodEditor : true
   const stepFourComplete = user?.hasDotabodEmoteSet
   const initialStep = [stepTwoComplete, stepThreeComplete, stepFourComplete].filter(Boolean).length
 
@@ -184,7 +187,10 @@ export default function ChatBot() {
         ]}
       />
       <Divider />
-      <h1>7TV</h1>
+      <div className='flex items-center gap-2'>
+        <h1>7TV</h1>
+        <TierBadge requiredTier={requiredTier} />
+      </div>
       <StepComponent
         initialStep={initialStep}
         stepProps={[
@@ -227,32 +233,41 @@ export default function ChatBot() {
 
           <div key={2}>
             <div className='flex flex-row items-center space-x-2'>
-              {!user?.hasDotabodEditor ? (
-                <div>
+              {hasAuto7TVAccess ? (
+                !user?.hasDotabodEditor ? (
                   <div>
-                    <span>You must add Dotabod as an editor </span>
-                    <Button
-                      className='!pl-0'
-                      target='_blank'
-                      type='link'
-                      href={`https://7tv.app/users/${user?.id}`}
-                      icon={<ExternalLinkIcon size={14} />}
-                      iconPosition='end'
-                      onClick={() => {
-                        track('7TV Add Editor')
-                      }}
-                    >
-                      on your 7TV account
-                    </Button>
-                  </div>
+                    <div>
+                      <span>You must add Dotabod as an editor </span>
+                      <Button
+                        className='!pl-0'
+                        target='_blank'
+                        type='link'
+                        href={`https://7tv.app/users/${user?.id}`}
+                        icon={<ExternalLinkIcon size={14} />}
+                        iconPosition='end'
+                        onClick={() => {
+                          track('7TV Add Editor')
+                        }}
+                      >
+                        on your 7TV account
+                      </Button>
+                    </div>
 
-                  <div className='flex flex-row items-center space-x-3'>
-                    {loading && <Spin size='small' spinning={true} />}
-                    <span>Waiting for Dotabod to become an editor...</span>
+                    <div className='flex flex-row items-center space-x-3'>
+                      {loading && <Spin size='small' spinning={true} />}
+                      <span>Waiting for Dotabod to become an editor...</span>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div>Dotabod is an editor on your 7TV account.</div>
+                )
               ) : (
-                <div>Dotabod is an editor on your 7TV account.</div>
+                <div>
+                  <p>
+                    You can add the required emotes manually to your emote set. Click each emote
+                    below to add it to your set.
+                  </p>
+                </div>
               )}
             </div>
           </div>,
@@ -269,13 +284,19 @@ export default function ChatBot() {
                   </div>
                 ) : (
                   <>
-                    {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
+                    {!user?.hasDotabodEmoteSet ? (
                       <div className='flex flex-row space-x-4'>
-                        <Spin size='small' spinning={true} />
-                        <p>
-                          Dotabod will be able to use the following emotes after the previous steps
-                          are completed.
-                        </p>
+                        {hasAuto7TVAccess ? (
+                          <>
+                            <Spin size='small' spinning={true} />
+                            <p>
+                              Dotabod will automatically add the following emotes after the previous
+                              steps are completed.
+                            </p>
+                          </>
+                        ) : (
+                          <p>Click each emote below to add it to your emote set:</p>
+                        )}
                       </div>
                     ) : (
                       <div>The following emotes are ready to use!</div>
