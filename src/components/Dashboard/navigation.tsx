@@ -101,10 +101,7 @@ export const navigation = [
   {
     name: 'Support the project',
     icon: ({ className }) => (
-      <HeartIcon
-        className={clsx('h-4 w-4 !text-red-500', className)}
-        aria-hidden="true"
-      />
+      <HeartIcon className={clsx('h-4 w-4 !text-red-500', className)} aria-hidden='true' />
     ),
     children: [
       {
@@ -116,13 +113,7 @@ export const navigation = [
         name: 'Boosty',
         href: 'https://boosty.to/dotabod',
         icon: ({ className }) => (
-          <Image
-            src={BoostyLogo}
-            height={16}
-            width={16}
-            alt="boosty"
-            className={className}
-          />
+          <Image src={BoostyLogo} height={16} width={16} alt='boosty' className={className} />
         ),
       },
     ],

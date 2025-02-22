@@ -112,13 +112,13 @@ const settingsSchema = {
 
 type SettingKeys = keyof typeof settingsSchema
 export const settingKeySchema = z.enum(
-  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]]
+  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],
 )
 
 // Helper function to check if user can access a setting based on their subscription
 export function canAccessSetting(
   settingKey: SettingKeys,
-  subscription: SubscriptionStatus | null
+  subscription: SubscriptionStatus | null,
 ): boolean {
   const requiredTier = FEATURE_TIERS[settingKey] || SUBSCRIPTION_TIERS.PRO
 
@@ -130,10 +130,7 @@ export function canAccessSetting(
 }
 
 // Add subscription validation to dynamic schema
-export const dynamicSettingSchema = (
-  key: SettingKeys,
-  subscription: SubscriptionStatus | null
-) =>
+export const dynamicSettingSchema = (key: SettingKeys, subscription: SubscriptionStatus | null) =>
   z
     .object({
       key: z.literal(key),

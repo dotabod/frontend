@@ -13,7 +13,7 @@ const accountUpdateSchema = z.array(
     mmr: z.number().min(0).max(30_000),
     name: z.string().max(500).optional(),
     delete: z.boolean().optional(),
-  })
+  }),
 )
 
 async function getAccounts(userId: string) {
@@ -55,9 +55,7 @@ async function getAccounts(userId: string) {
         return accountData
       }
 
-      const filteredConnections = connectedUserIds?.filter(
-        (id) => id === userId
-      )
+      const filteredConnections = connectedUserIds?.filter((id) => id === userId)
       if (filteredConnections?.length) {
         return {
           ...accountData,
@@ -82,11 +80,7 @@ async function handleGetRequest(res: NextApiResponse, userId: string) {
   return res.json({ accounts })
 }
 
-async function handlePatchRequest(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  userId: string
-) {
+async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, userId: string) {
   const accounts = await getAccounts(userId)
   if (!accounts) {
     return res.status(403).end()
@@ -98,17 +92,13 @@ async function handlePatchRequest(
     const updatePromises = accountUpdates
       .map((update) => {
         if (update.delete) {
-          if (
-            accounts.some((account) => account.steam32Id === update.steam32Id)
-          ) {
+          if (accounts.some((account) => account.steam32Id === update.steam32Id)) {
             return prisma.steamAccount.delete({
               where: { steam32Id: update.steam32Id },
             })
           }
         } else {
-          if (
-            accounts.some((account) => account.steam32Id === update.steam32Id)
-          ) {
+          if (accounts.some((account) => account.steam32Id === update.steam32Id)) {
             return prisma.steamAccount.update({
               data: { steam32Id: update.steam32Id, mmr: update.mmr },
               where: { steam32Id: update.steam32Id },

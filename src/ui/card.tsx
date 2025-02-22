@@ -9,13 +9,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   feature?: FeatureTier | GenericFeature
 }
 
-export function Card({
-  className,
-  feature,
-  title,
-  children,
-  ...props
-}: CardProps) {
+export function Card({ className, feature, title, children, ...props }: CardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
@@ -24,39 +18,30 @@ export function Card({
       className={clsx(
         'relative duration-200',
         'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
-        className
+        className,
       )}
       onMouseEnter={() => !hasAccess && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...props}
     >
       {title && (
-        <div className="title">
+        <div className='title'>
           <h3>{title}</h3>
           {requiredTier && <TierBadge requiredTier={requiredTier} />}
         </div>
       )}
       {children}
-      {!hasAccess && isHovered && (
-        <LockedFeatureOverlay requiredTier={requiredTier} />
-      )}
+      {!hasAccess && isHovered && <LockedFeatureOverlay requiredTier={requiredTier} />}
     </div>
   )
 }
 
 interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-Card.Footer = function CardFooter({
-  className,
-  children,
-  ...props
-}: CardFooterProps) {
+Card.Footer = function CardFooter({ className, children, ...props }: CardFooterProps) {
   return (
-    <div
-      className={clsx('block text-sm font-medium sm:rounded-b-lg', className)}
-      {...props}
-    >
-      <div className="grid w-full border-t border-solid border-gray-700  pt-4" />
+    <div className={clsx('block text-sm font-medium sm:rounded-b-lg', className)} {...props}>
+      <div className='grid w-full border-t border-solid border-gray-700  pt-4' />
       {children}
     </div>
   )

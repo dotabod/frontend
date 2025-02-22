@@ -83,20 +83,14 @@ function WidgetPage() {
     if (!original) return
 
     const steamAccount = original.SteamAccount?.[0]
-    const rank = getRankDetail(
-      steamAccount?.mmr ?? original.mmr,
-      steamAccount?.leaderboard_rank
-    )
+    const rank = getRankDetail(steamAccount?.mmr ?? original.mmr, steamAccount?.leaderboard_rank)
 
     if (!rank) return
 
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard:
-        'standing' in rank
-          ? rank.standing
-          : steamAccount?.leaderboard_rank ?? false,
+      leaderboard: 'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? false),
       notLoaded: false,
     }
 
@@ -106,11 +100,8 @@ function WidgetPage() {
   return (
     <div>
       <div
-        className={clsx(
-          'absolute flex items-end justify-end',
-          isRight && '!justify-start'
-        )}
-        id="ingame-wl-mmr-card"
+        className={clsx('absolute flex items-end justify-end', isRight && '!justify-start')}
+        id='ingame-wl-mmr-card'
         style={{
           ...wlPosition,
           width: res({ w: 215 }),
@@ -118,14 +109,14 @@ function WidgetPage() {
         }}
       >
         <AnimatedWL
-          key="animate-wl-class"
+          key='animate-wl-class'
           wl={wl}
           className={clsx('block', isRight && 'order-2')}
         />
 
         <AnimatedRankBadge
           className={clsx('block', isRight && 'order-1')}
-          key="animate-rank-badge-class"
+          key='animate-rank-badge-class'
           rankImageDetails={{
             ...rankImageDetails,
             leaderboard: rankImageDetails.leaderboard ?? null,

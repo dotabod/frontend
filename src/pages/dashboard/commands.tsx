@@ -17,10 +17,7 @@ const CommandsPage = () => {
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
-      const isEnabled = getValueOrDefault(
-        CommandDetail[command].key,
-        data?.settings
-      )
+      const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
       if (enabled === 'Enabled' && CommandDetail[command].key) {
         return isEnabled === true
       }
@@ -69,11 +66,11 @@ const CommandsPage = () => {
         <title>Dotabod | Commands</title>
       </Head>
       <Header
-        subtitle="An exhaustive list of all commands available using Twitch chat."
-        title="Commands"
+        subtitle='An exhaustive list of all commands available using Twitch chat.'
+        title='Commands'
       />
 
-      <div className="flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap">
+      <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap'>
         <Segmented
           value={enabled}
           onChange={(v) => setEnabled(v as string)}
@@ -85,7 +82,7 @@ const CommandsPage = () => {
           options={['All', 'Mods', 'Plebs']}
         />
         <Input
-          placeholder="Search commands..."
+          placeholder='Search commands...'
           value={searchTerm}
           style={{ width: 300 }}
           maxLength={200}
@@ -93,13 +90,10 @@ const CommandsPage = () => {
         />
       </div>
       {filteredCommands.length < 1 && (
-        <Empty
-          description="Could not find any matching commands."
-          imageStyle={{ height: 60 }}
-        />
+        <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3'>
         {filteredCommands.map((key) => (
           <CommandsCard key={key} id={key} command={CommandDetail[key]} />
         ))}

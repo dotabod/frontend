@@ -34,7 +34,7 @@ export const TextWithEmotes = ({
           alt={emote.code}
           width={res({ w: 25 })}
           height={res({ h: 25 })}
-          className="mx-1 inline"
+          className='mx-1 inline'
         />
       )
     }
@@ -42,9 +42,9 @@ export const TextWithEmotes = ({
   })
 
   return (
-    <div className="space-x-1">
+    <div className='space-x-1'>
       {textWithEmotes.map((word, i) => (
-        <span key={i} className="text-slate-50">
+        <span key={i} className='text-slate-50'>
           {word}
         </span>
       ))}

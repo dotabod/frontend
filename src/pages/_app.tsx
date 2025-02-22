@@ -30,10 +30,7 @@ type AppPropsWithLayout = AppProps & {
 
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
-const App = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppPropsWithLayout) => {
+const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -81,18 +78,14 @@ const App = ({
           },
         }}
       >
-        <StyleProvider hashPriority="high">
+        <StyleProvider hashPriority='high'>
           <SentrySession />
           <VercelAnalytics />
-          <GoogleAnalytics
-            gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''}
-          />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
           <MantineProvider>
             <Provider store={store}>
               <SubscriptionProvider>
-                <AntProvider>
-                  {getLayout(<Component {...pageProps} />)}
-                </AntProvider>
+                <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
               </SubscriptionProvider>
             </Provider>
           </MantineProvider>

@@ -4,10 +4,7 @@ import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -38,7 +35,7 @@ export default async function handler(
 
     // Update the subscription with the new price
     const updatedSubscription = await stripe.subscriptions.retrieve(
-      subscription.stripeSubscriptionId
+      subscription.stripeSubscriptionId,
     )
 
     await stripe.subscriptions.update(subscription.stripeSubscriptionId, {

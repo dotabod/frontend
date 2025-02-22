@@ -15,12 +15,9 @@ const FeaturesPage: NextPageWithLayout = () => (
       <title>Dotabod | Main features</title>
     </Head>
 
-    <Header
-      subtitle="Customize the options your stream receives."
-      title="Main features"
-    />
+    <Header subtitle='Customize the options your stream receives.' title='Main features' />
 
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
+    <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
       <LanguageCard />
       <StreamDelayCard />
       <MmrTrackerCard />

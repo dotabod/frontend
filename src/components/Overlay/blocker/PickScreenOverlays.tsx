@@ -8,11 +8,7 @@ import { motionProps } from '@/ui/utils'
 import { clsx } from 'clsx'
 import { motion } from 'framer-motion'
 
-export const PickScreenOverlays = ({
-  rankImageDetails,
-  wl,
-  block: { team, type },
-}) => {
+export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type } }) => {
   const res = useTransformRes()
   const { data: shouldBlock } = useUpdateSetting(Settings['picks-blocker'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
@@ -44,38 +40,26 @@ export const PickScreenOverlays = ({
 
   return (
     <>
-      <div
-        style={styles}
-        className={clsx('absolute ')}
-        id="picks-blocker-parent"
-      >
+      <div style={styles} className={clsx('absolute ')} id='picks-blocker-parent'>
         <div
           className={clsx(
             'flex h-full w-full items-end justify-end bg-slate-800/50 backdrop-blur-lg backdrop-filter',
             'absolute ',
             (type === 'strategy-2' || !shouldBlock || isRight) &&
               '!right-0 bg-slate-800/0 backdrop-blur-none backdrop-filter-none',
-            isRight && '!justify-start'
+            isRight && '!justify-start',
           )}
         >
-          <AnimatedWL
-            className={clsx(isRight && 'order-2')}
-            key="animate-wl-class-main"
-            wl={wl}
-          />
+          <AnimatedWL className={clsx(isRight && 'order-2')} key='animate-wl-class-main' wl={wl} />
           <AnimatedRankBadge
             className={clsx(isRight && 'order-1')}
-            key="animate-rank-badge-class-main"
+            key='animate-rank-badge-class-main'
             rankImageDetails={rankImageDetails}
           />
         </div>
       </div>
       {shouldBlock && (
-        <motion.div
-          key="animated-hero-blocker"
-          {...motionProps}
-          className="absolute"
-        >
+        <motion.div key='animated-hero-blocker' {...motionProps} className='absolute'>
           <HeroBlocker type={type} teamName={team} />
         </motion.div>
       )}

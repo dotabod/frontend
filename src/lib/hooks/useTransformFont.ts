@@ -9,11 +9,7 @@ export const useTransformFontSize = () => {
 
   const fontSize = (size: number) => {
     if (!windowSize || !windowSize.width || !windowSize.height) return size
-    if (
-      href?.asPath &&
-      typeof href.asPath === 'string' &&
-      !href.asPath.includes('overlay')
-    )
+    if (href?.asPath && typeof href.asPath === 'string' && !href.asPath.includes('overlay'))
       return size
 
     // Set the default font size based on 1080p screen size

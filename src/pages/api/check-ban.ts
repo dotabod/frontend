@@ -7,10 +7,7 @@ import { authOptions } from '@/lib/auth'
 import { captureException } from '@sentry/nextjs'
 import { getTwitchTokens } from '../../lib/getTwitchTokens'
 
-async function checkBan(
-  broadcasterId: string | undefined,
-  accessToken: string
-) {
+async function checkBan(broadcasterId: string | undefined, accessToken: string) {
   if (!broadcasterId) {
     throw new Error('Broadcaster ID is required')
   }
@@ -48,9 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { providerAccountId, accessToken, error } = await getTwitchTokens(
-      session.user.id
-    )
+    const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
     if (error) {
       return res.status(403).json({ message: 'Forbidden' })
     }
@@ -58,9 +53,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(response)
   } catch (error) {
     captureException(error)
-    return res
-      .status(500)
-      .json({ message: 'Failed to get ban info', error: error.message })
+    return res.status(500).json({ message: 'Failed to get ban info', error: error.message })
   }
 }
 

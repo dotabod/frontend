@@ -85,11 +85,8 @@ function Plan({
 
       // For new subscriptions, create checkout session
       const priceId = getPriceId(
-        name.toLowerCase() as Exclude<
-          SubscriptionTier,
-          typeof SUBSCRIPTION_TIERS.FREE
-        >,
-        activePeriod
+        name.toLowerCase() as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
+        activePeriod,
       )
       const response = await createCheckoutSession(priceId, session.user.id)
 
@@ -102,8 +99,7 @@ function Plan({
       console.error('Subscription error:', error)
       notification.error({
         message: 'Subscription Error',
-        description:
-          'Failed to process subscription request. Please try again later.',
+        description: 'Failed to process subscription request. Please try again later.',
         placement: 'bottomRight',
       })
     } finally {
@@ -117,26 +113,22 @@ function Plan({
         'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5',
         featured
           ? 'order-first bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
-          : 'bg-gray-800/50 backdrop-blur-xl'
+          : 'bg-gray-800/50 backdrop-blur-xl',
       )}
     >
       <h3
         className={clsx(
           'flex items-center text-sm font-semibold',
-          featured ? 'text-purple-400' : 'text-gray-100'
+          featured ? 'text-purple-400' : 'text-gray-100',
         )}
       >
-        {logo ? (
-          logo
-        ) : (
-          <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
-        )}
-        <span className="ml-4">{name}</span>
+        {logo ? logo : <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />}
+        <span className='ml-4'>{name}</span>
       </h3>
       <p
         className={clsx(
           'relative mt-5 flex text-4xl font-bold tracking-tight',
-          featured ? 'text-white' : 'text-gray-100'
+          featured ? 'text-white' : 'text-gray-100',
         )}
       >
         {price.monthly === price.annual ? (
@@ -148,11 +140,11 @@ function Plan({
               className={clsx(
                 'transition duration-300',
                 activePeriod === 'annual' &&
-                  'pointer-events-none translate-x-6 opacity-0 select-none'
+                  'pointer-events-none translate-x-6 opacity-0 select-none',
               )}
             >
               {price.monthly}
-              <span className="text-sm"> / month</span>
+              <span className='text-sm'> / month</span>
             </span>
             <span
               aria-hidden={activePeriod === 'annual'}
@@ -160,52 +152,40 @@ function Plan({
                 'absolute top-0 left-0 transition duration-300',
                 activePeriod === 'annual'
                   ? 'translate-x-0 opacity-100'
-                  : 'pointer-events-none -translate-x-6 opacity-0 select-none'
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
               )}
             >
               {price.annual}
-              <span className="text-sm"> / year</span>
+              <span className='text-sm'> / year</span>
             </span>
           </>
         )}
       </p>
       {activePeriod === 'annual' && !Number.isNaN(savings) && (
-        <p
-          className={clsx(
-            '-mt-10 text-sm',
-            featured ? 'text-purple-200' : 'text-gray-400'
-          )}
-        >
+        <p className={clsx('-mt-10 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
           Saving {savings}%
         </p>
       )}
-      <p
-        className={clsx(
-          'mt-3 text-sm',
-          featured ? 'text-purple-200' : 'text-gray-400'
-        )}
-      >
+      <p className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
         {description}
       </p>
-      <div className="order-last mt-6">
+      <div className='order-last mt-6'>
         <ol
           className={clsx(
             '-my-2 divide-y text-sm',
-            featured
-              ? 'divide-gray-700/50 text-gray-300'
-              : 'divide-gray-700/30 text-gray-300'
+            featured ? 'divide-gray-700/50 text-gray-300' : 'divide-gray-700/30 text-gray-300',
           )}
         >
           {features.map((feature, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <li key={index} className="flex py-2">
+            <li key={index} className='flex py-2'>
               <CheckIcon
                 className={clsx(
                   'h-6 w-6 flex-none',
-                  featured ? 'text-purple-400' : 'text-purple-500'
+                  featured ? 'text-purple-400' : 'text-purple-500',
                 )}
               />
-              <span className="ml-4">{feature}</span>
+              <span className='ml-4'>{feature}</span>
             </li>
           ))}
         </ol>
@@ -220,7 +200,7 @@ function Plan({
           'mt-6',
           featured
             ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-            : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+            : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
         )}
         aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
       >

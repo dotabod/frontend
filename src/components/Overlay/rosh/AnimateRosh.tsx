@@ -14,12 +14,7 @@ interface AnimateRoshProps {
   onComplete: () => void
 }
 
-export const AnimateRosh = ({
-  onComplete,
-  paused,
-  block,
-  roshan,
-}: AnimateRoshProps) => {
+export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshProps) => {
   if (!roshan) return null
 
   const props = {

@@ -26,10 +26,10 @@ export const StepComponent: React.FC<{
   return (
     <Steps
       status={status}
-      size="small"
+      size='small'
       current={current}
       onChange={onChange}
-      direction="vertical"
+      direction='vertical'
       items={steps.map((step, index) => ({
         title: hideTitle ? undefined : `Step ${index + 1}`,
         description: step,
@@ -46,12 +46,10 @@ const faqs = [
       <StepComponent
         steps={[
           <span key={0}>
-            Demo any hero and type <Tag>!facet</Tag> in your chat to confirm
-            Dotabod can find you.
+            Demo any hero and type <Tag>!facet</Tag> in your chat to confirm Dotabod can find you.
           </span>,
           <span key={1}>
-            While demoing, visit the{' '}
-            <Link href="/overlay">Live Preview page</Link> to confirm the
+            While demoing, visit the <Link href='/overlay'>Live Preview page</Link> to confirm the
             overlay is showing.
           </span>,
         ]}
@@ -64,12 +62,11 @@ const faqs = [
       <StepComponent
         steps={[
           <span key={1}>
-            Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can
-            type.
+            Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can type.
           </span>,
           <span key={2}>
-            Spectate a live pro match and type <Tag>!np</Tag> to confirm Dotabod
-            responds with the notable players.
+            Spectate a live pro match and type <Tag>!np</Tag> to confirm Dotabod responds with the
+            notable players.
           </span>,
         ]}
       />
@@ -80,9 +77,7 @@ const faqs = [
     answer: (
       <StepComponent
         steps={[
-          <span key={0}>
-            Press refresh on the dotabod overlay source in OBS
-          </span>,
+          <span key={0}>Press refresh on the dotabod overlay source in OBS</span>,
           'Restart OBS.',
           'Confirm your stream is online.',
           'Try the steps under "Overlay not showing anything?"',
@@ -131,20 +126,16 @@ const faqs = [
         steps={[
           <span key={0}>
             You probably placed the cfg file in the wrong folder.{' '}
-            <Link href="/dashboard?step=2">Follow Step 2</Link> of setup again.
-            Don't forget to reboot Dota after saving the cfg in the right
-            folder.
+            <Link href='/dashboard?step=2'>Follow Step 2</Link> of setup again. Don't forget to
+            reboot Dota after saving the cfg in the right folder.
           </span>,
           <span key={2}>
-            Still nothing? Could your Steam account be linked to another Dotabod
-            user? Only one person may have the Steam account linked. Dotabod
-            will tell you who is using your account from{' '}
-            <Link href="/dashboard/features">
-              the MMR tracker in the Features page
-            </Link>
-            . You can then ask them to remove it from their account. Or, join
-            our{' '}
-            <a target="_blank" href="https://help.dotabod.com" rel="noreferrer">
+            Still nothing? Could your Steam account be linked to another Dotabod user? Only one
+            person may have the Steam account linked. Dotabod will tell you who is using your
+            account from{' '}
+            <Link href='/dashboard/features'>the MMR tracker in the Features page</Link>. You can
+            then ask them to remove it from their account. Or, join our{' '}
+            <a target='_blank' href='https://help.dotabod.com' rel='noreferrer'>
               Discord server
             </a>{' '}
             and type /unlink-steam.
@@ -157,8 +148,8 @@ const faqs = [
     question: 'MMR not tracking?',
     answer: (
       <span>
-        <Link href="/dashboard/features">Enter your current MMR</Link> in the
-        dashboard so that it isnt 0.
+        <Link href='/dashboard/features'>Enter your current MMR</Link> in the dashboard so that it
+        isnt 0.
       </span>
     ),
   },
@@ -170,16 +161,15 @@ const faqs = [
   {
     question: 'Can I still use 9kmmrbot?',
     answer: (
-      <div className="flex flex-col space-y-4">
+      <div className='flex flex-col space-y-4'>
         <div>
-          Using Dotabod and 9kmmrbot together will not cause any issues. But
-          your chat might not like the double bot spam.
+          Using Dotabod and 9kmmrbot together will not cause any issues. But your chat might not
+          like the double bot spam.
         </div>
         <div>
-          Furthermore, 9kmmrbot is no longer able to retrieve game data for
-          accounts outside of the high immortal bracket (typically, the top 1000
-          players). Dotabod&apos;s game integration works for all players,
-          regardless of rank.
+          Furthermore, 9kmmrbot is no longer able to retrieve game data for accounts outside of the
+          high immortal bracket (typically, the top 1000 players). Dotabod&apos;s game integration
+          works for all players, regardless of rank.
         </div>
       </div>
     ),
@@ -189,7 +179,7 @@ const faqs = [
     answer: (
       <span>
         Get help in our{' '}
-        <a target="_blank" href="https://help.dotabod.com" rel="noreferrer">
+        <a target='_blank' href='https://help.dotabod.com' rel='noreferrer'>
           Discord
         </a>
         .
@@ -207,30 +197,25 @@ const TroubleshootPage = () => {
       <Head>
         <title>Dotabod | Troubleshooting</title>
       </Head>
-      <Header
-        subtitle="Try these steps in case something isn't working."
-        title="Troubleshooting"
-      />
+      <Header subtitle="Try these steps in case something isn't working." title='Troubleshooting' />
       {!isLive && (
         <Alert
-          message="Your stream is offline, and Dotabod will only work once you start streaming and go online."
-          type="warning"
+          message='Your stream is offline, and Dotabod will only work once you start streaming and go online.'
+          type='warning'
           showIcon
-          className="max-w-2xl"
+          className='max-w-2xl'
         />
       )}
-      <div className="mt-12 lg:col-span-2 lg:mt-0">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className='mt-12 lg:col-span-2 lg:mt-0'>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
           {faqs.map(
             (faq) =>
               faq.question && (
                 <Card key={faq.question}>
-                  <dt className="text-lg font-medium leading-6">
-                    {faq.question}
-                  </dt>
-                  <dd className="mt-2 text-base text-gray-300">{faq.answer}</dd>
+                  <dt className='text-lg font-medium leading-6'>{faq.question}</dt>
+                  <dd className='mt-2 text-base text-gray-300'>{faq.answer}</dd>
                 </Card>
-              )
+              ),
           )}
         </div>
       </div>

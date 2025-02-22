@@ -116,14 +116,10 @@ export const getLanguageProgress = (
         percentage: number
       }
     | undefined,
-  locale: string
+  locale: string,
 ) => {
-  const language = data?.project?.targetLanguages?.find(
-    (x) => x.locale === locale
-  )
-  const progress = data?.languageProgress?.find(
-    (x) => x.data.languageId === language?.id
-  )
+  const language = data?.project?.targetLanguages?.find((x) => x.locale === locale)
+  const progress = data?.languageProgress?.find((x) => x.data.languageId === language?.id)
 
   return progress
 }
@@ -134,10 +130,7 @@ const useLanguageTranslations = ({ languageId }: { languageId: string }) => {
     project: Project
     total: number | undefined
     percentage: number
-  }>(
-    languageId ? `/api/getLanguageProgress?languageId=${languageId}` : null,
-    fetcher
-  )
+  }>(languageId ? `/api/getLanguageProgress?languageId=${languageId}` : null, fetcher)
 
   return { data, isLoading }
 }

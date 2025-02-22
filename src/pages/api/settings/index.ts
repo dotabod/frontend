@@ -4,10 +4,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
-import {
-  dynamicSettingSchema,
-  settingKeySchema,
-} from '@/lib/validations/setting'
+import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -105,7 +102,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (session?.user?.isImpersonating) {
         // Filter out obsServerPassword
         data.settings = data.settings.filter(
-          (setting) => setting.key !== Settings.obsServerPassword
+          (setting) => setting.key !== Settings.obsServerPassword,
         )
       }
 
@@ -160,9 +157,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         if (error instanceof z.ZodError) {
           // Check if error is related to subscription access
           const subscriptionError = error.errors.find(
-            (e) =>
-              e.message ===
-              'Your subscription tier does not have access to this feature'
+            (e) => e.message === 'Your subscription tier does not have access to this feature',
           )
           if (subscriptionError) {
             return res.status(403).json({

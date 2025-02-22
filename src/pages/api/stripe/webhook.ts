@@ -22,10 +22,7 @@ const relevantEvents = new Set([
   'invoice.payment_failed',
 ])
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -72,9 +69,7 @@ export default async function handler(
         case 'invoice.payment_succeeded': {
           const invoice = event.data.object as Stripe.Invoice
           if (invoice.subscription) {
-            const subscription = await stripe.subscriptions.retrieve(
-              invoice.subscription as string
-            )
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
             await updateSubscriptionInDatabase(subscription)
           }
           break
@@ -82,9 +77,7 @@ export default async function handler(
         case 'invoice.payment_failed': {
           const invoice = event.data.object as Stripe.Invoice
           if (invoice.subscription) {
-            const subscription = await stripe.subscriptions.retrieve(
-              invoice.subscription as string
-            )
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
             await updateSubscriptionInDatabase(subscription)
           }
           break
@@ -132,9 +125,7 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string
 
   // Find matching price ID configuration
-  const priceTier = PRICE_IDS.find(
-    (price) => price.monthly === priceId || price.annual === priceId
-  )
+  const priceTier = PRICE_IDS.find((price) => price.monthly === priceId || price.annual === priceId)
   const tier = priceTier?.tier || SUBSCRIPTION_TIERS.FREE
 
   console.log('Updating subscription:', {

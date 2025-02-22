@@ -11,10 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let updatedScriptContent = scriptContent
 
     if (req.headers.host) {
-      updatedScriptContent = updatedScriptContent.replace(
-        /\/dotabod\.com/g,
-        `/${req.headers.host}`
-      )
+      updatedScriptContent = updatedScriptContent.replace(/\/dotabod\.com/g, `/${req.headers.host}`)
     }
 
     // Set appropriate headers for PowerShell script
@@ -25,9 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).send(updatedScriptContent)
   } catch (error) {
     console.error('Error serving install.ps1:', error)
-    return res
-      .status(500)
-      .json({ error: 'Failed to serve installation script' })
+    return res.status(500).json({ error: 'Failed to serve installation script' })
   }
 }
 

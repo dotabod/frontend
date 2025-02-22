@@ -13,9 +13,7 @@ const HeroUnit = ({ data, team }) => {
     return ''
   }
 
-  const rotation = isBrewling
-    ? undefined
-    : { transform: `rotate(${data.yaw * -1}deg)` }
+  const rotation = isBrewling ? undefined : { transform: `rotate(${data.yaw * -1}deg)` }
 
   return (
     <div

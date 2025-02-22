@@ -56,8 +56,7 @@ export function DisableToggle() {
         duration: 0,
         placement: 'bottomLeft',
         message: 'Your stream is offline.',
-        description:
-          'Dotabod will only work once you start streaming and go online.',
+        description: 'Dotabod will only work once you start streaming and go online.',
       })
     }
   }, [isLive, notification])
@@ -71,10 +70,10 @@ export function DisableToggle() {
         placement: 'bottomLeft',
         message: 'Dotabod is currently disabled.',
         description: (
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <span>
-              Click the toggle to enable it. You will not receive any game
-              events or commands until you do.
+              Click the toggle to enable it. You will not receive any game events or commands until
+              you do.
             </span>
             <Toggle />
           </div>
@@ -85,10 +84,7 @@ export function DisableToggle() {
     }
   }, [isDotabodDisabled, notification])
 
-  const botuser =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-      ? 'dotabod'
-      : 'dotabod_test'
+  const botuser = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? 'dotabod' : 'dotabod_test'
 
   useEffect(() => {
     if (data?.banned) {
@@ -101,15 +97,15 @@ export function DisableToggle() {
         description: user?.name && (
           <span>
             <Button
-              type="link"
+              type='link'
               onClick={() => {
                 window.open(
                   `https://www.twitch.tv/popout/${user?.name}/viewercard/${botuser}?popout=`,
                   'mywindow',
-                  'menubar=1,resizable=1,width=350,height=250'
+                  'menubar=1,resizable=1,width=350,height=250',
                 )
               }}
-              target="_blank"
+              target='_blank'
             >
               Click here
             </Button>

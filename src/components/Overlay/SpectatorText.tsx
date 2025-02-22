@@ -38,10 +38,10 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
 
   return (
     <motion.div
-      key="spectator-text"
+      key='spectator-text'
       {...motionProps}
-      className="absolute"
-      id="spectator-text"
+      className='absolute'
+      id='spectator-text'
       style={{
         bottom: styles.bottom,
         left: styles.left ?? undefined,
@@ -55,9 +55,7 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
           }),
         }}
       >
-        {block?.matchId
-          ? `Spectating match ${block.matchId}`
-          : 'Spectating a match'}
+        {block?.matchId ? `Spectating match ${block.matchId}` : 'Spectating a match'}
       </Card>
     </motion.div>
   )

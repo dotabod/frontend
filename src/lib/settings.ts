@@ -9,7 +9,7 @@ type Setting = {
 
 export function getValueOrDefault(
   key: SettingKeys | ChatterSettingKeys | undefined,
-  settings?: Setting[]
+  settings?: Setting[],
 ): unknown {
   if (!key) return undefined
 
@@ -18,8 +18,7 @@ export function getValueOrDefault(
     const chattersData = settings?.find((s) => s.key === 'chatters')
     const chatterKey = key.split('.')[1]
     return (
-      chattersData?.value?.[chatterKey]?.enabled ??
-      defaultSettings.chatters[chatterKey].enabled
+      chattersData?.value?.[chatterKey]?.enabled ?? defaultSettings.chatters[chatterKey].enabled
     )
   }
 

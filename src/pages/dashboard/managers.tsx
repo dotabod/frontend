@@ -42,9 +42,7 @@ const ModeratorsPage = () => {
 
   useEffect(() => {
     if (!loadingApprovedMods && Array.isArray(approvedMods)) {
-      setSelectedModerators(
-        approvedMods?.map((mod) => `${mod.moderatorChannelId}`) || []
-      )
+      setSelectedModerators(approvedMods?.map((mod) => `${mod.moderatorChannelId}`) || [])
     }
   }, [approvedMods, loadingApprovedMods])
 
@@ -96,35 +94,34 @@ const ModeratorsPage = () => {
         <title>Dotabod | Managers</title>
       </Head>
       <Header
-        subtitle="Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings."
-        title="Managers"
+        subtitle='Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings.'
+        title='Managers'
       />
 
-      <Card title="Approve Managers" feature="managers">
-        <div className="subtitle">
+      <Card title='Approve Managers' feature='managers'>
+        <div className='subtitle'>
           <p>
-            By approving a user, you're allowing them to access and modify your
-            Dotabod dashboard. Approved managers can manage features, toggle
-            commands, and update settings on your behalf.
+            By approving a user, you're allowing them to access and modify your Dotabod dashboard.
+            Approved managers can manage features, toggle commands, and update settings on your
+            behalf.
           </p>
           <p>
-            Note: They will not have access to your setup page, downloading the
-            GSI cfg, nor overlay URL.
+            Note: They will not have access to your setup page, downloading the GSI cfg, nor overlay
+            URL.
           </p>
         </div>
 
-        <div className="max-w-sm flex flex-col gap-4">
+        <div className='max-w-sm flex flex-col gap-4'>
           <Select
             disabled={!tierAccess.hasAccess}
-            optionFilterProp="label"
+            optionFilterProp='label'
             loading={loadingModList || loadingApprovedMods}
-            mode="multiple"
+            mode='multiple'
             style={{ width: '100%' }}
-            placeholder="Select moderators"
+            placeholder='Select moderators'
             value={selectedModerators}
             defaultValue={
-              Array.isArray(approvedMods) &&
-              approvedMods.map((mod) => `${mod.moderatorChannelId}`)
+              Array.isArray(approvedMods) && approvedMods.map((mod) => `${mod.moderatorChannelId}`)
             }
             onChange={(value: string[] | false) => {
               if (Array.isArray(value)) {
@@ -142,7 +139,7 @@ const ModeratorsPage = () => {
             }
           />
           <Button
-            type="primary"
+            type='primary'
             onClick={handleApprove}
             loading={loading}
             disabled={!tierAccess.hasAccess}
@@ -153,16 +150,16 @@ const ModeratorsPage = () => {
       </Card>
 
       <Card>
-        <div className="title">
+        <div className='title'>
           <h3>What is this?</h3>
         </div>
-        <div className="">
-          Once you approve a user, they will login to dotabod.com and be able to
-          access your dashboard by using this selectbox:
+        <div className=''>
+          Once you approve a user, they will login to dotabod.com and be able to access your
+          dashboard by using this selectbox:
         </div>
         <Image
-          src="https://i.imgur.com/GSRVXFz.png"
-          alt="Managers selectbox"
+          src='https://i.imgur.com/GSRVXFz.png'
+          alt='Managers selectbox'
           width={1245}
           height={829}
         />

@@ -11,33 +11,33 @@ import { TextWithEmotes } from './TextWithEmotes'
 
 const SeparatorImg = ({ pos, children, ...props }) => (
   <div
-    className="relative bottom-[15px] duration-[2s] ease-in-out"
+    className='relative bottom-[15px] duration-[2s] ease-in-out'
     style={{
       left: `calc(${Math.min(pos, 98)}% - 15px)`,
     }}
   >
     <Logomark
       {...props}
-      className="rounded-full bg-black shadow-[0_0_10px_0_rgba(0,0,0,0.5)]"
+      className='rounded-full bg-black shadow-[0_0_10px_0_rgba(0,0,0,0.5)]'
       style={{
         height: '30px',
         width: '30px',
       }}
     />
-    <div className="flex space-x-2">{children}</div>
+    <div className='flex space-x-2'>{children}</div>
   </div>
 )
 
 const FillRadiant = ({ width }) => (
   <div
-    className="rounded-l bg-gradient-to-r from-green-500 to-lime-500 text-right"
+    className='rounded-l bg-gradient-to-r from-green-500 to-lime-500 text-right'
     style={{ width: `${width}%`, transition: 'width 1.5s ease-in-out' }}
   />
 )
 
 const FillDire = ({ width }) => (
   <div
-    className="rounded-r bg-gradient-to-r from-red-600 to-red-500"
+    className='rounded-r bg-gradient-to-r from-red-600 to-red-500'
     style={{ width: `${width}%`, transition: 'width 1.5s ease-in-out' }}
   />
 )
@@ -50,7 +50,7 @@ const Text = ({
   <div
     className={clsx(
       'text-shadow relative flex translate-x-[-50%] flex-col text-center text-sm text-white duration-[2s] ease-in-out',
-      className
+      className,
     )}
     style={{ left: pos ? `${Math.min(pos, 98)}%` : 0 }}
   >
@@ -74,7 +74,7 @@ export const WinProbability = ({
   radiantWinChance.value = Math.min(Math.max(radiantWinChance.value, 0), 100)
 
   return (
-    <motion.div id="win-probability" key="wp-overlay-inner" {...motionProps}>
+    <motion.div id='win-probability' key='wp-overlay-inner' {...motionProps}>
       <div
         className={`relative rounded transition-[top_0.2s_ease-out,_opacity_0.2s_ease] ${
           radiantWinChance.visible ? 'opacity-100' : 'opacity-0'
@@ -82,37 +82,31 @@ export const WinProbability = ({
       >
         <Text pos={radiantWinChance.value}>
           <h1
-            className="font-outline-2 text-center font-bold text-slate-50"
+            className='font-outline-2 text-center font-bold text-slate-50'
             style={{
               fontSize: res({ h: 20 }),
             }}
           >
-            <TextWithEmotes emotes={[]} text="Win probability" />
+            <TextWithEmotes emotes={[]} text='Win probability' />
           </h1>
         </Text>
-        <div className="flex h-[5px] shadow-[0_0_10px_0_rgba(0,0,0,0.5)]">
+        <div className='flex h-[5px] shadow-[0_0_10px_0_rgba(0,0,0,0.5)]'>
           <FillRadiant width={radiantWinChance.value} />
           <FillDire width={100 - radiantWinChance.value} />
         </div>
-        <SeparatorImg alt="logo" pos={radiantWinChance.value}>
-          <Text className="font-outline-2 !flex-row text-center font-bold !text-green-400">
-            <AnimatedNumber
-              from={100 - radiantWinChance.value}
-              to={radiantWinChance.value}
-            />
+        <SeparatorImg alt='logo' pos={radiantWinChance.value}>
+          <Text className='font-outline-2 !flex-row text-center font-bold !text-green-400'>
+            <AnimatedNumber from={100 - radiantWinChance.value} to={radiantWinChance.value} />
             <span>%</span>
           </Text>
-          <Text className="font-outline-2 !flex-row text-center font-bold !text-red-400">
-            <AnimatedNumber
-              from={radiantWinChance.value}
-              to={100 - radiantWinChance.value}
-            />
+          <Text className='font-outline-2 !flex-row text-center font-bold !text-red-400'>
+            <AnimatedNumber from={radiantWinChance.value} to={100 - radiantWinChance.value} />
             <span>%</span>
           </Text>
         </SeparatorImg>
 
-        <Text className="bottom-[20px]" pos={radiantWinChance.value}>
-          <span className="font-outline-2 text-slate-50">(2m delay)</span>
+        <Text className='bottom-[20px]' pos={radiantWinChance.value}>
+          <span className='font-outline-2 text-slate-50'>(2m delay)</span>
         </Text>
       </div>
     </motion.div>

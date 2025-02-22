@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const response = await fetch(
-      `https://7tv.io/v3/users/twitch/${twitchId}?cacheBust=${Date.now()}`
+      `https://7tv.io/v3/users/twitch/${twitchId}?cacheBust=${Date.now()}`,
     )
     const stvResponse = await response.json()
 
@@ -50,15 +50,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const data: { user: { emote_sets: Array<any> } } = await client.request(
       GET_USER_EMOTE_SETS,
-      getUserEmoteSetsVariables
+      getUserEmoteSetsVariables,
     )
 
     // Find the emote set that has the twitch connection
     const existingEmoteSet = data?.user?.emote_sets?.find(
       (es) =>
         es.owner?.connections?.find(
-          (c) => Number.parseInt(c.id, 10) === Number.parseInt(twitchId, 10)
-        ) !== undefined
+          (c) => Number.parseInt(c.id, 10) === Number.parseInt(twitchId, 10),
+        ) !== undefined,
     )
     let emoteSetId = stvResponse?.emote_set?.id || existingEmoteSet?.id
 
@@ -114,7 +114,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const existingEmoteNames = userEmoteSet.emoteSet.emotes.map((e) => e.name)
     const emotesAlreadyInSet = emotesRequired.every((emote) =>
-      existingEmoteNames.includes(emote.label)
+      existingEmoteNames.includes(emote.label),
     )
 
     if (emotesAlreadyInSet) {
@@ -167,9 +167,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const emote of emotesRequired) {
-      const emoteInSet = updatedEmoteSet.emoteSet.emotes.find(
-        (e) => e.name === emote.label
-      )
+      const emoteInSet = updatedEmoteSet.emoteSet.emotes.find((e) => e.name === emote.label)
       if (!emoteInSet) {
         throw new Error(`Emote ${emote.label} not found in set`)
       }

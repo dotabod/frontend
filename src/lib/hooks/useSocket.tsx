@@ -132,7 +132,7 @@ export const useSocket = ({
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
           allTime ? '' : '&date=30'
-        }`
+        }`,
       )
 
       if (response) {
@@ -161,12 +161,7 @@ export const useSocket = ({
         console.log('[MMR] Job finished for jobId:', jobId)
 
         // Get match data once parsing is complete
-        console.log(
-          '[MMR] Fetching match data for matchId:',
-          matchId,
-          'and heroSlot:',
-          heroSlot
-        )
+        console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
         cb(data)
@@ -229,8 +224,7 @@ export const useSocket = ({
       updateLastReceived()
       console.log('twitchEvent', { eventName, data })
       const func = eventName.includes('Poll') ? setPollData : setBetData
-      const newData =
-        eventName.includes('End') || eventName.includes('Lock') ? null : data
+      const newData = eventName.includes('End') || eventName.includes('Lock') ? null : data
       func(newData)
     })
 
@@ -273,8 +267,7 @@ export const useSocket = ({
 
 const events = {
   subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
-  subscribeToChannelPredictionProgressEvents:
-    EventSubChannelPredictionProgressEvent,
+  subscribeToChannelPredictionProgressEvents: EventSubChannelPredictionProgressEvent,
   subscribeToChannelPredictionLockEvents: EventSubChannelPredictionLockEvent,
   subscribeToChannelPredictionEndEvents: EventSubChannelPredictionEndEvent,
   subscribeToChannelPollBeginEvents: EventSubChannelPollBeginEvent,

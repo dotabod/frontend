@@ -14,17 +14,17 @@ const FeaturesPage: NextPageWithLayout = () => (
 
     <Header
       subtitle={
-        <div className="flex flex-row items-center space-x-2">
+        <div className='flex flex-row items-center space-x-2'>
           <span>Looking for even more? They'll be here</span>
           <Image
-            src="https://cdn.7tv.app/emote/63071b80942ffb69e13d700f/1x.webp"
+            src='https://cdn.7tv.app/emote/63071b80942ffb69e13d700f/1x.webp'
             width={24}
             height={24}
-            alt="Krappa"
+            alt='Krappa'
           />
         </div>
       }
-      title="Advanced features"
+      title='Advanced features'
     />
 
     <SceneSwitcher />

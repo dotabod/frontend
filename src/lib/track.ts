@@ -15,7 +15,7 @@ export const useTrack = () => {
         ...properties,
       })
     },
-    [session]
+    [session],
   )
   return track
 }

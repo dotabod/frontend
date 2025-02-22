@@ -4,9 +4,7 @@ import retry from 'retry'
 export async function getMatchData(matchId: string, heroId: number) {
   let radiantWin = null
   let lobbyType = null
-  const opendotaMatch = await axios(
-    `https://api.opendota.com/api/matches/${matchId}`
-  )
+  const opendotaMatch = await axios(`https://api.opendota.com/api/matches/${matchId}`)
 
   const moreData = {
     radiantScore: 0,
@@ -53,9 +51,7 @@ export async function createJob(matchId: string): Promise<number> {
   return new Promise((resolve, reject) => {
     operation.attempt(async () => {
       try {
-        const createdJob = await axios.post(
-          `https://api.opendota.com/api/request/${matchId}`
-        )
+        const createdJob = await axios.post(`https://api.opendota.com/api/request/${matchId}`)
 
         const jobId = createdJob.data?.job?.jobId
         if (typeof jobId !== 'number') {
@@ -93,9 +89,7 @@ export async function getJobStatus(jobId: number): Promise<boolean> {
   return new Promise((resolve, reject) => {
     operation.attempt(async () => {
       try {
-        const jobStatus = await axios.get(
-          `https://api.opendota.com/api/request/${jobId}`
-        )
+        const jobStatus = await axios.get(`https://api.opendota.com/api/request/${jobId}`)
 
         if (jobStatus?.data?.type === 'parse') {
           if (operation.retry(new Error('Job not finished'))) {

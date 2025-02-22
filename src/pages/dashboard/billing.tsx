@@ -44,14 +44,12 @@ const BillingPage = () => {
       <Head>
         <title>Dotabod | Billing</title>
       </Head>
-      <Header subtitle="Manage your billing information." title="Billing" />
+      <Header subtitle='Manage your billing information.' title='Billing' />
 
       {subscription && subscription.status === 'active' && (
         <p>
           You are currently on the{' '}
-          {subscription.tier.charAt(0).toUpperCase() +
-            subscription.tier.slice(1)}{' '}
-          plan ({period}).{' '}
+          {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period}).{' '}
           {subscription.cancelAtPeriodEnd
             ? 'Your subscription will end'
             : 'Your subscription will renew'}{' '}
@@ -63,14 +61,14 @@ const BillingPage = () => {
       )}
 
       {isSubscriptionActive(subscription) && (
-        <div className="mt-6">
+        <div className='mt-6'>
           <Button onClick={handlePortalAccess} disabled={isLoading}>
             {isLoading ? 'Loading...' : 'Manage Subscription'}
           </Button>
         </div>
       )}
 
-      <div className="mt-12">
+      <div className='mt-12'>
         <BillingPlans subscription={subscription} showTitle={false} />
       </div>
     </>

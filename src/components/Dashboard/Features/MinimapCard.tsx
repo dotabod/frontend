@@ -35,15 +35,15 @@ export default function MinimapCard(): JSX.Element {
 
   return (
     <Card>
-      <div className="title">
+      <div className='title'>
         <h3>Minimap</h3>
       </div>
-      <div className="subtitle">
-        Semi-transparent blocker that auto places itself over your minimap to
-        deter people from farming your wards.
+      <div className='subtitle'>
+        Semi-transparent blocker that auto places itself over your minimap to deter people from
+        farming your wards.
       </div>
       <div className={clsx('pb-12 pt-4 transition-all')}>
-        <div className="flex flex-col items-start space-y-2 md:space-y-3">
+        <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           {switches.map((props) => (
             <TierSwitch key={props.settingKey} {...props} />
           ))}
@@ -53,17 +53,17 @@ export default function MinimapCard(): JSX.Element {
       <div
         className={clsx(
           'flex w-full items-center justify-center space-x-4 transition-all',
-          !isEnabled && 'opacity-40'
+          !isEnabled && 'opacity-40',
         )}
       >
-        <div className="flex flex-col items-center space-y-4">
+        <div className='flex flex-col items-center space-y-4'>
           <Image
             className={clsx(
               !minimapSimple && 'border-2 border-blue-600',
               minimapSimple && 'opacity-60',
-              'rounded-xl border-2 border-transparent transition-all'
+              'rounded-xl border-2 border-transparent transition-all',
             )}
-            alt="minimap blocker"
+            alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
             src={`/images/overlay/minimap/738-${'Complex'}-${
@@ -72,14 +72,14 @@ export default function MinimapCard(): JSX.Element {
           />
           <span>Complex minimap</span>
         </div>
-        <div className="flex flex-col items-center space-y-4">
+        <div className='flex flex-col items-center space-y-4'>
           <Image
             className={clsx(
               minimapSimple && 'border border-2 border-blue-600',
               !minimapSimple && 'opacity-60',
-              'rounded-xl border-2 border-transparent transition-all'
+              'rounded-xl border-2 border-transparent transition-all',
             )}
-            alt="minimap blocker"
+            alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
             src={`/images/overlay/minimap/738-${'Simple'}-${

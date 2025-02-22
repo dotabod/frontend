@@ -8,13 +8,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
-const TWITCH_MODERATED_CHANNELS_URL =
-  'https://api.twitch.tv/helix/moderation/moderators'
+const TWITCH_MODERATED_CHANNELS_URL = 'https://api.twitch.tv/helix/moderation/moderators'
 
-export async function getModerators(
-  userId: string | undefined,
-  accessToken: string
-) {
+export async function getModerators(userId: string | undefined, accessToken: string) {
   if (!userId) {
     throw new Error('User ID is required')
   }
@@ -45,9 +41,7 @@ export async function getModerators(
       })
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch moderated channels: ${response.statusText}`
-        )
+        throw new Error(`Failed to fetch moderated channels: ${response.statusText}`)
       }
 
       const data = await response.json()
@@ -87,9 +81,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const { providerAccountId, accessToken, error } = await getTwitchTokens(
-    session.user.id
-  )
+  const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
   if (error) {
     return res.status(403).json({ message: 'Forbidden' })
   }

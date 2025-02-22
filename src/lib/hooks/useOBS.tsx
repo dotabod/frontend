@@ -7,13 +7,9 @@ export const useOBS = ({ connected, block }) => {
   const router = useRouter()
   const { userId } = router.query
 
-  const { data: hasSceneSwitcher } = useUpdateSetting(
-    Settings['obs-scene-switcher']
-  )
+  const { data: hasSceneSwitcher } = useUpdateSetting(Settings['obs-scene-switcher'])
 
-  const { data: minimapName } = useUpdateSetting<string>(
-    Settings['obs-minimap']
-  )
+  const { data: minimapName } = useUpdateSetting<string>(Settings['obs-minimap'])
   const { data: picksName } = useUpdateSetting<string>(Settings['obs-picks'])
   const { data: dcName } = useUpdateSetting<string>(Settings['obs-dc'])
 
@@ -23,9 +19,7 @@ export const useOBS = ({ connected, block }) => {
     }
 
     if (!connected) {
-      console.log(
-        'Socket not connected just yet, will not run OBS scene switchers'
-      )
+      console.log('Socket not connected just yet, will not run OBS scene switchers')
 
       return
     }
@@ -33,8 +27,7 @@ export const useOBS = ({ connected, block }) => {
     console.log('Connected to socket! Running OBS scene switchers')
 
     // Only run in OBS browser source
-    if (!hasSceneSwitcher || typeof window !== 'object' || !window?.obsstudio)
-      return
+    if (!hasSceneSwitcher || typeof window !== 'object' || !window?.obsstudio) return
 
     window.obsstudio.getCurrentScene((scene) => {
       const myScenes = [minimapName, picksName, dcName]

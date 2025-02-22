@@ -17,10 +17,10 @@ export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
 
   return (
     <Image
-      id="minimap-blocker"
+      id='minimap-blocker'
       unoptimized
       priority
-      alt="minimap blocker"
+      alt='minimap blocker'
       width={
         isXL
           ? res({
@@ -58,14 +58,14 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
 
   return (
     <motion.div
-      key="minimap-blocker"
+      key='minimap-blocker'
       {...motionProps}
       style={{
         ...minimapPosition,
         left: minimapPosition.left ?? undefined,
         right: minimapPosition.right ?? undefined,
       }}
-      className="absolute"
+      className='absolute'
     >
       {status && original?.beta_tester ? (
         <Minimap block={block} />

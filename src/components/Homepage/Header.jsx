@@ -12,30 +12,30 @@ import { MobileNavLink } from './MobileNavLink'
 
 export function Header() {
   return (
-    <header className="bg-gray-800">
+    <header className='bg-gray-800'>
       <nav>
-        <Container className="relative z-50 flex justify-between py-8">
-          <div className="relative z-10 flex items-center gap-16">
-            <Link href="/" aria-label="Home">
-              <Logo className="h-10 w-auto" />
+        <Container className='relative z-50 flex justify-between py-8'>
+          <div className='relative z-10 flex items-center gap-16'>
+            <Link href='/' aria-label='Home'>
+              <Logo className='h-10 w-auto' />
             </Link>
-            <div className="hidden lg:flex lg:gap-10">
+            <div className='hidden lg:flex lg:gap-10'>
               <NavLinks />
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <Popover className="lg:hidden">
+          <div className='flex items-center gap-6'>
+            <Popover className='lg:hidden'>
               {({ open }) => (
                 <>
                   <PopoverButton
-                    className="relative z-10 -m-2 inline-flex items-center rounded-lg stroke-slate-300 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 [&:not(:focus-visible)]:focus:outline-none"
-                    aria-label="Toggle site navigation"
+                    className='relative z-10 -m-2 inline-flex items-center rounded-lg stroke-slate-300 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 [&:not(:focus-visible)]:focus:outline-none'
+                    aria-label='Toggle site navigation'
                   >
                     {({ open }) =>
                       open ? (
-                        <ChevronUpIcon className="h-6 w-6" />
+                        <ChevronUpIcon className='h-6 w-6' />
                       ) : (
-                        <MenuIcon className="h-6 w-6" />
+                        <MenuIcon className='h-6 w-6' />
                       )
                     }
                   </PopoverButton>
@@ -48,7 +48,7 @@ export function Header() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="fixed inset-0 z-0 bg-gray-300/60 backdrop-blur"
+                          className='fixed inset-0 z-0 bg-gray-300/60 backdrop-blur'
                         />
                         <Popover.Panel
                           static
@@ -60,30 +60,22 @@ export function Header() {
                             y: -32,
                             transition: { duration: 0.2 },
                           }}
-                          className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-800 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
+                          className='absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-800 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20'
                         >
-                          <div className="space-y-4">
-                            <MobileNavLink href="/#features">
-                              Features
-                            </MobileNavLink>
-                            <MobileNavLink href="/#faqs">FAQs</MobileNavLink>
-                            <MobileNavLink href="/privacy-policy">
-                              Privacy Policy
-                            </MobileNavLink>
-                            <MobileNavLink href="/dashboard">
-                              Dashboard
-                            </MobileNavLink>
-                            <MobileNavLink href="https://github.com/dotabod">
-                              Github
-                            </MobileNavLink>
-                            <MobileNavLink href="https://discord.dotabod.com">
+                          <div className='space-y-4'>
+                            <MobileNavLink href='/#features'>Features</MobileNavLink>
+                            <MobileNavLink href='/#faqs'>FAQs</MobileNavLink>
+                            <MobileNavLink href='/privacy-policy'>Privacy Policy</MobileNavLink>
+                            <MobileNavLink href='/dashboard'>Dashboard</MobileNavLink>
+                            <MobileNavLink href='https://github.com/dotabod'>Github</MobileNavLink>
+                            <MobileNavLink href='https://discord.dotabod.com'>
                               Discord
                             </MobileNavLink>
-                            <MobileNavLink href="https://ko-fi.com/dotabod">
+                            <MobileNavLink href='https://ko-fi.com/dotabod'>
                               Support the project
                             </MobileNavLink>
                           </div>
-                          <div className="mt-8 flex flex-col gap-4">
+                          <div className='mt-8 flex flex-col gap-4'>
                             <LoginButton />
                           </div>
                         </Popover.Panel>
@@ -93,7 +85,7 @@ export function Header() {
                 </>
               )}
             </Popover>
-            <LoginButton className="hidden lg:block" />
+            <LoginButton className='hidden lg:block' />
           </div>
         </Container>
       </nav>

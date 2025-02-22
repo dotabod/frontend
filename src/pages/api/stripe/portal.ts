@@ -4,10 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { stripe } from '@/lib/stripe-server'
 import prisma from '@/lib/db'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -36,9 +33,7 @@ export default async function handler(
 
     // Ensure return URL has explicit https:// scheme
     const baseUrl = process.env.NEXTAUTH_URL || ''
-    const returnUrl = baseUrl.startsWith('http')
-      ? baseUrl
-      : `https://${baseUrl}`
+    const returnUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`
 
     // Create customer portal session
     const portalSession = await stripe.billingPortal.sessions.create({

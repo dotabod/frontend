@@ -44,9 +44,7 @@ export const useOverlayPositions = () => {
   }
 
   const roshPosition: Position = {
-    left: isXL
-      ? res({ w: isSimple ? 280 : 285 })
-      : res({ w: isSimple ? 243 : 250 }),
+    left: isXL ? res({ w: isSimple ? 280 : 285 }) : res({ w: isSimple ? 243 : 250 }),
     bottom: res({ h: 100 }),
     right: null,
   }

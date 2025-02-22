@@ -4,7 +4,7 @@ export { getPriceId, PRICE_IDS }
 
 export async function createCheckoutSession(
   priceId: string,
-  userId: string
+  userId: string,
 ): Promise<{ url: string }> {
   const response = await fetch('/api/stripe/create-checkout', {
     method: 'POST',
@@ -21,9 +21,7 @@ export async function createCheckoutSession(
   return response.json()
 }
 
-export async function createPortalSession(
-  userId: string
-): Promise<{ url: string }> {
+export async function createPortalSession(userId: string): Promise<{ url: string }> {
   const response = await fetch('/api/stripe/create-portal', {
     method: 'POST',
     headers: {

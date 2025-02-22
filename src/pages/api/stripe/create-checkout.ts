@@ -5,10 +5,7 @@ import { authOptions } from '@/lib/auth'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user) {
@@ -93,9 +90,7 @@ export default async function handler(
     }
 
     if (!customerId) {
-      return res
-        .status(400)
-        .json({ error: 'Could not create or find customer' })
+      return res.status(400).json({ error: 'Could not create or find customer' })
     }
 
     // Create checkout session

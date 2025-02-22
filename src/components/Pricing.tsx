@@ -1,10 +1,5 @@
 import { Container } from '@/components/Container'
-import {
-  CheckOutlined,
-  CloseOutlined,
-  InfoCircleOutlined,
-  StarOutlined,
-} from '@ant-design/icons'
+import { CheckOutlined, CloseOutlined, InfoCircleOutlined, StarOutlined } from '@ant-design/icons'
 import { Table, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import Image from 'next/image'
@@ -29,23 +24,22 @@ const featureCategories = [
         },
         pro: {
           value: 'Full automation (4)',
-          tooltip:
-            'Complete automated setup of Twitch, OBS, 7TV, and Dota 2 integration',
+          tooltip: 'Complete automated setup of Twitch, OBS, 7TV, and Dota 2 integration',
         },
       },
       {
         name: '7TV Integration',
         tooltip: 'Automatic emote setup with 7TV',
-        free: <CloseOutlined className="text-red-500" />,
-        starter: <CloseOutlined className="text-red-500" />,
-        pro: <CheckOutlined className="text-green-500" />,
+        free: <CloseOutlined className='text-red-500' />,
+        starter: <CloseOutlined className='text-red-500' />,
+        pro: <CheckOutlined className='text-green-500' />,
       },
       {
         name: 'OBS Integration',
         tooltip: 'Automatic OBS scene setup and configuration',
-        free: <CloseOutlined className="text-red-500" />,
-        starter: <CloseOutlined className="text-red-500" />,
-        pro: <CheckOutlined className="text-green-500" />,
+        free: <CloseOutlined className='text-red-500' />,
+        starter: <CloseOutlined className='text-red-500' />,
+        pro: <CheckOutlined className='text-green-500' />,
       },
     ],
   },
@@ -72,22 +66,21 @@ const featureCategories = [
       {
         name: 'Pick Blocker',
         tooltip: 'Hides hero picks during draft phase',
-        free: <CloseOutlined className="text-red-500" />,
+        free: <CloseOutlined className='text-red-500' />,
         starter: {
           value: 'Basic',
           tooltip: 'Simple pick phase blocking',
         },
         pro: {
           value: 'Full phase control',
-          tooltip:
-            'Automatic phase detection with customizable overlays for each draft stage',
+          tooltip: 'Automatic phase detection with customizable overlays for each draft stage',
         },
       },
       {
         name: 'Stream Delay',
         tooltip: 'Customizable stream delay integration',
-        free: <CloseOutlined className="text-red-500" />,
-        starter: <CloseOutlined className="text-red-500" />,
+        free: <CloseOutlined className='text-red-500' />,
+        starter: <CloseOutlined className='text-red-500' />,
         pro: 'Up to 30s',
       },
     ],
@@ -98,7 +91,7 @@ const featureCategories = [
       {
         name: 'Predictions',
         tooltip: 'Automated Twitch channel point predictions',
-        free: <CloseOutlined className="text-red-500" />,
+        free: <CloseOutlined className='text-red-500' />,
         starter: 'Basic',
         pro: 'Advanced + Overlay',
       },
@@ -111,13 +104,11 @@ const featureCategories = [
         },
         starter: {
           value: 'Enhanced',
-          tooltip:
-            'Additional interactions: Bets, midas timing, first blood, aegis events',
+          tooltip: 'Additional interactions: Bets, midas timing, first blood, aegis events',
         },
         pro: {
           value: 'Full features',
-          tooltip:
-            'Complete chat integration with all game events, items, and hero interactions',
+          tooltip: 'Complete chat integration with all game events, items, and hero interactions',
         },
       },
       {
@@ -127,11 +118,10 @@ const featureCategories = [
           value: 'Basic command',
           tooltip: 'Simple !mmr command to check current MMR',
         },
-        starter: <CheckOutlined className="text-green-500" />,
+        starter: <CheckOutlined className='text-green-500' />,
         pro: {
           value: 'Advanced + Overlay',
-          tooltip:
-            'Live MMR tracking with customizable overlay and historical data',
+          tooltip: 'Live MMR tracking with customizable overlay and historical data',
         },
       },
     ],
@@ -141,13 +131,12 @@ const featureCategories = [
     features: [
       {
         name: 'Beta Features Access',
-        tooltip:
-          'Get early access to new features and updates before they go live',
-        free: <CloseOutlined className="text-red-500" />,
-        starter: <CloseOutlined className="text-red-500" />,
+        tooltip: 'Get early access to new features and updates before they go live',
+        free: <CloseOutlined className='text-red-500' />,
+        starter: <CloseOutlined className='text-red-500' />,
         pro: (
-          <span className="flex justify-center items-center gap-1">
-            <StarOutlined className="text-yellow-500" /> Priority access
+          <span className='flex justify-center items-center gap-1'>
+            <StarOutlined className='text-yellow-500' /> Priority access
           </span>
         ),
       },
@@ -157,8 +146,8 @@ const featureCategories = [
         free: 'Basic only',
         starter: 'Standard',
         pro: (
-          <span className="flex justify-center items-center gap-1">
-            <StarOutlined className="text-yellow-500" /> All features
+          <span className='flex justify-center items-center gap-1'>
+            <StarOutlined className='text-yellow-500' /> All features
           </span>
         ),
       },
@@ -190,7 +179,7 @@ function FeatureComparison() {
       key: `${category.name}-${feature.name}`,
       category: category.name,
       ...feature,
-    }))
+    })),
   )
 
   const columns: ColumnsType<TableItem> = [
@@ -199,10 +188,10 @@ function FeatureComparison() {
       dataIndex: 'name',
       key: 'name',
       render: (text: string, record: TableItem) => (
-        <div className="flex items-center">
+        <div className='flex items-center'>
           {text}
           <Tooltip title={record.tooltip}>
-            <InfoCircleOutlined className="ml-2 text-gray-500 hover:text-gray-300" />
+            <InfoCircleOutlined className='ml-2 text-gray-500 hover:text-gray-300' />
           </Tooltip>
         </div>
       ),
@@ -215,7 +204,7 @@ function FeatureComparison() {
       render: (value: React.ReactNode | FeatureValue | null) =>
         value && typeof value === 'object' && 'value' in value ? (
           <Tooltip title={value.tooltip}>
-            <span className="cursor-help">{value.value}</span>
+            <span className='cursor-help'>{value.value}</span>
           </Tooltip>
         ) : (
           value
@@ -229,7 +218,7 @@ function FeatureComparison() {
       render: (value: React.ReactNode | FeatureValue | null) =>
         value && typeof value === 'object' && 'value' in value ? (
           <Tooltip title={value.tooltip}>
-            <span className="cursor-help">{value.value}</span>
+            <span className='cursor-help'>{value.value}</span>
           </Tooltip>
         ) : (
           value
@@ -243,7 +232,7 @@ function FeatureComparison() {
       render: (value: React.ReactNode | FeatureValue | null) =>
         value && typeof value === 'object' && 'value' in value ? (
           <Tooltip title={value.tooltip}>
-            <span className="cursor-help">{value.value}</span>
+            <span className='cursor-help'>{value.value}</span>
           </Tooltip>
         ) : (
           value
@@ -279,38 +268,32 @@ function FeatureComparison() {
   }
 
   return (
-    <div className="mt-16">
-      <div className="px-6 py-4 bg-gray-900/50 rounded-t-lg">
-        <h3 className="text-xl font-semibold text-gray-100">
-          Feature Comparison
-        </h3>
+    <div className='mt-16'>
+      <div className='px-6 py-4 bg-gray-900/50 rounded-t-lg'>
+        <h3 className='text-xl font-semibold text-gray-100'>Feature Comparison</h3>
       </div>
       <Table
         columns={columns}
         dataSource={flattenedData}
         pagination={false}
-        className="pricing-table"
-        rowClassName={(record) =>
-          `pricing-table-row category-${record.category}`
-        }
-        size="middle"
+        className='pricing-table'
+        rowClassName={(record) => `pricing-table-row category-${record.category}`}
+        size='middle'
         bordered
         expandable={{
           expandedRowRender: (record) => (
-            <div className="px-4 py-6 space-y-4">
-              <p className="text-gray-400">{record.tooltip}</p>
+            <div className='px-4 py-6 space-y-4'>
+              <p className='text-gray-400'>{record.tooltip}</p>
               {demoImages[record.name] && (
-                <div className="flex flex-col items-center space-y-2">
+                <div className='flex flex-col items-center space-y-2'>
                   <Image
                     src={demoImages[record.name].image}
                     width={demoImages[record.name].width}
                     height={demoImages[record.name].height}
                     alt={record.name}
-                    className="rounded-lg"
+                    className='rounded-lg'
                   />
-                  <span className="text-sm text-gray-500">
-                    {demoImages[record.name].caption}
-                  </span>
+                  <span className='text-sm text-gray-500'>{demoImages[record.name].caption}</span>
                 </div>
               )}
             </div>
@@ -318,7 +301,7 @@ function FeatureComparison() {
           rowExpandable: (record) => true,
         }}
         showHeader={true}
-        rowKey="key"
+        rowKey='key'
       />
     </div>
   )
@@ -329,9 +312,9 @@ export function Pricing() {
 
   return (
     <section
-      id="pricing"
-      aria-labelledby="pricing-title"
-      className="border-t border-gray-800 bg-gradient-to-b from-gray-900 to-black py-20 sm:py-32"
+      id='pricing'
+      aria-labelledby='pricing-title'
+      className='border-t border-gray-800 bg-gradient-to-b from-gray-900 to-black py-20 sm:py-32'
     >
       <Container>
         <BillingPlans subscription={subscription} />

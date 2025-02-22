@@ -16,12 +16,7 @@ interface AnimatedAegisProps {
   onComplete: () => void
 }
 
-export const AnimatedAegis = ({
-  aegis,
-  paused,
-  onComplete,
-  block,
-}: AnimatedAegisProps) => {
+export const AnimatedAegis = ({ aegis, paused, onComplete, block }: AnimatedAegisProps) => {
   const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.aegis)
 
@@ -33,8 +28,8 @@ export const AnimatedAegis = ({
       <CountdownCircleTimer
         isPlaying={!paused}
         duration={aegis.expireS}
-        colors="#0000000"
-        trailColor="#0000000"
+        colors='#0000000'
+        trailColor='#0000000'
         onComplete={onComplete}
         size={res({
           w: 55,

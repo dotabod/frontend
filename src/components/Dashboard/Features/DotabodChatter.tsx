@@ -11,31 +11,29 @@ export default function DotabodChatter() {
     loading: l3,
   } = useUpdateSetting(Settings.tellChatBets)
 
-  const { data: tellChatNewMMR, updateSetting: updateChatNewMmr } =
-    useUpdateSetting(Settings.tellChatNewMMR)
+  const { data: tellChatNewMMR, updateSetting: updateChatNewMmr } = useUpdateSetting(
+    Settings.tellChatNewMMR,
+  )
 
   return (
     <Card>
-      <div className="title">
+      <div className='title'>
         <h3>Dotabod</h3>
       </div>
 
-      <div className="mt-5 flex items-center space-x-2">
+      <div className='mt-5 flex items-center space-x-2'>
         <TierSwitch
           settingKey={Settings.tellChatBets}
-          label="Tell chat when bets open, close, or get remade due to hero swap or match not scored scenario"
+          label='Tell chat when bets open, close, or get remade due to hero swap or match not scored scenario'
         />
       </div>
-      <div className="mt-5 flex items-center space-x-2">
+      <div className='mt-5 flex items-center space-x-2'>
         <Tooltip
-          placement="bottom"
-          title="When you win/lose a match or change your mmr manually"
-          className="flex items-center space-x-2"
+          placement='bottom'
+          title='When you win/lose a match or change your mmr manually'
+          className='flex items-center space-x-2'
         >
-          <TierSwitch
-            settingKey={Settings.tellChatNewMMR}
-            label="Tell chat anytime mmr changes"
-          />
+          <TierSwitch settingKey={Settings.tellChatNewMMR} label='Tell chat anytime mmr changes' />
         </Tooltip>
       </div>
     </Card>

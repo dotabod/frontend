@@ -4,10 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { SubscriptionTier } from '@/utils/subscription'
 import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) {

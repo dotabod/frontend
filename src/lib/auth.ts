@@ -83,9 +83,7 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials, req) {
-        const channelToImpersonate = Number.parseInt(
-          credentials?.channelToImpersonate ?? '0'
-        )
+        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0')
         if (!channelToImpersonate) {
           captureException(new Error('Invalid channel ID'))
           throw new Error('ACCESS_DENIED')
@@ -97,8 +95,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const secureCookie =
-            process.env.NEXTAUTH_URL?.startsWith('https://') ??
-            !!process.env.VERCEL
+            process.env.NEXTAUTH_URL?.startsWith('https://') ?? !!process.env.VERCEL
           const cookieName = secureCookie
             ? '__Secure-next-auth.session-token'
             : 'next-auth.session-token'
@@ -128,9 +125,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error('ACCESS_DENIED')
         }
 
-        const { providerAccountId, accessToken, error } = await getTwitchTokens(
-          currentLoggedInUserId
-        )
+        const { providerAccountId, accessToken, error } =
+          await getTwitchTokens(currentLoggedInUserId)
         if (error) {
           throw new Error('MODERATOR_ACCESS_DENIED')
         }
@@ -146,28 +142,20 @@ export const authOptions: NextAuthOptions = {
 
         if (!isAdmin) {
           // check to make sure they're still a moderator on twitch
-          const response = await getModeratedChannels(
-            providerAccountId,
-            accessToken
-          )
+          const response = await getModeratedChannels(providerAccountId, accessToken)
 
           if (
             Array.isArray(response) &&
             !response.find(
-              (channel) =>
-                Number.parseInt(channel.providerAccountId, 10) ===
-                channelToImpersonate
+              (channel) => Number.parseInt(channel.providerAccountId, 10) === channelToImpersonate,
             )
           ) {
-            captureException(
-              new Error('You are not a moderator for this channel'),
-              {
-                extra: {
-                  userId: currentLoggedInUserId,
-                  channelToImpersonate,
-                },
-              }
-            )
+            captureException(new Error('You are not a moderator for this channel'), {
+              extra: {
+                userId: currentLoggedInUserId,
+                channelToImpersonate,
+              },
+            })
             throw new Error('MODERATOR_ACCESS_DENIED')
           }
         }
@@ -243,9 +231,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: useBotScopes
-            ? `${defaultScopes} ${chatBotScopes}`
-            : defaultScopes,
+          scope: useBotScopes ? `${defaultScopes} ${chatBotScopes}` : defaultScopes,
         },
       },
     }),
@@ -351,13 +337,9 @@ export const authOptions: NextAuthOptions = {
       }
       const isBotUser = twitchId === Number(process.env.TWITCH_BOT_PROVIDERID)
       const shouldRefresh =
-        account &&
-        ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
+        account && ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if (
-        (shouldRefresh || process.env.VERCEL_ENV !== 'production') &&
-        !isImpersonating
-      ) {
+      if ((shouldRefresh || process.env.VERCEL_ENV !== 'production') && !isImpersonating) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
 

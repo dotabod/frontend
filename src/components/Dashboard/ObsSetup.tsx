@@ -4,17 +4,7 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
-import {
-  Alert,
-  Button,
-  Form,
-  Input,
-  Select,
-  Space,
-  Spin,
-  Tooltip,
-  message,
-} from 'antd'
+import { Alert, Button, Form, Input, Select, Space, Spin, Tooltip, message } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import OBSWebSocket from 'obs-websocket-js'
@@ -165,18 +155,13 @@ const ObsSetup: React.FC = () => {
   }, [obs])
 
   // Modify fetchScenes to accept baseWidth and baseHeight
-  const fetchScenes = async (
-    currentBaseWidth: number,
-    currentBaseHeight: number
-  ) => {
+  const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
     if (!obs) return
 
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
-      const sceneUuids = sceneListResponse.scenes.map(
-        (scene: any) => (scene as Scene).sceneUuid
-      )
+      const sceneUuids = sceneListResponse.scenes.map((scene: any) => (scene as Scene).sceneUuid)
       setScenes(sceneListResponse.scenes as unknown as Scene[])
 
       // Check each scene for the existence of the browser source
@@ -188,11 +173,7 @@ const ObsSetup: React.FC = () => {
         if (!scenesWithOverlay.includes(singleScene)) {
           // If there's only one scene and it doesn't have the overlay, auto-add
           setSelectedScenes([singleScene])
-          await handleSceneSelect(
-            [singleScene],
-            currentBaseWidth,
-            currentBaseHeight
-          )
+          await handleSceneSelect([singleScene], currentBaseWidth, currentBaseHeight)
         } else {
           // If the single scene already has the overlay, no action needed
           setSelectedScenes(scenesWithOverlay)
@@ -212,15 +193,13 @@ const ObsSetup: React.FC = () => {
   const handleSceneSelect = async (
     scenesToAdd: string[],
     currentBaseWidth: number,
-    currentBaseHeight: number
+    currentBaseHeight: number,
   ) => {
     if (!obs || scenesToAdd.length === 0) return
 
     track('obs/add_to_scene')
 
-    const newScenes = scenesToAdd.filter(
-      (scene) => !scenesWithSource.includes(scene)
-    )
+    const newScenes = scenesToAdd.filter((scene) => !scenesWithSource.includes(scene))
 
     let addedScenes = 0
 
@@ -233,7 +212,7 @@ const ObsSetup: React.FC = () => {
 
         // Check if the browser source already exists in the selected scene
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay'
+          (item: any) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -244,7 +223,7 @@ const ObsSetup: React.FC = () => {
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
         const existingInput = inputListResponse.inputs.find(
-          (input: any) => input.inputName === '[dotabod] main overlay'
+          (input: any) => input.inputName === '[dotabod] main overlay',
         )
 
         if (existingInput) {
@@ -281,9 +260,7 @@ const ObsSetup: React.FC = () => {
             sceneItemLocked: true,
           })
           addedScenes++
-          message.success(
-            `New browser source created and added to scene: ${selectedScene}`
-          )
+          message.success(`New browser source created and added to scene: ${selectedScene}`)
         }
       } catch (err: any) {
         setError(err.message || 'Error adding browser source to scene')
@@ -301,9 +278,7 @@ const ObsSetup: React.FC = () => {
     await fetchScenes(currentBaseWidth, currentBaseHeight)
   }
 
-  const checkScenesForSource = async (
-    sceneUuids: string[]
-  ): Promise<string[]> => {
+  const checkScenesForSource = async (sceneUuids: string[]): Promise<string[]> => {
     if (!obs) return []
 
     const scenesWithOverlay: string[] = []
@@ -316,7 +291,7 @@ const ObsSetup: React.FC = () => {
         })
 
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay'
+          (item: any) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -350,14 +325,14 @@ const ObsSetup: React.FC = () => {
       initialValues={{ port: obsPort, password: obsPassword }}
       form={form}
       onFinish={handleFormSubmit}
-      layout="vertical"
+      layout='vertical'
       style={{ maxWidth: 600, margin: '0 auto' }}
-      className="space-y-2"
+      className='space-y-2'
     >
       {!error && scenesWithSource.length > 0 && (
         <Alert
-          message="Overlay setup complete"
-          type="success"
+          message='Overlay setup complete'
+          type='success'
           description={`Added the Dotabod overlay on scene(s): ${scenesWithSource
             .map((sceneUuid) => {
               const scene = scenes.find((s) => s.sceneUuid === sceneUuid)
@@ -366,34 +341,26 @@ const ObsSetup: React.FC = () => {
             .join(', ')}`}
           showIcon
           action={
-            <Link href="/dashboard?step=4">
+            <Link href='/dashboard?step=4'>
               <Button>Go to step 4</Button>
             </Link>
           }
         />
       )}
       {!error && connected && scenesWithSource.length === 0 && (
-        <Alert
-          message="Connected to OBS, now select your scenes below"
-          type="info"
-          showIcon
-        />
+        <Alert message='Connected to OBS, now select your scenes below' type='info' showIcon />
       )}
 
       {error && (
         <Alert
           message={`${error}. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.`}
-          type="error"
+          type='error'
           showIcon
           action={
-            <div className="space-x-4">
+            <div className='space-x-4'>
               <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
               {error.includes('OBS version') && (
-                <Button
-                  type="primary"
-                  href="https://obsproject.com/download"
-                  target="_blank"
-                >
+                <Button type='primary' href='https://obsproject.com/download' target='_blank'>
                   Update OBS
                 </Button>
               )}
@@ -404,28 +371,24 @@ const ObsSetup: React.FC = () => {
 
       {error && !error.includes('OBS version') && (
         <Alert
-          message="Are you on the latest version of OBS? v30.2.3 or above is required."
-          type="warning"
+          message='Are you on the latest version of OBS? v30.2.3 or above is required.'
+          type='warning'
           showIcon
           action={
-            <Button
-              type="primary"
-              href="https://obsproject.com/download"
-              target="_blank"
-            >
+            <Button type='primary' href='https://obsproject.com/download' target='_blank'>
               Update OBS
             </Button>
           }
         />
       )}
 
-      <Spin spinning={l0 || l1} tip="Loading">
+      <Spin spinning={l0 || l1} tip='Loading'>
         {!connected && (
-          <div className="flex flex-col items-center space-x-4 md:flex-row">
+          <div className='flex flex-col items-center space-x-4 md:flex-row'>
             <Form.Item
-              name="password"
-              className="flex-1"
-              label="OBS WebSocket Password"
+              name='password'
+              className='flex-1'
+              label='OBS WebSocket Password'
               rules={[
                 {
                   required: true,
@@ -438,16 +401,16 @@ const ObsSetup: React.FC = () => {
               ]}
             >
               <Input
-                autoComplete="new-password"
-                placeholder="Enter the OBS WebSocket password"
+                autoComplete='new-password'
+                placeholder='Enter the OBS WebSocket password'
                 onPressEnter={() => form.submit()}
                 onChange={debouncedFormSubmit}
               />
             </Form.Item>
 
             <Form.Item
-              name="port"
-              label="Port"
+              name='port'
+              label='Port'
               rules={[
                 {
                   required: true,
@@ -456,9 +419,9 @@ const ObsSetup: React.FC = () => {
               ]}
             >
               <Input
-                autoComplete="off"
-                placeholder="4455"
-                type="number"
+                autoComplete='off'
+                placeholder='4455'
+                type='number'
                 min={1}
                 max={65535}
                 onChange={debouncedFormSubmit}
@@ -472,7 +435,7 @@ const ObsSetup: React.FC = () => {
             label={
               <Space>
                 <span>Choose the scene where Dota 2 is captured</span>
-                <Tooltip title="Refresh scenes">
+                <Tooltip title='Refresh scenes'>
                   <Button
                     disabled={!connected}
                     icon={<ReloadOutlined />}
@@ -484,22 +447,22 @@ const ObsSetup: React.FC = () => {
                         message.error('Video settings not loaded yet.')
                       }
                     }}
-                    type="default"
-                    shape="circle"
-                    title="Refresh scenes"
-                    size="small"
+                    type='default'
+                    shape='circle'
+                    title='Refresh scenes'
+                    size='small'
                   />
                 </Tooltip>
               </Space>
             }
           >
-            <div className="flex flex-row items-center space-x-4">
+            <div className='flex flex-row items-center space-x-4'>
               <Select
-                className="notranslate max-w-sm"
+                className='notranslate max-w-sm'
                 disabled={!connected}
-                mode="multiple"
+                mode='multiple'
                 defaultOpen
-                placeholder="Select scene(s)"
+                placeholder='Select scene(s)'
                 value={selectedScenes}
                 onChange={(value) => {
                   track('obs/select_scene', { scene: value.join(', ') })
@@ -507,7 +470,7 @@ const ObsSetup: React.FC = () => {
                 }}
                 options={scenes.map((scene) => ({
                   label: (
-                    <span translate="no" className="notranslate">
+                    <span translate='no' className='notranslate'>
                       {scene.sceneName}
                     </span>
                   ),
@@ -517,14 +480,10 @@ const ObsSetup: React.FC = () => {
               />
               {!error && connected && scenes.length > 1 && (
                 <Button
-                  type="primary"
+                  type='primary'
                   onClick={async () => {
                     if (baseWidth !== null && baseHeight !== null) {
-                      await handleSceneSelect(
-                        selectedScenes,
-                        baseWidth,
-                        baseHeight
-                      )
+                      await handleSceneSelect(selectedScenes, baseWidth, baseHeight)
                     } else {
                       message.error('Video settings not loaded yet.')
                     }
@@ -532,9 +491,7 @@ const ObsSetup: React.FC = () => {
                   disabled={
                     !connected ||
                     selectedScenes.length === 0 ||
-                    selectedScenes.every((scene) =>
-                      scenesWithSource.includes(scene)
-                    )
+                    selectedScenes.every((scene) => scenesWithSource.includes(scene))
                   }
                 >
                   Submit
@@ -546,27 +503,23 @@ const ObsSetup: React.FC = () => {
       </Spin>
 
       {!connected && (
-        <div className="space-y-4">
-          <div className="flex flex-col items-center space-y-2">
+        <div className='space-y-4'>
+          <div className='flex flex-col items-center space-y-2'>
             <div>
-              In OBS, go to Tools → Websocket Server → Enable → Apply → Show
-              connect info → Copy password. Make sure you press Apply or OK at
-              the end to enable the server.
+              In OBS, go to Tools → Websocket Server → Enable → Apply → Show connect info → Copy
+              password. Make sure you press Apply or OK at the end to enable the server.
             </div>
             <video
-              className="rounded-lg"
-              width="924"
-              height="720"
+              className='rounded-lg'
+              width='924'
+              height='720'
               controls
               playsInline
               autoPlay
               muted
               loop
             >
-              <source
-                src="/images/setup/how-to-obs-websocket.mp4"
-                type="video/mp4"
-              />
+              <source src='/images/setup/how-to-obs-websocket.mp4' type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           </div>

@@ -77,7 +77,7 @@ export function lookupLeaderRank({
   }
 
   const [myRank] = leaderRanks.filter(
-    (rank) => typeof standing === 'number' && standing <= rank.range[1]
+    (rank) => typeof standing === 'number' && standing <= rank.range[1],
   )
   return { myRank, mmr, standing }
 }

@@ -1,8 +1,4 @@
-import {
-  Settings,
-  defaultSettings,
-  type SettingKeys,
-} from '@/lib/defaultSettings'
+import { Settings, defaultSettings, type SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Input, Tag } from 'antd'
@@ -12,9 +8,7 @@ import { TierSwitch } from './TierSwitch'
 import { TierInput } from './TierInput'
 
 export default function SceneSwitcher(): JSX.Element {
-  const { data: isEnabled, loading: l0 } = useUpdateSetting(
-    Settings['obs-scene-switcher']
-  )
+  const { data: isEnabled, loading: l0 } = useUpdateSetting(Settings['obs-scene-switcher'])
   const {
     data: obsDc,
     loading: l1,
@@ -55,59 +49,55 @@ export default function SceneSwitcher(): JSX.Element {
       value: obsDc,
       update: updateDc,
       label: 'Game disconnected',
-      helpText:
-        'Switch to this scene when you disconnect and leave a Dota game',
+      helpText: 'Switch to this scene when you disconnect and leave a Dota game',
     },
   }
 
   return (
-    <Card title="OBS scene switcher" feature="obs-scene-switcher">
-      <div className="subtitle">
-        Auto switch scenes in OBS depending on game state. Your blockers will
-        still work without this.
-        <p className="mt-2 text-xs">
-          <Tag color="purple">Note</Tag>Does not work with Streamlabs
+    <Card title='OBS scene switcher' feature='obs-scene-switcher'>
+      <div className='subtitle'>
+        Auto switch scenes in OBS depending on game state. Your blockers will still work without
+        this.
+        <p className='mt-2 text-xs'>
+          <Tag color='purple'>Note</Tag>Does not work with Streamlabs
         </p>
       </div>
 
-      <div className="mb-4">
+      <div className='mb-4'>
         <TierSwitch
-          label="Enable OBS scene switcher"
+          label='Enable OBS scene switcher'
           hideTierBadge
           settingKey={Settings['obs-scene-switcher']}
         />
       </div>
 
-      <div className="mb-4">
-        This is optional but useful if you want to make your stream look unique
-        for different game states!
+      <div className='mb-4'>
+        This is optional but useful if you want to make your stream look unique for different game
+        states!
       </div>
 
       {isEnabled && (
-        <ul className="mb-2 ml-4 list-decimal space-y-2 text-sm">
+        <ul className='mb-2 ml-4 list-decimal space-y-2 text-sm'>
           <li>
-            Must put the dotabod browser source in the scenes you want to block
-            hero picks or minimap in.
+            Must put the dotabod browser source in the scenes you want to block hero picks or
+            minimap in.
           </li>
           <li>
-            Must set browser properties to{' '}
-            <span className="italics">Advanced access to OBS</span>
+            Must set browser properties to <span className='italics'>Advanced access to OBS</span>
           </li>
           <li>Must create the following scenes (case sensitive)</li>
-          <ul className="ml-4 list-none space-y-6">
+          <ul className='ml-4 list-none space-y-6'>
             {Object.keys(scenes).map((sceneKey: string) => {
               const scene = scenes[sceneKey]
               return (
                 <li key={sceneKey}>
-                  {loading && <Input placeholder="Loading..." disabled />}
+                  {loading && <Input placeholder='Loading...' disabled />}
                   {!loading && (
                     <TierInput
                       hideTierBadge
                       settingKey={sceneKey as SettingKeys}
                       label={scene.label}
-                      placeholder={
-                        defaultSettings['obs-scene-switcher'][sceneKey]
-                      }
+                      placeholder={defaultSettings['obs-scene-switcher'][sceneKey]}
                       value={scene.value}
                       maxLength={200}
                       onChange={(value) => handleSceneName(value, scene.update)}
@@ -121,12 +111,12 @@ export default function SceneSwitcher(): JSX.Element {
         </ul>
       )}
 
-      <div className="flex flex-col items-center space-y-4">
+      <div className='flex flex-col items-center space-y-4'>
         <Image
           width={536}
           height={115}
-          alt="scene switcher"
-          src="/images/setup/scene-switcher.png"
+          alt='scene switcher'
+          src='/images/setup/scene-switcher.png'
         />
         <span>Example OBS scenes and sources</span>
       </div>

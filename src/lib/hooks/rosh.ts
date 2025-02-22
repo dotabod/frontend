@@ -21,9 +21,7 @@ export const useRoshan = () => {
     count: isDev ? 1 : 0,
   })
 
-  const safeSetRoshan = (
-    value: RoshanState | ((prev: RoshanState) => RoshanState)
-  ) => {
+  const safeSetRoshan = (value: RoshanState | ((prev: RoshanState) => RoshanState)) => {
     if (value) {
       setRoshan(value)
     }
@@ -38,9 +36,7 @@ export const useAegis = () => {
     playerId: isDev ? 5 : null,
   })
 
-  const safeSetAegis = (
-    value: AegisState | ((prev: AegisState) => AegisState)
-  ) => {
+  const safeSetAegis = (value: AegisState | ((prev: AegisState) => AegisState)) => {
     if (value) {
       setAegis(value)
     }

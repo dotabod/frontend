@@ -22,12 +22,12 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
           width: width,
           top: 0,
         }}
-        id="main-screen-overlay"
-        className="absolute"
+        id='main-screen-overlay'
+        className='absolute'
       >
         <div
-          id="main-screen-wl-mmr-card"
-          className="absolute flex h-full items-center justify-center space-x-2 "
+          id='main-screen-wl-mmr-card'
+          className='absolute flex h-full items-center justify-center space-x-2 '
           style={{
             width: res({ w: 299 }),
             right: res({ w: 416 }),
@@ -35,15 +35,15 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
         >
           <AnimatedWL
             mainScreen
-            className="relative flex h-full items-center"
-            key="animate-wl-class-main"
+            className='relative flex h-full items-center'
+            key='animate-wl-class-main'
             wl={wl}
           />
 
           <AnimatedRankBadge
             mainScreen
-            key="animate-rank-badge-class-main"
-            className="relative h-full leading-none"
+            key='animate-rank-badge-class-main'
+            className='relative h-full leading-none'
             rankImageDetails={rankImageDetails}
           />
         </div>
