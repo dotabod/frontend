@@ -76,7 +76,7 @@ const EmoteList: React.FC<{
         <List.Item key={label}>
           <div className={clsx('flex items-center space-x-1')}>
             <Tooltip title={label}>
-              <a href={`https://7tv.app/emotes/${id}`} target='_blank' rel='noreferrer'>
+              <Link href={`https://7tv.app/emotes/${id}`} target='_blank' rel='noreferrer'>
                 <Image
                   className={clsx(
                     !added && 'grayscale group-hover:grayscale-0',
@@ -87,7 +87,7 @@ const EmoteList: React.FC<{
                   src={SevenTVBaseEmoteURL(id)}
                   alt={id}
                 />
-              </a>
+              </Link>
             </Tooltip>
           </div>
         </List.Item>
@@ -288,12 +288,14 @@ export default function ChatBot() {
                         )}
                       </span>,
                       <span className='flex flex-row items-center space-x-2' key={1}>
-                        {makeDotabodModLoading && <Spin size='small' spinning={loading} />}
                         {!stepModComplete ? (
-                          <div>
-                            Dotabod needs to be a moderator in your Twitch channel to function
-                            properly.
-                          </div>
+                          <>
+                            <Spin size='small' spinning={loading} />
+                            <div>
+                              Dotabod needs to be a moderator in your Twitch channel to function
+                              properly.
+                            </div>
+                          </>
                         ) : (
                           <div>Dotabod is a moderator in your Twitch channel.</div>
                         )}
@@ -308,7 +310,12 @@ export default function ChatBot() {
               key: 'manual',
               children: (
                 <StepComponent
-                  stepProps={[{ status: stepOneComplete ? 'finish' : undefined }]}
+                  stepProps={[
+                    { status: stepOneComplete ? 'finish' : undefined },
+                    { status: stepModComplete ? 'finish' : undefined },
+                    { status: stepModComplete ? 'finish' : undefined },
+                    { status: stepModComplete ? 'finish' : undefined },
+                  ]}
                   hideTitle={true}
                   steps={[
                     <span className='flex flex-col space-y-4' key={1}>
@@ -343,6 +350,19 @@ export default function ChatBot() {
                     </span>,
                     <span key={1}>Go to your Twitch chat</span>,
                     <span key={2}>Type the command: /mod dotabod</span>,
+                    <span key={3}>
+                      {!stepModComplete ? (
+                        <>
+                          <Spin size='small' spinning={loading} />
+                          <div>
+                            Dotabod needs to be a moderator in your Twitch channel to function
+                            properly.
+                          </div>
+                        </>
+                      ) : (
+                        <div>Dotabod is a moderator in your Twitch channel.</div>
+                      )}
+                    </span>,
                   ]}
                 />
               ),
@@ -488,17 +508,11 @@ export default function ChatBot() {
                             <>
                               {!user?.hasDotabodEmoteSet ? (
                                 <div className='flex flex-row space-x-4'>
-                                  {hasAuto7TVAccess ? (
-                                    <>
-                                      <Spin size='small' spinning={true} />
-                                      <p>
-                                        Dotabod will automatically add the following emotes after
-                                        the previous steps are completed.
-                                      </p>
-                                    </>
-                                  ) : (
-                                    <p>Click each emote below to add it to your emote set:</p>
-                                  )}
+                                  <Spin size='small' spinning={true} />
+                                  <p>
+                                    Dotabod will automatically add the following emotes after the
+                                    previous steps are completed.
+                                  </p>
                                 </div>
                               ) : (
                                 <div>All required emotes have been added to your channel!</div>
