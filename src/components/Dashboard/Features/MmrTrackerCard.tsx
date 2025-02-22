@@ -15,10 +15,7 @@ export default function MmrTrackerCard() {
   )
 
   return (
-    <Card>
-      <div className="title">
-        <h3>MMR tracker</h3>
-      </div>
+    <Card title="MMR tracker">
       <div className="subtitle">
         <p>Give or take {onlyParty ? 20 : 25} MMR after every ranked match.</p>
       </div>

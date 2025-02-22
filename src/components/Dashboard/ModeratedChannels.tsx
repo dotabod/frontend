@@ -7,6 +7,8 @@ import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+import { plans } from '../Billing/BillingPlans'
+import Link from 'next/link'
 
 export default function ModeratedChannels() {
   const { data } = useSession()
@@ -118,6 +120,10 @@ export default function ModeratedChannels() {
     signOut()
   }, [])
 
+  const currentPlan = plans.find(
+    (plan) => plan.name.toLowerCase() === subscription?.tier
+  )
+
   const allOptions = [
     {
       value: `${user?.twitchId}`,
@@ -145,21 +151,22 @@ export default function ModeratedChannels() {
     <div className="flex flex-col flex-grow items-center moderated-channels">
       {!user?.isImpersonating && (
         <div className="mb-2 flex items-center gap-2">
-          <Tag
-            color={
-              subscription?.tier === SUBSCRIPTION_TIERS.PRO
-                ? undefined
-                : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
-                  ? 'cyan'
-                  : 'default'
-            }
-          >
-            {subscription?.tier === SUBSCRIPTION_TIERS.PRO
-              ? 'Pro Plan'
-              : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
-                ? 'Starter Plan'
-                : 'Free Plan'}
-          </Tag>
+          <Link href="/dashboard/billing">
+            <Tag
+              color={
+                subscription?.tier === SUBSCRIPTION_TIERS.PRO
+                  ? 'purple'
+                  : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
+                    ? 'cyan'
+                    : 'default'
+              }
+            >
+              <div className="flex items-center gap-2">
+                {currentPlan?.logo}
+                {currentPlan?.name} Plan
+              </div>
+            </Tag>
+          </Link>
         </div>
       )}
       <Tooltip title="Select a streamer account to manage" placement="right">

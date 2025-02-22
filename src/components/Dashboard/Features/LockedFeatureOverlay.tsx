@@ -2,15 +2,21 @@ import { Button } from 'antd'
 import Link from 'next/link'
 import type { SubscriptionTier } from '@/utils/subscription'
 import Image from 'next/image'
+import { TierBadge } from './TierBadge'
 
 interface LockedFeatureOverlayProps {
   requiredTier?: SubscriptionTier | null
-  message?: string
+  message?: React.ReactNode
 }
 
 export function LockedFeatureOverlay({
   requiredTier,
-  message = `Unlock this feature by upgrading to ${requiredTier} tier`,
+  message = (
+    <span>
+      Unlock this feature by upgrading to{' '}
+      <TierBadge requiredTier={requiredTier} />
+    </span>
+  ),
 }: LockedFeatureOverlayProps) {
   if (!requiredTier) {
     return null
