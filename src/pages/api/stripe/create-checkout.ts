@@ -100,7 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?paid=true`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/pricing?paid=false`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/?paid=false`,
     })
 
     return res.status(200).json({ url: checkoutSession.url })

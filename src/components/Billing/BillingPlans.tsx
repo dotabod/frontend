@@ -29,8 +29,8 @@ export const plans = [
     features: [
       'Multi-language support',
       'Basic minimap blocker',
-      'Basic chat features: Turn off all chatters, match results',
-      'Essential commands: !toggle, !mmr, !commands, !dotabod',
+      'Basic game chat events',
+      'Essential commands: !mmr',
       'Manual setup process',
     ],
     logo: (
@@ -121,7 +121,7 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
         />
       </div>
 
-      <div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-3'>
+      <div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 sm:mt-20 lg:max-w-none lg:grid-cols-2'>
         {plans.map((plan) => (
           <Plan key={plan.name} {...plan} activePeriod={activePeriod} subscription={subscription} />
         ))}
