@@ -34,6 +34,7 @@ const settingsSchema = {
     noTp: z.object({ enabled: z.boolean() }),
     matchOutcome: z.object({ enabled: z.boolean() }),
     commandsReady: z.object({ enabled: z.boolean() }),
+    neutralItems: z.object({ enabled: z.boolean() }),
   }),
   commandAPM: z.boolean(),
   commandAvg: z.boolean(),

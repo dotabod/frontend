@@ -35,7 +35,7 @@ export type WinChance = {
   visible: boolean
 }
 
-type wlType = {
+export type wlType = {
   win: number
   lose: number
   type: string
@@ -59,59 +59,76 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
-  // on react unmount. mainly used for hot reloads so it doesnt register 900 .on()'s
-  useEffect(() => {
-    return () => {
-      socket?.off('block')
-      socket?.off('paused')
-      socket?.off('aegis-picked-up')
-      socket?.off('roshan-killed')
-      socket?.off('connect')
-      socket?.off('disconnect')
-      socket?.off('refresh-settings')
-      socket?.off('notable-players')
-      socket?.off('channelPollOrBet')
-      socket?.off('update-medal')
-      socket?.off('update-wl')
-      socket?.off('update-radiant-win-chance')
-      socket?.off('refresh')
-      socket?.off('connect_error')
-      socket?.disconnect()
-    }
-  }, [])
 
   useEffect(() => {
     if (!userId) return
+
+    // Add ping interval and last received time tracking
+    let lastReceivedTime = Date.now()
+    let reconnectTimeout: NodeJS.Timeout
 
     console.log('Connecting to socket init...')
 
     socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
       auth: { token: userId },
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
     })
 
-    socket.on('DATA_buildings', (data: any) => {
+    // Use socket.io's built-in ping event to track connection health
+    socket.io.on('ping', () => {
+      lastReceivedTime = Date.now()
+    })
+
+    // Monitor for stale connections
+    const connectionMonitor = setInterval(() => {
+      if (Date.now() - lastReceivedTime > 45000) {
+        // 45s = 3 missed pings
+        console.log('Connection appears stale, reconnecting...')
+        socket?.disconnect()
+        socket?.connect()
+      }
+    }, 15000)
+
+    // Update lastReceivedTime whenever we get any data
+    const updateLastReceived = () => {
+      lastReceivedTime = Date.now()
+    }
+
+    // Add handlers for all existing events
+    socket.on('DATA_buildings', (data) => {
+      updateLastReceived()
       dispatch(setMinimapDataBuildings(data))
     })
 
-    socket.on('DATA_heroes', (data: any) => {
+    socket.on('DATA_heroes', (data) => {
+      updateLastReceived()
       dispatch(setMinimapDataHeroes(data))
     })
 
     socket.on('DATA_couriers', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapDataCouriers(data))
     })
 
     socket.on('DATA_creeps', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapDataCreeps(data))
     })
     socket.on('DATA_hero_units', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapDataHeroUnits(data))
     })
     socket.on('STATUS', (data: any) => {
+      updateLastReceived()
       dispatch(setMinimapStatus(data))
     })
 
     socket.on('requestHeroData', async ({ allTime, heroId, steam32Id }, cb) => {
+      updateLastReceived()
       const wl = { win: 0, lose: 0 }
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
@@ -128,6 +145,7 @@ export const useSocket = ({
     })
 
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
+      updateLastReceived()
       console.log('[MMR] requestMatchData event received', {
         matchId,
         heroSlot,
@@ -161,6 +179,7 @@ export const useSocket = ({
     })
 
     socket.on('block', (data: blockType) => {
+      updateLastReceived()
       if (data?.type === 'playing') {
         setTimeout(() => {
           setBlock(data)
@@ -169,37 +188,46 @@ export const useSocket = ({
         setBlock(data)
       }
     })
-    socket.on('paused', setPaused)
-    socket.on('notable-players', setNotablePlayers)
-    socket.on('aegis-picked-up', setAegis)
-    socket.on('roshan-killed', setRoshan)
+    socket.on('paused', (data) => {
+      updateLastReceived()
+      setPaused(data)
+    })
+    socket.on('notable-players', (data) => {
+      updateLastReceived()
+      setNotablePlayers(data)
+    })
+    socket.on('aegis-picked-up', (data) => {
+      updateLastReceived()
+      setAegis(data)
+    })
+    socket.on('roshan-killed', (data) => {
+      updateLastReceived()
+      setRoshan(data)
+    })
     socket.on('auth_error', (message) => {
       console.error('Authentication failed:', message)
       socket.close()
     })
-    socket.on('connect', () => setConnected(true))
-    socket.on('connect_error', (err) => {
-      setTimeout(() => {
-        console.log('Reconnecting due to connect error...', { err })
-        socket.connect()
-      }, 4000)
+    socket.on('connect', () => {
+      console.log('Socket connected')
+      setConnected(true)
+    })
+    socket.on('connect_error', (error) => {
+      console.error('Connection error:', error)
+      setConnected(false)
     })
     socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason)
       setConnected(false)
-      console.log('Disconnected from socket', { reason })
-
-      if (reason === 'io server disconnect') {
-        console.log('Reconnecting...')
-        // the disconnection was initiated by the server, need to reconnect manually
-        socket.connect()
-      }
     })
 
     socket.on('refresh-settings', (key: typeof Settings) => {
+      updateLastReceived()
       mutate()
     })
 
     socket.on('channelPollOrBet', (data: any, eventName: string) => {
+      updateLastReceived()
       console.log('twitchEvent', { eventName, data })
       const func = eventName.includes('Poll') ? setPollData : setBetData
       const newData =
@@ -208,16 +236,19 @@ export const useSocket = ({
     })
 
     socket.on('update-medal', (deets: RankType) => {
+      updateLastReceived()
       if (isDev) return
       setRankImageDetails(getRankImage(deets))
     })
 
     socket.on('update-wl', (records: wlType) => {
+      updateLastReceived()
       if (isDev) return
       setWL(records)
     })
 
     socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
+      updateLastReceived()
       if (isDev) return
       // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
       if (!chanceDetails) {
@@ -227,8 +258,17 @@ export const useSocket = ({
     })
 
     socket.on('refresh', () => {
+      updateLastReceived()
       router.reload()
     })
+
+    // Clean up
+    return () => {
+      clearInterval(connectionMonitor)
+      clearTimeout(reconnectTimeout)
+      socket?.disconnect()
+      socket = null
+    }
   }, [userId])
 }
 

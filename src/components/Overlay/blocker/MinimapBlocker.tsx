@@ -27,7 +27,7 @@ export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
               w: 280,
             })
           : res({
-              w: 240,
+              w: 244,
             })
       }
       height={
@@ -36,10 +36,10 @@ export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
               h: 280,
             })
           : res({
-              h: 240,
+              h: 244,
             })
       }
-      src={`/images/overlay/minimap/731-${isSimple ? 'Simple' : 'Complex'}-${
+      src={`/images/overlay/minimap/738-${isSimple ? 'Simple' : 'Complex'}-${
         isXL ? 'X' : ''
       }Large-AntiStreamSnipeMap.png`}
     />

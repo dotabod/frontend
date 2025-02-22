@@ -4,33 +4,35 @@ import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import type { blockType } from '@/lib/devConsts'
 
-export const AnimatedAegis = ({
-  aegis: { expireS, playerId },
-  paused,
-  onComplete,
-  block,
-}: {
-  paused: boolean
+interface AnimatedAegisProps {
+  block: blockType
   aegis: {
     expireS: number
     playerId: number
   }
-  block: any
+  paused: boolean
   onComplete: () => void
-}) => {
+}
+
+export const AnimatedAegis = ({
+  aegis,
+  paused,
+  onComplete,
+  block,
+}: AnimatedAegisProps) => {
   const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.aegis)
 
-  if (!isEnabled || block.type !== 'playing' || !expireS) {
-    return null
-  }
+  if (!aegis || !block) return null
+  if (!isEnabled || block.type !== 'playing' || !aegis.expireS) return null
 
   return (
-    <PlayerTopbar position={playerId}>
+    <PlayerTopbar position={aegis.playerId}>
       <CountdownCircleTimer
         isPlaying={!paused}
-        duration={expireS}
+        duration={aegis.expireS}
         colors="#0000000"
         trailColor="#0000000"
         onComplete={onComplete}

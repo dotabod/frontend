@@ -78,7 +78,6 @@ const HomepageShell = ({
       >
         {children}
       </main>
-      <KofiButton />
       <Footer />
     </>
   )
