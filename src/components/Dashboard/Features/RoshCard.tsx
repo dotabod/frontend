@@ -1,26 +1,13 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from './TierSwitch'
 
 export default function RoshCard() {
-  const {
-    data: hasAegis,
-    loading: lA,
-    updateSetting: uA,
-  } = useUpdateSetting(Settings.aegis)
-  const {
-    data: hasRosh,
-    loading: lR,
-    updateSetting: uR,
-  } = useUpdateSetting(Settings.rosh)
-  const {
-    data: minimapXl,
-    loading: l2,
-    updateSetting: updateXl,
-  } = useUpdateSetting(Settings['minimap-xl'])
+  const { data: hasAegis } = useUpdateSetting(Settings.aegis)
+  const { data: hasRosh } = useUpdateSetting(Settings.rosh)
 
   return (
     <Card>
@@ -34,18 +21,16 @@ export default function RoshCard() {
       <div className={clsx('py-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <div className="flex items-center">
-            <Switch checked={hasRosh} onChange={uR} />
-            <span className="ml-2 text-sm text-gray-300">Roshan timer</span>
+            <TierSwitch settingKey={Settings.rosh} label="Roshan timer" />
           </div>
           <div className="flex items-center">
-            <Switch checked={hasAegis} onChange={uA} />
-            <span className="ml-2 text-sm text-gray-300">Aegis timer</span>
+            <TierSwitch settingKey={Settings.aegis} label="Aegis timer" />
           </div>
           <div className="flex items-center">
-            <Switch checked={minimapXl} onChange={updateXl} />
-            <span className="ml-2 text-sm text-gray-300">
-              Use extra large minimap
-            </span>
+            <TierSwitch
+              settingKey={Settings['minimap-xl']}
+              label="Use extra large minimap"
+            />
           </div>
         </div>
       </div>

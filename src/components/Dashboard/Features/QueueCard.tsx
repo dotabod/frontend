@@ -2,10 +2,11 @@ import { Input } from '@/components/Input'
 import { Settings, defaultSettings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Form, Spin, Switch } from 'antd'
+import { Button, Form, Spin } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
+import { TierSwitch } from './TierSwitch'
 
 export default function QueueCard() {
   const {
@@ -34,20 +35,16 @@ export default function QueueCard() {
         snipe you.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        <Switch
-          onChange={updateSetting}
-          loading={loading}
-          checked={isEnabled}
+        <TierSwitch
+          settingKey={Settings.queueBlocker}
+          label="Enable queue blocker overlay"
         />
-        <span>Enable queue blocker overlay</span>
       </div>
       <div className="mb-5 mt-5 flex items-center space-x-2">
-        <Switch
-          onChange={updateFindingMatchSetting}
-          loading={isFindingMatchLoading}
-          checked={isFindingMatchEnabled}
+        <TierSwitch
+          settingKey={Settings.queueBlockerFindMatch}
+          label="Show finding match"
         />
-        <span>Show finding match</span>
       </div>
       <Spin spinning={loading} tip="Loading">
         <Form

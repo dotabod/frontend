@@ -1,22 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from './TierSwitch'
 
 export default function NotablePlayersCard() {
-  const {
-    data: isEnabled,
-    loading,
-    updateSetting,
-  } = useUpdateSetting(Settings.notablePlayersOverlay)
-
-  const { data: showFlags, updateSetting: showFlagsUpdate } = useUpdateSetting(
-    Settings.notablePlayersOverlayFlags
-  )
-  const { data: showFlagsCmd, updateSetting: showFlagsCmdUpdate } =
-    useUpdateSetting(Settings.notablePlayersOverlayFlagsCmd)
+  const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
 
   return (
     <Card>
@@ -29,34 +19,26 @@ export default function NotablePlayersCard() {
       <div className={clsx('pb-12 pt-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
           <div className="flex items-center">
-            <Switch checked={isEnabled} onChange={updateSetting} />
-            <span className="ml-2 text-sm text-gray-300">
-              Enable overlay under hero top bar
-            </span>
+            <TierSwitch
+              settingKey={Settings.notablePlayersOverlay}
+              label="Enable overlay under hero top bar"
+            />
           </div>
           <div
             className={clsx('flex items-center', !isEnabled && 'opacity-40')}
           >
-            <Switch
-              disabled={!isEnabled}
-              checked={showFlags}
-              onChange={showFlagsUpdate}
+            <TierSwitch
+              settingKey={Settings.notablePlayersOverlayFlags}
+              label="Show country flags in overlay"
             />
-            <span className="ml-2 text-sm text-gray-300">
-              Show country flags in overlay
-            </span>
           </div>
           <div
             className={clsx('flex items-center', !isEnabled && 'opacity-40')}
           >
-            <Switch
-              disabled={!isEnabled}
-              checked={showFlagsCmd}
-              onChange={showFlagsCmdUpdate}
+            <TierSwitch
+              settingKey={Settings.notablePlayersOverlayFlagsCmd}
+              label="Show country flags in !np twitch chat command"
             />
-            <span className="ml-2 text-sm text-gray-300">
-              Show country flags in !np twitch chat command
-            </span>
           </div>
         </div>
       </div>

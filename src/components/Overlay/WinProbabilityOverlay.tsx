@@ -1,16 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 
 export default function WinProbabilityOverlay() {
-  const {
-    data: showWinProb,
-    updateSetting: updateWinProb,
-    loading: l2,
-  } = useUpdateSetting(Settings.winProbabilityOverlay)
+  const { data: showWinProb } = useUpdateSetting(Settings.winProbabilityOverlay)
 
   return (
     <Card>
@@ -25,8 +21,10 @@ export default function WinProbabilityOverlay() {
         chance.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        <Switch loading={l2} onChange={updateWinProb} checked={showWinProb} />
-        <span>Show win probability overlay</span>
+        <TierSwitch
+          settingKey={Settings.winProbabilityOverlay}
+          label="Show win probability overlay"
+        />
       </div>
 
       <Image

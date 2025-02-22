@@ -1,6 +1,7 @@
 import type { SubscriptionTier } from '@/utils/subscription'
 import { Tag } from 'antd'
 import { CrownIcon } from 'lucide-react'
+
 export const TierBadge: React.FC<{
   requiredTier?: SubscriptionTier | null
 }> = ({ requiredTier }) =>

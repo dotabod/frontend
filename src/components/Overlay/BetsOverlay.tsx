@@ -1,16 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 
 export default function BetsOverlay() {
-  const {
-    data: showLivePolls,
-    updateSetting: updateLivePoll,
-    loading: l2,
-  } = useUpdateSetting(Settings.livePolls)
+  const { data: showLivePolls } = useUpdateSetting(Settings.livePolls)
 
   return (
     <Card>
@@ -23,12 +19,10 @@ export default function BetsOverlay() {
         you win or lose a match.
       </div>
       <div className="mt-5 flex items-center space-x-2">
-        <Switch
-          loading={l2}
-          onChange={updateLivePoll}
-          checked={showLivePolls}
+        <TierSwitch
+          settingKey={Settings.livePolls}
+          label="Show live betting / polls overlay"
         />
-        <span>Show live betting / polls overlay</span>
       </div>
 
       <Image

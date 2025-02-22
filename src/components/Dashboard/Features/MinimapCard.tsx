@@ -1,66 +1,34 @@
 import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from './TierSwitch'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 export default function MinimapCard(): JSX.Element {
-  const {
-    data: isEnabled,
-    loading: l0,
-    updateSetting,
-  } = useUpdateSetting(Settings['minimap-blocker'])
-  const {
-    data: minimapSimple,
-    loading: l1,
-    updateSetting: updateSimple,
-  } = useUpdateSetting(Settings['minimap-simple'])
-  const {
-    data: minimapXl,
-    loading: l2,
-    updateSetting: updateXl,
-  } = useUpdateSetting(Settings['minimap-xl'])
-  const {
-    data: isBP,
-    loading: l3,
-    updateSetting: updateBP,
-  } = useUpdateSetting(Settings.battlepass)
-  const {
-    data: isMinimapRight,
-    loading: l4,
-    updateSetting: updateMinimapRight,
-  } = useUpdateSetting(Settings.minimapRight)
+  const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
+  const { data: minimapSimple } = useUpdateSetting(Settings['minimap-simple'])
+  const { data: minimapXl } = useUpdateSetting(Settings['minimap-xl'])
 
   const switches = [
     {
-      loading: l0,
-      checked: isEnabled,
-      onChange: updateSetting,
+      settingKey: Settings['minimap-blocker'],
       label: 'Enable minimap blocker',
     },
     {
-      loading: l1,
-      checked: minimapSimple,
-      onChange: updateSimple,
+      settingKey: Settings['minimap-simple'],
       label: 'Simple minimap background',
     },
     {
-      loading: l2,
-      checked: minimapXl,
-      onChange: updateXl,
+      settingKey: Settings['minimap-xl'],
       label: 'Extra large minimap',
     },
     {
-      loading: l4,
-      checked: isMinimapRight,
-      onChange: updateMinimapRight,
+      settingKey: Settings.minimapRight,
       label: 'Right side minimap',
     },
     {
-      loading: l3,
-      checked: isBP,
-      onChange: updateBP,
+      settingKey: Settings.battlepass,
       label: 'Battlepass hud',
     },
   ]
@@ -76,11 +44,8 @@ export default function MinimapCard(): JSX.Element {
       </div>
       <div className={clsx('pb-12 pt-4 transition-all')}>
         <div className="flex flex-col items-start space-y-2 md:space-y-3">
-          {switches.map(({ loading, checked, onChange, label }, i) => (
-            <div key={i} className="flex items-center space-x-2">
-              <Switch checked={checked} loading={loading} onChange={onChange} />
-              <span>{label}</span>
-            </div>
+          {switches.map((props) => (
+            <TierSwitch key={props.settingKey} {...props} />
           ))}
         </div>
       </div>

@@ -2,8 +2,8 @@ import type { SettingKeys } from '@/lib/defaultSettings'
 import type { defaultSettings } from '@/lib/defaultSettings'
 
 // Add type safety for chatters
-type ChatterKeys = keyof typeof defaultSettings.chatters
-type ChatterSettingKeys = `chatters.${ChatterKeys}`
+export type ChatterKeys = keyof typeof defaultSettings.chatters
+export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
 export function calculateSavings(
   monthlyPrice: string,
