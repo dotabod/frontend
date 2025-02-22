@@ -6,7 +6,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { captureException } from '@sentry/nextjs'
-
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 async function addModerator(broadcasterId: string | undefined, accessToken: string) {
   if (!broadcasterId) {
     throw new Error('Broadcaster ID is required')
@@ -47,15 +47,18 @@ async function addModerator(broadcasterId: string | undefined, accessToken: stri
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' })
-  }
-
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
   }
   if (!session?.user?.id) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  const subscription = await getSubscription(session.user.id)
+  const { hasAccess } = canAccessFeature('autoModerator', subscription)
+
+  if (!hasAccess) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 

@@ -10,19 +10,24 @@ import {
   GET_USER_EMOTE_SETS,
   UPDATE_USER_CONNECTION,
 } from '@/lib/gql'
+import { canAccessFeature } from '@/utils/subscription'
+import { getSubscription } from '@/utils/subscription'
 import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' })
-  }
-
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
   }
   if (!session?.user?.id) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
+  const subscription = await getSubscription(session.user.id)
+  const { hasAccess } = canAccessFeature('auto7TV', subscription)
+
+  if (!hasAccess) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
