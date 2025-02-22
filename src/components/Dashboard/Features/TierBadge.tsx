@@ -28,14 +28,14 @@ export const TierBadge: React.FC<{
 
             <Link href='/dashboard/billing'>
               <Button type='primary' className='mt-2'>
-                <CrownIcon color={tierToShow === 'starter' ? 'cyan' : 'gold'} className='h-4 w-4' />{' '}
+                <CrownIcon color={tierToShow === 'pro' ? 'gold' : undefined} className='h-4 w-4' />{' '}
                 Upgrade your stream
               </Button>
             </Link>
           </>
         }
       >
-        <Tag color={tierToShow === 'starter' ? 'cyan' : 'gold'}>
+        <Tag color={tierToShow === 'pro' ? 'gold' : undefined}>
           <div className='flex items-center gap-2 p-1'>
             <CrownIcon className='h-4 w-4' />
             <span className='first-letter:uppercase'>{tierToShow}</span>

@@ -1,6 +1,5 @@
 import prisma from '@/lib/db'
-import type { SettingKeys } from '@/lib/defaultSettings'
-import type { defaultSettings } from '@/lib/defaultSettings'
+import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -14,7 +13,6 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
 
 export const SUBSCRIPTION_TIERS = {
   FREE: 'free',
-  STARTER: 'starter',
   PRO: 'pro',
 } as const
 
@@ -37,8 +35,7 @@ export type SubscriptionStatus = {
 
 export const TIER_LEVELS: Record<SubscriptionTier, number> = {
   [SUBSCRIPTION_TIERS.FREE]: 0,
-  [SUBSCRIPTION_TIERS.STARTER]: 1,
-  [SUBSCRIPTION_TIERS.PRO]: 2,
+  [SUBSCRIPTION_TIERS.PRO]: 1,
 }
 
 export const PRICE_PERIODS = {
@@ -48,11 +45,6 @@ export const PRICE_PERIODS = {
 
 export type PricePeriod = (typeof PRICE_PERIODS)[keyof typeof PRICE_PERIODS]
 export const PRICE_IDS: SubscriptionPriceId[] = [
-  {
-    tier: SUBSCRIPTION_TIERS.STARTER,
-    monthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_MONTHLY_PRICE_ID || '',
-    annual: process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || '',
-  },
   {
     tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
@@ -77,39 +69,37 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandPing: SUBSCRIPTION_TIERS.FREE,
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
 
-  // Starter Tier Features
-  'mmr-tracker': SUBSCRIPTION_TIERS.STARTER,
-  bets: SUBSCRIPTION_TIERS.STARTER,
-  'picks-blocker': SUBSCRIPTION_TIERS.STARTER,
-  rosh: SUBSCRIPTION_TIERS.STARTER,
-  commandDelay: SUBSCRIPTION_TIERS.STARTER,
-  commandOnline: SUBSCRIPTION_TIERS.STARTER,
-  commandWL: SUBSCRIPTION_TIERS.STARTER,
-  commandRanked: SUBSCRIPTION_TIERS.STARTER,
-  commandRosh: SUBSCRIPTION_TIERS.STARTER,
-  'chatters.midas': SUBSCRIPTION_TIERS.FREE,
-  'chatters.pause': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.smoke': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.passiveDeath': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.roshPickup': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.roshDeny': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.roshanKilled': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.tip': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.bounties': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.powerTreads': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.killstreak': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.firstBloodDeath': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.noTp': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.matchOutcome': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.commandsReady': SUBSCRIPTION_TIERS.STARTER,
-  'chatters.neutralItems': SUBSCRIPTION_TIERS.PRO,
-  aegis: SUBSCRIPTION_TIERS.STARTER,
-  betsInfo: SUBSCRIPTION_TIERS.STARTER,
-  customMmr: SUBSCRIPTION_TIERS.STARTER,
-  tellChatNewMMR: SUBSCRIPTION_TIERS.STARTER,
-  tellChatBets: SUBSCRIPTION_TIERS.STARTER,
-
   // Pro Tier Features
+  'mmr-tracker': SUBSCRIPTION_TIERS.PRO,
+  bets: SUBSCRIPTION_TIERS.PRO,
+  'picks-blocker': SUBSCRIPTION_TIERS.PRO,
+  rosh: SUBSCRIPTION_TIERS.PRO,
+  commandDelay: SUBSCRIPTION_TIERS.PRO,
+  commandOnline: SUBSCRIPTION_TIERS.PRO,
+  commandWL: SUBSCRIPTION_TIERS.PRO,
+  commandRanked: SUBSCRIPTION_TIERS.PRO,
+  commandRosh: SUBSCRIPTION_TIERS.PRO,
+  'chatters.midas': SUBSCRIPTION_TIERS.FREE,
+  'chatters.pause': SUBSCRIPTION_TIERS.PRO,
+  'chatters.smoke': SUBSCRIPTION_TIERS.PRO,
+  'chatters.passiveDeath': SUBSCRIPTION_TIERS.PRO,
+  'chatters.roshPickup': SUBSCRIPTION_TIERS.PRO,
+  'chatters.roshDeny': SUBSCRIPTION_TIERS.PRO,
+  'chatters.roshanKilled': SUBSCRIPTION_TIERS.PRO,
+  'chatters.tip': SUBSCRIPTION_TIERS.PRO,
+  'chatters.bounties': SUBSCRIPTION_TIERS.PRO,
+  'chatters.powerTreads': SUBSCRIPTION_TIERS.PRO,
+  'chatters.killstreak': SUBSCRIPTION_TIERS.PRO,
+  'chatters.firstBloodDeath': SUBSCRIPTION_TIERS.PRO,
+  'chatters.noTp': SUBSCRIPTION_TIERS.PRO,
+  'chatters.matchOutcome': SUBSCRIPTION_TIERS.PRO,
+  'chatters.commandsReady': SUBSCRIPTION_TIERS.PRO,
+  'chatters.neutralItems': SUBSCRIPTION_TIERS.PRO,
+  aegis: SUBSCRIPTION_TIERS.PRO,
+  betsInfo: SUBSCRIPTION_TIERS.PRO,
+  customMmr: SUBSCRIPTION_TIERS.PRO,
+  tellChatNewMMR: SUBSCRIPTION_TIERS.PRO,
+  tellChatBets: SUBSCRIPTION_TIERS.PRO,
   'obs-scene-switcher': SUBSCRIPTION_TIERS.PRO,
   streamDelay: SUBSCRIPTION_TIERS.PRO,
   livePolls: SUBSCRIPTION_TIERS.PRO,
@@ -170,7 +160,7 @@ export const GENERIC_FEATURE_TIERS = {
   managers: SUBSCRIPTION_TIERS.PRO,
   autoOBS: SUBSCRIPTION_TIERS.PRO,
   autoInstaller: SUBSCRIPTION_TIERS.PRO,
-  autoModerator: SUBSCRIPTION_TIERS.STARTER,
+  autoModerator: SUBSCRIPTION_TIERS.PRO,
   auto7TV: SUBSCRIPTION_TIERS.PRO,
   other_future_feature: SUBSCRIPTION_TIERS.PRO,
 } as const

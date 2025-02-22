@@ -44,39 +44,6 @@ export const plans = [
     logomarkClassName: 'fill-gray-300',
   },
   {
-    name: 'Starter',
-    featured: false,
-    price: {
-      monthly: '$3',
-      annual: '$30',
-    },
-    description: 'Essential features for growing streamers who want core Dota 2 integration.',
-    button: {
-      label: 'Subscribe',
-      href: `/register?plan=${SUBSCRIPTION_TIERS.STARTER}`,
-    },
-    features: [
-      'All Free features',
-      'Automated moderator setup',
-      'MMR tracking',
-      'Basic Twitch predictions',
-      'Enhanced minimap and picks blockers',
-      'Basic rank, MMR, and Roshan overlays',
-      'Enhanced chat interactions: Bets, midas, first blood, aegis',
-      'Additional commands: !online, !mute, !wl, !ranked, !rosh, !delay',
-    ],
-    logo: (
-      <Image
-        src='https://cdn.betterttv.net/emote/61f2f17c06fd6a9f5be2630a/3x.webp'
-        width={24}
-        height={24}
-        className='rounded'
-        alt='Starter'
-      />
-    ),
-    logomarkClassName: 'fill-gray-500',
-  },
-  {
     name: 'Pro',
     featured: true,
     price: {
@@ -90,7 +57,10 @@ export const plans = [
       href: `/register?plan=${SUBSCRIPTION_TIERS.PRO}`,
     },
     features: [
-      'All Starter features',
+      'All Free features',
+      'Automated moderator setup',
+      'MMR tracking',
+      'Additional commands: !online, !mute, !wl, !ranked, !rosh, !delay',
       'Automated 7tv, OBS, and Dota 2 setup',
       'Stream delay customization',
       'Advanced Twitch predictions with live overlay',

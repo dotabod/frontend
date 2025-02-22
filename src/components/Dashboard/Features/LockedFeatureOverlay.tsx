@@ -25,7 +25,7 @@ export function LockedFeatureOverlay({
   return (
     <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg backdrop-blur-md z-10'>
       <div className='flex flex-col items-center gap-6 p-8 max-w-lg'>
-        {requiredTier === 'pro' ? (
+        {requiredTier !== 'free' && (
           <Image
             src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
             width={84}
@@ -33,15 +33,6 @@ export function LockedFeatureOverlay({
             className='rounded-lg shadow-lg hover:scale-110 transition-transform duration-200'
             style={{ objectFit: 'contain' }}
             alt='Pro tier emote'
-          />
-        ) : (
-          <Image
-            src='https://cdn.betterttv.net/emote/61f2f17c06fd6a9f5be2630a/3x.webp'
-            width={84}
-            height={84}
-            className='rounded-lg shadow-lg hover:scale-110 transition-transform duration-200'
-            style={{ objectFit: 'contain' }}
-            alt='Starter tier emote'
           />
         )}
         <TierBadge requiredTier={requiredTier} />

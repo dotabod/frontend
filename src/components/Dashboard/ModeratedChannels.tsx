@@ -147,15 +147,7 @@ export default function ModeratedChannels() {
       {!user?.isImpersonating && (
         <div className='mb-2 flex items-center gap-2'>
           <Link href='/dashboard/billing'>
-            <Tag
-              color={
-                subscription?.tier === SUBSCRIPTION_TIERS.PRO
-                  ? 'purple'
-                  : subscription?.tier === SUBSCRIPTION_TIERS.STARTER
-                    ? 'cyan'
-                    : 'default'
-              }
-            >
+            <Tag color={subscription?.tier === SUBSCRIPTION_TIERS.PRO ? 'gold' : 'default'}>
               <div className='flex items-center gap-2'>
                 {currentPlan?.logo}
                 {currentPlan?.name} Plan
