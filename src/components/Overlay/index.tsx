@@ -28,6 +28,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { RestrictFeature } from '../RestrictFeature'
 
 const OverlayPage = () => {
   const { notification } = App.useApp()
@@ -242,14 +243,15 @@ const OverlayPage = () => {
           </div>
         </motion.div>
 
-        <PollOverlays
-          pollData={pollData}
-          setBetData={setBetData}
-          setPollData={setPollData}
-          betData={betData}
-          radiantWinChance={radiantWinChance}
-          key='poll-overlays'
-        />
+        <RestrictFeature feature='livePolls'>
+          <PollOverlays
+            pollData={pollData}
+            setBetData={setBetData}
+            setPollData={setPollData}
+            betData={betData}
+            radiantWinChance={radiantWinChance}
+          />
+        </RestrictFeature>
 
         <MainScreenOverlays
           key='main-screen-overlays'

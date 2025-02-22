@@ -1,6 +1,7 @@
 import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
+import { RestrictFeature } from '@/components/RestrictFeature'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -50,18 +51,28 @@ export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type }
             isRight && '!justify-start',
           )}
         >
-          <AnimatedWL className={clsx(isRight && 'order-2')} key='animate-wl-class-main' wl={wl} />
-          <AnimatedRankBadge
-            className={clsx(isRight && 'order-1')}
-            key='animate-rank-badge-class-main'
-            rankImageDetails={rankImageDetails}
-          />
+          <RestrictFeature feature='commandWL'>
+            <AnimatedWL
+              className={clsx(isRight && 'order-2')}
+              key='animate-wl-class-main'
+              wl={wl}
+            />
+          </RestrictFeature>
+          <RestrictFeature feature='showRankImage'>
+            <AnimatedRankBadge
+              className={clsx(isRight && 'order-1')}
+              key='animate-rank-badge-class-main'
+              rankImageDetails={rankImageDetails}
+            />
+          </RestrictFeature>
         </div>
       </div>
       {shouldBlock && (
-        <motion.div key='animated-hero-blocker' {...motionProps} className='absolute'>
-          <HeroBlocker type={type} teamName={team} />
-        </motion.div>
+        <RestrictFeature feature='picks-blocker'>
+          <motion.div key='animated-hero-blocker' {...motionProps} className='absolute'>
+            <HeroBlocker type={type} teamName={team} />
+          </motion.div>
+        </RestrictFeature>
       )}
     </>
   )

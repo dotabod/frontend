@@ -1,5 +1,6 @@
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
+import { RestrictFeature } from '@/components/RestrictFeature'
 import { Settings } from '@/lib/defaultSettings'
 import { isDev } from '@/lib/devConsts'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
@@ -10,8 +11,8 @@ import { type RankType, getRankDetail, getRankImage } from '@/lib/ranks'
 import { clsx } from 'clsx'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import io from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
+import io from 'socket.io-client'
 
 let socket: Socket | null = null
 function WidgetPage() {
@@ -108,20 +109,24 @@ function WidgetPage() {
           left: wlPosition.left ?? undefined,
         }}
       >
-        <AnimatedWL
-          key='animate-wl-class'
-          wl={wl}
-          className={clsx('block', isRight && 'order-2')}
-        />
+        <RestrictFeature feature='commandWL'>
+          <AnimatedWL
+            key='animate-wl-class'
+            wl={wl}
+            className={clsx('block', isRight && 'order-2')}
+          />
+        </RestrictFeature>
 
-        <AnimatedRankBadge
-          className={clsx('block', isRight && 'order-1')}
-          key='animate-rank-badge-class'
-          rankImageDetails={{
-            ...rankImageDetails,
-            leaderboard: rankImageDetails.leaderboard ?? null,
-          }}
-        />
+        <RestrictFeature feature='showRankImage'>
+          <AnimatedRankBadge
+            className={clsx('block', isRight && 'order-1')}
+            key='animate-rank-badge-class'
+            rankImageDetails={{
+              ...rankImageDetails,
+              leaderboard: rankImageDetails.leaderboard ?? null,
+            }}
+          />
+        </RestrictFeature>
       </div>
     </div>
   )
