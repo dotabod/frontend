@@ -21,10 +21,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   // Check subscription access
   const subscription = await getSubscription(userId)
-  const { hasAccess } = canAccessFeature('autoInstaller', subscription)
+  const { hasAccess, requiredTier } = canAccessFeature('autoInstaller', subscription)
 
   if (!hasAccess) {
-    return res.status(403).json({ error: 'This feature requires a Pro subscription' })
+    return res.status(403).json({ error: 'This feature requires a subscription', requiredTier })
   }
 
   try {
