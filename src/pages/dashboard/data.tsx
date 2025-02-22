@@ -99,6 +99,14 @@ const DataPage = () => {
     })
   }
 
+  if (!session) {
+    return null
+  }
+
+  if (session.user.isImpersonating) {
+    return null
+  }
+
   return (
     <>
       <Head>

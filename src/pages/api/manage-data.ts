@@ -47,6 +47,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
+  if (session.user.isImpersonating) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
   try {
     const { action } = requestSchema.parse(req.body)
 
