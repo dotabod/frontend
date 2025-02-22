@@ -252,7 +252,10 @@ export default function ChatBot() {
                 <>
                   <StepComponent
                     hideTitle={true}
-                    status={stepOneComplete ? 'finish' : undefined}
+                    stepProps={[
+                      { status: stepOneComplete ? 'finish' : undefined },
+                      { status: stepModComplete ? 'finish' : undefined },
+                    ]}
                     steps={[
                       <span className='flex flex-col space-y-4' key={1}>
                         {!stepOneComplete ? (
@@ -284,13 +287,6 @@ export default function ChatBot() {
                           </div>
                         )}
                       </span>,
-                    ]}
-                  />
-
-                  <StepComponent
-                    hideTitle={true}
-                    status={stepModComplete ? 'finish' : undefined}
-                    steps={[
                       <span className='flex flex-row items-center space-x-2' key={1}>
                         {makeDotabodModLoading && <Spin size='small' spinning={loading} />}
                         {!stepModComplete ? (
@@ -311,13 +307,44 @@ export default function ChatBot() {
               label: 'Manual',
               key: 'manual',
               children: (
-                <div>
-                  <p>To manually add Dotabod as a moderator:</p>
-                  <ol className='list-decimal pl-4'>
-                    <li>Go to your Twitch chat</li>
-                    <li>Type the command: /mod dotabod</li>
-                  </ol>
-                </div>
+                <StepComponent
+                  stepProps={[{ status: stepOneComplete ? 'finish' : undefined }]}
+                  hideTitle={true}
+                  steps={[
+                    <span className='flex flex-col space-y-4' key={1}>
+                      {!stepOneComplete ? (
+                        <>
+                          <div>
+                            <span>
+                              Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
+                            </span>
+                            <span className='text-xs text-gray-500'>
+                              {' '}
+                              (you can change it later)
+                            </span>
+                          </div>
+                          <MmrForm hideText={true} />
+                        </>
+                      ) : (
+                        <div>
+                          <span>
+                            Dotabod knows your MMR.{' '}
+                            <Link
+                              href='/dashboard/features'
+                              onClick={() => {
+                                track('chatbot/change_mmr')
+                              }}
+                            >
+                              Change it
+                            </Link>
+                          </span>
+                        </div>
+                      )}
+                    </span>,
+                    <span key={1}>Go to your Twitch chat</span>,
+                    <span key={2}>Type the command: /mod dotabod</span>,
+                  ]}
+                />
               ),
             },
           ]}
@@ -393,27 +420,53 @@ export default function ChatBot() {
                       <div className='flex flex-row items-center space-x-2'>
                         {!hasAuto7TVAccess || !user?.hasDotabodEditor ? (
                           <div>
-                            <div>
-                              <span>You must add Dotabod as an editor </span>
-                              <Button
-                                className='!pl-0'
-                                target='_blank'
-                                type='link'
-                                href='https://7tv.app/settings/editors'
-                                icon={<ExternalLinkIcon size={14} />}
-                                iconPosition='end'
-                                onClick={() => {
-                                  track('7TV Add Editor')
-                                }}
-                              >
-                                on your 7TV account
-                              </Button>
-                            </div>
+                            {user?.hasDotabodEmoteSet ? (
+                              <div>
+                                <div>
+                                  You already have all the required emotes, but you still need to
+                                  add Dotabod as an editor to enable auto-updates.
+                                </div>
+                                <div>
+                                  <Button
+                                    className='!pl-0'
+                                    target='_blank'
+                                    type='link'
+                                    href='https://7tv.app/settings/editors'
+                                    icon={<ExternalLinkIcon size={14} />}
+                                    iconPosition='end'
+                                    onClick={() => {
+                                      track('7TV Add Editor')
+                                    }}
+                                  >
+                                    Add Dotabod as editor on 7TV
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <div>
+                                  <span>You must add Dotabod as an editor </span>
+                                  <Button
+                                    className='!pl-0'
+                                    target='_blank'
+                                    type='link'
+                                    href='https://7tv.app/settings/editors'
+                                    icon={<ExternalLinkIcon size={14} />}
+                                    iconPosition='end'
+                                    onClick={() => {
+                                      track('7TV Add Editor')
+                                    }}
+                                  >
+                                    on your 7TV account
+                                  </Button>
+                                </div>
 
-                            <div className='flex flex-row items-center space-x-3'>
-                              {loading && <Spin size='small' spinning={true} />}
-                              <span>Waiting for Dotabod to become an editor...</span>
-                            </div>
+                                <div className='flex flex-row items-center space-x-3'>
+                                  {loading && <Spin size='small' spinning={true} />}
+                                  <span>Waiting for Dotabod to become an editor...</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div>Dotabod is an editor on your 7TV account.</div>
@@ -448,7 +501,7 @@ export default function ChatBot() {
                                   )}
                                 </div>
                               ) : (
-                                <div>The following emotes are ready to use!</div>
+                                <div>All required emotes have been added to your channel!</div>
                               )}
                             </>
                           )}
