@@ -1,8 +1,10 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import { useSubscription } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
+import { canAccessFeature } from '@/utils/subscription'
 import { Button, Select, notification } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -10,8 +12,6 @@ import Image from 'next/image'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { canAccessFeature } from '@/utils/subscription'
-import { useSubscription } from '@/hooks/useSubscription'
 
 const ModeratorsPage = () => {
   const track = useTrack()

@@ -5,8 +5,8 @@ import { Button, Form, Spin } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
-import { TierSwitch } from './TierSwitch'
 import { TierInput } from './TierInput'
+import { TierSwitch } from './TierSwitch'
 
 export default function QueueCard() {
   const { data: isEnabled, loading } = useUpdateSetting(Settings.queueBlocker)

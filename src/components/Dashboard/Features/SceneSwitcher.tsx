@@ -1,11 +1,11 @@
-import { Settings, defaultSettings, type SettingKeys } from '@/lib/defaultSettings'
+import { type SettingKeys, Settings, defaultSettings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { Input, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
-import { TierSwitch } from './TierSwitch'
 import { TierInput } from './TierInput'
+import { TierSwitch } from './TierSwitch'
 
 export default function SceneSwitcher(): JSX.Element {
   const { data: isEnabled, loading: l0 } = useUpdateSetting(Settings['obs-scene-switcher'])

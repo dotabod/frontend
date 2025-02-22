@@ -1,9 +1,9 @@
 import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { TierSwitch } from './TierSwitch'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 export default function MinimapCard(): JSX.Element {
   const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])

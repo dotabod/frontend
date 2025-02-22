@@ -1,10 +1,10 @@
-import * as z from 'zod'
 import {
   FEATURE_TIERS,
   SUBSCRIPTION_TIERS,
   type SubscriptionStatus,
   TIER_LEVELS,
 } from '@/utils/subscription'
+import * as z from 'zod'
 
 // Define schemas for each specific setting
 const settingsSchema = {

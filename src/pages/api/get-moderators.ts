@@ -3,10 +3,10 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
-import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 const TWITCH_MODERATED_CHANNELS_URL = 'https://api.twitch.tv/helix/moderation/moderators'
 

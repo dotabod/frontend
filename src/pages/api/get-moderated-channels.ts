@@ -4,10 +4,10 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { GENERIC_FEATURE_TIERS } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
-import { GENERIC_FEATURE_TIERS } from '@/utils/subscription'
 
 const TWITCH_MODERATED_CHANNELS_URL = 'https://api.twitch.tv/helix/moderation/channels'
 

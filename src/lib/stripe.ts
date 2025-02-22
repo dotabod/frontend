@@ -1,4 +1,4 @@
-import { getPriceId, PRICE_IDS } from '@/utils/subscription'
+import { PRICE_IDS, getPriceId } from '@/utils/subscription'
 
 export { getPriceId, PRICE_IDS }
 

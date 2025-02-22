@@ -1,10 +1,10 @@
 import prisma from '@/lib/db'
+import { PRICE_IDS } from '@/lib/stripe'
 import { stripe } from '@/lib/stripe-server'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import type { NextApiResponse } from 'next'
 import type { NextApiRequest } from 'next'
 import type Stripe from 'stripe'
-import { PRICE_IDS } from '@/lib/stripe'
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 // Disable the default body parser
 export const config = {

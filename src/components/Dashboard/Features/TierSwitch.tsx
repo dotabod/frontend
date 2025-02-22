@@ -1,8 +1,8 @@
-import { Switch } from 'antd'
-import { TierBadge } from './TierBadge'
 import type { SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import type { ChatterSettingKeys } from '@/utils/subscription'
+import { Switch } from 'antd'
+import { TierBadge } from './TierBadge'
 
 interface TierSwitchProps {
   settingKey: SettingKeys | ChatterSettingKeys

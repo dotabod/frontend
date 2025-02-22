@@ -5,10 +5,10 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
+import { FEATURE_TIERS, getSubscription } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { FEATURE_TIERS, getSubscription } from '@/utils/subscription'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

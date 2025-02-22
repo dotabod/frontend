@@ -1,6 +1,6 @@
-import { canAccessFeature, type FeatureTier, type GenericFeature } from '@/utils/subscription'
-import { useContext } from 'react'
 import { SubscriptionContext } from '@/hooks/SubscriptionProvider'
+import { type FeatureTier, type GenericFeature, canAccessFeature } from '@/utils/subscription'
+import { useContext } from 'react'
 
 export function useSubscription() {
   const context = useContext(SubscriptionContext)

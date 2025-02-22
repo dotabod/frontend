@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { PeriodToggle } from './PeriodToggle'
 import {
   type PricePeriod,
   SUBSCRIPTION_TIERS,
@@ -7,9 +5,11 @@ import {
   getCurrentPeriod,
 } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
-import Image from 'next/image'
-import Plan from '../Plan'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import { useState } from 'react'
+import Plan from '../Plan'
+import { PeriodToggle } from './PeriodToggle'
 interface BillingPlansProps {
   subscription: SubscriptionStatus | null
   showTitle?: boolean

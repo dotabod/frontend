@@ -1,13 +1,13 @@
+import { BillingPlans } from '@/components/Billing/BillingPlans'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
-import { BillingPlans } from '@/components/Billing/BillingPlans'
+import { useSubscription } from '@/hooks/useSubscription'
+import { getCurrentPeriod, isSubscriptionActive } from '@/utils/subscription'
+import { Button } from 'antd'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
-import { isSubscriptionActive, getCurrentPeriod } from '@/utils/subscription'
-import { Button } from 'antd'
-import { useSubscription } from '@/hooks/useSubscription'
-import { useSession } from 'next-auth/react'
 
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)

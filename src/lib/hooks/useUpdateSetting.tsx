@@ -1,16 +1,16 @@
+import { useSubscription } from '@/hooks/useSubscription'
 import { type SettingKeys, Settings } from '@/lib/defaultSettings'
+import {
+  type ChatterSettingKeys,
+  type FeatureTier,
+  type SubscriptionTier,
+  canAccessFeature,
+} from '@/utils/subscription'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
 import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
-import {
-  canAccessFeature,
-  type FeatureTier,
-  type SubscriptionTier,
-  type ChatterSettingKeys,
-} from '@/utils/subscription'
-import { useSubscription } from '@/hooks/useSubscription'
 
 interface UpdateProps {
   path?: any

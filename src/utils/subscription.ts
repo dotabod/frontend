@@ -1,6 +1,6 @@
+import prisma from '@/lib/db'
 import type { SettingKeys } from '@/lib/defaultSettings'
 import type { defaultSettings } from '@/lib/defaultSettings'
-import prisma from '@/lib/db'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters

@@ -1,8 +1,8 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import type { SubscriptionTier } from '@/utils/subscription'
 import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

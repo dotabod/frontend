@@ -12,12 +12,12 @@ import '@mantine/core/styles.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { App as AntProvider, ConfigProvider, theme } from 'antd'
 import 'antd/dist/reset.css'
+import { SubscriptionProvider } from '@/hooks/SubscriptionProvider'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
 import { Provider } from 'react-redux'
-import { SubscriptionProvider } from '@/hooks/SubscriptionProvider'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode

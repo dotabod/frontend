@@ -1,17 +1,17 @@
-import { Button, notification } from 'antd'
-import { useState } from 'react'
-import { signIn, useSession } from 'next-auth/react'
+import { createCheckoutSession } from '@/lib/stripe'
 import {
-  getPriceId,
+  type PricePeriod,
+  type SUBSCRIPTION_TIERS,
   type SubscriptionStatus,
   type SubscriptionTier,
   calculateSavings,
-  type SUBSCRIPTION_TIERS,
-  type PricePeriod,
+  getPriceId,
 } from '@/utils/subscription'
-import { createCheckoutSession } from '@/lib/stripe'
+import { Button, notification } from 'antd'
 import clsx from 'clsx'
 import { CheckIcon } from 'lucide-react'
+import { signIn, useSession } from 'next-auth/react'
+import { useState } from 'react'
 import { Logomark } from './Logo'
 
 function Plan({

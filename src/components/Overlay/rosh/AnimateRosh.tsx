@@ -1,6 +1,6 @@
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
 import { Settings } from '@/lib/defaultSettings'
-import { isDev, type blockType } from '@/lib/devConsts'
+import { type blockType, isDev } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 interface AnimateRoshProps {

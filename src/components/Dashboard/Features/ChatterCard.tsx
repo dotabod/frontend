@@ -1,12 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+import type { ChatterSettingKeys } from '@/utils/subscription'
 import { Tooltip } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import DotabodChatter from './DotabodChatter'
 import { TierSwitch } from './TierSwitch'
-import type { ChatterSettingKeys } from '@/utils/subscription'
 
 enum CATEGORIES {
   General = 'General',

@@ -1,9 +1,9 @@
 import { getServerSession } from '@/lib/api/getServerSession'
-import { stripe } from '@/lib/stripe-server'
-import prisma from '@/lib/db'
 import { authOptions } from '@/lib/auth'
-import type { NextApiRequest, NextApiResponse } from 'next'
+import prisma from '@/lib/db'
+import { stripe } from '@/lib/stripe-server'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
