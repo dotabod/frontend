@@ -17,6 +17,7 @@ import type { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
 import { Provider } from 'react-redux'
+import { SubscriptionProvider } from '@/hooks/SubscriptionProvider'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -89,7 +90,9 @@ const App = ({
           <MantineProvider>
             <Provider store={store}>
               <AntProvider>
-                {getLayout(<Component {...pageProps} />)}
+                <SubscriptionProvider>
+                  {getLayout(<Component {...pageProps} />)}
+                </SubscriptionProvider>
               </AntProvider>
             </Provider>
           </MantineProvider>

@@ -1,35 +1,12 @@
-import {
-  canAccessFeature,
-  type SubscriptionStatus,
-  type FeatureTier,
-} from '@/utils/subscription'
-import { useEffect, useState } from 'react'
+import { canAccessFeature, type FeatureTier } from '@/utils/subscription'
+import { useContext } from 'react'
+import { SubscriptionContext } from '@/hooks/SubscriptionProvider'
 
 export function useSubscription() {
-  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
-    null
-  )
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    async function getSubscription() {
-      setIsLoading(true)
-      const response = await fetch('/api/stripe/subscription')
-      if (response.ok) {
-        const data = await response.json()
-        setSubscription(data)
-      }
-      setIsLoading(false)
-    }
-
-    getSubscription()
-  }, [])
-
-  return {
-    subscription,
-    isLoading,
-    isSubscribed: subscription?.status === 'active',
-  }
+  const context = useContext(SubscriptionContext)
+  if (!context)
+    throw new Error('useSubscription must be used within SubscriptionProvider')
+  return context
 }
 
 export function useFeatureAccess(feature?: FeatureTier) {
