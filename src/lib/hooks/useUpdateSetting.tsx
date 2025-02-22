@@ -85,7 +85,21 @@ export const useUpdateLocale = (props?: UpdateProps) => {
 
 interface UpdateSettingResult<T = boolean> {
   data: T
-  original: unknown
+  original: {
+    beta_tester?: boolean
+    settings?: Array<{
+      key: string
+      value: unknown
+    }>
+    SteamAccount?: {
+      steam32Id: number
+      mmr: number
+      name: string | null
+      leaderboard_rank: number | null
+      connectedUserIds: string[]
+    }
+    mmr?: number
+  }
   error: unknown
   loading: boolean
   updateSetting: (newValue: T) => void
@@ -186,8 +200,8 @@ export function useUpdateSetting<T = boolean>(
   }
 
   return {
-    data: value,
-    original: data,
+    data: value as T,
+    original: data || {},
     error,
     loading,
     updateSetting,
