@@ -3,12 +3,14 @@ import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import type { FeatureTier, GenericFeature } from '@/utils/subscription'
 import clsx from 'clsx'
-import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useState } from 'react'
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string
+interface CardProps {
+  title?: React.ReactNode
   feature?: FeatureTier | GenericFeature
+  className?: string
+  children?: React.ReactNode
 }
 interface FeatureWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
   feature?: FeatureTier | GenericFeature

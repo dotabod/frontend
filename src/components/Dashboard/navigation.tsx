@@ -15,7 +15,7 @@ import {
   TvIcon,
 } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
-import { CreditCardIcon, Github, Info, ShieldCheck } from 'lucide-react'
+import { CircleDollarSignIcon, Github, HardDriveIcon, Info, ShieldCheck } from 'lucide-react'
 import Image from 'next/image'
 
 export const navigation = [
@@ -59,7 +59,13 @@ export const navigation = [
   {
     name: 'Billing',
     href: '/dashboard/billing',
-    icon: CreditCardIcon,
+    icon: CircleDollarSignIcon,
+    new: true,
+  },
+  {
+    name: 'Data',
+    href: '/dashboard/data',
+    icon: HardDriveIcon,
     new: true,
   },
   {
