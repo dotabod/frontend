@@ -26,9 +26,7 @@ export default function ModeratedChannels() {
   const track = useTrack()
 
   const [fetching, setFetching] = useState(false)
-  const [options, setOptions] = useState<
-    { value: string; label: string; image: string }[]
-  >([])
+  const [options, setOptions] = useState<{ value: string; label: string; image: string }[]>([])
   const fetchRef = useRef(0)
 
   const fetchModeratedChannels = useCallback(async () => {
@@ -84,12 +82,12 @@ export default function ModeratedChannels() {
   }, [track])
 
   const renderOptionLabel = (imageSrc, name) => (
-    <div className="flex flex-row items-center gap-2">
+    <div className='flex flex-row items-center gap-2'>
       <img
-        alt="User Profile"
+        alt='User Profile'
         width={30}
         height={30}
-        className="rounded-full flex"
+        className='rounded-full flex'
         onError={(e) => {
           e.currentTarget.src = '/images/hero/default.png'
         }}
@@ -112,7 +110,7 @@ export default function ModeratedChannels() {
         callbackUrl: '/dashboard/features',
       })
     },
-    [user, track]
+    [user, track],
   )
 
   const handleSignOut = useCallback(() => {
@@ -120,9 +118,7 @@ export default function ModeratedChannels() {
     signOut()
   }, [])
 
-  const currentPlan = plans.find(
-    (plan) => plan.name.toLowerCase() === subscription?.tier
-  )
+  const currentPlan = plans.find((plan) => plan.name.toLowerCase() === subscription?.tier)
 
   const allOptions = [
     {
@@ -143,15 +139,14 @@ export default function ModeratedChannels() {
   ]
 
   const fullOptions = allOptions.filter(
-    (option, index, self) =>
-      index === self.findIndex((o) => o.name === option.name)
+    (option, index, self) => index === self.findIndex((o) => o.name === option.name),
   )
 
   return (
-    <div className="flex flex-col flex-grow items-center moderated-channels">
+    <div className='flex flex-col flex-grow items-center moderated-channels'>
       {!user?.isImpersonating && (
-        <div className="mb-2 flex items-center gap-2">
-          <Link href="/dashboard/billing">
+        <div className='mb-2 flex items-center gap-2'>
+          <Link href='/dashboard/billing'>
             <Tag
               color={
                 subscription?.tier === SUBSCRIPTION_TIERS.PRO
@@ -161,7 +156,7 @@ export default function ModeratedChannels() {
                     : 'default'
               }
             >
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 {currentPlan?.logo}
                 {currentPlan?.name} Plan
               </div>
@@ -169,28 +164,27 @@ export default function ModeratedChannels() {
           </Link>
         </div>
       )}
-      <Tooltip title="Select a streamer account to manage" placement="right">
+      <Tooltip
+        title='Choose a channel to manage. Only streamers with an active Dotabod subscription will be shown.'
+        placement='right'
+      >
         <Select
           onClick={handleOnClick}
-          optionFilterProp="name"
+          optionFilterProp='name'
           showSearch={user?.role === 'admin'}
           onChange={handleOnChange}
           onSearch={debounceFetcher}
-          notFoundContent={fetching ? <Spin size="small" /> : null}
+          notFoundContent={fetching ? <Spin size='small' /> : null}
           labelRender={() => renderOptionLabel(user?.image, user?.name)}
           loading={loading}
           defaultValue={user?.name}
           style={{ width: '90%' }}
-          size="large"
+          size='large'
           options={fullOptions}
         />
       </Tooltip>
       {user?.isImpersonating && (
-        <Button
-          onClick={handleSignOut}
-          loading={isSigningOut}
-          style={{ marginTop: '10px' }}
-        >
+        <Button onClick={handleSignOut} loading={isSigningOut} style={{ marginTop: '10px' }}>
           <StopCircleIcon size={16} />
           <span>Stop managing</span>
         </Button>
