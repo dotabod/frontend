@@ -23,13 +23,13 @@ export function TierInput({
   ...inputProps
 }: TierInputProps) {
   const {
-    data: value,
+    data: rawValue,
     updateSetting,
     tierAccess,
   } = useUpdateSetting(settingKey)
 
   const isDisabled = externalDisabled || !tierAccess.hasAccess
-  const inputValue = externalValue ?? value
+  const inputValue = (externalValue ?? rawValue)?.toString() || ''
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     if (externalOnChange) {

@@ -19,17 +19,17 @@ export default function SceneSwitcher(): JSX.Element {
     data: obsDc,
     loading: l1,
     updateSetting: updateDc,
-  } = useUpdateSetting(Settings['obs-dc'])
+  } = useUpdateSetting<string>(Settings['obs-dc'])
   const {
     data: obsMini,
     loading: l2,
     updateSetting: updateMini,
-  } = useUpdateSetting(Settings['obs-minimap'])
+  } = useUpdateSetting<string>(Settings['obs-minimap'])
   const {
     data: obsPick,
     loading: l3,
     updateSetting: updatePicks,
-  } = useUpdateSetting(Settings['obs-picks'])
+  } = useUpdateSetting<string>(Settings['obs-picks'])
 
   const loading = l0 || l1 || l2 || l3
 
