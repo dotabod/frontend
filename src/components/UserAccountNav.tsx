@@ -15,7 +15,11 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
 }
 
 const UserButton = ({ user }: UserButtonProps) => {
-  const { data } = useSWR('/api/settings', fetcher)
+  const { data } = useSWR('/api/settings', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const isLive = data?.stream_online
 
   return (

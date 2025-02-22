@@ -13,6 +13,11 @@ const useMaybeSignout = (skip = false) => {
   const { data: requiresRefresh } = useSWR(
     shouldFetch ? '/api/check-requires-refresh' : null,
     fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
   )
 
   // Effect to sign out user if they lack the necessary scope or a refresh is required

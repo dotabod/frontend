@@ -1,6 +1,9 @@
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
-import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import {
+  useUpdateAccount,
+  useUpdateSetting,
+} from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/troubleshoot'
 import { Card } from '@/ui/card'
@@ -54,16 +57,23 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(true)
   const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`
   const track = useTrack()
-  const { error: makeDotabodModError, isLoading: makeDotabodModLoading } = useSWR(
-    '/api/make-dotabod-mod',
-    fetcher,
-  )
-  const { error: updateEmoteSetError, data: updateEmoteSetData } = useSWR(
+  const { error: makeDotabodModError, isLoading: makeDotabodModLoading } =
+    useSWR('/api/make-dotabod-mod', fetcher, {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    })
+  const { error: updateEmoteSetError } = useSWR(
     '/api/update-emote-set',
     (url) => {
       track('updateEmoteSet called')
       return fetcher(url)
     },
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   )
 
   useEffect(() => {
@@ -78,17 +88,22 @@ export default function ChatBot() {
             Array.isArray(data.user?.editors) &&
             !!data.user?.editors?.find(
               (editor: { id: string }) =>
-                editor.id?.toLowerCase() === '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase(),
+                editor.id?.toLowerCase() ===
+                '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase()
             ),
           hasDotabodEmoteSet: !!emotesRequired.every(
             (emote) =>
               Array.isArray(data.emote_set?.emotes) &&
-              data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),
+              data.emote_set?.emotes?.find(
+                (e: { name: string }) => e.name === emote.label
+              )
           ),
         }
 
         if (updateEmoteSetError) {
-          setUser((prev) => (prev ? { ...prev, hasDotabodEmoteSet: false } : null))
+          setUser((prev) =>
+            prev ? { ...prev, hasDotabodEmoteSet: false } : null
+          )
           clearInterval(intervalId)
         }
 
@@ -128,7 +143,11 @@ export default function ChatBot() {
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor
   const stepFourComplete = user?.hasDotabodEmoteSet
-  const initialStep = [stepTwoComplete, stepThreeComplete, stepFourComplete].filter(Boolean).length
+  const initialStep = [
+    stepTwoComplete,
+    stepThreeComplete,
+    stepFourComplete,
+  ].filter(Boolean).length
 
   return (
     <Card>
@@ -137,12 +156,18 @@ export default function ChatBot() {
         hideTitle={true}
         status={stepOneComplete ? 'finish' : undefined}
         steps={[
-          <span className='flex flex-col space-y-4' key={1}>
+          <span className="flex flex-col space-y-4" key={1}>
             {!stepOneComplete ? (
               <>
                 <div>
-                  <span>Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it</span>
-                  <span className='text-xs text-gray-500'> (you can change it later)</span>
+                  <span>
+                    Dotabod doesn&apos;t know your MMR right now, so let&apos;s
+                    tell it
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {' '}
+                    (you can change it later)
+                  </span>
                 </div>
                 <MmrForm hideText={true} />
               </>
@@ -159,12 +184,15 @@ export default function ChatBot() {
         status={stepModComplete ? 'finish' : undefined}
         steps={[
           // Check if dotabod is a moderator of the channel
-          <div key={2} className='flex flex-col space-y-2'>
-            <div className='flex flex-row items-center space-x-2'>
-              {makeDotabodModLoading && <Spin size='small' spinning={loading} />}
+          <div key={2} className="flex flex-col space-y-2">
+            <div className="flex flex-row items-center space-x-2">
+              {makeDotabodModLoading && (
+                <Spin size="small" spinning={loading} />
+              )}
               {makeDotabodModError ? (
                 <div>
-                  Dotabod needs to be a moderator in your Twitch channel to function properly.
+                  Dotabod needs to be a moderator in your Twitch channel to
+                  function properly.
                 </div>
               ) : (
                 <div>Dotabod is a moderator in your Twitch channel.</div>
@@ -181,26 +209,30 @@ export default function ChatBot() {
           { status: stepTwoComplete ? 'finish' : undefined },
           { status: stepThreeComplete ? 'finish' : undefined },
           {
-            status: stepFourComplete ? 'finish' : updateEmoteSetError ? 'error' : undefined,
+            status: stepFourComplete
+              ? 'finish'
+              : updateEmoteSetError
+                ? 'error'
+                : undefined,
           },
         ]}
         steps={[
-          <div key={1} className='flex flex-col space-y-2'>
-            <div className='flex flex-row items-center space-x-2'>
-              {loading && <Spin size='small' spinning={loading} />}
+          <div key={1} className="flex flex-col space-y-2">
+            <div className="flex flex-row items-center space-x-2">
+              {loading && <Spin size="small" spinning={loading} />}
               {!user ? (
                 <>
                   <div>
-                    You don't have a 7TV account setup yet! Dotabod uses 7TV to display emotes in
-                    your chat.{' '}
+                    You don't have a 7TV account setup yet! Dotabod uses 7TV to
+                    display emotes in your chat.{' '}
                   </div>
                   <div>
                     <Button
-                      target='_blank'
-                      type='primary'
-                      href='https://7tv.app/'
+                      target="_blank"
+                      type="primary"
+                      href="https://7tv.app/"
                       icon={<ExternalLinkIcon size={14} />}
-                      iconPosition='end'
+                      iconPosition="end"
                       onClick={() => {
                         track('7TV Register')
                       }}
@@ -216,18 +248,18 @@ export default function ChatBot() {
           </div>,
 
           <div key={2}>
-            <div className='flex flex-row items-center space-x-2'>
+            <div className="flex flex-row items-center space-x-2">
               {!user?.hasDotabodEditor ? (
                 <div>
                   <div>
                     <span>You must add Dotabod as an editor </span>
                     <Button
-                      className='!pl-0'
-                      target='_blank'
-                      type='link'
+                      className="!pl-0"
+                      target="_blank"
+                      type="link"
                       href={`https://7tv.app/users/${user?.id}`}
                       icon={<ExternalLinkIcon size={14} />}
-                      iconPosition='end'
+                      iconPosition="end"
                       onClick={() => {
                         track('7TV Add Editor')
                       }}
@@ -236,8 +268,8 @@ export default function ChatBot() {
                     </Button>
                   </div>
 
-                  <div className='flex flex-row items-center space-x-3'>
-                    {loading && <Spin size='small' spinning={true} />}
+                  <div className="flex flex-row items-center space-x-3">
+                    {loading && <Spin size="small" spinning={true} />}
                     <span>Waiting for Dotabod to become an editor...</span>
                   </div>
                 </div>
@@ -247,24 +279,24 @@ export default function ChatBot() {
             </div>
           </div>,
           <div key={3}>
-            <div className='flex flex-row items-center space-x-2 mb-4'>
-              <div className='flex flex-col'>
+            <div className="flex flex-row items-center space-x-2 mb-4">
+              <div className="flex flex-col">
                 {updateEmoteSetError ? (
-                  <div className='m-4'>
+                  <div className="m-4">
                     <Alert
-                      message='There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually.'
-                      type='error'
+                      message="There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually."
+                      type="error"
                       showIcon
                     />
                   </div>
                 ) : (
                   <>
                     {!user?.hasDotabodEditor || !user?.hasDotabodEmoteSet ? (
-                      <div className='flex flex-row space-x-4'>
-                        <Spin size='small' spinning={true} />
+                      <div className="flex flex-row space-x-4">
+                        <Spin size="small" spinning={true} />
                         <p>
-                          Dotabod will be able to use the following emotes after the previous steps
-                          are completed.
+                          Dotabod will be able to use the following emotes after
+                          the previous steps are completed.
                         </p>
                       </div>
                     ) : (
@@ -291,17 +323,23 @@ export default function ChatBot() {
                 return 0
               })}
               renderItem={({ id, label }) => {
-                const added = user?.hasDotabodEmoteSet || emotes.find((e) => e?.name === label)
+                const added =
+                  user?.hasDotabodEmoteSet ||
+                  emotes.find((e) => e?.name === label)
 
                 return (
                   <List.Item key={label}>
                     <div className={clsx('flex items-center space-x-1')}>
                       <Tooltip title={label}>
-                        <a href={`https://7tv.app/emotes/${id}`} target='_blank' rel='noreferrer'>
+                        <a
+                          href={`https://7tv.app/emotes/${id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           <Image
                             className={clsx(
                               !added && 'grayscale group-hover:grayscale-0',
-                              'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
+                              'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300'
                             )}
                             height={60}
                             width={60}

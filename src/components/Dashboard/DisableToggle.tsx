@@ -8,7 +8,11 @@ import useSWR from 'swr'
 import { TierSwitch } from './Features/TierSwitch'
 
 const Toggle = () => {
-  const { data } = useSWR('/api/check-ban', fetcher)
+  const { data } = useSWR('/api/check-ban', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const {
     data: isDotabodDisabled,
     loading,
@@ -38,10 +42,18 @@ const Toggle = () => {
 }
 
 export function DisableToggle() {
-  const { data } = useSWR('/api/check-ban', fetcher)
+  const { data } = useSWR('/api/check-ban', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const { notification } = App.useApp()
   const user = useSession()?.data?.user
-  const { data: settingsData } = useSWR('/api/settings', fetcher)
+  const { data: settingsData } = useSWR('/api/settings', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const isLive = settingsData?.stream_online
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)

@@ -19,7 +19,11 @@ import useSWR from 'swr'
 const SetupPage = () => {
   const session = useSession()
   const track = useTrack()
-  const { data } = useSWR('/api/settings', fetcher)
+  const { data } = useSWR('/api/settings', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const isLive = data?.stream_online
 
   const [active, setActive] = useState(0)
