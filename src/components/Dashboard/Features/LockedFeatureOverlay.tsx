@@ -13,7 +13,8 @@ export function LockedFeatureOverlay({
   requiredTier,
   message = (
     <span>
-      Unlock this feature by upgrading to <TierBadge requiredTier={requiredTier} />
+      To use this feature, upgrade your plan and access the most powerful features of Dotabod for
+      your stream
     </span>
   ),
 }: LockedFeatureOverlayProps) {
@@ -22,30 +23,42 @@ export function LockedFeatureOverlay({
   }
 
   return (
-    <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/1 rounded-lg backdrop-blur-sm z-10'>
-      {requiredTier === 'pro' ? (
-        <Image
-          src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
-          width={68}
-          height={68}
-          className='rounded'
-          style={{ objectFit: 'contain' }}
-          alt='Starter'
-        />
-      ) : (
-        <Image
-          src='https://cdn.betterttv.net/emote/61f2f17c06fd6a9f5be2630a/3x.webp'
-          width={68}
-          height={68}
-          className='rounded'
-          style={{ objectFit: 'contain' }}
-          alt='Starter'
-        />
-      )}
-      <p className='text-white text-center mb-4'>{message}</p>
-      <Link href='/dashboard/billing'>
-        <Button type='primary'>Upgrade now</Button>
-      </Link>
+    <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg backdrop-blur-md z-10'>
+      <div className='flex flex-col items-center gap-6 p-8 max-w-lg'>
+        {requiredTier === 'pro' ? (
+          <Image
+            src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+            width={84}
+            height={84}
+            className='rounded-lg shadow-lg hover:scale-110 transition-transform duration-200'
+            style={{ objectFit: 'contain' }}
+            alt='Pro tier emote'
+          />
+        ) : (
+          <Image
+            src='https://cdn.betterttv.net/emote/61f2f17c06fd6a9f5be2630a/3x.webp'
+            width={84}
+            height={84}
+            className='rounded-lg shadow-lg hover:scale-110 transition-transform duration-200'
+            style={{ objectFit: 'contain' }}
+            alt='Starter tier emote'
+          />
+        )}
+        <TierBadge requiredTier={requiredTier} />
+
+        <div className='text-center'>
+          <p className='text-white text-lg font-medium mb-2'>{message}</p>
+          <Link href='/dashboard/billing'>
+            <Button
+              type='primary'
+              size='large'
+              className='shadow-lg hover:scale-105 transition-transform duration-200'
+            >
+              Upgrade now
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

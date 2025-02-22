@@ -4,6 +4,8 @@ import { useFeatureAccess } from '@/hooks/useSubscription'
 import type { FeatureTier, GenericFeature } from '@/utils/subscription'
 import clsx from 'clsx'
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
   feature?: FeatureTier | GenericFeature
@@ -24,7 +26,19 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
       {...props}
     >
       {children}
-      {!hasAccess && isHovered && <LockedFeatureOverlay requiredTier={requiredTier} />}
+      <AnimatePresence>
+        {!hasAccess && isHovered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className='absolute inset-0'
+          >
+            <LockedFeatureOverlay requiredTier={requiredTier} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
