@@ -3,6 +3,7 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierBadge } from './TierBadge'
 import { TierSwitch } from './TierSwitch'
 
 export default function MinimapCard(): JSX.Element {
@@ -86,7 +87,10 @@ export default function MinimapCard(): JSX.Element {
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
-          <span>Simple minimap</span>
+          <div className='flex items-center space-x-2'>
+            <TierBadge feature='minimap-simple' />
+            <span>Simple minimap</span>
+          </div>
         </div>
       </div>
     </Card>
