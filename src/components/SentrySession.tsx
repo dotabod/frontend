@@ -11,7 +11,7 @@ const SentrySession = () => {
       Sentry.setUser({
         id: data?.user?.id,
         username: data?.user?.name,
-        email: data?.user?.email,
+        email: data?.user?.email ?? undefined,
         twitchId: data?.user?.twitchId,
         locale: data?.user?.locale,
         isImpersonating: data?.user?.isImpersonating,

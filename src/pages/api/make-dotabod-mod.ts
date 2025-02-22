@@ -6,12 +6,16 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { captureException } from '@sentry/nextjs'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
+async function addModerator(broadcasterId: string | undefined, accessToken: string) {
+  if (!broadcasterId) {
+    throw new Error('Broadcaster ID is required')
+  }
 
-async function addModerator(broadcasterId: string, accessToken: string) {
   const checkUrl = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${broadcasterId}&user_id=${process.env.TWITCH_BOT_PROVIDERID}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    'Client-Id': process.env.TWITCH_CLIENT_ID,
+    'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
   }
 
   try {
@@ -43,10 +47,6 @@ async function addModerator(broadcasterId: string, accessToken: string) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' })
-  }
-
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
@@ -55,10 +55,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
+  const subscription = await getSubscription(session.user.id)
+  const { hasAccess } = canAccessFeature('autoModerator', subscription)
+
+  if (!hasAccess) {
+    return res.status(403).json({ message: 'Forbidden' })
+  }
+
   try {
-    const { providerAccountId, accessToken, error } = await getTwitchTokens(
-      session.user.id
-    )
+    const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
     if (error) {
       return res.status(403).json({ message: 'Forbidden' })
     }
@@ -67,9 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   } catch (error) {
     captureException(error)
     console.error('Failed to update mod:', error)
-    return res
-      .status(500)
-      .json({ message: 'Failed to update mod', error: error.message })
+    return res.status(500).json({ message: 'Failed to update mod', error: error.message })
   }
 }
 

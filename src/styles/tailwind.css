@@ -1,38 +1,37 @@
 @font-face {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-weight: 100 900;
   font-display: block;
   font-style: normal;
-  font-named-instance: 'Regular';
-  src: url('/fonts/Inter-roman.var.woff2') format('woff2');
+  font-named-instance: "Regular";
+  src: url("/fonts/Inter-roman.var.woff2") format("woff2");
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-weight: 100 900;
   font-display: block;
   font-style: italic;
-  font-named-instance: 'Italic';
-  src: url('/fonts/Inter-italic.var.woff2') format('woff2');
+  font-named-instance: "Italic";
+  src: url("/fonts/Inter-italic.var.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: 'RadianceM';
-  src: url('/fonts/radiancem_regular.otf') format('opentype');
+  font-family: "RadianceM";
+  src: url("/fonts/radiancem_regular.otf") format("opentype");
   font-weight: normal;
 }
 
 @font-face {
-  font-family: 'Radiance';
-  src: url('/fonts/radiance-regular.otf') format('opentype');
+  font-family: "Radiance";
+  src: url("/fonts/radiance-regular.otf") format("opentype");
   font-weight: normal;
 }
 
 @font-face {
-  font-family: 'Radiance';
-  src: url('/fonts/radiance-light.otf') format('opentype');
+  font-family: "Radiance";
+  src: url("/fonts/radiance-light.otf") format("opentype");
   font-weight: thin;
 }
-
 
 @tailwind base;
 @tailwind components;
@@ -41,32 +40,18 @@
 @layer base {
   .font-outline-4 {
     text-shadow:
-      #333 3px 0px 0px,
-      #333 2.83487px 0.981584px 0px,
-      #333 2.35766px 1.85511px 0px,
-      #333 1.62091px 2.52441px 0px,
-      #333 0.705713px 2.91581px 0px,
-      #333 -0.287171px 2.98622px 0px,
-      #333 -1.24844px 2.72789px 0px,
-      #333 -2.07227px 2.16926px 0px,
-      #333 -2.66798px 1.37182px 0px,
-      #333 -2.96998px 0.42336px 0px,
-      #333 -2.94502px -0.571704px 0px,
-      #333 -2.59586px -1.50383px 0px,
-      #333 -1.96093px -2.27041px 0px,
-      #333 -1.11013px -2.78704px 0px,
-      #333 -0.137119px -2.99686px 0px,
-      #333 0.850987px -2.87677px 0px,
-      #333 1.74541px -2.43999px 0px,
-      #333 2.44769px -1.73459px 0px,
-      #333 2.88051px -0.838247px 0px;
+      #333 3px 0px 0px, #333 2.83487px 0.981584px 0px, #333 2.35766px
+      1.85511px 0px, #333 1.62091px 2.52441px 0px, #333 0.705713px 2.91581px 0px,
+      #333 -0.287171px 2.98622px 0px, #333 -1.24844px 2.72789px 0px, #333
+      -2.07227px 2.16926px 0px, #333 -2.66798px 1.37182px 0px, #333 -2.96998px
+      0.42336px 0px, #333 -2.94502px -0.571704px 0px, #333 -2.59586px -1.50383px
+      0px, #333 -1.96093px -2.27041px 0px, #333 -1.11013px -2.78704px 0px, #333
+      -0.137119px -2.99686px 0px, #333 0.850987px -2.87677px 0px, #333 1.74541px
+      -2.43999px 0px, #333 2.44769px -1.73459px 0px, #333 2.88051px -0.838247px
+      0px;
   }
   .font-outline-2 {
-    text-shadow:
-      1px 0 0 #333,
-      0 -1px 0 #333,
-      0 1px 0 #333,
-      -1px 0 0 #333;
+    text-shadow: 1px 0 0 #333, 0 -1px 0 #333, 0 1px 0 #333, -1px 0 0 #333;
   }
 }
 
@@ -78,7 +63,7 @@
 .animate-border-rgb:after {
   @apply rounded-md;
 
-  content: '';
+  content: "";
   position: absolute;
   left: -2px;
   top: -2px;
@@ -154,9 +139,9 @@
 }
 
 @layer base {
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number'] {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
     -webkit-appearance: none;
     margin: 0;
     -moz-appearance: textfield !important;
@@ -203,10 +188,10 @@
   bottom: 0;
   width: 12.7vw;
   height: 100%;
-  aspect-ratio: 1/1;
+  aspect-ratio: 1 / 1;
   padding-left: 0.19%;
   background-color: black;
-  background-image: url('/images/overlay/minimap/blocker/bg/graphical.png');
+  background-image: url("/images/overlay/minimap/blocker/bg/graphical.png");
   background-size: 100%;
   background-position: 50% 50%;
   background-repeat: no-repeat;
@@ -219,20 +204,20 @@
   }
 
   &.simple {
-    background-image: url('/images/overlay/minimap/blocker/bg/simple.png');
+    background-image: url("/images/overlay/minimap/blocker/bg/simple.png");
     .fog {
       width: 100%;
       height: 100%;
       background: transparent;
     }
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('/images/overlay/minimap/blocker/bg/simple.png');
+      background-image: url("/images/overlay/minimap/blocker/bg/simple.png");
       background-size: 100%;
       background-position: 50% 50%;
       background-repeat: no-repeat;
@@ -375,8 +360,7 @@
   &.icon {
     .icon {
       filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
-        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
-        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
+        drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4)) drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
 
       &.enemy {
         filter: drop-shadow(0 0 0.2vw rgba(224, 40, 40, 0.4))
@@ -392,8 +376,7 @@
     width: 1.9vw;
     height: 1.9vw;
     filter: drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
-      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4))
-      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
+      drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4)) drop-shadow(0 0 0.2vw rgba(41, 240, 41, 0.4));
     transition: transform linear 2s;
 
     &.enemy {

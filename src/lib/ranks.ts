@@ -77,7 +77,7 @@ export function lookupLeaderRank({
   }
 
   const [myRank] = leaderRanks.filter(
-    (rank) => typeof standing === 'number' && standing <= rank.range[1]
+    (rank) => typeof standing === 'number' && standing <= rank.range[1],
   )
   return { myRank, mmr, standing }
 }
@@ -112,7 +112,7 @@ export function getRankDetail(mmr: string | number, standing: number | null) {
 // Used for obs overlay
 export function getRankImage(rank: RankType) {
   if (!rank?.mmr) {
-    return { image: '0.png', rank: null, leaderboard: false }
+    return { image: '0.png', rank: null, leaderboard: 0 }
   }
 
   return {

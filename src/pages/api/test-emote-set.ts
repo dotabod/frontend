@@ -27,8 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const authHeader = req.headers?.authorization
   if (
     process.env.VERCEL_ENV !== 'development' &&
-    (!process.env.CRON_SECRET ||
-      authHeader !== `Bearer ${process.env.CRON_SECRET}`)
+    (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`)
   ) {
     return res.status(401).json({ success: false })
   }
@@ -56,7 +55,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     console.log('Fetching user data from 7tv...')
     const response = await fetch(
-      `https://7tv.io/v3/users/twitch/${twitchId}?cacheBust=${Date.now()}`
+      `https://7tv.io/v3/users/twitch/${twitchId}?cacheBust=${Date.now()}`,
     )
     if (!response.ok) {
       throw new Error(`Failed to fetch user data: ${response.statusText}`)
@@ -76,7 +75,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     const createEmoteSetResult = (await client.request(
       CREATE_EMOTE_SET,
-      createEmoteSetVariables
+      createEmoteSetVariables,
     )) as { createEmoteSet: { id: string } } | undefined
     if (!createEmoteSetResult?.createEmoteSet?.id) {
       throw new Error('Failed to create emote set')
@@ -148,9 +147,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       throw new Error('Emote set not found')
     }
 
-    const emote = userEmoteSet.emoteSet.emotes.find(
-      (e: any) => e.name === 'TESTER'
-    )
+    const emote = userEmoteSet.emoteSet.emotes.find((e: any) => e.name === 'TESTER')
     if (!emote) {
       throw new Error('Emote not found in set')
     }
@@ -169,9 +166,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
       Sentry.captureException(error)
     })
-    res
-      .status(500)
-      .json({ message: 'Internal server error', error: error.message || error })
+    res.status(500).json({ message: 'Internal server error', error: error.message || error })
   } finally {
     if (emoteSetId) {
       await deleteEmoteSet(client, emoteSetId)

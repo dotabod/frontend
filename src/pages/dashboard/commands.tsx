@@ -17,10 +17,7 @@ const CommandsPage = () => {
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
-      const isEnabled = getValueOrDefault(
-        CommandDetail[command].key,
-        data?.settings
-      )
+      const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
       if (enabled === 'Enabled' && CommandDetail[command].key) {
         return isEnabled === true
       }
@@ -39,25 +36,28 @@ const CommandsPage = () => {
       return true
     })
     .filter((command) => {
-      let containsStringValue = false
-      ;['alias', 'title', 'description', 'cmd'].forEach((key) => {
-        if (Array.isArray(CommandDetail[command][key])) {
-          CommandDetail[command][key].forEach((alias) => {
+      if (!searchTerm) return true
+
+      const searchableKeys = ['alias', 'title', 'description', 'cmd']
+
+      for (const key of searchableKeys) {
+        const value = CommandDetail[command][key]
+
+        if (Array.isArray(value)) {
+          for (const alias of value) {
             if (
               alias.toLowerCase().includes(searchTerm) ||
               `!${alias.toLowerCase()}`.includes(searchTerm)
             ) {
-              containsStringValue = true
+              return true
             }
-          })
-        } else if (
-          CommandDetail[command][key].toLowerCase().includes(searchTerm)
-        ) {
-          containsStringValue = true
+          }
+        } else if (value.toLowerCase().includes(searchTerm)) {
+          return true
         }
-      })
+      }
 
-      return !(searchTerm && !containsStringValue)
+      return false
     })
 
   return (
@@ -66,11 +66,11 @@ const CommandsPage = () => {
         <title>Dotabod | Commands</title>
       </Head>
       <Header
-        subtitle="An exhaustive list of all commands available using Twitch chat."
-        title="Commands"
+        subtitle='An exhaustive list of all commands available using Twitch chat.'
+        title='Commands'
       />
 
-      <div className="flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap">
+      <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap'>
         <Segmented
           value={enabled}
           onChange={(v) => setEnabled(v as string)}
@@ -82,7 +82,7 @@ const CommandsPage = () => {
           options={['All', 'Mods', 'Plebs']}
         />
         <Input
-          placeholder="Search commands..."
+          placeholder='Search commands...'
           value={searchTerm}
           style={{ width: 300 }}
           maxLength={200}
@@ -90,15 +90,12 @@ const CommandsPage = () => {
         />
       </div>
       {filteredCommands.length < 1 && (
-        <Empty
-          description="Could not find any matching commands."
-          imageStyle={{ height: 60 }}
-        />
+        <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {filteredCommands.map((key, i) => (
-          <CommandsCard key={i} id={key} command={CommandDetail[key]} />
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3'>
+        {filteredCommands.map((key) => (
+          <CommandsCard key={key} id={key} command={CommandDetail[key]} />
         ))}
       </div>
     </>

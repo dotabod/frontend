@@ -1,3 +1,9 @@
+import {
+  FEATURE_TIERS,
+  SUBSCRIPTION_TIERS,
+  type SubscriptionStatus,
+  TIER_LEVELS,
+} from '@/utils/subscription'
 import * as z from 'zod'
 
 // Define schemas for each specific setting
@@ -104,17 +110,35 @@ const settingsSchema = {
   commandWinProbability: z.boolean(),
 }
 
-export const settingSchemas = z.object(settingsSchema)
 type SettingKeys = keyof typeof settingsSchema
 export const settingKeySchema = z.enum(
-  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]]
+  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],
 )
 
-export const dynamicSettingSchema = (key: SettingKeys) =>
-  z.object({
-    key: z.literal(key),
-    value: settingsSchema[key],
-  })
+// Helper function to check if user can access a setting based on their subscription
+export function canAccessSetting(
+  settingKey: SettingKeys,
+  subscription: SubscriptionStatus | null,
+): boolean {
+  const requiredTier = FEATURE_TIERS[settingKey] || SUBSCRIPTION_TIERS.PRO
+
+  if (!subscription || subscription.status !== 'active') {
+    return requiredTier === SUBSCRIPTION_TIERS.FREE
+  }
+
+  return TIER_LEVELS[subscription.tier] >= TIER_LEVELS[requiredTier]
+}
+
+// Add subscription validation to dynamic schema
+export const dynamicSettingSchema = (key: SettingKeys, subscription: SubscriptionStatus | null) =>
+  z
+    .object({
+      key: z.literal(key),
+      value: settingsSchema[key],
+    })
+    .refine(() => canAccessSetting(key, subscription), {
+      message: 'Your subscription tier does not have access to this feature',
+    })
 
 export const localePatchSchema = z.enum([
   'af-ZA',

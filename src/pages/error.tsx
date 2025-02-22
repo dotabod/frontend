@@ -22,48 +22,40 @@ const AuthErrorPage: NextPageWithLayout = () => {
       const decodedError = decodeURIComponent(errorParam)
 
       if (decodedError === 'ACCESS_DENIED') {
-        setErrorMessage(
-          'Something went wrong. You do not have permission to view this page.'
-        )
+        setErrorMessage('Something went wrong. You do not have permission to view this page.')
         return
       }
       if (decodedError === 'MODERATOR_ACCESS_DENIED') {
         setErrorMessage(
-          'You do not have permission to view this page. Only approved moderators for this streamer can access this page.'
+          'You do not have permission to view this page. Only approved moderators for this streamer can access this page.',
         )
         return
       }
       if (decodedError === 'NOT_APPROVED') {
         setErrorMessage(
-          'Your account has not been approved to manage this stream. Contact the streamer to get approved.'
+          'Your account has not been approved to manage this stream. Contact the streamer to get approved.',
         )
         return
       }
 
-      setErrorMessage(
-        'Something went wrong. Please try again or contact support.'
-      )
+      setErrorMessage('Something went wrong. Please try again or contact support.')
     }
   }, [router.query.error])
 
   return (
     <div
-      className="grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem),1fr]"
+      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem),1fr]'
       style={{
         minHeight: 'inherit',
       }}
     >
-      <main className="mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8">
-        <div className="max-w-lg">
-          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">
-            Error
-          </h1>
-          {errorMessage && (
-            <p className="mt-6 text-base leading-7">{errorMessage}</p>
-          )}
-          <div className="mt-10">
-            <a href="/" className="text-sm font-semibold leading-7">
-              <span aria-hidden="true">&larr;</span> Back to home
+      <main className='mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8'>
+        <div className='max-w-lg'>
+          <h1 className='mt-4 text-3xl font-bold tracking-tight sm:text-5xl'>Error</h1>
+          {errorMessage && <p className='mt-6 text-base leading-7'>{errorMessage}</p>}
+          <div className='mt-10'>
+            <a href='/' className='text-sm font-semibold leading-7'>
+              <span aria-hidden='true'>&larr;</span> Back to home
             </a>
           </div>
         </div>

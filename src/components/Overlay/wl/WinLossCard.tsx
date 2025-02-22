@@ -20,12 +20,10 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
     <Card
       className={clsx(
         !className && 'rounded-r-none',
-        !className &&
-          mainScreen &&
-          'bg-transparent p-0 leading-none text-[#e4d98d]',
-        className
+        !className && mainScreen && 'bg-transparent p-0 leading-none text-[#e4d98d]',
+        className,
       )}
-      id="win-loss-card"
+      id='win-loss-card'
     >
       {wl.map(({ win, lose, type }) => (
         <div
@@ -34,11 +32,11 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
           className={clsx('w-full space-x-1', wl.length > 1 && 'font-mono')}
         >
           <span>{win || 0}</span>
-          <span className="text-green-400">W</span>
+          <span className='text-green-400'>W</span>
           <span>-</span>
           <span>{lose || 0}</span>
-          <span className="text-red-400">L</span>
-          {wl.length > 1 ? <span className="text-sm">{type}</span> : null}
+          <span className='text-red-400'>L</span>
+          {wl.length > 1 ? <span className='text-sm'>{type}</span> : null}
         </div>
       ))}
     </Card>

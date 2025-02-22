@@ -35,9 +35,7 @@ async function fetchLanguageProgress(languageId: string) {
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch Crowdin language progress. Status: ${response.status}`
-    )
+    throw new Error(`Failed to fetch Crowdin language progress. Status: ${response.status}`)
   }
 
   const data = await response.json()
@@ -54,9 +52,7 @@ async function fetchProject() {
 
   if (!response.ok) {
     console.log(await response.text())
-    throw new Error(
-      `Failed to fetch Crowdin project. Status: ${response.status}`
-    )
+    throw new Error(`Failed to fetch Crowdin project. Status: ${response.status}`)
   }
 
   const data = await response.json()
@@ -78,9 +74,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const languageProgress = await fetchLanguageProgress(languageId as string)
     const project = await fetchProject()
-    const { total, percentage } = await getTotalUsersForLanguage(
-      languageId as string
-    )
+    const { total, percentage } = await getTotalUsersForLanguage(languageId as string)
 
     res.status(200).json({
       total: languageId !== 'en' ? total : undefined,

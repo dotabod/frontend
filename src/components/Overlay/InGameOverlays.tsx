@@ -30,10 +30,10 @@ export const InGameOverlays = ({
 
   return (
     <>
-      <SpectatorText key="spectator-class" block={block} />
+      <SpectatorText key='spectator-class' block={block} />
 
       <AnimateRosh
-        key="animate-rosh-class"
+        key='animate-rosh-class'
         block={block}
         roshan={roshan}
         paused={paused}
@@ -47,7 +47,7 @@ export const InGameOverlays = ({
       />
 
       <AnimatedAegis
-        key="animate-aegis-class"
+        key='animate-aegis-class'
         block={block}
         paused={paused}
         aegis={aegis}
@@ -59,31 +59,24 @@ export const InGameOverlays = ({
         }}
       />
 
-      <NotablePlayers
-        players={notablePlayers}
-        key="animate-np-class"
-        block={block}
-      />
+      <NotablePlayers players={notablePlayers} key='animate-np-class' block={block} />
 
-      <MinimapBlocker block={block} key="minimap-blocker-class" />
+      <MinimapBlocker block={block} key='minimap-blocker-class' />
 
       <div
-        className={clsx(
-          'absolute flex items-end justify-end',
-          isRight && '!justify-start'
-        )}
-        id="ingame-wl-mmr-card"
+        className={clsx('absolute flex items-end justify-end', isRight && '!justify-start')}
+        id='ingame-wl-mmr-card'
         style={{ ...wlPosition, width: res({ w: 215 }) }}
       >
         <AnimatedWL
-          key="animate-wl-class"
+          key='animate-wl-class'
           wl={wl}
           className={clsx('block', isRight && 'order-2')}
         />
 
         <AnimatedRankBadge
           className={clsx('block', isRight && 'order-1')}
-          key="animate-rank-badge-class"
+          key='animate-rank-badge-class'
           rankImageDetails={rankImageDetails}
         />
       </div>

@@ -4,10 +4,8 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
-import {
-  dynamicSettingSchema,
-  settingKeySchema,
-} from '@/lib/validations/setting'
+import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
+import { FEATURE_TIERS, getSubscription } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -104,7 +102,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (session?.user?.isImpersonating) {
         // Filter out obsServerPassword
         data.settings = data.settings.filter(
-          (setting) => setting.key !== Settings.obsServerPassword
+          (setting) => setting.key !== Settings.obsServerPassword,
         )
       }
 
@@ -129,36 +127,51 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(422).json({ error: 'Invalid setting key' })
       }
 
+      // Get user's subscription
+      const subscription = await getSubscription(session.user.id)
       const validKey = keyValidation.data
-      const schema = dynamicSettingSchema(validKey)
-      const validatedBody = schema.parse(parsedBody)
+      const schema = dynamicSettingSchema(validKey, subscription)
 
-      if (session.user.isImpersonating) {
-        if (validatedBody.key === Settings.obsServerPassword) {
-          return res.status(403).json({ message: 'Forbidden' })
+      try {
+        const validatedBody = schema.parse(parsedBody)
+
+        if (session.user.isImpersonating) {
+          if (validatedBody.key === Settings.obsServerPassword) {
+            return res.status(403).json({ message: 'Forbidden' })
+          }
         }
+
+        const post = await prisma.setting.create({
+          data: {
+            key: validatedBody.key,
+            value: validatedBody.value,
+            userId: session.user.id,
+          },
+          select: {
+            id: true,
+          },
+        })
+
+        return res.json(post)
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          // Check if error is related to subscription access
+          const subscriptionError = error.errors.find(
+            (e) => e.message === 'Your subscription tier does not have access to this feature',
+          )
+          if (subscriptionError) {
+            return res.status(403).json({
+              error: 'Subscription tier does not have access to this feature',
+              requiredTier: FEATURE_TIERS[validKey],
+            })
+          }
+          return res.status(422).json(error.issues)
+        }
+        throw error
       }
-
-      const post = await prisma.setting.create({
-        data: {
-          key: validatedBody.key,
-          value: validatedBody.value,
-          userId: session.user.id,
-        },
-        select: {
-          id: true,
-        },
-      })
-
-      return res.json(post)
     } catch (error) {
       captureException(error)
       console.error('Error creating setting:', error)
-
-      if (error instanceof z.ZodError) {
-        return res.status(422).json(error.issues)
-      }
-
       return res.status(500).end()
     }
   }

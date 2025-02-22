@@ -2,12 +2,10 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-async function getApprovedModerators(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function getApprovedModerators(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
@@ -16,6 +14,16 @@ async function getApprovedModerators(
 
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Unauthorized' })
+  }
+
+  const subscription = await getSubscription(session.user.id)
+  const tierAccess = canAccessFeature('managers', subscription)
+
+  if (!tierAccess.hasAccess) {
+    return res.status(403).json({
+      error: true,
+      message: 'This feature requires Pro subscription',
+    })
   }
 
   try {
@@ -32,9 +40,7 @@ async function getApprovedModerators(
     })
     res.status(200).json(moderators)
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: `Failed to fetch approved moderators: ${error.message}` })
+    res.status(500).json({ error: `Failed to fetch approved moderators: ${error.message}` })
   }
 }
 

@@ -10,15 +10,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactNode, useEffect, useState } from 'react'
 import CodeBlock from './CodeBlock'
+import { FeatureWrapper } from '@/ui/card'
 
 const { Step } = Steps
 
 const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
   const steps = [
     {
-      title: !errorWithoutSuccess
-        ? 'Connection check'
-        : 'Connection check failed',
+      title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',
       description: errorWithoutSuccess ? (
         'Please try again or reach out on Discord for more help.'
       ) : (
@@ -31,12 +30,9 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
               muted
               loop
               playsInline
-              className="w-full h-auto max-w-3xl rounded-lg"
+              className='w-full h-auto max-w-3xl rounded-lg'
             >
-              <source
-                src="/images/setup/how-to-automated-install.mp4"
-                type="video/mp4"
-              />
+              <source src='/images/setup/how-to-automated-install.mp4' type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           )}
@@ -56,16 +52,14 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
   let icon: ReactNode = null
 
   if (errorWithoutSuccess) {
-    icon = (
-      <ExclamationCircleOutlined style={{ color: 'var(--color-red-500)' }} />
-    )
+    icon = <ExclamationCircleOutlined style={{ color: 'var(--color-red-500)' }} />
   }
 
   return (
-    <Steps direction="vertical" current={currentStep}>
+    <Steps direction='vertical' current={currentStep}>
       {steps.map((step, index) => (
         <Step
-          key={index}
+          key={step.title}
           title={step.title}
           description={step.description}
           icon={
@@ -75,13 +69,7 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
               <LoadingOutlined />
             ) : null
           }
-          status={
-            currentStep > index
-              ? 'finish'
-              : currentStep === index
-                ? 'process'
-                : 'wait'
-          }
+          status={currentStep > index ? 'finish' : currentStep === index ? 'process' : 'wait'}
         />
       ))}
     </Steps>
@@ -93,9 +81,7 @@ const WindowsInstaller = () => {
   const router = useRouter()
   const session = useSession()
   const port = Number.parseInt(router.query.port as string, 10)
-  const sanitizedPort = Number.isNaN(port)
-    ? 8089
-    : Math.min(Math.max(port, 8000), 9000)
+  const sanitizedPort = Number.isNaN(port) ? 8089 : Math.min(Math.max(port, 8000), 9000)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
@@ -127,8 +113,8 @@ const WindowsInstaller = () => {
       const fetchToken = async () => {
         try {
           const response = await fetch(
-            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user.id)}`,
-            { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+            `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data?.user?.id ?? '')}`,
+            { method: 'GET', headers: { 'Content-Type': 'application/json' } },
           )
           if (!response.ok) {
             throw new Error('Network response was not ok')
@@ -146,10 +132,10 @@ const WindowsInstaller = () => {
 
       interval = setInterval(async () => {
         try {
-          const response = await fetch(
-            `http://localhost:${sanitizedPort}/status`,
-            { method: 'GET', headers: { 'Content-Type': 'application/json' } }
-          )
+          const response = await fetch(`http://localhost:${sanitizedPort}/status`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          })
           if (response.ok) {
             fetchToken()
             setError(null)
@@ -169,16 +155,15 @@ const WindowsInstaller = () => {
   }, [success, error, sanitizedPort, session?.data?.user?.id])
 
   return (
-    <>
+    <FeatureWrapper feature='autoInstaller'>
       <p>
-        <b>Why?</b> This step is necessary to ensure that Dota 2 knows which
-        data Dotabod requires. It&apos;s a Valve approved way of getting game
-        data.
+        <b>Why?</b> This step is necessary to ensure that Dota 2 knows which data Dotabod requires.
+        It&apos;s a Valve approved way of getting game data.
       </p>
-      <div className="flex flex-row justify-center pt-4">
+      <div className='flex flex-row justify-center pt-4'>
         <CodeBlock />
       </div>
-      <div className="mb-4">
+      <div className='mb-4'>
         <InstallationSteps
           success={success}
           errorWithoutSuccess={errorWithoutSuccess}
@@ -187,19 +172,19 @@ const WindowsInstaller = () => {
       </div>
       {success && (
         <Alert
-          className="max-w-2xl"
-          message="The Dotabod installer is running! You can continue on to the next step."
-          type="success"
+          className='max-w-2xl'
+          message='The Dotabod installer is running! You can continue on to the next step.'
+          type='success'
           showIcon
         />
       )}
-      <p className="space-x-2">
+      <p className='space-x-2'>
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
           <Link
-            target="_blank"
-            href="https://help.dotabod.com"
+            target='_blank'
+            href='https://help.dotabod.com'
             onClick={() => {
               track('setup/help_discord')
             }}
@@ -211,7 +196,7 @@ const WindowsInstaller = () => {
             onClick={() => {
               track('setup/manual_steps')
             }}
-            href="/dashboard?step=2&gsiType=manual"
+            href='/dashboard?step=2&gsiType=manual'
           >
             the manual steps
           </Link>
@@ -220,13 +205,13 @@ const WindowsInstaller = () => {
       </p>
       {error && (
         <Alert
-          className="max-w-2xl"
+          className='max-w-2xl'
           message={`An error occurred: ${error}`}
-          type="error"
+          type='error'
           showIcon
         />
       )}
-    </>
+    </FeatureWrapper>
   )
 }
 

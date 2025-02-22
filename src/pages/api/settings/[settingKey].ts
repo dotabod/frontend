@@ -4,10 +4,8 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
-import {
-  dynamicSettingSchema,
-  settingKeySchema,
-} from '@/lib/validations/setting'
+import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
+import { getSubscription } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
@@ -42,7 +40,7 @@ async function handleGetRequest(
   req: NextApiRequest,
   res: NextApiResponse,
   userId: string,
-  settingKey: string
+  settingKey: string,
 ) {
   const session = await getServerSession(req, res, authOptions)
 
@@ -73,7 +71,7 @@ async function handlePatchRequest(
   req: NextApiRequest,
   res: NextApiResponse,
   userId: string,
-  settingKey: keyof typeof settingKeySchema.Values
+  settingKey: keyof typeof settingKeySchema.Values,
 ) {
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
@@ -84,10 +82,14 @@ async function handlePatchRequest(
   }
 
   try {
+    // Get user's subscription
+    const subscription = await getSubscription(userId)
+
     const parsedBody = JSON.parse(req.body)
     parsedBody.key = settingKey
 
-    const schema = dynamicSettingSchema(settingKey)
+    // Pass subscription to schema validation
+    const schema = dynamicSettingSchema(settingKey, subscription)
     const validatedBody = schema.parse(parsedBody)
 
     if (settingKey === Settings.mmr) {

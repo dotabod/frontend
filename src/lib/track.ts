@@ -8,14 +8,14 @@ export const useTrack = () => {
   const track = useCallback(
     (event: string, properties?: Parameters<typeof vercelTrack>[1]) => {
       const user = session?.data?.user
-      vercelTrack(event, { ...properties, user: user?.twitchId })
+      vercelTrack(event, { ...properties, user: user?.twitchId ?? '' })
       sendGTMEvent({
         event,
-        user: user?.twitchId,
+        user: user?.twitchId ?? '',
         ...properties,
       })
     },
-    [session]
+    [session],
   )
   return track
 }

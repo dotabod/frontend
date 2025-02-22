@@ -19,18 +19,16 @@ function getItem(item) {
 
   return {
     key: item.href,
-    icon: item.icon ? (
-      <item.icon className={clsx('h-4 w-4')} aria-hidden="true" />
-    ) : null,
+    icon: item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null,
     label: item.href ? (
       <Link
         {...props}
         href={item.href}
-        className="!text-gray-200 flex flex-row gap-2 items-center"
+        className='!text-gray-200 flex flex-row gap-2 items-center'
         target={item.href.startsWith('http') ? '_blank' : '_self'}
       >
         {item.name}
-        {item.new && <Tag color="green">New</Tag>}
+        {item.new && <Tag color='green'>New</Tag>}
       </Link>
     ) : (
       item.name
@@ -63,10 +61,7 @@ export default function DashboardShell({
     const lastUpdate = localStorage.getItem('lastSingleRunAPI')
     const now = new Date()
 
-    if (
-      !lastUpdate ||
-      now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000
-    ) {
+    if (!lastUpdate || now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000) {
       localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
 
       fetch('/api/update-followers').catch((error) => {
@@ -91,9 +86,9 @@ export default function DashboardShell({
 
   return (
     <>
-      <Layout className="h-full bg-gray-800">
+      <Layout className='h-full bg-gray-800'>
         <Sider
-          breakpoint="md"
+          breakpoint='md'
           onBreakpoint={(broken) => {
             setCollapsed(broken)
             setBroken(broken)
@@ -102,32 +97,29 @@ export default function DashboardShell({
             background: colorBgLayout,
           }}
           width={250}
-          className={clsx(
-            'border-r-transparent',
-            collapsed && '!min-w-11 !max-w-11'
-          )}
+          className={clsx('border-r-transparent', collapsed && '!min-w-11 !max-w-11')}
           trigger={null}
           collapsible
           collapsed={collapsed}
         >
-          <div className="logo" />
+          <div className='logo' />
 
-          <div className="flex flex-col items-end">
-            <div className="w-full md:max-w-xs">
-              <div className="m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center">
+          <div className='flex flex-col items-end'>
+            <div className='w-full md:max-w-xs'>
+              <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center'>
                 {!collapsed ? (
-                  <Link href="/">
-                    <DarkLogo className="h-full w-auto" />
+                  <Link href='/'>
+                    <DarkLogo className='h-full w-auto' />
                   </Link>
                 ) : (
-                  <Link href="/">
-                    <Logomark className="h-full w-auto" aria-hidden="true" />
+                  <Link href='/'>
+                    <Logomark className='h-full w-auto' aria-hidden='true' />
                   </Link>
                 )}
               </div>
 
               {!collapsed && (
-                <div className="flex justify-center py-4">
+                <div className='flex justify-center py-4'>
                   <ModeratedChannels />
                 </div>
               )}
@@ -140,11 +132,11 @@ export default function DashboardShell({
                   background: colorBgLayout,
                   borderInlineEnd: 'none',
                 }}
-                mode="inline"
+                mode='inline'
                 items={navigation.map((item, i) => {
                   if (
                     data?.user?.isImpersonating &&
-                    ['Setup', 'Managers'].includes(item.name)
+                    ['Setup', 'Managers', 'Billing'].includes(item.name)
                   ) {
                     return null
                   }
@@ -162,23 +154,21 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout
-          className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}
-        >
+        <Layout className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}>
           <Header
             className={clsx(
               '!bg-gray-900',
               broken && !collapsed && '!hidden',
-              'flex w-full items-center justify-between !p-8'
+              'flex w-full items-center justify-between !p-8',
             )}
           >
             <DisableToggle />
 
-            <div className="w-fit py-2">
+            <div className='w-fit py-2'>
               <UserAccountNav />
             </div>
           </Header>
-          <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
+          <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
             {children}
           </Content>
         </Layout>

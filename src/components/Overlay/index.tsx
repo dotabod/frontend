@@ -59,12 +59,17 @@ const OverlayPage = () => {
       type: 'U',
     },
   ])
-  const [radiantWinChance, setRadiantWinChance] = useState<WinChance>(null)
+  const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)
 
-  const [rankImageDetails, setRankImageDetails] = useState({
+  const [rankImageDetails, setRankImageDetails] = useState<{
+    image: string | null
+    rank: number | null
+    leaderboard: number | null
+    notLoaded?: boolean
+  }>({
     image: '0.png',
     rank: 0,
-    leaderboard: false,
+    leaderboard: 0,
     notLoaded: true,
   })
 
@@ -93,20 +98,14 @@ const OverlayPage = () => {
     if (!original) return
 
     const steamAccount = original.SteamAccount?.[0]
-    const rank = getRankDetail(
-      steamAccount?.mmr ?? original.mmr,
-      steamAccount?.leaderboard_rank
-    )
+    const rank = getRankDetail(steamAccount?.mmr ?? original.mmr, steamAccount?.leaderboard_rank)
 
     if (!rank) return
 
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard:
-        'standing' in rank
-          ? rank.standing
-          : (steamAccount?.leaderboard_rank ?? false),
+      leaderboard: 'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? false),
       notLoaded: false,
     }
 
@@ -157,8 +156,7 @@ const OverlayPage = () => {
         duration: 0,
         placement: 'bottomLeft',
         message: 'Authentication failed',
-        description:
-          'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+        description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
       })
     } else {
       notification.destroy('auth-error')
@@ -195,19 +193,17 @@ const OverlayPage = () => {
       <>
         <motion.div
           className={clsx('absolute right-0 mt-9 block max-w-xs')}
-          key="not-live"
+          key='not-live'
           {...motionProps}
         >
-          <Alert message="Dotabod is disabled!" />
+          <Alert message='Dotabod is disabled!' />
         </motion.div>
         <Image
-          key="dev-image"
+          key='dev-image'
           width={width}
           height={height}
           alt={`${block.type} dev screenshot`}
-          src={`/images/dev/${
-            block.type === 'spectator' ? 'playing' : block.type
-          }.png`}
+          src={`/images/dev/${block.type === 'spectator' ? 'playing' : block.type}.png`}
         />
       </>
     ) : null
@@ -225,22 +221,17 @@ const OverlayPage = () => {
         }
       `}</style>
       <AnimatePresence>
-        <motion.div key="not-detected" {...motionProps}>
+        <motion.div key='not-detected' {...motionProps}>
           <div
-            className={clsx(
-              'hidden',
-              isInIframe && rankImageDetails?.notLoaded ? '!block' : ''
-            )}
+            className={clsx('hidden', isInIframe && rankImageDetails?.notLoaded ? '!block' : '')}
           >
             <Center style={{ height }}>
-              <div className="space-y-6 rounded-md bg-gray-300 p-4">
+              <div className='space-y-6 rounded-md bg-gray-300 p-4'>
                 <Spin spinning>
-                  <div className="flex text-center">
-                    <div className="ml-3">
-                      <h3 className="text-2xl font-medium text-gray-800">
-                        Waiting for Dota
-                      </h3>
-                      <div className="mt-2 text-lg text-gray-700">
+                  <div className='flex text-center'>
+                    <div className='ml-3'>
+                      <h3 className='text-2xl font-medium text-gray-800'>Waiting for Dota</h3>
+                      <div className='mt-2 text-lg text-gray-700'>
                         <p>Dotabod hasn&apos;t detected your game yet.</p>
                       </div>
                     </div>
@@ -257,11 +248,11 @@ const OverlayPage = () => {
           setPollData={setPollData}
           betData={betData}
           radiantWinChance={radiantWinChance}
-          key="poll-overlays"
+          key='poll-overlays'
         />
 
         <MainScreenOverlays
-          key="main-screen-overlays"
+          key='main-screen-overlays'
           block={block}
           wl={wl}
           rankImageDetails={rankImageDetails}
@@ -269,13 +260,13 @@ const OverlayPage = () => {
 
         <PickScreenOverlays
           block={block}
-          key="hero-blocker-class"
+          key='hero-blocker-class'
           rankImageDetails={rankImageDetails}
           wl={wl}
         />
 
         <InGameOverlays
-          key="in-game-overlays"
+          key='in-game-overlays'
           block={block}
           wl={wl}
           rankImageDetails={rankImageDetails}
@@ -289,13 +280,11 @@ const OverlayPage = () => {
 
         {isDev && (
           <Image
-            key="dev-image"
+            key='dev-image'
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${
-              block.type === 'spectator' ? 'playing' : block.type
-            }.png`}
+            src={`/images/dev/${block.type === 'spectator' ? 'playing' : block.type}.png`}
           />
         )}
       </AnimatePresence>

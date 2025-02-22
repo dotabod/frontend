@@ -54,6 +54,13 @@ const extractCookieValue = (cookieHeader: string | string[], name: string) => {
   return name + cookieStringFull?.split(name)[1].split(';')[0]
 }
 
+if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
+  throw new Error('TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET is not set')
+}
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET is not set')
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -76,9 +83,7 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials, req) {
-        const channelToImpersonate = Number.parseInt(
-          credentials?.channelToImpersonate
-        )
+        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0')
         if (!channelToImpersonate) {
           captureException(new Error('Invalid channel ID'))
           throw new Error('ACCESS_DENIED')
@@ -90,18 +95,17 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const secureCookie =
-            process.env.NEXTAUTH_URL?.startsWith('https://') ??
-            !!process.env.VERCEL
+            process.env.NEXTAUTH_URL?.startsWith('https://') ?? !!process.env.VERCEL
           const cookieName = secureCookie
             ? '__Secure-next-auth.session-token'
             : 'next-auth.session-token'
           const sessionToken = extractCookieValue(headerCookies, cookieName)
           const actualToken = await decode({
-            secret: process.env.NEXTAUTH_SECRET,
+            secret: process.env.NEXTAUTH_SECRET ?? '',
             token: sessionToken.replace(`${cookieName}=`, ''),
           })
-          currentLoggedInUserId = actualToken.id
-          currentProviderId = actualToken.twitchId
+          currentLoggedInUserId = actualToken?.id ?? undefined
+          currentProviderId = actualToken?.twitchId ?? undefined
         } catch (e) {
           console.error(e)
           captureException(e, {
@@ -121,9 +125,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error('ACCESS_DENIED')
         }
 
-        const { providerAccountId, accessToken, error } = await getTwitchTokens(
-          currentLoggedInUserId
-        )
+        const { providerAccountId, accessToken, error } =
+          await getTwitchTokens(currentLoggedInUserId)
         if (error) {
           throw new Error('MODERATOR_ACCESS_DENIED')
         }
@@ -139,28 +142,20 @@ export const authOptions: NextAuthOptions = {
 
         if (!isAdmin) {
           // check to make sure they're still a moderator on twitch
-          const response = await getModeratedChannels(
-            providerAccountId,
-            accessToken
-          )
+          const response = await getModeratedChannels(providerAccountId, accessToken)
 
           if (
             Array.isArray(response) &&
             !response.find(
-              (channel) =>
-                Number.parseInt(channel.providerAccountId, 10) ===
-                channelToImpersonate
+              (channel) => Number.parseInt(channel.providerAccountId, 10) === channelToImpersonate,
             )
           ) {
-            captureException(
-              new Error('You are not a moderator for this channel'),
-              {
-                extra: {
-                  userId: currentLoggedInUserId,
-                  channelToImpersonate,
-                },
-              }
-            )
+            captureException(new Error('You are not a moderator for this channel'), {
+              extra: {
+                userId: currentLoggedInUserId,
+                channelToImpersonate,
+              },
+            })
             throw new Error('MODERATOR_ACCESS_DENIED')
           }
         }
@@ -192,7 +187,7 @@ export const authOptions: NextAuthOptions = {
               createdAt: true,
             },
             where: {
-              moderatorChannelId: Number.parseInt(currentProviderId, 10),
+              moderatorChannelId: Number.parseInt(currentProviderId ?? '0', 10),
               userId: userToImpersonate.userId,
             },
           })
@@ -236,9 +231,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: useBotScopes
-            ? `${defaultScopes} ${chatBotScopes}`
-            : defaultScopes,
+          scope: useBotScopes ? `${defaultScopes} ${chatBotScopes}` : defaultScopes,
         },
       },
     }),
@@ -248,6 +241,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         const encryptedId = await encode({
           token: {
+            image: token.picture ?? '',
             name: '',
             id: token.id,
             isImpersonating: token.isImpersonating,
@@ -255,7 +249,7 @@ export const authOptions: NextAuthOptions = {
             locale: '',
             scope: '',
           },
-          secret: process.env.NEXTAUTH_SECRET,
+          secret: process.env.NEXTAUTH_SECRET ?? '',
         })
         session.user.isImpersonating = token.isImpersonating
         session.user.locale = token.locale
@@ -264,7 +258,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token?.isImpersonating ? encryptedId : token.id
         session.user.name = token.name
         session.user.email = token?.isImpersonating ? '' : token.email
-        session.user.image = token.picture
+        session.user.image = token.picture ?? ''
         session.user.scope = token.scope
       }
 
@@ -276,6 +270,9 @@ export const authOptions: NextAuthOptions = {
       if (token.id) return token
 
       if (!user) {
+        if (!token.sub) {
+          throw new Error('User ID is required')
+        }
         token.id = token.sub
         return token
       }
@@ -297,7 +294,7 @@ export const authOptions: NextAuthOptions = {
 
       const provider = await prisma.user.findFirst({
         where: {
-          id: token.id || user.id || profile.sub,
+          id: token.id || user.id || profile?.sub,
         },
         select: {
           admin: {
@@ -320,7 +317,7 @@ export const authOptions: NextAuthOptions = {
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
       if (
         !isImpersonating &&
-        provider.displayName &&
+        provider?.displayName &&
         provider.displayName !== newUser.displayName &&
         account
       ) {
@@ -334,18 +331,21 @@ export const authOptions: NextAuthOptions = {
         })
       }
 
-      const twitchId = Number(provider.Account.providerAccountId)
+      const twitchId = Number(provider?.Account?.providerAccountId ?? '0')
+      if (!twitchId) {
+        throw new Error('Twitch ID is required')
+      }
       const isBotUser = twitchId === Number(process.env.TWITCH_BOT_PROVIDERID)
       const shouldRefresh =
-        account &&
-        ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
+        account && ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if (
-        (shouldRefresh || process.env.VERCEL_ENV !== 'production') &&
-        !isImpersonating
-      ) {
+      if ((shouldRefresh || process.env.VERCEL_ENV !== 'production') && !isImpersonating) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
+
+        if (!account) {
+          throw new Error('Account is required')
+        }
 
         await prisma.account.update({
           where: {
@@ -365,14 +365,14 @@ export const authOptions: NextAuthOptions = {
       }
 
       return {
-        locale: provider.locale,
+        locale: provider?.locale,
         twitchId: twitchId,
         id: user.id,
         name: newUser.displayName || newUser.name,
         email: newUser.email,
         picture: newUser.image,
         isImpersonating,
-        role: provider.admin?.role,
+        role: provider?.admin?.role,
         scope: account?.scope,
       }
     },

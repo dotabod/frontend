@@ -29,14 +29,11 @@ export function MagicCard({
         mouseX.set(e.clientX - left)
         mouseY.set(e.clientY - top)
       }}
-      className={clsx(
-        'group relative flex size-full overflow-hidden',
-        className
-      )}
+      className={clsx('group relative flex size-full overflow-hidden', className)}
     >
-      <div className="relative pointer-events-none z-20 w-full">{children}</div>
+      <div className='relative pointer-events-none z-20 w-full'>{children}</div>
       <motion.div
-        className="absolute pointer-events-none -inset-px opacity-0 transition duration-300 group-hover:opacity-100"
+        className='absolute pointer-events-none -inset-px opacity-0 transition duration-300 group-hover:opacity-100'
         style={{
           background: useMotionTemplate`
       radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px, ${gradientColor}, transparent 100%)

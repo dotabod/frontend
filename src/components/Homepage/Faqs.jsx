@@ -11,11 +11,11 @@ const faqs = [
         <div>
           Because we all have a little dota bod in us{' '}
           <Image
-            className="inline align-bottom"
-            src="/images/emotes/peepofat.gif"
+            className='inline align-bottom'
+            src='/images/emotes/peepofat.gif'
             height={28}
             width={28}
-            alt="peepofat"
+            alt='peepofat'
             unoptimized
           />
           . But also because dotabot was taken.
@@ -71,41 +71,33 @@ const faqs = [
 export function Faqs() {
   return (
     <section
-      id="faqs"
-      aria-labelledby="faqs-title"
-      className="border-t border-gray-500 py-20 sm:py-32"
+      id='faqs'
+      aria-labelledby='faqs-title'
+      className='border-t border-gray-500 py-20 sm:py-32'
     >
       <Container>
-        <div className="mx-auto max-w-2xl lg:mx-0">
-          <h2
-            id="faqs-title"
-            className="text-3xl font-medium tracking-tight text-gray-200"
-          >
+        <div className='mx-auto max-w-2xl lg:mx-0'>
+          <h2 id='faqs-title' className='text-3xl font-medium tracking-tight text-gray-200'>
             Frequently asked questions
           </h2>
-          <p className="mt-2 text-lg text-gray-300">
+          <p className='mt-2 text-lg text-gray-300'>
             If you have anything else you want to ask,{' '}
-            <Link
-              href="https://help.dotabod.com"
-              className="text-gray-200 underline"
-            >
+            <Link href='https://help.dotabod.com' className='text-gray-200 underline'>
               reach out to us on discord
             </Link>
             .
           </p>
         </div>
-        <ul className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:max-w-none lg:grid-cols-3">
+        <ul className='mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:max-w-none lg:grid-cols-3'>
           {faqs.map((column, columnIndex) => (
             <li key={columnIndex}>
-              <ul className="space-y-10">
+              <ul className='space-y-10'>
                 {column.map((faq, faqIndex) => (
                   <li key={faqIndex}>
-                    <h3 className="text-lg font-semibold leading-6 text-gray-200">
+                    <h3 className='text-lg font-semibold leading-6 text-gray-200'>
                       {faq.question}
                     </h3>
-                    <div className="mt-4 text-sm text-gray-300">
-                      {faq.answer}
-                    </div>
+                    <div className='mt-4 text-sm text-gray-300'>{faq.answer}</div>
                   </li>
                 ))}
               </ul>

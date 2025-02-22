@@ -150,9 +150,7 @@ const Particles: React.FC<ParticlesProps> = ({
     const translateY = 0
     const pSize = Math.floor(Math.random() * 2) + size
     const alpha = 0
-    const targetAlpha = Number.parseFloat(
-      (Math.random() * 0.6 + 0.1).toFixed(1)
-    )
+    const targetAlpha = Number.parseFloat((Math.random() * 0.6 + 0.1).toFixed(1))
     const dx = (Math.random() - 0.5) * 0.1
     const dy = (Math.random() - 0.5) * 0.1
     const magnetism = 0.1 + Math.random() * 4
@@ -190,12 +188,7 @@ const Particles: React.FC<ParticlesProps> = ({
 
   const clearContext = () => {
     if (context.current) {
-      context.current.clearRect(
-        0,
-        0,
-        canvasSize.current.w,
-        canvasSize.current.h
-      )
+      context.current.clearRect(0, 0, canvasSize.current.w, canvasSize.current.h)
     }
   }
 
@@ -213,10 +206,9 @@ const Particles: React.FC<ParticlesProps> = ({
     start1: number,
     end1: number,
     start2: number,
-    end2: number
+    end2: number,
   ): number => {
-    const remapped =
-      ((value - start1) * (end2 - start2)) / (end1 - start1) + start2
+    const remapped = ((value - start1) * (end2 - start2)) / (end1 - start1) + start2
     return remapped > 0 ? remapped : 0
   }
 
@@ -231,9 +223,7 @@ const Particles: React.FC<ParticlesProps> = ({
         canvasSize.current.h - circle.y - circle.translateY - circle.size, // distance from bottom edge
       ]
       const closestEdge = edge.reduce((a, b) => Math.min(a, b))
-      const remapClosestEdge = Number.parseFloat(
-        remapValue(closestEdge, 0, 20, 0, 1).toFixed(2)
-      )
+      const remapClosestEdge = Number.parseFloat(remapValue(closestEdge, 0, 20, 0, 1).toFixed(2))
       if (remapClosestEdge > 1) {
         circle.alpha += 0.02
         if (circle.alpha > circle.targetAlpha) {
@@ -245,11 +235,9 @@ const Particles: React.FC<ParticlesProps> = ({
       circle.x += circle.dx + vx
       circle.y += circle.dy + vy
       circle.translateX +=
-        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
-        ease
+        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) / ease
       circle.translateY +=
-        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
-        ease
+        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) / ease
 
       drawCircle(circle, true)
 
@@ -272,8 +260,8 @@ const Particles: React.FC<ParticlesProps> = ({
   }
 
   return (
-    <div className={className} ref={canvasContainerRef} aria-hidden="true">
-      <canvas ref={canvasRef} className="size-full" />
+    <div className={className} ref={canvasContainerRef} aria-hidden='true'>
+      <canvas ref={canvasRef} className='size-full' />
     </div>
   )
 }

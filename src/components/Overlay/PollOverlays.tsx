@@ -5,26 +5,18 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { AnimatePresence } from 'framer-motion'
 import { WinProbability } from './WinProbability'
 
-export const PollOverlays = ({
-  pollData,
-  betData,
-  radiantWinChance,
-  setPollData,
-  setBetData,
-}) => {
+export const PollOverlays = ({ pollData, betData, radiantWinChance, setPollData, setBetData }) => {
   const res = useTransformRes()
 
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
-  const { data: isWinProbEnabled } = useUpdateSetting(
-    Settings.winProbabilityOverlay
-  )
+  const { data: isWinProbEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
 
   if (!isEnabled || (!pollData && !betData && !isWinProbEnabled)) return null
 
   return (
     <div
-      className="absolute"
-      id="poll-and-bet-overlay"
+      className='absolute'
+      id='poll-and-bet-overlay'
       style={{
         right: res({ w: 1920 / 2 - 200 }),
         top: res({ h: 115 }),
@@ -32,13 +24,11 @@ export const PollOverlays = ({
         zIndex: 1,
       }}
     >
-      <AnimatePresence key="poll-primary">
-        {isWinProbEnabled && (
-          <WinProbability radiantWinChance={radiantWinChance} />
-        )}
+      <AnimatePresence key='poll-primary'>
+        {isWinProbEnabled && <WinProbability radiantWinChance={radiantWinChance} />}
         {pollData && (
           <PollOverlay
-            key="poll-overlay"
+            key='poll-overlay'
             endDate={pollData.endDate}
             title={pollData.title}
             choices={pollData.choices}
@@ -49,7 +39,7 @@ export const PollOverlays = ({
         )}
         {betData && (
           <PollOverlay
-            key="bet-overlay"
+            key='bet-overlay'
             endDate={betData.endDate}
             title={betData.title}
             choices={betData.outcomes}

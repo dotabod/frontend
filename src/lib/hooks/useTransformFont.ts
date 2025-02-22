@@ -5,12 +5,11 @@ export const useTransformFontSize = () => {
   const windowSize = useWindowSize()
   const href = useRouter()
 
-  const fontSize = (size) => {
-    if (
-      href?.asPath &&
-      typeof href.asPath === 'string' &&
-      !href.asPath.includes('overlay')
-    )
+  if (!windowSize) return 12
+
+  const fontSize = (size: number) => {
+    if (!windowSize || !windowSize.width || !windowSize.height) return size
+    if (href?.asPath && typeof href.asPath === 'string' && !href.asPath.includes('overlay'))
       return size
 
     // Set the default font size based on 1080p screen size
@@ -22,7 +21,7 @@ export const useTransformFontSize = () => {
     // Calculate the aspect ratio of 1080p
     const defaultAspectRatio = 16 / 9
 
-    let fontRatio
+    let fontRatio: number
 
     // If the screen aspect ratio is greater than the default aspect ratio, adjust based on width
     if (screenAspectRatio > defaultAspectRatio) {

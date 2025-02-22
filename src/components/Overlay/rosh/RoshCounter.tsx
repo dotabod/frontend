@@ -25,17 +25,12 @@ export const RoshCounter = ({ color, count, duration, onComplete, paused }) => {
           width: ${res({ w: 55 })}px !important;
         }
       `}</style>
-      <motion.div
-        key="rosh-counter"
-        {...motionProps}
-        style={style}
-        className="rosh-timer absolute"
-      >
+      <motion.div key='rosh-counter' {...motionProps} style={style} className='rosh-timer absolute'>
         <CountdownCircleTimer
           isPlaying={!paused}
           duration={duration}
           colors={color === 'red' ? '#ff0000' : '#a39800'}
-          trailColor="#0000000"
+          trailColor='#0000000'
           onComplete={onComplete}
           size={res({
             w: 55,

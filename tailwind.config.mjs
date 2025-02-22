@@ -13,9 +13,7 @@ const config = {
         return Object.keys(colorObj).reduce((vars, colorKey) => {
           const value = colorObj[colorKey]
           const cssVariable =
-            colorKey === 'DEFAULT'
-              ? `--color${colorGroup}`
-              : `--color${colorGroup}-${colorKey}`
+            colorKey === 'DEFAULT' ? `--color${colorGroup}` : `--color${colorGroup}-${colorKey}`
 
           const newVars =
             typeof value === 'string'

@@ -12,7 +12,7 @@ import { forwardRef } from 'react'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   label: string
-  translation?: CrowdinLanguage
+  translation?: CrowdinLanguage | undefined
   code: string
 }
 
@@ -20,53 +20,59 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
   ({ code, translation, label, ...others }: ItemProps, ref) => (
     <div
       ref={ref}
-      className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-2"
+      className='flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-2'
       {...others}
     >
       <span>{label}</span>
-      {!isNaN(translation?.data?.translationProgress) && (
-        <div style={{ width: 170 }} className="min-w-fit">
+      {!Number.isNaN(Number(translation?.data?.translationProgress)) && (
+        <div style={{ width: 170 }} className='min-w-fit'>
           <span
             className={clsx(
               'w-11',
               !translation?.data?.translationProgress && 'text-gray-600',
-              translation?.data?.translationProgress > 0 &&
+              translation?.data?.translationProgress &&
+                translation?.data?.translationProgress > 0 &&
                 translation?.data?.translationProgress < 80 &&
                 'text-amber-600',
-              translation?.data?.translationProgress > 80 && 'text-green-400'
+              translation?.data?.translationProgress &&
+                translation?.data?.translationProgress > 80 &&
+                'text-green-400',
             )}
           >
-            <Progress
-              size="small"
-              percent={translation?.data?.translationProgress}
-            />
+            <Progress size='small' percent={translation?.data?.translationProgress} />
           </span>
         </div>
       )}
     </div>
-  )
+  ),
 )
 
 SelectItem.displayName = 'SelectItem'
 
 export default function LanguageCard() {
-  const {
-    data: localeOption,
-    loading: loadingLocale,
-    update: updateLocale,
-  } = useUpdateLocale()
+  const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()
 
   const { isLoading, data } = useLanguageTranslations({
     languageId: localeOption?.locale,
   })
-  const languageProgress = getLanguageProgress(data, localeOption?.locale)
+  const languageProgress = getLanguageProgress(
+    data && {
+      ...data,
+      total: data.total ?? 0, // Provide default value of 0 for undefined total
+    },
+    localeOption?.locale,
+  )
 
-  const arr = (
-    data?.languageProgress ? Object.values(data?.languageProgress) : []
-  ).map((x) => {
-    const fullLanguage = Object.values(data?.project?.targetLanguages).find(
-      (t) => t.id === x.data.languageId
-    )
+  const arr = (data?.languageProgress ? Object.values(data.languageProgress) : []).map((x) => {
+    const fullLanguage = data?.project?.targetLanguages?.find((t) => t.id === x.data.languageId)
+
+    if (!fullLanguage) {
+      return {
+        value: 'en',
+        id: 'en-US',
+        label: 'English',
+      }
+    }
 
     return {
       value: fullLanguage.locale,
@@ -94,10 +100,10 @@ export default function LanguageCard() {
   })
 
   const UsedBy = () => (
-    <div className="space-x-1 flex flex-row items-center mb-2">
+    <div className='space-x-1 flex flex-row items-center mb-2'>
       <span>Used by</span>
       {isLoading ? (
-        <Spin size="small" />
+        <Spin size='small' />
       ) : (
         <>
           <NumberTicker value={data?.total || data?.percentage || 0} />
@@ -106,42 +112,38 @@ export default function LanguageCard() {
       )}
       <span>dotabods</span>
       <Image
-        className="inline align-bottom"
-        src="/images/emotes/peepofat.gif"
+        className='inline align-bottom'
+        src='/images/emotes/peepofat.gif'
         height={28}
         width={28}
         unoptimized
-        alt="peepofat"
+        alt='peepofat'
       />
     </div>
   )
 
   return (
     <Card>
-      <div className="title">
+      <div className='title'>
         <h3>Language</h3>
       </div>
-      <div className="subtitle mb-2">
-        The @dotabod Twitch chat bot will speak in this language.
-      </div>
+      <div className='subtitle mb-2'>The @dotabod Twitch chat bot will speak in this language.</div>
       {languageProgress?.data ? (
-        <div className="mt-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div className='mt-4'>
+          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
             <span>
-              <NumberTicker
-                value={languageProgress?.data?.translationProgress || 0}
-              />
+              <NumberTicker value={languageProgress?.data?.translationProgress || 0} />
               <span>% translated</span>
             </span>
             {data?.total === 1 && (
               <span>
                 You&apos;re the only one using this language
                 <Image
-                  className="inline align-bottom"
-                  src="https://cdn.7tv.app/emote/6293b16a3fae4eb13f5e5f60/2x.webp"
+                  className='inline align-bottom'
+                  src='https://cdn.7tv.app/emote/6293b16a3fae4eb13f5e5f60/2x.webp'
                   height={28}
                   width={28}
-                  alt="lonely"
+                  alt='lonely'
                 />
               </span>
             )}
@@ -155,20 +157,28 @@ export default function LanguageCard() {
         <Select
           showSearch
           filterOption={(input, option) =>
-            (arr.find((a) => a.value === option.value)?.label ?? '')
-              .toLowerCase()
-              .includes(input?.toLowerCase())
+            option
+              ? (arr.find((a) => a.value === option.value)?.label ?? '')
+                  .toLowerCase()
+                  .includes(input?.toLowerCase() ?? '')
+              : false
           }
           loading={loadingLocale || isLoading}
-          placeholder="Language selector"
-          className="w-full transition-all"
+          placeholder='Language selector'
+          className='w-full transition-all'
           options={arr.map((x) => ({
             value: x.value,
             label: (
               <SelectItem
                 label={x.label}
                 code={x.id}
-                translation={getLanguageProgress(data, x.value)}
+                translation={getLanguageProgress(
+                  data && {
+                    ...data,
+                    total: data.total ?? 0,
+                  },
+                  x.value,
+                )}
               />
             ),
           }))}
@@ -177,14 +187,15 @@ export default function LanguageCard() {
         />
       </div>
 
-      <div className="mt-2">
+      <div className='mt-2'>
         <Button
           loading={isLoading}
-          href="https://crowdin.com/project/dotabod"
-          target="_blank"
-          type="link"
+          href='https://crowdin.com/project/dotabod'
+          target='_blank'
+          type='link'
         >
-          {languageProgress?.data?.translationProgress < 100
+          {languageProgress?.data?.translationProgress != null &&
+          languageProgress.data.translationProgress < 100
             ? 'Help complete on Crowdin'
             : 'Fix locale issues on Crowdin'}
         </Button>

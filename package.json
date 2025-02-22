@@ -10,6 +10,7 @@
     "push": "doppler run -- bun prisma db push",
     "studio": "doppler run -- bun prisma studio",
     "build": "next build",
+    "build-local": "doppler run -- bun run build",
     "start": "next start",
     "lint": "next lint",
     "up": "bun upgrade-interactive --latest",
@@ -62,6 +63,7 @@
     "redux-socket.io-middleware": "^1.0.4",
     "retry": "^0.13.1",
     "socket.io-client": "^4.8.1",
+    "stripe": "^17.6.0",
     "swr": "^2.2.5",
     "tailwindcss": "^3.4.14",
     "tmi-emote-parse": "^2.0.0",
@@ -91,5 +93,6 @@
     "@prisma/engines",
     "@sentry/cli",
     "prisma"
-  ]
+  ],
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

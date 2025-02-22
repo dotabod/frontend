@@ -50,10 +50,10 @@ const OverlayPage = () => {
       </Head>
 
       <Header
-        subtitle="Take a peak to see if your OBS is showing the correct overlay. Try joining a live match to have this preview show some details."
-        title="Live preview"
+        subtitle='Take a peak to see if your OBS is showing the correct overlay. Try joining a live match to have this preview show some details.'
+        title='Live preview'
       />
-      <Spin size="large" tip="Loading overlay..." spinning={isLoading}>
+      <Spin size='large' tip='Loading overlay...' spinning={isLoading}>
         <div
           style={{
             width: `${scaledWidth}px`,
@@ -62,9 +62,9 @@ const OverlayPage = () => {
           }}
         >
           <iframe
-            title="dotabod overlay"
+            title='dotabod overlay'
             onLoad={() => setIsLoading(false)}
-            className="rounded-lg border border-gray-400"
+            className='rounded-lg border border-gray-400'
             src={`/overlay/${data?.user?.id}`}
             style={{
               transform: `scale(${scale})`,

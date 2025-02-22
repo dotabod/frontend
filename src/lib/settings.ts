@@ -1,43 +1,28 @@
-import { type SettingKeys, defaultSettings } from '@/lib/defaultSettings'
+import type { ChatterSettingKeys } from '@/utils/subscription'
+import type { SettingKeys } from './defaultSettings'
+import { defaultSettings } from './defaultSettings'
 
-export const getValueOrDefault = (
-  key: SettingKeys,
-  data?: { key: string; value: any }[]
-) => {
-  if (!Array.isArray(data) || !data.length || !data.filter(Boolean).length) {
-    return defaultSettings[key]
+type Setting = {
+  key: string
+  value: unknown
+}
+
+export function getValueOrDefault(
+  key: SettingKeys | ChatterSettingKeys | undefined,
+  settings?: Setting[],
+): unknown {
+  if (!key) return undefined
+
+  // Handle chatter settings
+  if (key.startsWith('chatters.')) {
+    const chattersData = settings?.find((s) => s.key === 'chatters')
+    const chatterKey = key.split('.')[1]
+    return (
+      chattersData?.value?.[chatterKey]?.enabled ?? defaultSettings.chatters[chatterKey].enabled
+    )
   }
 
-  const dbVal = data?.find((s) => s.key === key)?.value
-
-  // Undefined is not touching the option in FE yet
-  // So we give them our best default
-  if (dbVal === undefined) {
-    return defaultSettings[key]
-  }
-
-  try {
-    if (typeof dbVal === 'string') {
-      const val = JSON.parse(dbVal) as unknown as any
-      if (typeof val === 'object' && typeof defaultSettings[key] === 'object') {
-        return {
-          ...(defaultSettings[key] as any),
-          ...val,
-        }
-      }
-
-      return val
-    }
-
-    if (typeof dbVal === 'object' && typeof defaultSettings[key] === 'object') {
-      return {
-        ...(defaultSettings[key] as any),
-        ...dbVal,
-      }
-    }
-
-    return dbVal
-  } catch {
-    return dbVal
-  }
+  // Handle regular settings
+  const setting = settings?.find((s) => s.key === key)
+  return setting?.value ?? defaultSettings[key]
 }

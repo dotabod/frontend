@@ -77,11 +77,9 @@ export const selectMainHero = (state) =>
 
 export const selectHeroes = (state) => (state.heroes ? state.heroes : [])
 
-export const selectHeroUnits = (state) =>
-  state.hero_units ? state.hero_units : []
+export const selectHeroUnits = (state) => (state.hero_units ? state.hero_units : [])
 
-export const selectBuildings = (state) =>
-  state.buildings ? state.buildings : []
+export const selectBuildings = (state) => (state.buildings ? state.buildings : [])
 
 export const selectCreeps = (state) => (state.creeps ? state.creeps : [])
 

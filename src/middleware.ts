@@ -7,14 +7,7 @@ import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 
 export const config = {
-  matcher: [
-    '/',
-    '/login',
-    '/overlay/:path*',
-    '/api/:path*',
-    '/dashboard/:path*',
-    '/install',
-  ],
+  matcher: ['/', '/login', '/overlay/:path*', '/api/:path*', '/dashboard/:path*', '/install'],
 }
 
 export async function middleware(req: NextRequestWithAuth) {
@@ -47,10 +40,7 @@ export async function middleware(req: NextRequestWithAuth) {
     // but log the error to the console
     console.error(error)
   }
-  if (
-    req.nextUrl.pathname.startsWith('/dashboard') ||
-    req.nextUrl.pathname.endsWith('/overlay')
-  ) {
+  if (req.nextUrl.pathname.startsWith('/dashboard') || req.nextUrl.pathname.endsWith('/overlay')) {
     // Proceed with the authentication middleware for /dashboard paths
     return withAuth(req)
   }

@@ -28,10 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${
         process.env.STEAM_WEB_API
       }&steamids=${
-        !Array.isArray(steamIds)
-          ? steamIds
-          : steamIds.map(convertSteam32To64).join(',')
-      }}`
+        !Array.isArray(steamIds) ? steamIds : steamIds.map(convertSteam32To64).join(',')
+      }}`,
     )
 
     const json = await response.json()

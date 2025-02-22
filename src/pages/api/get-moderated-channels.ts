@@ -4,18 +4,19 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { GENERIC_FEATURE_TIERS } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
 
-const TWITCH_MODERATED_CHANNELS_URL =
-  'https://api.twitch.tv/helix/moderation/channels'
+const TWITCH_MODERATED_CHANNELS_URL = 'https://api.twitch.tv/helix/moderation/channels'
 
-export async function getModeratedChannels(
-  userId: string,
-  accessToken: string
-) {
+export async function getModeratedChannels(userId: string | undefined, accessToken: string) {
   try {
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
+
     const moderatedChannels: {
       broadcaster_id: string
       broadcaster_login: string
@@ -41,9 +42,7 @@ export async function getModeratedChannels(
       })
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch moderated channels: ${response.statusText}`
-        )
+        throw new Error(`Failed to fetch moderated channels: ${response.statusText}`)
       }
 
       const data = await response.json()
@@ -54,9 +53,7 @@ export async function getModeratedChannels(
       after = data.pagination?.cursor
     } while (after)
 
-    const broadcasterIds = moderatedChannels.map(
-      (channel) => channel.broadcaster_id
-    )
+    const broadcasterIds = moderatedChannels.map((channel) => channel.broadcaster_id)
 
     const userModeratedChannels = await prisma.account.findMany({
       where: {
@@ -88,15 +85,33 @@ export async function getModeratedChannels(
     return { message: 'Failed to get moderated channels', error: error.message }
   }
 }
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const search = req.query.search as string | undefined
 
-  if (session?.user?.isImpersonating) {
+  if (!session?.user?.id) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
-  if (!session?.user?.id) {
+  // Get channels that have the required tier
+  const eligibleChannels = await prisma.account.findMany({
+    where: {
+      user: {
+        subscription: {
+          tier: GENERIC_FEATURE_TIERS.managers,
+          status: 'active',
+        },
+      },
+    },
+    select: {
+      providerAccountId: true,
+    },
+  })
+
+  const eligibleChannelIds = new Set(eligibleChannels.map((c) => c.providerAccountId))
+
+  if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
@@ -127,21 +142,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
       take: 10,
     })
-    return res.status(200).json(users.map((user) => ({
-      value: user.providerAccountId,
-      label: user.user.name,
-      image: user.user.image,
-    })))
+    return res.status(200).json(
+      users.map((user) => ({
+        value: user.providerAccountId,
+        label: user.user.name,
+        image: user.user.image,
+      })),
+    )
   }
 
-  const { providerAccountId, accessToken, error } = await getTwitchTokens(
-    session.user.id
-  )
+  const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
   if (error) {
     return res.status(403).json({ message: 'Forbidden' })
   }
+
   const response = await getModeratedChannels(providerAccountId, accessToken)
-  return res.status(200).json(response)
+
+  // Filter response to only include channels with required tier
+  const filteredResponse = Array.isArray(response)
+    ? response.filter((channel) => eligibleChannelIds.has(channel.providerAccountId))
+    : response
+
+  return res.status(200).json(filteredResponse)
 }
 
 export default withMethods(['GET'], withAuthentication(handler))

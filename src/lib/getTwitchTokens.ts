@@ -7,6 +7,10 @@ const TWITCH_TOKEN_URL = 'https://id.twitch.tv/oauth2/token'
 const CLIENT_ID = process.env.TWITCH_CLIENT_ID
 const CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET
 
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  throw new Error('TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET is not set')
+}
+
 async function validateToken(accessToken: string) {
   const response = await fetch(TWITCH_VALIDATE_URL, {
     method: 'GET',
@@ -26,8 +30,8 @@ async function refreshToken(refreshToken: string) {
     body: new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: CLIENT_ID ?? '',
+      client_secret: CLIENT_SECRET ?? '',
     }),
   })
   return response

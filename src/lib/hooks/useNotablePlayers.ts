@@ -53,9 +53,7 @@ const devPlayers: NotablePlayer[] = [
 ]
 
 export const useNotablePlayers = () => {
-  const [notablePlayers, setNotablePlayers] = useState<NotablePlayer[]>(
-    isDev ? devPlayers : []
-  )
+  const [notablePlayers, setNotablePlayers] = useState<NotablePlayer[]>(isDev ? devPlayers : [])
 
   return { notablePlayers, setNotablePlayers }
 }

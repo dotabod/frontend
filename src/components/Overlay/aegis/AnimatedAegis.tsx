@@ -1,10 +1,10 @@
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
 import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import type { blockType } from '@/lib/devConsts'
 
 interface AnimatedAegisProps {
   block: blockType
@@ -16,12 +16,7 @@ interface AnimatedAegisProps {
   onComplete: () => void
 }
 
-export const AnimatedAegis = ({
-  aegis,
-  paused,
-  onComplete,
-  block,
-}: AnimatedAegisProps) => {
+export const AnimatedAegis = ({ aegis, paused, onComplete, block }: AnimatedAegisProps) => {
   const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.aegis)
 
@@ -33,8 +28,8 @@ export const AnimatedAegis = ({
       <CountdownCircleTimer
         isPlaying={!paused}
         duration={aegis.expireS}
-        colors="#0000000"
-        trailColor="#0000000"
+        colors='#0000000'
+        trailColor='#0000000'
         onComplete={onComplete}
         size={res({
           w: 55,

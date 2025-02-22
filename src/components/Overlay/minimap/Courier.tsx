@@ -14,13 +14,7 @@ const Courier = ({ data, team }) => {
       className={`container-courier ${isEnemy ? 'enemy' : ''}`}
       style={{ bottom: data.yposP, left: data.xposP }}
     >
-      {hasIcon && (
-        <img
-          className={`icon ${isFlying ? 'flying' : ''}`}
-          src={icon}
-          alt="courier"
-        />
-      )}
+      {hasIcon && <img className={`icon ${isFlying ? 'flying' : ''}`} src={icon} alt='courier' />}
     </div>
   )
 }
