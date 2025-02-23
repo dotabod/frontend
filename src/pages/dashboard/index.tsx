@@ -79,8 +79,8 @@ const SetupPage = () => {
           key: 'paid',
           message: isTrial ? 'Trial successful' : 'Payment successful',
           description: isTrial
-            ? 'Thank you for supporting Dotabod! You have 14 days of trial access.'
-            : 'Thank you for supporting Dotabod!',
+            ? 'Your 14-day trial with full access to all features has begun.'
+            : 'Thanks for subscribing to Dotabod! All premium features are now unlocked.',
           duration: 55,
         })
         // Clear the query params
