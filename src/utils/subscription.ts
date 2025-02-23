@@ -1,5 +1,6 @@
 import prisma from '@/lib/db'
 import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
+import type Stripe from 'stripe'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -11,7 +12,7 @@ export const SUBSCRIPTION_TIERS = {
 } as const
 
 export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
-export type SubscriptionTierStatus = 'active' | 'inactive' | 'past_due' | 'canceled' | 'trialing'
+export type SubscriptionTierStatus = Stripe.Subscription.Status
 
 export type SubscriptionStatus = {
   tier: SubscriptionTier
@@ -159,14 +160,13 @@ export function getRequiredTier(feature?: FeatureTier | GenericFeature): Subscri
     SUBSCRIPTION_TIERS.PRO
   )
 }
-
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
   subscription: SubscriptionStatus | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier = getRequiredTier(feature)
 
-  if (!subscription || subscription.status !== 'active') {
+  if (!subscription || !isSubscriptionActive(subscription)) {
     return {
       hasAccess: requiredTier === SUBSCRIPTION_TIERS.FREE,
       requiredTier,
@@ -178,9 +178,10 @@ export function canAccessFeature(
     requiredTier,
   }
 }
-
-export function isSubscriptionActive(subscription: SubscriptionStatus | null): boolean {
-  return subscription?.status === 'active'
+export function isSubscriptionActive(
+  subscription: { status: SubscriptionTierStatus | undefined } | null,
+): boolean {
+  return subscription?.status === 'active' || subscription?.status === 'trialing'
 }
 
 export interface SubscriptionPriceId {
@@ -217,45 +218,13 @@ export function getCurrentPeriod(priceId?: string): PricePeriod {
   return 'annual' // Default to annual if no match found
 }
 
-export function getButtonText(
-  currentSubscription: SubscriptionStatus | null,
-  targetTier: SubscriptionTier,
-  targetPeriod: PricePeriod,
-  defaultLabel: string,
-): string {
-  if (!currentSubscription || currentSubscription.status === 'inactive') {
-    if (targetTier === 'pro' && targetPeriod !== 'lifetime') {
-      return 'Start free trial'
-    }
-    return defaultLabel
-  }
-
-  if (currentSubscription.status === 'trialing') {
-    return 'Currently trialing'
-  }
-
-  const currentTier = currentSubscription.tier
-  const currentPeriod = getCurrentPeriod(currentSubscription.stripePriceId)
-
-  // If same tier but different period
-  if (currentTier === targetTier && currentPeriod !== targetPeriod) {
-    return `Switch to ${targetPeriod}`
-  }
-
-  // If same tier and period
-  if (currentTier === targetTier && currentPeriod === targetPeriod) {
-    return currentSubscription.cancelAtPeriodEnd ? 'Reactivate' : 'Current plan'
-  }
-
-  // If different tier
-  return TIER_LEVELS[targetTier] > TIER_LEVELS[currentTier] ? 'Upgrade' : 'Downgrade'
-}
-
 export function isButtonDisabled(
   subscription: SubscriptionStatus | null,
   targetTier: SubscriptionTier,
   targetPeriod: PricePeriod,
 ): boolean {
+  if (subscription?.status === 'trialing') return true
+
   // Free tier button should never be disabled
   if (targetTier === SUBSCRIPTION_TIERS.FREE) return false
 

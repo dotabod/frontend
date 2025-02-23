@@ -100,7 +100,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       user: {
         subscription: {
           tier: GENERIC_FEATURE_TIERS.managers,
-          status: 'active',
+          status: {
+            in: ['active', 'trialing'],
+          },
         },
       },
     },

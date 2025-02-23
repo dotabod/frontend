@@ -1,6 +1,5 @@
-import type { SubscriptionStatus } from '@/utils/subscription'
-import { useEffect, useState } from 'react'
-import { createContext } from 'react'
+import { type SubscriptionStatus, isSubscriptionActive } from '@/utils/subscription'
+import { createContext, useEffect, useState } from 'react'
 
 interface SubscriptionContextType {
   subscription: SubscriptionStatus | null
@@ -32,7 +31,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       value={{
         subscription,
         isLoading,
-        isSubscribed: subscription?.status === 'active',
+        isSubscribed: isSubscriptionActive({ status: subscription?.status }),
       }}
     >
       {children}

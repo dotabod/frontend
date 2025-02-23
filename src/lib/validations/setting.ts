@@ -3,6 +3,7 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionStatus,
   TIER_LEVELS,
+  isSubscriptionActive,
 } from '@/utils/subscription'
 import * as z from 'zod'
 
@@ -122,7 +123,7 @@ export function canAccessSetting(
 ): boolean {
   const requiredTier = FEATURE_TIERS[settingKey] || SUBSCRIPTION_TIERS.PRO
 
-  if (!subscription || subscription.status !== 'active') {
+  if (!subscription || !isSubscriptionActive({ status: subscription.status })) {
     return requiredTier === SUBSCRIPTION_TIERS.FREE
   }
 

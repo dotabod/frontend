@@ -103,8 +103,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       mode: isRecurring ? 'subscription' : 'payment',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXTAUTH_URL}/dashboard?paid=true`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/?paid=false`,
+      success_url: `${process.env.NEXTAUTH_URL}/dashboard?paid=true&trial=${isRecurring ? 'true' : 'false'}`,
+      cancel_url: req.headers.referer?.includes('/dashboard')
+        ? `${process.env.NEXTAUTH_URL}/dashboard/billing?paid=false`
+        : `${process.env.NEXTAUTH_URL}/?paid=false`,
       subscription_data: isRecurring
         ? {
             trial_period_days: 14,

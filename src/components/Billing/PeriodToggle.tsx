@@ -4,6 +4,7 @@ import {
   type SubscriptionStatus,
   calculateSavings,
   getCurrentPeriod,
+  isSubscriptionActive,
 } from '@/utils/subscription'
 import { Radio, RadioGroup } from '@headlessui/react'
 import clsx from 'clsx'
@@ -18,8 +19,8 @@ interface PeriodToggleProps {
 export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodToggleProps) {
   // Set initial period based on subscription
   useEffect(() => {
-    if (subscription?.status === 'active') {
-      const period = getCurrentPeriod(subscription.stripePriceId)
+    if (isSubscriptionActive({ status: subscription?.status })) {
+      const period = getCurrentPeriod(subscription?.stripePriceId)
       onChange(period)
     }
   }, [subscription, onChange])

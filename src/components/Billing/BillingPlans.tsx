@@ -4,6 +4,7 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionStatus,
   getCurrentPeriod,
+  isSubscriptionActive,
 } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
@@ -113,10 +114,11 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
         <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
           Simple pricing for every Dota 2 streamer
         </h2>
-        {subscription && subscription.status === 'active' && (
+        {subscription && isSubscriptionActive({ status: subscription.status }) && (
           <p className='mt-2 text-lg text-purple-400'>
             You are currently on the{' '}
             {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period})
+            {subscription.status === 'trialing' && ' (Trial)'}
           </p>
         )}
       </div>

@@ -6,6 +6,8 @@ import {
   type SubscriptionTier,
   calculateSavings,
   getPriceId,
+  isButtonDisabled,
+  isSubscriptionActive,
 } from '@/utils/subscription'
 import { Button, notification } from 'antd'
 import clsx from 'clsx'
@@ -55,7 +57,12 @@ function Plan({
 
   // Update description display to show trial info
   const displayDescription = () => {
-    if (hasTrial && tier === 'pro' && (!subscription || subscription.status !== 'active')) {
+    if (
+      hasTrial &&
+      tier === 'pro' &&
+      activePeriod !== 'lifetime' &&
+      (!subscription || subscription.status !== 'active')
+    ) {
       return (
         <>
           {description}
@@ -103,9 +110,8 @@ function Plan({
         window.location.href = '/dashboard'
         return
       }
-
-      // If user has an active subscription, redirect to portal
-      if (subscription?.status === 'active') {
+      // If user has an active subscription or is trialing, redirect to portal
+      if (isSubscriptionActive({ status: subscription?.status })) {
         const response = await fetch('/api/stripe/portal', {
           method: 'POST',
         })
@@ -256,6 +262,7 @@ function Plan({
       <Button
         loading={redirectingToCheckout}
         onClick={handleSubscribe}
+        disabled={isButtonDisabled(subscription, tier, activePeriod)}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
         className={clsx(

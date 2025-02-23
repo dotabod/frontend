@@ -46,7 +46,7 @@ const BillingPage = () => {
       </Head>
       <Header subtitle='Manage your billing information.' title='Billing' />
 
-      {subscription && subscription.status === 'active' && (
+      {subscription && isSubscriptionActive(subscription) && (
         <p>
           You are currently on the{' '}
           {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period}).{' '}

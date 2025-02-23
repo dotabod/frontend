@@ -29,6 +29,7 @@ const SetupPage = () => {
   const [active, setActive] = useState(0)
   const router = useRouter()
   const didJustPay = router.query.paid === 'true'
+  const isTrial = router.query.trial === 'true'
 
   const updateStepInUrl = (newActiveStep) => {
     // Update the URL without adding a new history entry
@@ -76,8 +77,10 @@ const SetupPage = () => {
       if (didJustPay) {
         notification.success({
           key: 'paid',
-          message: 'Payment successful',
-          description: 'Thank you for supporting Dotabod!',
+          message: isTrial ? 'Trial successful' : 'Payment successful',
+          description: isTrial
+            ? 'Thank you for supporting Dotabod! You have 14 days of trial access.'
+            : 'Thank you for supporting Dotabod!',
           duration: 55,
         })
         // Clear the query params
@@ -112,7 +115,7 @@ const SetupPage = () => {
 
       frame()
     }
-  }, [active, didJustPay, router.pathname, router.query, router.replace])
+  }, [active, didJustPay, isTrial, router.pathname, router.query, router.replace])
 
   if (session?.data?.user?.isImpersonating) {
     return null

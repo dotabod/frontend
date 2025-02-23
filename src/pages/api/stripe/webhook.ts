@@ -1,7 +1,7 @@
 import prisma from '@/lib/db'
 import { PRICE_IDS } from '@/lib/stripe'
 import { stripe } from '@/lib/stripe-server'
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, isSubscriptionActive } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
@@ -150,7 +150,7 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
     where: { userId: existingSubscription.userId },
     data: {
       status: subscription.status,
-      tier: subscription.status === 'active' ? tier : SUBSCRIPTION_TIERS.FREE,
+      tier: isSubscriptionActive({ status: subscription.status }) ? tier : SUBSCRIPTION_TIERS.FREE,
       stripePriceId: priceId,
       stripeSubscriptionId: subscription.id,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
