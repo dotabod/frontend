@@ -51,6 +51,7 @@ export const plans = [
   {
     name: 'Pro',
     featured: true,
+    hasTrial: true,
     price: {
       monthly: '$6',
       annual: '$57',

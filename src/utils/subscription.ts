@@ -11,7 +11,7 @@ export const SUBSCRIPTION_TIERS = {
 } as const
 
 export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
-export type SubscriptionTierStatus = 'active' | 'inactive' | 'past_due' | 'canceled'
+export type SubscriptionTierStatus = 'active' | 'inactive' | 'past_due' | 'canceled' | 'trialing'
 
 export type SubscriptionStatus = {
   tier: SubscriptionTier
@@ -19,6 +19,7 @@ export type SubscriptionStatus = {
   currentPeriodEnd?: Date
   cancelAtPeriodEnd?: boolean
   stripePriceId: string
+  trialEnd?: Date | null
 }
 
 export const TIER_LEVELS: Record<SubscriptionTier, number> = {
@@ -222,8 +223,15 @@ export function getButtonText(
   targetPeriod: PricePeriod,
   defaultLabel: string,
 ): string {
-  if (!currentSubscription || currentSubscription.status !== 'active') {
+  if (!currentSubscription || currentSubscription.status === 'inactive') {
+    if (targetTier === 'pro' && targetPeriod !== 'lifetime') {
+      return 'Start free trial'
+    }
     return defaultLabel
+  }
+
+  if (currentSubscription.status === 'trialing') {
+    return 'Currently trialing'
   }
 
   const currentTier = currentSubscription.tier

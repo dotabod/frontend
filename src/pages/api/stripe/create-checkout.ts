@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const price = await stripe.prices.retrieve(priceId)
     const isRecurring = price.type === 'recurring'
 
-    // Create checkout session with different configuration based on price type
+    // Create checkout session with trial period
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: isRecurring ? 'subscription' : 'payment',
@@ -105,6 +105,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?paid=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/?paid=false`,
+      subscription_data: isRecurring
+        ? {
+            trial_period_days: 14,
+            trial_settings: {
+              end_behavior: {
+                missing_payment_method: 'cancel',
+              },
+            },
+          }
+        : undefined,
     })
 
     return res.status(200).json({ url: checkoutSession.url })

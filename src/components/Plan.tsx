@@ -27,6 +27,7 @@ function Plan({
   logomarkClassName,
   featured = false,
   subscription,
+  hasTrial = false,
 }: {
   name: string
   tier: SubscriptionTier
@@ -46,16 +47,38 @@ function Plan({
   logomarkClassName?: string
   featured?: boolean
   subscription: SubscriptionStatus | null
+  hasTrial?: boolean
 }) {
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
 
+  // Update description display to show trial info
+  const displayDescription = () => {
+    if (hasTrial && tier === 'pro' && (!subscription || subscription.status !== 'active')) {
+      return (
+        <>
+          {description}
+          <span className='block mt-1 text-purple-400'>Includes 14-day free trial</span>
+        </>
+      )
+    }
+    return description
+  }
+
   // Update button text logic
   const getSimplifiedButtonText = () => {
+    if (subscription?.status === 'trialing') {
+      return 'Currently trialing'
+    }
+
     if (!subscription || subscription.status !== 'active') {
       if (tier === 'pro' && activePeriod === 'lifetime') {
         return 'Get lifetime access'
+      }
+
+      if (tier === 'pro' && activePeriod !== 'lifetime') {
+        return 'Start free trial'
       }
       return button.label
     }
@@ -206,7 +229,7 @@ function Plan({
         </p>
       )}
       <p className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-        {description}
+        {displayDescription()}
       </p>
       <div className='order-last mt-6'>
         <ol
