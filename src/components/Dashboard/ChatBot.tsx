@@ -438,7 +438,7 @@ export default function ChatBot() {
 
                     <div key={2}>
                       <div className='flex flex-row items-center space-x-2'>
-                        {!hasAuto7TVAccess || !user?.hasDotabodEditor ? (
+                        {!user?.hasDotabodEditor ? (
                           <div>
                             {user?.hasDotabodEmoteSet ? (
                               <div>
