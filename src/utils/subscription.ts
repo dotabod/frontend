@@ -166,7 +166,7 @@ export function canAccessFeature(
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier = getRequiredTier(feature)
 
-  if (!subscription || !isSubscriptionActive(subscription)) {
+  if (!subscription || !isSubscriptionActive({ status: subscription.status })) {
     return {
       hasAccess: requiredTier === SUBSCRIPTION_TIERS.FREE,
       requiredTier,
@@ -181,7 +181,8 @@ export function canAccessFeature(
 export function isSubscriptionActive(
   subscription: { status: SubscriptionTierStatus | undefined } | null,
 ): boolean {
-  return subscription?.status === 'active' || subscription?.status === 'trialing'
+  if (!subscription?.status) return false
+  return ['active', 'trialing'].includes(subscription.status)
 }
 
 export interface SubscriptionPriceId {

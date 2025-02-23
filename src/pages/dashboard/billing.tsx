@@ -46,7 +46,7 @@ const BillingPage = () => {
       </Head>
       <Header subtitle='Manage your billing information.' title='Billing' />
 
-      {subscription && isSubscriptionActive(subscription) && (
+      {subscription && isSubscriptionActive({ status: subscription.status }) && (
         <p>
           You are currently on the{' '}
           {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period}).{' '}
@@ -60,7 +60,7 @@ const BillingPage = () => {
         </p>
       )}
 
-      {isSubscriptionActive(subscription) && (
+      {isSubscriptionActive({ status: subscription?.status }) && (
         <div className='mt-6'>
           <Button onClick={handlePortalAccess} disabled={isLoading}>
             {isLoading ? 'Loading...' : 'Manage Subscription'}
