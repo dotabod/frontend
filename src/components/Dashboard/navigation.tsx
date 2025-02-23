@@ -3,6 +3,7 @@ import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/rea
 import { Cookie, DollarSignIcon, Github, HardDriveIcon, Info, ShieldCheck } from 'lucide-react'
 
 export const navigation = [
+  // Main features
   {
     name: 'Setup',
     href: '/dashboard',
@@ -29,6 +30,12 @@ export const navigation = [
         name: 'Advanced',
         href: '/dashboard/features/advanced',
       },
+    ],
+  },
+  {
+    name: 'Bot Settings',
+    icon: SparklesIcon,
+    children: [
       {
         name: 'Commands',
         href: '/dashboard/commands',
@@ -40,61 +47,74 @@ export const navigation = [
     ],
   },
 
+  // Account & Support
   {
-    name: 'Billing',
-    href: '/dashboard/billing',
-    icon: DollarSignIcon,
-    new: true,
+    name: 'Account',
+    icon: ShieldCheck,
+    children: [
+      {
+        name: 'Billing',
+        href: '/dashboard/billing',
+        icon: DollarSignIcon,
+        new: true,
+      },
+      {
+        name: 'Data',
+        href: '/dashboard/data',
+        icon: HardDriveIcon,
+        new: true,
+      },
+    ],
   },
+
+  // Help & Resources
   {
-    name: 'Data',
-    href: '/dashboard/data',
-    icon: HardDriveIcon,
-    new: true,
-  },
-  {
-    name: 'Help',
-    href: '/dashboard/troubleshoot',
+    name: 'Help & Resources',
     icon: QuestionMarkCircleIcon,
+    children: [
+      {
+        name: 'Help',
+        href: '/dashboard/troubleshoot',
+        icon: QuestionMarkCircleIcon,
+      },
+      {
+        name: 'Discord',
+        href: 'https://discord.dotabod.com',
+        icon: Discord,
+      },
+      {
+        name: 'Github',
+        href: 'https://github.com/dotabod/',
+        icon: Github,
+      },
+      {
+        name: 'Status',
+        href: 'https://status.dotabod.com',
+        icon: Info,
+      },
+    ],
   },
+
+  // Legal
   {
-    name: '',
-    href: '',
-    icon: null,
-  },
-  {
-    name: 'Status',
-    href: 'https://status.dotabod.com',
-    icon: Info,
-  },
-  {
-    name: 'Github',
-    href: 'https://github.com/dotabod/',
-    icon: Github,
-  },
-  {
-    name: 'Discord',
-    href: 'https://discord.dotabod.com',
-    icon: Discord,
-  },
-  {
-    name: '',
-    href: '',
-    icon: null,
-  },
-  {
-    name: 'Privacy Policy',
-    href: '/privacy-policy',
+    name: 'Legal',
     icon: ShieldCheck,
-  },
-  {
-    name: 'Terms of Service',
-    href: '/terms-of-service',
-    icon: ShieldCheck,
-  },
-  {
-    name: 'Cookie Policy',
-    href: '/cookies',
-    icon: Cookie,
+    children: [
+      {
+        name: 'Privacy Policy',
+        href: '/privacy-policy',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Terms of Service',
+        href: '/terms-of-service',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Cookie Policy',
+        href: '/cookies',
+        icon: Cookie,
+      },
+    ],
   },
 ]

@@ -1,8 +1,10 @@
+import { useSubscription } from '@/hooks/useSubscription'
 import {
   type FeatureTier,
   type GenericFeature,
   type SubscriptionTier,
   getRequiredTier,
+  isSubscriptionActive,
 } from '@/utils/subscription'
 import { Button, Tag, Tooltip } from 'antd'
 import { CrownIcon } from 'lucide-react'
@@ -13,8 +15,13 @@ export const TierBadge: React.FC<{
   feature?: FeatureTier | GenericFeature
   tooltip?: boolean
 }> = ({ requiredTier, feature, tooltip = true }) => {
+  const { subscription } = useSubscription()
   const featureRequiredTier = getRequiredTier(feature)
   const tierToShow = feature ? featureRequiredTier : requiredTier
+
+  if (isSubscriptionActive({ status: subscription?.status })) {
+    return null
+  }
 
   return (
     tierToShow &&
