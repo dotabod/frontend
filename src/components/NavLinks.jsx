@@ -12,6 +12,8 @@ export function NavLinks({ bottom = false }) {
   const additional = []
   if (bottom) {
     additional.push(['Privacy Policy', '/privacy-policy'])
+    additional.push(['Terms of Service', '/terms-of-service'])
+    additional.push(['Cookie Policy', '/cookie-policy'])
   }
 
   return [
@@ -42,7 +44,6 @@ export function NavLinks({ bottom = false }) {
       </svg>,
       'Support the project',
     ],
-    // ['Twitch', 'https://twitch.tv/dotabod/about', TwitchSvg],
   ].map(([label, href, Icon, tooltip], index) => {
     return (
       <Tooltip key={label} title={tooltip} disabled={!tooltip} position='top'>
@@ -69,7 +70,7 @@ export function NavLinks({ bottom = false }) {
             )}
           </AnimatePresence>
 
-          <span className='relative z-10'>
+          <span className='relative z-10 flex items-center gap-2'>
             {Icon?.type === 'svg' && <span>{Icon}</span>}
 
             {Icon?.type !== 'svg' && Icon && (
@@ -81,7 +82,8 @@ export function NavLinks({ bottom = false }) {
                 className='pointer-events-none'
               />
             )}
-            {!Icon && label}
+            {bottom && label}
+            {!bottom &&!Icon && label}
           </span>
         </a>
       </Tooltip>
