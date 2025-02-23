@@ -1,7 +1,5 @@
-import { plans } from '@/components/Billing/BillingPlans'
 import type { SubscriptionTier } from '@/utils/subscription'
 import { Button } from 'antd'
-import Image from 'next/image'
 import Link from 'next/link'
 import { TierBadge } from './TierBadge'
 
@@ -19,24 +17,14 @@ export function LockedFeatureOverlay({
     </span>
   ),
 }: LockedFeatureOverlayProps) {
-  if (!requiredTier) {
+  if (!requiredTier || requiredTier === 'free') {
     return null
   }
 
   return (
     <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg backdrop-blur-md z-10'>
       <div className='flex flex-col items-center gap-6 p-8 max-w-lg'>
-        {requiredTier !== 'free' && (
-          <Image
-            src={plans.find((plan) => plan.tier === requiredTier)?.logo.props.src}
-            width={84}
-            height={84}
-            className='rounded-lg shadow-lg hover:scale-110 transition-transform duration-200'
-            style={{ objectFit: 'contain' }}
-            alt='Pro tier emote'
-          />
-        )}
-        <TierBadge requiredTier={requiredTier} />
+        <TierBadge tooltip={false} requiredTier={requiredTier} />
 
         <div className='text-center'>
           <p className='text-white text-lg font-medium mb-2'>{message}</p>

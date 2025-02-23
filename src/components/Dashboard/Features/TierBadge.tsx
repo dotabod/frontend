@@ -11,7 +11,8 @@ import Link from 'next/link'
 export const TierBadge: React.FC<{
   requiredTier?: SubscriptionTier | null
   feature?: FeatureTier | GenericFeature
-}> = ({ requiredTier, feature }) => {
+  tooltip?: boolean
+}> = ({ requiredTier, feature, tooltip = true }) => {
   const featureRequiredTier = getRequiredTier(feature)
   const tierToShow = feature ? featureRequiredTier : requiredTier
 
@@ -20,19 +21,24 @@ export const TierBadge: React.FC<{
     tierToShow !== 'free' && (
       <Tooltip
         title={
-          <>
-            <span>
-              To use this feature, upgrade your plan and access the most powerful features of
-              Dotabod for your stream
-            </span>
+          tooltip && (
+            <>
+              <span>
+                To use this feature, upgrade your plan and access the most powerful features of
+                Dotabod for your stream
+              </span>
 
-            <Link href='/dashboard/billing'>
-              <Button type='primary' className='mt-2'>
-                <CrownIcon color={tierToShow === 'pro' ? 'gold' : undefined} className='h-4 w-4' />{' '}
-                Upgrade your stream
-              </Button>
-            </Link>
-          </>
+              <Link href='/dashboard/billing'>
+                <Button type='primary' className='mt-2'>
+                  <CrownIcon
+                    color={tierToShow === 'pro' ? 'gold' : undefined}
+                    className='h-4 w-4'
+                  />{' '}
+                  Upgrade your stream
+                </Button>
+              </Link>
+            </>
+          )
         }
       >
         <Tag color={tierToShow === 'pro' ? 'gold' : undefined}>
