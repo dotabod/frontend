@@ -51,6 +51,7 @@ export const navigation = [
   {
     name: 'Account',
     icon: ShieldCheck,
+    new: true,
     children: [
       {
         name: 'Billing',

@@ -1,4 +1,5 @@
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
+import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import { navigation } from '@/components/Dashboard/navigation'
 import { DarkLogo, Logomark } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
@@ -35,6 +36,11 @@ function getItem(item) {
     ),
     children: item.children?.map(getItem),
   }
+}
+
+// Add helper function to check if item should be hidden during impersonation
+const shouldHideForImpersonator = (itemName: string) => {
+  return ['Setup', 'Managers', 'Billing', 'Data', 'Account'].includes(itemName)
 }
 
 export default function DashboardShell({
@@ -84,6 +90,36 @@ export default function DashboardShell({
 
   if (status !== 'authenticated') return null
 
+  const filterNavigationItems = (items) => {
+    if (!data?.user?.isImpersonating) return items
+
+    return items
+      .map((item) => {
+        if (!item.name) return item // Keep dividers
+
+        // Hide parent items that should be restricted
+        if (shouldHideForImpersonator(item.name)) return null
+
+        // If item has children, filter them too
+        if (item.children) {
+          const filteredChildren = item.children.filter(
+            (child) => !shouldHideForImpersonator(child.name),
+          )
+
+          // If no children left after filtering, hide the parent item
+          if (filteredChildren.length === 0) return null
+
+          return {
+            ...item,
+            children: filteredChildren,
+          }
+        }
+
+        return item
+      })
+      .filter(Boolean) // Remove null items
+  }
+
   return (
     <>
       <Layout className='h-full bg-gray-800'>
@@ -118,6 +154,8 @@ export default function DashboardShell({
                 )}
               </div>
 
+              <SubscriptionBadge collapsed={collapsed} />
+
               {!collapsed && (
                 <div className='flex justify-center py-4'>
                   <ModeratedChannels />
@@ -133,14 +171,7 @@ export default function DashboardShell({
                   borderInlineEnd: 'none',
                 }}
                 mode='inline'
-                items={navigation.map((item, i) => {
-                  if (
-                    data?.user?.isImpersonating &&
-                    ['Setup', 'Managers', 'Billing'].includes(item.name)
-                  ) {
-                    return null
-                  }
-
+                items={filterNavigationItems(navigation).map((item, i) => {
                   if (!item.name)
                     return {
                       key: item?.href || i,

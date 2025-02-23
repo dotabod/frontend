@@ -1,11 +1,9 @@
 import { useSubscription } from '@/hooks/useSubscription'
 import { useTrack } from '@/lib/track'
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
-import { Button, Select, Spin, Tag, Tooltip } from 'antd'
+import { Button, Select, Spin, Tooltip } from 'antd'
 import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { plans } from '../Billing/BillingPlans'
@@ -144,18 +142,6 @@ export default function ModeratedChannels() {
 
   return (
     <div className='flex flex-col flex-grow items-center moderated-channels'>
-      {!user?.isImpersonating && (
-        <div className='mb-2 flex items-center gap-2'>
-          <Link href='/dashboard/billing'>
-            <Tag color={subscription?.tier === SUBSCRIPTION_TIERS.PRO ? 'gold' : 'default'}>
-              <div className='flex items-center gap-2'>
-                {currentPlan?.logo}
-                {currentPlan?.name} Plan
-              </div>
-            </Tag>
-          </Link>
-        </div>
-      )}
       <Tooltip
         title='Choose a channel to manage. Only streamers with an active Dotabod subscription will be shown.'
         placement='right'
