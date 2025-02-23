@@ -1,13 +1,8 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { Card } from '@/ui/card'
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  ExclamationCircleOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons'
-import { Button, Col, Divider, Modal, Row, Space, Typography, message } from 'antd'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { Button, Modal, Space, Typography, message } from 'antd'
 import { signOut, useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
@@ -68,7 +63,7 @@ const DataPage = () => {
             <li>Delete all your personal information</li>
             <li>Remove all your settings and preferences</li>
             <li>Cancel any active subscriptions</li>
-            <li>Delete your betting history</li>
+            <li>Delete your match history</li>
             <li>Remove all connected accounts</li>
           </ul>
         </div>
@@ -112,100 +107,69 @@ const DataPage = () => {
       <Head>
         <title>Dotabod | Data Management</title>
       </Head>
-      <Header subtitle='Manage your personal data.' title='Data Management' />
-
-      <div className='max-w-4xl mx-auto'>
-        <Card className='mb-8'>
-          <Space className='w-full' align='start'>
-            <InfoCircleOutlined className='text-blue-400 text-xl mt-1' />
-            <div>
-              <Title level={5} className='!mb-2 !text-blue-400'>
-                Data Privacy
-              </Title>
-              <Text className='text-gray-300'>
-                You have the right to export or delete your personal data. Exporting data will
+      <Header
+        subtitle='You have the right to export or delete your personal data. Exporting data will
                 download all information we have about your account. Deleting your account will
-                permanently remove all your data from our servers.
-              </Text>
-            </div>
+                permanently remove all your data from our servers.'
+        title='Data Management'
+      />
+
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
+        <Card title={<span>Export Your Data</span>}>
+          <Space direction='vertical' className='w-full' size='large'>
+            <Text>
+              Download a copy of all your personal data in JSON format. This includes your:
+            </Text>
+            <ul className='list-disc pl-4 '>
+              <li>Account information</li>
+              <li>Preferences and settings</li>
+              <li>Connected Twitch account</li>
+              <li>Connected Steam accounts</li>
+              <li>Dota 2 match history</li>
+              <li>Approved managers</li>
+            </ul>
+            <Button
+              key='export'
+              size='large'
+              onClick={handleExportData}
+              loading={loading === 'export'}
+              block
+            >
+              Export Data
+            </Button>
           </Space>
         </Card>
 
-        <Row gutter={24}>
-          <Col span={12}>
-            <Card
-              title={
-                <Space>
-                  <DownloadOutlined className='text-blue-400' />
-                  <span>Export Your Data</span>
-                </Space>
-              }
-              className='h-full'
+        <Card title={<span>Delete Your Account</span>}>
+          <div className='subtitle'>
+            This action permanently removes all your data from our servers and cannot be undone.
+          </div>
+          <Space direction='vertical' className='w-full' size='large'>
+            <Text>This will delete your:</Text>
+            <ul className='list-disc pl-4'>
+              <li>Personal information</li>
+              <li>Twitch connection</li>
+              <li>Settings</li>
+              <li>Stripe customer</li>
+              <li>Invalidate token for Dota 2 client</li>
+              <li>Invalidate overlay URL</li>
+              <li>Dota 2 match history</li>
+              <li>Approved managers</li>
+              <li>Steam accounts</li>
+              <li>Cancel active subscriptions</li>
+            </ul>
+            <Button
+              key='delete'
+              danger
+              size='large'
+              onClick={handleDeleteAccount}
+              loading={loading === 'delete'}
+              block
             >
-              <Space direction='vertical' className='w-full' size='large'>
-                <Text className='text-gray-300'>
-                  Download a copy of all your personal data in JSON format. This includes your:
-                </Text>
-                <ul className='list-disc pl-4 text-gray-300'>
-                  <li>Account information</li>
-                  <li>Preferences and settings</li>
-                  <li>Connected accounts</li>
-                  <li>Usage history</li>
-                </ul>
-                <Button
-                  key='export'
-                  type='primary'
-                  size='large'
-                  icon={<DownloadOutlined />}
-                  onClick={handleExportData}
-                  loading={loading === 'export'}
-                  block
-                >
-                  Export Data
-                </Button>
-              </Space>
-            </Card>
-          </Col>
-
-          <Col span={12}>
-            <Card
-              title={
-                <Space>
-                  <DeleteOutlined className='text-red-400' />
-                  <span className='text-red-400'>Delete Your Account</span>
-                </Space>
-              }
-              className='h-full border-red-500/20'
-            >
-              <Space direction='vertical' className='w-full' size='large'>
-                <Text type='danger'>
-                  This action permanently removes all your data from our servers and cannot be
-                  undone.
-                </Text>
-                <Divider className='my-2 border-red-500/20' />
-                <Text className='text-gray-300'>This will delete your:</Text>
-                <ul className='list-disc pl-4 text-red-400/80'>
-                  <li>Personal information</li>
-                  <li>Settings and preferences</li>
-                  <li>Active subscriptions</li>
-                  <li>Betting history</li>
-                  <li>Connected accounts</li>
-                </ul>
-                <Button
-                  key='delete'
-                  danger
-                  size='large'
-                  icon={<DeleteOutlined />}
-                  onClick={handleDeleteAccount}
-                  loading={loading === 'delete'}
-                  block
-                >
-                  Delete Account
-                </Button>
-              </Space>
-            </Card>
-          </Col>
-        </Row>
+              Delete Account
+            </Button>
+          </Space>
+        </Card>
       </div>
     </>
   )
