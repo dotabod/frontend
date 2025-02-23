@@ -5,7 +5,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
-import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
+import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD, UPDATE_USER_CONNECTION } from '@/lib/gql'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -60,30 +60,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       )
 
       if (emotesAlreadyInSet) {
+        const activeConnection = userEmoteSet.emoteSet.owner?.connections?.find(
+          (c) => c.id === twitchId,
+        )
+        if (!activeConnection) {
+          await client.request(UPDATE_USER_CONNECTION, {
+            id: stvResponse.user.id,
+            conn_id: `${twitchId}`,
+            d: { emote_set_id: result.emoteSetId },
+          })
+          console.log('Updated user connection')
+        }
         return res.status(200).json({ message: 'Emote set already updated' })
       }
 
       console.log('Adding emotes to emote set...')
       const failedEmotes: Array<{ name: string; error: unknown }> = []
-
-      for (const emote of emotesRequired) {
-        try {
-          console.log(`Adding emote ${emote.label}...`)
-          await client.request(CHANGE_EMOTE_IN_SET, {
-            id: result.emoteSetId,
-            action: 'ADD',
-            name: emote.label,
-            emote_id: emote.id,
-          })
-          console.log(`Successfully added emote ${emote.label}`)
-        } catch (error) {
-          console.error(`Error adding emote ${emote.label}:`, error)
-          failedEmotes.push({ name: emote.label, error })
-          break
-          // Continue with other emotes instead of silently ignoring
-        }
-      }
-
+      await Promise.all(
+        emotesRequired.map(async (emote) => {
+          try {
+            console.log(`Adding emote ${emote.label}...`)
+            await client.request(CHANGE_EMOTE_IN_SET, {
+              id: result.emoteSetId,
+              action: 'ADD',
+              name: emote.label,
+              emote_id: emote.id,
+            })
+            console.log(`Successfully added emote ${emote.label}`)
+          } catch (error) {
+            console.error(`Error adding emote ${emote.label}:`, error)
+            failedEmotes.push({ name: emote.label, error })
+          }
+        }),
+      )
       console.log('Verifying emote set update...')
 
       const updatedEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
@@ -115,10 +124,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.log('Emote set update verified successfully')
       return res.status(200).json({ message: 'Emote set updated successfully' })
     } catch (error) {
-      if (error instanceof Error && error.message.includes('permission')) {
-        return res
-          .status(403)
-          .json({ message: 'User does not have permission to use personal emote sets' })
+      if (error instanceof Error && error.message) {
+        return res.status(403).json({ message: error.message })
       }
       throw error
     }

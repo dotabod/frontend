@@ -12,6 +12,12 @@ export type EmoteSetResponse = {
     capacity: number
     flags: number
     name: string
+    owner?: {
+      connections?: Array<{
+        id: string
+        name: string
+      }>
+    }
     emotes: Array<{
       id: string
       name: string
@@ -38,6 +44,7 @@ export type UserEmoteSetsResponse = {
       owner?: {
         connections?: Array<{
           id: string
+          name: string
         }>
       }
     }>
@@ -95,15 +102,22 @@ export async function getOrCreateEmoteSet({
     })
 
     // Find the emote set that has the twitch connection
-    const existingEmoteSet = data?.user?.emote_sets?.find(
-      (es) =>
-        es.owner?.connections?.find(
-          (c) => Number.parseInt(c.id, 10) === Number.parseInt(twitchId, 10),
-        ) !== undefined,
+    const existingEmoteSet = data?.user?.emote_sets?.find((es) => es.name === name)
+
+    const isActiveConnection = existingEmoteSet?.owner?.connections?.find(
+      (c) => Number.parseInt(c.id, 10) === Number.parseInt(twitchId, 10),
     )
 
     // Get the existing set details to check its name
-    if (existingEmoteSet?.id && existingEmoteSet.name !== 'Personal Emotes') {
+    if (existingEmoteSet?.id) {
+      if (!isActiveConnection) {
+        await client.request(UPDATE_USER_CONNECTION, {
+          id: userId,
+          conn_id: `${twitchId}`,
+          d: { emote_set_id: existingEmoteSet.id },
+        })
+      }
+
       return { emoteSetId: existingEmoteSet.id, created: false }
     }
 
@@ -128,7 +142,8 @@ export async function getOrCreateEmoteSet({
       isSevenTVError(error) &&
       error.response.errors[0]?.extensions?.code === 'LACKING_PRIVILEGES'
     ) {
-      throw new Error('User does not have permission to use personal emote sets')
+      const message = error.response.errors[0]?.message || 'Unknown error'
+      throw new Error(message)
     }
     throw error
   }
