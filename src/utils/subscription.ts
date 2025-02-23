@@ -144,7 +144,7 @@ export const GENERIC_FEATURE_TIERS = {
   autoOBS: SUBSCRIPTION_TIERS.PRO,
   autoInstaller: SUBSCRIPTION_TIERS.PRO,
   autoModerator: SUBSCRIPTION_TIERS.PRO,
-  auto7TV: SUBSCRIPTION_TIERS.PRO,
+  auto7TV: SUBSCRIPTION_TIERS.FREE,
 } as const
 
 export type GenericFeature = keyof typeof GENERIC_FEATURE_TIERS

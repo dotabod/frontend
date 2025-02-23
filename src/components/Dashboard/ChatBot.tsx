@@ -479,11 +479,19 @@ export default function ChatBot() {
                                   >
                                     on your 7TV account
                                   </Button>
+                                  <span>with permissions:</span>
+                                </div>
+
+                                <div className='flex flex-row items-center space-x-3'>
+                                  <span>Emote sets: Admin</span>
                                 </div>
 
                                 <div className='flex flex-row items-center space-x-3'>
                                   {loading && <Spin size='small' spinning={true} />}
                                   <span>Waiting for Dotabod to become an editor...</span>
+                                  <span>
+                                    Make sure you allow Dotabod to create emote sets on 7TV
+                                  </span>
                                 </div>
                               </div>
                             )}
