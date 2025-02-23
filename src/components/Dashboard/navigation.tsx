@@ -2,6 +2,15 @@ import Discord from '@/images/logos/Discord'
 import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import { Cookie, DollarSignIcon, Github, HardDriveIcon, Info, ShieldCheck } from 'lucide-react'
 
+// Add a const for parent keys
+export const PARENT_KEYS = {
+  FEATURES: 'features-menu',
+  BOT_SETTINGS: 'bot-settings-menu',
+  ACCOUNT: 'account-menu',
+  HELP: 'help-menu',
+  LEGAL: 'legal-menu',
+} as const
+
 export const navigation = [
   // Main features
   {
@@ -11,7 +20,7 @@ export const navigation = [
   },
   {
     name: 'Features',
-    href: '/dashboard/features',
+    key: PARENT_KEYS.FEATURES,
     icon: SparklesIcon,
     children: [
       {
@@ -34,6 +43,7 @@ export const navigation = [
   },
   {
     name: 'Bot Settings',
+    key: PARENT_KEYS.BOT_SETTINGS,
     icon: SparklesIcon,
     children: [
       {
@@ -50,6 +60,7 @@ export const navigation = [
   // Account & Support
   {
     name: 'Account',
+    key: PARENT_KEYS.ACCOUNT,
     icon: ShieldCheck,
     new: true,
     children: [
@@ -57,13 +68,11 @@ export const navigation = [
         name: 'Billing',
         href: '/dashboard/billing',
         icon: DollarSignIcon,
-        new: true,
       },
       {
         name: 'Data',
         href: '/dashboard/data',
         icon: HardDriveIcon,
-        new: true,
       },
     ],
   },
@@ -71,6 +80,7 @@ export const navigation = [
   // Help & Resources
   {
     name: 'Help & Resources',
+    key: PARENT_KEYS.HELP,
     icon: QuestionMarkCircleIcon,
     children: [
       {
@@ -99,6 +109,7 @@ export const navigation = [
   // Legal
   {
     name: 'Legal',
+    key: PARENT_KEYS.LEGAL,
     icon: ShieldCheck,
     children: [
       {
