@@ -13,7 +13,7 @@ export function NavLinks({ bottom = false }) {
   if (bottom) {
     additional.push(['Privacy Policy', '/privacy-policy'])
     additional.push(['Terms of Service', '/terms-of-service'])
-    additional.push(['Cookie Policy', '/cookie-policy'])
+    additional.push(['Cookie Policy', '/cookies'])
   }
 
   return [
@@ -24,26 +24,6 @@ export function NavLinks({ bottom = false }) {
     ['Status', 'https://status.dotabod.com', StatusSvg, 'Status'],
     ['Github', 'https://github.com/dotabod', GithubSvg, 'Github'],
     ['Discord', 'https://discord.dotabod.com', DiscordSvg, 'Discord'],
-    [
-      'Support the project',
-      'https://ko-fi.com/dotabod',
-      <svg
-        key='heart'
-        xmlns='http://www.w3.org/2000/svg'
-        fill='none'
-        viewBox='0 0 24 24'
-        strokeWidth={1.5}
-        stroke='currentColor'
-        className='h-5 w-5 text-red-500'
-      >
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          d='M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z'
-        />
-      </svg>,
-      'Support the project',
-    ],
   ].map(([label, href, Icon, tooltip], index) => {
     return (
       <Tooltip key={label} title={tooltip} disabled={!tooltip} position='top'>

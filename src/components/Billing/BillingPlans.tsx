@@ -110,18 +110,20 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
 
   return (
     <div>
-      <div className='mx-auto max-w-2xl text-center'>
-        <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
-          Simple pricing for every Dota 2 streamer
-        </h2>
-        {subscription && isSubscriptionActive({ status: subscription.status }) && (
-          <p className='mt-2 text-lg text-purple-400'>
-            You are currently on the{' '}
-            {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period})
-            {subscription.status === 'trialing' && ' (Trial)'}
-          </p>
-        )}
-      </div>
+      {showTitle && (
+        <div className='mx-auto max-w-2xl text-center'>
+          <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
+            Simple pricing for every Dota 2 streamer
+          </h2>
+          {subscription && isSubscriptionActive({ status: subscription.status }) && (
+            <p className='mt-2 text-lg text-purple-400'>
+              You are currently on the{' '}
+              {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
+              {period}){subscription.status === 'trialing' && ' (Trial)'}
+            </p>
+          )}
+        </div>
+      )}
 
       <Wrapper>
         <div className='mt-8 flex justify-center'>

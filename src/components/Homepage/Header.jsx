@@ -68,14 +68,11 @@ export function Header() {
                             <MobileNavLink href='/#faqs'>FAQs</MobileNavLink>
                             <MobileNavLink href='/privacy-policy'>Privacy Policy</MobileNavLink>
                             <MobileNavLink href='/terms-of-service'>Terms of Service</MobileNavLink>
-                            <MobileNavLink href='/cookie-policy'>Cookie Policy</MobileNavLink>
+                            <MobileNavLink href='/cookies'>Cookie Policy</MobileNavLink>
                             <MobileNavLink href='/dashboard'>Dashboard</MobileNavLink>
                             <MobileNavLink href='https://github.com/dotabod'>Github</MobileNavLink>
                             <MobileNavLink href='https://discord.dotabod.com'>
                               Discord
-                            </MobileNavLink>
-                            <MobileNavLink href='https://ko-fi.com/dotabod'>
-                              Support the project
                             </MobileNavLink>
                           </div>
                           <div className='mt-8 flex flex-col gap-4'>

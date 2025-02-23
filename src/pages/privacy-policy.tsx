@@ -241,8 +241,8 @@ const PrivacyPolicy: NextPageWithLayout = () => (
         <p>
           Like many businesses, we also collect information through cookies and similar
           technologies. You can find out more about this in our Cookie Notice:
-          <a href='https://dotabod.com/cookie-policy' target='_blank' rel='noreferrer'>
-            https://dotabod.com/cookie-policy
+          <a href='https://dotabod.com/cookies' target='_blank' rel='noreferrer'>
+            https://dotabod.com/cookies
           </a>
           .
         </p>
@@ -524,8 +524,8 @@ const PrivacyPolicy: NextPageWithLayout = () => (
         <p>
           Specific information about how we use such technologies and how you can refuse certain
           cookies is set out in our Cookie Notice:
-          <a href='https://dotabod.com/cookie-policy' target='_blank' rel='noreferrer'>
-            https://dotabod.com/cookie-policy
+          <a href='https://dotabod.com/cookies' target='_blank' rel='noreferrer'>
+            https://dotabod.com/cookies
           </a>
           .
         </p>
@@ -743,8 +743,8 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           choose to set your browser to remove cookies and to reject cookies. If you choose to
           remove cookies or reject cookies, this could affect certain features or services of our
           Services. For further information, please see our Cookie Notice:
-          <a href='https://dotabod.com/cookie-policy' target='_blank' rel='noreferrer'>
-            https://dotabod.com/cookie-policy
+          <a href='https://dotabod.com/cookies' target='_blank' rel='noreferrer'>
+            https://dotabod.com/cookies
           </a>
           .
         </p>

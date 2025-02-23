@@ -4,6 +4,7 @@ import Header from '@/components/Dashboard/Header'
 import { useSubscription } from '@/hooks/useSubscription'
 import { getCurrentPeriod, isSubscriptionActive } from '@/utils/subscription'
 import { Button } from 'antd'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
@@ -44,26 +45,39 @@ const BillingPage = () => {
       <Head>
         <title>Dotabod | Billing</title>
       </Head>
-      <Header subtitle='Manage your billing information.' title='Billing' />
 
-      {subscription && isSubscriptionActive({ status: subscription.status }) && (
-        <p>
-          You are currently on the{' '}
-          {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan ({period}).{' '}
-          {subscription.cancelAtPeriodEnd
-            ? 'Your subscription will end'
-            : 'Your subscription will renew'}{' '}
-          on{' '}
-          {subscription.currentPeriodEnd
-            ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-            : 'unknown'}
-        </p>
+      {subscription && isSubscriptionActive({ status: subscription.status }) ? (
+        <Header
+          title='Billing'
+          subtitle={
+            <p>
+              You are currently on the{' '}
+              {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
+              {period}).{' '}
+              {subscription.cancelAtPeriodEnd
+                ? 'Your subscription will end'
+                : 'Your subscription will renew'}{' '}
+              on{' '}
+              {subscription.currentPeriodEnd
+                ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+                : 'unknown'}
+            </p>
+          }
+        />
+      ) : (
+        <Header title='Billing' subtitle='Manage your subscription and billing settings' />
       )}
 
       {isSubscriptionActive({ status: subscription?.status }) && (
         <div className='mt-6'>
-          <Button onClick={handlePortalAccess} disabled={isLoading}>
-            {isLoading ? 'Loading...' : 'Manage Subscription'}
+          <Button
+            type='primary'
+            size='large'
+            icon={<ExternalLinkIcon size={14} />}
+            onClick={handlePortalAccess}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Manage your subscription'}
           </Button>
         </div>
       )}
