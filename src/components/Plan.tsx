@@ -74,8 +74,17 @@ function Plan({
 
   // Update button text logic
   const getSimplifiedButtonText = () => {
-    if (subscription?.status === 'trialing') {
-      return 'Currently trialing'
+    // If free plan, show manage plan
+    if (tier === 'free') {
+      return 'Manage your subscription'
+    }
+
+    if (hasTrial && activePeriod === 'lifetime') {
+      return 'Get lifetime access'
+    }
+
+    if (hasTrial && subscription?.status === 'trialing') {
+      return 'Manage trial'
     }
 
     if (!subscription || subscription.status !== 'active') {

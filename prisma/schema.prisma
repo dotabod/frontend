@@ -210,3 +210,10 @@ model Subscription {
   @@index([status])
   @@map("subscriptions")
 }
+
+model WebhookEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  eventType     String
+  processedAt   DateTime
+}

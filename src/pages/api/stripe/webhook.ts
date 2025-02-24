@@ -1,10 +1,10 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscriptionTier } from '@/utils/subscription'
+import type { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
-// Disable the default body parser
 export const config = {
   api: {
     bodyParser: false,
@@ -31,240 +31,228 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
   if (!signature || !webhookSecret) {
-    return res.status(400).json({ error: 'Missing stripe webhook secret' })
+    return res.status(400).json({ error: 'Webhook configuration error' })
   }
 
   let event: Stripe.Event
-
   try {
-    const chunks: Uint8Array[] = []
-
-    for await (const chunk of req) {
-      chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
-    }
-
-    const rawBody = Buffer.concat(chunks).toString()
-
+    const rawBody = await getRawBody(req)
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
   } catch (err) {
-    console.error('Error verifying webhook:', err)
-    return res.status(400).json({ error: 'Webhook error' })
+    console.error('Webhook verification failed:', err)
+    return res.status(400).json({ error: 'Webhook verification failed' })
   }
 
-  if (relevantEvents.has(event.type)) {
-    try {
-      switch (event.type) {
-        case 'customer.deleted': {
-          const customer = event.data.object as Stripe.Customer
-          await handleCustomerDeleted(customer)
-          break
-        }
-        case 'customer.subscription.created':
-        case 'customer.subscription.updated':
-        case 'customer.subscription.deleted': {
-          const subscription = event.data.object as Stripe.Subscription
-          await updateSubscriptionInDatabase(subscription)
-          break
-        }
-        case 'invoice.payment_succeeded': {
-          const invoice = event.data.object as Stripe.Invoice
-          if (invoice.subscription) {
-            const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
-            await updateSubscriptionInDatabase(subscription)
-          }
-          break
-        }
-        case 'invoice.payment_failed': {
-          const invoice = event.data.object as Stripe.Invoice
-          if (invoice.subscription) {
-            const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
-            await updateSubscriptionInDatabase(subscription)
-          }
-          break
-        }
-        case 'checkout.session.completed': {
-          const session = event.data.object as Stripe.Checkout.Session
+  // Early return for non-relevant events
+  if (!relevantEvents.has(event.type)) {
+    return res.status(200).json({ received: true })
+  }
 
-          if (session.mode === 'subscription') {
-            // Handle regular subscription case
-          } else if (session.mode === 'payment') {
-            const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
-            const priceId = lineItems.data[0]?.price?.id
+  try {
+    // Process event with transaction lock
+    await prisma.$transaction(async (tx) => {
+      // Check if event was already processed
+      const existingEvent = await tx.webhookEvent.findUnique({
+        where: { stripeEventId: event.id },
+      })
 
-            const userId = session.metadata?.userId
-            if (!userId) {
-              console.error('No userId found in session metadata')
-              return res.status(400).json({ error: 'No userId found' })
-            }
-
-            // Handle upgrade to lifetime case
-            if (session.metadata?.isUpgradeToLifetime === 'true') {
-              const previousSubscriptionId = session.metadata?.previousSubscriptionId
-
-              if (previousSubscriptionId) {
-                try {
-                  // Cancel the previous subscription immediately
-                  await stripe.subscriptions.cancel(previousSubscriptionId, {
-                    invoice_now: false,
-                    prorate: true,
-                  })
-                } catch (error) {
-                  console.error('Error canceling previous subscription:', error)
-                }
-              }
-            }
-
-            // Update to lifetime subscription
-            await handleLifetimeSubscription(userId, session.customer as string, priceId)
-          }
-          break
-        }
-        case 'charge.succeeded': {
-          const charge = event.data.object as Stripe.Charge
-          const userId = charge.metadata?.userId
-          if (!userId) {
-            console.error('No userId found in charge metadata')
-            return res.status(400).json({ error: 'No userId found' })
-          }
-          await handleLifetimeSubscription(
-            userId,
-            charge.customer as string,
-            charge.amount > 0 ? charge.amount.toString() : null,
-          )
-          break
-        }
-        case 'customer.subscription.deleted': {
-          const subscription = event.data.object as Stripe.Subscription
-          const customer = await stripe.customers.retrieve(subscription.customer as string)
-          const userId = (customer as Stripe.Customer).metadata?.userId
-
-          if (!userId) {
-            console.error('No userId found in customer metadata:', subscription.customer)
-            break
-          }
-
-          // Check if this was part of a lifetime upgrade
-          const recentCheckout = await stripe.checkout.sessions.list({
-            customer: subscription.customer as string,
-            limit: 1,
-          })
-
-          const latestSession = recentCheckout.data[0]
-
-          // If this was a lifetime upgrade, don't update the subscription
-          if (
-            latestSession &&
-            latestSession.mode === 'payment' &&
-            latestSession.metadata?.isUpgradeToLifetime === 'true' &&
-            Date.now() - latestSession.created * 1000 < 300000 // Within last 5 minutes
-          ) {
-            break
-          }
-
-          // Otherwise proceed with normal subscription deletion
-          await updateSubscriptionInDatabase(subscription)
-          break
-        }
-        default:
-          console.warn('Unhandled relevant event:', event.type)
-          throw new Error(`Unhandled relevant event: ${event.type}`)
+      if (existingEvent) {
+        return // Idempotency: skip already processed events
       }
-    } catch (error) {
-      console.error('Error processing webhook event:', error)
-      return res.status(500).json({ error: 'Webhook handler failed' })
+
+      // Record event processing
+      await tx.webhookEvent.create({
+        data: {
+          stripeEventId: event.id,
+          eventType: event.type,
+          processedAt: new Date(),
+        },
+      })
+
+      await processWebhookEvent(event, tx)
+    })
+
+    return res.status(200).json({ received: true })
+  } catch (error) {
+    console.error('Webhook processing failed:', error)
+    return res.status(500).json({ error: 'Webhook processing failed' })
+  }
+}
+
+async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionClient) {
+  switch (event.type) {
+    case 'customer.deleted':
+      await handleCustomerDeleted(event.data.object as Stripe.Customer, tx)
+      break
+    case 'customer.subscription.created':
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object as Stripe.Subscription
+      if (['trialing', 'active'].includes(subscription.status)) {
+        await updateSubscription(subscription, tx)
+      }
+      break
     }
+    case 'customer.subscription.deleted':
+      await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, tx)
+      break
+    case 'invoice.payment_succeeded':
+    case 'invoice.payment_failed':
+      await handleInvoiceEvent(event.data.object as Stripe.Invoice, tx)
+      break
+    case 'checkout.session.completed':
+      await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session, tx)
+      break
+    case 'charge.succeeded':
+      await handleChargeSucceeded(event.data.object as Stripe.Charge, tx)
+      break
   }
-
-  return res.status(200).json({ received: true })
 }
 
-async function handleCustomerDeleted(customer: Stripe.Customer) {
-  // First try to find subscription by customer ID or check metadata for userId
-  const existingSubscription =
-    (await prisma.subscription.findFirst({
-      where: { stripeCustomerId: customer.id },
-    })) ||
-    (await prisma.subscription.findUnique({
-      where: { userId: customer.metadata?.userId as string },
-    }))
-
-  if (!existingSubscription) {
-    console.warn(`No subscription found for deleted customer: ${customer.id}`)
-    return
-  }
-
-  // Update using userId instead of stripeCustomerId
-  await prisma.subscription.delete({
-    where: { userId: existingSubscription.userId },
-  })
-}
-
-async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
-  const priceId = subscription.items.data[0].price.id
-  const customerId = subscription.customer as string
-
-  // Get the customer to find the userId from metadata
-  const customer = await stripe.customers.retrieve(customerId)
-  const userId = (customer as Stripe.Customer).metadata?.userId
-
-  if (!userId) {
-    console.error('No userId found in customer metadata:', customerId)
-    return
-  }
-
-  // Try to find subscription by userId
-  const existingSubscription = await prisma.subscription.findUnique({
-    where: { userId },
-  })
-
-  // Update existing subscription
-  const updateData = {
-    status: subscription.status,
-    tier: getSubscriptionTier(priceId, subscription.status),
-    stripePriceId: priceId,
-    stripeSubscriptionId: subscription.id,
-    stripeCustomerId: customerId,
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    cancelAtPeriodEnd: subscription.cancel_at_period_end,
-  }
-
-  if (existingSubscription) {
-    await prisma.subscription.update({
+async function handleCustomerDeleted(customer: Stripe.Customer, tx: Prisma.TransactionClient) {
+  const userId = customer.metadata?.userId
+  if (userId) {
+    await tx.subscription.deleteMany({
       where: { userId },
-      data: updateData,
-    })
-  } else {
-    // Create new subscription if none exists
-    await prisma.subscription.create({
-      data: {
-        userId,
-        ...updateData,
-      },
     })
   }
 }
 
-async function handleLifetimeSubscription(
+async function updateSubscription(subscription: Stripe.Subscription, tx: Prisma.TransactionClient) {
+  const customer = await stripe.customers.retrieve(subscription.customer as string)
+  const userId = (customer as Stripe.Customer).metadata?.userId
+  if (!userId) return
+
+  const priceId = subscription.items.data[0].price.id
+
+  await tx.subscription.upsert({
+    where: { userId },
+    update: {
+      status: subscription.status,
+      tier: getSubscriptionTier(priceId, subscription.status),
+      stripePriceId: priceId,
+      stripeSubscriptionId: subscription.id,
+      stripeCustomerId: subscription.customer as string,
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+    create: {
+      userId,
+      status: subscription.status,
+      tier: getSubscriptionTier(priceId, subscription.status),
+      stripePriceId: priceId,
+      stripeSubscriptionId: subscription.id,
+      stripeCustomerId: subscription.customer as string,
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+  })
+}
+
+async function handleSubscriptionDeleted(
+  subscription: Stripe.Subscription,
+  tx: Prisma.TransactionClient,
+) {
+  const customer = await stripe.customers.retrieve(subscription.customer as string)
+  const userId = (customer as Stripe.Customer).metadata?.userId
+  if (!userId) return
+
+  // Check if this is part of a lifetime upgrade
+  const recentCheckout = await stripe.checkout.sessions.list({
+    customer: subscription.customer as string,
+    limit: 1,
+  })
+
+  if (
+    recentCheckout.data[0]?.metadata?.isUpgradeToLifetime === 'true' &&
+    Date.now() - recentCheckout.data[0].created * 1000 < 300000
+  ) {
+    return // Skip if part of lifetime upgrade
+  }
+
+  await updateSubscription(subscription, tx)
+}
+
+async function handleInvoiceEvent(invoice: Stripe.Invoice, tx: Prisma.TransactionClient) {
+  if (invoice.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
+    await updateSubscription(subscription, tx)
+  }
+}
+
+async function handleCheckoutCompleted(
+  session: Stripe.Checkout.Session,
+  tx: Prisma.TransactionClient,
+) {
+  const userId = session.metadata?.userId
+  if (!userId) return
+
+  if (session.mode === 'subscription' && session.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+    await updateSubscription(subscription, tx)
+  } else if (session.mode === 'payment') {
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+    const priceId = lineItems.data[0]?.price?.id ?? null
+
+    if (
+      session.metadata?.isUpgradeToLifetime === 'true' &&
+      session.metadata?.previousSubscriptionId
+    ) {
+      await stripe.subscriptions.cancel(session.metadata.previousSubscriptionId, {
+        invoice_now: false,
+        prorate: true,
+      })
+    }
+
+    await handleLifetimePurchase(userId, session.customer as string, priceId, tx)
+  }
+}
+
+async function handleChargeSucceeded(charge: Stripe.Charge, tx: Prisma.TransactionClient) {
+  const userId = charge.metadata?.userId
+  if (!userId) return
+
+  await handleLifetimePurchase(
+    userId,
+    charge.customer as string,
+    charge.amount > 0 ? charge.amount.toString() : null,
+    tx,
+  )
+}
+
+async function handleLifetimePurchase(
   userId: string,
   customerId: string,
   priceId: string | null,
+  tx: Prisma.TransactionClient,
 ) {
-  const subscriptionData = {
-    status: 'active' as const,
-    tier: getSubscriptionTier(priceId, 'active'),
-    stripePriceId: priceId || '',
-    stripeCustomerId: customerId,
-    currentPeriodEnd: new Date('2099-12-31'), // Lifetime access
-    cancelAtPeriodEnd: false,
-    stripeSubscriptionId: null, // Clear subscription ID for lifetime
-  }
-
-  await prisma.subscription.upsert({
+  await tx.subscription.upsert({
     where: { userId },
+    update: {
+      status: 'active',
+      tier: getSubscriptionTier(priceId, 'active'),
+      stripePriceId: priceId || '',
+      stripeCustomerId: customerId,
+      currentPeriodEnd: new Date('2099-12-31'),
+      cancelAtPeriodEnd: false,
+      stripeSubscriptionId: null,
+    },
     create: {
       userId,
-      ...subscriptionData,
+      status: 'active',
+      tier: getSubscriptionTier(priceId, 'active'),
+      stripePriceId: priceId || '',
+      stripeCustomerId: customerId,
+      currentPeriodEnd: new Date('2099-12-31'),
+      cancelAtPeriodEnd: false,
+      stripeSubscriptionId: null,
     },
-    update: subscriptionData,
   })
+}
+
+async function getRawBody(req: NextApiRequest): Promise<string> {
+  const chunks: Uint8Array[] = []
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
+  }
+  return Buffer.concat(chunks).toString()
 }
