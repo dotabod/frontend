@@ -280,6 +280,15 @@ export function getSubscriptionStatusInfo(
 ): SubscriptionStatusInfo | null {
   if (!status) return null
 
+  // Check for lifetime subscription
+  if (status === 'active' && currentPeriodEnd && currentPeriodEnd.getFullYear() > 2090) {
+    return {
+      message: 'Lifetime access',
+      type: 'success',
+      badge: 'gold',
+    }
+  }
+
   const endDate = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : 'unknown'
 
   switch (status) {
@@ -338,7 +347,7 @@ export function getSubscriptionStatusInfo(
 
 // Add new helper for determining tier
 export function getSubscriptionTier(
-  priceId: string | null,
+  priceId: string | null | undefined,
   status: SubscriptionTierStatus | undefined,
 ): SubscriptionTier {
   console.log('getSubscriptionTier called with:', { priceId, status })

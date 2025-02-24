@@ -117,6 +117,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
           }
         : undefined,
+      customer_update: {
+        name: 'auto',
+        address: 'auto',
+      },
+      metadata: {
+        userId: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        image: session.user.image,
+        locale: session.user.locale,
+        twitchId: session.user.twitchId,
+      },
     })
 
     return res.status(200).json({ url: checkoutSession.url })
