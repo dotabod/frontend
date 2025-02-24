@@ -8,27 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELED
-  INCOMPLETE
-  INCOMPLETE_EXPIRED
-  PAST_DUE
-  PAUSED
-  TRIALING
-  UNPAID
-}
-
-enum SubscriptionTier {
-  FREE
-  PRO
-}
-
-enum TransactionType {
-  RECURRING
-  LIFETIME
-}
-
 model Account {
   id                   String    @id @default(dbgenerated("gen_random_uuid()"))
   userId               String    @unique
@@ -214,19 +193,19 @@ model admin {
 }
 
 model Subscription {
-  id                   String            @id @default(dbgenerated("gen_random_uuid()"))
+  id                   String              @id @default(dbgenerated("gen_random_uuid()"))
   userId               String
   stripeCustomerId     String?
   stripePriceId        String?
-  stripeSubscriptionId String?           @unique
-  tier                 SubscriptionTier  @default(FREE)
+  stripeSubscriptionId String?             @unique
   status               SubscriptionStatus?
   transactionType      TransactionType
   currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean           @default(false)
-  createdAt            DateTime          @default(now()) @map("created_at")
-  updatedAt            DateTime          @default(now()) @map("updated_at")
-  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cancelAtPeriodEnd    Boolean             @default(false)
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @default(now()) @map("updated_at")
+  tier                 SubscriptionTier    @default(FREE)
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -239,4 +218,25 @@ model WebhookEvent {
   stripeEventId String   @unique
   eventType     String
   processedAt   DateTime
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  PAUSED
+  TRIALING
+  UNPAID
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+}
+
+enum TransactionType {
+  RECURRING
+  LIFETIME
 }
