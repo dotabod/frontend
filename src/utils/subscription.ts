@@ -219,25 +219,6 @@ export function getCurrentPeriod(priceId?: string): PricePeriod {
   return 'annual' // Default to annual if no match found
 }
 
-export function isButtonDisabled(
-  subscription: SubscriptionStatus | null,
-  targetTier: SubscriptionTier,
-  targetPeriod: PricePeriod,
-): boolean {
-  if (subscription?.status === 'trialing') return true
-
-  // Free tier button should never be disabled
-  if (targetTier === SUBSCRIPTION_TIERS.FREE) return false
-
-  if (!subscription || subscription.status !== 'active') return false
-
-  const targetPriceId = getPriceId(
-    targetTier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
-    targetPeriod,
-  )
-  return subscription.stripePriceId === targetPriceId && !subscription.cancelAtPeriodEnd
-}
-
 // Validation
 if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
   throw new Error('Missing required Stripe price IDs in environment variables')

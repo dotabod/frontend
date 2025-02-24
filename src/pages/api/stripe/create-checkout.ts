@@ -21,13 +21,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Price ID is required' })
     }
 
-    // First check if user has a subscription record
-    const subscription = await prisma.subscription.findUnique({
+    // Verify price type before creating checkout
+    const price = await stripe.prices.retrieve(priceId)
+    const isRecurring = price.type === 'recurring'
+    const isLifetime = !isRecurring
+
+    // Get current subscription if exists
+    const subscriptionData = await prisma.subscription.findUnique({
       where: { userId: session.user.id },
-      select: { stripeCustomerId: true },
+      select: {
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
+        status: true,
+        stripePriceId: true,
+      },
     })
 
-    let customerId = subscription?.stripeCustomerId
+    let customerId = subscriptionData?.stripeCustomerId
 
     if (customerId) {
       // Verify if customer still exists in Stripe
@@ -98,11 +108,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Could not create or find customer' })
     }
 
-    // Verify price type before creating checkout
-    const price = await stripe.prices.retrieve(priceId)
-    const isRecurring = price.type === 'recurring'
+    // Handle upgrade to lifetime case
+    if (isLifetime && subscriptionData?.stripeSubscriptionId) {
+      // Schedule the current subscription to cancel at period end
+      await stripe.subscriptions.update(subscriptionData.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      })
+    }
 
-    // Create checkout session with trial period
+    // Create checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: isRecurring ? 'subscription' : 'payment',
@@ -122,10 +136,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
           }
         : undefined,
-      customer_update: {
-        name: 'auto',
-        address: 'auto',
-      },
+      allow_promotion_codes: true,
       metadata: {
         userId: session.user.id ?? '',
         email: session.user.email ?? '',
@@ -133,6 +144,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         image: session.user.image ?? '',
         locale: session.user.locale ?? '',
         twitchId: session.user.twitchId ?? '',
+        isUpgradeToLifetime:
+          isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+        previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       },
     })
 

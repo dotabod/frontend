@@ -85,6 +85,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const session = event.data.object as Stripe.Checkout.Session
 
           if (session.mode === 'subscription') {
+            // Handle regular subscription case
           } else if (session.mode === 'payment') {
             const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
             const priceId = lineItems.data[0]?.price?.id
@@ -96,11 +97,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               return res.status(400).json({ error: 'No userId found' })
             }
 
-            // Find existing subscription first
-            const existingSubscription = await prisma.subscription.findUnique({
-              where: { userId },
-            })
+            // Handle upgrade to lifetime case
+            if (session.metadata?.isUpgradeToLifetime === 'true') {
+              const previousSubscriptionId = session.metadata?.previousSubscriptionId
 
+              if (previousSubscriptionId) {
+                // Cancel the previous subscription immediately instead of waiting for period end
+                try {
+                  await stripe.subscriptions.cancel(previousSubscriptionId, {
+                    invoice_now: false, // Don't generate a final invoice
+                    prorate: true,
+                  })
+                } catch (error) {
+                  console.error('Error canceling previous subscription:', error)
+                }
+              }
+            }
+
+            // Update subscription in database
             const subscriptionData = {
               status: 'active' as const,
               tier: getSubscriptionTier(priceId, 'active'),
@@ -108,21 +122,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               stripeCustomerId: session.customer as string,
               currentPeriodEnd: new Date('2099-12-31'), // Lifetime access
               cancelAtPeriodEnd: false,
+              stripeSubscriptionId: null, // Clear subscription ID for lifetime
             }
 
-            if (existingSubscription) {
-              await prisma.subscription.update({
-                where: { userId },
-                data: subscriptionData,
-              })
-            } else {
-              await prisma.subscription.create({
-                data: {
-                  userId,
-                  ...subscriptionData,
-                },
-              })
-            }
+            await prisma.subscription.upsert({
+              where: { userId },
+              create: {
+                userId,
+                ...subscriptionData,
+              },
+              update: subscriptionData,
+            })
           }
           break
         }

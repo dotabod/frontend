@@ -6,7 +6,6 @@ import {
   type SubscriptionTier,
   calculateSavings,
   getPriceId,
-  isButtonDisabled,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import { Button, notification } from 'antd'
@@ -90,6 +89,11 @@ function Plan({
       return button.label
     }
 
+    // Special case for lifetime when already subscribed
+    if (tier === 'pro' && activePeriod === 'lifetime') {
+      return 'Upgrade to lifetime'
+    }
+
     return 'Manage plan'
   }
 
@@ -110,6 +114,7 @@ function Plan({
         window.location.href = '/dashboard'
         return
       }
+
       // If user has an active subscription or is trialing, redirect to portal
       if (isSubscriptionActive({ status: subscription?.status })) {
         const response = await fetch('/api/stripe/portal', {
@@ -262,7 +267,6 @@ function Plan({
       <Button
         loading={redirectingToCheckout}
         onClick={handleSubscribe}
-        disabled={isButtonDisabled(subscription, tier, activePeriod)}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
         className={clsx(
