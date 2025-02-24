@@ -8,7 +8,7 @@ import {
   getPriceId,
   isSubscriptionActive,
 } from '@/utils/subscription'
-import { Button, notification } from 'antd'
+import { Button, Modal, notification } from 'antd'
 import clsx from 'clsx'
 import { CheckIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
@@ -112,6 +112,48 @@ function Plan({
       // If free plan, redirect to dashboard
       if (tier === 'free') {
         window.location.href = '/dashboard'
+        return
+      }
+
+      // Special case for upgrading to lifetime
+      if (
+        tier === 'pro' &&
+        activePeriod === 'lifetime' &&
+        isSubscriptionActive({ status: subscription?.status }) &&
+        subscription?.stripePriceId !== getPriceId('pro', 'lifetime')
+      ) {
+        // Show confirmation modal before proceeding
+        Modal.confirm({
+          title: 'Upgrade to Lifetime Access',
+          content: (
+            <div className='space-y-2 mt-2'>
+              <p>You currently have an active subscription. Here's what will happen:</p>
+              <ul className='list-disc pl-4 space-y-1'>
+                <li>Your current subscription will be automatically canceled</li>
+                <li>You'll be charged once for lifetime access</li>
+                <li>Your access to Pro features will continue uninterrupted</li>
+                <li>You won't be charged any recurring fees in the future</li>
+              </ul>
+              <p className='mt-4'>Would you like to proceed with the upgrade?</p>
+            </div>
+          ),
+          okText: 'Upgrade to Lifetime',
+          cancelText: 'Cancel',
+          onOk: async () => {
+            // Create new checkout session for lifetime upgrade
+            const priceId = getPriceId('pro', 'lifetime')
+            const response = await createCheckoutSession(priceId, session.user.id)
+
+            if (!response.url) {
+              throw new Error('Failed to create checkout session')
+            }
+
+            window.location.href = response.url
+          },
+          className: 'text-base',
+          width: 500,
+        })
+        setRedirectingToCheckout(false)
         return
       }
 

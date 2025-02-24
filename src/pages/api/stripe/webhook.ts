@@ -19,6 +19,7 @@ const relevantEvents = new Set([
   'invoice.payment_succeeded',
   'invoice.payment_failed',
   'checkout.session.completed',
+  'charge.succeeded',
 ])
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -90,7 +91,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
             const priceId = lineItems.data[0]?.price?.id
 
-            // Get userId from session metadata
             const userId = session.metadata?.userId
             if (!userId) {
               console.error('No userId found in session metadata')
@@ -102,10 +102,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               const previousSubscriptionId = session.metadata?.previousSubscriptionId
 
               if (previousSubscriptionId) {
-                // Cancel the previous subscription immediately instead of waiting for period end
                 try {
+                  // Cancel the previous subscription immediately
                   await stripe.subscriptions.cancel(previousSubscriptionId, {
-                    invoice_now: false, // Don't generate a final invoice
+                    invoice_now: false,
                     prorate: true,
                   })
                 } catch (error) {
@@ -114,26 +114,55 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               }
             }
 
-            // Update subscription in database
-            const subscriptionData = {
-              status: 'active' as const,
-              tier: getSubscriptionTier(priceId, 'active'),
-              stripePriceId: priceId || '',
-              stripeCustomerId: session.customer as string,
-              currentPeriodEnd: new Date('2099-12-31'), // Lifetime access
-              cancelAtPeriodEnd: false,
-              stripeSubscriptionId: null, // Clear subscription ID for lifetime
-            }
-
-            await prisma.subscription.upsert({
-              where: { userId },
-              create: {
-                userId,
-                ...subscriptionData,
-              },
-              update: subscriptionData,
-            })
+            // Update to lifetime subscription
+            await handleLifetimeSubscription(userId, session.customer as string, priceId)
           }
+          break
+        }
+        case 'charge.succeeded': {
+          const charge = event.data.object as Stripe.Charge
+          const userId = charge.metadata?.userId
+          if (!userId) {
+            console.error('No userId found in charge metadata')
+            return res.status(400).json({ error: 'No userId found' })
+          }
+          await handleLifetimeSubscription(
+            userId,
+            charge.customer as string,
+            charge.amount > 0 ? charge.amount.toString() : null,
+          )
+          break
+        }
+        case 'customer.subscription.deleted': {
+          const subscription = event.data.object as Stripe.Subscription
+          const customer = await stripe.customers.retrieve(subscription.customer as string)
+          const userId = (customer as Stripe.Customer).metadata?.userId
+
+          if (!userId) {
+            console.error('No userId found in customer metadata:', subscription.customer)
+            break
+          }
+
+          // Check if this was part of a lifetime upgrade
+          const recentCheckout = await stripe.checkout.sessions.list({
+            customer: subscription.customer as string,
+            limit: 1,
+          })
+
+          const latestSession = recentCheckout.data[0]
+
+          // If this was a lifetime upgrade, don't update the subscription
+          if (
+            latestSession &&
+            latestSession.mode === 'payment' &&
+            latestSession.metadata?.isUpgradeToLifetime === 'true' &&
+            Date.now() - latestSession.created * 1000 < 300000 // Within last 5 minutes
+          ) {
+            break
+          }
+
+          // Otherwise proceed with normal subscription deletion
+          await updateSubscriptionInDatabase(subscription)
           break
         }
         default:
@@ -213,4 +242,29 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
       },
     })
   }
+}
+
+async function handleLifetimeSubscription(
+  userId: string,
+  customerId: string,
+  priceId: string | null,
+) {
+  const subscriptionData = {
+    status: 'active' as const,
+    tier: getSubscriptionTier(priceId, 'active'),
+    stripePriceId: priceId || '',
+    stripeCustomerId: customerId,
+    currentPeriodEnd: new Date('2099-12-31'), // Lifetime access
+    cancelAtPeriodEnd: false,
+    stripeSubscriptionId: null, // Clear subscription ID for lifetime
+  }
+
+  await prisma.subscription.upsert({
+    where: { userId },
+    create: {
+      userId,
+      ...subscriptionData,
+    },
+    update: subscriptionData,
+  })
 }

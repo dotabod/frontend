@@ -108,14 +108,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Could not create or find customer' })
     }
 
-    // Handle upgrade to lifetime case
-    if (isLifetime && subscriptionData?.stripeSubscriptionId) {
-      // Schedule the current subscription to cancel at period end
-      await stripe.subscriptions.update(subscriptionData.stripeSubscriptionId, {
-        cancel_at_period_end: true,
-      })
-    }
-
     // Create checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
