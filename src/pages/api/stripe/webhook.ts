@@ -22,7 +22,13 @@ const relevantEvents = new Set([
 ])
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('Received webhook request:', {
+    method: req.method,
+    headers: req.headers,
+  })
+
   if (req.method !== 'POST') {
+    console.log('Invalid request method:', req.method)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
@@ -30,6 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
   if (!signature || !webhookSecret) {
+    console.log('Missing webhook secret or signature:', { signature, webhookSecret })
     return res.status(400).json({ error: 'Missing stripe webhook secret' })
   }
 
@@ -43,17 +50,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const rawBody = Buffer.concat(chunks).toString()
+    console.log('Raw webhook body:', rawBody)
 
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
+    console.log('Constructed webhook event:', event)
   } catch (err) {
     console.error('Error verifying webhook:', err)
     return res.status(400).json({ error: 'Webhook error' })
   }
 
   if (relevantEvents.has(event.type)) {
+    console.log('Processing relevant event:', event.type)
     try {
       switch (event.type) {
         case 'customer.deleted': {
+          console.log('Processing customer.deleted event')
           const customer = event.data.object as Stripe.Customer
           await handleCustomerDeleted(customer)
           break
@@ -61,11 +72,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted': {
+          console.log('Processing subscription event:', event.type)
           const subscription = event.data.object as Stripe.Subscription
           await updateSubscriptionInDatabase(subscription)
           break
         }
         case 'invoice.payment_succeeded': {
+          console.log('Processing invoice.payment_succeeded event')
           const invoice = event.data.object as Stripe.Invoice
           if (invoice.subscription) {
             const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
@@ -74,6 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           break
         }
         case 'invoice.payment_failed': {
+          console.log('Processing invoice.payment_failed event')
           const invoice = event.data.object as Stripe.Invoice
           if (invoice.subscription) {
             const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
@@ -82,40 +96,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           break
         }
         case 'checkout.session.completed': {
+          console.log('Processing checkout.session.completed event')
           const session = event.data.object as Stripe.Checkout.Session
 
-          // Get user ID from metadata or try to find by customer ID
-          const customerId = session.customer as string
-          let userId: string | undefined
-
-          // Try to find existing subscription by customer ID first
-          const existingSubscription = await prisma.subscription.findFirst({
-            where: { stripeCustomerId: customerId },
-          })
-
-          if (existingSubscription) {
-            userId = existingSubscription.userId
-          } else {
-            // If no existing subscription, try to get user from customer
-            const customer = await stripe.customers.retrieve(customerId)
-            userId = (customer as Stripe.Customer).metadata?.userId
-          }
-
-          if (!userId) {
-            console.error('No userId found for checkout session:', session.id)
-            return res.status(400).json({ error: 'No userId found' })
-          }
-
           if (session.mode === 'subscription') {
-            if (session.subscription) {
-              const subscription = await stripe.subscriptions.retrieve(
-                session.subscription as string,
-              )
-              await updateSubscriptionInDatabase(subscription)
-            }
+            console.log('Subscription mode checkout completed - waiting for subscription webhook')
           } else if (session.mode === 'payment') {
+            console.log('Processing payment mode checkout')
             const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
             const priceId = lineItems.data[0]?.price?.id
+            console.log('Retrieved line items:', { lineItems, priceId })
+
+            // Get userId from session metadata
+            const userId = session.metadata?.userId
+            if (!userId) {
+              console.error('No userId found in session metadata')
+              return res.status(400).json({ error: 'No userId found' })
+            }
 
             // Find existing subscription first
             const existingSubscription = await prisma.subscription.findUnique({
@@ -126,19 +123,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               status: 'active' as const,
               tier: getSubscriptionTier(priceId, 'active'),
               stripePriceId: priceId || '',
-              stripeCustomerId: customerId,
-              currentPeriodEnd: new Date('2099-12-31'),
+              stripeCustomerId: session.customer as string,
+              currentPeriodEnd: new Date('2099-12-31'), // Lifetime access
               cancelAtPeriodEnd: false,
             }
+            console.log('Prepared subscription data:', subscriptionData)
 
             if (existingSubscription) {
-              // Update existing subscription
+              console.log('Updating existing subscription')
               await prisma.subscription.update({
                 where: { userId },
                 data: subscriptionData,
               })
             } else {
-              // Create new subscription
+              console.log('Creating new subscription')
               await prisma.subscription.create({
                 data: {
                   userId,
@@ -150,6 +148,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           break
         }
         default:
+          console.warn('Unhandled relevant event:', event.type)
           throw new Error(`Unhandled relevant event: ${event.type}`)
       }
     } catch (error) {
@@ -162,6 +161,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleCustomerDeleted(customer: Stripe.Customer) {
+  console.log('Handling customer deleted:', customer)
   // First try to find subscription by customer ID or check metadata for userId
   const existingSubscription =
     (await prisma.subscription.findFirst({
@@ -176,6 +176,7 @@ async function handleCustomerDeleted(customer: Stripe.Customer) {
     return
   }
 
+  console.log('Deleting subscription:', existingSubscription)
   // Update using userId instead of stripeCustomerId
   await prisma.subscription.delete({
     where: { userId: existingSubscription.userId },
@@ -193,29 +194,46 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
     status: subscription.status,
   })
 
-  // Try to find subscription by either customer ID or subscription ID
-  const existingSubscription = await prisma.subscription.findFirst({
-    where: {
-      OR: [{ stripeCustomerId: customerId }, { stripeSubscriptionId: subscription.id }],
-    },
-  })
+  // Get the customer to find the userId from metadata
+  const customer = await stripe.customers.retrieve(customerId)
+  const userId = (customer as Stripe.Customer).metadata?.userId
 
-  if (!existingSubscription) {
-    console.warn(`No subscription found for Stripe customer: ${customerId}`)
+  if (!userId) {
+    console.error('No userId found in customer metadata:', customerId)
     return
   }
 
-  // Update existing subscription
-  await prisma.subscription.update({
-    where: { userId: existingSubscription.userId },
-    data: {
-      status: subscription.status,
-      tier: getSubscriptionTier(priceId, subscription.status),
-      stripePriceId: priceId,
-      stripeSubscriptionId: subscription.id,
-      stripeCustomerId: customerId,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    },
+  // Try to find subscription by userId
+  const existingSubscription = await prisma.subscription.findUnique({
+    where: { userId },
   })
+
+  console.log('Found existing subscription:', existingSubscription)
+
+  // Update existing subscription
+  const updateData = {
+    status: subscription.status,
+    tier: getSubscriptionTier(priceId, subscription.status),
+    stripePriceId: priceId,
+    stripeSubscriptionId: subscription.id,
+    stripeCustomerId: customerId,
+    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+  }
+  console.log('Updating with data:', updateData)
+
+  if (existingSubscription) {
+    await prisma.subscription.update({
+      where: { userId },
+      data: updateData,
+    })
+  } else {
+    // Create new subscription if none exists
+    await prisma.subscription.create({
+      data: {
+        userId,
+        ...updateData,
+      },
+    })
+  }
 }
