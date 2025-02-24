@@ -85,8 +85,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (action === 'delete') {
       // First get the user's subscription info
-      const subscription = await prisma.subscription.findUnique({
-        where: { userId: session.user.id },
+      const subscription = await prisma.subscription.findFirst({
+        where: {
+          userId: session.user.id,
+          status: 'ACTIVE',
+        },
         select: { stripeSubscriptionId: true, stripeCustomerId: true },
       })
 

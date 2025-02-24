@@ -1,6 +1,6 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { getSubscriptionTier } from '@/utils/subscription'
+import { type SubscriptionTierStatus, getSubscriptionTier } from '@/utils/subscription'
 import type { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
@@ -21,6 +21,17 @@ const relevantEvents = new Set([
   'checkout.session.completed',
   'charge.succeeded',
 ])
+
+const statusMap: Record<SubscriptionTierStatus, string> = {
+  active: 'ACTIVE',
+  canceled: 'CANCELED',
+  incomplete: 'INCOMPLETE',
+  incomplete_expired: 'INCOMPLETE_EXPIRED',
+  past_due: 'PAST_DUE',
+  paused: 'PAUSED',
+  trialing: 'TRIALING',
+  unpaid: 'UNPAID',
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -43,24 +54,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Webhook verification failed' })
   }
 
-  // Early return for non-relevant events
   if (!relevantEvents.has(event.type)) {
     return res.status(200).json({ received: true })
   }
 
   try {
-    // Process event with transaction lock
     await prisma.$transaction(async (tx) => {
-      // Check if event was already processed
       const existingEvent = await tx.webhookEvent.findUnique({
         where: { stripeEventId: event.id },
       })
 
       if (existingEvent) {
-        return // Idempotency: skip already processed events
+        return // Idempotency
       }
 
-      // Record event processing
       await tx.webhookEvent.create({
         data: {
           stripeEventId: event.id,
@@ -85,13 +92,9 @@ async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionCl
       await handleCustomerDeleted(event.data.object as Stripe.Customer, tx)
       break
     case 'customer.subscription.created':
-    case 'customer.subscription.updated': {
-      const subscription = event.data.object as Stripe.Subscription
-      if (['trialing', 'active'].includes(subscription.status)) {
-        await updateSubscription(subscription, tx)
-      }
+    case 'customer.subscription.updated':
+      await handleSubscriptionEvent(event.data.object as Stripe.Subscription, tx)
       break
-    }
     case 'customer.subscription.deleted':
       await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, tx)
       break
@@ -109,39 +112,33 @@ async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionCl
 }
 
 async function handleCustomerDeleted(customer: Stripe.Customer, tx: Prisma.TransactionClient) {
-  const userId = customer.metadata?.userId
-  if (userId) {
-    await tx.subscription.deleteMany({
-      where: { userId },
-    })
-  }
+  await tx.subscription.deleteMany({
+    where: { userId: customer.metadata?.userId },
+  })
 }
 
-async function updateSubscription(subscription: Stripe.Subscription, tx: Prisma.TransactionClient) {
+async function handleSubscriptionEvent(
+  subscription: Stripe.Subscription,
+  tx: Prisma.TransactionClient,
+) {
   const customer = await stripe.customers.retrieve(subscription.customer as string)
   const userId = (customer as Stripe.Customer).metadata?.userId
   if (!userId) return
 
+  const status = statusMap[subscription.status]
+  if (!status) return
+
   const priceId = subscription.items.data[0].price.id
 
-  await tx.subscription.upsert({
-    where: { userId },
-    update: {
-      status: subscription.status,
-      tier: getSubscriptionTier(priceId, subscription.status),
-      stripePriceId: priceId,
-      stripeSubscriptionId: subscription.id,
-      stripeCustomerId: subscription.customer as string,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    },
-    create: {
+  await tx.subscription.create({
+    data: {
       userId,
-      status: subscription.status,
+      status,
       tier: getSubscriptionTier(priceId, subscription.status),
       stripePriceId: priceId,
       stripeSubscriptionId: subscription.id,
       stripeCustomerId: subscription.customer as string,
+      transactionType: 'RECURRING',
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
@@ -156,26 +153,30 @@ async function handleSubscriptionDeleted(
   const userId = (customer as Stripe.Customer).metadata?.userId
   if (!userId) return
 
-  // Check if this is part of a lifetime upgrade
-  const recentCheckout = await stripe.checkout.sessions.list({
-    customer: subscription.customer as string,
-    limit: 1,
+  await tx.subscription.updateMany({
+    where: { stripeSubscriptionId: subscription.id },
+    data: {
+      status: 'CANCELED',
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: true,
+    },
   })
-
-  if (
-    recentCheckout.data[0]?.metadata?.isUpgradeToLifetime === 'true' &&
-    Date.now() - recentCheckout.data[0].created * 1000 < 300000
-  ) {
-    return // Skip if part of lifetime upgrade
-  }
-
-  await updateSubscription(subscription, tx)
 }
 
 async function handleInvoiceEvent(invoice: Stripe.Invoice, tx: Prisma.TransactionClient) {
   if (invoice.subscription) {
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
-    await updateSubscription(subscription, tx)
+
+    const status = statusMap[subscription.status] || 'INACTIVE'
+
+    await tx.subscription.updateMany({
+      where: { stripeSubscriptionId: subscription.id },
+      data: {
+        status,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      },
+    })
   }
 }
 
@@ -188,7 +189,7 @@ async function handleCheckoutCompleted(
 
   if (session.mode === 'subscription' && session.subscription) {
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-    await updateSubscription(subscription, tx)
+    await handleSubscriptionEvent(subscription, tx)
   } else if (session.mode === 'payment') {
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
     const priceId = lineItems.data[0]?.price?.id ?? null
@@ -197,13 +198,17 @@ async function handleCheckoutCompleted(
       session.metadata?.isUpgradeToLifetime === 'true' &&
       session.metadata?.previousSubscriptionId
     ) {
-      await stripe.subscriptions.cancel(session.metadata.previousSubscriptionId, {
-        invoice_now: false,
-        prorate: true,
-      })
+      try {
+        await stripe.subscriptions.cancel(session.metadata.previousSubscriptionId, {
+          invoice_now: false,
+          prorate: true,
+        })
+      } catch (error) {
+        console.error('Failed to cancel previous subscription:', error)
+      }
     }
 
-    await handleLifetimePurchase(userId, session.customer as string, priceId, tx)
+    await createLifetimePurchase(userId, session.customer as string, priceId, tx)
   }
 }
 
@@ -211,7 +216,7 @@ async function handleChargeSucceeded(charge: Stripe.Charge, tx: Prisma.Transacti
   const userId = charge.metadata?.userId
   if (!userId) return
 
-  await handleLifetimePurchase(
+  await createLifetimePurchase(
     userId,
     charge.customer as string,
     charge.amount > 0 ? charge.amount.toString() : null,
@@ -219,29 +224,20 @@ async function handleChargeSucceeded(charge: Stripe.Charge, tx: Prisma.Transacti
   )
 }
 
-async function handleLifetimePurchase(
+async function createLifetimePurchase(
   userId: string,
   customerId: string,
   priceId: string | null,
   tx: Prisma.TransactionClient,
 ) {
-  await tx.subscription.upsert({
-    where: { userId },
-    update: {
-      status: 'active',
-      tier: getSubscriptionTier(priceId, 'active'),
-      stripePriceId: priceId || '',
-      stripeCustomerId: customerId,
-      currentPeriodEnd: new Date('2099-12-31'),
-      cancelAtPeriodEnd: false,
-      stripeSubscriptionId: null,
-    },
-    create: {
+  await tx.subscription.create({
+    data: {
       userId,
-      status: 'active',
+      status: 'ACTIVE',
       tier: getSubscriptionTier(priceId, 'active'),
       stripePriceId: priceId || '',
       stripeCustomerId: customerId,
+      transactionType: 'LIFETIME',
       currentPeriodEnd: new Date('2099-12-31'),
       cancelAtPeriodEnd: false,
       stripeSubscriptionId: null,

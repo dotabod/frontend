@@ -7,8 +7,8 @@ export type ChatterKeys = keyof typeof defaultSettings.chatters
 export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
 export const SUBSCRIPTION_TIERS = {
-  FREE: 'free',
-  PRO: 'pro',
+  FREE: 'FREE',
+  PRO: 'PRO',
 } as const
 
 export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]

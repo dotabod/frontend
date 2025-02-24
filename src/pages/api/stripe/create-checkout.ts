@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import type { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 interface CheckoutRequestBody {
@@ -66,13 +67,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function ensureCustomer(
   user: {
     id: string
-    email?: string
-    name?: string
-    image?: string
-    locale?: string
-    twitchId?: string
+    email?: string | null
+    name?: string | null
+    image?: string | null
+    locale?: string | null
+    twitchId?: string | null
   },
-  tx: any,
+  tx: Prisma.TransactionClient,
 ): Promise<string> {
   const subscription = await tx.subscription.findUnique({
     where: { userId: user.id },
@@ -149,7 +150,7 @@ async function createStripeCustomer(user: {
   })
 }
 
-async function getCurrentSubscription(userId: string, tx: any) {
+async function getCurrentSubscription(userId: string, tx: Prisma.TransactionClient) {
   return tx.subscription.findUnique({
     where: { userId },
     select: {

@@ -99,9 +99,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     where: {
       user: {
         subscription: {
-          tier: GENERIC_FEATURE_TIERS.managers,
-          status: {
-            in: ['active', 'trialing'],
+          some: {
+            tier: GENERIC_FEATURE_TIERS.managers,
+            status: {
+              in: ['ACTIVE', 'TRIALING'],
+            },
           },
         },
       },

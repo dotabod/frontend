@@ -1,4 +1,4 @@
-import type { SubscriptionTier } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, type SubscriptionTier } from '@/utils/subscription'
 import { Button } from 'antd'
 import Link from 'next/link'
 import { TierBadge } from './TierBadge'
@@ -17,7 +17,7 @@ export function LockedFeatureOverlay({
     </span>
   ),
 }: LockedFeatureOverlayProps) {
-  if (!requiredTier || requiredTier === 'free') {
+  if (!requiredTier || requiredTier === SUBSCRIPTION_TIERS.FREE) {
     return null
   }
 

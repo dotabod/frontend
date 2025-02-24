@@ -2,6 +2,7 @@ import { useSubscription } from '@/hooks/useSubscription'
 import {
   type FeatureTier,
   type GenericFeature,
+  SUBSCRIPTION_TIERS,
   type SubscriptionTier,
   getRequiredTier,
   isSubscriptionActive,
@@ -25,7 +26,7 @@ export const TierBadge: React.FC<{
 
   return (
     tierToShow &&
-    tierToShow !== 'free' && (
+    tierToShow !== SUBSCRIPTION_TIERS.FREE && (
       <Tooltip
         title={
           tooltip && (
@@ -38,7 +39,7 @@ export const TierBadge: React.FC<{
               <Link href='/dashboard/billing'>
                 <Button type='primary' className='mt-2'>
                   <CrownIcon
-                    color={tierToShow === 'pro' ? 'gold' : undefined}
+                    color={tierToShow === SUBSCRIPTION_TIERS.PRO ? 'gold' : undefined}
                     className='h-4 w-4'
                   />{' '}
                   Upgrade your stream
@@ -48,7 +49,7 @@ export const TierBadge: React.FC<{
           )
         }
       >
-        <Tag color={tierToShow === 'pro' ? 'gold' : undefined}>
+        <Tag color={tierToShow === SUBSCRIPTION_TIERS.PRO ? 'gold' : undefined}>
           <div className='flex items-center gap-2 p-1'>
             <CrownIcon className='h-4 w-4' />
             <span className='first-letter:uppercase'>{tierToShow}</span>

@@ -8,6 +8,27 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  PAUSED
+  TRIALING
+  UNPAID
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+}
+
+enum TransactionType {
+  RECURRING
+  LIFETIME
+}
+
 model Account {
   id                   String    @id @default(dbgenerated("gen_random_uuid()"))
   userId               String    @unique
@@ -62,7 +83,7 @@ model User {
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
-  subscription                      Subscription?
+  subscription                      Subscription[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -193,21 +214,23 @@ model admin {
 }
 
 model Subscription {
-  id                   String    @id @default(dbgenerated("gen_random_uuid()"))
-  userId               String    @unique
-  stripeCustomerId     String?   @unique
+  id                   String            @id @default(dbgenerated("gen_random_uuid()"))
+  userId               String
+  stripeCustomerId     String?
   stripePriceId        String?
-  stripeSubscriptionId String?   @unique
-  tier                 String    @default("free")
-  status               String    @default("inactive")
+  stripeSubscriptionId String?           @unique
+  tier                 SubscriptionTier?
+  status               SubscriptionStatus?
+  transactionType      TransactionType
   currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean   @default(false)
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt            DateTime  @default(now()) @map("updated_at")
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cancelAtPeriodEnd    Boolean           @default(false)
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @default(now()) @map("updated_at")
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
+  @@index([transactionType])
   @@map("subscriptions")
 }
 

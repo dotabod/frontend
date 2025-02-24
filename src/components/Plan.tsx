@@ -1,7 +1,7 @@
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   type PricePeriod,
-  type SUBSCRIPTION_TIERS,
+  SUBSCRIPTION_TIERS,
   type SubscriptionStatus,
   type SubscriptionTier,
   calculateSavings,
@@ -58,7 +58,7 @@ function Plan({
   const displayDescription = () => {
     if (
       hasTrial &&
-      tier === 'pro' &&
+      tier === SUBSCRIPTION_TIERS.PRO &&
       activePeriod !== 'lifetime' &&
       (!subscription || subscription.status !== 'active')
     ) {
@@ -75,7 +75,7 @@ function Plan({
   // Update button text logic
   const getSimplifiedButtonText = () => {
     // If free plan, show manage plan
-    if (tier === 'free') {
+    if (tier === SUBSCRIPTION_TIERS.FREE) {
       return 'Manage your subscription'
     }
 
@@ -88,18 +88,18 @@ function Plan({
     }
 
     if (!subscription || subscription.status !== 'active') {
-      if (tier === 'pro' && activePeriod === 'lifetime') {
+      if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod === 'lifetime') {
         return 'Get lifetime access'
       }
 
-      if (tier === 'pro' && activePeriod !== 'lifetime') {
+      if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
         return 'Start free trial'
       }
       return button.label
     }
 
     // Special case for lifetime when already subscribed
-    if (tier === 'pro' && activePeriod === 'lifetime') {
+    if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod === 'lifetime') {
       return 'Upgrade to lifetime'
     }
 
@@ -119,17 +119,17 @@ function Plan({
       }
 
       // If free plan, redirect to dashboard
-      if (tier === 'free') {
+      if (tier === SUBSCRIPTION_TIERS.FREE) {
         window.location.href = '/dashboard'
         return
       }
 
       // Special case for upgrading to lifetime
       if (
-        tier === 'pro' &&
+        tier === SUBSCRIPTION_TIERS.PRO &&
         activePeriod === 'lifetime' &&
         isSubscriptionActive({ status: subscription?.status }) &&
-        subscription?.stripePriceId !== getPriceId('pro', 'lifetime')
+        subscription?.stripePriceId !== getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
       ) {
         // Show confirmation modal before proceeding
         Modal.confirm({
@@ -150,7 +150,7 @@ function Plan({
           cancelText: 'Cancel',
           onOk: async () => {
             // Create new checkout session for lifetime upgrade
-            const priceId = getPriceId('pro', 'lifetime')
+            const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
             const response = await createCheckoutSession(priceId, session.user.id)
 
             if (!response.url) {
@@ -221,7 +221,7 @@ function Plan({
         )}
       >
         {logo ? (
-          activePeriod === 'lifetime' && tier === 'pro' ? (
+          activePeriod === 'lifetime' && tier === SUBSCRIPTION_TIERS.PRO ? (
             <Image
               src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
               width={24}
