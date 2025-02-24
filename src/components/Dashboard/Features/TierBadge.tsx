@@ -20,15 +20,12 @@ export const TierBadge: React.FC<{
   const featureRequiredTier = getRequiredTier(feature)
   const tierToShow = feature ? featureRequiredTier : requiredTier
 
-  if (isSubscriptionActive({ status: subscription?.status })) {
-    return null
-  }
-
   return (
     tierToShow &&
     tierToShow !== SUBSCRIPTION_TIERS.FREE && (
       <Tooltip
         title={
+          !isSubscriptionActive({ status: subscription?.status }) &&
           tooltip && (
             <>
               <span>
@@ -52,7 +49,7 @@ export const TierBadge: React.FC<{
         <Tag color={tierToShow === SUBSCRIPTION_TIERS.PRO ? 'gold' : undefined}>
           <div className='flex items-center gap-2 p-1'>
             <CrownIcon className='h-4 w-4' />
-            <span className='first-letter:uppercase'>{tierToShow}</span>
+            <span className='first-letter:uppercase'>{tierToShow?.toLowerCase()}</span>
           </div>
         </Tag>
       </Tooltip>

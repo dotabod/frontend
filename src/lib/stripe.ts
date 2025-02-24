@@ -1,6 +1,6 @@
 import { PRICE_IDS, getPriceId } from '@/utils/subscription'
 
-export { getPriceId, PRICE_IDS }
+export { PRICE_IDS, getPriceId }
 
 export async function createCheckoutSession(
   priceId: string,
@@ -16,22 +16,6 @@ export async function createCheckoutSession(
 
   if (!response.ok) {
     throw new Error('Failed to create checkout session')
-  }
-
-  return response.json()
-}
-
-export async function createPortalSession(userId: string): Promise<{ url: string }> {
-  const response = await fetch('/api/stripe/create-portal', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ userId }),
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to create portal session')
   }
 
   return response.json()

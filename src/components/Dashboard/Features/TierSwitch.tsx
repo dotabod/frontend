@@ -33,9 +33,7 @@ export function TierSwitch({
     <div className={`flex items-center gap-2 ${className}`}>
       <Switch checked={isChecked} onChange={handleChange} disabled={isDisabled} />
       {label && <span>{label}</span>}
-      {!tierAccess.hasAccess && !hideTierBadge && (
-        <TierBadge requiredTier={tierAccess.requiredTier} />
-      )}
+      {!hideTierBadge && <TierBadge requiredTier={tierAccess.requiredTier} />}
     </div>
   )
 }
