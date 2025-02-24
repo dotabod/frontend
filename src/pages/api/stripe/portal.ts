@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Get or create Stripe customer ID
     // First check if user has a subscription record
-    const subscription = await prisma.subscription.findUnique({
+    const subscription = await prisma.subscription.findFirst({
       where: { userId: session.user.id },
       select: { stripeCustomerId: true },
     })

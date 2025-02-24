@@ -3,10 +3,10 @@ import {
   type FeatureTier,
   type GenericFeature,
   SUBSCRIPTION_TIERS,
-  type SubscriptionTier,
   getRequiredTier,
   isSubscriptionActive,
 } from '@/utils/subscription'
+import type { SubscriptionTier } from '@prisma/client'
 import { Button, Tag, Tooltip } from 'antd'
 import { CrownIcon } from 'lucide-react'
 import Link from 'next/link'

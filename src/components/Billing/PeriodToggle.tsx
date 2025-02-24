@@ -1,7 +1,7 @@
 import { plans } from '@/components/Billing/BillingPlans'
 import {
   type PricePeriod,
-  type SubscriptionStatus,
+  type SubscriptionRow,
   calculateSavings,
   getCurrentPeriod,
   isSubscriptionActive,
@@ -13,7 +13,7 @@ import { useEffect } from 'react'
 interface PeriodToggleProps {
   activePeriod: PricePeriod
   onChange: (period: PricePeriod) => void
-  subscription: SubscriptionStatus | null
+  subscription: SubscriptionRow | null
 }
 
 export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodToggleProps) {

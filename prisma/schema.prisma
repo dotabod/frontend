@@ -219,7 +219,7 @@ model Subscription {
   stripeCustomerId     String?
   stripePriceId        String?
   stripeSubscriptionId String?           @unique
-  tier                 SubscriptionTier?
+  tier                 SubscriptionTier  @default(FREE)
   status               SubscriptionStatus?
   transactionType      TransactionType
   currentPeriodEnd     DateTime?

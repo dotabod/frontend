@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { GENERIC_FEATURE_TIERS } from '@/utils/subscription'
+import { SubscriptionStatus } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
@@ -102,7 +103,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           some: {
             tier: GENERIC_FEATURE_TIERS.managers,
             status: {
-              in: ['ACTIVE', 'TRIALING'],
+              in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
             },
           },
         },

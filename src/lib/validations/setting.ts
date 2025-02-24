@@ -1,10 +1,4 @@
-import {
-  FEATURE_TIERS,
-  SUBSCRIPTION_TIERS,
-  type SubscriptionStatus,
-  TIER_LEVELS,
-  isSubscriptionActive,
-} from '@/utils/subscription'
+import { type SubscriptionRow, canAccessFeature } from '@/utils/subscription'
 import * as z from 'zod'
 
 // Define schemas for each specific setting
@@ -116,28 +110,17 @@ export const settingKeySchema = z.enum(
   Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],
 )
 
-// Helper function to check if user can access a setting based on their subscription
-export function canAccessSetting(
-  settingKey: SettingKeys,
-  subscription: SubscriptionStatus | null,
-): boolean {
-  const requiredTier = FEATURE_TIERS[settingKey] || SUBSCRIPTION_TIERS.PRO
-
-  if (!subscription || !isSubscriptionActive({ status: subscription.status })) {
-    return requiredTier === SUBSCRIPTION_TIERS.FREE
-  }
-
-  return TIER_LEVELS[subscription.tier] >= TIER_LEVELS[requiredTier]
-}
-
 // Add subscription validation to dynamic schema
-export const dynamicSettingSchema = (key: SettingKeys, subscription: SubscriptionStatus | null) =>
+export const dynamicSettingSchema = (
+  key: SettingKeys,
+  subscription: Partial<SubscriptionRow> | null,
+) =>
   z
     .object({
       key: z.literal(key),
       value: settingsSchema[key],
     })
-    .refine(() => canAccessSetting(key, subscription), {
+    .refine(() => canAccessFeature(key, subscription).hasAccess, {
       message: 'Your subscription tier does not have access to this feature',
     })
 

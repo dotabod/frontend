@@ -1,6 +1,7 @@
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import { SubscriptionStatus } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
@@ -88,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const subscription = await prisma.subscription.findFirst({
         where: {
           userId: session.user.id,
-          status: 'ACTIVE',
+          status: SubscriptionStatus.ACTIVE,
         },
         select: { stripeSubscriptionId: true, stripeCustomerId: true },
       })

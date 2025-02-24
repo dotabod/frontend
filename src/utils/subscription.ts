@@ -1,27 +1,14 @@
 import prisma from '@/lib/db'
 import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
-import type Stripe from 'stripe'
+import { type Subscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
 export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
-export const SUBSCRIPTION_TIERS = {
-  FREE: 'FREE',
-  PRO: 'PRO',
-} as const
+export const SUBSCRIPTION_TIERS = SubscriptionTier
 
-export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
-export type SubscriptionTierStatus = Stripe.Subscription.Status
-
-export type SubscriptionStatus = {
-  tier: SubscriptionTier
-  status: SubscriptionTierStatus
-  currentPeriodEnd?: Date
-  cancelAtPeriodEnd?: boolean
-  stripePriceId: string
-  trialEnd?: Date | null
-}
+export type SubscriptionRow = Subscription
 
 export const TIER_LEVELS: Record<SubscriptionTier, number> = {
   [SUBSCRIPTION_TIERS.FREE]: 0,
@@ -162,27 +149,37 @@ export function getRequiredTier(feature?: FeatureTier | GenericFeature): Subscri
 }
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
-  subscription: SubscriptionStatus | null,
+  subscription: Partial<SubscriptionRow> | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier = getRequiredTier(feature)
+  const isFreeFeature = requiredTier === SUBSCRIPTION_TIERS.FREE
 
-  if (!subscription || !isSubscriptionActive({ status: subscription.status })) {
+  // Return early if feature is free or subscription is invalid
+  if (
+    isFreeFeature ||
+    !subscription?.status ||
+    !subscription?.tier ||
+    !isSubscriptionActive({ status: subscription.status })
+  ) {
     return {
-      hasAccess: requiredTier === SUBSCRIPTION_TIERS.FREE,
+      hasAccess: isFreeFeature,
       requiredTier,
     }
   }
 
+  // Check if subscription tier level meets required tier level
   return {
     hasAccess: TIER_LEVELS[subscription.tier] >= TIER_LEVELS[requiredTier],
     requiredTier,
   }
 }
 export function isSubscriptionActive(
-  subscription: { status: SubscriptionTierStatus | undefined } | null,
+  subscription: { status: SubscriptionStatus | null | undefined } | null,
 ): boolean {
   if (!subscription?.status) return false
-  return ['active', 'trialing'].includes(subscription.status)
+  if (subscription.status === SubscriptionStatus.TRIALING) return true
+  if (subscription.status === SubscriptionStatus.ACTIVE) return true
+  return false
 }
 
 export interface SubscriptionPriceId {
@@ -212,7 +209,8 @@ export function getPriceId(
   return price.lifetime
 }
 
-export function getCurrentPeriod(priceId?: string): PricePeriod {
+export function getCurrentPeriod(priceId?: string | null): PricePeriod {
+  if (!priceId) return 'monthly'
   if (PRICE_IDS.some((price) => price.monthly === priceId)) return 'monthly'
   if (PRICE_IDS.some((price) => price.annual === priceId)) return 'annual'
   if (PRICE_IDS.some((price) => price.lifetime === priceId)) return 'lifetime'
@@ -225,8 +223,11 @@ if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime
 }
 
 export async function getSubscription(userId: string) {
-  const subscription = (await prisma.subscription.findUnique({
-    where: { userId },
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId,
+      status: SubscriptionStatus.ACTIVE, // Prioritize active subscriptions
+    },
     select: {
       tier: true,
       status: true,
@@ -235,7 +236,11 @@ export async function getSubscription(userId: string) {
       stripePriceId: true,
       stripeCustomerId: true,
     },
-  })) as SubscriptionStatus | null
+    orderBy: [
+      { transactionType: 'desc' }, // LIFETIME > RECURRING
+      { createdAt: 'desc' }, // Most recent first
+    ],
+  })
 
   return subscription
 }
@@ -255,14 +260,18 @@ export type SubscriptionStatusInfo = {
 
 // Add this function with other exported functions
 export function getSubscriptionStatusInfo(
-  status: SubscriptionTierStatus | undefined,
+  status: SubscriptionStatus | null | undefined,
   cancelAtPeriodEnd?: boolean,
-  currentPeriodEnd?: Date,
+  currentPeriodEnd?: Date | null,
 ): SubscriptionStatusInfo | null {
   if (!status) return null
 
   // Check for lifetime subscription
-  if (status === 'active' && currentPeriodEnd && currentPeriodEnd.getFullYear() > 2090) {
+  if (
+    status === SubscriptionStatus.ACTIVE &&
+    currentPeriodEnd &&
+    currentPeriodEnd.getFullYear() > 2090
+  ) {
     return {
       message: 'Lifetime access',
       type: 'success',
@@ -273,49 +282,49 @@ export function getSubscriptionStatusInfo(
   const endDate = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : 'unknown'
 
   switch (status) {
-    case 'trialing':
+    case SubscriptionStatus.TRIALING:
       return {
         message: `Trial period ending on ${endDate}`,
         type: 'info',
         badge: 'blue',
       }
-    case 'active':
+    case SubscriptionStatus.ACTIVE:
       return {
         message: cancelAtPeriodEnd ? `Subscription ending on ${endDate}` : `Renews on ${endDate}`,
         type: cancelAtPeriodEnd ? 'warning' : 'success',
         badge: cancelAtPeriodEnd ? 'red' : 'gold',
       }
-    case 'past_due':
+    case SubscriptionStatus.PAST_DUE:
       return {
         message: 'Payment past due',
         type: 'error',
         badge: 'red',
       }
-    case 'incomplete':
+    case SubscriptionStatus.INCOMPLETE:
       return {
         message: 'Payment incomplete',
         type: 'warning',
         badge: 'red',
       }
-    case 'incomplete_expired':
+    case SubscriptionStatus.INCOMPLETE_EXPIRED:
       return {
         message: 'Payment expired',
         type: 'error',
         badge: 'red',
       }
-    case 'canceled':
+    case SubscriptionStatus.CANCELED:
       return {
         message: 'Subscription canceled',
         type: 'info',
         badge: 'default',
       }
-    case 'unpaid':
+    case SubscriptionStatus.UNPAID:
       return {
         message: 'Payment required',
         type: 'error',
         badge: 'red',
       }
-    case 'paused':
+    case SubscriptionStatus.PAUSED:
       return {
         message: 'Subscription paused',
         type: 'warning',
@@ -329,21 +338,15 @@ export function getSubscriptionStatusInfo(
 // Add new helper for determining tier
 export function getSubscriptionTier(
   priceId: string | null | undefined,
-  status: SubscriptionTierStatus | undefined,
+  status: SubscriptionStatus | null,
 ): SubscriptionTier {
-  console.log('getSubscriptionTier called with:', { priceId, status })
-
   if (isSubscriptionActive({ status })) {
-    console.log('Subscription is active, looking up tier from price ID')
-
     const tierFromPrice = PRICE_IDS.find((price) =>
       [price.monthly, price.annual, price.lifetime].includes(priceId || ''),
     )?.tier
 
-    console.log('Found tier:', { tierFromPrice })
     return tierFromPrice || SUBSCRIPTION_TIERS.FREE
   }
 
-  console.log('Subscription not active, defaulting to free tier')
   return SUBSCRIPTION_TIERS.FREE
 }

@@ -1,11 +1,7 @@
 import { useSubscription } from '@/hooks/useSubscription'
 import { type SettingKeys, Settings } from '@/lib/defaultSettings'
-import {
-  type ChatterSettingKeys,
-  type FeatureTier,
-  type SubscriptionTier,
-  canAccessFeature,
-} from '@/utils/subscription'
+import { type ChatterSettingKeys, type FeatureTier, canAccessFeature } from '@/utils/subscription'
+import type { SubscriptionTier } from '@prisma/client'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'

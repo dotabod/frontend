@@ -1,7 +1,7 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { type SubscriptionTierStatus, getSubscriptionTier } from '@/utils/subscription'
-import type { Prisma } from '@prisma/client'
+import { getSubscriptionTier } from '@/utils/subscription'
+import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
@@ -22,7 +22,8 @@ const relevantEvents = new Set([
   'charge.succeeded',
 ])
 
-const statusMap: Record<SubscriptionTierStatus, string> = {
+// Stripe statuses to Prisma statuses
+const statusMap: Record<Stripe.Subscription.Status, SubscriptionStatus> = {
   active: 'ACTIVE',
   canceled: 'CANCELED',
   incomplete: 'INCOMPLETE',
@@ -125,7 +126,7 @@ async function handleSubscriptionEvent(
   const userId = (customer as Stripe.Customer).metadata?.userId
   if (!userId) return
 
-  const status = statusMap[subscription.status]
+  const status = statusMap[subscription.status as Stripe.Subscription.Status]
   if (!status) return
 
   const priceId = subscription.items.data[0].price.id
@@ -133,12 +134,12 @@ async function handleSubscriptionEvent(
   await tx.subscription.create({
     data: {
       userId,
-      status,
-      tier: getSubscriptionTier(priceId, subscription.status),
+      status: status as SubscriptionStatus,
+      tier: getSubscriptionTier(priceId, status),
       stripePriceId: priceId,
       stripeSubscriptionId: subscription.id,
       stripeCustomerId: subscription.customer as string,
-      transactionType: 'RECURRING',
+      transactionType: TransactionType.RECURRING,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
@@ -167,7 +168,7 @@ async function handleInvoiceEvent(invoice: Stripe.Invoice, tx: Prisma.Transactio
   if (invoice.subscription) {
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
 
-    const status = statusMap[subscription.status] || 'INACTIVE'
+    const status = statusMap[subscription.status] || null
 
     await tx.subscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
@@ -233,11 +234,11 @@ async function createLifetimePurchase(
   await tx.subscription.create({
     data: {
       userId,
-      status: 'ACTIVE',
-      tier: getSubscriptionTier(priceId, 'active'),
+      status: SubscriptionStatus.ACTIVE,
+      tier: getSubscriptionTier(priceId, SubscriptionStatus.ACTIVE),
       stripePriceId: priceId || '',
       stripeCustomerId: customerId,
-      transactionType: 'LIFETIME',
+      transactionType: TransactionType.LIFETIME,
       currentPeriodEnd: new Date('2099-12-31'),
       cancelAtPeriodEnd: false,
       stripeSubscriptionId: null,

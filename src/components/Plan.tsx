@@ -2,12 +2,13 @@ import { createCheckoutSession } from '@/lib/stripe'
 import {
   type PricePeriod,
   SUBSCRIPTION_TIERS,
-  type SubscriptionStatus,
-  type SubscriptionTier,
+  type SubscriptionRow,
   calculateSavings,
   getPriceId,
   isSubscriptionActive,
 } from '@/utils/subscription'
+import type { SubscriptionTier } from '@prisma/client'
+import { SubscriptionStatus } from '@prisma/client'
 import { Button, Modal, notification } from 'antd'
 import clsx from 'clsx'
 import { CheckIcon } from 'lucide-react'
@@ -47,7 +48,7 @@ function Plan({
   activePeriod: PricePeriod
   logomarkClassName?: string
   featured?: boolean
-  subscription: SubscriptionStatus | null
+  subscription: SubscriptionRow | null
   hasTrial?: boolean
 }) {
   const { data: session } = useSession()
@@ -60,7 +61,7 @@ function Plan({
       hasTrial &&
       tier === SUBSCRIPTION_TIERS.PRO &&
       activePeriod !== 'lifetime' &&
-      (!subscription || subscription.status !== 'active')
+      (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
     ) {
       return (
         <>
@@ -83,11 +84,11 @@ function Plan({
       return 'Get lifetime access'
     }
 
-    if (hasTrial && subscription?.status === 'trialing') {
+    if (hasTrial && subscription?.status === SubscriptionStatus.TRIALING) {
       return 'Manage trial'
     }
 
-    if (!subscription || subscription.status !== 'active') {
+    if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
       if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod === 'lifetime') {
         return 'Get lifetime access'
       }

@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
-import type { Prisma } from '@prisma/client'
+import { type Prisma, SubscriptionStatus, type TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 interface CheckoutRequestBody {
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Handle customer and subscription logic in a transaction
     const checkoutUrl = await prisma.$transaction(async (tx) => {
       const customerId = await ensureCustomer(session.user, tx)
-      const subscriptionData = await getCurrentSubscription(session.user.id, tx)
+      const subscriptionData = await getActiveSubscription(session.user.id, tx)
       return await createCheckoutSession({
         customerId,
         priceId,
@@ -75,9 +75,11 @@ async function ensureCustomer(
   },
   tx: Prisma.TransactionClient,
 ): Promise<string> {
-  const subscription = await tx.subscription.findUnique({
+  // Look for any existing subscription to get a customer ID
+  const subscription = await tx.subscription.findFirst({
     where: { userId: user.id },
     select: { stripeCustomerId: true },
+    orderBy: { createdAt: 'desc' }, // Use the most recent subscription
   })
 
   let customerId = subscription?.stripeCustomerId
@@ -87,17 +89,7 @@ async function ensureCustomer(
     try {
       await stripe.customers.retrieve(customerId)
     } catch (error) {
-      // Reset invalid customer ID
-      await tx.subscription.update({
-        where: { userId: user.id },
-        data: {
-          stripeCustomerId: null,
-          stripePriceId: null,
-          stripeSubscriptionId: null,
-          status: 'inactive',
-          tier: SUBSCRIPTION_TIERS.FREE,
-        },
-      })
+      console.error('Invalid customer ID found:', error)
       customerId = null
     }
   }
@@ -109,17 +101,35 @@ async function ensureCustomer(
       limit: 1,
     })
 
-    customerId = existingCustomers.data[0]?.id || (await createStripeCustomer(user)).id
+    if (existingCustomers.data.length > 0) {
+      customerId = existingCustomers.data[0].id
+    } else {
+      const newCustomer = await createStripeCustomer(user)
+      customerId = newCustomer.id
+    }
 
-    await tx.subscription.upsert({
+    // Create an initial subscription record if none exists
+    const hasSubscription = await tx.subscription.findFirst({
       where: { userId: user.id },
-      create: {
-        userId: user.id,
-        stripeCustomerId: customerId,
-        tier: SUBSCRIPTION_TIERS.FREE,
-      },
-      update: { stripeCustomerId: customerId },
     })
+
+    if (!hasSubscription) {
+      await tx.subscription.create({
+        data: {
+          userId: user.id,
+          stripeCustomerId: customerId,
+          tier: SUBSCRIPTION_TIERS.FREE,
+          status: null,
+          transactionType: 'RECURRING', // Default to recurring for initial record
+        },
+      })
+    } else if (!subscription?.stripeCustomerId) {
+      // Update existing subscriptions with no customer ID
+      await tx.subscription.updateMany({
+        where: { userId: user.id, stripeCustomerId: null },
+        data: { stripeCustomerId: customerId },
+      })
+    }
   }
 
   if (!customerId) {
@@ -131,14 +141,14 @@ async function ensureCustomer(
 
 async function createStripeCustomer(user: {
   id: string
-  email?: string
-  name?: string
-  image?: string
-  locale?: string
-  twitchId?: string
+  email?: string | null
+  name?: string | null
+  image?: string | null
+  locale?: string | null
+  twitchId?: string | null
 }) {
   return stripe.customers.create({
-    email: user.email,
+    email: user.email ?? undefined,
     metadata: {
       userId: user.id,
       email: user.email ?? '',
@@ -150,15 +160,20 @@ async function createStripeCustomer(user: {
   })
 }
 
-async function getCurrentSubscription(userId: string, tx: Prisma.TransactionClient) {
-  return tx.subscription.findUnique({
-    where: { userId },
+async function getActiveSubscription(userId: string, tx: Prisma.TransactionClient) {
+  return tx.subscription.findFirst({
+    where: { userId, status: SubscriptionStatus.ACTIVE },
     select: {
       stripeCustomerId: true,
       stripeSubscriptionId: true,
       status: true,
       stripePriceId: true,
+      transactionType: true,
     },
+    orderBy: [
+      { transactionType: 'desc' }, // LIFETIME > RECURRING
+      { createdAt: 'desc' },
+    ],
   })
 }
 
@@ -167,7 +182,13 @@ interface CheckoutSessionParams {
   priceId: string
   isRecurring: boolean
   isLifetime: boolean
-  subscriptionData: any
+  subscriptionData: {
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    status: string | null
+    stripePriceId: string | null
+    transactionType: TransactionType
+  } | null
   userId: string
   email: string
   name: string
@@ -193,7 +214,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     referer,
   } = params
 
-  const baseUrl = process.env.NEXTAUTH_URL!
+  const baseUrl = process.env.NEXTAUTH_URL ?? ''
   const successUrl = `${baseUrl}/dashboard?paid=true&trial=${isRecurring}`
   const cancelUrl = referer?.includes('/dashboard')
     ? `${baseUrl}/dashboard/billing?paid=false`
@@ -227,5 +248,5 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     },
   })
 
-  return session.url!
+  return session.url ?? ''
 }

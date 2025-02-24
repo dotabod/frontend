@@ -1,4 +1,5 @@
-import { SUBSCRIPTION_TIERS, type SubscriptionTier } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import type { SubscriptionTier } from '@prisma/client'
 import { Button } from 'antd'
 import Link from 'next/link'
 import { TierBadge } from './TierBadge'

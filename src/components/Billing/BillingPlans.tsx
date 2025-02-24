@@ -2,18 +2,19 @@ import { Card } from '@/ui/card'
 import {
   type PricePeriod,
   SUBSCRIPTION_TIERS,
-  type SubscriptionStatus,
+  type SubscriptionRow,
   getCurrentPeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
+import { SubscriptionStatus } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useState } from 'react'
 import Plan from '../Plan'
 import { PeriodToggle } from './PeriodToggle'
 interface BillingPlansProps {
-  subscription: SubscriptionStatus | null
+  subscription: SubscriptionRow | null
   showTitle?: boolean
 }
 
@@ -119,7 +120,7 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
             <p className='mt-2 text-lg text-purple-400'>
               You are currently on the{' '}
               {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
-              {period}){subscription.status === 'trialing' && ' (Trial)'}
+              {period}){subscription.status === SubscriptionStatus.TRIALING && ' (Trial)'}
             </p>
           )}
         </div>
