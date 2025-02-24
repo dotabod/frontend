@@ -262,7 +262,7 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
 
 // Add these types at the top with other types
 export type SubscriptionStatusInfo = {
-  message: string
+  message?: string
   type: 'success' | 'warning' | 'error' | 'info'
   badge: 'gold' | 'blue' | 'red' | 'default'
 }
@@ -293,9 +293,8 @@ export function getSubscriptionStatusInfo(
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
-        message: `Trial period ending on ${endDate}`,
         type: 'info',
-        badge: 'blue',
+        badge: 'gold',
       }
     case SubscriptionStatus.ACTIVE:
       return {

@@ -67,7 +67,7 @@ const BillingPage = () => {
         }
       />
 
-      {statusInfo && subscription?.status && (
+      {statusInfo?.message && subscription?.status && (
         <Alert className='mt-6' message={statusInfo.message} type={statusInfo.type} showIcon />
       )}
 
