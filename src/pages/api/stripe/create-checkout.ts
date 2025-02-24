@@ -67,6 +67,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           email: session.user.email,
           metadata: {
             userId: session.user.id,
+            email: session.user.email,
+            name: session.user.name,
+            image: session.user.image,
+            locale: session.user.locale,
+            twitchId: session.user.twitchId,
           },
         })
         customerId = newCustomer.id
@@ -122,12 +127,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         address: 'auto',
       },
       metadata: {
-        userId: session.user.id,
-        email: session.user.email,
-        name: session.user.name,
-        image: session.user.image,
-        locale: session.user.locale,
-        twitchId: session.user.twitchId,
+        userId: session.user.id ?? '',
+        email: session.user.email ?? '',
+        name: session.user.name ?? '',
+        image: session.user.image ?? '',
+        locale: session.user.locale ?? '',
+        twitchId: session.user.twitchId ?? '',
       },
     })
 

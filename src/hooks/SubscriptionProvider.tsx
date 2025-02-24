@@ -19,7 +19,12 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       const response = await fetch('/api/stripe/subscription')
       if (response.ok) {
         const data = await response.json()
-        setSubscription(data)
+        // Create date objects for currentPeriodEnd
+        const subscriptionData = {
+          ...data,
+          currentPeriodEnd: data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
+        }
+        setSubscription(subscriptionData)
       }
       setIsLoading(false)
     }
