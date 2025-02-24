@@ -103,7 +103,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         throw new Error('Emote set not found')
       }
 
-      const missingEmotes = []
+      const missingEmotes: string[] = []
       for (const emote of emotesRequired) {
         const emoteInSet = updatedEmoteSet.emoteSet.emotes.find((e) => e.name === emote.label)
         if (!emoteInSet) {
