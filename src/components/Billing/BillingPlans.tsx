@@ -69,7 +69,7 @@ export const plans = [
     features: [
       'All Free features',
       'Automated setup (Dota 2, OBS, 7TV, Twitch)',
-      'Twitch predictions with live overlay',
+      'Auto twitch predictions for each match',
       'Advanced overlays (Minimap XL, Anti-snipe blocker)',
       'Notable players overlay with flags',
       'Win probability overlay',
