@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!subscription) {
       return res.status(200).json({
         tier: SUBSCRIPTION_TIERS.FREE,
-        status: 'inactive',
+        status: null,
         stripePriceId: '',
       })
     }
