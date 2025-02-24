@@ -77,7 +77,7 @@ const SetupPage = () => {
       if (didJustPay) {
         notification.success({
           key: 'paid',
-          message: isTrial ? 'Trial successful' : 'Payment successful',
+          message: isTrial ? 'Dotabod Pro Unlocked' : 'Dotabod Pro Unlocked',
           description: isTrial
             ? 'Your 14-day trial with full access to all features has begun.'
             : 'Thanks for subscribing to Dotabod! All premium features are now unlocked.',
