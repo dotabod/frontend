@@ -231,7 +231,9 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   const subscription = await (tx || prisma).subscription.findFirst({
     where: {
       userId,
-      status: SubscriptionStatus.ACTIVE, // Prioritize active subscriptions
+      status: {
+        in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
+      },
     },
     select: {
       tier: true,

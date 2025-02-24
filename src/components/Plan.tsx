@@ -88,8 +88,8 @@ function Plan({
       return 'Get started'
     }
 
-    if (hasTrial && isLifetimePlan && !hasLifetimeSubscription) {
-      return 'Get lifetime access'
+    if (isProTier && isLifetimePlan && !hasLifetimeSubscription) {
+      return 'Upgrade to lifetime'
     }
 
     if (hasTrial && isTrialing) {
@@ -105,10 +105,6 @@ function Plan({
         return 'Start free trial'
       }
       return button.label
-    }
-
-    if (isProTier && isLifetimePlan && !hasLifetimeSubscription) {
-      return 'Upgrade to lifetime'
     }
 
     if (hasLifetimeSubscription) {

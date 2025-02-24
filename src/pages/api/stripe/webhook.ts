@@ -131,13 +131,25 @@ async function handleSubscriptionEvent(
 
   const priceId = subscription.items.data[0].price.id
 
-  await tx.subscription.create({
-    data: {
-      userId,
+  await tx.subscription.upsert({
+    where: {
+      stripeSubscriptionId: subscription.id,
+    },
+    create: {
+      stripeSubscriptionId: subscription.id,
+      stripeCustomerId: subscription.customer as string,
       status: status as SubscriptionStatus,
       tier: getSubscriptionTier(priceId, status),
       stripePriceId: priceId,
-      stripeSubscriptionId: subscription.id,
+      userId,
+      transactionType: TransactionType.RECURRING,
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+    update: {
+      status: status as SubscriptionStatus,
+      tier: getSubscriptionTier(priceId, status),
+      stripePriceId: priceId,
       stripeCustomerId: subscription.customer as string,
       transactionType: TransactionType.RECURRING,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),

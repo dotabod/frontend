@@ -2,8 +2,8 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
-import { type Prisma, SubscriptionStatus, type TransactionType } from '@prisma/client'
+import { getSubscription } from '@/utils/subscription'
+import type { Prisma, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 interface CheckoutRequestBody {
@@ -108,22 +108,7 @@ async function ensureCustomer(
       customerId = newCustomer.id
     }
 
-    // Create an initial subscription record if none exists
-    const hasSubscription = await tx.subscription.findFirst({
-      where: { userId: user.id },
-    })
-
-    if (!hasSubscription) {
-      await tx.subscription.create({
-        data: {
-          userId: user.id,
-          stripeCustomerId: customerId,
-          tier: SUBSCRIPTION_TIERS.FREE,
-          status: null,
-          transactionType: 'RECURRING', // Default to recurring for initial record
-        },
-      })
-    } else if (!subscription?.stripeCustomerId) {
+    if (!subscription?.stripeCustomerId) {
       // Update existing subscriptions with no customer ID
       await tx.subscription.updateMany({
         where: { userId: user.id, stripeCustomerId: null },
