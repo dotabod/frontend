@@ -1,7 +1,6 @@
 import prisma from '@/lib/db'
-import { PRICE_IDS } from '@/lib/stripe'
 import { stripe } from '@/lib/stripe-server'
-import { SUBSCRIPTION_TIERS, isSubscriptionActive } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, getSubscriptionTier } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
@@ -94,10 +93,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleCustomerDeleted(customer: Stripe.Customer) {
-  // First find the subscription by customer ID to get the userId
-  const existingSubscription = await prisma.subscription.findFirst({
-    where: { stripeCustomerId: customer.id },
-  })
+  // First try to find subscription by customer ID or check metadata for userId
+  const existingSubscription =
+    (await prisma.subscription.findFirst({
+      where: { stripeCustomerId: customer.id },
+    })) ||
+    (await prisma.subscription.findUnique({
+      where: { userId: customer.metadata?.userId as string },
+    }))
 
   if (!existingSubscription) {
     console.warn(`No subscription found for deleted customer: ${customer.id}`)
@@ -105,17 +108,8 @@ async function handleCustomerDeleted(customer: Stripe.Customer) {
   }
 
   // Update using userId instead of stripeCustomerId
-  await prisma.subscription.update({
+  await prisma.subscription.delete({
     where: { userId: existingSubscription.userId },
-    data: {
-      stripeCustomerId: null,
-      stripePriceId: null,
-      stripeSubscriptionId: null,
-      status: 'inactive',
-      tier: SUBSCRIPTION_TIERS.FREE,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-    },
   })
 }
 
@@ -123,15 +117,10 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
   const priceId = subscription.items.data[0].price.id
   const customerId = subscription.customer as string
 
-  // Get subscription tier from price ID
-  const tier =
-    PRICE_IDS.find((price) => [price.monthly, price.annual, price.lifetime].includes(priceId))
-      ?.tier || SUBSCRIPTION_TIERS.FREE
-
   console.log('Updating subscription:', {
     customerId,
     priceId,
-    tier,
+    subscription,
     status: subscription.status,
   })
 
@@ -142,15 +131,26 @@ async function updateSubscriptionInDatabase(subscription: Stripe.Subscription) {
 
   if (!existingSubscription) {
     console.warn(`No subscription found for Stripe customer: ${customerId}`)
+    // Create a new subscription
+    await prisma.subscription.create({
+      data: {
+        userId: customerId,
+        status: subscription.status,
+        tier: getSubscriptionTier(priceId, subscription.status),
+        stripePriceId: priceId,
+        stripeSubscriptionId: subscription.id,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      },
+    })
     return
   }
 
-  // Update using userId instead of stripeCustomerId
   await prisma.subscription.update({
     where: { userId: existingSubscription.userId },
     data: {
       status: subscription.status,
-      tier: isSubscriptionActive({ status: subscription.status }) ? tier : SUBSCRIPTION_TIERS.FREE,
+      tier: getSubscriptionTier(priceId, subscription.status),
       stripePriceId: priceId,
       stripeSubscriptionId: subscription.id,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),

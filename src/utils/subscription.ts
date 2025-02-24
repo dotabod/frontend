@@ -264,3 +264,96 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
   const annual = Number.parseFloat(annualPrice.replace('$', ''))
   return Math.round(((monthly - annual) / monthly) * 100)
 }
+
+// Add these types at the top with other types
+export type SubscriptionStatusInfo = {
+  message: string
+  type: 'success' | 'warning' | 'error' | 'info'
+  badge: 'gold' | 'blue' | 'red' | 'default'
+}
+
+// Add this function with other exported functions
+export function getSubscriptionStatusInfo(
+  status: SubscriptionTierStatus | undefined,
+  cancelAtPeriodEnd?: boolean,
+  currentPeriodEnd?: Date,
+): SubscriptionStatusInfo | null {
+  if (!status) return null
+
+  const endDate = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : 'unknown'
+
+  switch (status) {
+    case 'trialing':
+      return {
+        message: `Trial period ending on ${endDate}`,
+        type: 'info',
+        badge: 'blue',
+      }
+    case 'active':
+      return {
+        message: cancelAtPeriodEnd ? `Subscription ending on ${endDate}` : `Renews on ${endDate}`,
+        type: cancelAtPeriodEnd ? 'warning' : 'success',
+        badge: cancelAtPeriodEnd ? 'red' : 'gold',
+      }
+    case 'past_due':
+      return {
+        message: 'Payment past due',
+        type: 'error',
+        badge: 'red',
+      }
+    case 'incomplete':
+      return {
+        message: 'Payment incomplete',
+        type: 'warning',
+        badge: 'red',
+      }
+    case 'incomplete_expired':
+      return {
+        message: 'Payment expired',
+        type: 'error',
+        badge: 'red',
+      }
+    case 'canceled':
+      return {
+        message: 'Subscription canceled',
+        type: 'info',
+        badge: 'default',
+      }
+    case 'unpaid':
+      return {
+        message: 'Payment required',
+        type: 'error',
+        badge: 'red',
+      }
+    case 'paused':
+      return {
+        message: 'Subscription paused',
+        type: 'warning',
+        badge: 'default',
+      }
+    default:
+      return null
+  }
+}
+
+// Add new helper for determining tier
+export function getSubscriptionTier(
+  priceId: string | null,
+  status: SubscriptionTierStatus | undefined,
+): SubscriptionTier {
+  console.log('getSubscriptionTier called with:', { priceId, status })
+
+  if (isSubscriptionActive({ status })) {
+    console.log('Subscription is active, looking up tier from price ID')
+
+    const tierFromPrice = PRICE_IDS.find((price) =>
+      [price.monthly, price.annual, price.lifetime].includes(priceId || ''),
+    )?.tier
+
+    console.log('Found tier:', { tierFromPrice })
+    return tierFromPrice || SUBSCRIPTION_TIERS.FREE
+  }
+
+  console.log('Subscription not active, defaulting to free tier')
+  return SUBSCRIPTION_TIERS.FREE
+}

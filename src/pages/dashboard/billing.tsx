@@ -2,8 +2,12 @@ import { BillingPlans } from '@/components/Billing/BillingPlans'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { useSubscription } from '@/hooks/useSubscription'
-import { getCurrentPeriod, isSubscriptionActive } from '@/utils/subscription'
-import { Button } from 'antd'
+import {
+  getCurrentPeriod,
+  getSubscriptionStatusInfo,
+  isSubscriptionActive,
+} from '@/utils/subscription'
+import { Alert, Button } from 'antd'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -40,32 +44,31 @@ const BillingPage = () => {
     return null
   }
 
+  const statusInfo = getSubscriptionStatusInfo(
+    subscription?.status,
+    subscription?.cancelAtPeriodEnd,
+    subscription?.currentPeriodEnd,
+  )
+
   return (
     <>
       <Head>
         <title>Dotabod | Billing</title>
       </Head>
 
-      {subscription && isSubscriptionActive({ status: subscription.status }) ? (
-        <Header
-          title='Billing'
-          subtitle={
-            <p>
-              You are currently on the{' '}
-              {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
-              {period}).{' '}
-              {subscription.cancelAtPeriodEnd
-                ? 'Your subscription will end'
-                : 'Your subscription will renew'}{' '}
-              on{' '}
-              {subscription.currentPeriodEnd
-                ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-                : 'unknown'}
-            </p>
-          }
-        />
-      ) : (
-        <Header title='Billing' subtitle='Manage your subscription and billing settings' />
+      <Header
+        title='Billing'
+        subtitle={
+          subscription
+            ? `You are currently on the ${
+                subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+              } plan (${period})`
+            : 'Manage your subscription and billing settings'
+        }
+      />
+
+      {statusInfo && subscription?.status && (
+        <Alert className='mt-6' message={statusInfo.message} type={statusInfo.type} showIcon />
       )}
 
       {isSubscriptionActive({ status: subscription?.status }) && (

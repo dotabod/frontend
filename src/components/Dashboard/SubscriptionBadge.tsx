@@ -1,13 +1,19 @@
 import { useSubscription } from '@/hooks/useSubscription'
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { getSubscriptionStatusInfo } from '@/utils/subscription'
 import { Tag, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { plans } from '../Billing/BillingPlans'
+
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const { subscription } = useSubscription()
   const { data } = useSession()
   const currentPlan = plans.find((plan) => plan.tier === subscription?.tier)
+  const statusInfo = getSubscriptionStatusInfo(
+    subscription?.status,
+    subscription?.cancelAtPeriodEnd,
+    subscription?.currentPeriodEnd,
+  )
 
   if (data?.user?.isImpersonating) {
     return null
@@ -15,7 +21,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
 
   const commonClasses = 'flex items-center gap-2'
   const tooltipProps = {
-    title: 'Manage your subscription',
+    title: statusInfo?.message || 'Manage your subscription',
     placement: collapsed ? ('right' as const) : undefined,
   }
 
@@ -33,11 +39,14 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     <div className={`${commonClasses} justify-center`}>
       <Tooltip {...tooltipProps}>
         <Link href='/dashboard/billing'>
-          <Tag color={subscription?.tier === SUBSCRIPTION_TIERS.PRO ? 'gold' : 'default'}>
-            <div className={commonClasses}>
-              {currentPlan?.logo}
-              {currentPlan?.name} Plan
+          <Tag color={statusInfo?.badge}>
+            <div className={`${commonClasses} justify-center`}>
+              <div className='flex items-center gap-2'>
+                {currentPlan?.logo}
+                {currentPlan?.name} Plan
+              </div>
             </div>
+            {statusInfo?.message && <div className='text-center'>{statusInfo.message}</div>}
           </Tag>
         </Link>
       </Tooltip>
