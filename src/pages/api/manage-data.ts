@@ -5,6 +5,7 @@ import { SubscriptionStatus } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
+import { getSubscription } from '@/utils/subscription'
 
 const requestSchema = z.object({
   action: z.enum(['export', 'delete']),
@@ -86,13 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (action === 'delete') {
       // First get the user's subscription info
-      const subscription = await prisma.subscription.findFirst({
-        where: {
-          userId: session.user.id,
-          status: SubscriptionStatus.ACTIVE,
-        },
-        select: { stripeSubscriptionId: true, stripeCustomerId: true },
-      })
+      const subscription = await getSubscription(session.user.id)
 
       // Cancel Stripe subscription if it exists
       if (subscription?.stripeSubscriptionId) {

@@ -1,6 +1,11 @@
 import prisma from '@/lib/db'
 import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
-import { type Subscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
+import {
+  type Prisma,
+  type Subscription,
+  SubscriptionStatus,
+  SubscriptionTier,
+} from '@prisma/client'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -222,8 +227,8 @@ if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime
   throw new Error('Missing required Stripe price IDs in environment variables')
 }
 
-export async function getSubscription(userId: string) {
-  const subscription = await prisma.subscription.findFirst({
+export async function getSubscription(userId: string, tx?: Prisma.TransactionClient) {
+  const subscription = await (tx || prisma).subscription.findFirst({
     where: {
       userId,
       status: SubscriptionStatus.ACTIVE, // Prioritize active subscriptions
@@ -231,10 +236,12 @@ export async function getSubscription(userId: string) {
     select: {
       tier: true,
       status: true,
+      transactionType: true,
       currentPeriodEnd: true,
       cancelAtPeriodEnd: true,
       stripePriceId: true,
       stripeCustomerId: true,
+      stripeSubscriptionId: true,
     },
     orderBy: [
       { transactionType: 'desc' }, // LIFETIME > RECURRING

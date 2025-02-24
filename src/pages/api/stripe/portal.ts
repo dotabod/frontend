@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import { getSubscription } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 
@@ -20,12 +20,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Get or create Stripe customer ID
     // First check if user has a subscription record
-    const subscription = await prisma.subscription.findFirst({
-      where: { userId: session.user.id },
-      select: { stripeCustomerId: true },
-    })
-
+    const subscription = await getSubscription(session.user.id)
     const customerId = subscription?.stripeCustomerId
+
+    console.log({ subscription })
 
     if (!customerId) {
       return res.status(400).json({ error: 'No Stripe customer found' })

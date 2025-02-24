@@ -2,7 +2,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
 import { type Prisma, SubscriptionStatus, type TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Handle customer and subscription logic in a transaction
     const checkoutUrl = await prisma.$transaction(async (tx) => {
       const customerId = await ensureCustomer(session.user, tx)
-      const subscriptionData = await getActiveSubscription(session.user.id, tx)
+      const subscriptionData = await getSubscription(session.user.id, tx)
       return await createCheckoutSession({
         customerId,
         priceId,
@@ -157,23 +157,6 @@ async function createStripeCustomer(user: {
       locale: user.locale ?? '',
       twitchId: user.twitchId ?? '',
     },
-  })
-}
-
-async function getActiveSubscription(userId: string, tx: Prisma.TransactionClient) {
-  return tx.subscription.findFirst({
-    where: { userId, status: SubscriptionStatus.ACTIVE },
-    select: {
-      stripeCustomerId: true,
-      stripeSubscriptionId: true,
-      status: true,
-      stripePriceId: true,
-      transactionType: true,
-    },
-    orderBy: [
-      { transactionType: 'desc' }, // LIFETIME > RECURRING
-      { createdAt: 'desc' },
-    ],
   })
 }
 

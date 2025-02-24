@@ -73,35 +73,46 @@ function Plan({
     return description
   }
 
+  const hasLifetimeSubscription =
+    subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
+
   // Update button text logic
   const getSimplifiedButtonText = () => {
-    // If free plan, show manage plan
-    if (tier === SUBSCRIPTION_TIERS.FREE) {
-      return 'Manage your subscription'
+    const isLifetimePlan = activePeriod === 'lifetime'
+    const isProTier = tier === SUBSCRIPTION_TIERS.PRO
+    const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
+    const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
+    const isActive = subscription?.status === SubscriptionStatus.ACTIVE
+
+    if (isFreeTier) {
+      return 'Get started'
     }
 
-    if (hasTrial && activePeriod === 'lifetime') {
+    if (hasTrial && isLifetimePlan && !hasLifetimeSubscription) {
       return 'Get lifetime access'
     }
 
-    if (hasTrial && subscription?.status === SubscriptionStatus.TRIALING) {
+    if (hasTrial && isTrialing) {
       return 'Manage trial'
     }
 
-    if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
-      if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod === 'lifetime') {
+    if (!subscription || !isActive) {
+      if (isProTier && isLifetimePlan) {
         return 'Get lifetime access'
       }
 
-      if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
+      if (isProTier && !isLifetimePlan) {
         return 'Start free trial'
       }
       return button.label
     }
 
-    // Special case for lifetime when already subscribed
-    if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod === 'lifetime') {
+    if (isProTier && isLifetimePlan && !hasLifetimeSubscription) {
       return 'Upgrade to lifetime'
+    }
+
+    if (hasLifetimeSubscription) {
+      return 'You have lifetime access'
     }
 
     return 'Manage plan'
@@ -319,6 +330,7 @@ function Plan({
       <Button
         loading={redirectingToCheckout}
         onClick={handleSubscribe}
+        disabled={hasLifetimeSubscription}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
         className={clsx(
