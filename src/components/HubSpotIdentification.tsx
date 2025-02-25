@@ -9,11 +9,10 @@ const HubSpotIdentification = () => {
       // Identify the visitor in HubSpot
       window._hsq.push(['identify', {
         email: data.user.email,
-        id: data.user.id,
         name: data.user.name
       }]);
     }
-  }, [status, data?.user?.email, data?.user?.id, data?.user?.name]);
+  }, [status, data?.user?.email, data?.user?.name]);
 
   return null;
 }
