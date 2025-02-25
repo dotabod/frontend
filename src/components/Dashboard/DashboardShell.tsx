@@ -32,10 +32,10 @@ function getItem(item) {
         {item.new && <Tag color='green'>New</Tag>}
       </Link>
     ) : (
-      <>
+      <div className='flex flex-row gap-2 items-center'>
         {item.name}
         {item.new && <Tag color='green'>New</Tag>}
-      </>
+      </div>
     ),
     children: item.children?.map(getItem),
   }

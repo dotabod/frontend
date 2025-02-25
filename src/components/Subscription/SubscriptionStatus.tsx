@@ -41,7 +41,7 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
 
     // If in grace period without paid subscription
     if (inGracePeriod && !hasActivePlan) {
-      return `All users currently have free access to all Pro features until ${gracePeriodPrettyDate}. You can subscribe to the Pro plan to continue using Dotabod Pro after that date.`
+      return 'Subscribe to Pro to continue using Dotabod Pro features after the free period ends.'
     }
 
     // Default message

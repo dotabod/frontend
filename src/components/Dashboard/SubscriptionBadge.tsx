@@ -69,7 +69,9 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
               </div>
             </div>
             {statusInfo?.message && (
-              <div className='text-center text-xs mt-1 opacity-90'>{statusInfo.message}</div>
+              <div className='text-center text-xs mt-1 opacity-90 break-words'>
+                {statusInfo.message}
+              </div>
             )}
           </Tag>
         </Link>

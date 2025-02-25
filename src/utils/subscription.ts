@@ -314,11 +314,8 @@ export function getSubscriptionStatusInfo(
 ): SubscriptionStatusInfo | null {
   // If we're in the grace period but user doesn't have a paid plan, show grace period message
   if (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId)) {
-    const daysRemaining = Math.ceil(
-      (GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-    )
     return {
-      message: `Free Pro access until ${gracePeriodPrettyDate} (${daysRemaining} days remaining)`,
+      message: `Free Pro access until ${gracePeriodPrettyDate}`,
       type: 'info',
       badge: 'gold',
     }
