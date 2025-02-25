@@ -2,9 +2,9 @@ import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
 import { Badge, Tag, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { plans } from '../Billing/BillingPlans'
-
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()
   const { data } = useSession()
@@ -42,6 +42,20 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     }
   }
 
+  // logo for lifetime is https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp
+  // otehrwise its the current plan logo
+  const logo =
+    currentPlan?.tier === 'PRO' && subscription?.transactionType === 'LIFETIME' ? (
+      <Image
+        src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+        alt='Lifetime'
+        width={24}
+        height={24}
+      />
+    ) : (
+      currentPlan?.logo
+    )
+
   const subscriptionContent = collapsed ? (
     <div
       className={`${commonClasses} justify-center mx-auto hover:cursor-pointer hover:opacity-90 transition-opacity duration-200 hover:scale-110`}
@@ -49,7 +63,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
       <Tooltip {...tooltipProps}>
         <Link href='/dashboard/billing'>
           <Badge status={getBadgeStatus()} dot>
-            <div className={commonClasses}>{currentPlan?.logo}</div>
+            <div className={commonClasses}>{logo}</div>
           </Badge>
         </Link>
       </Tooltip>
@@ -64,7 +78,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
           >
             <div className={`${commonClasses} justify-center`}>
               <div className='flex items-center gap-2'>
-                {currentPlan?.logo}
+                {logo}
                 <span className='font-medium'>{currentPlan?.name} Plan</span>
               </div>
             </div>

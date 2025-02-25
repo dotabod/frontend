@@ -333,7 +333,7 @@ export function getSubscriptionStatusInfo(
     return {
       message: 'Lifetime access',
       type: 'success',
-      badge: 'gold',
+      badge: 'default',
     }
   }
 
@@ -361,11 +361,12 @@ export function getSubscriptionStatusInfo(
         (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
     : 0
-
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
-        message: `Trial ends on ${endDate}`,
+        message: cancelAtPeriodEnd
+          ? `Trial ends on ${endDate}`
+          : `Trial until ${endDate}, then auto-renews`,
         type: 'info',
         badge: 'gold',
       }
