@@ -114,7 +114,9 @@ async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionCl
 
 async function handleCustomerDeleted(customer: Stripe.Customer, tx: Prisma.TransactionClient) {
   await tx.subscription.deleteMany({
-    where: { userId: customer.metadata?.userId },
+    where: {
+      OR: [{ userId: customer.metadata?.userId }, { stripeCustomerId: customer.id }],
+    },
   })
 }
 
