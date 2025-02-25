@@ -326,6 +326,12 @@ export function getSubscriptionStatusInfo(
 
   const endDate = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : 'unknown'
 
+  // Check if subscription is ending within 10 days
+  const isEndingSoon =
+    currentPeriodEnd &&
+    cancelAtPeriodEnd &&
+    (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) <= 10
+
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
@@ -335,8 +341,8 @@ export function getSubscriptionStatusInfo(
     case SubscriptionStatus.ACTIVE:
       return {
         message: cancelAtPeriodEnd ? `Subscription ending on ${endDate}` : `Renews on ${endDate}`,
-        type: cancelAtPeriodEnd ? 'warning' : 'success',
-        badge: cancelAtPeriodEnd ? 'red' : 'gold',
+        type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
+        badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
       }
     case SubscriptionStatus.PAST_DUE:
       return {
