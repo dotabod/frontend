@@ -1,12 +1,6 @@
+import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
-import {
-  type PricePeriod,
-  SUBSCRIPTION_TIERS,
-  type SubscriptionRow,
-  getCurrentPeriod,
-  isInGracePeriod,
-  isSubscriptionActive,
-} from '@/utils/subscription'
+import { type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
 import { SubscriptionStatus } from '@prisma/client'
 import { useSession } from 'next-auth/react'
@@ -14,8 +8,8 @@ import Image from 'next/image'
 import { useState } from 'react'
 import Plan from '../Plan'
 import { PeriodToggle } from './PeriodToggle'
+
 interface BillingPlansProps {
-  subscription: SubscriptionRow | null
   showTitle?: boolean
 }
 
@@ -99,14 +93,10 @@ export const plans = [
   },
 ]
 
-export function BillingPlans({ subscription, showTitle = true }: BillingPlansProps) {
+export function BillingPlans({ showTitle = true }: BillingPlansProps) {
   const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const { data: session } = useSession()
-
-  const period = getCurrentPeriod(subscription?.stripePriceId)
-  const inGracePeriod = isInGracePeriod()
-  const hasActiveSubscription =
-    subscription && isSubscriptionActive({ status: subscription.status })
+  const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()
 
   if (session?.user?.isImpersonating) {
     return null
@@ -128,15 +118,13 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
             </p>
           )}
 
-          {hasActiveSubscription && (
+          {hasActivePlan && (
             <p className='mt-2 text-lg text-purple-400'>
-              You are currently on the{' '}
-              {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
-              {period}){subscription.status === SubscriptionStatus.TRIALING && ' (Trial)'}
+              <SubscriptionStatus showAlert={false} />
             </p>
           )}
 
-          {inGracePeriod && !hasActiveSubscription && (
+          {inGracePeriod && !hasActivePlan && (
             <p className='mt-2 text-lg text-gray-400'>
               Subscribe now to maintain Pro features after April 30, 2025
             </p>

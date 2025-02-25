@@ -1,0 +1,74 @@
+import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
+import { getCurrentPeriod, getSubscriptionStatusInfo } from '@/utils/subscription'
+import { Alert } from 'antd'
+
+interface SubscriptionStatusProps {
+  showAlert?: boolean
+  className?: string
+}
+
+export function SubscriptionStatus({ showAlert = true, className = '' }: SubscriptionStatusProps) {
+  const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
+
+  const period = getCurrentPeriod(subscription?.stripePriceId)
+
+  const statusInfo = getSubscriptionStatusInfo(
+    subscription?.status,
+    subscription?.cancelAtPeriodEnd,
+    subscription?.currentPeriodEnd,
+    subscription?.transactionType,
+    subscription?.stripeSubscriptionId,
+  )
+
+  // Get appropriate subtitle based on subscription status
+  const getSubtitle = () => {
+    // If user has a lifetime subscription
+    if (isLifetimePlan && subscription) {
+      return `You have lifetime access to the ${
+        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+      } plan`
+    }
+
+    // If user has a paid subscription
+    if (hasActivePlan && subscription?.tier) {
+      return `You are currently on the ${
+        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+      } plan (${period})`
+    }
+
+    // If in grace period without paid subscription
+    if (inGracePeriod && !hasActivePlan) {
+      return 'You currently have free access to all Pro features until April 30, 2025'
+    }
+
+    // Default message
+    return 'Manage your subscription and billing settings'
+  }
+
+  return (
+    <div className={className}>
+      {showAlert && statusInfo?.message && (
+        <Alert
+          className='mt-6 max-w-2xl'
+          message={statusInfo.message}
+          type={statusInfo.type}
+          showIcon
+        />
+      )}
+
+      {/* Show additional alert for users with paid subscription during grace period */}
+      {showAlert && inGracePeriod && hasActivePlan && (
+        <Alert
+          className='mt-2 max-w-2xl'
+          message="All users have free Pro access until April 30, 2025, but you're already subscribed. Thank you for your support!"
+          type='success'
+          showIcon
+        />
+      )}
+
+      <div className='text-base'>
+        {subscription ? getSubtitle() : 'Manage your subscription and billing settings'}
+      </div>
+    </div>
+  )
+}

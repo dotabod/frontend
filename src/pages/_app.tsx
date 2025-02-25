@@ -7,7 +7,8 @@ import 'focus-visible'
 import HubSpotIdentification from '@/components/HubSpotIdentification'
 import HubSpotScript from '@/components/HubSpotScript'
 import SentrySession from '@/components/SentrySession'
-import { SubscriptionProvider } from '@/hooks/SubscriptionProvider'
+import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
+import { SubscriptionProvider as SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
 import store from '@/lib/redux/store'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { MantineProvider } from '@mantine/core'
@@ -38,63 +39,65 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
   return (
     <SessionProvider session={session}>
-      <ConfigProvider
-        theme={{
-          algorithm: theme.darkAlgorithm,
-          components: {
-            Spin: {
-              colorPrimary: 'var(--color-purple-300)',
-            },
-            Button: {
-              colorLink: 'var(--color-purple-300)',
-              colorPrimaryHover: 'var(--color-purple-300)',
-            },
-            Tabs: {
-              colorPrimary: 'var(--color-purple-400)',
-              itemHoverColor: 'var(--color-purple-300)',
-            },
-            Menu: {
-              subMenuItemBg: 'var(--color-gray-800)',
-              itemHoverBg: 'var(--color-gray-700)',
-              itemSelectedBg: 'var(--color-gray-600)',
-              itemSelectedColor: 'var(--color-gray-200)',
-              itemColor: 'var(--color-gray-300)',
-            },
-            Switch: {
-              colorPrimary: 'var(--color-purple-900)',
-            },
-            Steps: {
-              colorPrimary: 'var(--color-purple-500)',
-              colorPrimaryHover: 'var(--color-purple-300)',
-              colorPrimaryActive: 'var(--color-purple-300)',
-            },
-          },
-          token: {
-            colorPrimary: 'rgb(85, 24, 103)',
-            colorLink: 'var(--color-purple-500)',
-            colorLinkActive: 'var(--color-purple-300)',
-            colorLinkHover: 'var(--color-purple-300)',
-            colorText: 'var(--color-gray-200)',
-            colorBgLayout: 'var(--color-gray-900)',
-            colorBgContainer: 'var(--color-gray-800)',
-          },
-        }}
-      >
-        <StyleProvider hashPriority='high'>
-          <SentrySession />
-          <HubSpotScript />
-          <HubSpotIdentification />
-          <VercelAnalytics />
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
-          <MantineProvider>
-            <Provider store={store}>
-              <SubscriptionProvider>
-                <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
-              </SubscriptionProvider>
-            </Provider>
-          </MantineProvider>
-        </StyleProvider>
-      </ConfigProvider>
+      <SubscriptionProviderMain>
+        <SubscriptionProvider>
+          <ConfigProvider
+            theme={{
+              algorithm: theme.darkAlgorithm,
+              components: {
+                Spin: {
+                  colorPrimary: 'var(--color-purple-300)',
+                },
+                Button: {
+                  colorLink: 'var(--color-purple-300)',
+                  colorPrimaryHover: 'var(--color-purple-300)',
+                },
+                Tabs: {
+                  colorPrimary: 'var(--color-purple-400)',
+                  itemHoverColor: 'var(--color-purple-300)',
+                },
+                Menu: {
+                  subMenuItemBg: 'var(--color-gray-800)',
+                  itemHoverBg: 'var(--color-gray-700)',
+                  itemSelectedBg: 'var(--color-gray-600)',
+                  itemSelectedColor: 'var(--color-gray-200)',
+                  itemColor: 'var(--color-gray-300)',
+                },
+                Switch: {
+                  colorPrimary: 'var(--color-purple-900)',
+                },
+                Steps: {
+                  colorPrimary: 'var(--color-purple-500)',
+                  colorPrimaryHover: 'var(--color-purple-300)',
+                  colorPrimaryActive: 'var(--color-purple-300)',
+                },
+              },
+              token: {
+                colorPrimary: 'rgb(85, 24, 103)',
+                colorLink: 'var(--color-purple-500)',
+                colorLinkActive: 'var(--color-purple-300)',
+                colorLinkHover: 'var(--color-purple-300)',
+                colorText: 'var(--color-gray-200)',
+                colorBgLayout: 'var(--color-gray-900)',
+                colorBgContainer: 'var(--color-gray-800)',
+              },
+            }}
+          >
+            <StyleProvider hashPriority='high'>
+              <SentrySession />
+              <HubSpotScript />
+              <HubSpotIdentification />
+              <VercelAnalytics />
+              <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
+              <MantineProvider>
+                <Provider store={store}>
+                  <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
+                </Provider>
+              </MantineProvider>
+            </StyleProvider>
+          </ConfigProvider>
+        </SubscriptionProvider>
+      </SubscriptionProviderMain>
     </SessionProvider>
   )
 }

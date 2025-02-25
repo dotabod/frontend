@@ -1,3 +1,4 @@
+import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   type PricePeriod,
@@ -5,8 +6,6 @@ import {
   type SubscriptionRow,
   calculateSavings,
   getPriceId,
-  hasPaidPlan,
-  isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
@@ -30,7 +29,6 @@ function Plan({
   logo,
   logomarkClassName,
   featured = false,
-  subscription,
   hasTrial = false,
 }: {
   name: string
@@ -50,15 +48,14 @@ function Plan({
   activePeriod: PricePeriod
   logomarkClassName?: string
   featured?: boolean
-  subscription: SubscriptionRow | null
+  subscription?: SubscriptionRow | null
   hasTrial?: boolean
 }) {
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
-  const inGracePeriod = isInGracePeriod()
-  const hasActivePlan = hasPaidPlan(subscription)
-  const isLifetimePlan = subscription?.transactionType === 'LIFETIME'
+  const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
+
   const isCurrentPlan =
     subscription?.tier === tier &&
     activePeriod ===
