@@ -5,6 +5,7 @@ import {
   type SubscriptionRow,
   calculateSavings,
   getPriceId,
+  hasPaidPlan,
   isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
@@ -56,13 +57,16 @@ function Plan({
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
   const inGracePeriod = isInGracePeriod()
-  const hasPaidSubscription = subscription?.stripeSubscriptionId !== null
+  const hasActivePlan = hasPaidPlan(subscription)
+  const isLifetimePlan = subscription?.transactionType === 'LIFETIME'
   const isCurrentPlan =
     subscription?.tier === tier &&
     activePeriod ===
-      (subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
+      (isLifetimePlan
         ? 'lifetime'
-        : 'monthly')
+        : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual')
+          ? 'annual'
+          : 'monthly')
 
   // Update description display to show trial info
   const displayDescription = () => {
@@ -82,49 +86,48 @@ function Plan({
     return description
   }
 
-  const hasLifetimeSubscription =
-    subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
-
   // Update button text logic
   const getSimplifiedButtonText = () => {
-    const isLifetimePlan = activePeriod === 'lifetime'
+    const isLifetimePeriod = activePeriod === 'lifetime'
     const isProTier = tier === SUBSCRIPTION_TIERS.PRO
     const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
     const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
     const isActive = subscription?.status === SubscriptionStatus.ACTIVE
 
-    // If user has a paid subscription, prioritize showing that status
-    if (hasPaidSubscription && isCurrentPlan) {
-      if (hasLifetimeSubscription) {
-        return 'You have lifetime access'
-      }
+    // If user has a lifetime subscription
+    if (isLifetimePlan && isCurrentPlan) {
+      return 'You have lifetime access'
+    }
+
+    // If user has a paid subscription for this plan
+    if (hasActivePlan && isCurrentPlan) {
       return 'Manage plan'
     }
 
     // Handle grace period for users without paid subscription
-    if (inGracePeriod && isProTier && !hasPaidSubscription) {
-      return isLifetimePlan ? 'Get lifetime access' : 'Subscribe now'
+    if (inGracePeriod && isProTier && !hasActivePlan) {
+      return isLifetimePeriod ? 'Get lifetime access' : 'Subscribe now'
     }
 
     if (isFreeTier) {
       return 'Get started'
     }
 
-    if (isProTier && isLifetimePlan && !hasLifetimeSubscription) {
+    if (isProTier && isLifetimePeriod && !isLifetimePlan) {
       return 'Upgrade to lifetime'
     }
 
-    if (hasTrial && isTrialing && !hasPaidSubscription) {
+    if (hasTrial && isTrialing && !hasActivePlan) {
       return 'Manage trial'
     }
 
     if (!subscription || !isActive) {
-      if (isProTier && isLifetimePlan) {
+      if (isProTier && isLifetimePeriod) {
         return 'Get lifetime access'
       }
 
-      if (isProTier && !isLifetimePlan) {
-        return 'Start free trial'
+      if (isProTier && !isLifetimePeriod) {
+        return 'Update your subscription'
       }
       return button.label
     }
@@ -140,10 +143,7 @@ function Plan({
     if (tier === SUBSCRIPTION_TIERS.FREE) return false
 
     // Disable if user already has lifetime access
-    if (hasLifetimeSubscription) return true
-
-    // If user has a paid subscription for this tier, don't disable
-    if (hasPaidSubscription && isCurrentPlan) return false
+    if (isLifetimePlan && isCurrentPlan) return true
 
     return false
   }
@@ -166,11 +166,11 @@ function Plan({
 
       // Special case for upgrading to lifetime
       if (
-        !inGracePeriod &&
+        subscription?.stripePriceId &&
+        !isLifetimePlan &&
         tier === SUBSCRIPTION_TIERS.PRO &&
         activePeriod === 'lifetime' &&
-        isSubscriptionActive({ status: subscription?.status }) &&
-        subscription?.stripePriceId !== getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
+        isSubscriptionActive({ status: subscription?.status })
       ) {
         // Show confirmation modal before proceeding
         Modal.confirm({
@@ -208,7 +208,10 @@ function Plan({
       }
 
       // If user has an active paid subscription, redirect to portal
-      if (isSubscriptionActive({ status: subscription?.status }) && hasPaidSubscription) {
+      if (
+        isSubscriptionActive({ status: subscription?.status }) &&
+        subscription?.stripeSubscriptionId
+      ) {
         const response = await fetch('/api/stripe/portal', {
           method: 'POST',
         })
@@ -277,12 +280,12 @@ function Plan({
           <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
         )}
         <span className='ml-4'>{name}</span>
-        {inGracePeriod && tier === SUBSCRIPTION_TIERS.PRO && !hasPaidSubscription && (
+        {inGracePeriod && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
             Free until Apr 30, 2025
           </span>
         )}
-        {hasPaidSubscription && isCurrentPlan && (
+        {hasActivePlan && isCurrentPlan && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
             Your plan
           </span>
