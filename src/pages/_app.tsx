@@ -5,6 +5,7 @@ import '@/styles/tailwind.css'
 import 'focus-visible'
 
 import HubSpotIdentification from '@/components/HubSpotIdentification'
+import HubSpotScript from '@/components/HubSpotScript'
 import SentrySession from '@/components/SentrySession'
 import { SubscriptionProvider } from '@/hooks/SubscriptionProvider'
 import store from '@/lib/redux/store'
@@ -82,6 +83,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
         <StyleProvider hashPriority='high'>
           <SentrySession />
           <HubSpotIdentification />
+          <HubSpotScript />
           <VercelAnalytics />
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
           <MantineProvider>
