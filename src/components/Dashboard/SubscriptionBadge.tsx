@@ -46,9 +46,6 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
               <div className='flex items-center gap-2'>
                 {currentPlan?.logo}
                 {currentPlan?.name} Plan
-                {inGracePeriod && !hasActivePlan && (
-                  <span className='text-xs text-yellow-400'>(Free until Apr 30, 2025)</span>
-                )}
               </div>
             </div>
             {statusInfo?.message && <div className='text-center'>{statusInfo.message}</div>}
