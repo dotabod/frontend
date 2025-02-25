@@ -318,11 +318,7 @@ export function getSubscriptionStatusInfo(
       (GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
     )
     return {
-      message: `Free Pro access until ${GRACE_PERIOD_END.toLocaleString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })} (${daysRemaining} days remaining)`,
+      message: `Free Pro access until ${gracePeriodPrettyDate} (${daysRemaining} days remaining)`,
       type: 'info',
       badge: 'gold',
     }
@@ -460,3 +456,9 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
 
   return false
 }
+
+export const gracePeriodPrettyDate = GRACE_PERIOD_END.toLocaleString('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+})

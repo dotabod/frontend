@@ -1,6 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
-import { GRACE_PERIOD_END, type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { type PricePeriod, SUBSCRIPTION_TIERS, gracePeriodPrettyDate } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
@@ -114,12 +114,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
           {inGracePeriod && !hasActivePlan ? (
             <>
               <p className='mt-2 text-lg text-yellow-400 font-medium'>
-                Enjoy complimentary access to all Pro features until{' '}
-                {GRACE_PERIOD_END.toLocaleString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                Enjoy complimentary access to all Pro features until {gracePeriodPrettyDate}
               </p>
               <p className='mt-2 text-lg text-gray-400'>
                 Subscribe today to continue using Pro features after the trial period ends

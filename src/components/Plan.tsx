@@ -7,6 +7,7 @@ import {
   type SubscriptionRow,
   calculateSavings,
   getPriceId,
+  gracePeriodPrettyDate,
   isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
@@ -86,13 +87,7 @@ function Plan({
           <>
             {description}
             <span className='block mt-1 text-purple-400'>
-              Includes free trial until{' '}
-              {GRACE_PERIOD_END.toLocaleString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}{' '}
-              ({daysUntilEnd} days)
+              Includes free trial until {gracePeriodPrettyDate} ({daysUntilEnd} days)
             </span>
           </>
         )
@@ -306,12 +301,7 @@ function Plan({
           !hasActivePlan &&
           activePeriod !== 'lifetime' && (
             <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
-              Free until{' '}
-              {GRACE_PERIOD_END.toLocaleString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
+              Free until {gracePeriodPrettyDate}
             </span>
           )}
         {hasActivePlan && isCurrentPlan && (
