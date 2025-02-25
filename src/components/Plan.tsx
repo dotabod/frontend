@@ -57,7 +57,12 @@ function Plan({
   const savings = calculateSavings(price.monthly, price.annual)
   const inGracePeriod = isInGracePeriod()
   const hasPaidSubscription = subscription?.stripeSubscriptionId !== null
-  const isCurrentPlan = subscription?.tier === tier
+  const isCurrentPlan =
+    subscription?.tier === tier &&
+    activePeriod ===
+      (subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
+        ? 'lifetime'
+        : 'monthly')
 
   // Update description display to show trial info
   const displayDescription = () => {
