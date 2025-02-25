@@ -5,6 +5,7 @@ import {
   type Subscription,
   SubscriptionStatus,
   SubscriptionTier,
+  TransactionType,
 } from '@prisma/client'
 
 // Add type safety for chatters
@@ -276,9 +277,9 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
 
   if (!subscription && isInGracePeriod()) {
     return {
-      tier: 'PRO',
-      status: 'TRIALING',
-      transactionType: 'RECURRING',
+      tier: SUBSCRIPTION_TIERS.PRO,
+      status: SubscriptionStatus.TRIALING,
+      transactionType: TransactionType.RECURRING,
       currentPeriodEnd: GRACE_PERIOD_END,
       cancelAtPeriodEnd: true,
       stripePriceId: '',
