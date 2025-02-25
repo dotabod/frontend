@@ -260,10 +260,11 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       cancelAtPeriodEnd: true,
       stripePriceId: true,
       stripeCustomerId: true,
+      createdAt: true,
       stripeSubscriptionId: true,
     },
     orderBy: [
-      { stripeSubscriptionId: 'desc' }, // Paid subscriptions first (non-null)
+      { stripeSubscriptionId: 'asc' }, // Paid subscriptions first (non-null)
       { transactionType: 'desc' }, // LIFETIME > RECURRING
       { createdAt: 'desc' }, // Most recent first
     ],

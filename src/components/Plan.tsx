@@ -5,6 +5,7 @@ import {
   type SubscriptionRow,
   calculateSavings,
   getPriceId,
+  isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
@@ -54,6 +55,8 @@ function Plan({
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
+  const inGracePeriod = isInGracePeriod()
+  const hasPaidSubscription = subscription?.stripeSubscriptionId !== null
 
   // Update description display to show trial info
   const displayDescription = () => {
@@ -83,6 +86,11 @@ function Plan({
     const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
     const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
     const isActive = subscription?.status === SubscriptionStatus.ACTIVE
+
+    // Handle grace period
+    if (inGracePeriod && isProTier && !hasPaidSubscription) {
+      return isLifetimePlan ? 'Get lifetime access' : 'Subscribe now'
+    }
 
     if (isFreeTier) {
       return 'Get started'
@@ -116,6 +124,20 @@ function Plan({
 
   const buttonText = getSimplifiedButtonText()
 
+  // Determine if button should be disabled
+  const isButtonDisabled = () => {
+    // Always enable Free tier button
+    if (tier === SUBSCRIPTION_TIERS.FREE) return false
+
+    // Disable if user already has lifetime access
+    if (hasLifetimeSubscription) return true
+
+    // During grace period, enable Pro tier buttons to allow users to subscribe
+    if (inGracePeriod) return false
+
+    return false
+  }
+
   const handleSubscribe = async () => {
     setRedirectingToCheckout(true)
     try {
@@ -134,6 +156,7 @@ function Plan({
 
       // Special case for upgrading to lifetime
       if (
+        !inGracePeriod &&
         tier === SUBSCRIPTION_TIERS.PRO &&
         activePeriod === 'lifetime' &&
         isSubscriptionActive({ status: subscription?.status }) &&
@@ -174,8 +197,8 @@ function Plan({
         return
       }
 
-      // If user has an active subscription or is trialing, redirect to portal
-      if (isSubscriptionActive({ status: subscription?.status })) {
+      // If user has an active paid subscription, redirect to portal
+      if (isSubscriptionActive({ status: subscription?.status }) && hasPaidSubscription) {
         const response = await fetch('/api/stripe/portal', {
           method: 'POST',
         })
@@ -244,6 +267,11 @@ function Plan({
           <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
         )}
         <span className='ml-4'>{name}</span>
+        {inGracePeriod && tier === SUBSCRIPTION_TIERS.PRO && (
+          <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
+            Free until Apr 30, 2025
+          </span>
+        )}
       </h3>
       <p
         className={clsx(
@@ -326,7 +354,7 @@ function Plan({
       <Button
         loading={redirectingToCheckout}
         onClick={handleSubscribe}
-        disabled={hasLifetimeSubscription}
+        disabled={isButtonDisabled()}
         size={featured ? 'large' : 'middle'}
         color={featured ? 'danger' : 'default'}
         className={clsx(

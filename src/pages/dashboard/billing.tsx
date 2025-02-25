@@ -5,6 +5,7 @@ import { useSubscription } from '@/hooks/useSubscription'
 import {
   getCurrentPeriod,
   getSubscriptionStatusInfo,
+  isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import { Alert, Button } from 'antd'
@@ -19,6 +20,8 @@ const BillingPage = () => {
   const { subscription, isLoading: isLoadingSubscription } = useSubscription()
   const period = getCurrentPeriod(subscription?.stripePriceId)
   const { data: session } = useSession()
+  const inGracePeriod = isInGracePeriod()
+  const hasPaidSubscription = subscription?.stripeSubscriptionId !== null
 
   const handlePortalAccess = async () => {
     try {
@@ -56,7 +59,7 @@ const BillingPage = () => {
         <title>Dotabod | Billing</title>
       </Head>
 
-      {statusInfo?.message && subscription?.status && (
+      {statusInfo?.message && (
         <Alert
           className='mt-6 max-w-2xl'
           message={statusInfo.message}
@@ -68,15 +71,17 @@ const BillingPage = () => {
       <Header
         title='Billing'
         subtitle={
-          subscription
-            ? `You are currently on the ${
-                subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
-              } plan (${period})`
-            : 'Manage your subscription and billing settings'
+          inGracePeriod && !hasPaidSubscription
+            ? 'You currently have free access to all Pro features until April 30, 2025'
+            : subscription
+              ? `You are currently on the ${
+                  subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+                } plan (${period})`
+              : 'Manage your subscription and billing settings'
         }
       />
 
-      {isSubscriptionActive({ status: subscription?.status }) && (
+      {isSubscriptionActive({ status: subscription?.status }) && hasPaidSubscription && (
         <div className='mt-6'>
           <Button
             type='primary'
