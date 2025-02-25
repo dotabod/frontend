@@ -53,6 +53,24 @@ const BillingPage = () => {
     subscription?.currentPeriodEnd,
   )
 
+  // Get appropriate subtitle based on subscription status
+  const getSubtitle = () => {
+    // If user has a paid subscription, prioritize showing that
+    if (hasPaidSubscription && subscription?.tier) {
+      return `You are currently on the ${
+        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+      } plan (${period})`
+    }
+
+    // If in grace period without paid subscription
+    if (inGracePeriod && !hasPaidSubscription) {
+      return 'You currently have free access to all Pro features until April 30, 2025'
+    }
+
+    // Default message
+    return 'Manage your subscription and billing settings'
+  }
+
   return (
     <>
       <Head>
@@ -68,17 +86,19 @@ const BillingPage = () => {
         />
       )}
 
+      {/* Show additional alert for users with paid subscription during grace period */}
+      {inGracePeriod && hasPaidSubscription && (
+        <Alert
+          className='mt-2 max-w-2xl'
+          message="All users have free Pro access until April 30, 2025, but you're already subscribed. Thank you for your support!"
+          type='success'
+          showIcon
+        />
+      )}
+
       <Header
         title='Billing'
-        subtitle={
-          inGracePeriod && !hasPaidSubscription
-            ? 'You currently have free access to all Pro features until April 30, 2025'
-            : subscription
-              ? `You are currently on the ${
-                  subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
-                } plan (${period})`
-              : 'Manage your subscription and billing settings'
-        }
+        subtitle={subscription ? getSubtitle() : 'Manage your subscription and billing settings'}
       />
 
       {isSubscriptionActive({ status: subscription?.status }) && hasPaidSubscription && (

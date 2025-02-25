@@ -286,14 +286,15 @@ export type SubscriptionStatusInfo = {
   badge: 'gold' | 'blue' | 'red' | 'default'
 }
 
-// Add this function with other exported functions
+// Update the getSubscriptionStatusInfo function to handle both grace period and paid subscription
 export function getSubscriptionStatusInfo(
   status: SubscriptionStatus | null | undefined,
   cancelAtPeriodEnd?: boolean,
   currentPeriodEnd?: Date | null,
+  stripeSubscriptionId?: string | null,
 ): SubscriptionStatusInfo | null {
-  // Check if we're in the grace period
-  if (isInGracePeriod()) {
+  // If we're in the grace period but user has a paid subscription, prioritize showing their subscription status
+  if (isInGracePeriod() && !stripeSubscriptionId) {
     return {
       message: 'Free Pro access until April 30, 2025',
       type: 'info',

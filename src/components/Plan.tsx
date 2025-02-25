@@ -57,6 +57,7 @@ function Plan({
   const savings = calculateSavings(price.monthly, price.annual)
   const inGracePeriod = isInGracePeriod()
   const hasPaidSubscription = subscription?.stripeSubscriptionId !== null
+  const isCurrentPlan = subscription?.tier === tier
 
   // Update description display to show trial info
   const displayDescription = () => {
@@ -87,7 +88,15 @@ function Plan({
     const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
     const isActive = subscription?.status === SubscriptionStatus.ACTIVE
 
-    // Handle grace period
+    // If user has a paid subscription, prioritize showing that status
+    if (hasPaidSubscription && isCurrentPlan) {
+      if (hasLifetimeSubscription) {
+        return 'You have lifetime access'
+      }
+      return 'Manage plan'
+    }
+
+    // Handle grace period for users without paid subscription
     if (inGracePeriod && isProTier && !hasPaidSubscription) {
       return isLifetimePlan ? 'Get lifetime access' : 'Subscribe now'
     }
@@ -100,7 +109,7 @@ function Plan({
       return 'Upgrade to lifetime'
     }
 
-    if (hasTrial && isTrialing) {
+    if (hasTrial && isTrialing && !hasPaidSubscription) {
       return 'Manage trial'
     }
 
@@ -113,10 +122,6 @@ function Plan({
         return 'Start free trial'
       }
       return button.label
-    }
-
-    if (hasLifetimeSubscription) {
-      return 'You have lifetime access'
     }
 
     return 'Manage plan'
@@ -132,8 +137,8 @@ function Plan({
     // Disable if user already has lifetime access
     if (hasLifetimeSubscription) return true
 
-    // During grace period, enable Pro tier buttons to allow users to subscribe
-    if (inGracePeriod) return false
+    // If user has a paid subscription for this tier, don't disable
+    if (hasPaidSubscription && isCurrentPlan) return false
 
     return false
   }
@@ -267,9 +272,14 @@ function Plan({
           <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
         )}
         <span className='ml-4'>{name}</span>
-        {inGracePeriod && tier === SUBSCRIPTION_TIERS.PRO && (
+        {inGracePeriod && tier === SUBSCRIPTION_TIERS.PRO && !hasPaidSubscription && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
             Free until Apr 30, 2025
+          </span>
+        )}
+        {hasPaidSubscription && isCurrentPlan && (
+          <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
+            Your plan
           </span>
         )}
       </h3>
