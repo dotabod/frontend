@@ -1,3 +1,4 @@
+import Banner from '@/components/Banner'
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
@@ -60,6 +61,7 @@ const HomepageShell = ({
         />
       </Head>
 
+      <Banner />
       <Header />
       <main
         className='bg-gray-800'

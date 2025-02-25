@@ -1,3 +1,4 @@
+import Banner from '@/components/Banner'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import { DarkLogo, Logomark } from '@/components/Logo'
@@ -149,88 +150,91 @@ export default function DashboardShell({
   }
 
   return (
-    <Layout className='h-full bg-gray-800'>
-      <Sider
-        breakpoint='md'
-        onBreakpoint={(broken) => {
-          setCollapsed(broken)
-          setBroken(broken)
-        }}
-        style={{
-          background: colorBgLayout,
-        }}
-        width={250}
-        className={clsx('border-r-transparent', collapsed && '!min-w-11 !max-w-11')}
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-      >
-        <div className='logo' />
-
-        <div className='flex flex-col items-end'>
-          <div className='w-full md:max-w-xs'>
-            <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center'>
-              {!collapsed ? (
-                <Link href='/'>
-                  <DarkLogo className='h-full w-auto' />
-                </Link>
-              ) : (
-                <Link href='/'>
-                  <Logomark className='h-full w-auto' aria-hidden='true' />
-                </Link>
-              )}
-            </div>
-
-            <SubscriptionBadge collapsed={collapsed} />
-
-            {!collapsed && (
-              <div className='flex justify-center py-4'>
-                <ModeratedChannels />
-              </div>
-            )}
-
-            <Menu
-              onClick={onClick}
-              selectedKeys={[current]}
-              openKeys={openKeys}
-              onOpenChange={onOpenChange}
-              style={{
-                background: colorBgLayout,
-                borderInlineEnd: 'none',
-              }}
-              mode='inline'
-              items={filterNavigationItems(navigation).map((item, i) => {
-                if (!item.name)
-                  return {
-                    key: item?.href || i,
-                    type: 'divider',
-                    className: '!m-6 !bg-gray-500',
-                  }
-
-                return getItem(item)
-              })}
-            />
-          </div>
-        </div>
-      </Sider>
-      <Layout className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}>
-        <Header
-          className={clsx(
-            '!bg-gray-900',
-            broken && !collapsed && '!hidden',
-            'flex w-full items-center justify-between !p-8',
-          )}
+    <>
+      <Banner />
+      <Layout className='h-full bg-gray-800'>
+        <Sider
+          breakpoint='md'
+          onBreakpoint={(broken) => {
+            setCollapsed(broken)
+            setBroken(broken)
+          }}
+          style={{
+            background: colorBgLayout,
+          }}
+          width={250}
+          className={clsx('border-r-transparent', collapsed && '!min-w-11 !max-w-11')}
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
         >
-          <DisableToggle />
+          <div className='logo' />
 
-          <div className='w-fit py-2'>
-            <UserAccountNav />
+          <div className='flex flex-col items-end'>
+            <div className='w-full md:max-w-xs'>
+              <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center'>
+                {!collapsed ? (
+                  <Link href='/'>
+                    <DarkLogo className='h-full w-auto' />
+                  </Link>
+                ) : (
+                  <Link href='/'>
+                    <Logomark className='h-full w-auto' aria-hidden='true' />
+                  </Link>
+                )}
+              </div>
+
+              <SubscriptionBadge collapsed={collapsed} />
+
+              {!collapsed && (
+                <div className='flex justify-center py-4'>
+                  <ModeratedChannels />
+                </div>
+              )}
+
+              <Menu
+                onClick={onClick}
+                selectedKeys={[current]}
+                openKeys={openKeys}
+                onOpenChange={onOpenChange}
+                style={{
+                  background: colorBgLayout,
+                  borderInlineEnd: 'none',
+                }}
+                mode='inline'
+                items={filterNavigationItems(navigation).map((item, i) => {
+                  if (!item.name)
+                    return {
+                      key: item?.href || i,
+                      type: 'divider',
+                      className: '!m-6 !bg-gray-500',
+                    }
+
+                  return getItem(item)
+                })}
+              />
+            </div>
           </div>
-        </Header>
-        <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
-          {children}
-        </Content>
+        </Sider>
+        <Layout className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}>
+          <Header
+            className={clsx(
+              '!bg-gray-900',
+              broken && !collapsed && '!hidden',
+              'flex w-full items-center justify-between !p-8',
+            )}
+          >
+            <DisableToggle />
+
+            <div className='w-fit py-2'>
+              <UserAccountNav />
+            </div>
+          </Header>
+          <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
+            {children}
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   )
 }
