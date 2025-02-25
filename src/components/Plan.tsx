@@ -1,11 +1,13 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
+  GRACE_PERIOD_END,
   type PricePeriod,
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
   calculateSavings,
   getPriceId,
+  isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
@@ -73,6 +75,28 @@ function Plan({
       activePeriod !== 'lifetime' &&
       (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
     ) {
+      const now = new Date()
+
+      if (isInGracePeriod()) {
+        // Calculate days until grace period ends
+        const daysUntilEnd = Math.ceil(
+          (GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+        )
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>
+              Includes free trial until{' '}
+              {GRACE_PERIOD_END.toLocaleString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}{' '}
+              ({daysUntilEnd} days)
+            </span>
+          </>
+        )
+      }
       return (
         <>
           {description}
@@ -277,11 +301,19 @@ function Plan({
           <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
         )}
         <span className='ml-4'>{name}</span>
-        {inGracePeriod && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan && (
-          <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
-            Free until Apr 30, 2025
-          </span>
-        )}
+        {inGracePeriod &&
+          tier === SUBSCRIPTION_TIERS.PRO &&
+          !hasActivePlan &&
+          activePeriod !== 'lifetime' && (
+            <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
+              Free until{' '}
+              {GRACE_PERIOD_END.toLocaleString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </span>
+          )}
         {hasActivePlan && isCurrentPlan && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
             Your plan

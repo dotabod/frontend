@@ -2,7 +2,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { getSubscription } from '@/utils/subscription'
+import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 import type { Prisma, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -188,6 +188,14 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     ? `${baseUrl}/dashboard/billing?paid=false`
     : `${baseUrl}/?paid=false`
 
+  // Calculate trial period based on grace period
+  const now = new Date()
+
+  // If in grace period, calculate days until grace period ends, otherwise use 14 days
+  const trialDays = isInGracePeriod()
+    ? Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : 14
+
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: isRecurring ? 'subscription' : 'payment',
@@ -197,7 +205,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     cancel_url: cancelUrl,
     subscription_data: isRecurring
       ? {
-          trial_period_days: 14,
+          trial_period_days: trialDays,
           trial_settings: {
             end_behavior: { missing_payment_method: 'cancel' },
           },

@@ -1,5 +1,5 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { getCurrentPeriod, getSubscriptionStatusInfo } from '@/utils/subscription'
+import { GRACE_PERIOD_END, getCurrentPeriod, getSubscriptionStatusInfo } from '@/utils/subscription'
 import { Alert } from 'antd'
 
 interface SubscriptionStatusProps {
@@ -37,7 +37,14 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
 
     // If in grace period without paid subscription
     if (inGracePeriod && !hasActivePlan) {
-      return 'All users currently have free access to all Pro features until April 30, 2025. You can subscribe to the Pro plan to continue using Dotabod Pro after that date.'
+      return `All users currently have free access to all Pro features until ${GRACE_PERIOD_END.toLocaleString(
+        'en-US',
+        {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        },
+      )}. You can subscribe to the Pro plan to continue using Dotabod Pro after that date.`
     }
 
     // Default message
@@ -62,7 +69,11 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
           message={
             isLifetimePlan
               ? 'Thank you for being a lifetime supporter!'
-              : "All users have free Pro access until April 30, 2025, but you're already subscribed. Thank you for your support!"
+              : `All users have free Pro access until ${GRACE_PERIOD_END.toLocaleString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}, but you're already subscribed. Thank you for your support!`
           }
           type='success'
           showIcon

@@ -1,6 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
-import { type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { GRACE_PERIOD_END, type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
@@ -111,21 +111,27 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
             Simple pricing for every Dota 2 streamer
           </h2>
 
-          {inGracePeriod && !hasActivePlan && (
-            <p className='mt-2 text-lg text-yellow-400'>
-              You have free access to all Pro features until April 30, 2025
-            </p>
-          )}
-
-          {hasActivePlan && (
+          {inGracePeriod && !hasActivePlan ? (
+            <>
+              <p className='mt-2 text-lg text-yellow-400 font-medium'>
+                Enjoy complimentary access to all Pro features until{' '}
+                {GRACE_PERIOD_END.toLocaleString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </p>
+              <p className='mt-2 text-lg text-gray-400'>
+                Subscribe today to continue using Pro features after the trial period ends
+              </p>
+            </>
+          ) : hasActivePlan ? (
             <p className='mt-2 text-lg text-purple-400'>
               <SubscriptionStatus showAlert={false} />
             </p>
-          )}
-
-          {inGracePeriod && !hasActivePlan && (
+          ) : (
             <p className='mt-2 text-lg text-gray-400'>
-              Subscribe now to maintain Pro features after April 30, 2025
+              Choose the plan that best fits your streaming needs
             </p>
           )}
         </div>

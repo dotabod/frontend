@@ -163,11 +163,10 @@ export function canAccessFeature(
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier = getRequiredTier(feature)
   const isFreeFeature = requiredTier === SUBSCRIPTION_TIERS.FREE
-  const now = new Date()
 
   // Check if we're in the grace period (before April 30, 2025)
   // Grant Pro access to all users during this period
-  if (now < GRACE_PERIOD_END) {
+  if (isInGracePeriod()) {
     return {
       hasAccess: true, // All features are accessible during grace period
       requiredTier,
@@ -315,8 +314,15 @@ export function getSubscriptionStatusInfo(
 ): SubscriptionStatusInfo | null {
   // If we're in the grace period but user doesn't have a paid plan, show grace period message
   if (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId)) {
+    const daysRemaining = Math.ceil(
+      (GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+    )
     return {
-      message: 'Free Pro access until April 30, 2025',
+      message: `Free Pro access until ${GRACE_PERIOD_END.toLocaleString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })} (${daysRemaining} days remaining)`,
       type: 'info',
       badge: 'gold',
     }
