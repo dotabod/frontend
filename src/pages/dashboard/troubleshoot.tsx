@@ -2,12 +2,13 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
-import { Alert, type StepProps, Steps, type StepsProps, Tag } from 'antd'
+import { MessageOutlined } from '@ant-design/icons'
+import { Alert, Button, type StepProps, Steps, type StepsProps, Tag } from 'antd'
 import Head from 'next/head'
 import Link from 'next/link'
 import type React from 'react'
-import { useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
+import { useState } from 'react'
 import useSWR from 'swr'
 
 export const StepComponent: React.FC<{
@@ -196,20 +197,32 @@ const TroubleshootPage = () => {
   })
   const isLive = data?.stream_online
 
+  // Function to open HubSpot chat widget
+  const openChatWidget = () => {
+    if (window.HubSpotConversations) {
+      window.HubSpotConversations.widget.open()
+    }
+  }
+
   return (
     <>
       <Head>
         <title>Dotabod | Troubleshooting</title>
       </Head>
       <Header subtitle="Try these steps in case something isn't working." title='Troubleshooting' />
-      {!isLive && (
-        <Alert
-          message='Your stream is offline, and Dotabod will only work once you start streaming and go online.'
-          type='warning'
-          showIcon
-          className='max-w-2xl'
-        />
-      )}
+      <div className='flex flex-col gap-4 justify-between items-start max-w-2xl'>
+        <Button type='primary' icon={<MessageOutlined />} onClick={openChatWidget}>
+          Chat Support
+        </Button>
+        {!isLive && (
+          <Alert
+            message='Your stream is offline, and Dotabod will only work once you start streaming and go online.'
+            type='warning'
+            showIcon
+            className='flex-grow'
+          />
+        )}
+      </div>
       <div className='mt-12 lg:col-span-2 lg:mt-0'>
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
           {faqs.map(
