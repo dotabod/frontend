@@ -152,12 +152,26 @@ export function getRequiredTier(feature?: FeatureTier | GenericFeature): Subscri
     SUBSCRIPTION_TIERS.PRO
   )
 }
+
+// Add this constant at the top with other constants
+export const GRACE_PERIOD_END = new Date('2025-04-30T23:59:59.999Z')
+
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
   subscription: Partial<SubscriptionRow> | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier = getRequiredTier(feature)
   const isFreeFeature = requiredTier === SUBSCRIPTION_TIERS.FREE
+  const now = new Date()
+
+  // Check if we're in the grace period (before April 30, 2025)
+  // Grant Pro access to all users during this period
+  if (now < GRACE_PERIOD_END) {
+    return {
+      hasAccess: true, // All features are accessible during grace period
+      requiredTier,
+    }
+  }
 
   // Return early if feature is free or subscription is invalid
   if (
@@ -178,6 +192,7 @@ export function canAccessFeature(
     requiredTier,
   }
 }
+
 export function isSubscriptionActive(
   subscription: { status: SubscriptionStatus | null | undefined } | null,
 ): boolean {
@@ -231,9 +246,11 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   const subscription = await (tx || prisma).subscription.findFirst({
     where: {
       userId,
-      status: {
-        in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
-      },
+      OR: [
+        { status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] } },
+        // Ensure paid subscriptions take precedence
+        { stripeSubscriptionId: { not: null } },
+      ],
     },
     select: {
       tier: true,
@@ -246,6 +263,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeSubscriptionId: true,
     },
     orderBy: [
+      { stripeSubscriptionId: 'desc' }, // Paid subscriptions first (non-null)
       { transactionType: 'desc' }, // LIFETIME > RECURRING
       { createdAt: 'desc' }, // Most recent first
     ],
@@ -273,6 +291,15 @@ export function getSubscriptionStatusInfo(
   cancelAtPeriodEnd?: boolean,
   currentPeriodEnd?: Date | null,
 ): SubscriptionStatusInfo | null {
+  // Check if we're in the grace period
+  if (isInGracePeriod()) {
+    return {
+      message: 'Free Pro access until April 30, 2025',
+      type: 'info',
+      badge: 'gold',
+    }
+  }
+
   if (!status) return null
 
   // Check for lifetime subscription
@@ -357,4 +384,9 @@ export function getSubscriptionTier(
   }
 
   return SUBSCRIPTION_TIERS.FREE
+}
+
+// Add a function to check if we're in the grace period
+export function isInGracePeriod(): boolean {
+  return new Date() < GRACE_PERIOD_END
 }

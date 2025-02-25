@@ -56,6 +56,15 @@ const BillingPage = () => {
         <title>Dotabod | Billing</title>
       </Head>
 
+      {statusInfo?.message && subscription?.status && (
+        <Alert
+          className='mt-6 max-w-2xl'
+          message={statusInfo.message}
+          type={statusInfo.type}
+          showIcon
+        />
+      )}
+
       <Header
         title='Billing'
         subtitle={
@@ -66,10 +75,6 @@ const BillingPage = () => {
             : 'Manage your subscription and billing settings'
         }
       />
-
-      {statusInfo?.message && subscription?.status && (
-        <Alert className='mt-6' message={statusInfo.message} type={statusInfo.type} showIcon />
-      )}
 
       {isSubscriptionActive({ status: subscription?.status }) && (
         <div className='mt-6'>

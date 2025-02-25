@@ -4,6 +4,7 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
   getCurrentPeriod,
+  isInGracePeriod,
   isSubscriptionActive,
 } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
@@ -103,6 +104,9 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
   const { data: session } = useSession()
 
   const period = getCurrentPeriod(subscription?.stripePriceId)
+  const inGracePeriod = isInGracePeriod()
+  const hasActiveSubscription =
+    subscription && isSubscriptionActive({ status: subscription.status })
 
   if (session?.user?.isImpersonating) {
     return null
@@ -117,11 +121,24 @@ export function BillingPlans({ subscription, showTitle = true }: BillingPlansPro
           <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
             Simple pricing for every Dota 2 streamer
           </h2>
-          {subscription && isSubscriptionActive({ status: subscription.status }) && (
+
+          {inGracePeriod && (
+            <p className='mt-2 text-lg text-yellow-400'>
+              You have free access to all Pro features until April 30, 2025
+            </p>
+          )}
+
+          {hasActiveSubscription && (
             <p className='mt-2 text-lg text-purple-400'>
               You are currently on the{' '}
               {subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} plan (
               {period}){subscription.status === SubscriptionStatus.TRIALING && ' (Trial)'}
+            </p>
+          )}
+
+          {inGracePeriod && !hasActiveSubscription && (
+            <p className='mt-2 text-lg text-gray-400'>
+              Subscribe now to maintain Pro features after April 30, 2025
             </p>
           )}
         </div>
