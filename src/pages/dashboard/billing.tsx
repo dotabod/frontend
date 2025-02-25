@@ -46,9 +46,9 @@ const BillingPage = () => {
         <title>Dotabod | Billing</title>
       </Head>
 
-      <SubscriptionStatus />
+      <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
-      <Header title='Billing' subtitle={<SubscriptionStatus showAlert={false} />} />
+      <SubscriptionStatus />
 
       {/* Only show manage subscription button for recurring subscriptions with Stripe */}
       {isSubscriptionActive({ status: subscription?.status }) &&

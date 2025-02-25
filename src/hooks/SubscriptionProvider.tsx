@@ -10,7 +10,7 @@ interface SubscriptionContextType {
 
 export const SubscriptionContext = createContext<SubscriptionContextType | null>(null)
 
-export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
+export function SubscriptionProviderMain({ children }: { children: React.ReactNode }) {
   const [subscription, setSubscription] = useState<SubscriptionRow | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 

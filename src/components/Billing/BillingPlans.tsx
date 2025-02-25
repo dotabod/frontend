@@ -2,13 +2,12 @@ import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
 import { type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import { StarOutlined } from '@ant-design/icons'
-import { SubscriptionStatus } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useState } from 'react'
 import Plan from '../Plan'
+import { SubscriptionStatus } from '../Subscription/SubscriptionStatus'
 import { PeriodToggle } from './PeriodToggle'
-
 interface BillingPlansProps {
   showTitle?: boolean
 }
@@ -112,7 +111,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
             Simple pricing for every Dota 2 streamer
           </h2>
 
-          {inGracePeriod && (
+          {inGracePeriod && !hasActivePlan && (
             <p className='mt-2 text-lg text-yellow-400'>
               You have free access to all Pro features until April 30, 2025
             </p>

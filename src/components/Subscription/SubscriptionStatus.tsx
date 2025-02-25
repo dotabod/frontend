@@ -4,10 +4,9 @@ import { Alert } from 'antd'
 
 interface SubscriptionStatusProps {
   showAlert?: boolean
-  className?: string
 }
 
-export function SubscriptionStatus({ showAlert = true, className = '' }: SubscriptionStatusProps) {
+export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps) {
   const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
 
   const period = getCurrentPeriod(subscription?.stripePriceId)
@@ -25,14 +24,14 @@ export function SubscriptionStatus({ showAlert = true, className = '' }: Subscri
     // If user has a lifetime subscription
     if (isLifetimePlan && subscription) {
       return `You have lifetime access to the ${
-        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
       } plan`
     }
 
     // If user has a paid subscription
     if (hasActivePlan && subscription?.tier) {
       return `You are currently on the ${
-        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)
+        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
       } plan (${period})`
     }
 
@@ -46,7 +45,7 @@ export function SubscriptionStatus({ showAlert = true, className = '' }: Subscri
   }
 
   return (
-    <div className={className}>
+    <div className='flex flex-col gap-4'>
       {showAlert && statusInfo?.message && (
         <Alert
           className='mt-6 max-w-2xl'
@@ -60,7 +59,11 @@ export function SubscriptionStatus({ showAlert = true, className = '' }: Subscri
       {showAlert && inGracePeriod && hasActivePlan && (
         <Alert
           className='mt-2 max-w-2xl'
-          message="All users have free Pro access until April 30, 2025, but you're already subscribed. Thank you for your support!"
+          message={
+            isLifetimePlan
+              ? 'Thank you for being a lifetime supporter!'
+              : "All users have free Pro access until April 30, 2025, but you're already subscribed. Thank you for your support!"
+          }
           type='success'
           showIcon
         />
