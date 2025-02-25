@@ -8,15 +8,16 @@ const HubSpotScript = () => {
         strategy='beforeInteractive'
         dangerouslySetInnerHTML={{
           __html: `
-            window.hsConversationsSettings = {
-              loadImmediately: false
-            };
-
             // Initialize HubSpot tracking object
             window._hsq = window._hsq || [];
 
             // Create a queue for callbacks when HubSpot conversations is ready
             window.hsConversationsOnReady = window.hsConversationsOnReady || [];
+
+            // Set minimal settings to ensure widget loads
+            window.hsConversationsSettings = {
+              loadImmediately: true
+            };
           `,
         }}
       />

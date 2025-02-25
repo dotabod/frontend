@@ -82,8 +82,8 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
       >
         <StyleProvider hashPriority='high'>
           <SentrySession />
-          <HubSpotIdentification />
           <HubSpotScript />
+          <HubSpotIdentification />
           <VercelAnalytics />
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
           <MantineProvider>
