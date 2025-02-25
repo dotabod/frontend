@@ -1,5 +1,6 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Button, Modal, Space, Typography, message } from 'antd'
@@ -14,13 +15,14 @@ const { confirm } = Modal
 const DataPage = () => {
   const { data: session } = useSession()
   const [loading, setLoading] = useState<'export' | 'delete' | null>(null)
-
+  const track = useTrack()
   if (session?.user?.isImpersonating) {
     return null
   }
 
   const handleExportData = async () => {
     try {
+      track('export_data')
       setLoading('export')
       const response = await fetch('/api/manage-data', {
         method: 'POST',
@@ -53,6 +55,7 @@ const DataPage = () => {
   }
 
   const handleDeleteAccount = () => {
+    track('delete_account')
     confirm({
       title: 'Are you sure you want to delete your account?',
       icon: <ExclamationCircleOutlined />,
