@@ -26,12 +26,13 @@ export const plans = [
     tier: SUBSCRIPTION_TIERS.FREE,
     features: [
       'Multi-language support',
+      'Win-loss record display overlay',
+      'Basic rank display with mmr',
       'Basic minimap blocker',
       'Basic game events in chat (kills, bounties, match outcome)',
       'Essential commands (!mmr, !wl, !ranked, !online, !spectators)',
       'Hero stats commands (!dotabuff, !opendota, !builds)',
       'Game stats commands (!gpm, !xpm, !apm)',
-      'Basic rank display with MMR tracking',
       'Manual setup process',
     ],
     logo: (
