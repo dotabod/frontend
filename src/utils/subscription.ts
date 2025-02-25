@@ -274,7 +274,20 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
     ],
   })
 
-  console.log('subscription', subscription)
+  if (!subscription && isInGracePeriod()) {
+    return {
+      tier: 'PRO',
+      status: 'TRIALING',
+      transactionType: 'RECURRING',
+      currentPeriodEnd: GRACE_PERIOD_END,
+      cancelAtPeriodEnd: true,
+      stripePriceId: '',
+      stripeCustomerId: '',
+      createdAt: new Date(),
+      stripeSubscriptionId: null,
+    }
+  }
+
   return subscription
 }
 
@@ -324,7 +337,17 @@ export function getSubscriptionStatusInfo(
     }
   }
 
-  const endDate = currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : 'unknown'
+  // Format date in a more user-friendly way
+  const formatDate = (date: Date): string => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }
+    return new Date(date).toLocaleDateString(undefined, options)
+  }
+
+  const endDate = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'unknown'
 
   // Check if subscription is ending within 10 days
   const isEndingSoon =
@@ -332,15 +355,27 @@ export function getSubscriptionStatusInfo(
     cancelAtPeriodEnd &&
     (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) <= 10
 
+  // Calculate days remaining for better messaging
+  const daysRemaining = currentPeriodEnd
+    ? Math.ceil(
+        (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+      )
+    : 0
+
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
+        message: `Trial ends on ${endDate}`,
         type: 'info',
         badge: 'gold',
       }
     case SubscriptionStatus.ACTIVE:
       return {
-        message: cancelAtPeriodEnd ? `Subscription ending on ${endDate}` : `Renews on ${endDate}`,
+        message: cancelAtPeriodEnd
+          ? isEndingSoon
+            ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
+            : `Subscription ends on ${endDate}`
+          : `Renews on ${endDate}`,
         type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
         badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
       }
