@@ -15,6 +15,13 @@ export default function Document() {
       <body className='min-h-screen bg-transparent'>
         <Main />
         <NextScript />
+        <script
+          type='text/javascript'
+          id='hs-script-loader'
+          async
+          defer
+          src='//js-na1.hs-scripts.com/39771134.js'
+        />
       </body>
     </Html>
   )
