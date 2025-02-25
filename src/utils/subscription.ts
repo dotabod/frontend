@@ -7,6 +7,7 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
+import { formatDate } from '@/utils/formatDate'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -455,8 +456,4 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
   return false
 }
 
-export const gracePeriodPrettyDate = GRACE_PERIOD_END.toLocaleString('en-US', {
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric',
-})
+export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)

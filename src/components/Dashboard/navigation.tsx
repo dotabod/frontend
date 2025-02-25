@@ -1,6 +1,14 @@
 import Discord from '@/images/logos/Discord'
 import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/24/outline'
-import { Cookie, DollarSignIcon, Github, HardDriveIcon, Info, ShieldCheck } from 'lucide-react'
+import {
+  Cookie,
+  DollarSignIcon,
+  Github,
+  HardDriveIcon,
+  Info,
+  NewspaperIcon,
+  ShieldCheck,
+} from 'lucide-react'
 
 // Add a const for parent keys
 export const PARENT_KEYS = {
@@ -97,6 +105,11 @@ export const navigation = [
         name: 'Github',
         href: 'https://github.com/dotabod/',
         icon: Github,
+      },
+      {
+        name: 'Blog',
+        href: '/blog',
+        icon: NewspaperIcon,
       },
       {
         name: 'Status',

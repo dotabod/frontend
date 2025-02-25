@@ -1,9 +1,5 @@
-import DiscordSvg from '@/images/logos/discord.svg'
-import GithubSvg from '@/images/logos/github.svg'
-import StatusSvg from '@/images/logos/status.svg'
 import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
-import Image from 'next/image'
 import { useState } from 'react'
 
 export function NavLinks({ bottom = false }) {
@@ -20,11 +16,9 @@ export function NavLinks({ bottom = false }) {
     ['Features', '/#features'],
     ['Pricing', '/#pricing'],
     ['FAQs', '/#faqs'],
+    ['Blog', '/blog'],
     ...additional,
-    ['Status', 'https://status.dotabod.com', StatusSvg, 'Status'],
-    ['Github', 'https://github.com/dotabod', GithubSvg, 'Github'],
-    ['Discord', 'https://discord.dotabod.com', DiscordSvg, 'Discord'],
-  ].map(([label, href, Icon, tooltip], index) => {
+  ].map(([label, href, tooltip], index) => {
     return (
       <Tooltip key={label} title={tooltip} disabled={!tooltip} position='top'>
         <a
@@ -50,21 +44,7 @@ export function NavLinks({ bottom = false }) {
             )}
           </AnimatePresence>
 
-          <span className='relative z-10 flex items-center gap-2'>
-            {Icon?.type === 'svg' && <span>{Icon}</span>}
-
-            {Icon?.type !== 'svg' && Icon && (
-              <Image
-                src={Icon}
-                width={18}
-                height={18}
-                alt={label}
-                className='pointer-events-none'
-              />
-            )}
-            {bottom && label}
-            {!bottom &&!Icon && label}
-          </span>
+          <span className='relative z-10 flex items-center gap-2'>{label}</span>
         </a>
       </Tooltip>
     )
