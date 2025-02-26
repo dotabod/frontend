@@ -1,7 +1,7 @@
 ---
 title: Introducing Dotabod
 description: A powerful Twitch bot and overlay system for Dota 2 streamers
-date: 2025-02-26
+date: 2025-03-01
 author: Dotabod Team
 ---
 

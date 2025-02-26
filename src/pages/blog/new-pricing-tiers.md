@@ -1,7 +1,7 @@
 ---
 title: Dotabod's New Pricing And What It Means For You
 description: Dotabod's new pricing plans are here! Learn what's changing and how it affects you.
-date: 2025-02-27
+date: 2025-03-01
 author: Dotabod Team
 ---
 
