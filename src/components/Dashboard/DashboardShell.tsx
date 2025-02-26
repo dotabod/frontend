@@ -1,6 +1,8 @@
 import Banner from '@/components/Banner'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
+import HubSpotIdentification from '@/components/HubSpotIdentification'
+import HubSpotScript from '@/components/HubSpotScript'
 import { DarkLogo, Logomark } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
@@ -152,6 +154,8 @@ export default function DashboardShell({
   return (
     <>
       <Banner />
+      <HubSpotScript />
+      <HubSpotIdentification />
       <Layout className='h-full bg-gray-800'>
         <Sider
           breakpoint='md'

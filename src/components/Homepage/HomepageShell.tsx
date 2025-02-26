@@ -4,6 +4,8 @@ import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import Head from 'next/head'
 import type { ReactNode } from 'react'
+import HubSpotIdentification from '../HubSpotIdentification'
+import HubSpotScript from '../HubSpotScript'
 
 const HomepageShell = ({
   title,
@@ -63,6 +65,8 @@ const HomepageShell = ({
 
       <Banner />
       <Header />
+      <HubSpotScript />
+      <HubSpotIdentification />
       <main
         className='bg-gray-800'
         style={{

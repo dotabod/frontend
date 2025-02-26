@@ -1,21 +1,18 @@
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { SessionProvider } from 'next-auth/react'
 
-import '@/styles/tailwind.css'
-import 'focus-visible'
-
-import HubSpotIdentification from '@/components/HubSpotIdentification'
-import HubSpotScript from '@/components/HubSpotScript'
 import SentrySession from '@/components/SentrySession'
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
 import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
 import store from '@/lib/redux/store'
+import '@/styles/tailwind.css'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { App as AntProvider, ConfigProvider, theme } from 'antd'
 import 'antd/dist/reset.css'
+import 'focus-visible'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
@@ -85,8 +82,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
           >
             <StyleProvider hashPriority='high'>
               <SentrySession />
-              <HubSpotScript />
-              <HubSpotIdentification />
               <VercelAnalytics />
               <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
               <MantineProvider>
