@@ -29,7 +29,7 @@ interface BlogPostProps {
 
 const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => {
   return (
-    <Container>
+    <Container className='pb-16'>
       <div className='max-w-3xl mx-auto'>
         <div className='mb-8'>
           <Button

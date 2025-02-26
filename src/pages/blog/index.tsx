@@ -26,7 +26,7 @@ interface BlogIndexProps {
 
 const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
   return (
-    <Container>
+    <Container className='pb-16'>
       <div className='max-w-3xl mx-auto'>
         <Title level={1}>Blog</Title>
         <Paragraph className='text-lg text-gray-600 dark:text-gray-400 mb-8'>
