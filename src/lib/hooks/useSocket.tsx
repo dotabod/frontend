@@ -1,7 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { type blockType, isDev } from '@/lib/devConsts'
 import { fetcher } from '@/lib/fetcher'
-import { createJob, getJobStatus, getMatchData } from '@/lib/hooks/openDotaAPI'
+import { getMatchData, matchDataCache } from '@/lib/hooks/openDotaAPI'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { type RankType, getRankImage } from '@/lib/ranks'
 import { captureException } from '@sentry/nextjs'
@@ -40,6 +40,55 @@ export type wlType = {
   lose: number
   type: string
 }[]
+
+// Add these type definitions
+type CourierData = {
+  // Define courier data structure based on your application
+  id: number
+  position: [number, number]
+  team: number
+  // Add other properties as needed
+}
+
+type CreepData = {
+  // Define creep data structure based on your application
+  id: number
+  position: [number, number]
+  team: number
+  // Add other properties as needed
+}
+
+type HeroUnitData = {
+  // Define hero unit data structure based on your application
+  id: number
+  position: [number, number]
+  team: number
+  // Add other properties as needed
+}
+
+type MinimapStatusData = {
+  // Define status data structure based on your application
+  gameState: string
+  matchId?: string
+  // Add other properties as needed
+}
+
+type TwitchEventData = {
+  // Define the structure of your Twitch event data
+  id: string
+  title?: string
+  outcomes?: Array<{
+    id: string
+    title: string
+    color: string
+    users?: number
+    points?: number
+    // Add other properties as needed
+  }>
+  status?: string
+  // Add other properties as needed
+}
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -108,20 +157,20 @@ export const useSocket = ({
       dispatch(setMinimapDataHeroes(data))
     })
 
-    socket.on('DATA_couriers', (data: any) => {
+    socket.on('DATA_couriers', (data: CourierData[]) => {
       updateLastReceived()
       dispatch(setMinimapDataCouriers(data))
     })
 
-    socket.on('DATA_creeps', (data: any) => {
+    socket.on('DATA_creeps', (data: CreepData[]) => {
       updateLastReceived()
       dispatch(setMinimapDataCreeps(data))
     })
-    socket.on('DATA_hero_units', (data: any) => {
+    socket.on('DATA_hero_units', (data: HeroUnitData[]) => {
       updateLastReceived()
       dispatch(setMinimapDataHeroUnits(data))
     })
-    socket.on('STATUS', (data: any) => {
+    socket.on('STATUS', (data: MinimapStatusData) => {
       updateLastReceived()
       dispatch(setMinimapStatus(data))
     })
@@ -150,17 +199,14 @@ export const useSocket = ({
         heroSlot,
       })
       try {
-        // Create a job to parse the match
-        console.log('[MMR] Creating job for matchId:', matchId)
-        const jobId = await createJob(matchId)
-        console.log('[MMR] Job created with jobId:', jobId)
+        // First check if we already have the match data cached
+        if (matchDataCache.has(matchId)) {
+          console.log('[MMR] Using cached match data for matchId:', matchId)
+          cb(matchDataCache.get(matchId))
+          return
+        }
 
-        // Wait for the job to finish
-        console.log('[MMR] Waiting for job to finish for jobId:', jobId)
-        await getJobStatus(jobId)
-        console.log('[MMR] Job finished for jobId:', jobId)
-
-        // Get match data once parsing is complete
+        // Try to get match data directly - the enhanced getMatchData will handle parsing if needed
         console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
@@ -220,7 +266,7 @@ export const useSocket = ({
       mutate()
     })
 
-    socket.on('channelPollOrBet', (data: any, eventName: string) => {
+    socket.on('channelPollOrBet', (data: TwitchEventData, eventName: string) => {
       updateLastReceived()
       console.log('twitchEvent', { eventName, data })
       const func = eventName.includes('Poll') ? setPollData : setBetData
