@@ -15,13 +15,13 @@ import {
 } from '@/lib/devConsts'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
-import { useOBS } from '@/lib/hooks/useOBS'
-import { type WinChance, useSocket } from '@/lib/hooks/useSocket'
+import type { WinChance } from '@/lib/hooks/useSocket'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 import { Center } from '@mantine/core'
+import * as Sentry from '@sentry/nextjs'
 import { Alert, App, Spin } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -151,16 +151,27 @@ const OverlayPage = () => {
 
   useEffect(() => {
     if (error) {
-      notification.open({
-        key: 'auth-error',
-        type: 'error',
-        duration: 0,
-        placement: 'bottomLeft',
-        message: 'Authentication failed',
-        description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+      // Log the error to Sentry instead of showing to users
+      Sentry.captureException(new Error('Authentication error in overlay'), {
+        extra: {
+          error,
+          originalData: original,
+        },
       })
-    } else {
-      notification.destroy('auth-error')
+
+      // For development environment only, still show the notification
+      if (isDev) {
+        notification.open({
+          key: 'auth-error',
+          type: 'error',
+          duration: 0,
+          placement: 'bottomLeft',
+          message: 'Authentication failed',
+          description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+        })
+      } else {
+        notification.destroy('auth-error')
+      }
     }
   }, [error, notification])
 
