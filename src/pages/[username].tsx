@@ -4,7 +4,7 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Empty, Input, Segmented } from 'antd'
+import { Empty, Input, Segmented, Spin } from 'antd'
 import { ExternalLinkIcon } from 'lucide-react'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -16,38 +16,42 @@ const CommandsPage: NextPageWithLayout = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
-  const { data, loading } = useGetSettingsByUsername()
   const router = useRouter()
+  const { username } = router.query
+  const { data, loading, error, notFound } = useGetSettingsByUsername()
 
   useEffect(() => {
-    if (data?.error) {
+    // Only redirect to 404 if username exists in query and we've finished loading
+    if (username && !loading && (notFound || data?.error || error)) {
       router.push('/404')
     }
-  }, [data, router])
+  }, [data, loading, router, notFound, error, username])
 
-  const commands = Object.keys(CommandDetail).map((command) => {
-    const isEnabled = getValueOrDefault(
-      CommandDetail[command].key,
-      data?.settings
+  if (loading || error || !data) {
+    return (
+      <div className='p-6 flex justify-center items-center min-h-screen'>
+        <Spin size='large' tip='Loading user data...' />
+      </div>
     )
-    return { command, isEnabled: !!isEnabled }
-  })
+  }
+
+  const commands = data?.settings
+    ? Object.keys(CommandDetail).map((command) => {
+        const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
+        return { command, isEnabled: !!isEnabled }
+      })
+    : []
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
-      const isEnabled = getValueOrDefault(
-        CommandDetail[command].key,
-        data?.settings
-      )
+      const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
       if (enabled === 'Enabled') return isEnabled === true
       if (enabled === 'Disabled') return isEnabled === false
       return true
     })
     .filter((command) => {
-      if (permission === 'Mods')
-        return CommandDetail[command].allowed === 'mods'
-      if (permission === 'Plebs')
-        return CommandDetail[command].allowed === 'all'
+      if (permission === 'Mods') return CommandDetail[command].allowed === 'mods'
+      if (permission === 'Plebs') return CommandDetail[command].allowed === 'all'
       return true
     })
     .filter((command) => {
@@ -58,55 +62,47 @@ const CommandsPage: NextPageWithLayout = () => {
           return value.some(
             (alias) =>
               alias.toLowerCase().includes(searchTerm) ||
-              `!${alias.toLowerCase()}`.includes(searchTerm)
+              `!${alias.toLowerCase()}`.includes(searchTerm),
           )
         }
         return value.toLowerCase().includes(searchTerm)
       })
     })
 
-  if (data?.error) {
-    return null
-  }
-
   return (
     <>
       <Head>
         <title>{`Commands for ${loading || !data?.displayName ? '...' : data.displayName} - Dotabod`}</title>
         <meta
-          name="description"
-          content="An exhaustive list of all commands available using Twitch chat."
+          name='description'
+          content='An exhaustive list of all commands available using Twitch chat.'
         />
       </Head>
-      <div className="p-6">
-        <div className="mb-12 space-y-4">
-          <div className="flex flex-row items-center space-x-2">
+      <div className='p-6'>
+        <div className='mb-12 space-y-4'>
+          <div className='flex flex-row items-center space-x-2'>
             <Image
               onError={(e) => {
                 e.currentTarget.src = '/images/hero/default.png'
               }}
               src={data?.image || '/images/hero/default.png'}
-              alt="Profile Picture"
+              alt='Profile Picture'
               width={80}
               height={80}
-              className="rounded-full flex"
+              className='rounded-full flex'
             />
             <div>
-              <div className="flex flex-row items-center space-x-4">
+              <div className='flex flex-row items-center space-x-4'>
                 <Link
-                  target="_blank"
-                  href={
-                    !loading && data ? `https://twitch.tv/${data?.name}` : ''
-                  }
+                  target='_blank'
+                  href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
                   passHref
-                  className="flex flex-row items-center space-x-2"
+                  className='flex flex-row items-center space-x-2'
                 >
-                  <h1 className="text-2xl font-bold leading-6">
-                    {loading || !data?.displayName
-                      ? 'Loading...'
-                      : data.displayName}
+                  <h1 className='text-2xl font-bold leading-6'>
+                    {loading || !data?.displayName ? 'Loading...' : data.displayName}
                   </h1>
-                  <ExternalLinkIcon className="flex" size={15} />
+                  <ExternalLinkIcon className='flex' size={15} />
                 </Link>
                 <span
                   className={`rounded-md px-2 py-0.5 text-xs ${data?.stream_online ? 'bg-red-700' : 'bg-gray-700'}`}
@@ -122,11 +118,11 @@ const CommandsPage: NextPageWithLayout = () => {
               </span>
             </div>
           </div>
-          <div className="text-gray-300">
+          <div className='text-gray-300'>
             All commands available to use in Twitch chat with Dotabod.
           </div>
         </div>
-        <div className="flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap">
+        <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap mb-4'>
           <Segmented
             value={enabled}
             onChange={(v) => setEnabled(v as string)}
@@ -138,7 +134,7 @@ const CommandsPage: NextPageWithLayout = () => {
             options={['All', 'Mods', 'Plebs']}
           />
           <Input
-            placeholder="Search commands..."
+            placeholder='Search commands...'
             value={searchTerm}
             maxLength={200}
             style={{ width: 300 }}
@@ -146,21 +142,16 @@ const CommandsPage: NextPageWithLayout = () => {
           />
         </div>
         {filteredCommands.length < 1 && (
-          <Empty
-            description="Could not find any matching commands."
-            imageStyle={{ height: 60 }}
-          />
+          <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
         )}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10">
-          {filteredCommands.map((key, i) => (
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10'>
+          {filteredCommands.map((key) => (
             <CommandsCard
               readonly
-              key={i}
+              key={key}
               id={key}
               publicLoading={loading}
-              publicIsEnabled={
-                commands.find((c) => c.command === key)?.isEnabled
-              }
+              publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
               command={CommandDetail[key]}
             />
           ))}

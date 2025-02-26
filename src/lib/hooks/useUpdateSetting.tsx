@@ -19,7 +19,10 @@ export const useUpdate = ({
   const { data, error } = useSWR(path, fetcher)
   const { mutate } = useSWRConfig()
   const { message } = App.useApp()
-  const loading = data === undefined
+
+  // Update loading logic to consider both data and error
+  // This ensures loading becomes false when we get an error response
+  const loading = data === undefined && !error
 
   const updateSetting = (newValue, customPath = '') => {
     const options: MutatorOptions = {
@@ -145,6 +148,13 @@ export function useGetSettingsByUsername() {
 
   const { username } = router.query
   const url = `/api/settings${username ? `?username=${username}` : ''}`
-  const { data, loading } = useUpdate({ path: url })
-  return { data, loading }
+  const { data, loading, error } = useUpdate({ path: url })
+
+  // Return error information to make it easier to handle in the component
+  return {
+    data,
+    loading,
+    error,
+    notFound: error && (error as any)?.status === 404,
+  }
 }
