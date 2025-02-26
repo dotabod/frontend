@@ -4,7 +4,7 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Empty, Input, Segmented } from 'antd'
+import { Empty, Input, Segmented, Spin } from 'antd'
 import { ExternalLinkIcon } from 'lucide-react'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -16,19 +16,31 @@ const CommandsPage: NextPageWithLayout = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
-  const { data, loading } = useGetSettingsByUsername()
   const router = useRouter()
+  const { username } = router.query
+  const { data, loading, error, notFound } = useGetSettingsByUsername()
 
   useEffect(() => {
-    if (data?.error) {
+    // Only redirect to 404 if username exists in query and we've finished loading
+    if (username && !loading && (notFound || data?.error || error)) {
       router.push('/404')
     }
-  }, [data, router])
+  }, [data, loading, router, notFound, error, username])
 
-  const commands = Object.keys(CommandDetail).map((command) => {
-    const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
-    return { command, isEnabled: !!isEnabled }
-  })
+  if (loading || error || !data) {
+    return (
+      <div className='p-6 flex justify-center items-center min-h-screen'>
+        <Spin size='large' tip='Loading user data...' />
+      </div>
+    )
+  }
+
+  const commands = data?.settings
+    ? Object.keys(CommandDetail).map((command) => {
+        const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
+        return { command, isEnabled: !!isEnabled }
+      })
+    : []
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
@@ -56,10 +68,6 @@ const CommandsPage: NextPageWithLayout = () => {
         return value.toLowerCase().includes(searchTerm)
       })
     })
-
-  if (data?.error) {
-    return null
-  }
 
   return (
     <>
@@ -114,7 +122,7 @@ const CommandsPage: NextPageWithLayout = () => {
             All commands available to use in Twitch chat with Dotabod.
           </div>
         </div>
-        <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap'>
+        <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap mb-4'>
           <Segmented
             value={enabled}
             onChange={(v) => setEnabled(v as string)}
@@ -137,10 +145,10 @@ const CommandsPage: NextPageWithLayout = () => {
           <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
         )}
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10'>
-          {filteredCommands.map((key, i) => (
+          {filteredCommands.map((key) => (
             <CommandsCard
               readonly
-              key={i}
+              key={key}
               id={key}
               publicLoading={loading}
               publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
