@@ -15,7 +15,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-const { Title, Text, Paragraph } = Typography
+const { Title, Text } = Typography
 
 interface BlogPostProps {
   source: MDXRemoteSerializeResult
@@ -113,11 +113,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Replace any undefined values with null
-  Object.keys(processedData).forEach((key) => {
+  for (const key of Object.keys(processedData)) {
     if (processedData[key] === undefined) {
       processedData[key] = null
     }
-  })
+  }
 
   const mdxSource = await serialize(content, {
     mdxOptions: {
@@ -136,7 +136,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       meta: {
         title: processedData.title || 'Untitled',
         description: processedData.description || '',
-        date: date,
+        date,
         author: processedData.author || null,
       },
     },
