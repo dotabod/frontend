@@ -77,6 +77,10 @@ const CommandsPage: NextPageWithLayout = () => {
           name='description'
           content='An exhaustive list of all commands available using Twitch chat.'
         />
+        {username && typeof username === 'string' && (
+          <link rel="canonical" href={`https://dotabod.com/${username}`} />
+        )}
+        <meta name="robots" content={username === '[username]' ? 'noindex, nofollow' : 'index, follow'} />
       </Head>
       <div className='p-6'>
         <div className='mb-12 space-y-4'>
