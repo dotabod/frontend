@@ -34,14 +34,20 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
 
   const initialProps = await Document.getInitialProps(ctx)
   const style = extractStyle(cache, true)
+
+  // Create a new array with all styles
+  const allStyles = [
+    ...(Array.isArray(initialProps.styles) ? initialProps.styles : [initialProps.styles]),
+    // Add the Ant Design styles as a string in a nonce attribute
+    // This avoids using dangerouslySetInnerHTML or children props
+    <style key='antd-styles' id='antd-styles' nonce='antd-css'>
+      {style}
+    </style>,
+  ]
+
   return {
     ...initialProps,
-    styles: (
-      <>
-        {initialProps.styles}
-        <style dangerouslySetInnerHTML={{ __html: style }} />
-      </>
-    ),
+    styles: allStyles,
   }
 }
 

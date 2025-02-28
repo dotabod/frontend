@@ -6,7 +6,7 @@ import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
 import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
 import store from '@/lib/redux/store'
 import '@/styles/tailwind.css'
-import { StyleProvider } from '@ant-design/cssinjs'
+import { StyleProvider, createCache } from '@ant-design/cssinjs'
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
@@ -34,53 +34,56 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
 
+  // Create a cache instance for StyleProvider
+  const cache = createCache()
+
   return (
     <SessionProvider session={session}>
       <SubscriptionProviderMain>
         <SubscriptionProvider>
-          <ConfigProvider
-            theme={{
-              algorithm: theme.darkAlgorithm,
-              components: {
-                Spin: {
-                  colorPrimary: 'var(--color-purple-300)',
+          <StyleProvider cache={cache} hashPriority="high">
+            <ConfigProvider
+              theme={{
+                algorithm: theme.darkAlgorithm,
+                components: {
+                  Spin: {
+                    colorPrimary: 'var(--color-purple-300)',
+                  },
+                  Button: {
+                    colorLink: 'var(--color-purple-300)',
+                    colorPrimaryHover: 'var(--color-purple-300)',
+                  },
+                  Tabs: {
+                    colorPrimary: 'var(--color-purple-400)',
+                    itemHoverColor: 'var(--color-purple-300)',
+                  },
+                  Menu: {
+                    subMenuItemBg: 'var(--color-gray-800)',
+                    itemHoverBg: 'var(--color-gray-700)',
+                    itemSelectedBg: 'var(--color-gray-600)',
+                    itemSelectedColor: 'var(--color-gray-200)',
+                    itemColor: 'var(--color-gray-300)',
+                  },
+                  Switch: {
+                    colorPrimary: 'var(--color-purple-900)',
+                  },
+                  Steps: {
+                    colorPrimary: 'var(--color-purple-500)',
+                    colorPrimaryHover: 'var(--color-purple-300)',
+                    colorPrimaryActive: 'var(--color-purple-300)',
+                  },
                 },
-                Button: {
-                  colorLink: 'var(--color-purple-300)',
-                  colorPrimaryHover: 'var(--color-purple-300)',
+                token: {
+                  colorPrimary: 'rgb(85, 24, 103)',
+                  colorLink: 'var(--color-purple-500)',
+                  colorLinkActive: 'var(--color-purple-300)',
+                  colorLinkHover: 'var(--color-purple-300)',
+                  colorText: 'var(--color-gray-200)',
+                  colorBgLayout: 'var(--color-gray-900)',
+                  colorBgContainer: 'var(--color-gray-800)',
                 },
-                Tabs: {
-                  colorPrimary: 'var(--color-purple-400)',
-                  itemHoverColor: 'var(--color-purple-300)',
-                },
-                Menu: {
-                  subMenuItemBg: 'var(--color-gray-800)',
-                  itemHoverBg: 'var(--color-gray-700)',
-                  itemSelectedBg: 'var(--color-gray-600)',
-                  itemSelectedColor: 'var(--color-gray-200)',
-                  itemColor: 'var(--color-gray-300)',
-                },
-                Switch: {
-                  colorPrimary: 'var(--color-purple-900)',
-                },
-                Steps: {
-                  colorPrimary: 'var(--color-purple-500)',
-                  colorPrimaryHover: 'var(--color-purple-300)',
-                  colorPrimaryActive: 'var(--color-purple-300)',
-                },
-              },
-              token: {
-                colorPrimary: 'rgb(85, 24, 103)',
-                colorLink: 'var(--color-purple-500)',
-                colorLinkActive: 'var(--color-purple-300)',
-                colorLinkHover: 'var(--color-purple-300)',
-                colorText: 'var(--color-gray-200)',
-                colorBgLayout: 'var(--color-gray-900)',
-                colorBgContainer: 'var(--color-gray-800)',
-              },
-            }}
-          >
-            <StyleProvider hashPriority='high'>
+              }}
+            >
               <SentrySession />
               <VercelAnalytics />
               <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
@@ -89,8 +92,8 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
                   <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
                 </Provider>
               </MantineProvider>
-            </StyleProvider>
-          </ConfigProvider>
+            </ConfigProvider>
+          </StyleProvider>
         </SubscriptionProvider>
       </SubscriptionProviderMain>
     </SessionProvider>
