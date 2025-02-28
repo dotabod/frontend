@@ -84,13 +84,7 @@ export function useUpdateSetting(key?: SettingKeys) {
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
-
-  // Only create the URL if userId is available or not expected
-  const url = userId
-    ? `/api/settings?id=${userId}`
-    : router.pathname.includes('/overlay')
-      ? null
-      : '/api/settings'
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
 
   const {
     data,
@@ -101,8 +95,6 @@ export function useUpdateSetting(key?: SettingKeys) {
   } = useUpdate({
     path: url,
     dataTransform: (data, newValue) => {
-      if (!data) return {}
-
       if (key === Settings.mmr) {
         return { ...data, mmr: newValue.value }
       }
@@ -128,7 +120,6 @@ export function useUpdateSetting(key?: SettingKeys) {
   if (key === Settings.mmr) value = data?.mmr || 0
 
   const updateSetting = (newValue) => {
-    if (!url) return
     update({ value: newValue }, `/api/settings/${key}`)
   }
 
@@ -138,7 +129,7 @@ export function useUpdateSetting(key?: SettingKeys) {
     error,
     loading,
     updateSetting,
-    mutate: () => url && mutate(url),
+    mutate: () => mutate(url),
   }
 }
 
@@ -147,11 +138,7 @@ export function useGetSettings() {
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
-  const url = userId
-    ? `/api/settings?id=${userId}`
-    : router.pathname.includes('/overlay')
-      ? null
-      : '/api/settings'
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
   const { data, loading } = useUpdate({ path: url })
   return { data, loading }
 }
@@ -160,7 +147,7 @@ export function useGetSettingsByUsername() {
   const router = useRouter()
 
   const { username } = router.query
-  const url = username ? `/api/settings?username=${username}` : null
+  const url = `/api/settings${username ? `?username=${username}` : ''}`
   const { data, loading, error } = useUpdate({ path: url })
 
   // Return error information to make it easier to handle in the component
