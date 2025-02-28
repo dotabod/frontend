@@ -30,13 +30,28 @@ export default function ModeratedChannels() {
   const fetchModeratedChannels = useCallback(async () => {
     try {
       const res = await fetch('/api/get-moderated-channels')
-      const channels = await res.json()
-      if (Array.isArray(channels)) {
-        setModeratedChannels(channels)
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`)
+      }
+      const text = await res.text()
+      if (!text) {
+        setModeratedChannels([])
+        return
+      }
+      try {
+        const channels = JSON.parse(text)
+        if (Array.isArray(channels)) {
+          setModeratedChannels(channels)
+        }
+      } catch (parseError) {
+        captureException(parseError)
+        console.error('JSON parse error:', parseError, 'Response text:', text)
+        setModeratedChannels([])
       }
     } catch (error) {
       captureException(error)
       console.error(error)
+      setModeratedChannels([])
     } finally {
       setLoading(false)
     }
