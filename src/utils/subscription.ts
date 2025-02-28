@@ -1,5 +1,6 @@
 import prisma from '@/lib/db'
 import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
+import { formatDate } from '@/utils/formatDate'
 import {
   type Prisma,
   type Subscription,
@@ -7,7 +8,6 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
-import { formatDate } from '@/utils/formatDate'
 
 // Add type safety for chatters
 export type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -130,6 +130,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   'obs-picks': SUBSCRIPTION_TIERS.PRO,
   queueBlockerFindMatchText: SUBSCRIPTION_TIERS.PRO,
   winProbabilityOverlayIntervalMinutes: SUBSCRIPTION_TIERS.PRO,
+  crypto_payment_interest: SUBSCRIPTION_TIERS.FREE,
 } as const
 
 export type FeatureTier = keyof typeof FEATURE_TIERS
