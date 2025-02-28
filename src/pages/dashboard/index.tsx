@@ -6,7 +6,8 @@ import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { Alert, Button, Collapse, Steps, notification } from 'antd'
+import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
+import { Alert, App, Button, Collapse, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -18,6 +19,7 @@ import useSWR from 'swr'
 
 const SetupPage = () => {
   const session = useSession()
+  const { notification } = App.useApp()
   const track = useTrack()
   const { data } = useSWR('/api/settings', fetcher, {
     revalidateIfStale: false,
@@ -69,6 +71,10 @@ const SetupPage = () => {
     )
   }, [router.query.step]) // Dependency array, re-run effect when `step` changes
 
+  const trialDays = isInGracePeriod()
+  ? Math.ceil((GRACE_PERIOD_END.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  : 14
+
   useEffect(() => {
     if (active === maxStepIndex || didJustPay) {
       const end = Date.now() + 1 * 1000
@@ -79,8 +85,8 @@ const SetupPage = () => {
           key: 'paid',
           message: isTrial ? 'Dotabod Pro Unlocked' : 'Dotabod Pro Unlocked',
           description: isTrial
-            ? 'Your 14-day trial with full access to all features has begun.'
-            : 'Thanks for subscribing to Dotabod! All premium features are now unlocked.',
+            ? `Your ${trialDays}-day trial with full access to all features begins now.`
+            : 'Thanks for supporting Dotabod! All premium features are now unlocked.',
           duration: 55,
         })
         // Clear the query params

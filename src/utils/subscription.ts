@@ -367,7 +367,7 @@ export function getSubscriptionStatusInfo(
       return {
         message: cancelAtPeriodEnd
           ? `Trial ends on ${endDate}`
-          : `Trial until ${endDate}, then auto-renews`,
+          : `Trial until ${endDate}`,
         type: 'info',
         badge: 'gold',
       }
