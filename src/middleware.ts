@@ -7,10 +7,15 @@ import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 
 export const config = {
-  matcher: ['/', '/login', '/overlay/:path*', '/api/:path*', '/dashboard/:path*', '/install'],
+  matcher: ['/', '/login', '/overlay/:path*', '/api/:path*', '/dashboard/:path*', '/install', '/[username]'],
 }
 
 export async function middleware(req: NextRequestWithAuth) {
+  // Redirect literal [username] path to login page
+  if (req.nextUrl.pathname === '/[username]') {
+    return NextResponse.redirect(new URL('/login', req.url))
+  }
+
   if (req.nextUrl.pathname === '/install') {
     return NextResponse.redirect(new URL('/api/install', req.url))
   }
