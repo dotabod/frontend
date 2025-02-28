@@ -1,8 +1,9 @@
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { Card } from '@/ui/card'
 import { formatDate } from '@/utils/formatDate'
-import { Card, Space, Typography } from 'antd'
+import { Space, Typography } from 'antd'
 import fs from 'fs'
 import matter from 'gray-matter'
 import type { GetStaticProps } from 'next'
@@ -52,7 +53,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
       <Container className='pb-16'>
         <div className='max-w-3xl mx-auto'>
           <Title level={1}>Blog</Title>
-          <Paragraph className='text-lg text-gray-600 dark:text-gray-400 mb-8'>
+          <Paragraph className='text-lg   mb-8'>
             Updates, announcements, and insights about Dotabod.
           </Paragraph>
 
@@ -60,8 +61,6 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
             {posts.map((post) => (
               <Card
                 key={post.slug}
-                bordered={false}
-                className='bg-gray-50 dark:bg-gray-800/50 hover:shadow-md transition-shadow'
               >
                 <Space direction='vertical' size='small'>
                   <Text type='secondary' className='block mb-2'>
@@ -72,7 +71,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
                       {post.title}
                     </Title>
                   </Link>
-                  <Paragraph className='text-gray-600 dark:text-gray-400'>
+                  <Paragraph className=' '>
                     {post.description}
                   </Paragraph>
                   <Link
