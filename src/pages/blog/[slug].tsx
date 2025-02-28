@@ -24,6 +24,8 @@ interface BlogPostProps {
     description: string
     date: string
     author?: string
+    image?: string
+    slug: string
   }
 }
 
@@ -74,7 +76,23 @@ const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => {
 }
 
 BlogPost.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell>{page}</HomepageShell>
+  const { meta } = page.props as BlogPostProps;
+  const pageTitle = `${meta.title} | Dotabod Blog`;
+  const canonicalUrl = `https://dotabod.com/blog/${meta.slug}`;
+
+  return (
+    <HomepageShell
+      seo={{
+        title: pageTitle,
+        description: meta.description,
+        ogImage: meta.image,
+        canonicalUrl: canonicalUrl,
+        ogType: 'article'
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -138,6 +156,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         description: processedData.description || '',
         date,
         author: processedData.author || null,
+        image: processedData.image || null,
+        slug, // Add slug to meta for canonical URL
       },
     },
   }

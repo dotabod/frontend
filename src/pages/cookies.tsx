@@ -232,7 +232,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
             <tr>
               <td className='text-right font-medium  pr-2 py-1'>Purpose:</td>
               <td className=''>
-                A session cookie used to check if the user’s browser supports cookies.
+                A session cookie used to check if the user's browser supports cookies.
               </td>
             </tr>
             <tr>
@@ -514,7 +514,13 @@ const CookiePolicyPage: NextPageWithLayout = () => {
 }
 
 CookiePolicyPage.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell title='Cookie Policy | Dotabod'>{page}</HomepageShell>
+  return <HomepageShell
+    seo={{
+      title: 'Cookie Policy | Dotabod',
+      description: 'Learn about how Dotabod uses cookies and other tracking technologies to enhance your experience on our website.',
+      canonicalUrl: 'https://dotabod.com/cookies',
+    }}
+  >{page}</HomepageShell>
 }
 
 export default CookiePolicyPage

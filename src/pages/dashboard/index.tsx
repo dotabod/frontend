@@ -270,7 +270,18 @@ const SetupPage = () => {
 }
 
 SetupPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Dashboard | Dotabod',
+        description: 'Manage your Dotabod settings and features to enhance your Dota 2 streaming experience.',
+        canonicalUrl: 'https://dotabod.com/dashboard',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default SetupPage

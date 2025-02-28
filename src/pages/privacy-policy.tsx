@@ -349,7 +349,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           </li>
           <li>
             <strong>To save or protect an individual's vital interest.</strong> We may process your
-            information when necessary to save or protect an individual’s vital interest, such as to
+            information when necessary to save or protect an individual's vital interest, such as to
             prevent harm.
           </li>
         </ul>
@@ -644,7 +644,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           We do not knowingly collect, solicit data from, or market to children under 18 years of
           age, nor do we knowingly sell such personal information. By using the Services, you
           represent that you are at least 18 or that you are the parent or guardian of such a minor
-          and consent to such minor dependent’s use of the Services. If we learn that personal
+          and consent to such minor dependent's use of the Services. If we learn that personal
           information from users less than 18 years of age has been collected, we will deactivate
           the account and take reasonable measures to promptly delete such data from our records. If
           you become aware of any data we may have collected from children under age 18, please
@@ -875,7 +875,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
               <td>K. Inferences drawn from collected personal information</td>
               <td>
                 Inferences drawn from any of the collected personal information listed above to
-                create a profile or summary about, for example, an individual’s preferences and
+                create a profile or summary about, for example, an individual's preferences and
                 characteristics
               </td>
               <td style={{ textAlign: 'center' }}>NO</td>
@@ -963,7 +963,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           </li>
           <li>
             <strong>Right to opt out</strong> of the processing of your personal data if it is used
-            for targeted advertising (or sharing as defined under California’s privacy law), the
+            for targeted advertising (or sharing as defined under California's privacy law), the
             sale of personal data, or profiling in furtherance of decisions that produce legal or
             similarly significant effects ("profiling")
           </li>
@@ -972,7 +972,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
         <ul className='list-disc list-inside'>
           <li>
             Right to access the categories of personal data being processed (as permitted by
-            applicable law, including Minnesota’s privacy law)
+            applicable law, including Minnesota's privacy law)
           </li>
           <li>
             Right to obtain a list of the categories of third parties to which we have disclosed
@@ -985,16 +985,16 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           </li>
           <li>
             Right to review, understand, question, and correct how personal data has been profiled
-            (as permitted by applicable law, including Minnesota’s privacy law)
+            (as permitted by applicable law, including Minnesota's privacy law)
           </li>
           <li>
             Right to limit use and disclosure of sensitive personal data (as permitted by applicable
-            law, including California’s privacy law)
+            law, including California's privacy law)
           </li>
           <li>
             Right to opt out of the collection of sensitive data and personal data collected through
             the operation of a voice or facial recognition feature (as permitted by applicable law,
-            including Florida’s privacy law)
+            including Florida's privacy law)
           </li>
         </ul>
         <h3>How to Exercise Your Rights</h3>
@@ -1096,7 +1096,13 @@ const PrivacyPolicy: NextPageWithLayout = () => (
 )
 
 PrivacyPolicy.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell title='Privacy Policy | Dotabod'>{page}</HomepageShell>
+  return <HomepageShell
+    seo={{
+      title: 'Privacy Policy | Dotabod',
+      description: 'Learn about how Dotabod collects, uses, and protects your personal information.',
+      canonicalUrl: 'https://dotabod.com/privacy-policy',
+    }}
+  >{page}</HomepageShell>
 }
 
 export default PrivacyPolicy

@@ -36,7 +36,13 @@ const NotFound: NextPageWithLayout = () => {
 }
 
 NotFound.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell>{page}</HomepageShell>
+  return <HomepageShell
+    seo={{
+      title: 'Page Not Found | Dotabod',
+      description: 'The page you are looking for could not be found.',
+      canonicalUrl: 'https://dotabod.com/404',
+    }}
+  >{page}</HomepageShell>
 }
 
 export default NotFound

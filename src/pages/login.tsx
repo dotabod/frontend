@@ -90,7 +90,13 @@ const Login: NextPageWithLayout = () => {
 }
 
 Login.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell title='Sign In | Dotabod'>{page}</HomepageShell>
+  return <HomepageShell
+    seo={{
+      title: 'Sign In | Dotabod',
+      description: 'Sign in to your Dotabod account to access your dashboard and manage your Dota 2 streaming tools.',
+      canonicalUrl: 'https://dotabod.com/login',
+    }}
+  >{page}</HomepageShell>
 }
 
 export default Login

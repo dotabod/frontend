@@ -179,7 +179,18 @@ const DataPage = () => {
 }
 
 DataPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Data | Dotabod Dashboard',
+        description: 'View and manage the data associated with your Dotabod account.',
+        canonicalUrl: 'https://dotabod.com/dashboard/data',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default DataPage

@@ -241,7 +241,18 @@ const TroubleshootPage = () => {
 }
 
 TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Troubleshoot | Dotabod Dashboard',
+        description: 'Troubleshoot and resolve issues with your Dotabod setup.',
+        canonicalUrl: 'https://dotabod.com/dashboard/troubleshoot',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default TroubleshootPage

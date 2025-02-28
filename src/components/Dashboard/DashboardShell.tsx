@@ -10,6 +10,7 @@ import { captureException } from '@sentry/nextjs'
 import { Layout, Menu, type MenuProps, Tag, theme } from 'antd'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import Link from 'next/link'
 import type React from 'react'
 import { useEffect, useState } from 'react'
@@ -17,6 +18,16 @@ import ModeratedChannels from './ModeratedChannels'
 import { navigation } from './navigation'
 
 const { Header, Sider, Content } = Layout
+
+// Add SEO interface
+interface SEOProps {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  ogType?: string;
+  noindex?: boolean;
+}
 
 function getItem(item) {
   const props = item.onClick ? { onClick: item.onClick } : {}
@@ -64,8 +75,10 @@ for (const item of navigation) {
 
 export default function DashboardShell({
   children,
+  seo,
 }: {
-  children: React.ReactElement
+  children: React.ReactElement;
+  seo?: SEOProps;
 }) {
   const { status, data } = useSession()
   const [collapsed, setCollapsed] = useState(false)
@@ -75,6 +88,19 @@ export default function DashboardShell({
   } = theme.useToken()
   const [current, setCurrent] = useState('/dashboard')
   const [openKeys, setOpenKeys] = useState<string[]>([])
+
+  // Default SEO values
+  const defaultTitle = 'Dashboard | Dotabod';
+  const defaultDescription = 'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.';
+  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`;
+  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/dashboard`;
+
+  // Use SEO props if provided, otherwise use defaults
+  const pageTitle = seo?.title || defaultTitle;
+  const pageDescription = seo?.description || defaultDescription;
+  const pageImage = seo?.ogImage || defaultOgImage;
+  const pageUrl = seo?.canonicalUrl || defaultUrl;
+  const pageType = seo?.ogType || 'website';
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
@@ -153,6 +179,27 @@ export default function DashboardShell({
 
   return (
     <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name='title' content={pageTitle} />
+        <meta name='description' content={pageDescription} />
+        <meta property='og:type' content={pageType} />
+        <meta property='og:url' content={pageUrl} />
+        <meta property='og:title' content={pageTitle} />
+        <meta property='og:description' content={pageDescription} />
+        <meta property='og:image' content={pageImage} />
+
+        <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:url' content={pageUrl} />
+        <meta property='twitter:title' content={pageTitle} />
+        <meta property='twitter:description' content={pageDescription} />
+        <meta property='twitter:image' content={pageImage} />
+
+        {seo?.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+
+        {/* Dashboard pages should generally not be indexed by search engines */}
+        {seo?.noindex !== false && <meta name="robots" content="noindex, nofollow" />}
+      </Head>
       <Banner />
       <HubSpotScript />
       <HubSpotIdentification />

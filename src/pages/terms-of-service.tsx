@@ -319,7 +319,7 @@ const TermsOfService: NextPageWithLayout = () => (
         <div>
           You are solely responsible for your Submissions and you expressly agree to reimburse us
           for any and all losses that we may suffer because of your breach of (a) this section, (b)
-          any third party’s intellectual property rights, or (c) applicable law.
+          any third party's intellectual property rights, or (c) applicable law.
         </div>
         <br />
         <div id='userreps'>
@@ -470,7 +470,7 @@ const TermsOfService: NextPageWithLayout = () => (
           <li>
             Upload or transmit (or attempt to upload or to transmit) viruses, Trojan horses, or
             other material, including excessive use of capital letters and spamming (continuous
-            posting of repetitive text), that interferes with any party’s uninterrupted use and
+            posting of repetitive text), that interferes with any party's uninterrupted use and
             enjoyment of the Services or modifies, impairs, disrupts, alters, or interferes with the
             use, features, functions, operation, or maintenance of the Services.
           </li>
@@ -802,7 +802,7 @@ const TermsOfService: NextPageWithLayout = () => (
           by binding arbitration. YOU UNDERSTAND THAT WITHOUT THIS PROVISION, YOU WOULD HAVE THE
           RIGHT TO SUE IN COURT AND HAVE A JURY TRIAL. The arbitration shall be commenced and
           conducted under the Commercial Arbitration Rules of the American Arbitration Association
-          ("AAA") and, where appropriate, the AAA’s Supplementary Procedures for Consumer Related
+          ("AAA") and, where appropriate, the AAA's Supplementary Procedures for Consumer Related
           Disputes ("AAA Consumer Rules"), both of which are available at the{' '}
           <a href='http://www.adr.org' target='_blank' rel='noreferrer'>
             American Arbitration Association (AAA) website
@@ -928,7 +928,7 @@ const TermsOfService: NextPageWithLayout = () => (
         <div>
           You agree to defend, indemnify, and hold us harmless, including our subsidiaries,
           affiliates, and all of our respective officers, agents, partners, and employees, from and
-          against any loss, damage, liability, claim, or demand, including reasonable attorneys’
+          against any loss, damage, liability, claim, or demand, including reasonable attorneys'
           fees and expenses, made by any third party due to or arising out of: (1) use of the
           Services; (2) breach of these Legal Terms; (3) any breach of your representations and
           warranties set forth in these Legal Terms; (4) your violation of the rights of a third
@@ -1030,7 +1030,13 @@ const TermsOfService: NextPageWithLayout = () => (
 )
 
 TermsOfService.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell title='Terms of Service | Dotabod'>{page}</HomepageShell>
+  return <HomepageShell
+    seo={{
+      title: 'Terms of Service | Dotabod',
+      description: 'Read the terms and conditions that govern your use of Dotabod services.',
+      canonicalUrl: 'https://dotabod.com/terms-of-service',
+    }}
+  >{page}</HomepageShell>
 }
 
 export default TermsOfService

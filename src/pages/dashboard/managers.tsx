@@ -169,7 +169,18 @@ const ModeratorsPage = () => {
 }
 
 ModeratorsPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Managers | Dotabod Dashboard',
+        description: 'Manage moderators and channel managers for your Dotabod account.',
+        canonicalUrl: 'https://dotabod.com/dashboard/managers',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default ModeratorsPage

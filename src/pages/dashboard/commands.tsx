@@ -103,7 +103,18 @@ const CommandsPage = () => {
 }
 
 CommandsPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Commands | Dotabod Dashboard',
+        description: 'Manage your Dotabod chat commands for your Dota 2 stream.',
+        canonicalUrl: 'https://dotabod.com/dashboard/commands',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default CommandsPage

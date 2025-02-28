@@ -112,7 +112,18 @@ const BillingPage = () => {
 }
 
 BillingPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Billing | Dotabod Dashboard',
+        description: 'Manage your Dotabod subscription and billing information.',
+        canonicalUrl: 'https://dotabod.com/dashboard/billing',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default BillingPage
