@@ -281,7 +281,7 @@ export default function ChatBot() {
                                   track('chatbot/change_mmr')
                                 }}
                               >
-                                Change it
+                                <span className='text-purple-300'>Change it</span>
                               </Link>
                             </span>
                           </div>
@@ -342,7 +342,7 @@ export default function ChatBot() {
                                 track('chatbot/change_mmr')
                               }}
                             >
-                              Change it
+                              <span className='text-purple-300'>Change it</span>
                             </Link>
                           </span>
                         </div>
