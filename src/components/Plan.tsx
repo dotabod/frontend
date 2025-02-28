@@ -1,5 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Settings } from '@/lib/defaultSettings'
+import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
@@ -21,6 +22,7 @@ import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import useSWR from 'swr'
 import { Logomark } from './Logo'
 
 function Plan({
@@ -61,6 +63,11 @@ function Plan({
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
   const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
+  const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR('/api/get-total-crypto-interest', fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+  })
   const router = useRouter()
   // Add ref to track if subscription process has started
   const subscriptionStarted = useRef(false)
@@ -288,11 +295,22 @@ function Plan({
     }
 
     try {
-      updateCryptoInterest({
+      // Call the update function without chaining .then()
+      await updateCryptoInterest({
         interested: true,
         tier: tier,
         transactionType: activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
       })
+
+      // Optimistically update the UI
+      if (cryptoInterestData) {
+        mutateCryptoInterestData({
+          ...cryptoInterestData,
+          userCount: cryptoInterestData.userCount + 1
+        }, false)
+      }
+
+
     } catch (error) {
       console.error('Error registering crypto interest:', error)
       notification.error({
@@ -483,7 +501,9 @@ function Plan({
                 featured ? 'text-purple-300 hover:text-purple-200' : 'text-gray-400 hover:text-gray-300'
               )}
             >
-              {cryptoInterest?.interested ? 'Thanks for your interest in crypto payments!' : 'Interested in paying with crypto?'}
+              {cryptoInterest?.interested
+                ? `Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`
+                : `Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 1} interested)`}
             </Button>
           </Tooltip>
         </div>
