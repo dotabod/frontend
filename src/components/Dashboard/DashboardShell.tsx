@@ -12,6 +12,7 @@ import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import ModeratedChannels from './ModeratedChannels'
@@ -73,6 +74,28 @@ for (const item of navigation) {
   }
 }
 
+// Helper function to find the best matching menu item for a given path
+const findBestMatchingMenuItem = (pathname: string) => {
+  // First try exact match
+  if (PATH_TO_PARENT_KEY[pathname]) {
+    return { key: pathname, parentKey: PATH_TO_PARENT_KEY[pathname] };
+  }
+
+  // For nested routes like /dashboard/features/something
+  // Try to find the closest parent path
+  const pathParts = pathname.split('/');
+  while (pathParts.length > 1) {
+    pathParts.pop();
+    const parentPath = pathParts.join('/');
+    if (PATH_TO_PARENT_KEY[parentPath]) {
+      return { key: parentPath, parentKey: PATH_TO_PARENT_KEY[parentPath] };
+    }
+  }
+
+  // Default to dashboard if no match found
+  return { key: '/dashboard', parentKey: '' };
+}
+
 export default function DashboardShell({
   children,
   seo,
@@ -81,6 +104,7 @@ export default function DashboardShell({
   seo?: SEOProps;
 }) {
   const { status, data } = useSession()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
   const {
@@ -134,16 +158,17 @@ export default function DashboardShell({
     }
   }, [])
 
+  // Update selected menu item and open parent menu when route changes
   useEffect(() => {
-    const { pathname } = window.location
-    setCurrent(pathname)
+    const { pathname } = router;
+    const { key, parentKey } = findBestMatchingMenuItem(pathname);
 
-    // Get parent key from mapping
-    const parentKey = PATH_TO_PARENT_KEY[pathname]
-    if (parentKey) {
-      setOpenKeys([parentKey])
+    setCurrent(key);
+
+    if (parentKey && !openKeys.includes(parentKey)) {
+      setOpenKeys(prev => [...prev, parentKey]);
     }
-  }, [])
+  }, [router.pathname, router.asPath]);
 
   if (status !== 'authenticated') return null
 
