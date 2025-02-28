@@ -72,8 +72,8 @@ const SetupPage = () => {
   }, [router.query.step]) // Dependency array, re-run effect when `step` changes
 
   const trialDays = isInGracePeriod()
-  ? Math.ceil((GRACE_PERIOD_END.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-  : 14
+    ? Math.ceil((GRACE_PERIOD_END.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : 14
 
   useEffect(() => {
     if (active === maxStepIndex || didJustPay) {

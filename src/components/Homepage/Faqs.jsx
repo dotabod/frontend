@@ -25,8 +25,7 @@ const faqs = [
     {
       question:
         'How do I explain to my wife the money I withdraw from our joint bank account to use Dotabod?',
-      answer:
-        `This feels like one-hundred percent a you problem. Dotabod is not responsible in any way for your marital grievances. But you could just tell her it's an investment in your streaming career.`,
+      answer: `This feels like one-hundred percent a you problem. Dotabod is not responsible in any way for your marital grievances. But you could just tell her it's an investment in your streaming career.`,
     },
     {
       question: 'How do I get started?',

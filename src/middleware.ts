@@ -7,7 +7,15 @@ import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 
 export const config = {
-  matcher: ['/', '/login', '/overlay/:path*', '/api/:path*', '/dashboard/:path*', '/install', '/[username]'],
+  matcher: [
+    '/',
+    '/login',
+    '/overlay/:path*',
+    '/api/:path*',
+    '/dashboard/:path*',
+    '/install',
+    '/[username]',
+  ],
 }
 
 export async function middleware(req: NextRequestWithAuth) {

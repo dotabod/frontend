@@ -91,7 +91,7 @@ function WidgetPage() {
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard: 'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? false),
+      leaderboard: 'standing' in rank ? rank.standing : steamAccount?.leaderboard_rank ?? false,
       notLoaded: false,
     }
 

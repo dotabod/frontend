@@ -366,9 +366,7 @@ export function getSubscriptionStatusInfo(
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
-        message: cancelAtPeriodEnd
-          ? `Trial ends on ${endDate}`
-          : `Trial until ${endDate}`,
+        message: cancelAtPeriodEnd ? `Trial ends on ${endDate}` : `Trial until ${endDate}`,
         type: 'info',
         badge: 'gold',
       }

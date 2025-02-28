@@ -63,11 +63,15 @@ function Plan({
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
   const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
-  const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR('/api/get-total-crypto-interest', fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    revalidateIfStale: false,
-  })
+  const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR(
+    '/api/get-total-crypto-interest',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    },
+  )
   const router = useRouter()
   // Add ref to track if subscription process has started
   const subscriptionStarted = useRef(false)
@@ -299,18 +303,20 @@ function Plan({
       await updateCryptoInterest({
         interested: true,
         tier: tier,
-        transactionType: activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
+        transactionType:
+          activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
       })
 
       // Optimistically update the UI
       if (cryptoInterestData) {
-        mutateCryptoInterestData({
-          ...cryptoInterestData,
-          userCount: cryptoInterestData.userCount + 1
-        }, false)
+        mutateCryptoInterestData(
+          {
+            ...cryptoInterestData,
+            userCount: cryptoInterestData.userCount + 1,
+          },
+          false,
+        )
       }
-
-
     } catch (error) {
       console.error('Error registering crypto interest:', error)
       notification.error({
@@ -343,7 +349,7 @@ function Plan({
       // Trigger subscription process
       handleSubscribe()
     }
-  }, [router.query, session, tier, activePeriod, redirectingToCheckout]);
+  }, [router.query, session, tier, activePeriod, redirectingToCheckout])
 
   return (
     <section
@@ -487,18 +493,26 @@ function Plan({
 
       {/* Crypto interest button */}
       {tier !== SUBSCRIPTION_TIERS.FREE && (
-        <div className="mt-3 text-center">
-          <Tooltip title={cryptoInterest?.interested ? "We'll add crypto payments if enough people want it. Check back soon!" : "Let us know if you'd like to pay with cryptocurrency"}>
+        <div className='mt-3 text-center'>
+          <Tooltip
+            title={
+              cryptoInterest?.interested
+                ? "We'll add crypto payments if enough people want it. Check back soon!"
+                : "Let us know if you'd like to pay with cryptocurrency"
+            }
+          >
             <Button
-              type="link"
-              size="small"
+              type='link'
+              size='small'
               icon={<Bitcoin size={16} />}
               onClick={handleCryptoInterest}
               loading={loadingCryptoInterest}
               disabled={cryptoInterest?.interested}
               className={clsx(
                 'text-xs',
-                featured ? 'text-purple-300 hover:text-purple-200' : 'text-gray-400 hover:text-gray-300'
+                featured
+                  ? 'text-purple-300 hover:text-purple-200'
+                  : 'text-gray-400 hover:text-gray-300',
               )}
             >
               {cryptoInterest?.interested

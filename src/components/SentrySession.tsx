@@ -24,7 +24,7 @@ const SentrySession = () => {
     data?.user?.email,
     data?.user?.twitchId,
     data?.user?.locale,
-    data?.user?.isImpersonating
+    data?.user?.isImpersonating,
   ])
 
   return null
