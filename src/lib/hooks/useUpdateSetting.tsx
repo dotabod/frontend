@@ -122,13 +122,7 @@ export function useUpdateSetting<T = boolean>(
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
-
-  // Only create the URL if userId is available or not expected
-  const url = userId
-    ? `/api/settings?id=${userId}`
-    : router.pathname.includes('/overlay')
-      ? null
-      : '/api/settings'
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
 
   const {
     data,
@@ -224,11 +218,7 @@ export function useGetSettings() {
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
-  const url = userId
-    ? `/api/settings?id=${userId}`
-    : router.pathname.includes('/overlay')
-      ? null
-      : '/api/settings'
+  const url = `/api/settings${userId ? `?id=${userId}` : ''}`
   const { data, loading } = useUpdate({ path: url })
   return { data, loading }
 }
@@ -237,7 +227,7 @@ export function useGetSettingsByUsername() {
   const router = useRouter()
 
   const { username } = router.query
-  const url = username ? `/api/settings?username=${username}` : null
+  const url = `/api/settings${username ? `?username=${username}` : ''}`
   const { data, loading, error } = useUpdate({ path: url })
 
   // Return error information to make it easier to handle in the component
