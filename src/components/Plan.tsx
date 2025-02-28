@@ -1,24 +1,25 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
-  GRACE_PERIOD_END,
-  type PricePeriod,
-  SUBSCRIPTION_TIERS,
-  type SubscriptionRow,
   calculateSavings,
   getPriceId,
+  GRACE_PERIOD_END,
   gracePeriodPrettyDate,
   isInGracePeriod,
   isSubscriptionActive,
+  type PricePeriod,
+  SUBSCRIPTION_TIERS,
+  type SubscriptionRow,
 } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
-import { Button, Modal, notification } from 'antd'
+import { Button, message, Modal, notification } from 'antd'
 import clsx from 'clsx'
 import { CheckIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import { Logomark } from './Logo'
 
 function Plan({
@@ -58,6 +59,9 @@ function Plan({
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
   const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
+  const router = useRouter()
+  // Add ref to track if subscription process has started
+  const subscriptionStarted = useRef(false)
 
   const isCurrentPlan =
     subscription?.tier === tier &&
@@ -264,6 +268,31 @@ function Plan({
       setRedirectingToCheckout(false)
     }
   }
+
+  // Add effect to handle auto-subscription based on URL parameters
+  useEffect(() => {
+    const { plan, period } = router.query
+
+    // Check if URL parameters match this plan's tier and period
+    if (
+      session &&
+      plan === tier &&
+      period === activePeriod &&
+      !redirectingToCheckout &&
+      !subscriptionStarted.current
+    ) {
+      // Mark that we've started the subscription process
+      subscriptionStarted.current = true
+
+      // Remove the query parameters to prevent repeated subscription attempts
+      const { pathname } = router
+      router.replace(pathname, undefined, { shallow: true })
+      message.success('Redirecting to checkout...')
+
+      // Trigger subscription process
+      handleSubscribe()
+    }
+  }, [router.query, session, tier, activePeriod, redirectingToCheckout]);
 
   return (
     <section
