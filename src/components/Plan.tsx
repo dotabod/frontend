@@ -1,4 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   calculateSavings,
@@ -11,11 +13,10 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
 } from '@/utils/subscription'
-import type { SubscriptionTier } from '@prisma/client'
-import { SubscriptionStatus } from '@prisma/client'
-import { Button, message, Modal, notification } from 'antd'
+import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import { App, Button, Modal, notification, Tooltip } from 'antd'
 import clsx from 'clsx'
-import { CheckIcon } from 'lucide-react'
+import { Bitcoin, CheckIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -55,6 +56,7 @@ function Plan({
   subscription?: SubscriptionRow | null
   hasTrial?: boolean
 }) {
+  const { message } = App.useApp()
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const savings = calculateSavings(price.monthly, price.annual)
@@ -62,6 +64,15 @@ function Plan({
   const router = useRouter()
   // Add ref to track if subscription process has started
   const subscriptionStarted = useRef(false)
+  const {
+    data: cryptoInterest,
+    loading: loadingCryptoInterest,
+    updateSetting: updateCryptoInterest,
+  } = useUpdateSetting<{
+    interested: boolean
+    tier: SubscriptionTier
+    transactionType: TransactionType
+  }>(Settings.crypto_payment_interest)
 
   const isCurrentPlan =
     subscription?.tier === tier &&
@@ -269,6 +280,28 @@ function Plan({
     }
   }
 
+  // Function to handle crypto interest vote
+  const handleCryptoInterest = async () => {
+    if (!session) {
+      message.info('Please sign in to register your interest in crypto payments')
+      return
+    }
+
+    try {
+      updateCryptoInterest({
+        interested: true,
+        tier: tier,
+        transactionType: activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
+      })
+    } catch (error) {
+      console.error('Error registering crypto interest:', error)
+      notification.error({
+        message: 'Error',
+        description: 'Failed to register your interest. Please try again later.',
+      })
+    }
+  }
+
   // Add effect to handle auto-subscription based on URL parameters
   useEffect(() => {
     const { plan, period } = router.query
@@ -433,6 +466,28 @@ function Plan({
       >
         {buttonText}
       </Button>
+
+      {/* Crypto interest button */}
+      {tier !== SUBSCRIPTION_TIERS.FREE && (
+        <div className="mt-3 text-center">
+          <Tooltip title={cryptoInterest?.interested ? "We'll add crypto payments if enough people want it. Check back soon!" : "Let us know if you'd like to pay with cryptocurrency"}>
+            <Button
+              type="link"
+              size="small"
+              icon={<Bitcoin size={16} />}
+              onClick={handleCryptoInterest}
+              loading={loadingCryptoInterest}
+              disabled={cryptoInterest?.interested}
+              className={clsx(
+                'text-xs',
+                featured ? 'text-purple-300 hover:text-purple-200' : 'text-gray-400 hover:text-gray-300'
+              )}
+            >
+              {cryptoInterest?.interested ? 'Thanks for your interest in crypto payments!' : 'Interested in paying with crypto?'}
+            </Button>
+          </Tooltip>
+        </div>
+      )}
     </section>
   )
 }

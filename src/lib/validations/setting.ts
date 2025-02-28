@@ -17,6 +17,11 @@ const settingsSchema = {
         message: 'Duration must be between 30 and 1800 seconds',
       }),
   }),
+  crypto_payment_interest: z.object({
+    interested: z.boolean(),
+    tier: z.enum(['FREE', 'PRO']),
+    transactionType: z.enum(['RECURRING', 'LIFETIME']),
+  }),
   battlepass: z.boolean(),
   chatter: z.boolean(),
   chatters: z.object({

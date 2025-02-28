@@ -137,6 +137,11 @@ export const defaultSettings = {
   queueBlocker: false,
   queueBlockerFindMatch: false,
   queueBlockerFindMatchText: 'Ranked match / All pick / Europe East, Russia',
+  crypto_payment_interest: {
+    interested: false,
+    tier: 'PRO',
+    transactionType: 'RECURRING',
+  },
   ...commands,
 }
 
