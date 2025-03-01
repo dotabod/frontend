@@ -82,9 +82,7 @@ export function Hero() {
               />
             </h1>
             <p className='mt-6 text-lg text-gray-300'>
-              Unlock the Ultimate Dota 2 Streaming Experience with Dotabod! Boost your stream&apos;s
-              engagement, showcase real-time stats, and delight your audience with our all-in-one
-              streaming toolkit. Elevate your game and become the streamer you were meant to be!
+            Dotabod is the all-in-one toolkit that transforms your Dota 2 stream, providing real-time stats, automated Twitch predictions, and intelligent overlays that engage your audience effortlessly.
             </p>
             <div className='mt-8 flex flex-wrap gap-x-6 gap-y-4'>
               <Link href='/dashboard'>
@@ -126,7 +124,7 @@ export function Hero() {
         <div className='relative lg:col-span-7 xl:col-span-6'>
           <div className='flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left'>
             <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
-            <span>Featured in over {new Intl.NumberFormat().format(20000)} Twitch streamers</span>
+            <span>Trusted by Over {new Intl.NumberFormat().format(20000)} Twitch Streamers Including:</span>
             <LiveIcon />
           </div>
         </div>

@@ -407,7 +407,7 @@ const CommandDetail: Record<
   commandGM: {
     key: 'commandGM',
     title: 'Game medals',
-    description: 'Return the rankings for each players in the game.',
+    description: 'Quickly show the ranks of all players in your match, giving your viewers deeper insight into each game.',
     cmd: '!gm',
     alias: ['medals', 'ranks'],
     allowed: 'all',

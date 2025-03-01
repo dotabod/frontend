@@ -20,7 +20,7 @@ export function SecondaryFeatures() {
           {CommandDetail[Settings.commandWL].response({}, false)}
         </div>
       ),
-      name: 'Win loss overlay and command',
+      name: 'Real-Time Win/Loss Overlay',
       disableHover: false,
       cta: (
         <Popover
@@ -41,7 +41,7 @@ export function SecondaryFeatures() {
         </Popover>
       ),
       description:
-        'Tell everyone watching what your current Win Loss record is. Automatically displays ranked or unranked, or both at the same time!',
+        'Instantly display your ranked or unranked win-loss record, current MMR, and progress to next rank on stream with one simple command.',
       className: 'lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2',
     },
     {
@@ -84,8 +84,8 @@ export function SecondaryFeatures() {
       className: 'lg:row-start-1 lg:row-end-3 lg:col-start-2 lg:col-end-3',
     },
     {
-      name: 'Smurf detection',
-      description: 'Dotabod will tell you the lifetime games played of any player in your match.',
+      name: 'Instant Smurf Detection',
+      description: 'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
       background: (
         <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandSmurfs].response()}
@@ -111,7 +111,7 @@ export function SecondaryFeatures() {
       className: 'lg:row-start-2 lg:row-end-3 lg:col-start-3 lg:col-end-4',
     },
     {
-      name: 'Aegis and rosh timer',
+      name: 'Roshan & Aegis Timers',
       cta: (
         <Popover
           content={
@@ -141,7 +141,7 @@ export function SecondaryFeatures() {
       ),
       disableHover: false,
       description:
-        'Tired of copy pasting three clock times? Dotabod knows when rosh is killed or when the aegis is picked up. A timer will display for your viewers to see!',
+        'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
       className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
       background: (
         <div className='flex flex-col items-center justify-center'>
@@ -159,7 +159,7 @@ export function SecondaryFeatures() {
       ),
     },
     {
-      name: 'Game medals',
+      name: 'In-Game Medal Tracking',
       description: CommandDetail[Settings.commandGM].description,
       background: (
         <div className='flex flex-col items-center justify-center'>

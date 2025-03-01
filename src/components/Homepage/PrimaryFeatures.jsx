@@ -18,8 +18,7 @@ const features = [
     name: 'Twitch predictions creator',
     description: (
       <span>
-        Let your chatters bet with their native Twitch channel points whether you win or lose the
-        game. After the match ends, the bets will close and points go to the winners!
+        Let viewers use channel points to predict game outcomes. Dotabod handles opening and closing bets automatically, letting you focus on the game.
       </span>
     ),
     icon: () => (
@@ -37,7 +36,7 @@ const features = [
   {
     name: 'Active chatting',
     description:
-      'Help keep your stream lively and engaging for your viewers, while also providing useful information about the current game. Dotabod can see your current game conditions so the messages will always be relevant, not random!',
+      'Dotabod sends timely, context-aware chat messages to engage your audience with insights relevant to your gameplay—never spammy, always helpful.',
     icon: () => (
       <Image
         className='ml-1 inline'
@@ -53,9 +52,7 @@ const features = [
     name: 'Minimap and hero picks blocker',
     description: (
       <span>
-        Stream snipers ruining your games? Tired of getting your picks banned? Your wards will be
-        protected by our minimap blocker, and our picks blocker will make it impossible to see what
-        hero you picked. Hides and shows when it needs to, automatically!
+        Stop stream snipers and protect your strategy with auto-activated minimap and hero selection blockers.
       </span>
     ),
     icon: () => (
