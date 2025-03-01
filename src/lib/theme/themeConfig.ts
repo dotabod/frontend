@@ -1,8 +1,11 @@
 import type { ThemeConfig } from 'antd'
 import { theme } from 'antd'
 
+// Create a stable theme configuration that won't change between renders
 const themeConfig: ThemeConfig = {
   algorithm: theme.darkAlgorithm,
+  // Set hash to false to avoid hash-based class names which can cause issues in SSR
+  hashed: false,
   components: {
     Spin: {
       colorPrimary: 'var(--color-purple-300)',

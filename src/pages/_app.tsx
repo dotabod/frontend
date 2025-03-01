@@ -17,7 +17,7 @@ import 'focus-visible'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
-import type { ReactElement, ReactNode } from 'react'
+import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
@@ -29,28 +29,42 @@ type AppPropsWithLayout = AppProps & {
   session: Session
 }
 
+// Create a singleton cache for client-side
+const clientCache = createCache()
+
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
-  const cache = createCache()
+
+  // Fix for hydration issues
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Use a simple layout during SSR, and the full layout after mounting on the client
+  const content = (
+    <ConfigProvider theme={themeConfig}>
+      <SentrySession />
+      <VercelAnalytics />
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
+      <MantineProvider>
+        <Provider store={store}>
+          <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
+        </Provider>
+      </MantineProvider>
+    </ConfigProvider>
+  )
 
   return (
     <SessionProvider session={session}>
       <SubscriptionProviderMain>
         <SubscriptionProvider>
-          <StyleProvider cache={cache}>
-            <ConfigProvider theme={themeConfig}>
-              <SentrySession />
-              <VercelAnalytics />
-              <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
-              <MantineProvider>
-                <Provider store={store}>
-                  <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
-                </Provider>
-              </MantineProvider>
-            </ConfigProvider>
+          <StyleProvider cache={clientCache} hashPriority="high">
+            {mounted ? content : <div style={{ visibility: 'hidden' }}>{content}</div>}
           </StyleProvider>
         </SubscriptionProvider>
       </SubscriptionProviderMain>

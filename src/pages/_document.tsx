@@ -11,7 +11,7 @@ export default class MyDocument extends Document {
     ctx.renderPage = () =>
       originalRenderPage({
         enhanceApp: (App) => (props) => (
-          <StyleProvider cache={cache}>
+          <StyleProvider cache={cache} hashPriority="high">
             <ConfigProvider theme={themeConfig}>
               <App {...props} />
             </ConfigProvider>
@@ -28,7 +28,7 @@ export default class MyDocument extends Document {
         <>
           {initialProps.styles}
           {/* eslint-disable-next-line react/no-danger */}
-          <style dangerouslySetInnerHTML={{ __html: style }} />
+          <style data-type="antd-cssinjs" dangerouslySetInnerHTML={{ __html: style }} />
         </>
       ),
     }

@@ -5,7 +5,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import { withSentryConfig } from '@sentry/nextjs'
+import { withSentryConfig } from '@sentry/nextjs';
 
 /**
  * @type {import('next').NextConfig}
@@ -19,6 +19,7 @@ const nextConfig = {
   transpilePackages: [
     'antd',
     '@ant-design',
+    '@ant-design/cssinjs',
     'rc-util',
     'rc-pagination',
     'rc-picker',
@@ -27,6 +28,15 @@ const nextConfig = {
     'rc-tree',
     'rc-table',
   ],
+  webpack: (config, { dev, isServer }) => {
+    // Fix for the "Cannot read properties of null (reading '1')" error in production
+    if (!dev && !isServer) {
+      Object.assign(config.resolve.alias, {
+        '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
+      });
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {
