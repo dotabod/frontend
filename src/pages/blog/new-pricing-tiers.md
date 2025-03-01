@@ -5,20 +5,30 @@ date: 2025-03-01
 author: Dotabod Team
 ---
 
-Hey streamers! Since day one, Dotabod's been free for everyone—and we've loved watching our 22,000-strong community grow together like a family. But to keep pushing the boundaries of Dota 2 streaming (think slicker automation, pro-grade overlays, and more), we're rolling out new pricing plans on April 30, 2025.
 
-Here's the scoop:
+Since Dotabod launched, we've proudly provided everything free for over 22,000 passionate Dota 2 streamers. Watching this community flourish has been amazing—but to level up and sustain growth, we're introducing new pricing tiers starting **April 30, 2025**.
 
-- **Free Plan ($0):** Perfect for casual streamers. You'll get multi-language support, basic minimap blockers, essential commands (!mmr, !wl), and more. No cost, no catch—just solid streaming basics to keep your passion alive.
-- **Pro Plan ($6/month):** Built for the grinders chasing their streaming dreams. Unlock automated setups (Dota 2, OBS, Twitch), win probability overlays, Roshan timers, and early access to beta features. It's everything you need to stand out and create those unforgettable moments with your viewers.
-- **Lifetime ($99):** Pay once, use forever. Get all current and future features, updates, and support—become part of Dotabod's legacy.
+### Here’s what the new plans look like
 
-Until April 30, everyone gets full access to all features—Free *and* Pro. Test the goods, see what fits, and pick your plan. We want you to feel confident in your choice.
+- **Free Plan ($0/month)**
+  Ideal for casual streamers, this tier gives you essential tools: multi-language support, basic minimap blockers, core chat commands (!mmr, !wl), and everything you need for effortless streaming.
 
-Why the change? As you might know, Dotabod is completely open-source (check us out at [github.com/dotabod](https://github.com/dotabod)). I've been pouring my heart and soul into it as a solo developer—late nights maintaining the codebase, fixing bugs, introducing new features, and collaborating with top streamers to make it better. While the project will always remain open-source, and you're absolutely free to self-host it if you prefer, the new pricing will help cover the infrastructure costs needed to host and maintain Dotabod for thousands of streamers who've become part of our journey.
+- **Pro Plan ($6/month)**
+  Designed for streamers ready to turn passion into growth. Unlock powerful automation (OBS/Twitch integrations), dynamic overlays like Roshan timers and win-probability displays, plus early access to new beta features. This is your ticket to a pro-level streaming experience.
 
-Building and maintaining Dotabod isn't just work—it's a labor of love that takes significant time and resources. Going free got us here, but Pro subscriptions will fuel the next level—more updates, better support, and features you'll love. Your support means everything to keeping this dream alive.
+- **Lifetime Plan ($99 one-time payment)**
+  Pay once, stream forever. Lifetime access includes all current and future features, regular updates, and ongoing support, letting you permanently secure your streaming toolkit.
 
-Got questions? We're here for you. Hit up our chat on dotabod.com, join our community at [discord.dotabod.com](https://discord.dotabod.com), or check the [FAQ](https://dotabod.com/#faqs). You can also view our [pricing details](https://dotabod.com/#pricing) for more information. Together, let's keep making your streams legendary!
+From today until April 30, everyone gets complete access to all features—both Free and Pro. Try it out, explore what's possible, and confidently pick the plan that's best for you.
+
+### Why introduce pricing?
+
+Dotabod is proudly open-source (see our work on [GitHub](https://github.com/dotabod)). As a solo developer, I've spent countless hours coding, debugging, and introducing new features. While the code will always remain free and self-hostable, hosting infrastructure at scale comes at a cost. Moving to a sustainable model ensures Dotabod thrives long-term, benefiting every streamer who relies on our tools.
+
+Your support directly funds infrastructure, innovation, and the resources necessary to maintain Dotabod's high standards. Thanks for being a vital part of our community!
+
+Have questions? Join the conversation at [discord.dotabod.com](https://discord.dotabod.com) or visit our FAQ at [dotabod.com](https://dotabod.com/#faq).
+
+Together, let's continue making streaming extraordinary.
 
 — The Dotabod Team
