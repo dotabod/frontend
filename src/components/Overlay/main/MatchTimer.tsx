@@ -7,9 +7,7 @@ import { zeroPad } from 'react-countdown'
 
 export const MatchTimer = ({ res }) => {
   const [duration, setDuration] = useState(0)
-  const { data: findMatchText } = useUpdateSetting(
-    Settings.queueBlockerFindMatchText
-  )
+  const { data: findMatchText } = useUpdateSetting(Settings.queueBlockerFindMatchText)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,7 +22,7 @@ export const MatchTimer = ({ res }) => {
 
   return (
     <motion.div
-      key="match-counter"
+      key='match-counter'
       {...motionProps}
       style={{
         bottom: res({ h: 72 }),
@@ -32,13 +30,13 @@ export const MatchTimer = ({ res }) => {
         width: res({ w: 469 }),
         height: res({ h: 24 }),
       }}
-      id="match-timer"
-      className="match-timer absolute flex space-x-4"
+      id='match-timer'
+      className='match-timer absolute flex space-x-4'
     >
-      <span className="pt-1 align-bottom font-[Radiance] text-base font-thin uppercase tracking-wide text-[#99dfee]">
+      <span className='pt-1 align-bottom font-[Radiance] text-base font-thin uppercase tracking-wide text-[#99dfee]'>
         {findMatchText}
       </span>
-      <span className="align-bottom font-[Radiance] text-base font-thin tracking-[1px] text-white transition-opacity duration-[0.3s] ease-[ease-in]">
+      <span className='align-bottom font-[Radiance] text-base font-thin tracking-[1px] text-white transition-opacity duration-[0.3s] ease-[ease-in]'>
         {minutes}:{zeroPad(seconds)}
       </span>
     </motion.div>

@@ -12,8 +12,8 @@ const FeaturesPage: NextPageWithLayout = () => (
     </Head>
 
     <Header
-      subtitle="The bot reacts with chat messages to your game events as you play your match."
-      title="Chatter"
+      subtitle='The bot reacts with chat messages to your game events as you play your match.'
+      title='Chatter'
     />
 
     <ChatterCard />

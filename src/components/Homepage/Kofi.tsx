@@ -18,7 +18,7 @@ const KofiButton = () => {
         'Help keep Dotabod free and get new features faster by supporting the project with a donation.',
       btn: (
         <button
-          type="button"
+          type='button'
           onClick={() => {
             track('kofi_donate_button_clicked')
             setIsKofiModalOpen(true)
@@ -26,10 +26,10 @@ const KofiButton = () => {
           }}
         >
           <img
-            height="36"
+            height='36'
             style={{ border: '0px', height: '36px' }}
-            src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
-            alt="Support me at ko-fi.com"
+            src='https://storage.ko-fi.com/cdn/kofi6.png?v=6'
+            alt='Support me at ko-fi.com'
           />
         </button>
       ),
@@ -38,22 +38,22 @@ const KofiButton = () => {
 
   return (
     <Modal
-      title="Support Dotabod"
+      title='Support Dotabod'
       open={isKofiModalOpen}
       onCancel={() => setIsKofiModalOpen(false)}
       footer={null}
     >
       <iframe
-        id="kofiframe"
-        src="https://ko-fi.com/dotabod/?hidefeed=true&widget=true&embed=true&preview=true"
+        id='kofiframe'
+        src='https://ko-fi.com/dotabod/?hidefeed=true&widget=true&embed=true&preview=true'
         style={{
           border: 'none',
           width: '100%',
           padding: '4px',
           background: '#f9f9f9',
         }}
-        height="712"
-        title="dotabod"
+        height='712'
+        title='dotabod'
       />
     </Modal>
   )

@@ -27,8 +27,12 @@ if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
 
-    // Adjust this value in production, or use tracesSampler for greater control
-    tracesSampleRate: 1,
+    // Use tracesSampler for more granular control over sampling
+    tracesSampleRate: 0.1,
+    // Capture errors based on environment
+    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+    // Automatically set user information from session when available
+    autoSessionTracking: true,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,

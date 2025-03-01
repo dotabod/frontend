@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { ObsSetup } from './ObsSetup'
+import { TierBadge } from './Features/TierBadge'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -20,9 +21,7 @@ export default function OBSOverlay() {
   const [activeKey, setActiveKey] = useState('auto')
   const router = useRouter()
 
-  const updateUrlWithOverlayType = (
-    newOverlayType: 'auto' | 'text' | 'video'
-  ) => {
+  const updateUrlWithOverlayType = (newOverlayType: 'auto' | 'text' | 'video') => {
     // Update the URL without adding a new history entry
     router.replace(
       {
@@ -30,27 +29,23 @@ export default function OBSOverlay() {
         query: { ...router.query, overlayType: newOverlayType },
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     ) // `shallow: true` to not trigger data fetching methods again
   }
 
   useEffect(() => {
     const parsedStep = router.query.overlayType as string
-    if (
-      parsedStep === 'auto' ||
-      parsedStep === 'text' ||
-      parsedStep === 'video'
-    ) {
+    if (parsedStep === 'auto' || parsedStep === 'text' || parsedStep === 'video') {
       setActiveKey(parsedStep)
     }
   }, [router.query.overlayType])
 
   const CopyInstructions = () => (
-    <div className="flex flex-col items-center space-x-4 md:flex-row">
+    <div className='flex flex-col items-center space-x-4 md:flex-row'>
       <CopyButton value={copyURL}>
         {({ copied, copy }) => (
           <Button
-            type="dashed"
+            type='dashed'
             className={clsx(copied && '!border-green-600 !text-green-600')}
             onClick={() => {
               copy()
@@ -61,34 +56,34 @@ export default function OBSOverlay() {
           </Button>
         )}
       </CopyButton>
-      <div className="mt-4 space-x-2 text-xs md:mt-0">
-        <Tag color="red">Warning</Tag>
+      <div className='mt-4 space-x-2 text-xs md:mt-0'>
+        <Tag color='red'>Warning</Tag>
         <span>Do not share or show this URL on stream</span>
       </div>
     </div>
   )
 
   const OBSVideo = () => (
-    <div className="space-y-2">
-      <div className="flex items-center space-x-2">
-        <Tag className="!text-xs">Note</Tag>
+    <div className='space-y-2'>
+      <div className='flex items-center space-x-2'>
+        <Tag className='!text-xs'>Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
 
       <CopyInstructions />
       <p>Paste this into the URL field when making the browser source</p>
-      <div className="flex flex-col items-center space-y-4">
+      <div className='flex flex-col items-center space-y-4'>
         <video
-          className="rounded-lg"
+          className='rounded-lg'
           playsInline
-          width="630"
-          height="766"
+          width='630'
+          height='766'
           controls
           autoPlay
           muted
           loop
         >
-          <source src="/images/setup/how-to-obs.mp4" type="video/mp4" />
+          <source src='/images/setup/how-to-obs.mp4' type='video/mp4' />
           Your browser does not support the video tag.
         </video>
       </div>
@@ -96,103 +91,98 @@ export default function OBSOverlay() {
   )
 
   const OBSText = () => (
-    <div className="space-y-2">
-      <div className="flex items-center space-x-2">
-        <Tag className="!text-xs">Note</Tag>
+    <div className='space-y-2'>
+      <div className='flex items-center space-x-2'>
+        <Tag className='!text-xs'>Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
 
       <p>
-        1. Let&apos;s see what our canvas resolution is set to. Open OBS Studio
-        and go to File &gt; Settings
+        1. Let&apos;s see what our canvas resolution is set to. Open OBS Studio and go to File &gt;
+        Settings
       </p>
-      <div className="flex flex-col items-center space-y-4">
+      <div className='flex flex-col items-center space-y-4'>
         <Image
-          alt="dotabod browser source properties"
+          alt='dotabod browser source properties'
           width={331}
           unoptimized
           height={292}
-          src="/images/setup/obs-step-1.png"
+          src='/images/setup/obs-step-1.png'
         />
       </div>
 
       <p>
-        2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s usually
-        1920x1080 but you could have a different one.
+        2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s usually 1920x1080 but you
+        could have a different one.
       </p>
-      <div className="flex flex-col items-center space-y-4">
+      <div className='flex flex-col items-center space-y-4'>
         <Image
-          alt="dotabod browser source properties"
+          alt='dotabod browser source properties'
           width={544}
           unoptimized
           height={310}
-          src="/images/setup/obs-step-2.png"
+          src='/images/setup/obs-step-2.png'
         />
       </div>
 
       <p>
-        3. Close the settings window. Now let&apos;s add the browser source.
-        Under Sources click Add &gt; Browser and press OK.
+        3. Close the settings window. Now let&apos;s add the browser source. Under Sources click Add
+        &gt; Browser and press OK.
       </p>
 
-      <div className="flex flex-col items-center space-y-4">
+      <div className='flex flex-col items-center space-y-4'>
         <Image
-          alt="dotabod browser source properties"
+          alt='dotabod browser source properties'
           width={572}
           unoptimized
           height={256}
-          src="/images/setup/obs-step-3.png"
+          src='/images/setup/obs-step-3.png'
         />
       </div>
 
       <p>
-        4. Fill out the properties, entering your &quot;Base (Canvas)
-        Resolution&quot; from Step 2 earlier. If you had 1920x1080, put 1920 for
-        width, and 1080 for height.
+        4. Fill out the properties, entering your &quot;Base (Canvas) Resolution&quot; from Step 2
+        earlier. If you had 1920x1080, put 1920 for width, and 1080 for height.
       </p>
-      <div className="ml-4 space-y-4">
+      <div className='ml-4 space-y-4'>
         <p>
-          Copy and paste your personal URL into the URL field (1) for the
-          browser source. Click OK to save.
+          Copy and paste your personal URL into the URL field (1) for the browser source. Click OK
+          to save.
         </p>
 
         <CopyInstructions />
       </div>
 
-      <div className="flex flex-col items-center space-y-4">
+      <div className='flex flex-col items-center space-y-4'>
         <Image
-          alt="dotabod browser source properties"
+          alt='dotabod browser source properties'
           unoptimized
           width={635}
           height={519}
-          src="/images/setup/obs-step-4.png"
+          src='/images/setup/obs-step-4.png'
         />
       </div>
-      <p>
-        5. Right click the Dotabod browser source &gt; Transform &gt; Fit to
-        screen.
-      </p>
+      <p>5. Right click the Dotabod browser source &gt; Transform &gt; Fit to screen.</p>
     </div>
   )
 
   return (
     <Card>
-      <div className="mb-4 space-x-2">
+      <div className='mb-4 space-x-2'>
         <span>
-          <b>Why?</b> Dotabod can show game related overlays on your stream.
-          Your medal, the blockers, prediction polls, and more. Some commands
-          like !hero require the overlay.
+          <b>Why?</b> Dotabod can show game related overlays on your stream. Your medal, the
+          blockers, prediction polls, and more. Some commands like !hero require the overlay.
         </span>
         <Image
-          className="inline"
-          alt="ok emote"
+          className='inline'
+          alt='ok emote'
           unoptimized
-          src="https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp"
+          src='https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp'
           width={28}
           height={28}
         />
       </div>
-      <div className="space-y-4 px-8 pb-8 text-sm text-gray-300">
+      <div className='space-y-4 px-8 pb-8 text-sm text-gray-300'>
         <Tabs
           defaultActiveKey={activeKey}
           activeKey={activeKey}
@@ -202,7 +192,15 @@ export default function OBSOverlay() {
           }}
           onChange={updateUrlWithOverlayType}
           items={[
-            { label: 'Automatic (OBS)', key: 'auto', children: <ObsSetup /> },
+            {
+              label: (
+                <span>
+                  Automatic (OBS) <TierBadge feature='autoOBS' />
+                </span>
+              ),
+              key: 'auto',
+              children: <ObsSetup />,
+            },
             { label: 'Manual (text)', key: 'text', children: <OBSText /> },
             {
               label: 'Manual (video)',
@@ -212,13 +210,13 @@ export default function OBSOverlay() {
           ]}
         />
       </div>
-      <p className="space-x-2">
+      <p className='space-x-2'>
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
           <Link
-            target="_blank"
-            href="https://help.dotabod.com"
+            target='_blank'
+            href='https://help.dotabod.com'
             onClick={() => {
               track('overlay/help_discord')
             }}
@@ -230,7 +228,7 @@ export default function OBSOverlay() {
             onClick={() => {
               track('overlay/manual_steps')
             }}
-            href="/dashboard?step=3&overlayType=text"
+            href='/dashboard?step=3&overlayType=text'
           >
             the manual steps
           </Link>

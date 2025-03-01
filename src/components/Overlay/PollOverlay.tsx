@@ -2,7 +2,6 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { Center, Progress } from '@mantine/core'
-import { captureException } from '@sentry/nextjs'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
@@ -31,7 +30,7 @@ const PollTimer = ({ minutes, seconds, completed }) =>
   completed ? (
     <></>
   ) : (
-    <span className="font-outline-2 text-slate-50">
+    <span className='font-outline-2 text-slate-50'>
       {zeroPad(minutes)}:{zeroPad(seconds)}
     </span>
   )
@@ -61,18 +60,18 @@ export const PollOverlay = ({
       })
   }, [data?.Account?.providerAccountId])
 
-  const totalVotes = choices.reduce((acc, choice) => acc + choice.totalVotes, 0)
+  const totalVotes = choices.reduce((acc, choice) => acc + (choice.totalVotes ?? 0), 0)
   const choicesWithPercent = choices.map((choice) => {
     const percent = !totalVotes
       ? Math.round(100 / choices.length)
-      : Math.round((choice.totalVotes / totalVotes) * 100)
+      : Math.round(((choice.totalVotes ?? 0) / totalVotes) * 100)
     return { ...choice, percent }
   })
 
   return (
-    <motion.div key="poll-overlay-inner" {...motionProps}>
+    <motion.div key='poll-overlay-inner' {...motionProps}>
       <h1
-        className="font-outline-2 text-center font-bold text-slate-50"
+        className='font-outline-2 text-center font-bold text-slate-50'
         style={{
           fontSize: res({ h: 20 }),
         }}
@@ -81,8 +80,8 @@ export const PollOverlay = ({
       </h1>
       <Progress.Root
         size={res({ w: 24 })}
-        className="border border-slate-600 shadow-lg"
-        radius="lg"
+        className='border border-slate-600 shadow-lg'
+        radius='lg'
       >
         {choicesWithPercent.map((choice, i) => (
           <Progress.Section
@@ -91,20 +90,14 @@ export const PollOverlay = ({
             color={PollColors[i] || PollColors[0]}
           >
             <Progress.Label>{`${choice.title}${
-              choice.totalVotes
-                ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})`
-                : ''
+              choice.totalVotes ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})` : ''
             }`}</Progress.Label>
           </Progress.Section>
         ))}
       </Progress.Root>
       <Center>
         {endDate && (
-          <Countdown
-            onComplete={onComplete}
-            renderer={PollTimer}
-            date={new Date(endDate)}
-          />
+          <Countdown onComplete={onComplete} renderer={PollTimer} date={new Date(endDate)} />
         )}
       </Center>
     </motion.div>

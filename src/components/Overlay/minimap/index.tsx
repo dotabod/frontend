@@ -32,12 +32,9 @@ function Minimap({ block }: { block: blockType }) {
 
   return (
     <div
-      className={[
-        wrapper,
-        isXL ? xl : '',
-        isPreview ? preview : '',
-        isRight ? right : '',
-      ].join(' ')}
+      className={[wrapper, isXL ? xl : '', isPreview ? preview : '', isRight ? right : ''].join(
+        ' ',
+      )}
     >
       <div
         className={[
@@ -52,28 +49,16 @@ function Minimap({ block }: { block: blockType }) {
         <div className={fog} />
 
         {buildings.map((building, index) => (
-          <Building
-            team={block?.team}
-            data={building}
-            key={`minimap-building-${index}`}
-          />
+          <Building team={block?.team} data={building} key={`minimap-building-${index}`} />
         ))}
         {creeps.map((creep, index) => (
-          <Creep
-            team={block?.team}
-            data={creep}
-            key={`minimap-creep-${index}`}
-          />
+          <Creep team={block?.team} data={creep} key={`minimap-creep-${index}`} />
         ))}
         {heroes.map((hero, index) => (
           <Hero team={block?.team} data={hero} key={`${hero.name}-${index}`} />
         ))}
         {heroUnits.map((unit, index) => (
-          <HeroUnit
-            team={block?.team}
-            data={unit}
-            key={`${unit.unitname}-${index}`}
-          />
+          <HeroUnit team={block?.team} data={unit} key={`${unit.unitname}-${index}`} />
         ))}
         {couriers.map((courier, index) => (
           <Courier team={block?.team} data={courier} key={`courier-${index}`} />

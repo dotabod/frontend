@@ -16,12 +16,7 @@ export const AnimatedWL = ({
   const style = mainScreen ? { fontSize: wlPosition.fontSize } : {}
 
   return (
-    <motion.div
-      key="mainscreen-wl"
-      {...motionProps}
-      className={className}
-      style={style}
-    >
+    <motion.div key='mainscreen-wl' {...motionProps} className={className} style={style}>
       <WinLossCard wl={wl} mainScreen={mainScreen} />
     </motion.div>
   )

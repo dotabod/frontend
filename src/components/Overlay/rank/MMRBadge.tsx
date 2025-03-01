@@ -6,8 +6,8 @@ import { Card } from '../../Card'
 
 interface NumbersProps {
   hasImage: boolean
-  leaderboardPosition?: number
-  playerRank?: number
+  leaderboardPosition?: number | null
+  playerRank?: number | null
   className?: string
 }
 
@@ -32,12 +32,7 @@ const Numbers: React.FC<NumbersProps> = ({
 
     if (playerRank && (leaderboardPosition || !hasImage || playerRank)) {
       return (
-        <span
-          className={clsx(
-            leaderboardPosition ? 'text-base' : '',
-            !playerRank && 'hidden'
-          )}
-        >
+        <span className={clsx(leaderboardPosition ? 'text-base' : '', !playerRank && 'hidden')}>
           <NumberTicker value={playerRank} />
           {' MMR'}
         </span>
@@ -49,7 +44,7 @@ const Numbers: React.FC<NumbersProps> = ({
 
   return (
     <div
-      id="rank-numbers"
+      id='rank-numbers'
       style={{ fontSize }}
       className={clsx(className, 'flex flex-col items-center')}
     >
@@ -66,7 +61,16 @@ export const MMRBadge = ({
   mainScreen = false,
   className = '',
   notLoaded = undefined,
+  style,
   ...props
+}: {
+  image?: string | null
+  leaderboard?: number | null
+  rank?: number | null
+  mainScreen?: boolean
+  className?: string
+  notLoaded?: boolean
+  style?: React.CSSProperties
 }) => {
   const res = useTransformRes()
   if (!image && !leaderboard && !rank) return null
@@ -75,13 +79,11 @@ export const MMRBadge = ({
     return (
       <div
         {...props}
-        className={clsx(
-          'flex h-full items-center space-x-1 text-[#e4d98d]',
-          className
-        )}
+        style={style}
+        className={clsx('flex h-full items-center space-x-1 text-[#e4d98d]', className)}
       >
         <Badge
-          key="main-badge"
+          key='main-badge'
           width={res({ w: 75 })}
           height={res({ h: 75 })}
           image={image}
@@ -89,27 +91,19 @@ export const MMRBadge = ({
             marginTop: res({ h: 20 }),
           }}
         />
-        <Numbers
-          hasImage={!!image}
-          playerRank={rank}
-          leaderboardPosition={leaderboard}
-        />
+        <Numbers hasImage={!!image} playerRank={rank} leaderboardPosition={leaderboard} />
       </div>
     )
   }
 
   return (
-    <Card
-      {...props}
-      className={clsx(className, 'rounded-bl-none')}
-      id="rank-card"
-    >
+    <Card {...props} style={style} className={clsx(className, 'rounded-bl-none')} id='rank-card'>
       <Badge
-        key="card-badge"
+        key='card-badge'
         width={res({ w: 82 })}
         height={res({ h: 75 })}
         image={image}
-        id="rank-badge"
+        id='rank-badge'
       />
       <Numbers
         hasImage={!!image}
@@ -117,9 +111,8 @@ export const MMRBadge = ({
         leaderboardPosition={leaderboard}
         className={clsx(
           !image && 'mt-0',
-          (leaderboard || ['80.png', '91.png', '92.png'].includes(image)) &&
-            '-mt-1',
-          image && rank && !leaderboard && '-mt-3'
+          (leaderboard || ['80.png', '91.png', '92.png'].includes(image ?? '')) && '-mt-1',
+          image && rank && !leaderboard && '-mt-3',
         )}
       />
     </Card>

@@ -1,17 +1,18 @@
-import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge';
-import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL';
-import { clsx } from 'clsx';
-import { Settings } from '@/lib/defaultSettings';
-import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions';
-import { useTransformRes } from '@/lib/hooks/useTransformRes';
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting';
-import { useState, useEffect } from 'react';
-import { getRankDetail, RankType, getRankImage } from '@/lib/ranks';
-import { isDev } from '@/lib/devConsts';
-import { wlType } from '@/lib/hooks/useSocket';
-import io from 'socket.io-client';
-import { useRouter } from 'next/router';
-import { Socket } from 'socket.io-client';
+import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
+import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
+import { RestrictFeature } from '@/components/RestrictFeature'
+import { Settings } from '@/lib/defaultSettings'
+import { isDev } from '@/lib/devConsts'
+import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
+import type { wlType } from '@/lib/hooks/useSocket'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { type RankType, getRankDetail, getRankImage } from '@/lib/ranks'
+import { clsx } from 'clsx'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import type { Socket } from 'socket.io-client'
+import io from 'socket.io-client'
 
 let socket: Socket | null = null
 function WidgetPage() {
@@ -29,13 +30,17 @@ function WidgetPage() {
       type: 'U',
     },
   ])
-  const [rankImageDetails, setRankImageDetails] = useState({
+  const [rankImageDetails, setRankImageDetails] = useState<{
+    image: string | null
+    rank: number | null
+    leaderboard: number | null | undefined
+    notLoaded?: boolean
+  }>({
     image: '0.png',
     rank: 0,
-    leaderboard: false,
+    leaderboard: 0,
     notLoaded: true,
   })
-
 
   useEffect(() => {
     if (!userId) return
@@ -61,11 +66,10 @@ function WidgetPage() {
       setRankImageDetails({
         image: rankDetails.image,
         rank: rankDetails.rank,
-        leaderboard: Boolean(rankDetails.leaderboard),
-        notLoaded: false
+        leaderboard: rankDetails.leaderboard,
+        notLoaded: false,
       })
     })
-
   }, [userId])
 
   useEffect(() => {
@@ -80,20 +84,14 @@ function WidgetPage() {
     if (!original) return
 
     const steamAccount = original.SteamAccount?.[0]
-    const rank = getRankDetail(
-      steamAccount?.mmr ?? original.mmr,
-      steamAccount?.leaderboard_rank
-    )
+    const rank = getRankDetail(steamAccount?.mmr ?? original.mmr, steamAccount?.leaderboard_rank)
 
     if (!rank) return
 
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard:
-        'standing' in rank
-          ? rank.standing
-          : steamAccount?.leaderboard_rank ?? false,
+      leaderboard: 'standing' in rank ? rank.standing : steamAccount?.leaderboard_rank ?? false,
       notLoaded: false,
     }
 
@@ -103,24 +101,32 @@ function WidgetPage() {
   return (
     <div>
       <div
-        className={clsx(
-          'absolute flex items-end justify-end',
-          isRight && '!justify-start'
-        )}
-        id="ingame-wl-mmr-card"
-        style={{ ...wlPosition, width: res({ w: 215 }) }}
+        className={clsx('absolute flex items-end justify-end', isRight && '!justify-start')}
+        id='ingame-wl-mmr-card'
+        style={{
+          ...wlPosition,
+          width: res({ w: 215 }),
+          left: wlPosition.left ?? undefined,
+        }}
       >
-        <AnimatedWL
-          key="animate-wl-class"
-          wl={wl}
-          className={clsx('block', isRight && 'order-2')}
-        />
+        <RestrictFeature feature='commandWL'>
+          <AnimatedWL
+            key='animate-wl-class'
+            wl={wl}
+            className={clsx('block', isRight && 'order-2')}
+          />
+        </RestrictFeature>
 
-        <AnimatedRankBadge
-          className={clsx('block', isRight && 'order-1')}
-          key="animate-rank-badge-class"
-          rankImageDetails={rankImageDetails}
-        />
+        <RestrictFeature feature='showRankImage'>
+          <AnimatedRankBadge
+            className={clsx('block', isRight && 'order-1')}
+            key='animate-rank-badge-class'
+            rankImageDetails={{
+              ...rankImageDetails,
+              leaderboard: rankImageDetails.leaderboard ?? null,
+            }}
+          />
+        </RestrictFeature>
       </div>
     </div>
   )

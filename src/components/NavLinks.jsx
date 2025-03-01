@@ -1,9 +1,5 @@
-import DiscordSvg from '@/images/logos/discord.svg'
-import GithubSvg from '@/images/logos/github.svg'
-import StatusSvg from '@/images/logos/status.svg'
 import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
-import Image from 'next/image'
 import { useState } from 'react'
 
 export function NavLinks({ bottom = false }) {
@@ -12,43 +8,23 @@ export function NavLinks({ bottom = false }) {
   const additional = []
   if (bottom) {
     additional.push(['Privacy Policy', '/privacy-policy'])
+    additional.push(['Terms of Service', '/terms-of-service'])
+    additional.push(['Cookie Policy', '/cookies'])
   }
 
   return [
     ['Features', '/#features'],
+    ['Pricing', '/#pricing'],
     ['FAQs', '/#faqs'],
+    ['Blog', '/blog'],
     ...additional,
-    ['Status', 'https://status.dotabod.com', StatusSvg, 'Status'],
-    ['Github', 'https://github.com/dotabod', GithubSvg, 'Github'],
-    ['Discord', 'https://discord.dotabod.com', DiscordSvg, 'Discord'],
-    [
-      'Support the project',
-      'https://ko-fi.com/dotabod',
-      <svg
-        key="heart"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="h-5 w-5 text-red-500"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-        />
-      </svg>,
-      'Support the project',
-    ],
-    // ['Twitch', 'https://twitch.tv/dotabod/about', TwitchSvg],
-  ].map(([label, href, Icon, tooltip], index) => {
+  ].map(([label, href, tooltip], index) => {
     return (
-      <Tooltip key={label} title={tooltip} disabled={!tooltip} position="top">
+      <Tooltip key={label} title={tooltip} disabled={!tooltip} position='top'>
         <a
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
-          className="relative -mx-3 -my-2 flex items-center rounded-lg px-3 py-2 text-sm !text-gray-300 transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]"
+          className='relative -mx-3 -my-2 flex items-center rounded-lg px-3 py-2 text-sm !text-gray-300 transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]'
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
@@ -56,8 +32,8 @@ export function NavLinks({ bottom = false }) {
             {hoveredIndex === index && (
               <motion.span
                 key={index}
-                className="absolute inset-0 rounded-lg bg-gray-700"
-                layoutId="hoverBackground"
+                className='absolute inset-0 rounded-lg bg-gray-700'
+                layoutId='hoverBackground'
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.15 } }}
                 exit={{
@@ -68,20 +44,7 @@ export function NavLinks({ bottom = false }) {
             )}
           </AnimatePresence>
 
-          <span className="relative z-10">
-            {Icon?.type === 'svg' && <span>{Icon}</span>}
-
-            {Icon?.type !== 'svg' && Icon && (
-              <Image
-                src={Icon}
-                width={18}
-                height={18}
-                alt={label}
-                className="pointer-events-none"
-              />
-            )}
-            {!Icon && label}
-          </span>
+          <span className='relative z-10 flex items-center gap-2'>{label}</span>
         </a>
       </Tooltip>
     )

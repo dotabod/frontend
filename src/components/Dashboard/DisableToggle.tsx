@@ -1,13 +1,18 @@
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { App, Button, Switch, Tooltip } from 'antd'
+import { App, Button, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import useSWR from 'swr'
+import { TierSwitch } from './Features/TierSwitch'
 
 const Toggle = () => {
-  const { data } = useSWR('/api/check-ban', fetcher)
+  const { data } = useSWR('/api/check-ban', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const {
     data: isDotabodDisabled,
     loading,
@@ -24,31 +29,31 @@ const Toggle = () => {
           : 'Click to disable Dotabod and stop responding to game events and commands'
       }
     >
-      <label
-        htmlFor="disable-toggle"
-        className="cursor-pointer space-x-2 rounded flex flex-row items-center text-gray-300"
-      >
-        <Switch
-          id="disable-toggle"
-          loading={loading}
-          className="flex"
-          disabled={data?.banned}
-          checked={!checkBanOrDisable}
-          onChange={(checked) => updateSetting(!checked)}
-        />
-        <span className="text-clip text-nowrap">
-          Dotabod is {checkBanOrDisable ? 'disabled' : 'enabled'}
-        </span>
-      </label>
+      <TierSwitch
+        hideTierBadge
+        settingKey={Settings.commandDisable}
+        label={`Dotabod is ${checkBanOrDisable ? 'disabled' : 'enabled'}`}
+        disabled={data?.banned}
+        checked={!checkBanOrDisable}
+        onChange={(checked) => updateSetting(!checked)}
+      />
     </Tooltip>
   )
 }
 
 export function DisableToggle() {
-  const { data } = useSWR('/api/check-ban', fetcher)
+  const { data } = useSWR('/api/check-ban', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const { notification } = App.useApp()
   const user = useSession()?.data?.user
-  const { data: settingsData } = useSWR('/api/settings', fetcher)
+  const { data: settingsData } = useSWR('/api/settings', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const isLive = settingsData?.stream_online
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
@@ -63,8 +68,7 @@ export function DisableToggle() {
         duration: 0,
         placement: 'bottomLeft',
         message: 'Your stream is offline.',
-        description:
-          'Dotabod will only work once you start streaming and go online.',
+        description: 'Dotabod will only work once you start streaming and go online.',
       })
     }
   }, [isLive, notification])
@@ -78,10 +82,10 @@ export function DisableToggle() {
         placement: 'bottomLeft',
         message: 'Dotabod is currently disabled.',
         description: (
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <span>
-              Click the toggle to enable it. You will not receive any game
-              events or commands until you do.
+              Click the toggle to enable it. You will not receive any game events or commands until
+              you do.
             </span>
             <Toggle />
           </div>
@@ -92,10 +96,7 @@ export function DisableToggle() {
     }
   }, [isDotabodDisabled, notification])
 
-  const botuser =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-      ? 'dotabod'
-      : 'dotabod_test'
+  const botuser = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? 'dotabod' : 'dotabod_test'
 
   useEffect(() => {
     if (data?.banned) {
@@ -108,15 +109,15 @@ export function DisableToggle() {
         description: user?.name && (
           <span>
             <Button
-              type="link"
+              type='link'
               onClick={() => {
                 window.open(
                   `https://www.twitch.tv/popout/${user?.name}/viewercard/${botuser}?popout=`,
                   'mywindow',
-                  'menubar=1,resizable=1,width=350,height=250'
+                  'menubar=1,resizable=1,width=350,height=250',
                 )
               }}
-              target="_blank"
+              target='_blank'
             >
               Click here
             </Button>

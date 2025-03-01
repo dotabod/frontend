@@ -12,7 +12,12 @@ const useMaybeSignout = (skip = false) => {
   // Fetch data to check if a refresh is required
   const { data: requiresRefresh } = useSWR(
     shouldFetch ? '/api/check-requires-refresh' : null,
-    fetcher
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
   )
 
   // Effect to sign out user if they lack the necessary scope or a refresh is required
@@ -28,12 +33,7 @@ const useMaybeSignout = (skip = false) => {
     if (shouldSignOut) {
       signOut({ callbackUrl: '/login?setup-scopes' })
     }
-  }, [
-    session?.user?.scope,
-    session?.user?.isImpersonating,
-    status,
-    requiresRefresh,
-  ])
+  }, [session?.user?.scope, session?.user?.isImpersonating, status, requiresRefresh])
 }
 
 export default useMaybeSignout

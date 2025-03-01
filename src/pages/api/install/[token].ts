@@ -5,16 +5,26 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const token = decodeURIComponent((req.query.token as string) || '').trim()
   const userId = token || session?.user?.id
+
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
   }
   if (!userId) {
     return res.status(403).json({ message: 'Unauthorized' })
+  }
+
+  // Check subscription access
+  const subscription = await getSubscription(userId)
+  const { hasAccess, requiredTier } = canAccessFeature('autoInstaller', subscription)
+
+  if (!hasAccess) {
+    return res.status(403).json({ error: 'This feature requires a subscription', requiredTier })
   }
 
   try {
@@ -59,9 +69,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(200).send(fileData)
   } catch (error) {
     captureException(error)
-    return res
-      .status(500)
-      .json({ message: 'Failed to get info', error: error.message })
+    return res.status(500).json({ message: 'Failed to get info', error: error.message })
   }
 }
 

@@ -9,7 +9,11 @@ export const AnimatedRankBadge = ({
   className = 'absolute',
   mainScreen,
 }: {
-  rankImageDetails: { image: string; leaderboard: boolean; rank: number }
+  rankImageDetails: {
+    image: string | null
+    leaderboard: number | null
+    rank: number | null
+  }
   className?: string
   mainScreen?: boolean
 }) => {
@@ -19,15 +23,15 @@ export const AnimatedRankBadge = ({
 
   return (
     <motion.div
-      key="animated-rank-badge"
+      key='animated-rank-badge'
       {...motionProps}
       className={className}
-      id="rank-badge-motion"
+      id='rank-badge-motion'
     >
       <MMRBadge
-        leaderboard={showRankLeader ? rank?.leaderboard : null}
-        image={showRankImage ? rank?.image : null}
-        rank={showRankMmr ? rank?.rank : null}
+        leaderboard={showRankLeader ? rank?.leaderboard : undefined}
+        image={showRankImage ? rank?.image : undefined}
+        rank={showRankMmr ? rank?.rank : undefined}
         mainScreen={mainScreen}
       />
     </motion.div>

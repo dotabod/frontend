@@ -25,16 +25,14 @@ export const NotablePlayers = ({
 }) => {
   const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
-  const { data: showFlags } = useUpdateSetting(
-    Settings.notablePlayersOverlayFlags
-  )
+  const { data: showFlags } = useUpdateSetting(Settings.notablePlayersOverlayFlags)
 
   if (!isEnabled || !['spectator', 'playing'].includes(block.type)) {
     return null
   }
 
   return (
-    <div id="notable-players">
+    <div id='notable-players'>
       {(players || []).map((player, i) => {
         const FlagComp = player.country_code
           ? Flags[`${player.country_code.toUpperCase()}Flag`]
@@ -42,14 +40,10 @@ export const NotablePlayers = ({
 
         return (
           <PlayerTopbar key={i} position={player.position}>
-            <div className="flex flex-col items-center">
+            <div className='flex flex-col items-center'>
               <div>
                 <div className={clsx(!showFlags && 'hidden')}>
-                  {FlagComp ? (
-                    <FlagComp w={30} radius={2} />
-                  ) : (
-                    <div style={{ height: 22.5 }} />
-                  )}
+                  {FlagComp ? <FlagComp w={30} radius={2} /> : <div style={{ height: 22.5 }} />}
                 </div>
               </div>
 

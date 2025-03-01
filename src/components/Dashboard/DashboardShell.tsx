@@ -1,5 +1,8 @@
+import Banner from '@/components/Banner'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
-import { navigation } from '@/components/Dashboard/navigation'
+import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
+import HubSpotIdentification from '@/components/HubSpotIdentification'
+import HubSpotScript from '@/components/HubSpotScript'
 import { DarkLogo, Logomark } from '@/components/Logo'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
@@ -7,54 +10,130 @@ import { captureException } from '@sentry/nextjs'
 import { Layout, Menu, type MenuProps, Tag, theme } from 'antd'
 import clsx from 'clsx'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import ModeratedChannels from './ModeratedChannels'
+import { navigation } from './navigation'
 
 const { Header, Sider, Content } = Layout
+
+// Add SEO interface
+interface SEOProps {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  ogType?: string;
+  noindex?: boolean;
+}
 
 function getItem(item) {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   return {
-    key: item.href,
-    icon: item.icon ? (
-      <item.icon className={clsx('h-4 w-4')} aria-hidden="true" />
-    ) : null,
+    key: item.href || item.key,
+    icon: item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null,
     label: item.href ? (
       <Link
         {...props}
         href={item.href}
-        className="!text-gray-200 flex flex-row gap-2 items-center"
+        className='!text-gray-200 flex flex-row gap-2 items-center'
         target={item.href.startsWith('http') ? '_blank' : '_self'}
       >
         {item.name}
-        {item.new && <Tag color="green">New</Tag>}
+        {item.new && <Tag color='green'>New</Tag>}
       </Link>
     ) : (
-      item.name
+      <div className='flex flex-row gap-2 items-center'>
+        {item.name}
+        {item.new && <Tag color='green'>New</Tag>}
+      </div>
     ),
     children: item.children?.map(getItem),
   }
 }
 
+// Add helper function to check if item should be hidden during impersonation
+const shouldHideForImpersonator = (itemName: string) => {
+  return ['Setup', 'Managers', 'Billing', 'Data', 'Account'].includes(itemName)
+}
+
+// Create mapping dynamically from navigation structure
+const PATH_TO_PARENT_KEY: Record<string, string> = {}
+for (const item of navigation) {
+  if (item.children) {
+    // For each parent with children, map all child hrefs to parent key
+    for (const child of item.children) {
+      if (child.href) {
+        PATH_TO_PARENT_KEY[child.href] = item.key || ''
+      }
+    }
+  }
+}
+
+// Helper function to find the best matching menu item for a given path
+const findBestMatchingMenuItem = (pathname: string) => {
+  // First try exact match
+  if (PATH_TO_PARENT_KEY[pathname]) {
+    return { key: pathname, parentKey: PATH_TO_PARENT_KEY[pathname] };
+  }
+
+  // For nested routes like /dashboard/features/something
+  // Try to find the closest parent path
+  const pathParts = pathname.split('/');
+  while (pathParts.length > 1) {
+    pathParts.pop();
+    const parentPath = pathParts.join('/');
+    if (PATH_TO_PARENT_KEY[parentPath]) {
+      return { key: parentPath, parentKey: PATH_TO_PARENT_KEY[parentPath] };
+    }
+  }
+
+  // Default to dashboard if no match found
+  return { key: '/dashboard', parentKey: '' };
+}
+
 export default function DashboardShell({
   children,
+  seo,
 }: {
-  children: React.ReactElement
+  children: React.ReactElement;
+  seo?: SEOProps;
 }) {
   const { status, data } = useSession()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
   const {
     token: { colorBgLayout },
   } = theme.useToken()
   const [current, setCurrent] = useState('/dashboard')
+  const [openKeys, setOpenKeys] = useState<string[]>([])
+
+  // Default SEO values
+  const defaultTitle = 'Dashboard | Dotabod';
+  const defaultDescription = 'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.';
+  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`;
+  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/dashboard`;
+
+  // Use SEO props if provided, otherwise use defaults
+  const pageTitle = seo?.title || defaultTitle;
+  const pageDescription = seo?.description || defaultDescription;
+  const pageImage = seo?.ogImage || defaultOgImage;
+  const pageUrl = seo?.canonicalUrl || defaultUrl;
+  const pageType = seo?.ogType || 'website';
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
     if (broken) setCollapsed(true)
+  }
+
+  // Handle submenu open/close
+  const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
+    setOpenKeys(keys)
   }
 
   useMaybeSignout()
@@ -63,10 +142,7 @@ export default function DashboardShell({
     const lastUpdate = localStorage.getItem('lastSingleRunAPI')
     const now = new Date()
 
-    if (
-      !lastUpdate ||
-      now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000
-    ) {
+    if (!lastUpdate || now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000) {
       localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
 
       fetch('/api/update-followers').catch((error) => {
@@ -82,18 +158,79 @@ export default function DashboardShell({
     }
   }, [])
 
+  // Update selected menu item and open parent menu when route changes
   useEffect(() => {
-    const { pathname } = window.location
-    setCurrent(pathname)
-  }, [])
+    const { pathname } = router;
+    const { key, parentKey } = findBestMatchingMenuItem(pathname);
+
+    setCurrent(key);
+
+    if (parentKey && !openKeys.includes(parentKey)) {
+      setOpenKeys(prev => [...prev, parentKey]);
+    }
+  }, [router.pathname, router.asPath]);
 
   if (status !== 'authenticated') return null
 
+  const filterNavigationItems = (items) => {
+    if (!data?.user?.isImpersonating) return items
+
+    return items
+      .map((item) => {
+        if (!item.name) return item // Keep dividers
+
+        // Hide parent items that should be restricted
+        if (shouldHideForImpersonator(item.name)) return null
+
+        // If item has children, filter them too
+        if (item.children) {
+          const filteredChildren = item.children.filter(
+            (child) => !shouldHideForImpersonator(child.name),
+          )
+
+          // If no children left after filtering, hide the parent item
+          if (filteredChildren.length === 0) return null
+
+          return {
+            ...item,
+            children: filteredChildren,
+          }
+        }
+
+        return item
+      })
+      .filter(Boolean) // Remove null items
+  }
+
   return (
     <>
-      <Layout className="h-full bg-gray-800">
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name='title' content={pageTitle} />
+        <meta name='description' content={pageDescription} />
+        <meta property='og:type' content={pageType} />
+        <meta property='og:url' content={pageUrl} />
+        <meta property='og:title' content={pageTitle} />
+        <meta property='og:description' content={pageDescription} />
+        <meta property='og:image' content={pageImage} />
+
+        <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:url' content={pageUrl} />
+        <meta property='twitter:title' content={pageTitle} />
+        <meta property='twitter:description' content={pageDescription} />
+        <meta property='twitter:image' content={pageImage} />
+
+        {seo?.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+
+        {/* Dashboard pages should generally not be indexed by search engines */}
+        {seo?.noindex !== false && <meta name="robots" content="noindex, nofollow" />}
+      </Head>
+      <Banner />
+      <HubSpotScript />
+      <HubSpotIdentification />
+      <Layout className='h-full bg-gray-800'>
         <Sider
-          breakpoint="md"
+          breakpoint='md'
           onBreakpoint={(broken) => {
             setCollapsed(broken)
             setBroken(broken)
@@ -102,32 +239,31 @@ export default function DashboardShell({
             background: colorBgLayout,
           }}
           width={250}
-          className={clsx(
-            'border-r-transparent',
-            collapsed && '!min-w-11 !max-w-11'
-          )}
+          className={clsx('border-r-transparent', collapsed && '!min-w-11 !max-w-11')}
           trigger={null}
           collapsible
           collapsed={collapsed}
         >
-          <div className="logo" />
+          <div className='logo' />
 
-          <div className="flex flex-col items-end">
-            <div className="w-full md:max-w-xs">
-              <div className="m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center">
+          <div className='flex flex-col items-end'>
+            <div className='w-full md:max-w-xs'>
+              <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center'>
                 {!collapsed ? (
-                  <Link href="/">
-                    <DarkLogo className="h-full w-auto" />
+                  <Link href='/'>
+                    <DarkLogo className='h-full w-auto' />
                   </Link>
                 ) : (
-                  <Link href="/">
-                    <Logomark className="h-full w-auto" aria-hidden="true" />
+                  <Link href='/'>
+                    <Logomark className='h-full w-auto' aria-hidden='true' />
                   </Link>
                 )}
               </div>
 
+              <SubscriptionBadge collapsed={collapsed} />
+
               {!collapsed && (
-                <div className="flex justify-center py-4">
+                <div className='flex justify-center py-4'>
                   <ModeratedChannels />
                 </div>
               )}
@@ -135,20 +271,14 @@ export default function DashboardShell({
               <Menu
                 onClick={onClick}
                 selectedKeys={[current]}
-                defaultOpenKeys={['/dashboard/features']}
+                openKeys={openKeys}
+                onOpenChange={onOpenChange}
                 style={{
                   background: colorBgLayout,
                   borderInlineEnd: 'none',
                 }}
-                mode="inline"
-                items={navigation.map((item, i) => {
-                  if (
-                    data?.user?.isImpersonating &&
-                    ['Setup', 'Managers'].includes(item.name)
-                  ) {
-                    return null
-                  }
-
+                mode='inline'
+                items={filterNavigationItems(navigation).map((item, i) => {
                   if (!item.name)
                     return {
                       key: item?.href || i,
@@ -162,23 +292,21 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout
-          className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}
-        >
+        <Layout className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}>
           <Header
             className={clsx(
               '!bg-gray-900',
               broken && !collapsed && '!hidden',
-              'flex w-full items-center justify-between !p-8'
+              'flex w-full items-center justify-between !p-8',
             )}
           >
             <DisableToggle />
 
-            <div className="w-fit py-2">
+            <div className='w-fit py-2'>
               <UserAccountNav />
             </div>
           </Header>
-          <Content className="min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all">
+          <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
             {children}
           </Content>
         </Layout>

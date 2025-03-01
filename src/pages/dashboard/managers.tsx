@@ -1,8 +1,10 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import { useSubscription } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
+import { canAccessFeature } from '@/utils/subscription'
 import { Button, Select, notification } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -14,6 +16,9 @@ import useSWR from 'swr'
 const ModeratorsPage = () => {
   const track = useTrack()
   const session = useSession()
+  const { subscription } = useSubscription()
+  const tierAccess = canAccessFeature('managers', subscription)
+
   const {
     data: approvedMods,
     isLoading: loadingApprovedMods,
@@ -37,9 +42,7 @@ const ModeratorsPage = () => {
 
   useEffect(() => {
     if (!loadingApprovedMods && Array.isArray(approvedMods)) {
-      setSelectedModerators(
-        approvedMods?.map((mod) => `${mod.moderatorChannelId}`) || []
-      )
+      setSelectedModerators(approvedMods?.map((mod) => `${mod.moderatorChannelId}`) || [])
     }
   }, [approvedMods, loadingApprovedMods])
 
@@ -91,65 +94,72 @@ const ModeratorsPage = () => {
         <title>Dotabod | Managers</title>
       </Head>
       <Header
-        subtitle="Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings."
-        title="Managers"
+        subtitle='Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings.'
+        title='Managers'
       />
 
-      <Card>
-        <div className="title">
-          <h3>Approve Managers</h3>
-        </div>
-        <div className="subtitle">
+      <Card title='Approve Managers' feature='managers'>
+        <div className='subtitle'>
           <p>
-            By approving a user, you're allowing them to access and modify your
-            Dotabod dashboard. Approved managers can manage features, toggle
-            commands, and update settings on your behalf.
+            By approving a user, you're allowing them to access and modify your Dotabod dashboard.
+            Approved managers can manage features, toggle commands, and update settings on your
+            behalf.
           </p>
           <p>
-            Note: They will not have access to your setup page, downloading the
-            GSI cfg, nor overlay URL.
+            Note: They will not have access to your setup page, downloading the GSI cfg, nor overlay
+            URL.
           </p>
         </div>
 
-        <div className="max-w-sm flex flex-col gap-4">
+        <div className='max-w-sm flex flex-col gap-4'>
           <Select
-            optionFilterProp="label"
+            disabled={!tierAccess.hasAccess}
+            optionFilterProp='label'
             loading={loadingModList || loadingApprovedMods}
-            mode="multiple"
+            mode='multiple'
             style={{ width: '100%' }}
-            placeholder="Select moderators"
+            placeholder='Select moderators'
             value={selectedModerators}
             defaultValue={
-              Array.isArray(approvedMods) &&
-              approvedMods.map((mod) => `${mod.moderatorChannelId}`)
+              Array.isArray(approvedMods) && approvedMods.map((mod) => `${mod.moderatorChannelId}`)
             }
-            onChange={setSelectedModerators}
+            onChange={(value: string[] | false) => {
+              if (Array.isArray(value)) {
+                setSelectedModerators(value)
+              }
+            }}
             options={
-              Array.isArray(moderatorList) &&
-              moderatorList.map((moderator) => ({
-                label: moderator.user_name,
-                value: moderator.user_id,
-                disabled: moderator.user_id === '843245458',
-              }))
+              Array.isArray(moderatorList)
+                ? moderatorList.map((moderator) => ({
+                    label: moderator.user_name,
+                    value: moderator.user_id,
+                    disabled: moderator.user_id === '843245458',
+                  }))
+                : []
             }
           />
-          <Button type="primary" onClick={handleApprove} loading={loading}>
+          <Button
+            type='primary'
+            onClick={handleApprove}
+            loading={loading}
+            disabled={!tierAccess.hasAccess}
+          >
             Submit
           </Button>
         </div>
       </Card>
 
       <Card>
-        <div className="title">
+        <div className='title'>
           <h3>What is this?</h3>
         </div>
-        <div className="">
-          Once you approve a user, they will login to dotabod.com and be able to
-          access your dashboard by using this selectbox:
+        <div className=''>
+          Once you approve a user, they will login to dotabod.com and be able to access your
+          dashboard by using this selectbox:
         </div>
         <Image
-          src="https://i.imgur.com/GSRVXFz.png"
-          alt="Managers selectbox"
+          src='https://i.imgur.com/GSRVXFz.png'
+          alt='Managers selectbox'
           width={1245}
           height={829}
         />
@@ -159,7 +169,18 @@ const ModeratorsPage = () => {
 }
 
 ModeratorsPage.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Managers | Dotabod Dashboard',
+        description: 'Manage moderators and channel managers for your Dotabod account.',
+        canonicalUrl: 'https://dotabod.com/dashboard/managers',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default ModeratorsPage

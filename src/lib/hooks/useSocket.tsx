@@ -112,9 +112,8 @@ export const useSocket = ({
   useEffect(() => {
     if (!userId) return
 
-    // Add ping interval and last received time tracking
     let lastReceivedTime = Date.now()
-    let reconnectTimeout: NodeJS.Timeout
+    let reconnectTimeout: NodeJS.Timeout | undefined
 
     console.log('Connecting to socket init...')
 
@@ -247,7 +246,7 @@ export const useSocket = ({
     })
     socket.on('auth_error', (message) => {
       console.error('Authentication failed:', message)
-      socket.close()
+      socket?.disconnect()
     })
     socket.on('connect', () => {
       console.log('Socket connected')

@@ -1,6 +1,6 @@
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
 import { Settings } from '@/lib/defaultSettings'
-import { isDev, type blockType } from '@/lib/devConsts'
+import { type blockType, isDev } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 interface AnimateRoshProps {
@@ -14,12 +14,7 @@ interface AnimateRoshProps {
   onComplete: () => void
 }
 
-export const AnimateRosh = ({
-  onComplete,
-  paused,
-  block,
-  roshan,
-}: AnimateRoshProps) => {
+export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshProps) => {
   if (!roshan) return null
 
   const props = {

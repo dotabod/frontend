@@ -1,8 +1,4 @@
-import {
-  selectHeroUnits,
-  selectMainHero,
-  selectSettings,
-} from '@/lib/redux/store'
+import { selectHeroUnits, selectMainHero, selectSettings } from '@/lib/redux/store'
 import { useSelector } from 'react-redux'
 
 function Hero({ data, team }) {
@@ -20,9 +16,7 @@ function Hero({ data, team }) {
   const isIllusion = data.image === 'heroimage' || data.image === 'enemyimage'
   const isBrewmaster = data.name === 'brewmaster'
 
-  const brewlingCount = heroUnits.filter((unit) =>
-    unit.unitname.includes('brewmaster')
-  ).length
+  const brewlingCount = heroUnits.filter((unit) => unit.unitname.includes('brewmaster')).length
   const hasBrewlings = brewlingCount >= 3
 
   const rotation = {
@@ -53,24 +47,18 @@ function Hero({ data, team }) {
           {displayType === 'custom' && (
             <img
               title={data.name}
-              alt="hero icon"
-              className={[
-                'pointer',
-                isEnemy ? 'enemy' : '',
-                isIllusion ? 'illusion' : '',
-              ].join(' ')}
+              alt='hero icon'
+              className={['pointer', isEnemy ? 'enemy' : '', isIllusion ? 'illusion' : ''].join(
+                ' ',
+              )}
               style={rotation}
               src={pointerIcon}
             />
           )}
           <img
             title={data.name}
-            alt="hero icon"
-            className={[
-              'icon',
-              isEnemy ? 'enemy' : '',
-              isIllusion ? 'illusion' : '',
-            ].join(' ')}
+            alt='hero icon'
+            className={['icon', isEnemy ? 'enemy' : '', isIllusion ? 'illusion' : ''].join(' ')}
             style={displayType === 'default' ? rotation : {}}
             src={heroIcon}
           />

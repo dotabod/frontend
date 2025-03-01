@@ -1,24 +1,26 @@
-import BoostyLogo from '@/images/logos/BoostyIcon.png'
 import Discord from '@/images/logos/Discord'
-import KofiIcon from '@/images/logos/Kofi'
+import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import {
-  BeakerIcon,
-  CommandLineIcon,
-  GlobeEuropeAfricaIcon,
-  HeartIcon,
-  MegaphoneIcon,
+  Cookie,
+  DollarSignIcon,
+  Github,
+  HardDriveIcon,
+  Info,
   NewspaperIcon,
-  QuestionMarkCircleIcon,
-  ScaleIcon,
-  ShareIcon,
-  SparklesIcon,
-  TvIcon,
-} from '@heroicons/react/24/outline'
-import clsx from 'clsx'
-import { Github, Info, ShieldCheck } from 'lucide-react'
-import Image from 'next/image'
+  ShieldCheck,
+} from 'lucide-react'
+
+// Add a const for parent keys
+export const PARENT_KEYS = {
+  FEATURES: 'features-menu',
+  BOT_SETTINGS: 'bot-settings-menu',
+  ACCOUNT: 'account-menu',
+  HELP: 'help-menu',
+  LEGAL: 'legal-menu',
+} as const
 
 export const navigation = [
+  // Main features
   {
     name: 'Setup',
     href: '/dashboard',
@@ -26,60 +28,78 @@ export const navigation = [
   },
   {
     name: 'Features',
-    href: '/dashboard/features',
+    key: PARENT_KEYS.FEATURES,
     icon: SparklesIcon,
     children: [
       {
         name: 'Main',
         href: '/dashboard/features',
-        icon: GlobeEuropeAfricaIcon,
       },
       {
         name: 'Overlay',
         href: '/dashboard/features/overlay',
-        icon: TvIcon,
       },
       {
         name: 'Chat',
         href: '/dashboard/features/chat',
-        icon: MegaphoneIcon,
       },
       {
         name: 'Advanced',
         href: '/dashboard/features/advanced',
-        icon: ScaleIcon,
       },
     ],
   },
   {
-    name: 'Managers',
-    href: '/dashboard/managers',
-    icon: ShieldCheck,
-    new: true,
-  },
-  {
-    name: 'Commands',
-    href: '/dashboard/commands',
-    icon: CommandLineIcon,
-  },
-  {
-    name: 'Help',
-    href: '/dashboard/troubleshoot',
-    icon: QuestionMarkCircleIcon,
-  },
-  {
-    name: '',
-    href: '',
-    icon: null,
-  },
-  {
-    name: 'Socials',
-    icon: ShareIcon,
+    name: 'Bot Settings',
+    key: PARENT_KEYS.BOT_SETTINGS,
+    icon: SparklesIcon,
     children: [
       {
-        name: 'Status',
-        href: 'https://status.dotabod.com',
-        icon: Info,
+        name: 'Commands',
+        href: '/dashboard/commands',
+      },
+      {
+        name: 'Managers',
+        href: '/dashboard/managers',
+      },
+    ],
+  },
+
+  // Account & Support
+  {
+    name: 'Account',
+    key: PARENT_KEYS.ACCOUNT,
+    icon: ShieldCheck,
+    new: true,
+    children: [
+      {
+        name: 'Billing',
+        href: '/dashboard/billing',
+        icon: DollarSignIcon,
+      },
+      {
+        name: 'Data',
+        href: '/dashboard/data',
+        icon: HardDriveIcon,
+      },
+    ],
+  },
+
+  // Help & Resources
+  {
+    name: 'Help & Resources',
+    key: PARENT_KEYS.HELP,
+    icon: QuestionMarkCircleIcon,
+    children: [
+      {
+        name: 'Help',
+        href: '/dashboard/troubleshoot',
+        icon: QuestionMarkCircleIcon,
+      },
+      {
+        name: 'Discord',
+        href: 'https://discord.dotabod.com',
+        icon: Discord,
       },
       {
         name: 'Github',
@@ -87,44 +107,39 @@ export const navigation = [
         icon: Github,
       },
       {
-        name: 'Discord',
-        href: 'https://discord.dotabod.com',
-        icon: Discord,
+        name: 'Blog',
+        href: '/blog',
+        icon: NewspaperIcon,
+      },
+      {
+        name: 'Status',
+        href: 'https://status.dotabod.com',
+        icon: Info,
       },
     ],
   },
+
+  // Legal
   {
-    name: 'Support the project',
-    icon: ({ className }) => (
-      <HeartIcon
-        className={clsx('h-4 w-4 !text-red-500', className)}
-        aria-hidden="true"
-      />
-    ),
+    name: 'Legal',
+    key: PARENT_KEYS.LEGAL,
+    icon: ShieldCheck,
     children: [
       {
-        name: 'Ko-fi',
-        href: 'https://ko-fi.com/dotabod',
-        icon: KofiIcon,
+        name: 'Privacy Policy',
+        href: '/privacy-policy',
+        icon: ShieldCheck,
       },
       {
-        name: 'Boosty',
-        href: 'https://boosty.to/dotabod',
-        icon: ({ className }) => (
-          <Image
-            src={BoostyLogo}
-            height={16}
-            width={16}
-            alt="boosty"
-            className={className}
-          />
-        ),
+        name: 'Terms of Service',
+        href: '/terms-of-service',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Cookie Policy',
+        href: '/cookies',
+        icon: Cookie,
       },
     ],
-  },
-  {
-    name: 'Changelog',
-    href: 'https://updates.dotabod.com',
-    icon: NewspaperIcon,
   },
 ]

@@ -1,15 +1,12 @@
 import UnixInstaller from '@/components/Dashboard/UnixInstaller'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import {
-  AppleOutlined,
-  LinuxOutlined,
-  WindowsOutlined,
-} from '@ant-design/icons'
+import { AppleOutlined, LinuxOutlined, WindowsOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import WindowsInstaller from './WindowsInstaller'
+import { TierBadge } from './Features/TierBadge'
 
 function InstallPage() {
   const track = useTrack()
@@ -24,7 +21,7 @@ function InstallPage() {
         query: { ...router.query, gsiType: newGsiType },
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     ) // `shallow: true` to not trigger data fetching methods again
   }
 
@@ -71,7 +68,11 @@ function InstallPage() {
         items={[
           {
             key: 'windows',
-            label: 'Automatic',
+            label: (
+              <span>
+                Automatic <TierBadge feature='autoInstaller' />
+              </span>
+            ),
             children: <WindowsInstaller />,
             icon: <WindowsOutlined />,
           },

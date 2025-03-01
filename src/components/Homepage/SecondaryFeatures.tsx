@@ -1,8 +1,4 @@
-import {
-  BentoCard,
-  BentoGrid,
-  type BentoGridItemProps,
-} from '@/components/magicui/bento-grid'
+import { BentoCard, BentoGrid, type BentoGridItemProps } from '@/components/magicui/bento-grid'
 import { Settings } from '@/lib/defaultSettings'
 import { Popover, Typography } from 'antd'
 import { SparklesIcon } from 'lucide-react'
@@ -20,32 +16,32 @@ export function SecondaryFeatures() {
   const features: BentoGridItemProps[] = [
     {
       background: (
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandWL].response({}, false)}
         </div>
       ),
-      name: 'Win loss overlay and command',
+      name: 'Real-Time Win/Loss Overlay',
       disableHover: false,
       cta: (
         <Popover
-          className="self-end"
+          className='self-end'
           content={
             <Image
-              alt="wl overlay"
+              alt='wl overlay'
               width={534}
               height={82}
-              src="/images/dashboard/wl-overlay.png"
+              src='/images/dashboard/wl-overlay.png'
             />
           }
         >
-          <Link className="flex space-x-1" onClick={(e) => e.preventDefault()}>
-            <SparklesIcon className="text-purple-200" height={22} />
-            <span className="text-purple-300">Preview</span>
+          <Link className='flex space-x-1' onClick={(e) => e.preventDefault()}>
+            <SparklesIcon className='text-purple-200' height={22} />
+            <span className='text-purple-300'>Preview</span>
           </Link>
         </Popover>
       ),
       description:
-        'Tell everyone watching what your current Win Loss record is. Automatically displays ranked or unranked, or both at the same time!',
+        'Instantly display your ranked or unranked win-loss record, current MMR, and progress to next rank on stream with one simple command.',
       className: 'lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2',
     },
     {
@@ -55,49 +51,43 @@ export function SecondaryFeatures() {
         <Popover
           content={
             <Image
-              alt="mmr tracker"
+              alt='mmr tracker'
               width={534}
               height={82}
-              src="/images/dashboard/mmr-tracker.png"
+              src='/images/dashboard/mmr-tracker.png'
             />
           }
         >
           <Link onClick={(e) => e.preventDefault()}>
-            <span className="flex items-center space-x-1">
-              <SparklesIcon className="text-purple-200" height={22} />
-              <span className="text-purple-300">Preview</span>
+            <span className='flex items-center space-x-1'>
+              <SparklesIcon className='text-purple-200' height={22} />
+              <span className='text-purple-300'>Preview</span>
             </span>
           </Link>
         </Popover>
       ),
       background: (
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandMmr].response()}
-          <div className="mt-6 flex justify-center space-x-4">
+          <div className='mt-6 flex justify-center space-x-4'>
+            <MMRBadge image='55.png' rank={3860} className='self-center !rounded-md' />
             <MMRBadge
-              image="55.png"
-              rank="3860"
-              className="self-center !rounded-md"
-            />
-            <MMRBadge
-              image="92.png"
-              className="self-center !rounded-md"
-              leaderboard="1"
-              rank="13150"
+              image='92.png'
+              className='self-center !rounded-md'
+              leaderboard={1}
+              rank={13150}
             />
           </div>
         </div>
       ),
-      description:
-        'Show off your current rank, or leaderboard standing on stream.',
+      description: 'Show off your current rank, or leaderboard standing on stream.',
       className: 'lg:row-start-1 lg:row-end-3 lg:col-start-2 lg:col-end-3',
     },
     {
-      name: 'Smurf detection',
-      description:
-        'Dotabod will tell you the lifetime games played of any player in your match.',
+      name: 'Instant Smurf Detection',
+      description: 'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
       background: (
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandSmurfs].response()}
         </div>
       ),
@@ -105,10 +95,9 @@ export function SecondaryFeatures() {
     },
     {
       name: 'Dotabod has things to say',
-      description:
-        'But only when the game conditions meet the correct parameters.',
+      description: 'But only when the game conditions meet the correct parameters.',
       background: (
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
           <TwitchChat
             responses={[
               chatterInfo.smoke.message,
@@ -122,43 +111,40 @@ export function SecondaryFeatures() {
       className: 'lg:row-start-2 lg:row-end-3 lg:col-start-3 lg:col-end-4',
     },
     {
-      name: 'Aegis and rosh timer',
+      name: 'Roshan & Aegis Timers',
       cta: (
         <Popover
           content={
-            <div className="flex flex-col items-center space-y-4 text-white">
+            <div className='flex flex-col items-center space-y-4 text-white'>
               <Image
-                alt="aegis timer"
+                alt='aegis timer'
                 width={372}
                 height={141}
-                src="/images/dashboard/just-aegis-timer.png"
+                src='/images/dashboard/just-aegis-timer.png'
               />
               <span>Aegis timer</span>
               <Image
-                alt="rosh timer"
+                alt='rosh timer'
                 width={336}
                 height={249}
-                src="/images/dashboard/rosh-timer.png"
+                src='/images/dashboard/rosh-timer.png'
               />
               <span>Roshan timer</span>
             </div>
           }
         >
-          <Link
-            className="flex !items-center space-x-1"
-            onClick={(e) => e.preventDefault()}
-          >
-            <SparklesIcon className="text-purple-200" height={22} />
-            <span className="text-purple-300">Preview</span>
+          <Link className='flex !items-center space-x-1' onClick={(e) => e.preventDefault()}>
+            <SparklesIcon className='text-purple-200' height={22} />
+            <span className='text-purple-300'>Preview</span>
           </Link>
         </Popover>
       ),
       disableHover: false,
       description:
-        'Tired of copy pasting three clock times? Dotabod knows when rosh is killed or when the aegis is picked up. A timer will display for your viewers to see!',
+        'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
       className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
       background: (
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
           <TwitchChat
             responses={[
               <React.Fragment key={1}>
@@ -173,10 +159,10 @@ export function SecondaryFeatures() {
       ),
     },
     {
-      name: 'Game medals',
+      name: 'In-Game Medal Tracking',
       description: CommandDetail[Settings.commandGM].description,
       background: (
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandGM].response()}
         </div>
       ),
@@ -186,21 +172,21 @@ export function SecondaryFeatures() {
 
   return (
     <section
-      id="secondary-features"
-      aria-label="Features for building a portfolio"
-      className="py-20 sm:py-32"
+      id='secondary-features'
+      aria-label='Features for building a portfolio'
+      className='py-20 sm:py-32'
     >
       <Container>
-        <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-3xl font-medium tracking-tight text-gray-200">
+        <div className='mx-auto max-w-2xl sm:text-center'>
+          <h2 className='text-3xl font-medium tracking-tight text-gray-200'>
             But wait, there&apos;s more.
           </h2>
-          <p className="mt-2 text-lg text-gray-300">
-            Under active development and speaking to multiple Dota 2
-            personalities, features are being added as they are requested.
+          <p className='mt-2 text-lg text-gray-300'>
+            Under active development and speaking to multiple Dota 2 personalities, features are
+            being added as they are requested.
           </p>
         </div>
-        <BentoGrid className="lg:grid-rows-3">
+        <BentoGrid className='lg:grid-rows-3'>
           {features.map((feature, i) => (
             <BentoCard key={i} {...feature} />
           ))}

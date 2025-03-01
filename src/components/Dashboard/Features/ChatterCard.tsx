@@ -1,10 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch, Tooltip } from 'antd'
+import type { ChatterSettingKeys } from '@/utils/subscription'
+import { Tooltip } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import DotabodChatter from './DotabodChatter'
+import { TierSwitch } from './TierSwitch'
 
 enum CATEGORIES {
   General = 'General',
@@ -18,24 +20,24 @@ export const chatterInfo = {
     category: CATEGORIES.Item,
     message: (
       <>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <Image
             width={22}
             height={22}
-            alt="massivePIDAS"
-            className="inline align-middle"
-            src="/images/emotes/massivePIDAS.webp"
+            alt='massivePIDAS'
+            className='inline align-middle'
+            src='/images/emotes/massivePIDAS.webp'
           />
           <span>Use your midas</span>
         </div>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>Midas was finally used, 64 seconds late</span>
           <Image
             width={22}
             height={22}
-            alt="massivePIDAS"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/6350aa989bb828a9f0d42863/1x"
+            alt='massivePIDAS'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/6350aa989bb828a9f0d42863/1x'
           />
         </div>
       </>
@@ -45,13 +47,13 @@ export const chatterInfo = {
     tooltip: 'As soon as anyone presses F9',
     category: CATEGORIES.Item,
     message: (
-      <span className="inline space-x-2">
+      <span className='inline space-x-2'>
         <Image
           width={22}
           height={22}
-          alt="pauseChamp"
-          className="inline align-middle"
-          src="/images/emotes/pauseChamp.webp"
+          alt='pauseChamp'
+          className='inline align-middle'
+          src='/images/emotes/pauseChamp.webp'
         />
         <span>Who paused the game?</span>
       </span>
@@ -61,13 +63,13 @@ export const chatterInfo = {
     tooltip: 'Whenever your hero has smoke debuff',
     category: CATEGORIES.Hero,
     message: (
-      <span className="inline space-x-2">
+      <span className='inline space-x-2'>
         <Image
           width={22}
           height={22}
-          alt="Shush"
-          className="inline align-middle"
-          src="/images/emotes/Shush.png"
+          alt='Shush'
+          className='inline align-middle'
+          src='/images/emotes/Shush.png'
         />
         <span>Pudge is smoked!</span>
       </span>
@@ -77,14 +79,14 @@ export const chatterInfo = {
     tooltip: 'Whenever you die with passive stick / faerie / etc',
     category: CATEGORIES.Item,
     message: (
-      <span className="inline space-x-2">
+      <span className='inline space-x-2'>
         <span>Pudge died with passive faerie fire</span>
         <Image
           width={22}
           height={22}
-          alt="ICANT"
-          className="inline align-middle"
-          src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
         />
       </span>
     ),
@@ -98,14 +100,14 @@ export const chatterInfo = {
     tooltip: '',
     category: CATEGORIES.Event,
     message: (
-      <span className="inline space-x-2">
+      <span className='inline space-x-2'>
         <span>Pudge denied the aegis</span>
         <Image
           width={22}
           height={22}
-          alt="ICANT"
-          className="inline align-middle"
-          src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
         />
       </span>
     ),
@@ -121,24 +123,24 @@ export const chatterInfo = {
     category: CATEGORIES.Event,
     message: (
       <>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>The tip from Spectre</span>
           <Image
             width={22}
             height={22}
-            alt="ICANT"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
           />
         </div>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>We tipping Crystal Maiden</span>
           <Image
             width={22}
             height={22}
-            alt="ICANT"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x"
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
           />
         </div>
       </>
@@ -148,29 +150,29 @@ export const chatterInfo = {
     tooltip: '',
     category: CATEGORIES.Event,
     message: (
-      <div className="space-x-2">
+      <div className='space-x-2'>
         <span>+80 gold from bounty (2/4)</span>
         <Image
           width={22}
           height={22}
-          alt="ICANT"
-          className="inline align-middle"
-          src="https://cdn.betterttv.net/emote/600ae212df6a0665f274c9df/1x"
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/600ae212df6a0665f274c9df/1x'
         />
         <Image
           width={22}
           height={22}
-          alt="ICANT"
-          className="inline align-middle"
-          src="https://cdn.betterttv.net/emote/62b103336ef7a5f0b7df90c4/1x"
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/62b103336ef7a5f0b7df90c4/1x'
         />
         <span>Thanks Pink, Yellow</span>
         <Image
           width={22}
           height={22}
-          alt="ICANT"
-          className="inline align-middle"
-          src="https://cdn.betterttv.net/emote/60936f4a39b5010444d0c752/1x"
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/60936f4a39b5010444d0c752/1x'
         />
       </div>
     ),
@@ -185,24 +187,24 @@ export const chatterInfo = {
     category: CATEGORIES.Hero,
     message: (
       <>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>Pudge has a 4 kill streak</span>
           <Image
             width={22}
             height={22}
-            alt="ICANT"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/62aafeef6ef7a5f0b7df3d98/1x"
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/62aafeef6ef7a5f0b7df3d98/1x'
           />
         </div>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>Pudge lost the 4 kill streak</span>
           <Image
             width={22}
             height={22}
-            alt="ICANT"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/61a5e69b371b825d3f6dd0b2/1x"
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/61a5e69b371b825d3f6dd0b2/1x'
           />
         </div>
       </>
@@ -212,14 +214,14 @@ export const chatterInfo = {
     tooltip: '',
     category: CATEGORIES.Hero,
     message: (
-      <div className="space-x-2">
+      <div className='space-x-2'>
         <span>Pudge giving up first blood</span>
         <Image
           width={22}
           height={22}
-          alt="ICANT"
-          className="inline align-middle"
-          src="https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x"
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x'
         />
       </div>
     ),
@@ -229,24 +231,24 @@ export const chatterInfo = {
     category: CATEGORIES.Item,
     message: (
       <>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>@techleed where&apos;s your tp</span>
           <Image
             width={22}
             height={22}
-            alt="ICANT"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp"
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp'
           />
         </div>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>@techleed nice job getting a tp finally after 322 seconds</span>
           <Image
             width={22}
             height={22}
-            alt="ICANT"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/60ec91f58ed8b373e4221742/1x.webp"
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/60ec91f58ed8b373e4221742/1x.webp'
           />
         </div>
       </>
@@ -257,27 +259,27 @@ export const chatterInfo = {
     category: CATEGORIES.Event,
     message: (
       <>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>We have lost, gg nt</span>
           <Image
             width={22}
             height={22}
             unoptimized
-            alt="happi"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/634042bce6cf26500b42ce56/1x.webp"
+            alt='happi'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/634042bce6cf26500b42ce56/1x.webp'
           />
           <span>go next</span>
         </div>
-        <div className="space-x-2">
+        <div className='space-x-2'>
           <span>We have won</span>
           <Image
             width={22}
             height={22}
             unoptimized
-            alt="happi"
-            className="inline align-middle"
-            src="https://cdn.betterttv.net/emote/634042bce6cf26500b42ce56/1x.webp"
+            alt='happi'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/634042bce6cf26500b42ce56/1x.webp'
           />
           <span>go next</span>
         </div>
@@ -289,96 +291,75 @@ export const chatterInfo = {
       'At the beginning of every match, once !np etc are ready. Usually when you first spawn in fountain.',
     category: CATEGORIES.Event,
     message: (
-      <span>
-        Match data found !np · !smurfs · !gm · !lg · !avg · !items commands
-        activated.
-      </span>
+      <span>Match data found !np · !smurfs · !gm · !lg · !avg · !items commands activated.</span>
     ),
   },
   neutralItems: {
     tooltip:
-      'Depending on whether you\'re playing turbo or normal, neutral items will be available at different times.',
+      "Depending on whether you're playing turbo or normal, neutral items will be available at different times.",
     category: CATEGORIES.Event,
     message: (
-      <span className="inline space-x-2">
-        <span>Tier 5 neutral items are now available! Time to check the jungle</span>
+      <span className='inline space-x-2'>
+        <span>Tier 1 neutral items are now available! Time to check the jungle</span>
         <Image
           width={22}
           height={22}
-          alt="PogChamp"
-          className="inline align-middle"
-          src="https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/dark/2.0"
+          alt='PogChamp'
+          className='inline align-middle'
+          src='https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/dark/2.0'
         />
       </span>
     ),
   },
 }
 
-const groupedChatterInfo = Object.entries(chatterInfo).reduce(
-  (acc, [key, value]) => {
-    const { category } = value
-    if (!acc[category]) {
-      acc[category] = []
-    }
-    acc[category].push({ ...value, id: key })
-    return acc
-  },
-  {}
-)
+const groupedChatterInfo = Object.entries(chatterInfo).reduce((acc, [key, value]) => {
+  const { category } = value
+  if (!acc[category]) {
+    acc[category] = []
+  }
+  acc[category].push({ ...value, id: key })
+  return acc
+}, {})
 
 export default function ChatterCard() {
-  const {
-    data: isEnabled,
-    loading,
-    updateSetting,
-  } = useUpdateSetting(Settings.chatter)
-  const {
-    data: dbChatters,
-    loading: loadingChatters,
-    updateSetting: updateChatters,
-  } = useUpdateSetting(Settings.chatters)
+  const { data: isEnabled } = useUpdateSetting(Settings.chatter)
+  const { data: dbChatters, updateSetting: updateChatters } = useUpdateSetting<
+    Record<string, { enabled: boolean }>
+  >(Settings.chatters)
 
   return (
     <>
       <Card>
-        <div className="title">
+        <div className='title'>
           <h3>Everything</h3>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <Switch
-            loading={loading}
-            checkedChildren="All"
-            unCheckedChildren="All"
-            onChange={updateSetting}
-            checked={isEnabled}
-          />
-          <span>Turn off every chatter</span>
+        <div className='flex items-center space-x-4'>
+          <TierSwitch settingKey={Settings.chatter} label='Turn off every chatter' />
         </div>
       </Card>
 
       <div
         className={clsx(
           !isEnabled && 'opacity-40 transition-all',
-          'grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'
+          'grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2',
         )}
       >
         <DotabodChatter />
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
           return (
-            <Card key={categoryName}>
-              <div className="title">
-                <h3>{categoryName}</h3>
-              </div>
-              <div className="ml-4 flex flex-col space-y-3">
+            <Card key={categoryName} title={categoryName}>
+              <div className='ml-4 flex flex-col space-y-3'>
                 {(groupedChatterInfo[categoryName] || []).map((value) => (
                   <div key={value.id}>
-                    <Tooltip title={value?.tooltip} placement="left">
-                      <div className="flex items-center space-x-3">
-                        <Switch
-                          disabled={!isEnabled || loadingChatters}
+                    <Tooltip title={value?.tooltip} placement='left'>
+                      <div className='flex items-center space-x-3'>
+                        <TierSwitch
+                          settingKey={`chatters.${value.id}` as ChatterSettingKeys}
+                          disabled={!isEnabled}
                           checked={dbChatters[value.id]?.enabled}
-                          onChange={(checked, e) => {
+                          onChange={(checked) => {
                             updateChatters({
                               ...dbChatters,
                               [value.id]: {

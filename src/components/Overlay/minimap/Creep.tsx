@@ -6,12 +6,7 @@ const Creep = ({ data, team }) => {
     left: data.xposP,
   }
 
-  return (
-    <div
-      className={`container-creep ${isEnemy ? 'enemy' : ''}`}
-      style={position}
-    />
-  )
+  return <div className={`container-creep ${isEnemy ? 'enemy' : ''}`} style={position} />
 }
 
 export default Creep

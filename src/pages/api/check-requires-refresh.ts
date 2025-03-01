@@ -51,9 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(requiresRefresh)
   } catch (error) {
     captureException(error)
-    return res
-      .status(500)
-      .json({ message: 'Failed to get info', error: error.message })
+    return res.status(500).json({ message: 'Failed to get info', error: error.message })
   }
 }
 

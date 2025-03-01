@@ -11,18 +11,18 @@ import { captureException } from '@sentry/nextjs'
 // Helper function to fetch follower count for a user
 async function fetchFollowerCount(providerAccountId, accessToken) {
   const url = `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${Number(
-    providerAccountId
+    providerAccountId,
   )}`
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    'Client-Id': process.env.TWITCH_CLIENT_ID,
+    'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
   }
 
   try {
     const response = await fetch(url, { headers })
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch followers for providerAccountId ${providerAccountId}: ${response.statusText}`
+        `Failed to fetch followers for providerAccountId ${providerAccountId}: ${response.statusText}`,
       )
     }
     const data = await response.json()
@@ -35,16 +35,12 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
 
 // Main function to update followers count
 async function updateFollows(userId: string) {
-  const { providerAccountId, accessToken, error } =
-    await getTwitchTokens(userId)
+  const { providerAccountId, accessToken, error } = await getTwitchTokens(userId)
   if (error) {
     return
   }
 
-  const totalFollowerCount = await fetchFollowerCount(
-    providerAccountId,
-    accessToken
-  )
+  const totalFollowerCount = await fetchFollowerCount(providerAccountId, accessToken)
 
   if (totalFollowerCount !== null) {
     await prisma.user.update({

@@ -1,43 +1,31 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Switch } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 
 export default function WinProbabilityOverlay() {
-  const {
-    data: showWinProb,
-    updateSetting: updateWinProb,
-    loading: l2,
-  } = useUpdateSetting(Settings.winProbabilityOverlay)
+  const { data: showWinProb } = useUpdateSetting(Settings.winProbabilityOverlay)
 
   return (
-    <Card>
-      <div className="title">
-        <h3>Win probability</h3>
-      </div>
-      <div className="subtitle">
-        Dotabod can display the current win percent chance.
-      </div>
-      <div>
-        For top 100 immortal games, Dotabod can display the current win percent
-        chance.
-      </div>
-      <div className="mt-5 flex items-center space-x-2">
-        <Switch loading={l2} onChange={updateWinProb} checked={showWinProb} />
-        <span>Show win probability overlay</span>
+    <Card title='Win probability' feature='winProbabilityOverlay'>
+      <div className='subtitle'>Dotabod can display the current win percent chance.</div>
+      <div>For top 100 immortal games, Dotabod can display the current win percent chance.</div>
+      <div className='mt-5 flex items-center space-x-2'>
+        <TierSwitch
+          hideTierBadge
+          settingKey={Settings.winProbabilityOverlay}
+          label='Show win probability overlay'
+        />
       </div>
 
       <Image
-        src="https://i.imgur.com/Vr01ilw.gif"
-        alt="Win probability oerlay"
+        src='https://i.imgur.com/Vr01ilw.gif'
+        alt='Win probability oerlay'
         width={1070}
         height={436}
-        className={clsx(
-          !showWinProb && 'opacity-40',
-          'scale-90 rounded shadow'
-        )}
+        className={clsx(!showWinProb && 'opacity-40', 'scale-90 rounded shadow')}
       />
     </Card>
   )

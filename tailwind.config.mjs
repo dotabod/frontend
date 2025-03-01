@@ -13,16 +13,15 @@ const config = {
         return Object.keys(colorObj).reduce((vars, colorKey) => {
           const value = colorObj[colorKey]
           const cssVariable =
-            colorKey === 'DEFAULT'
-              ? `--color${colorGroup}`
-              : `--color${colorGroup}-${colorKey}`
+            colorKey === 'DEFAULT' ? `--color${colorGroup}` : `--color${colorGroup}-${colorKey}`
 
           const newVars =
             typeof value === 'string'
               ? { [cssVariable]: value }
               : extractColorVars(value, `-${colorKey}`)
 
-          return { ...vars, ...newVars }
+          // Use Object.assign instead of spread to avoid linter error
+          return Object.assign({}, vars, newVars)
         }, {})
       }
 

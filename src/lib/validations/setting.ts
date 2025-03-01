@@ -1,3 +1,4 @@
+import { type SubscriptionRow, canAccessFeature } from '@/utils/subscription'
 import * as z from 'zod'
 
 // Define schemas for each specific setting
@@ -15,6 +16,11 @@ const settingsSchema = {
       .refine((num) => num >= 30 && num <= 1800, {
         message: 'Duration must be between 30 and 1800 seconds',
       }),
+  }),
+  crypto_payment_interest: z.object({
+    interested: z.boolean(),
+    tier: z.enum(['FREE', 'PRO']),
+    transactionType: z.enum(['RECURRING', 'LIFETIME']),
   }),
   battlepass: z.boolean(),
   chatter: z.boolean(),
@@ -104,17 +110,24 @@ const settingsSchema = {
   commandWinProbability: z.boolean(),
 }
 
-export const settingSchemas = z.object(settingsSchema)
 type SettingKeys = keyof typeof settingsSchema
 export const settingKeySchema = z.enum(
-  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]]
+  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],
 )
 
-export const dynamicSettingSchema = (key: SettingKeys) =>
-  z.object({
-    key: z.literal(key),
-    value: settingsSchema[key],
-  })
+// Add subscription validation to dynamic schema
+export const dynamicSettingSchema = (
+  key: SettingKeys,
+  subscription: Partial<SubscriptionRow> | null,
+) =>
+  z
+    .object({
+      key: z.literal(key),
+      value: settingsSchema[key],
+    })
+    .refine(() => canAccessFeature(key, subscription).hasAccess, {
+      message: 'Your subscription tier does not have access to this feature',
+    })
 
 export const localePatchSchema = z.enum([
   'af-ZA',

@@ -6,11 +6,7 @@ export const useTransformRes = () => {
   const href = useRouter()
 
   const res = ({ h = 0, w = 0 }) => {
-    if (
-      href?.asPath &&
-      typeof href.asPath === 'string' &&
-      !href.asPath.includes('overlay')
-    )
+    if (href?.asPath && typeof href.asPath === 'string' && !href.asPath.includes('overlay'))
       return h || w
 
     const defaultWidth = 1920

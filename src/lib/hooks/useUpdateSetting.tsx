@@ -1,4 +1,7 @@
+import { useSubscription } from '@/hooks/useSubscription'
 import { type SettingKeys, Settings } from '@/lib/defaultSettings'
+import { type ChatterSettingKeys, type FeatureTier, canAccessFeature } from '@/utils/subscription'
+import type { SubscriptionTier } from '@prisma/client'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
@@ -16,7 +19,11 @@ export const useUpdate = ({
   revalidate = false,
   dataTransform = (data, newValue) => newValue,
 }: UpdateProps) => {
-  const { data, error } = useSWR(path, fetcher)
+  const { data, error } = useSWR(path, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
   const { mutate } = useSWRConfig()
   const { message } = App.useApp()
 
@@ -79,8 +86,39 @@ export const useUpdateLocale = (props?: UpdateProps) => {
   return { data, loading, update: updateSetting }
 }
 
-export function useUpdateSetting(key?: SettingKeys) {
+interface UpdateSettingResult<T = boolean> {
+  data: T
+  original: {
+    beta_tester?: boolean
+    settings?: Array<{
+      key: string
+      value: unknown
+    }>
+    SteamAccount?: {
+      steam32Id: number
+      mmr: number
+      name: string | null
+      leaderboard_rank: number | null
+      connectedUserIds: string[]
+    }
+    stream_online?: boolean
+    mmr?: number
+  }
+  error: unknown
+  loading: boolean
+  updateSetting: (newValue: T) => void
+  mutate: () => void
+  tierAccess: {
+    hasAccess: boolean
+    requiredTier: SubscriptionTier
+  }
+}
+
+export function useUpdateSetting<T = boolean>(
+  key?: SettingKeys | ChatterSettingKeys,
+): UpdateSettingResult<T> {
   const router = useRouter()
+  const { subscription } = useSubscription()
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
@@ -95,11 +133,33 @@ export function useUpdateSetting(key?: SettingKeys) {
   } = useUpdate({
     path: url,
     dataTransform: (data, newValue) => {
+      if (!data) return {}
+
       if (key === Settings.mmr) {
         return { ...data, mmr: newValue.value }
       }
 
-      // find the key in data, then update the value to be new
+      // Handle chatter settings differently
+      if (key?.startsWith('chatters.')) {
+        const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
+        return {
+          ...data,
+          settings: data?.settings?.map((setting) => {
+            if (setting.key === Settings.chatters) {
+              return {
+                ...setting,
+                value: {
+                  ...chattersData?.value,
+                  ...newValue,
+                },
+              }
+            }
+            return setting
+          }),
+        }
+      }
+
+      // Regular settings
       const newData =
         data?.settings?.map((setting) => {
           if (setting.key === key) {
@@ -118,18 +178,38 @@ export function useUpdateSetting(key?: SettingKeys) {
 
   let value = getValueOrDefault(key, data?.settings)
   if (key === Settings.mmr) value = data?.mmr || 0
+  if (key?.startsWith('chatters.')) {
+    const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
+    const chatterKey = key.split('.')[1]
+    value = chattersData?.value?.[chatterKey]?.enabled ?? false
+  }
 
-  const updateSetting = (newValue) => {
+  const tierAccess = canAccessFeature(key as FeatureTier, subscription)
+
+  const updateSetting = (newValue: unknown) => {
+    if (!tierAccess.hasAccess) return
+    if (!url) return
+
+    if (key?.startsWith('chatters.')) {
+      const chatterKey = key.split('.')[1]
+      update(
+        { value: { [chatterKey]: { enabled: newValue } } },
+        `/api/settings/${Settings.chatters}`,
+      )
+      return
+    }
+
     update({ value: newValue }, `/api/settings/${key}`)
   }
 
   return {
-    data: value,
-    original: data,
+    data: value as T,
+    original: data || {},
     error,
     loading,
     updateSetting,
-    mutate: () => mutate(url),
+    tierAccess,
+    mutate: () => url && mutate(url),
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -19,22 +19,37 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 80,
-    "attributePosition": "auto"
+    "lineWidth": 100,
+    "attributePosition": "auto",
+    "ignore": [
+      "**/locales/**/*.json",
+      "**/.env*",
+      "**/.idea",
+      "**/node_modules",
+      "**/assets",
+      "**/dist/**",
+      "**/build",
+      "**/config.js",
+      "**/volumes",
+      "**/newrelic_agent.log",
+      "**/*.key"
+    ]
   },
-  "organizeImports": { "enabled": true },
+  "organizeImports": {
+    "enabled": true
+  },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": { "noUnusedImports": "error", "noUnusedVariables": "off" }
+      "correctness": { "noUnusedImports": "error" }
     }
   },
   "javascript": {
     "formatter": {
-      "jsxQuoteStyle": "double",
+      "jsxQuoteStyle": "single",
       "quoteProperties": "asNeeded",
-      "trailingCommas": "es5",
+      "trailingCommas": "all",
       "semicolons": "asNeeded",
       "arrowParentheses": "always",
       "bracketSpacing": true,
