@@ -65,20 +65,20 @@ export const plans = [
       'All Free features',
       'Automated setup (Dota 2, OBS, 7TV, Twitch)',
       'Auto twitch predictions for each match',
-      'Advanced overlays (Minimap XL, Anti-snipe blocker)',
+      'Pro commands (!hero, !np, !items, !gm, !smurfs)',
+      'Advanced overlays (XL Minimap, Anti-snipe blockers)',
       'Notable players overlay with flags',
-      'Win probability overlay',
-      'Live win probability (!wp)',
+      'Win probability overlay with !wp command',
       'Stream delay customization',
-      'OBS scene switcher',
-      'Roshan timer and aegis tracking',
+      'Auto OBS scene switcher',
+      'Auto Roshan and Aegis timers',
       'MMR tracking with each match',
       'Advanced game events (Midas, Rosh events, Neutral items)',
-      'Pro commands (!hero, !np, !items, !gm, !smurfs)',
       'Manager access',
       <span key='beta-features' className='flex items-center gap-1'>
         <StarOutlined className='text-yellow-500' /> Early access to beta features and updates
       </span>,
+      'And more! Browse the full list of features in the dashboard',
     ],
     logo: (
       <Image
