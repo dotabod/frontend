@@ -1,4 +1,5 @@
 import Banner from '@/components/Banner'
+import CookieConsent from '@/components/CookieConsent'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import HubSpotIdentification from '@/components/HubSpotIdentification'
@@ -22,12 +23,12 @@ const { Header, Sider, Content } = Layout
 
 // Add SEO interface
 interface SEOProps {
-  title?: string;
-  description?: string;
-  ogImage?: string;
-  canonicalUrl?: string;
-  ogType?: string;
-  noindex?: boolean;
+  title?: string
+  description?: string
+  ogImage?: string
+  canonicalUrl?: string
+  ogType?: string
+  noindex?: boolean
 }
 
 function getItem(item) {
@@ -78,30 +79,30 @@ for (const item of navigation) {
 const findBestMatchingMenuItem = (pathname: string) => {
   // First try exact match
   if (PATH_TO_PARENT_KEY[pathname]) {
-    return { key: pathname, parentKey: PATH_TO_PARENT_KEY[pathname] };
+    return { key: pathname, parentKey: PATH_TO_PARENT_KEY[pathname] }
   }
 
   // For nested routes like /dashboard/features/something
   // Try to find the closest parent path
-  const pathParts = pathname.split('/');
+  const pathParts = pathname.split('/')
   while (pathParts.length > 1) {
-    pathParts.pop();
-    const parentPath = pathParts.join('/');
+    pathParts.pop()
+    const parentPath = pathParts.join('/')
     if (PATH_TO_PARENT_KEY[parentPath]) {
-      return { key: parentPath, parentKey: PATH_TO_PARENT_KEY[parentPath] };
+      return { key: parentPath, parentKey: PATH_TO_PARENT_KEY[parentPath] }
     }
   }
 
   // Default to dashboard if no match found
-  return { key: '/dashboard', parentKey: '' };
+  return { key: '/dashboard', parentKey: '' }
 }
 
 export default function DashboardShell({
   children,
   seo,
 }: {
-  children: React.ReactElement;
-  seo?: SEOProps;
+  children: React.ReactElement
+  seo?: SEOProps
 }) {
   const { status, data } = useSession()
   const router = useRouter()
@@ -114,17 +115,18 @@ export default function DashboardShell({
   const [openKeys, setOpenKeys] = useState<string[]>([])
 
   // Default SEO values
-  const defaultTitle = 'Dashboard | Dotabod';
-  const defaultDescription = 'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.';
-  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`;
-  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/dashboard`;
+  const defaultTitle = 'Dashboard | Dotabod'
+  const defaultDescription =
+    'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.'
+  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`
+  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/dashboard`
 
   // Use SEO props if provided, otherwise use defaults
-  const pageTitle = seo?.title || defaultTitle;
-  const pageDescription = seo?.description || defaultDescription;
-  const pageImage = seo?.ogImage || defaultOgImage;
-  const pageUrl = seo?.canonicalUrl || defaultUrl;
-  const pageType = seo?.ogType || 'website';
+  const pageTitle = seo?.title || defaultTitle
+  const pageDescription = seo?.description || defaultDescription
+  const pageImage = seo?.ogImage || defaultOgImage
+  const pageUrl = seo?.canonicalUrl || defaultUrl
+  const pageType = seo?.ogType || 'website'
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
@@ -160,15 +162,15 @@ export default function DashboardShell({
 
   // Update selected menu item and open parent menu when route changes
   useEffect(() => {
-    const { pathname } = router;
-    const { key, parentKey } = findBestMatchingMenuItem(pathname);
+    const { pathname } = router
+    const { key, parentKey } = findBestMatchingMenuItem(pathname)
 
-    setCurrent(key);
+    setCurrent(key)
 
     if (parentKey && !openKeys.includes(parentKey)) {
-      setOpenKeys(prev => [...prev, parentKey]);
+      setOpenKeys((prev) => [...prev, parentKey])
     }
-  }, [router.pathname, router.asPath]);
+  }, [router.pathname, router.asPath])
 
   if (status !== 'authenticated') return null
 
@@ -220,10 +222,10 @@ export default function DashboardShell({
         <meta property='twitter:description' content={pageDescription} />
         <meta property='twitter:image' content={pageImage} />
 
-        {seo?.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+        {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
 
         {/* Dashboard pages should generally not be indexed by search engines */}
-        {seo?.noindex !== false && <meta name="robots" content="noindex, nofollow" />}
+        {seo?.noindex !== false && <meta name='robots' content='noindex, nofollow' />}
       </Head>
       <Banner />
       <HubSpotScript />
@@ -311,6 +313,7 @@ export default function DashboardShell({
           </Content>
         </Layout>
       </Layout>
+      <CookieConsent />
     </>
   )
 }

@@ -1,4 +1,5 @@
 import Banner from '@/components/Banner'
+import CookieConsent from '@/components/CookieConsent'
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
@@ -8,11 +9,11 @@ import HubSpotIdentification from '../HubSpotIdentification'
 import HubSpotScript from '../HubSpotScript'
 
 interface SEOProps {
-  title?: string;
-  description?: string;
-  ogImage?: string;
-  canonicalUrl?: string;
-  ogType?: string;
+  title?: string
+  description?: string
+  ogImage?: string
+  canonicalUrl?: string
+  ogType?: string
 }
 
 const HomepageShell = ({
@@ -21,31 +22,30 @@ const HomepageShell = ({
   children,
   seo,
 }: {
-  dontUseTitle?: boolean;
-  title?: ReactNode;
-  children?: ReactNode;
-  seo?: SEOProps;
+  dontUseTitle?: boolean
+  title?: ReactNode
+  children?: ReactNode
+  seo?: SEOProps
 }) => {
   useMaybeSignout()
 
-  const defaultTitle = 'Dotabod - Enhance Your Dota 2 Streaming Experience';
-  const defaultDescription = 'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!';
-  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`;
-  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`;
+  const defaultTitle = 'Dotabod - Enhance Your Dota 2 Streaming Experience'
+  const defaultDescription =
+    'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!'
+  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`
+  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
 
   // Use SEO props if provided, otherwise use defaults
-  const pageTitle = seo?.title || (title as string) || defaultTitle;
-  const pageDescription = seo?.description || defaultDescription;
-  const pageImage = seo?.ogImage || defaultOgImage;
-  const pageUrl = seo?.canonicalUrl || defaultUrl;
-  const pageType = seo?.ogType || 'website';
+  const pageTitle = seo?.title || (title as string) || defaultTitle
+  const pageDescription = seo?.description || defaultDescription
+  const pageImage = seo?.ogImage || defaultOgImage
+  const pageUrl = seo?.canonicalUrl || defaultUrl
+  const pageType = seo?.ogType || 'website'
 
   return (
     <>
       <Head>
-        {!dontUseTitle && (
-          <title>{pageTitle}</title>
-        )}
+        {!dontUseTitle && <title>{pageTitle}</title>}
         <meta name='title' content={pageTitle} />
         <meta name='description' content={pageDescription} />
         <meta
@@ -64,7 +64,7 @@ const HomepageShell = ({
         <meta property='twitter:description' content={pageDescription} />
         <meta property='twitter:image' content={pageImage} />
 
-        {seo?.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+        {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
       </Head>
 
       <Banner />
@@ -80,6 +80,7 @@ const HomepageShell = ({
         {children}
       </main>
       <Footer />
+      <CookieConsent />
     </>
   )
 }

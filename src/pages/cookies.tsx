@@ -1,7 +1,42 @@
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { showCookieConsentBanner, showCookieConsentSettings } from '@/lib/cookieManager'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { Button, Space } from 'antd'
+import Link from 'next/link'
 import type { ReactElement } from 'react'
+import { useEffect, useState } from 'react'
+
+// Simple component to manage cookie preferences via the banner
+const ManageCookiePreferences = () => {
+  const [isClient, setIsClient] = useState(false)
+
+  // Handle hydration issues
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) return null
+
+  return (
+    <div className='border border-gray-200 rounded-lg p-6 my-6 text-center'>
+      <h3 className='text-xl font-semibold mb-4'>Manage Your Cookie Preferences</h3>
+      <p className='text-sm mb-6'>
+        You can adjust your cookie preferences at any time. Click the button below to open the
+        cookie settings panel.
+      </p>
+
+      <Space direction='horizontal'>
+        <Button type='primary' size='large' onClick={showCookieConsentSettings}>
+          Open Cookie Settings
+        </Button>
+        <Button size='large' onClick={showCookieConsentBanner}>
+          Show Consent Banner
+        </Button>
+      </Space>
+    </div>
+  )
+}
 
 const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.com' }) => (
   <div className='max-w-4xl mx-auto p-6 font-sans'>
@@ -29,6 +64,15 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
         In some cases, we may use cookies to collect personal information, or that becomes personal
         information if we combine it with other information.
       </p>
+    </section>
+
+    {/* Direct Cookie Management */}
+    <section className='mb-6'>
+      <h2 className='text-xl font-semibold mb-2'>Manage Your Cookie Preferences</h2>
+      <p className='text-sm leading-relaxed'>
+        You can adjust your cookie preferences directly below. Changes will take effect immediately.
+      </p>
+      <ManageCookiePreferences />
     </section>
 
     {/* What are cookies? */}
@@ -492,6 +536,78 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
       </p>
     </section>
 
+    {/* Managing Your Cookie Preferences */}
+    <section className='mb-6'>
+      <h2 className='text-xl font-semibold mb-2'>How can I manage my cookie preferences?</h2>
+      <p className='text-sm leading-relaxed'>
+        We respect your right to privacy and provide you with control over your cookie preferences.
+        You can manage your cookie settings in several ways:
+      </p>
+
+      <h3 className='text-lg font-medium mt-4 mb-2'>On This Page</h3>
+      <p className='text-sm leading-relaxed'>
+        You can manage your cookie preferences directly on this page using the control panel above,
+        which will open the same cookie settings interface you see when first visiting our site.
+      </p>
+
+      <h3 className='text-lg font-medium mt-4 mb-2'>Cookie Consent Banner</h3>
+      <p className='text-sm leading-relaxed'>
+        When you first visit our website, you'll see a cookie consent banner that allows you to:
+      </p>
+      <ul className='list-disc pl-8 text-sm leading-relaxed mt-2'>
+        <li>Accept all cookies</li>
+        <li>Reject non-essential cookies</li>
+        <li>Customize your cookie preferences</li>
+      </ul>
+
+      <h3 className='text-lg font-medium mt-4 mb-2'>Dashboard Settings</h3>
+      <p className='text-sm leading-relaxed'>
+        If you have an account with us, you can also manage your cookie preferences through your
+        account dashboard:
+      </p>
+      <ol className='list-decimal pl-8 text-sm leading-relaxed mt-2'>
+        <li>Log in to your account</li>
+        <li>
+          Go to the{' '}
+          <Link href='/dashboard/data' className='text-blue-600 hover:underline'>
+            Data Management
+          </Link>{' '}
+          page
+        </li>
+        <li>Find the "Cookie Preferences" section</li>
+      </ol>
+
+      <h3 className='text-lg font-medium mt-4 mb-2'>Cookie Categories You Can Control</h3>
+      <p className='text-sm leading-relaxed'>
+        We group cookies into the following categories to make it easier for you to manage your
+        preferences:
+      </p>
+      <ul className='pl-8 text-sm leading-relaxed mt-2'>
+        <li>
+          <strong>Necessary Cookies:</strong> These cookies are essential for the website to
+          function properly and cannot be disabled.
+        </li>
+        <li>
+          <strong>Analytics Cookies:</strong> These cookies help us understand how visitors interact
+          with our website by collecting and reporting information anonymously.
+        </li>
+        <li>
+          <strong>Marketing Cookies:</strong> These cookies are used for personalized ads and
+          content. Note that our customer support chat will still work even if you disable marketing
+          cookies.
+        </li>
+        <li>
+          <strong>Preference Cookies:</strong> These cookies enable the website to remember
+          information that changes the way the website behaves or looks.
+        </li>
+      </ul>
+
+      <p className='text-sm leading-relaxed mt-4'>
+        Your preferences will be saved and respected across all your visits to our website. You can
+        change these preferences at any time.
+      </p>
+    </section>
+
     {/* Further Information */}
     <section className='mb-6'>
       <h2 className='text-xl font-semibold  mb-2'>Where can I get further information?</h2>
@@ -514,13 +630,18 @@ const CookiePolicyPage: NextPageWithLayout = () => {
 }
 
 CookiePolicyPage.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell
-    seo={{
-      title: 'Cookie Policy | Dotabod',
-      description: 'Learn about how Dotabod uses cookies and other tracking technologies to enhance your experience on our website.',
-      canonicalUrl: 'https://dotabod.com/cookies',
-    }}
-  >{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Cookie Policy | Dotabod',
+        description:
+          'Learn about how Dotabod uses cookies and other tracking technologies to enhance your experience on our website.',
+        canonicalUrl: 'https://dotabod.com/cookies',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default CookiePolicyPage

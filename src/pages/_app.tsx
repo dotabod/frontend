@@ -1,9 +1,12 @@
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { SessionProvider } from 'next-auth/react'
 
+import CookieConsent from '@/components/CookieConsent'
+import HubSpotScript from '@/components/HubSpotScript'
 import SentrySession from '@/components/SentrySession'
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
 import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
+import { useCookiePreferences } from '@/lib/cookieManager'
 import store from '@/lib/redux/store'
 import themeConfig from '@/lib/theme/themeConfig'
 import '@/styles/tailwind.css'
@@ -17,6 +20,7 @@ import 'focus-visible'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
+import Script from 'next/script'
 import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 
@@ -40,6 +44,8 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
   // Fix for hydration issues
   const [mounted, setMounted] = useState(false)
+  // Get cookie preferences
+  const { preferences: cookieConsent, hasConsented } = useCookiePreferences()
 
   useEffect(() => {
     setMounted(true)
@@ -49,8 +55,34 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   const content = (
     <ConfigProvider theme={themeConfig}>
       <SentrySession />
-      <VercelAnalytics />
-      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
+
+      {/* Only load Vercel Analytics if explicit consent has been given */}
+      {hasConsented && cookieConsent.analytics && <VercelAnalytics />}
+
+      {/* Only load Google Analytics if explicit consent has been given */}
+      {hasConsented && cookieConsent.analytics && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''} />
+      )}
+
+      {/* Google Tag Manager with consent mode - only load if consent has been given */}
+      {hasConsented && (
+        <Script id='gtm-consent-mode' strategy='afterInteractive'>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              'analytics_storage': '${cookieConsent.analytics ? 'granted' : 'denied'}',
+              'ad_storage': '${cookieConsent.marketing ? 'granted' : 'denied'}',
+              'functionality_storage': '${cookieConsent.necessary ? 'granted' : 'denied'}',
+              'personalization_storage': '${cookieConsent.preferences ? 'granted' : 'denied'}'
+            });
+          `}
+        </Script>
+      )}
+
+      {/* HubSpot component with built-in consent check */}
+      <HubSpotScript />
+
       <MantineProvider>
         <Provider store={store}>
           <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
@@ -63,7 +95,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
     <SessionProvider session={session}>
       <SubscriptionProviderMain>
         <SubscriptionProvider>
-          <StyleProvider cache={clientCache} hashPriority="high">
+          <StyleProvider cache={clientCache} hashPriority='high'>
             {mounted ? content : <div style={{ visibility: 'hidden' }}>{content}</div>}
           </StyleProvider>
         </SubscriptionProvider>

@@ -240,7 +240,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
         </p>
         <p>
           Like many businesses, we also collect information through cookies and similar
-          technologies. You can find out more about this in our Cookie Notice:
+          technologies. You can find out more about this in our Cookie Policy:
           <a href='https://dotabod.com/cookies' target='_blank' rel='noreferrer'>
             https://dotabod.com/cookies
           </a>
@@ -523,7 +523,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
         </p>
         <p>
           Specific information about how we use such technologies and how you can refuse certain
-          cookies is set out in our Cookie Notice:
+          cookies is set out in our Cookie Policy:
           <a href='https://dotabod.com/cookies' target='_blank' rel='noreferrer'>
             https://dotabod.com/cookies
           </a>
@@ -742,7 +742,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           Most Web browsers are set to accept cookies by default. If you prefer, you can usually
           choose to set your browser to remove cookies and to reject cookies. If you choose to
           remove cookies or reject cookies, this could affect certain features or services of our
-          Services. For further information, please see our Cookie Notice:
+          Services. For further information, please see our Cookie Policy:
           <a href='https://dotabod.com/cookies' target='_blank' rel='noreferrer'>
             https://dotabod.com/cookies
           </a>
@@ -1096,13 +1096,18 @@ const PrivacyPolicy: NextPageWithLayout = () => (
 )
 
 PrivacyPolicy.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell
-    seo={{
-      title: 'Privacy Policy | Dotabod',
-      description: 'Learn about how Dotabod collects, uses, and protects your personal information.',
-      canonicalUrl: 'https://dotabod.com/privacy-policy',
-    }}
-  >{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Privacy Policy | Dotabod',
+        description:
+          'Learn about how Dotabod collects, uses, and protects your personal information.',
+        canonicalUrl: 'https://dotabod.com/privacy-policy',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default PrivacyPolicy
