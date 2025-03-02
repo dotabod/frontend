@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Ensure return URL has explicit https:// scheme
-    const baseUrl = process.env.NEXTAUTH_URL || ''
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://dotabod.com'
     const returnUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`
 
     // Create customer portal session
