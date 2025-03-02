@@ -124,7 +124,8 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
                     key: 'name',
                     render: (text, record) => (
                       <span>
-                        {text} {record.pattern && <Tag color='blue'>Pattern</Tag>}
+                        {text}{' '}
+                        {'pattern' in record && record.pattern && <Tag color='blue'>Pattern</Tag>}
                       </span>
                     ),
                   },
@@ -173,7 +174,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
               title: 'Category',
               dataIndex: 'category',
               key: 'category',
-              filters: [...new Set(allCookies.map((c) => c.category))].map((cat) => ({
+              filters: Array.from(new Set(allCookies.map((c) => c.category))).map((cat) => ({
                 text: cat,
                 value: cat,
               })),
