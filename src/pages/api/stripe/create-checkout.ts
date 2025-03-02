@@ -183,10 +183,10 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
   } = params
 
   const baseUrl = process.env.NEXTAUTH_URL ?? ''
-  const successUrl = `${baseUrl}/dashboard?paid=true&trial=${isRecurring}`
+  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${isRecurring}`
   const cancelUrl = referer?.includes('/dashboard')
-    ? `${baseUrl}/dashboard/billing?paid=false`
-    : `${baseUrl}/?paid=false`
+    ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
+    : `${baseUrl || 'https://dotabod.com'}/?paid=false`
 
   // Calculate trial period based on grace period
   const now = new Date()
