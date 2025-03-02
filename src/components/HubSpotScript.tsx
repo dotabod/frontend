@@ -5,57 +5,32 @@ import { useEffect } from 'react'
 const HubSpotScript = () => {
   const { preferences, hasConsented } = useCookiePreferences()
 
-  // Chat functionality should always be available, but tracking requires marketing consent
-  const enableTracking = hasConsented && preferences.marketing
-
-  // Initialize HubSpot settings via useEffect
+  // Initialize HubSpot settings via useEffect to avoid dangerouslySetInnerHTML
   useEffect(() => {
-    // Initialize HubSpot tracking object (needed for both chat and tracking)
+    // Initialize HubSpot tracking object
     window._hsq = window._hsq || []
 
     // Create a queue for callbacks when HubSpot conversations is ready
     window.hsConversationsOnReady = window.hsConversationsOnReady || []
 
-    // Set minimal settings to ensure chat widget loads
+    // Set minimal settings to ensure widget loads
     window.hsConversationsSettings = {
       loadImmediately: true,
+      // Always enable identification regardless of cookie preferences
+      identificationEnabled: true,
     }
 
-    // If user has loaded the page and made a choice about cookies
-    if (hasConsented) {
-      // Configure HubSpot tracking based on user preferences
-      if (window.HubSpotConsentConfig) {
-        window.HubSpotConsentConfig.setTrackingCookiesAllowed(preferences.marketing)
-      }
-
-      // If tracking is not allowed, push privacy settings to HubSpot
-      if (!preferences.marketing) {
-        window._hsq.push(['doNotTrack', true])
-      }
+    // If user has made a choice about cookies and doesn't want marketing
+    if (hasConsented && !preferences.marketing) {
+      // Use doNotTrack with the correct parameters to disable tracking but keep identification
+      // According to docs: doNotTrack can take an object parameter { track: true, identify: false }
+      // This disables tracking but allows identification
+      window._hsq.push(['doNotTrack', { track: true, identify: false }])
     }
   }, [hasConsented, preferences.marketing])
 
   return (
-    <>
-      {/* Always load the HubSpot script for chat functionality */}
-      <Script
-        id='hs-script'
-        strategy='afterInteractive'
-        src='//js-na1.hs-scripts.com/39771134.js'
-        onLoad={() => {
-          // Once script is loaded, configure tracking consent
-          if (window.HubSpotConsentConfig) {
-            window.HubSpotConsentConfig.setTrackingCookiesAllowed(enableTracking)
-          }
-
-          // If tracking is not allowed, push privacy settings to HubSpot
-          if (!enableTracking) {
-            window._hsq = window._hsq || []
-            window._hsq.push(['doNotTrack', true])
-          }
-        }}
-      />
-    </>
+    <Script id='hs-script' strategy='afterInteractive' src='//js-na1.hs-scripts.com/39771134.js' />
   )
 }
 

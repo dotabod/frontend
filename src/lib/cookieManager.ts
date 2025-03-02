@@ -179,38 +179,6 @@ export const useCookiePreferences = () => {
     }
 
     setLoaded(true)
-
-    // Set up periodic check for new cookies
-    const cookieCheckInterval = setInterval(() => {
-      if (document.cookie && savedPreferences) {
-        try {
-          const parsedPrefs = JSON.parse(savedPreferences) as CookiePreferences
-          // Re-apply preferences to remove any cookies that might have been added
-          applyPreferences(parsedPrefs)
-        } catch (e) {
-          console.error('Error re-applying cookie preferences', e)
-        }
-      }
-    }, 2000) // Check every 2 seconds
-
-    // Also re-apply preferences before page unload
-    const handleBeforeUnload = () => {
-      if (savedPreferences) {
-        try {
-          const parsedPrefs = JSON.parse(savedPreferences) as CookiePreferences
-          applyPreferences(parsedPrefs)
-        } catch (e) {
-          console.error('Error re-applying cookie preferences on unload', e)
-        }
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      clearInterval(cookieCheckInterval)
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
   }, [])
 
   const updatePreferences = useCallback((newPreferences: CookiePreferences) => {
