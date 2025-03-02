@@ -1,8 +1,3 @@
-import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
-import { SessionProvider } from 'next-auth/react'
-
-import CookieConsent from '@/components/CookieConsent'
-import HubSpotScript from '@/components/HubSpotScript'
 import SentrySession from '@/components/SentrySession'
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
 import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
@@ -14,11 +9,13 @@ import { StyleProvider, createCache } from '@ant-design/cssinjs'
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { App as AntProvider, ConfigProvider } from 'antd'
 import 'antd/dist/reset.css'
 import 'focus-visible'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
+import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
 import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
@@ -79,9 +76,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
           `}
         </Script>
       )}
-
-      {/* HubSpot component with built-in consent check */}
-      <HubSpotScript />
 
       <MantineProvider>
         <Provider store={store}>
