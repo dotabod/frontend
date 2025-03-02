@@ -3,13 +3,32 @@ import Header from '@/components/Dashboard/Header'
 import { fetcher } from '@/lib/fetcher'
 import { Card } from '@/ui/card'
 import { MessageOutlined } from '@ant-design/icons'
-import { Alert, Button, type StepProps, Steps, type StepsProps, Tag } from 'antd'
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  type StepProps,
+  Steps,
+  type StepsProps,
+  Tag,
+  message,
+} from 'antd'
+import axios from 'axios'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
 import type React from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { useState } from 'react'
 import useSWR from 'swr'
+
+// Define form values interface
+interface FormValues {
+  email: string
+  message: string
+  subject: string
+}
 
 export const StepComponent: React.FC<{
   steps: ReactNode[]
@@ -190,17 +209,64 @@ const faqs = [
 ]
 
 const TroubleshootPage = () => {
+  const session = useSession()
   const { data } = useSWR('/api/settings', fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   })
   const isLive = data?.stream_online
+  const [form] = Form.useForm()
+  const [submitting, setSubmitting] = useState(false)
 
   // Function to open HubSpot chat widget
   const openChatWidget = () => {
     if (window.HubSpotConversations) {
       window.HubSpotConversations.widget.open()
+    }
+  }
+
+  // Function to handle form submission to HubSpot
+  const handleSubmit = async (values: FormValues) => {
+    setSubmitting(true)
+    try {
+      // HubSpot API endpoint for form submissions
+      const hubspotEndpoint =
+        'https://api.hsforms.com/submissions/v3/integration/submit/39771134/a394f067-5026-42bd-8e2d-c556ffd6499f'
+
+      // Prepare the data for HubSpot
+      const data = {
+        fields: [
+          {
+            name: 'email',
+            value: session.data?.user?.email || session.data?.user?.name,
+          },
+          {
+            name: 'TICKET.subject',
+            value: 'Troubleshooting',
+          },
+          {
+            name: 'TICKET.content',
+            value: values.message || '',
+          },
+        ],
+        context: {
+          pageUri: window.location.href,
+          pageName: 'Dotabod Troubleshooting',
+        },
+      }
+
+      // Submit to HubSpot
+      await axios.post(hubspotEndpoint, data)
+
+      // Show success message
+      message.success('Your message has been sent! We will get back to you soon.')
+      form.resetFields(['message'])
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      message.error('There was an error submitting your message. Please try again.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -223,7 +289,30 @@ const TroubleshootPage = () => {
           />
         )}
       </div>
-      <div className='mt-12 lg:col-span-2 lg:mt-0'>
+
+      {/* Ant Design Form replacing HubSpot embedded form */}
+      <div className='mt-8 max-w-2xl mb-12'>
+        <Card>
+          <h2 className='text-lg font-medium mb-4'>Need help? Send us a message</h2>
+          <Form form={form} layout='vertical' onFinish={handleSubmit}>
+            <Form.Item
+              name='message'
+              label='Message'
+              rules={[{ required: true, message: 'Please enter your message' }]}
+            >
+              <Input.TextArea placeholder="Describe the issue you're experiencing..." rows={4} />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type='primary' htmlType='submit' loading={submitting}>
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
+
+      <div className='lg:col-span-2'>
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
           {faqs.map(
             (faq) =>
