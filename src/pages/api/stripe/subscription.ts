@@ -7,13 +7,22 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions)
-    if (!session?.user?.id) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
+
+    // Prevent impersonation
     if (session?.user?.isImpersonating) {
       return res.status(403).json({ message: 'Unauthorized' })
     }
-    const subscription = await getSubscription(session.user.id)
+
+    // Get the effective user ID
+    const userId = req.query.id as string | undefined
+    const userIdToUse = userId || session?.user?.id
+
+    // Check for authentication
+    if (!userIdToUse) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const subscription = await getSubscription(userIdToUse)
     if (!subscription) {
       return res.status(200).json({
         tier: SUBSCRIPTION_TIERS.FREE,
