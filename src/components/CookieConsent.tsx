@@ -6,7 +6,19 @@ import {
   showCookieConsentSettings,
   useCookiePreferences,
 } from '@/lib/cookieManager'
-import { Alert, Button, Checkbox, Divider, Drawer, Space, Table, Tabs, Typography } from 'antd'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Collapse,
+  Divider,
+  Drawer,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -232,6 +244,104 @@ const privacyPolicies = [
   },
 ]
 
+// Define cookie categories and their descriptions
+const cookieCategories = {
+  necessary: {
+    title: 'Necessary',
+    description:
+      'These cookies are required for the website to function properly and cannot be disabled.',
+    cookies: [
+      {
+        name: 'cookie_preferences',
+        domain: 'current',
+        description: 'Stores your cookie consent preferences',
+        expiry: '1 year',
+        type: 'necessary',
+      },
+      {
+        name: 'next-auth.session-token',
+        domain: 'current',
+        description: 'Authentication session token',
+        expiry: 'Session',
+        type: 'necessary',
+      },
+    ],
+  },
+  analytics: {
+    title: 'Analytics',
+    description:
+      'These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.',
+    cookies: [
+      {
+        name: '_ga',
+        domain: '.dotabod.com',
+        description: 'Google Analytics cookie used to distinguish users',
+        expiry: '2 years',
+        type: 'analytics',
+      },
+      {
+        name: '_ga_*',
+        domain: '.dotabod.com',
+        description: 'Google Analytics cookie used to persist session state',
+        expiry: '2 years',
+        type: 'analytics',
+        pattern: true,
+      },
+    ],
+  },
+  marketing: {
+    title: 'Marketing',
+    description:
+      'These cookies are used to track visitors across websites to display relevant advertisements.',
+    cookies: [
+      {
+        name: 'hubspotutk',
+        domain: '.dotabod.com',
+        description: 'HubSpot cookie used to track visitors across HubSpot sites',
+        expiry: '13 months',
+        type: 'marketing',
+      },
+      {
+        name: '__hssc',
+        domain: '.dotabod.com',
+        description: 'HubSpot cookie for session tracking',
+        expiry: '30 minutes',
+        type: 'marketing',
+      },
+      {
+        name: '__hssrc',
+        domain: '.dotabod.com',
+        description: 'HubSpot cookie to determine if the user has restarted their browser',
+        expiry: 'Session',
+        type: 'marketing',
+      },
+      {
+        name: '__hstc',
+        domain: '.dotabod.com',
+        description: 'HubSpot main cookie for tracking visitors',
+        expiry: '13 months',
+        type: 'marketing',
+      },
+    ],
+  },
+  preferences: {
+    title: 'Preferences',
+    description: 'These cookies enable personalized features and functionality on our website.',
+    cookies: [
+      {
+        name: 'theme',
+        domain: 'current',
+        description: 'Stores your theme preference (light/dark)',
+        expiry: '1 year',
+        type: 'preferences',
+      },
+    ],
+  },
+}
+
+// Export the cookie categories for use in other components
+export const getCookieCategories = () => cookieCategories
+
 const CookieConsent = () => {
   const [visible, setVisible] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -344,28 +454,20 @@ const CookieConsent = () => {
               <Paragraph>
                 <strong>Your privacy matters to us.</strong> This website uses cookies to enhance
                 your browsing experience. We only use strictly necessary cookies by default, which
-                are essential for the website to function properly.
+                are essential for the website to function properly. For analytics, marketing, and
+                preference cookies, we need your explicit consent. No non-essential cookies are set
+                until you provide consent. For more information, please read our{' '}
+                <Link href='/cookies'>Cookie Policy</Link>.
               </Paragraph>
-              <Paragraph>
-                For analytics, marketing, and preference cookies, we need your explicit consent. No
-                non-essential cookies are set until you provide consent.
-              </Paragraph>
-              <Space direction='vertical' style={{ width: '100%' }}>
-                <Space>
-                  <Button type='primary' onClick={handleAcceptAll} size='large'>
-                    Accept All Cookies
-                  </Button>
-                  <Button onClick={handleRejectAll} size='large'>
-                    Reject Non-Essential Cookies
-                  </Button>
-                </Space>
+              <Space style={{ width: '100%' }}>
+                <Button type='primary' onClick={handleAcceptAll}>
+                  Accept All Cookies
+                </Button>
+                <Button onClick={handleRejectAll}>Reject Non-Essential Cookies</Button>
                 <Button type='link' onClick={handleManagePreferences}>
                   Customize Cookie Preferences
                 </Button>
               </Space>
-              <Paragraph style={{ marginTop: 12, fontSize: '0.9rem' }}>
-                For more information, please read our <Link href='/cookies'>Cookie Policy</Link>.
-              </Paragraph>
             </div>
           }
           showIcon
@@ -414,112 +516,70 @@ const CookieConsent = () => {
 
           <Divider />
 
-          <div style={{ marginBottom: '16px' }}>
-            <Checkbox checked={preferences.necessary} disabled>
-              <Text strong>Strictly Necessary Cookies</Text>{' '}
-              <Text type='secondary'>(Mandatory - cannot be deselected)</Text>
-            </Checkbox>
-            <Paragraph style={{ marginLeft: '24px' }}>
-              These cookies are essential for the website to function properly. They enable basic
-              functions like page navigation, secure login, and access to secure areas of the
-              website. The website cannot function properly without these cookies.
-            </Paragraph>
-          </div>
+          {/* Cookie categories */}
+          <div>
+            {Object.entries(cookieCategories).map(([key, category]) => (
+              <div key={key} style={{ marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <Checkbox
+                    checked={preferences[key as keyof CookiePreferences]}
+                    onChange={handlePreferenceChange(key as keyof CookiePreferences)}
+                    disabled={key === 'necessary'} // Necessary cookies can't be disabled
+                  />
+                  <Title level={5} style={{ margin: '0 0 0 8px' }}>
+                    {category.title} Cookies
+                  </Title>
+                </div>
+                <Paragraph style={{ marginLeft: '24px' }}>{category.description}</Paragraph>
 
-          <div style={{ marginBottom: '16px' }}>
-            <Checkbox
-              checked={preferences.analytics}
-              onChange={handlePreferenceChange('analytics')}
-            >
-              <Text strong>Statistics Cookies</Text>
-            </Checkbox>
-            <Paragraph style={{ marginLeft: '24px' }}>
-              These cookies help us understand how visitors interact with our website by collecting
-              and reporting information anonymously. They help us improve our website and services.
-            </Paragraph>
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <Checkbox
-              checked={preferences.marketing}
-              onChange={handlePreferenceChange('marketing')}
-            >
-              <Text strong>Marketing Cookies</Text>
-            </Checkbox>
-            <Paragraph style={{ marginLeft: '24px' }}>
-              These cookies are used to track visitors across websites and collect information to
-              provide customized ads and content based on your interests and online behavior.
-            </Paragraph>
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <Checkbox
-              checked={preferences.preferences}
-              onChange={handlePreferenceChange('preferences')}
-            >
-              <Text strong>Preference Cookies</Text>
-            </Checkbox>
-            <Paragraph style={{ marginLeft: '24px' }}>
-              These cookies enable the website to remember information that changes the way the
-              website behaves or looks, like your preferred language or the region you are in.
-            </Paragraph>
-          </div>
-
-          <Divider />
-
-          <Title level={5}>Detailed Cookie Information</Title>
-          <Tabs defaultActiveKey='necessary'>
-            <TabPane tab={`Necessary (${cookieInfo.necessary.length})`} key='necessary'>
-              <Table
-                dataSource={cookieInfo.necessary}
-                columns={columns}
-                rowKey='name'
-                pagination={false}
-                size='small'
-              />
-            </TabPane>
-            <TabPane tab={`Statistics (${cookieInfo.statistics.length})`} key='statistics'>
-              <Table
-                dataSource={cookieInfo.statistics}
-                columns={columns}
-                rowKey='name'
-                pagination={false}
-                size='small'
-              />
-            </TabPane>
-            <TabPane tab={`Marketing (${cookieInfo.advertising.length})`} key='marketing'>
-              <Table
-                dataSource={cookieInfo.advertising}
-                columns={columns}
-                rowKey='name'
-                pagination={false}
-                size='small'
-              />
-            </TabPane>
-            <TabPane tab={`Preferences (${cookieInfo.preferences.length})`} key='preferences'>
-              <Table
-                dataSource={cookieInfo.preferences}
-                columns={columns}
-                rowKey='name'
-                pagination={false}
-                size='small'
-              />
-            </TabPane>
-          </Tabs>
-
-          <Divider />
-
-          <Title level={5}>Third-Party Privacy Policies</Title>
-          <ul>
-            {privacyPolicies.map((policy) => (
-              <li key={`${policy.provider}-${policy.domain}`}>
-                <a href={policy.url} target='_blank' rel='noopener noreferrer'>
-                  {policy.provider}'s privacy policy
-                </a>{' '}
-                (for cookies from {policy.domain})
-              </li>
+                {/* Cookie details collapsible panel */}
+                <Collapse
+                  style={{ marginLeft: '24px', marginBottom: '16px' }}
+                  items={[
+                    {
+                      key: `${key}-cookies`,
+                      label: `View ${category.cookies.length} cookie${category.cookies.length !== 1 ? 's' : ''}`,
+                      children: (
+                        <Table
+                          dataSource={category.cookies}
+                          columns={[
+                            {
+                              title: 'Name',
+                              dataIndex: 'name',
+                              key: 'name',
+                              render: (text, record) => (
+                                <span>
+                                  {text} {record.pattern && <Tag color='blue'>Pattern</Tag>}
+                                </span>
+                              ),
+                            },
+                            {
+                              title: 'Domain',
+                              dataIndex: 'domain',
+                              key: 'domain',
+                              render: (text) => (text === 'current' ? 'This website' : text),
+                            },
+                            {
+                              title: 'Description',
+                              dataIndex: 'description',
+                              key: 'description',
+                            },
+                            {
+                              title: 'Expiry',
+                              dataIndex: 'expiry',
+                              key: 'expiry',
+                            },
+                          ]}
+                          pagination={false}
+                          size='small'
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </Drawer>
     </>
