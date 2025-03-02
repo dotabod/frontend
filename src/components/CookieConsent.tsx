@@ -549,7 +549,10 @@ const CookieConsent = () => {
                               key: 'name',
                               render: (text, record) => (
                                 <span>
-                                  {text} {record.pattern && <Tag color='blue'>Pattern</Tag>}
+                                  {text}{' '}
+                                  {'pattern' in record && record.pattern && (
+                                    <Tag color='blue'>Pattern</Tag>
+                                  )}
                                 </span>
                               ),
                             },
