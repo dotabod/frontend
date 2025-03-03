@@ -67,6 +67,10 @@ const AdminPage = () => {
     fetchMessages()
   }, [session?.user?.role, status, router.push])
 
+  if (!session?.user?.role?.includes('admin')) {
+    return null
+  }
+
   const fetchMessages = async () => {
     try {
       setLoading(true)
