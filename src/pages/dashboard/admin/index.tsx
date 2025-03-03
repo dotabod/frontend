@@ -506,16 +506,6 @@ const AdminPage = () => {
     },
   ]
 
-  if (status === 'loading' || loading) {
-    return (
-      <Spin>
-        <Title level={2} style={{ marginBottom: 24 }}>
-          Admin Panel - Scheduled Messages
-        </Title>
-      </Spin>
-    )
-  }
-
   if (!session?.user?.role || !session.user.role.includes('admin')) {
     return null
   }
