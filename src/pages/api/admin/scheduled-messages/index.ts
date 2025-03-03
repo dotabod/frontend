@@ -1,84 +1,127 @@
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { captureException } from '@sentry/nextjs'
+import type { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-
-  // Check if user is authenticated and has admin role
-  if (!session?.user?.id || !session.user.role || !session.user.role.includes('admin')) {
-    return res.status(403).json({ message: 'Forbidden' })
+  if (!session || !session.user || !session.user.role.includes('admin')) {
+    return res.status(401).json({ error: 'Unauthorized' })
   }
 
-  // Handle GET request - retrieve scheduled messages
   if (req.method === 'GET') {
-    try {
-      const messages = await prisma.scheduledMessage.findMany({
-        orderBy: {
-          createdAt: 'desc',
+    const scheduledMessages = await prisma.scheduledMessage.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
         },
-      })
+        deliveries: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
 
-      return res.status(200).json(messages)
-    } catch (error) {
-      console.error('Error fetching scheduled messages:', error)
-      captureException(error)
-      return res.status(500).json({ message: 'Failed to fetch scheduled messages' })
-    }
-  }
+    // Get total user count for percentage calculations
+    const totalUsers = await prisma.user.count()
 
-  // Handle POST request - create a new scheduled message
-  if (req.method === 'POST') {
-    const { message, scheduledAt } = req.body
-
-    if (!message || typeof message !== 'string' || !message.trim()) {
-      return res.status(400).json({ message: 'Message is required' })
-    }
-
-    try {
-      // If scheduledAt is null, send the message immediately
-      if (!scheduledAt) {
-        // Create a record of the sent message
-        const scheduledMessage = await prisma.scheduledMessage.create({
-          data: {
-            message,
-            status: 'PENDING',
-            sentAt: new Date(),
-            userId: session.user.id,
+    const messagesWithStats = await Promise.all(
+      scheduledMessages.map(async (message) => {
+        const deliveryStats = await prisma.messageDelivery.groupBy({
+          by: ['status'],
+          where: {
+            scheduledMessageId: message.id,
+          },
+          _count: {
+            status: true,
           },
         })
 
-        return res.status(200).json({
-          message: 'Message scheduled successfully',
-          scheduledMessage,
-        })
-      }
+        const stats = {
+          delivered: 0,
+          pending: 0,
+          cancelled: 0,
+        }
 
-      // Otherwise, schedule the message for later
-      const scheduledMessage = await prisma.scheduledMessage.create({
-        data: {
-          message,
-          scheduledAt: new Date(scheduledAt),
-          userId: session.user.id,
-        },
-      })
+        for (const stat of deliveryStats) {
+          stats[stat.status as keyof typeof stats] = Number(stat._count.status)
+        }
 
-      return res.status(200).json({
-        message: 'Message scheduled successfully',
-        scheduledMessage,
-      })
-    } catch (error) {
-      console.error('Error scheduling message:', error)
-      captureException(error)
-      return res.status(500).json({ message: 'Failed to schedule message' })
-    }
+        const targetUserCount = message.isForAllUsers ? totalUsers : 1
+
+        return {
+          ...message,
+          deliveryStats: {
+            ...stats,
+            totalTargetUsers: targetUserCount,
+            deliveredPercent: Math.round((stats.delivered / targetUserCount) * 100),
+            pendingPercent: Math.round((stats.pending / targetUserCount) * 100),
+            cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
+          },
+        }
+      }),
+    )
+
+    return res.status(200).json(messagesWithStats)
   }
 
-  return res.status(405).json({ message: 'Method not allowed' })
-}
+  if (req.method === 'POST') {
+    const { message, sendAt, userId, isForAllUsers, scheduledAt } = req.body
 
-export default withMethods(['GET', 'POST'], withAuthentication(handler))
+    if (!message || !sendAt) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    if (!isForAllUsers && !userId) {
+      return res.status(400).json({ error: 'Either userId or isForAllUsers must be provided' })
+    }
+
+    // If we have a userId and it's not for all users, we need to find the actual user ID
+    // from the accounts table using the provider account ID
+    let actualUserId: string | null = null
+    if (!isForAllUsers && userId) {
+      try {
+        // Find the user associated with this provider account ID (from Twitch)
+        const account = await prisma.account.findFirst({
+          where: {
+            providerAccountId: userId,
+          },
+          select: {
+            userId: true,
+          },
+        })
+
+        if (!account) {
+          return res.status(404).json({ error: 'User not found with the provided account ID' })
+        }
+
+        actualUserId = account.userId
+      } catch (error) {
+        console.error('Error finding user by provider account ID:', error)
+        return res.status(500).json({ error: 'Failed to process user ID' })
+      }
+    }
+
+    // Create the scheduled message with the correct user ID
+    const createData: Prisma.ScheduledMessageUncheckedCreateInput = {
+      message,
+      sendAt: new Date(sendAt),
+      userId: isForAllUsers ? null : actualUserId,
+      isForAllUsers,
+      status: 'PENDING',
+    }
+
+    const scheduledMessage = await prisma.scheduledMessage.create({
+      data: createData,
+    })
+
+    return res.status(201).json(scheduledMessage)
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' })
+}

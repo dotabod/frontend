@@ -64,6 +64,7 @@ model User {
   SteamAccount                      SteamAccount[]
   streams                           streams?
   subscription                      Subscription[]
+  MessageDelivery                   MessageDelivery[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -221,23 +222,6 @@ model WebhookEvent {
   processedAt   DateTime
 }
 
-model ScheduledMessage {
-  id          String        @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @default(now()) @map("updated_at")
-  message     String
-  scheduledAt DateTime?     @map("scheduled_at")
-  sentAt      DateTime?     @map("sent_at")
-  status      MessageStatus @default(PENDING)
-  userId      String        @map("user_id")
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([status])
-  @@index([scheduledAt])
-  @@map("scheduled_messages")
-}
-
 enum SubscriptionStatus {
   ACTIVE
   CANCELED
@@ -263,4 +247,39 @@ enum MessageStatus {
   PENDING
   DELIVERED
   FAILED
+  CANCELLED
+}
+
+model ScheduledMessage {
+  id            String            @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  message       String
+  sendAt        DateTime
+  userId        String?
+  user          User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isForAllUsers Boolean           @default(false)
+  status        MessageStatus     @default(PENDING)
+  deliveries    MessageDelivery[]
+
+  @@index([sendAt])
+  @@index([status])
+  @@index([userId])
+}
+
+model MessageDelivery {
+  id                 String           @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  scheduledMessageId String
+  scheduledMessage   ScheduledMessage @relation(fields: [scheduledMessageId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status             MessageStatus    @default(PENDING)
+  deliveredAt        DateTime?
+
+  @@unique([scheduledMessageId, userId])
+  @@index([scheduledMessageId])
+  @@index([userId])
+  @@index([status])
 }

@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev": "doppler run -- next dev --turbopack",
+    "dev": "doppler run -- next dev",
     "pull": "doppler run -- bun prisma db pull",
     "push": "doppler run -- bun prisma db push",
     "studio": "doppler run -- bun prisma studio",

@@ -1,20 +1,29 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { DeleteOutlined } from '@ant-design/icons'
+import UserSelector from '@/components/Dashboard/UserSelector'
+import { Card } from '@/ui/card'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import type { ScheduledMessage } from '@prisma/client'
 import type { TabsProps } from 'antd'
 import {
   Button,
-  Card,
+  Checkbox,
   DatePicker,
   Form,
   Input,
+  Modal,
+  Progress,
   Radio,
+  Space,
   Spin,
   Table,
   Tabs,
+  Tooltip,
   Typography,
   message,
 } from 'antd'
-import dayjs from 'dayjs'
+import type { ColumnsType } from 'antd/es/table'
+import { format } from 'date-fns'
+import type dayjs from 'dayjs'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -22,19 +31,13 @@ import { useEffect, useState } from 'react'
 const { Title } = Typography
 const { TextArea } = Input
 
-type ScheduledMessage = {
-  id: string
-  message: string
-  scheduledAt: string | null
-  sentAt: string | null
-  status: 'pending' | 'delivered' | 'failed'
-  createdAt: string
-}
-
 interface FormValues {
   message: string
-  messageType: 'when_online' | 'scheduled'
+  messageType?: 'when_online' | 'scheduled'
   scheduledDate?: dayjs.Dayjs
+  sendAt: string | dayjs.Dayjs | Date
+  userId?: string
+  isForAllUsers: boolean
 }
 
 const AdminPage = () => {
@@ -44,6 +47,14 @@ const AdminPage = () => {
   const [messages, setMessages] = useState<ScheduledMessage[]>([])
   const [messageType, setMessageType] = useState<'when_online' | 'scheduled'>('when_online')
   const [form] = Form.useForm()
+  const [openDialog, setOpenDialog] = useState(false)
+  const [editingMessage, setEditingMessage] = useState<ScheduledMessage | null>(null)
+  const [formData, setFormData] = useState({
+    message: '',
+    sendAt: '',
+    userId: '',
+    isForAllUsers: false,
+  })
 
   useEffect(() => {
     if (status === 'loading') return
@@ -71,24 +82,38 @@ const AdminPage = () => {
   }
 
   const handleSubmit = async (values: FormValues) => {
+    console.log('Form values submitted:', values)
     if (!values.message.trim()) {
       message.error('Message cannot be empty')
       return
     }
+
+    // Validate userId if not sending to all users
+    if (!values.isForAllUsers && !values.userId) {
+      message.error('Please select a user')
+      return
+    }
+
     setLoading(true)
     try {
+      const payload = {
+        message: values.message,
+        isForAllUsers: values.isForAllUsers || false,
+        userId: values.isForAllUsers ? null : values.userId,
+        sendAt:
+          values.messageType === 'scheduled' && values.scheduledDate
+            ? values.scheduledDate.format('YYYY-MM-DDTHH:mm:ss')
+            : new Date(Date.now() + 3600000).toISOString(), // Default to 1 hour from now if not scheduled
+      }
+
+      console.log('Payload being sent:', payload)
+
       const response = await fetch('/api/admin/scheduled-messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: values.message,
-          scheduledAt:
-            values.messageType === 'scheduled' && values.scheduledDate
-              ? values.scheduledDate.format('YYYY-MM-DDTHH:mm:ss')
-              : null,
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
@@ -108,25 +133,110 @@ const AdminPage = () => {
     }
   }
 
-  const handleDeleteMessage = async (id: string) => {
-    try {
-      const response = await fetch(`/api/admin/scheduled-messages/${id}`, {
-        method: 'DELETE',
+  const handleOpenDialog = (message: ScheduledMessage | null) => {
+    if (message) {
+      setEditingMessage(message)
+      form.setFieldsValue({
+        message: message.message,
+        sendAt: message.sendAt,
+        userId: message.userId || '',
+        isForAllUsers: message.isForAllUsers,
       })
+    } else {
+      setEditingMessage(null)
+      form.setFieldsValue({
+        message: '',
+        sendAt: new Date(Date.now() + 3600000), // Default to 1 hour from now
+        userId: '',
+        isForAllUsers: false,
+      })
+    }
+    setOpenDialog(true)
+  }
 
-      if (!response.ok) {
-        throw new Error('Failed to delete message')
+  const handleCloseDialog = () => {
+    setOpenDialog(false)
+    setEditingMessage(null)
+    // Reset the form completely to ensure UserSelector is properly cleared
+    form.resetFields()
+  }
+
+  const handleSubmitDialog = async (values: FormValues) => {
+    try {
+      console.log('Dialog form values:', values)
+
+      // Validate userId if not sending to all users
+      if (!values.isForAllUsers && !values.userId) {
+        message.error('Please select a user')
+        return
       }
 
-      message.success('Message deleted successfully')
+      // Convert sendAt to ISO string, handling different possible types
+      let sendAtISOString: string
+      if (typeof values.sendAt === 'string') {
+        sendAtISOString = new Date(values.sendAt).toISOString()
+      } else {
+        // Default to current time if we can't parse the date
+        sendAtISOString = new Date().toISOString()
+      }
+
+      const formData = {
+        message: values.message,
+        isForAllUsers: values.isForAllUsers || false,
+        userId: values.isForAllUsers ? null : values.userId,
+        sendAt: sendAtISOString,
+      }
+
+      console.log('Dialog payload being sent:', formData)
+
+      if (editingMessage) {
+        // Update existing message
+        await fetch(`/api/admin/scheduled-messages/${editingMessage.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+      } else {
+        // Create new message
+        await fetch('/api/admin/scheduled-messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+      }
+
+      message.success(`Message ${editingMessage ? 'updated' : 'created'} successfully`)
+      handleCloseDialog()
       fetchMessages()
     } catch (error) {
-      message.error('Failed to delete message')
-      console.error(error)
+      console.error('Error saving scheduled message:', error)
+      message.error('Failed to save message')
     }
   }
 
-  const columns = [
+  const handleDelete = async (id: string) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this scheduled message?',
+      onOk: async () => {
+        try {
+          await fetch(`/api/admin/scheduled-messages/${id}`, {
+            method: 'DELETE',
+          })
+          fetchMessages()
+        } catch (error) {
+          console.error('Error deleting scheduled message:', error)
+        }
+      },
+    })
+  }
+
+  const columns: ColumnsType<ScheduledMessage> = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      ellipsis: true,
+    },
     {
       title: 'Message',
       dataIndex: 'message',
@@ -134,47 +244,82 @@ const AdminPage = () => {
       ellipsis: true,
     },
     {
+      title: 'Send At',
+      dataIndex: 'sendAt',
+      key: 'sendAt',
+      render: (text) => format(new Date(text), 'PPpp'),
+    },
+    {
+      title: 'Recipient',
+      key: 'recipient',
+      render: (_, record) => (record.isForAllUsers ? 'All Users' : record.userId || 'Unknown'),
+    },
+    {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) => {
-        const colorMap: Record<string, string> = {
-          pending: 'blue',
-          delivered: 'green',
-          failed: 'red',
-        }
+    },
+    {
+      title: 'Delivery Status',
+      key: 'deliveryStats',
+      render: (_, record) => {
+        const stats = (
+          record as {
+            deliveryStats?: {
+              delivered: number
+              pending: number
+              cancelled: number
+              totalTargetUsers: number
+              deliveredPercent: number
+              pendingPercent: number
+              cancelledPercent: number
+            }
+          }
+        ).deliveryStats
+        if (!stats) return 'N/A'
+
         return (
-          <span style={{ color: colorMap[status] || 'default' }}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </span>
+          <Space direction='vertical' style={{ width: '100%' }}>
+            <Tooltip title={`Delivered: ${stats.delivered}/${stats.totalTargetUsers}`}>
+              <Progress
+                percent={stats.deliveredPercent}
+                size='small'
+                status='success'
+                showInfo={false}
+              />
+            </Tooltip>
+            <Space>
+              <Typography.Text>{stats.deliveredPercent}% delivered</Typography.Text>
+              <Tooltip title={`Pending: ${stats.pending}/${stats.totalTargetUsers}`}>
+                <Typography.Text type='warning'>{stats.pendingPercent}% pending</Typography.Text>
+              </Tooltip>
+              <Tooltip title={`Cancelled: ${stats.cancelled}/${stats.totalTargetUsers}`}>
+                <Typography.Text type='danger'>{stats.cancelledPercent}% cancelled</Typography.Text>
+              </Tooltip>
+            </Space>
+          </Space>
         )
       },
     },
     {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (date: string) => (date ? dayjs(date).format('MMM D, YYYY HH:mm') : 'N/A'),
-    },
-    {
-      title: 'Scheduled For',
-      dataIndex: 'scheduledAt',
-      key: 'scheduledAt',
-      render: (date: string) => (date ? dayjs(date).format('MMM D, YYYY HH:mm') : 'Instant'),
-    },
-    {
-      title: 'Sent At',
-      dataIndex: 'sentAt',
-      key: 'sentAt',
-      render: (date: string) => (date ? dayjs(date).format('MMM D, YYYY HH:mm') : 'Not sent yet'),
-    },
-    {
       title: 'Actions',
       key: 'actions',
-      render: (_: unknown, record: ScheduledMessage) =>
-        record.status === 'pending' && (
-          <Button danger icon={<DeleteOutlined />} onClick={() => handleDeleteMessage(record.id)} />
-        ),
+      render: (_, record) => (
+        <Space>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleOpenDialog(record)}
+            disabled={record.status === 'DELIVERED'}
+            type='text'
+          />
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            type='text'
+            danger
+          />
+        </Space>
+      ),
     },
   ]
 
@@ -206,6 +351,30 @@ const AdminPage = () => {
               rules={[{ required: true, message: 'Please enter a message' }]}
             >
               <TextArea rows={4} placeholder='Enter your message here...' />
+            </Form.Item>
+
+            <Form.Item name='isForAllUsers' valuePropName='checked'>
+              <Checkbox>Send to all users</Checkbox>
+            </Form.Item>
+
+            <Form.Item
+              noStyle
+              shouldUpdate={(prevValues, currentValues) =>
+                prevValues.isForAllUsers !== currentValues.isForAllUsers
+              }
+            >
+              {({ getFieldValue }) =>
+                !getFieldValue('isForAllUsers') ? (
+                  <Form.Item
+                    name='userId'
+                    label='Select User'
+                    rules={[{ required: true, message: 'Please select a user' }]}
+                    tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API."
+                  >
+                    <UserSelector placeholder='Search for a user' />
+                  </Form.Item>
+                ) : null
+              }
             </Form.Item>
 
             {messageType === 'scheduled' && (
@@ -240,9 +409,94 @@ const AdminPage = () => {
             dataSource={messages}
             columns={columns}
             rowKey='id'
-            loading={loading}
             pagination={{ pageSize: 10 }}
           />
+
+          <Modal
+            title={editingMessage ? 'Edit Scheduled Message' : 'Create Scheduled Message'}
+            open={openDialog}
+            onCancel={handleCloseDialog}
+            footer={null}
+            width={700}
+          >
+            <Form
+              form={form}
+              layout='vertical'
+              onFinish={handleSubmitDialog}
+              initialValues={
+                editingMessage
+                  ? {
+                      message: editingMessage.message,
+                      sendAt: editingMessage.sendAt,
+                      userId: editingMessage.userId || '',
+                      isForAllUsers: editingMessage.isForAllUsers,
+                    }
+                  : {
+                      message: '',
+                      sendAt: new Date(Date.now() + 3600000),
+                      userId: '',
+                      isForAllUsers: false,
+                    }
+              }
+            >
+              <Form.Item
+                name='message'
+                label='Message'
+                rules={[{ required: true, message: 'Please enter a message' }]}
+              >
+                <Input.TextArea rows={4} />
+              </Form.Item>
+
+              <Form.Item
+                name='sendAt'
+                label='Send At'
+                rules={[{ required: true, message: 'Please select a date and time' }]}
+                getValueProps={(value) => {
+                  // Convert Date to dayjs for DatePicker
+                  if (value) {
+                    const dayjs = require('dayjs')
+                    return { value: dayjs(value) }
+                  }
+                  return { value }
+                }}
+              >
+                <DatePicker showTime format='YYYY-MM-DD HH:mm' style={{ width: '100%' }} />
+              </Form.Item>
+
+              <Form.Item name='isForAllUsers' valuePropName='checked'>
+                <Checkbox>Send to all users</Checkbox>
+              </Form.Item>
+
+              <Form.Item
+                noStyle
+                shouldUpdate={(prevValues, currentValues) =>
+                  prevValues.isForAllUsers !== currentValues.isForAllUsers
+                }
+              >
+                {({ getFieldValue }) =>
+                  !getFieldValue('isForAllUsers') ? (
+                    <Form.Item
+                      name='userId'
+                      label='Select User'
+                      rules={[{ required: true, message: 'Please select a user' }]}
+                      tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API."
+                    >
+                      <UserSelector placeholder='Search for a user' />
+                    </Form.Item>
+                  ) : null
+                }
+              </Form.Item>
+
+              <Form.Item>
+                <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button onClick={handleCloseDialog}>Cancel</Button>
+                  <Button type='primary' htmlType='submit'>
+                    {editingMessage ? 'Update' : 'Create'}
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Form>
+          </Modal>
         </Card>
       ),
     },
