@@ -7,7 +7,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { TierInput } from './TierInput'
 import { TierSwitch } from './TierSwitch'
 
-export default function SceneSwitcher(): JSX.Element {
+export default function SceneSwitcher(): React.ReactNode {
   const { data: isEnabled, loading: l0 } = useUpdateSetting(Settings['obs-scene-switcher'])
   const {
     data: obsDc,

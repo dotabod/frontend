@@ -1,7 +1,12 @@
 import { useMotionValue, useSpring } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 
-export function AnimatedNumber({ from, to }) {
+interface AnimatedNumberProps {
+  from: number
+  to: number
+}
+
+export function AnimatedNumber({ from, to }: AnimatedNumberProps) {
   const ref = useRef<HTMLSpanElement>(null)
   const motionValue = useMotionValue(from)
   const springValue = useSpring(motionValue)
@@ -10,15 +15,14 @@ export function AnimatedNumber({ from, to }) {
     motionValue.set(to)
   }, [motionValue, to])
 
-  useEffect(
-    () =>
-      springValue.onChange((latest) => {
-        if (ref.current) {
-          ref.current.textContent = latest.toFixed(0)
-        }
-      }),
-    [springValue],
-  )
+  useEffect(() => {
+    const unsubscribe = springValue.on('change', (latest: number) => {
+      if (ref.current) {
+        ref.current.textContent = Math.round(latest).toString()
+      }
+    })
+    return unsubscribe
+  }, [springValue])
 
   return <span ref={ref} />
 }

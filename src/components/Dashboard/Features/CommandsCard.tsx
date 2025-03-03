@@ -16,7 +16,7 @@ export default function CommandsCard({
   command: (typeof CommandDetail)[keyof typeof CommandDetail]
   publicIsEnabled?: boolean
   publicLoading?: boolean
-}): JSX.Element {
+}): React.ReactNode {
   const { data: isEnabled, loading, updateSetting } = useUpdateSetting(command.key)
   const { hasAccess, requiredTier } = useFeatureAccess(command.key)
 

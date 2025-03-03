@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { TierBadge } from './TierBadge'
 import { TierSwitch } from './TierSwitch'
 
-export default function MinimapCard(): JSX.Element {
+export default function MinimapCard(): React.ReactNode {
   const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
   const { data: minimapSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: minimapXl } = useUpdateSetting(Settings['minimap-xl'])
