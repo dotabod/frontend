@@ -20,7 +20,7 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
     <Card
       className={clsx(
         !className && 'rounded-r-none',
-        !className && mainScreen && 'bg-transparent/0! p-0 leading-none text-[#e4d98d]',
+        !className && mainScreen && 'bg-transparent p-0 leading-none text-[#e4d98d]',
         className,
       )}
       id='win-loss-card'

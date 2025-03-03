@@ -157,7 +157,7 @@ const MmrForm = ({ hideText = false }) => {
                             image={rank?.image}
                             rank={null}
                             key={account.steam32Id}
-                            className='rounded-md! bg-transparent/0! p-0!'
+                            className='rounded-md! bg-transparent p-0!'
                           />
                         </div>
                         <SteamAvatar id={account.steam32Id} data={steamData} />
@@ -269,7 +269,7 @@ const MmrForm = ({ hideText = false }) => {
               leaderboard={null}
               image={noSteamRank?.image}
               rank={null}
-              className='bg-transparent/0!'
+              className='bg-transparent'
             />
             <div className='flex flex-col'>
               {loading ? (

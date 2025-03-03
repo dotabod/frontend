@@ -122,7 +122,7 @@ function BlockScreen({ custom, animated = false }) {
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
-        className='bg-transparent/0!'
+        className='bg-transparent'
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
         <div className='flex flex-col items-center space-y-4 text-white'>
@@ -154,7 +154,7 @@ function BetsScreen({ custom, animated = false }) {
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
-        className='bg-transparent/0!'
+        className='bg-transparent'
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
         <div className='flex flex-col items-center space-y-4 text-white'>
@@ -183,7 +183,7 @@ function OBSScreen({ custom, animated = false }) {
         </AppScreen.Subtitle>
       </MotionAppScreenHeader>
       <MotionAppScreenBody
-        className='bg-transparent/0!'
+        className='bg-transparent'
         {...(animated ? { ...bodyAnimation, custom } : {})}
       >
         <div className='flex flex-col items-center space-y-4 text-white'>
