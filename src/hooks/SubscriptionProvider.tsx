@@ -32,8 +32,8 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
       }
       setIsLoading(false)
     }
-    getSubscription()
-  }, [userId])
+    router.isReady && getSubscription()
+  }, [userId, router.isReady])
 
   return (
     <SubscriptionContext.Provider
