@@ -16,13 +16,18 @@ const Maintenance: NextPageWithLayout = () => (
 )
 
 Maintenance.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell
-    seo={{
-      title: 'Maintenance | Dotabod',
-      description: 'Dotabod is currently undergoing scheduled maintenance. Please check back later.',
-      canonicalUrl: 'https://dotabod.com/maintenance',
-    }}
-  >{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Maintenance | Dotabod',
+        description:
+          'Dotabod is currently undergoing scheduled maintenance. Please check back later.',
+        canonicalUrl: 'https://dotabod.com/maintenance',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default Maintenance

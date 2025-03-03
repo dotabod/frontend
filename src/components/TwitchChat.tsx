@@ -16,7 +16,9 @@ export default function TwitchChat({
 }) {
   if (response) responses.push(response)
   return (
-    <div className={clsx(className, 'mt-2 max-w-xs rounded-sm border p-2 text-sm', 'border-gray-700')}>
+    <div
+      className={clsx(className, 'mt-2 max-w-xs rounded-sm border p-2 text-sm', 'border-gray-700')}
+    >
       {command && (
         <div>
           {modOnly && <ModImage />}

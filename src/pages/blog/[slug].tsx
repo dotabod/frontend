@@ -76,9 +76,9 @@ const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => {
 }
 
 BlogPost.getLayout = function getLayout(page: ReactElement) {
-  const { meta } = page.props as BlogPostProps;
-  const pageTitle = `${meta.title} | Dotabod Blog`;
-  const canonicalUrl = `https://dotabod.com/blog/${meta.slug}`;
+  const { meta } = page.props as BlogPostProps
+  const pageTitle = `${meta.title} | Dotabod Blog`
+  const canonicalUrl = `https://dotabod.com/blog/${meta.slug}`
 
   return (
     <HomepageShell
@@ -87,7 +87,7 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
         description: meta.description,
         ogImage: meta.image,
         canonicalUrl: canonicalUrl,
-        ogType: 'article'
+        ogType: 'article',
       }}
     >
       {page}

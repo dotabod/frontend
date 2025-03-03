@@ -85,7 +85,8 @@ export function SecondaryFeatures() {
     },
     {
       name: 'Instant Smurf Detection',
-      description: 'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
+      description:
+        'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
       background: (
         <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandSmurfs].response()}
@@ -140,8 +141,7 @@ export function SecondaryFeatures() {
         </Popover>
       ),
       disableHover: false,
-      description:
-        'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
+      description: 'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
       className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
       background: (
         <div className='flex flex-col items-center justify-center'>

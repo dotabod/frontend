@@ -35,20 +35,20 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
     <>
       <Head>
         <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={canonicalUrl} />
+        <meta name='description' content={pageDescription} />
+        <link rel='canonical' href={canonicalUrl} />
 
         {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
+        <meta property='og:type' content='website' />
+        <meta property='og:url' content={canonicalUrl} />
+        <meta property='og:title' content={pageTitle} />
+        <meta property='og:description' content={pageDescription} />
 
         {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={canonicalUrl} />
-        <meta property="twitter:title" content={pageTitle} />
-        <meta property="twitter:description" content={pageDescription} />
+        <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:url' content={canonicalUrl} />
+        <meta property='twitter:title' content={pageTitle} />
+        <meta property='twitter:description' content={pageDescription} />
       </Head>
       <Container className='pb-16'>
         <div className='max-w-3xl mx-auto'>
@@ -59,9 +59,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
 
           <Space direction='vertical' size='large' className='w-full'>
             {posts.map((post) => (
-              <Card
-                key={post.slug}
-              >
+              <Card key={post.slug}>
                 <Space direction='vertical' size='small'>
                   <Text type='secondary' className='block mb-2'>
                     {formatDate(post.date)}
@@ -71,9 +69,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
                       {post.title}
                     </Title>
                   </Link>
-                  <Paragraph className=' '>
-                    {post.description}
-                  </Paragraph>
+                  <Paragraph className=' '>{post.description}</Paragraph>
                   <Link
                     href={`/blog/${post.slug}`}
                     className='text-purple-500 font-medium flex items-center'
@@ -104,9 +100,9 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
 }
 
 BlogIndex.getLayout = function getLayout(page: ReactElement) {
-  const pageTitle = 'Blog | Dotabod';
-  const pageDescription = 'Latest news, updates, and insights from the Dotabod team';
-  const canonicalUrl = 'https://dotabod.com/blog';
+  const pageTitle = 'Blog | Dotabod'
+  const pageDescription = 'Latest news, updates, and insights from the Dotabod team'
+  const canonicalUrl = 'https://dotabod.com/blog'
 
   return (
     <HomepageShell
@@ -114,7 +110,7 @@ BlogIndex.getLayout = function getLayout(page: ReactElement) {
         title: pageTitle,
         description: pageDescription,
         canonicalUrl: canonicalUrl,
-        ogType: 'website'
+        ogType: 'website',
       }}
     >
       {page}

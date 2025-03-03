@@ -65,13 +65,17 @@ const AuthErrorPage: NextPageWithLayout = () => {
 }
 
 AuthErrorPage.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell
-    seo={{
-      title: 'Error | Dotabod',
-      description: 'An error occurred while processing your request.',
-      canonicalUrl: 'https://dotabod.com/error',
-    }}
-  >{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Error | Dotabod',
+        description: 'An error occurred while processing your request.',
+        canonicalUrl: 'https://dotabod.com/error',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default AuthErrorPage

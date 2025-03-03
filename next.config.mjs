@@ -5,7 +5,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs'
 
 /**
  * @type {import('next').NextConfig}
@@ -33,9 +33,9 @@ const nextConfig = {
     if (!dev && !isServer) {
       Object.assign(config.resolve.alias, {
         '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
-      });
+      })
     }
-    return config;
+    return config
   },
   images: {
     remotePatterns: [

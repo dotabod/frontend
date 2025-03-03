@@ -15,7 +15,7 @@ export default function Banner() {
         banner
         type='info'
         showIcon={false}
-        className='text-center font-medium text-white bg-purple-600 hover:bg-purple-500 transition-colors cursor-pointer border-0'
+        className='text-center font-medium text-white bg-purple-600! hover:bg-purple-500! transition-colors cursor-pointer border-0!'
       />
     </Link>
   )

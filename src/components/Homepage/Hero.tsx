@@ -67,7 +67,7 @@ export function Hero() {
   const track = useTrack()
 
   return (
-    <div className='overflow-hidden py-15 sm:py-27 lg:pb-27 xl:pb-31'>
+    <div className='overflow-hidden py-4 sm:py-4 lg:pb-4 xl:pb-4'>
       <Container>
         <div className='lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20'>
           <div className='relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6'>
@@ -82,7 +82,9 @@ export function Hero() {
               />
             </h1>
             <p className='mt-6 text-lg text-gray-300'>
-            Dotabod is the all-in-one toolkit that transforms your Dota 2 stream, providing real-time stats, automated Twitch predictions, and intelligent overlays that engage your audience effortlessly.
+              Dotabod is the all-in-one toolkit that transforms your Dota 2 stream, providing
+              real-time stats, automated Twitch predictions, and intelligent overlays that engage
+              your audience effortlessly.
             </p>
             <div className='mt-8 flex flex-wrap gap-x-6 gap-y-4'>
               <Link href='/dashboard'>
@@ -124,7 +126,9 @@ export function Hero() {
         <div className='relative lg:col-span-7 xl:col-span-6'>
           <div className='flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left'>
             <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
-            <span>Trusted by Over {new Intl.NumberFormat().format(20000)} Twitch Streamers Including:</span>
+            <span>
+              Trusted by Over {new Intl.NumberFormat().format(20000)} Twitch Streamers Including:
+            </span>
             <LiveIcon />
           </div>
         </div>

@@ -3,7 +3,7 @@ import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
 import * as Sentry from '@sentry/nextjs'
-import { App } from 'antd'
+import { App, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect } from 'react'
@@ -74,15 +74,19 @@ const Login: NextPageWithLayout = () => {
 
   return (
     <Container>
-      <div className='flex flex-col justify-center mx-auto w-full max-w-2xl px-4 sm:px-6 h-full'>
-        <div className='sm:mt-16'>
-          <h1 className='text-center text-2xl font-medium tracking-tight text-gray-200'>Sign in</h1>
-          <p className='mt-3 text-center text-lg text-gray-300'>
-            You can begin using Dotabod right away!
-          </p>
-        </div>
-        <div className='-mx-4 mt-10 flex-auto bg-gray-700 px-4 shadow-2xl shadow-gray-900/10 sm:mx-0 sm:flex-none sm:rounded-5xl sm:p-24'>
-          <UserAuthForm />
+      <div
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+      >
+        <div style={{ width: '100%', maxWidth: '32rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <Typography.Title level={2}>Sign in</Typography.Title>
+            <Typography.Paragraph style={{ fontSize: '1.125rem', color: 'var(--color-dark-300)' }}>
+              You can begin using Dotabod right away!
+            </Typography.Paragraph>
+          </div>
+          <div>
+            <UserAuthForm />
+          </div>
         </div>
       </div>
     </Container>
@@ -90,13 +94,18 @@ const Login: NextPageWithLayout = () => {
 }
 
 Login.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell
-    seo={{
-      title: 'Sign In | Dotabod',
-      description: 'Sign in to your Dotabod account to access your dashboard and manage your Dota 2 streaming tools.',
-      canonicalUrl: 'https://dotabod.com/login',
-    }}
-  >{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Sign In | Dotabod',
+        description:
+          'Sign in to your Dotabod account to access your dashboard and manage your Dota 2 streaming tools.',
+        canonicalUrl: 'https://dotabod.com/login',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default Login

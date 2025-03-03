@@ -18,7 +18,8 @@ const features = [
     name: 'Twitch predictions creator',
     description: (
       <span>
-        Let viewers use channel points to predict game outcomes. Dotabod handles opening and closing bets automatically, letting you focus on the game.
+        Let viewers use channel points to predict game outcomes. Dotabod handles opening and closing
+        bets automatically, letting you focus on the game.
       </span>
     ),
     icon: () => (
@@ -52,7 +53,8 @@ const features = [
     name: 'Minimap and hero picks blocker',
     description: (
       <span>
-        Stop stream snipers and protect your strategy with auto-activated minimap and hero selection blockers.
+        Stop stream snipers and protect your strategy with auto-activated minimap and hero selection
+        blockers.
       </span>
     ),
     icon: () => (

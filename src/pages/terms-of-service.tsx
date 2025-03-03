@@ -1030,13 +1030,17 @@ const TermsOfService: NextPageWithLayout = () => (
 )
 
 TermsOfService.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell
-    seo={{
-      title: 'Terms of Service | Dotabod',
-      description: 'Read the terms and conditions that govern your use of Dotabod services.',
-      canonicalUrl: 'https://dotabod.com/terms-of-service',
-    }}
-  >{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Terms of Service | Dotabod',
+        description: 'Read the terms and conditions that govern your use of Dotabod services.',
+        canonicalUrl: 'https://dotabod.com/terms-of-service',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default TermsOfService
