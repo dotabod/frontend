@@ -22,6 +22,7 @@
     "@ant-design/cssinjs": "^1.23.0",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@crowdin/ota-client": "^2.0.1",
+    "@csstools/postcss-oklab-function": "^4.0.8",
     "@emotion/react": "^11.14.0",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",

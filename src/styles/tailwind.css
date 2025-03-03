@@ -597,5 +597,3 @@ a:not(.ant-btn) {
 	color: white;
 	opacity: 0.5;
 }
-
-.bg-transparent { background-color: rgba(0, 0, 0, 0) !important;}
