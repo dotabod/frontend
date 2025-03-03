@@ -35,7 +35,7 @@ AppScreen.Subtitle = forwardRef(function AppScreenSubtitle({ children }, ref) {
 
 AppScreen.Body = forwardRef(function AppScreenBody({ children, className }, ref) {
   return (
-    <div ref={ref} className={clsx('mt-6 flex-auto rounded-t-2xl bg-transparent', className)}>
+    <div ref={ref} className={clsx('mt-6 flex-auto rounded-t-2xl bg-transparent/0!', className)}>
       {children}
     </div>
   )

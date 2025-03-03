@@ -9,7 +9,6 @@ export default function CommandsCard({
   command,
   readonly,
   publicIsEnabled,
-  publicLoading,
 }: {
   readonly?: boolean
   id: string
@@ -17,11 +16,11 @@ export default function CommandsCard({
   publicIsEnabled?: boolean
   publicLoading?: boolean
 }): React.ReactNode {
-  const { data: isEnabled, loading, updateSetting } = useUpdateSetting(command.key)
-  const { hasAccess, requiredTier } = useFeatureAccess(command.key)
+  const { data: isEnabled, updateSetting } = useUpdateSetting(command.key)
+  const { hasAccess } = useFeatureAccess(command.key)
 
   return (
-    <Collapse bordered={false} className='bg-transparent!'>
+    <Collapse bordered={false} className='bg-transparent/0!'>
       <Collapse.Panel
         className='rounded-lg! border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-xs hover:shadow-gray-500'
         style={{ padding: 0 }}

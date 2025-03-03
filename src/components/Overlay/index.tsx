@@ -153,12 +153,14 @@ const OverlayPage = () => {
   useEffect(() => {
     if (error) {
       // Log the error to Sentry instead of showing to users
-      Sentry.captureException(new Error('Authentication error in overlay'), {
-        extra: {
-          error,
-          originalData: original,
-        },
-      })
+      if (!isDev) {
+        Sentry.captureException(new Error('Authentication error in overlay'), {
+          extra: {
+            error,
+            originalData: original,
+          },
+        })
+      }
 
       // For development environment only, still show the notification
       if (isDev) {

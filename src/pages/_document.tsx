@@ -36,7 +36,7 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html className='h-full bg-transparent' lang='en'>
+      <Html className='h-full bg-transparent/0!' lang='en'>
         <Head>
           <link rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png' />
           <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
@@ -46,7 +46,7 @@ export default class MyDocument extends Document {
           <meta name='msapplication-TileColor' content='#da532c' />
           <meta name='theme-color' content='#000000' />
         </Head>
-        <body className='min-h-screen bg-transparent'>
+        <body className='min-h-screen bg-transparent/0!'>
           <Main />
           <NextScript />
         </body>
