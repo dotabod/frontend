@@ -15,6 +15,11 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     forceSwcTransforms: false,
+    turbo: {
+      resolveAlias: {
+        '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
+      },
+    },
   },
   transpilePackages: [
     'antd',
