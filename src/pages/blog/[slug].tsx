@@ -148,13 +148,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // Ensure date is a string for serialization
   const date = processedData.date || new Date().toISOString()
 
+  // Convert date to string if it's a Date object
+  const dateString = date instanceof Date ? date.toISOString() : String(date)
+
   return {
     props: {
       source: mdxSource,
       meta: {
         title: processedData.title || 'Untitled',
         description: processedData.description || '',
-        date,
+        date: dateString,
         author: processedData.author || null,
         image: processedData.image || null,
         slug, // Add slug to meta for canonical URL
