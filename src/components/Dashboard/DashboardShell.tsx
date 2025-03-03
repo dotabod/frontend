@@ -2,6 +2,7 @@ import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
+import type { PARENT_KEYS } from '@/components/Dashboard/navigation'
 import HubSpotIdentification from '@/components/HubSpotIdentification'
 import HubSpotScript from '@/components/HubSpotScript'
 import { DarkLogo, Logomark } from '@/components/Logo'
@@ -59,7 +60,11 @@ function getItem(item) {
 
 // Add helper function to check if item should be hidden during impersonation
 const shouldHideForImpersonator = (itemName: string) => {
-  return ['Setup', 'Managers', 'Billing', 'Data', 'Account'].includes(itemName)
+  return ['Setup', 'Managers', 'Billing', 'Data', 'Account', 'Admin'].includes(itemName)
+}
+
+const shouldShowAdminItems = (itemKey: keyof typeof PARENT_KEYS, role?: string[]) => {
+  return itemKey === 'ADMIN' && role?.includes('admin')
 }
 
 // Create mapping dynamically from navigation structure
@@ -183,6 +188,9 @@ export default function DashboardShell({
 
         // Hide parent items that should be restricted
         if (shouldHideForImpersonator(item.name)) return null
+
+        // Hide admin items if user is not an admin
+        if (!shouldShowAdminItems(item.key, data?.user?.role)) return null
 
         // If item has children, filter them too
         if (item.children) {

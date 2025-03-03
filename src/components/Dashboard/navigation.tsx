@@ -12,6 +12,7 @@ import {
 
 // Add a const for parent keys
 export const PARENT_KEYS = {
+  ADMIN: 'admin-menu',
   FEATURES: 'features-menu',
   BOT_SETTINGS: 'bot-settings-menu',
   ACCOUNT: 'account-menu',
@@ -20,6 +21,14 @@ export const PARENT_KEYS = {
 } as const
 
 export const navigation = [
+  // Admin only
+  {
+    name: 'Admin',
+    key: PARENT_KEYS.ADMIN,
+    icon: ShieldCheck,
+    children: [{ name: 'Scheduled Messages', href: '/dashboard/admin' }],
+  },
+
   // Main features
   {
     name: 'Setup',

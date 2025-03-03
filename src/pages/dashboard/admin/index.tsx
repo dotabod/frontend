@@ -19,9 +19,8 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-const { Title, Text } = Typography
+const { Title } = Typography
 const { TextArea } = Input
-const { TabPane } = Tabs
 
 type ScheduledMessage = {
   id: string
@@ -38,7 +37,7 @@ interface FormValues {
   scheduledDate?: dayjs.Dayjs
 }
 
-function AdminPage() {
+const AdminPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -274,7 +273,18 @@ function AdminPage() {
 }
 
 AdminPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <DashboardShell>{page}</DashboardShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Admin Panel | Dotabod Dashboard',
+        description: 'Manage scheduled messages for Dotabod users.',
+        canonicalUrl: 'https://dotabod.com/dashboard/admin',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default AdminPage

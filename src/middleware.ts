@@ -13,6 +13,7 @@ export const config = {
     '/overlay/:path*',
     '/api/:path*',
     '/dashboard/:path*',
+    '/dashboard/admin/:path*',
     '/install',
     '/[username]',
   ],
