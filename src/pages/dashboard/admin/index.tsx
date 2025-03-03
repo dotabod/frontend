@@ -54,7 +54,7 @@ const AdminPage = () => {
     }
 
     fetchMessages()
-  }, [session, status, router])
+  }, [session?.user?.role, status, router.push])
 
   const fetchMessages = async () => {
     try {
@@ -202,6 +202,7 @@ const AdminPage = () => {
             <Form.Item
               name='message'
               label='Message Content'
+              help='Use [username] to include the users name'
               rules={[{ required: true, message: 'Please enter a message' }]}
             >
               <TextArea rows={4} placeholder='Enter your message here...' />
