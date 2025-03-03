@@ -59,6 +59,7 @@ model User {
   Bet                               Bet[]
   mods_mods_mod_user_idTousers      mods[]              @relation("mods_mod_user_idTousers")
   mods_mods_streamer_user_idTousers mods[]              @relation("mods_streamer_user_idTousers")
+  scheduledMessages                 ScheduledMessage[]
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
@@ -198,13 +199,13 @@ model Subscription {
   stripeCustomerId     String?
   stripePriceId        String?
   stripeSubscriptionId String?             @unique
+  tier                 SubscriptionTier    @default(FREE)
   status               SubscriptionStatus?
   transactionType      TransactionType
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean             @default(false)
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @default(now()) @map("updated_at")
-  tier                 SubscriptionTier    @default(FREE)
   user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -218,6 +219,23 @@ model WebhookEvent {
   stripeEventId String   @unique
   eventType     String
   processedAt   DateTime
+}
+
+model ScheduledMessage {
+  id          String        @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @map("updated_at")
+  message     String
+  scheduledAt DateTime?     @map("scheduled_at")
+  sentAt      DateTime?     @map("sent_at")
+  status      MessageStatus @default(PENDING)
+  userId      String        @map("user_id")
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("scheduled_messages")
 }
 
 enum SubscriptionStatus {
@@ -239,4 +257,10 @@ enum SubscriptionTier {
 enum TransactionType {
   RECURRING
   LIFETIME
+}
+
+enum MessageStatus {
+  PENDING
+  DELIVERED
+  FAILED
 }
