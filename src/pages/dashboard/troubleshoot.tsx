@@ -194,18 +194,6 @@ const faqs = [
       </div>
     ),
   },
-  {
-    question: 'Still not working?',
-    answer: (
-      <span>
-        Get help in our{' '}
-        <a target='_blank' href='https://help.dotabod.com' rel='noreferrer'>
-          Discord
-        </a>
-        .
-      </span>
-    ),
-  },
 ]
 
 const TroubleshootPage = () => {
@@ -285,15 +273,29 @@ const TroubleshootPage = () => {
             message='Your stream is offline, and Dotabod will only work once you start streaming and go online.'
             type='warning'
             showIcon
-            className='flex-grow'
+            className='grow'
           />
         )}
       </div>
 
+      <div className='lg:col-span-2'>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
+          {faqs.map(
+            (faq) =>
+              faq.question && (
+                <Card key={faq.question}>
+                  <dt className='text-lg font-medium leading-6'>{faq.question}</dt>
+                  <dd className='mt-2 text-base text-gray-300'>{faq.answer}</dd>
+                </Card>
+              ),
+          )}
+        </div>
+      </div>
+
       {/* Ant Design Form replacing HubSpot embedded form */}
-      <div className='mt-8 max-w-2xl mb-12'>
+      <div className='max-w-2xl'>
         <Card>
-          <h2 className='text-lg font-medium mb-4'>Need help? Send us a message</h2>
+          <h2 className='text-lg font-medium mb-4'>Still need help? Send us a message</h2>
           <Form form={form} layout='vertical' onFinish={handleSubmit}>
             <Form.Item
               name='message'
@@ -310,20 +312,6 @@ const TroubleshootPage = () => {
             </Form.Item>
           </Form>
         </Card>
-      </div>
-
-      <div className='lg:col-span-2'>
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
-          {faqs.map(
-            (faq) =>
-              faq.question && (
-                <Card key={faq.question}>
-                  <dt className='text-lg font-medium leading-6'>{faq.question}</dt>
-                  <dd className='mt-2 text-base text-gray-300'>{faq.answer}</dd>
-                </Card>
-              ),
-          )}
-        </div>
       </div>
     </>
   )

@@ -249,7 +249,7 @@ function FeaturesDesktop() {
             <div className='relative z-10 p-8'>
               <feature.icon className='h-8 w-8' />
               <h3 className='mt-6 text-lg font-semibold text-white'>
-                <Tab className='text-left [&:not(:focus-visible)]:focus:outline-none'>
+                <Tab className='text-left not-focus-visible:focus:outline-hidden'>
                   <span className='absolute inset-0 rounded-2xl' />
                   {feature.name}
                 </Tab>
@@ -270,7 +270,7 @@ function FeaturesDesktop() {
                 <Tab.Panel
                   static
                   key={feature.name + changeCount}
-                  className='col-start-1 row-start-1 flex focus:outline-offset-[32px] [&:not(:focus-visible)]:focus:outline-none'
+                  className='col-start-1 row-start-1 flex focus:outline-offset-[32px] not-focus-visible:focus:outline-hidden'
                 >
                   <feature.screen animated custom={{ isForwards, changeCount }} />
                 </Tab.Panel>
@@ -337,7 +337,7 @@ function FeaturesMobile() {
               <PhoneFrame className='relative mx-auto w-full max-w-[366px]'>
                 <feature.screen />
               </PhoneFrame>
-              <div className='absolute inset-x-0 bottom-0 bg-gray-800/95 p-6 backdrop-blur sm:p-10'>
+              <div className='absolute inset-x-0 bottom-0 bg-gray-800/95 p-6 backdrop-blur-sm sm:p-10'>
                 <feature.icon />
                 <h3 className='mt-6 text-sm font-semibold text-white sm:text-lg'>{feature.name}</h3>
                 <p className='mt-2 text-sm text-gray-400'>{feature.description}</p>

@@ -21,8 +21,8 @@ const CodeBlock = () => {
 
   return (
     <div className='mb-4 mt-0 sm:max-w-sm lg:max-w-2xl max-w-full'>
-      <div className='mb-1 flex p-5 sm:p-4 xs:p-3 justify-between items-center flex-row border-2 border-purple-400 rounded text-lg sm:text-base xs:text-sm'>
-        <pre className='bg-gray-900 overflow-hidden text-white rounded mb-0'>
+      <div className='mb-1 flex p-5 sm:p-4 xs:p-3 justify-between items-center flex-row border-2 border-purple-400 rounded-sm text-lg sm:text-base xs:text-sm'>
+        <pre className='bg-gray-900 overflow-hidden text-white rounded-sm mb-0'>
           <code>
             <span className='command-line'>
               <span style={{ color: '#F8F8F2' }}>powershell </span>
@@ -53,7 +53,7 @@ const CodeBlock = () => {
         <Link
           target='_blank'
           href='https://github.com/dotabod/frontend/blob/master/public/install.ps1'
-          className=' !text-gray-400'
+          className=' text-gray-400!'
         >
           View source
         </Link>

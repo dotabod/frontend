@@ -156,7 +156,7 @@ export default function ModeratedChannels() {
   )
 
   return (
-    <div className='flex flex-col flex-grow items-center moderated-channels'>
+    <div className='flex flex-col grow items-center moderated-channels'>
       <Tooltip
         title='Choose a channel to manage. Only streamers with an active Dotabod subscription will be shown.'
         placement='right'

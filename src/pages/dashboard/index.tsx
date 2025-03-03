@@ -243,6 +243,8 @@ const SetupPage = () => {
         items={steps}
       />
 
+      <div className='mb-10' />
+
       {steps[active].content}
 
       <div className='flex space-x-4 pb-10'>
@@ -274,7 +276,8 @@ SetupPage.getLayout = function getLayout(page: ReactElement) {
     <DashboardShell
       seo={{
         title: 'Dashboard | Dotabod',
-        description: 'Manage your Dotabod settings and features to enhance your Dota 2 streaming experience.',
+        description:
+          'Manage your Dotabod settings and features to enhance your Dota 2 streaming experience.',
         canonicalUrl: 'https://dotabod.com/dashboard',
         noindex: true,
       }}

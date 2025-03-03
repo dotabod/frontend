@@ -41,7 +41,7 @@ function getItem(item) {
       <Link
         {...props}
         href={item.href}
-        className='!text-gray-200 flex flex-row gap-2 items-center'
+        className='text-gray-200! flex flex-row gap-2 items-center'
         target={item.href.startsWith('http') ? '_blank' : '_self'}
       >
         {item.name}
@@ -241,7 +241,7 @@ export default function DashboardShell({
             background: colorBgLayout,
           }}
           width={250}
-          className={clsx('border-r-transparent', collapsed && '!min-w-11 !max-w-11')}
+          className={clsx('border-r-transparent', collapsed && 'min-w-11! max-w-11!')}
           trigger={null}
           collapsible
           collapsed={collapsed}
@@ -285,7 +285,7 @@ export default function DashboardShell({
                     return {
                       key: item?.href || i,
                       type: 'divider',
-                      className: '!m-6 !bg-gray-500',
+                      className: 'm-6! bg-gray-500!',
                     }
 
                   return getItem(item)
@@ -294,12 +294,12 @@ export default function DashboardShell({
             </div>
           </div>
         </Sider>
-        <Layout className={clsx('!bg-gray-800', broken && !collapsed && '!hidden')}>
+        <Layout className={clsx('bg-gray-800!', broken && !collapsed && 'hidden!')}>
           <Header
             className={clsx(
-              '!bg-gray-900',
-              broken && !collapsed && '!hidden',
-              'flex w-full items-center justify-between !p-8',
+              'bg-gray-900!',
+              broken && !collapsed && 'hidden!',
+              'flex w-full items-center justify-between p-8!',
             )}
           >
             <DisableToggle />

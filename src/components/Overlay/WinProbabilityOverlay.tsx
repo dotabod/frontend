@@ -25,7 +25,7 @@ export default function WinProbabilityOverlay() {
         alt='Win probability oerlay'
         width={1070}
         height={436}
-        className={clsx(!showWinProb && 'opacity-40', 'scale-90 rounded shadow')}
+        className={clsx(!showWinProb && 'opacity-40', 'scale-90 rounded-sm shadow-sm')}
       />
     </Card>
   )

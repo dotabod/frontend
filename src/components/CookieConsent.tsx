@@ -459,7 +459,7 @@ const CookieConsent = () => {
                 until you provide consent. For more information, please read our{' '}
                 <Link href='/cookies'>Cookie Policy</Link>.
               </Paragraph>
-              <Space style={{ width: '100%' }}>
+              <Space wrap>
                 <Button type='primary' onClick={handleAcceptAll}>
                   Accept All Cookies
                 </Button>

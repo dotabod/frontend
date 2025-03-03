@@ -19,6 +19,7 @@ const themeConfig: ThemeConfig = {
       itemHoverColor: 'var(--color-purple-300)',
     },
     Menu: {
+      subMenuItemSelectedColor: 'var(--color-gray-300)',
       subMenuItemBg: 'var(--color-gray-800)',
       itemHoverBg: 'var(--color-gray-700)',
       itemSelectedBg: 'var(--color-gray-600)',

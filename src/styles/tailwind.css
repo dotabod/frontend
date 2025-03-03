@@ -1,41 +1,148 @@
-@font-face {
-	font-family: "Inter";
-	font-weight: 100 900;
-	font-display: block;
-	font-style: normal;
-	font-named-instance: "Regular";
-	src: url("/fonts/Inter-roman.var.woff2") format("woff2");
-}
-@font-face {
-	font-family: "Inter";
-	font-weight: 100 900;
-	font-display: block;
-	font-style: italic;
-	font-named-instance: "Italic";
-	src: url("/fonts/Inter-italic.var.woff2") format("woff2");
+@import 'tailwindcss';
+
+@theme {
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 2rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 3rem;
+  --text-4xl: 2.5rem;
+  --text-4xl--line-height: 3rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 1;
+  --text-8xl: 6rem;
+  --text-8xl--line-height: 1;
+  --text-9xl: 8rem;
+  --text-9xl--line-height: 1;
+
+  --animate-fade-in: fade-in 0.5s linear forwards;
+  --animate-marquee: marquee var(--marquee-duration) linear infinite;
+  --animate-spin-slow: spin 4s linear infinite;
+  --animate-spin-slower: spin 6s linear infinite;
+  --animate-spin-reverse: spin-reverse 1s linear infinite;
+  --animate-spin-reverse-slow: spin-reverse 4s linear infinite;
+  --animate-spin-reverse-slower: spin-reverse 6s linear infinite;
+
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
+
+  --color-dark-50: #f9fafb;
+  --color-dark-100: rgb(242, 244, 251);
+  --color-dark-200: rgb(198, 200, 215);
+  --color-dark-300: rgb(145, 149, 171);
+  --color-dark-400: rgb(101, 106, 131);
+  --color-dark-500: rgb(61, 65, 85);
+  --color-dark-600: rgb(49, 52, 66);
+  --color-dark-700: rgb(39, 41, 52);
+  --color-dark-800: rgb(31, 33, 41);
+  --color-dark-900: rgb(23, 24, 30);
+
+  --color-gray-50: oklch(0.985 0 0);
+  --color-gray-100: oklch(0.97 0 0);
+  --color-gray-200: oklch(0.922 0 0);
+  --color-gray-300: oklch(0.87 0 0);
+  --color-gray-400: oklch(0.708 0 0);
+  --color-gray-500: oklch(0.556 0 0);
+  --color-gray-600: oklch(0.439 0 0);
+  --color-gray-700: oklch(0.371 0 0);
+  --color-gray-800: oklch(0.269 0 0);
+  --color-gray-900: oklch(0.205 0 0);
+  --color-gray-950: oklch(0.145 0 0);
+
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --container-2xl: 40rem;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes marquee {
+    100% {
+      transform: translateY(-50%);
+    }
+  }
+  @keyframes spin-reverse {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
 }
 
-@font-face {
-	font-family: "RadianceM";
-	src: url("/fonts/radiancem_regular.otf") format("opentype");
-	font-weight: normal;
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }
 
-@font-face {
-	font-family: "Radiance";
-	src: url("/fonts/radiance-regular.otf") format("opentype");
-	font-weight: normal;
-}
+@layer base {
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 100 900;
+    font-display: block;
+    font-style: normal;
+    font-named-instance: 'Regular';
+    src: url('/fonts/Inter-roman.var.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 100 900;
+    font-display: block;
+    font-style: italic;
+    font-named-instance: 'Italic';
+    src: url('/fonts/Inter-italic.var.woff2') format('woff2');
+  }
 
-@font-face {
-	font-family: "Radiance";
-	src: url("/fonts/radiance-light.otf") format("opentype");
-	font-weight: thin;
-}
+  @font-face {
+    font-family: 'RadianceM';
+    src: url('/fonts/radiancem_regular.otf') format('opentype');
+    font-weight: normal;
+  }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+  @font-face {
+    font-family: 'Radiance';
+    src: url('/fonts/radiance-regular.otf') format('opentype');
+    font-weight: normal;
+  }
+
+  @font-face {
+    font-family: 'Radiance';
+    src: url('/fonts/radiance-light.otf') format('opentype');
+    font-weight: thin;
+  }
+}
 
 @layer base {
 	.font-outline-4 {
@@ -54,87 +161,89 @@
 	}
 }
 
-.animate-border-rgb {
-	position: relative;
-}
+@layer utilities {
+  .animate-border-rgb {
+    position: relative;
+  }
 
-.animate-border-rgb:before,
-.animate-border-rgb:after {
-	@apply rounded-md;
+  .animate-border-rgb:before,
+  .animate-border-rgb:after {
+    @apply rounded-md;
 
-	content: "";
-	position: absolute;
-	left: -2px;
-	top: -2px;
-	background: linear-gradient(
-		45deg,
-		#fb0094,
-		#ff0084,
-		#0033ff,
-		#b700ff,
-		#ff0000,
-		#fb0094,
-		#ff00f2,
-		#0066ff,
-		#9900ff,
-		#ff0066
-	);
-	background-size: 400%;
-	width: calc(100% + 4px);
-	height: calc(100% + 4px);
-	z-index: -1;
-	animation: steam 20s linear infinite;
-}
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    background: linear-gradient(
+      45deg,
+      #fb0094,
+      #ff0084,
+      #0033ff,
+      #b700ff,
+      #ff0000,
+      #fb0094,
+      #ff00f2,
+      #0066ff,
+      #9900ff,
+      #ff0066
+    );
+    background-size: 400%;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    z-index: -1;
+    animation: steam 20s linear infinite;
+  }
 
-@keyframes steam {
-	0% {
-		background-position: 0 0;
-	}
-	50% {
-		background-position: 400% 0;
-	}
-	100% {
-		background-position: 0 0;
-	}
-}
+  @keyframes steam {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
 
-.animate-border-rgb:after {
-	filter: blur(10px);
-}
+  .animate-border-rgb:after {
+    filter: blur(10px);
+  }
 
-#__next {
-	min-height: 100%;
-	height: 100%;
-	display: grid;
-}
+  #__next {
+    min-height: 100%;
+    height: 100%;
+    display: grid;
+  }
 
-/* Geist UI stuff */
-.caption {
-	@apply !text-gray-300;
-}
+  /* Geist UI stuff */
+  .caption {
+    @apply text-gray-300!;
+  }
 
-.title:not(.command) {
-	@apply flex items-center justify-between;
-}
+  .title:not(.command) {
+    @apply flex items-center justify-between;
+  }
 
-.title {
-	@apply pb-2;
-}
+  .title {
+    @apply pb-2;
+  }
 
-.title h3 {
-	@apply !text-lg !font-medium !leading-6;
-}
+  .title h3 {
+    @apply text-lg! font-medium! leading-6!;
+  }
 
-.subtitle {
-	@apply mb-4 border-b border-gray-500 pb-4 !text-sm !text-gray-300;
-}
+  .subtitle {
+    @apply mb-4 border-b border-gray-500 pb-4 text-sm! text-gray-300!;
+  }
 
-.collapse {
-	@apply !border-gray-700 !shadow-none;
-}
+  .collapse {
+    @apply border-gray-700! shadow-none!;
+  }
 
-.collapse .content {
-	@apply text-sm text-gray-300;
+  .collapse .content {
+    @apply text-sm text-gray-300;
+  }
 }
 
 @layer base {

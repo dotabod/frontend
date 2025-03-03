@@ -59,7 +59,7 @@ const BillingPage = () => {
 
       <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
-      <Card className='mb-6 shadow-sm'>
+      <Card className='mb-6 shadow-xs'>
         <Space direction='vertical' size='large' className='w-full'>
           <SubscriptionStatus />
 

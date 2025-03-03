@@ -236,7 +236,7 @@ const OverlayPage = () => {
       <AnimatePresence>
         <motion.div key='not-detected' {...motionProps}>
           <div
-            className={clsx('hidden', isInIframe && rankImageDetails?.notLoaded ? '!block' : '')}
+            className={clsx('hidden', isInIframe && rankImageDetails?.notLoaded ? 'block!' : '')}
           >
             <Center style={{ height }}>
               <div className='space-y-6 rounded-md bg-gray-300 p-4'>

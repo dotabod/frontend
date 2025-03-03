@@ -21,7 +21,7 @@ export const FindMatch = () => {
             top: res({ h: 144 }),
             left: res({ w: 108 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-sm bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
         >
           Finding a Match
         </span>
@@ -35,7 +35,7 @@ export const FindMatch = () => {
             top: res({ h: 144 }),
             left: res({ w: 108 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-sm bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
         >
           Main menu
         </span>
@@ -51,7 +51,7 @@ export const FindMatch = () => {
             top: res({ h: 224 }),
             left: res({ w: 411 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-sm bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
         >
           Finding a match
         </span>
@@ -65,7 +65,7 @@ export const FindMatch = () => {
             top: res({ h: 224 }),
             left: res({ w: 411 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-sm bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
         >
           Main menu
         </span>

@@ -46,7 +46,7 @@ export default function OBSOverlay() {
         {({ copied, copy }) => (
           <Button
             type='dashed'
-            className={clsx(copied && '!border-green-600 !text-green-600')}
+            className={clsx(copied && 'border-green-600! text-green-600!')}
             onClick={() => {
               copy()
               track('overlay/copy_url')
@@ -66,7 +66,7 @@ export default function OBSOverlay() {
   const OBSVideo = () => (
     <div className='space-y-2'>
       <div className='flex items-center space-x-2'>
-        <Tag className='!text-xs'>Note</Tag>
+        <Tag className='text-xs!'>Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
 
@@ -93,7 +93,7 @@ export default function OBSOverlay() {
   const OBSText = () => (
     <div className='space-y-2'>
       <div className='flex items-center space-x-2'>
-        <Tag className='!text-xs'>Note</Tag>
+        <Tag className='text-xs!'>Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
 

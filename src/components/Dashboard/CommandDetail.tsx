@@ -527,11 +527,11 @@ const CommandDetail: Record<
     key: 'commandDelay',
     title: 'Stream delay',
     description: 'Tells chat the Dotabod bot delay you configured from the features page.',
-    cmd: '!delay',
+    cmd: 'delay!',
     alias: ['streamdelay'],
     allowed: 'all',
     response: (props) => (
-      <TwitchChat {...props} command='!delay' response='Stream delay: 3 seconds' />
+      <TwitchChat {...props} command='delay!' response='Stream delay: 3 seconds' />
     ),
   },
   commandRosh: {

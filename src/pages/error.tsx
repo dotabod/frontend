@@ -44,7 +44,7 @@ const AuthErrorPage: NextPageWithLayout = () => {
 
   return (
     <div
-      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem),1fr]'
+      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem)_1fr]'
       style={{
         minHeight: 'inherit',
       }}

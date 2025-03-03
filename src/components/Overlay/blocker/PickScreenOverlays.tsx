@@ -47,8 +47,8 @@ export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type }
             'flex h-full w-full items-end justify-end bg-slate-800/50 backdrop-blur-lg backdrop-filter',
             'absolute ',
             (type === 'strategy-2' || !shouldBlock || isRight) &&
-              '!right-0 bg-slate-800/0 backdrop-blur-none backdrop-filter-none',
-            isRight && '!justify-start',
+              'right-0! bg-slate-800/0 backdrop-blur-none backdrop-filter-none',
+            isRight && 'justify-start!',
           )}
         >
           <RestrictFeature feature='commandWL'>

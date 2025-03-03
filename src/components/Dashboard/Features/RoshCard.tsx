@@ -50,7 +50,7 @@ export default function RoshCard() {
             width={372}
             height={141}
             src='/images/dashboard/just-aegis-timer.png'
-            className={clsx('inline rounded transition-all', !hasAegis && 'opacity-40')}
+            className={clsx('inline rounded-sm transition-all', !hasAegis && 'opacity-40')}
           />
           <span>Aegis timer</span>
         </div>
@@ -60,7 +60,7 @@ export default function RoshCard() {
             width={336}
             height={249}
             src='/images/dashboard/rosh-timer.png'
-            className={clsx('inline rounded transition-all', !hasRosh && 'opacity-40')}
+            className={clsx('inline rounded-sm transition-all', !hasRosh && 'opacity-40')}
           />
           <span>Roshan timer</span>
         </div>

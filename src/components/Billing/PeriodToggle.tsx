@@ -37,7 +37,7 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
           value={period}
           className={clsx(
             'cursor-pointer px-8 py-2 text-sm transition-colors rounded-md flex items-center gap-2',
-            'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900',
+            'focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900',
             activePeriod === period
               ? 'bg-purple-500 text-gray-900 font-semibold shadow-lg'
               : 'text-gray-300 hover:bg-gray-700/50',

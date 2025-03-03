@@ -80,7 +80,7 @@ const EmoteList: React.FC<{
                 <Image
                   className={clsx(
                     !added && 'grayscale group-hover:grayscale-0',
-                    'rounded border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
+                    'rounded-sm border border-transparent p-2 transition-all group-hover:border group-hover:border-solid group-hover:border-purple-300',
                   )}
                   height={60}
                   width={60}
@@ -448,7 +448,7 @@ export default function ChatBot() {
                                 </div>
                                 <div>
                                   <Button
-                                    className='!pl-0'
+                                    className='pl-0!'
                                     target='_blank'
                                     type='link'
                                     href='https://7tv.app/settings/editors'
@@ -467,7 +467,7 @@ export default function ChatBot() {
                                 <div>
                                   <span>You must add Dotabod as an editor </span>
                                   <Button
-                                    className='!pl-0'
+                                    className='pl-0!'
                                     target='_blank'
                                     type='link'
                                     href='https://7tv.app/settings/editors'

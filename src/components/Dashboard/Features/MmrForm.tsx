@@ -34,7 +34,7 @@ const SteamAvatar = ({ data: response, id }) => {
     <Image
       width={45}
       height={45}
-      className='rounded'
+      className='rounded-sm'
       src={
         response?.data?.find((d) => `${d.id}` === `${id}`)?.avatar ||
         'https://avatars.cloudflare.steamstatic.com/fe7c264f9d2b435dfc2c4e099e3a5fc0ab71f492.jpg'
@@ -118,8 +118,8 @@ const MmrForm = ({ hideText = false }) => {
                   <Form.Item
                     className={clsx(
                       'max-w-[327px]',
-                      multiUsedBy && 'rounded border border-solid border-yellow-500/40 !p-4',
-                      removed && 'rounded border border-dashed border-red-500/80 !p-4',
+                      multiUsedBy && 'rounded-sm border border-solid border-yellow-500/40 p-4!',
+                      removed && 'rounded-sm border border-dashed border-red-500/80 p-4!',
                     )}
                     help={
                       multiUsedBy && (
@@ -151,13 +151,13 @@ const MmrForm = ({ hideText = false }) => {
                           (removed || multiUsedBy) && 'opacity-40',
                         )}
                       >
-                        <div className='!h-12 !w-12'>
+                        <div className='h-12! w-12!'>
                           <MMRBadge
                             leaderboard={null}
                             image={rank?.image}
                             rank={null}
                             key={account.steam32Id}
-                            className='!rounded-md bg-transparent !p-0'
+                            className='rounded-md! bg-transparent p-0!'
                           />
                         </div>
                         <SteamAvatar id={account.steam32Id} data={steamData} />
@@ -169,7 +169,7 @@ const MmrForm = ({ hideText = false }) => {
                               rel='noreferrer'
                               className='flex items-center space-x-2'
                             >
-                              <span className='max-w-[90px] overflow-hidden overflow-ellipsis whitespace-nowrap'>
+                              <span className='max-w-[90px] overflow-hidden text-ellipsis whitespace-nowrap'>
                                 {steamData?.name || account.name || 'Unknown steam name'}
                               </span>
                               <ExternalLinkIcon className='h-4 w-4' />
@@ -183,7 +183,7 @@ const MmrForm = ({ hideText = false }) => {
                             type='number'
                             min={0}
                             max={30000}
-                            className='!w-[120px]'
+                            className='w-[120px]!'
                             {...form.getInputProps(`accounts.${index}.mmr`)}
                           />
                         </Form.Item>
@@ -273,11 +273,11 @@ const MmrForm = ({ hideText = false }) => {
             />
             <div className='flex flex-col'>
               {loading ? (
-                <Input placeholder='Loading...' className='!w-[200px]' disabled />
+                <Input placeholder='Loading...' className='w-[200px]!' disabled />
               ) : (
                 <InputNumber
                   placeholder='9000'
-                  className='!w-[200px]'
+                  className='w-[200px]!'
                   id='mmr'
                   name='mmr'
                   type='number'

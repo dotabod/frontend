@@ -72,7 +72,7 @@ export const InGameOverlays = ({
       </RestrictFeature>
 
       <div
-        className={clsx('absolute flex items-end justify-end', isRight && '!justify-start')}
+        className={clsx('absolute flex items-end justify-end', isRight && 'justify-start!')}
         id='ingame-wl-mmr-card'
         style={{ ...wlPosition, width: res({ w: 215 }) }}
       >

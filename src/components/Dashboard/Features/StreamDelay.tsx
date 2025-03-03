@@ -26,7 +26,7 @@ export default function StreamDelayCard() {
               min={0}
               max={60}
               placeholder='0 seconds'
-              className='!w-[200px] transition-all'
+              className='w-[200px]! transition-all'
               defaultValue={Math.abs(Number(delay) || 0) / 1000}
               onChange={debouncedUpdate}
             />

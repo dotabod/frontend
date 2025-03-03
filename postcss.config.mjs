@@ -1,11 +1,9 @@
 const config = {
   plugins: {
-    'tailwindcss/nesting': {},
-    tailwindcss: {},
+    '@tailwindcss/postcss': {},
     'postcss-focus-visible': {
       replaceWith: '[data-focus-visible-added]',
     },
-    autoprefixer: {},
   },
 }
 

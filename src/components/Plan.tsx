@@ -356,7 +356,7 @@ function Plan({
       className={clsx(
         'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5',
         featured
-          ? 'order-first bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
+          ? 'order-first bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
           : 'bg-gray-800/50 backdrop-blur-xl',
       )}
     >
@@ -373,7 +373,7 @@ function Plan({
               width={24}
               height={24}
               alt='Lifetime'
-              className='rounded'
+              className='rounded-sm'
             />
           ) : (
             logo

@@ -6,7 +6,7 @@ const NotFound: NextPageWithLayout = () => {
   // Opinionated: do not record an exception in Sentry for 404
   return (
     <div
-      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem),1fr]'
+      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem)_1fr]'
       style={{
         minHeight: 'inherit',
       }}
@@ -28,7 +28,7 @@ const NotFound: NextPageWithLayout = () => {
         <img
           src='/images/404.webp'
           alt=''
-          className='absolute inset-0 h-full w-full object-cover rounded'
+          className='absolute inset-0 h-full w-full object-cover rounded-sm'
         />
       </div>
     </div>

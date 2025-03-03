@@ -70,10 +70,10 @@ export function SecondaryFeatures() {
         <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandMmr].response()}
           <div className='mt-6 flex justify-center space-x-4'>
-            <MMRBadge image='55.png' rank={3860} className='self-center !rounded-md' />
+            <MMRBadge image='55.png' rank={3860} className='self-center rounded-md!' />
             <MMRBadge
               image='92.png'
-              className='self-center !rounded-md'
+              className='self-center rounded-md!'
               leaderboard={1}
               rank={13150}
             />
@@ -133,7 +133,7 @@ export function SecondaryFeatures() {
             </div>
           }
         >
-          <Link className='flex !items-center space-x-1' onClick={(e) => e.preventDefault()}>
+          <Link className='flex items-center! space-x-1' onClick={(e) => e.preventDefault()}>
             <SparklesIcon className='text-purple-200' height={22} />
             <span className='text-purple-300'>Preview</span>
           </Link>

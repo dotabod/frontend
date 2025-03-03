@@ -85,7 +85,7 @@ export const plans = [
         src='https://cdn.betterttv.net/emote/5ff1bbbf9d7d952e405a2edc/3x.webp'
         width={24}
         height={24}
-        className='rounded'
+        className='rounded-sm'
         alt='Pro'
       />
     ),
