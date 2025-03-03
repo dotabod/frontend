@@ -20,6 +20,7 @@
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
     "@ant-design/cssinjs": "^1.23.0",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@crowdin/ota-client": "^2.0.1",
     "@emotion/react": "^11.14.0",
     "@headlessui/react": "^2.2.0",

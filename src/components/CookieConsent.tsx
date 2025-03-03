@@ -446,7 +446,7 @@ const CookieConsent = () => {
 
   return (
     <>
-      {visible && (
+      {visible && !showSettings && (
         <Alert
           message='Cookie Consent Required'
           description={
@@ -493,8 +493,22 @@ const CookieConsent = () => {
         onClose={() => setShowSettings(false)}
         open={showSettings}
         height={600}
+        width='100%'
+        style={{ maxWidth: '100%' }}
+        styles={{
+          header: {
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            flexWrap: 'wrap',
+            gap: '20px',
+          },
+          body: {
+            paddingTop: '20px',
+          },
+        }}
         extra={
-          <Space>
+          <Space wrap>
             <Button onClick={handleRejectAll}>Reject All</Button>
             <Button onClick={handleAcceptAll}>Accept All</Button>
             <Button type='primary' onClick={handleSavePreferences}>
@@ -504,7 +518,6 @@ const CookieConsent = () => {
         }
       >
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <Title level={4}>Manage Cookie Preferences</Title>
           <Paragraph>
             Cookies are small data files that are placed on your computer or mobile device when you
             visit a website. Cookies are widely used by website owners to make their websites work,
