@@ -31,8 +31,6 @@ if (SENTRY_DSN) {
     tracesSampleRate: 0.1,
     // Capture errors based on environment
     release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
-    // Automatically set user information from session when available
-    autoSessionTracking: true,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
@@ -44,7 +42,7 @@ if (SENTRY_DSN) {
      * "0" so that we have manual control over session-based replays
      */
     replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 0,
+    replaysOnErrorSampleRate: 1,
     integrations: [replay],
   })
 
