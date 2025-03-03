@@ -97,21 +97,37 @@ const ObsSetup: React.FC = () => {
   }, [obsPort, obsPassword, form, obs, obsPassword])
 
   useEffect(() => {
-    const connectObs = async () => {
-      if (!obs || !hasAccess) return
+    if (!obs || !hasAccess) return
 
+    const handleConnectionClosed = (error?: any) => {
+      console.log('OBS connection closed', error)
+      setConnected(false)
+      if (error) {
+        setError(`Connection to OBS lost: ${error.message || 'Unknown error'}`)
+        track('obs/connection_closed', { error: error.message })
+      } else {
+        setError('Connection to OBS lost. Please check your OBS is running.')
+        track('obs/connection_closed', { error: 'No error details' })
+      }
+    }
+
+    const handleConnectionError = (error: any) => {
+      console.log('OBS connection error:', error)
+      setConnected(false)
+      setError(`Connection error: ${error.message || 'Unknown error'}`)
+      track('obs/connection_error', { error: error.message })
+    }
+
+    // Register event handlers
+    obs.on('ConnectionClosed', handleConnectionClosed)
+    obs.on('ConnectionError', handleConnectionError)
+
+    const connectObs = async () => {
       try {
         const obsHost = 'localhost'
         const obsPortValue = form.getFieldValue('port') || 4455
         const obsPasswordValue = form.getFieldValue('password') || ''
 
-        // Add error handler for WebSocket closure
-        obs.on('ConnectionClosed', () => {
-          setConnected(false)
-          setError('Connection to OBS lost. Please check your OBS is running.')
-        })
-
-        // Connect to OBS WebSocket
         await obs.connect(`ws://${obsHost}:${obsPortValue}`, obsPasswordValue, {
           eventSubscriptions: 0b1111111111111111,
         })
@@ -119,11 +135,9 @@ const ObsSetup: React.FC = () => {
 
         track('obs/connect_success', { port: obsPortValue })
 
-        // Get the current OBS version
         const getVersion = await obs.call('GetVersion')
         const obsVersion = getVersion.obsVersion
 
-        // Make sure they are 30.2.3 or above
         const [major, minor, patch] = obsVersion.split('.').map(Number)
         if (
           major < 30 ||
@@ -131,39 +145,41 @@ const ObsSetup: React.FC = () => {
           (major === 30 && minor === 2 && patch < 3)
         ) {
           setError('OBS version 30.2.3 or above is required')
-          console.error('Error: OBS version 30.2.3 or above is required')
+          console.log('Error: OBS version 30.2.3 or above is required')
           track('obs/version_error', { version: obsVersion })
           return
         }
 
-        // Fetch the base canvas resolution
         const videoSettings = await obs.call('GetVideoSettings')
         const fetchedBaseWidth = videoSettings.baseWidth
         const fetchedBaseHeight = videoSettings.baseHeight
         setBaseWidth(fetchedBaseWidth)
         setBaseHeight(fetchedBaseHeight)
 
-        // Fetch the list of scenes and handle auto-add if necessary
         await fetchScenes(fetchedBaseWidth, fetchedBaseHeight)
         setError(null)
       } catch (err: unknown) {
         const error = err as Error
         setError(error.message || 'Error connecting to OBS')
-        console.error('Error:', error)
+        console.log('Error:', error)
         track('obs/connection_error', { error: error.message })
       }
     }
 
-    if (obs && hasAccess) {
-      connectObs()
-    }
+    connectObs()
 
     return () => {
-      if (obs) {
-        obs.off('ConnectionClosed')
+      // Clean up all event listeners
+      obs.off('ConnectionClosed', handleConnectionClosed)
+      obs.off('ConnectionError', handleConnectionError)
+
+      try {
         obs.disconnect()
-        setConnected(false)
+      } catch (err) {
+        console.log('Error disconnecting from OBS:', err)
       }
+
+      setConnected(false)
     }
   }, [obs, hasAccess, form, track])
 
@@ -199,7 +215,7 @@ const ObsSetup: React.FC = () => {
     } catch (err: unknown) {
       const error = err as Error
       setError('Error fetching scenes')
-      console.error('Error:', error)
+      console.log('Error:', error)
       Sentry.captureException(error)
       track('obs/fetch_scenes_error', { error: error.message })
     }
@@ -281,7 +297,7 @@ const ObsSetup: React.FC = () => {
       } catch (err: unknown) {
         const error = err as Error
         setError(error.message || 'Error adding browser source to scene')
-        console.error('Error:', error)
+        console.log('Error:', error)
         Sentry.captureException(error)
         track('obs/add_to_scene_error', { error: error.message })
       }
@@ -316,7 +332,7 @@ const ObsSetup: React.FC = () => {
         }
       } catch (err: unknown) {
         const error = err as Error
-        console.error(`Error checking scene "${scene}":`, error)
+        console.log(`Error checking scene "${scene}":`, error)
         Sentry.captureException(error)
         // Continue checking other scenes even if one fails
       }

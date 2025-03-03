@@ -7,7 +7,7 @@ import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
-import { Alert, App, Button, Collapse, Steps } from 'antd'
+import { Alert, App, Button, Collapse, Space, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -247,7 +247,7 @@ const SetupPage = () => {
 
       {steps[active].content}
 
-      <div className='flex space-x-4 pb-10'>
+      <Space>
         {active > 0 && (
           <Button size='large' onClick={prevStep}>
             Back
@@ -266,7 +266,7 @@ const SetupPage = () => {
             Next step
           </Button>
         )}
-      </div>
+      </Space>
     </>
   )
 }
