@@ -94,7 +94,7 @@ const ObsSetup: React.FC = () => {
     } else if (!obs && obsPort && obsPassword) {
       setObs(new OBSWebSocket())
     }
-  }, [obsPort, obsPassword])
+  }, [obsPort, obsPassword, form, obs, obsPassword])
 
   useEffect(() => {
     const connectObs = async () => {
@@ -105,8 +105,16 @@ const ObsSetup: React.FC = () => {
         const obsPortValue = form.getFieldValue('port') || 4455
         const obsPasswordValue = form.getFieldValue('password') || ''
 
+        // Add error handler for WebSocket closure
+        obs.on('ConnectionClosed', () => {
+          setConnected(false)
+          setError('Connection to OBS lost. Please check your OBS is running.')
+        })
+
         // Connect to OBS WebSocket
-        await obs.connect(`ws://${obsHost}:${obsPortValue}`, obsPasswordValue)
+        await obs.connect(`ws://${obsHost}:${obsPortValue}`, obsPasswordValue, {
+          eventSubscriptions: 0b1111111111111111,
+        })
         setConnected(true)
 
         track('obs/connect_success', { port: obsPortValue })
@@ -138,10 +146,11 @@ const ObsSetup: React.FC = () => {
         // Fetch the list of scenes and handle auto-add if necessary
         await fetchScenes(fetchedBaseWidth, fetchedBaseHeight)
         setError(null)
-      } catch (err: any) {
-        setError(err.message || 'Error connecting to OBS')
-        console.error('Error:', err)
-        track('obs/connection_error', { error: err.message })
+      } catch (err: unknown) {
+        const error = err as Error
+        setError(error.message || 'Error connecting to OBS')
+        console.error('Error:', error)
+        track('obs/connection_error', { error: error.message })
       }
     }
 
@@ -151,11 +160,12 @@ const ObsSetup: React.FC = () => {
 
     return () => {
       if (obs) {
+        obs.off('ConnectionClosed')
         obs.disconnect()
         setConnected(false)
       }
     }
-  }, [obs, hasAccess])
+  }, [obs, hasAccess, form, track])
 
   // Modify fetchScenes to accept baseWidth and baseHeight
   const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
@@ -164,7 +174,9 @@ const ObsSetup: React.FC = () => {
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
-      const sceneUuids = sceneListResponse.scenes.map((scene: any) => (scene as Scene).sceneUuid)
+      const sceneUuids = sceneListResponse.scenes.map(
+        (scene: { sceneUuid: string }) => scene.sceneUuid,
+      )
       setScenes(sceneListResponse.scenes as unknown as Scene[])
 
       // Check each scene for the existence of the browser source
@@ -184,11 +196,12 @@ const ObsSetup: React.FC = () => {
       }
 
       setError(null)
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error
       setError('Error fetching scenes')
-      console.error('Error:', err)
-      Sentry.captureException(err)
-      track('obs/fetch_scenes_error', { error: err.message })
+      console.error('Error:', error)
+      Sentry.captureException(error)
+      track('obs/fetch_scenes_error', { error: error.message })
     }
   }
 
@@ -215,7 +228,7 @@ const ObsSetup: React.FC = () => {
 
         // Check if the browser source already exists in the selected scene
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay',
+          (item: { sourceName: string }) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -226,7 +239,7 @@ const ObsSetup: React.FC = () => {
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
         const existingInput = inputListResponse.inputs.find(
-          (input: any) => input.inputName === '[dotabod] main overlay',
+          (input: { inputName: string }) => input.inputName === '[dotabod] main overlay',
         )
 
         if (existingInput) {
@@ -265,11 +278,12 @@ const ObsSetup: React.FC = () => {
           addedScenes++
           message.success(`New browser source created and added to scene: ${selectedScene}`)
         }
-      } catch (err: any) {
-        setError(err.message || 'Error adding browser source to scene')
-        console.error('Error:', err)
-        Sentry.captureException(err)
-        track('obs/add_to_scene_error', { error: err.message })
+      } catch (err: unknown) {
+        const error = err as Error
+        setError(error.message || 'Error adding browser source to scene')
+        console.error('Error:', error)
+        Sentry.captureException(error)
+        track('obs/add_to_scene_error', { error: error.message })
       }
     }
 
@@ -294,15 +308,16 @@ const ObsSetup: React.FC = () => {
         })
 
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay',
+          (item: { sourceName: string }) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
           scenesWithOverlay.push(scene)
         }
-      } catch (err: any) {
-        console.error(`Error checking scene "${scene}":`, err)
-        Sentry.captureException(err)
+      } catch (err: unknown) {
+        const error = err as Error
+        console.error(`Error checking scene "${scene}":`, error)
+        Sentry.captureException(error)
         // Continue checking other scenes even if one fails
       }
     }
@@ -339,62 +354,63 @@ const ObsSetup: React.FC = () => {
         style={{ maxWidth: 600, margin: '0 auto' }}
         className='space-y-2'
       >
-        {!error && scenesWithSource.length > 0 && (
-          <Alert
-            message='Overlay setup complete'
-            type='success'
-            description={`Added the Dotabod overlay on scene(s): ${scenesWithSource
-              .map((sceneUuid) => {
-                const scene = scenes.find((s) => s.sceneUuid === sceneUuid)
-                return scene ? scene.sceneName : sceneUuid
-              })
-              .join(', ')}`}
-            showIcon
-            action={
-              <Link href='/dashboard?step=4'>
-                <Button>Go to step 4</Button>
-              </Link>
-            }
-          />
-        )}
-        {!error && connected && scenesWithSource.length === 0 && (
-          <Alert message='Connected to OBS, now select your scenes below' type='info' showIcon />
-        )}
+        <Space direction='vertical' size='middle' className='mb-4'>
+          {!error && scenesWithSource.length > 0 && (
+            <Alert
+              message='Overlay setup complete'
+              type='success'
+              description={`Added the Dotabod overlay on scene(s): ${scenesWithSource
+                .map((sceneUuid) => {
+                  const scene = scenes.find((s) => s.sceneUuid === sceneUuid)
+                  return scene ? scene.sceneName : sceneUuid
+                })
+                .join(', ')}`}
+              showIcon
+              action={
+                <Link href='/dashboard?step=4'>
+                  <Button>Go to step 4</Button>
+                </Link>
+              }
+            />
+          )}
+          {!error && connected && scenesWithSource.length === 0 && (
+            <Alert message='Connected to OBS, now select your scenes below' type='info' showIcon />
+          )}
 
-        {error && (
-          <Alert
-            message={`${error}. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.`}
-            type='error'
-            showIcon
-            action={
-              <div className='space-x-4'>
-                <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
-                {error.includes('OBS version') && (
-                  <Button type='primary' href='https://obsproject.com/download' target='_blank'>
-                    Update OBS
-                  </Button>
-                )}
-              </div>
-            }
-          />
-        )}
+          {error && (
+            <Alert
+              message={`${error}. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.`}
+              type='error'
+              showIcon
+              action={
+                <div className='space-x-4'>
+                  <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
+                  {error.includes('OBS version') && (
+                    <Button type='primary' href='https://obsproject.com/download' target='_blank'>
+                      Update OBS
+                    </Button>
+                  )}
+                </div>
+              }
+            />
+          )}
 
-        {error && !error.includes('OBS version') && (
-          <Alert
-            message='Are you on the latest version of OBS? v30.2.3 or above is required.'
-            type='warning'
-            showIcon
-            action={
-              <Button type='primary' href='https://obsproject.com/download' target='_blank'>
-                Update OBS
-              </Button>
-            }
-          />
-        )}
-
+          {error && !error.includes('OBS version') && (
+            <Alert
+              message='Are you on the latest version of OBS? v30.2.3 or above is required.'
+              type='warning'
+              showIcon
+              action={
+                <Button type='primary' href='https://obsproject.com/download' target='_blank'>
+                  Update OBS
+                </Button>
+              }
+            />
+          )}
+        </Space>
         <Spin spinning={l0 || l1} tip='Loading'>
           {!connected && (
-            <div className='flex flex-col items-center space-x-4 md:flex-row'>
+            <Space size='middle'>
               <Form.Item
                 name='password'
                 className='flex-1'
@@ -438,7 +454,7 @@ const ObsSetup: React.FC = () => {
                   onPressEnter={() => form.submit()}
                 />
               </Form.Item>
-            </div>
+            </Space>
           )}
           {!error && connected && scenes.length > 1 && (
             <Form.Item
