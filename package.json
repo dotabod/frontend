@@ -47,6 +47,7 @@
     "caniuse-lite": "^1.0.30001701",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "focus-visible": "^5.2.1",
     "framer-motion": "^12.4.7",
     "graphql-request": "^7.1.2",
