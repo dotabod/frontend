@@ -1,7 +1,7 @@
-import { Tab } from '@headlessui/react'
+import { Tab, TabPanel } from '@headlessui/react'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import Image from 'next/image'
@@ -266,7 +266,7 @@ function FeaturesDesktop() {
           <CircleBackground color='#13B5C8' className='animate-spin-slower' />
         </div>
         <PhoneFrame className='z-10 mx-auto w-full max-w-[366px]'>
-          <Tab.Panels as={Fragment}>
+          <TabPanel>
             {features.map((feature, featureIndex) =>
               selectedIndex === featureIndex ? (
                 <Tab.Panel
@@ -278,7 +278,7 @@ function FeaturesDesktop() {
                 </Tab.Panel>
               ) : null,
             )}
-          </Tab.Panels>
+          </TabPanel>
         </PhoneFrame>
       </div>
     </Tab.Group>
@@ -386,7 +386,7 @@ export function PrimaryFeatures() {
             Best features you need to stream. Try it for yourself.
           </h2>
           <p className='mt-2 text-lg text-gray-400'>
-            Dotabod was built for streamers like you who play by their own rules and aren’t going to
+            Dotabod was built for streamers like you who play by their own rules and aren't going to
             let anything get in the way of their dreams. If other streaming tools are afraid to
             build it, Dotabod has it.
           </p>

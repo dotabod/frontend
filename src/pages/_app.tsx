@@ -6,12 +6,11 @@ import store from '@/lib/redux/store'
 import themeConfig from '@/lib/theme/themeConfig'
 import '@/styles/tailwind.css'
 import { StyleProvider, createCache } from '@ant-design/cssinjs'
-import '@ant-design/v5-patch-for-react-19'
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
-import { App as AntProvider, ConfigProvider } from 'antd'
+import { App as AntProvider, ConfigProvider, unstableSetRender } from 'antd'
 import 'antd/dist/reset.css'
 import 'focus-visible'
 import type { NextPage } from 'next'
@@ -19,8 +18,28 @@ import type { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
-import { type ReactElement, type ReactNode, useEffect, useState } from 'react'
+import type { ReactElement, ReactNode } from 'react'
+import { useEffect, useState } from 'react'
+import { type Root, createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
+
+// Define a type for the container with _reactRoot property
+interface ContainerWithRoot extends Element {
+  _reactRoot?: Root
+}
+
+// Add the unstableSetRender implementation
+unstableSetRender((node, container) => {
+  // Use the specific type instead of any
+  const containerWithRoot = container as ContainerWithRoot
+  containerWithRoot._reactRoot ||= createRoot(container)
+  const root = containerWithRoot._reactRoot
+  root.render(node)
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    root.unmount()
+  }
+})
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
