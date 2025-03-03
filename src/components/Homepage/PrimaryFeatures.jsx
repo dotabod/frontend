@@ -1,4 +1,4 @@
-import { Tab, TabPanel } from '@headlessui/react'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
@@ -227,14 +227,14 @@ function FeaturesDesktop() {
   )
 
   return (
-    <Tab.Group
+    <TabGroup
       as='div'
       className='grid grid-cols-12 items-center gap-8 lg:gap-16 xl:gap-24'
       selectedIndex={selectedIndex}
       onChange={onChange}
       vertical
     >
-      <Tab.List className='relative z-10 order-last col-span-6 space-y-6'>
+      <TabList className='relative z-10 order-last col-span-6 space-y-6'>
         {features.map((feature, featureIndex) => (
           <div
             key={feature.name}
@@ -260,28 +260,28 @@ function FeaturesDesktop() {
             </div>
           </div>
         ))}
-      </Tab.List>
+      </TabList>
       <div className='relative col-span-6'>
         <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
           <CircleBackground color='#13B5C8' className='animate-spin-slower' />
         </div>
         <PhoneFrame className='z-10 mx-auto w-full max-w-[366px]'>
-          <TabPanel>
+          <TabPanels as='div'>
             {features.map((feature, featureIndex) =>
               selectedIndex === featureIndex ? (
-                <Tab.Panel
+                <TabPanel
                   static
                   key={feature.name + changeCount}
                   className='col-start-1 row-start-1 flex focus:outline-offset-[32px] not-focus-visible:focus:outline-hidden'
                 >
                   <feature.screen animated custom={{ isForwards, changeCount }} />
-                </Tab.Panel>
+                </TabPanel>
               ) : null,
             )}
-          </TabPanel>
+          </TabPanels>
         </PhoneFrame>
       </div>
-    </Tab.Group>
+    </TabGroup>
   )
 }
 
