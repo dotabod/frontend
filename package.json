@@ -37,6 +37,7 @@
     "@sentry/nextjs": "9.3.0",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "^4.0.9",
+    "@tailwindcss/typography": "^0.5.16",
     "@twurple/eventsub-base": "7.2.1",
     "@vercel/analytics": "^1.5.0",
     "@vercel/edge-config": "^1.4.0",

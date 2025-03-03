@@ -65,8 +65,7 @@ const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => {
           <Title level={1} className='mb-8'>
             {meta.title}
           </Title>
-
-          <div className='prose dark:prose-invert max-w-none'>
+          <div className='max-w-none prose prose-invert prose-headings:font-bold prose-headings:text-gray-300 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-500 prose-li:text-gray-300 prose-ul:ml-5 prose-ol:ml-5 prose-li:pl-0 prose-code:bg-gray-800 prose-code:text-gray-200 prose-pre:bg-gray-800 prose-pre:text-gray-200 prose-blockquote:text-gray-400 prose-blockquote:border-gray-600'>
             <MDXRemote {...source} />
           </div>
         </article>
