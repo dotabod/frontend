@@ -252,10 +252,10 @@ enum MessageStatus {
 
 model ScheduledMessage {
   id            String            @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime          @updatedAt @db.Timestamptz(6)
   message       String
-  sendAt        DateTime
+  sendAt        DateTime          @db.Timestamptz(6)
   userId        String?
   user          User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   isForAllUsers Boolean           @default(false)
@@ -269,14 +269,14 @@ model ScheduledMessage {
 
 model MessageDelivery {
   id                 String           @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  createdAt          DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime         @updatedAt @db.Timestamptz(6)
   scheduledMessageId String
   scheduledMessage   ScheduledMessage @relation(fields: [scheduledMessageId], references: [id], onDelete: Cascade)
   userId             String
   user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   status             MessageStatus    @default(PENDING)
-  deliveredAt        DateTime?
+  deliveredAt        DateTime?        @db.Timestamptz(6)
 
   @@unique([scheduledMessageId, userId])
   @@index([scheduledMessageId])

@@ -48,12 +48,6 @@ const AdminPage = () => {
   const [form] = Form.useForm()
   const [openDialog, setOpenDialog] = useState(false)
   const [editingMessage, setEditingMessage] = useState<ScheduledMessage | null>(null)
-  const [formData, setFormData] = useState({
-    message: '',
-    sendAt: '',
-    userId: '',
-    isForAllUsers: false,
-  })
 
   useEffect(() => {
     if (status === 'loading') return
@@ -106,7 +100,7 @@ const AdminPage = () => {
         sendAt:
           values.messageType === 'scheduled' && values.scheduledDate
             ? values.scheduledDate.format('YYYY-MM-DDTHH:mm:ss')
-            : new Date(Date.now() + 3600000).toISOString(), // Default to 1 hour from now if not scheduled
+            : new Date().toISOString(), // Default to now if not scheduled
       }
 
       console.log('Payload being sent:', payload)
@@ -149,7 +143,7 @@ const AdminPage = () => {
       setEditingMessage(null)
       form.setFieldsValue({
         message: '',
-        sendAt: new Date(Date.now() + 3600000), // Default to 1 hour from now
+        sendAt: new Date(), // Default to now
         userId: '',
         isForAllUsers: false,
       })
@@ -174,20 +168,11 @@ const AdminPage = () => {
         return
       }
 
-      // Convert sendAt to ISO string, handling different possible types
-      let sendAtISOString: string
-      if (typeof values.sendAt === 'string') {
-        sendAtISOString = new Date(values.sendAt).toISOString()
-      } else {
-        // Default to current time if we can't parse the date
-        sendAtISOString = new Date().toISOString()
-      }
-
       const formData = {
         message: values.message,
         isForAllUsers: values.isForAllUsers || false,
         userId: values.isForAllUsers ? null : values.userId,
-        sendAt: sendAtISOString,
+        sendAt: values.sendAt,
       }
 
       console.log('Dialog payload being sent:', formData)
@@ -250,7 +235,7 @@ const AdminPage = () => {
       title: 'Send At',
       dataIndex: 'sendAt',
       key: 'sendAt',
-      render: (text) => format(new Date(text), 'PPpp'),
+      render: (text) => (text ? format(new Date(text), 'PPpp') : 'When online'),
     },
     {
       title: 'Recipient',
@@ -436,7 +421,7 @@ const AdminPage = () => {
                     }
                   : {
                       message: '',
-                      sendAt: new Date(Date.now() + 3600000),
+                      sendAt: new Date(),
                       userId: '',
                       isForAllUsers: false,
                     }
@@ -454,16 +439,8 @@ const AdminPage = () => {
                 name='sendAt'
                 label='Send At'
                 rules={[{ required: true, message: 'Please select a date and time' }]}
-                getValueProps={(value) => {
-                  // Convert Date to dayjs for DatePicker
-                  if (value) {
-                    const dayjs = require('dayjs')
-                    return { value: dayjs(value) }
-                  }
-                  return { value }
-                }}
               >
-                <DatePicker showTime format='YYYY-MM-DD HH:mm' style={{ width: '100%' }} />
+                <DatePicker showTime />
               </Form.Item>
 
               <Form.Item name='isForAllUsers' valuePropName='checked'>

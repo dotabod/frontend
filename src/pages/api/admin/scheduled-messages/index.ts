@@ -1,7 +1,6 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import type { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -107,20 +106,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    // Create the scheduled message with the correct user ID
-    const createData: Prisma.ScheduledMessageUncheckedCreateInput = {
-      message,
-      sendAt: new Date(sendAt),
-      userId: isForAllUsers ? null : actualUserId,
-      isForAllUsers,
-      status: 'PENDING',
+    // When creating the scheduled message, ensure proper date handling
+    try {
+      const createdMessage = await prisma.scheduledMessage.create({
+        data: {
+          message,
+          userId: actualUserId,
+          isForAllUsers,
+          sendAt: new Date(sendAt),
+        },
+      })
+
+      return res.status(200).json(createdMessage)
+    } catch (error) {
+      console.error('Error creating scheduled message:', error)
+      return res.status(500).json({ error: 'Failed to create scheduled message' })
     }
-
-    const scheduledMessage = await prisma.scheduledMessage.create({
-      data: createData,
-    })
-
-    return res.status(201).json(scheduledMessage)
   }
 
   return res.status(405).json({ error: 'Method not allowed' })
