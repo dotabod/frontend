@@ -22,6 +22,12 @@ export const useUpdate = ({
   const router = useRouter()
   const { data, error } = useSWR(router.isReady ? path : null, fetcher, {
     revalidateIfStale: false,
+    shouldRetryOnError(err) {
+      if (err.status === 404 || err.status === 403) {
+        return false
+      }
+      return true
+    },
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   })
