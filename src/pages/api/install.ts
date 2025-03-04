@@ -1,27 +1,9 @@
-import { promises as fs } from 'node:fs'
-import path from 'node:path'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
-import { authOptions } from '@/lib/auth'
-import { canAccessFeature } from '@/utils/subscription'
-import { getSubscription } from '@/utils/subscription'
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Get user session
-  const session = await getServerSession(req, res, authOptions)
-  if (!session?.user?.id) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
-
-  // Check subscription access
-  const subscription = await getSubscription(session.user.id)
-  const { hasAccess, requiredTier } = canAccessFeature('autoInstaller', subscription)
-
-  if (!hasAccess) {
-    return res.status(403).json({ error: 'This feature requires a subscription', requiredTier })
-  }
-
   try {
     // Read the PowerShell script from private directory
     const scriptPath = path.join(process.cwd(), 'src', 'lib', 'private', 'install.ps1')
