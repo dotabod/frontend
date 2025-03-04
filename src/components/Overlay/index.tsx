@@ -76,6 +76,7 @@ const OverlayPage = () => {
   })
 
   const [isInIframe, setIsInIframe] = useState(false)
+  const is404 = error && typeof error === 'object' && 'status' in error && error.status === 404
 
   // Refresh the page every 5 minutes if the socket is disconnected
   useEffect(() => {
@@ -117,7 +118,7 @@ const OverlayPage = () => {
   useEffect(() => {
     let reloadTimeout: NodeJS.Timeout | null = null
 
-    if (!original?.stream_online) {
+    if (original?.stream_online === false) {
       notification.open({
         key: 'stream-offline',
         type: 'error',
@@ -151,32 +152,36 @@ const OverlayPage = () => {
   }, [])
 
   useEffect(() => {
-    if (error) {
-      // Log the error to Sentry instead of showing to users
-      if (!isDev) {
-        Sentry.captureException(new Error('Authentication error in overlay'), {
-          extra: {
-            error,
-            originalData: original,
-          },
-        })
-      }
-
-      // For development environment only, still show the notification
-      if (isDev) {
-        notification.open({
-          key: 'auth-error',
-          type: 'error',
-          duration: 0,
-          placement: 'bottomLeft',
-          message: 'Authentication failed',
-          description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
-        })
-      } else {
-        notification.destroy('auth-error')
-      }
+    if (!is404) {
+      Sentry.captureException(new Error('Error in overlay page fetching settings'), {
+        extra: {
+          error,
+          originalData: original,
+        },
+      })
     }
-  }, [error, notification])
+
+    if (is404) {
+      notification.open({
+        key: 'auth-error',
+        type: 'error',
+        duration: 0,
+        placement: 'bottomLeft',
+        message: 'Authentication failed',
+        description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+      })
+      // Capture a soft error to Sentry for 404 accounts
+      Sentry.captureMessage('Account not found in overlay', {
+        level: 'warning',
+        extra: {
+          error,
+          originalData: original,
+        },
+      })
+    } else {
+      notification.destroy('auth-error')
+    }
+  }, [error, notification, is404, original])
 
   useEffect(() => {
     if (!isDev) return
@@ -222,6 +227,22 @@ const OverlayPage = () => {
         />
       </>
     ) : null
+  }
+
+  if (is404) {
+    return (
+      <>
+        <Head>
+          <title>Dotabod | Stream overlays</title>
+        </Head>
+        <style global jsx>{`
+          html,
+          body {
+            overflow: hidden;
+          }
+        `}</style>
+      </>
+    )
   }
 
   return (
