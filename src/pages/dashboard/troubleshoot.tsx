@@ -6,6 +6,7 @@ import { MessageOutlined } from '@ant-design/icons'
 import {
   Alert,
   Button,
+  Divider,
   Form,
   Input,
   type StepProps,
@@ -20,7 +21,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import type React from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 // Define form values interface
@@ -206,16 +207,67 @@ const TroubleshootPage = () => {
   const isLive = data?.stream_online
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
+  const [hubspotBlocked, setHubspotBlocked] = useState(false)
+
+  // Check if HubSpot is blocked
+  useEffect(() => {
+    let checkAttempts = 0
+    const maxAttempts = 5 // 2.5 seconds with 500ms interval
+    let checkInterval: NodeJS.Timeout | null = null
+
+    const checkHubspotAvailability = () => {
+      // Check if HubSpot script loaded properly
+      const hubspotLoaded = typeof window.HubSpotConversations !== 'undefined'
+
+      if (hubspotLoaded) {
+        // HubSpot is available, clear interval
+        if (checkInterval) {
+          clearInterval(checkInterval)
+        }
+        setHubspotBlocked(false)
+      } else if (checkAttempts >= maxAttempts) {
+        // Max attempts reached, consider HubSpot blocked
+        if (checkInterval) {
+          clearInterval(checkInterval)
+        }
+        setHubspotBlocked(true)
+      }
+
+      checkAttempts++
+    }
+
+    if (typeof window !== 'undefined') {
+      // Initial check
+      checkHubspotAvailability()
+
+      // Set up interval to check every 500ms for up to 5 seconds
+      checkInterval = setInterval(checkHubspotAvailability, 500)
+
+      // Clean up interval on unmount
+      return () => {
+        if (checkInterval) {
+          clearInterval(checkInterval)
+        }
+      }
+    }
+  }, [])
 
   // Function to open HubSpot chat widget
   const openChatWidget = () => {
     if (window.HubSpotConversations) {
       window.HubSpotConversations.widget.open()
+    } else {
+      message.error('Chat support appears to be blocked by your browser or extensions')
     }
   }
 
   // Function to handle form submission to HubSpot
   const handleSubmit = async (values: FormValues) => {
+    if (!values.message) {
+      message.error('Please enter a message')
+      return
+    }
+
     setSubmitting(true)
     try {
       // HubSpot API endpoint for form submissions
@@ -253,6 +305,11 @@ const TroubleshootPage = () => {
     } catch (error) {
       console.error('Error submitting form:', error)
       message.error('There was an error submitting your message. Please try again.')
+
+      // Check if it might be due to content blockers
+      if (error.message?.includes('Network Error') || error.message?.includes('Failed to fetch')) {
+        message.warning('This may be due to ad blockers or privacy settings in your browser')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -264,10 +321,46 @@ const TroubleshootPage = () => {
         <title>Dotabod | Troubleshooting</title>
       </Head>
       <Header subtitle="Try these steps in case something isn't working." title='Troubleshooting' />
-      <div className='flex flex-col gap-4 justify-between items-start max-w-2xl'>
-        <Button type='primary' icon={<MessageOutlined />} onClick={openChatWidget}>
-          Chat Support
-        </Button>
+      <div className='flex flex-col gap-4 justify-between items-start'>
+        <div className='max-w-2xl w-full'>
+          <Card className='gap-4 flex flex-col' title='Need help? Get support'>
+            {hubspotBlocked && (
+              <Alert
+                banner
+                message="Live chat may be blocked by your browser's privacy settings or extensions"
+                type='warning'
+                showIcon
+              />
+            )}
+
+            <Form
+              form={form}
+              layout='vertical'
+              onFinish={handleSubmit}
+              className='gap-4 flex flex-col'
+            >
+              <Form.Item
+                name='message'
+                label='Message'
+                rules={[{ required: true, message: 'Please enter your message' }]}
+              >
+                <Input.TextArea placeholder="Describe the issue you're experiencing..." rows={4} />
+              </Form.Item>
+
+              <Form.Item>
+                <div className='flex gap-3 items-center'>
+                  <Button type='primary' htmlType='submit' loading={submitting}>
+                    Submit Ticket
+                  </Button>
+                  <Divider type='vertical' />
+                  <Button icon={<MessageOutlined />} onClick={openChatWidget} type='default'>
+                    Live Chat Support
+                  </Button>
+                </div>
+              </Form.Item>
+            </Form>
+          </Card>
+        </div>
         {!isLive && (
           <Alert
             message='Your stream is offline, and Dotabod will only work once you start streaming and go online.'
@@ -290,28 +383,6 @@ const TroubleshootPage = () => {
               ),
           )}
         </div>
-      </div>
-
-      {/* Ant Design Form replacing HubSpot embedded form */}
-      <div className='max-w-2xl'>
-        <Card>
-          <h2 className='text-lg font-medium mb-4'>Still need help? Send us a message</h2>
-          <Form form={form} layout='vertical' onFinish={handleSubmit}>
-            <Form.Item
-              name='message'
-              label='Message'
-              rules={[{ required: true, message: 'Please enter your message' }]}
-            >
-              <Input.TextArea placeholder="Describe the issue you're experiencing..." rows={4} />
-            </Form.Item>
-
-            <Form.Item>
-              <Button type='primary' htmlType='submit' loading={submitting}>
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
-        </Card>
       </div>
     </>
   )
