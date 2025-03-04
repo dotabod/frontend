@@ -6,13 +6,11 @@ import type { ScheduledMessage } from '@prisma/client'
 import type { TabsProps } from 'antd'
 import {
   Button,
-  Checkbox,
   DatePicker,
   Form,
   Input,
   Modal,
   Progress,
-  Radio,
   Space,
   Table,
   Tabs,
@@ -21,8 +19,9 @@ import {
   message,
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import axios from 'axios'
 import { format } from 'date-fns'
-import type dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -32,11 +31,9 @@ const { TextArea } = Input
 
 interface FormValues {
   message: string
-  messageType?: 'when_online' | 'scheduled'
   scheduledDate?: dayjs.Dayjs
   sendAt: string | dayjs.Dayjs | Date
   userId?: string
-  isForAllUsers: boolean
 }
 
 const AdminPage = () => {
@@ -44,10 +41,10 @@ const AdminPage = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState<ScheduledMessage[]>([])
-  const [messageType, setMessageType] = useState<'when_online' | 'scheduled'>('when_online')
   const [form] = Form.useForm()
   const [openDialog, setOpenDialog] = useState(false)
   const [editingMessage, setEditingMessage] = useState<ScheduledMessage | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -79,54 +76,26 @@ const AdminPage = () => {
   }
 
   const handleSubmit = async (values: FormValues) => {
-    console.log('Form values submitted:', values)
-    if (!values.message.trim()) {
-      message.error('Message cannot be empty')
-      return
-    }
-
-    // Validate userId if not sending to all users
-    if (!values.isForAllUsers && !values.userId) {
-      message.error('Please select a user')
-      return
-    }
-
-    setLoading(true)
     try {
+      setSubmitting(true)
+      const isForAllUsers = !values.userId
+
       const payload = {
         message: values.message,
-        isForAllUsers: values.isForAllUsers || false,
-        userId: values.isForAllUsers ? null : values.userId,
-        sendAt:
-          values.messageType === 'scheduled' && values.scheduledDate
-            ? values.scheduledDate.format('YYYY-MM-DDTHH:mm:ss')
-            : new Date().toISOString(), // Default to now if not scheduled
+        sendAt: values.scheduledDate ? values.scheduledDate.toISOString() : dayjs().toISOString(),
+        userId: isForAllUsers ? undefined : values.userId,
+        isForAllUsers,
       }
 
-      console.log('Payload being sent:', payload)
-
-      const response = await fetch('/api/admin/scheduled-messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to schedule message')
-      }
-
-      message.success(
-        `Message ${values.messageType === 'when_online' ? 'created' : 'scheduled'} successfully`,
-      )
+      await axios.post('/api/admin/scheduled-messages', payload)
+      message.success('Message scheduled successfully')
       form.resetFields()
       fetchMessages()
     } catch (error) {
-      console.error('Error sending message:', error)
-      message.error('Failed to send message')
+      console.error(error)
+      message.error('Failed to schedule message')
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -137,7 +106,6 @@ const AdminPage = () => {
         message: message.message,
         sendAt: message.sendAt,
         userId: message.userId || '',
-        isForAllUsers: message.isForAllUsers,
       })
     } else {
       setEditingMessage(null)
@@ -145,7 +113,6 @@ const AdminPage = () => {
         message: '',
         sendAt: new Date(), // Default to now
         userId: '',
-        isForAllUsers: false,
       })
     }
     setOpenDialog(true)
@@ -160,45 +127,25 @@ const AdminPage = () => {
 
   const handleSubmitDialog = async (values: FormValues) => {
     try {
-      console.log('Dialog form values:', values)
+      setSubmitting(true)
+      const isForAllUsers = !values.userId
 
-      // Validate userId if not sending to all users
-      if (!values.isForAllUsers && !values.userId) {
-        message.error('Please select a user')
-        return
-      }
-
-      const formData = {
+      const payload = {
         message: values.message,
-        isForAllUsers: values.isForAllUsers || false,
-        userId: values.isForAllUsers ? null : values.userId,
-        sendAt: values.sendAt,
+        sendAt: values.scheduledDate ? values.scheduledDate.toISOString() : dayjs().toISOString(),
+        userId: isForAllUsers ? undefined : values.userId,
+        isForAllUsers,
       }
 
-      console.log('Dialog payload being sent:', formData)
-
-      if (editingMessage) {
-        // Update existing message
-        await fetch(`/api/admin/scheduled-messages/${editingMessage.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        })
-      } else {
-        // Create new message
-        await fetch('/api/admin/scheduled-messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        })
-      }
-
-      message.success(`Message ${editingMessage ? 'updated' : 'created'} successfully`)
-      handleCloseDialog()
+      await axios.put(`/api/admin/scheduled-messages/${editingMessage?.id}`, payload)
+      message.success('Message updated successfully')
+      setOpenDialog(false)
       fetchMessages()
     } catch (error) {
-      console.error('Error saving scheduled message:', error)
-      message.error('Failed to save message')
+      console.error(error)
+      message.error('Failed to update message')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -317,71 +264,38 @@ const AdminPage = () => {
       label: 'Create Message',
       children: (
         <Card>
-          <Form
-            form={form}
-            layout='vertical'
-            onFinish={handleSubmit}
-            initialValues={{ messageType: 'when_online' }}
-          >
-            <Form.Item name='messageType' label='Message Type'>
-              <Radio.Group optionType='default' onChange={(e) => setMessageType(e.target.value)}>
-                <Radio.Button value='when_online'>Send When User Comes Online</Radio.Button>
-                <Radio.Button value='scheduled'>
-                  Scheduled (Send When User Comes Online After Date)
-                </Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-
+          <Form form={form} layout='vertical' onFinish={handleSubmit}>
             <Form.Item
               name='message'
-              label='Message Content'
-              help='Use [username] to include the users name'
+              label='Message'
               rules={[{ required: true, message: 'Please enter a message' }]}
             >
-              <TextArea rows={4} placeholder='Enter your message here...' />
-            </Form.Item>
-
-            <Form.Item name='isForAllUsers' valuePropName='checked'>
-              <Checkbox>Send to all users</Checkbox>
+              <Input.TextArea rows={4} placeholder='Enter your message' />
             </Form.Item>
 
             <Form.Item
-              noStyle
-              shouldUpdate={(prevValues, currentValues) =>
-                prevValues.isForAllUsers !== currentValues.isForAllUsers
-              }
+              name='userId'
+              label='Select User (empty to send to all users)'
+              tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API. If left empty, the message will be sent to all users."
             >
-              {({ getFieldValue }) =>
-                !getFieldValue('isForAllUsers') ? (
-                  <Form.Item
-                    name='userId'
-                    label='Select User'
-                    rules={[{ required: true, message: 'Please select a user' }]}
-                    tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API."
-                  >
-                    <UserSelector placeholder='Search for a user' />
-                  </Form.Item>
-                ) : null
-              }
+              <UserSelector placeholder='Search for a user' />
             </Form.Item>
 
-            {messageType === 'scheduled' && (
-              <Form.Item
-                name='scheduledDate'
-                label='Scheduled Date'
-                rules={[{ required: true, message: 'Please select a date and time' }]}
-              >
-                <DatePicker
-                  showTime
-                  format='YYYY-MM-DD HH:mm:ss'
-                  placeholder='Select date and time'
-                />
-              </Form.Item>
-            )}
+            <Form.Item
+              name='scheduledDate'
+              label='Scheduled Date (defaults to now)'
+              initialValue={dayjs()}
+            >
+              <DatePicker
+                showTime
+                format='YYYY-MM-DD HH:mm:ss'
+                placeholder='Select date and time'
+              />
+            </Form.Item>
 
             <Form.Item>
               <Button type='primary' htmlType='submit' block>
-                {messageType === 'when_online' ? 'Send Message Now' : 'Schedule Message'}
+                Schedule Message
               </Button>
             </Form.Item>
           </Form>
@@ -417,13 +331,11 @@ const AdminPage = () => {
                       message: editingMessage.message,
                       sendAt: editingMessage.sendAt,
                       userId: editingMessage.userId || '',
-                      isForAllUsers: editingMessage.isForAllUsers,
                     }
                   : {
                       message: '',
                       sendAt: new Date(),
                       userId: '',
-                      isForAllUsers: false,
                     }
               }
             >
@@ -432,39 +344,27 @@ const AdminPage = () => {
                 label='Message'
                 rules={[{ required: true, message: 'Please enter a message' }]}
               >
-                <Input.TextArea rows={4} />
+                <Input.TextArea rows={4} placeholder='Enter your message' />
               </Form.Item>
 
               <Form.Item
-                name='sendAt'
-                label='Send At'
-                rules={[{ required: true, message: 'Please select a date and time' }]}
+                name='userId'
+                label='Select User (empty to send to all users)'
+                tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API. If left empty, the message will be sent to all users."
               >
-                <DatePicker showTime />
-              </Form.Item>
-
-              <Form.Item name='isForAllUsers' valuePropName='checked'>
-                <Checkbox>Send to all users</Checkbox>
+                <UserSelector placeholder='Search for a user' allowClear />
               </Form.Item>
 
               <Form.Item
-                noStyle
-                shouldUpdate={(prevValues, currentValues) =>
-                  prevValues.isForAllUsers !== currentValues.isForAllUsers
-                }
+                name='scheduledDate'
+                label='Scheduled Date (Defaults to now if empty)'
+                initialValue={dayjs()}
               >
-                {({ getFieldValue }) =>
-                  !getFieldValue('isForAllUsers') ? (
-                    <Form.Item
-                      name='userId'
-                      label='Select User'
-                      rules={[{ required: true, message: 'Please select a user' }]}
-                      tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API."
-                    >
-                      <UserSelector placeholder='Search for a user' />
-                    </Form.Item>
-                  ) : null
-                }
+                <DatePicker
+                  showTime
+                  format='YYYY-MM-DD HH:mm:ss'
+                  placeholder='Select date and time'
+                />
               </Form.Item>
 
               <Form.Item>

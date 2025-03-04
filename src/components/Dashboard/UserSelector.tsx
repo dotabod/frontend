@@ -93,6 +93,7 @@ const UserSelector = ({
   return (
     <Tooltip title="This selector returns the user's provider account ID (e.g., Twitch ID)">
       <Select
+        allowClear
         showSearch
         value={value}
         onChange={onChange}
