@@ -352,7 +352,7 @@ const AdminPage = () => {
                 label='Select User (empty to send to all users)'
                 tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API. If left empty, the message will be sent to all users."
               >
-                <UserSelector placeholder='Search for a user' allowClear />
+                <UserSelector placeholder='Search for a user' />
               </Form.Item>
 
               <Form.Item
