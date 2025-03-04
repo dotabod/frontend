@@ -1,7 +1,6 @@
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { SubscriptionStatus } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
