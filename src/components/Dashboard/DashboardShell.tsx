@@ -323,7 +323,7 @@ export default function DashboardShell({
       </Layout>
       <CookieConsent />
       <div className="pt-4 pb-1 text-center text-xs text-gray-400 bg-gray-900 border-t border-gray-700">
-        <p>Dota 2 is a registered trademark of Valve Corporation. This site is not affiliated with Valve Corporation.</p>
+          <p>Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is not affiliated with Valve Corporation.</p>
       </div>
     </>
   )

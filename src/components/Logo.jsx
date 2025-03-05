@@ -4,6 +4,7 @@ export function Logomark(props) {
       viewBox='37.4 13.88 425.53 461.48'
       xmlns='http://www.w3.org/2000/svg'
       aria-hidden='true'
+      aria-label='Dotabod Logo'
       {...props}
     >
       <path

@@ -1,11 +1,13 @@
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import { NavLinks } from 'src/components/NavLinks'
 import { QrCodeBorder } from './QrCodeBorder'
 
 export function Footer() {
+  const { status } = useSession()
+
   return (
     <footer className='border-t border-gray-500 bg-gray-900'>
       <Container>
@@ -27,7 +29,7 @@ export function Footer() {
           <div className='group relative -mx-4 flex items-center self-stretch p-4 transition-colors hover:bg-gray-800 sm:self-auto sm:rounded-2xl lg:mx-0 lg:self-auto lg:p-6'>
             <div className='relative flex h-24 w-24 flex-none items-center justify-center'>
               <QrCodeBorder className='absolute inset-0 h-full w-full stroke-gray-300 transition-colors group-hover:stroke-red-500' />
-              <Logomark className='p-4' />
+              <Logomark className='h-16 w-16' />
             </div>
             <div className='ml-8 lg:w-64'>
               <p className='text-base font-semibold'>
@@ -36,12 +38,16 @@ export function Footer() {
                   <span>Be a better streamer</span>
                 </Link>
               </p>
-              <p className='mt-1 text-sm text-gray-300'>Login to our dashboard to get started.</p>
+              {status === 'authenticated' ? (
+                <p className='mt-1 text-sm text-gray-300'>View your dashboard to get started.</p>
+              ) : (
+                <p className='mt-1 text-sm text-gray-300'>Login to our dashboard to get started.</p>
+              )}
             </div>
           </div>
         </div>
         <div className="py-4 text-center text-xs text-gray-400">
-          <p>Dota 2 is a registered trademark of Valve Corporation. This site is not affiliated with Valve Corporation.</p>
+          <p>Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is not affiliated with Valve Corporation.</p>
         </div>
       </Container>
     </footer>
