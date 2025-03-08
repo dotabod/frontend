@@ -1,14 +1,10 @@
-import {
-  type NotablePlayer,
-  NotablePlayers,
-} from '@/components/Overlay/NotablePlayers'
+import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { Settings } from '@/lib/defaultSettings'
-import type { blockType } from '@/lib/devConsts'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -25,16 +21,6 @@ export const InGameOverlays = ({
   setAegis,
   aegis,
   notablePlayers,
-}: {
-  wl: { lose: number; type: string; win: number }[]
-  block: blockType
-  rankImageDetails: { image: string; leaderboard: boolean; rank: number }
-  paused: any
-  roshan: any
-  setRoshan: any
-  setAegis: any
-  aegis: any
-  notablePlayers: NotablePlayer[] | null
 }) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
