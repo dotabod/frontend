@@ -1,6 +1,5 @@
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import { Settings } from '@/lib/defaultSettings'
-import type { blockType } from '@/lib/devConsts'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import clsx from 'clsx'
@@ -22,7 +21,7 @@ export const NotablePlayers = ({
   block,
 }: {
   players: NotablePlayer[] | null
-  block: blockType
+  block: any
 }) => {
   const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
