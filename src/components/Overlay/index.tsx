@@ -78,6 +78,18 @@ const OverlayPage = () => {
   const [isInIframe, setIsInIframe] = useState(false)
   const is404 = error && typeof error === 'object' && 'status' in error && error.status === 404
 
+  // Add detection for OBS environment
+  const [isOldObs, setIsOldObs] = useState(false)
+  useEffect(() => {
+    // Check if running in OBS (older Chromium)
+    const isOldOBS =
+      // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)
+      // Check if we're running in an older version that needs compatibility
+      Number.parseInt(navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] || '999', 10) < 127
+
+    setIsOldObs(isOldOBS)
+  }, [])
+
   // Refresh the page every 5 minutes if the socket is disconnected
   useEffect(() => {
     let reloadTimeout: NodeJS.Timeout | null = null
@@ -249,6 +261,7 @@ const OverlayPage = () => {
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
+        {isOldObs && <link rel='stylesheet' href='/styles/obs-compat.css' />}
       </Head>
       <style global jsx>{`
         html,
@@ -257,10 +270,12 @@ const OverlayPage = () => {
         }
       `}</style>
       <AnimatePresence>
-        <motion.div key='not-detected' {...motionProps}>
-          <div
-            className={clsx('hidden', isInIframe && rankImageDetails?.notLoaded ? 'block!' : '')}
-          >
+        <motion.div
+          key='not-detected'
+          {...motionProps}
+          style={{ display: isInIframe && rankImageDetails?.notLoaded ? 'block' : 'none' }}
+        >
+          <div id='not-detected'>
             <Center style={{ height }}>
               <div className='space-y-6 rounded-md bg-gray-300 p-4'>
                 <Spin spinning>
