@@ -98,7 +98,7 @@ const MmrForm = ({ hideText = false }) => {
               )
               form.resetDirty()
             })}
-            className='mt-6 space-y-2'
+            className='mt-6 flex flex-col gap-2'
           >
             {form.values.accounts.map((account, index) => {
               const rankResponse = getRankDetail(account.mmr, account.leaderboard_rank)
@@ -133,7 +133,7 @@ const MmrForm = ({ hideText = false }) => {
                             className='mx-1 inline'
                           >
                             {multiUsedBy}
-                            <ExternalLinkIcon className='inline h-4 w-4' />
+                            <ExternalLinkIcon className='inline ml-1 h-4 w-4' />
                           </a>
                           removes it from their dashboard. Or, join our{' '}
                           <a target='_blank' href='https://help.dotabod.com' rel='noreferrer'>
@@ -147,7 +147,7 @@ const MmrForm = ({ hideText = false }) => {
                     <div className='flex flex-col justify-center sm:items-start'>
                       <div
                         className={clsx(
-                          'flex flex-col items-center sm:flex-row sm:items-start sm:justify-start sm:space-x-2',
+                          'flex flex-col items-center sm:flex-row sm:items-start sm:justify-start sm:gap-2',
                           (removed || multiUsedBy) && 'opacity-40',
                         )}
                       >
@@ -167,7 +167,7 @@ const MmrForm = ({ hideText = false }) => {
                               target='_blank'
                               href={`https://steamid.xyz/${account.steam32Id}`}
                               rel='noreferrer'
-                              className='flex items-center space-x-2'
+                              className='flex items-center gap-2'
                             >
                               <span className='max-w-[90px] overflow-hidden text-ellipsis whitespace-nowrap'>
                                 {steamData?.name || account.name || 'Unknown steam name'}
@@ -214,7 +214,7 @@ const MmrForm = ({ hideText = false }) => {
               )
             })}
             {form.isDirty() && (
-              <div className={clsx('space-x-4')}>
+              <div className={clsx('gap-4')}>
                 <Button
                   htmlType='submit'
                   type='primary'
@@ -222,7 +222,7 @@ const MmrForm = ({ hideText = false }) => {
                   loading={loadingAccounts}
                   danger={form.isDirty() && form.values.accounts.some((a) => a.delete)}
                 >
-                  <span className='space-x-1'>
+                  <span className='gap-1'>
                     {form.isDirty() && form.values.accounts.some((a) => a.delete) ? (
                       <span>
                         Confirm remove {form.values.accounts.filter((a) => a.delete).length}
@@ -264,7 +264,7 @@ const MmrForm = ({ hideText = false }) => {
               }
             />
           </div>
-          <div className='flex space-x-4 transition-all'>
+          <div className='flex gap-4 transition-all'>
             <MMRBadge
               leaderboard={null}
               image={noSteamRank?.image}

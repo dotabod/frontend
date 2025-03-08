@@ -74,7 +74,7 @@ const EmoteList: React.FC<{
 
       return (
         <List.Item key={label}>
-          <div className={clsx('flex items-center space-x-1')}>
+          <div className={clsx('flex items-center gap-1')}>
             <Tooltip title={label}>
               <Link href={`https://7tv.app/emotes/${id}`} target='_blank' rel='noreferrer'>
                 <Image
@@ -231,7 +231,7 @@ export default function ChatBot() {
   return (
     <Card>
       <h1 className='text-xl font-bold'>Twitch</h1>
-      <div className='space-y-4 pb-8 text-sm text-gray-300'>
+      <div className='gap-4 pb-8 text-sm text-gray-300'>
         <Tabs
           defaultActiveKey={activeKeyMod}
           activeKey={activeKeyMod}
@@ -257,7 +257,7 @@ export default function ChatBot() {
                       { status: stepModComplete ? 'finish' : undefined },
                     ]}
                     steps={[
-                      <span className='flex flex-col space-y-4' key={1}>
+                      <span className='flex flex-col gap-4' key={1}>
                         {!stepOneComplete ? (
                           <>
                             <div>
@@ -287,7 +287,7 @@ export default function ChatBot() {
                           </div>
                         )}
                       </span>,
-                      <span className='flex flex-row items-center space-x-2' key={1}>
+                      <span className='flex flex-row items-center gap-2' key={1}>
                         {!stepModComplete ? (
                           <>
                             <Spin size='small' spinning={loading} />
@@ -318,7 +318,7 @@ export default function ChatBot() {
                   ]}
                   hideTitle={true}
                   steps={[
-                    <span className='flex flex-col space-y-4' key={1}>
+                    <span className='flex flex-col gap-4' key={1}>
                       {!stepOneComplete ? (
                         <>
                           <div>
@@ -374,7 +374,7 @@ export default function ChatBot() {
       <div className='flex items-center gap-2'>
         <h1 className='text-xl font-bold'>7TV</h1>
       </div>
-      <div className='space-y-4 pb-8 text-sm text-gray-300'>
+      <div className='gap-4 pb-8 text-sm text-gray-300'>
         <Tabs
           defaultActiveKey={activeKey7TV}
           activeKey={activeKey7TV}
@@ -406,8 +406,8 @@ export default function ChatBot() {
                     },
                   ]}
                   steps={[
-                    <div key={1} className='flex flex-col space-y-2'>
-                      <div className='flex flex-row items-center space-x-2'>
+                    <div key={1} className='flex flex-col gap-2'>
+                      <div className='flex flex-row items-center gap-2'>
                         {loading && <Spin size='small' spinning={loading} />}
                         {!user ? (
                           <>
@@ -437,7 +437,7 @@ export default function ChatBot() {
                     </div>,
 
                     <div key={2}>
-                      <div className='flex flex-row items-center space-x-2'>
+                      <div className='flex flex-row items-center gap-2'>
                         {!user?.hasDotabodEditor ? (
                           <div>
                             {user?.hasDotabodEmoteSet ? (
@@ -482,11 +482,11 @@ export default function ChatBot() {
                                   <span>with permissions:</span>
                                 </div>
 
-                                <div className='flex flex-row items-center space-x-3'>
+                                <div className='flex flex-row items-center gap-3'>
                                   <span>Emote sets: Admin</span>
                                 </div>
 
-                                <div className='flex flex-row items-center space-x-3'>
+                                <div className='flex flex-row items-center gap-3'>
                                   {loading && <Spin size='small' spinning={true} />}
                                   <span>Waiting for Dotabod to become an editor...</span>
                                   <span>
@@ -502,7 +502,7 @@ export default function ChatBot() {
                       </div>
                     </div>,
                     <div key={3}>
-                      <div className='flex flex-row items-center space-x-2 mb-4'>
+                      <div className='flex flex-row items-center gap-2 mb-4'>
                         <div className='flex flex-col'>
                           {updateEmoteSetError ? (
                             <div className='m-4'>
@@ -515,7 +515,7 @@ export default function ChatBot() {
                           ) : (
                             <>
                               {!user?.hasDotabodEmoteSet ? (
-                                <div className='flex flex-row space-x-4'>
+                                <div className='flex flex-row gap-4'>
                                   <Spin size='small' spinning={true} />
                                   <p>
                                     Dotabod will automatically add the following emotes after the

@@ -26,7 +26,10 @@ export const navigation = [
     name: 'Admin',
     key: PARENT_KEYS.ADMIN,
     icon: ShieldCheck,
-    children: [{ name: 'Scheduled Messages', href: '/dashboard/admin' }],
+    children: [
+      { name: 'Scheduled Messages', href: '/dashboard/admin' },
+      { name: 'Manage Channel', href: '/dashboard/admin/manage-channel' },
+    ],
   },
 
   // Main features
