@@ -1,4 +1,5 @@
 import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
+import { PickScreenV2 } from '@/components/Overlay/blocker/PickBlockerV2'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { RestrictFeature } from '@/components/RestrictFeature'
@@ -41,6 +42,8 @@ export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type }
 
   return (
     <>
+      <PickScreenV2 />
+
       <div style={styles} className='absolute' id='picks-blocker-parent'>
         <div
           className={clsx(

@@ -2,6 +2,7 @@ import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import type { PollData } from '@/components/Overlay/PollOverlay'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
+import { InGameV2 } from '@/components/Overlay/blocker/InGameV2'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { Settings } from '@/lib/defaultSettings'
 import {
@@ -30,7 +31,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
-import { PickBlockerV2 } from './blocker/PickBlockerV2'
+import { OverlayV2 } from './blocker/PickBlockerV2'
 
 const OverlayPage = () => {
   const { notification } = App.useApp()
@@ -294,44 +295,46 @@ const OverlayPage = () => {
           </div>
         </motion.div>
 
-        <RestrictFeature feature='livePolls'>
-          <PollOverlays
-            pollData={pollData}
-            setBetData={setBetData}
-            setPollData={setPollData}
-            betData={betData}
-            radiantWinChance={radiantWinChance}
+        <OverlayV2>
+          <RestrictFeature feature='livePolls'>
+            <PollOverlays
+              pollData={pollData}
+              setBetData={setBetData}
+              setPollData={setPollData}
+              betData={betData}
+              radiantWinChance={radiantWinChance}
+            />
+          </RestrictFeature>
+
+          <MainScreenOverlays
+            key='main-screen-overlays'
+            block={block}
+            wl={wl}
+            rankImageDetails={rankImageDetails}
           />
-        </RestrictFeature>
 
-        <PickBlockerV2 />
+          <PickScreenOverlays
+            block={block}
+            key='hero-blocker-class'
+            rankImageDetails={rankImageDetails}
+            wl={wl}
+          />
+        </OverlayV2>
 
-        <MainScreenOverlays
-          key='main-screen-overlays'
-          block={block}
-          wl={wl}
-          rankImageDetails={rankImageDetails}
-        />
-
-        <PickScreenOverlays
-          block={block}
-          key='hero-blocker-class'
-          rankImageDetails={rankImageDetails}
-          wl={wl}
-        />
-
-        <InGameOverlays
-          key='in-game-overlays'
-          block={block}
-          wl={wl}
-          rankImageDetails={rankImageDetails}
-          paused={paused}
-          roshan={roshan}
-          setRoshan={setRoshan}
-          setAegis={setAegis}
-          aegis={aegis}
-          notablePlayers={notablePlayers}
-        />
+        <InGameV2>
+          <InGameOverlays
+            key='in-game-overlays'
+            block={block}
+            wl={wl}
+            rankImageDetails={rankImageDetails}
+            paused={paused}
+            roshan={roshan}
+            setRoshan={setRoshan}
+            setAegis={setAegis}
+            aegis={aegis}
+            notablePlayers={notablePlayers}
+          />
+        </InGameV2>
 
         {isDev && (
           <Image
@@ -339,7 +342,7 @@ const OverlayPage = () => {
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${block.type === 'spectator' ? 'playing' : block.type}.png`}
+            src={`/images/dev/21-9-playing.png`}
           />
         )}
       </AnimatePresence>
