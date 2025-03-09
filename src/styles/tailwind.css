@@ -599,3 +599,10 @@ a:not(.ant-btn) {
 }
 
 .bg-transparent { background-color: transparent; }
+
+body, html, #root, .ant-app, #__next {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	margin: 0;
+}

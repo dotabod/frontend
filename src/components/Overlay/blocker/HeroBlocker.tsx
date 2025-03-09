@@ -4,7 +4,7 @@ import Image from 'next/image'
 export function HeroBlocker({ teamName, type }) {
   const res = useTransformRes()
 
-  if (!type) return null
+  if (type) return null
 
   return (
     <Image

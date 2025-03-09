@@ -1,6 +1,6 @@
 import type { PollData } from '@/components/Overlay/PollOverlay'
 
-export const isDev = false // || process.env.NODE_ENV === 'development'
+export const isDev = true // || process.env.NODE_ENV === 'development'
 
 export type blockType = {
   matchId: number | null
@@ -10,7 +10,7 @@ export type blockType = {
 export const devBlockTypes: blockType = {
   matchId: 123456789,
   team: 'radiant',
-  type: null,
+  type: 'strategy',
 }
 export const devPoll: PollData = {
   endDate: new Date().getTime() + 300000,

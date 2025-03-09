@@ -30,6 +30,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
+import { PickBlockerV2 } from './blocker/PickBlockerV2'
 
 const OverlayPage = () => {
   const { notification } = App.useApp()
@@ -302,6 +303,8 @@ const OverlayPage = () => {
             radiantWinChance={radiantWinChance}
           />
         </RestrictFeature>
+
+        <PickBlockerV2 />
 
         <MainScreenOverlays
           key='main-screen-overlays'
