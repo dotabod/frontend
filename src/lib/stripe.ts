@@ -1,7 +1,3 @@
-import { PRICE_IDS, getPriceId } from '@/utils/subscription'
-
-export { PRICE_IDS, getPriceId }
-
 export async function createCheckoutSession(
   priceId: string,
   userId: string,

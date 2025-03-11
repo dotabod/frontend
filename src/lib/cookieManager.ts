@@ -9,7 +9,7 @@ export type CookiePreferences = {
 }
 
 // Cookie storage key
-export const COOKIE_PREFERENCES_KEY = 'cookieConsent'
+const COOKIE_PREFERENCES_KEY = 'cookieConsent'
 
 // Global event names for cookie consent
 export const COOKIE_EVENTS = {
@@ -18,7 +18,7 @@ export const COOKIE_EVENTS = {
 }
 
 // Extract domain from NEXTAUTH_URL or use default
-export const getDomain = (): string => {
+const getDomain = (): string => {
   if (typeof window !== 'undefined') {
     try {
       const url = process.env.NEXTAUTH_URL ?? 'dotabod.com'
@@ -33,7 +33,7 @@ export const getDomain = (): string => {
 }
 
 // Helper functions for cookie management
-export const setCookie = (
+const setCookie = (
   name: string,
   value: string,
   options: { expires?: number; path?: string } = {},
@@ -50,7 +50,7 @@ export const setCookie = (
   document.cookie = `${name}=${encodeURIComponent(value)};expires=${expiryDate.toUTCString()};path=${path};`
 }
 
-export const getCookie = (name: string): string | undefined => {
+const getCookie = (name: string): string | undefined => {
   if (typeof window === 'undefined') return undefined
 
   const cookies = document.cookie.split(';')
@@ -63,7 +63,7 @@ export const getCookie = (name: string): string | undefined => {
   return undefined
 }
 
-export const getAllCookies = (): Record<string, string> => {
+const getAllCookies = (): Record<string, string> => {
   if (typeof window === 'undefined') return {}
 
   const result: Record<string, string> = {}
@@ -79,7 +79,7 @@ export const getAllCookies = (): Record<string, string> => {
   return result
 }
 
-export const removeCookie = (name: string, path = '/', domain?: string): void => {
+const removeCookie = (name: string, path = '/', domain?: string): void => {
   if (typeof window === 'undefined') return
 
   // Try different combinations of paths and domains to ensure the cookie is removed
@@ -107,7 +107,7 @@ export const removeCookie = (name: string, path = '/', domain?: string): void =>
 }
 
 // Initialize third-party scripts based on cookie preferences
-export const initializeThirdPartyScripts = (prefs: CookiePreferences): void => {
+const initializeThirdPartyScripts = (prefs: CookiePreferences): void => {
   if (typeof window === 'undefined') return
 
   // Only initialize scripts if we have explicit consent
@@ -199,7 +199,7 @@ export const useCookiePreferences = () => {
 }
 
 // Apply cookie preferences by removing disallowed cookies
-export const applyPreferences = (prefs: CookiePreferences): void => {
+const applyPreferences = (prefs: CookiePreferences): void => {
   if (typeof window === 'undefined') return
 
   // First, initialize third-party scripts with the current preferences

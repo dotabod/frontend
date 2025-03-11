@@ -27,7 +27,7 @@ import {
   setMinimapStatus,
 } from '../redux/store'
 
-export let socket: Socket | null = null
+let socket: Socket | null = null
 
 export type WinChance = {
   value: number
@@ -320,5 +320,3 @@ const events = {
   subscribeToChannelPollProgressEvents: EventSubChannelPollProgressEvent,
   subscribeToChannelPollEndEvents: EventSubChannelPollEndEvent,
 }
-
-export type Events = keyof typeof events
