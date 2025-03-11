@@ -321,20 +321,18 @@ const OverlayPage = () => {
           />
         </OverlayV2>
 
-        <InGameV2>
-          <InGameOverlays
-            key='in-game-overlays'
-            block={block}
-            wl={wl}
-            rankImageDetails={rankImageDetails}
-            paused={paused}
-            roshan={roshan}
-            setRoshan={setRoshan}
-            setAegis={setAegis}
-            aegis={aegis}
-            notablePlayers={notablePlayers}
-          />
-        </InGameV2>
+        <InGameOverlays
+          key='in-game-overlays'
+          block={block}
+          wl={wl}
+          rankImageDetails={rankImageDetails}
+          paused={paused}
+          roshan={roshan}
+          setRoshan={setRoshan}
+          setAegis={setAegis}
+          aegis={aegis}
+          notablePlayers={notablePlayers}
+        />
 
         {isDev && (
           <Image
