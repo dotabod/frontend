@@ -109,23 +109,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       console.log('Adding emotes to emote set...')
       const failedEmotes: Array<{ name: string; error: unknown }> = []
-      await Promise.all(
-        emotesRequired.map(async (emote, index) => {
-          try {
-            console.log(`Adding emote ${emote.label}...`)
-            await client.request(CHANGE_EMOTE_IN_SET, {
-              id: result.emoteSetId,
-              action: 'ADD',
-              name: emote.label,
-              emote_id: emote.id,
-            })
-            console.log(`Successfully added emote ${emote.label}`)
-          } catch (error) {
-            console.error(`Error adding emote ${emote.label}:`, error)
-            failedEmotes.push({ name: emote.label, error })
-          }
-        }),
-      )
+
+      // Process emotes sequentially instead of in parallel
+      for (const emote of emotesRequired) {
+        try {
+          console.log(`Adding emote ${emote.label}...`)
+          await client.request(CHANGE_EMOTE_IN_SET, {
+            id: result.emoteSetId,
+            action: 'ADD',
+            name: emote.label,
+            emote_id: emote.id,
+          })
+          console.log(`Successfully added emote ${emote.label}`)
+        } catch (error) {
+          console.error(`Error adding emote ${emote.label}:`, error)
+          failedEmotes.push({ name: emote.label, error })
+        }
+      }
+
       console.log('Verifying emote set update...')
 
       const updatedEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
@@ -157,20 +158,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.log('Emote set update verified successfully')
       return res.status(200).json({ message: 'Emote set updated successfully' })
     } catch (error) {
+      console.error('Inner try-catch error:', error)
       if (error instanceof Error && error.message) {
         return res.status(403).json({ message: error.message })
       }
-      throw error
+      return res.status(500).json({
+        message: 'Error processing request',
+        error: error instanceof Error ? error.message : String(error),
+      })
     }
   } catch (error) {
-    console.error('Error:', error)
-    // Provide more detailed error information
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    const errorStack = error instanceof Error ? error.stack : undefined
+    console.error('Error fetching 7TV user:', error)
+
+    // Check for network-related errors
+    if (
+      error instanceof Error &&
+      (error.message.includes('network') ||
+        error.message.includes('timeout') ||
+        error.message.includes('ECONNREFUSED'))
+    ) {
+      return res.status(503).json({
+        message: 'Service temporarily unavailable. 7TV API may be down or unreachable.',
+        error: error.message,
+      })
+    }
+
+    // Handle other errors
     return res.status(500).json({
-      message: 'Internal server error',
-      error: errorMessage,
-      stack: process.env.NODE_ENV === 'development' ? errorStack : undefined,
+      message: 'Error connecting to 7TV',
+      error: error instanceof Error ? error.message : String(error),
     })
   }
 }
