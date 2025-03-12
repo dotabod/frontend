@@ -342,7 +342,17 @@ const TroubleshootPage = () => {
               <Form.Item
                 name='message'
                 label='Message'
-                rules={[{ required: true, message: 'Please enter your message' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter your message - we need details to help you effectively',
+                  },
+                  {
+                    min: 80,
+                    message:
+                      'Please provide more details about your issue (at least 80 characters)',
+                  },
+                ]}
               >
                 <Input.TextArea placeholder="Describe the issue you're experiencing..." rows={4} />
               </Form.Item>
