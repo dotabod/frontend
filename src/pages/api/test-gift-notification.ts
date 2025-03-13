@@ -37,6 +37,34 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const giftMessage =
       req.body?.giftMessage || 'This is a test gift message. Enjoy your subscription!'
 
+    // Check if user already has a lifetime subscription
+    if (giftType === 'lifetime') {
+      const existingLifetime = await prisma.subscription.findFirst({
+        where: {
+          userId: userId,
+          status: 'ACTIVE',
+          OR: [
+            {
+              transactionType: 'LIFETIME',
+            },
+            {
+              isGift: true,
+              giftDetails: {
+                giftType: 'lifetime',
+              },
+            },
+          ],
+        },
+      })
+
+      if (existingLifetime) {
+        // For testing purposes, we'll still create the notification but add a warning
+        console.warn(
+          `User ${userId} already has a lifetime subscription but creating a test notification anyway`,
+        )
+      }
+    }
+
     // Create a test subscription with isGift flag
     const subscription = await prisma.subscription.create({
       data: {
@@ -71,12 +99,43 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
+    // Get total active gift subscriptions for this user
+    const activeGiftSubscriptions = await prisma.subscription.findMany({
+      where: {
+        userId: userId,
+        status: 'ACTIVE',
+        isGift: true,
+      },
+      include: {
+        giftDetails: true,
+      },
+    })
+
+    // Calculate total gifted months
+    let totalGiftedMonths = 0
+    let hasLifetime = false
+
+    for (const sub of activeGiftSubscriptions) {
+      if (sub.giftDetails?.giftType === 'lifetime') {
+        hasLifetime = true
+        break
+      }
+
+      if (sub.giftDetails?.giftType === 'annual') {
+        totalGiftedMonths += 12
+      } else if (sub.giftDetails?.giftType === 'monthly') {
+        totalGiftedMonths += 1
+      }
+    }
+
     return res.status(200).json({
       success: true,
       message: 'Test gift notification created',
       notification,
       giftSubscription,
       subscription,
+      totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,
+      hasLifetime,
     })
   } catch (error) {
     console.error('Error creating test gift notification:', error)

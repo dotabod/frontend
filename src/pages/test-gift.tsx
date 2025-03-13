@@ -1,10 +1,12 @@
 import type React from 'react'
-import { useState } from 'react'
-import { Button, Card, Layout, Typography, message, Select, Input, Space } from 'antd'
+import { useState, useEffect } from 'react'
+import { Button, Card, Layout, Typography, message, Select, Input, Space, Alert } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { fetcher } from '@/lib/fetcher'
+import useSWR from 'swr'
 
 const { Content } = Layout
 const { Title, Text, Paragraph } = Typography
@@ -18,6 +20,22 @@ const TestGiftPage: NextPageWithLayout = () => {
     'This is a test gift message. Enjoy your subscription!',
   )
   const [messageApi, contextHolder] = message.useMessage()
+
+  // Fetch subscription status to check if user has lifetime
+  const { data: giftNotificationData } = useSWR(
+    status === 'authenticated' ? '/api/gift-notifications' : null,
+    fetcher,
+  )
+
+  const [hasLifetime, setHasLifetime] = useState(false)
+  const [totalGiftedMonths, setTotalGiftedMonths] = useState<number | 'lifetime'>(0)
+
+  useEffect(() => {
+    if (giftNotificationData) {
+      setHasLifetime(giftNotificationData.hasLifetime || false)
+      setTotalGiftedMonths(giftNotificationData.totalGiftedMonths || 0)
+    }
+  }, [giftNotificationData])
 
   const createTestNotification = async () => {
     if (status !== 'authenticated') {
@@ -53,6 +71,28 @@ const TestGiftPage: NextPageWithLayout = () => {
     }
   }
 
+  // Format subscription status message
+  const getSubscriptionStatusMessage = () => {
+    if (hasLifetime) {
+      return {
+        type: 'info',
+        message:
+          'You already have a Lifetime subscription. In a real scenario, users would not be able to gift you additional subscriptions.',
+      }
+    }
+
+    if (typeof totalGiftedMonths === 'number' && totalGiftedMonths > 0) {
+      return {
+        type: 'info',
+        message: `You currently have ${totalGiftedMonths} month${totalGiftedMonths > 1 ? 's' : ''} of gifted Dotabod Pro.`,
+      }
+    }
+
+    return null
+  }
+
+  const subscriptionStatus = getSubscriptionStatusMessage()
+
   return (
     <>
       {contextHolder}
@@ -74,6 +114,14 @@ const TestGiftPage: NextPageWithLayout = () => {
                   This page allows you to create a test gift notification for development purposes.
                   The notification will appear in your dashboard.
                 </Paragraph>
+
+                {subscriptionStatus && (
+                  <Alert
+                    type={subscriptionStatus.type as 'info' | 'warning'}
+                    message={subscriptionStatus.message}
+                    style={{ marginBottom: 16 }}
+                  />
+                )}
 
                 <div style={{ marginBottom: 16 }}>
                   <Text strong>Gift Type:</Text>

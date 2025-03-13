@@ -1,5 +1,6 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import { SUBSCRIPTION_TIERS, getPriceId } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
@@ -43,6 +44,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!recipientUser) {
       return res.status(404).json({ error: 'Recipient not found' })
+    }
+
+    // Check if the recipient already has a lifetime subscription
+    const recipientSubscriptions = await prisma.subscription.findMany({
+      where: {
+        userId: recipientUser.id,
+        status: 'ACTIVE',
+      },
+      include: {
+        giftDetails: true,
+      },
+    })
+
+    // Check if recipient has a lifetime subscription
+    const hasLifetime = recipientSubscriptions.some(
+      (sub) =>
+        sub.giftDetails?.giftType === 'lifetime' ||
+        (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),
+    )
+
+    if (hasLifetime && priceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')) {
+      return res.status(400).json({
+        message:
+          'The recipient already has a lifetime subscription. Please choose a different gift or recipient.',
+      })
     }
 
     // Create a checkout session for the gift

@@ -21,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const userId = session.user.id
 
-    // GET: Fetch unread gift notifications
+    // GET: Fetch unread gift notifications and subscription status
     if (req.method === 'GET') {
       console.log(`Fetching gift notifications for user ${userId}`)
 
@@ -40,6 +40,42 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             createdAt: 'desc',
           },
         })
+
+        // Get active subscriptions to check if user has lifetime
+        const activeSubscriptions = await prisma.subscription.findMany({
+          where: {
+            userId: userId,
+            status: 'ACTIVE',
+          },
+          include: {
+            giftDetails: true,
+          },
+        })
+
+        // Check if user has a lifetime subscription
+        const hasLifetime = activeSubscriptions.some(
+          (sub) =>
+            sub.giftDetails?.giftType === 'lifetime' ||
+            (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),
+        )
+
+        // Calculate total gifted months
+        let totalGiftedMonths = 0
+
+        for (const sub of activeSubscriptions) {
+          if (sub.isGift && sub.giftDetails) {
+            if (sub.giftDetails.giftType === 'lifetime') {
+              totalGiftedMonths = Number.POSITIVE_INFINITY // Represent lifetime as infinity
+              break
+            }
+
+            if (sub.giftDetails.giftType === 'annual') {
+              totalGiftedMonths += 12
+            } else if (sub.giftDetails.giftType === 'monthly') {
+              totalGiftedMonths += 1
+            }
+          }
+        }
 
         // Format notifications for frontend
         const formattedNotifications = notifications
@@ -61,6 +97,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(200).json({
           hasNotification: formattedNotifications.length > 0,
           notifications: formattedNotifications,
+          hasLifetime,
+          totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,
+          totalNotifications: formattedNotifications.length,
         })
       } catch (error) {
         console.error('Error fetching gift notifications:', error)

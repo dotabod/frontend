@@ -211,7 +211,7 @@ interface SubscriptionPriceId {
   lifetime: string
 }
 
-const PRICE_IDS: SubscriptionPriceId[] = [
+export const PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',

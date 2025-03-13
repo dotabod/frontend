@@ -193,6 +193,9 @@ export default function DashboardShell({
     giftMessage?: string
     giftType: 'monthly' | 'annual' | 'lifetime'
   } | null>(null)
+  const [totalGiftedMonths, setTotalGiftedMonths] = useState<number | 'lifetime'>(0)
+  const [hasLifetime, setHasLifetime] = useState(false)
+  const [totalNotifications, setTotalNotifications] = useState(0)
 
   // Update notification state when data changes
   useEffect(() => {
@@ -206,6 +209,11 @@ export default function DashboardShell({
         giftType: firstNotification.giftType,
       })
       setHasGiftNotification(true)
+
+      // Set total gifted months and lifetime status
+      setTotalGiftedMonths(giftNotificationData.totalGiftedMonths || 0)
+      setHasLifetime(giftNotificationData.hasLifetime || false)
+      setTotalNotifications(giftNotificationData.totalNotifications || 0)
     } else {
       setHasGiftNotification(false)
       setGiftDetails(null)
@@ -385,6 +393,9 @@ export default function DashboardShell({
               giftMessage={giftDetails.giftMessage}
               giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
               onDismiss={dismissGiftNotification}
+              totalGiftedMonths={totalGiftedMonths}
+              hasLifetime={hasLifetime}
+              totalNotifications={totalNotifications}
             />
           )}
           <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
