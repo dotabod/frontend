@@ -15,12 +15,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).json({ message: 'This endpoint is only available in development mode' })
   }
 
-  try {
-    const session = await getServerSession(req, res, authOptions)
-    if (!session?.user?.id) {
-      return res.status(401).json({ message: 'Unauthorized' })
-    }
+  const session = await getServerSession(req, res, authOptions)
+  if (!session?.user?.id) {
+    return res.status(401).json({ message: 'Unauthorized' })
+  }
 
+  if (!session || !session.user || !session.user.role.includes('admin')) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
+  try {
     const userId = session.user.id
 
     // Get gift type from query parameter or default to monthly
