@@ -78,8 +78,6 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
     return null
   }
 
-  const totalGiftedMessage = getTotalGiftedMessage()
-
   // Use notification API instead of Alert component
   useEffect(() => {
     const key = `gift-notification-${Date.now()}`
@@ -89,7 +87,7 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
       description: (
         <Space direction='vertical' size='small'>
           <Text>
-            {senderName} has gifted you {giftTypeDisplay}!
+            {senderName || 'Someone'} has gifted you {giftTypeDisplay}!
           </Text>
           {giftMessage && <Text italic>"{giftMessage}"</Text>}
           {totalNotifications > 1 && (
@@ -101,7 +99,7 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
       duration: 0, // Don't auto-close
       key,
       onClose: onDismiss,
-      placement: 'topRight',
+      placement: 'bottomLeft',
       className: 'gift-notification',
     })
 
