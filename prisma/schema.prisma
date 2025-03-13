@@ -65,6 +65,7 @@ model User {
   streams                           streams?
   subscription                      Subscription[]
   MessageDelivery                   MessageDelivery[]
+  notifications                     Notification[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -208,11 +209,48 @@ model Subscription {
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @default(now()) @map("updated_at")
   user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isGift               Boolean             @default(false)
+  giftDetails          GiftSubscription?
 
   @@index([userId])
   @@index([status])
   @@index([transactionType])
+  @@index([isGift])
   @@map("subscriptions")
+}
+
+model GiftSubscription {
+  id              String       @id @default(dbgenerated("gen_random_uuid()"))
+  subscriptionId  String       @unique
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  senderName      String       @default("Anonymous")
+  giftMessage     String?
+  giftType        String       @default("monthly") // monthly, annual, lifetime
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @default(now()) @map("updated_at")
+  isViewed        Boolean      @default(false)
+  notification    Notification?
+
+  @@index([subscriptionId])
+  @@index([isViewed])
+  @@map("gift_subscriptions")
+}
+
+model Notification {
+  id                String           @id @default(dbgenerated("gen_random_uuid()"))
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String           @default("GIFT_SUBSCRIPTION") // For future notification types
+  isRead            Boolean          @default(false)
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @default(now()) @map("updated_at")
+  giftSubscriptionId String?         @unique
+  giftSubscription  GiftSubscription? @relation(fields: [giftSubscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@map("notifications")
 }
 
 model WebhookEvent {

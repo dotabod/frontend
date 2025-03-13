@@ -1,0 +1,117 @@
+import type React from 'react'
+import { useState } from 'react'
+import { Button, Card, Layout, Typography, message, Select, Input, Space } from 'antd'
+import { useSession } from 'next-auth/react'
+import Head from 'next/head'
+import HomepageShell from '@/components/Homepage/HomepageShell'
+import type { NextPageWithLayout } from '@/pages/_app'
+
+const { Content } = Layout
+const { Title, Text, Paragraph } = Typography
+const { Option } = Select
+
+const TestGiftPage: NextPageWithLayout = () => {
+  const { data: session, status } = useSession()
+  const [loading, setLoading] = useState(false)
+  const [giftType, setGiftType] = useState<string>('monthly')
+  const [giftMessage, setGiftMessage] = useState<string>(
+    'This is a test gift message. Enjoy your subscription!',
+  )
+  const [messageApi, contextHolder] = message.useMessage()
+
+  const createTestNotification = async () => {
+    if (status !== 'authenticated') {
+      messageApi.error('You must be logged in to create a test notification')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/test-gift-notification?giftType=${giftType}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          giftMessage,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create test notification')
+      }
+
+      messageApi.success('Test gift notification created successfully!')
+      console.log('Created notification:', data)
+    } catch (error) {
+      console.error('Error creating test notification:', error)
+      messageApi.error('Failed to create test notification')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      {contextHolder}
+      <Head>
+        <title>Test Gift Notification | Dotabod</title>
+      </Head>
+      <Layout>
+        <Content style={{ padding: '50px', maxWidth: '800px', margin: '0 auto' }}>
+          <Card>
+            <Title level={2}>Test Gift Notification</Title>
+
+            {status === 'loading' ? (
+              <Paragraph>Loading...</Paragraph>
+            ) : status === 'unauthenticated' ? (
+              <Paragraph>You must be logged in to use this page.</Paragraph>
+            ) : (
+              <Space direction='vertical' style={{ width: '100%' }}>
+                <Paragraph>
+                  This page allows you to create a test gift notification for development purposes.
+                  The notification will appear in your dashboard.
+                </Paragraph>
+
+                <div style={{ marginBottom: 16 }}>
+                  <Text strong>Gift Type:</Text>
+                  <Select
+                    style={{ width: 200, marginLeft: 8 }}
+                    value={giftType}
+                    onChange={(value) => setGiftType(value)}
+                  >
+                    <Option value='monthly'>Monthly</Option>
+                    <Option value='annual'>Annual</Option>
+                    <Option value='lifetime'>Lifetime</Option>
+                  </Select>
+                </div>
+
+                <div style={{ marginBottom: 16 }}>
+                  <Text strong>Gift Message:</Text>
+                  <Input.TextArea
+                    rows={3}
+                    value={giftMessage}
+                    onChange={(e) => setGiftMessage(e.target.value)}
+                    style={{ marginTop: 8 }}
+                  />
+                </div>
+
+                <Button type='primary' onClick={createTestNotification} loading={loading}>
+                  Create Test Notification
+                </Button>
+              </Space>
+            )}
+          </Card>
+        </Content>
+      </Layout>
+    </>
+  )
+}
+
+TestGiftPage.getLayout = function getLayout(page: React.ReactElement) {
+  return <HomepageShell>{page}</HomepageShell>
+}
+
+export default TestGiftPage

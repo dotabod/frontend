@@ -199,6 +199,116 @@ async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
   tx: Prisma.TransactionClient,
 ) {
+  // Handle gift subscriptions
+  if (session.metadata?.isGift === 'true') {
+    const recipientUserId = session.metadata.recipientUserId
+    if (!recipientUserId) return
+
+    const giftSenderName = session.metadata.giftSenderName || 'Anonymous'
+    const giftMessage = session.metadata.giftMessage || ''
+    const giftType = session.metadata.giftDuration || 'monthly'
+
+    if (session.mode === 'subscription' && session.subscription) {
+      const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+
+      // For gift subscriptions, we need to create the subscription record with the recipient's userId
+      const status = statusMap[subscription.status as Stripe.Subscription.Status]
+      if (!status) return
+
+      const priceId = subscription.items.data[0].price.id
+
+      // Create the subscription with isGift flag
+      const createdSubscription = await tx.subscription.upsert({
+        where: {
+          stripeSubscriptionId: subscription.id,
+        },
+        create: {
+          stripeSubscriptionId: subscription.id,
+          stripeCustomerId: subscription.customer as string,
+          status: status as SubscriptionStatus,
+          tier: getSubscriptionTier(priceId, status),
+          stripePriceId: priceId,
+          userId: recipientUserId,
+          transactionType: TransactionType.RECURRING,
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          isGift: true,
+        },
+        update: {
+          status: status as SubscriptionStatus,
+          tier: getSubscriptionTier(priceId, status),
+          stripePriceId: priceId,
+          stripeCustomerId: subscription.customer as string,
+          transactionType: TransactionType.RECURRING,
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          isGift: true,
+        },
+      })
+
+      // Create the gift subscription details
+      const giftSubscription = await tx.giftSubscription.create({
+        data: {
+          subscriptionId: createdSubscription.id,
+          senderName: giftSenderName,
+          giftMessage: giftMessage,
+          giftType: giftType,
+        },
+      })
+
+      // Create a notification for the recipient
+      await tx.notification.create({
+        data: {
+          userId: recipientUserId,
+          type: 'GIFT_SUBSCRIPTION',
+          giftSubscriptionId: giftSubscription.id,
+        },
+      })
+    } else if (session.mode === 'payment') {
+      // For lifetime gift subscriptions
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+      const priceId = lineItems.data[0]?.price?.id ?? null
+
+      // Create the lifetime subscription with gift details
+      const createdSubscription = await tx.subscription.create({
+        data: {
+          userId: recipientUserId,
+          status: SubscriptionStatus.ACTIVE,
+          tier: getSubscriptionTier(priceId, SubscriptionStatus.ACTIVE),
+          stripePriceId: priceId || '',
+          stripeCustomerId: session.customer as string,
+          transactionType: TransactionType.LIFETIME,
+          currentPeriodEnd: new Date('2099-12-31'),
+          cancelAtPeriodEnd: false,
+          stripeSubscriptionId: null,
+          isGift: true,
+        },
+      })
+
+      // Create the gift subscription details
+      const giftSubscription = await tx.giftSubscription.create({
+        data: {
+          subscriptionId: createdSubscription.id,
+          senderName: giftSenderName,
+          giftMessage: giftMessage,
+          giftType: 'lifetime',
+        },
+      })
+
+      // Create a notification for the recipient
+      await tx.notification.create({
+        data: {
+          userId: recipientUserId,
+          type: 'GIFT_SUBSCRIPTION',
+          giftSubscriptionId: giftSubscription.id,
+        },
+      })
+    }
+
+    return
+  }
+
+  // Handle regular (non-gift) subscriptions
   const userId = session.metadata?.userId
   if (!userId) return
 

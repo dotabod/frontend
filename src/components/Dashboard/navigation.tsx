@@ -3,6 +3,7 @@ import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/rea
 import {
   Cookie,
   DollarSignIcon,
+  Gift,
   Github,
   HardDriveIcon,
   Info,
@@ -88,6 +89,12 @@ export const navigation = [
         name: 'Billing',
         href: '/dashboard/billing',
         icon: DollarSignIcon,
+      },
+      {
+        name: 'Gift Pro',
+        href: '/gift',
+        icon: Gift,
+        new: true,
       },
       {
         name: 'Data',

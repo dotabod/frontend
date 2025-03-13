@@ -19,6 +19,9 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import ModeratedChannels from './ModeratedChannels'
 import { navigation } from './navigation'
+import GiftNotification from '@/components/Subscription/GiftNotification'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/fetcher'
 
 const { Header, Sider, Content } = Layout
 
@@ -175,7 +178,67 @@ export default function DashboardShell({
     if (parentKey && !openKeys.includes(parentKey)) {
       setOpenKeys((prev) => [...prev, parentKey])
     }
-  }, [router.pathname, router.asPath])
+  }, [router, openKeys])
+
+  // Fetch gift notifications from the API
+  const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
+    status === 'authenticated' ? '/api/gift-notifications' : null,
+    fetcher,
+  )
+
+  const [hasGiftNotification, setHasGiftNotification] = useState(false)
+  const [giftDetails, setGiftDetails] = useState<{
+    id: string
+    senderName: string
+    giftMessage?: string
+    giftType: 'monthly' | 'annual' | 'lifetime'
+  } | null>(null)
+
+  // Update notification state when data changes
+  useEffect(() => {
+    if (giftNotificationData?.hasNotification && giftNotificationData.notifications?.length > 0) {
+      // Get the first unread notification
+      const firstNotification = giftNotificationData.notifications[0]
+      setGiftDetails({
+        id: firstNotification.id,
+        senderName: firstNotification.senderName,
+        giftMessage: firstNotification.giftMessage,
+        giftType: firstNotification.giftType,
+      })
+      setHasGiftNotification(true)
+    } else {
+      setHasGiftNotification(false)
+      setGiftDetails(null)
+    }
+  }, [giftNotificationData])
+
+  const dismissGiftNotification = async () => {
+    if (giftDetails?.id) {
+      try {
+        // Call API to mark notification as read
+        const response = await fetch('/api/gift-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notificationId: giftDetails.id,
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Failed to mark notification as read:', errorData)
+          throw new Error(errorData.message || 'Failed to mark notification as read')
+        }
+
+        // Refresh notifications after marking as read
+        refreshGiftNotifications()
+      } catch (error) {
+        console.error('Failed to mark notification as read:', error)
+      }
+    }
+  }
 
   if (status !== 'authenticated') return null
 
@@ -316,14 +379,25 @@ export default function DashboardShell({
               <UserAccountNav />
             </div>
           </Header>
+          {hasGiftNotification && giftDetails && (
+            <GiftNotification
+              senderName={giftDetails.senderName}
+              giftMessage={giftDetails.giftMessage}
+              giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
+              onDismiss={dismissGiftNotification}
+            />
+          )}
           <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
             {children}
           </Content>
         </Layout>
       </Layout>
       <CookieConsent />
-      <div className="pt-4 pb-1 text-center text-xs text-gray-400 bg-gray-900 border-t border-gray-700">
-          <p>Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is not affiliated with Valve Corporation.</p>
+      <div className='pt-4 pb-1 text-center text-xs text-gray-400 bg-gray-900 border-t border-gray-700'>
+        <p>
+          Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is
+          not affiliated with Valve Corporation.
+        </p>
       </div>
     </>
   )
