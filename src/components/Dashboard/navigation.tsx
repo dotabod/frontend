@@ -30,6 +30,7 @@ export const navigation = [
     children: [
       { name: 'Scheduled Messages', href: '/dashboard/admin' },
       { name: 'Manage Channel', href: '/dashboard/admin/manage-channel' },
+      { name: 'Test Gift', href: '/dashboard/admin/test-gift' },
     ],
   },
 

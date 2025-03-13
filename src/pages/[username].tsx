@@ -4,13 +4,14 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Empty, Input, Segmented, Spin } from 'antd'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Button, Empty, Input, Segmented, Spin } from 'antd'
+import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
+import { createGiftLink } from '@/utils/gift-links'
 
 const CommandsPage: NextPageWithLayout = () => {
   const [permission, setPermission] = useState('All')
@@ -98,7 +99,7 @@ const CommandsPage: NextPageWithLayout = () => {
               height={80}
               className='rounded-full flex'
             />
-            <div>
+            <div className='flex-grow'>
               <div className='flex flex-row items-center space-x-4'>
                 <Link
                   target='_blank'
@@ -123,6 +124,13 @@ const CommandsPage: NextPageWithLayout = () => {
                   ? '...'
                   : new Date(data.createdAt).toLocaleDateString()}
               </span>
+            </div>
+            <div>
+              <Link href={createGiftLink(username as string)} passHref>
+                <Button type='primary' icon={<GiftIcon size={16} />} className='flex items-center'>
+                  Gift Subscription
+                </Button>
+              </Link>
             </div>
           </div>
           <div className='text-gray-300'>

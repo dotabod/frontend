@@ -14,10 +14,10 @@ import {
 } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
 
 const { Content } = Layout
 const { Title, Text, Paragraph } = Typography
@@ -195,7 +195,18 @@ const TestGiftPage: NextPageWithLayout = () => {
 }
 
 TestGiftPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <HomepageShell>{page}</HomepageShell>
+  return (
+    <DashboardShell
+      seo={{
+        title: 'Test Gift Notification | Dotabod',
+        description: 'Test gift notification for Dotabod',
+        canonicalUrl: 'https://dotabod.com/dashboard/admin/test-gift',
+        noindex: true,
+      }}
+    >
+      {page}
+    </DashboardShell>
+  )
 }
 
 export default TestGiftPage

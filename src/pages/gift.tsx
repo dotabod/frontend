@@ -9,6 +9,7 @@ import { GiftIcon } from 'lucide-react'
 import { Card } from '@/ui/card'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { createGiftLink } from '@/utils/gift-links'
 
 const { Title, Text, Paragraph } = Typography
 const { Content } = Layout
@@ -32,6 +33,14 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
 
   // Get the canceled status from the URL query
   const canceled = router.query.canceled === 'true'
+
+  // Check if username is provided in the query
+  useEffect(() => {
+    const { username } = router.query
+    if (username && typeof username === 'string' && router.pathname === '/gift') {
+      router.push(createGiftLink(username))
+    }
+  }, [router])
 
   // Reset quantity to 1 when selecting lifetime
   useEffect(() => {
@@ -246,7 +255,16 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
 }
 
 GiftSubscriptionPage.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell>{page}</HomepageShell>
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Gift Dotabod Pro',
+        description: 'Gift Dotabod Pro to your favorite streamer',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
 }
 
 export default GiftSubscriptionPage
