@@ -131,7 +131,8 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
                   <Text className='ml-2'>{activePeriod === 'monthly' ? 'months' : 'years'}</Text>
                 </div>
                 <Text type='secondary' className='mt-1'>
-                  This will extend the subscription duration, not create multiple subscriptions.
+                  This will extend the subscription duration, not create multiple subscriptions. You
+                  can also adjust the quantity during checkout.
                 </Text>
               </div>
             </div>

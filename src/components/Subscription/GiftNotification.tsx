@@ -1,6 +1,7 @@
 import type React from 'react'
-import { Alert, Button, Space, Typography, Badge } from 'antd'
-import { CloseOutlined } from '@ant-design/icons'
+import { Typography, Space, App } from 'antd'
+import { GiftOutlined } from '@ant-design/icons'
+import { useEffect } from 'react'
 
 const { Text, Paragraph } = Typography
 
@@ -25,6 +26,9 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
   hasLifetime = false,
   totalNotifications = 1,
 }) => {
+  // Use App's notification API
+  const { notification } = App.useApp()
+
   // Format the gift type for display
   const getGiftTypeDisplay = (type: 'monthly' | 'annual' | 'lifetime', quantity: number) => {
     if (quantity <= 1) {
@@ -76,44 +80,39 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
 
   const totalGiftedMessage = getTotalGiftedMessage()
 
-  return (
-    <Alert
-      type='success'
-      showIcon
-      className='mb-4'
-      message={
+  // Use notification API instead of Alert component
+  useEffect(() => {
+    const key = `gift-notification-${Date.now()}`
+
+    notification.success({
+      message: "You've received a gift!",
+      description: (
         <Space direction='vertical' size='small'>
-          <div className='flex justify-between items-center'>
-            <div className='flex items-center'>
-              <Text strong>You've received a gift!</Text>
-              {totalNotifications > 1 && (
-                <Badge
-                  count={totalNotifications}
-                  style={{ marginLeft: 8, backgroundColor: '#52c41a' }}
-                  title={`You have ${totalNotifications} unread gift notifications`}
-                />
-              )}
-            </div>
-            <Button
-              type='text'
-              size='small'
-              icon={<CloseOutlined />}
-              onClick={onDismiss}
-              aria-label='Dismiss notification'
-            />
-          </div>
           <Text>
             {senderName} has gifted you {giftTypeDisplay}!
           </Text>
           {giftMessage && <Text italic>"{giftMessage}"</Text>}
-
-          {totalGiftedMessage && (
-            <Paragraph className='mt-2 text-sm'>{totalGiftedMessage}</Paragraph>
+          {totalNotifications > 1 && (
+            <Text type='secondary'>You have {totalNotifications} unread gift notifications.</Text>
           )}
         </Space>
-      }
-    />
-  )
+      ),
+      icon: <GiftOutlined style={{ color: '#52c41a' }} />,
+      duration: 0, // Don't auto-close
+      key,
+      onClose: onDismiss,
+      placement: 'topRight',
+      className: 'gift-notification',
+    })
+
+    // Clean up notification when component unmounts
+    return () => {
+      notification.destroy(key)
+    }
+  }, [senderName, giftTypeDisplay, giftMessage, totalNotifications, notification])
+
+  // Return null since we're using the notification API
+  return null
 }
 
 export default GiftNotification

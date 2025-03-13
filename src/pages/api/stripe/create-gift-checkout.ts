@@ -90,6 +90,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         {
           price: priceId,
           quantity: finalQuantity,
+          // Allow customers to adjust quantity during checkout (except for lifetime)
+          adjustable_quantity: isLifetime
+            ? undefined
+            : {
+                enabled: true,
+                minimum: 1,
+                maximum: 100,
+              },
           // For subscription mode, Stripe will handle the recurring billing
           // For one-time payments, we'll handle the duration in our webhook
         },

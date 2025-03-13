@@ -207,7 +207,28 @@ async function handleCheckoutCompleted(
     const giftSenderName = session.metadata.giftSenderName || 'Anonymous'
     const giftMessage = session.metadata.giftMessage || ''
     const giftType = session.metadata.giftDuration || 'monthly'
-    const giftQuantity = Number.parseInt(session.metadata.giftQuantity || '1', 10)
+
+    // Get the initial quantity from metadata
+    let giftQuantity = Number.parseInt(session.metadata.giftQuantity || '1', 10)
+
+    // For non-lifetime subscriptions, get the actual quantity from the line items
+    // in case the customer adjusted it during checkout
+    if (giftType !== 'lifetime' && session.mode === 'subscription') {
+      try {
+        // Retrieve the line items to get the final quantity
+        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 })
+        if (lineItems.data.length > 0) {
+          const actualQuantity = lineItems.data[0].quantity || 1
+          if (actualQuantity !== giftQuantity) {
+            console.log(`Customer adjusted quantity from ${giftQuantity} to ${actualQuantity}`)
+            giftQuantity = actualQuantity
+          }
+        }
+      } catch (error) {
+        console.error('Error retrieving line items:', error)
+        // Continue with the quantity from metadata as fallback
+      }
+    }
 
     if (session.mode === 'subscription' && session.subscription) {
       const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
@@ -308,6 +329,7 @@ async function handleCheckoutCompleted(
           senderName: giftSenderName,
           giftMessage: giftMessage,
           giftType: 'lifetime',
+          giftQuantity: 1, // Lifetime subscriptions always have quantity 1
         },
       })
 

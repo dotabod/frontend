@@ -169,6 +169,7 @@ export default function DashboardShell({
   }, [])
 
   // Update selected menu item and open parent menu when route changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: adding openKeys causes too many re-renders
   useEffect(() => {
     const { pathname } = router
     const { key, parentKey } = findBestMatchingMenuItem(pathname)
@@ -178,12 +179,17 @@ export default function DashboardShell({
     if (parentKey && !openKeys.includes(parentKey)) {
       setOpenKeys((prev) => [...prev, parentKey])
     }
-  }, [router, openKeys])
+  }, [router.pathname, router.asPath])
 
   // Fetch gift notifications from the API
   const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
     status === 'authenticated' ? '/api/gift-notifications' : null,
     fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
   )
 
   const [hasGiftNotification, setHasGiftNotification] = useState(false)
