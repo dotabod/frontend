@@ -147,18 +147,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         })
 
-        // Also mark the gift subscription as viewed
-        if (notification.giftSubscriptionId) {
-          await prisma.giftSubscription.update({
-            where: {
-              id: notification.giftSubscriptionId,
-            },
-            data: {
-              isViewed: true,
-            },
-          })
-        }
-
         return res.status(200).json({ message: 'Notification marked as read' })
       } catch (error) {
         console.error('Error marking notification as read:', error)

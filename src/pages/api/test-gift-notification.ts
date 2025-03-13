@@ -111,7 +111,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         giftMessage: giftMessage,
         giftType: giftType,
         giftQuantity: finalGiftQuantity,
-        isViewed: false,
       },
     })
 
