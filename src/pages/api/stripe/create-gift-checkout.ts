@@ -83,10 +83,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // For lifetime, quantity doesn't make sense, so we enforce quantity = 1
     const finalQuantity = isLifetime ? 1 : quantity
 
-    // If quantity > 1, add it to the metadata
+    // Create the checkout session with the correct quantity in line items
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [
+        {
+          price: priceId,
+          quantity: finalQuantity,
+          // For subscription mode, Stripe will handle the recurring billing
+          // For one-time payments, we'll handle the duration in our webhook
+        },
+      ],
       mode: isLifetime ? 'payment' : 'subscription',
       success_url: successUrl,
       cancel_url: cancelUrl,

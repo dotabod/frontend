@@ -6,6 +6,7 @@ export interface GiftCheckoutParams {
   giftDuration: PricePeriod
   giftMessage?: string
   giftSenderName?: string
+  quantity?: number
 }
 
 /**

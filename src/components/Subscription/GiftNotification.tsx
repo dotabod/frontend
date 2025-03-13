@@ -38,17 +38,18 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
         default:
           return 'Dotabod Pro'
       }
-    } else {
-      switch (type) {
-        case 'monthly':
-          return `${quantity} months of Dotabod Pro`
-        case 'annual':
-          return `${quantity} years of Dotabod Pro`
-        case 'lifetime':
-          return 'Dotabod Pro Lifetime'
-        default:
-          return 'Dotabod Pro'
-      }
+    }
+
+    // For quantity > 1
+    switch (type) {
+      case 'monthly':
+        return `${quantity} months of Dotabod Pro`
+      case 'annual':
+        return `${quantity} years of Dotabod Pro`
+      case 'lifetime':
+        return 'Dotabod Pro Lifetime'
+      default:
+        return 'Dotabod Pro'
     }
   }
 

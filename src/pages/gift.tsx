@@ -2,9 +2,9 @@ import { plans } from '@/components/Billing/BillingPlans'
 import { PeriodToggle } from '@/components/Billing/PeriodToggle'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { getPriceId, SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
-import { Alert, App, Button, Form, Input, Layout, Space, Typography } from 'antd'
+import { Alert, App, Button, Form, Input, Layout, Space, Typography, InputNumber } from 'antd'
 import { useRouter } from 'next/router'
-import { useState, type ReactElement } from 'react'
+import { useState, type ReactElement, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
 import { Card } from '@/ui/card'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -18,6 +18,7 @@ interface GiftFormValues {
   recipientUsername: string
   giftSenderName?: string
   giftMessage?: string
+  quantity?: number
 }
 
 const GiftSubscriptionPage: NextPageWithLayout = () => {
@@ -26,10 +27,19 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
   const [form] = Form.useForm<GiftFormValues>()
   const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [quantity, setQuantity] = useState<number>(1)
   const selectedTier = SUBSCRIPTION_TIERS.PRO
 
   // Get the canceled status from the URL query
   const canceled = router.query.canceled === 'true'
+
+  // Reset quantity to 1 when selecting lifetime
+  useEffect(() => {
+    if (activePeriod === 'lifetime' && quantity > 1) {
+      setQuantity(1)
+      form.setFieldsValue({ quantity: 1 })
+    }
+  }, [activePeriod, quantity, form])
 
   const handleSubmit = async (values: GiftFormValues) => {
     try {
@@ -43,6 +53,7 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
         giftDuration: activePeriod,
         giftMessage: values.giftMessage,
         giftSenderName: values.giftSenderName,
+        quantity: values.quantity || 1,
       })
 
       window.location.href = url
@@ -52,6 +63,24 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Calculate the total price based on quantity and period
+  const calculateTotalPrice = () => {
+    const basePrice = plans.find((p) => p.tier === selectedTier)?.price[activePeriod] || '$0'
+
+    // For lifetime, quantity is always 1
+    if (activePeriod === 'lifetime') {
+      return basePrice
+    }
+
+    // Extract the numeric value from the price string (e.g., "$5" -> 5)
+    const numericPrice = Number.parseFloat(basePrice.replace(/[^0-9.]/g, ''))
+    const total = numericPrice * quantity
+
+    // Format the total price with the same currency symbol
+    const currencySymbol = basePrice.match(/[^0-9.]/g)?.[0] || '$'
+    return `${currencySymbol}${total.toFixed(2)}`
   }
 
   return (
@@ -83,6 +112,31 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
             />
           </div>
 
+          {activePeriod !== 'lifetime' && (
+            <div className='mb-6'>
+              <Title level={5}>Duration</Title>
+              <div className='flex flex-col'>
+                <div className='flex items-center'>
+                  <InputNumber
+                    min={1}
+                    max={100}
+                    value={quantity}
+                    onChange={(value) => {
+                      const newQuantity = Number(value) || 1
+                      setQuantity(newQuantity)
+                      form.setFieldsValue({ quantity: newQuantity })
+                    }}
+                    style={{ width: 100 }}
+                  />
+                  <Text className='ml-2'>{activePeriod === 'monthly' ? 'months' : 'years'}</Text>
+                </div>
+                <Text type='secondary' className='mt-1'>
+                  This will extend the subscription duration, not create multiple subscriptions.
+                </Text>
+              </div>
+            </div>
+          )}
+
           <div className='bg-purple-800 p-4 rounded-md mb-6'>
             <div className='flex items-center mb-2'>
               <GiftIcon className='h-5 w-5 mr-2 text-blue-500' />
@@ -91,19 +145,35 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
             <Text>
               {activePeriod === 'lifetime'
                 ? 'Lifetime'
-                : activePeriod === 'annual'
-                  ? '1 Year'
-                  : '1 Month'}{' '}
+                : quantity > 1
+                  ? `${quantity} ${activePeriod === 'annual' ? 'Years' : 'Months'}`
+                  : activePeriod === 'annual'
+                    ? '1 Year'
+                    : '1 Month'}{' '}
               of Dotabod Pro
             </Text>
             <div className='mt-2'>
               <Text strong>Price: </Text>
-              <Text>{plans.find((p) => p.tier === selectedTier)?.price[activePeriod]}</Text>
+              <Text>{calculateTotalPrice()}</Text>
             </div>
+            {quantity > 1 && activePeriod !== 'lifetime' && (
+              <div className='mt-2'>
+                <Text type='secondary'>
+                  The recipient will receive a single subscription that lasts for {quantity}{' '}
+                  {activePeriod === 'annual' ? 'years' : 'months'}.
+                </Text>
+              </div>
+            )}
           </div>
         </div>
 
-        <Form form={form} layout='vertical' onFinish={handleSubmit} requiredMark={false}>
+        <Form
+          form={form}
+          layout='vertical'
+          onFinish={handleSubmit}
+          requiredMark={false}
+          initialValues={{ quantity: 1 }}
+        >
           <Form.Item
             name='recipientUsername'
             label="Recipient's Username"
@@ -132,6 +202,10 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
               maxLength={200}
               showCount
             />
+          </Form.Item>
+
+          <Form.Item name='quantity' hidden>
+            <InputNumber />
           </Form.Item>
 
           <Form.Item>
