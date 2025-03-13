@@ -192,6 +192,7 @@ export default function DashboardShell({
     senderName: string
     giftMessage?: string
     giftType: 'monthly' | 'annual' | 'lifetime'
+    giftQuantity?: number
   } | null>(null)
   const [totalGiftedMonths, setTotalGiftedMonths] = useState<number | 'lifetime'>(0)
   const [hasLifetime, setHasLifetime] = useState(false)
@@ -207,6 +208,7 @@ export default function DashboardShell({
         senderName: firstNotification.senderName,
         giftMessage: firstNotification.giftMessage,
         giftType: firstNotification.giftType,
+        giftQuantity: firstNotification.giftQuantity || 1,
       })
       setHasGiftNotification(true)
 
@@ -392,6 +394,7 @@ export default function DashboardShell({
               senderName={giftDetails.senderName}
               giftMessage={giftDetails.giftMessage}
               giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
+              giftQuantity={giftDetails.giftQuantity}
               onDismiss={dismissGiftNotification}
               totalGiftedMonths={totalGiftedMonths}
               hasLifetime={hasLifetime}

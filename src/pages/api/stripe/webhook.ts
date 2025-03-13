@@ -207,6 +207,7 @@ async function handleCheckoutCompleted(
     const giftSenderName = session.metadata.giftSenderName || 'Anonymous'
     const giftMessage = session.metadata.giftMessage || ''
     const giftType = session.metadata.giftDuration || 'monthly'
+    const giftQuantity = Number.parseInt(session.metadata.giftQuantity || '1', 10)
 
     if (session.mode === 'subscription' && session.subscription) {
       const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
@@ -216,6 +217,20 @@ async function handleCheckoutCompleted(
       if (!status) return
 
       const priceId = subscription.items.data[0].price.id
+
+      // Calculate the end date based on quantity
+      const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
+
+      // If quantity > 1, extend the period end date
+      if (giftQuantity > 1) {
+        if (giftType === 'monthly') {
+          // Add (quantity - 1) months to the end date
+          currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + (giftQuantity - 1))
+        } else if (giftType === 'annual') {
+          // Add (quantity - 1) years to the end date
+          currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + (giftQuantity - 1))
+        }
+      }
 
       // Create the subscription with isGift flag
       const createdSubscription = await tx.subscription.upsert({
@@ -230,7 +245,7 @@ async function handleCheckoutCompleted(
           stripePriceId: priceId,
           userId: recipientUserId,
           transactionType: TransactionType.RECURRING,
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodEnd: currentPeriodEnd,
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           isGift: true,
         },
@@ -240,7 +255,7 @@ async function handleCheckoutCompleted(
           stripePriceId: priceId,
           stripeCustomerId: subscription.customer as string,
           transactionType: TransactionType.RECURRING,
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodEnd: currentPeriodEnd,
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           isGift: true,
         },
@@ -253,6 +268,7 @@ async function handleCheckoutCompleted(
           senderName: giftSenderName,
           giftMessage: giftMessage,
           giftType: giftType,
+          giftQuantity: giftQuantity,
         },
       })
 

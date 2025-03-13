@@ -1,6 +1,17 @@
 import type React from 'react'
 import { useState, useEffect } from 'react'
-import { Button, Card, Layout, Typography, message, Select, Input, Space, Alert } from 'antd'
+import {
+  Button,
+  Card,
+  Layout,
+  Typography,
+  message,
+  Select,
+  Input,
+  Space,
+  Alert,
+  InputNumber,
+} from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -19,6 +30,7 @@ const TestGiftPage: NextPageWithLayout = () => {
   const [giftMessage, setGiftMessage] = useState<string>(
     'This is a test gift message. Enjoy your subscription!',
   )
+  const [giftQuantity, setGiftQuantity] = useState<number>(1)
   const [messageApi, contextHolder] = message.useMessage()
 
   // Fetch subscription status to check if user has lifetime
@@ -37,6 +49,13 @@ const TestGiftPage: NextPageWithLayout = () => {
     }
   }, [giftNotificationData])
 
+  // Reset quantity to 1 when selecting lifetime
+  useEffect(() => {
+    if (giftType === 'lifetime' && giftQuantity > 1) {
+      setGiftQuantity(1)
+    }
+  }, [giftType, giftQuantity])
+
   const createTestNotification = async () => {
     if (status !== 'authenticated') {
       messageApi.error('You must be logged in to create a test notification')
@@ -52,6 +71,7 @@ const TestGiftPage: NextPageWithLayout = () => {
         },
         body: JSON.stringify({
           giftMessage,
+          giftQuantity,
         }),
       })
 
@@ -135,6 +155,22 @@ const TestGiftPage: NextPageWithLayout = () => {
                     <Option value='lifetime'>Lifetime</Option>
                   </Select>
                 </div>
+
+                {giftType !== 'lifetime' && (
+                  <div style={{ marginBottom: 16 }}>
+                    <Text strong>Quantity:</Text>
+                    <InputNumber
+                      style={{ width: 100, marginLeft: 8 }}
+                      min={1}
+                      max={100}
+                      value={giftQuantity}
+                      onChange={(value) => setGiftQuantity(Number(value) || 1)}
+                    />
+                    <Text style={{ marginLeft: 8 }}>
+                      {giftType === 'monthly' ? 'months' : 'years'}
+                    </Text>
+                  </div>
+                )}
 
                 <div style={{ marginBottom: 16 }}>
                   <Text strong>Gift Message:</Text>

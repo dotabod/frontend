@@ -69,10 +69,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               break
             }
 
+            // Apply the gift quantity multiplier
+            const quantity = sub.giftDetails.giftQuantity || 1
+
             if (sub.giftDetails.giftType === 'annual') {
-              totalGiftedMonths += 12
+              totalGiftedMonths += 12 * quantity
             } else if (sub.giftDetails.giftType === 'monthly') {
-              totalGiftedMonths += 1
+              totalGiftedMonths += 1 * quantity
             }
           }
         }
@@ -89,6 +92,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               senderName: notification.giftSubscription.senderName,
               giftMessage: notification.giftSubscription.giftMessage,
               giftType: notification.giftSubscription.giftType,
+              giftQuantity: notification.giftSubscription.giftQuantity || 1,
               createdAt: notification.createdAt,
             }
           })

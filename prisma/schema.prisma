@@ -226,6 +226,7 @@ model GiftSubscription {
   senderName      String       @default("Anonymous")
   giftMessage     String?
   giftType        String       @default("monthly") // monthly, annual, lifetime
+  giftQuantity    Int          @default(1) // Number of months/years gifted
   createdAt       DateTime     @default(now()) @map("created_at")
   updatedAt       DateTime     @default(now()) @map("updated_at")
   isViewed        Boolean      @default(false)

@@ -37,6 +37,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const giftMessage =
       req.body?.giftMessage || 'This is a test gift message. Enjoy your subscription!'
 
+    // Get gift quantity from request body or use default
+    const giftQuantity = Number.parseInt(req.body?.giftQuantity || '1', 10)
+
+    // Validate gift quantity
+    if (Number.isNaN(giftQuantity) || giftQuantity < 1) {
+      return res.status(400).json({ message: 'Gift quantity must be a positive number' })
+    }
+
+    // For lifetime, enforce quantity = 1
+    const finalGiftQuantity = giftType === 'lifetime' ? 1 : giftQuantity
+
     // Check if user already has a lifetime subscription
     if (giftType === 'lifetime') {
       const existingLifetime = await prisma.subscription.findFirst({
@@ -65,6 +76,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
+    // Calculate the end date based on quantity
+    const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+
+    // If quantity > 1, extend the period end date
+    if (finalGiftQuantity > 1) {
+      if (giftType === 'monthly') {
+        // Add (quantity - 1) months to the end date
+        currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + (finalGiftQuantity - 1))
+      } else if (giftType === 'annual') {
+        // Add (quantity - 1) years to the end date
+        currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + (finalGiftQuantity - 1))
+      }
+    }
+
     // Create a test subscription with isGift flag
     const subscription = await prisma.subscription.create({
       data: {
@@ -72,7 +97,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         status: 'ACTIVE',
         tier: 'PRO',
         transactionType: 'RECURRING',
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        currentPeriodEnd: currentPeriodEnd,
         cancelAtPeriodEnd: false,
         isGift: true,
       },
@@ -85,6 +110,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         senderName: 'Test Sender',
         giftMessage: giftMessage,
         giftType: giftType,
+        giftQuantity: finalGiftQuantity,
         isViewed: false,
       },
     })
@@ -122,9 +148,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       if (sub.giftDetails?.giftType === 'annual') {
-        totalGiftedMonths += 12
+        // Apply the gift quantity multiplier
+        const quantity = sub.giftDetails.giftQuantity || 1
+        totalGiftedMonths += 12 * quantity
       } else if (sub.giftDetails?.giftType === 'monthly') {
-        totalGiftedMonths += 1
+        // Apply the gift quantity multiplier
+        const quantity = sub.giftDetails.giftQuantity || 1
+        totalGiftedMonths += 1 * quantity
       }
     }
 

@@ -8,6 +8,7 @@ interface GiftNotificationProps {
   senderName: string
   giftMessage?: string
   giftType: 'monthly' | 'annual' | 'lifetime'
+  giftQuantity?: number
   onDismiss: () => void
   totalGiftedMonths?: number | 'lifetime'
   hasLifetime?: boolean
@@ -18,26 +19,40 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
   senderName,
   giftMessage,
   giftType,
+  giftQuantity = 1,
   onDismiss,
   totalGiftedMonths = 0,
   hasLifetime = false,
   totalNotifications = 1,
 }) => {
   // Format the gift type for display
-  const getGiftTypeDisplay = (type: 'monthly' | 'annual' | 'lifetime') => {
-    switch (type) {
-      case 'monthly':
-        return 'a month of Dotabod Pro'
-      case 'annual':
-        return 'a year of Dotabod Pro'
-      case 'lifetime':
-        return 'Dotabod Pro Lifetime'
-      default:
-        return 'Dotabod Pro'
+  const getGiftTypeDisplay = (type: 'monthly' | 'annual' | 'lifetime', quantity: number) => {
+    if (quantity <= 1) {
+      switch (type) {
+        case 'monthly':
+          return 'a month of Dotabod Pro'
+        case 'annual':
+          return 'a year of Dotabod Pro'
+        case 'lifetime':
+          return 'Dotabod Pro Lifetime'
+        default:
+          return 'Dotabod Pro'
+      }
+    } else {
+      switch (type) {
+        case 'monthly':
+          return `${quantity} months of Dotabod Pro`
+        case 'annual':
+          return `${quantity} years of Dotabod Pro`
+        case 'lifetime':
+          return 'Dotabod Pro Lifetime'
+        default:
+          return 'Dotabod Pro'
+      }
     }
   }
 
-  const giftTypeDisplay = getGiftTypeDisplay(giftType)
+  const giftTypeDisplay = getGiftTypeDisplay(giftType, giftQuantity)
 
   // Format total gifted months message
   const getTotalGiftedMessage = () => {

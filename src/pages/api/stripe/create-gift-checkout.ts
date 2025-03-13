@@ -11,6 +11,7 @@ const giftCheckoutSchema = z.object({
   giftDuration: z.enum(['monthly', 'annual', 'lifetime']),
   giftMessage: z.string().optional(),
   giftSenderName: z.string().optional(),
+  quantity: z.number().int().min(1).default(1),
 })
 
 export type GiftCheckoutRequest = z.infer<typeof giftCheckoutSchema>
@@ -32,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    const { recipientUsername, priceId, giftDuration, giftMessage, giftSenderName } =
+    const { recipientUsername, priceId, giftDuration, giftMessage, giftSenderName, quantity } =
       validationResult.data
 
     // Find the recipient user by username (name or displayName)
@@ -79,6 +80,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Determine if this is a one-time payment (lifetime) or subscription
     const isLifetime = giftDuration === 'lifetime'
 
+    // For lifetime, quantity doesn't make sense, so we enforce quantity = 1
+    const finalQuantity = isLifetime ? 1 : quantity
+
+    // If quantity > 1, add it to the metadata
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
@@ -93,6 +98,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         giftDuration,
         giftMessage: giftMessage || '',
         giftSenderName: giftSenderName || 'Anonymous',
+        giftQuantity: finalQuantity.toString(),
       },
       // For subscription gifts, we don't want to create a customer portal
       // as the gift recipient will manage the subscription
