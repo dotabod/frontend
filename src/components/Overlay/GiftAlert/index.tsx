@@ -18,13 +18,20 @@ interface GiftAlertProps {
 
 export const GiftAlert = ({ userId }: GiftAlertProps) => {
   const [activeNotification, setActiveNotification] = useState<GiftNotification | null>(null)
-  const [pollingInterval, setPollingInterval] = useState<number>(5000) // 5 seconds by default
+  const [pollingInterval, setPollingInterval] = useState<number>(15000) // Changed from 5000 to 15000 (15 seconds)
 
-  // Use SWR to poll for new notifications
+  // Use SWR to poll for new notifications with improved configuration
   const { data, error, mutate } = useSWR(userId ? '/api/overlay/gift-alert' : null, fetcher, {
     refreshInterval: pollingInterval,
     revalidateOnFocus: false,
-    dedupingInterval: 2000,
+    dedupingInterval: pollingInterval, // Match deduping interval to polling interval
+    focusThrottleInterval: 10000, // 10 seconds
+    loadingTimeout: 8000, // 8 seconds
+    errorRetryInterval: 5000, // 5 seconds
+    errorRetryCount: 3,
+    refreshWhenHidden: false, // Don't refresh when tab is hidden
+    revalidateIfStale: false, // Don't revalidate stale data automatically
+    revalidateOnReconnect: false, // Don't revalidate on reconnect
   })
 
   // Handle notification display
@@ -53,7 +60,7 @@ export const GiftAlert = ({ userId }: GiftAlertProps) => {
     setActiveNotification(null)
 
     // Resume faster polling after dismissal
-    setPollingInterval(5000)
+    setPollingInterval(15000) // Changed from 5000 to 15000 (15 seconds)
 
     // Revalidate to check for new notifications
     mutate()

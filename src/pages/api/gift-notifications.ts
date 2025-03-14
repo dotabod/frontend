@@ -21,17 +21,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const userId = session.user.id
 
-    // GET: Fetch unread gift notifications and subscription status
+    // GET: Fetch gift notifications and subscription status
     if (req.method === 'GET') {
       console.log(`Fetching gift notifications for user ${userId}`)
 
       try {
-        // Find all unread notifications of type GIFT_SUBSCRIPTION
+        // Check if we should include read notifications
+        const includeRead = req.query.includeRead === 'true'
+
+        // Find notifications of type GIFT_SUBSCRIPTION
+        // Only filter by isRead if includeRead is false
         const notifications = await prisma.notification.findMany({
           where: {
             userId: userId,
             type: 'GIFT_SUBSCRIPTION',
-            isRead: false,
+            ...(includeRead ? {} : { isRead: false }),
           },
           include: {
             giftSubscription: true,
@@ -94,12 +98,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               giftType: notification.giftSubscription.giftType,
               giftQuantity: notification.giftSubscription.giftQuantity || 1,
               createdAt: notification.createdAt,
+              read: notification.isRead, // Include read status in the response
             }
           })
           .filter(Boolean)
 
         return res.status(200).json({
-          hasNotification: formattedNotifications.length > 0,
+          hasNotification: formattedNotifications.some((n) => !n.read), // Only unread count as notifications
           notifications: formattedNotifications,
           hasLifetime,
           totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,

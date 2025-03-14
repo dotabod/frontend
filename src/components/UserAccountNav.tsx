@@ -9,6 +9,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import useSWR from 'swr'
 import { BellOutlined } from '@ant-design/icons'
+import { useState } from 'react'
 
 const { Text } = Typography
 
@@ -20,6 +21,7 @@ interface GiftNotification {
   giftType: 'monthly' | 'annual' | 'lifetime'
   giftQuantity?: number
   createdAt: string
+  read?: boolean
 }
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
@@ -34,14 +36,26 @@ const UserButton = ({ user }: UserButtonProps) => {
     revalidateOnReconnect: false,
   })
 
-  // Fetch gift notifications
+  // Fetch gift notifications with dedupingInterval to prevent request pileup
   const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
-    '/api/gift-notifications',
+    '/api/gift-notifications?includeRead=true',
     fetcher,
+    {
+      dedupingInterval: 5000, // 5 seconds
+      focusThrottleInterval: 10000, // 10 seconds
+      loadingTimeout: 8000, // 8 seconds
+      errorRetryInterval: 5000, // 5 seconds
+      errorRetryCount: 3,
+    },
   )
 
   const hasNotifications = giftNotificationData?.hasNotification || false
   const notifications = (giftNotificationData?.notifications || []) as GiftNotification[]
+  const totalUnreadNotifications = notifications.filter((n) => !n.read).length
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 5
   const totalNotifications = notifications.length
 
   const isLive = data?.stream_online
@@ -95,34 +109,88 @@ const UserButton = ({ user }: UserButtonProps) => {
 
   // Notification popover content
   const notificationContent = (
-    <div style={{ maxWidth: 300, maxHeight: 400, overflow: 'auto' }}>
+    <div
+      style={{
+        maxWidth: 300,
+        maxHeight: 400,
+        overflow: 'auto',
+        backgroundColor: '#1a1a1a',
+        color: '#fff',
+      }}
+    >
       {totalNotifications > 0 ? (
-        <List
-          itemLayout='vertical'
-          dataSource={notifications}
-          renderItem={(notification: GiftNotification) => (
-            <List.Item
-              key={notification.id}
-              extra={
-                <Button size='small' onClick={() => dismissNotification(notification.id)}>
-                  Dismiss
-                </Button>
-              }
-            >
-              <List.Item.Meta
-                title='Gift Subscription'
-                description={`${notification.senderName || 'Someone'} has gifted you ${formatGiftType(notification.giftType, notification.giftQuantity)}!`}
-              />
-              {notification.giftMessage && (
-                <Text italic style={{ display: 'block', marginTop: 8 }}>
-                  "{notification.giftMessage}"
-                </Text>
-              )}
-            </List.Item>
+        <>
+          <List
+            itemLayout='vertical'
+            dataSource={notifications.slice((currentPage - 1) * pageSize, currentPage * pageSize)}
+            renderItem={(notification: GiftNotification) => (
+              <List.Item
+                key={notification.id}
+                extra={
+                  !notification.read ? (
+                    <Button size='small' onClick={() => dismissNotification(notification.id)}>
+                      Dismiss
+                    </Button>
+                  ) : (
+                    <Text type='secondary' style={{ fontSize: '12px' }}>
+                      Read
+                    </Text>
+                  )
+                }
+                style={{
+                  backgroundColor: notification.read ? '#1f1f1f' : '#2a2a2a',
+                  opacity: notification.read ? 0.8 : 1,
+                }}
+              >
+                <List.Item.Meta
+                  title={
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Gift Subscription</span>
+                      <Text type='secondary' style={{ fontSize: '12px' }}>
+                        {new Date(notification.createdAt).toLocaleDateString()}
+                      </Text>
+                    </div>
+                  }
+                  description={`${notification.senderName || 'Someone'} has gifted you ${formatGiftType(notification.giftType, notification.giftQuantity)}!`}
+                />
+                {notification.giftMessage && (
+                  <Text italic style={{ display: 'block', marginTop: 8 }}>
+                    "{notification.giftMessage}"
+                  </Text>
+                )}
+              </List.Item>
+            )}
+          />
+          {totalNotifications > pageSize && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+              <Button
+                size='small'
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                style={{ backgroundColor: '#2a2a2a', borderColor: '#444', color: '#fff' }}
+              >
+                Previous
+              </Button>
+              <Text style={{ margin: '0 12px', color: '#bfbfbf' }}>
+                Page {currentPage} of {Math.ceil(totalNotifications / pageSize)}
+              </Text>
+              <Button
+                size='small'
+                disabled={currentPage >= Math.ceil(totalNotifications / pageSize)}
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    Math.min(prev + 1, Math.ceil(totalNotifications / pageSize)),
+                  )
+                }
+                style={{ backgroundColor: '#2a2a2a', borderColor: '#444', color: '#fff' }}
+              >
+                Next
+              </Button>
+            </div>
           )}
-        />
+        </>
       ) : (
-        <Text>No new notifications</Text>
+        <Text style={{ color: '#bfbfbf' }}>No notifications</Text>
       )}
     </div>
   )
@@ -138,7 +206,7 @@ const UserButton = ({ user }: UserButtonProps) => {
         arrow={{ pointAtCenter: true }}
       >
         <div className='mr-4 cursor-pointer'>
-          <Badge count={totalNotifications} size='small'>
+          <Badge count={totalUnreadNotifications} size='small'>
             <BellOutlined style={{ fontSize: '20px', color: '#fff' }} />
           </Badge>
         </div>
@@ -148,7 +216,6 @@ const UserButton = ({ user }: UserButtonProps) => {
       <Link href='/dashboard/features'>
         <div
           className={clsx(
-            'text-gray-200',
             `outline:transparent group block h-full w-full cursor-pointer rounded-md border border-transparent px-3.5
               py-2 text-left text-sm transition-all
               `,

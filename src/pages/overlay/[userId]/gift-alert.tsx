@@ -34,7 +34,8 @@ export default function GiftAlertOverlay() {
   // Handle notification display
   useEffect(() => {
     if (data?.hasNotification && !activeNotification) {
-      setActiveNotification(data.notification)
+      const currentNotification = data.notification
+      setActiveNotification(currentNotification)
 
       // Slow down polling when displaying a notification
       setPollingInterval(30000) // 30 seconds
@@ -46,11 +47,31 @@ export default function GiftAlertOverlay() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          notificationId: data.notification.id,
+          notificationId: currentNotification.id,
         }),
-      }).catch(console.error)
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to mark notification as read')
+          }
+          return response.json()
+        })
+        .then(() => {
+          // Force revalidate the data to prevent the same notification from appearing again
+          mutate(
+            (prev) => ({
+              ...prev,
+              hasNotification: false,
+              notification: null,
+            }),
+            false, // Don't revalidate from the server immediately
+          )
+        })
+        .catch((error) => {
+          console.error('Error marking notification as read:', error)
+        })
     }
-  }, [data, activeNotification])
+  }, [data, activeNotification, mutate])
 
   // Handle notification dismissal
   const handleDismiss = () => {
