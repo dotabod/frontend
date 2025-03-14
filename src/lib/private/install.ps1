@@ -218,7 +218,7 @@ function Start-DotabodInstaller {
   # Check connectivity to Dotabod GSI link
   $gsiUrl = "https://gsi.dotabod.com"
   if (-not (Test-NetworkConnection -Url $gsiUrl)) {
-    Write-Log "Your PC can't access the Dotabod GSI server. This is likely due to a firewall issue or your internet service provider blocking it. In certain places like China or Kazakhstan, it is blocked. You may have to use a VPN like https://1.1.1.1 to use Dotabod. You can also try https://github.com/dotabod/bypass and running general.bat to bypass your ISP." "ERROR"
+    Write-Log "Your PC can't access the Dotabod GSI server. This is likely due to a firewall issue or your internet service provider blocking it. In certain places like China or Kazakhstan, it is blocked. You may have to use a VPN like https://1.1.1.1 to use Dotabod." "ERROR"
     # Don't return here, let the script continue to the finally block
     return $false
   }

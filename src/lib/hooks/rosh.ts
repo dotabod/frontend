@@ -1,7 +1,7 @@
 import { isDev } from '@/lib/devConsts'
 import { useState } from 'react'
 
-export const devTotalTimer = 480000
+const devTotalTimer = 480000
 
 interface RoshanState {
   minS: number

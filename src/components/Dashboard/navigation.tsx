@@ -3,6 +3,7 @@ import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/rea
 import {
   Cookie,
   DollarSignIcon,
+  Gift,
   Github,
   HardDriveIcon,
   Info,
@@ -26,7 +27,11 @@ export const navigation = [
     name: 'Admin',
     key: PARENT_KEYS.ADMIN,
     icon: ShieldCheck,
-    children: [{ name: 'Scheduled Messages', href: '/dashboard/admin' }],
+    children: [
+      { name: 'Scheduled Messages', href: '/dashboard/admin' },
+      { name: 'Manage Channel', href: '/dashboard/admin/manage-channel' },
+      { name: 'Test Gift', href: '/dashboard/admin/test-gift' },
+    ],
   },
 
   // Main features
@@ -85,6 +90,12 @@ export const navigation = [
         name: 'Billing',
         href: '/dashboard/billing',
         icon: DollarSignIcon,
+      },
+      {
+        name: 'Gift Pro',
+        href: '/gift',
+        icon: Gift,
+        new: true,
       },
       {
         name: 'Data',

@@ -10,8 +10,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { ObsSetup } from './ObsSetup'
 import { TierBadge } from './Features/TierBadge'
+import { ObsSetup } from './ObsSetup'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -214,14 +214,8 @@ export default function OBSOverlay() {
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
-          <Link
-            target='_blank'
-            href='https://help.dotabod.com'
-            onClick={() => {
-              track('overlay/help_discord')
-            }}
-          >
-            on Discord
+          <Link target='_blank' href='/dashboard/troubleshoot'>
+            from the help page
           </Link>
           , and then try{' '}
           <Link

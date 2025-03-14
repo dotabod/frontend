@@ -1,11 +1,4 @@
-import {
-  COOKIE_EVENTS,
-  type CookiePreferences,
-  getDomain,
-  showCookieConsentBanner,
-  showCookieConsentSettings,
-  useCookiePreferences,
-} from '@/lib/cookieManager'
+import { COOKIE_EVENTS, type CookiePreferences, useCookiePreferences } from '@/lib/cookieManager'
 import {
   Alert,
   Button,
@@ -23,24 +16,8 @@ import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Paragraph } = Typography
 const { TabPane } = Tabs
-
-// Export the functions for easy access
-export const useCookieConsent = () => ({
-  showConsentBanner: showCookieConsentBanner,
-  showConsentSettings: showCookieConsentSettings,
-})
-
-// Define cookie info type
-type CookieInfo = {
-  name: string
-  domain: string
-  description: string
-  expiry: string
-  type: string
-  pattern?: boolean
-}
 
 // Define window with our custom properties
 declare global {
@@ -55,194 +32,6 @@ declare global {
     }
   }
 }
-
-const cookieInfo: Record<string, CookieInfo[]> = {
-  necessary: [
-    {
-      name: 'next-auth.csrf-token',
-      domain: getDomain(),
-      description:
-        'Ensures visitor browsing-security by preventing cross-site request forgery. This cookie is essential for the security of the website and visitor.',
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'next-auth.callback-url',
-      domain: getDomain(),
-      description: "Used in order to detect spam and improve the website's security.",
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'next-auth.session-token',
-      domain: getDomain(),
-      description: "Stores the user's authentication session information.",
-      expiry: '30 days',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'CookieConsent',
-      domain: getDomain(),
-      description: "Stores the user's cookie consent state for the current domain",
-      expiry: '1 year',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__hssrc',
-      domain: getDomain(),
-      description: "Used to recognize the visitor's browser upon reentry on the website.",
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__Host-next-auth.csrf-token',
-      domain: getDomain(),
-      description:
-        'Ensures visitor browsing-security by preventing cross-site request forgery. This cookie is essential for the security of the website and visitor.',
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__Secure-next-auth.callback-url',
-      domain: getDomain(),
-      description: "Used in order to detect spam and improve the website's security.",
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'test_cookie',
-      domain: 'doubleclick.net',
-      description: "Used to check if the user's browser supports cookies.",
-      expiry: '1 day',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__cf_bm',
-      domain: 'Multiple domains',
-      description:
-        'Used by Cloudflare to manage server load, deliver website content and serve DNS connection.',
-      expiry: '1 day',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '_cfuvid',
-      domain: 'hubspot.com',
-      description:
-        'Part of Cloudflare services including load-balancing and website content delivery.',
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-  ],
-  preferences: [
-    {
-      name: 'messagesUtk',
-      domain: getDomain(),
-      description:
-        'Stores a unique ID string for each chat-box session. This allows the website-support to see previous issues and reconnect with the previous supporter.',
-      expiry: '180 days',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'hs-messages-hide-welcome-message',
-      domain: getDomain(),
-      description: 'Stores user preference for hiding the welcome message in chat.',
-      expiry: '1 day',
-      type: 'HTTP Cookie',
-    },
-  ],
-  statistics: [
-    {
-      name: '__hssc',
-      domain: getDomain(),
-      description: "Identifies if the cookie data needs to be updated in the visitor's browser.",
-      expiry: '1 day',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__hssrc',
-      domain: getDomain(),
-      description: "Used to recognise the visitor's browser upon reentry on the website.",
-      expiry: 'Session',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__hstc',
-      domain: getDomain(),
-      description:
-        'Sets a unique ID for the session. This allows the website to obtain data on visitor behaviour for statistical purposes.',
-      expiry: '180 days',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'hubspotutk',
-      domain: getDomain(),
-      description:
-        'Sets a unique ID for the session. This allows the website to obtain data on visitor behaviour for statistical purposes.',
-      expiry: '180 days',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: 'sentryReplaySession',
-      domain: getDomain(),
-      description:
-        "Registers data on visitors' website-behaviour. This is used for internal analysis and website optimization.",
-      expiry: 'Session',
-      type: 'HTML Local Storage',
-    },
-  ],
-  advertising: [
-    {
-      name: '_ga',
-      domain: getDomain(),
-      description:
-        "Used to send data to Google Analytics about the visitor's device and behavior. Tracks the visitor across devices and marketing channels.",
-      expiry: '2 years',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '_ga_*',
-      pattern: true,
-      domain: getDomain(),
-      description:
-        "Used to send data to Google Analytics about the visitor's device and behavior with a unique identifier. Tracks the visitor across devices and marketing channels.",
-      expiry: '2 years',
-      type: 'HTTP Cookie',
-    },
-    {
-      name: '__ptq.gif',
-      domain: 'hubspot.com',
-      description:
-        "Sends data to the marketing platform Hubspot about the visitor's device and behaviour. Tracks the visitor across devices and marketing channels.",
-      expiry: 'Session',
-      type: 'Pixel Tracker',
-    },
-  ],
-}
-
-const privacyPolicies = [
-  { domain: 'doubleclick.net', provider: 'Google', url: 'https://business.safety.google/privacy/' },
-  {
-    domain: 'hs-analytics.net',
-    provider: 'Hubspot',
-    url: 'https://legal.hubspot.com/privacy-policy',
-  },
-  { domain: 'hubspot.com', provider: 'Hubspot', url: 'https://legal.hubspot.com/privacy-policy' },
-  {
-    domain: 'js.hs-analytics.net',
-    provider: 'Hubspot',
-    url: 'https://legal.hubspot.com/privacy-policy',
-  },
-  {
-    domain: 'js.usemessages.com',
-    provider: 'Hubspot',
-    url: 'https://legal.hubspot.com/privacy-policy',
-  },
-  {
-    domain: 'www.googletagmanager.com',
-    provider: 'Google',
-    url: 'https://business.safety.google/privacy/',
-  },
-]
 
 // Define cookie categories and their descriptions
 const cookieCategories = {
@@ -416,33 +205,6 @@ const CookieConsent = () => {
   }
 
   // Table columns for cookie details
-  const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Domain',
-      dataIndex: 'domain',
-      key: 'domain',
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Expiry',
-      dataIndex: 'expiry',
-      key: 'expiry',
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-  ]
 
   return (
     <>

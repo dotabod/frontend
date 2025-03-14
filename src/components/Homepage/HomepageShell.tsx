@@ -65,6 +65,11 @@ const HomepageShell = ({
         <meta property='twitter:image' content={pageImage} />
 
         {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
+        <style global jsx>{`
+          html,#__next,body {
+            background-color: #1f2937; /* bg-gray-800 */
+          }
+        `}</style>
       </Head>
 
       <Banner />

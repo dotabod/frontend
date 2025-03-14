@@ -28,6 +28,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const twitchId = session?.user?.twitchId
 
+  if (!twitchId) {
+    return res.status(400).json({ message: 'Twitch ID is required' })
+  }
+
+  // Check if emotesRequired is defined and not empty
+  if (!emotesRequired || emotesRequired.length === 0) {
+    return res.status(400).json({ message: 'No emotes defined for addition' })
+  }
+
   try {
     const client = new GraphQLClient('https://7tv.io/v3/gql', {
       headers: {
@@ -35,15 +44,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
+    // Check if SEVENTV_AUTH environment variable is set
+    if (!process.env.SEVENTV_AUTH) {
+      console.error('SEVENTV_AUTH environment variable is not set')
+      return res.status(500).json({ message: 'Server configuration error' })
+    }
+
+    // Check if twitchId exists
+    if (!twitchId) {
+      console.error('User does not have a Twitch ID')
+      return res.status(400).json({ message: 'Twitch ID not found for user' })
+    }
+
     const stvResponse = await get7TVUser(twitchId)
 
+    // Check if stvResponse is valid
+    if (!stvResponse || !stvResponse.user) {
+      console.error('Failed to get 7TV user:', stvResponse)
+      return res.status(404).json({ message: '7TV user not found' })
+    }
+
     try {
+      console.log('Attempting to get or create emote set...')
       const result = await getOrCreateEmoteSet({
         client,
         userId: stvResponse.user.id,
         twitchId,
         name: 'DotabodEmotes',
       })
+
+      if (!result || !result.emoteSetId) {
+        console.error('Failed to get or create emote set:', result)
+        return res.status(500).json({ message: 'Failed to get or create emote set' })
+      }
 
       console.log('Checking existing emotes in the emote set...')
       const userEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
@@ -77,7 +110,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.log('Adding emotes to emote set...')
       const failedEmotes: Array<{ name: string; error: unknown }> = []
       await Promise.all(
-        emotesRequired.map(async (emote) => {
+        emotesRequired.map(async (emote, index) => {
           try {
             console.log(`Adding emote ${emote.label}...`)
             await client.request(CHANGE_EMOTE_IN_SET, {
@@ -131,7 +164,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
   } catch (error) {
     console.error('Error:', error)
-    return res.status(500).json({ message: 'Internal server error', error })
+    // Provide more detailed error information
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: errorMessage,
+      stack: process.env.NODE_ENV === 'development' ? errorStack : undefined,
+    })
   }
 }
 

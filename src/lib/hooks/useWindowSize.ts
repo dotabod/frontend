@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export interface Size {
+interface Size {
   width: number | undefined
   height: number | undefined
 }

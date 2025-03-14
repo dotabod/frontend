@@ -10,19 +10,19 @@ import {
 } from '@prisma/client'
 
 // Add type safety for chatters
-export type ChatterKeys = keyof typeof defaultSettings.chatters
+type ChatterKeys = keyof typeof defaultSettings.chatters
 export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
 export const SUBSCRIPTION_TIERS = SubscriptionTier
 
 export type SubscriptionRow = Subscription
 
-export const TIER_LEVELS: Record<SubscriptionTier, number> = {
+const TIER_LEVELS: Record<SubscriptionTier, number> = {
   [SUBSCRIPTION_TIERS.FREE]: 0,
   [SUBSCRIPTION_TIERS.PRO]: 1,
 }
 
-export const PRICE_PERIODS = {
+const PRICE_PERIODS = {
   MONTHLY: 'monthly',
   ANNUAL: 'annual',
   LIFETIME: 'lifetime',
@@ -47,6 +47,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandMute: SUBSCRIPTION_TIERS.FREE,
   commandPing: SUBSCRIPTION_TIERS.FREE,
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
+  showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
 
   // Pro Tier Features
   'mmr-tracker': SUBSCRIPTION_TIERS.PRO,
@@ -204,7 +205,7 @@ export function isSubscriptionActive(
   return false
 }
 
-export interface SubscriptionPriceId {
+interface SubscriptionPriceId {
   tier: SubscriptionTier
   monthly: string
   annual: string
@@ -300,7 +301,7 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
 }
 
 // Add these types at the top with other types
-export type SubscriptionStatusInfo = {
+type SubscriptionStatusInfo = {
   message?: string
   type: 'success' | 'warning' | 'error' | 'info'
   badge: 'gold' | 'blue' | 'red' | 'default'

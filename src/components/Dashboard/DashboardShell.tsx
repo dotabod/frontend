@@ -1,5 +1,6 @@
 import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
+import { CompactDisableToggle } from '@/components/Dashboard/CompactDisableToggle'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import type { PARENT_KEYS } from '@/components/Dashboard/navigation'
@@ -19,6 +20,9 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import ModeratedChannels from './ModeratedChannels'
 import { navigation } from './navigation'
+import GiftNotification from '@/components/Subscription/GiftNotification'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/fetcher'
 
 const { Header, Sider, Content } = Layout
 
@@ -32,29 +36,34 @@ interface SEOProps {
   noindex?: boolean
 }
 
-function getItem(item) {
+function getItem(item, collapsed = false, isChild = false) {
   const props = item.onClick ? { onClick: item.onClick } : {}
+
+  let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null
+  if (collapsed && isChild) icon = null
+
+  const label = item.href ? (
+    <Link
+      {...props}
+      href={item.href}
+      className='text-gray-200! flex flex-row gap-2 items-center'
+      target={item.href.startsWith('http') ? '_blank' : '_self'}
+    >
+      {item.name}
+      {item.new && <Tag color='green'>New</Tag>}
+    </Link>
+  ) : (
+    <div className='flex flex-row gap-2 items-center'>
+      {item.name}
+      {item.new && <Tag color='green'>New</Tag>}
+    </div>
+  )
 
   return {
     key: item.href || item.key,
-    icon: item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null,
-    label: item.href ? (
-      <Link
-        {...props}
-        href={item.href}
-        className='text-gray-200! flex flex-row gap-2 items-center'
-        target={item.href.startsWith('http') ? '_blank' : '_self'}
-      >
-        {item.name}
-        {item.new && <Tag color='green'>New</Tag>}
-      </Link>
-    ) : (
-      <div className='flex flex-row gap-2 items-center'>
-        {item.name}
-        {item.new && <Tag color='green'>New</Tag>}
-      </div>
-    ),
-    children: item.children?.map(getItem),
+    icon,
+    label: label,
+    children: item.children?.map((child) => getItem(child, collapsed, true)),
   }
 }
 
@@ -166,6 +175,7 @@ export default function DashboardShell({
   }, [])
 
   // Update selected menu item and open parent menu when route changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: adding openKeys causes too many re-renders
   useEffect(() => {
     const { pathname } = router
     const { key, parentKey } = findBestMatchingMenuItem(pathname)
@@ -176,6 +186,81 @@ export default function DashboardShell({
       setOpenKeys((prev) => [...prev, parentKey])
     }
   }, [router.pathname, router.asPath])
+
+  // Fetch gift notifications from the API
+  const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
+    status === 'authenticated' ? '/api/gift-notifications' : null,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  )
+
+  const [hasGiftNotification, setHasGiftNotification] = useState(false)
+  const [giftDetails, setGiftDetails] = useState<{
+    id: string
+    senderName: string
+    giftMessage?: string
+    giftType: 'monthly' | 'annual' | 'lifetime'
+    giftQuantity?: number
+  } | null>(null)
+  const [totalGiftedMonths, setTotalGiftedMonths] = useState<number | 'lifetime'>(0)
+  const [hasLifetime, setHasLifetime] = useState(false)
+  const [totalNotifications, setTotalNotifications] = useState(0)
+
+  // Update notification state when data changes
+  useEffect(() => {
+    if (giftNotificationData?.hasNotification && giftNotificationData.notifications?.length > 0) {
+      // Get the first unread notification
+      const firstNotification = giftNotificationData.notifications[0]
+      setGiftDetails({
+        id: firstNotification.id,
+        senderName: firstNotification.senderName,
+        giftMessage: firstNotification.giftMessage,
+        giftType: firstNotification.giftType,
+        giftQuantity: firstNotification.giftQuantity || 1,
+      })
+      setHasGiftNotification(true)
+
+      // Set total gifted months and lifetime status
+      setTotalGiftedMonths(giftNotificationData.totalGiftedMonths || 0)
+      setHasLifetime(giftNotificationData.hasLifetime || false)
+      setTotalNotifications(giftNotificationData.totalNotifications || 0)
+    } else {
+      setHasGiftNotification(false)
+      setGiftDetails(null)
+    }
+  }, [giftNotificationData])
+
+  const dismissGiftNotification = async () => {
+    if (giftDetails?.id) {
+      try {
+        // Call API to mark notification as read
+        const response = await fetch('/api/gift-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notificationId: giftDetails.id,
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Failed to mark notification as read:', errorData)
+          throw new Error(errorData.message || 'Failed to mark notification as read')
+        }
+
+        // Refresh notifications after marking as read
+        refreshGiftNotifications()
+      } catch (error) {
+        console.error('Failed to mark notification as read:', error)
+      }
+    }
+  }
 
   if (status !== 'authenticated') return null
 
@@ -272,6 +357,16 @@ export default function DashboardShell({
 
               <SubscriptionBadge collapsed={collapsed} />
 
+              {!collapsed ? (
+                <div className='flex justify-center py-2'>
+                  <DisableToggle />
+                </div>
+              ) : (
+                <div className='flex justify-center py-2'>
+                  <CompactDisableToggle />
+                </div>
+              )}
+
               {!collapsed && (
                 <div className='flex justify-center py-4'>
                   <ModeratedChannels />
@@ -296,7 +391,7 @@ export default function DashboardShell({
                       className: 'm-6! bg-gray-500!',
                     }
 
-                  return getItem(item)
+                  return getItem(item, collapsed)
                 })}
               />
             </div>
@@ -310,18 +405,36 @@ export default function DashboardShell({
               'flex w-full items-center justify-between p-8!',
             )}
           >
-            <DisableToggle />
+            <div />
 
             <div className='w-fit py-2'>
               <UserAccountNav />
             </div>
           </Header>
+          {hasGiftNotification && giftDetails && (
+            <GiftNotification
+              senderName={giftDetails.senderName}
+              giftMessage={giftDetails.giftMessage}
+              giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
+              giftQuantity={giftDetails.giftQuantity}
+              onDismiss={dismissGiftNotification}
+              totalGiftedMonths={totalGiftedMonths}
+              hasLifetime={hasLifetime}
+              totalNotifications={totalNotifications}
+            />
+          )}
           <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
             {children}
           </Content>
         </Layout>
       </Layout>
       <CookieConsent />
+      <div className='pt-4 pb-1 text-center text-xs text-gray-400 bg-gray-900 border-t border-gray-700'>
+        <p>
+          Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is
+          not affiliated with Valve Corporation.
+        </p>
+      </div>
     </>
   )
 }

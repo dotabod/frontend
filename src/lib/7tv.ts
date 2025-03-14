@@ -36,7 +36,7 @@ export type EmoteSetResponse = {
   }
 }
 
-export type UserEmoteSetsResponse = {
+type UserEmoteSetsResponse = {
   user: {
     emote_sets: Array<{
       id: string
@@ -51,7 +51,7 @@ export type UserEmoteSetsResponse = {
   }
 }
 
-export type SevenTVErrorResponse = {
+type SevenTVErrorResponse = {
   response: {
     errors: Array<{
       message: string

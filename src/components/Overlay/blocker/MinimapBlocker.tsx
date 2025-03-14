@@ -10,7 +10,7 @@ import Image from 'next/image'
 import { useSelector } from 'react-redux'
 import Minimap from '../minimap'
 
-export const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
+const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const res = useTransformRes()

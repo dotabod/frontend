@@ -1,0 +1,106 @@
+/* OBS v27 Compatibility Layer */
+/* These classes ensure basic utilities work in older browsers like OBS v27 */
+
+/* Display */
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.hidden { display: none; }
+
+/* Position */
+.static { position: static; }
+.fixed { position: fixed; }
+.absolute { position: absolute; }
+.relative { position: relative; }
+.sticky { position: sticky; }
+
+/* Width/Height */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.w-screen { width: 100vw; }
+.h-screen { height: 100vh; }
+
+/* Flex */
+.flex-row { flex-direction: row; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+
+/* Spacing */
+.p-0 { padding: 0; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.m-0 { margin: 0; }
+.m-1 { margin: 0.25rem; }
+.m-2 { margin: 0.5rem; }
+.m-4 { margin: 1rem; }
+
+/* Background */
+.bg-transparent { background-color: rgba(0, 0, 0, 0); }
+.bg-black { background-color: #000; }
+.bg-white { background-color: #fff; }
+
+/* Text */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-white { color: #fff; }
+.text-white\/90 { color: rgba(255, 255, 255, 0.9); }
+.text-black { color: #000; }
+.text-green-400 { color: #00ff00; }
+.text-red-400 { color: #ff0000; }
+
+/* Borders */
+.rounded { border-radius: 0.25rem; }
+.rounded-full { border-radius: 9999px; }
+.border { border-width: 1px; }
+.border-0 { border-width: 0; }
+
+/* Overflow */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-scroll { overflow: scroll; }
+
+/* Z-index */
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+
+/* Additional classes for specific component */
+.font-\[RadianceM\] { font-family: "RadianceM", sans-serif; }
+.bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+.border-slate-500 { border-color: #64748b; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.rounded-bl-none { border-bottom-left-radius: 0; }
+.rounded-sm { border-radius: 0.125rem; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.bg-slate-700\/50 { background-color: rgba(51, 65, 85, 0.5); }
+.space-x-1 { display: flex; gap: 0.25rem; }
+.space-x-2 { display: flex; gap: 0.5rem; }
+.space-x-4 { display: flex; gap: 1rem; }
+.space-y-1 { display: flex; flex-direction: column; gap: 0.25rem; }
+.space-y-2 { display: flex; flex-direction: column; gap: 0.5rem; }
+.space-y-4 { display: flex; flex-direction: column; gap: 1rem; }
+.text-slate-50 { color: #f8fafc; }
+.text-slate-100 { color: #f1f5f9; }
+.text-slate-200 { color: #e2e8f0; }
+.text-slate-300 { color: #cbd5e1; }
+.text-slate-400 { color: #94a3b8; }
+.text-slate-500 { color: #64748b; }
+.text-slate-600 { color: #475569; }
+.text-\[\#e4d98d\] { color: #e4d98d; }

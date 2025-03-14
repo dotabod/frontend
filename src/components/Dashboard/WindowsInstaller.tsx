@@ -20,7 +20,10 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
     {
       title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',
       description: errorWithoutSuccess ? (
-        'Please try again or reach out on Discord for more help.'
+        <span>
+          Please try again or reach out from the{' '}
+          <Link href='/dashboard/troubleshoot'>help page</Link> for more help.
+        </span>
       ) : (
         <div>
           <div>Run the script above to connect to the Dotabod installer!</div>
@@ -194,14 +197,7 @@ const WindowsInstaller = () => {
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
-          <Link
-            target='_blank'
-            href='https://help.dotabod.com'
-            onClick={() => track('setup/help_discord')}
-          >
-            on Discord
-          </Link>
-          , and then try{' '}
+          <Link href='/dashboard/troubleshoot'>from the help page</Link>, and then try{' '}
           <Link onClick={() => track('setup/manual_steps')} href='/dashboard?step=2&gsiType=manual'>
             the manual steps
           </Link>

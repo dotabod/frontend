@@ -62,7 +62,7 @@ export default function BetsCard() {
             >
               <Input placeholder='Title' maxLength={45} />
             </Form.Item>
-            <div className='flex flex-col md:flex-row md:space-x-4'>
+            <div className='flex flex-col md:flex-row md:gap-4'>
               <Form.Item colon={false} label='Yes' name='yes'>
                 <Input style={{ maxWidth: 108 }} maxLength={25} placeholder='Yes' />
               </Form.Item>
