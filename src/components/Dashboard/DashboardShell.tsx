@@ -18,7 +18,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type React from 'react'
 import { useEffect, useState } from 'react'
-import ModeratedChannels from './ModeratedChannels'
 import { navigation } from './navigation'
 import GiftNotification from '@/components/Subscription/GiftNotification'
 import useSWR from 'swr'
@@ -343,7 +342,7 @@ export default function DashboardShell({
 
           <div className='flex flex-col items-end'>
             <div className='w-full md:max-w-xs'>
-              <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center'>
+              <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center gap-2'>
                 {!collapsed ? (
                   <Link href='/'>
                     <DarkLogo className='h-full w-auto' />
@@ -353,9 +352,9 @@ export default function DashboardShell({
                     <Logomark className='h-full w-auto' aria-hidden='true' />
                   </Link>
                 )}
-              </div>
 
-              <SubscriptionBadge collapsed={collapsed} />
+                <SubscriptionBadge collapsed={collapsed} />
+              </div>
 
               {!collapsed ? (
                 <div className='flex justify-center py-2'>
@@ -364,12 +363,6 @@ export default function DashboardShell({
               ) : (
                 <div className='flex justify-center py-2'>
                   <CompactDisableToggle />
-                </div>
-              )}
-
-              {!collapsed && (
-                <div className='flex justify-center py-4'>
-                  <ModeratedChannels />
                 </div>
               )}
 
