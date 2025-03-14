@@ -52,7 +52,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
       return {
         icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
         text: 'Lifetime Pro',
-        color: 'gold',
+        color: 'black',
         tooltip: 'Lifetime Pro Subscriber',
       }
     }
