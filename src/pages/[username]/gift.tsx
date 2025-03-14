@@ -314,8 +314,8 @@ GiftSubscriptionPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       seo={{
-        title: `Gift a subscription to ${username} - Dotabod`,
-        description: `Support ${username} by gifting them Dotabod Pro!`,
+        title: `Gift a subscription to ${username || 'streamers'} - Dotabod`,
+        description: `Support ${username || 'streamers'} by gifting them Dotabod Pro!`,
         canonicalUrl: `https://dotabod.com/${username}/gift`,
       }}
     >
