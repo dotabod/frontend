@@ -1,5 +1,5 @@
 import prisma from '@/lib/db'
-import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, getSubscription, isInGracePeriod } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -28,11 +28,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get the subscription for the user
     const subscription = await getSubscription(user.id)
 
+    // Check if we're in the grace period
+    const inGracePeriod = isInGracePeriod()
+
+    // Determine if the user has an actual paid subscription or lifetime plan
+    const hasPaidOrLifetime =
+      subscription &&
+      (subscription.stripeSubscriptionId ||
+        subscription.transactionType === 'LIFETIME' ||
+        subscription.isGift)
+
+    // User is on grace period Pro if we're in grace period and they don't have a paid plan
+    const isGracePeriodPro = inGracePeriod && !hasPaidOrLifetime
+
     if (!subscription) {
       return res.status(200).json({
         tier: SUBSCRIPTION_TIERS.FREE,
         status: null,
         isPro: false,
+        isGracePeriodPro: false,
+        isLifetime: false,
+        inGracePeriod,
       })
     }
 
@@ -41,7 +57,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       tier: subscription.tier as SubscriptionTier,
       status: subscription.status,
       isPro: subscription.tier === SUBSCRIPTION_TIERS.PRO,
+      isGracePeriodPro,
       isLifetime: subscription.transactionType === 'LIFETIME',
+      isGift: subscription.isGift || false,
+      inGracePeriod,
     })
   } catch (error) {
     console.error('Error in subscription by username route:', error)

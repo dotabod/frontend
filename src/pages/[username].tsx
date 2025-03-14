@@ -20,10 +20,16 @@ const CommandsPage: NextPageWithLayout = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState<{
     isPro: boolean
     isLifetime: boolean
+    isGracePeriodPro: boolean
+    isGift: boolean
+    inGracePeriod: boolean
     loading: boolean
   }>({
     isPro: false,
     isLifetime: false,
+    isGracePeriodPro: false,
+    isGift: false,
+    inGracePeriod: false,
     loading: true,
   })
   const router = useRouter()
@@ -39,6 +45,9 @@ const CommandsPage: NextPageWithLayout = () => {
           setSubscriptionInfo({
             isPro: data.isPro || false,
             isLifetime: data.isLifetime || false,
+            isGracePeriodPro: data.isGracePeriodPro || false,
+            isGift: data.isGift || false,
+            inGracePeriod: data.inGracePeriod || false,
             loading: false,
           })
         })
@@ -46,6 +55,9 @@ const CommandsPage: NextPageWithLayout = () => {
           setSubscriptionInfo({
             isPro: false,
             isLifetime: false,
+            isGracePeriodPro: false,
+            isGift: false,
+            inGracePeriod: false,
             loading: false,
           })
         })
@@ -133,6 +145,57 @@ const CommandsPage: NextPageWithLayout = () => {
       })
     })
 
+  // Determine what subscription badge to show
+  const getSubscriptionBadge = () => {
+    if (subscriptionInfo.loading) return null
+
+    if (subscriptionInfo.isPro) {
+      if (subscriptionInfo.isGracePeriodPro) {
+        return (
+          <Tooltip title='Using Pro features during free trial period'>
+            <Tag color='blue' className='flex items-center gap-1'>
+              <CrownIcon size={14} className='inline-block' />
+              <span>Free Trial</span>
+            </Tag>
+          </Tooltip>
+        )
+      }
+
+      if (subscriptionInfo.isLifetime) {
+        return (
+          <Tooltip title='Lifetime Pro Subscriber'>
+            <Tag color='gold' className='flex items-center gap-1'>
+              <CrownIcon size={14} className='inline-block' />
+              <span>Lifetime Pro</span>
+            </Tag>
+          </Tooltip>
+        )
+      }
+
+      if (subscriptionInfo.isGift) {
+        return (
+          <Tooltip title='Received Pro as a gift'>
+            <Tag color='gold' className='flex items-center gap-1'>
+              <GiftIcon size={14} className='inline-block' />
+              <span>Gifted Pro</span>
+            </Tag>
+          </Tooltip>
+        )
+      }
+
+      return (
+        <Tooltip title='Pro Subscriber'>
+          <Tag color='gold' className='flex items-center gap-1'>
+            <CrownIcon size={14} className='inline-block' />
+            <span>Pro</span>
+          </Tag>
+        </Tooltip>
+      )
+    }
+
+    return null
+  }
+
   return (
     <>
       <Head>
@@ -180,18 +243,7 @@ const CommandsPage: NextPageWithLayout = () => {
                 >
                   {data?.stream_online ? 'Live' : 'Offline'}
                 </span>
-                {!subscriptionInfo.loading && subscriptionInfo.isPro && (
-                  <Tooltip
-                    title={
-                      subscriptionInfo.isLifetime ? 'Lifetime Pro Subscriber' : 'Pro Subscriber'
-                    }
-                  >
-                    <Tag color='gold' className='flex items-center gap-1'>
-                      <CrownIcon size={14} />
-                      <span>{subscriptionInfo.isLifetime ? 'Lifetime Pro' : 'Pro'}</span>
-                    </Tag>
-                  </Tooltip>
-                )}
+                {getSubscriptionBadge()}
               </div>
               <span>
                 Using Dotabod since{' '}
