@@ -2,6 +2,26 @@ import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity'
+
+// Initialize the profanity matcher
+const profanityMatcher = new RegExpMatcher({
+  ...englishDataset.build(),
+  ...englishRecommendedTransformers,
+})
+
+// Function to check for profanity in text
+const checkForProfanity = (text: string | undefined): boolean => {
+  if (!text) return false
+  return profanityMatcher.hasMatch(text)
+}
+
+// Function to sanitize input
+const sanitizeInput = (text: string | undefined): string => {
+  if (!text) return ''
+  // Basic sanitization - remove any HTML tags and limit length
+  return text.replace(/<[^>]*>?/gm, '').substring(0, 200)
+}
 
 // Define the request schema for validation
 const giftCheckoutSchema = z.object({
@@ -34,6 +54,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { recipientUsername, priceId, giftDuration, giftMessage, giftSenderName, quantity } =
       validationResult.data
+
+    // Check for profanity in gift message and sender name
+    if (giftMessage && checkForProfanity(giftMessage)) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Gift message contains inappropriate language. Please revise it.',
+      })
+    }
+
+    if (giftSenderName && checkForProfanity(giftSenderName)) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Sender name contains inappropriate language. Please revise it.',
+      })
+    }
 
     // Find the recipient user by username (name or displayName)
     const recipientUser = await prisma.user.findFirst({
@@ -110,8 +145,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         recipientUserId: recipientUser.id,
         recipientUsername,
         giftDuration,
-        giftMessage: giftMessage || '',
-        giftSenderName: giftSenderName || 'Anonymous',
+        giftMessage: sanitizeInput(giftMessage),
+        giftSenderName: sanitizeInput(giftSenderName) || 'Anonymous',
         giftQuantity: finalQuantity.toString(),
         noAutoRenew: 'true', // Add metadata to indicate this should not auto-renew
       },

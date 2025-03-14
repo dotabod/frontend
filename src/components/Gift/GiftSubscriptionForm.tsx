@@ -7,8 +7,15 @@ import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
 import { Card } from '@/ui/card'
 import Link from 'next/link'
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity'
 
 const { Title, Text, Paragraph } = Typography
+
+// Initialize the profanity matcher
+const profanityMatcher = new RegExpMatcher({
+  ...englishDataset.build(),
+  ...englishRecommendedTransformers,
+})
 
 // Define the form values type
 export interface GiftFormValues {
@@ -29,7 +36,6 @@ export const GiftSubscriptionForm = ({
   recipientUsername,
   recipientDisplayName,
   canceled = false,
-  loading = false,
 }: GiftSubscriptionFormProps) => {
   const { message } = App.useApp()
   const [form] = Form.useForm<GiftFormValues>()
@@ -39,6 +45,14 @@ export const GiftSubscriptionForm = ({
   const [formError, setFormError] = useState<string | null>(null)
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const selectedTier = SUBSCRIPTION_TIERS.PRO
+
+  // Function to check for profanity in text
+  const checkForProfanity = (text: string | undefined): boolean => {
+    if (!text) return false
+    return profanityMatcher.hasMatch(text)
+  }
+
+  // Function to sanitize input (as an extra precaution)
 
   // Reset quantity to 1 when selecting lifetime
   useEffect(() => {
@@ -56,7 +70,7 @@ export const GiftSubscriptionForm = ({
   }, [recipientUsername, form])
 
   // Clear username error when username changes
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUsernameChange = () => {
     if (usernameError) {
       setUsernameError(null)
     }
@@ -68,6 +82,32 @@ export const GiftSubscriptionForm = ({
       // Clear any previous errors
       setFormError(null)
       setUsernameError(null)
+
+      // Client-side profanity check for immediate feedback
+      // Note: We still rely on server-side validation for security
+      if (checkForProfanity(values.giftMessage)) {
+        form.setFields([
+          {
+            name: 'giftMessage',
+            errors: ['Your message contains inappropriate language. Please revise it.'],
+          },
+        ])
+        setFormError('Please remove inappropriate language from your message.')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (checkForProfanity(values.giftSenderName)) {
+        form.setFields([
+          {
+            name: 'giftSenderName',
+            errors: ['Your name contains inappropriate language. Please revise it.'],
+          },
+        ])
+        setFormError('Please remove inappropriate language from your name.')
+        setIsSubmitting(false)
+        return
+      }
 
       const priceId = getPriceId(selectedTier as typeof SUBSCRIPTION_TIERS.PRO, activePeriod)
 
@@ -275,6 +315,18 @@ export const GiftSubscriptionForm = ({
             name='giftSenderName'
             label='Your Name (Optional)'
             tooltip='This will be shown to the recipient'
+            rules={[
+              {
+                validator: (_, value) => {
+                  // Client-side validation for immediate user feedback
+                  // Server will also validate to ensure security
+                  if (value && checkForProfanity(value)) {
+                    return Promise.reject('Please remove inappropriate language from your name')
+                  }
+                  return Promise.resolve()
+                },
+              },
+            ]}
           >
             <Input placeholder='Your name or leave blank to gift anonymously' />
           </Form.Item>
@@ -283,6 +335,18 @@ export const GiftSubscriptionForm = ({
             name='giftMessage'
             label='Gift Message (Optional)'
             tooltip='A personal message to include with your gift'
+            rules={[
+              {
+                validator: (_, value) => {
+                  // Client-side validation for immediate user feedback
+                  // Server will also validate to ensure security
+                  if (value && checkForProfanity(value)) {
+                    return Promise.reject('Please remove inappropriate language from your message')
+                  }
+                  return Promise.resolve()
+                },
+              },
+            ]}
           >
             <Input.TextArea
               placeholder='Add a personal message'
@@ -341,6 +405,10 @@ export const GiftSubscriptionForm = ({
           <div>
             If the recipient already has an active subscription, this gift will extend their
             existing subscription.
+          </div>
+          <div className='mt-1 pt-1 border-t border-gray-700'>
+            Note: Messages containing inappropriate language will be automatically rejected by our
+            system.
           </div>
         </div>
       </Card>
