@@ -126,11 +126,26 @@ const CommandsPage: NextPageWithLayout = () => {
               </span>
             </div>
             <div>
-              <Link href={createGiftLink(username as string)} passHref>
-                <Button type='primary' icon={<GiftIcon size={16} />} className='flex items-center'>
-                  Gift Subscription
-                </Button>
-              </Link>
+              <div className='flex space-x-2'>
+                <Link
+                  target='_blank'
+                  href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
+                  passHref
+                >
+                  <Button icon={<ExternalLinkIcon size={16} />} className='flex items-center'>
+                    View on Twitch
+                  </Button>
+                </Link>
+                <Link href={createGiftLink(username as string)} passHref>
+                  <Button
+                    type='primary'
+                    icon={<GiftIcon size={16} />}
+                    className='flex items-center'
+                  >
+                    Gift Subscription
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
           <div className='text-gray-300'>
