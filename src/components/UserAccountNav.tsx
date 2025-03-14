@@ -8,6 +8,7 @@ import { BellOutlined } from '@ant-design/icons'
 import clsx from 'clsx'
 import type { Session } from 'next-auth'
 import Image from 'next/image'
+import Link from 'next/link'
 import useSWR from 'swr'
 import { useState } from 'react'
 
@@ -218,11 +219,16 @@ const UserButton = ({ user }: UserButtonProps) => {
         menu={{
           items: [
             {
+              label: <Link href='/dashboard'>Dashboard</Link>,
+              key: 'dashboard',
+            },
+            {
               label: 'Logout',
               key: 'logout',
               onClick: () => {
                 signOut({
-                  callbackUrl: `${window.location.origin}/`,
+                  callbackUrl: window.location.origin,
+                  redirect: true,
                 })
               },
             },
