@@ -1,5 +1,6 @@
 import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
+import { CompactDisableToggle } from '@/components/Dashboard/CompactDisableToggle'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import type { PARENT_KEYS } from '@/components/Dashboard/navigation'
@@ -351,6 +352,16 @@ export default function DashboardShell({
 
               <SubscriptionBadge collapsed={collapsed} />
 
+              {!collapsed ? (
+                <div className='flex justify-center py-2'>
+                  <DisableToggle />
+                </div>
+              ) : (
+                <div className='flex justify-center py-2'>
+                  <CompactDisableToggle />
+                </div>
+              )}
+
               {!collapsed && (
                 <div className='flex justify-center py-4'>
                   <ModeratedChannels />
@@ -389,7 +400,7 @@ export default function DashboardShell({
               'flex w-full items-center justify-between p-8!',
             )}
           >
-            <DisableToggle />
+            <div />
 
             <div className='w-fit py-2'>
               <UserAccountNav />
