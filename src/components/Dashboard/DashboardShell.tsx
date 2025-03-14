@@ -36,29 +36,34 @@ interface SEOProps {
   noindex?: boolean
 }
 
-function getItem(item) {
+function getItem(item, collapsed = false, isChild = false) {
   const props = item.onClick ? { onClick: item.onClick } : {}
+
+  let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null
+  if (collapsed && isChild) icon = null
+
+  const label = item.href ? (
+    <Link
+      {...props}
+      href={item.href}
+      className='text-gray-200! flex flex-row gap-2 items-center'
+      target={item.href.startsWith('http') ? '_blank' : '_self'}
+    >
+      {item.name}
+      {item.new && <Tag color='green'>New</Tag>}
+    </Link>
+  ) : (
+    <div className='flex flex-row gap-2 items-center'>
+      {item.name}
+      {item.new && <Tag color='green'>New</Tag>}
+    </div>
+  )
 
   return {
     key: item.href || item.key,
-    icon: item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null,
-    label: item.href ? (
-      <Link
-        {...props}
-        href={item.href}
-        className='text-gray-200! flex flex-row gap-2 items-center'
-        target={item.href.startsWith('http') ? '_blank' : '_self'}
-      >
-        {item.name}
-        {item.new && <Tag color='green'>New</Tag>}
-      </Link>
-    ) : (
-      <div className='flex flex-row gap-2 items-center'>
-        {item.name}
-        {item.new && <Tag color='green'>New</Tag>}
-      </div>
-    ),
-    children: item.children?.map(getItem),
+    icon,
+    label: label,
+    children: item.children?.map((child) => getItem(child, collapsed, true)),
   }
 }
 
@@ -386,7 +391,7 @@ export default function DashboardShell({
                       className: 'm-6! bg-gray-500!',
                     }
 
-                  return getItem(item)
+                  return getItem(item, collapsed)
                 })}
               />
             </div>
