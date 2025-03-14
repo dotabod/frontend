@@ -15,6 +15,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     subscription?.currentPeriodEnd,
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
+    subscription?.isGift,
   )
 
   if (data?.user?.isImpersonating) {

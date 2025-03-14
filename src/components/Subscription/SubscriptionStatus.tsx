@@ -1,6 +1,7 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import {
   getCurrentPeriod,
+  getGiftSubscriptionInfo,
   getSubscriptionStatusInfo,
   gracePeriodPrettyDate,
 } from '@/utils/subscription'
@@ -21,10 +22,21 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
     subscription?.currentPeriodEnd,
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
+    subscription?.isGift,
   )
+
+  // Get gift subscription info if applicable
+  const giftInfo = getGiftSubscriptionInfo(subscription)
 
   // Get appropriate subtitle based on subscription status
   const getSubtitle = () => {
+    // If user has a gift subscription
+    if (giftInfo.isGift && subscription?.tier) {
+      return `You have a gift subscription to the ${
+        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
+      } plan that will not auto-renew`
+    }
+
     // If user has a lifetime subscription
     if (isLifetimePlan && subscription) {
       return `You have lifetime access to the ${
@@ -57,6 +69,11 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
           type={statusInfo.type}
           showIcon
         />
+      )}
+
+      {/* Show gift subscription info if applicable */}
+      {showAlert && giftInfo.isGift && (
+        <Alert className='mt-2 max-w-2xl' message={giftInfo.message} type='info' showIcon />
       )}
 
       {/* Show additional alert for users with paid subscription during grace period */}

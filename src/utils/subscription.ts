@@ -473,3 +473,20 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
 }
 
 export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
+
+// Add a function to get gift subscription information
+export function getGiftSubscriptionInfo(subscription: Partial<SubscriptionRow> | null): {
+  message: string
+  isGift: boolean
+} {
+  if (!subscription?.isGift) {
+    return { message: '', isGift: false }
+  }
+
+  // Since we don't have access to gift details, provide a generic message
+  return {
+    message:
+      'You have a gift subscription that will not auto-renew. This is a one-time gift with no recurring charges.',
+    isGift: true,
+  }
+}
