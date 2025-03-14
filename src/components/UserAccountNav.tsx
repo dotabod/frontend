@@ -235,56 +235,58 @@ const UserButton = ({ user }: UserButtonProps) => {
           ],
         }}
       >
-        <div className='flex items-center cursor-pointer'>
-          <div className='relative'>
-            {isLive && (
-              <span className='absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full z-10'>
-                Live
-              </span>
-            )}
+        <Link href='/dashboard'>
+          <div className='flex items-center cursor-pointer'>
+            <div className='relative'>
+              {isLive && (
+                <span className='absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full z-10'>
+                  Live
+                </span>
+              )}
 
-            {/* Show skeleton while loading */}
-            {(isSettingsLoading || !imageLoaded) && (
-              <div className='w-10 h-10'>
-                <Skeleton.Avatar active size={40} shape='circle' />
-              </div>
-            )}
-
-            {/* Hidden until loaded, then shown */}
-            <div className={!imageLoaded ? 'hidden' : 'block'}>
-              <Image
-                width={40}
-                height={40}
-                alt='User Avatar'
-                src={user?.image || '/images/hero/default.png'}
-                className='rounded-full'
-                onLoad={() => setImageLoaded(true)}
-              />
-            </div>
-          </div>
-
-          <div className='ml-3 flex flex-col'>
-            {isSettingsLoading ? (
-              <>
-                <Skeleton.Input active size='small' style={{ width: 100, height: 16 }} />
-                <div className='mt-1'>
-                  <Skeleton.Input active size='small' style={{ width: 80, height: 14 }} />
+              {/* Show skeleton while loading */}
+              {(isSettingsLoading || !imageLoaded) && (
+                <div className='w-10 h-10'>
+                  <Skeleton.Avatar active size={40} shape='circle' />
                 </div>
-              </>
-            ) : (
-              <>
-                <p className='text-base font-medium text-white uppercase my-0!'>
-                  {user?.name || 'TECHLEED'}
-                </p>
-                <p className='text-sm text-gray-400 my-0!'>
-                  {isLive ? 'Streaming now' : 'Offline'}
-                </p>
-              </>
-            )}
-          </div>
+              )}
 
-          <ChevronDownIcon className='h-5 w-5 ml-2 text-gray-400' />
-        </div>
+              {/* Hidden until loaded, then shown */}
+              <div className={!imageLoaded ? 'hidden' : 'block'}>
+                <Image
+                  width={40}
+                  height={40}
+                  alt='User Avatar'
+                  src={user?.image || '/images/hero/default.png'}
+                  className='rounded-full'
+                  onLoad={() => setImageLoaded(true)}
+                />
+              </div>
+            </div>
+
+            <div className='ml-3 flex flex-col'>
+              {isSettingsLoading ? (
+                <>
+                  <Skeleton.Input active size='small' style={{ width: 100, height: 16 }} />
+                  <div className='mt-1'>
+                    <Skeleton.Input active size='small' style={{ width: 80, height: 14 }} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className='text-base font-medium text-white uppercase my-0!'>
+                    {user?.name || 'TECHLEED'}
+                  </p>
+                  <p className='text-sm text-gray-400 my-0!'>
+                    {isLive ? 'Streaming now' : 'Offline'}
+                  </p>
+                </>
+              )}
+            </div>
+
+            <ChevronDownIcon className='h-5 w-5 ml-2 text-gray-400' />
+          </div>
+        </Link>
       </Dropdown>
     </div>
   )
