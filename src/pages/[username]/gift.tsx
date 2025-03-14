@@ -2,7 +2,18 @@ import { plans } from '@/components/Billing/BillingPlans'
 import { PeriodToggle } from '@/components/Billing/PeriodToggle'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { getPriceId, SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
-import { Alert, App, Button, Form, Input, Layout, Space, Typography, InputNumber } from 'antd'
+import {
+  Alert,
+  App,
+  Button,
+  Form,
+  Input,
+  Layout,
+  Space,
+  Typography,
+  InputNumber,
+  Skeleton,
+} from 'antd'
 import { useRouter } from 'next/router'
 import { useState, type ReactElement, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
@@ -61,10 +72,16 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
 
   if (loading) {
     return (
-      <div className='p-6 flex justify-center items-center min-h-screen'>
-        <div className='text-center'>
-          <div className='mb-4'>Loading user data...</div>
-        </div>
+      <div className='flex justify-center items-center'>
+        <Card className='w-full max-w-2xl'>
+          <Skeleton active avatar paragraph={{ rows: 4 }} />
+          <div className='mt-8'>
+            <Skeleton.Button active block size='large' />
+          </div>
+          <div className='mt-6'>
+            <Skeleton active paragraph={{ rows: 3 }} />
+          </div>
+        </Card>
       </div>
     )
   }
@@ -293,13 +310,12 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
 GiftSubscriptionPage.getLayout = function getLayout(page: ReactElement) {
   const router = useRouter()
   const { username } = router.query
-  const { data, loading } = useGetSettingsByUsername()
 
   return (
     <HomepageShell
       seo={{
-        title: `Gift a subscription to ${!loading && data?.displayName ? data.displayName : username} - Dotabod`,
-        description: `Support ${!loading && data?.displayName ? data.displayName : username} by gifting them Dotabod Pro!`,
+        title: `Gift a subscription to ${username} - Dotabod`,
+        description: `Support ${username} by gifting them Dotabod Pro!`,
         canonicalUrl: `https://dotabod.com/${username}/gift`,
       }}
     >
