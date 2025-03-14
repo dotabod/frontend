@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { plans } from '../Billing/BillingPlans'
+import { CrownIcon, GiftIcon } from 'lucide-react'
+
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()
   const { data } = useSession()
@@ -43,6 +45,51 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     }
   }
 
+  // Get the appropriate subscription badge based on subscription type
+  const getSubscriptionBadge = () => {
+    // Priority order: Lifetime > Gift > Pro > Grace Period
+    if (subscription?.transactionType === 'LIFETIME') {
+      return {
+        icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Lifetime Pro',
+        color: 'gold',
+        tooltip: 'Lifetime Pro Subscriber',
+      }
+    }
+
+    if (subscription?.isGift) {
+      return {
+        icon: <GiftIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Gifted Pro',
+        color: 'gold',
+        tooltip: 'Received Pro as a gift',
+      }
+    }
+
+    if (hasActivePlan) {
+      return {
+        icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Pro',
+        color: 'gold',
+        tooltip: 'Pro Subscriber',
+      }
+    }
+
+    if (inGracePeriod) {
+      return {
+        icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Free Trial',
+        color: 'blue',
+        tooltip: 'Using Pro features during free trial period',
+      }
+    }
+
+    return null
+  }
+
+  // Get the badge details
+  const badgeDetails = getSubscriptionBadge()
+
   // logo for lifetime is https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp
   // otehrwise its the current plan logo
   const logo =
@@ -71,19 +118,28 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     </div>
   ) : (
     <div className={`${commonClasses} justify-center`}>
-      <Tooltip {...tooltipProps}>
+      <Tooltip title={badgeDetails?.tooltip || tooltipProps.title}>
         <Link href='/dashboard/billing' className='no-underline'>
           <Tag
-            color={statusInfo?.badge}
+            color={badgeDetails?.color || statusInfo?.badge}
             className='px-3 py-1.5 rounded-md transition-all duration-200 hover:shadow-md'
           >
             <div className={`${commonClasses} justify-center`}>
               <div className='flex items-center gap-2'>
-                {logo}
-                <span className='font-medium'>{currentPlan?.name} Plan</span>
+                {badgeDetails?.icon ? (
+                  <>
+                    {badgeDetails.icon}
+                    <span className='font-medium'>{badgeDetails.text}</span>
+                  </>
+                ) : (
+                  <>
+                    {logo}
+                    <span className='font-medium'>{currentPlan?.name} Plan</span>
+                  </>
+                )}
               </div>
             </div>
-            {statusInfo?.message && (
+            {!badgeDetails && statusInfo?.message && (
               <div className='text-center text-xs mt-1 opacity-90 break-words'>
                 {statusInfo.message}
               </div>
