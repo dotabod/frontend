@@ -277,8 +277,9 @@ const OverlayPage = () => {
       `}</style>
       {showGiftAlerts && <GiftAlert userId={typeof userId === 'string' ? userId : undefined} />}
       <AnimatePresence>
-        {!connected && !isDev && (
+        {connected !== true && (
           <Center
+            key='connecting-spinner'
             style={{
               position: 'absolute',
               top: 0,
