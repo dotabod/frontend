@@ -6,7 +6,7 @@ import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
 import { Card } from '@/ui/card'
 import { getSubscriptionStatusInfo, isSubscriptionActive } from '@/utils/subscription'
-import { Alert, Button, Divider, Space, Typography } from 'antd'
+import { Alert, Button, Space, Typography } from 'antd'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -95,21 +95,15 @@ const BillingPage = () => {
             subscription?.stripeSubscriptionId &&
             !isLifetimePlan &&
             !subscription?.isGift && (
-              <>
-                <Divider className='my-2' />
-                <div className='flex justify-between items-center'>
-                  <Text>Need to update payment method or cancel?</Text>
-                  <Button
-                    type='primary'
-                    size='middle'
-                    icon={<ExternalLinkIcon size={14} />}
-                    onClick={handlePortalAccess}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Loading...' : 'Manage subscription'}
-                  </Button>
-                </div>
-              </>
+              <Button
+                type='primary'
+                size='middle'
+                icon={<ExternalLinkIcon size={14} />}
+                onClick={handlePortalAccess}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Loading...' : 'Manage subscription'}
+              </Button>
             )}
         </Space>
       </Card>
