@@ -2,7 +2,7 @@ import { signOut, useSession } from 'next-auth/react'
 
 import { fetcher } from '@/lib/fetcher'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { Dropdown, Badge } from 'antd'
+import { Dropdown, Badge, Skeleton } from 'antd'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { BellOutlined } from '@ant-design/icons'
 import clsx from 'clsx'
@@ -28,7 +28,8 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
 }
 
 const UserButton = ({ user }: UserButtonProps) => {
-  const { data } = useSWR('/api/settings', fetcher, {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const { data, isLoading: isSettingsLoading } = useSWR('/api/settings', fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -212,7 +213,7 @@ const UserButton = ({ user }: UserButtonProps) => {
         </PopoverPanel>
       </Popover>
 
-      {/* User Profile - Redesigned to match the image */}
+      {/* User Profile with loading skeleton */}
       <Dropdown
         menu={{
           items: [
@@ -235,20 +236,45 @@ const UserButton = ({ user }: UserButtonProps) => {
                 Live
               </span>
             )}
-            <Image
-              width={40}
-              height={40}
-              alt='User Avatar'
-              src={user?.image || '/images/hero/default.png'}
-              className='rounded-full'
-            />
+
+            {/* Show skeleton while loading */}
+            {(isSettingsLoading || !imageLoaded) && (
+              <div className='w-10 h-10'>
+                <Skeleton.Avatar active size={40} shape='circle' />
+              </div>
+            )}
+
+            {/* Hidden until loaded, then shown */}
+            <div className={!imageLoaded ? 'hidden' : 'block'}>
+              <Image
+                width={40}
+                height={40}
+                alt='User Avatar'
+                src={user?.image || '/images/hero/default.png'}
+                className='rounded-full'
+                onLoad={() => setImageLoaded(true)}
+              />
+            </div>
           </div>
 
           <div className='ml-3 flex flex-col'>
-            <p className='text-base font-medium text-white uppercase my-0!'>
-              {user?.name || 'TECHLEED'}
-            </p>
-            <p className='text-sm text-gray-400 my-0!'>{isLive ? 'Streaming now' : 'Offline'}</p>
+            {isSettingsLoading ? (
+              <>
+                <Skeleton.Input active size='small' style={{ width: 100, height: 16 }} />
+                <div className='mt-1'>
+                  <Skeleton.Input active size='small' style={{ width: 80, height: 14 }} />
+                </div>
+              </>
+            ) : (
+              <>
+                <p className='text-base font-medium text-white uppercase my-0!'>
+                  {user?.name || 'TECHLEED'}
+                </p>
+                <p className='text-sm text-gray-400 my-0!'>
+                  {isLive ? 'Streaming now' : 'Offline'}
+                </p>
+              </>
+            )}
           </div>
 
           <ChevronDownIcon className='h-5 w-5 ml-2 text-gray-400' />
