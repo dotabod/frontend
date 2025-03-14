@@ -3,6 +3,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { SubscriptionStatus } from '@/components/Subscription/SubscriptionStatus'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
+import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
 import { Card } from '@/ui/card'
 import { getSubscriptionStatusInfo, isSubscriptionActive } from '@/utils/subscription'
 import { Alert, Button, Divider, Space, Typography } from 'antd'
@@ -10,12 +11,21 @@ import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const { Title, Text } = Typography
 
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const [giftInfo, setGiftInfo] = useState<{
+    hasGifts: boolean
+    giftCount: number
+    giftMessage: string
+  }>({
+    hasGifts: false,
+    giftCount: 0,
+    giftMessage: '',
+  })
   const { data: session } = useSession()
   const { subscription, isLifetimePlan } = useSubscriptionContext()
 
@@ -25,7 +35,24 @@ const BillingPage = () => {
     subscription?.currentPeriodEnd,
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
+    subscription?.isGift,
   )
+
+  // Fetch gift information when the component mounts
+  useEffect(() => {
+    const fetchGiftInfo = async () => {
+      if (session?.user?.id && !subscription?.isGift) {
+        try {
+          const gifts = await fetchGiftSubscriptions()
+          setGiftInfo(gifts)
+        } catch (error) {
+          console.error('Error fetching gift information:', error)
+        }
+      }
+    }
+
+    fetchGiftInfo()
+  }, [session?.user?.id, subscription?.isGift])
 
   const handlePortalAccess = async () => {
     try {
@@ -66,7 +93,8 @@ const BillingPage = () => {
           {/* Only show manage subscription button for recurring subscriptions with Stripe */}
           {isSubscriptionActive({ status: subscription?.status }) &&
             subscription?.stripeSubscriptionId &&
-            !isLifetimePlan && (
+            !isLifetimePlan &&
+            !subscription?.isGift && (
               <>
                 <Divider className='my-2' />
                 <div className='flex justify-between items-center'>
@@ -86,10 +114,14 @@ const BillingPage = () => {
         </Space>
       </Card>
 
-      {statusInfo?.type === 'warning' && (
+      {statusInfo?.type === 'warning' && !subscription?.isGift && (
         <Alert
           message='Subscription Ending Soon'
-          description='Your subscription will end soon. Renew to keep access to all Pro features.'
+          description={
+            giftInfo.hasGifts
+              ? 'Your paid subscription will end soon, but you have gift subscription(s) that will extend your access.'
+              : 'Your subscription will end soon. Renew to keep access to all Pro features.'
+          }
           type='warning'
           showIcon
           className='mb-6'

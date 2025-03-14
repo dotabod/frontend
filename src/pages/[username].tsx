@@ -4,8 +4,8 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Button, Empty, Input, Segmented, Skeleton } from 'antd'
-import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
+import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
+import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -17,9 +17,40 @@ const CommandsPage: NextPageWithLayout = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
+  const [subscriptionInfo, setSubscriptionInfo] = useState<{
+    isPro: boolean
+    isLifetime: boolean
+    loading: boolean
+  }>({
+    isPro: false,
+    isLifetime: false,
+    loading: true,
+  })
   const router = useRouter()
   const { username } = router.query
   const { data, loading, error, notFound } = useGetSettingsByUsername()
+
+  // Fetch subscription information
+  useEffect(() => {
+    if (username && typeof username === 'string') {
+      fetch(`/api/subscription/by-username?username=${username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setSubscriptionInfo({
+            isPro: data.isPro || false,
+            isLifetime: data.isLifetime || false,
+            loading: false,
+          })
+        })
+        .catch(() => {
+          setSubscriptionInfo({
+            isPro: false,
+            isLifetime: false,
+            loading: false,
+          })
+        })
+    }
+  }, [username])
 
   useEffect(() => {
     // Only redirect to 404 if username exists in query and we've finished loading
@@ -149,6 +180,18 @@ const CommandsPage: NextPageWithLayout = () => {
                 >
                   {data?.stream_online ? 'Live' : 'Offline'}
                 </span>
+                {!subscriptionInfo.loading && subscriptionInfo.isPro && (
+                  <Tooltip
+                    title={
+                      subscriptionInfo.isLifetime ? 'Lifetime Pro Subscriber' : 'Pro Subscriber'
+                    }
+                  >
+                    <Tag color='gold' className='flex items-center gap-1'>
+                      <CrownIcon size={14} />
+                      <span>{subscriptionInfo.isLifetime ? 'Lifetime Pro' : 'Pro'}</span>
+                    </Tag>
+                  </Tooltip>
+                )}
               </div>
               <span>
                 Using Dotabod since{' '}

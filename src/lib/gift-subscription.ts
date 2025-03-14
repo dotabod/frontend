@@ -1,13 +1,6 @@
-import type { PricePeriod } from '@/utils/subscription'
+import type { GiftCheckoutRequest } from '@/pages/api/stripe/create-gift-checkout'
 
-export interface GiftCheckoutParams {
-  recipientUsername: string
-  priceId: string
-  giftDuration: PricePeriod
-  giftMessage?: string
-  giftSenderName?: string
-  quantity?: number
-}
+export type GiftCheckoutParams = GiftCheckoutRequest
 
 /**
  * Creates a checkout session for gifting a subscription
@@ -31,4 +24,36 @@ export async function createGiftCheckoutSession(
   }
 
   return response.json()
+}
+
+/**
+ * Fetches gift subscription information for the current user
+ * @returns Gift subscription information
+ */
+export async function fetchGiftSubscriptions(): Promise<{
+  hasGifts: boolean
+  giftCount: number
+  giftMessage: string
+  giftSubscriptions?: Array<{
+    id: string
+    endDate: Date | null
+    senderName: string
+  }>
+}> {
+  try {
+    const response = await fetch('/api/user/gift-subscriptions')
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch gift subscriptions')
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error('Error fetching gift subscriptions:', error)
+    return {
+      hasGifts: false,
+      giftCount: 0,
+      giftMessage: '',
+    }
+  }
 }
