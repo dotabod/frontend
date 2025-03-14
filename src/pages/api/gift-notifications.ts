@@ -104,7 +104,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           .filter(Boolean)
 
         return res.status(200).json({
-          hasNotification: formattedNotifications.some((n) => !n.read), // Only unread count as notifications
+          hasNotification: formattedNotifications.some((n) => n !== null && !n.read), // Check for null before accessing read property
           notifications: formattedNotifications,
           hasLifetime,
           totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,

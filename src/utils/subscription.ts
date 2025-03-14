@@ -47,6 +47,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandMute: SUBSCRIPTION_TIERS.FREE,
   commandPing: SUBSCRIPTION_TIERS.FREE,
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
+  showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
 
   // Pro Tier Features
   'mmr-tracker': SUBSCRIPTION_TIERS.PRO,
