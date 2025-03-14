@@ -153,9 +153,9 @@ const CommandsPage: NextPageWithLayout = () => {
       if (subscriptionInfo.isGracePeriodPro) {
         return (
           <Tooltip title='Using Pro features during free trial period'>
-            <Tag color='blue' className='flex items-center gap-1'>
-              <CrownIcon size={14} className='inline-block' />
-              <span>Free Trial</span>
+            <Tag color='blue' className='flex items-center gap-1 py-0.5'>
+              <CrownIcon size={14} className='flex-shrink-0' />
+              <span className='flex items-center'>Free Trial</span>
             </Tag>
           </Tooltip>
         )
@@ -164,9 +164,9 @@ const CommandsPage: NextPageWithLayout = () => {
       if (subscriptionInfo.isLifetime) {
         return (
           <Tooltip title='Lifetime Pro Subscriber'>
-            <Tag color='gold' className='flex items-center gap-1'>
-              <CrownIcon size={14} className='inline-block' />
-              <span>Lifetime Pro</span>
+            <Tag color='gold' className='flex items-center gap-1 py-0.5'>
+              <CrownIcon size={14} className='flex-shrink-0' />
+              <span className='flex items-center'>Lifetime Pro</span>
             </Tag>
           </Tooltip>
         )
@@ -175,9 +175,9 @@ const CommandsPage: NextPageWithLayout = () => {
       if (subscriptionInfo.isGift) {
         return (
           <Tooltip title='Received Pro as a gift'>
-            <Tag color='gold' className='flex items-center gap-1'>
-              <GiftIcon size={14} className='inline-block' />
-              <span>Gifted Pro</span>
+            <Tag color='gold' className='flex items-center gap-1 py-0.5'>
+              <GiftIcon size={14} className='flex-shrink-0' />
+              <span className='flex items-center'>Gifted Pro</span>
             </Tag>
           </Tooltip>
         )
@@ -185,9 +185,9 @@ const CommandsPage: NextPageWithLayout = () => {
 
       return (
         <Tooltip title='Pro Subscriber'>
-          <Tag color='gold' className='flex items-center gap-1'>
-            <CrownIcon size={14} className='inline-block' />
-            <span>Pro</span>
+          <Tag color='gold' className='flex items-center gap-1 py-0.5'>
+            <CrownIcon size={14} className='flex-shrink-0' />
+            <span className='flex items-center'>Pro</span>
           </Tag>
         </Tooltip>
       )
