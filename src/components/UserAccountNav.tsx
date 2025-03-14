@@ -10,7 +10,7 @@ import type { Session } from 'next-auth'
 import Image from 'next/image'
 import Link from 'next/link'
 import useSWR from 'swr'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // Define the notification type
 interface GiftNotification {
@@ -37,17 +37,37 @@ const UserButton = ({ user }: UserButtonProps) => {
   })
 
   // Fetch gift notifications with dedupingInterval to prevent request pileup
-  const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
-    '/api/gift-notifications?includeRead=true',
-    fetcher,
-    {
-      dedupingInterval: 5000, // 5 seconds
-      focusThrottleInterval: 10000, // 10 seconds
-      loadingTimeout: 8000, // 8 seconds
-      errorRetryInterval: 5000, // 5 seconds
-      errorRetryCount: 3,
+  const {
+    data: giftNotificationData,
+    error: notificationError,
+    mutate: refreshGiftNotifications,
+  } = useSWR('/api/gift-notifications?includeRead=true', fetcher, {
+    dedupingInterval: 5000, // 5 seconds
+    focusThrottleInterval: 10000, // 10 seconds
+    loadingTimeout: 8000, // 8 seconds
+    errorRetryInterval: 5000, // 5 seconds
+    errorRetryCount: 3,
+    onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+      // Only retry up to 3 times
+      if (retryCount >= 3) return
+
+      // Retry after 5 seconds
+      setTimeout(() => revalidate({ retryCount }), 5000)
     },
-  )
+  })
+
+  // Force image to load even if notifications fail
+  useEffect(() => {
+    // If there's an error with notifications or it's taking too long,
+    // ensure the image is shown after a timeout
+    const timer = setTimeout(() => {
+      if (!imageLoaded) {
+        setImageLoaded(true)
+      }
+    }, 3000) // 3 seconds timeout
+
+    return () => clearTimeout(timer)
+  }, [imageLoaded])
 
   const hasNotifications = giftNotificationData?.hasNotification || false
   const notifications = (giftNotificationData?.notifications || []) as GiftNotification[]
@@ -113,7 +133,7 @@ const UserButton = ({ user }: UserButtonProps) => {
       <Popover className='relative mr-4'>
         <PopoverButton className='flex items-center justify-center'>
           <div className='cursor-pointer'>
-            <Badge count={totalUnreadNotifications} size='small'>
+            <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
               <BellOutlined style={{ fontSize: '20px', color: '#fff' }} />
             </Badge>
           </div>
@@ -133,7 +153,11 @@ const UserButton = ({ user }: UserButtonProps) => {
               )}
             </div>
 
-            {totalNotifications > 0 ? (
+            {notificationError ? (
+              <div className='py-6 text-center text-gray-400'>
+                Unable to load notifications. Please try again later.
+              </div>
+            ) : totalNotifications > 0 ? (
               <div className='max-h-80 overflow-y-auto'>
                 {notifications
                   .slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -244,7 +268,7 @@ const UserButton = ({ user }: UserButtonProps) => {
                 </span>
               )}
 
-              {/* Show skeleton while loading */}
+              {/* Show skeleton while loading, but only for a reasonable time */}
               {(isSettingsLoading || !imageLoaded) && (
                 <div className='w-10 h-10'>
                   <Skeleton.Avatar active size={40} shape='circle' />
@@ -252,7 +276,7 @@ const UserButton = ({ user }: UserButtonProps) => {
               )}
 
               {/* Hidden until loaded, then shown */}
-              <div className={!imageLoaded ? 'hidden' : 'block'}>
+              <div className={!imageLoaded || isSettingsLoading ? 'hidden' : 'block'}>
                 <Image
                   width={40}
                   height={40}
