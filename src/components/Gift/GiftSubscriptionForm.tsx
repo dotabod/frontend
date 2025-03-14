@@ -6,6 +6,7 @@ import { Alert, App, Button, Form, Input, Space, Typography, InputNumber, Toolti
 import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
 import { Card } from '@/ui/card'
+import Link from 'next/link'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -161,17 +162,27 @@ export const GiftSubscriptionForm = ({
 
       <Card>
         <Title level={4}>
-          {recipientUsername ? `Gift a Subscription to ${displayName}` : 'Gift a Subscription'}
+          {recipientUsername ? (
+            <>
+              Gift a Subscription to <Link href={`/${recipientUsername}`}>{displayName}</Link>
+            </>
+          ) : (
+            'Gift a Subscription'
+          )}
         </Title>
         <Paragraph>
-          {recipientUsername
-            ? `Support ${displayName} by gifting them Dotabod Pro! They'll get access to all Pro features.`
-            : "Support your favorite streamer by gifting them Dotabod Pro! They'll get access to all Pro features."}
+          {recipientUsername ? (
+            <>
+              Support <Link href={`/${recipientUsername}`}>{displayName}</Link> by gifting them
+              Dotabod Pro! They'll get access to all Pro features.
+            </>
+          ) : (
+            "Support your favorite streamer by gifting them Dotabod Pro! They'll get access to all Pro features."
+          )}
         </Paragraph>
 
         <div className='mb-8 gap-6 flex flex-col'>
-          <Title level={5}>Select Duration</Title>
-          <div className='mb-6'>
+          <div>
             <PeriodToggle
               activePeriod={activePeriod}
               onChange={setActivePeriod}
@@ -179,33 +190,7 @@ export const GiftSubscriptionForm = ({
             />
           </div>
 
-          {activePeriod !== 'lifetime' && (
-            <div className='mb-6'>
-              <Title level={5}>Duration</Title>
-              <div className='flex flex-col'>
-                <div className='flex items-center'>
-                  <InputNumber
-                    min={1}
-                    max={100}
-                    value={quantity}
-                    onChange={(value) => {
-                      const newQuantity = Number(value) || 1
-                      setQuantity(newQuantity)
-                      form.setFieldsValue({ quantity: newQuantity })
-                    }}
-                    style={{ width: 100 }}
-                  />
-                  <Text className='ml-2'>{activePeriod === 'monthly' ? 'months' : 'years'}</Text>
-                </div>
-                <Text type='secondary' className='mt-1'>
-                  This will extend the subscription duration. You can also adjust the quantity
-                  during checkout.
-                </Text>
-              </div>
-            </div>
-          )}
-
-          <div className='bg-purple-800 p-4 rounded-md mb-6'>
+          <div className='bg-purple-800 p-4 rounded-md'>
             <div className='flex items-center mb-2'>
               <GiftIcon className='h-5 w-5 mr-2 text-blue-500' />
               <Text strong>You're gifting:</Text>
@@ -232,33 +217,45 @@ export const GiftSubscriptionForm = ({
                 </Text>
               </div>
             )}
-            {activePeriod !== 'lifetime' && (
-              <div className='mt-2'>
-                <Text type='secondary' className='font-semibold'>
-                  This is a one-time payment. The subscription will not auto-renew, and you will not
-                  be charged again.
-                </Text>
-              </div>
-            )}
-            <div className='mt-2'>
-              <Text type='secondary'>
-                If the recipient already has an active subscription, this gift will extend their
-                existing subscription.
-              </Text>
-            </div>
           </div>
         </div>
 
         <Form
           form={form}
-          layout='vertical'
+          layout='horizontal'
+          labelAlign='left'
           onFinish={handleSubmit}
           requiredMark={false}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 24 }}
           initialValues={{
             quantity: 1,
             recipientUsername: recipientUsername || '',
           }}
         >
+          {activePeriod !== 'lifetime' && (
+            <Form.Item
+              name='quantity'
+              label='Duration'
+              tooltip='How long the subscription will last'
+            >
+              <div className='flex items-center'>
+                <InputNumber
+                  min={1}
+                  max={100}
+                  value={quantity}
+                  onChange={(value) => {
+                    const newQuantity = Number(value) || 1
+                    setQuantity(newQuantity)
+                    form.setFieldsValue({ quantity: newQuantity })
+                  }}
+                  style={{ width: 100 }}
+                />
+                <Text className='ml-2'>{activePeriod === 'monthly' ? 'months' : 'years'}</Text>
+              </div>
+            </Form.Item>
+          )}
+
           <Form.Item
             name='recipientUsername'
             label="Recipient's Username"
@@ -293,10 +290,6 @@ export const GiftSubscriptionForm = ({
               maxLength={200}
               showCount
             />
-          </Form.Item>
-
-          <Form.Item name='quantity' hidden>
-            <InputNumber />
           </Form.Item>
 
           {formError && (
@@ -337,6 +330,19 @@ export const GiftSubscriptionForm = ({
             )}
           </Form.Item>
         </Form>
+
+        <div className='bg-gray-800/80 p-2 rounded text-center text-xs'>
+          {activePeriod !== 'lifetime' && (
+            <div>
+              This is a one-time payment. The subscription will not auto-renew, and you will not be
+              charged again.
+            </div>
+          )}
+          <div>
+            If the recipient already has an active subscription, this gift will extend their
+            existing subscription.
+          </div>
+        </div>
       </Card>
 
       <Card>
