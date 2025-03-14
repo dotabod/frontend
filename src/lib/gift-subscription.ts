@@ -5,11 +5,11 @@ export type GiftCheckoutParams = GiftCheckoutRequest
 /**
  * Creates a checkout session for gifting a subscription
  * @param params Gift checkout parameters
- * @returns The checkout URL
+ * @returns The checkout URL or error information
  */
 export async function createGiftCheckoutSession(
   params: GiftCheckoutParams,
-): Promise<{ url: string }> {
+): Promise<{ url: string } | { error: string } | { message: string }> {
   const response = await fetch('/api/stripe/create-gift-checkout', {
     method: 'POST',
     headers: {
@@ -18,12 +18,14 @@ export async function createGiftCheckoutSession(
     body: JSON.stringify(params),
   })
 
+  const data = await response.json()
+
   if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || 'Failed to create gift checkout session')
+    // Return the error data directly instead of throwing
+    return data
   }
 
-  return response.json()
+  return data
 }
 
 /**

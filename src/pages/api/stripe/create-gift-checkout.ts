@@ -1,6 +1,5 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { SUBSCRIPTION_TIERS, getPriceId } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
@@ -65,10 +64,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),
     )
 
-    if (hasLifetime && priceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')) {
+    if (hasLifetime) {
       return res.status(400).json({
         message:
-          'The recipient already has a lifetime subscription. Please choose a different gift or recipient.',
+          'The recipient already has a lifetime subscription. They cannot receive additional subscriptions.',
       })
     }
 

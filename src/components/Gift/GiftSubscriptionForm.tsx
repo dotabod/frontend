@@ -2,7 +2,7 @@ import { plans } from '@/components/Billing/BillingPlans'
 import { PeriodToggle } from '@/components/Billing/PeriodToggle'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { getPriceId, SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
-import { Alert, App, Button, Form, Input, Space, Typography, InputNumber } from 'antd'
+import { Alert, App, Button, Form, Input, Space, Typography, InputNumber, Tooltip } from 'antd'
 import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
 import { Card } from '@/ui/card'
@@ -35,6 +35,8 @@ export const GiftSubscriptionForm = ({
   const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [quantity, setQuantity] = useState<number>(1)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
   const selectedTier = SUBSCRIPTION_TIERS.PRO
 
   // Reset quantity to 1 when selecting lifetime
@@ -52,13 +54,23 @@ export const GiftSubscriptionForm = ({
     }
   }, [recipientUsername, form])
 
+  // Clear username error when username changes
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (usernameError) {
+      setUsernameError(null)
+    }
+  }
+
   const handleSubmit = async (values: GiftFormValues) => {
     try {
       setIsSubmitting(true)
+      // Clear any previous errors
+      setFormError(null)
+      setUsernameError(null)
 
       const priceId = getPriceId(selectedTier as typeof SUBSCRIPTION_TIERS.PRO, activePeriod)
 
-      const { url } = await createGiftCheckoutSession({
+      const result = await createGiftCheckoutSession({
         recipientUsername: values.recipientUsername,
         priceId,
         giftDuration: activePeriod,
@@ -67,10 +79,49 @@ export const GiftSubscriptionForm = ({
         quantity: values.quantity || 1,
       })
 
-      window.location.href = url
-    } catch (error) {
+      // Check if the result contains an error or message
+      if ('error' in result || 'message' in result) {
+        const errorText =
+          'message' in result
+            ? result.message
+            : 'error' in result
+              ? result.error
+              : 'Failed to create gift checkout. Please try again.'
+
+        // Check if the error is about lifetime subscription
+        if (errorText.includes('lifetime subscription')) {
+          // Set error specifically on the username field
+          setUsernameError(errorText)
+          // Update the form field with error
+          form.setFields([
+            {
+              name: 'recipientUsername',
+              errors: [errorText],
+            },
+          ])
+        } else {
+          // For other errors, use the general form error
+          setFormError(errorText)
+        }
+
+        // Also show the toast message
+        message.error(errorText)
+        return
+      }
+
+      // If we get here, we have a URL
+      window.location.href = result.url
+    } catch (error: unknown) {
       console.error('Gift checkout error:', error)
-      message.error('Failed to create gift checkout. Please try again.')
+      // Handle any unexpected errors
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to create gift checkout. Please try again.'
+
+      // Set the form error to display in the UI
+      setFormError(errorMessage)
+
+      // Also show the toast message
+      message.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -213,8 +264,14 @@ export const GiftSubscriptionForm = ({
             label="Recipient's Username"
             rules={[{ required: true, message: "Please enter the recipient's username" }]}
             tooltip='Enter the Twitch username of the streamer you want to gift to'
+            validateStatus={usernameError ? 'error' : undefined}
+            help={usernameError}
           >
-            <Input placeholder='Enter Twitch username' disabled={!!recipientUsername} />
+            <Input
+              placeholder='Enter Twitch username'
+              disabled={!!recipientUsername}
+              onChange={handleUsernameChange}
+            />
           </Form.Item>
 
           <Form.Item
@@ -242,10 +299,42 @@ export const GiftSubscriptionForm = ({
             <InputNumber />
           </Form.Item>
 
+          {formError && (
+            <Form.Item>
+              <div className='ant-form-item-explain ant-form-item-explain-error'>
+                <div role='alert' className='ant-form-item-explain-error'>
+                  {formError}
+                </div>
+              </div>
+            </Form.Item>
+          )}
+
           <Form.Item>
-            <Button type='primary' htmlType='submit' loading={isSubmitting} size='large' block>
-              Continue to Payment
-            </Button>
+            {usernameError ? (
+              <Tooltip title='Please change the recipient username to continue'>
+                <Button
+                  type='primary'
+                  htmlType='submit'
+                  loading={isSubmitting}
+                  size='large'
+                  block
+                  disabled={true}
+                >
+                  Continue to Payment
+                </Button>
+              </Tooltip>
+            ) : (
+              <Button
+                type='primary'
+                htmlType='submit'
+                loading={isSubmitting}
+                size='large'
+                block
+                disabled={isSubmitting}
+              >
+                Continue to Payment
+              </Button>
+            )}
           </Form.Item>
         </Form>
       </Card>
