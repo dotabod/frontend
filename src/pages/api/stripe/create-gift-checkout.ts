@@ -98,10 +98,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 minimum: 1,
                 maximum: 100,
               },
-          // For subscription mode, Stripe will handle the recurring billing
-          // For one-time payments, we'll handle the duration in our webhook
         },
       ],
+      // Use Stripe's subscription mode for non-lifetime gifts to leverage Stripe's billing capabilities
+      // For lifetime gifts, use payment mode
       mode: isLifetime ? 'payment' : 'subscription',
       success_url: successUrl,
       cancel_url: cancelUrl,
@@ -114,9 +114,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         giftMessage: giftMessage || '',
         giftSenderName: giftSenderName || 'Anonymous',
         giftQuantity: finalQuantity.toString(),
+        noAutoRenew: 'true', // Add metadata to indicate this should not auto-renew
       },
-      // For subscription gifts, we don't want to create a customer portal
-      // as the gift recipient will manage the subscription
+      // We'll handle subscription configuration in the webhook
     })
 
     if (!session.url) {

@@ -174,6 +174,20 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
                 </Text>
               </div>
             )}
+            {activePeriod !== 'lifetime' && (
+              <div className='mt-2'>
+                <Text type='secondary' className='font-semibold'>
+                  This is a one-time payment. The subscription will not auto-renew, and you will not
+                  be charged again.
+                </Text>
+              </div>
+            )}
+            <div className='mt-2'>
+              <Text type='secondary'>
+                If the recipient already has an active subscription, this gift will extend their
+                existing subscription.
+              </Text>
+            </div>
           </div>
         </div>
 
@@ -245,7 +259,15 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
           <div>
             <Text strong>No Recurring Charges</Text>
             <Paragraph>
-              You pay once for the duration you choose. No subscription required for you.
+              You pay once for the duration you choose. The gift subscription will not auto-renew
+              and you will not be charged again.
+            </Paragraph>
+          </div>
+          <div>
+            <Text strong>Stackable Gifts</Text>
+            <Paragraph>
+              Multiple gifts extend the recipient's subscription duration. If they already have a
+              subscription, your gift will add to their existing time.
             </Paragraph>
           </div>
         </Space>

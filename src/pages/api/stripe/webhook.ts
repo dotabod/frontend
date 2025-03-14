@@ -231,7 +231,8 @@ async function handleCheckoutCompleted(
     }
 
     if (session.mode === 'subscription' && session.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+      // Retrieve the subscription from Stripe
+      let subscription = await stripe.subscriptions.retrieve(session.subscription as string)
 
       // For gift subscriptions, we need to create the subscription record with the recipient's userId
       const status = statusMap[subscription.status as Stripe.Subscription.Status]
@@ -239,19 +240,70 @@ async function handleCheckoutCompleted(
 
       const priceId = subscription.items.data[0].price.id
 
-      // Calculate the end date based on quantity
+      // For gift subscriptions, ensure they don't auto-renew by canceling at period end
+      // and setting the cancel_at date based on the gift quantity
+      if (session.metadata?.noAutoRenew === 'true') {
+        // Check if the recipient already has active subscriptions
+        const existingSubscriptions = await tx.subscription.findMany({
+          where: {
+            userId: recipientUserId,
+            status: 'ACTIVE',
+          },
+          orderBy: {
+            currentPeriodEnd: 'desc', // Get the subscription with the furthest end date first
+          },
+        })
+
+        // Calculate the appropriate end date
+        let endDate: Date
+        const giftQuantity = Number.parseInt(session.metadata.giftQuantity || '1', 10)
+        const giftType = session.metadata.giftDuration || 'monthly'
+
+        // Get the current period end from Stripe
+        const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
+
+        // If there's an existing subscription with a later end date, extend from that date
+        const furthestEndDate =
+          existingSubscriptions.length > 0 ? existingSubscriptions[0].currentPeriodEnd : null
+
+        let startDate = currentPeriodEnd
+        if (furthestEndDate && furthestEndDate > currentPeriodEnd) {
+          startDate = new Date(furthestEndDate)
+        }
+
+        // Calculate the end date based on the start date and gift quantity
+        endDate = new Date(startDate)
+        if (giftType === 'monthly') {
+          // For monthly, add the remaining months (quantity - 1 since the first month is covered by Stripe)
+          if (giftQuantity > 1) {
+            endDate.setMonth(endDate.getMonth() + (giftQuantity - 1))
+          }
+        } else if (giftType === 'annual') {
+          // For annual, add the remaining years (quantity - 1 since the first year is covered by Stripe)
+          if (giftQuantity > 1) {
+            endDate.setFullYear(endDate.getFullYear() + (giftQuantity - 1))
+          }
+        }
+
+        // Update the Stripe subscription to cancel at the calculated date
+        const cancelAtTimestamp = Math.floor(endDate.getTime() / 1000)
+        await stripe.subscriptions.update(subscription.id, {
+          cancel_at: cancelAtTimestamp,
+          cancel_at_period_end: false, // We're using cancel_at instead
+        })
+
+        // Retrieve the updated subscription
+        subscription = await stripe.subscriptions.retrieve(subscription.id)
+      }
+
+      // Calculate the end date based on Stripe's data
+      // This ensures we're using Stripe's calculation which handles proration correctly
       const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
 
-      // If quantity > 1, extend the period end date
-      if (giftQuantity > 1) {
-        if (giftType === 'monthly') {
-          // Add (quantity - 1) months to the end date
-          currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + (giftQuantity - 1))
-        } else if (giftType === 'annual') {
-          // Add (quantity - 1) years to the end date
-          currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + (giftQuantity - 1))
-        }
-      }
+      // If cancel_at is set, use that as the end date instead
+      const endDate = subscription.cancel_at
+        ? new Date(subscription.cancel_at * 1000)
+        : currentPeriodEnd
 
       // Create the subscription with isGift flag
       const createdSubscription = await tx.subscription.upsert({
@@ -266,8 +318,9 @@ async function handleCheckoutCompleted(
           stripePriceId: priceId,
           userId: recipientUserId,
           transactionType: TransactionType.RECURRING,
-          currentPeriodEnd: currentPeriodEnd,
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          currentPeriodEnd: endDate,
+          // For gift subscriptions, always set cancelAtPeriodEnd to true
+          cancelAtPeriodEnd: true,
           isGift: true,
         },
         update: {
@@ -276,8 +329,9 @@ async function handleCheckoutCompleted(
           stripePriceId: priceId,
           stripeCustomerId: subscription.customer as string,
           transactionType: TransactionType.RECURRING,
-          currentPeriodEnd: currentPeriodEnd,
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          currentPeriodEnd: endDate,
+          // For gift subscriptions, always set cancelAtPeriodEnd to true
+          cancelAtPeriodEnd: true,
           isGift: true,
         },
       })
@@ -302,11 +356,51 @@ async function handleCheckoutCompleted(
         },
       })
     } else if (session.mode === 'payment') {
-      // For lifetime gift subscriptions
+      // For payment mode (both lifetime and non-lifetime gift subscriptions)
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
       const priceId = lineItems.data[0]?.price?.id ?? null
 
-      // Create the lifetime subscription with gift details
+      // Determine if this is a lifetime subscription or a regular gift subscription
+      const isLifetime = giftType === 'lifetime'
+
+      // Check if the recipient already has active subscriptions
+      const existingSubscriptions = await tx.subscription.findMany({
+        where: {
+          userId: recipientUserId,
+          status: 'ACTIVE',
+        },
+        orderBy: {
+          currentPeriodEnd: 'desc', // Get the subscription with the furthest end date first
+        },
+      })
+
+      // Calculate the appropriate start and end dates
+      let startDate = new Date()
+      let endDate: Date
+
+      if (isLifetime) {
+        // For lifetime subscriptions, use a far future date
+        endDate = new Date('2099-12-31')
+      } else {
+        // For regular gift subscriptions, calculate based on the furthest existing subscription end date
+        const furthestEndDate =
+          existingSubscriptions.length > 0 ? existingSubscriptions[0].currentPeriodEnd : null
+
+        // If there's an existing subscription, extend from that date
+        if (furthestEndDate && furthestEndDate > startDate) {
+          startDate = new Date(furthestEndDate)
+        }
+
+        // Calculate the end date based on the start date
+        endDate = new Date(startDate)
+        if (giftType === 'monthly') {
+          endDate.setMonth(endDate.getMonth() + giftQuantity)
+        } else if (giftType === 'annual') {
+          endDate.setFullYear(endDate.getFullYear() + giftQuantity)
+        }
+      }
+
+      // Create the subscription with gift details
       const createdSubscription = await tx.subscription.create({
         data: {
           userId: recipientUserId,
@@ -314,9 +408,12 @@ async function handleCheckoutCompleted(
           tier: getSubscriptionTier(priceId, SubscriptionStatus.ACTIVE),
           stripePriceId: priceId || '',
           stripeCustomerId: session.customer as string,
-          transactionType: TransactionType.LIFETIME,
-          currentPeriodEnd: new Date('2099-12-31'),
-          cancelAtPeriodEnd: false,
+          // Set the transaction type based on whether it's lifetime or not
+          transactionType: isLifetime ? TransactionType.LIFETIME : TransactionType.RECURRING,
+          // Use the calculated end date
+          currentPeriodEnd: endDate,
+          // All gift subscriptions don't auto-renew
+          cancelAtPeriodEnd: true,
           stripeSubscriptionId: null,
           isGift: true,
         },
@@ -328,8 +425,8 @@ async function handleCheckoutCompleted(
           subscriptionId: createdSubscription.id,
           senderName: giftSenderName,
           giftMessage: giftMessage,
-          giftType: 'lifetime',
-          giftQuantity: 1, // Lifetime subscriptions always have quantity 1
+          giftType: giftType,
+          giftQuantity: giftQuantity,
         },
       })
 
@@ -406,6 +503,21 @@ async function createLifetimePurchase(
       stripeSubscriptionId: null,
     },
   })
+}
+
+// Helper function to calculate the end date for gift subscriptions
+function calculateGiftEndDate(giftType: string, quantity: number): Date {
+  const endDate = new Date()
+
+  if (giftType === 'monthly') {
+    // Add quantity months to the current date
+    endDate.setMonth(endDate.getMonth() + quantity)
+  } else if (giftType === 'annual') {
+    // Add quantity years to the current date
+    endDate.setFullYear(endDate.getFullYear() + quantity)
+  }
+
+  return endDate
 }
 
 async function getRawBody(req: NextApiRequest): Promise<string> {

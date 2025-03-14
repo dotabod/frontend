@@ -266,6 +266,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeCustomerId: true,
       createdAt: true,
       stripeSubscriptionId: true,
+      isGift: true,
     },
     orderBy: [
       // Prioritize lifetime subscriptions first
@@ -288,6 +289,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeCustomerId: '',
       createdAt: new Date(),
       stripeSubscriptionId: null,
+      isGift: false,
     }
   }
 
@@ -314,6 +316,7 @@ export function getSubscriptionStatusInfo(
   currentPeriodEnd?: Date | null,
   transactionType?: string | null,
   stripeSubscriptionId?: string | null,
+  isGift?: boolean,
 ): SubscriptionStatusInfo | null {
   // If we're in the grace period but user doesn't have a paid plan, show grace period message
   if (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId)) {
@@ -364,6 +367,7 @@ export function getSubscriptionStatusInfo(
         (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
     : 0
+
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
@@ -372,6 +376,18 @@ export function getSubscriptionStatusInfo(
         badge: 'gold',
       }
     case SubscriptionStatus.ACTIVE:
+      // For gift subscriptions, use different messaging
+      if (isGift) {
+        return {
+          message: isEndingSoon
+            ? `Gift subscription ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
+            : `Gift subscription ends on ${endDate}`,
+          type: isEndingSoon ? 'warning' : 'info',
+          badge: isEndingSoon ? 'red' : 'gold',
+        }
+      }
+
+      // For regular subscriptions
       return {
         message: cancelAtPeriodEnd
           ? isEndingSoon
