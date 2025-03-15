@@ -113,15 +113,23 @@ const SetupPage = () => {
     frame()
   }, [])
 
+  // Consolidated useEffect for confetti and payment notifications
   useEffect(() => {
-    if (active === maxStepIndex) {
-      triggerConfetti()
-    }
-  }, [active, triggerConfetti])
+    // Track if confetti has been triggered in this effect run
+    let confettiTriggered = false
 
-  useEffect(() => {
-    if (didJustPay) {
+    // Case 1: User reaches the final step
+    if (active === maxStepIndex && !didJustPay) {
       triggerConfetti()
+      confettiTriggered = true
+    }
+
+    // Case 2: User just completed a payment
+    if (didJustPay) {
+      // Only trigger confetti if it hasn't been triggered yet
+      if (!confettiTriggered) {
+        triggerConfetti()
+      }
 
       notification.success({
         key: 'paid',
@@ -142,7 +150,7 @@ const SetupPage = () => {
         { shallow: true },
       )
     }
-  }, [didJustPay, isTrial, notification, router, trialDays, triggerConfetti])
+  }, [active, didJustPay, isTrial, notification, router, trialDays, triggerConfetti])
 
   if (session?.data?.user?.isImpersonating) {
     return null
