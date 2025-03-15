@@ -47,6 +47,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandMute: SUBSCRIPTION_TIERS.FREE,
   commandPing: SUBSCRIPTION_TIERS.FREE,
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
+  showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
 
   // Pro Tier Features
   'mmr-tracker': SUBSCRIPTION_TIERS.PRO,
@@ -211,7 +212,7 @@ interface SubscriptionPriceId {
   lifetime: string
 }
 
-const PRICE_IDS: SubscriptionPriceId[] = [
+export const PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
@@ -265,6 +266,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeCustomerId: true,
       createdAt: true,
       stripeSubscriptionId: true,
+      isGift: true,
     },
     orderBy: [
       // Prioritize lifetime subscriptions first
@@ -287,6 +289,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeCustomerId: '',
       createdAt: new Date(),
       stripeSubscriptionId: null,
+      isGift: false,
     }
   }
 
@@ -313,6 +316,7 @@ export function getSubscriptionStatusInfo(
   currentPeriodEnd?: Date | null,
   transactionType?: string | null,
   stripeSubscriptionId?: string | null,
+  isGift?: boolean,
 ): SubscriptionStatusInfo | null {
   // If we're in the grace period but user doesn't have a paid plan, show grace period message
   if (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId)) {
@@ -363,6 +367,7 @@ export function getSubscriptionStatusInfo(
         (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
     : 0
+
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
@@ -371,6 +376,18 @@ export function getSubscriptionStatusInfo(
         badge: 'gold',
       }
     case SubscriptionStatus.ACTIVE:
+      // For gift subscriptions, use different messaging
+      if (isGift) {
+        return {
+          message: isEndingSoon
+            ? `Gift subscription ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
+            : `Gift subscription ends on ${endDate}`,
+          type: isEndingSoon ? 'warning' : 'info',
+          badge: isEndingSoon ? 'red' : 'gold',
+        }
+      }
+
+      // For regular subscriptions
       return {
         message: cancelAtPeriodEnd
           ? isEndingSoon
@@ -456,3 +473,20 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
 }
 
 export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
+
+// Add a function to get gift subscription information
+export function getGiftSubscriptionInfo(subscription: Partial<SubscriptionRow> | null): {
+  message: string
+  isGift: boolean
+} {
+  if (!subscription?.isGift) {
+    return { message: '', isGift: false }
+  }
+
+  // Since we don't have access to gift details, provide a generic message
+  return {
+    message:
+      'You have a gift subscription that will not auto-renew. This is a one-time gift with no recurring charges.',
+    isGift: true,
+  }
+}

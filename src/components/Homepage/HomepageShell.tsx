@@ -14,6 +14,7 @@ interface SEOProps {
   ogImage?: string
   canonicalUrl?: string
   ogType?: string
+  noindex?: boolean
 }
 
 const HomepageShell = ({
@@ -64,7 +65,14 @@ const HomepageShell = ({
         <meta property='twitter:description' content={pageDescription} />
         <meta property='twitter:image' content={pageImage} />
 
+        {!seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
+
         {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
+        <style global jsx>{`
+          html,#__next,body {
+            background-color: #1f2937; /* bg-gray-800 */
+          }
+        `}</style>
       </Head>
 
       <Banner />

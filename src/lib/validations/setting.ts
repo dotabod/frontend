@@ -110,6 +110,7 @@ const settingsSchema = {
   commandShard: z.boolean(),
   commandAghs: z.boolean(),
   commandWinProbability: z.boolean(),
+  showGiftAlerts: z.boolean(),
 }
 
 type SettingKeys = keyof typeof settingsSchema

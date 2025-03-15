@@ -1,6 +1,7 @@
 import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
+import { GiftIcon } from 'lucide-react'
 
 export function NavLinks({ bottom = false }) {
   const [hoveredIndex, setHoveredIndex] = useState(null)
@@ -15,10 +16,13 @@ export function NavLinks({ bottom = false }) {
   return [
     ['Features', '/#features'],
     ['Pricing', '/#pricing'],
+    ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
     ['FAQs', '/#faqs'],
     ['Blog', '/blog'],
     ...additional,
   ].map(([label, href, tooltip], index) => {
+    const isGiftLink = label === 'Gift Pro'
+
     return (
       <Tooltip key={label} title={tooltip} disabled={!tooltip} position='top'>
         <a
@@ -44,7 +48,10 @@ export function NavLinks({ bottom = false }) {
             )}
           </AnimatePresence>
 
-          <span className='relative z-10 flex items-center gap-2'>{label}</span>
+          <span className='relative z-10 flex items-center gap-2'>
+            {isGiftLink && <GiftIcon className="h-4 w-4" />}
+            {label}
+          </span>
         </a>
       </Tooltip>
     )

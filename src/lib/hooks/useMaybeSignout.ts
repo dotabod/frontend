@@ -31,7 +31,7 @@ const useMaybeSignout = (skip = false) => {
         requiresRefresh)
 
     if (shouldSignOut) {
-      signOut({ callbackUrl: '/login?setup-scopes' })
+      signOut({ callbackUrl: '/login?setup-scopes', redirect: true })
     }
   }, [session?.user?.scope, session?.user?.isImpersonating, status, requiresRefresh])
 }

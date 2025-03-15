@@ -115,16 +115,21 @@ export const useSocket = ({
     let lastReceivedTime = Date.now()
     let reconnectTimeout: NodeJS.Timeout | undefined
 
-    console.log('Connecting to socket init...')
+    console.log('Connecting to socket init...', { userId })
 
-    socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
-      auth: { token: userId },
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      timeout: 20000,
-    })
+    // Create socket connection only once per userId
+    if (!socket) {
+      socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
+        auth: { token: userId },
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
+      })
+
+      console.log('Socket instance created:', !!socket)
+    }
 
     // Use socket.io's built-in ping event to track connection health
     socket.io.on('ping', () => {
@@ -249,15 +254,15 @@ export const useSocket = ({
       socket?.disconnect()
     })
     socket.on('connect', () => {
-      console.log('Socket connected')
+      console.log('Socket connected event fired')
       setConnected(true)
     })
     socket.on('connect_error', (error) => {
-      console.error('Connection error:', error)
+      console.error('Connection error event fired:', error)
       setConnected(false)
     })
     socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason)
+      console.log('Socket disconnected event fired:', reason)
       setConnected(false)
     })
 
@@ -305,10 +310,34 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearTimeout(reconnectTimeout)
-      socket?.disconnect()
-      socket = null
+
+      // Don't disconnect the socket on every effect cleanup
+      // Only clean up event handlers
+      socket?.off('connect')
+      socket?.off('connect_error')
+      socket?.off('disconnect')
+      socket?.off('DATA_buildings')
+      socket?.off('DATA_heroes')
+      socket?.off('DATA_couriers')
+      socket?.off('DATA_creeps')
+      socket?.off('DATA_hero_units')
+      socket?.off('STATUS')
+      socket?.off('requestHeroData')
+      socket?.off('requestMatchData')
+      socket?.off('block')
+      socket?.off('paused')
+      socket?.off('notable-players')
+      socket?.off('aegis-picked-up')
+      socket?.off('roshan-killed')
+      socket?.off('auth_error')
+      socket?.off('refresh-settings')
+      socket?.off('channelPollOrBet')
+      socket?.off('update-medal')
+      socket?.off('update-wl')
+      socket?.off('update-radiant-win-chance')
+      socket?.off('refresh')
     }
-  }, [userId])
+  }, [userId]) // Only depend on userId
 }
 
 const events = {

@@ -1,4 +1,3 @@
-import { useSubscription } from '@/hooks/useSubscription'
 import { useTrack } from '@/lib/track'
 import { captureException } from '@sentry/nextjs'
 import { Button, Select, Spin, Tooltip } from 'antd'
@@ -6,7 +5,6 @@ import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
-import { plans } from '../Billing/BillingPlans'
 
 export default function ModeratedChannels() {
   const { data } = useSession()
@@ -18,7 +16,6 @@ export default function ModeratedChannels() {
       image: string
     }[]
   >([])
-  const { subscription } = useSubscription()
   const [loading, setLoading] = useState(true)
   const [isSigningOut, setIsSigningOut] = useState(false)
   const track = useTrack()
@@ -130,8 +127,6 @@ export default function ModeratedChannels() {
     setIsSigningOut(true)
     signOut()
   }, [])
-
-  const currentPlan = plans.find((plan) => plan.name.toLowerCase() === subscription?.tier)
 
   const allOptions = [
     {

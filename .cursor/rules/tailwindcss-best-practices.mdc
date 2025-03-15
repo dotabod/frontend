@@ -1,0 +1,10 @@
+---
+description: Best practices for using Tailwind CSS for styling
+globs: *.css, *.jsx, *.tsx
+---
+- Use utility-first approach for consistent and maintainable styles, but create custom components for reusability
+- Implement responsive design using Tailwind's responsive modifiers
+- Create custom themes and extend Tailwind's default configuration
+- Use `@apply` directive to create component-specific styles
+- Utilize responsive design utilities for mobile-first development
+- Keep your tailwind.config.ts organized and maintainable

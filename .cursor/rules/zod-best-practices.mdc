@@ -1,0 +1,9 @@
+---
+description: Best practices for using Zod for runtime type checking and validation
+globs: **/*.{js,jsx,ts,tsx}
+---
+- Define schemas for all incoming data to ensure type safety
+- Use Zod's `z.infer` to derive TypeScript types from your schemas.
+- Utilize Zod's async validation for handling asynchronous data validation
+- Implement custom error messages with Zod's `refine` method for better user feedback.
+- Utilize Zod's `superRefine` for complex validation logic.

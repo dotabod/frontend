@@ -53,18 +53,19 @@ model User {
   locale                            String              @default("en")
   kick                              BigInt?             @unique
   youtube                           String?             @unique
+  MessageDelivery                   MessageDelivery[]
+  scheduledMessages                 ScheduledMessage[]
   Account                           Account?
   admin                             admin?
   approvedModerators                ApprovedModerator[] @relation("UserApprovedModerators")
   Bet                               Bet[]
   mods_mods_mod_user_idTousers      mods[]              @relation("mods_mod_user_idTousers")
   mods_mods_streamer_user_idTousers mods[]              @relation("mods_streamer_user_idTousers")
-  scheduledMessages                 ScheduledMessage[]
+  notifications                     Notification[]
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
   subscription                      Subscription[]
-  MessageDelivery                   MessageDelivery[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -207,12 +208,48 @@ model Subscription {
   cancelAtPeriodEnd    Boolean             @default(false)
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @default(now()) @map("updated_at")
+  isGift               Boolean             @default(false)
+  giftDetails          GiftSubscription?
   user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
   @@index([transactionType])
+  @@index([isGift])
   @@map("subscriptions")
+}
+
+model GiftSubscription {
+  id             String        @id @default(dbgenerated("gen_random_uuid()"))
+  subscriptionId String        @unique
+  senderName     String        @default("Anonymous")
+  giftMessage    String?
+  giftType       String        @default("monthly")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @map("updated_at")
+  giftQuantity   Int           @default(1)
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  notification   Notification?
+
+  @@index([subscriptionId])
+  @@map("gift_subscriptions")
+}
+
+model Notification {
+  id                 String            @id @default(dbgenerated("gen_random_uuid()"))
+  userId             String
+  type               String            @default("GIFT_SUBSCRIPTION")
+  isRead             Boolean           @default(false)
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @default(now()) @map("updated_at")
+  giftSubscriptionId String?           @unique
+  giftSubscription   GiftSubscription? @relation(fields: [giftSubscriptionId], references: [id])
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@map("notifications")
 }
 
 model WebhookEvent {
@@ -220,6 +257,40 @@ model WebhookEvent {
   stripeEventId String   @unique
   eventType     String
   processedAt   DateTime
+}
+
+model ScheduledMessage {
+  id            String            @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime          @updatedAt @db.Timestamptz(6)
+  message       String
+  sendAt        DateTime          @db.Timestamptz(6)
+  userId        String?
+  isForAllUsers Boolean           @default(false)
+  status        MessageStatus     @default(PENDING)
+  deliveries    MessageDelivery[]
+  user          User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sendAt])
+  @@index([status])
+  @@index([userId])
+}
+
+model MessageDelivery {
+  id                 String           @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt          DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime         @updatedAt @db.Timestamptz(6)
+  scheduledMessageId String
+  userId             String
+  status             MessageStatus    @default(PENDING)
+  deliveredAt        DateTime?        @db.Timestamptz(6)
+  scheduledMessage   ScheduledMessage @relation(fields: [scheduledMessageId], references: [id], onDelete: Cascade)
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduledMessageId, userId])
+  @@index([scheduledMessageId])
+  @@index([userId])
+  @@index([status])
 }
 
 enum SubscriptionStatus {
@@ -248,38 +319,4 @@ enum MessageStatus {
   DELIVERED
   FAILED
   CANCELLED
-}
-
-model ScheduledMessage {
-  id            String            @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt     DateTime          @updatedAt @db.Timestamptz(6)
-  message       String
-  sendAt        DateTime          @db.Timestamptz(6)
-  userId        String?
-  user          User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isForAllUsers Boolean           @default(false)
-  status        MessageStatus     @default(PENDING)
-  deliveries    MessageDelivery[]
-
-  @@index([sendAt])
-  @@index([status])
-  @@index([userId])
-}
-
-model MessageDelivery {
-  id                 String           @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt          DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime         @updatedAt @db.Timestamptz(6)
-  scheduledMessageId String
-  scheduledMessage   ScheduledMessage @relation(fields: [scheduledMessageId], references: [id], onDelete: Cascade)
-  userId             String
-  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status             MessageStatus    @default(PENDING)
-  deliveredAt        DateTime?        @db.Timestamptz(6)
-
-  @@unique([scheduledMessageId, userId])
-  @@index([scheduledMessageId])
-  @@index([userId])
-  @@index([status])
 }

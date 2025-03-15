@@ -31,11 +31,11 @@ const TwitchUser = ({
 
   return (
     <li className='relative'>
-      <a
+      <Link
         className='flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105'
         rel='noreferrer'
         onClick={onClick}
-        href={userName === 'You?' ? '#' : `https://twitch.tv/${userName}`}
+        href={userName === 'You?' ? '#' : `/${userName}`}
         target='_blank'
       >
         <Image
@@ -52,7 +52,7 @@ const TwitchUser = ({
         <span className='text-xs text-gray-300 transition-colors duration-300 ease-in-out group-hover:text-primary-foreground'>
           {userName}
         </span>
-      </a>
+      </Link>
     </li>
   )
 }

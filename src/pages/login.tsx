@@ -46,7 +46,7 @@ const Login: NextPageWithLayout = () => {
     if (status === 'authenticated') {
       void router.push('/dashboard')
     }
-  }, [router, status])
+  }, [router.push, status])
 
   useEffect(() => {
     if (status !== 'authenticated' && router.asPath.toLowerCase().includes('error')) {
