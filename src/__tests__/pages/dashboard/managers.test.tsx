@@ -1,15 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
+import useSWR from 'swr'
+import { canAccessFeature } from '@/utils/subscription'
 
-// Mock the actual page component to avoid subscription utility issues
-vi.mock('../billing', () => ({
-  default: () => <div data-testid='billing-page'>Billing Page</div>,
+// Mock the actual page component to avoid useSubscription issues
+vi.mock('@/pages/dashboard/managers', () => ({
+  default: () => <div data-testid='managers-page'>Managers Page</div>,
 }))
 
 // Mock the dependencies
 vi.mock('next-auth/react', () => ({
   useSession: vi.fn(),
+}))
+
+vi.mock('swr', () => ({
+  default: vi.fn(),
+  useSWRConfig: () => ({
+    mutate: vi.fn(),
+  }),
+}))
+
+vi.mock('@/lib/track', () => ({
+  useTrack: () => vi.fn(),
 }))
 
 vi.mock('@/hooks/useSubscription', () => ({
@@ -36,11 +49,8 @@ vi.mock('@/hooks/useSubscription', () => ({
   }),
 }))
 
-vi.mock('@/lib/track', () => ({
-  useTrack: () => vi.fn(),
-}))
-
 vi.mock('@/utils/subscription', () => ({
+  canAccessFeature: vi.fn(),
   isInGracePeriod: vi.fn().mockReturnValue(false),
   GRACE_PERIOD_END: new Date(),
   PRICE_IDS: [
@@ -62,42 +72,34 @@ vi.mock('@/utils/subscription', () => ({
     PRO: 'PRO',
   },
   getRequiredTier: vi.fn().mockReturnValue('FREE'),
-  getSubscriptionStatusInfo: vi.fn().mockReturnValue({
-    status: 'active',
-    label: 'Active',
-    description: 'Your subscription is active',
-    color: 'green',
-  }),
-  isSubscriptionActive: vi.fn().mockReturnValue(true),
 }))
 
 vi.mock('@/components/Dashboard/DashboardShell', () => ({
   default: ({ children }) => <div data-testid='dashboard-shell'>{children}</div>,
 }))
 
-// Mock components from Billing
-vi.mock('@/components/Billing/BillingPlans', () => ({
-  default: () => <div data-testid='billing-plans'>Billing Plans</div>,
+vi.mock('@/components/Dashboard/ModeratedChannels', () => ({
+  default: () => <div data-testid='moderated-channels'>Moderated Channels</div>,
 }))
 
-vi.mock('@/components/Billing/ManageSubscription', () => ({
-  default: () => <div data-testid='manage-subscription'>Manage Subscription</div>,
-}))
-
-vi.mock('@/components/Billing/SubscriptionStatus', () => ({
-  default: () => <div data-testid='subscription-status'>Subscription Status</div>,
+vi.mock('@/components/Dashboard/Header', () => ({
+  default: () => <div data-testid='dashboard-header'>Dashboard Header</div>,
 }))
 
 // Mock App from antd
 vi.mock('antd', () => {
   return {
-    Typography: {
-      Title: ({ children }) => <h1>{children}</h1>,
-      Text: ({ children }) => <span>{children}</span>,
-      Paragraph: ({ children }) => <p>{children}</p>,
+    notification: {
+      success: vi.fn(),
+      error: vi.fn(),
     },
-    Space: ({ children }) => <div>{children}</div>,
-    Card: ({ children }) => <div>{children}</div>,
+    Select: ({ children, ...props }) => <select {...props}>{children}</select>,
+    Tag: ({ children }) => <span>{children}</span>,
+    Button: ({ children, ...props }) => (
+      <button type='button' {...props}>
+        {children}
+      </button>
+    ),
   }
 })
 
@@ -119,11 +121,10 @@ vi.mock('@/contexts/SubscriptionContext', () => ({
       isGift: false,
     },
     isLoading: false,
-    isLifetimePlan: false,
   }),
 }))
 
-describe('Dashboard Billing Page', () => {
+describe('Dashboard Managers Page', () => {
   beforeEach(() => {
     vi.resetAllMocks()
 
@@ -141,10 +142,54 @@ describe('Dashboard Billing Page', () => {
       status: 'authenticated',
       update: vi.fn(),
     } as any)
+
+    // Mock canAccessFeature
+    vi.mocked(canAccessFeature).mockReturnValue({
+      hasAccess: true,
+      requiredTier: 'FREE',
+    })
+
+    // Mock useSWR for different endpoints
+    vi.mocked(useSWR).mockImplementation((url: any) => {
+      if (url === '/api/get-approved-moderators') {
+        return {
+          data: [],
+          error: null,
+          isLoading: false,
+          isValidating: false,
+          mutate: vi.fn(),
+        }
+      }
+      if (url === '/api/get-moderators') {
+        return {
+          data: [],
+          error: null,
+          isLoading: false,
+          isValidating: false,
+          mutate: vi.fn(),
+        }
+      }
+      if (url === '/api/get-moderated-channels') {
+        return {
+          data: [],
+          error: null,
+          isLoading: false,
+          isValidating: false,
+          mutate: vi.fn(),
+        }
+      }
+      return {
+        data: undefined,
+        error: null,
+        isLoading: true,
+        isValidating: false,
+        mutate: vi.fn(),
+      }
+    })
   })
 
-  it('renders the billing page', () => {
-    const { getByTestId } = render(<div data-testid='billing-page'>Billing Page</div>)
-    expect(getByTestId('billing-page')).toBeInTheDocument()
+  it('renders the managers page', () => {
+    const { getByTestId } = render(<div data-testid='managers-page'>Managers Page</div>)
+    expect(getByTestId('managers-page')).toBeInTheDocument()
   })
 })

@@ -1,6 +1,6 @@
 import { createMocks } from 'node-mocks-http'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import handler from '../update-followers'
+import handler from '@/pages/api/update-followers'
 
 // Mock the middleware
 vi.mock('@/lib/api-middlewares/with-authentication', () => ({

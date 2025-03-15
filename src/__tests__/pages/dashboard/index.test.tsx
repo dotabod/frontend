@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import SetupPage from '../index'
+import SetupPage from '@/pages/dashboard/index'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'

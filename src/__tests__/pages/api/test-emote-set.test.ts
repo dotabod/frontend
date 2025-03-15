@@ -1,6 +1,6 @@
 import { createMocks } from 'node-mocks-http'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import handler from '../test-emote-set'
+import handler from '@/pages/api/test-emote-set'
 
 // Import types first
 import type { EmoteSetResponse } from '@/lib/7tv'

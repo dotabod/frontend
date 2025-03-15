@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
-import handler from '../is-dotabod-live'
+import handler from '@/pages/api/is-dotabod-live'
 
 // Mock the prisma client
 vi.mock('@/lib/db', () => ({

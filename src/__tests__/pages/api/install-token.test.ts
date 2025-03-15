@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
-import handler from '../install/[token]'
+import handler from '@/pages/api/install/[token]'
 import type { Session } from 'next-auth'
 import type { SubscriptionTier, SubscriptionStatus } from '@prisma/client'
 import type { NextApiHandler } from 'next'

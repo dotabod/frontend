@@ -15,7 +15,14 @@ export default defineConfig({
     unstubEnvs: true,
     // Load environment variables from .env files
     env: loadEnv('', process.cwd(), ''),
-    exclude: ['.next/', 'node_modules/', 'vitest.setup.ts', '**/*.d.ts', '**/*.config.*'],
+    exclude: [
+      '.next/',
+      'node_modules/',
+      'vitest.setup.ts',
+      '**/*.d.ts',
+      '**/*.config.*',
+      'src/pages/**/__tests__/**', // Exclude test files in pages directory
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -27,6 +34,7 @@ export default defineConfig({
         '**/*.config.*',
         '**/dist/**',
         '**/__tests__/**',
+        'src/pages/**/__tests__/**', // Exclude test files in pages directory
       ],
       include: ['src/components/Overlay/GiftAlert/GiftSubscriptionAlert.tsx'],
     },
