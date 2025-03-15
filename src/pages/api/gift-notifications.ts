@@ -19,6 +19,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
+    console.log('geczy', req.method)
+
     const userId = session.user.id
 
     // GET: Fetch gift notifications and subscription status

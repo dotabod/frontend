@@ -15,7 +15,10 @@
     "lint": "next lint",
     "parse": "i18next -c ./i18next-parser.config.mjs",
     "postinstall": "prisma generate",
-    "knip": "knip"
+    "knip": "knip",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' vitest run --coverage"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
@@ -74,13 +77,20 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/node": "^22.13.10",
     "@types/obs-studio": "^2.17.2",
     "@types/react": "19.0.10",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^3.0.8",
+    "happy-dom": "^17.4.4",
     "knip": "^5.45.0",
+    "node-mocks-http": "^1.16.2",
     "postcss": "^8.5.3",
     "prisma": "^6.4.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
   },
   "trustedDependencies": [
     "@biomejs/biome",
