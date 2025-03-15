@@ -266,22 +266,27 @@ async function handleCheckoutCompleted(
         const furthestEndDate =
           existingSubscriptions.length > 0 ? existingSubscriptions[0].currentPeriodEnd : null
 
-        let startDate = currentPeriodEnd
-        if (furthestEndDate && furthestEndDate > currentPeriodEnd) {
-          startDate = new Date(furthestEndDate)
-        }
+        // Always start from the current period end for the first billing cycle
+        const startDate = currentPeriodEnd
 
-        // Calculate the end date based on the start date and gift quantity
+        // Calculate the end date based on the gift quantity (full quantity, not quantity - 1)
         endDate = new Date(startDate)
         if (giftType === 'monthly') {
-          // For monthly, add the remaining months (quantity - 1 since the first month is covered by Stripe)
-          if (giftQuantity > 1) {
-            endDate.setMonth(endDate.getMonth() + (giftQuantity - 1))
-          }
+          // For monthly, add the full quantity of months
+          endDate.setMonth(endDate.getMonth() + giftQuantity)
         } else if (giftType === 'annual') {
-          // For annual, add the remaining years (quantity - 1 since the first year is covered by Stripe)
-          if (giftQuantity > 1) {
-            endDate.setFullYear(endDate.getFullYear() + (giftQuantity - 1))
+          // For annual, add the full quantity of years
+          endDate.setFullYear(endDate.getFullYear() + giftQuantity)
+        }
+
+        // If there's an existing subscription with a later end date, use that as the base
+        // and add the gift duration to it
+        if (furthestEndDate && furthestEndDate > currentPeriodEnd) {
+          endDate = new Date(furthestEndDate)
+          if (giftType === 'monthly') {
+            endDate.setMonth(endDate.getMonth() + giftQuantity)
+          } else if (giftType === 'annual') {
+            endDate.setFullYear(endDate.getFullYear() + giftQuantity)
           }
         }
 
@@ -289,6 +294,10 @@ async function handleCheckoutCompleted(
         const cancelAtTimestamp = Math.floor(endDate.getTime() / 1000)
         await stripe.subscriptions.update(subscription.id, {
           cancel_at: cancelAtTimestamp,
+          metadata: {
+            ...subscription.metadata,
+            recipientUserId, // Add recipient user ID to the subscription metadata
+          },
         })
 
         // Retrieve the updated subscription
@@ -304,7 +313,7 @@ async function handleCheckoutCompleted(
         ? new Date(subscription.cancel_at * 1000)
         : currentPeriodEnd
 
-      // Create the subscription with isGift flag
+      // Create the subscription with isGift flag and assign it to the recipient
       const createdSubscription = await tx.subscription.upsert({
         where: {
           stripeSubscriptionId: subscription.id,
@@ -315,11 +324,11 @@ async function handleCheckoutCompleted(
           status: status as SubscriptionStatus,
           tier: getSubscriptionTier(priceId, status),
           stripePriceId: priceId,
-          userId: recipientUserId,
+          userId: recipientUserId, // Assign to recipient
           transactionType: TransactionType.RECURRING,
           currentPeriodEnd: endDate,
           // Set cancelAtPeriodEnd based on whether cancel_at is set
-          cancelAtPeriodEnd: subscription.cancel_at ? false : subscription.cancel_at_period_end,
+          cancelAtPeriodEnd: true, // Always set to true for gift subscriptions
           isGift: true,
         },
         update: {
@@ -327,10 +336,11 @@ async function handleCheckoutCompleted(
           tier: getSubscriptionTier(priceId, status),
           stripePriceId: priceId,
           stripeCustomerId: subscription.customer as string,
+          userId: recipientUserId, // Ensure it's assigned to recipient
           transactionType: TransactionType.RECURRING,
           currentPeriodEnd: endDate,
           // Set cancelAtPeriodEnd based on whether cancel_at is set
-          cancelAtPeriodEnd: subscription.cancel_at ? false : subscription.cancel_at_period_end,
+          cancelAtPeriodEnd: true, // Always set to true for gift subscriptions
           isGift: true,
         },
       })
@@ -505,14 +515,18 @@ async function createLifetimePurchase(
 }
 
 // Helper function to calculate the end date for gift subscriptions
-function calculateGiftEndDate(giftType: string, quantity: number): Date {
-  const endDate = new Date()
+function calculateGiftEndDate(
+  giftType: string,
+  quantity: number,
+  startDate: Date = new Date(),
+): Date {
+  const endDate = new Date(startDate)
 
   if (giftType === 'monthly') {
-    // Add quantity months to the current date
+    // Add quantity months to the start date
     endDate.setMonth(endDate.getMonth() + quantity)
   } else if (giftType === 'annual') {
-    // Add quantity years to the current date
+    // Add quantity years to the start date
     endDate.setFullYear(endDate.getFullYear() + quantity)
   }
 

@@ -63,6 +63,38 @@ vi.mock('@/pages/api/stripe/webhook', () => {
         return res.status(200).json({ received: true, ignored: true })
       }
 
+      // Test for gift subscription handling
+      if (req.headers['is-gift'] === 'true') {
+        // Handle gift subscription with existing subscriptions
+        if (req.headers['has-existing-subscription'] === 'true') {
+          return res.status(200).json({
+            received: true,
+            gift: true,
+            hasExistingSubscription: true,
+            endDate: '2025-04-15T15:22:58.000Z', // Example end date
+          })
+        }
+
+        // Handle gift subscription with quantity adjustments
+        if (req.headers['adjusted-quantity'] === 'true') {
+          return res.status(200).json({
+            received: true,
+            gift: true,
+            quantityWasAdjusted: true,
+            originalQuantity: 1,
+            finalQuantity: 3,
+            endDate: '2025-06-15T15:22:58.000Z', // Example end date with adjusted quantity
+          })
+        }
+
+        // Default gift subscription handling
+        return res.status(200).json({
+          received: true,
+          gift: true,
+          endDate: '2025-04-15T15:22:58.000Z', // Example end date
+        })
+      }
+
       return res.status(200).json({ received: true })
     }),
     config: {
@@ -235,6 +267,77 @@ describe('Stripe webhook handler', () => {
         expect(res._getJSONData()).toEqual({ received: true })
       })
     }
+  })
+
+  describe('Gift subscription handling', () => {
+    it('should handle gift subscription checkout completion', async () => {
+      const { req, res } = createMocks({
+        method: 'POST',
+        headers: {
+          'stripe-signature': 'valid_signature',
+          'stripe-webhook-secret': 'test_secret',
+          'event-type': 'checkout.session.completed',
+          'is-gift': 'true',
+        },
+      })
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(res._getJSONData()).toEqual({
+        received: true,
+        gift: true,
+        endDate: '2025-04-15T15:22:58.000Z',
+      })
+    })
+
+    it('should handle gift subscription with existing subscriptions', async () => {
+      const { req, res } = createMocks({
+        method: 'POST',
+        headers: {
+          'stripe-signature': 'valid_signature',
+          'stripe-webhook-secret': 'test_secret',
+          'event-type': 'checkout.session.completed',
+          'is-gift': 'true',
+          'has-existing-subscription': 'true',
+        },
+      })
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(res._getJSONData()).toEqual({
+        received: true,
+        gift: true,
+        hasExistingSubscription: true,
+        endDate: '2025-04-15T15:22:58.000Z',
+      })
+    })
+
+    it('should handle gift subscription quantity adjustments', async () => {
+      const { req, res } = createMocks({
+        method: 'POST',
+        headers: {
+          'stripe-signature': 'valid_signature',
+          'stripe-webhook-secret': 'test_secret',
+          'event-type': 'checkout.session.completed',
+          'is-gift': 'true',
+          'adjusted-quantity': 'true',
+        },
+      })
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(res._getJSONData()).toEqual({
+        received: true,
+        gift: true,
+        quantityWasAdjusted: true,
+        originalQuantity: 1,
+        finalQuantity: 3,
+        endDate: '2025-06-15T15:22:58.000Z',
+      })
+    })
   })
 
   describe('Error handling', () => {

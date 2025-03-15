@@ -151,6 +151,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         noAutoRenew: 'true', // Add metadata to indicate this should not auto-renew
       },
       // We'll handle subscription configuration in the webhook
+
+      // Add transfer_data if you want to credit the subscription to the recipient's Stripe account
+      // Note: This requires the recipient to have a connected Stripe account
+      // If you're just tracking subscriptions in your database, this isn't necessary
+      // Instead, we're using the metadata.recipientUserId to assign the subscription in the webhook
     })
 
     if (!session.url) {
