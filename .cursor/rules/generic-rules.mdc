@@ -1,0 +1,74 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Custom Cursor Rules for Dotabod Frontend
+
+This repository contains custom rules for Cursor AI to better understand and assist with the Dotabod Frontend codebase.
+
+## Overview
+
+The [cursor-rules.json](mdc:.cursor/rules/cursor-rules.json) file defines custom rules that help Cursor AI understand the structure, patterns, and technologies used in this project. These rules improve code suggestions, completions, and other AI-assisted features in Cursor.
+
+## Tech Stack
+
+The Dotabod Frontend is built with:
+
+- **Next.js** (Pages Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Prisma** (PostgreSQL)
+- **NextAuth.js**
+- **Redux Toolkit**
+- **UI library** (Ant Design)
+- **Vitest** and React Testing Library
+- **Sentry** for error monitoring
+- **Twitch API** integration
+- **Stripe** for payment processing
+
+## How to Use
+
+1. Ensure you have the latest version of Cursor installed
+2. Place the `cursor-rules.json` file in the root of your project
+3. Cursor will automatically detect and apply these rules when working with the codebase
+
+## Rule Categories
+
+The custom rules cover various aspects of the codebase:
+
+- **Project Structure**: Overall project organization and dependencies
+- **Component Structure**: Patterns for React components
+- **Styling**: Tailwind CSS usage
+- **API Routes**: Next.js API route patterns
+- **Database Access**: Prisma client usage
+- **Authentication**: NextAuth.js implementation
+- **UI Libraries**: Ant Design and Mantine component usage
+- **State Management**: Redux patterns
+- **Testing**: Vitest and React Testing Library patterns
+- **Error Monitoring**: Sentry integration
+- **Twitch Integration**: Twitch API usage
+- **Payment Processing**: Stripe integration
+- **Subscription Management**: Subscription logic
+- **Environment Variables**: Doppler usage
+- **TypeScript Types**: Type definition patterns
+
+## Benefits
+
+These custom rules help Cursor AI to:
+
+1. Provide more accurate code suggestions
+2. Better understand the project's architecture
+3. Follow established patterns in the codebase
+4. Suggest appropriate libraries and components
+5. Maintain consistency with existing code
+
+## Updating Rules
+
+As the codebase evolves, you may need to update these rules. To do so:
+
+1. Modify the `cursor-rules.json` file
+2. Ensure the JSON is valid
+3. Restart Cursor to apply the changes
+
+For more information on Cursor rules, visit: [https://docs.cursor.com/context/rules-for-ai](mdc:https:/docs.cursor.com/context/rules-for-ai)

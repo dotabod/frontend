@@ -15,10 +15,12 @@ export default defineConfig({
     unstubEnvs: true,
     // Load environment variables from .env files
     env: loadEnv('', process.cwd(), ''),
+    exclude: ['.next/', 'node_modules/', 'vitest.setup.ts', '**/*.d.ts', '**/*.config.*'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
+        '.next/',
         'node_modules/',
         'vitest.setup.ts',
         '**/*.d.ts',

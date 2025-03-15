@@ -84,7 +84,6 @@ import { getSubscription, canAccessFeature } from '@/utils/subscription'
 import { GraphQLClient } from 'graphql-request'
 
 describe('update-emote-set API', () => {
-  const originalEnv = { ...process.env }
   let mockRequest: ReturnType<typeof vi.fn>
 
   beforeEach(() => {

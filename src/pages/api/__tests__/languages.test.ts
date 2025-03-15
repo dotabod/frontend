@@ -14,12 +14,11 @@ vi.mock('@sentry/nextjs', () => ({
 import { captureException } from '@sentry/nextjs'
 
 // Mock environment variables
-const originalEnv = process.env
 beforeEach(() => {
-  process.env = { ...originalEnv, CROWDIN_TOKEN: 'mock-token' }
+  vi.stubEnv('CROWDIN_TOKEN', 'mock-token')
 })
 afterEach(() => {
-  process.env = originalEnv
+  vi.unstubAllEnvs()
 })
 
 describe('languages API', () => {
