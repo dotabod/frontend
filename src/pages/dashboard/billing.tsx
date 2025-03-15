@@ -4,7 +4,6 @@ import Header from '@/components/Dashboard/Header'
 import { SubscriptionStatus } from '@/components/Subscription/SubscriptionStatus'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
-import { Card } from '@/ui/card'
 import { getSubscriptionStatusInfo, isSubscriptionActive } from '@/utils/subscription'
 import { Alert, Button, Space, Typography } from 'antd'
 import { ExternalLinkIcon } from 'lucide-react'
@@ -86,7 +85,7 @@ const BillingPage = () => {
 
       <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
-      <Card className='mb-6 shadow-xs'>
+      <div className='mb-6'>
         <Space direction='vertical' size='large' className='w-full'>
           <SubscriptionStatus />
 
@@ -106,7 +105,7 @@ const BillingPage = () => {
               </Button>
             )}
         </Space>
-      </Card>
+      </div>
 
       {statusInfo?.type === 'warning' && !subscription?.isGift && (
         <Alert

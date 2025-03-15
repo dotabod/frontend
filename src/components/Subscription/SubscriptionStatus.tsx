@@ -16,12 +16,18 @@ interface SubscriptionStatusProps {
 }
 
 export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps) {
-  const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
+  const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan, isPro } =
+    useSubscriptionContext()
   const { data: session } = useSession()
   const [giftInfo, setGiftInfo] = useState<{
     hasGifts: boolean
     giftCount: number
     giftMessage: string
+    giftSubscriptions?: Array<{
+      id: string
+      endDate: Date | null
+      senderName: string
+    }>
   }>({
     hasGifts: false,
     giftCount: 0,
@@ -40,12 +46,12 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
   )
 
   // Get gift subscription info if applicable
-  const giftSubInfo = getGiftSubscriptionInfo(subscription)
+  const giftSubInfo = getGiftSubscriptionInfo(subscription) || { isGift: false, message: '' }
 
   // Fetch gift information when the component mounts
   useEffect(() => {
     const fetchGiftInfo = async () => {
-      if (session?.user?.id && !subscription?.isGift) {
+      if (session?.user?.id) {
         try {
           const gifts = await fetchGiftSubscriptions()
           setGiftInfo(gifts)
@@ -56,12 +62,12 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
     }
 
     fetchGiftInfo()
-  }, [session?.user?.id, subscription?.isGift])
+  }, [session?.user?.id])
 
   // Get appropriate subtitle based on subscription status
   const getSubtitle = () => {
     // If user has a gift subscription
-    if (giftSubInfo.isGift && subscription?.tier) {
+    if (giftSubInfo?.isGift && subscription?.tier) {
       // Special case for lifetime gift
       if (isLifetimePlan) {
         return `You have lifetime access to the ${
@@ -95,6 +101,11 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
       } plan (${period})`
     }
 
+    // If user has gift subscriptions but no active subscription
+    if (giftInfo.hasGifts) {
+      return `You have ${giftInfo.giftCount} gift subscription(s) to the Pro plan`
+    }
+
     // If in grace period without paid subscription
     if (inGracePeriod && !hasActivePlan) {
       return 'Subscribe to Pro to continue using Dotabod Pro features after the free period ends.'
@@ -110,7 +121,7 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
       {showAlert && (
         <>
           {/* For lifetime gift subscriptions, show a single consolidated message */}
-          {isLifetimePlan && giftSubInfo.isGift ? (
+          {isLifetimePlan && giftSubInfo?.isGift ? (
             <Alert
               className='mt-6 max-w-2xl'
               message='Lifetime Access'
@@ -127,8 +138,16 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
               type='success'
               showIcon
             />
-          ) : statusInfo?.message ? (
-            /* For regular subscriptions, show the status info */
+          ) : subscription?.isGift ? (
+            /* If the primary subscription is a gift, show only that alert */
+            <Alert
+              className='mt-6 max-w-2xl'
+              message={statusInfo?.message || 'Gift Subscription'}
+              type={statusInfo?.type || 'info'}
+              showIcon
+            />
+          ) : statusInfo?.message && !statusInfo.message.includes('Gift subscription') ? (
+            /* For regular subscriptions, show the status info if it's not about gift subscriptions */
             <Alert
               className='mt-6 max-w-2xl'
               message={statusInfo.message}
@@ -138,17 +157,21 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
           ) : null}
 
           {/* Only show grace period alert if not a lifetime plan and in grace period */}
-          {!isLifetimePlan && inGracePeriod && hasActivePlan && (
+          {!isLifetimePlan && inGracePeriod && (
             <Alert
               className='mt-2 max-w-2xl'
-              message={`All users have free Pro access until ${gracePeriodPrettyDate}, but you're already subscribed. Thank you for your support!`}
+              message={
+                hasActivePlan
+                  ? `All users have free Pro access until ${gracePeriodPrettyDate}, but you're already subscribed. Thank you for your support!`
+                  : `All users have free Pro access until ${gracePeriodPrettyDate}.`
+              }
               type='info'
               showIcon
             />
           )}
 
-          {/* Only show additional gift info if user has their own subscription plus gifts */}
-          {giftInfo.hasGifts && !subscription?.isGift && !isLifetimePlan && (
+          {/* Show gift info for users with gift subscriptions, but only if their primary subscription isn't a gift */}
+          {giftInfo.hasGifts && !subscription?.isGift && (
             <Alert
               className='mt-2 max-w-2xl'
               message={giftInfo.giftMessage}
@@ -161,7 +184,9 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
       )}
 
       {/* Only show the subtitle text when alerts are hidden */}
-      {!showAlert && subscription && <div className='text-base'>{getSubtitle()}</div>}
+      {!showAlert && (subscription || giftInfo.hasGifts) && (
+        <div className='text-base'>{getSubtitle()}</div>
+      )}
     </div>
   )
 }
