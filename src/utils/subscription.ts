@@ -337,7 +337,7 @@ export function getSubscriptionStatusInfo(
       currentPeriodEnd.getFullYear() > 2090)
   ) {
     return {
-      message: 'Lifetime access',
+      message: isGift ? 'Lifetime access via gift' : 'Lifetime access',
       type: 'success',
       badge: 'default',
     }
@@ -483,10 +483,15 @@ export function getGiftSubscriptionInfo(subscription: Partial<SubscriptionRow> |
     return { message: '', isGift: false }
   }
 
-  // Since we don't have access to gift details, provide a generic message
+  // Check if it's a lifetime gift subscription
+  const isLifetime =
+    subscription.transactionType === 'LIFETIME' ||
+    (subscription.currentPeriodEnd && subscription.currentPeriodEnd.getFullYear() > 2090)
+
   return {
-    message:
-      'You have a gift subscription that will not auto-renew. This is a one-time gift with no recurring charges.',
+    message: isLifetime
+      ? 'Someone gifted you lifetime access to Dotabod Pro. Enjoy all premium features forever!'
+      : 'You have a gift subscription that will not auto-renew. This is a one-time gift with no recurring charges.',
     isGift: true,
   }
 }

@@ -62,6 +62,13 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
   const getSubtitle = () => {
     // If user has a gift subscription
     if (giftSubInfo.isGift && subscription?.tier) {
+      // Special case for lifetime gift
+      if (isLifetimePlan) {
+        return `You have lifetime access to the ${
+          subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
+        } plan thanks to a generous gift`
+      }
+
       return `You have a gift subscription to the ${
         subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
       } plan that will not auto-renew`
@@ -99,48 +106,62 @@ export function SubscriptionStatus({ showAlert = true }: SubscriptionStatusProps
 
   return (
     <div className='flex flex-col gap-4'>
-      {showAlert && statusInfo?.message && (
-        <Alert
-          className='mt-6 max-w-2xl'
-          message={statusInfo.message}
-          type={statusInfo.type}
-          showIcon
-        />
+      {/* Primary subscription status alert - prioritize showing the most important information */}
+      {showAlert && (
+        <>
+          {/* For lifetime gift subscriptions, show a single consolidated message */}
+          {isLifetimePlan && giftSubInfo.isGift ? (
+            <Alert
+              className='mt-6 max-w-2xl'
+              message='Lifetime Access'
+              description='Someone gifted you lifetime access to Dotabod Pro. Enjoy all premium features forever!'
+              type='success'
+              showIcon
+            />
+          ) : isLifetimePlan ? (
+            /* For regular lifetime subscriptions */
+            <Alert
+              className='mt-6 max-w-2xl'
+              message='Lifetime Access'
+              description='Thank you for being a lifetime supporter!'
+              type='success'
+              showIcon
+            />
+          ) : statusInfo?.message ? (
+            /* For regular subscriptions, show the status info */
+            <Alert
+              className='mt-6 max-w-2xl'
+              message={statusInfo.message}
+              type={statusInfo.type}
+              showIcon
+            />
+          ) : null}
+
+          {/* Only show grace period alert if not a lifetime plan and in grace period */}
+          {!isLifetimePlan && inGracePeriod && hasActivePlan && (
+            <Alert
+              className='mt-2 max-w-2xl'
+              message={`All users have free Pro access until ${gracePeriodPrettyDate}, but you're already subscribed. Thank you for your support!`}
+              type='info'
+              showIcon
+            />
+          )}
+
+          {/* Only show additional gift info if user has their own subscription plus gifts */}
+          {giftInfo.hasGifts && !subscription?.isGift && !isLifetimePlan && (
+            <Alert
+              className='mt-2 max-w-2xl'
+              message={giftInfo.giftMessage}
+              type='info'
+              showIcon
+              icon={<GiftIcon size={16} />}
+            />
+          )}
+        </>
       )}
 
-      {/* Show gift subscription info if applicable */}
-      {showAlert && giftSubInfo.isGift && (
-        <Alert className='mt-2 max-w-2xl' message={giftSubInfo.message} type='info' showIcon />
-      )}
-
-      {/* Show additional gift info if user has their own subscription plus gifts */}
-      {showAlert && giftInfo.hasGifts && !subscription?.isGift && (
-        <Alert
-          className='mt-2 max-w-2xl'
-          message={giftInfo.giftMessage}
-          type='info'
-          showIcon
-          icon={<GiftIcon size={16} />}
-        />
-      )}
-
-      {/* Show additional alert for users with paid subscription during grace period */}
-      {showAlert && inGracePeriod && hasActivePlan && (
-        <Alert
-          className='mt-2 max-w-2xl'
-          message={
-            isLifetimePlan
-              ? 'Thank you for being a lifetime supporter!'
-              : `All users have free Pro access until ${gracePeriodPrettyDate}, but you're already subscribed. Thank you for your support!`
-          }
-          type='success'
-          showIcon
-        />
-      )}
-
-      <div className='text-base'>
-        {subscription ? getSubtitle() : 'Manage your subscription and billing settings'}
-      </div>
+      {/* Only show the subtitle text when alerts are hidden */}
+      {!showAlert && subscription && <div className='text-base'>{getSubtitle()}</div>}
     </div>
   )
 }

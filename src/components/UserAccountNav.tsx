@@ -2,7 +2,7 @@ import { signOut, useSession } from 'next-auth/react'
 
 import { fetcher } from '@/lib/fetcher'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { Dropdown, Badge, Skeleton } from 'antd'
+import { Dropdown, Badge, Skeleton, Button } from 'antd'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { BellOutlined } from '@ant-design/icons'
 import clsx from 'clsx'
@@ -76,7 +76,29 @@ const UserButton = ({ user }: UserButtonProps) => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 5
-  const totalNotifications = notifications.length
+
+  // Add notification filter state
+  const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'read'>('all')
+
+  // Filter notifications based on active tab
+  const filteredNotifications = notifications.filter((notification) => {
+    if (activeTab === 'all') return true
+    if (activeTab === 'unread') return !notification.read
+    if (activeTab === 'read') return notification.read
+    return true
+  })
+
+  // Sort notifications - unread first
+  const sortedNotifications = [...filteredNotifications].sort((a, b) => {
+    // First sort by read status (unread first)
+    if (a.read !== b.read) {
+      return a.read ? 1 : -1
+    }
+    // Then sort by date (newest first)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+
+  const totalFilteredNotifications = filteredNotifications.length
 
   const isLive = data?.stream_online
 
@@ -153,13 +175,62 @@ const UserButton = ({ user }: UserButtonProps) => {
               )}
             </div>
 
+            {/* Add notification filter tabs */}
+            <div className='flex space-x-2 mb-4 border-b border-gray-700'>
+              <button
+                type='button'
+                onClick={() => {
+                  setActiveTab('all')
+                  setCurrentPage(1)
+                }}
+                className={clsx(
+                  'px-3 py-2 text-sm font-medium transition-colors',
+                  activeTab === 'all'
+                    ? 'text-white border-b-2 border-blue-500'
+                    : 'text-gray-400 hover:text-white',
+                )}
+              >
+                All
+              </button>
+              <button
+                type='button'
+                onClick={() => {
+                  setActiveTab('unread')
+                  setCurrentPage(1)
+                }}
+                className={clsx(
+                  'px-3 py-2 text-sm font-medium transition-colors',
+                  activeTab === 'unread'
+                    ? 'text-white border-b-2 border-blue-500'
+                    : 'text-gray-400 hover:text-white',
+                )}
+              >
+                Unread {totalUnreadNotifications > 0 && `(${totalUnreadNotifications})`}
+              </button>
+              <button
+                type='button'
+                onClick={() => {
+                  setActiveTab('read')
+                  setCurrentPage(1)
+                }}
+                className={clsx(
+                  'px-3 py-2 text-sm font-medium transition-colors',
+                  activeTab === 'read'
+                    ? 'text-white border-b-2 border-blue-500'
+                    : 'text-gray-400 hover:text-white',
+                )}
+              >
+                Read
+              </button>
+            </div>
+
             {notificationError ? (
               <div className='py-6 text-center text-gray-400'>
                 Unable to load notifications. Please try again later.
               </div>
-            ) : totalNotifications > 0 ? (
+            ) : totalFilteredNotifications > 0 ? (
               <div className='max-h-80 overflow-y-auto'>
-                {notifications
+                {sortedNotifications
                   .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                   .map((notification) => (
                     <div
@@ -182,18 +253,17 @@ const UserButton = ({ user }: UserButtonProps) => {
                         <p className='mt-2 italic text-gray-400'>"{notification.giftMessage}"</p>
                       )}
                       {!notification.read && (
-                        <button
-                          type='button'
+                        <Button
                           onClick={() => dismissNotification(notification.id)}
                           className='mt-2 px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors'
                         >
                           Dismiss
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ))}
 
-                {totalNotifications > pageSize && (
+                {totalFilteredNotifications > pageSize && (
                   <div className='flex justify-between items-center mt-4'>
                     <button
                       type='button'
@@ -209,20 +279,20 @@ const UserButton = ({ user }: UserButtonProps) => {
                       Previous
                     </button>
                     <span className='text-gray-400 text-xs'>
-                      Page {currentPage} of {Math.ceil(totalNotifications / pageSize)}
+                      Page {currentPage} of {Math.ceil(totalFilteredNotifications / pageSize)}
                     </span>
                     <button
                       type='button'
                       className={clsx(
                         'px-3 py-1 text-xs rounded-md transition-colors',
-                        currentPage >= Math.ceil(totalNotifications / pageSize)
+                        currentPage >= Math.ceil(totalFilteredNotifications / pageSize)
                           ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                           : 'bg-gray-700 hover:bg-gray-600 text-white',
                       )}
-                      disabled={currentPage >= Math.ceil(totalNotifications / pageSize)}
+                      disabled={currentPage >= Math.ceil(totalFilteredNotifications / pageSize)}
                       onClick={() =>
                         setCurrentPage((prev) =>
-                          Math.min(prev + 1, Math.ceil(totalNotifications / pageSize)),
+                          Math.min(prev + 1, Math.ceil(totalFilteredNotifications / pageSize)),
                         )
                       }
                     >
@@ -232,7 +302,13 @@ const UserButton = ({ user }: UserButtonProps) => {
                 )}
               </div>
             ) : (
-              <div className='py-6 text-center text-gray-400'>No notifications</div>
+              <div className='py-6 text-center text-gray-400'>
+                {activeTab === 'all'
+                  ? 'No notifications'
+                  : activeTab === 'unread'
+                    ? 'No unread notifications'
+                    : 'No read notifications'}
+              </div>
             )}
           </div>
         </PopoverPanel>
