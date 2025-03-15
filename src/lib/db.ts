@@ -9,42 +9,11 @@ declare let global: { prisma: PrismaClient }
 
 let prisma: PrismaClient
 
-// Configure Prisma client with increased connection pool settings
-const prismaClientSingleton = () => {
-  const url = process.env.DATABASE_URL || ''
-
-  // Check if the URL already contains the connection pool parameters
-  const hasConnectionLimit = url.includes('connection_limit=')
-  const hasPoolTimeout = url.includes('pool_timeout=')
-
-  // Build the parameters string based on what's missing
-  let paramsToAdd = ''
-  if (!hasConnectionLimit) {
-    paramsToAdd += 'connection_limit=10'
-  }
-  if (!hasPoolTimeout) {
-    if (paramsToAdd) paramsToAdd += '&'
-    paramsToAdd += 'pool_timeout=20'
-  }
-
-  // Only add parameters if there are any to add
-  let finalUrl = url
-  if (paramsToAdd) {
-    const separator = url.includes('?') ? '&' : '?'
-    finalUrl = `${url}${separator}${paramsToAdd}`
-  }
-
-  return new PrismaClient({
-    log: ['error', 'warn'],
-    datasourceUrl: finalUrl,
-  })
-}
-
 if (process.env.VERCEL_ENV === 'production') {
-  prisma = prismaClientSingleton()
+  prisma = new PrismaClient()
 } else {
   if (!global.prisma) {
-    global.prisma = prismaClientSingleton()
+    global.prisma = new PrismaClient()
   }
   prisma = global.prisma
 }
