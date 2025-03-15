@@ -289,7 +289,6 @@ async function handleCheckoutCompleted(
         const cancelAtTimestamp = Math.floor(endDate.getTime() / 1000)
         await stripe.subscriptions.update(subscription.id, {
           cancel_at: cancelAtTimestamp,
-          cancel_at_period_end: false, // We're using cancel_at instead
         })
 
         // Retrieve the updated subscription
@@ -319,8 +318,8 @@ async function handleCheckoutCompleted(
           userId: recipientUserId,
           transactionType: TransactionType.RECURRING,
           currentPeriodEnd: endDate,
-          // For gift subscriptions, always set cancelAtPeriodEnd to true
-          cancelAtPeriodEnd: true,
+          // Set cancelAtPeriodEnd based on whether cancel_at is set
+          cancelAtPeriodEnd: subscription.cancel_at ? false : subscription.cancel_at_period_end,
           isGift: true,
         },
         update: {
@@ -330,8 +329,8 @@ async function handleCheckoutCompleted(
           stripeCustomerId: subscription.customer as string,
           transactionType: TransactionType.RECURRING,
           currentPeriodEnd: endDate,
-          // For gift subscriptions, always set cancelAtPeriodEnd to true
-          cancelAtPeriodEnd: true,
+          // Set cancelAtPeriodEnd based on whether cancel_at is set
+          cancelAtPeriodEnd: subscription.cancel_at ? false : subscription.cancel_at_period_end,
           isGift: true,
         },
       })
