@@ -1,0 +1,12 @@
+---
+description: Best practices for writing tests with Vitest
+globs: **/*.test.{ts,tsx,js,jsx}
+---
+- Use `describe` and `it` blocks to organize your tests
+- Implement mocking with `vi.mock` for isolating dependencies
+- Use Vitest's concurrent test running feature for faster test execution
+- Leverage Vitest's code coverage reporting to ensure thorough test coverage
+- Implement proper mocking of dependencies using Vitest's mocking utilities
+- Utilize `vitest.run` for running tests programmatically
+- Leverage `vitest`'s snapshot testing for UI components
+- Utilize Vitest's watch mode for efficient test-driven development
