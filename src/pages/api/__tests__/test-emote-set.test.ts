@@ -13,6 +13,9 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
   },
 }))
 
+// Import EmoteSetResponse type
+import type { EmoteSetResponse } from '@/lib/7tv'
+
 // Mock 7TV functions
 vi.mock('@/lib/7tv', () => ({
   create7TVClient: vi.fn(() => 'mock-client'),
@@ -45,28 +48,24 @@ import {
 import { captureException, withScope } from '@sentry/nextjs'
 
 describe('test-emote-set API', () => {
-  const originalEnv = { ...process.env }
-
   beforeEach(() => {
     vi.resetAllMocks()
 
     // Setup environment variables
-    process.env.NODE_ENV = 'development'
-    process.env.CRON_SECRET = 'test-secret'
-    process.env.CRON_TWITCH_ID = 'test-twitch-id'
-    process.env.SEVENTV_AUTH = 'test-auth-token'
+    vi.stubEnv('NODE_ENV', 'development')
+    vi.stubEnv('CRON_SECRET', 'test-secret')
+    vi.stubEnv('CRON_TWITCH_ID', 'test-twitch-id')
+    vi.stubEnv('SEVENTV_AUTH', 'test-auth-token')
   })
 
   afterEach(() => {
     vi.clearAllMocks()
-
-    // Restore original environment
-    process.env = { ...originalEnv }
+    vi.unstubAllEnvs()
   })
 
   it('returns 401 when authorization header is missing in production', async () => {
-    process.env.NODE_ENV = 'production'
-    process.env.VERCEL_ENV = 'production'
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('VERCEL_ENV', 'production')
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -79,8 +78,8 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 401 when authorization header is invalid in production', async () => {
-    process.env.NODE_ENV = 'production'
-    process.env.VERCEL_ENV = 'production'
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('VERCEL_ENV', 'production')
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -107,7 +106,7 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 403 when CRON_TWITCH_ID is missing', async () => {
-    delete process.env.CRON_TWITCH_ID
+    vi.stubEnv('CRON_TWITCH_ID', undefined)
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -120,7 +119,7 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 500 when SEVENTV_AUTH is missing', async () => {
-    delete process.env.SEVENTV_AUTH
+    vi.stubEnv('SEVENTV_AUTH', undefined)
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -180,7 +179,9 @@ describe('test-emote-set API', () => {
       }),
     }
 
-    vi.mocked(create7TVClient).mockReturnValueOnce(mockClient as any)
+    vi.mocked(create7TVClient).mockReturnValueOnce(
+      mockClient as unknown as ReturnType<typeof create7TVClient>,
+    )
     vi.mocked(isSevenTVError).mockReturnValueOnce(true)
 
     await handler(req, res)
@@ -213,8 +214,40 @@ describe('test-emote-set API', () => {
       request: vi.fn().mockResolvedValueOnce({}),
     }
 
-    vi.mocked(create7TVClient).mockReturnValueOnce(mockClient as any)
-    vi.mocked(verifyEmoteInSet).mockResolvedValueOnce(undefined)
+    vi.mocked(create7TVClient).mockReturnValueOnce(
+      mockClient as unknown as ReturnType<typeof create7TVClient>,
+    )
+
+    // Create a mock EmoteSetResponse
+    const mockEmoteSetResponse: EmoteSetResponse = {
+      emoteSet: {
+        emote_count: 1,
+        capacity: 10,
+        flags: 0,
+        name: 'TestEmoteSet',
+        emotes: [
+          {
+            id: 'test-emote-id',
+            name: 'TESTER',
+            data: {
+              id: 'test-data-id',
+              name: 'TESTER',
+              host: {
+                url: 'https://example.com',
+                files: [
+                  {
+                    name: 'test-file',
+                    format: 'webp',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    }
+
+    vi.mocked(verifyEmoteInSet).mockResolvedValueOnce(mockEmoteSetResponse)
 
     await handler(req, res)
 

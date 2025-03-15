@@ -58,14 +58,14 @@ describe('update-followers API', () => {
     vi.resetAllMocks()
 
     // Setup environment variables
-    process.env.TWITCH_CLIENT_ID = 'mock-client-id'
+    vi.stubEnv('TWITCH_CLIENT_ID', 'mock-client-id')
   })
 
   afterEach(() => {
     vi.clearAllMocks()
 
     // Clean up environment variables
-    delete process.env.TWITCH_CLIENT_ID
+    vi.unstubAllEnvs()
   })
 
   it('returns 405 for non-GET methods', async () => {
@@ -125,12 +125,10 @@ describe('update-followers API', () => {
         isImpersonating: false,
       },
     })
-
     // Mock getTwitchTokens to return tokens
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
       providerAccountId: '12345',
       accessToken: 'mock-access-token',
-      error: null,
     })
 
     // Mock fetch response for follower count

@@ -91,9 +91,9 @@ describe('update-emote-set API', () => {
     vi.resetAllMocks()
 
     // Setup environment variables for testing
-    process.env.SEVENTV_AUTH = 'test-auth-token'
-    process.env.TWITCH_CLIENT_ID = 'mock-client-id'
-    process.env.TWITCH_CLIENT_SECRET = 'mock-client-secret'
+    vi.stubEnv('SEVENTV_AUTH', 'test-auth-token')
+    vi.stubEnv('TWITCH_CLIENT_ID', 'mock-client-id')
+    vi.stubEnv('TWITCH_CLIENT_SECRET', 'mock-client-secret')
 
     // Reset the mock request function
     mockRequest = vi.fn()
@@ -107,7 +107,7 @@ describe('update-emote-set API', () => {
 
   afterEach(() => {
     // Restore original environment
-    process.env = { ...originalEnv }
+    vi.unstubAllEnvs()
   })
 
   it('returns 403 when user is impersonating', async () => {
@@ -316,8 +316,7 @@ describe('update-emote-set API', () => {
     })
 
     // Remove SEVENTV_AUTH
-    const originalAuth = process.env.SEVENTV_AUTH
-    process.env.SEVENTV_AUTH = ''
+    vi.stubEnv('SEVENTV_AUTH', '')
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -326,7 +325,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     // Restore original value
-    process.env.SEVENTV_AUTH = originalAuth
+    vi.unstubAllEnvs()
 
     expect(res.statusCode).toBe(400)
     expect(res._getJSONData()).toEqual({ message: 'No emotes defined for addition' })
