@@ -1,6 +1,6 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { getSubscriptionTier } from '@/utils/subscription'
+import { GRACE_PERIOD_END, getSubscriptionTier } from '@/utils/subscription'
 import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
@@ -59,32 +59,63 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ received: true })
   }
 
-  try {
-    await prisma.$transaction(async (tx) => {
-      const existingEvent = await tx.webhookEvent.findUnique({
+  // Maximum number of retry attempts for transaction failures
+  const MAX_RETRIES = 3
+  let retryCount = 0
+  let lastError: Error | unknown = null
+
+  while (retryCount < MAX_RETRIES) {
+    try {
+      // First check if we've already processed this event (outside of transaction to avoid locking)
+      const existingEvent = await prisma.webhookEvent.findUnique({
         where: { stripeEventId: event.id },
       })
 
       if (existingEvent) {
-        return // Idempotency
+        // Event already processed (idempotency)
+        return res.status(200).json({ received: true })
       }
 
-      await tx.webhookEvent.create({
-        data: {
-          stripeEventId: event.id,
-          eventType: event.type,
-          processedAt: new Date(),
+      // Process the event in a transaction
+      await prisma.$transaction(
+        async (tx) => {
+          // Record the event to ensure idempotency
+          await tx.webhookEvent.create({
+            data: {
+              stripeEventId: event.id,
+              eventType: event.type,
+              processedAt: new Date(),
+            },
+          })
+
+          // Process the webhook event
+          await processWebhookEvent(event, tx)
         },
-      })
+        {
+          // Set a longer timeout for complex operations
+          timeout: 10000, // 10 seconds
+        },
+      )
 
-      await processWebhookEvent(event, tx)
-    })
+      return res.status(200).json({ received: true })
+    } catch (error) {
+      lastError = error
+      retryCount++
 
-    return res.status(200).json({ received: true })
-  } catch (error) {
-    console.error('Webhook processing failed:', error)
-    return res.status(500).json({ error: 'Webhook processing failed' })
+      // Log the error but continue with retries
+      console.error(`Webhook processing attempt ${retryCount} failed:`, error)
+
+      // Wait before retrying (exponential backoff)
+      if (retryCount < MAX_RETRIES) {
+        const delay = 2 ** retryCount * 500 // 1s, 2s, 4s
+        await new Promise((resolve) => setTimeout(resolve, delay))
+      }
+    }
   }
+
+  // If we've exhausted all retries, return an error
+  console.error('Webhook processing failed after multiple attempts:', lastError)
+  return res.status(500).json({ error: 'Webhook processing failed' })
 }
 
 async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionClient) {
@@ -111,7 +142,6 @@ async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionCl
       break
   }
 }
-
 async function handleCustomerDeleted(customer: Stripe.Customer, tx: Prisma.TransactionClient) {
   await tx.subscription.deleteMany({
     where: {
@@ -262,33 +292,34 @@ async function handleCheckoutCompleted(
         // Get the current period end from Stripe
         const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
 
-        // If there's an existing subscription with a later end date, extend from that date
+        // Find the furthest end date from all active subscriptions (including trials)
         const furthestEndDate =
-          existingSubscriptions.length > 0 ? existingSubscriptions[0].currentPeriodEnd : null
+          existingSubscriptions.length > 0
+            ? existingSubscriptions.reduce((latest, sub) => {
+                return sub.currentPeriodEnd && sub.currentPeriodEnd > latest
+                  ? sub.currentPeriodEnd
+                  : latest
+              }, new Date(0))
+            : null
 
-        // Always start from the current period end for the first billing cycle
-        const startDate = currentPeriodEnd
+        // Determine the base date to start calculating from
+        // Consider grace period, existing subscriptions, and current period end
+        let baseDate: Date
 
-        // Calculate the end date based on the gift quantity (full quantity, not quantity - 1)
-        endDate = new Date(startDate)
-        if (giftType === 'monthly') {
-          // For monthly, add the full quantity of months
-          endDate.setMonth(endDate.getMonth() + giftQuantity)
-        } else if (giftType === 'annual') {
-          // For annual, add the full quantity of years
-          endDate.setFullYear(endDate.getFullYear() + giftQuantity)
+        // First check if grace period end is later than current period end
+        if (GRACE_PERIOD_END > currentPeriodEnd) {
+          baseDate = new Date(GRACE_PERIOD_END)
+        } else {
+          baseDate = new Date(currentPeriodEnd)
         }
 
-        // If there's an existing subscription with a later end date, use that as the base
-        // and add the gift duration to it
-        if (furthestEndDate && furthestEndDate > currentPeriodEnd) {
-          endDate = new Date(furthestEndDate)
-          if (giftType === 'monthly') {
-            endDate.setMonth(endDate.getMonth() + giftQuantity)
-          } else if (giftType === 'annual') {
-            endDate.setFullYear(endDate.getFullYear() + giftQuantity)
-          }
+        // Then check if there's an existing subscription with an even later end date
+        if (furthestEndDate && furthestEndDate > baseDate) {
+          baseDate = new Date(furthestEndDate)
         }
+
+        // Calculate the end date based on the gift quantity and the base date
+        endDate = calculateGiftEndDate(giftType, giftQuantity, baseDate)
 
         // Update the Stripe subscription to cancel at the calculated date
         const cancelAtTimestamp = Math.floor(endDate.getTime() / 1000)
@@ -528,6 +559,26 @@ function calculateGiftEndDate(
   } else if (giftType === 'annual') {
     // Add quantity years to the start date
     endDate.setFullYear(endDate.getFullYear() + quantity)
+  }
+
+  // Ensure we're not losing days due to month length differences
+  // For example, Jan 31 + 1 month would become Feb 28/29, which is not a full month
+  // This ensures we always get the same day of the month when possible
+  const originalDay = startDate.getDate()
+  const endDay = endDate.getDate()
+
+  if (endDay < originalDay) {
+    // If the end day is less than the original day, it means we lost days
+    // Try to set it back to the original day if the month allows
+    const endMonth = endDate.getMonth()
+    const lastDayOfMonth = new Date(endDate.getFullYear(), endMonth + 1, 0).getDate()
+
+    if (originalDay <= lastDayOfMonth) {
+      endDate.setDate(originalDay)
+    } else {
+      // If original day exceeds the last day of the end month, set to last day
+      endDate.setDate(lastDayOfMonth)
+    }
   }
 
   return endDate
