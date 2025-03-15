@@ -1,0 +1,169 @@
+{
+  "rules": [
+    {
+      "name": "Next.js Frontend Project",
+      "description": "This is a Next.js frontend project using Pages Router with TypeScript, Tailwind CSS, Prisma, and various UI libraries including Ant Design and Mantine.",
+      "pattern": "**/*.{ts,tsx,js,jsx}",
+      "actions": [
+        {
+          "type": "analyze",
+          "description": "Analyze the codebase structure and dependencies"
+        }
+      ]
+    },
+    {
+      "name": "Component Structure",
+      "description": "Follow the project's component organization patterns",
+      "pattern": "src/components/**/*.{tsx,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Components should follow the existing structure with proper TypeScript typing and styling approaches"
+        }
+      ]
+    },
+    {
+      "name": "Tailwind CSS Styling",
+      "description": "Project uses Tailwind CSS for styling",
+      "pattern": "**/*.{tsx,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Use Tailwind CSS classes for styling following the project's conventions"
+        }
+      ]
+    },
+    {
+      "name": "API Routes",
+      "description": "Next.js API routes with proper error handling and authentication",
+      "pattern": "src/pages/api/**/*.{ts,js}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's API route patterns with proper error handling and authentication checks"
+        }
+      ]
+    },
+    {
+      "name": "Prisma Database Access",
+      "description": "Database access using Prisma client",
+      "pattern": "**/*.{ts,js}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Use the Prisma client for database operations following the project's patterns"
+        }
+      ]
+    },
+    {
+      "name": "Authentication with NextAuth",
+      "description": "Authentication using NextAuth.js",
+      "pattern": "src/lib/auth.ts",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's authentication patterns using NextAuth.js"
+        }
+      ]
+    },
+    {
+      "name": "UI Component Libraries",
+      "description": "Project uses multiple UI libraries including Ant Design and Mantine",
+      "pattern": "**/*.{tsx,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Use the appropriate UI library components based on the file context and existing patterns"
+        }
+      ]
+    },
+    {
+      "name": "Redux State Management",
+      "description": "State management using Redux Toolkit",
+      "pattern": "src/lib/redux/**/*.{ts,js}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's Redux patterns for state management"
+        }
+      ]
+    },
+    {
+      "name": "Testing with Vitest",
+      "description": "Testing using Vitest and React Testing Library",
+      "pattern": "**/__tests__/**/*.{ts,tsx,js,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Write tests using Vitest and React Testing Library following the project's testing patterns"
+        }
+      ]
+    },
+    {
+      "name": "Error Monitoring with Sentry",
+      "description": "Error monitoring using Sentry",
+      "pattern": "**/*.{ts,tsx,js,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Use Sentry for error monitoring and reporting following the project's patterns"
+        }
+      ]
+    },
+    {
+      "name": "Twitch Integration",
+      "description": "Integration with Twitch API",
+      "pattern": "**/*.{ts,tsx,js,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's patterns for Twitch API integration"
+        }
+      ]
+    },
+    {
+      "name": "Stripe Payment Integration",
+      "description": "Integration with Stripe for payments",
+      "pattern": "src/lib/stripe*.ts",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's patterns for Stripe payment integration"
+        }
+      ]
+    },
+    {
+      "name": "Subscription Management",
+      "description": "Subscription management logic",
+      "pattern": "**/*subscription*.{ts,tsx,js,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's patterns for subscription management"
+        }
+      ]
+    },
+    {
+      "name": "Environment Variables",
+      "description": "Environment variables using Doppler",
+      "pattern": "**/*.{ts,tsx,js,jsx}",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Use environment variables through Doppler following the project's patterns"
+        }
+      ]
+    },
+    {
+      "name": "TypeScript Types",
+      "description": "TypeScript type definitions",
+      "pattern": "src/types/**/*.ts",
+      "actions": [
+        {
+          "type": "suggest",
+          "description": "Follow the project's TypeScript type definition patterns"
+        }
+      ]
+    }
+  ]
+}

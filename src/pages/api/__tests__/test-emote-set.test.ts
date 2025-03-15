@@ -2,7 +2,10 @@ import { createMocks } from 'node-mocks-http'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import handler from '../test-emote-set'
 
-// Mock the middleware
+// Import types first
+import type { EmoteSetResponse } from '@/lib/7tv'
+
+// Mock modules with vi.mock
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (methods, handler) => (req, res) => {
     if (!methods.includes(req.method)) {
@@ -13,10 +16,6 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
   },
 }))
 
-// Import EmoteSetResponse type
-import type { EmoteSetResponse } from '@/lib/7tv'
-
-// Mock 7TV functions
 vi.mock('@/lib/7tv', () => ({
   create7TVClient: vi.fn(() => 'mock-client'),
   get7TVUser: vi.fn(),
@@ -25,19 +24,17 @@ vi.mock('@/lib/7tv', () => ({
   verifyEmoteInSet: vi.fn(),
 }))
 
-// Mock GraphQL queries
 vi.mock('@/lib/gql', () => ({
   CHANGE_EMOTE_IN_SET: 'mock-change-emote-query',
   DELETE_EMOTE_SET: 'mock-delete-emote-set-query',
 }))
 
-// Mock Sentry
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
   withScope: vi.fn((callback) => callback({ setTag: vi.fn(), setContext: vi.fn() })),
 }))
 
-// Import mocked modules
+// Import mocked modules after vi.mock declarations
 import {
   create7TVClient,
   get7TVUser,
@@ -49,9 +46,10 @@ import { captureException, withScope } from '@sentry/nextjs'
 
 describe('test-emote-set API', () => {
   beforeEach(() => {
+    // Reset all mocks before each test
     vi.resetAllMocks()
 
-    // Setup environment variables
+    // Setup environment variables using vi.stubEnv
     vi.stubEnv('NODE_ENV', 'development')
     vi.stubEnv('CRON_SECRET', 'test-secret')
     vi.stubEnv('CRON_TWITCH_ID', 'test-twitch-id')
@@ -59,11 +57,13 @@ describe('test-emote-set API', () => {
   })
 
   afterEach(() => {
+    // Clean up after each test
     vi.clearAllMocks()
     vi.unstubAllEnvs()
   })
 
   it('returns 401 when authorization header is missing in production', async () => {
+    // Set environment for this specific test
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('VERCEL_ENV', 'production')
 
@@ -106,6 +106,7 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 403 when CRON_TWITCH_ID is missing', async () => {
+    // Use vi.stubEnv with undefined instead of delete operator
     vi.stubEnv('CRON_TWITCH_ID', undefined)
 
     const { req, res } = createMocks({
@@ -119,6 +120,7 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 500 when SEVENTV_AUTH is missing', async () => {
+    // Use vi.stubEnv with undefined instead of delete operator
     vi.stubEnv('SEVENTV_AUTH', undefined)
 
     const { req, res } = createMocks({
@@ -179,6 +181,7 @@ describe('test-emote-set API', () => {
       }),
     }
 
+    // Use proper type casting
     vi.mocked(create7TVClient).mockReturnValueOnce(
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
@@ -214,11 +217,12 @@ describe('test-emote-set API', () => {
       request: vi.fn().mockResolvedValueOnce({}),
     }
 
+    // Use proper type casting
     vi.mocked(create7TVClient).mockReturnValueOnce(
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
 
-    // Create a mock EmoteSetResponse
+    // Create a properly typed mock EmoteSetResponse
     const mockEmoteSetResponse: EmoteSetResponse = {
       emoteSet: {
         emote_count: 1,

@@ -176,12 +176,10 @@ describe('update-followers API', () => {
         isImpersonating: false,
       },
     })
-
     // Mock getTwitchTokens to return tokens
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
       providerAccountId: '12345',
       accessToken: 'mock-access-token',
-      error: null,
     })
 
     // Mock fetch response with error
