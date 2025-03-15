@@ -1,7 +1,9 @@
 ---
 description: Best practices for writing tests with Vitest
 globs: **/*.test.{ts,tsx,js,jsx}
+alwaysApply: false
 ---
+- Run `bun run vitest run <test name here>` to run the test in terminal
 - Use `describe` and `it` blocks to organize your tests
 - Implement mocking with `vi.mock` for isolating dependencies
 - Use Vitest's concurrent test running feature for faster test execution

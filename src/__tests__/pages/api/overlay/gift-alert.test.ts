@@ -1,61 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import handler from '@/pages/api/overlay/gift-alert'
 
-// Create a mock handler that simulates the API behavior
-const mockHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Simulate authentication check
-  const session = req.headers.session ? JSON.parse(req.headers.session as string) : null
-  if (!session) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
+// Mock dependencies
+vi.mock('@/lib/db', () => ({
+  default: {
+    notification: {
+      findFirst: vi.fn(),
+      update: vi.fn(),
+    },
+  },
+}))
 
-  const userId = session?.user?.id
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
+vi.mock('@/lib/api/getServerSession', () => ({
+  getServerSession: vi.fn(),
+}))
 
-  // Handle GET request
-  if (req.method === 'GET') {
-    // Simulate database query for notifications
-    if (req.headers.mocknotificationfound === 'false') {
-      return res.status(200).json({ hasNotification: false })
-    }
+// Mock dependencies
+vi.mock('@/lib/api-middlewares/with-authentication', () => ({
+  withAuthentication: (fn) => fn,
+}))
 
-    if (req.headers.mockservererror === 'true') {
-      return res.status(500).json({ error: 'Internal server error' })
-    }
+vi.mock('@/lib/auth', () => ({
+  authOptions: {},
+}))
 
-    // Return mock notification data
-    return res.status(200).json({
-      hasNotification: true,
-      notification: {
-        id: 'notification-123',
-        senderName: req.headers.sendername || 'John Doe',
-        giftType: req.headers.gifttype || 'monthly',
-        giftQuantity: Number.parseInt(req.headers.giftquantity as string) || 3,
-        giftMessage: req.headers.giftmessage || 'Enjoy your gift!',
-        createdAt: new Date().toISOString(),
-      },
-    })
-  }
-
-  // Handle POST request
-  if (req.method === 'POST') {
-    const { notificationId } = req.body
-
-    // Simulate notification not found
-    if (req.headers.mocknotificationfound === 'false') {
-      return res.status(404).json({ error: 'Notification not found' })
-    }
-
-    // Simulate successful update
-    return res.status(200).json({ success: true })
-  }
-
-  // Default response for unsupported methods
-  return res.status(405).json({ error: 'Method not allowed' })
-}
+// Import the mocked dependencies for direct manipulation
+import prisma from '@/lib/db'
+import { getServerSession } from '@/lib/api/getServerSession'
 
 describe('overlay/gift-alert API', () => {
   beforeEach(() => {
@@ -67,7 +40,10 @@ describe('overlay/gift-alert API', () => {
       method: 'GET',
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return null (unauthenticated)
+    vi.mocked(getServerSession).mockResolvedValueOnce(null)
+
+    await handler(req, res)
 
     expect(res.statusCode).toBe(401)
     expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
@@ -76,14 +52,24 @@ describe('overlay/gift-alert API', () => {
   it('returns 401 when userId is not available', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        session: JSON.stringify({
-          user: { id: '' },
-        }),
-      },
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return a session without user id
+    vi.mocked(getServerSession).mockResolvedValueOnce({
+      user: {
+        id: '',
+        name: '',
+        image: '',
+        isImpersonating: false,
+        twitchId: '',
+        role: undefined,
+        locale: '',
+        scope: '',
+      },
+      expires: '',
+    })
+
+    await handler(req, res)
 
     expect(res.statusCode).toBe(401)
     expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
@@ -92,15 +78,27 @@ describe('overlay/gift-alert API', () => {
   it('returns hasNotification: false when no unread notifications exist', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        session: JSON.stringify({
-          user: { id: 'user-123' },
-        }),
-        mocknotificationfound: 'false',
-      },
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return a valid session
+    vi.mocked(getServerSession).mockResolvedValueOnce({
+      user: {
+        id: 'user-123',
+        twitchId: 'twitch-123',
+        name: 'Test User',
+        image: 'image-url',
+        isImpersonating: false,
+        role: 'USER',
+        locale: 'en-US',
+        scope: 'test-scope',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    })
+
+    // Mock prisma to return no notification
+    vi.mocked(prisma.notification.findFirst).mockResolvedValueOnce(null)
+
+    await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({ hasNotification: false })
@@ -109,18 +107,42 @@ describe('overlay/gift-alert API', () => {
   it('returns notification details when unread notification exists', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        session: JSON.stringify({
-          user: { id: 'user-123' },
-        }),
-        sendername: 'John Doe',
-        gifttype: 'monthly',
-        giftquantity: '3',
-        giftmessage: 'Enjoy your gift!',
-      },
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return a valid session
+    vi.mocked(getServerSession).mockResolvedValueOnce({
+      user: {
+        id: 'user-123',
+        twitchId: 'twitch-123',
+        name: 'Test User',
+        image: 'image-url',
+        isImpersonating: false,
+        role: 'USER',
+        locale: 'en-US',
+        scope: 'test-scope',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    })
+
+    // Create a mock date for consistent testing
+    const mockDate = new Date('2023-01-01T00:00:00Z')
+
+    // Mock prisma to return a notification
+    vi.mocked(prisma.notification.findFirst).mockResolvedValueOnce({
+      id: 'notification-123',
+      userId: 'user-123',
+      type: 'GIFT_SUBSCRIPTION',
+      isRead: false,
+      createdAt: mockDate,
+      giftSubscription: {
+        senderName: 'John Doe',
+        giftType: 'monthly',
+        giftQuantity: 3,
+        giftMessage: 'Enjoy your gift!',
+      },
+    } as any)
+
+    await handler(req, res)
     const responseData = res._getJSONData()
 
     expect(res.statusCode).toBe(200)
@@ -130,24 +152,36 @@ describe('overlay/gift-alert API', () => {
     expect(responseData.notification.giftType).toBe('monthly')
     expect(responseData.notification.giftQuantity).toBe(3)
     expect(responseData.notification.giftMessage).toBe('Enjoy your gift!')
-    expect(typeof responseData.notification.createdAt).toBe('string')
+    expect(responseData.notification.createdAt).toBe('2023-01-01T00:00:00.000Z')
   })
 
   it('returns 404 when marking non-existent notification as read', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        session: JSON.stringify({
-          user: { id: 'user-123' },
-        }),
-        mocknotificationfound: 'false',
-      },
       body: {
         notificationId: 'notification-123',
       },
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return a valid session
+    vi.mocked(getServerSession).mockResolvedValueOnce({
+      user: {
+        id: 'user-123',
+        twitchId: 'twitch-123',
+        name: 'Test User',
+        image: 'image-url',
+        isImpersonating: false,
+        role: 'USER',
+        locale: 'en-US',
+        scope: 'test-scope',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    })
+
+    // Mock prisma to return no notification
+    vi.mocked(prisma.notification.findFirst).mockResolvedValueOnce(null)
+
+    await handler(req, res)
 
     expect(res.statusCode).toBe(404)
     expect(res._getJSONData()).toEqual({ error: 'Notification not found' })
@@ -156,17 +190,49 @@ describe('overlay/gift-alert API', () => {
   it('successfully marks notification as read', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        session: JSON.stringify({
-          user: { id: 'user-123' },
-        }),
-      },
       body: {
         notificationId: 'notification-123',
       },
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return a valid session
+    vi.mocked(getServerSession).mockResolvedValueOnce({
+      user: {
+        id: 'user-123',
+        twitchId: 'twitch-123',
+        name: 'Test User',
+        image: 'image-url',
+        isImpersonating: false,
+        role: 'USER',
+        locale: 'en-US',
+        scope: 'test-scope',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    })
+
+    // Mock prisma to return a notification
+    vi.mocked(prisma.notification.findFirst).mockResolvedValueOnce({
+      id: 'notification-123',
+      userId: 'user-123',
+      type: '',
+      isRead: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      giftSubscriptionId: null,
+    })
+
+    // Mock prisma update to return success
+    vi.mocked(prisma.notification.update).mockResolvedValueOnce({
+      id: '',
+      userId: '',
+      type: '',
+      isRead: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      giftSubscriptionId: null,
+    })
+
+    await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({ success: true })
@@ -175,15 +241,30 @@ describe('overlay/gift-alert API', () => {
   it('handles server errors', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        session: JSON.stringify({
-          user: { id: 'user-123' },
-        }),
-        mockservererror: 'true',
+      query: {
+        id: 'user-123',
       },
     })
 
-    await mockHandler(req, res)
+    // Mock getServerSession to return a valid session
+    vi.mocked(getServerSession).mockResolvedValueOnce({
+      user: {
+        id: 'user-123',
+        twitchId: 'twitch-123',
+        name: 'Test User',
+        image: 'image-url',
+        isImpersonating: false,
+        role: 'USER',
+        locale: 'en-US',
+        scope: 'test-scope',
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    })
+
+    // Mock prisma to throw an error
+    vi.mocked(prisma.notification.findFirst).mockRejectedValueOnce(new Error('Database error'))
+
+    await handler(req, res)
 
     expect(res.statusCode).toBe(500)
     expect(res._getJSONData()).toEqual({ error: 'Internal server error' })
