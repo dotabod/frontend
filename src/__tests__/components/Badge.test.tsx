@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Badge } from '../Badge'
+import { Badge } from '@/components/Badge'
 
 // Mock the useTransformRes hook
 vi.mock('@/lib/hooks/useTransformRes', () => ({
@@ -11,6 +11,7 @@ vi.mock('@/lib/hooks/useTransformRes', () => ({
 vi.mock('next/image', () => ({
   default: (props: any) => {
     // Just pass all props to the img element
+    // biome-ignore lint/a11y/useAltText: <explanation>
     return <img data-testid={props['data-testid'] || 'mock-image'} {...props} />
   },
 }))

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
-import handler from '../gift-subscriptions'
+import handler from '@/pages/api/user/gift-subscriptions'
 
 // Mock prisma
 vi.mock('@/lib/db', () => ({

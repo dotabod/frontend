@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, cleanup, act } from '@testing-library/react'
-import GiftSubscriptionAlert from '../GiftSubscriptionAlert'
+import GiftSubscriptionAlert from '../../../../components/Overlay/GiftAlert/GiftSubscriptionAlert'
 
 describe('GiftSubscriptionAlert', () => {
   beforeEach(() => {
