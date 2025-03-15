@@ -129,8 +129,11 @@ export const GiftSubscriptionForm = ({
               ? result.error
               : 'Failed to create gift checkout. Please try again.'
 
-        // Check if the error is about lifetime subscription
-        if (errorText.includes('lifetime subscription')) {
+        // Check if the error is about lifetime subscription or recipient not found
+        if (
+          errorText.includes('lifetime subscription') ||
+          errorText.includes('Recipient not found')
+        ) {
           // Set error specifically on the username field
           setUsernameError(errorText)
           // Update the form field with error
