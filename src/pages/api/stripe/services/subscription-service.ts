@@ -88,9 +88,12 @@ export class SubscriptionService {
               behavior: 'keep_as_draft',
               resumes_at: resumeAt,
             },
+            proration_behavior: 'none',
             metadata: {
               ...stripeSubscription.metadata,
               giftExtendedUntil: giftExpirationDate.toISOString(),
+              resumeBillingAt: resumeAt.toString(),
+              shouldResetBillingCycle: 'true', // Flag for webhook handler
               ...metadata,
             },
           })

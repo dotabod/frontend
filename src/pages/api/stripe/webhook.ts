@@ -67,9 +67,40 @@ async function processWebhookEvent(
       await handleCustomerDeleted(event.data.object as Stripe.Customer, tx)
       break
     case 'customer.subscription.created':
-    case 'customer.subscription.updated':
-      await handleSubscriptionEvent(event.data.object as Stripe.Subscription, tx)
+    case 'customer.subscription.updated': {
+      // For subscription.updated events, we need to check if this is a subscription
+      // resuming from a paused state due to a gift expiration
+      const subscription = event.data.object as Stripe.Subscription
+
+      // Special handling for subscriptions that have resumed after a gift
+      if (
+        event.type === 'customer.subscription.updated' &&
+        subscription.status === 'active' &&
+        subscription.metadata?.shouldResetBillingCycle === 'true' &&
+        !subscription.pause_collection
+      ) {
+        console.log(`Detected subscription ${subscription.id} resuming after gift expiration`)
+
+        try {
+          // Log additional details for debugging
+          console.log(`Subscription details:
+            - ID: ${subscription.id}
+            - Status: ${subscription.status}
+            - Customer: ${subscription.customer}
+            - Current period end: ${new Date(subscription.current_period_end * 1000).toISOString()}
+            - Gift extended until: ${subscription.metadata?.giftExtendedUntil || 'N/A'}
+          `)
+
+          // The actual reset will be handled in handleSubscriptionEvent
+          console.log('Proceeding with billing cycle reset in handleSubscriptionEvent')
+        } catch (error) {
+          console.error(`Error processing gift subscription resumption: ${error}`)
+        }
+      }
+
+      await handleSubscriptionEvent(subscription, tx)
       break
+    }
     case 'customer.subscription.deleted':
       await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, tx)
       break
@@ -127,13 +158,23 @@ async function processWebhookEvent(
 
           // If we found a valid gift expiration date, update the regular subscription
           if (latestGiftExpirationDate) {
+            console.log(
+              `Pausing subscription ${regularSubscription.stripeSubscriptionId} until gift expires on ${latestGiftExpirationDate.toISOString()}`,
+            )
+
+            // Pause the subscription and ensure the billing cycle will be reset when it resumes
             await subscriptionService.pauseForGift(
               regularSubscription.stripeSubscriptionId,
               latestGiftExpirationDate,
               {
                 originalRenewalDate: regularSubscription.currentPeriodEnd?.toISOString() || '',
                 giftCheckoutSessionId: session.id,
+                shouldResetBillingCycle: 'true',
               },
+            )
+
+            console.log(
+              `Successfully paused subscription ${regularSubscription.stripeSubscriptionId}`,
             )
           }
         }
