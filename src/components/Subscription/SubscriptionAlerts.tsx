@@ -17,7 +17,7 @@ const formatDate = (date: Date | string | null, format: 'short' | 'long' = 'shor
   const dateObj = typeof date === 'string' ? new Date(date) : date
 
   return format === 'short'
-    ? dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    ? dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
     : dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
@@ -29,6 +29,8 @@ function SubscriptionTimeline({
   renewalDate,
   hasActivePlan,
   cancelAtPeriodEnd,
+  hasPostPaidGift,
+  paidPeriodEnd,
 }: {
   gracePeriodEnd: Date
   giftStartDate: Date
@@ -36,9 +38,15 @@ function SubscriptionTimeline({
   renewalDate?: Date
   hasActivePlan: boolean
   cancelAtPeriodEnd?: boolean
+  hasPostPaidGift?: boolean
+  paidPeriodEnd?: Date
 }) {
   const now = new Date()
   const showGracePeriod = now < gracePeriodEnd
+
+  // Determine if the user has a paid subscription that starts during the grace period
+  const hasPaidDuringGracePeriod =
+    hasActivePlan && paidPeriodEnd && paidPeriodEnd > now && paidPeriodEnd > gracePeriodEnd
 
   // Create timeline items based on subscription state
   const timelineItems = [
@@ -52,8 +60,8 @@ function SubscriptionTimeline({
         </div>
       ),
     },
-    // Grace period end (if applicable)
-    ...(showGracePeriod
+    // Grace period end (if applicable and user doesn't have a paid subscription during grace period)
+    ...(showGracePeriod && !hasPaidDuringGracePeriod
       ? [
           {
             color: 'orange',
@@ -66,8 +74,22 @@ function SubscriptionTimeline({
           },
         ]
       : []),
-    // Gift sub start (if different from grace period end)
-    ...(showGracePeriod
+    // Current paid period end (if applicable)
+    ...(hasActivePlan && paidPeriodEnd && paidPeriodEnd > now
+      ? [
+          {
+            color: 'green',
+            label: formatDate(paidPeriodEnd),
+            children: (
+              <div className='text-emerald-300'>
+                <span className='font-medium'>Current paid period ends</span>
+              </div>
+            ),
+          },
+        ]
+      : []),
+    // Gift sub start (if different from now)
+    ...(giftStartDate > now
       ? [
           {
             color: 'purple',
@@ -121,6 +143,40 @@ function SubscriptionTimeline({
       : []),
   ]
 
+  // Create a summary text based on the subscription state
+  let summaryText = ''
+
+  if (hasPaidDuringGracePeriod) {
+    // User has a paid subscription during grace period
+    summaryText = `Paid until ${formatDate(paidPeriodEnd)}`
+
+    if (giftStartDate > now) {
+      // Gift starts after current period
+      summaryText += ` → Gift until ${formatDate(giftEndDate)}`
+    }
+  } else if (showGracePeriod) {
+    // User is in grace period
+    summaryText = `Free until ${formatDate(gracePeriodEnd)}`
+
+    if (giftStartDate >= gracePeriodEnd) {
+      // Gift starts after grace period
+      summaryText += ` → Gift until ${formatDate(giftEndDate)}`
+    }
+  } else if (giftStartDate <= now) {
+    // Gift is active now
+    summaryText = `Gift until ${formatDate(giftEndDate)}`
+  } else {
+    // Gift starts in the future
+    summaryText = `Gift starts ${formatDate(giftStartDate)} → Gift until ${formatDate(giftEndDate)}`
+  }
+
+  // Add renewal info
+  if (hasActivePlan && renewalDate && !cancelAtPeriodEnd) {
+    summaryText += ` → Paid begins ${formatDate(renewalDate)}`
+  } else if (hasActivePlan && cancelAtPeriodEnd) {
+    summaryText += ' → Dotabod Pro ends'
+  }
+
   return (
     <div className='flex flex-col items-center'>
       <h4 className='text-sm font-medium text-indigo-200'>Subscription Timeline</h4>
@@ -128,16 +184,7 @@ function SubscriptionTimeline({
 
       {/* Summary text */}
       <div className='text-xs text-gray-300'>
-        <p>
-          {showGracePeriod
-            ? `Free until ${formatDate(gracePeriodEnd)} → Gift until ${formatDate(giftEndDate)}`
-            : `Gift until ${formatDate(giftEndDate)}`}
-          {hasActivePlan &&
-            renewalDate &&
-            !cancelAtPeriodEnd &&
-            ` → Paid begins ${formatDate(renewalDate)}`}
-          {hasActivePlan && cancelAtPeriodEnd && ' → Dotabod Pro ends'}
-        </p>
+        <p>{summaryText}</p>
       </div>
     </div>
   )
@@ -292,11 +339,21 @@ export function SubscriptionAlerts({
     if (!subscription || !subscription.metadata) return null
 
     const metadata = subscription.metadata as Record<string, unknown>
+
+    // If the subscription is paused for a gift, use the giftExtendedUntil date
     if (metadata.giftExtendedUntil) {
       // Add one day to the gift expiration date to get the renewal date
       const renewalDate = new Date(metadata.giftExtendedUntil as string)
       renewalDate.setDate(renewalDate.getDate() + 1)
       return renewalDate
+    }
+
+    // If the subscription has a post-paid gift (gift that will be applied after the current paid period)
+    // we still want to show the current period end as the renewal date
+    if (metadata.hasPostPaidGift === 'true' && metadata.giftExpirationDate) {
+      // The current period end is still the correct renewal date
+      // The gift will start after this date
+      return subscription.currentPeriodEnd
     }
 
     return subscription.currentPeriodEnd
@@ -313,14 +370,43 @@ export function SubscriptionAlerts({
   const renderTimeline = () => {
     if (!latestGiftEndDate) return null
 
+    // Check if this is a post-paid gift (gift that will be applied after the current paid period)
+    const metadata = subscription?.metadata as Record<string, unknown> | undefined
+    const hasPostPaidGift = metadata?.hasPostPaidGift === 'true'
+    const giftExpirationDate =
+      hasPostPaidGift && metadata?.giftExpirationDate
+        ? new Date(metadata.giftExpirationDate as string)
+        : new Date(latestGiftEndDate)
+
+    // Determine the correct gift start date
+    // If user has an active paid subscription, the gift should start after current period
+    // Otherwise, if in grace period, it starts after grace period
+    // Otherwise, it starts now
+    let effectiveGiftStartDate: Date
+
+    if (subscription?.currentPeriodEnd && !subscription.isGift && hasActivePlan) {
+      // If user has an active paid subscription, gift starts after current period
+      effectiveGiftStartDate = new Date(subscription.currentPeriodEnd)
+    } else if (inGracePeriod) {
+      // If in grace period and no paid subscription, gift starts after grace period
+      effectiveGiftStartDate = new Date(GRACE_PERIOD_END)
+    } else {
+      // Otherwise, gift starts now
+      effectiveGiftStartDate = new Date()
+    }
+
     return (
       <SubscriptionTimeline
         gracePeriodEnd={new Date(GRACE_PERIOD_END)}
-        giftStartDate={inGracePeriod ? new Date(GRACE_PERIOD_END) : new Date()}
-        giftEndDate={new Date(latestGiftEndDate)}
+        giftStartDate={effectiveGiftStartDate}
+        giftEndDate={giftExpirationDate}
         renewalDate={actualRenewalDate ? new Date(actualRenewalDate) : undefined}
         hasActivePlan={!isLifetimePlan && hasActivePlan}
         cancelAtPeriodEnd={subscription?.cancelAtPeriodEnd}
+        hasPostPaidGift={hasPostPaidGift}
+        paidPeriodEnd={
+          subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd) : undefined
+        }
       />
     )
   }
@@ -512,6 +598,16 @@ export function SubscriptionAlerts({
                       ? `You also have a gift subscription active until ${formattedGiftExpirationDate}`
                       : 'Your gift subscription has expired'}
                   </p>
+                  {/* Show post-paid gift info if applicable */}
+                  {subscription?.metadata &&
+                    typeof subscription.metadata === 'object' &&
+                    (subscription.metadata as Record<string, unknown>).hasPostPaidGift === 'true' &&
+                    subscription?.currentPeriodEnd && (
+                      <p className='mt-1 text-xs text-indigo-400'>
+                        Your gift subscription will be applied after your current paid period ends
+                        on {new Date(subscription.currentPeriodEnd).toLocaleDateString()}.
+                      </p>
+                    )}
                   {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
                     <p className='mt-1 text-xs text-indigo-400'>
                       From: {giftInfo.giftSubscriptions[0].senderName}
@@ -573,6 +669,16 @@ export function SubscriptionAlerts({
                       : '.'}
                   </p>
                 )}
+                {/* Show post-paid gift info if applicable */}
+                {subscription.metadata &&
+                  typeof subscription.metadata === 'object' &&
+                  (subscription.metadata as Record<string, unknown>).hasPostPaidGift === 'true' &&
+                  subscription.currentPeriodEnd && (
+                    <p className='mt-1 text-sm'>
+                      Your gift subscription will be applied after your current paid period ends on{' '}
+                      {new Date(subscription.currentPeriodEnd).toLocaleDateString()}.
+                    </p>
+                  )}
               </div>
             }
             type='info'

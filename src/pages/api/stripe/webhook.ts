@@ -158,24 +158,72 @@ async function processWebhookEvent(
 
           // If we found a valid gift expiration date, update the regular subscription
           if (latestGiftExpirationDate) {
-            console.log(
-              `Pausing subscription ${regularSubscription.stripeSubscriptionId} until gift expires on ${latestGiftExpirationDate.toISOString()}`,
-            )
-
-            // Pause the subscription and ensure the billing cycle will be reset when it resumes
-            await subscriptionService.pauseForGift(
+            // Check if the subscription is already active and not paused
+            const stripeSubscription = await stripe.subscriptions.retrieve(
               regularSubscription.stripeSubscriptionId,
-              latestGiftExpirationDate,
-              {
-                originalRenewalDate: regularSubscription.currentPeriodEnd?.toISOString() || '',
-                giftCheckoutSessionId: session.id,
-                shouldResetBillingCycle: 'true',
-              },
             )
+            const isPaused = stripeSubscription.pause_collection !== null
+            const isActive = stripeSubscription.status === 'active'
 
-            console.log(
-              `Successfully paused subscription ${regularSubscription.stripeSubscriptionId}`,
-            )
+            // Get the current period end date from Stripe
+            const currentPeriodEnd = new Date(stripeSubscription.current_period_end * 1000)
+
+            // Determine if the gift should be applied after the current paid period
+            // Only pause if the gift expiration date is after the current period end
+            // or if the subscription is already paused
+            if (isPaused || latestGiftExpirationDate > currentPeriodEnd) {
+              console.log(
+                `Pausing subscription ${regularSubscription.stripeSubscriptionId} until gift expires on ${latestGiftExpirationDate.toISOString()}`,
+              )
+
+              // Pause the subscription and ensure the billing cycle will be reset when it resumes
+              await subscriptionService.pauseForGift(
+                regularSubscription.stripeSubscriptionId,
+                latestGiftExpirationDate,
+                {
+                  originalRenewalDate: regularSubscription.currentPeriodEnd?.toISOString() || '',
+                  giftCheckoutSessionId: session.id,
+                  shouldResetBillingCycle: 'true',
+                },
+              )
+
+              console.log(
+                `Successfully paused subscription ${regularSubscription.stripeSubscriptionId}`,
+              )
+            } else {
+              // If the gift expiration is before the current period end, we don't need to pause
+              // but we should update the metadata to show the gift in the UI timeline
+              console.log(
+                `Gift expires before current period end. Updating metadata for subscription ${regularSubscription.stripeSubscriptionId}`,
+              )
+
+              // Update the subscription metadata to include the gift information
+              await stripe.subscriptions.update(regularSubscription.stripeSubscriptionId, {
+                metadata: {
+                  ...stripeSubscription.metadata,
+                  hasPostPaidGift: 'true',
+                  giftExpirationDate: latestGiftExpirationDate.toISOString(),
+                  giftCheckoutSessionId: session.id,
+                },
+              })
+
+              // Also update the database record
+              await tx.subscription.update({
+                where: { id: regularSubscription.id },
+                data: {
+                  metadata: {
+                    ...((regularSubscription.metadata as Record<string, unknown>) || {}),
+                    hasPostPaidGift: 'true',
+                    giftExpirationDate: latestGiftExpirationDate.toISOString(),
+                    giftCheckoutSessionId: session.id,
+                  },
+                },
+              })
+
+              console.log(
+                `Updated metadata for subscription ${regularSubscription.stripeSubscriptionId} to include post-paid gift information`,
+              )
+            }
           }
         }
       }
