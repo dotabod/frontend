@@ -5,7 +5,7 @@ import { processEventIdempotently } from './utils/idempotency'
 import { handleSubscriptionEvent, handleSubscriptionDeleted } from './handlers/subscription-events'
 import { handleInvoiceEvent } from './handlers/invoice-events'
 import { handleCheckoutCompleted } from './handlers/checkout-events'
-import { handleChargeSucceeded } from './handlers/charge-events'
+import { handleChargeSucceeded, handleChargeRefunded } from './handlers/charge-events'
 import { handleCustomerDeleted } from './handlers/customer-events'
 import type Stripe from 'stripe'
 import type { Prisma } from '@prisma/client'
@@ -25,6 +25,7 @@ const relevantEvents = new Set([
   'invoice.payment_failed',
   'checkout.session.completed',
   'charge.succeeded',
+  'charge.refunded',
 ])
 
 /**
@@ -141,6 +142,9 @@ async function processWebhookEvent(
     }
     case 'charge.succeeded':
       await handleChargeSucceeded(event.data.object as Stripe.Charge, tx)
+      break
+    case 'charge.refunded':
+      await handleChargeRefunded(event.data.object as Stripe.Charge, tx)
       break
   }
 }
