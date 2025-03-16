@@ -193,12 +193,12 @@ describe('gift-subscriptions API', () => {
       giftSubscriptions: [
         {
           id: 'sub-123',
-          endDate: endDate,
+          endDate: endDate.toISOString(),
           senderName: 'John Doe',
           giftType: 'monthly',
           giftQuantity: 1,
           giftMessage: '',
-          createdAt: expect.any(Date),
+          createdAt: expect.any(String),
         },
       ],
     })
@@ -310,21 +310,21 @@ describe('gift-subscriptions API', () => {
       giftSubscriptions: [
         {
           id: 'sub-123',
-          endDate: endDate1,
+          endDate: endDate1.toISOString(),
           senderName: 'John Doe',
           giftType: 'monthly',
           giftQuantity: 1,
           giftMessage: '',
-          createdAt: expect.any(Date),
+          createdAt: expect.any(String),
         },
         {
           id: 'sub-456',
-          endDate: endDate2,
+          endDate: endDate2.toISOString(),
           senderName: 'Jane Smith',
           giftType: 'monthly',
           giftQuantity: 1,
           giftMessage: '',
-          createdAt: expect.any(Date),
+          createdAt: expect.any(String),
         },
       ],
     })
