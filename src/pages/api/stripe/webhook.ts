@@ -222,20 +222,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ received: true })
   }
 
-  const result = await withTransaction(async (tx) => {
-    return processEventIdempotently(
-      event.id,
-      event.type,
-      async (tx) => {
-        await processWebhookEvent(event, tx)
-      },
-      tx,
+  try {
+    const result = await withTransaction(async (tx) => {
+      return processEventIdempotently(
+        event.id,
+        event.type,
+        async (tx) => {
+          await processWebhookEvent(event, tx)
+        },
+        tx,
+      )
+    })
+
+    if (result === null) {
+      console.error(`Webhook processing failed for event ${event.id} (${event.type})`)
+      // Return 200 to prevent Stripe from retrying, as we've already recorded the event
+      // We'll handle the failure through our own monitoring and recovery process
+      return res.status(200).json({ received: true, processed: false })
+    }
+
+    return res.status(200).json({ received: true, processed: true })
+  } catch (error) {
+    console.error(
+      `Unhandled error in webhook handler for event ${event.id} (${event.type}):`,
+      error,
     )
-  })
-
-  if (result === null) {
-    return res.status(500).json({ error: 'Webhook processing failed' })
+    // Return 200 to prevent Stripe from retrying, as this might be a persistent error
+    // We'll handle the failure through our own monitoring and recovery process
+    return res.status(200).json({ received: true, processed: false })
   }
-
-  return res.status(200).json({ received: true })
 }

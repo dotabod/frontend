@@ -17,7 +17,7 @@ export async function withTransaction<T>(
   while (retryCount < maxRetries) {
     try {
       return await prisma.$transaction(operation, {
-        timeout: 10000, // 10 seconds
+        timeout: 30000, // Increase from 10000 to 30000 (30 seconds)
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, // Ensure consistent reads
       })
     } catch (error) {

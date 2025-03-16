@@ -103,31 +103,8 @@ export async function handleSubscriptionEvent(
  */
 async function resetBillingCycle(subscriptionId: string): Promise<boolean> {
   try {
-    // Get the current subscription
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-
-    // Calculate the new billing period end date based on the subscription's billing interval
-    const now = Math.floor(Date.now() / 1000)
-    let newPeriodEnd = now
-
-    // Get the billing interval from the first price (assuming there's only one)
-    const interval = subscription.items.data[0]?.price.recurring?.interval
-    const intervalCount = subscription.items.data[0]?.price.recurring?.interval_count || 1
-
-    // Calculate the new period end based on the interval
-    if (interval === 'day') {
-      newPeriodEnd = now + 86400 * intervalCount // 86400 seconds in a day
-    } else if (interval === 'week') {
-      newPeriodEnd = now + 604800 * intervalCount // 604800 seconds in a week
-    } else if (interval === 'month') {
-      // Approximate 30 days for a month
-      newPeriodEnd = now + 2592000 * intervalCount // 2592000 seconds in 30 days
-    } else if (interval === 'year') {
-      // Approximate 365 days for a year
-      newPeriodEnd = now + 31536000 * intervalCount // 31536000 seconds in a year
-    }
-
     // Update the subscription with a new billing cycle anchor
+    // This is a lightweight operation that just sets the billing cycle anchor to now
     await stripe.subscriptions.update(subscriptionId, {
       billing_cycle_anchor: 'now',
       proration_behavior: 'none',
