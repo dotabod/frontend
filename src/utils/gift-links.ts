@@ -15,12 +15,3 @@ export function createGiftLink(username: string): string {
 
   return `/${formattedUsername}/gift`
 }
-
-/**
- * Checks if a path is a gift page
- * @param path The current path
- * @returns True if the path is a gift page
- */
-export function isGiftPage(path: string): boolean {
-  return path === '/gift' || /^\/[^\/]+\/gift$/.test(path)
-}

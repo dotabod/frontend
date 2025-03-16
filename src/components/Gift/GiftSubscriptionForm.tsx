@@ -17,7 +17,7 @@ const profanityMatcher = new RegExpMatcher({
 })
 
 // Define the form values type
-export interface GiftFormValues {
+interface GiftFormValues {
   recipientUsername: string
   giftSenderName?: string
   giftMessage?: string

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import type { GiftInfo, SubscriptionWithGiftDetails } from './types'
 
-export function SubscriptionStatusComponent() {
+function SubscriptionStatusComponent() {
   const {
     subscription: rawSubscription,
     inGracePeriod,

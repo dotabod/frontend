@@ -1,6 +1,6 @@
 import type { GiftCheckoutRequest } from '@/pages/api/stripe/create-gift-checkout'
 
-export type GiftCheckoutParams = GiftCheckoutRequest
+type GiftCheckoutParams = GiftCheckoutRequest
 
 /**
  * Creates a checkout session for gifting a subscription
