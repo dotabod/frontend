@@ -66,3 +66,5 @@ export PropertyMap extends Record<string, string> {}
 - Optimize Web Vitals (LCP, CLS, FID).
 - Follow best practices for Data Fetching, Rendering, and Routing.
 - Don't be lazy, write all the code to implement features I ask for.
+
+use `doppler run -- bun run <script path here>` to execute scripts

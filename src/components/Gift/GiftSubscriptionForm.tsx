@@ -1,7 +1,6 @@
 import { plans } from '@/components/Billing/BillingPlans'
-import { PeriodToggle } from '@/components/Billing/PeriodToggle'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
-import { getPriceId, SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
 import { Alert, App, Button, Form, Input, Space, Typography, InputNumber, Tooltip } from 'antd'
 import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
@@ -39,12 +38,13 @@ export const GiftSubscriptionForm = ({
 }: GiftSubscriptionFormProps) => {
   const { message } = App.useApp()
   const [form] = Form.useForm<GiftFormValues>()
-  const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [quantity, setQuantity] = useState<number>(1)
   const [formError, setFormError] = useState<string | null>(null)
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const selectedTier = SUBSCRIPTION_TIERS.PRO
+  // Always use monthly for gift credits
+  const activePeriod: PricePeriod = 'monthly'
 
   // Function to check for profanity in text
   const checkForProfanity = (text: string | undefined): boolean => {
@@ -53,14 +53,6 @@ export const GiftSubscriptionForm = ({
   }
 
   // Function to sanitize input (as an extra precaution)
-
-  // Reset quantity to 1 when selecting lifetime
-  useEffect(() => {
-    if (activePeriod === 'lifetime' && quantity > 1) {
-      setQuantity(1)
-      form.setFieldsValue({ quantity: 1 })
-    }
-  }, [activePeriod, quantity, form])
 
   // Set the recipient username from props
   useEffect(() => {
@@ -109,7 +101,7 @@ export const GiftSubscriptionForm = ({
         return
       }
 
-      const priceId = getPriceId(selectedTier as typeof SUBSCRIPTION_TIERS.PRO, activePeriod)
+      const priceId = process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID as string
 
       const result = await createGiftCheckoutSession({
         recipientUsername: values.recipientUsername,
@@ -175,11 +167,6 @@ export const GiftSubscriptionForm = ({
   const calculateTotalPrice = () => {
     const basePrice = plans.find((p) => p.tier === selectedTier)?.price[activePeriod] || '$0'
 
-    // For lifetime, quantity is always 1
-    if (activePeriod === 'lifetime') {
-      return basePrice
-    }
-
     // Extract the numeric value from the price string (e.g., "$5" -> 5)
     const numericPrice = Number.parseFloat(basePrice.replace(/[^0-9.]/g, ''))
     const total = numericPrice * quantity
@@ -217,46 +204,28 @@ export const GiftSubscriptionForm = ({
           {recipientUsername ? (
             <>
               Support <Link href={`/${recipientUsername}`}>{displayName}</Link> by gifting them
-              Dotabod Pro! They'll get access to all Pro features.
+              Dotabod Pro Credits! They'll get access to all Pro features.
             </>
           ) : (
-            "Support your favorite streamer by gifting them Dotabod Pro! They'll get access to all Pro features."
+            "Support your favorite streamer by gifting them Dotabod Pro Credits! They'll get access to all Pro features."
           )}
         </Paragraph>
 
         <div className='mb-8 gap-6 flex flex-col'>
-          <div>
-            <PeriodToggle
-              activePeriod={activePeriod}
-              onChange={setActivePeriod}
-              subscription={null}
-            />
-          </div>
-
           <div className='bg-purple-800 p-4 rounded-md'>
             <div className='flex items-center mb-2'>
               <GiftIcon className='h-5 w-5 mr-2 text-blue-500' />
               <Text strong>You're gifting:</Text>
             </div>
-            <Text>
-              {activePeriod === 'lifetime'
-                ? 'Lifetime'
-                : quantity > 1
-                  ? `${quantity} ${activePeriod === 'annual' ? 'Years' : 'Months'}`
-                  : activePeriod === 'annual'
-                    ? '1 Year'
-                    : '1 Month'}{' '}
-              of Dotabod Pro
-            </Text>
+            <Text>{quantity > 1 ? `${quantity} Months` : '1 Month'} of Dotabod Pro Credits</Text>
             <div className='mt-2'>
               <Text strong>Price: </Text>
               <Text>{calculateTotalPrice()}</Text>
             </div>
-            {quantity > 1 && activePeriod !== 'lifetime' && (
+            {quantity > 1 && (
               <div className='mt-2'>
                 <Text type='secondary'>
-                  The recipient will receive a single subscription that lasts for {quantity}{' '}
-                  {activePeriod === 'annual' ? 'years' : 'months'}.
+                  The recipient will receive credits equivalent to {quantity} months of Dotabod Pro.
                 </Text>
               </div>
             )}
@@ -276,28 +245,26 @@ export const GiftSubscriptionForm = ({
             recipientUsername: recipientUsername || '',
           }}
         >
-          {activePeriod !== 'lifetime' && (
-            <Form.Item
-              name='quantity'
-              label='Duration'
-              tooltip='How long the subscription will last'
-            >
-              <div className='flex items-center'>
-                <InputNumber
-                  min={1}
-                  max={100}
-                  value={quantity}
-                  onChange={(value) => {
-                    const newQuantity = Number(value) || 1
-                    setQuantity(newQuantity)
-                    form.setFieldsValue({ quantity: newQuantity })
-                  }}
-                  style={{ width: 100 }}
-                />
-                <Text className='ml-2'>{activePeriod === 'monthly' ? 'months' : 'years'}</Text>
-              </div>
-            </Form.Item>
-          )}
+          <Form.Item
+            name='quantity'
+            label='Duration'
+            tooltip='How many months the credits will last'
+          >
+            <div className='flex items-center'>
+              <InputNumber
+                min={1}
+                max={100}
+                value={quantity}
+                onChange={(value) => {
+                  const newQuantity = Number(value) || 1
+                  setQuantity(newQuantity)
+                  form.setFieldsValue({ quantity: newQuantity })
+                }}
+                style={{ width: 100 }}
+              />
+              <Text className='ml-2'>months</Text>
+            </div>
+          </Form.Item>
 
           <Form.Item
             name='recipientUsername'
@@ -399,15 +366,13 @@ export const GiftSubscriptionForm = ({
         </Form>
 
         <div className='bg-gray-800/80 p-2 rounded text-center text-xs'>
-          {activePeriod !== 'lifetime' && (
-            <div>
-              This is a one-time payment. The subscription will not auto-renew, and you will not be
-              charged again.
-            </div>
-          )}
           <div>
-            If the recipient already has an active subscription, this gift will extend their
-            existing subscription.
+            This is a one-time payment. The credits will not auto-renew, and you will not be charged
+            again.
+          </div>
+          <div>
+            If the recipient already has an active subscription, these credits will be added to
+            their account.
           </div>
           <div className='mt-1 pt-1 border-t border-gray-700'>
             Note: Messages containing inappropriate language will be automatically rejected by our
@@ -417,7 +382,7 @@ export const GiftSubscriptionForm = ({
       </Card>
 
       <Card>
-        <Title level={4}>Why Gift Dotabod Pro?</Title>
+        <Title level={4}>Why Gift Dotabod Pro Credits?</Title>
         <Space direction='vertical' size='middle'>
           <div>
             <Text strong>Support Your Favorite Streamer</Text>
@@ -426,24 +391,23 @@ export const GiftSubscriptionForm = ({
             </Paragraph>
           </div>
           <div>
-            <Text strong>Premium Features</Text>
+            <Text strong>Flexible Usage</Text>
             <Paragraph>
-              Give them access to all Pro features including advanced stats, custom overlays, and
-              more.
+              Gift credits that can be applied to any Dotabod Pro subscription or usage-based
+              features.
             </Paragraph>
           </div>
           <div>
             <Text strong>No Recurring Charges</Text>
             <Paragraph>
-              You pay once for the duration you choose. The gift subscription will not auto-renew
-              and you will not be charged again.
+              You pay once for the credits you choose. The recipient can use them at their own pace.
             </Paragraph>
           </div>
           <div>
-            <Text strong>Stackable Gifts</Text>
+            <Text strong>Stackable Credits</Text>
             <Paragraph>
-              Multiple gifts extend the recipient's subscription duration. If they already have a
-              subscription, your gift will add to their existing time.
+              Multiple gifts add to the recipient's credit balance. Credits can be used for any
+              Dotabod Pro features.
             </Paragraph>
           </div>
         </Space>

@@ -1,6 +1,6 @@
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
-import { GRACE_PERIOD_END, getSubscriptionTier } from '@/utils/subscription'
+import { getSubscriptionTier } from '@/utils/subscription'
 import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
@@ -241,244 +241,193 @@ async function handleCheckoutCompleted(
     // Get the initial quantity from metadata
     let giftQuantity = Number.parseInt(session.metadata.giftQuantity || '1', 10)
 
-    // For non-lifetime subscriptions, get the actual quantity from the line items
+    // For gift credits, get the actual quantity from the line items
     // in case the customer adjusted it during checkout
-    if (giftType !== 'lifetime' && session.mode === 'subscription') {
-      try {
-        // Retrieve the line items to get the final quantity
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 })
-        if (lineItems.data.length > 0) {
-          const actualQuantity = lineItems.data[0].quantity || 1
-          if (actualQuantity !== giftQuantity) {
-            console.log(`Customer adjusted quantity from ${giftQuantity} to ${actualQuantity}`)
-            giftQuantity = actualQuantity
-          }
+    try {
+      // Retrieve the line items to get the final quantity
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 })
+      if (lineItems.data.length > 0) {
+        const actualQuantity = lineItems.data[0].quantity || 1
+        if (actualQuantity !== giftQuantity) {
+          console.log(`Customer adjusted quantity from ${giftQuantity} to ${actualQuantity}`)
+          giftQuantity = actualQuantity
         }
-      } catch (error) {
-        console.error('Error retrieving line items:', error)
-        // Continue with the quantity from metadata as fallback
       }
+    } catch (error) {
+      console.error('Error retrieving line items:', error)
+      // Continue with the quantity from metadata as fallback
     }
 
-    if (session.mode === 'subscription' && session.subscription) {
-      // Retrieve the subscription from Stripe
-      let subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+    // Get the payment amount from the checkout session
+    const paymentAmount = session.amount_total || 0
+    const currency = session.currency || 'usd'
 
-      // For gift subscriptions, we need to create the subscription record with the recipient's userId
-      const status = statusMap[subscription.status as Stripe.Subscription.Status]
-      if (!status) return
+    // Find the recipient user
+    const recipientUser = await tx.user.findUnique({
+      where: { id: recipientUserId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        locale: true,
+        proExpiration: true,
+      },
+    })
 
-      const priceId = subscription.items.data[0].price.id
+    if (!recipientUser) {
+      console.error(`Recipient user not found: ${recipientUserId}`)
+      return
+    }
 
-      // For gift subscriptions, ensure they don't auto-renew by canceling at period end
-      // and setting the cancel_at date based on the gift quantity
-      if (session.metadata?.noAutoRenew === 'true') {
-        // Check if the recipient already has active subscriptions
-        const existingSubscriptions = await tx.subscription.findMany({
-          where: {
-            userId: recipientUserId,
-            status: 'ACTIVE',
-          },
-          orderBy: {
-            currentPeriodEnd: 'desc', // Get the subscription with the furthest end date first
-          },
-        })
+    // Ensure the recipient has a Stripe customer ID
+    const recipientCustomerId = await ensureCustomer(recipientUser, tx)
 
-        // Calculate the appropriate end date
-        let endDate: Date
-        const giftQuantity = Number.parseInt(session.metadata.giftQuantity || '1', 10)
-        const giftType = session.metadata.giftDuration || 'monthly'
+    // Find existing subscription for the recipient
+    const existingSubscription = await tx.subscription.findFirst({
+      where: {
+        userId: recipientUserId,
+        status: { in: ['ACTIVE', 'TRIALING'] },
+      },
+      orderBy: {
+        currentPeriodEnd: 'desc',
+      },
+    })
 
-        // Get the current period end from Stripe
-        const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
+    // Calculate the new expiration date based on gift type and quantity
+    // If there's an existing subscription, extend it
+    let currentPeriodEnd: Date
 
-        // Find the furthest end date from all active subscriptions (including trials)
-        const furthestEndDate =
-          existingSubscriptions.length > 0
-            ? existingSubscriptions.reduce((latest, sub) => {
-                return sub.currentPeriodEnd && sub.currentPeriodEnd > latest
-                  ? sub.currentPeriodEnd
-                  : latest
-              }, new Date(0))
-            : null
+    if (giftType === 'lifetime') {
+      // For lifetime gifts, set a far future date
+      currentPeriodEnd = new Date('2099-12-31T23:59:59.999Z')
+    } else {
+      // For other gift types, calculate based on existing subscription or proExpiration
+      const now = new Date()
 
-        // Determine the base date to start calculating from
-        // Consider grace period, existing subscriptions, and current period end
-        let baseDate: Date
+      // Check if we're in the grace period
+      const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
 
-        // First check if grace period end is later than current period end
-        if (GRACE_PERIOD_END > currentPeriodEnd) {
-          baseDate = new Date(GRACE_PERIOD_END)
-        } else {
-          baseDate = new Date(currentPeriodEnd)
-        }
+      // Determine the starting point for the gift duration
+      // If in grace period, start from the grace period end to avoid overlap
+      let startDate: Date
 
-        // Then check if there's an existing subscription with an even later end date
-        if (furthestEndDate && furthestEndDate > baseDate) {
-          baseDate = new Date(furthestEndDate)
-        }
-
-        // Calculate the end date based on the gift quantity and the base date
-        endDate = calculateGiftEndDate(giftType, giftQuantity, baseDate)
-
-        // Update the Stripe subscription to cancel at the calculated date
-        const cancelAtTimestamp = Math.floor(endDate.getTime() / 1000)
-        await stripe.subscriptions.update(subscription.id, {
-          cancel_at: cancelAtTimestamp,
-          metadata: {
-            ...subscription.metadata,
-            recipientUserId, // Add recipient user ID to the subscription metadata
-          },
-        })
-
-        // Retrieve the updated subscription
-        subscription = await stripe.subscriptions.retrieve(subscription.id)
-      }
-
-      // Calculate the end date based on Stripe's data
-      // This ensures we're using Stripe's calculation which handles proration correctly
-      const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
-
-      // If cancel_at is set, use that as the end date instead
-      const endDate = subscription.cancel_at
-        ? new Date(subscription.cancel_at * 1000)
-        : currentPeriodEnd
-
-      // Create the subscription with isGift flag and assign it to the recipient
-      const createdSubscription = await tx.subscription.upsert({
-        where: {
-          stripeSubscriptionId: subscription.id,
-        },
-        create: {
-          stripeSubscriptionId: subscription.id,
-          stripeCustomerId: subscription.customer as string,
-          status: status as SubscriptionStatus,
-          tier: getSubscriptionTier(priceId, status),
-          stripePriceId: priceId,
-          userId: recipientUserId, // Assign to recipient
-          transactionType: TransactionType.RECURRING,
-          currentPeriodEnd: endDate,
-          // Set cancelAtPeriodEnd based on whether cancel_at is set
-          cancelAtPeriodEnd: true, // Always set to true for gift subscriptions
-          isGift: true,
-        },
-        update: {
-          status: status as SubscriptionStatus,
-          tier: getSubscriptionTier(priceId, status),
-          stripePriceId: priceId,
-          stripeCustomerId: subscription.customer as string,
-          userId: recipientUserId, // Ensure it's assigned to recipient
-          transactionType: TransactionType.RECURRING,
-          currentPeriodEnd: endDate,
-          // Set cancelAtPeriodEnd based on whether cancel_at is set
-          cancelAtPeriodEnd: true, // Always set to true for gift subscriptions
-          isGift: true,
-        },
-      })
-
-      // Create the gift subscription details
-      const giftSubscription = await tx.giftSubscription.create({
-        data: {
-          subscriptionId: createdSubscription.id,
-          senderName: giftSenderName,
-          giftMessage: giftMessage,
-          giftType: giftType,
-          giftQuantity: giftQuantity,
-        },
-      })
-
-      // Create a notification for the recipient
-      await tx.notification.create({
-        data: {
-          userId: recipientUserId,
-          type: 'GIFT_SUBSCRIPTION',
-          giftSubscriptionId: giftSubscription.id,
-        },
-      })
-    } else if (session.mode === 'payment') {
-      // For payment mode (both lifetime and non-lifetime gift subscriptions)
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
-      const priceId = lineItems.data[0]?.price?.id ?? null
-
-      // Determine if this is a lifetime subscription or a regular gift subscription
-      const isLifetime = giftType === 'lifetime'
-
-      // Check if the recipient already has active subscriptions
-      const existingSubscriptions = await tx.subscription.findMany({
-        where: {
-          userId: recipientUserId,
-          status: 'ACTIVE',
-        },
-        orderBy: {
-          currentPeriodEnd: 'desc', // Get the subscription with the furthest end date first
-        },
-      })
-
-      // Calculate the appropriate start and end dates
-      let startDate = new Date()
-      let endDate: Date
-
-      if (isLifetime) {
-        // For lifetime subscriptions, use a far future date
-        endDate = new Date('2099-12-31')
+      if (isInGracePeriod()) {
+        // Start from the grace period end
+        startDate = new Date(GRACE_PERIOD_END)
       } else {
-        // For regular gift subscriptions, calculate based on the furthest existing subscription end date
-        const furthestEndDate =
-          existingSubscriptions.length > 0 ? existingSubscriptions[0].currentPeriodEnd : null
-
-        // If there's an existing subscription, extend from that date
-        if (furthestEndDate && furthestEndDate > startDate) {
-          startDate = new Date(furthestEndDate)
-        }
-
-        // Calculate the end date based on the start date
-        endDate = new Date(startDate)
-        if (giftType === 'monthly') {
-          endDate.setMonth(endDate.getMonth() + giftQuantity)
-        } else if (giftType === 'annual') {
-          endDate.setFullYear(endDate.getFullYear() + giftQuantity)
-        }
+        // Start from the later of now or existing expiration
+        const existingExpiration =
+          recipientUser.proExpiration || existingSubscription?.currentPeriodEnd || null
+        startDate =
+          existingExpiration && existingExpiration > now ? new Date(existingExpiration) : now
       }
 
-      // Create the subscription with gift details
-      const createdSubscription = await tx.subscription.create({
+      // Import the aggregateGiftDuration function from the gift-subscription module
+      const { aggregateGiftDuration } = await import('@/lib/gift-subscription')
+
+      // Calculate the new expiration date
+      currentPeriodEnd = aggregateGiftDuration(giftType, giftQuantity, null, startDate)
+    }
+
+    // Create or update the subscription record
+    let subscription: { id: string }
+
+    if (existingSubscription) {
+      // Update the existing subscription
+      subscription = await tx.subscription.update({
+        where: { id: existingSubscription.id },
+        data: {
+          currentPeriodEnd,
+          // Only update status if it's not already active
+          status:
+            existingSubscription.status !== SubscriptionStatus.ACTIVE
+              ? SubscriptionStatus.ACTIVE
+              : existingSubscription.status,
+          tier:
+            existingSubscription.status !== SubscriptionStatus.ACTIVE
+              ? getSubscriptionTier(null, SubscriptionStatus.ACTIVE)
+              : existingSubscription.tier,
+          // Add metadata about the gift
+          metadata: {
+            ...((existingSubscription.metadata as Record<string, unknown>) || {}),
+            lastGiftAt: new Date().toISOString(),
+            lastGiftType: giftType,
+            lastGiftQuantity: giftQuantity.toString(),
+          },
+        },
+      })
+    } else {
+      // Create a new subscription
+      subscription = await tx.subscription.create({
         data: {
           userId: recipientUserId,
           status: SubscriptionStatus.ACTIVE,
-          tier: getSubscriptionTier(priceId, SubscriptionStatus.ACTIVE),
-          stripePriceId: priceId || '',
-          stripeCustomerId: session.customer as string,
-          // Set the transaction type based on whether it's lifetime or not
-          transactionType: isLifetime ? TransactionType.LIFETIME : TransactionType.RECURRING,
-          // Use the calculated end date
-          currentPeriodEnd: endDate,
-          // All gift subscriptions don't auto-renew
+          tier: getSubscriptionTier(null, SubscriptionStatus.ACTIVE),
+          stripePriceId: session.metadata.priceId || '',
+          stripeCustomerId: recipientCustomerId,
+          transactionType:
+            giftType === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
+          currentPeriodEnd,
           cancelAtPeriodEnd: true,
           stripeSubscriptionId: null,
           isGift: true,
-        },
-      })
-
-      // Create the gift subscription details
-      const giftSubscription = await tx.giftSubscription.create({
-        data: {
-          subscriptionId: createdSubscription.id,
-          senderName: giftSenderName,
-          giftMessage: giftMessage,
-          giftType: giftType,
-          giftQuantity: giftQuantity,
-        },
-      })
-
-      // Create a notification for the recipient
-      await tx.notification.create({
-        data: {
-          userId: recipientUserId,
-          type: 'GIFT_SUBSCRIPTION',
-          giftSubscriptionId: giftSubscription.id,
+          metadata: {
+            giftType,
+            giftQuantity: giftQuantity.toString(),
+            createdAt: new Date().toISOString(),
+          },
         },
       })
     }
+
+    // Create the gift subscription details
+    const giftSubscription = await tx.giftSubscription.create({
+      data: {
+        subscriptionId: subscription.id,
+        senderName: giftSenderName,
+        giftMessage: giftMessage,
+        giftType: giftType,
+        giftQuantity: giftQuantity,
+      },
+    })
+
+    // Create a notification for the recipient
+    await tx.notification.create({
+      data: {
+        userId: recipientUserId,
+        type: 'GIFT_SUBSCRIPTION',
+        giftSubscriptionId: giftSubscription.id,
+      },
+    })
+
+    // Create a gift transaction for auditing
+    const giftTransaction = await tx.giftTransaction.create({
+      data: {
+        giftSubscriptionId: giftSubscription.id,
+        recipientId: recipientUserId,
+        gifterId: session.metadata.gifterId || null,
+        giftType,
+        giftQuantity,
+        amount: paymentAmount || 0,
+        currency: session.currency || 'usd',
+        stripeSessionId: session.id,
+        metadata: {
+          giftSenderName,
+          giftMessage,
+          giftSenderEmail: session.metadata.giftSenderEmail || '',
+          checkoutSessionId: session.id,
+        },
+      },
+    })
+
+    // Update the user's proExpiration field to match the subscription's currentPeriodEnd
+    await tx.user.update({
+      where: { id: recipientUserId },
+      data: {
+        proExpiration: currentPeriodEnd,
+      },
+    })
 
     return
   }
@@ -545,49 +494,89 @@ async function createLifetimePurchase(
   })
 }
 
-// Helper function to calculate the end date for gift subscriptions
-function calculateGiftEndDate(
-  giftType: string,
-  quantity: number,
-  startDate: Date = new Date(),
-): Date {
-  const endDate = new Date(startDate)
-
-  if (giftType === 'monthly') {
-    // Add quantity months to the start date
-    endDate.setMonth(endDate.getMonth() + quantity)
-  } else if (giftType === 'annual') {
-    // Add quantity years to the start date
-    endDate.setFullYear(endDate.getFullYear() + quantity)
-  }
-
-  // Ensure we're not losing days due to month length differences
-  // For example, Jan 31 + 1 month would become Feb 28/29, which is not a full month
-  // This ensures we always get the same day of the month when possible
-  const originalDay = startDate.getDate()
-  const endDay = endDate.getDate()
-
-  if (endDay < originalDay) {
-    // If the end day is less than the original day, it means we lost days
-    // Try to set it back to the original day if the month allows
-    const endMonth = endDate.getMonth()
-    const lastDayOfMonth = new Date(endDate.getFullYear(), endMonth + 1, 0).getDate()
-
-    if (originalDay <= lastDayOfMonth) {
-      endDate.setDate(originalDay)
-    } else {
-      // If original day exceeds the last day of the end month, set to last day
-      endDate.setDate(lastDayOfMonth)
-    }
-  }
-
-  return endDate
-}
-
 async function getRawBody(req: NextApiRequest): Promise<string> {
   const chunks: Uint8Array[] = []
   for await (const chunk of req) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
   }
   return Buffer.concat(chunks).toString()
+}
+
+// Helper function to ensure a customer exists for a user
+async function ensureCustomer(
+  user: {
+    id: string
+    email?: string | null
+    name?: string | null
+    image?: string | null
+    locale?: string | null
+  },
+  tx: Prisma.TransactionClient,
+): Promise<string> {
+  // Look for any existing subscription to get a customer ID
+  const subscription = await tx.subscription.findFirst({
+    where: { userId: user.id },
+    select: { stripeCustomerId: true },
+    orderBy: { createdAt: 'desc' }, // Use the most recent subscription
+  })
+
+  let customerId = subscription?.stripeCustomerId
+
+  // Verify existing customer
+  if (customerId) {
+    try {
+      await stripe.customers.retrieve(customerId)
+    } catch (error) {
+      console.error('Invalid customer ID found:', error)
+      customerId = null
+    }
+  }
+
+  // Create or find customer if needed
+  if (!customerId && user.email) {
+    const existingCustomers = await stripe.customers.list({
+      email: user.email,
+      limit: 1,
+    })
+
+    if (existingCustomers.data.length > 0) {
+      customerId = existingCustomers.data[0].id
+    } else {
+      const newCustomer = await createStripeCustomer(user)
+      customerId = newCustomer.id
+    }
+
+    if (!subscription?.stripeCustomerId) {
+      // Update existing subscriptions with no customer ID
+      await tx.subscription.updateMany({
+        where: { userId: user.id, stripeCustomerId: null },
+        data: { stripeCustomerId: customerId },
+      })
+    }
+  }
+
+  if (!customerId) {
+    throw new Error('Unable to establish customer ID')
+  }
+
+  return customerId
+}
+
+async function createStripeCustomer(user: {
+  id: string
+  email?: string | null
+  name?: string | null
+  image?: string | null
+  locale?: string | null
+}) {
+  return stripe.customers.create({
+    email: user.email ?? undefined,
+    metadata: {
+      userId: user.id,
+      email: user.email ?? '',
+      name: user.name ?? '',
+      image: user.image ?? '',
+      locale: user.locale ?? '',
+    },
+  })
 }

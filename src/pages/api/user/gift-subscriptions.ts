@@ -1,5 +1,4 @@
 import prisma from '@/lib/db'
-import { formatDate } from '@/utils/formatDate'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -10,64 +9,75 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Get the user's session
+    // Get the current user session
     const session = await getServerSession(req, res, authOptions)
-
     if (!session?.user?.id) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
     const userId = session.user.id
 
-    // Find all active gift subscriptions for this user
+    // Find all active gift subscriptions for the user
     const giftSubscriptions = await prisma.subscription.findMany({
       where: {
         userId,
         isGift: true,
         status: 'ACTIVE',
       },
-      orderBy: {
-        currentPeriodEnd: 'desc', // Order by end date descending
-      },
       include: {
-        giftDetails: true, // Include gift details if needed
+        giftDetails: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     })
 
+    // Check if the user has any active gift subscriptions
+    const hasGifts = giftSubscriptions.length > 0
+
+    // Calculate total gift count
     const giftCount = giftSubscriptions.length
 
-    if (giftCount === 0) {
-      return res.status(200).json({
-        hasGifts: false,
-        giftCount: 0,
-        giftMessage: '',
-      })
-    }
+    // Check if any subscription is a lifetime gift
+    const hasLifetime = giftSubscriptions.some(
+      (sub) => sub.giftDetails?.giftType === 'lifetime' || sub.transactionType === 'LIFETIME',
+    )
 
-    // Create a message about the gifts
+    // Get the user's pro expiration date
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { proExpiration: true },
+    })
+
+    // Format gift subscriptions for the response
+    const formattedGifts = giftSubscriptions.map((sub) => ({
+      id: sub.id,
+      endDate: sub.currentPeriodEnd,
+      senderName: sub.giftDetails?.senderName || 'Anonymous',
+      giftType: sub.giftDetails?.giftType || 'monthly',
+      giftQuantity: sub.giftDetails?.giftQuantity || 1,
+      giftMessage: sub.giftDetails?.giftMessage || '',
+      createdAt: sub.createdAt,
+    }))
+
+    // Create a message based on the gift status
     let giftMessage = ''
-    if (giftCount === 1) {
-      const endDate = giftSubscriptions[0].currentPeriodEnd
-        ? formatDate(giftSubscriptions[0].currentPeriodEnd)
-        : 'unknown date'
-      giftMessage = `You have received a gift subscription that extends your access until ${endDate}. This gift will not auto-renew.`
-    } else {
-      // Find the furthest end date
-      const furthestEndDate = giftSubscriptions[0].currentPeriodEnd
-        ? formatDate(giftSubscriptions[0].currentPeriodEnd)
-        : 'unknown date'
-      giftMessage = `You have received ${giftCount} gift subscriptions that extend your access until ${furthestEndDate}. These gifts will not auto-renew.`
+    if (hasLifetime) {
+      giftMessage = 'You have a lifetime subscription!'
+    } else if (hasGifts && user?.proExpiration) {
+      const expirationDate = new Date(user.proExpiration)
+      giftMessage = `Your Pro subscription is active until ${expirationDate.toLocaleDateString()}`
+    } else if (hasGifts) {
+      giftMessage = 'You have active gift subscriptions!'
     }
 
     return res.status(200).json({
-      hasGifts: true,
+      hasGifts,
       giftCount,
+      hasLifetime,
       giftMessage,
-      giftSubscriptions: giftSubscriptions.map((sub) => ({
-        id: sub.id,
-        endDate: sub.currentPeriodEnd,
-        senderName: sub.giftDetails?.senderName || 'Anonymous',
-      })),
+      proExpiration: user?.proExpiration || null,
+      giftSubscriptions: formattedGifts,
     })
   } catch (error) {
     console.error('Error fetching gift subscriptions:', error)

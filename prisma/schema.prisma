@@ -33,7 +33,6 @@ model Account {
   @@map("accounts")
 }
 
-/// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
 model User {
   id                                String              @id @default(dbgenerated("gen_random_uuid()"))
   displayName                       String?             @unique(map: "users_name_key")
@@ -53,6 +52,7 @@ model User {
   locale                            String              @default("en")
   kick                              BigInt?             @unique
   youtube                           String?             @unique
+  proExpiration                     DateTime?           @map("pro_expiration") // NEW FIELD: Tracks streamer pro access expiration
   MessageDelivery                   MessageDelivery[]
   scheduledMessages                 ScheduledMessage[]
   Account                           Account?
@@ -172,7 +172,6 @@ model streams {
   users             User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model discord_accounts {
   id                BigInt   @default(autoincrement())
   created_at        DateTime @default(now()) @db.Timestamptz(6)
@@ -209,6 +208,7 @@ model Subscription {
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @default(now()) @map("updated_at")
   isGift               Boolean             @default(false)
+  metadata             Json? // Additional gift metadata if needed
   giftDetails          GiftSubscription?
   user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -220,19 +220,42 @@ model Subscription {
 }
 
 model GiftSubscription {
-  id             String        @id @default(dbgenerated("gen_random_uuid()"))
-  subscriptionId String        @unique
-  senderName     String        @default("Anonymous")
+  id             String           @id @default(dbgenerated("gen_random_uuid()"))
+  subscriptionId String           @unique
+  senderName     String           @default("Anonymous")
   giftMessage    String?
-  giftType       String        @default("monthly")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @default(now()) @map("updated_at")
-  giftQuantity   Int           @default(1)
-  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  giftType       String           @default("monthly")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @default(now()) @map("updated_at")
+  giftQuantity   Int              @default(1)
+  gifterId       String?          // Added field to store the gifter's user ID
+  subscription   Subscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   notification   Notification?
+  transactions   GiftTransaction[]
 
   @@index([subscriptionId])
   @@map("gift_subscriptions")
+}
+
+model GiftTransaction {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()"))
+  giftSubscriptionId String
+  recipientId        String
+  gifterId           String?
+  giftType           String
+  giftQuantity       Int
+  amount             Int
+  currency           String          @default("usd")
+  stripeSessionId    String?
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @default(now()) @map("updated_at")
+  metadata           Json?
+  giftSubscription   GiftSubscription @relation(fields: [giftSubscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([giftSubscriptionId])
+  @@index([recipientId])
+  @@index([gifterId])
+  @@map("gift_transactions")
 }
 
 model Notification {
