@@ -74,7 +74,8 @@ const BillingPage = () => {
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
     subscription?.isGift,
-    giftInfo.proExpiration,
+    // Only pass proExpiration if there are actual gift subscriptions
+    giftInfo.hasGifts ? giftInfo.proExpiration : null,
   )
 
   // Get gift subscription info if applicable
@@ -84,7 +85,8 @@ const BillingPage = () => {
       // Convert null to undefined for transactionType
       transactionType: subscription?.transactionType || undefined,
     },
-    giftInfo.proExpiration,
+    // Only pass proExpiration if there are actual gift subscriptions
+    giftInfo.hasGifts ? giftInfo.proExpiration : null,
     subscription?.giftDetails,
   )
 

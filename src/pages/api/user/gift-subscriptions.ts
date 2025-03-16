@@ -71,12 +71,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       giftMessage = 'You have active gift subscriptions!'
     }
 
+    // Only include proExpiration if there are actual gift subscriptions
+    // or if the proExpiration is specifically from a gift
+    const proExpiration = hasGifts ? user?.proExpiration : null
+
     return res.status(200).json({
       hasGifts,
       giftCount,
       hasLifetime,
       giftMessage,
-      proExpiration: user?.proExpiration || null,
+      proExpiration,
       giftSubscriptions: formattedGifts,
     })
   } catch (error) {

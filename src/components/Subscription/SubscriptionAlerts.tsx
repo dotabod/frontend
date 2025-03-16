@@ -41,12 +41,22 @@ export function SubscriptionAlerts({
 
   // Determine if gift subscription will start after grace period
   const isGiftAfterGracePeriod = () => {
-    if (!giftInfo.proExpiration || !inGracePeriod) return false
+    // Only check if there are actual gift subscriptions
+    if (!giftInfo.hasGifts || !giftInfo.proExpiration || !inGracePeriod) return false
 
     // Check if the gift expiration is after the grace period
     const gracePeriodEndDate = new Date(GRACE_PERIOD_END)
     return new Date(giftInfo.proExpiration) > gracePeriodEndDate
   }
+
+  // Check if the user has an active gift subscription
+  const hasActiveGiftSubscription =
+    giftInfo.hasGifts && giftInfo.proExpiration && new Date(giftInfo.proExpiration) > new Date()
+
+  // Get formatted expiration date for gift subscription
+  const formattedGiftExpirationDate = giftInfo.proExpiration
+    ? new Date(giftInfo.proExpiration).toLocaleDateString()
+    : ''
 
   // Format time since gift was received
   const formatGiftTime = (date: Date) => {
@@ -62,8 +72,17 @@ export function SubscriptionAlerts({
       subscription?.currentPeriodEnd &&
       new Date(subscription.currentPeriodEnd).getTime() === new Date(GRACE_PERIOD_END).getTime())
 
+  // Determine if we should show the grace period alert
+  // Only show if not a lifetime plan, in grace period, not a virtual grace period subscription,
+  // and not showing the gift subscription alert that already mentions the grace period
+  const shouldShowGracePeriodAlert =
+    !isLifetimePlan &&
+    inGracePeriod &&
+    !isVirtualGracePeriodSubscription &&
+    !hasActiveGiftSubscription
+
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4 gap-4 flex flex-col'>
       {/* Manage subscription button */}
       {showManageButton && (
         <Button
@@ -119,7 +138,7 @@ export function SubscriptionAlerts({
           type='success'
           showIcon={false}
         />
-      ) : giftInfo.proExpiration && new Date(giftInfo.proExpiration) > new Date() ? (
+      ) : hasActiveGiftSubscription ? (
         /* If user has an active gift subscription via proExpiration */
         <Alert
           className='max-w-2xl rounded-lg border-2 border-indigo-800 bg-indigo-950/60 shadow-sm'
@@ -133,14 +152,13 @@ export function SubscriptionAlerts({
             <div className='mt-1 text-indigo-300'>
               <p>
                 {isGiftAfterGracePeriod()
-                  ? `Your gift subscription will activate after the free period ends (${gracePeriodPrettyDate})${giftInfo.proExpiration ? ` and will be active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}` : ''}`
-                  : `Your gift subscription is active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}`}
+                  ? `Your gift subscription will activate after the free period ends (${gracePeriodPrettyDate})${giftInfo.proExpiration ? ` and will be active until ${formattedGiftExpirationDate}` : ''}`
+                  : `Your gift subscription is active until ${formattedGiftExpirationDate}`}
               </p>
               {/* Add information about when they'll be charged */}
               {!isLifetimePlan && !hasActivePlan && (
                 <p className='mt-1 text-sm font-medium'>
-                  You will be charged for a subscription starting{' '}
-                  {new Date(giftInfo.proExpiration).toLocaleDateString()}
+                  You will be charged for a subscription starting {formattedGiftExpirationDate}
                   unless you cancel before then.
                 </p>
               )}
@@ -151,6 +169,13 @@ export function SubscriptionAlerts({
                   subscription
                   {subscription.cancelAtPeriodEnd ? ' ends' : ' renews'} on{' '}
                   {new Date(subscription.currentPeriodEnd).toLocaleDateString()}.
+                </p>
+              )}
+              {/* If in grace period, mention it here instead of showing a separate alert */}
+              {inGracePeriod && (
+                <p className='mt-2 text-sm'>
+                  <span className='font-medium'>Note:</span> All users currently have free Pro
+                  access until {gracePeriodPrettyDate}.
                 </p>
               )}
               {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
@@ -213,6 +238,13 @@ export function SubscriptionAlerts({
               {giftSubInfo?.giftMessage && (
                 <p className='mt-1 italic text-sm text-indigo-400'>"{giftSubInfo.giftMessage}"</p>
               )}
+              {/* If in grace period, mention it here instead of showing a separate alert */}
+              {inGracePeriod && (
+                <p className='mt-2 text-sm'>
+                  <span className='font-medium'>Note:</span> All users currently have free Pro
+                  access until {gracePeriodPrettyDate}.
+                </p>
+              )}
             </div>
           }
           type={statusInfo?.type || 'info'}
@@ -236,14 +268,13 @@ export function SubscriptionAlerts({
                   <p className='mt-1'>
                     Your gift subscription will automatically activate after this period ends
                     {giftInfo.proExpiration
-                      ? ` and will be active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}`
+                      ? ` and will be active until ${formattedGiftExpirationDate}`
                       : ''}
                     .
                   </p>
                   {!hasActivePlan && giftInfo.proExpiration && (
                     <p className='mt-1 font-medium'>
-                      After your gift expires on{' '}
-                      {new Date(giftInfo.proExpiration).toLocaleDateString()}, you will be charged
+                      After your gift expires on {formattedGiftExpirationDate}, you will be charged
                       for a subscription unless you cancel before then.
                     </p>
                   )}
@@ -284,8 +315,8 @@ export function SubscriptionAlerts({
                     <span className='font-medium'>Gift subscription active</span>
                   </p>
                   <p className='mt-1 text-sm'>
-                    {new Date() < new Date(giftInfo.proExpiration)
-                      ? `You also have a gift subscription active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}`
+                    {giftInfo.proExpiration && new Date(giftInfo.proExpiration) > new Date()
+                      ? `You also have a gift subscription active until ${formattedGiftExpirationDate}`
                       : 'Your gift subscription has expired'}
                   </p>
                   {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
@@ -297,6 +328,14 @@ export function SubscriptionAlerts({
                   )}
                 </div>
               )}
+
+              {/* If in grace period, mention it here instead of showing a separate alert */}
+              {inGracePeriod && (
+                <p className='mt-2 text-sm'>
+                  <span className='font-medium'>Note:</span> All users currently have free Pro
+                  access until {gracePeriodPrettyDate}.
+                </p>
+              )}
             </div>
           }
           type={statusInfo.type}
@@ -304,8 +343,9 @@ export function SubscriptionAlerts({
         />
       ) : null}
 
-      {/* Only show grace period alert if not a lifetime plan, in grace period, and not a virtual grace period subscription */}
-      {!isLifetimePlan && inGracePeriod && !isVirtualGracePeriodSubscription && (
+      {/* Only show grace period alert if not a lifetime plan, in grace period, not a virtual grace period subscription,
+          and not showing the gift subscription alert that already mentions the grace period */}
+      {shouldShowGracePeriodAlert && (
         <Alert
           className='max-w-2xl rounded-lg border-2 border-amber-800 bg-amber-950/60 shadow-sm'
           message={
@@ -324,14 +364,13 @@ export function SubscriptionAlerts({
                   <p className='mt-1'>
                     Your gift subscription will automatically activate after this period ends
                     {giftInfo.proExpiration
-                      ? ` and will be active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}`
+                      ? ` and will be active until ${formattedGiftExpirationDate}`
                       : ''}
                     .
                   </p>
                   {!hasActivePlan && giftInfo.proExpiration && (
                     <p className='mt-1 font-medium'>
-                      After your gift expires on{' '}
-                      {new Date(giftInfo.proExpiration).toLocaleDateString()}, you will be charged
+                      After your gift expires on {formattedGiftExpirationDate}, you will be charged
                       for a subscription unless you cancel before then.
                     </p>
                   )}
@@ -369,30 +408,34 @@ export function SubscriptionAlerts({
         />
       )}
 
-      {/* Show special alert for users with both subscription types */}
-      {hasBothSubscriptionTypes && subscription && !giftInfo.proExpiration && (
-        <Alert
-          message='You Have Multiple Subscriptions'
-          description={
-            <div>
-              <p>You have both a regular subscription and gift subscription(s).</p>
-              {giftInfo.proExpiration && subscription.currentPeriodEnd && (
-                <p>
-                  Your gift subscription{giftInfo.giftCount > 1 ? 's' : ''} will extend your Pro
-                  access
-                  {subscription.cancelAtPeriodEnd
-                    ? ` after your current subscription ends on ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}.`
-                    : '.'}
-                </p>
-              )}
-            </div>
-          }
-          type='info'
-          showIcon
-          icon={<GiftIcon className='text-indigo-400' />}
-          className='border-2 border-indigo-800 bg-indigo-950/60 text-indigo-300'
-        />
-      )}
+      {/* Show special alert for users with both subscription types, but only if we're not already showing
+          detailed information about both in the main alerts */}
+      {hasBothSubscriptionTypes &&
+        subscription &&
+        !giftInfo.proExpiration &&
+        !(statusInfo?.message && giftInfo.hasGifts) && (
+          <Alert
+            message='You Have Multiple Subscriptions'
+            description={
+              <div>
+                <p>You have both a regular subscription and gift subscription(s).</p>
+                {giftInfo.proExpiration && subscription.currentPeriodEnd && (
+                  <p>
+                    Your gift subscription{giftInfo.giftCount > 1 ? 's' : ''} will extend your Pro
+                    access
+                    {subscription.cancelAtPeriodEnd
+                      ? ` after your current subscription ends on ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}.`
+                      : '.'}
+                  </p>
+                )}
+              </div>
+            }
+            type='info'
+            showIcon
+            icon={<GiftIcon className='text-indigo-400' />}
+            className='border-2 border-indigo-800 bg-indigo-950/60 text-indigo-300'
+          />
+        )}
 
       {/* Warning alert for subscription ending soon */}
       {statusInfo?.type === 'warning' &&
