@@ -158,11 +158,6 @@ function Plan({
       return 'Upgrade to lifetime'
     }
 
-    // Show "Manage trial" if user is in trial status, regardless of gift subscription
-    if (hasTrial && isTrialing) {
-      return 'Manage trial'
-    }
-
     if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
       if (isProTier && isLifetimePeriod) {
         return 'Get lifetime access'
