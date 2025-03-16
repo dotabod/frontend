@@ -269,6 +269,43 @@ async function handleSubscriptionEvent(
     },
   })
 
+  // Check if the user has a gift subscription that extends beyond this subscription
+  const hasGiftExtendingBeyondSubscription =
+    user?.proExpiration &&
+    new Date(user.proExpiration) > currentPeriodEnd &&
+    // Make sure the proExpiration isn't from this subscription itself
+    Math.abs(new Date(user.proExpiration).getTime() - currentPeriodEnd.getTime()) > 1000 * 60 * 60 // More than 1 hour difference
+
+  // If the user has a gift subscription that extends beyond this subscription,
+  // pause billing until after the gift expires
+  if (
+    hasGiftExtendingBeyondSubscription &&
+    (status === 'ACTIVE' || status === 'TRIALING') &&
+    subscription.id &&
+    user?.proExpiration // Ensure proExpiration exists
+  ) {
+    try {
+      // Pause the subscription billing until after the gift expires
+      await stripe.subscriptions.update(subscription.id, {
+        pause_collection: {
+          behavior: 'keep_as_draft',
+          resumes_at: Math.floor(new Date(user.proExpiration).getTime() / 1000),
+        },
+        metadata: {
+          ...subscription.metadata,
+          giftExtendedUntil: new Date(user.proExpiration).toISOString(),
+          originalRenewalDate: currentPeriodEnd.toISOString(),
+        },
+      })
+
+      console.log(
+        `Paused billing for subscription ${subscription.id} until gift expires on ${new Date(user.proExpiration).toISOString()}`,
+      )
+    } catch (error) {
+      console.error('Failed to pause subscription billing after gift detection:', error)
+    }
+  }
+
   // Only update proExpiration if:
   // 1. The subscription is active or trialing
   // 2. The user doesn't have a gift subscription that extends beyond this subscription
@@ -378,14 +415,50 @@ async function handleInvoiceEvent(invoice: Stripe.Invoice, tx: Prisma.Transactio
       },
     })
 
+    // Get the user to check for gift subscriptions
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: { proExpiration: true },
+    })
+
+    // Check if the user has a gift subscription that extends beyond this subscription
+    const hasGiftExtendingBeyondSubscription =
+      user?.proExpiration &&
+      new Date(user.proExpiration) > currentPeriodEnd &&
+      // Make sure the proExpiration isn't from this subscription itself
+      Math.abs(new Date(user.proExpiration).getTime() - currentPeriodEnd.getTime()) > 1000 * 60 * 60 // More than 1 hour difference
+
+    // If this is a payment attempt for a subscription that should be paused due to a gift,
+    // void the invoice and ensure the subscription is paused
+    if (hasGiftExtendingBeyondSubscription && invoice.status === 'open' && user?.proExpiration) {
+      try {
+        // Void the invoice to prevent charging the user
+        await stripe.invoices.voidInvoice(invoice.id)
+        console.log(`Voided invoice ${invoice.id} for user ${userId} with active gift subscription`)
+
+        // Ensure the subscription is paused until after the gift expires
+        await stripe.subscriptions.update(subscription.id, {
+          pause_collection: {
+            behavior: 'keep_as_draft',
+            resumes_at: Math.floor(new Date(user.proExpiration).getTime() / 1000),
+          },
+          metadata: {
+            ...subscription.metadata,
+            giftExtendedUntil: new Date(user.proExpiration).toISOString(),
+            invoiceVoided: 'true',
+          },
+        })
+
+        console.log(
+          `Ensured subscription ${subscription.id} is paused until gift expires on ${new Date(user.proExpiration).toISOString()}`,
+        )
+      } catch (error) {
+        console.error('Failed to void invoice or pause subscription:', error)
+      }
+    }
+
     // For successful payments, update the user's proExpiration if needed
     if (invoice.status === 'paid' && (status === 'ACTIVE' || status === 'TRIALING')) {
-      // Get the user to check for gift subscriptions
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-        select: { proExpiration: true },
-      })
-
       // Only update if the new end date is later than the current proExpiration
       if (!user?.proExpiration || currentPeriodEnd > new Date(user.proExpiration)) {
         await tx.user.update({
@@ -656,6 +729,41 @@ async function handleCheckoutCompleted(
           console.log(
             `Updated regular subscription ${regularSubscription.id} to resume after gift expires on ${currentPeriodEnd.toISOString()}`,
           )
+        } else {
+          // Even if the gift doesn't extend beyond the current period, we should still pause billing
+          // until after the grace period if we're in the grace period
+          const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
+
+          if (isInGracePeriod() && currentPeriodEnd > new Date(GRACE_PERIOD_END)) {
+            // Update the subscription in Stripe to pause billing until after the gift expires
+            await stripe.subscriptions.update(regularSubscription.stripeSubscriptionId, {
+              pause_collection: {
+                behavior: 'keep_as_draft',
+                resumes_at: Math.floor(currentPeriodEnd.getTime() / 1000),
+              },
+              metadata: {
+                ...stripeSubscription.metadata,
+                giftExtendedUntil: currentPeriodEnd.toISOString(),
+                pausedDuringGracePeriod: 'true',
+              },
+            })
+
+            // Update the subscription in the database
+            await tx.subscription.update({
+              where: { id: regularSubscription.id },
+              data: {
+                metadata: {
+                  ...((regularSubscription.metadata as Record<string, unknown>) || {}),
+                  giftExtendedUntil: currentPeriodEnd.toISOString(),
+                  pausedDuringGracePeriod: 'true',
+                },
+              },
+            })
+
+            console.log(
+              `Paused regular subscription ${regularSubscription.id} during grace period until gift expires on ${currentPeriodEnd.toISOString()}`,
+            )
+          }
         }
       } catch (error) {
         console.error('Failed to update regular subscription after gift:', error)

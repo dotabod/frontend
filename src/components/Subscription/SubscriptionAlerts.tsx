@@ -86,6 +86,12 @@ export function SubscriptionAlerts({
     !isVirtualGracePeriodSubscription &&
     !hasActiveGiftSubscription
 
+  // Check if gift subscription covers the period immediately after grace period
+  const giftCoversPostGracePeriod =
+    hasActiveGiftSubscription &&
+    giftInfo.proExpiration &&
+    new Date(giftInfo.proExpiration) > new Date(GRACE_PERIOD_END)
+
   return (
     <div className='space-y-4 gap-4 flex flex-col'>
       {/* Manage subscription button */}
@@ -180,8 +186,10 @@ export function SubscriptionAlerts({
               {inGracePeriod && (
                 <p className='mt-2 text-sm'>
                   <span className='font-medium'>Note:</span> All users currently have free Pro
-                  access until {gracePeriodPrettyDate}. Your paid subscription will begin on{' '}
-                  {gracePeriodEndNextDay}.
+                  access until {gracePeriodPrettyDate}.
+                  {giftCoversPostGracePeriod
+                    ? ` Your gift subscription will activate on ${gracePeriodEndNextDay} - you will not be charged until after your gift expires.`
+                    : ` Your paid subscription will begin on ${gracePeriodEndNextDay}.`}
                 </p>
               )}
               {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
@@ -340,8 +348,10 @@ export function SubscriptionAlerts({
               {inGracePeriod && (
                 <p className='mt-2 text-sm'>
                   <span className='font-medium'>Note:</span> All users currently have free Pro
-                  access until {gracePeriodPrettyDate}. Your paid subscription will begin on{' '}
-                  {gracePeriodEndNextDay}.
+                  access until {gracePeriodPrettyDate}.
+                  {giftCoversPostGracePeriod
+                    ? ` Your gift subscription will activate on ${gracePeriodEndNextDay} - you will not be charged until after your gift expires.`
+                    : ` Your paid subscription will begin on ${gracePeriodEndNextDay}.`}
                 </p>
               )}
             </div>

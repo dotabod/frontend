@@ -463,12 +463,18 @@ export function getSubscriptionStatusInfo(
     const giftExtendsSubscription =
       currentPeriodEnd && new Date(proExpiration) > new Date(currentPeriodEnd)
 
+    // Check if we're in grace period and gift extends beyond it
+    const isGiftAfterGracePeriod =
+      isInGracePeriod() && new Date(proExpiration) > new Date(GRACE_PERIOD_END)
+
     return {
-      message: cancelAtPeriodEnd
-        ? isEndingSoon
-          ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} with gift extension`
-          : `Subscription ends on ${endDate} with gift extension`
-        : `Renews on ${endDate} with gift backup`,
+      message: isGiftAfterGracePeriod
+        ? `Renews on ${endDate} (gift active first)`
+        : cancelAtPeriodEnd
+          ? isEndingSoon
+            ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} with gift extension`
+            : `Subscription ends on ${endDate} with gift extension`
+          : `Renews on ${endDate} with gift backup`,
       type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
       badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
     }
@@ -671,12 +677,18 @@ export function getGiftSubscriptionInfo(
       subscription.currentPeriodEnd &&
       new Date(proExpiration) > new Date(subscription.currentPeriodEnd)
 
+    // Check if we're in grace period and gift extends beyond it
+    const isGiftAfterGracePeriod =
+      isInGracePeriod() && new Date(proExpiration) > new Date(GRACE_PERIOD_END)
+
     return {
       message: isLifetime
         ? 'You have both a regular subscription and a lifetime gift subscription.'
-        : giftExtendsSubscription
-          ? `You have a gift subscription that will extend your access after your current subscription ${subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}.`
-          : 'You have both a regular subscription and a gift subscription.',
+        : isGiftAfterGracePeriod
+          ? `You have a gift subscription that will activate on ${gracePeriodEndNextDay}. Your paid subscription will not be charged until after your gift expires on ${formatDate(proExpiration)}.`
+          : giftExtendsSubscription
+            ? `You have a gift subscription that will extend your access after your current subscription ${subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}.`
+            : 'You have both a regular subscription and a gift subscription.',
       isGift: false, // Not primarily a gift subscription
       senderName: giftDetails?.senderName || 'Anonymous',
       giftType: giftDetails?.giftType || (isLifetime ? 'lifetime' : 'monthly'),
