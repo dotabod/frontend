@@ -1,5 +1,10 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { isSubscriptionActive, gracePeriodPrettyDate, GRACE_PERIOD_END } from '@/utils/subscription'
+import {
+  isSubscriptionActive,
+  gracePeriodPrettyDate,
+  gracePeriodEndNextDay,
+  GRACE_PERIOD_END,
+} from '@/utils/subscription'
 import { Button, Alert } from 'antd'
 import { ExternalLinkIcon, GiftIcon, CalendarIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -152,7 +157,7 @@ export function SubscriptionAlerts({
             <div className='mt-1 text-indigo-300'>
               <p>
                 {isGiftAfterGracePeriod()
-                  ? `Your gift subscription will activate after the free period ends (${gracePeriodPrettyDate})${giftInfo.proExpiration ? ` and will be active until ${formattedGiftExpirationDate}` : ''}`
+                  ? `Your gift subscription will activate on ${gracePeriodEndNextDay}${giftInfo.proExpiration ? ` and will be active until ${formattedGiftExpirationDate}` : ''}`
                   : `Your gift subscription is active until ${formattedGiftExpirationDate}`}
               </p>
               {/* Add information about when they'll be charged */}
@@ -175,7 +180,8 @@ export function SubscriptionAlerts({
               {inGracePeriod && (
                 <p className='mt-2 text-sm'>
                   <span className='font-medium'>Note:</span> All users currently have free Pro
-                  access until {gracePeriodPrettyDate}.
+                  access until {gracePeriodPrettyDate}. Your paid subscription will begin on{' '}
+                  {gracePeriodEndNextDay}.
                 </p>
               )}
               {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
@@ -242,7 +248,8 @@ export function SubscriptionAlerts({
               {inGracePeriod && (
                 <p className='mt-2 text-sm'>
                   <span className='font-medium'>Note:</span> All users currently have free Pro
-                  access until {gracePeriodPrettyDate}.
+                  access until {gracePeriodPrettyDate}. Your paid subscription will begin on{' '}
+                  {gracePeriodEndNextDay}.
                 </p>
               )}
             </div>
@@ -266,7 +273,7 @@ export function SubscriptionAlerts({
               {isGiftAfterGracePeriod() && (
                 <div>
                   <p className='mt-1'>
-                    Your gift subscription will automatically activate after this period ends
+                    Your gift subscription will automatically activate on {gracePeriodEndNextDay}
                     {giftInfo.proExpiration
                       ? ` and will be active until ${formattedGiftExpirationDate}`
                       : ''}
@@ -333,7 +340,8 @@ export function SubscriptionAlerts({
               {inGracePeriod && (
                 <p className='mt-2 text-sm'>
                   <span className='font-medium'>Note:</span> All users currently have free Pro
-                  access until {gracePeriodPrettyDate}.
+                  access until {gracePeriodPrettyDate}. Your paid subscription will begin on{' '}
+                  {gracePeriodEndNextDay}.
                 </p>
               )}
             </div>
@@ -358,11 +366,11 @@ export function SubscriptionAlerts({
             <div className='mt-1 text-amber-300'>
               {hasActivePlan
                 ? `All users have free Pro access until ${gracePeriodPrettyDate}, but you're already subscribed. Thank you for your support!`
-                : `All users have free Pro access until ${gracePeriodPrettyDate}.`}
+                : `All users have free Pro access until ${gracePeriodPrettyDate}. Regular subscriptions will begin on ${gracePeriodEndNextDay}.`}
               {isGiftAfterGracePeriod() && (
                 <div>
                   <p className='mt-1'>
-                    Your gift subscription will automatically activate after this period ends
+                    Your gift subscription will automatically activate on {gracePeriodEndNextDay}
                     {giftInfo.proExpiration
                       ? ` and will be active until ${formattedGiftExpirationDate}`
                       : ''}

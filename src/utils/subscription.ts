@@ -398,7 +398,20 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
   return Math.round(((monthly - annual) / monthly) * 100)
 }
 
+// Add a function to check if we're in the grace period
+export function isInGracePeriod(): boolean {
+  return new Date() < GRACE_PERIOD_END
+}
+
+// Format the grace period date in a consistent way with other dates
 export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
+
+// Get the day after grace period ends (for consistent messaging with subscription dates)
+export const gracePeriodEndNextDay = (() => {
+  const nextDay = new Date(GRACE_PERIOD_END)
+  nextDay.setDate(nextDay.getDate() + 1)
+  return formatDate(nextDay)
+})()
 
 // Update the getSubscriptionStatusInfo function
 export function getSubscriptionStatusInfo(
@@ -612,11 +625,6 @@ export function getSubscriptionTier(
   return SUBSCRIPTION_TIERS.FREE
 }
 
-// Add a function to check if we're in the grace period
-export function isInGracePeriod(): boolean {
-  return new Date() < GRACE_PERIOD_END
-}
-
 // Update the hasPaidSubscription check to include proExpiration
 export function hasPaidPlan(
   subscription: Partial<SubscriptionRow> | null,
@@ -681,11 +689,15 @@ export function getGiftSubscriptionInfo(
   // Check proExpiration for gift subscriptions
   if (proExpiration && new Date(proExpiration) > new Date()) {
     const isLifetime = new Date(proExpiration).getFullYear() > 2090
+    const isAfterGracePeriod =
+      isInGracePeriod() && new Date(proExpiration) > new Date(GRACE_PERIOD_END)
 
     return {
       message: isLifetime
         ? 'You have received a lifetime gift subscription. Enjoy all premium features forever!'
-        : `You have received a gift subscription that extends your access until ${formatDate(proExpiration)}. This gift will not auto-renew.`,
+        : isAfterGracePeriod
+          ? `You have received a gift subscription that will activate on ${gracePeriodEndNextDay} and extend your access until ${formatDate(proExpiration)}. This gift will not auto-renew.`
+          : `You have received a gift subscription that extends your access until ${formatDate(proExpiration)}. This gift will not auto-renew.`,
       isGift: true,
       senderName: giftDetails?.senderName || 'Anonymous',
       giftType: giftDetails?.giftType || (isLifetime ? 'lifetime' : 'monthly'),
