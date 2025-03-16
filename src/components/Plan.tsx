@@ -21,7 +21,7 @@ import { Bitcoin, CheckIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import { Logomark } from './Logo'
 
@@ -134,7 +134,6 @@ function Plan({
     const isProTier = tier === SUBSCRIPTION_TIERS.PRO
     const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
     const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
-    const isActive = subscription?.status === SubscriptionStatus.ACTIVE
 
     // If user has a lifetime subscription
     if (isLifetimePlan && isCurrentPlan) {
@@ -159,11 +158,12 @@ function Plan({
       return 'Upgrade to lifetime'
     }
 
-    if (hasTrial && isTrialing && !hasActivePlan) {
+    // Show "Manage trial" if user is in trial status, regardless of gift subscription
+    if (hasTrial && isTrialing) {
       return 'Manage trial'
     }
 
-    if (!subscription || !isActive) {
+    if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
       if (isProTier && isLifetimePeriod) {
         return 'Get lifetime access'
       }
@@ -190,7 +190,7 @@ function Plan({
     return false
   }
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = useCallback(async () => {
     setRedirectingToCheckout(true)
     try {
       if (!session) {
@@ -289,7 +289,7 @@ function Plan({
     } finally {
       setRedirectingToCheckout(false)
     }
-  }
+  }, [session, tier, activePeriod, subscription, isLifetimePlan, modal])
 
   // Function to handle crypto interest vote
   const handleCryptoInterest = async () => {
@@ -349,7 +349,7 @@ function Plan({
       // Trigger subscription process
       handleSubscribe()
     }
-  }, [router.query, session, tier, activePeriod, redirectingToCheckout])
+  }, [router, session, tier, activePeriod, redirectingToCheckout, handleSubscribe, message])
 
   return (
     <section

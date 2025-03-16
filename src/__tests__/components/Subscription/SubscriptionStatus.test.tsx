@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import React from 'react'
-import { SubscriptionStatus } from '../SubscriptionStatus'
+import { SubscriptionStatus } from '@/components/Subscription/SubscriptionStatus'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { useSession } from 'next-auth/react'
 import { fetchGiftSubscriptions } from '@/lib/gift-subscription'

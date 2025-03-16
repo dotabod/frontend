@@ -143,11 +143,83 @@ async function processWebhookEvent(event: Stripe.Event, tx: Prisma.TransactionCl
   }
 }
 async function handleCustomerDeleted(customer: Stripe.Customer, tx: Prisma.TransactionClient) {
-  await tx.subscription.deleteMany({
+  const userId = customer.metadata?.userId
+  if (!userId) return
+
+  // Get the user to check for gift subscriptions
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: { proExpiration: true },
+  })
+
+  // Get all active subscriptions for this user
+  const subscriptions = await tx.subscription.findMany({
     where: {
-      OR: [{ userId: customer.metadata?.userId }, { stripeCustomerId: customer.id }],
+      userId,
+      status: { in: ['ACTIVE', 'TRIALING'] },
     },
   })
+
+  // Delete subscriptions associated with this customer
+  await tx.subscription.deleteMany({
+    where: {
+      OR: [{ userId }, { stripeCustomerId: customer.id }],
+    },
+  })
+
+  // Check if there are any remaining active subscriptions (e.g., gift subscriptions)
+  // that aren't associated with this customer
+  const remainingSubscriptions = await tx.subscription.findMany({
+    where: {
+      userId,
+      status: { in: ['ACTIVE', 'TRIALING'] },
+      stripeCustomerId: { not: customer.id },
+    },
+  })
+
+  // If there are no remaining subscriptions and the proExpiration is likely from this customer,
+  // clear the proExpiration
+  if (remainingSubscriptions.length === 0 && user?.proExpiration) {
+    // Check if the proExpiration matches any of the deleted subscriptions
+    const matchesDeletedSubscription = subscriptions.some(
+      (sub) =>
+        sub.currentPeriodEnd &&
+        Math.abs(
+          new Date(sub.currentPeriodEnd).getTime() - new Date(user.proExpiration as Date).getTime(),
+        ) <
+          1000 * 60 * 60, // Within 1 hour
+    )
+
+    if (matchesDeletedSubscription) {
+      await tx.user.update({
+        where: { id: userId },
+        data: { proExpiration: null },
+      })
+      console.log(`Cleared proExpiration for user ${userId} after customer deletion`)
+    }
+  } else if (remainingSubscriptions.length > 0) {
+    // Find the subscription with the furthest end date
+    const latestSubscription = remainingSubscriptions.reduce((latest, current) => {
+      if (!latest.currentPeriodEnd) return current
+      if (!current.currentPeriodEnd) return latest
+      return current.currentPeriodEnd > latest.currentPeriodEnd ? current : latest
+    })
+
+    // Update proExpiration to the latest subscription end date if it's later than the current proExpiration
+    if (
+      latestSubscription.currentPeriodEnd &&
+      (!user?.proExpiration ||
+        new Date(latestSubscription.currentPeriodEnd) > new Date(user.proExpiration))
+    ) {
+      await tx.user.update({
+        where: { id: userId },
+        data: { proExpiration: latestSubscription.currentPeriodEnd },
+      })
+      console.log(
+        `Updated user ${userId} proExpiration to ${latestSubscription.currentPeriodEnd.toISOString()} after customer deletion`,
+      )
+    }
+  }
 }
 
 async function handleSubscriptionEvent(
@@ -162,7 +234,15 @@ async function handleSubscriptionEvent(
   if (!status) return
 
   const priceId = subscription.items.data[0].price.id
+  const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
 
+  // Get the user to check for gift subscriptions
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: { proExpiration: true },
+  })
+
+  // Update the subscription record
   await tx.subscription.upsert({
     where: {
       stripeSubscriptionId: subscription.id,
@@ -175,7 +255,7 @@ async function handleSubscriptionEvent(
       stripePriceId: priceId,
       userId,
       transactionType: TransactionType.RECURRING,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
     update: {
@@ -184,10 +264,25 @@ async function handleSubscriptionEvent(
       stripePriceId: priceId,
       stripeCustomerId: subscription.customer as string,
       transactionType: TransactionType.RECURRING,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
   })
+
+  // Only update proExpiration if:
+  // 1. The subscription is active or trialing
+  // 2. The user doesn't have a gift subscription that extends beyond this subscription
+  // 3. The user doesn't have a proExpiration that extends beyond this subscription
+  if (
+    (status === 'ACTIVE' || status === 'TRIALING') &&
+    (!user?.proExpiration || new Date(currentPeriodEnd) > new Date(user.proExpiration))
+  ) {
+    await tx.user.update({
+      where: { id: userId },
+      data: { proExpiration: currentPeriodEnd },
+    })
+    console.log(`Updated user ${userId} proExpiration to ${currentPeriodEnd.toISOString()}`)
+  }
 }
 
 async function handleSubscriptionDeleted(
@@ -206,22 +301,102 @@ async function handleSubscriptionDeleted(
       cancelAtPeriodEnd: true,
     },
   })
+
+  // Check if the user has any other active subscriptions or gift subscriptions
+  const otherActiveSubscriptions = await tx.subscription.findMany({
+    where: {
+      userId,
+      status: { in: ['ACTIVE', 'TRIALING'] },
+      stripeSubscriptionId: { not: subscription.id },
+    },
+  })
+
+  // Get the user to check for gift subscriptions
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: { proExpiration: true },
+  })
+
+  // If no other active subscriptions and the proExpiration matches this subscription's end date,
+  // update proExpiration to null or to the next active subscription's end date
+  if (otherActiveSubscriptions.length === 0) {
+    // If the user has a gift subscription (proExpiration), keep it unless it matches this subscription's end date
+    const subscriptionEndDate = new Date(subscription.current_period_end * 1000)
+    if (
+      !user?.proExpiration ||
+      Math.abs(new Date(user.proExpiration).getTime() - subscriptionEndDate.getTime()) <
+        1000 * 60 * 60 // Within 1 hour
+    ) {
+      // No other active subscriptions or gifts, set proExpiration to null
+      await tx.user.update({
+        where: { id: userId },
+        data: { proExpiration: null },
+      })
+      console.log(`Cleared proExpiration for user ${userId} after subscription cancellation`)
+    }
+  } else {
+    // Find the subscription with the furthest end date
+    const latestSubscription = otherActiveSubscriptions.reduce((latest, current) => {
+      if (!latest.currentPeriodEnd) return current
+      if (!current.currentPeriodEnd) return latest
+      return current.currentPeriodEnd > latest.currentPeriodEnd ? current : latest
+    })
+
+    // Update proExpiration to the latest subscription end date if it's later than the current proExpiration
+    if (
+      latestSubscription.currentPeriodEnd &&
+      (!user?.proExpiration ||
+        new Date(latestSubscription.currentPeriodEnd) > new Date(user.proExpiration))
+    ) {
+      await tx.user.update({
+        where: { id: userId },
+        data: { proExpiration: latestSubscription.currentPeriodEnd },
+      })
+      console.log(
+        `Updated user ${userId} proExpiration to ${latestSubscription.currentPeriodEnd.toISOString()} after subscription cancellation`,
+      )
+    }
+  }
 }
 
 async function handleInvoiceEvent(invoice: Stripe.Invoice, tx: Prisma.TransactionClient) {
   if (invoice.subscription) {
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string)
+    const customer = await stripe.customers.retrieve(subscription.customer as string)
+    const userId = (customer as Stripe.Customer).metadata?.userId
+    if (!userId) return
 
     const status = statusMap[subscription.status] || null
+    const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
 
     await tx.subscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
       data: {
         status,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        currentPeriodEnd,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       },
     })
+
+    // For successful payments, update the user's proExpiration if needed
+    if (invoice.status === 'paid' && (status === 'ACTIVE' || status === 'TRIALING')) {
+      // Get the user to check for gift subscriptions
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { proExpiration: true },
+      })
+
+      // Only update if the new end date is later than the current proExpiration
+      if (!user?.proExpiration || currentPeriodEnd > new Date(user.proExpiration)) {
+        await tx.user.update({
+          where: { id: userId },
+          data: { proExpiration: currentPeriodEnd },
+        })
+        console.log(
+          `Updated user ${userId} proExpiration to ${currentPeriodEnd.toISOString()} after invoice payment`,
+        )
+      }
+    }
   }
 }
 
@@ -428,6 +603,64 @@ async function handleCheckoutCompleted(
         proExpiration: currentPeriodEnd,
       },
     })
+
+    // If the user has an active regular subscription (not a gift), adjust its renewal date
+    // to start after the gift subscription expires
+    const regularSubscription = await tx.subscription.findFirst({
+      where: {
+        userId: recipientUserId,
+        status: { in: ['ACTIVE', 'TRIALING'] },
+        isGift: false,
+        stripeSubscriptionId: { not: null },
+      },
+    })
+
+    if (regularSubscription?.stripeSubscriptionId) {
+      try {
+        // Get the Stripe subscription
+        const stripeSubscription = await stripe.subscriptions.retrieve(
+          regularSubscription.stripeSubscriptionId,
+        )
+
+        // Only update if the gift extends beyond the current period and currentPeriodEnd is not null
+        if (
+          regularSubscription.currentPeriodEnd &&
+          currentPeriodEnd > regularSubscription.currentPeriodEnd
+        ) {
+          // Update the subscription in Stripe to pause billing until after the gift expires
+          await stripe.subscriptions.update(regularSubscription.stripeSubscriptionId, {
+            pause_collection: {
+              behavior: 'keep_as_draft',
+              resumes_at: Math.floor(currentPeriodEnd.getTime() / 1000),
+            },
+            metadata: {
+              ...stripeSubscription.metadata,
+              giftExtendedUntil: currentPeriodEnd.toISOString(),
+              originalRenewalDate: regularSubscription.currentPeriodEnd.toISOString(),
+            },
+          })
+
+          // Update the subscription in the database
+          await tx.subscription.update({
+            where: { id: regularSubscription.id },
+            data: {
+              // Store the original renewal date in metadata
+              metadata: {
+                ...((regularSubscription.metadata as Record<string, unknown>) || {}),
+                originalRenewalDate: regularSubscription.currentPeriodEnd.toISOString(),
+                giftExtendedUntil: currentPeriodEnd.toISOString(),
+              },
+            },
+          })
+
+          console.log(
+            `Updated regular subscription ${regularSubscription.id} to resume after gift expires on ${currentPeriodEnd.toISOString()}`,
+          )
+        }
+      } catch (error) {
+        console.error('Failed to update regular subscription after gift:', error)
+      }
+    }
 
     return
   }

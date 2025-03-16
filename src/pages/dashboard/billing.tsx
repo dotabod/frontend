@@ -1,18 +1,41 @@
 import { BillingPlans } from '@/components/Billing/BillingPlans'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
-import { SubscriptionStatus } from '@/components/Subscription/SubscriptionStatus'
+import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
-import { getSubscriptionStatusInfo, isSubscriptionActive } from '@/utils/subscription'
-import { Alert, Button, Space, Typography } from 'antd'
-import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
+import { getGiftSubscriptionInfo, getSubscriptionStatusInfo } from '@/utils/subscription'
+import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState, useEffect } from 'react'
+import type { JsonValue } from '@prisma/client/runtime/library'
+import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
 
-const { Title, Text } = Typography
+const { Title } = Typography
+
+// Define the subscription type with giftDetails for type safety
+interface SubscriptionWithGiftDetails {
+  id?: string
+  userId?: string
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
+  tier?: SubscriptionTier
+  status?: SubscriptionStatus | null
+  transactionType?: TransactionType | null
+  currentPeriodEnd?: Date | null
+  cancelAtPeriodEnd?: boolean
+  isGift?: boolean
+  metadata?: JsonValue
+  giftDetails?: {
+    senderName?: string | null
+    giftType?: string | null
+    giftQuantity?: number | null
+    giftMessage?: string | null
+  } | null
+}
 
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +62,10 @@ const BillingPage = () => {
     hasLifetime: false,
   })
   const { data: session } = useSession()
-  const { subscription, isLifetimePlan } = useSubscriptionContext()
+  const { subscription: rawSubscription } = useSubscriptionContext()
+
+  // Cast subscription to the type with giftDetails
+  const subscription = rawSubscription as unknown as SubscriptionWithGiftDetails
 
   const statusInfo = getSubscriptionStatusInfo(
     subscription?.status,
@@ -49,6 +75,17 @@ const BillingPage = () => {
     subscription?.stripeSubscriptionId,
     subscription?.isGift,
     giftInfo.proExpiration,
+  )
+
+  // Get gift subscription info if applicable
+  const giftSubInfo = getGiftSubscriptionInfo(
+    {
+      ...subscription,
+      // Convert null to undefined for transactionType
+      transactionType: subscription?.transactionType || undefined,
+    },
+    giftInfo.proExpiration,
+    subscription?.giftDetails,
   )
 
   // Fetch gift information when the component mounts
@@ -91,12 +128,6 @@ const BillingPage = () => {
     return null
   }
 
-  // Determine if the user has both a regular subscription and gift subscription
-  const hasBothSubscriptionTypes =
-    isSubscriptionActive({ status: subscription?.status }) &&
-    !subscription?.isGift &&
-    giftInfo.hasGifts
-
   return (
     <>
       <Head>
@@ -106,70 +137,14 @@ const BillingPage = () => {
       <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
       <div className='mb-6'>
-        <Space direction='vertical' size='large' className='w-full'>
-          <SubscriptionStatus />
-
-          {/* Only show manage subscription button for recurring subscriptions with Stripe */}
-          {isSubscriptionActive({ status: subscription?.status }) &&
-            subscription?.stripeSubscriptionId &&
-            !isLifetimePlan &&
-            !subscription?.isGift && (
-              <Button
-                type='primary'
-                size='middle'
-                icon={<ExternalLinkIcon size={14} />}
-                onClick={handlePortalAccess}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Loading...' : 'Manage subscription'}
-              </Button>
-            )}
-        </Space>
+        <SubscriptionAlerts
+          giftInfo={giftInfo}
+          statusInfo={statusInfo}
+          handlePortalAccess={handlePortalAccess}
+          isLoading={isLoading}
+          giftSubInfo={giftSubInfo}
+        />
       </div>
-
-      {/* Show special alert for users with both subscription types */}
-      {hasBothSubscriptionTypes && subscription && (
-        <Alert
-          message='You Have Multiple Subscriptions'
-          description={
-            <div>
-              <p>You have both a regular subscription and gift subscription(s).</p>
-              {giftInfo.proExpiration && subscription.currentPeriodEnd && (
-                <p>
-                  Your gift subscription{giftInfo.giftCount > 1 ? 's' : ''} will extend your Pro
-                  access
-                  {subscription.cancelAtPeriodEnd
-                    ? ` after your current subscription ends on ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}.`
-                    : '.'}
-                </p>
-              )}
-            </div>
-          }
-          type='info'
-          showIcon
-          icon={<GiftIcon className='text-indigo-400' />}
-          className='mb-6 border-2 border-indigo-800 bg-indigo-950/60 text-indigo-300'
-        />
-      )}
-
-      {statusInfo?.type === 'warning' && !subscription?.isGift && (
-        <Alert
-          message='Subscription Ending Soon'
-          description={
-            giftInfo.hasGifts
-              ? 'Your paid subscription will end soon, but you have gift subscription(s) that will extend your access.'
-              : 'Your subscription will end soon. Renew to keep access to all Pro features.'
-          }
-          type='warning'
-          showIcon
-          className='mb-6'
-          action={
-            <Button size='small' type='primary' onClick={handlePortalAccess}>
-              Renew Now
-            </Button>
-          }
-        />
-      )}
 
       <div className='mt-6'>
         <Title level={4} className='mb-4'>

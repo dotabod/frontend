@@ -156,25 +156,6 @@ vi.mock('@/utils/env', () => ({
   },
 }))
 
-// Mock subscription utility
-vi.mock('@/utils/subscription', () => ({
-  SUBSCRIPTION_TIERS: {
-    FREE: 'FREE',
-    PRO: 'PRO',
-  },
-  PRICE_IDS: [
-    {
-      tier: 'PRO',
-      monthly: 'price_monthly_123',
-      annual: 'price_annual_123',
-      lifetime: 'price_lifetime_123',
-    },
-  ],
-  getSubscriptionTier: vi.fn().mockReturnValue('PRO'),
-  getCurrentPeriod: vi.fn().mockReturnValue('monthly'),
-  isSubscriptionActive: vi.fn().mockReturnValue(true),
-}))
-
 describe('Stripe Webhook Handler - Gift Subscriptions', () => {
   beforeEach(() => {
     vi.resetAllMocks()

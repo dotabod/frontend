@@ -25,6 +25,15 @@ vi.mock('@/lib/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
+// Mock environment variables
+vi.mock('@/utils/env', () => ({
+  env: {
+    NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID: 'price_monthly_123',
+    NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID: 'price_annual_123',
+    NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID: 'price_lifetime_123',
+    STRIPE_WEBHOOK_SECRET: 'whsec_test_secret',
+  },
+}))
 vi.mock('@/utils/subscription', () => ({
   isInGracePeriod: vi.fn().mockReturnValue(false),
   GRACE_PERIOD_END: new Date(),

@@ -8,6 +8,7 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
+import type { StatusInfo, GiftSubInfo } from '@/components/Subscription/types'
 
 // Add type safety for chatters
 type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -267,9 +268,13 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
 }
 
 // Validation
-if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
-  throw new Error('Missing required Stripe price IDs in environment variables')
-}
+// if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
+//   throw new Error(
+//     `Missing required Stripe price IDs in environment variables, found: ${PRICE_IDS.filter(
+//       (price) => !price.monthly || !price.annual || !price.lifetime,
+//     )}`,
+//   )
+// }
 
 export async function getSubscription(userId: string, tx?: Prisma.TransactionClient) {
   const db = tx || prisma
@@ -306,6 +311,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       createdAt: true,
       stripeSubscriptionId: true,
       isGift: true,
+      metadata: true,
       giftDetails: {
         select: {
           senderName: true,
@@ -316,17 +322,30 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       },
     },
     orderBy: [
-      // Prioritize lifetime subscriptions first
-      { transactionType: 'desc' },
-      // Then active subscriptions
+      // Prioritize active status first
       { status: 'asc' },
-      // Then prioritize non-gift subscriptions
+      // Then prioritize lifetime subscriptions
+      { transactionType: 'desc' },
+      // Then prioritize non-gift subscriptions over gift subscriptions
       { isGift: 'asc' },
       // Then most recent
       { createdAt: 'desc' },
     ],
   })
 
+  // Prioritize non-gift active or trialing subscriptions over gift subscriptions
+  const nonGiftSubscription = subscriptions.find(
+    (sub) =>
+      (sub.status === SubscriptionStatus.ACTIVE || sub.status === SubscriptionStatus.TRIALING) &&
+      !sub.isGift &&
+      sub.stripeSubscriptionId,
+  )
+
+  if (nonGiftSubscription) {
+    return nonGiftSubscription
+  }
+
+  // If no non-gift subscription found, check if we should create a virtual subscription
   // If no subscriptions found
   if (subscriptions.length === 0) {
     // If user has an active proExpiration but no subscription, create a virtual subscription
@@ -369,18 +388,14 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   // Return the first subscription (based on our ordering)
   return subscriptions[0]
 }
+
 export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
   const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
   const annual = Number.parseFloat(annualPrice.replace('$', ''))
   return Math.round(((monthly - annual) / monthly) * 100)
 }
 
-// Add these types at the top with other types
-type SubscriptionStatusInfo = {
-  message?: string
-  type: 'success' | 'warning' | 'error' | 'info'
-  badge: 'gold' | 'blue' | 'red' | 'default'
-}
+export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
 
 // Update the getSubscriptionStatusInfo function
 export function getSubscriptionStatusInfo(
@@ -391,7 +406,7 @@ export function getSubscriptionStatusInfo(
   stripeSubscriptionId?: string | null,
   isGift?: boolean,
   proExpiration?: Date | null,
-): SubscriptionStatusInfo | null {
+): StatusInfo | null {
   // Check for lifetime subscription first (highest priority)
   if (
     transactionType === 'LIFETIME' ||
@@ -609,8 +624,6 @@ export function hasPaidPlan(
   return false
 }
 
-export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
-
 // Add a function to get gift subscription information
 export function getGiftSubscriptionInfo(
   subscription: Partial<SubscriptionRow> | null,
@@ -621,15 +634,7 @@ export function getGiftSubscriptionInfo(
     giftQuantity?: number | null
     giftMessage?: string | null
   } | null,
-): {
-  message: string
-  isGift: boolean
-  senderName?: string
-  giftType?: string
-  giftQuantity?: number
-  giftMessage?: string
-  expirationDate?: Date | null
-} {
+): GiftSubInfo & { expirationDate?: Date | null } {
   // Check if this is a regular subscription with a gift extension
   if (
     subscription &&
