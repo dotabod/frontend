@@ -171,15 +171,12 @@ function GracePeriodInfo({
   giftCoversPostGracePeriod?: boolean | null
   gracePeriodEndNextDay: string
 }) {
-  if (!inGracePeriod) return null
+  if (!inGracePeriod || !giftCoversPostGracePeriod) return null
 
   return (
     <p className='mt-2 text-sm'>
-      <span className='font-medium'>Note:</span> All users currently have free Pro access until{' '}
-      {gracePeriodPrettyDate}.
-      {giftCoversPostGracePeriod
-        ? ` Your gift subscription will activate on ${gracePeriodEndNextDay} - you will not be charged until after your gift expires.`
-        : ` Your paid subscription will begin on ${gracePeriodEndNextDay}.`}
+      Your gift subscription will activate on {gracePeriodEndNextDay} - you will not be charged
+      until after your gift expires.
     </p>
   )
 }
