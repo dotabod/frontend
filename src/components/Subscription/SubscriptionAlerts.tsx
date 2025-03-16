@@ -11,6 +11,129 @@ import { formatDistanceToNow } from 'date-fns'
 import type { GiftInfo, StatusInfo, GiftSubInfo } from './types'
 import type { SubscriptionWithGiftDetails } from './types'
 
+// Timeline component to visualize subscription periods
+function SubscriptionTimeline({
+  gracePeriodEnd,
+  giftStartDate,
+  giftEndDate,
+  renewalDate,
+  hasActivePlan,
+}: {
+  gracePeriodEnd: Date
+  giftStartDate: Date
+  giftEndDate: Date
+  renewalDate?: Date
+  hasActivePlan: boolean
+}) {
+  const now = new Date()
+
+  return (
+    <div className='mt-4 mb-5'>
+      <h4 className='text-sm font-medium mb-2 text-indigo-200'>Subscription Timeline</h4>
+
+      {/* Legend */}
+      <div className='flex flex-wrap gap-x-4 gap-y-1 mb-2 text-xs'>
+        {now < gracePeriodEnd && (
+          <div className='flex items-center gap-1'>
+            <div className='w-3 h-3 bg-amber-500 rounded-sm' />
+            <span className='text-amber-300'>Free</span>
+          </div>
+        )}
+        <div className='flex items-center gap-1'>
+          <div className='w-3 h-3 bg-indigo-500 rounded-sm' />
+          <span className='text-indigo-300'>Gift</span>
+        </div>
+        {hasActivePlan && (
+          <div className='flex items-center gap-1'>
+            <div className='w-3 h-3 bg-emerald-500 rounded-sm' />
+            <span className='text-emerald-300'>Paid</span>
+          </div>
+        )}
+      </div>
+
+      {/* Timeline bar - simplified fixed-width approach */}
+      <div className='relative h-10 w-full bg-gray-800/60 rounded-md overflow-hidden border border-gray-700'>
+        {/* Fixed segments with clear labels */}
+        <div className='absolute top-0 left-0 h-full w-full flex'>
+          {/* Free period segment */}
+          {now < gracePeriodEnd && (
+            <div className='h-full bg-amber-500/80 border-r-2 border-amber-400 w-1/4 relative'>
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <span className='text-xs font-medium text-amber-100'>Free</span>
+              </div>
+            </div>
+          )}
+
+          {/* Gift subscription segment */}
+          <div
+            className={`h-full bg-indigo-500/80 border-r-2 border-indigo-400 ${now < gracePeriodEnd ? 'w-2/4' : 'w-3/4'} relative`}
+          >
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <span className='text-xs font-medium text-indigo-100'>Gift</span>
+            </div>
+          </div>
+
+          {/* Paid subscription segment */}
+          {hasActivePlan && (
+            <div className='h-full bg-emerald-500/80 w-1/4 relative'>
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <span className='text-xs font-medium text-emerald-100'>Paid</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Date markers */}
+      <div className='relative w-full h-6 mt-1'>
+        <div className='absolute left-0 top-0 flex items-center'>
+          <div className='h-3 border-l-2 border-white' />
+          <span className='ml-1 text-xs text-white'>Now</span>
+        </div>
+
+        {now < gracePeriodEnd && (
+          <div className='absolute left-1/4 top-0 flex items-center -ml-1'>
+            <div className='h-3 border-l-2 border-amber-400' />
+            <span className='ml-1 text-xs text-amber-400'>
+              {gracePeriodEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </span>
+          </div>
+        )}
+
+        <div
+          className={`absolute ${now < gracePeriodEnd ? 'left-3/4' : 'left-3/4'} top-0 flex items-center -ml-1`}
+        >
+          <div className='h-3 border-l-2 border-indigo-400' />
+          <span className='ml-1 text-xs text-indigo-400'>
+            {giftEndDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+          </span>
+        </div>
+
+        {hasActivePlan && renewalDate && (
+          <div className='absolute right-0 top-0 flex items-center'>
+            <div className='h-3 border-l-2 border-emerald-400' />
+            <span className='ml-1 text-xs text-emerald-400'>
+              {renewalDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Timeline explanation - more concise */}
+      <div className='mt-4 text-xs text-gray-300'>
+        <p>
+          {now < gracePeriodEnd
+            ? `Free until ${gracePeriodEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} → Gift until ${giftEndDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+            : `Gift until ${giftEndDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
+          {hasActivePlan && renewalDate
+            ? ` → Paid from ${renewalDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+            : ''}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
   statusInfo: StatusInfo | null
@@ -88,7 +211,11 @@ export function SubscriptionAlerts({
 
   const latestGiftEndDate = getLatestGiftEndDate()
   const formattedGiftExpirationDate = latestGiftEndDate
-    ? new Date(latestGiftEndDate).toLocaleDateString()
+    ? new Date(latestGiftEndDate).toLocaleDateString(undefined, {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
     : ''
 
   // Format time since gift was received
@@ -213,32 +340,42 @@ export function SubscriptionAlerts({
             <div className='mt-1 text-indigo-300'>
               <p>
                 {isGiftAfterGracePeriod()
-                  ? `Your gift subscription will activate on ${gracePeriodEndNextDay}${formattedGiftExpirationDate ? ` and will be active until ${formattedGiftExpirationDate}` : ''}`
-                  : `Your gift subscription is active until ${formattedGiftExpirationDate}`}
+                  ? `Gift activates ${gracePeriodEndNextDay} until ${formattedGiftExpirationDate}`
+                  : `Gift active until ${formattedGiftExpirationDate}`}
               </p>
-              {/* Add information about when they'll be charged */}
+
+              {/* Add timeline visualization */}
+              {latestGiftEndDate && inGracePeriod && (
+                <SubscriptionTimeline
+                  gracePeriodEnd={new Date(GRACE_PERIOD_END)}
+                  giftStartDate={new Date(GRACE_PERIOD_END)}
+                  giftEndDate={new Date(latestGiftEndDate)}
+                  renewalDate={actualRenewalDate ? new Date(actualRenewalDate) : undefined}
+                  hasActivePlan={!isLifetimePlan && hasActivePlan}
+                />
+              )}
+
+              {/* Add information about when they'll be charged - more concise */}
               {!isLifetimePlan && !hasActivePlan && (
                 <p className='mt-1 text-sm font-medium'>
-                  You will be charged for a subscription starting {formattedGiftExpirationDate}
-                  unless you cancel before then.
+                  Billing starts {formattedGiftExpirationDate} unless canceled.
                 </p>
               )}
-              {/* If they have an active plan, explain that gift takes priority */}
+              {/* If they have an active plan, explain that gift takes priority - more concise */}
               {!isLifetimePlan && hasActivePlan && subscription?.metadata && (
                 <p className='mt-1 text-sm font-medium'>
-                  Your gift subscription will be used before your paid subscription. Your paid
-                  subscription
-                  {subscription.cancelAtPeriodEnd ? ' ends' : ' renews'} on {formattedRenewalDate}.
+                  Gift used before paid subscription. Paid{' '}
+                  {subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}: {formattedRenewalDate}
                 </p>
               )}
-              {/* If in grace period, mention it here instead of showing a separate alert */}
+              {/* If in grace period, mention it here instead of showing a separate alert - more concise */}
               {inGracePeriod && (
                 <p className='mt-2 text-sm'>
-                  <span className='font-medium'>Note:</span> All users currently have free Pro
-                  access until {gracePeriodPrettyDate}.
+                  <span className='font-medium'>Note:</span> Free Pro access for all until{' '}
+                  {gracePeriodPrettyDate}.
                   {giftCoversPostGracePeriod
-                    ? ` Your gift subscription will activate on ${gracePeriodEndNextDay} - you will not be charged until after your gift expires.`
-                    : ` Your paid subscription will begin on ${gracePeriodEndNextDay}.`}
+                    ? ' No charges until after gift expires.'
+                    : ` Paid subscription begins ${gracePeriodEndNextDay}.`}
                 </p>
               )}
               {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
@@ -289,7 +426,7 @@ export function SubscriptionAlerts({
           message={
             <div className='flex items-center gap-2 font-medium text-indigo-300'>
               <GiftIcon size={18} className='text-indigo-400' />
-              <span>{statusInfo?.message || 'Gift Subscription'}</span>
+              <span>Gift Subscription</span>
             </div>
           }
           description={
@@ -330,15 +467,32 @@ export function SubscriptionAlerts({
               {isGiftAfterGracePeriod() && (
                 <div>
                   <p className='mt-1'>
-                    Your gift subscription will automatically activate on {gracePeriodEndNextDay}
-                    {formattedGiftExpirationDate &&
-                      ` and will be active until ${formattedGiftExpirationDate}`}
-                    .
+                    Gift activates {gracePeriodEndNextDay}
+                    {formattedGiftExpirationDate && (
+                      <span> until {formattedGiftExpirationDate}</span>
+                    )}
                   </p>
+
+                  {/* Add timeline visualization */}
+                  {latestGiftEndDate && (
+                    <SubscriptionTimeline
+                      gracePeriodEnd={new Date(GRACE_PERIOD_END)}
+                      giftStartDate={new Date(GRACE_PERIOD_END)}
+                      giftEndDate={new Date(latestGiftEndDate)}
+                      renewalDate={actualRenewalDate ? new Date(actualRenewalDate) : undefined}
+                      hasActivePlan={!isLifetimePlan && hasActivePlan}
+                    />
+                  )}
+
                   {!hasActivePlan && formattedGiftExpirationDate && (
                     <p className='mt-1 font-medium'>
-                      After your gift expires on {formattedGiftExpirationDate}, you will be charged
-                      for a subscription unless you cancel before then.
+                      Billing starts {formattedGiftExpirationDate} unless canceled.
+                    </p>
+                  )}
+                  {hasActivePlan && subscription?.metadata && (
+                    <p className='mt-1 font-medium'>
+                      Gift used before paid subscription. Paid{' '}
+                      {subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}: {formattedRenewalDate}
                     </p>
                   )}
                 </div>
@@ -376,6 +530,17 @@ export function SubscriptionAlerts({
                     {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                   </p>
                 )
+              )}
+
+              {/* Add timeline for regular subscription with gift */}
+              {hasActiveGiftSubscription && latestGiftEndDate && (
+                <SubscriptionTimeline
+                  gracePeriodEnd={new Date(GRACE_PERIOD_END)}
+                  giftStartDate={inGracePeriod ? new Date(GRACE_PERIOD_END) : new Date()}
+                  giftEndDate={new Date(latestGiftEndDate)}
+                  renewalDate={actualRenewalDate ? new Date(actualRenewalDate) : undefined}
+                  hasActivePlan={!isLifetimePlan && hasActivePlan}
+                />
               )}
 
               {/* Show gift subscription info if user has a gift subscription */}
@@ -431,29 +596,36 @@ export function SubscriptionAlerts({
           }
           description={
             <div className='mt-1 text-amber-300'>
-              {hasActivePlan
-                ? `All users have free Pro access until ${gracePeriodPrettyDate}, but you're already subscribed. Thank you for your support!`
-                : `All users have free Pro access until ${gracePeriodPrettyDate}. Regular subscriptions will begin on ${gracePeriodEndNextDay}.`}
+              <p>All users have free Pro access until {gracePeriodPrettyDate}.</p>
               {isGiftAfterGracePeriod() && (
                 <div>
                   <p className='mt-1'>
-                    Your gift subscription will automatically activate on {gracePeriodEndNextDay}
-                    {formattedGiftExpirationDate &&
-                      ` and will be active until ${formattedGiftExpirationDate}`}
-                    .
+                    Gift activates {gracePeriodEndNextDay}
+                    {formattedGiftExpirationDate && (
+                      <span> until {formattedGiftExpirationDate}</span>
+                    )}
                   </p>
+
+                  {/* Add timeline visualization */}
+                  {latestGiftEndDate && (
+                    <SubscriptionTimeline
+                      gracePeriodEnd={new Date(GRACE_PERIOD_END)}
+                      giftStartDate={new Date(GRACE_PERIOD_END)}
+                      giftEndDate={new Date(latestGiftEndDate)}
+                      renewalDate={actualRenewalDate ? new Date(actualRenewalDate) : undefined}
+                      hasActivePlan={!isLifetimePlan && hasActivePlan}
+                    />
+                  )}
+
                   {!hasActivePlan && formattedGiftExpirationDate && (
                     <p className='mt-1 font-medium'>
-                      After your gift expires on {formattedGiftExpirationDate}, you will be charged
-                      for a subscription unless you cancel before then.
+                      Billing starts {formattedGiftExpirationDate} unless canceled.
                     </p>
                   )}
                   {hasActivePlan && subscription?.metadata && (
                     <p className='mt-1 font-medium'>
-                      Your gift subscription will be used before your paid subscription. Your paid
-                      subscription
-                      {subscription.cancelAtPeriodEnd ? ' ends' : ' renews'} on{' '}
-                      {formattedRenewalDate}.
+                      Gift used before paid subscription. Paid{' '}
+                      {subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}: {formattedRenewalDate}
                     </p>
                   )}
                 </div>
