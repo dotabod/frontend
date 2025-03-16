@@ -170,8 +170,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         gifterId: userSession?.user?.id || null,
         // Add gifter email if provided or available from session
         giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',
-        // Add metadata to indicate this is for credits
-        isForCredits: 'true',
       },
     })
 

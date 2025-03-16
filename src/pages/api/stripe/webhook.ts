@@ -76,9 +76,69 @@ async function processWebhookEvent(
     case 'invoice.payment_failed':
       await handleInvoiceEvent(event.data.object as Stripe.Invoice, tx)
       break
-    case 'checkout.session.completed':
-      await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session, tx)
+    case 'checkout.session.completed': {
+      // For checkout.session.completed events, we need to ensure that gift subscriptions
+      // are properly processed and regular subscriptions are updated accordingly
+      const session = event.data.object as Stripe.Checkout.Session
+      await handleCheckoutCompleted(session, tx)
+
+      // After processing a checkout session that might involve gifts,
+      // check if we need to update any regular subscriptions for the user
+      if (session.metadata?.isGift === 'true' && session.metadata?.recipientUserId) {
+        // Import the SubscriptionService to handle updating regular subscriptions
+        const { SubscriptionService } = await import('./services/subscription-service')
+        const subscriptionService = new SubscriptionService(tx)
+
+        // Find the user's regular subscription and update it based on all gift subscriptions
+        const userId = session.metadata.recipientUserId
+        const regularSubscription = await tx.subscription.findFirst({
+          where: {
+            userId,
+            status: { in: ['ACTIVE', 'TRIALING'] },
+            isGift: false,
+            stripeSubscriptionId: { not: null },
+          },
+        })
+
+        if (regularSubscription?.stripeSubscriptionId) {
+          // Find all active gift subscriptions for this user
+          const giftSubscriptions = await tx.subscription.findMany({
+            where: {
+              userId,
+              status: { in: ['ACTIVE', 'TRIALING'] },
+              isGift: true,
+            },
+            orderBy: {
+              currentPeriodEnd: 'desc',
+            },
+          })
+
+          // Find the latest gift expiration date
+          let latestGiftExpirationDate: Date | null = null
+          for (const gift of giftSubscriptions) {
+            if (
+              gift.currentPeriodEnd &&
+              (!latestGiftExpirationDate || gift.currentPeriodEnd > latestGiftExpirationDate)
+            ) {
+              latestGiftExpirationDate = gift.currentPeriodEnd
+            }
+          }
+
+          // If we found a valid gift expiration date, update the regular subscription
+          if (latestGiftExpirationDate) {
+            await subscriptionService.pauseForGift(
+              regularSubscription.stripeSubscriptionId,
+              latestGiftExpirationDate,
+              {
+                originalRenewalDate: regularSubscription.currentPeriodEnd?.toISOString() || '',
+                giftCheckoutSessionId: session.id,
+              },
+            )
+          }
+        }
+      }
       break
+    }
     case 'charge.succeeded':
       await handleChargeSucceeded(event.data.object as Stripe.Charge, tx)
       break

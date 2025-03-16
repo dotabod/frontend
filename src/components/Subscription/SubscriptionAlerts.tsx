@@ -120,6 +120,28 @@ export function SubscriptionAlerts({
     latestGiftEndDate &&
     new Date(latestGiftEndDate) > new Date(GRACE_PERIOD_END)
 
+  // Get the actual renewal date from metadata if available
+  const getActualRenewalDate = () => {
+    if (!subscription || !subscription.metadata) return null
+
+    const metadata = subscription.metadata as Record<string, unknown>
+    if (metadata.giftExtendedUntil) {
+      // Add one day to the gift expiration date to get the renewal date
+      const renewalDate = new Date(metadata.giftExtendedUntil as string)
+      renewalDate.setDate(renewalDate.getDate() + 1)
+      return renewalDate
+    }
+
+    return subscription.currentPeriodEnd
+  }
+
+  const actualRenewalDate = getActualRenewalDate()
+  const formattedRenewalDate = actualRenewalDate
+    ? new Date(actualRenewalDate).toLocaleDateString()
+    : subscription?.currentPeriodEnd
+      ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+      : ''
+
   return (
     <div className='space-y-4 gap-4 flex flex-col'>
       {/* Manage subscription button */}
@@ -202,12 +224,11 @@ export function SubscriptionAlerts({
                 </p>
               )}
               {/* If they have an active plan, explain that gift takes priority */}
-              {!isLifetimePlan && hasActivePlan && subscription?.currentPeriodEnd && (
+              {!isLifetimePlan && hasActivePlan && subscription?.metadata && (
                 <p className='mt-1 text-sm font-medium'>
                   Your gift subscription will be used before your paid subscription. Your paid
                   subscription
-                  {subscription.cancelAtPeriodEnd ? ' ends' : ' renews'} on{' '}
-                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}.
+                  {subscription.cancelAtPeriodEnd ? ' ends' : ' renews'} on {formattedRenewalDate}.
                 </p>
               )}
               {/* If in grace period, mention it here instead of showing a separate alert */}
@@ -342,11 +363,19 @@ export function SubscriptionAlerts({
           }
           description={
             <div className='mt-1 text-indigo-300'>
-              {subscription?.currentPeriodEnd && (
+              {subscription?.metadata &&
+              (subscription.metadata as Record<string, unknown>).giftExtendedUntil ? (
                 <p>
                   Your subscription will {subscription.cancelAtPeriodEnd ? 'end' : 'renew'} on{' '}
-                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                  {formattedRenewalDate}
                 </p>
+              ) : (
+                subscription?.currentPeriodEnd && (
+                  <p>
+                    Your subscription will {subscription.cancelAtPeriodEnd ? 'end' : 'renew'} on{' '}
+                    {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                  </p>
+                )
               )}
 
               {/* Show gift subscription info if user has a gift subscription */}
@@ -419,12 +448,12 @@ export function SubscriptionAlerts({
                       for a subscription unless you cancel before then.
                     </p>
                   )}
-                  {hasActivePlan && subscription?.currentPeriodEnd && (
+                  {hasActivePlan && subscription?.metadata && (
                     <p className='mt-1 font-medium'>
                       Your gift subscription will be used before your paid subscription. Your paid
                       subscription
                       {subscription.cancelAtPeriodEnd ? ' ends' : ' renews'} on{' '}
-                      {new Date(subscription.currentPeriodEnd).toLocaleDateString()}.
+                      {formattedRenewalDate}.
                     </p>
                   )}
                 </div>
@@ -469,7 +498,7 @@ export function SubscriptionAlerts({
                     Your gift subscription{giftInfo.giftCount > 1 ? 's' : ''} will extend your Pro
                     access
                     {subscription.cancelAtPeriodEnd
-                      ? ` after your current subscription ends on ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}.`
+                      ? ` after your current subscription ends on ${formattedRenewalDate}.`
                       : '.'}
                   </p>
                 )}

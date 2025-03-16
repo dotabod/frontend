@@ -281,6 +281,28 @@ export class GiftService {
       return false
     }
 
+    // Find all active gift subscriptions for this user to determine the latest expiration date
+    const allGiftSubscriptions = await this.tx.subscription.findMany({
+      where: {
+        userId,
+        status: { in: ['ACTIVE', 'TRIALING'] },
+        isGift: true,
+      },
+      orderBy: {
+        currentPeriodEnd: 'desc',
+      },
+    })
+
+    // Determine the latest gift expiration date
+    let latestGiftExpirationDate = giftExpirationDate
+    if (allGiftSubscriptions.length > 0) {
+      for (const gift of allGiftSubscriptions) {
+        if (gift.currentPeriodEnd && gift.currentPeriodEnd > latestGiftExpirationDate) {
+          latestGiftExpirationDate = gift.currentPeriodEnd
+        }
+      }
+    }
+
     return (
       (await withErrorHandling(
         async () => {
@@ -289,16 +311,20 @@ export class GiftService {
           // Only update if the gift extends beyond the current period and currentPeriodEnd is not null
           if (
             regularSubscription.currentPeriodEnd &&
-            giftExpirationDate > regularSubscription.currentPeriodEnd
+            latestGiftExpirationDate > regularSubscription.currentPeriodEnd
           ) {
             // Use the helper function to pause the subscription
-            await this.subscriptionService.pauseForGift(stripeSubscriptionId, giftExpirationDate, {
-              originalRenewalDate: regularSubscription.currentPeriodEnd.toISOString(),
-              giftCheckoutSessionId: sessionId,
-            })
+            await this.subscriptionService.pauseForGift(
+              stripeSubscriptionId,
+              latestGiftExpirationDate,
+              {
+                originalRenewalDate: regularSubscription.currentPeriodEnd.toISOString(),
+                giftCheckoutSessionId: sessionId,
+              },
+            )
 
             console.log(
-              `Updated regular subscription ${regularSubscription.id} to resume after gift expires on ${giftExpirationDate.toISOString()}`,
+              `Updated regular subscription ${regularSubscription.id} to resume after gift expires on ${latestGiftExpirationDate.toISOString()}`,
             )
             return true
           }
@@ -307,15 +333,19 @@ export class GiftService {
           // until after the grace period if we're in the grace period
           const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
 
-          if (isInGracePeriod() && giftExpirationDate > new Date(GRACE_PERIOD_END)) {
+          if (isInGracePeriod() && latestGiftExpirationDate > new Date(GRACE_PERIOD_END)) {
             // Use the helper function to pause the subscription
-            await this.subscriptionService.pauseForGift(stripeSubscriptionId, giftExpirationDate, {
-              pausedDuringGracePeriod: 'true',
-              giftCheckoutSessionId: sessionId,
-            })
+            await this.subscriptionService.pauseForGift(
+              stripeSubscriptionId,
+              latestGiftExpirationDate,
+              {
+                pausedDuringGracePeriod: 'true',
+                giftCheckoutSessionId: sessionId,
+              },
+            )
 
             console.log(
-              `Paused regular subscription ${regularSubscription.id} during grace period until gift expires on ${giftExpirationDate.toISOString()}`,
+              `Paused regular subscription ${regularSubscription.id} during grace period until gift expires on ${latestGiftExpirationDate.toISOString()}`,
             )
             return true
           }

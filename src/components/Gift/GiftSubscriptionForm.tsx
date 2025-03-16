@@ -43,7 +43,8 @@ export const GiftSubscriptionForm = ({
   const [formError, setFormError] = useState<string | null>(null)
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const selectedTier = SUBSCRIPTION_TIERS.PRO
-  // Always use monthly for gift credits
+
+  // Always use monthly for gift subscriptions
   const activePeriod: PricePeriod = 'monthly'
 
   // Function to check for profanity in text
@@ -204,10 +205,10 @@ export const GiftSubscriptionForm = ({
           {recipientUsername ? (
             <>
               Support <Link href={`/${recipientUsername}`}>{displayName}</Link> by gifting them
-              Dotabod Pro Credits! They'll get access to all Pro features.
+              Dotabod Pro! They'll get access to all Pro features.
             </>
           ) : (
-            "Support your favorite streamer by gifting them Dotabod Pro Credits! They'll get access to all Pro features."
+            "Support your favorite streamer by gifting them Dotabod Pro! They'll get access to all Pro features."
           )}
         </Paragraph>
 
@@ -217,7 +218,7 @@ export const GiftSubscriptionForm = ({
               <GiftIcon className='h-5 w-5 mr-2 text-blue-500' />
               <Text strong>You're gifting:</Text>
             </div>
-            <Text>{quantity > 1 ? `${quantity} Months` : '1 Month'} of Dotabod Pro Credits</Text>
+            <Text>{quantity > 1 ? `${quantity} Months` : '1 Month'} of Dotabod Pro</Text>
             <div className='mt-2'>
               <Text strong>Price: </Text>
               <Text>{calculateTotalPrice()}</Text>
@@ -225,7 +226,7 @@ export const GiftSubscriptionForm = ({
             {quantity > 1 && (
               <div className='mt-2'>
                 <Text type='secondary'>
-                  The recipient will receive credits equivalent to {quantity} months of Dotabod Pro.
+                  The recipient will receive {quantity} months of Dotabod Pro.
                 </Text>
               </div>
             )}
@@ -248,7 +249,7 @@ export const GiftSubscriptionForm = ({
           <Form.Item
             name='quantity'
             label='Duration'
-            tooltip='How many months the credits will last'
+            tooltip='How many months of Pro the recipient will receive'
           >
             <div className='flex items-center'>
               <InputNumber
@@ -367,12 +368,12 @@ export const GiftSubscriptionForm = ({
 
         <div className='bg-gray-800/80 p-2 rounded text-center text-xs'>
           <div>
-            This is a one-time payment. The credits will not auto-renew, and you will not be charged
-            again.
+            This is a one-time payment. The gift subscription will not auto-renew, and you will not
+            be charged again.
           </div>
           <div>
-            If the recipient already has an active subscription, these credits will be added to
-            their account.
+            If the recipient already has an active subscription, this gift will extend their
+            subscription period.
           </div>
           <div className='mt-1 pt-1 border-t border-gray-700'>
             Note: Messages containing inappropriate language will be automatically rejected by our
@@ -382,7 +383,7 @@ export const GiftSubscriptionForm = ({
       </Card>
 
       <Card>
-        <Title level={4}>Why Gift Dotabod Pro Credits?</Title>
+        <Title level={4}>Why Gift Dotabod Pro?</Title>
         <Space direction='vertical' size='middle'>
           <div>
             <Text strong>Support Your Favorite Streamer</Text>
@@ -391,23 +392,24 @@ export const GiftSubscriptionForm = ({
             </Paragraph>
           </div>
           <div>
-            <Text strong>Flexible Usage</Text>
+            <Text strong>Immediate Access</Text>
             <Paragraph>
-              Gift credits that can be applied to any Dotabod Pro subscription or usage-based
-              features.
+              Your gift provides immediate access to all Dotabod Pro features for the duration you
+              choose.
             </Paragraph>
           </div>
           <div>
             <Text strong>No Recurring Charges</Text>
             <Paragraph>
-              You pay once for the credits you choose. The recipient can use them at their own pace.
+              You pay once for the duration you choose. No recurring charges for you or the
+              recipient.
             </Paragraph>
           </div>
           <div>
-            <Text strong>Stackable Credits</Text>
+            <Text strong>Subscription Extension</Text>
             <Paragraph>
-              Multiple gifts add to the recipient's credit balance. Credits can be used for any
-              Dotabod Pro features.
+              Multiple gifts extend the recipient's Pro subscription duration. They'll enjoy Pro
+              features longer.
             </Paragraph>
           </div>
         </Space>

@@ -114,6 +114,9 @@ export class SubscriptionService {
                   giftExtendedUntil: giftExpirationDate.toISOString(),
                   ...metadata,
                 },
+                // Also update the currentPeriodEnd to match the gift expiration date
+                // This ensures the UI correctly shows when the subscription will renew
+                currentPeriodEnd: giftExpirationDate,
               },
             })
           }
