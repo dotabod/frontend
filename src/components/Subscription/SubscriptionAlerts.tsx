@@ -9,7 +9,6 @@ import { Button, Alert, Timeline } from 'antd'
 import { ExternalLinkIcon, GiftIcon, CalendarIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
 import type { GiftInfo, StatusInfo, GiftSubInfo } from './types'
 import type { SubscriptionWithGiftDetails } from './types'
-import type { JsonValue } from '@prisma/client/runtime/library'
 
 // Helper function to format dates consistently
 const formatDate = (date: Date | string | null, format: 'short' | 'long' = 'short'): string => {
@@ -46,10 +45,10 @@ function SubscriptionTimeline({
     // Current date marker
     {
       color: 'blue',
+      label: formatDate(now),
       children: (
         <div className='text-white'>
           <span className='font-medium'>Now</span>
-          <span className='text-xs ml-2 text-gray-400'>{formatDate(now)}</span>
         </div>
       ),
     },
@@ -58,10 +57,10 @@ function SubscriptionTimeline({
       ? [
           {
             color: 'orange',
+            label: formatDate(gracePeriodEnd),
             children: (
               <div className='text-amber-300'>
                 <span className='font-medium'>Free period ends</span>
-                <span className='text-xs ml-2 text-amber-400'>{formatDate(gracePeriodEnd)}</span>
               </div>
             ),
           },
@@ -72,10 +71,10 @@ function SubscriptionTimeline({
       ? [
           {
             color: 'purple',
+            label: formatDate(giftStartDate),
             children: (
               <div className='text-indigo-300'>
                 <span className='font-medium'>Gift sub begins</span>
-                <span className='text-xs ml-2 text-indigo-400'>{formatDate(giftStartDate)}</span>
               </div>
             ),
           },
@@ -84,10 +83,10 @@ function SubscriptionTimeline({
     // Gift sub end
     {
       color: 'purple',
+      label: formatDate(giftEndDate),
       children: (
         <div className='text-indigo-300'>
           <span className='font-medium'>Gift sub ends</span>
-          <span className='text-xs ml-2 text-indigo-400'>{formatDate(giftEndDate)}</span>
         </div>
       ),
     },
@@ -96,10 +95,10 @@ function SubscriptionTimeline({
       ? [
           {
             color: 'green',
+            label: formatDate(renewalDate),
             children: (
               <div className='text-emerald-300'>
                 <span className='font-medium'>Paid subscription begins</span>
-                <span className='text-xs ml-2 text-emerald-400'>{formatDate(renewalDate)}</span>
               </div>
             ),
           },
@@ -110,10 +109,10 @@ function SubscriptionTimeline({
       ? [
           {
             color: 'red',
+            label: formatDate(giftEndDate),
             children: (
               <div className='text-red-300'>
                 <span className='font-medium'>Dotabod Pro ends</span>
-                <span className='text-xs ml-2 text-red-400'>{formatDate(giftEndDate)}</span>
                 <div className='text-xs text-gray-400 mt-1'>No further charges</div>
               </div>
             ),
@@ -125,7 +124,7 @@ function SubscriptionTimeline({
   return (
     <div className='flex flex-col items-center'>
       <h4 className='text-sm font-medium text-indigo-200'>Subscription Timeline</h4>
-      <Timeline items={timelineItems} />
+      <Timeline mode='left' items={timelineItems} className='w-full' />
 
       {/* Summary text */}
       <div className='text-xs text-gray-300'>
@@ -160,46 +159,6 @@ function SubscriptionAlertMessage({
       <span>{text}</span>
     </div>
   )
-}
-
-// Reusable component for billing information
-function BillingInfo({
-  subscription,
-  formattedGiftExpirationDate,
-  formattedRenewalDate,
-  hasActivePlan,
-  isLifetimePlan,
-}: {
-  subscription?: {
-    cancelAtPeriodEnd?: boolean
-    metadata?: JsonValue
-  } | null
-  formattedGiftExpirationDate: string
-  formattedRenewalDate: string
-  hasActivePlan: boolean
-  isLifetimePlan: boolean
-}) {
-  if (isLifetimePlan) return null
-
-  if (!hasActivePlan && formattedGiftExpirationDate) {
-    return (
-      <p className='mt-1 text-sm font-medium'>
-        Billing starts {formattedGiftExpirationDate} unless canceled.
-      </p>
-    )
-  }
-
-  if (hasActivePlan && subscription?.metadata) {
-    return (
-      <p className='mt-1 text-sm font-medium'>
-        {subscription.cancelAtPeriodEnd
-          ? `Dotabod Pro ends after gift sub (${formattedGiftExpirationDate}). No further charges.`
-          : `Gift used before paid subscription. Billing cycle resumes on ${formattedRenewalDate}.`}
-      </p>
-    )
-  }
-
-  return null
 }
 
 // Reusable component for grace period information
@@ -380,6 +339,41 @@ export function SubscriptionAlerts({
 
     return `max-w-2xl rounded-lg border-2 ${styles[type]} shadow-sm`
   }
+  // Helper function to create gift subscription alert
+  const createGiftAlert = (isActive: boolean) => {
+    const alertType = isActive ? 'info' : 'warning'
+    const icon = isActive ? (
+      <GiftIcon size={18} className='text-indigo-400' />
+    ) : (
+      <CalendarIcon size={18} className='text-amber-400' />
+    )
+    const title = isActive ? 'Gift Subscription Active' : 'Free Pro Access Period'
+    const textColor = isActive ? 'text-indigo-300' : 'text-amber-300'
+    const iconColor = isActive ? 'text-indigo-400' : 'text-amber-400'
+
+    return (
+      <Alert
+        className={getAlertStyles(alertType)}
+        message={<SubscriptionAlertMessage icon={icon} text={title} color={textColor} />}
+        description={
+          <div className={`mt-1 ${textColor}`}>
+            {!isActive && <p>All users have free Pro access until {gracePeriodPrettyDate}.</p>}
+            {(isActive || isGiftAfterGracePeriod()) && (
+              <div>
+                {/* Add timeline visualization */}
+                {(isActive ? latestGiftEndDate && inGracePeriod : true) && renderTimeline()}
+              </div>
+            )}
+          </div>
+        }
+        type={alertType}
+        showIcon={false}
+      />
+    )
+  }
+
+  const GiftSubtitle = createGiftAlert(false)
+  const GiftSubtitleActive = createGiftAlert(true)
 
   return (
     <div className='space-y-4 gap-4 flex flex-col'>
@@ -440,39 +434,7 @@ export function SubscriptionAlerts({
         />
       ) : hasActiveGiftSubscription ? (
         /* If user has an active gift subscription */
-        <Alert
-          className={getAlertStyles('info')}
-          message={
-            <SubscriptionAlertMessage
-              icon={<GiftIcon size={18} className='text-indigo-400' />}
-              text='Gift Subscription Active'
-              color='text-indigo-300'
-            />
-          }
-          description={
-            <div className='mt-1 text-indigo-300'>
-              <p>
-                {isGiftAfterGracePeriod()
-                  ? `Gift activates ${gracePeriodEndNextDay} until ${formattedGiftExpirationDate}`
-                  : `Gift active until ${formattedGiftExpirationDate}`}
-              </p>
-
-              {/* Add timeline visualization */}
-              {latestGiftEndDate && inGracePeriod && renderTimeline()}
-
-              {/* Billing information */}
-              <BillingInfo
-                subscription={subscription}
-                formattedGiftExpirationDate={formattedGiftExpirationDate}
-                formattedRenewalDate={formattedRenewalDate}
-                hasActivePlan={hasActivePlan}
-                isLifetimePlan={isLifetimePlan}
-              />
-            </div>
-          }
-          type='info'
-          showIcon={false}
-        />
+        GiftSubtitleActive
       ) : subscription?.isGift ? (
         /* If the primary subscription is a gift */
         <Alert
@@ -503,44 +465,7 @@ export function SubscriptionAlerts({
         />
       ) : isVirtualGracePeriodSubscription ? (
         /* For virtual subscriptions created during grace period */
-        <Alert
-          className={getAlertStyles('warning')}
-          message={
-            <SubscriptionAlertMessage
-              icon={<CalendarIcon size={18} className='text-amber-400' />}
-              text='Free Pro Access Period'
-              color='text-amber-300'
-            />
-          }
-          description={
-            <div className='mt-1 text-amber-300'>
-              <p>All users have free Pro access until {gracePeriodPrettyDate}.</p>
-              {isGiftAfterGracePeriod() && (
-                <div>
-                  <p className='mt-1'>
-                    Gift activates {gracePeriodEndNextDay}
-                    {formattedGiftExpirationDate && (
-                      <span> until {formattedGiftExpirationDate}</span>
-                    )}
-                  </p>
-
-                  {/* Add timeline visualization */}
-                  {renderTimeline()}
-
-                  <BillingInfo
-                    subscription={subscription}
-                    formattedGiftExpirationDate={formattedGiftExpirationDate}
-                    formattedRenewalDate={formattedRenewalDate}
-                    hasActivePlan={hasActivePlan}
-                    isLifetimePlan={isLifetimePlan}
-                  />
-                </div>
-              )}
-            </div>
-          }
-          type='warning'
-          showIcon={false}
-        />
+        GiftSubtitle
       ) : statusInfo?.message && !statusInfo.message.includes('Gift subscription') ? (
         <Alert
           className={getAlertStyles(statusInfo.type)}
@@ -613,46 +538,7 @@ export function SubscriptionAlerts({
       ) : null}
 
       {/* Grace period alert */}
-      {shouldShowGracePeriodAlert && (
-        <Alert
-          className={getAlertStyles('warning')}
-          message={
-            <SubscriptionAlertMessage
-              icon={<CalendarIcon size={18} className='text-amber-400' />}
-              text='Free Pro Access Period'
-              color='text-amber-300'
-            />
-          }
-          description={
-            <div className='mt-1 text-amber-300'>
-              <p>All users have free Pro access until {gracePeriodPrettyDate}.</p>
-              {isGiftAfterGracePeriod() && (
-                <div>
-                  <p className='mt-1'>
-                    Gift activates {gracePeriodEndNextDay}
-                    {formattedGiftExpirationDate && (
-                      <span> until {formattedGiftExpirationDate}</span>
-                    )}
-                  </p>
-
-                  {/* Add timeline visualization */}
-                  {renderTimeline()}
-
-                  <BillingInfo
-                    subscription={subscription}
-                    formattedGiftExpirationDate={formattedGiftExpirationDate}
-                    formattedRenewalDate={formattedRenewalDate}
-                    hasActivePlan={hasActivePlan}
-                    isLifetimePlan={isLifetimePlan}
-                  />
-                </div>
-              )}
-            </div>
-          }
-          type='warning'
-          showIcon={false}
-        />
-      )}
+      {shouldShowGracePeriodAlert && GiftSubtitle}
 
       {/* Gift info for users with gift subscriptions */}
       {giftInfo.hasGifts && !subscription?.isGift && !formattedGiftExpirationDate && (
