@@ -1,6 +1,6 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
-import { SUBSCRIPTION_TIERS, getSubscription } from '@/utils/subscription'
+import { SUBSCRIPTION_TIERS, getSubscription, isSubscriptionActive } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -23,7 +23,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const subscription = await getSubscription(userIdToUse)
-    if (!subscription) {
+
+    // Return free tier if no subscription or subscription is not active
+    if (!subscription || !isSubscriptionActive(subscription)) {
       return res.status(200).json({
         tier: SUBSCRIPTION_TIERS.FREE,
         status: null,
