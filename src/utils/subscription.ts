@@ -164,7 +164,6 @@ export const GRACE_PERIOD_END = new Date('2025-04-30T23:59:59.999Z')
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
   subscription: Partial<SubscriptionRow> | null,
-  proExpiration?: Date | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
   const requiredTier = getRequiredTier(feature)
   const isFreeFeature = requiredTier === SUBSCRIPTION_TIERS.FREE
@@ -174,14 +173,6 @@ export function canAccessFeature(
   if (isInGracePeriod()) {
     return {
       hasAccess: true, // All features are accessible during grace period
-      requiredTier,
-    }
-  }
-
-  // Check if user has an active pro expiration date
-  if (proExpiration && new Date(proExpiration) > new Date()) {
-    return {
-      hasAccess: true,
       requiredTier,
     }
   }
@@ -279,15 +270,6 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
 export async function getSubscription(userId: string, tx?: Prisma.TransactionClient) {
   const db = tx || prisma
 
-  // Get the user to check proExpiration
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: { proExpiration: true },
-  })
-
-  // Check if user has an active pro expiration
-  const hasActiveProExpiration = user?.proExpiration && new Date(user.proExpiration) > new Date()
-
   // Find all active subscriptions for the user
   const subscriptions = await db.subscription.findMany({
     where: {
@@ -348,24 +330,6 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   // If no non-gift subscription found, check if we should create a virtual subscription
   // If no subscriptions found
   if (subscriptions.length === 0) {
-    // If user has an active proExpiration but no subscription, create a virtual subscription
-    if (hasActiveProExpiration) {
-      return {
-        tier: SUBSCRIPTION_TIERS.PRO,
-        status: SubscriptionStatus.ACTIVE,
-        transactionType: TransactionType.RECURRING,
-        currentPeriodEnd: user?.proExpiration,
-        cancelAtPeriodEnd: true,
-        stripePriceId: '',
-        stripeCustomerId: '',
-        createdAt: new Date(),
-        stripeSubscriptionId: null,
-        isGift: true,
-        giftDetails: null,
-        isVirtual: true, // Mark as virtual subscription
-      }
-    }
-
     // Handle grace period
     if (isInGracePeriod()) {
       return {
@@ -421,7 +385,7 @@ export function getSubscriptionStatusInfo(
   transactionType?: string | null,
   stripeSubscriptionId?: string | null,
   isGift?: boolean,
-  proExpiration?: Date | null,
+  metadata?: Record<string, unknown> | null,
 ): StatusInfo | null {
   // Check for lifetime subscription first (highest priority)
   if (
@@ -434,76 +398,6 @@ export function getSubscriptionStatusInfo(
       message: isGift ? 'Lifetime access via gift' : 'Lifetime access',
       type: 'success',
       badge: 'default',
-    }
-  }
-
-  // For users with both a regular subscription and gift subscription
-  // We prioritize showing the regular subscription status, but mention the gift
-  if (
-    status &&
-    (status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIALING) &&
-    !isGift &&
-    proExpiration &&
-    new Date(proExpiration) > new Date()
-  ) {
-    // Calculate days remaining for better messaging
-    const daysRemaining = currentPeriodEnd
-      ? Math.ceil(
-          (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-        )
-      : 0
-
-    // Check if subscription is ending within 10 days
-    const isEndingSoon = currentPeriodEnd && cancelAtPeriodEnd && daysRemaining <= 10
-
-    // Format end date
-    const endDate = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'unknown'
-
-    // Check if gift extends beyond subscription
-    const giftExtendsSubscription =
-      currentPeriodEnd && new Date(proExpiration) > new Date(currentPeriodEnd)
-
-    // Check if we're in grace period and gift extends beyond it
-    const isGiftAfterGracePeriod =
-      isInGracePeriod() && new Date(proExpiration) > new Date(GRACE_PERIOD_END)
-
-    return {
-      message: isGiftAfterGracePeriod
-        ? `Renews on ${endDate} (gift active first)`
-        : cancelAtPeriodEnd
-          ? isEndingSoon
-            ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} with gift extension`
-            : `Subscription ends on ${endDate} with gift extension`
-          : `Renews on ${endDate} with gift backup`,
-      type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
-      badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
-    }
-  }
-
-  // Check for proExpiration (gift subscriptions)
-  if (proExpiration && new Date(proExpiration) > new Date()) {
-    const daysRemaining = Math.ceil(
-      (new Date(proExpiration).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-    )
-
-    // Check if it's a far future date (lifetime)
-    if (new Date(proExpiration).getFullYear() > 2090) {
-      return {
-        message: 'Lifetime access via gift',
-        type: 'success',
-        badge: 'gold',
-      }
-    }
-
-    // Regular gift with expiration
-    const isEndingSoon = daysRemaining <= 10
-
-    return {
-      message: isEndingSoon
-        ? `Gift subscription ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
-        : `Gift subscription active until ${formatDate(proExpiration)}`,
-      type: isEndingSoon ? 'warning' : 'success',
-      badge: isEndingSoon ? 'red' : 'gold',
     }
   }
 
@@ -631,16 +525,8 @@ export function getSubscriptionTier(
   return SUBSCRIPTION_TIERS.FREE
 }
 
-// Update the hasPaidSubscription check to include proExpiration
-export function hasPaidPlan(
-  subscription: Partial<SubscriptionRow> | null,
-  proExpiration?: Date | null,
-): boolean {
-  // Check for proExpiration first
-  if (proExpiration && new Date(proExpiration) > new Date()) {
-    return true
-  }
-
+// Update the hasPaidSubscription check
+export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): boolean {
   if (!subscription) return false
 
   // Check for lifetime subscription
@@ -649,13 +535,15 @@ export function hasPaidPlan(
   // Check for recurring subscription with Stripe ID
   if (subscription.stripeSubscriptionId) return true
 
+  // Check for gift subscription
+  if (subscription.isGift && isSubscriptionActive({ status: subscription.status })) return true
+
   return false
 }
 
 // Add a function to get gift subscription information
 export function getGiftSubscriptionInfo(
   subscription: Partial<SubscriptionRow> | null,
-  proExpiration?: Date | null,
   giftDetails?: {
     senderName?: string | null
     giftType?: string | null
@@ -663,62 +551,6 @@ export function getGiftSubscriptionInfo(
     giftMessage?: string | null
   } | null,
 ): GiftSubInfo & { expirationDate?: Date | null } {
-  // Check if this is a regular subscription with a gift extension
-  if (
-    subscription &&
-    !subscription.isGift &&
-    proExpiration &&
-    new Date(proExpiration) > new Date()
-  ) {
-    const isLifetime = new Date(proExpiration).getFullYear() > 2090
-
-    // Check if gift extends beyond subscription
-    const giftExtendsSubscription =
-      subscription.currentPeriodEnd &&
-      new Date(proExpiration) > new Date(subscription.currentPeriodEnd)
-
-    // Check if we're in grace period and gift extends beyond it
-    const isGiftAfterGracePeriod =
-      isInGracePeriod() && new Date(proExpiration) > new Date(GRACE_PERIOD_END)
-
-    return {
-      message: isLifetime
-        ? 'You have both a regular subscription and a lifetime gift subscription.'
-        : isGiftAfterGracePeriod
-          ? `You have a gift subscription that will activate on ${gracePeriodEndNextDay}. Your paid subscription will not be charged until after your gift expires on ${formatDate(proExpiration)}.`
-          : giftExtendsSubscription
-            ? `You have a gift subscription that will extend your access after your current subscription ${subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}.`
-            : 'You have both a regular subscription and a gift subscription.',
-      isGift: false, // Not primarily a gift subscription
-      senderName: giftDetails?.senderName || 'Anonymous',
-      giftType: giftDetails?.giftType || (isLifetime ? 'lifetime' : 'monthly'),
-      giftQuantity: giftDetails?.giftQuantity || 1,
-      giftMessage: giftDetails?.giftMessage || undefined,
-      expirationDate: proExpiration,
-    }
-  }
-
-  // Check proExpiration for gift subscriptions
-  if (proExpiration && new Date(proExpiration) > new Date()) {
-    const isLifetime = new Date(proExpiration).getFullYear() > 2090
-    const isAfterGracePeriod =
-      isInGracePeriod() && new Date(proExpiration) > new Date(GRACE_PERIOD_END)
-
-    return {
-      message: isLifetime
-        ? 'You have received a lifetime gift subscription. Enjoy all premium features forever!'
-        : isAfterGracePeriod
-          ? `You have received a gift subscription that will activate on ${gracePeriodEndNextDay} and extend your access until ${formatDate(proExpiration)}. This gift will not auto-renew.`
-          : `You have received a gift subscription that extends your access until ${formatDate(proExpiration)}. This gift will not auto-renew.`,
-      isGift: true,
-      senderName: giftDetails?.senderName || 'Anonymous',
-      giftType: giftDetails?.giftType || (isLifetime ? 'lifetime' : 'monthly'),
-      giftQuantity: giftDetails?.giftQuantity || 1,
-      giftMessage: giftDetails?.giftMessage || undefined,
-      expirationDate: proExpiration,
-    }
-  }
-
   // Fall back to subscription data
   if (!subscription?.isGift) {
     return { message: '', isGift: false }
@@ -740,29 +572,4 @@ export function getGiftSubscriptionInfo(
     giftMessage: giftDetails?.giftMessage || undefined,
     expirationDate: subscription.currentPeriodEnd || null,
   }
-}
-
-// Add a function to check if a user has pro access based on proExpiration or subscription
-export function hasProAccess(
-  subscription: Partial<SubscriptionRow> | null,
-  proExpiration?: Date | null,
-): boolean {
-  // Check proExpiration first (source of truth for gift access)
-  if (proExpiration && new Date(proExpiration) > new Date()) {
-    return true
-  }
-
-  // Check grace period
-  if (isInGracePeriod()) {
-    return true
-  }
-
-  // Check subscription
-  if (!subscription) return false
-
-  // Check if subscription is active
-  if (!subscription.status || !isSubscriptionActive({ status: subscription.status })) return false
-
-  // Check tier
-  return subscription.tier === SUBSCRIPTION_TIERS.PRO
 }

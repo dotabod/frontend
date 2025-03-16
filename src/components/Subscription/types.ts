@@ -7,7 +7,6 @@ export interface GiftInfo {
   hasGifts: boolean
   giftCount: number
   giftMessage: string
-  proExpiration: Date | null
   hasLifetime: boolean
   giftSubscriptions?: Array<{
     id: string

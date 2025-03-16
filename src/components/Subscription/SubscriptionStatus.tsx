@@ -18,7 +18,6 @@ export function SubscriptionStatusComponent() {
     hasGifts: false,
     giftCount: 0,
     giftMessage: '',
-    proExpiration: null,
     hasLifetime: false,
   })
 
@@ -30,7 +29,6 @@ export function SubscriptionStatusComponent() {
       ...subscription,
       transactionType: subscription?.transactionType || undefined,
     },
-    giftInfo.proExpiration,
     subscription?.giftDetails,
   )
 
@@ -56,6 +54,20 @@ export function SubscriptionStatusComponent() {
 
   // Get appropriate subtitle based on subscription status
   const getSubtitle = () => {
+    // Helper function to get the latest gift expiration date
+    const getLatestGiftEndDate = () => {
+      if (!giftInfo.giftSubscriptions?.length) return null
+
+      return giftInfo.giftSubscriptions.reduce(
+        (latest, gift) => {
+          if (!gift.endDate) return latest
+          if (!latest) return gift.endDate
+          return new Date(gift.endDate) > new Date(latest) ? gift.endDate : latest
+        },
+        null as Date | null,
+      )
+    }
+
     // If user has a gift subscription
     if (giftSubInfo?.isGift && subscription?.tier) {
       // Special case for lifetime gift
@@ -80,17 +92,21 @@ export function SubscriptionStatusComponent() {
     // If user has a paid subscription
     if (hasActivePlan && subscription?.tier) {
       // If they also have gift subscriptions
-      if (giftInfo.hasGifts && giftInfo.proExpiration) {
-        const giftExpirationDate = new Date(giftInfo.proExpiration)
+      if (giftInfo.hasGifts && giftInfo.giftSubscriptions?.length) {
+        const latestGiftEndDate = getLatestGiftEndDate()
         const subscriptionEndDate = subscription.currentPeriodEnd
           ? new Date(subscription.currentPeriodEnd)
           : null
 
         // If gift extends beyond subscription
-        if (subscriptionEndDate && giftExpirationDate > subscriptionEndDate) {
+        if (
+          subscriptionEndDate &&
+          latestGiftEndDate &&
+          new Date(latestGiftEndDate) > subscriptionEndDate
+        ) {
           return `You are on the ${
             subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
-          } plan (${period}) with additional gift coverage until ${giftExpirationDate.toLocaleDateString()}`
+          } plan (${period}) with additional gift coverage until ${new Date(latestGiftEndDate).toLocaleDateString()}`
         }
 
         return `You are on the ${

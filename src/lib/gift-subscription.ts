@@ -37,7 +37,6 @@ export async function fetchGiftSubscriptions(): Promise<{
   giftCount: number
   hasLifetime: boolean
   giftMessage: string
-  proExpiration: Date | null
   giftSubscriptions?: Array<{
     id: string
     endDate: Date | null
@@ -63,7 +62,6 @@ export async function fetchGiftSubscriptions(): Promise<{
       giftCount: 0,
       hasLifetime: false,
       giftMessage: '',
-      proExpiration: null,
     }
   }
 }

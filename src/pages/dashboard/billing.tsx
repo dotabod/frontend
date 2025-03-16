@@ -43,7 +43,6 @@ const BillingPage = () => {
     hasGifts: boolean
     giftCount: number
     giftMessage: string
-    proExpiration: Date | null
     hasLifetime: boolean
     giftSubscriptions?: Array<{
       id: string
@@ -58,7 +57,6 @@ const BillingPage = () => {
     hasGifts: false,
     giftCount: 0,
     giftMessage: '',
-    proExpiration: null,
     hasLifetime: false,
   })
   const { data: session } = useSession()
@@ -74,8 +72,6 @@ const BillingPage = () => {
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
     subscription?.isGift,
-    // Only pass proExpiration if there are actual gift subscriptions
-    giftInfo.hasGifts ? giftInfo.proExpiration : null,
   )
 
   // Get gift subscription info if applicable
@@ -85,8 +81,6 @@ const BillingPage = () => {
       // Convert null to undefined for transactionType
       transactionType: subscription?.transactionType || undefined,
     },
-    // Only pass proExpiration if there are actual gift subscriptions
-    giftInfo.hasGifts ? giftInfo.proExpiration : null,
     subscription?.giftDetails,
   )
 

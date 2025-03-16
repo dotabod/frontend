@@ -43,12 +43,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       (sub) => sub.giftDetails?.giftType === 'lifetime' || sub.transactionType === 'LIFETIME',
     )
 
-    // Get the user's pro expiration date
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { proExpiration: true },
-    })
-
     // Format gift subscriptions for the response
     const formattedGifts = giftSubscriptions.map((sub) => ({
       id: sub.id,
@@ -60,27 +54,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       createdAt: sub.createdAt,
     }))
 
+    // Find the latest gift expiration date
+    const latestGift = giftSubscriptions.reduce(
+      (latest, current) => {
+        if (!latest.currentPeriodEnd) return current
+        if (!current.currentPeriodEnd) return latest
+        return current.currentPeriodEnd > latest.currentPeriodEnd ? current : latest
+      },
+      { currentPeriodEnd: null } as (typeof giftSubscriptions)[0],
+    )
+
     // Create a message based on the gift status
     let giftMessage = ''
     if (hasLifetime) {
       giftMessage = 'You have a lifetime subscription!'
-    } else if (hasGifts && user?.proExpiration) {
-      const expirationDate = new Date(user.proExpiration)
+    } else if (hasGifts && latestGift.currentPeriodEnd) {
+      const expirationDate = new Date(latestGift.currentPeriodEnd)
       giftMessage = `Your Pro subscription is active until ${expirationDate.toLocaleDateString()}`
     } else if (hasGifts) {
       giftMessage = 'You have active gift subscriptions!'
     }
-
-    // Only include proExpiration if there are actual gift subscriptions
-    // or if the proExpiration is specifically from a gift
-    const proExpiration = hasGifts ? user?.proExpiration : null
 
     return res.status(200).json({
       hasGifts,
       giftCount,
       hasLifetime,
       giftMessage,
-      proExpiration,
       giftSubscriptions: formattedGifts,
     })
   } catch (error) {
