@@ -1,26 +1,16 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
-import {
-  getCurrentPeriod,
-  getGiftSubscriptionInfo,
-  getSubscriptionStatusInfo,
-} from '@/utils/subscription'
+import { getCurrentPeriod, getGiftSubscriptionInfo } from '@/utils/subscription'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { SubscriptionAlerts } from './SubscriptionAlerts'
 import type { GiftInfo, SubscriptionWithGiftDetails } from './types'
 
-interface SubscriptionStatusProps {
-  showAlert?: boolean
-}
-
-export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionStatusProps) {
+export function SubscriptionStatusComponent() {
   const {
     subscription: rawSubscription,
     inGracePeriod,
     hasActivePlan,
     isLifetimePlan,
-    isPro,
   } = useSubscriptionContext()
   const subscription = rawSubscription as unknown as SubscriptionWithGiftDetails
   const { data: session } = useSession()
@@ -33,16 +23,6 @@ export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionSt
   })
 
   const period = getCurrentPeriod(subscription?.stripePriceId)
-
-  const statusInfo = getSubscriptionStatusInfo(
-    subscription?.status,
-    subscription?.cancelAtPeriodEnd,
-    subscription?.currentPeriodEnd,
-    subscription?.transactionType,
-    subscription?.stripeSubscriptionId,
-    subscription?.isGift,
-    giftInfo.proExpiration,
-  )
 
   // Get gift subscription info if applicable
   const giftSubInfo = getGiftSubscriptionInfo(
@@ -142,23 +122,9 @@ export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionSt
     return 'Manage your subscription and billing settings'
   }
 
-  // Dummy function for SubscriptionAlerts
-  const handlePortalAccess = async () => {}
-
   return (
     <div className='flex flex-col gap-4'>
-      {showAlert ? (
-        <SubscriptionAlerts
-          giftInfo={giftInfo}
-          statusInfo={statusInfo}
-          handlePortalAccess={handlePortalAccess}
-          isLoading={false}
-          giftSubInfo={giftSubInfo}
-          hideManageButton={true}
-        />
-      ) : (
-        <div className='text-base font-medium text-gray-300'>{getSubtitle()}</div>
-      )}
+      <div className='text-base font-medium text-gray-300'>{getSubtitle()}</div>
     </div>
   )
 }

@@ -57,4 +57,6 @@ export interface SubscriptionWithGiftDetails {
     giftQuantity?: number | null
     giftMessage?: string | null
   } | null
+  isVirtual?: boolean
+  isGracePeriodVirtual?: boolean
 }

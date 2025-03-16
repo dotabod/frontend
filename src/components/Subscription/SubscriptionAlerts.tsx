@@ -4,6 +4,7 @@ import { Button, Alert } from 'antd'
 import { ExternalLinkIcon, GiftIcon, CalendarIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import type { GiftInfo, StatusInfo, GiftSubInfo } from './types'
+import type { SubscriptionWithGiftDetails } from './types'
 
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
@@ -51,6 +52,15 @@ export function SubscriptionAlerts({
   const formatGiftTime = (date: Date) => {
     return formatDistanceToNow(new Date(date), { addSuffix: true })
   }
+
+  // Check if this is a virtual subscription created for the grace period
+  const isVirtualGracePeriodSubscription =
+    (subscription as unknown as SubscriptionWithGiftDetails)?.isGracePeriodVirtual ||
+    (inGracePeriod &&
+      subscription?.status === 'TRIALING' &&
+      !subscription?.stripeSubscriptionId &&
+      subscription?.currentPeriodEnd &&
+      new Date(subscription.currentPeriodEnd).getTime() === new Date(GRACE_PERIOD_END).getTime())
 
   return (
     <div className='space-y-4'>
@@ -208,6 +218,42 @@ export function SubscriptionAlerts({
           type={statusInfo?.type || 'info'}
           showIcon={false}
         />
+      ) : isVirtualGracePeriodSubscription ? (
+        /* For virtual subscriptions created during grace period, only show the grace period alert */
+        <Alert
+          className='max-w-2xl rounded-lg border-2 border-amber-800 bg-amber-950/60 shadow-sm'
+          message={
+            <div className='flex items-center gap-2 font-medium text-amber-300'>
+              <CalendarIcon size={18} className='text-amber-400' />
+              <span>Free Pro Access Period</span>
+            </div>
+          }
+          description={
+            <div className='mt-1 text-amber-300'>
+              <p>All users have free Pro access until {gracePeriodPrettyDate}.</p>
+              {isGiftAfterGracePeriod() && (
+                <div>
+                  <p className='mt-1'>
+                    Your gift subscription will automatically activate after this period ends
+                    {giftInfo.proExpiration
+                      ? ` and will be active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}`
+                      : ''}
+                    .
+                  </p>
+                  {!hasActivePlan && giftInfo.proExpiration && (
+                    <p className='mt-1 font-medium'>
+                      After your gift expires on{' '}
+                      {new Date(giftInfo.proExpiration).toLocaleDateString()}, you will be charged
+                      for a subscription unless you cancel before then.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          }
+          type='warning'
+          showIcon={false}
+        />
       ) : statusInfo?.message && !statusInfo.message.includes('Gift subscription') ? (
         <Alert
           className='max-w-2xl rounded-lg border-2 border-indigo-800 bg-indigo-950/60 shadow-sm'
@@ -258,8 +304,8 @@ export function SubscriptionAlerts({
         />
       ) : null}
 
-      {/* Only show grace period alert if not a lifetime plan and in grace period */}
-      {!isLifetimePlan && inGracePeriod && (
+      {/* Only show grace period alert if not a lifetime plan, in grace period, and not a virtual grace period subscription */}
+      {!isLifetimePlan && inGracePeriod && !isVirtualGracePeriodSubscription && (
         <Alert
           className='max-w-2xl rounded-lg border-2 border-amber-800 bg-amber-950/60 shadow-sm'
           message={

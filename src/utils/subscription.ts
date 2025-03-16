@@ -362,6 +362,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
         stripeSubscriptionId: null,
         isGift: true,
         giftDetails: null,
+        isVirtual: true, // Mark as virtual subscription
       }
     }
 
@@ -379,6 +380,8 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
         stripeSubscriptionId: null,
         isGift: false,
         giftDetails: null,
+        isVirtual: true, // Mark as virtual subscription for grace period
+        isGracePeriodVirtual: true, // Specifically mark as grace period virtual subscription
       }
     }
 
@@ -485,8 +488,19 @@ export function getSubscriptionStatusInfo(
     }
   }
 
+  // Check if this is a virtual subscription created for the grace period
+  const isVirtualGracePeriodSubscription =
+    isInGracePeriod() &&
+    status === SubscriptionStatus.TRIALING &&
+    !stripeSubscriptionId &&
+    currentPeriodEnd &&
+    new Date(currentPeriodEnd).getTime() === new Date(GRACE_PERIOD_END).getTime()
+
   // If we're in the grace period but user doesn't have a paid plan, show grace period message
-  if (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId)) {
+  if (
+    isVirtualGracePeriodSubscription ||
+    (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId))
+  ) {
     return {
       message: `Free Pro access until ${gracePeriodPrettyDate}`,
       type: 'info',
