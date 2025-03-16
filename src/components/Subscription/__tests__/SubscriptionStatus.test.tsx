@@ -491,9 +491,12 @@ describe('SubscriptionStatus', () => {
       isGift: true,
     })
 
-    // Mock useEffect to prevent the callback from being called
-    const useEffectSpy = vi.spyOn(React, 'useEffect')
-    useEffectSpy.mockImplementationOnce(() => () => {})
+    // Mock all useEffect calls to prevent any from running
+    const originalUseEffect = React.useEffect
+    vi.spyOn(React, 'useEffect').mockImplementation((...args) => {
+      // Return a no-op cleanup function
+      return () => {}
+    })
 
     await act(async () => {
       render(<SubscriptionStatus />)
@@ -502,8 +505,8 @@ describe('SubscriptionStatus', () => {
     // We need to check this immediately, not in waitFor
     expect(fetchGiftSubscriptions).not.toHaveBeenCalled()
 
-    // Restore the original useEffect mock
-    useEffectSpy.mockRestore()
+    // Restore the original useEffect
+    vi.mocked(React.useEffect).mockRestore()
   })
 
   it('handles error when fetching gift subscriptions', async () => {

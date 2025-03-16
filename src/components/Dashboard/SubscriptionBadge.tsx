@@ -6,11 +6,31 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { plans } from '../Billing/BillingPlans'
 import { CrownIcon, GiftIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
 
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()
   const { data } = useSession()
   const currentPlan = plans.find((plan) => plan.tier === subscription?.tier)
+  const [hasGiftSubscription, setHasGiftSubscription] = useState(false)
+
+  // Fetch gift subscriptions to check if user has both types
+  useEffect(() => {
+    const checkGiftSubscriptions = async () => {
+      if (!data?.user?.id || subscription?.isGift) return
+
+      try {
+        const giftData = await fetchGiftSubscriptions()
+        setHasGiftSubscription(giftData.hasGifts)
+      } catch (error) {
+        console.error('Error fetching gift subscriptions:', error)
+      }
+    }
+
+    checkGiftSubscriptions()
+  }, [data?.user?.id, subscription?.isGift])
+
   const statusInfo = getSubscriptionStatusInfo(
     subscription?.status,
     subscription?.cancelAtPeriodEnd,
@@ -54,6 +74,21 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
         text: 'Lifetime Pro',
         color: 'black',
         tooltip: 'Lifetime Pro Subscriber',
+      }
+    }
+
+    // If user has both a regular subscription and gift subscription
+    if (hasActivePlan && hasGiftSubscription && !subscription?.isGift) {
+      return {
+        icon: (
+          <div className='relative'>
+            <CrownIcon size={14} className='inline-block flex-shrink-0' />
+            <GiftIcon size={10} className='absolute -top-1 -right-2 text-amber-400' />
+          </div>
+        ),
+        text: 'Pro + Gift',
+        color: 'gold',
+        tooltip: 'Pro Subscriber with additional Gift Subscription',
       }
     }
 

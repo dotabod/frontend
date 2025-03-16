@@ -100,9 +100,21 @@ export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionSt
   // Fetch gift information when the component mounts or when session changes
   useEffect(() => {
     if (!session?.user?.id) return
-    if (subscription?.isGift) return // Don't fetch if we already have a gift subscription
 
-    fetchGiftSubscriptions().catch(console.error)
+    // Skip fetching if the primary subscription is already a gift subscription
+    // This maintains backward compatibility with existing tests
+    if (subscription?.isGift) return
+
+    const getGiftInfo = async () => {
+      try {
+        const giftData = await fetchGiftSubscriptions()
+        setGiftInfo(giftData)
+      } catch (error) {
+        console.error('Error fetching gift subscriptions:', error)
+      }
+    }
+
+    getGiftInfo()
   }, [session?.user?.id, subscription?.isGift])
 
   // Get appropriate subtitle based on subscription status
@@ -131,7 +143,19 @@ export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionSt
     // If user has a paid subscription
     if (hasActivePlan && subscription?.tier) {
       // If they also have gift subscriptions
-      if (giftInfo.hasGifts) {
+      if (giftInfo.hasGifts && giftInfo.proExpiration) {
+        const giftExpirationDate = new Date(giftInfo.proExpiration)
+        const subscriptionEndDate = subscription.currentPeriodEnd
+          ? new Date(subscription.currentPeriodEnd)
+          : null
+
+        // If gift extends beyond subscription
+        if (subscriptionEndDate && giftExpirationDate > subscriptionEndDate) {
+          return `You are on the ${
+            subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
+          } plan (${period}) with additional gift coverage until ${giftExpirationDate.toLocaleDateString()}`
+        }
+
         return `You are on the ${
           subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
         } plan (${period}) with additional gift subscription(s)`
@@ -308,7 +332,6 @@ export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionSt
               showIcon={false}
             />
           ) : statusInfo?.message && !statusInfo.message.includes('Gift subscription') ? (
-            /* For regular subscriptions, show the status info if it's not about gift subscriptions */
             <Alert
               className='mt-6 max-w-2xl rounded-lg border-2 border-indigo-800 bg-indigo-950/60 shadow-sm'
               message={
@@ -319,6 +342,38 @@ export function SubscriptionStatusComponent({ showAlert = true }: SubscriptionSt
                     <ClockIcon size={18} className='text-indigo-400' />
                   )}
                   <span>{statusInfo.message}</span>
+                </div>
+              }
+              description={
+                <div className='mt-1 text-indigo-300'>
+                  {subscription?.currentPeriodEnd && (
+                    <p>
+                      Your subscription will {subscription.cancelAtPeriodEnd ? 'end' : 'renew'} on{' '}
+                      {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                    </p>
+                  )}
+
+                  {/* Show gift subscription info if user has both regular and gift subscriptions */}
+                  {giftInfo.hasGifts && giftInfo.proExpiration && (
+                    <div className='mt-2 border-t border-indigo-800/50 pt-2'>
+                      <p className='flex items-center gap-1 text-sm'>
+                        <GiftIcon size={14} className='text-indigo-400' />
+                        <span className='font-medium'>Gift subscription active</span>
+                      </p>
+                      <p className='mt-1 text-sm'>
+                        {new Date() < new Date(giftInfo.proExpiration)
+                          ? `You also have a gift subscription active until ${new Date(giftInfo.proExpiration).toLocaleDateString()}`
+                          : 'Your gift subscription has expired'}
+                      </p>
+                      {giftInfo.giftSubscriptions && giftInfo.giftSubscriptions.length > 0 && (
+                        <p className='mt-1 text-xs text-indigo-400'>
+                          From: {giftInfo.giftSubscriptions[0].senderName}
+                          {giftInfo.giftSubscriptions.length > 1 &&
+                            ` and ${giftInfo.giftSubscriptions.length - 1} others`}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               }
               type={statusInfo.type}

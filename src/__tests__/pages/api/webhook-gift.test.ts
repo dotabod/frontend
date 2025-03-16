@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createMocks } from 'node-mocks-http'
 import prisma from '@/lib/db'
 import type { PrismaClient } from '@prisma/client'
+import { stripe } from '@/lib/stripe-server'
+import type { Stripe } from 'stripe'
 
 // Mock the webhook handler directly
 vi.mock('@/pages/api/stripe/webhook', () => ({
@@ -261,6 +263,82 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
         'stripe-signature': 't=1234567890,v1=fake_signature',
       },
     })
+
+    await handler(req, res)
+
+    // Verify the response
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData()).toEqual({ received: true })
+  })
+
+  it('handles user subscribing after receiving a gift subscription', async () => {
+    const { req, res } = createMocks({
+      method: 'POST',
+      headers: {
+        'stripe-signature': 't=1234567890,v1=fake_signature',
+      },
+      body: {
+        type: 'customer.subscription.created',
+        data: {
+          object: {
+            id: 'sub_123',
+            customer: 'cus_123',
+            status: 'active',
+            items: {
+              data: [{ price: { id: 'price_monthly_test' } }],
+            },
+            current_period_end: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days from now
+          },
+        },
+      },
+    })
+
+    // Mock customer data with userId
+    vi.mocked(stripe.customers.retrieve).mockResolvedValueOnce({
+      id: 'cus_123',
+      metadata: { userId: 'user-123' },
+      lastResponse: {
+        headers: {},
+        requestId: 'req_123',
+        statusCode: 200,
+      },
+    } as unknown as Stripe.Response<Stripe.Customer>)
+
+    // Mock existing gift subscription
+    const giftExpiration = new Date()
+    giftExpiration.setMonth(giftExpiration.getMonth() + 2) // Gift expires in 2 months
+
+    const mockTx = {
+      webhookEvent: {
+        create: vi.fn().mockResolvedValueOnce({ id: 'webhook-1' }),
+        findUnique: vi.fn().mockResolvedValueOnce(null),
+      },
+      user: {
+        findUnique: vi.fn().mockResolvedValueOnce({
+          id: 'user-123',
+          email: 'user@example.com',
+          name: 'User',
+          proExpiration: giftExpiration,
+        }),
+        update: vi.fn().mockResolvedValueOnce({ id: 'user-123' }),
+      },
+      subscription: {
+        findFirst: vi.fn().mockResolvedValueOnce({
+          id: 'gift-sub-123',
+          userId: 'user-123',
+          status: 'ACTIVE',
+          tier: 'PRO',
+          isGift: true,
+          currentPeriodEnd: giftExpiration,
+        }),
+        findMany: vi.fn().mockResolvedValueOnce([]),
+        upsert: vi.fn().mockResolvedValueOnce({ id: 'sub-123' }),
+      },
+    }
+
+    vi.mocked(prisma.$transaction).mockImplementationOnce((callback) =>
+      callback(mockTx as unknown as PrismaClient),
+    )
 
     await handler(req, res)
 

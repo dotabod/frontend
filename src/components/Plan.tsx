@@ -14,7 +14,7 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
 } from '@/utils/subscription'
-import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
 import { App, Button, notification, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { Bitcoin, CheckIcon } from 'lucide-react'

@@ -6,7 +6,7 @@ import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
 import { getSubscriptionStatusInfo, isSubscriptionActive } from '@/utils/subscription'
 import { Alert, Button, Space, Typography } from 'antd'
-import { ExternalLinkIcon } from 'lucide-react'
+import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
@@ -20,10 +20,23 @@ const BillingPage = () => {
     hasGifts: boolean
     giftCount: number
     giftMessage: string
+    proExpiration: Date | null
+    hasLifetime: boolean
+    giftSubscriptions?: Array<{
+      id: string
+      endDate: Date | null
+      senderName: string
+      giftType: string
+      giftQuantity: number
+      giftMessage: string
+      createdAt: Date
+    }>
   }>({
     hasGifts: false,
     giftCount: 0,
     giftMessage: '',
+    proExpiration: null,
+    hasLifetime: false,
   })
   const { data: session } = useSession()
   const { subscription, isLifetimePlan } = useSubscriptionContext()
@@ -35,23 +48,24 @@ const BillingPage = () => {
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
     subscription?.isGift,
+    giftInfo.proExpiration,
   )
 
   // Fetch gift information when the component mounts
   useEffect(() => {
     const fetchGiftInfo = async () => {
-      if (session?.user?.id && !subscription?.isGift) {
-        try {
-          const gifts = await fetchGiftSubscriptions()
-          setGiftInfo(gifts)
-        } catch (error) {
-          console.error('Error fetching gift information:', error)
-        }
+      if (!session?.user?.id) return
+
+      try {
+        const gifts = await fetchGiftSubscriptions()
+        setGiftInfo(gifts)
+      } catch (error) {
+        console.error('Error fetching gift information:', error)
       }
     }
 
     fetchGiftInfo()
-  }, [session?.user?.id, subscription?.isGift])
+  }, [session?.user?.id])
 
   const handlePortalAccess = async () => {
     try {
@@ -76,6 +90,12 @@ const BillingPage = () => {
   if (session?.user?.isImpersonating) {
     return null
   }
+
+  // Determine if the user has both a regular subscription and gift subscription
+  const hasBothSubscriptionTypes =
+    isSubscriptionActive({ status: subscription?.status }) &&
+    !subscription?.isGift &&
+    giftInfo.hasGifts
 
   return (
     <>
@@ -106,6 +126,31 @@ const BillingPage = () => {
             )}
         </Space>
       </div>
+
+      {/* Show special alert for users with both subscription types */}
+      {hasBothSubscriptionTypes && subscription && (
+        <Alert
+          message='You Have Multiple Subscriptions'
+          description={
+            <div>
+              <p>You have both a regular subscription and gift subscription(s).</p>
+              {giftInfo.proExpiration && subscription.currentPeriodEnd && (
+                <p>
+                  Your gift subscription{giftInfo.giftCount > 1 ? 's' : ''} will extend your Pro
+                  access
+                  {subscription.cancelAtPeriodEnd
+                    ? ` after your current subscription ends on ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}.`
+                    : '.'}
+                </p>
+              )}
+            </div>
+          }
+          type='info'
+          showIcon
+          icon={<GiftIcon className='text-indigo-400' />}
+          className='mb-6 border-2 border-indigo-800 bg-indigo-950/60 text-indigo-300'
+        />
+      )}
 
       {statusInfo?.type === 'warning' && !subscription?.isGift && (
         <Alert

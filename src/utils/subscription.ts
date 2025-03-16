@@ -283,7 +283,8 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   // Check if user has an active pro expiration
   const hasActiveProExpiration = user?.proExpiration && new Date(user.proExpiration) > new Date()
 
-  const subscription = await db.subscription.findFirst({
+  // Find all active subscriptions for the user
+  const subscriptions = await db.subscription.findMany({
     where: {
       userId,
       OR: [
@@ -294,6 +295,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       ],
     },
     select: {
+      id: true,
       tier: true,
       status: true,
       transactionType: true,
@@ -318,48 +320,55 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       { transactionType: 'desc' },
       // Then active subscriptions
       { status: 'asc' },
+      // Then prioritize non-gift subscriptions
+      { isGift: 'asc' },
       // Then most recent
       { createdAt: 'desc' },
     ],
   })
 
-  // If user has an active proExpiration but no subscription, create a virtual subscription
-  if (!subscription && hasActiveProExpiration) {
-    return {
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: SubscriptionStatus.ACTIVE,
-      transactionType: TransactionType.RECURRING,
-      currentPeriodEnd: user?.proExpiration,
-      cancelAtPeriodEnd: true,
-      stripePriceId: '',
-      stripeCustomerId: '',
-      createdAt: new Date(),
-      stripeSubscriptionId: null,
-      isGift: true,
-      giftDetails: null,
+  // If no subscriptions found
+  if (subscriptions.length === 0) {
+    // If user has an active proExpiration but no subscription, create a virtual subscription
+    if (hasActiveProExpiration) {
+      return {
+        tier: SUBSCRIPTION_TIERS.PRO,
+        status: SubscriptionStatus.ACTIVE,
+        transactionType: TransactionType.RECURRING,
+        currentPeriodEnd: user?.proExpiration,
+        cancelAtPeriodEnd: true,
+        stripePriceId: '',
+        stripeCustomerId: '',
+        createdAt: new Date(),
+        stripeSubscriptionId: null,
+        isGift: true,
+        giftDetails: null,
+      }
     }
+
+    // Handle grace period
+    if (isInGracePeriod()) {
+      return {
+        tier: SUBSCRIPTION_TIERS.PRO,
+        status: SubscriptionStatus.TRIALING,
+        transactionType: TransactionType.RECURRING,
+        currentPeriodEnd: GRACE_PERIOD_END,
+        cancelAtPeriodEnd: true,
+        stripePriceId: '',
+        stripeCustomerId: '',
+        createdAt: new Date(),
+        stripeSubscriptionId: null,
+        isGift: false,
+        giftDetails: null,
+      }
+    }
+
+    return null
   }
 
-  // Handle grace period
-  if (!subscription && isInGracePeriod()) {
-    return {
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: SubscriptionStatus.TRIALING,
-      transactionType: TransactionType.RECURRING,
-      currentPeriodEnd: GRACE_PERIOD_END,
-      cancelAtPeriodEnd: true,
-      stripePriceId: '',
-      stripeCustomerId: '',
-      createdAt: new Date(),
-      stripeSubscriptionId: null,
-      isGift: false,
-      giftDetails: null,
-    }
-  }
-
-  return subscription
+  // Return the first subscription (based on our ordering)
+  return subscriptions[0]
 }
-
 export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
   const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
   const annual = Number.parseFloat(annualPrice.replace('$', ''))
@@ -383,7 +392,58 @@ export function getSubscriptionStatusInfo(
   isGift?: boolean,
   proExpiration?: Date | null,
 ): SubscriptionStatusInfo | null {
-  // Check for proExpiration first (this is the source of truth for gift subscriptions)
+  // Check for lifetime subscription first (highest priority)
+  if (
+    transactionType === 'LIFETIME' ||
+    (status === SubscriptionStatus.ACTIVE &&
+      currentPeriodEnd &&
+      currentPeriodEnd.getFullYear() > 2090)
+  ) {
+    return {
+      message: isGift ? 'Lifetime access via gift' : 'Lifetime access',
+      type: 'success',
+      badge: 'default',
+    }
+  }
+
+  // For users with both a regular subscription and gift subscription
+  // We prioritize showing the regular subscription status, but mention the gift
+  if (
+    status &&
+    (status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIALING) &&
+    !isGift &&
+    proExpiration &&
+    new Date(proExpiration) > new Date()
+  ) {
+    // Calculate days remaining for better messaging
+    const daysRemaining = currentPeriodEnd
+      ? Math.ceil(
+          (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+        )
+      : 0
+
+    // Check if subscription is ending within 10 days
+    const isEndingSoon = currentPeriodEnd && cancelAtPeriodEnd && daysRemaining <= 10
+
+    // Format end date
+    const endDate = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'unknown'
+
+    // Check if gift extends beyond subscription
+    const giftExtendsSubscription =
+      currentPeriodEnd && new Date(proExpiration) > new Date(currentPeriodEnd)
+
+    return {
+      message: cancelAtPeriodEnd
+        ? isEndingSoon
+          ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} with gift extension`
+          : `Subscription ends on ${endDate} with gift extension`
+        : `Renews on ${endDate} with gift backup`,
+      type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
+      badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
+    }
+  }
+
+  // Check for proExpiration (gift subscriptions)
   if (proExpiration && new Date(proExpiration) > new Date()) {
     const daysRemaining = Math.ceil(
       (new Date(proExpiration).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
@@ -420,20 +480,6 @@ export function getSubscriptionStatusInfo(
   }
 
   if (!status) return null
-
-  // Check for lifetime subscription
-  if (
-    transactionType === 'LIFETIME' ||
-    (status === SubscriptionStatus.ACTIVE &&
-      currentPeriodEnd &&
-      currentPeriodEnd.getFullYear() > 2090)
-  ) {
-    return {
-      message: isGift ? 'Lifetime access via gift' : 'Lifetime access',
-      type: 'success',
-      badge: 'default',
-    }
-  }
 
   // Calculate days remaining for better messaging
   const daysRemaining = currentPeriodEnd
@@ -584,7 +630,36 @@ export function getGiftSubscriptionInfo(
   giftMessage?: string
   expirationDate?: Date | null
 } {
-  // Check proExpiration first (source of truth for gift access)
+  // Check if this is a regular subscription with a gift extension
+  if (
+    subscription &&
+    !subscription.isGift &&
+    proExpiration &&
+    new Date(proExpiration) > new Date()
+  ) {
+    const isLifetime = new Date(proExpiration).getFullYear() > 2090
+
+    // Check if gift extends beyond subscription
+    const giftExtendsSubscription =
+      subscription.currentPeriodEnd &&
+      new Date(proExpiration) > new Date(subscription.currentPeriodEnd)
+
+    return {
+      message: isLifetime
+        ? 'You have both a regular subscription and a lifetime gift subscription.'
+        : giftExtendsSubscription
+          ? `You have a gift subscription that will extend your access after your current subscription ${subscription.cancelAtPeriodEnd ? 'ends' : 'renews'}.`
+          : 'You have both a regular subscription and a gift subscription.',
+      isGift: false, // Not primarily a gift subscription
+      senderName: giftDetails?.senderName || 'Anonymous',
+      giftType: giftDetails?.giftType || (isLifetime ? 'lifetime' : 'monthly'),
+      giftQuantity: giftDetails?.giftQuantity || 1,
+      giftMessage: giftDetails?.giftMessage || undefined,
+      expirationDate: proExpiration,
+    }
+  }
+
+  // Check proExpiration for gift subscriptions
   if (proExpiration && new Date(proExpiration) > new Date()) {
     const isLifetime = new Date(proExpiration).getFullYear() > 2090
 
