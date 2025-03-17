@@ -175,6 +175,27 @@ export class GiftService {
     // Check if we're in the grace period
     const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
 
+    // Find all existing gift subscriptions for the recipient
+    const existingGiftSubscriptions = await this.tx.subscription.findMany({
+      where: {
+        userId: recipientUser.id,
+        status: { in: ['ACTIVE', 'TRIALING'] },
+        isGift: true,
+      },
+      orderBy: {
+        currentPeriodEnd: 'desc',
+      },
+      select: {
+        id: true,
+        currentPeriodEnd: true,
+        metadata: true,
+      },
+    })
+
+    console.log(
+      `Found ${existingGiftSubscriptions.length} existing gift subscriptions for user ${recipientUser.id}`,
+    )
+
     // Determine the starting point for the gift duration
     // If in grace period, start from the grace period end to avoid overlap
     let startDate: Date
@@ -183,29 +204,33 @@ export class GiftService {
       // Start from the grace period end
       startDate = new Date(GRACE_PERIOD_END)
     } else {
-      // Find existing gift subscriptions for the recipient
-      const existingGiftSubscription = await this.tx.subscription.findFirst({
-        where: {
-          userId: recipientUser.id,
-          status: { in: ['ACTIVE', 'TRIALING'] },
-          isGift: true,
-        },
-        orderBy: {
-          currentPeriodEnd: 'desc',
-        },
-      })
+      // Find the latest expiration date among existing gift subscriptions
+      let latestExpiration: Date | null = null
+      for (const gift of existingGiftSubscriptions) {
+        if (
+          gift.currentPeriodEnd &&
+          (!latestExpiration || gift.currentPeriodEnd > latestExpiration)
+        ) {
+          latestExpiration = new Date(gift.currentPeriodEnd)
+        }
+      }
 
       // Start from the later of now or existing gift subscription end date
-      const existingExpiration = existingGiftSubscription?.currentPeriodEnd || null
-      startDate =
-        existingExpiration && existingExpiration > now ? new Date(existingExpiration) : now
+      startDate = latestExpiration && latestExpiration > now ? new Date(latestExpiration) : now
     }
+
+    console.log(`Starting gift calculation from date: ${startDate.toISOString()}`)
 
     // Import the aggregateGiftDuration function from the gift-subscription module
     const { aggregateGiftDuration } = await import('@/lib/gift-subscription')
 
     // Calculate the new expiration date
-    return aggregateGiftDuration(giftType, giftQuantity, null, startDate)
+    const expirationDate = aggregateGiftDuration(giftType, giftQuantity, null, startDate)
+    console.log(
+      `Calculated gift expiration date: ${expirationDate.toISOString()} for ${giftQuantity} ${giftType} periods`,
+    )
+
+    return expirationDate
   }
 
   /**
@@ -288,20 +313,32 @@ export class GiftService {
         status: { in: ['ACTIVE', 'TRIALING'] },
         isGift: true,
       },
-      orderBy: {
-        currentPeriodEnd: 'desc',
+      select: {
+        id: true,
+        currentPeriodEnd: true,
+        metadata: true,
       },
     })
 
-    // Determine the latest gift expiration date
-    let latestGiftExpirationDate = giftExpirationDate
-    if (allGiftSubscriptions.length > 0) {
-      for (const gift of allGiftSubscriptions) {
-        if (gift.currentPeriodEnd && gift.currentPeriodEnd > latestGiftExpirationDate) {
-          latestGiftExpirationDate = gift.currentPeriodEnd
-        }
+    // Import the aggregateGiftDuration function
+    const { aggregateGiftDuration } = await import('@/lib/gift-subscription')
+
+    // Start with the grace period end date or now as the base date
+    const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
+    const baseDate = isInGracePeriod() ? new Date(GRACE_PERIOD_END) : new Date()
+
+    // Properly accumulate all gift durations
+    let finalExpirationDate = baseDate
+
+    // First, find the latest existing gift expiration date to use as our starting point
+    for (const gift of allGiftSubscriptions) {
+      if (gift.currentPeriodEnd && gift.currentPeriodEnd > finalExpirationDate) {
+        finalExpirationDate = new Date(gift.currentPeriodEnd)
       }
     }
+
+    console.log(`Initial expiration date: ${finalExpirationDate.toISOString()}`)
+    console.log(`Total gift subscriptions: ${allGiftSubscriptions.length}`)
 
     return (
       (await withErrorHandling(
@@ -311,41 +348,33 @@ export class GiftService {
           // Only update if the gift extends beyond the current period and currentPeriodEnd is not null
           if (
             regularSubscription.currentPeriodEnd &&
-            latestGiftExpirationDate > regularSubscription.currentPeriodEnd
+            finalExpirationDate > regularSubscription.currentPeriodEnd
           ) {
             // Use the helper function to pause the subscription
-            await this.subscriptionService.pauseForGift(
-              stripeSubscriptionId,
-              latestGiftExpirationDate,
-              {
-                originalRenewalDate: regularSubscription.currentPeriodEnd.toISOString(),
-                giftCheckoutSessionId: sessionId,
-              },
-            )
+            await this.subscriptionService.pauseForGift(stripeSubscriptionId, finalExpirationDate, {
+              originalRenewalDate: regularSubscription.currentPeriodEnd.toISOString(),
+              giftCheckoutSessionId: sessionId,
+              totalGiftSubscriptions: allGiftSubscriptions.length.toString(),
+            })
 
             console.log(
-              `Updated regular subscription ${regularSubscription.id} to resume after gift expires on ${latestGiftExpirationDate.toISOString()}`,
+              `Updated regular subscription ${regularSubscription.id} to resume after all gifts expire on ${finalExpirationDate.toISOString()}`,
             )
             return true
           }
 
           // Even if the gift doesn't extend beyond the current period, we should still pause billing
           // until after the grace period if we're in the grace period
-          const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
-
-          if (isInGracePeriod() && latestGiftExpirationDate > new Date(GRACE_PERIOD_END)) {
+          if (isInGracePeriod() && finalExpirationDate > new Date(GRACE_PERIOD_END)) {
             // Use the helper function to pause the subscription
-            await this.subscriptionService.pauseForGift(
-              stripeSubscriptionId,
-              latestGiftExpirationDate,
-              {
-                pausedDuringGracePeriod: 'true',
-                giftCheckoutSessionId: sessionId,
-              },
-            )
+            await this.subscriptionService.pauseForGift(stripeSubscriptionId, finalExpirationDate, {
+              pausedDuringGracePeriod: 'true',
+              giftCheckoutSessionId: sessionId,
+              totalGiftSubscriptions: allGiftSubscriptions.length.toString(),
+            })
 
             console.log(
-              `Paused regular subscription ${regularSubscription.id} during grace period until gift expires on ${latestGiftExpirationDate.toISOString()}`,
+              `Paused regular subscription ${regularSubscription.id} during grace period until all gifts expire on ${finalExpirationDate.toISOString()}`,
             )
             return true
           }

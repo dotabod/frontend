@@ -217,9 +217,9 @@ interface SubscriptionPriceId {
 const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
-    monthly: process.env.NEXT_PUBLIC_STRIPE_GIFT_PRO_MONTHLY_PRICE_ID || '',
-    annual: process.env.NEXT_PUBLIC_STRIPE_GIFT_PRO_ANNUAL_PRICE_ID || '',
-    lifetime: process.env.NEXT_PUBLIC_STRIPE_GIFT_PRO_LIFETIME_PRICE_ID || '',
+    monthly: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
+    annual: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
+    lifetime: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
   },
 ]
 
@@ -235,9 +235,8 @@ const PRICE_IDS: SubscriptionPriceId[] = [
 export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,
-  isGift = false,
 ): string {
-  const priceList = isGift ? GIFT_PRICE_IDS : PRICE_IDS
+  const priceList = PRICE_IDS
   const price = priceList.find((p) => p.tier === tier)
   if (!price) throw new Error(`No price found for tier ${tier}`)
   if (period === 'monthly') return price.monthly

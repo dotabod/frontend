@@ -163,9 +163,7 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
     vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID', 'price_monthly_test')
     vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID', 'price_annual_test')
     vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID', 'price_lifetime_test')
-    vi.stubEnv('NEXT_PUBLIC_STRIPE_GIFT_PRO_MONTHLY_PRICE_ID', 'gift_price_monthly_test')
-    vi.stubEnv('NEXT_PUBLIC_STRIPE_GIFT_PRO_ANNUAL_PRICE_ID', 'gift_price_annual_test')
-    vi.stubEnv('NEXT_PUBLIC_STRIPE_GIFT_PRO_LIFETIME_PRICE_ID', 'gift_price_lifetime_test')
+    vi.stubEnv('NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID', 'gift_price_monthly_test')
   })
 
   afterEach(() => {

@@ -49,6 +49,8 @@ export async function handleCheckoutCompleted(
           },
         })
 
+        console.log(`Found ${giftSubscriptions.length} gift subscriptions for user ${userId}`)
+
         // Find the latest gift expiration date
         let latestGiftExpirationDate: Date | null = null
         for (const gift of giftSubscriptions) {
@@ -56,9 +58,13 @@ export async function handleCheckoutCompleted(
             gift.currentPeriodEnd &&
             (!latestGiftExpirationDate || gift.currentPeriodEnd > latestGiftExpirationDate)
           ) {
-            latestGiftExpirationDate = gift.currentPeriodEnd
+            latestGiftExpirationDate = new Date(gift.currentPeriodEnd)
           }
         }
+
+        console.log(
+          `Latest gift expiration date: ${latestGiftExpirationDate?.toISOString() || 'none'}`,
+        )
 
         // If we found a valid gift expiration date, update the regular subscription
         if (latestGiftExpirationDate) {
@@ -91,6 +97,7 @@ export async function handleCheckoutCompleted(
                 originalRenewalDate: regularSubscription.currentPeriodEnd?.toISOString() || '',
                 giftCheckoutSessionId: session.id,
                 shouldResetBillingCycle: 'true',
+                totalGiftSubscriptions: giftSubscriptions.length.toString(),
               },
             )
 
@@ -111,6 +118,7 @@ export async function handleCheckoutCompleted(
                 hasPostPaidGift: 'true',
                 giftExpirationDate: latestGiftExpirationDate.toISOString(),
                 giftCheckoutSessionId: session.id,
+                totalGiftSubscriptions: giftSubscriptions.length.toString(),
               },
             })
 
@@ -123,6 +131,7 @@ export async function handleCheckoutCompleted(
                   hasPostPaidGift: 'true',
                   giftExpirationDate: latestGiftExpirationDate.toISOString(),
                   giftCheckoutSessionId: session.id,
+                  totalGiftSubscriptions: giftSubscriptions.length.toString(),
                 },
               },
             })
