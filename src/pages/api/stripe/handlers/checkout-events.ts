@@ -47,27 +47,72 @@ export async function handleCheckoutCompleted(
           orderBy: {
             currentPeriodEnd: 'desc',
           },
+          select: {
+            id: true,
+            currentPeriodEnd: true,
+            metadata: true,
+          },
         })
 
         console.log(`Found ${giftSubscriptions.length} gift subscriptions for user ${userId}`)
 
-        // Find the latest gift expiration date
-        let latestGiftExpirationDate: Date | null = null
+        // Import the aggregateGiftDuration function
+        const { aggregateGiftDuration } = await import('@/lib/gift-subscription')
+        const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
+
+        // Start with the grace period end date or now as the base date
+        const baseDate = isInGracePeriod() ? new Date(GRACE_PERIOD_END) : new Date()
+
+        // Calculate the final expiration date by aggregating all gift durations
+        let finalExpirationDate = baseDate
+
+        // Process each gift subscription to build up the total duration
         for (const gift of giftSubscriptions) {
-          if (
-            gift.currentPeriodEnd &&
-            (!latestGiftExpirationDate || gift.currentPeriodEnd > latestGiftExpirationDate)
-          ) {
-            latestGiftExpirationDate = new Date(gift.currentPeriodEnd)
+          if (gift.metadata) {
+            const metadata = gift.metadata as Record<string, unknown>
+            const giftType = (metadata.giftType as string) || 'monthly'
+            const giftQuantity = Number.parseInt((metadata.giftQuantity as string) || '1', 10)
+
+            // Use aggregateGiftDuration to add this gift's duration to our running total
+            finalExpirationDate = aggregateGiftDuration(giftType, giftQuantity, finalExpirationDate)
+
+            console.log(
+              `Added gift: ${giftType} x ${giftQuantity}, new expiration: ${finalExpirationDate.toISOString()}`,
+            )
           }
         }
 
-        console.log(
-          `Latest gift expiration date: ${latestGiftExpirationDate?.toISOString() || 'none'}`,
-        )
+        console.log(`Final calculated expiration date: ${finalExpirationDate.toISOString()}`)
 
         // If we found a valid gift expiration date, update the regular subscription
-        if (latestGiftExpirationDate) {
+        if (finalExpirationDate > baseDate) {
+          // Update all gift subscription records with the final expiration date
+          // This ensures that all gift subscriptions have the same end date
+          if (giftSubscriptions.length > 0) {
+            console.log(
+              `Updating ${giftSubscriptions.length} gift subscriptions with final expiration date: ${finalExpirationDate.toISOString()}`,
+            )
+
+            // Update each gift subscription with the final expiration date
+            for (const gift of giftSubscriptions) {
+              await tx.subscription.update({
+                where: { id: gift.id },
+                data: {
+                  currentPeriodEnd: finalExpirationDate,
+                  metadata: {
+                    ...((gift.metadata as Record<string, unknown>) || {}),
+                    finalCalculatedExpiration: finalExpirationDate.toISOString(),
+                    totalGiftSubscriptions: giftSubscriptions.length.toString(),
+                    lastUpdated: new Date().toISOString(),
+                  },
+                },
+              })
+              console.log(
+                `Updated gift subscription ${gift.id} with final expiration date: ${finalExpirationDate.toISOString()}`,
+              )
+            }
+          }
+
           // Create a subscription service to handle the update
           const subscriptionService = new SubscriptionService(tx)
 
@@ -84,15 +129,15 @@ export async function handleCheckoutCompleted(
           // Determine if the gift should be applied after the current paid period
           // Only pause if the gift expiration date is after the current period end
           // or if the subscription is already paused
-          if (isPaused || latestGiftExpirationDate > currentPeriodEnd) {
+          if (isPaused || finalExpirationDate > currentPeriodEnd) {
             console.log(
-              `Pausing subscription ${regularSubscription.stripeSubscriptionId} until gift expires on ${latestGiftExpirationDate.toISOString()}`,
+              `Pausing subscription ${regularSubscription.stripeSubscriptionId} until all gifts expire on ${finalExpirationDate.toISOString()}`,
             )
 
             // Pause the subscription and ensure the billing cycle will be reset when it resumes
             await subscriptionService.pauseForGift(
               regularSubscription.stripeSubscriptionId,
-              latestGiftExpirationDate,
+              finalExpirationDate,
               {
                 originalRenewalDate: regularSubscription.currentPeriodEnd?.toISOString() || '',
                 giftCheckoutSessionId: session.id,
@@ -116,7 +161,7 @@ export async function handleCheckoutCompleted(
               metadata: {
                 ...stripeSubscription.metadata,
                 hasPostPaidGift: 'true',
-                giftExpirationDate: latestGiftExpirationDate.toISOString(),
+                giftExpirationDate: finalExpirationDate.toISOString(),
                 giftCheckoutSessionId: session.id,
                 totalGiftSubscriptions: giftSubscriptions.length.toString(),
               },
@@ -129,7 +174,7 @@ export async function handleCheckoutCompleted(
                 metadata: {
                   ...((regularSubscription.metadata as Record<string, unknown>) || {}),
                   hasPostPaidGift: 'true',
-                  giftExpirationDate: latestGiftExpirationDate.toISOString(),
+                  giftExpirationDate: finalExpirationDate.toISOString(),
                   giftCheckoutSessionId: session.id,
                   totalGiftSubscriptions: giftSubscriptions.length.toString(),
                 },

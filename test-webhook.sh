@@ -12,12 +12,19 @@ PRICE_ID_MONTHLY="price_monthly123"
 PRICE_ID_ANNUAL="price_annual123"
 PRICE_ID_LIFETIME="price_lifetime123"
 
+# Grace period end date from subscription.ts
+GRACE_PERIOD_END="2025-05-01T00:00:00.000Z"
+
 # Override with environment variables if available
 [[ -n "$NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID" ]] && PRICE_ID_MONTHLY="$NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID"
 [[ -n "$NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID" ]] && PRICE_ID_ANNUAL="$NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID"
 [[ -n "$NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID" ]] && PRICE_ID_LIFETIME="$NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID"
+# Gift price IDs
+GIFT_PRICE_ID_MONTHLY="price_gift_monthly123"
 
-# Print header
+# Override with environment variables if available
+[[ -n "$NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID" ]] && GIFT_PRICE_ID_MONTHLY="$NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID"
+
 echo -e "${GREEN}Stripe Webhook Testing Script${NC}"
 echo "This script helps test the Stripe webhook handler with common scenarios."
 echo
@@ -41,6 +48,45 @@ run_test() {
   echo "Press Enter to continue to the next test..."
   read
   echo
+}
+
+# Function to delete all customers
+delete_all_customers() {
+  echo -e "${YELLOW}Deleting all customers in your Stripe account...${NC}"
+  echo "This will delete ALL customers in your Stripe test mode account."
+  echo "Are you sure you want to continue? (y/n)"
+  read -r confirm
+
+  if [[ "$confirm" != "y" ]]; then
+    echo "Operation cancelled."
+    return
+  fi
+
+  echo "Fetching customers..."
+  customers=$(stripe customers list --limit 100)
+
+  if [[ -z "$customers" ]]; then
+    echo "No customers found."
+    return
+  fi
+
+  customer_ids=$(echo "$customers" | grep -o '"id": "[^"]*"' | cut -d'"' -f4)
+
+  if [[ -z "$customer_ids" ]]; then
+    echo "No customer IDs found."
+    return
+  fi
+
+  count=0
+  for id in $customer_ids; do
+    echo "Deleting customer $id..."
+    stripe customers delete "$id"
+    ((count++))
+  done
+
+  echo -e "${GREEN}Deleted $count customers.${NC}"
+  echo "Press Enter to continue..."
+  read
 }
 
 # Ask for user ID if not provided
@@ -72,6 +118,10 @@ while true; do
   echo "13. Complete Subscription Cancellation Flow"
   echo "14. Test Subscription + Gift Interaction"
   echo "15. Change User ID"
+  echo "16. Delete All Customers"
+  echo "17. Trial Subscription Created"
+  echo "18. Grace Period Subscription"
+  echo "19. Test Multiple Gift Subscriptions"
   echo "0. Exit"
 
   read -p "Enter your choice: " choice
@@ -117,12 +167,12 @@ while true; do
     run_test "Checkout Session Completed (Gift Subscription)" "checkout.session.completed" \
       --override "checkout_session:mode=payment" \
       --override "checkout_session:metadata.isGift=true" \
-      --override "checkout_session:metadata.recipientUserId=user_456" \
+      --override "checkout_session:metadata.recipientUserId=$USER_ID" \
       --override "checkout_session:metadata.giftSenderName=John Doe" \
       --override "checkout_session:metadata.giftMessage=Enjoy!" \
       --override "checkout_session:metadata.giftDuration=monthly" \
       --override "checkout_session:metadata.giftQuantity=3" \
-      --override "checkout_session:line_items[0][price]=$PRICE_ID_MONTHLY"
+      --override "checkout_session:line_items[0][price]=$GIFT_PRICE_ID_MONTHLY"
     ;;
   9)
     run_test "Checkout Session Completed (Lifetime Purchase)" "checkout.session.completed" \
@@ -141,24 +191,18 @@ while true; do
     ;;
   12)
     echo -e "${YELLOW}Running Complete Gift Subscription Flow${NC}"
+    echo "running for price id: $GIFT_PRICE_ID_MONTHLY"
     echo "Step 1: Create a checkout session for a gift"
     stripe trigger checkout.session.completed \
-      --override "checkout_session:mode=payment" \
-      --override "checkout_session:metadata.isGift=true" \
-      --override "checkout_session:metadata.recipientUserId=user_456" \
-      --override "checkout_session:metadata.giftSenderName=John Doe" \
-      --override "checkout_session:metadata.giftMessage=Enjoy your gift!" \
-      --override "checkout_session:metadata.giftDuration=monthly" \
-      --override "checkout_session:metadata.giftQuantity=3" \
-      --override "checkout_session:line_items[0][price]=$PRICE_ID_MONTHLY"
-
-    echo "Press Enter to continue to step 2..."
-    read
-
-    echo "Step 2: Create a regular subscription for the same user"
-    stripe trigger customer.subscription.created \
-      --override "customer:metadata.userId=user_456" \
-      --override "subscription:items[0][price]=$PRICE_ID_MONTHLY"
+      --add "checkout_session:mode=payment" \
+      --add "checkout_session:metadata.isGift=true" \
+      --add "checkout_session:metadata.recipientUserId=$USER_ID" \
+      --add "checkout_session:metadata.giftSenderName=John Doe" \
+      --add "checkout_session:metadata.giftMessage=Enjoy your gift!" \
+      --add "checkout_session:metadata.giftDuration=monthly" \
+      --add "checkout_session:metadata.giftQuantity=5" \
+      --add "checkout_session:line_items[0][price]=$GIFT_PRICE_ID_MONTHLY" \
+      --add "checkout_session:line_items[0][quantity]=5"
 
     echo "Press Enter to continue..."
     read
@@ -195,9 +239,11 @@ while true; do
       --override "checkout_session:mode=payment" \
       --override "checkout_session:metadata.isGift=true" \
       --override "checkout_session:metadata.recipientUserId=$USER_ID" \
-      --override "checkout_session:metadata.giftDuration=annual" \
-      --override "checkout_session:metadata.giftQuantity=1" \
-      --override "checkout_session:line_items[0][price]=$PRICE_ID_ANNUAL"
+      --override "checkout_session:metadata.giftDuration=monthly" \
+      --override "checkout_session:metadata.giftQuantity=12" \
+      --override "checkout_session:line_items[0][price]=$GIFT_PRICE_ID_MONTHLY" \
+      --override "checkout_session:currency=usd" \
+      --override "checkout_session:metadata.amount=3000"
 
     echo "Press Enter to continue to step 3..."
     read
@@ -212,6 +258,111 @@ while true; do
     ;;
   15)
     prompt_for_user_id
+    ;;
+  16)
+    delete_all_customers
+    ;;
+  17)
+    run_test "Trial Subscription Created" "customer.subscription.created" \
+      --override "subscription:items[0][price]=$PRICE_ID_MONTHLY" \
+      --override "subscription:trial_period_days=14" \
+      --override "customer:metadata.userId=$USER_ID"
+
+    echo -e "${GREEN}Created a trial subscription that will end in 14 days${NC}"
+    ;;
+  18)
+    # Calculate days until grace period ends
+    # Parse the grace period end date
+    GRACE_YEAR=$(echo $GRACE_PERIOD_END | cut -d'-' -f1)
+    GRACE_MONTH=$(echo $GRACE_PERIOD_END | cut -d'-' -f2)
+    GRACE_DAY=$(echo $GRACE_PERIOD_END | cut -d'-' -f3 | cut -dT -f1)
+
+    # Get current date components
+    CURRENT_YEAR=$(date +%Y)
+    CURRENT_MONTH=$(date +%m)
+    CURRENT_DAY=$(date +%d)
+
+    # Calculate rough estimate of days (this is approximate)
+    DAYS_IN_YEAR=365
+    GRACE_TOTAL_DAYS=$((GRACE_YEAR * DAYS_IN_YEAR + GRACE_MONTH * 30 + GRACE_DAY))
+    CURRENT_TOTAL_DAYS=$((CURRENT_YEAR * DAYS_IN_YEAR + CURRENT_MONTH * 30 + CURRENT_DAY))
+    DAYS_UNTIL_GRACE_END=$((GRACE_TOTAL_DAYS - CURRENT_TOTAL_DAYS))
+
+    # Ensure positive value
+    if [ $DAYS_UNTIL_GRACE_END -lt 0 ]; then
+      DAYS_UNTIL_GRACE_END=0
+    fi
+
+    echo -e "${YELLOW}Days remaining until grace period ends (April 30, 2025): $DAYS_UNTIL_GRACE_END${NC}"
+
+    run_test "Grace Period Subscription" "customer.subscription.created" \
+      --override "subscription:items[0][price]=$PRICE_ID_MONTHLY" \
+      --override "subscription:trial_period_days=$DAYS_UNTIL_GRACE_END" \
+      --override "subscription:cancel_at_period_end=true" \
+      --override "customer:metadata.userId=$USER_ID" \
+      --override "customer:metadata.isGracePeriodVirtual=true"
+
+    echo -e "${GREEN}Created a grace period subscription with $DAYS_UNTIL_GRACE_END days trial period${NC}"
+    echo -e "${YELLOW}Note: This simulates the virtual subscription created during the grace period${NC}"
+    ;;
+  19)
+    echo -e "${YELLOW}Testing Multiple Gift Subscriptions${NC}"
+    echo "This test will create multiple gift subscriptions for the same user to test gift accumulation"
+
+    echo "Step 1: Create a regular subscription"
+    stripe trigger customer.subscription.created \
+      --override "customer:metadata.userId=$USER_ID" \
+      --override "subscription:items[0][price]=$PRICE_ID_MONTHLY"
+
+    echo "Press Enter to continue to step 2..."
+    read
+
+    echo "Step 2: Create first gift subscription (3 months)"
+    stripe trigger checkout.session.completed \
+      --override "checkout_session:mode=payment" \
+      --override "checkout_session:metadata.isGift=true" \
+      --override "checkout_session:metadata.recipientUserId=$USER_ID" \
+      --override "checkout_session:metadata.giftSenderName=First Gifter" \
+      --override "checkout_session:metadata.giftMessage=First gift!" \
+      --override "checkout_session:metadata.giftDuration=monthly" \
+      --override "checkout_session:metadata.giftQuantity=3" \
+      --override "checkout_session:line_items[0][price]=$GIFT_PRICE_ID_MONTHLY" \
+      --override "checkout_session:currency=usd"
+
+    echo "Press Enter to continue to step 3..."
+    read
+
+    echo "Step 3: Create second gift subscription (2 months)"
+    stripe trigger checkout.session.completed \
+      --override "checkout_session:mode=payment" \
+      --override "checkout_session:metadata.isGift=true" \
+      --override "checkout_session:metadata.recipientUserId=$USER_ID" \
+      --override "checkout_session:metadata.giftSenderName=Second Gifter" \
+      --override "checkout_session:metadata.giftMessage=Second gift!" \
+      --override "checkout_session:metadata.giftDuration=monthly" \
+      --override "checkout_session:metadata.giftQuantity=2" \
+      --override "checkout_session:line_items[0][price]=$GIFT_PRICE_ID_MONTHLY" \
+      --override "checkout_session:currency=usd"
+
+    echo "Press Enter to continue to step 4..."
+    read
+
+    echo "Step 4: Create third gift subscription (4 months)"
+    stripe trigger checkout.session.completed \
+      --override "checkout_session:mode=payment" \
+      --override "checkout_session:metadata.isGift=true" \
+      --override "checkout_session:metadata.recipientUserId=$USER_ID" \
+      --override "checkout_session:metadata.giftSenderName=Third Gifter" \
+      --override "checkout_session:metadata.giftMessage=Third gift!" \
+      --override "checkout_session:metadata.giftDuration=monthly" \
+      --override "checkout_session:metadata.giftQuantity=4" \
+      --override "checkout_session:line_items[0][price]=$GIFT_PRICE_ID_MONTHLY" \
+      --override "checkout_session:currency=usd"
+
+    echo -e "${GREEN}Created 3 gift subscriptions totaling 9 months${NC}"
+    echo -e "${YELLOW}Check the database to verify all gift subscriptions have the same end date${NC}"
+    echo "Press Enter to continue..."
+    read
     ;;
   0)
     echo "Exiting..."

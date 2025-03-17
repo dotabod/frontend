@@ -327,18 +327,54 @@ export class GiftService {
     const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
     const baseDate = isInGracePeriod() ? new Date(GRACE_PERIOD_END) : new Date()
 
-    // Properly accumulate all gift durations
+    // Calculate the final expiration date by aggregating all gift durations
     let finalExpirationDate = baseDate
 
-    // First, find the latest existing gift expiration date to use as our starting point
+    // Process each gift subscription to build up the total duration
     for (const gift of allGiftSubscriptions) {
-      if (gift.currentPeriodEnd && gift.currentPeriodEnd > finalExpirationDate) {
-        finalExpirationDate = new Date(gift.currentPeriodEnd)
+      if (gift.metadata) {
+        const metadata = gift.metadata as Record<string, unknown>
+        const giftType = (metadata.giftType as string) || 'monthly'
+        const giftQuantity = Number.parseInt((metadata.giftQuantity as string) || '1', 10)
+
+        // Use aggregateGiftDuration to add this gift's duration to our running total
+        finalExpirationDate = aggregateGiftDuration(giftType, giftQuantity, finalExpirationDate)
+
+        console.log(
+          `Added gift: ${giftType} x ${giftQuantity}, new expiration: ${finalExpirationDate.toISOString()}`,
+        )
       }
     }
 
-    console.log(`Initial expiration date: ${finalExpirationDate.toISOString()}`)
+    console.log(`Final calculated expiration date: ${finalExpirationDate.toISOString()}`)
     console.log(`Total gift subscriptions: ${allGiftSubscriptions.length}`)
+
+    // Update all gift subscription records with the final expiration date
+    // This ensures that all gift subscriptions have the same end date
+    if (allGiftSubscriptions.length > 0) {
+      console.log(
+        `Updating ${allGiftSubscriptions.length} gift subscriptions with final expiration date: ${finalExpirationDate.toISOString()}`,
+      )
+
+      // Update each gift subscription with the final expiration date
+      for (const gift of allGiftSubscriptions) {
+        await this.tx.subscription.update({
+          where: { id: gift.id },
+          data: {
+            currentPeriodEnd: finalExpirationDate,
+            metadata: {
+              ...((gift.metadata as Record<string, unknown>) || {}),
+              finalCalculatedExpiration: finalExpirationDate.toISOString(),
+              totalGiftSubscriptions: allGiftSubscriptions.length.toString(),
+              lastUpdated: new Date().toISOString(),
+            },
+          },
+        })
+        console.log(
+          `Updated gift subscription ${gift.id} with final expiration date: ${finalExpirationDate.toISOString()}`,
+        )
+      }
+    }
 
     return (
       (await withErrorHandling(
