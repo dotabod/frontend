@@ -9,6 +9,7 @@ import { handleChargeSucceeded, handleChargeRefunded } from './handlers/charge-e
 import { handleCustomerDeleted } from './handlers/customer-events'
 import type Stripe from 'stripe'
 import type { Prisma } from '@prisma/client'
+import { SubscriptionService } from './services/subscription-service'
 
 export const config = {
   api: {
@@ -85,6 +86,69 @@ async function processWebhookEvent(
       // For checkout.session.completed events, we need to ensure that gift subscriptions
       // are properly processed and regular subscriptions are updated accordingly
       const session = event.data.object as Stripe.Checkout.Session
+
+      // If this is a new subscription checkout, update the subscription with the isNewSubscription flag
+      if (
+        session.mode === 'subscription' &&
+        session.subscription &&
+        session.metadata?.isNewSubscription === 'true'
+      ) {
+        try {
+          // Update the subscription metadata to include the isNewSubscription flag
+          await stripe.subscriptions.update(session.subscription as string, {
+            metadata: {
+              ...session.metadata,
+              isNewSubscription: 'true',
+            },
+          })
+          console.log(`Updated subscription ${session.subscription} with isNewSubscription flag`)
+
+          // Check if the user has existing gift subscriptions and adjust the subscription accordingly
+          if (session.metadata?.userId) {
+            const subscriptionService = new SubscriptionService(tx)
+
+            // If the user already has an active gift subscription, we need to pause the subscription
+            // until the gift expires, even if there's no trial period
+            if (session.metadata?.hasActiveGiftSubscription === 'true') {
+              // Find the latest gift subscription expiration date
+              const giftSubscription = await tx.subscription.findFirst({
+                where: {
+                  userId: session.metadata.userId,
+                  isGift: true,
+                  status: { in: ['ACTIVE', 'TRIALING'] },
+                },
+                orderBy: { currentPeriodEnd: 'desc' },
+                select: { currentPeriodEnd: true },
+              })
+
+              if (giftSubscription?.currentPeriodEnd) {
+                // Pause the subscription until the gift expires
+                await subscriptionService.pauseForGift(
+                  session.subscription as string,
+                  giftSubscription.currentPeriodEnd,
+                  {
+                    pausedForGift: 'true',
+                    createdWithActiveGift: 'true',
+                  },
+                )
+                console.log(
+                  `Paused subscription ${session.subscription} until gift expires on ${giftSubscription.currentPeriodEnd.toISOString()}`,
+                )
+              }
+            } else {
+              // If the user doesn't have an active gift subscription but gets one later,
+              // we'll adjust the trial period
+              await subscriptionService.adjustTrialForGifts(
+                session.subscription as string,
+                session.metadata.userId,
+              )
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to update subscription ${session.subscription} metadata:`, error)
+        }
+      }
+
       await handleCheckoutCompleted(session, tx)
       break
     }

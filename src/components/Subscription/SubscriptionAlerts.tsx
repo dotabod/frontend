@@ -30,6 +30,7 @@ function SubscriptionTimeline({
   hasActivePlan,
   cancelAtPeriodEnd,
   paidPeriodEnd,
+  isTrialing,
 }: {
   gracePeriodEnd: Date
   giftStartDate: Date
@@ -39,6 +40,7 @@ function SubscriptionTimeline({
   cancelAtPeriodEnd?: boolean
   hasPostPaidGift?: boolean
   paidPeriodEnd?: Date
+  isTrialing?: boolean
 }) {
   const now = new Date()
   const showGracePeriod = now < gracePeriodEnd
@@ -83,8 +85,12 @@ function SubscriptionTimeline({
               <div className='text-emerald-300'>
                 <span className='font-medium'>
                   {giftStartDate > now && giftStartDate.getTime() === paidPeriodEnd.getTime()
-                    ? 'Subscription ends'
-                    : 'Current paid period ends'}
+                    ? isTrialing
+                      ? 'Trial ends'
+                      : 'Subscription ends'
+                    : isTrialing
+                      ? 'Trial period ends'
+                      : 'Current paid period ends'}
                 </span>
               </div>
             ),
@@ -462,6 +468,7 @@ export function SubscriptionAlerts({
             ? new Date(subscription.currentPeriodEnd)
             : undefined
         }
+        isTrialing={subscription?.status === 'TRIALING'}
       />
     )
   }

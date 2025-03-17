@@ -60,8 +60,26 @@ export async function handleCheckoutCompleted(
         const { aggregateGiftDuration } = await import('@/lib/gift-subscription')
         const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
 
-        // Start with the grace period end date or now as the base date
-        const baseDate = isInGracePeriod() ? new Date(GRACE_PERIOD_END) : new Date()
+        // Get the current subscription from Stripe to check if it's in trial period
+        const stripeSubscription = await stripe.subscriptions.retrieve(
+          regularSubscription.stripeSubscriptionId,
+        )
+
+        let baseDate: Date
+
+        // If subscription is in trial period, use the trial end date as the base date
+        if (stripeSubscription.status === 'trialing' && stripeSubscription.trial_end) {
+          baseDate = new Date(stripeSubscription.trial_end * 1000)
+          console.log(
+            `Subscription is in trial period. Using trial end date as base: ${baseDate.toISOString()}`,
+          )
+        } else if (isInGracePeriod()) {
+          // If in grace period, use grace period end date
+          baseDate = new Date(GRACE_PERIOD_END)
+        } else {
+          // Otherwise use current date
+          baseDate = new Date()
+        }
 
         // Calculate the final expiration date by aggregating all gift durations
         let finalExpirationDate = baseDate

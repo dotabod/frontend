@@ -187,4 +187,131 @@ export class SubscriptionService {
 
     return statusMap[stripeStatus] || null
   }
+
+  /**
+   * Adjusts the trial period for a new subscription based on existing gift subscriptions
+   * @param subscriptionId The Stripe subscription ID
+   * @param userId The user ID
+   * @returns True if the adjustment was successful, false otherwise
+   */
+  async adjustTrialForGifts(subscriptionId: string, userId: string): Promise<boolean> {
+    return (
+      (await withErrorHandling(async () => {
+        // Find all active gift subscriptions for this user
+        const giftSubscriptions = await this.tx.subscription.findMany({
+          where: {
+            userId,
+            status: { in: ['ACTIVE', 'TRIALING'] },
+            isGift: true,
+          },
+          orderBy: {
+            currentPeriodEnd: 'desc',
+          },
+          select: {
+            id: true,
+            currentPeriodEnd: true,
+            metadata: true,
+          },
+        })
+
+        if (giftSubscriptions.length === 0) {
+          console.log(`No active gift subscriptions found for user ${userId}`)
+          return false
+        }
+
+        console.log(
+          `Found ${giftSubscriptions.length} active gift subscriptions for user ${userId}`,
+        )
+
+        // Find the latest expiration date among gift subscriptions
+        let latestExpirationDate: Date | null = null
+        for (const gift of giftSubscriptions) {
+          if (
+            gift.currentPeriodEnd &&
+            (!latestExpirationDate || gift.currentPeriodEnd > latestExpirationDate)
+          ) {
+            latestExpirationDate = new Date(gift.currentPeriodEnd)
+          }
+        }
+
+        if (!latestExpirationDate) {
+          console.log(`No valid expiration dates found in gift subscriptions for user ${userId}`)
+          return false
+        }
+
+        console.log(
+          `Latest gift subscription expiration date: ${latestExpirationDate.toISOString()}`,
+        )
+
+        // Get the subscription from Stripe
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+
+        // Check if this is a trial subscription
+        if (subscription.status !== 'trialing' || !subscription.trial_end) {
+          console.log(`Subscription ${subscriptionId} is not in trial period`)
+          return false
+        }
+
+        // Get the trial end date from the subscription
+        const trialEndDate = new Date(subscription.trial_end * 1000)
+
+        // For new subscriptions with gift subscriptions, we want to:
+        // 1. Keep the original trial period (don't extend it)
+        // 2. Pause the subscription after the trial until the gift expires
+
+        // Calculate the resume date (when billing should restart)
+        const resumeAt = Math.floor(latestExpirationDate.getTime() / 1000)
+
+        console.log(`Original trial end: ${trialEndDate.toISOString()}`)
+        console.log(`Gift expiration date: ${latestExpirationDate.toISOString()}`)
+        console.log(
+          `Subscription will resume billing at: ${new Date(resumeAt * 1000).toISOString()}`,
+        )
+
+        // Update the subscription to pause after the trial ends
+        await stripe.subscriptions.update(subscriptionId, {
+          pause_collection: {
+            behavior: 'keep_as_draft',
+            resumes_at: resumeAt,
+          },
+          proration_behavior: 'none',
+          metadata: {
+            ...subscription.metadata,
+            adjustedForGift: 'true',
+            originalTrialEnd: subscription.trial_end.toString(),
+            giftExpirationDate: latestExpirationDate.toISOString(),
+            pausedForGift: 'true',
+            resumeBillingAt: resumeAt.toString(),
+          },
+        })
+
+        console.log(
+          `Updated subscription ${subscriptionId} to pause after trial until gift expires`,
+        )
+
+        // Update the subscription in the database too
+        const dbSubscription = await this.tx.subscription.findFirst({
+          where: { stripeSubscriptionId: subscriptionId },
+          select: { id: true, metadata: true },
+        })
+
+        if (dbSubscription) {
+          await this.tx.subscription.update({
+            where: { id: dbSubscription.id },
+            data: {
+              metadata: {
+                ...((dbSubscription.metadata as Record<string, unknown>) || {}),
+                adjustedForGift: 'true',
+                giftExpirationDate: latestExpirationDate.toISOString(),
+                pausedForGift: 'true',
+                resumeBillingAt: resumeAt.toString(),
+              },
+            },
+          })
+        }
+
+        return true
+      }, `adjustTrialForGifts(${subscriptionId})`)) !== null
+    )
+  }
 }

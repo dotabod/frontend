@@ -175,6 +175,16 @@ export class GiftService {
     // Check if we're in the grace period
     const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
 
+    // Check if the user has an active trial subscription
+    const trialSubscription = await this.tx.subscription.findFirst({
+      where: {
+        userId: recipientUser.id,
+        status: 'TRIALING',
+        isGift: false,
+        stripeSubscriptionId: { not: null },
+      },
+    })
+
     // Find all existing gift subscriptions for the recipient
     const existingGiftSubscriptions = await this.tx.subscription.findMany({
       where: {
@@ -197,12 +207,38 @@ export class GiftService {
     )
 
     // Determine the starting point for the gift duration
-    // If in grace period, start from the grace period end to avoid overlap
     let startDate: Date
 
-    if (isInGracePeriod()) {
-      // Start from the grace period end
-      startDate = new Date(GRACE_PERIOD_END)
+    if (trialSubscription?.stripeSubscriptionId) {
+      // If user has a trial subscription, retrieve it from Stripe to get the trial end date
+      const stripeSubscription = await stripe.subscriptions.retrieve(
+        trialSubscription.stripeSubscriptionId,
+      )
+
+      if (stripeSubscription.status === 'trialing' && stripeSubscription.trial_end) {
+        // Use the trial end date as the start date
+        startDate = new Date(stripeSubscription.trial_end * 1000)
+        console.log(
+          `User has a trial subscription. Using trial end date as start: ${startDate.toISOString()}`,
+        )
+      } else if (isInGracePeriod()) {
+        // If in grace period, use grace period end date
+        startDate = new Date(GRACE_PERIOD_END)
+      } else {
+        // Find the latest expiration date among existing gift subscriptions
+        let latestExpiration: Date | null = null
+        for (const gift of existingGiftSubscriptions) {
+          if (
+            gift.currentPeriodEnd &&
+            (!latestExpiration || gift.currentPeriodEnd > latestExpiration)
+          ) {
+            latestExpiration = new Date(gift.currentPeriodEnd)
+          }
+        }
+
+        // Start from the later of now or existing gift subscription end date
+        startDate = latestExpiration && latestExpiration > now ? new Date(latestExpiration) : now
+      }
     } else {
       // Find the latest expiration date among existing gift subscriptions
       let latestExpiration: Date | null = null
@@ -323,9 +359,29 @@ export class GiftService {
     // Import the aggregateGiftDuration function
     const { aggregateGiftDuration } = await import('@/lib/gift-subscription')
 
-    // Start with the grace period end date or now as the base date
+    // Get the current subscription from Stripe to check if it's in trial period
+    const stripeSubscription = await stripe.subscriptions.retrieve(
+      regularSubscription.stripeSubscriptionId,
+    )
+
+    // Determine the base date for gift calculation
     const { isInGracePeriod, GRACE_PERIOD_END } = await import('@/utils/subscription')
-    const baseDate = isInGracePeriod() ? new Date(GRACE_PERIOD_END) : new Date()
+
+    let baseDate: Date
+
+    // If subscription is in trial period, use the trial end date as the base date
+    if (stripeSubscription.status === 'trialing' && stripeSubscription.trial_end) {
+      baseDate = new Date(stripeSubscription.trial_end * 1000)
+      console.log(
+        `Subscription is in trial period. Using trial end date as base: ${baseDate.toISOString()}`,
+      )
+    } else if (isInGracePeriod()) {
+      // If in grace period, use grace period end date
+      baseDate = new Date(GRACE_PERIOD_END)
+    } else {
+      // Otherwise use current date
+      baseDate = new Date()
+    }
 
     // Calculate the final expiration date by aggregating all gift durations
     let finalExpirationDate = baseDate

@@ -94,17 +94,58 @@ function Plan({
           ? 'annual'
           : 'monthly')
 
+  // Helper to check if user has an active gift subscription
+  const hasActiveGift =
+    subscription?.isGift && isSubscriptionActive({ status: subscription?.status })
+
+  // Helper to check if user has an active non-gift subscription
+  const hasActiveNonGiftPlan = hasActivePlan && !subscription?.isGift
+
   // Update description display to show trial info
   const displayDescription = () => {
-    if (
-      hasTrial &&
-      tier === SUBSCRIPTION_TIERS.PRO &&
-      activePeriod !== 'lifetime' &&
-      (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
-    ) {
+    if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
       const now = new Date()
 
-      if (isInGracePeriod()) {
+      // If user already has an active gift subscription
+      if (hasActivePlan && subscription?.isGift) {
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>
+              Your subscription will start after your gift expires
+            </span>
+          </>
+        )
+      }
+
+      // If user has an active gift subscription and is looking at a regular plan
+      if (hasActiveGift) {
+        if (isCurrentPlan) {
+          return (
+            <>
+              {description}
+              <span className='block mt-1 text-purple-400'>
+                You have access through a gift subscription. Subscribe now to continue after your
+                gift expires.
+              </span>
+            </>
+          )
+        }
+
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>
+              No trial needed - you already have access through your gift subscription
+            </span>
+          </>
+        )
+      }
+
+      if (
+        isInGracePeriod() &&
+        (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
+      ) {
         // Calculate days until grace period ends
         const daysUntilEnd = Math.ceil(
           (GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
@@ -118,12 +159,15 @@ function Plan({
           </>
         )
       }
-      return (
-        <>
-          {description}
-          <span className='block mt-1 text-purple-400'>Includes 14-day free trial</span>
-        </>
-      )
+
+      if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>Includes 14-day free trial</span>
+          </>
+        )
+      }
     }
     return description
   }
@@ -133,16 +177,25 @@ function Plan({
     const isLifetimePeriod = activePeriod === 'lifetime'
     const isProTier = tier === SUBSCRIPTION_TIERS.PRO
     const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
-    const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
 
     // If user has a lifetime subscription
     if (isLifetimePlan && isCurrentPlan) {
       return 'You have lifetime access'
     }
 
-    // If user has a paid subscription for this plan
-    if (hasActivePlan && isCurrentPlan) {
+    // If user has a paid non-gift subscription for this plan
+    if (hasActiveNonGiftPlan && isCurrentPlan) {
       return 'Manage plan'
+    }
+
+    // If user only has a gift subscription and is looking at the same plan
+    if (hasActiveGift && isCurrentPlan) {
+      return 'Subscribe (starts after gift)'
+    }
+
+    // If user has an active gift subscription and is looking at a regular plan
+    if (hasActiveGift && isProTier && !isLifetimePeriod) {
+      return 'Subscribe (starts after gift)'
     }
 
     // Handle grace period for users without paid subscription
@@ -163,7 +216,7 @@ function Plan({
         return 'Get lifetime access'
       }
 
-      if (isProTier && !isLifetimePeriod) {
+      if (isProTier && !isLifetimePeriod && subscription?.tier === SUBSCRIPTION_TIERS.PRO) {
         return 'Update your subscription'
       }
       return button.label
@@ -181,6 +234,9 @@ function Plan({
 
     // Disable if user already has lifetime access
     if (isLifetimePlan && isCurrentPlan) return true
+
+    // We allow users with gift subscriptions to subscribe to the same plan
+    // This generates revenue and ensures continuity after the gift expires
 
     return false
   }
@@ -247,7 +303,8 @@ function Plan({
       // If user has an active paid subscription, redirect to portal
       if (
         isSubscriptionActive({ status: subscription?.status }) &&
-        subscription?.stripeSubscriptionId
+        subscription?.stripeSubscriptionId &&
+        !subscription?.isGift
       ) {
         const response = await fetch('/api/stripe/portal', {
           method: 'POST',
@@ -344,7 +401,7 @@ function Plan({
       // Trigger subscription process
       handleSubscribe()
     }
-  }, [router, session, tier, activePeriod, redirectingToCheckout, handleSubscribe, message])
+  }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 
   return (
     <section
@@ -385,9 +442,14 @@ function Plan({
               Free until {gracePeriodPrettyDate}
             </span>
           )}
-        {hasActivePlan && isCurrentPlan && (
+        {hasActiveNonGiftPlan && isCurrentPlan && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
             Your plan
+          </span>
+        )}
+        {hasActiveGift && isCurrentPlan && (
+          <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full'>
+            Gift subscription - expires soon
           </span>
         )}
       </h3>
@@ -469,22 +531,61 @@ function Plan({
         </ol>
       </div>
 
-      <Button
-        loading={redirectingToCheckout}
-        onClick={handleSubscribe}
-        disabled={isButtonDisabled()}
-        size={featured ? 'large' : 'middle'}
-        color={featured ? 'danger' : 'default'}
-        className={clsx(
-          'mt-6',
-          featured
-            ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-            : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-        )}
-        aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
-      >
-        {buttonText}
-      </Button>
+      {hasActiveGift && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' ? (
+        <Tooltip title='Your subscription will be paused until your gift expires, then billing will begin automatically'>
+          <Button
+            loading={redirectingToCheckout}
+            onClick={handleSubscribe}
+            disabled={isButtonDisabled()}
+            size={featured ? 'large' : 'middle'}
+            color={featured ? 'danger' : 'default'}
+            className={clsx(
+              'mt-6 w-full',
+              featured
+                ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+            )}
+            aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+          >
+            {buttonText}
+          </Button>
+        </Tooltip>
+      ) : hasActiveGift && isCurrentPlan ? (
+        <Tooltip title='Subscribe now to ensure uninterrupted access after your gift expires'>
+          <Button
+            loading={redirectingToCheckout}
+            onClick={handleSubscribe}
+            size={featured ? 'large' : 'middle'}
+            color={featured ? 'danger' : 'default'}
+            className={clsx(
+              'mt-6',
+              featured
+                ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+            )}
+            aria-label={`Subscribe to ${name} to continue after your gift expires`}
+          >
+            {buttonText}
+          </Button>
+        </Tooltip>
+      ) : (
+        <Button
+          loading={redirectingToCheckout}
+          onClick={handleSubscribe}
+          disabled={isButtonDisabled()}
+          size={featured ? 'large' : 'middle'}
+          color={featured ? 'danger' : 'default'}
+          className={clsx(
+            'mt-6',
+            featured
+              ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+              : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+          )}
+          aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+        >
+          {buttonText}
+        </Button>
+      )}
 
       {/* Crypto interest button */}
       {tier !== SUBSCRIPTION_TIERS.FREE && (

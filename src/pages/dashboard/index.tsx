@@ -135,7 +135,7 @@ const SetupPage = () => {
         key: 'paid',
         message: isTrial ? 'Dotabod Pro Unlocked' : 'Dotabod Pro Unlocked',
         description: isTrial
-          ? `Your ${trialDays}-day trial with full access to all features begins now.`
+          ? `Your ${trialDays > 0 ? `${trialDays}-day trial` : 'subscription'} with full access to all features begins now.`
           : 'Thanks for supporting Dotabod! All premium features are now unlocked.',
         duration: 55,
       })
