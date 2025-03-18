@@ -3,12 +3,13 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
-import type { Prisma, TransactionType } from '@prisma/client'
+import { Prisma, type TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 interface CheckoutRequestBody {
   priceId: string
   period?: string
+  isGift?: boolean
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -27,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Parse and validate request body
-    const { priceId } = (await req.body) as CheckoutRequestBody
+    const { priceId, isGift } = (await req.body) as CheckoutRequestBody
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID is required' })
     }
@@ -38,24 +39,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isLifetime = !isRecurring
 
     // Handle customer and subscription logic in a transaction
-    const checkoutUrl = await prisma.$transaction(async (tx) => {
-      const customerId = await ensureCustomer(session.user, tx)
-      const subscriptionData = await getSubscription(session.user.id, tx)
-      return await createCheckoutSession({
-        customerId,
-        priceId,
-        isRecurring,
-        isLifetime,
-        subscriptionData,
-        userId: session.user.id,
-        email: session.user.email ?? '',
-        name: session.user.name ?? '',
-        image: session.user.image ?? '',
-        locale: session.user.locale ?? '',
-        twitchId: session.user.twitchId ?? '',
-        referer: req.headers.referer,
-      })
-    })
+    const checkoutUrl = await prisma.$transaction(
+      async (tx) => {
+        const customerId = await ensureCustomer(session.user, tx)
+        const subscriptionData = await getSubscription(session.user.id, tx)
+        return await createCheckoutSession({
+          customerId,
+          priceId,
+          isRecurring,
+          isLifetime,
+          subscriptionData,
+          userId: session.user.id,
+          email: session.user.email ?? '',
+          name: session.user.name ?? '',
+          image: session.user.image ?? '',
+          locale: session.user.locale ?? '',
+          twitchId: session.user.twitchId ?? '',
+          referer: req.headers.referer,
+          isGift,
+          tx,
+        })
+      },
+      {
+        timeout: 30000, // Increase timeout to 30 seconds to handle gift subscription processing
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      },
+    )
 
     return res.status(200).json({ url: checkoutUrl })
   } catch (error) {
@@ -164,6 +173,8 @@ interface CheckoutSessionParams {
   locale: string
   twitchId: string
   referer?: string
+  isGift?: boolean
+  tx?: Prisma.TransactionClient
 }
 
 async function createCheckoutSession(params: CheckoutSessionParams): Promise<string> {
@@ -180,21 +191,37 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     locale,
     twitchId,
     referer,
+    isGift,
+    tx,
   } = params
 
   const baseUrl = process.env.NEXTAUTH_URL ?? ''
-  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${isRecurring}`
-  const cancelUrl = referer?.includes('/dashboard')
-    ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
-    : `${baseUrl || 'https://dotabod.com'}/?paid=false`
 
   // Calculate trial period based on grace period
   const now = new Date()
 
-  // If in grace period, calculate days until grace period ends, otherwise use 14 days
-  const trialDays = isInGracePeriod()
-    ? Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    : 14
+  // Simplified trial period logic
+  let trialDays = 0
+
+  if (isGift) {
+    // No trial for gift purchases
+    trialDays = 0
+  } else if (isInGracePeriod()) {
+    // If we're in the grace period, use days until grace period ends as trial
+    trialDays = Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  } else if (isRecurring) {
+    // Standard trial for new self-subscriptions
+    trialDays = 14
+  }
+
+  // Build success URL with simplified parameters
+  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${
+    isRecurring && trialDays > 0
+  }&trialDays=${trialDays}`
+
+  const cancelUrl = referer?.includes('/dashboard')
+    ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
+    : `${baseUrl || 'https://dotabod.com'}/?paid=false`
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -205,7 +232,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     cancel_url: cancelUrl,
     subscription_data: isRecurring
       ? {
-          trial_period_days: trialDays,
+          ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
           trial_settings: {
             end_behavior: { missing_payment_method: 'cancel' },
           },
@@ -221,6 +248,8 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       twitchId,
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
+      isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      isGift: isGift ? 'true' : 'false',
     },
   })
 

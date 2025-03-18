@@ -1,6 +1,7 @@
 import { Popover, PopoverButton } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
+import { GiftIcon } from 'lucide-react'
 
 import { Container } from 'src/components/Container'
 import { Logo } from 'src/components/Logo'
@@ -65,6 +66,12 @@ export function Header() {
                           <div className='space-y-4'>
                             <MobileNavLink href='/#features'>Features</MobileNavLink>
                             <MobileNavLink href='/#pricing'>Pricing</MobileNavLink>
+                            <MobileNavLink href='/gift'>
+                              <span className="flex items-center gap-2">
+                                <GiftIcon className="h-4 w-4" />
+                                Gift Pro
+                              </span>
+                            </MobileNavLink>
                             <MobileNavLink href='/#faqs'>FAQs</MobileNavLink>
                             <MobileNavLink href='/blog'>Blog</MobileNavLink>
                             <MobileNavLink href='/privacy-policy'>Privacy Policy</MobileNavLink>

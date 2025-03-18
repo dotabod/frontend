@@ -14,14 +14,14 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
 } from '@/utils/subscription'
-import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
 import { App, Button, notification, Tooltip } from 'antd'
 import clsx from 'clsx'
-import { Bitcoin, CheckIcon } from 'lucide-react'
+import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import { Logomark } from './Logo'
 
@@ -72,6 +72,22 @@ function Plan({
       revalidateIfStale: false,
     },
   )
+
+  // Fetch credit balance
+  const { data: creditBalanceData } = useSWR(
+    session?.user ? '/api/stripe/credit-balance' : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      refreshInterval: 60000, // Refresh every minute
+    },
+  )
+
+  const creditBalance = creditBalanceData?.balance || 0
+  const formattedCreditBalance =
+    creditBalance > 0 ? `$${(Math.abs(creditBalance) / 100).toFixed(2)}` : '$0.00'
+
   const router = useRouter()
   // Add ref to track if subscription process has started
   const subscriptionStarted = useRef(false)
@@ -94,17 +110,42 @@ function Plan({
           ? 'annual'
           : 'monthly')
 
-  // Update description display to show trial info
+  // Check if user has credit balance
+  const hasCreditBalance = creditBalance > 0
+
+  // Update description display to show trial and credit info
   const displayDescription = () => {
-    if (
-      hasTrial &&
-      tier === SUBSCRIPTION_TIERS.PRO &&
-      activePeriod !== 'lifetime' &&
-      (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
-    ) {
+    if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
       const now = new Date()
 
-      if (isInGracePeriod()) {
+      // If user has credit balance and is considering a subscription
+      if (hasCreditBalance && !hasActivePlan) {
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>
+              You have {formattedCreditBalance} credit that will be applied at checkout
+            </span>
+          </>
+        )
+      }
+
+      // If user has an active subscription and credit balance
+      if (hasActivePlan && hasCreditBalance) {
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>
+              You have {formattedCreditBalance} credit that will be applied to your next invoice
+            </span>
+          </>
+        )
+      }
+
+      if (
+        isInGracePeriod() &&
+        (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
+      ) {
         // Calculate days until grace period ends
         const daysUntilEnd = Math.ceil(
           (GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
@@ -118,12 +159,15 @@ function Plan({
           </>
         )
       }
-      return (
-        <>
-          {description}
-          <span className='block mt-1 text-purple-400'>Includes 14-day free trial</span>
-        </>
-      )
+
+      if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-purple-400'>Includes 14-day free trial</span>
+          </>
+        )
+      }
     }
     return description
   }
@@ -133,17 +177,20 @@ function Plan({
     const isLifetimePeriod = activePeriod === 'lifetime'
     const isProTier = tier === SUBSCRIPTION_TIERS.PRO
     const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
-    const isTrialing = subscription?.status === SubscriptionStatus.TRIALING
-    const isActive = subscription?.status === SubscriptionStatus.ACTIVE
 
     // If user has a lifetime subscription
-    if (isLifetimePlan && isCurrentPlan) {
+    if (isLifetimePlan && !isFreeTier) {
       return 'You have lifetime access'
     }
 
     // If user has a paid subscription for this plan
     if (hasActivePlan && isCurrentPlan) {
       return 'Manage plan'
+    }
+
+    // If user has credit balance available
+    if (hasCreditBalance && isProTier && !hasActivePlan && isLifetimePeriod) {
+      return `Subscribe (${formattedCreditBalance} credit applied)`
     }
 
     // Handle grace period for users without paid subscription
@@ -159,16 +206,12 @@ function Plan({
       return 'Upgrade to lifetime'
     }
 
-    if (hasTrial && isTrialing && !hasActivePlan) {
-      return 'Manage trial'
-    }
-
-    if (!subscription || !isActive) {
+    if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
       if (isProTier && isLifetimePeriod) {
         return 'Get lifetime access'
       }
 
-      if (isProTier && !isLifetimePeriod) {
+      if (isProTier && !isLifetimePeriod && subscription?.tier === SUBSCRIPTION_TIERS.PRO) {
         return 'Update your subscription'
       }
       return button.label
@@ -178,19 +221,18 @@ function Plan({
   }
 
   const buttonText = getSimplifiedButtonText()
-
   // Determine if button should be disabled
   const isButtonDisabled = () => {
     // Always enable Free tier button
     if (tier === SUBSCRIPTION_TIERS.FREE) return false
 
     // Disable if user already has lifetime access
-    if (isLifetimePlan && isCurrentPlan) return true
+    if (isLifetimePlan) return true
 
     return false
   }
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = useCallback(async () => {
     setRedirectingToCheckout(true)
     try {
       if (!session) {
@@ -289,7 +331,16 @@ function Plan({
     } finally {
       setRedirectingToCheckout(false)
     }
-  }
+  }, [
+    session,
+    tier,
+    activePeriod,
+    subscription,
+    isLifetimePlan,
+    modal,
+    hasCreditBalance,
+    formattedCreditBalance,
+  ])
 
   // Function to handle crypto interest vote
   const handleCryptoInterest = async () => {
@@ -349,7 +400,7 @@ function Plan({
       // Trigger subscription process
       handleSubscribe()
     }
-  }, [router.query, session, tier, activePeriod, redirectingToCheckout])
+  }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 
   return (
     <section
@@ -393,6 +444,12 @@ function Plan({
         {hasActivePlan && isCurrentPlan && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
             Your plan
+          </span>
+        )}
+        {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' && (
+          <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full flex items-center gap-1'>
+            <Wallet size={12} />
+            Credit: {formattedCreditBalance}
           </span>
         )}
       </h3>
@@ -474,22 +531,43 @@ function Plan({
         </ol>
       </div>
 
-      <Button
-        loading={redirectingToCheckout}
-        onClick={handleSubscribe}
-        disabled={isButtonDisabled()}
-        size={featured ? 'large' : 'middle'}
-        color={featured ? 'danger' : 'default'}
-        className={clsx(
-          'mt-6',
-          featured
-            ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-            : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-        )}
-        aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
-      >
-        {buttonText}
-      </Button>
+      {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan ? (
+        <Tooltip title='Your credit balance will be automatically applied at checkout'>
+          <Button
+            loading={redirectingToCheckout}
+            onClick={handleSubscribe}
+            disabled={isButtonDisabled()}
+            size={featured ? 'large' : 'middle'}
+            color={featured ? 'danger' : 'default'}
+            className={clsx(
+              'mt-6 w-full',
+              featured
+                ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+            )}
+            aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+          >
+            {buttonText}
+          </Button>
+        </Tooltip>
+      ) : (
+        <Button
+          loading={redirectingToCheckout}
+          onClick={handleSubscribe}
+          disabled={isButtonDisabled()}
+          size={featured ? 'large' : 'middle'}
+          color={featured ? 'danger' : 'default'}
+          className={clsx(
+            'mt-6',
+            featured
+              ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+              : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+          )}
+          aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+        >
+          {buttonText}
+        </Button>
+      )}
 
       {/* Crypto interest button */}
       {tier !== SUBSCRIPTION_TIERS.FREE && (

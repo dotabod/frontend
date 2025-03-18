@@ -123,7 +123,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
             </>
           ) : hasActivePlan ? (
             <p className='mt-2 text-lg text-purple-400'>
-              <SubscriptionStatus showAlert={false} />
+              <SubscriptionStatus />
             </p>
           ) : (
             <p className='mt-2 text-lg text-gray-400'>

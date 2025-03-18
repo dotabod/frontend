@@ -70,7 +70,7 @@ const CommandsPage = () => {
         title='Commands'
       />
 
-      <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap'>
+      <div className='flex items-baseline sm:gap-x-6 gap-y-2 max-w-full flex-wrap'>
         <Segmented
           value={enabled}
           onChange={(v) => setEnabled(v as string)}

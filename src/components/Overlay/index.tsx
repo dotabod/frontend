@@ -3,6 +3,7 @@ import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import type { PollData } from '@/components/Overlay/PollOverlay'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
+import { GiftAlert } from '@/components/Overlay/GiftAlert'
 import { Settings } from '@/lib/defaultSettings'
 import {
   type blockType,
@@ -30,8 +31,13 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
+import { useRouter } from 'next/router'
 
 const OverlayPage = () => {
+  const router = useRouter()
+  const { userId } = router.query
+  const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
+
   const { notification } = App.useApp()
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
@@ -269,7 +275,23 @@ const OverlayPage = () => {
           overflow: hidden;
         }
       `}</style>
+      {showGiftAlerts && <GiftAlert userId={typeof userId === 'string' ? userId : undefined} />}
       <AnimatePresence>
+        {connected !== true && (
+          <Center
+            key='connecting-spinner'
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+            }}
+          >
+            <Spin size='large' tip='Connecting to Dotabod...' />
+          </Center>
+        )}
         <motion.div
           key='not-detected'
           {...motionProps}
