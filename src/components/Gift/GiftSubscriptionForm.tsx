@@ -89,9 +89,15 @@ export const GiftSubscriptionForm = ({
       setFormError(null)
       setUsernameError(null)
 
+      // Ensure quantity is a number
+      const submittedValues = {
+        ...values,
+        quantity: Number(values.quantity) || 1,
+      }
+
       // Client-side profanity check for immediate feedback
       // Note: We still rely on server-side validation for security
-      if (checkForProfanity(values.giftMessage)) {
+      if (checkForProfanity(submittedValues.giftMessage)) {
         form.setFields([
           {
             name: 'giftMessage',
@@ -103,7 +109,7 @@ export const GiftSubscriptionForm = ({
         return
       }
 
-      if (checkForProfanity(values.giftSenderName)) {
+      if (checkForProfanity(submittedValues.giftSenderName)) {
         form.setFields([
           {
             name: 'giftSenderName',
@@ -118,11 +124,11 @@ export const GiftSubscriptionForm = ({
       const priceId = process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID as string
 
       const result = await createGiftCheckoutSession({
-        recipientUsername: values.recipientUsername,
+        recipientUsername: submittedValues.recipientUsername,
         priceId,
-        giftMessage: values.giftMessage,
-        giftSenderName: values.giftSenderName,
-        quantity: values.quantity || 1,
+        giftMessage: submittedValues.giftMessage,
+        giftSenderName: submittedValues.giftSenderName,
+        quantity: submittedValues.quantity,
       })
 
       // Check if the result contains an error or message
