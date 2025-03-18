@@ -8,7 +8,7 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
-import type { StatusInfo, GiftSubInfo } from '@/components/Subscription/types'
+import type { StatusInfo } from '@/components/Subscription/types'
 
 // Add type safety for chatters
 type ChatterKeys = keyof typeof defaultSettings.chatters
@@ -297,7 +297,6 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeCustomerId: true,
       createdAt: true,
       stripeSubscriptionId: true,
-      isGift: true,
       metadata: true,
       giftDetails: {
         select: {
@@ -386,8 +385,6 @@ export function getSubscriptionStatusInfo(
   currentPeriodEnd?: Date | null,
   transactionType?: string | null,
   stripeSubscriptionId?: string | null,
-  isGift?: boolean,
-  metadata?: Record<string, unknown> | null,
 ): StatusInfo | null {
   // Check for lifetime subscription first (highest priority)
   if (
@@ -397,7 +394,7 @@ export function getSubscriptionStatusInfo(
       currentPeriodEnd.getFullYear() > 2090)
   ) {
     return {
-      message: isGift ? 'Lifetime access via gift' : 'Lifetime access',
+      message: 'Lifetime access',
       type: 'success',
       badge: 'default',
     }
@@ -446,18 +443,6 @@ export function getSubscriptionStatusInfo(
         badge: 'gold',
       }
     case SubscriptionStatus.ACTIVE:
-      // For gift subscriptions, use different messaging
-      if (isGift) {
-        return {
-          message: isEndingSoon
-            ? `Gift subscription ends in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
-            : `Gift subscription ends on ${endDate}`,
-          type: isEndingSoon ? 'warning' : 'info',
-          badge: isEndingSoon ? 'red' : 'gold',
-        }
-      }
-
-      // For regular subscriptions
       return {
         message: cancelAtPeriodEnd
           ? isEndingSoon
@@ -540,37 +525,4 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
   if (subscription.stripeSubscriptionId) return true
 
   return false
-}
-
-// Add a function to get gift subscription information
-export function getGiftSubscriptionInfo(
-  subscription: Partial<SubscriptionRow> | null,
-  giftDetails?: {
-    senderName?: string | null
-    giftType?: string | null
-    giftQuantity?: number | null
-    giftMessage?: string | null
-  } | null,
-): GiftSubInfo & { expirationDate?: Date | null } {
-  // Fall back to subscription data
-  if (!subscription?.isGift) {
-    return { message: '', isGift: false }
-  }
-
-  // Check if it's a lifetime gift subscription
-  const isLifetime =
-    subscription.transactionType === 'LIFETIME' ||
-    (subscription.currentPeriodEnd && subscription.currentPeriodEnd.getFullYear() > 2090)
-
-  return {
-    message: isLifetime
-      ? 'Someone gifted you lifetime access to Dotabod Pro. Enjoy all premium features forever!'
-      : 'You have a gift subscription that will not auto-renew. This is a one-time gift with no recurring charges.',
-    isGift: true,
-    senderName: giftDetails?.senderName || 'Anonymous',
-    giftType: giftDetails?.giftType || (isLifetime ? 'lifetime' : 'monthly'),
-    giftQuantity: giftDetails?.giftQuantity || 1,
-    giftMessage: giftDetails?.giftMessage || undefined,
-    expirationDate: subscription.currentPeriodEnd || null,
-  }
 }

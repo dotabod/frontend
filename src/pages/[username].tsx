@@ -21,14 +21,12 @@ const CommandsPage: NextPageWithLayout = () => {
     isPro: boolean
     isLifetime: boolean
     isGracePeriodPro: boolean
-    isGift: boolean
     inGracePeriod: boolean
     loading: boolean
   }>({
     isPro: false,
     isLifetime: false,
     isGracePeriodPro: false,
-    isGift: false,
     inGracePeriod: false,
     loading: true,
   })
@@ -46,7 +44,6 @@ const CommandsPage: NextPageWithLayout = () => {
             isPro: data.isPro || false,
             isLifetime: data.isLifetime || false,
             isGracePeriodPro: data.isGracePeriodPro || false,
-            isGift: data.isGift || false,
             inGracePeriod: data.inGracePeriod || false,
             loading: false,
           })
@@ -56,7 +53,6 @@ const CommandsPage: NextPageWithLayout = () => {
             isPro: false,
             isLifetime: false,
             isGracePeriodPro: false,
-            isGift: false,
             inGracePeriod: false,
             loading: false,
           })
@@ -166,17 +162,6 @@ const CommandsPage: NextPageWithLayout = () => {
             <Tag color='gold' className='flex! gap-1 items-center py-0.5'>
               <CrownIcon size={14} className='inline-block flex-shrink-0' />
               <span>Lifetime Pro</span>
-            </Tag>
-          </Tooltip>
-        )
-      }
-
-      if (subscriptionInfo.isGift) {
-        return (
-          <Tooltip title='Received Pro as a gift'>
-            <Tag color='gold' className='flex! gap-1 items-center py-0.5'>
-              <GiftIcon size={14} className='inline-block flex-shrink-0' />
-              <span>Gifted Pro</span>
             </Tag>
           </Tooltip>
         )

@@ -224,32 +224,7 @@ export function SubscriptionAlerts({
 
       {/* Primary subscription status alert - prioritize showing the most important information */}
       {/* For lifetime gift subscriptions */}
-      {(isLifetimePlan || giftInfo.hasLifetime) && giftSubInfo?.isGift ? (
-        <Alert
-          className={getAlertStyles('success')}
-          message={
-            <SubscriptionAlertMessage
-              icon={<CheckCircleIcon size={18} className='text-emerald-400' />}
-              text='Lifetime Access'
-              color='text-emerald-300'
-            />
-          }
-          description={
-            <div className='mt-1 text-emerald-300'>
-              <p>
-                Someone gifted you lifetime access to Dotabod Pro. Enjoy all premium features
-                forever!
-              </p>
-              <GiftSenderInfo
-                senderName={giftSubInfo.senderName}
-                giftMessage={giftSubInfo.giftMessage}
-              />
-            </div>
-          }
-          type='success'
-          showIcon={false}
-        />
-      ) : isLifetimePlan ? (
+      {isLifetimePlan ? (
         /* For regular lifetime subscriptions */
         <Alert
           className={getAlertStyles('success')}

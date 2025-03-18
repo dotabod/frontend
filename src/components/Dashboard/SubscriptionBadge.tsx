@@ -1,17 +1,18 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { Tooltip } from 'antd'
+import { getSubscriptionStatusInfo } from '@/utils/subscription'
+import { Badge, Tag, Tooltip } from 'antd'
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { plans } from '../Billing/BillingPlans'
 import { CrownIcon, Wallet } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
-  const router = useRouter()
+  const { data } = useSession()
   const { subscription, isLifetimePlan, hasActivePlan, inGracePeriod, isLoading } =
     useSubscriptionContext()
-
-  // Don't show the badge on the billing page to avoid redundancy
-  const isBillingPage = router.pathname.includes('/dashboard/billing')
-  if (isBillingPage || isLoading) return null
+  const currentPlan = plans.find((plan) => plan.tier === subscription?.tier)
 
   // Check if a credit balance exists
   const creditBalance = useMemo(() => {
@@ -19,9 +20,42 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     return Number((subscription.metadata as Record<string, unknown>).creditBalance || 0)
   }, [subscription?.metadata])
 
+  const statusInfo = getSubscriptionStatusInfo(
+    subscription?.status,
+    subscription?.cancelAtPeriodEnd,
+    subscription?.currentPeriodEnd,
+    subscription?.transactionType,
+    subscription?.stripeSubscriptionId,
+  )
+
+  if (data?.user?.isImpersonating) {
+    return null
+  }
+
+  const commonClasses = 'flex items-center gap-2'
+  const tooltipProps = {
+    title: statusInfo?.message || 'Manage your subscription',
+    placement: collapsed ? ('right' as const) : undefined,
+  }
+
+  // Determine badge status
+  const getBadgeStatus = () => {
+    if (!statusInfo) return 'default'
+    switch (statusInfo.type) {
+      case 'success':
+        return 'success'
+      case 'warning':
+        return 'warning'
+      case 'error':
+        return 'error'
+      default:
+        return 'processing'
+    }
+  }
+
   // Get the appropriate subscription badge based on subscription type
   const getSubscriptionBadge = () => {
-    // Priority order: Lifetime > Credit Balance > Pro > Grace Period
+    // Priority order: Lifetime > Gift > Pro > Grace Period
     if (subscription?.transactionType === 'LIFETIME') {
       return {
         icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
@@ -76,29 +110,68 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     return null
   }
 
-  const badge = getSubscriptionBadge()
-  if (!badge) return null
+  // Get the badge details
+  const badgeDetails = getSubscriptionBadge()
 
-  return (
-    <Tooltip title={badge.tooltip} placement={collapsed ? 'right' : 'top'}>
-      <div
-        className={`flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium ${
-          collapsed ? 'justify-center' : ''
-        } ${
-          badge.color === 'gold'
-            ? 'bg-amber-900/30 text-amber-300'
-            : badge.color === 'black'
-              ? 'bg-gray-900 text-amber-300'
-              : badge.color === 'blue'
-                ? 'bg-blue-900/30 text-blue-300'
-                : badge.color === 'green'
-                  ? 'bg-emerald-900/30 text-emerald-300'
-                  : 'bg-gray-800 text-gray-300'
-        }`}
-      >
-        {badge.icon}
-        {!collapsed && <span>{badge.text}</span>}
-      </div>
-    </Tooltip>
+  // logo for lifetime is https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp
+  // otehrwise its the current plan logo
+  const logo =
+    currentPlan?.tier === 'PRO' && subscription?.transactionType === 'LIFETIME' ? (
+      <Image
+        src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+        alt='Lifetime'
+        width={24}
+        height={24}
+      />
+    ) : (
+      currentPlan?.logo
+    )
+
+  const subscriptionContent = collapsed ? (
+    <div
+      className={`${commonClasses} justify-center mx-auto hover:cursor-pointer hover:opacity-90 transition-opacity duration-200 hover:scale-110`}
+    >
+      <Tooltip {...tooltipProps}>
+        <Link href='/dashboard/billing'>
+          <Badge status={getBadgeStatus()} dot>
+            <div className={commonClasses}>{logo}</div>
+          </Badge>
+        </Link>
+      </Tooltip>
+    </div>
+  ) : (
+    <div className={`${commonClasses} justify-center`}>
+      <Tooltip title={badgeDetails?.tooltip || tooltipProps.title}>
+        <Link href='/dashboard/billing' className='no-underline'>
+          <Tag
+            color={badgeDetails?.color || statusInfo?.badge}
+            className='px-3 py-1.5 rounded-md transition-all duration-200 hover:shadow-md'
+          >
+            <div className={`${commonClasses} justify-center`}>
+              <div className='flex items-center gap-2'>
+                {badgeDetails?.icon ? (
+                  <>
+                    {badgeDetails.icon}
+                    <span className='font-medium'>{badgeDetails.text}</span>
+                  </>
+                ) : (
+                  <>
+                    {logo}
+                    <span className='font-medium'>{currentPlan?.name} Plan</span>
+                  </>
+                )}
+              </div>
+            </div>
+            {!badgeDetails && statusInfo?.message && (
+              <div className='text-center text-xs mt-1 opacity-90 break-words'>
+                {statusInfo.message}
+              </div>
+            )}
+          </Tag>
+        </Link>
+      </Tooltip>
+    </div>
   )
+
+  return subscriptionContent
 }

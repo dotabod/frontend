@@ -205,7 +205,6 @@ export default function DashboardShell({
     giftType: 'monthly' | 'annual' | 'lifetime'
     giftQuantity?: number
   } | null>(null)
-  const [totalGiftedMonths, setTotalGiftedMonths] = useState<number | 'lifetime'>(0)
   const [hasLifetime, setHasLifetime] = useState(false)
   const [totalNotifications, setTotalNotifications] = useState(0)
 
@@ -223,8 +222,6 @@ export default function DashboardShell({
       })
       setHasGiftNotification(true)
 
-      // Set total gifted months and lifetime status
-      setTotalGiftedMonths(giftNotificationData.totalGiftedMonths || 0)
       setHasLifetime(giftNotificationData.hasLifetime || false)
       setTotalNotifications(giftNotificationData.totalNotifications || 0)
     } else {
@@ -411,7 +408,6 @@ export default function DashboardShell({
               giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
               giftQuantity={giftDetails.giftQuantity}
               onDismiss={dismissGiftNotification}
-              totalGiftedMonths={totalGiftedMonths}
               hasLifetime={hasLifetime}
               totalNotifications={totalNotifications}
             />

@@ -28,7 +28,6 @@ export interface StatusInfo {
 
 // Shared gift subscription details type
 export interface GiftSubInfo {
-  isGift?: boolean
   message?: string
   senderName?: string
   giftMessage?: string
@@ -48,7 +47,6 @@ export interface SubscriptionWithGiftDetails {
   transactionType?: TransactionType | null
   currentPeriodEnd?: Date | null
   cancelAtPeriodEnd?: boolean
-  isGift?: boolean
   metadata?: JsonValue
   giftDetails?: {
     senderName?: string | null

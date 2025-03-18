@@ -11,7 +11,6 @@ interface GiftNotificationProps {
   giftType: 'monthly' | 'annual' | 'lifetime'
   giftQuantity?: number
   onDismiss: () => void
-  totalGiftedMonths?: number | 'lifetime'
   hasLifetime?: boolean
   totalNotifications?: number
 }
@@ -22,7 +21,6 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
   giftType,
   giftQuantity = 1,
   onDismiss,
-  totalGiftedMonths = 0,
   hasLifetime = false,
   totalNotifications = 1,
 }) => {
@@ -58,25 +56,6 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
   }
 
   const giftTypeDisplay = getGiftTypeDisplay(giftType, giftQuantity)
-
-  // Format total gifted months message
-  const getTotalGiftedMessage = () => {
-    if (hasLifetime) {
-      return 'You have Dotabod Pro Lifetime from gift subscriptions!'
-    }
-
-    if (typeof totalGiftedMonths === 'number') {
-      if (totalGiftedMonths === 1) {
-        return 'You have 1 month of Dotabod Pro from gift subscriptions.'
-      }
-
-      if (totalGiftedMonths > 1) {
-        return `You have ${totalGiftedMonths} months of Dotabod Pro from gift subscriptions.`
-      }
-    }
-
-    return null
-  }
 
   // Use notification API instead of Alert component
   useEffect(() => {

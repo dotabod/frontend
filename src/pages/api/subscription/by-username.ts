@@ -34,9 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Determine if the user has an actual paid subscription or lifetime plan
     const hasPaidOrLifetime =
       subscription &&
-      (subscription.stripeSubscriptionId ||
-        subscription.transactionType === 'LIFETIME' ||
-        subscription.isGift)
+      (subscription.stripeSubscriptionId || subscription.transactionType === 'LIFETIME')
 
     // User is on grace period Pro if we're in grace period and they don't have a paid plan
     const isGracePeriodPro = inGracePeriod && !hasPaidOrLifetime
@@ -59,7 +57,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       isPro: subscription.tier === SUBSCRIPTION_TIERS.PRO,
       isGracePeriodPro,
       isLifetime: subscription.transactionType === 'LIFETIME',
-      isGift: subscription.isGift || false,
       inGracePeriod,
     })
   } catch (error) {

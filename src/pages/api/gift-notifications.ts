@@ -63,27 +63,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),
         )
 
-        // Calculate total gifted months
-        let totalGiftedMonths = 0
-
-        for (const sub of activeSubscriptions) {
-          if (sub.isGift && sub.giftDetails) {
-            if (sub.giftDetails.giftType === 'lifetime') {
-              totalGiftedMonths = Number.POSITIVE_INFINITY // Represent lifetime as infinity
-              break
-            }
-
-            // Apply the gift quantity multiplier
-            const quantity = sub.giftDetails.giftQuantity || 1
-
-            if (sub.giftDetails.giftType === 'annual') {
-              totalGiftedMonths += 12 * quantity
-            } else if (sub.giftDetails.giftType === 'monthly') {
-              totalGiftedMonths += 1 * quantity
-            }
-          }
-        }
-
         // Format notifications for frontend
         const formattedNotifications = notifications
           .map((notification) => {
@@ -107,7 +86,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           hasNotification: formattedNotifications.some((n) => n !== null && !n.read), // Check for null before accessing read property
           notifications: formattedNotifications,
           hasLifetime,
-          totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,
           totalNotifications: formattedNotifications.length,
         })
       } catch (error) {

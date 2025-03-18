@@ -189,7 +189,7 @@ function Plan({
     }
 
     // If user has credit balance available
-    if (hasCreditBalance && isProTier && !hasActivePlan) {
+    if (hasCreditBalance && isProTier && !hasActivePlan && activePeriod !== 'lifetime') {
       return `Subscribe (${formattedCreditBalance} credit applied)`
     }
 
@@ -452,7 +452,7 @@ function Plan({
             Your plan
           </span>
         )}
-        {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && (
+        {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full flex items-center gap-1'>
             <Wallet size={12} />
             Credit: {formattedCreditBalance}
