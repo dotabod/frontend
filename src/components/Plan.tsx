@@ -161,6 +161,14 @@ function Plan({
       }
 
       if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
+        // Don't show trial message if user has a gift subscription or has their own subscription that will start after gift
+        if (
+          hasActiveGift ||
+          (hasActivePlan && subscription?.status === SubscriptionStatus.TRIALING)
+        ) {
+          return <>{description}</>
+        }
+
         return (
           <>
             {description}

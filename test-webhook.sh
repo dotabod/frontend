@@ -7,13 +7,13 @@ NC='\033[0m' # No Color
 
 # Default values
 WEBHOOK_URL="http://localhost:3000/api/stripe/webhook"
-USER_ID=""
+USER_ID="d8fb664f-74b6-485c-a277-4423ee179eeb"
 PRICE_ID_MONTHLY="price_monthly123"
 PRICE_ID_ANNUAL="price_annual123"
 PRICE_ID_LIFETIME="price_lifetime123"
 
 # Grace period end date from subscription.ts
-GRACE_PERIOD_END="2025-05-01T00:00:00.000Z"
+GRACE_PERIOD_END="2025-02-01T00:00:00.000Z"
 
 # Override with environment variables if available
 [[ -n "$NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID" ]] && PRICE_ID_MONTHLY="$NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID"
@@ -54,13 +54,6 @@ run_test() {
 delete_all_customers() {
   echo -e "${YELLOW}Deleting all customers in your Stripe account...${NC}"
   echo "This will delete ALL customers in your Stripe test mode account."
-  echo "Are you sure you want to continue? (y/n)"
-  read -r confirm
-
-  if [[ "$confirm" != "y" ]]; then
-    echo "Operation cancelled."
-    return
-  fi
 
   echo "Fetching customers..."
   customers=$(stripe customers list --limit 100)
@@ -80,13 +73,11 @@ delete_all_customers() {
   count=0
   for id in $customer_ids; do
     echo "Deleting customer $id..."
-    stripe customers delete "$id"
+    stripe customers delete "$id" --confirm
     ((count++))
   done
 
   echo -e "${GREEN}Deleted $count customers.${NC}"
-  echo "Press Enter to continue..."
-  read
 }
 
 # Ask for user ID if not provided
@@ -290,7 +281,7 @@ while true; do
 
     # Ensure positive value
     if [ $DAYS_UNTIL_GRACE_END -lt 0 ]; then
-      DAYS_UNTIL_GRACE_END=0
+      DAYS_UNTIL_GRACE_END=14
     fi
 
     echo -e "${YELLOW}Days remaining until grace period ends (April 30, 2025): $DAYS_UNTIL_GRACE_END${NC}"
@@ -298,7 +289,7 @@ while true; do
     run_test "Grace Period Subscription" "customer.subscription.created" \
       --override "subscription:items[0][price]=$PRICE_ID_MONTHLY" \
       --override "subscription:trial_period_days=$DAYS_UNTIL_GRACE_END" \
-      --override "subscription:cancel_at_period_end=true" \
+      --override "subscription:cancel_at_period_end=false" \
       --override "customer:metadata.userId=$USER_ID" \
       --override "customer:metadata.isGracePeriodVirtual=true"
 

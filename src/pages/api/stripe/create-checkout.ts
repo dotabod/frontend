@@ -9,6 +9,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 interface CheckoutRequestBody {
   priceId: string
   period?: string
+  isGift?: boolean
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -27,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Parse and validate request body
-    const { priceId } = (await req.body) as CheckoutRequestBody
+    const { priceId, isGift } = (await req.body) as CheckoutRequestBody
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID is required' })
     }
@@ -55,6 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           locale: session.user.locale ?? '',
           twitchId: session.user.twitchId ?? '',
           referer: req.headers.referer,
+          isGift,
           tx,
         })
       },
@@ -171,6 +173,7 @@ interface CheckoutSessionParams {
   locale: string
   twitchId: string
   referer?: string
+  isGift?: boolean
   tx?: Prisma.TransactionClient
 }
 
@@ -188,6 +191,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     locale,
     twitchId,
     referer,
+    isGift,
     tx,
   } = params
 
@@ -207,35 +211,59 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     select: { id: true, currentPeriodEnd: true },
   })
 
-  // If in grace period, calculate days until grace period ends
-  // If user already has an active gift subscription, skip trial period
-  // Otherwise use standard 14 days trial
+  // Trial period logic:
+  // 1. If creating a gift subscription, never apply trial days
+  // 2. If user has an active gift subscription and is self-subscribing, set trial to match gift expiration
+  // 3. If we're in the grace period, use days until grace period ends as trial
+  // 4. Otherwise use standard 14-day trial for new self-subscriptions
   let trialDays = 0
-  if (hasActiveGiftSubscription) {
-    // Skip trial for users who already have an active gift subscription
+
+  if (isGift) {
+    // Never apply trial days to gift subscriptions
     trialDays = 0
-    console.log(`User ${userId} already has an active gift subscription. Skipping trial period.`)
+    console.log(`Creating a gift subscription for user ${userId}. No trial period applied.`)
+  } else if (hasActiveGiftSubscription && isRecurring) {
+    // For users with active gift subscriptions who are self-subscribing,
+    // set trial period to match their gift expiration date
+    // This ensures they don't get charged until their gift expires
+    if (hasActiveGiftSubscription.currentPeriodEnd) {
+      const giftEndTime = hasActiveGiftSubscription.currentPeriodEnd.getTime()
+      const nowTime = now.getTime()
+      trialDays = Math.ceil((giftEndTime - nowTime) / (1000 * 60 * 60 * 24))
+
+      // Ensure we have at least 1 day of trial if gift is about to expire
+      trialDays = Math.max(1, trialDays)
+
+      console.log(
+        `User ${userId} has active gift subscription expiring on ${hasActiveGiftSubscription.currentPeriodEnd.toISOString()}. Setting trial period to ${trialDays} days.`,
+      )
+    }
   } else if (isInGracePeriod()) {
     trialDays = Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  } else {
+  } else if (isRecurring) {
+    // Standard trial for new self-subscriptions
     trialDays = 14
   }
 
-  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${isRecurring && trialDays > 0}`
+  // Get gift subscription count for the user
+  const giftCount = hasActiveGiftSubscription
+    ? await queryClient.subscription.count({
+        where: {
+          userId,
+          isGift: true,
+          status: { in: ['ACTIVE', 'TRIALING'] },
+        },
+      })
+    : 0
+
+  // Build success URL with all necessary parameters
+  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${
+    isRecurring && trialDays > 0
+  }&trialDays=${trialDays}&hasGifts=${!!hasActiveGiftSubscription}&giftCount=${giftCount}`
+
   const cancelUrl = referer?.includes('/dashboard')
     ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
     : `${baseUrl || 'https://dotabod.com'}/?paid=false`
-
-  // If user has an active gift subscription and is trying to self-subscribe,
-  // we need to set up the subscription to start after the gift expires
-  let subscriptionStartDate: number | undefined = undefined
-  if (isRecurring && hasActiveGiftSubscription?.currentPeriodEnd) {
-    // Set the subscription to start after the gift expires
-    subscriptionStartDate = Math.floor(hasActiveGiftSubscription.currentPeriodEnd.getTime() / 1000)
-    console.log(
-      `User ${userId} has active gift subscription. Setting subscription to start after gift expires on ${hasActiveGiftSubscription.currentPeriodEnd.toISOString()}`,
-    )
-  }
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -250,12 +278,6 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
           trial_settings: {
             end_behavior: { missing_payment_method: 'cancel' },
           },
-          ...(subscriptionStartDate
-            ? {
-                billing_cycle_anchor: subscriptionStartDate,
-                proration_behavior: 'none',
-              }
-            : {}),
         }
       : undefined,
     allow_promotion_codes: true,
@@ -270,6 +292,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       hasActiveGiftSubscription: hasActiveGiftSubscription ? 'true' : 'false',
+      isGift: isGift ? 'true' : 'false',
       ...(hasActiveGiftSubscription?.currentPeriodEnd
         ? {
             giftExpirationDate: hasActiveGiftSubscription.currentPeriodEnd.toISOString(),

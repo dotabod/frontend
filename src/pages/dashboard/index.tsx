@@ -33,11 +33,35 @@ const SetupPage = () => {
   const [active, setActive] = useState(0)
   const router = useRouter()
   const didJustPay = router.query.paid === 'true'
+  // isTrial comes from the checkout API's success URL: ?trial=${isRecurring && trialDays > 0}
+  // It will be true for recurring subscriptions with a trial period (grace period or standard 14-day trial)
+  // It will be false for lifetime purchases or subscriptions with no trial (like when a user already has a gift sub)
   const isTrial = router.query.trial === 'true'
 
-  const trialDays = isInGracePeriod()
-    ? Math.ceil((GRACE_PERIOD_END.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    : 14
+  // Get trial days directly from URL query params if available, otherwise calculate
+  const trialDays = (() => {
+    // If trial days are provided in the URL (from checkout success redirect), use that
+    const trialDaysFromUrl = router.query.trialDays
+      ? Number.parseInt(router.query.trialDays as string, 10)
+      : null
+    if (trialDaysFromUrl !== null && !Number.isNaN(trialDaysFromUrl)) {
+      return trialDaysFromUrl
+    }
+
+    // Otherwise calculate based on grace period
+    if (isInGracePeriod()) {
+      return Math.ceil((GRACE_PERIOD_END.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    }
+
+    // Default to standard 14 days trial
+    return 14
+  })()
+
+  // Get gift information from URL query params
+  const hasGiftSubs = router.query.hasGifts === 'true'
+  const giftCount = router.query.giftCount
+    ? Number.parseInt(router.query.giftCount as string, 10)
+    : 0
 
   const updateStepInUrl = useCallback(
     (newActiveStep) => {
@@ -131,26 +155,50 @@ const SetupPage = () => {
         triggerConfetti()
       }
 
+      // Create a more descriptive message based on the subscription type
+      let description = ''
+      if (isTrial) {
+        if (hasGiftSubs && trialDays > 14) {
+          // Case: User has gift subscriptions and is now self-subscribing
+          description = `Your subscription is active! You won't be charged until your gift subscription${giftCount > 1 ? 's' : ''} ${giftCount > 1 ? 'expire' : 'expires'} in ${trialDays} days.`
+        } else {
+          // Standard trial case
+          description = `Your ${trialDays > 0 ? `${trialDays}-day trial` : 'subscription'} with full access to all features begins now.`
+        }
+      } else {
+        // Lifetime or no trial case
+        description = 'Thanks for supporting Dotabod! All premium features are now unlocked.'
+      }
+
       notification.success({
         key: 'paid',
-        message: isTrial ? 'Dotabod Pro Unlocked' : 'Dotabod Pro Unlocked',
-        description: isTrial
-          ? `Your ${trialDays > 0 ? `${trialDays}-day trial` : 'subscription'} with full access to all features begins now.`
-          : 'Thanks for supporting Dotabod! All premium features are now unlocked.',
+        message: 'Dotabod Pro Unlocked',
+        description,
         duration: 55,
       })
 
-      // Clear the query params
+      // Clear the query params but preserve the step
+      const step = router.query.step
       router.replace(
         {
           pathname: router.pathname,
-          query: { ...router.query, paid: undefined, trial: undefined },
+          query: step ? { step } : {},
         },
         undefined,
         { shallow: true },
       )
     }
-  }, [active, didJustPay, isTrial, notification, router, trialDays, triggerConfetti])
+  }, [
+    active,
+    didJustPay,
+    isTrial,
+    notification,
+    router,
+    trialDays,
+    triggerConfetti,
+    hasGiftSubs,
+    giftCount,
+  ])
 
   if (session?.data?.user?.isImpersonating) {
     return null

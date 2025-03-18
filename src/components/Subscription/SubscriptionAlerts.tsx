@@ -29,8 +29,11 @@ function SubscriptionTimeline({
   renewalDate,
   hasActivePlan,
   cancelAtPeriodEnd,
+  hasPostPaidGift,
   paidPeriodEnd,
   isTrialing,
+  giftBasedTrialDays,
+  metadata,
 }: {
   gracePeriodEnd: Date
   giftStartDate: Date
@@ -41,13 +44,11 @@ function SubscriptionTimeline({
   hasPostPaidGift?: boolean
   paidPeriodEnd?: Date
   isTrialing?: boolean
+  giftBasedTrialDays?: number
+  metadata?: Record<string, unknown>
 }) {
   const now = new Date()
   const showGracePeriod = now < gracePeriodEnd
-
-  // Determine if the user has a paid subscription that starts during the grace period
-  const hasPaidDuringGracePeriod =
-    hasActivePlan && paidPeriodEnd && paidPeriodEnd > now && paidPeriodEnd > gracePeriodEnd
 
   // Create timeline items based on subscription state
   const timelineItems = [
@@ -61,6 +62,20 @@ function SubscriptionTimeline({
         </div>
       ),
     },
+    // Trial period start (if currently trialing)
+    ...(isTrialing && giftBasedTrialDays && giftBasedTrialDays > 14
+      ? [
+          {
+            color: 'purple',
+            label: formatDate(now),
+            children: (
+              <div className='text-indigo-300'>
+                <span className='font-medium'>Trial started (gift-extended)</span>
+              </div>
+            ),
+          },
+        ]
+      : []),
     // Grace period end (if applicable)
     ...(showGracePeriod
       ? [
@@ -75,8 +90,8 @@ function SubscriptionTimeline({
           },
         ]
       : []),
-    // Current paid period end (if applicable and not during grace period)
-    ...(hasActivePlan && paidPeriodEnd && paidPeriodEnd > now && !showGracePeriod
+    // Trial period end (if applicable)
+    ...(isTrialing && paidPeriodEnd && paidPeriodEnd > now
       ? [
           {
             color: 'green',
@@ -84,75 +99,71 @@ function SubscriptionTimeline({
             children: (
               <div className='text-emerald-300'>
                 <span className='font-medium'>
-                  {giftStartDate > now && giftStartDate.getTime() === paidPeriodEnd.getTime()
-                    ? isTrialing
-                      ? 'Trial ends'
-                      : 'Subscription ends'
-                    : isTrialing
-                      ? 'Trial period ends'
-                      : 'Current paid period ends'}
+                  {giftBasedTrialDays && giftBasedTrialDays > 14
+                    ? 'Gift-extended trial ends'
+                    : 'Trial ends'}
                 </span>
               </div>
             ),
           },
         ]
       : []),
-    // Gift sub start (if different from now and after grace period)
-    ...(giftStartDate > now
+    // Gift subscription start (if in future)
+    ...(giftStartDate > now && (!isTrialing || (giftBasedTrialDays && giftBasedTrialDays <= 14))
       ? [
           {
             color: 'purple',
             label: formatDate(giftStartDate),
             children: (
               <div className='text-indigo-300'>
-                <span className='font-medium'>
-                  {hasActivePlan &&
-                  paidPeriodEnd &&
-                  giftStartDate.getTime() === paidPeriodEnd.getTime()
-                    ? 'Gift sub begins (subscription paused)'
-                    : showGracePeriod && giftStartDate.getTime() === gracePeriodEnd.getTime()
-                      ? 'Gift sub begins after free period'
-                      : 'Gift sub begins'}
-                </span>
+                <span className='font-medium'>Gift subscription starts</span>
               </div>
             ),
           },
         ]
       : []),
-    // Gift sub end
-    {
-      color: 'purple',
-      label: formatDate(giftEndDate),
-      children: (
-        <div className='text-indigo-300'>
-          <span className='font-medium'>Gift sub ends</span>
-        </div>
-      ),
-    },
-    // Paid subscription (if applicable)
-    ...(hasActivePlan && renewalDate && !cancelAtPeriodEnd
+    // Gift subscription end
+    ...(giftEndDate > now
+      ? [
+          {
+            color: 'purple',
+            label: formatDate(giftEndDate),
+            children: (
+              <div className='text-indigo-300'>
+                <span className='font-medium'>Gift subscription ends</span>
+              </div>
+            ),
+          },
+        ]
+      : []),
+    // Paid subscription end (if applicable)
+    ...(hasActivePlan && paidPeriodEnd && paidPeriodEnd > now && !isTrialing
       ? [
           {
             color: 'green',
-            label: formatDate(renewalDate),
+            label: formatDate(paidPeriodEnd),
             children: (
               <div className='text-emerald-300'>
-                <span className='font-medium'>Subscription resumes</span>
+                <span className='font-medium'>Current paid period ends</span>
               </div>
             ),
           },
         ]
       : []),
-    // Subscription ends (if cancelAtPeriodEnd or if only gift subscription and no other subscription)
-    ...((hasActivePlan && paidPeriodEnd && renewalDate && cancelAtPeriodEnd) || !hasActivePlan
+    // Subscription renewal or end
+    ...(renewalDate && renewalDate > now
       ? [
           {
-            color: 'red',
-            label: formatDate(giftEndDate),
+            color: cancelAtPeriodEnd ? 'red' : 'green',
+            label: formatDate(renewalDate),
             children: (
-              <div className='text-red-300'>
-                <span className='font-medium'>Dotabod Pro ends</span>
-                <div className='text-xs text-gray-400 mt-1'>No further charges</div>
+              <div className={cancelAtPeriodEnd ? 'text-red-300' : 'text-emerald-300'}>
+                <span className='font-medium'>
+                  {cancelAtPeriodEnd ? 'Subscription ends' : 'Subscription renews'}
+                </span>
+                {cancelAtPeriodEnd && (
+                  <div className='text-xs text-gray-400 mt-1'>No further charges</div>
+                )}
               </div>
             ),
           },
@@ -160,80 +171,42 @@ function SubscriptionTimeline({
       : []),
   ]
 
-  // Create a summary text based on the subscription state
+  // Sort timeline items by date and remove duplicates
+  const sortedUniqueItems = timelineItems
+    .sort((a, b) => new Date(a.label).getTime() - new Date(b.label).getTime())
+    .filter(
+      (item, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.label === item.label &&
+            t.children?.props?.children?.props?.children ===
+              item.children?.props?.children?.props?.children,
+        ),
+    )
+
+  // Create summary text
   let summaryText = ''
-  let hasAddedRenewalInfo = false
-
-  if (showGracePeriod) {
-    // User is in grace period - this takes precedence over everything else
-    summaryText = `Free until ${formatDate(gracePeriodEnd)}`
-
-    if (giftStartDate >= gracePeriodEnd) {
-      // Gift starts after grace period
-      summaryText += ` → Gift until ${formatDate(giftEndDate)}`
-
-      // Add renewal info if applicable
-      if (hasActivePlan && renewalDate && !cancelAtPeriodEnd) {
-        summaryText += ` → Subscription resumes ${formatDate(renewalDate)}`
-        hasAddedRenewalInfo = true
-      } else if (hasActivePlan && cancelAtPeriodEnd) {
-        summaryText += ' → Dotabod Pro ends'
-        hasAddedRenewalInfo = true
-      } else if (!hasActivePlan) {
-        summaryText += ' → Dotabod Pro ends'
-        hasAddedRenewalInfo = true
-      }
-    }
-  } else if (hasPaidDuringGracePeriod) {
-    // User has a paid subscription during grace period
-    summaryText = `Paid until ${formatDate(paidPeriodEnd)}`
-
-    if (giftStartDate > now) {
-      // Gift starts after current period
-      summaryText += ` → Gift until ${formatDate(giftEndDate)}`
-    }
-  } else if (giftStartDate <= now) {
-    // Gift is active now
-    summaryText = `Gift until ${formatDate(giftEndDate)}`
-
-    // Add "Dotabod Pro ends" for gift-only subscriptions
-    if (!hasActivePlan && !renewalDate) {
-      summaryText += ' → Dotabod Pro ends'
-      hasAddedRenewalInfo = true
-    }
-  } else {
-    // Gift starts in the future
-    const isPaused =
-      hasActivePlan && paidPeriodEnd && giftStartDate.getTime() === paidPeriodEnd.getTime()
-
-    if (isPaused) {
-      summaryText = `Subscription until ${formatDate(paidPeriodEnd)} → Gift until ${formatDate(giftEndDate)}`
-    } else {
-      summaryText = `Gift starts ${formatDate(giftStartDate)} → Gift until ${formatDate(giftEndDate)}`
-    }
-
-    // Add "Dotabod Pro ends" for gift-only subscriptions
-    if (!hasActivePlan && !renewalDate) {
-      summaryText += ' → Dotabod Pro ends'
-      hasAddedRenewalInfo = true
+  if (isTrialing) {
+    summaryText = `Trial until ${paidPeriodEnd ? formatDate(paidPeriodEnd) : ''}`
+    if (giftBasedTrialDays && giftBasedTrialDays > 14) {
+      summaryText += ' (gift-extended)'
     }
   }
-
-  // Add renewal info - only if user actually has an active paid plan and we haven't added it yet
-  if (!hasAddedRenewalInfo) {
-    if (hasActivePlan && paidPeriodEnd && renewalDate && !cancelAtPeriodEnd) {
-      summaryText += ` → Subscription resumes ${formatDate(renewalDate)}`
-    } else if (hasActivePlan && paidPeriodEnd && cancelAtPeriodEnd) {
-      summaryText += ' → Dotabod Pro ends'
-    }
+  if (giftStartDate <= now && giftEndDate > now) {
+    summaryText += `${summaryText ? ' → ' : ''}Gift until ${formatDate(giftEndDate)}`
+  }
+  if (hasActivePlan && paidPeriodEnd && !isTrialing) {
+    summaryText += `${summaryText ? ' → ' : ''}Paid until ${formatDate(paidPeriodEnd)}`
+  }
+  if (renewalDate) {
+    summaryText += ` → ${cancelAtPeriodEnd ? 'Ends' : 'Renews'} ${formatDate(renewalDate)}`
   }
 
   return (
     <div className='flex flex-col items-center'>
       <h4 className='text-sm font-medium text-indigo-200'>Subscription Timeline</h4>
-      <Timeline mode='left' items={timelineItems} className='w-full' />
-
-      {/* Summary text */}
+      <Timeline mode='left' items={sortedUniqueItems} className='w-full' />
       <div className='text-xs text-gray-300'>
         <p>{summaryText}</p>
       </div>
@@ -429,13 +402,47 @@ export function SubscriptionAlerts({
         ? new Date(metadata.giftExpirationDate as string)
         : new Date(latestGiftEndDate)
 
+    // Get gift-based trial days from metadata if available
+    const giftBasedTrialDays = metadata?.giftBasedTrialDays
+      ? Number.parseInt(metadata.giftBasedTrialDays as string, 10)
+      : 0
+
     // Determine the correct gift start date
     // If we're in the grace period, the gift should start after grace period
     // If user has an active paid subscription, the gift should start after current period
     // Otherwise, it starts now
     let effectiveGiftStartDate: Date
 
-    if (inGracePeriod) {
+    // Check if the subscription is in trial mode
+    const isTrialingFromStatus = subscription?.status === 'TRIALING'
+
+    // Check if this is a gift-based trial extension (user self-subscribed after receiving a gift)
+    const isGiftBasedTrialExtension =
+      isTrialingFromStatus && giftBasedTrialDays > 14 && metadata?.createdWithActiveGift === 'true'
+
+    // Debug logs
+    console.log('DEBUG - Subscription Timeline Data:', {
+      subscription: {
+        id: subscription?.id,
+        status: subscription?.status,
+        cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd,
+        stripeSubscriptionId: subscription?.stripeSubscriptionId,
+        currentPeriodEnd: subscription?.currentPeriodEnd,
+        isGift: subscription?.isGift,
+      },
+      metadata,
+      isTrialingFromStatus,
+      giftBasedTrialDays,
+      isGiftBasedTrialExtension,
+      hasActivePlan,
+      actualRenewalDate,
+      latestGiftEndDate,
+    })
+
+    if (isGiftBasedTrialExtension) {
+      // For gift-based extensions, the gift is already active now
+      effectiveGiftStartDate = new Date()
+    } else if (inGracePeriod) {
       // If in grace period, gift starts after grace period
       effectiveGiftStartDate = new Date(GRACE_PERIOD_END)
     } else if (subscription?.currentPeriodEnd && !subscription.isGift && hasActivePlan) {
@@ -454,21 +461,66 @@ export function SubscriptionAlerts({
       !subscription.isGift &&
       !(subscription as unknown as SubscriptionWithGiftDetails)?.isVirtual
 
+    const isGiftOnly = !hasPaidSubscription && subscription?.isGift === true
+
+    // Check if the subscription is in trial mode - just use the subscription status
+    const isTrialing = isTrialingFromStatus
+
+    // For gift-based trial extensions, calculate the renewal date (day after gift ends)
+    let calculatedRenewalDate = actualRenewalDate ? new Date(actualRenewalDate) : undefined
+
+    // If this is a gift-based trial extension and we don't have a renewal date yet,
+    // calculate it as the day after the gift ends
+    if (isGiftBasedTrialExtension && !calculatedRenewalDate && giftExpirationDate) {
+      calculatedRenewalDate = new Date(giftExpirationDate)
+      calculatedRenewalDate.setDate(calculatedRenewalDate.getDate() + 1)
+      console.log(
+        'DEBUG - Calculated renewal date for gift-based trial extension:',
+        calculatedRenewalDate,
+      )
+    }
+
+    // Debug logs for timeline parameters
+    console.log('DEBUG - Timeline Parameters:', {
+      hasActivePlan: hasPaidSubscription && !isGiftBasedTrialExtension,
+      cancelAtPeriodEnd: isGiftBasedTrialExtension
+        ? subscription?.cancelAtPeriodEnd
+        : hasPaidSubscription
+          ? subscription?.cancelAtPeriodEnd
+          : undefined,
+      paidPeriodEnd:
+        hasPaidSubscription && subscription?.currentPeriodEnd && !isGiftBasedTrialExtension
+          ? new Date(subscription.currentPeriodEnd)
+          : undefined,
+      isTrialing: isTrialing && (!giftBasedTrialDays || giftBasedTrialDays <= 14),
+      renewalDate: calculatedRenewalDate,
+    })
+
     return (
       <SubscriptionTimeline
         gracePeriodEnd={new Date(GRACE_PERIOD_END)}
         giftStartDate={effectiveGiftStartDate}
         giftEndDate={giftExpirationDate}
-        renewalDate={actualRenewalDate ? new Date(actualRenewalDate) : undefined}
-        hasActivePlan={hasPaidSubscription}
-        cancelAtPeriodEnd={hasPaidSubscription ? subscription?.cancelAtPeriodEnd : undefined}
+        renewalDate={calculatedRenewalDate}
+        hasActivePlan={hasPaidSubscription && !isGiftBasedTrialExtension}
+        cancelAtPeriodEnd={
+          isGiftBasedTrialExtension
+            ? subscription?.cancelAtPeriodEnd
+            : hasPaidSubscription
+              ? subscription?.cancelAtPeriodEnd
+              : isGiftOnly
+                ? subscription?.cancelAtPeriodEnd === true
+                : undefined
+        }
         hasPostPaidGift={hasPostPaidGift}
         paidPeriodEnd={
-          hasPaidSubscription && subscription?.currentPeriodEnd
+          hasPaidSubscription && subscription?.currentPeriodEnd && !isGiftBasedTrialExtension
             ? new Date(subscription.currentPeriodEnd)
             : undefined
         }
-        isTrialing={subscription?.status === 'TRIALING'}
+        isTrialing={isTrialing && (!giftBasedTrialDays || giftBasedTrialDays <= 14)}
+        giftBasedTrialDays={giftBasedTrialDays}
+        metadata={metadata}
       />
     )
   }
