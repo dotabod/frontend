@@ -365,19 +365,9 @@ export const GiftSubscriptionForm = ({
           </Form.Item>
         </Form>
 
-        <div className='bg-gray-800/80 p-2 rounded text-center text-xs'>
-          <div>
-            This is a one-time payment. The gift subscription will not auto-renew, and you will not
-            be charged again.
-          </div>
-          <div>
-            If the recipient already has an active subscription, this gift will extend their
-            subscription period.
-          </div>
-          <div className='mt-1 pt-1 border-t border-gray-700'>
-            Note: Messages containing inappropriate language will be automatically rejected by our
-            system.
-          </div>
+        <div className='text-center text-xs'>
+          This is a one-time payment. The gift subscription will not auto-renew, and you will not be
+          charged again.
         </div>
       </Card>
 
@@ -412,6 +402,36 @@ export const GiftSubscriptionForm = ({
             </Paragraph>
           </div>
         </Space>
+      </Card>
+
+      <Card className='mt-4'>
+        <Title level={4}>How Gift Subscriptions Work</Title>
+        <div className='space-y-3'>
+          <div>
+            <Text strong>For New Users:</Text>
+            <Paragraph>
+              If the recipient has never subscribed to Dotabod Pro, they will need to set up a
+              subscription after receiving your gift. The credits will be automatically applied, so
+              they won't be charged for the duration of your gift.
+            </Paragraph>
+          </div>
+
+          <div>
+            <Text strong>For Existing Subscribers:</Text>
+            <Paragraph>
+              If the recipient is already a Pro subscriber, the gift credits will automatically be
+              applied to their account and used when their subscription renews.
+            </Paragraph>
+          </div>
+
+          <div>
+            <Text strong>Not Valid for Lifetime Purchases:</Text>
+            <Paragraph>
+              Gift credits can only be applied toward monthly Pro subscriptions, not toward lifetime
+              purchases.
+            </Paragraph>
+          </div>
+        </div>
       </Card>
     </div>
   )
