@@ -179,7 +179,7 @@ function Plan({
     const isFreeTier = tier === SUBSCRIPTION_TIERS.FREE
 
     // If user has a lifetime subscription
-    if (isLifetimePlan && isCurrentPlan) {
+    if (isLifetimePlan && !isFreeTier) {
       return 'You have lifetime access'
     }
 
@@ -189,7 +189,7 @@ function Plan({
     }
 
     // If user has credit balance available
-    if (hasCreditBalance && isProTier && !hasActivePlan && activePeriod !== 'lifetime') {
+    if (hasCreditBalance && isProTier && !hasActivePlan && isLifetimePeriod) {
       return `Subscribe (${formattedCreditBalance} credit applied)`
     }
 
@@ -221,14 +221,13 @@ function Plan({
   }
 
   const buttonText = getSimplifiedButtonText()
-
   // Determine if button should be disabled
   const isButtonDisabled = () => {
     // Always enable Free tier button
     if (tier === SUBSCRIPTION_TIERS.FREE) return false
 
     // Disable if user already has lifetime access
-    if (isLifetimePlan && isCurrentPlan) return true
+    if (isLifetimePlan) return true
 
     return false
   }

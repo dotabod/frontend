@@ -217,9 +217,10 @@ interface SubscriptionPriceId {
 export const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
+    // Can only gift monthly for now
     monthly: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
-    annual: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
-    lifetime: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
+    annual: '',
+    lifetime: '',
   },
 ]
 
