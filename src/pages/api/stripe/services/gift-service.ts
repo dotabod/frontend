@@ -165,12 +165,9 @@ export class GiftService {
    */
   private async calculateCreditAmount(giftType: string, giftQuantity: number): Promise<number> {
     // Get the monthly price from environment variables or configuration
-    const monthlyPrice = Number.parseInt(process.env.MONTHLY_SUBSCRIPTION_PRICE_CENTS || '600', 10)
-    const annualPrice = Number.parseInt(process.env.ANNUAL_SUBSCRIPTION_PRICE_CENTS || '5700', 10)
-    const lifetimePrice = Number.parseInt(
-      process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS || '9900',
-      10,
-    )
+    const monthlyPrice = 600
+    const annualPrice = 5700
+    const lifetimePrice = 9900
 
     let creditAmount = 0
 

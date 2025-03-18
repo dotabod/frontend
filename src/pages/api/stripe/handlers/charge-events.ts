@@ -204,18 +204,9 @@ async function handleGiftCreditRefund(
   const session = sessions.data[0]
   console.log(`Found checkout session ${session.id} for payment intent ${paymentIntent}`)
 
-  // Check if this was a gift with customer balance credits
-  if (session.metadata?.isGift !== 'true' || session.metadata?.useCustomerBalance !== 'true') {
-    console.log(`Checkout session ${session.id} is not a gift using customer balance credits`)
-
-    // If it's a gift but not using customer balance, fall back to the legacy logic
-    if (session.metadata?.isGift === 'true') {
-      console.log(
-        `Checkout session ${session.id} is a legacy gift subscription, using fallback logic`,
-      )
-      await handleLegacyGiftSubscriptionRefund(charge, session, tx)
-    }
-
+  // Verify this is a gift
+  if (session.metadata?.isGift !== 'true') {
+    console.log(`Checkout session ${session.id} is not a gift`)
     return
   }
 
@@ -337,7 +328,7 @@ async function handleGiftCreditRefund(
   } else {
     console.log(`No gift transaction record found for refund of checkout ${session.id}`)
 
-    // If we can't find a record, create a basic reversal based on session metadata
+    // Create a basic reversal based on session metadata
     if (customerId && session.metadata?.giftType && session.metadata?.giftQuantity) {
       try {
         const giftType = session.metadata.giftType
@@ -386,120 +377,4 @@ async function handleGiftCreditRefund(
       }
     }
   }
-}
-
-/**
- * Legacy method to handle gift subscription refunds for backwards compatibility
- * @deprecated Use handleGiftCreditRefund for new gift credits approach
- */
-async function handleLegacyGiftSubscriptionRefund(
-  charge: Stripe.Charge,
-  session: Stripe.Checkout.Session,
-  tx: Prisma.TransactionClient,
-): Promise<void> {
-  // Only process full refunds
-  if (!charge.refunded) {
-    console.log(`Skipping charge ${charge.id}: not fully refunded`)
-    return
-  }
-
-  const recipientUserId = session.metadata?.recipientUserId
-  if (!recipientUserId) {
-    console.log(`Checkout session ${session.id} has no recipientUserId`)
-    return
-  }
-
-  console.log(`Processing legacy gift subscription refund for recipient ${recipientUserId}`)
-
-  // Find the gift subscription record - first try by checkout session ID
-  let giftSubscription = await tx.subscription.findFirst({
-    where: {
-      userId: recipientUserId,
-      isGift: true,
-      metadata: {
-        path: ['checkoutSessionId'],
-        equals: session.id,
-      },
-    },
-  })
-
-  if (giftSubscription) {
-    console.log(`Found gift subscription by checkout session ID: ${giftSubscription.id}`)
-  } else {
-    // If not found by session ID, try by payment intent
-    const paymentIntentStr =
-      typeof charge.payment_intent === 'string' ? charge.payment_intent : null
-
-    if (paymentIntentStr) {
-      giftSubscription = await tx.subscription.findFirst({
-        where: {
-          userId: recipientUserId,
-          isGift: true,
-          metadata: {
-            path: ['paymentIntentId'],
-            equals: paymentIntentStr,
-          },
-        },
-      })
-    }
-
-    if (giftSubscription) {
-      console.log(`Found gift subscription by payment intent: ${giftSubscription.id}`)
-    } else {
-      // If still not found, try to find any gift subscription for this user that matches the amount
-      if (charge.amount > 0) {
-        console.log(`Searching for gift subscription by amount: ${charge.amount}`)
-        const possibleGiftSubscriptions = await tx.subscription.findMany({
-          where: {
-            userId: recipientUserId,
-            isGift: true,
-            status: 'ACTIVE',
-          },
-        })
-
-        console.log(`Found ${possibleGiftSubscriptions.length} possible gift subscriptions`)
-
-        // Find a subscription with matching amount in metadata
-        const matchingSubscription = possibleGiftSubscriptions.find((sub) => {
-          const metadata = (sub.metadata as Record<string, unknown>) || {}
-          return metadata.amount === charge.amount.toString()
-        })
-
-        if (matchingSubscription) {
-          console.log(`Found gift subscription by amount: ${matchingSubscription.id}`)
-          giftSubscription = matchingSubscription
-        }
-      }
-    }
-  }
-
-  if (!giftSubscription) {
-    console.log(
-      `No matching gift subscription found for refund of payment ${typeof charge.payment_intent === 'string' ? charge.payment_intent : '(unknown)'}`,
-    )
-    return
-  }
-
-  console.log(`Canceling gift subscription ${giftSubscription.id} due to refund`)
-
-  // Mark the gift subscription as canceled
-  await tx.subscription.update({
-    where: { id: giftSubscription.id },
-    data: {
-      status: SubscriptionStatus.CANCELED,
-      metadata: {
-        ...((giftSubscription.metadata as Record<string, unknown>) || {}),
-        refundedAt: new Date().toISOString(),
-        refundId: charge.refunds?.data?.[0]?.id || null,
-        paymentIntentId: typeof charge.payment_intent === 'string' ? charge.payment_intent : null,
-      },
-    },
-  })
-
-  console.log(`Marked gift subscription ${giftSubscription.id} as canceled due to refund`)
-
-  // For legacy pattern, we just log that refund was processed but advise migration
-  console.log(
-    'Legacy gift subscription refund completed. Consider migrating this gift to the new credit balance approach.',
-  )
 }
