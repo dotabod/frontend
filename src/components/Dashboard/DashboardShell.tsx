@@ -260,23 +260,21 @@ export default function DashboardShell({
 
   if (status !== 'authenticated') return null
 
-  const filterNavigationItems = (items) => {
-    if (!data?.user?.isImpersonating) return items
-
-    return items
+  const filterNavigationItems = (items) =>
+    items
       .map((item) => {
         if (!item.name) return item // Keep dividers
 
         // Hide parent items that should be restricted
-        if (shouldHideForImpersonator(item.name)) return null
+        if (data?.user?.isImpersonating && shouldHideForImpersonator(item.name)) return null
 
         // Hide admin items if user is not an admin
-        if (!shouldShowAdminItems(item.key, data?.user?.role)) return null
+        if (data?.user?.role !== 'admin' && item.key === 'admin-menu') return null
 
         // If item has children, filter them too
         if (item.children) {
           const filteredChildren = item.children.filter(
-            (child) => !shouldHideForImpersonator(child.name),
+            (child) => !(data?.user?.isImpersonating && shouldHideForImpersonator(child.name)),
           )
 
           // If no children left after filtering, hide the parent item
@@ -290,8 +288,7 @@ export default function DashboardShell({
 
         return item
       })
-      .filter(Boolean) // Remove null items
-  }
+      .filter(Boolean) // Remove null items;
 
   return (
     <>
