@@ -274,8 +274,11 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
     where: {
       userId,
       OR: [
-        // Active or trialing subscriptions
-        { status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] } },
+        // Active or trialing subscriptions - exclude gift markers
+        {
+          status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+          isGift: false,
+        },
         // Include lifetime subscriptions that are not canceled
         {
           transactionType: 'LIFETIME',
@@ -310,26 +313,23 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       { status: 'asc' },
       // Then prioritize lifetime subscriptions
       { transactionType: 'desc' },
-      // Then prioritize non-gift subscriptions over gift subscriptions
-      { isGift: 'asc' },
       // Then most recent
       { createdAt: 'desc' },
     ],
   })
 
-  // Prioritize non-gift active or trialing subscriptions over gift subscriptions
-  const nonGiftSubscription = subscriptions.find(
+  // Prioritize active or trialing subscriptions
+  const activeSubscription = subscriptions.find(
     (sub) =>
       (sub.status === SubscriptionStatus.ACTIVE || sub.status === SubscriptionStatus.TRIALING) &&
-      !sub.isGift &&
       sub.stripeSubscriptionId,
   )
 
-  if (nonGiftSubscription) {
-    return nonGiftSubscription
+  if (activeSubscription) {
+    return activeSubscription
   }
 
-  // If no non-gift subscription found, check if we should create a virtual subscription
+  // If no active subscription found, check if we should create a virtual subscription
   // If no subscriptions found
   if (subscriptions.length === 0) {
     // Handle grace period
@@ -463,7 +463,9 @@ export function getSubscriptionStatusInfo(
           ? isEndingSoon
             ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
             : `Subscription ends on ${endDate}`
-          : `Renews on ${endDate}`,
+          : currentPeriodEnd
+            ? `Renews on ${endDate}`
+            : 'Active subscription',
         type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
         badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
       }
@@ -536,9 +538,6 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
 
   // Check for recurring subscription with Stripe ID
   if (subscription.stripeSubscriptionId) return true
-
-  // Check for gift subscription
-  if (subscription.isGift && isSubscriptionActive({ status: subscription.status })) return true
 
   return false
 }

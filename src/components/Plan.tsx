@@ -17,7 +17,7 @@ import {
 import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
 import { App, Button, notification, Tooltip } from 'antd'
 import clsx from 'clsx'
-import { Bitcoin, CheckIcon } from 'lucide-react'
+import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -72,6 +72,22 @@ function Plan({
       revalidateIfStale: false,
     },
   )
+
+  // Fetch credit balance
+  const { data: creditBalanceData } = useSWR(
+    session?.user ? '/api/stripe/credit-balance' : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      refreshInterval: 60000, // Refresh every minute
+    },
+  )
+
+  const creditBalance = creditBalanceData?.balance || 0
+  const formattedCreditBalance =
+    creditBalance > 0 ? `$${(Math.abs(creditBalance) / 100).toFixed(2)}` : '$0.00'
+
   const router = useRouter()
   // Add ref to track if subscription process has started
   const subscriptionStarted = useRef(false)
@@ -94,49 +110,33 @@ function Plan({
           ? 'annual'
           : 'monthly')
 
-  // Helper to check if user has an active gift subscription
-  const hasActiveGift =
-    subscription?.isGift && isSubscriptionActive({ status: subscription?.status })
+  // Check if user has credit balance
+  const hasCreditBalance = creditBalance > 0
 
-  // Helper to check if user has an active non-gift subscription
-  const hasActiveNonGiftPlan = hasActivePlan && !subscription?.isGift
-
-  // Update description display to show trial info
+  // Update description display to show trial and credit info
   const displayDescription = () => {
     if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
       const now = new Date()
 
-      // If user already has an active gift subscription
-      if (hasActivePlan && subscription?.isGift) {
+      // If user has credit balance and is considering a subscription
+      if (hasCreditBalance && !hasActivePlan) {
         return (
           <>
             {description}
             <span className='block mt-1 text-purple-400'>
-              Your subscription will start after your gift expires
+              You have {formattedCreditBalance} credit that will be applied at checkout
             </span>
           </>
         )
       }
 
-      // If user has an active gift subscription and is looking at a regular plan
-      if (hasActiveGift) {
-        if (isCurrentPlan) {
-          return (
-            <>
-              {description}
-              <span className='block mt-1 text-purple-400'>
-                You have access through a gift subscription. Subscribe now to continue after your
-                gift expires.
-              </span>
-            </>
-          )
-        }
-
+      // If user has an active subscription and credit balance
+      if (hasActivePlan && hasCreditBalance) {
         return (
           <>
             {description}
             <span className='block mt-1 text-purple-400'>
-              No trial needed - you already have access through your gift subscription
+              You have {formattedCreditBalance} credit that will be applied to your next invoice
             </span>
           </>
         )
@@ -161,14 +161,6 @@ function Plan({
       }
 
       if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
-        // Don't show trial message if user has a gift subscription or has their own subscription that will start after gift
-        if (
-          hasActiveGift ||
-          (hasActivePlan && subscription?.status === SubscriptionStatus.TRIALING)
-        ) {
-          return <>{description}</>
-        }
-
         return (
           <>
             {description}
@@ -191,19 +183,14 @@ function Plan({
       return 'You have lifetime access'
     }
 
-    // If user has a paid non-gift subscription for this plan
-    if (hasActiveNonGiftPlan && isCurrentPlan) {
+    // If user has a paid subscription for this plan
+    if (hasActivePlan && isCurrentPlan) {
       return 'Manage plan'
     }
 
-    // If user only has a gift subscription and is looking at the same plan
-    if (hasActiveGift && isCurrentPlan) {
-      return 'Subscribe (starts after gift)'
-    }
-
-    // If user has an active gift subscription and is looking at a regular plan
-    if (hasActiveGift && isProTier && !isLifetimePeriod) {
-      return 'Subscribe (starts after gift)'
+    // If user has credit balance available
+    if (hasCreditBalance && isProTier && !hasActivePlan) {
+      return `Subscribe (${formattedCreditBalance} credit applied)`
     }
 
     // Handle grace period for users without paid subscription
@@ -243,9 +230,6 @@ function Plan({
     // Disable if user already has lifetime access
     if (isLifetimePlan && isCurrentPlan) return true
 
-    // We allow users with gift subscriptions to subscribe to the same plan
-    // This generates revenue and ensures continuity after the gift expires
-
     return false
   }
 
@@ -284,6 +268,11 @@ function Plan({
                 <li>Your current subscription will be automatically canceled</li>
                 <li>Your access to Pro features will continue uninterrupted</li>
                 <li>You won't be charged any recurring fees in the future</li>
+                {hasCreditBalance && (
+                  <li>
+                    Your {formattedCreditBalance} credit balance will be applied to this purchase
+                  </li>
+                )}
               </ul>
               <p className='mt-4'>Would you like to proceed with the upgrade?</p>
             </div>
@@ -311,8 +300,7 @@ function Plan({
       // If user has an active paid subscription, redirect to portal
       if (
         isSubscriptionActive({ status: subscription?.status }) &&
-        subscription?.stripeSubscriptionId &&
-        !subscription?.isGift
+        subscription?.stripeSubscriptionId
       ) {
         const response = await fetch('/api/stripe/portal', {
           method: 'POST',
@@ -349,7 +337,16 @@ function Plan({
     } finally {
       setRedirectingToCheckout(false)
     }
-  }, [session, tier, activePeriod, subscription, isLifetimePlan, modal])
+  }, [
+    session,
+    tier,
+    activePeriod,
+    subscription,
+    isLifetimePlan,
+    modal,
+    hasCreditBalance,
+    formattedCreditBalance,
+  ])
 
   // Function to handle crypto interest vote
   const handleCryptoInterest = async () => {
@@ -450,14 +447,15 @@ function Plan({
               Free until {gracePeriodPrettyDate}
             </span>
           )}
-        {hasActiveNonGiftPlan && isCurrentPlan && (
+        {hasActivePlan && isCurrentPlan && (
           <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
             Your plan
           </span>
         )}
-        {hasActiveGift && isCurrentPlan && (
-          <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full'>
-            Gift subscription - expires soon
+        {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && (
+          <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full flex items-center gap-1'>
+            <Wallet size={12} />
+            Credit: {formattedCreditBalance}
           </span>
         )}
       </h3>
@@ -539,8 +537,8 @@ function Plan({
         </ol>
       </div>
 
-      {hasActiveGift && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' ? (
-        <Tooltip title='Your subscription will be paused until your gift expires, then billing will begin automatically'>
+      {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan ? (
+        <Tooltip title='Your credit balance will be automatically applied at checkout'>
           <Button
             loading={redirectingToCheckout}
             onClick={handleSubscribe}
@@ -554,24 +552,6 @@ function Plan({
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
             )}
             aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
-          >
-            {buttonText}
-          </Button>
-        </Tooltip>
-      ) : hasActiveGift && isCurrentPlan ? (
-        <Tooltip title='Subscribe now to ensure uninterrupted access after your gift expires'>
-          <Button
-            loading={redirectingToCheckout}
-            onClick={handleSubscribe}
-            size={featured ? 'large' : 'middle'}
-            color={featured ? 'danger' : 'default'}
-            className={clsx(
-              'mt-6',
-              featured
-                ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-                : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-            )}
-            aria-label={`Subscribe to ${name} to continue after your gift expires`}
           >
             {buttonText}
           </Button>

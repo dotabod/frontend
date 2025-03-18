@@ -3,20 +3,19 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
-import { getGiftSubscriptionInfo, getSubscriptionStatusInfo } from '@/utils/subscription'
+import { getSubscriptionStatusInfo } from '@/utils/subscription'
 import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { JsonValue } from '@prisma/client/runtime/library'
 import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
 
 const { Title } = Typography
 
-// Define the subscription type with giftDetails for type safety
-interface SubscriptionWithGiftDetails {
+// Define the subscription type with metadata for type safety
+interface SubscriptionWithMetadata {
   id?: string
   userId?: string
   stripeCustomerId?: string | null
@@ -27,43 +26,20 @@ interface SubscriptionWithGiftDetails {
   transactionType?: TransactionType | null
   currentPeriodEnd?: Date | null
   cancelAtPeriodEnd?: boolean
-  isGift?: boolean
   metadata?: JsonValue
-  giftDetails?: {
-    senderName?: string | null
-    giftType?: string | null
-    giftQuantity?: number | null
-    giftMessage?: string | null
-  } | null
 }
 
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [giftInfo, setGiftInfo] = useState<{
-    hasGifts: boolean
-    giftCount: number
-    giftMessage: string
-    hasLifetime: boolean
-    giftSubscriptions?: Array<{
-      id: string
-      endDate: Date | null
-      senderName: string
-      giftType: string
-      giftQuantity: number
-      giftMessage: string
-      createdAt: Date
-    }>
-  }>({
-    hasGifts: false,
-    giftCount: 0,
-    giftMessage: '',
-    hasLifetime: false,
-  })
   const { data: session } = useSession()
-  const { subscription: rawSubscription } = useSubscriptionContext()
+  const {
+    subscription: rawSubscription,
+    creditBalance: contextCreditBalance,
+    formattedCreditBalance,
+  } = useSubscriptionContext()
 
-  // Cast subscription to the type with giftDetails
-  const subscription = rawSubscription as unknown as SubscriptionWithGiftDetails
+  // Cast subscription to the type with metadata
+  const subscription = rawSubscription as unknown as SubscriptionWithMetadata
 
   const statusInfo = getSubscriptionStatusInfo(
     subscription?.status,
@@ -71,34 +47,7 @@ const BillingPage = () => {
     subscription?.currentPeriodEnd,
     subscription?.transactionType,
     subscription?.stripeSubscriptionId,
-    subscription?.isGift,
   )
-
-  // Get gift subscription info if applicable
-  const giftSubInfo = getGiftSubscriptionInfo(
-    {
-      ...subscription,
-      // Convert null to undefined for transactionType
-      transactionType: subscription?.transactionType || undefined,
-    },
-    subscription?.giftDetails,
-  )
-
-  // Fetch gift information when the component mounts
-  useEffect(() => {
-    const fetchGiftInfo = async () => {
-      if (!session?.user?.id) return
-
-      try {
-        const gifts = await fetchGiftSubscriptions()
-        setGiftInfo(gifts)
-      } catch (error) {
-        console.error('Error fetching gift information:', error)
-      }
-    }
-
-    fetchGiftInfo()
-  }, [session?.user?.id])
 
   const handlePortalAccess = async () => {
     try {
@@ -124,6 +73,14 @@ const BillingPage = () => {
     return null
   }
 
+  // Empty gift info to pass to SubscriptionAlerts (to maintain compatibility)
+  const emptyGiftInfo = {
+    hasGifts: false,
+    giftCount: 0,
+    giftMessage: '',
+    hasLifetime: false,
+  }
+
   return (
     <>
       <Head>
@@ -132,13 +89,12 @@ const BillingPage = () => {
 
       <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
-      <div className='mb-6'>
+      <div>
         <SubscriptionAlerts
-          giftInfo={giftInfo}
+          giftInfo={emptyGiftInfo}
           statusInfo={statusInfo}
           handlePortalAccess={handlePortalAccess}
           isLoading={isLoading}
-          giftSubInfo={giftSubInfo}
         />
       </div>
 

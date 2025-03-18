@@ -1,9 +1,13 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { fetchGiftSubscriptions } from '@/lib/gift-subscription'
-import { getCurrentPeriod, getGiftSubscriptionInfo } from '@/utils/subscription'
+import { getCurrentPeriod } from '@/utils/subscription'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import type { GiftInfo, SubscriptionWithGiftDetails } from './types'
+
+// Define a type for credit balance
+interface CreditBalance {
+  amount: number
+  formattedAmount: string
+}
 
 function SubscriptionStatusComponent() {
   const {
@@ -12,76 +16,42 @@ function SubscriptionStatusComponent() {
     hasActivePlan,
     isLifetimePlan,
   } = useSubscriptionContext()
-  const subscription = rawSubscription as unknown as SubscriptionWithGiftDetails
+  const subscription = rawSubscription
   const { data: session } = useSession()
-  const [giftInfo, setGiftInfo] = useState<GiftInfo>({
-    hasGifts: false,
-    giftCount: 0,
-    giftMessage: '',
-    hasLifetime: false,
+  const [creditBalance, setCreditBalance] = useState<CreditBalance>({
+    amount: 0,
+    formattedAmount: '$0.00',
   })
 
   const period = getCurrentPeriod(subscription?.stripePriceId)
 
-  // Get gift subscription info if applicable
-  const giftSubInfo = getGiftSubscriptionInfo(
-    {
-      ...subscription,
-      transactionType: subscription?.transactionType || undefined,
-    },
-    subscription?.giftDetails,
-  )
-
-  // Fetch gift information when the component mounts or when session changes
+  // Fetch credit balance information when the component mounts
   useEffect(() => {
     if (!session?.user?.id) return
 
-    // Skip fetching if the primary subscription is already a gift subscription
-    // This maintains backward compatibility with existing tests
-    if (subscription?.isGift) return
-
-    const getGiftInfo = async () => {
+    const fetchCreditBalance = async () => {
       try {
-        const giftData = await fetchGiftSubscriptions()
-        setGiftInfo(giftData)
+        // This is a placeholder - replace with actual API call to fetch credit balance
+        // For now, we'll simulate credit balance with metadata
+        const creditBalanceAmount =
+          subscription?.metadata && typeof subscription.metadata === 'object'
+            ? Number((subscription.metadata as Record<string, unknown>).creditBalance || 0)
+            : 0
+
+        setCreditBalance({
+          amount: creditBalanceAmount,
+          formattedAmount: `$${(creditBalanceAmount / 100).toFixed(2)}`,
+        })
       } catch (error) {
-        console.error('Error fetching gift subscriptions:', error)
+        console.error('Error fetching credit balance:', error)
       }
     }
 
-    getGiftInfo()
-  }, [session?.user?.id, subscription?.isGift])
+    fetchCreditBalance()
+  }, [session?.user?.id, subscription?.metadata])
 
   // Get appropriate subtitle based on subscription status
   const getSubtitle = () => {
-    // Helper function to get the latest gift expiration date
-    const getLatestGiftEndDate = () => {
-      if (!giftInfo.giftSubscriptions?.length) return null
-
-      return giftInfo.giftSubscriptions.reduce(
-        (latest, gift) => {
-          if (!gift.endDate) return latest
-          if (!latest) return gift.endDate
-          return new Date(gift.endDate) > new Date(latest) ? gift.endDate : latest
-        },
-        null as Date | null,
-      )
-    }
-
-    // If user has a gift subscription
-    if (giftSubInfo?.isGift && subscription?.tier) {
-      // Special case for lifetime gift
-      if (isLifetimePlan || giftInfo.hasLifetime) {
-        return `You have lifetime access to the ${
-          subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
-        } plan thanks to a generous gift`
-      }
-
-      return `You have a gift subscription to the ${
-        subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
-      } plan that will not auto-renew`
-    }
-
     // If user has a lifetime subscription
     if (isLifetimePlan && subscription?.tier) {
       return `You have lifetime access to the ${
@@ -91,27 +61,11 @@ function SubscriptionStatusComponent() {
 
     // If user has a paid subscription
     if (hasActivePlan && subscription?.tier) {
-      // If they also have gift subscriptions
-      if (giftInfo.hasGifts && giftInfo.giftSubscriptions?.length) {
-        const latestGiftEndDate = getLatestGiftEndDate()
-        const subscriptionEndDate = subscription.currentPeriodEnd
-          ? new Date(subscription.currentPeriodEnd)
-          : null
-
-        // If gift extends beyond subscription
-        if (
-          subscriptionEndDate &&
-          latestGiftEndDate &&
-          new Date(latestGiftEndDate) > subscriptionEndDate
-        ) {
-          return `You are on the ${
-            subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
-          } plan (${period}) with additional gift coverage until ${new Date(latestGiftEndDate).toLocaleDateString()}`
-        }
-
+      // If they also have a credit balance
+      if (creditBalance.amount > 0) {
         return `You are on the ${
           subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1).toLowerCase()
-        } plan (${period}) with additional gift subscription(s)`
+        } plan (${period}) with a ${creditBalance.formattedAmount} credit balance`
       }
 
       return `You are currently on the ${
@@ -119,9 +73,9 @@ function SubscriptionStatusComponent() {
       } plan (${period})`
     }
 
-    // If user has gift subscriptions but no active subscription
-    if (giftInfo.hasGifts) {
-      return `You have ${giftInfo.giftCount} gift subscription(s) to the Pro plan`
+    // If user has a credit balance but no active subscription
+    if (creditBalance.amount > 0) {
+      return `You have a ${creditBalance.formattedAmount} credit balance available - subscribe to a Pro plan to use it`
     }
 
     // If in grace period without paid subscription
