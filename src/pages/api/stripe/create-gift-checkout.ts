@@ -133,10 +133,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const successUrl = `${baseUrl}/gift-success?recipient=${encodeURIComponent(recipientUser.name || recipientUser.displayName || '')}`
     const cancelUrl = `${baseUrl}/gift?canceled=true`
 
-    // For gift credits, we always use payment mode and monthly duration
+    // Always use one-time payment mode for gift credits
     const finalQuantity = quantity
 
-    // Create the checkout session with the correct quantity in line items
+    // Create the checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -170,6 +170,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         gifterId: userSession?.user?.id || null,
         // Add gifter email if provided or available from session
         giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',
+        // Flag that we're using the customer balance approach
+        useCustomerBalance: 'true',
       },
     })
 
