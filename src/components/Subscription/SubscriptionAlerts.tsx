@@ -1,5 +1,5 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { gracePeriodEndNextDay, GRACE_PERIOD_END } from '@/utils/subscription'
+import { gracePeriodEndNextDay, GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
 import { Button, Alert } from 'antd'
 import { ExternalLinkIcon, GiftIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
 import type { GiftInfo, StatusInfo, GiftSubInfo } from './types'
@@ -171,6 +171,7 @@ export function SubscriptionAlerts({
 
   // Create gift credit alert
   const createCreditAlert = () => {
+    if (isInGracePeriod()) return null
     if (creditBalance <= 0) return null
 
     return (
