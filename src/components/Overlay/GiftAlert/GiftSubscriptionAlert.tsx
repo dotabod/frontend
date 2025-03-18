@@ -11,6 +11,7 @@ interface GiftSubscriptionAlertProps {
   giftMessage?: string
   onComplete?: () => void
   className?: string
+  preview?: boolean
 }
 
 const GiftSubscriptionAlert = ({
@@ -20,6 +21,7 @@ const GiftSubscriptionAlert = ({
   giftMessage,
   onComplete,
   className,
+  preview = false,
 }: GiftSubscriptionAlertProps) => {
   const [visible, setVisible] = useState(true)
   const res = useTransformRes()
@@ -40,6 +42,9 @@ const GiftSubscriptionAlert = ({
 
   // Hide the alert after 10 seconds
   useEffect(() => {
+    // Skip the timeout in preview mode
+    if (preview) return
+
     const timer = setTimeout(() => {
       setVisible(false)
       setTimeout(() => {
@@ -48,18 +53,23 @@ const GiftSubscriptionAlert = ({
     }, 10000)
 
     return () => clearTimeout(timer)
-  }, [onComplete])
+  }, [onComplete, preview])
+
+  // Set appropriate animation properties based on preview mode
+  const initialAnimation = preview ? {} : { opacity: 0, y: -50 }
+  const animateAnimation = preview ? { opacity: 1 } : { opacity: 1, y: 0 }
+  const exitAnimation = preview ? { opacity: 0 } : { opacity: 0, y: -50 }
 
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
+          initial={initialAnimation}
+          animate={animateAnimation}
+          exit={exitAnimation}
           transition={{ duration: 0.5 }}
           className={clsx(
-            'fixed top-4 left-1/2 transform -translate-x-1/2 z-50',
+            preview ? '' : 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50',
             'flex flex-col items-center',
             className,
           )}

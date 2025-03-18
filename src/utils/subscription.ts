@@ -283,7 +283,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
         // Include lifetime subscriptions that are not canceled
         {
           transactionType: 'LIFETIME',
-          status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+          status: { in: [SubscriptionStatus.ACTIVE] },
         },
       ],
     },

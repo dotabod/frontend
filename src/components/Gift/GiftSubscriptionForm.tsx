@@ -3,10 +3,11 @@ import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
 import { Alert, App, Button, Form, Input, Space, Typography, InputNumber, Tooltip } from 'antd'
 import { useState, useEffect } from 'react'
-import { GiftIcon } from 'lucide-react'
 import { Card } from '@/ui/card'
 import Link from 'next/link'
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity'
+import TwitchChat from '@/components/TwitchChat'
+import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscriptionAlert'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -42,6 +43,8 @@ export const GiftSubscriptionForm = ({
   const [quantity, setQuantity] = useState<number>(1)
   const [formError, setFormError] = useState<string | null>(null)
   const [usernameError, setUsernameError] = useState<string | null>(null)
+  const [senderName, setSenderName] = useState<string>('Anonymous')
+  const [giftMessage, setGiftMessage] = useState<string>('')
   const selectedTier = SUBSCRIPTION_TIERS.PRO
 
   // Always use monthly for gift subscriptions
@@ -67,6 +70,16 @@ export const GiftSubscriptionForm = ({
     if (usernameError) {
       setUsernameError(null)
     }
+  }
+
+  // Update the sender name when the form field changes
+  const handleSenderNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSenderName(e.target.value || 'Anonymous')
+  }
+
+  // Update the gift message when the form field changes
+  const handleGiftMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setGiftMessage(e.target.value || '')
   }
 
   const handleSubmit = async (values: GiftFormValues) => {
@@ -176,10 +189,24 @@ export const GiftSubscriptionForm = ({
     return `${currencySymbol}${total.toFixed(2)}`
   }
 
-  const displayName = recipientDisplayName || recipientUsername || 'your favorite streamer'
+  const displayName = recipientDisplayName || recipientUsername || 'this streamer'
+
+  // Create gift message preview for Twitch chat
+  const giftChatMessage = (
+    <>
+      {senderName === 'Anonymous' ? (
+        <span>A gift sub for Dotabod Pro was just gifted anonymously!</span>
+      ) : (
+        <span>
+          A gift sub for Dotabod Pro was just gifted by{' '}
+          <span className='text-purple-400 font-semibold'>{senderName}</span>!
+        </span>
+      )}
+    </>
+  )
 
   return (
-    <div className='max-w-4xl mx-auto pb-12 flex flex-col gap-4'>
+    <div className='mx-auto pb-12 flex flex-col gap-4'>
       {canceled && (
         <Alert
           message='Payment Canceled'
@@ -190,249 +217,257 @@ export const GiftSubscriptionForm = ({
         />
       )}
 
-      <Card>
-        <Title level={4}>
-          {recipientUsername ? (
-            <>
-              Gift a Subscription to <Link href={`/${recipientUsername}`}>{displayName}</Link>
-            </>
-          ) : (
-            'Gift a Subscription'
-          )}
-        </Title>
-        <Paragraph>
-          {recipientUsername ? (
-            <>
-              Support <Link href={`/${recipientUsername}`}>{displayName}</Link> by gifting them
-              Dotabod Pro! They'll get access to all Pro features.
-            </>
-          ) : (
-            "Support your favorite streamer by gifting them Dotabod Pro! They'll get access to all Pro features."
-          )}
-        </Paragraph>
-
-        <div className='mb-8 gap-6 flex flex-col'>
-          <div className='bg-purple-800 p-4 rounded-md'>
-            <div className='flex items-center mb-2'>
-              <GiftIcon className='h-5 w-5 mr-2 text-blue-500' />
-              <Text strong>You're gifting:</Text>
-            </div>
-            <Text>{quantity > 1 ? `${quantity} Months` : '1 Month'} of Dotabod Pro</Text>
-            <div className='mt-2'>
-              <Text strong>Price: </Text>
-              <Text>{calculateTotalPrice()}</Text>
-            </div>
-            {quantity > 1 && (
-              <div className='mt-2'>
-                <Text type='secondary'>
-                  The recipient will receive {quantity} months of Dotabod Pro.
-                </Text>
-              </div>
+      <div className='flex flex-row justify-center gap-4'>
+        <Card>
+          <Title level={4}>
+            {recipientUsername ? (
+              <>
+                Gift a Subscription to <Link href={`/${recipientUsername}`}>{displayName}</Link>
+              </>
+            ) : (
+              'Gift a Subscription'
             )}
-          </div>
-        </div>
+          </Title>
+          <Paragraph>
+            {recipientUsername ? (
+              <>
+                Support <Link href={`/${recipientUsername}`}>{displayName}</Link> by gifting them
+                Dotabod Pro! They'll get access to all Pro features.
+              </>
+            ) : (
+              "Support this streamer by gifting them Dotabod Pro! They'll get access to all Pro features."
+            )}
+          </Paragraph>
 
-        <Form
-          form={form}
-          layout='horizontal'
-          labelAlign='left'
-          onFinish={handleSubmit}
-          requiredMark={false}
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 24 }}
-          initialValues={{
-            quantity: 1,
-            recipientUsername: recipientUsername || '',
-          }}
-        >
-          <Form.Item
-            name='quantity'
-            label='Duration'
-            tooltip='How many months of Pro the recipient will receive'
+          <Form
+            form={form}
+            layout='vertical'
+            onFinish={handleSubmit}
+            requiredMark={false}
+            initialValues={{
+              quantity: 1,
+              recipientUsername: recipientUsername || '',
+            }}
           >
-            <div className='flex items-center'>
-              <InputNumber
-                min={1}
-                max={100}
-                value={quantity}
-                onChange={(value) => {
-                  const newQuantity = Number(value) || 1
-                  setQuantity(newQuantity)
-                  form.setFieldsValue({ quantity: newQuantity })
-                }}
-                style={{ width: 100 }}
-              />
-              <Text className='ml-2'>months</Text>
-            </div>
-          </Form.Item>
-
-          <Form.Item
-            name='recipientUsername'
-            label="Recipient's Username"
-            rules={[{ required: true, message: "Please enter the recipient's username" }]}
-            tooltip='Enter the Twitch username of the streamer you want to gift to'
-            validateStatus={usernameError ? 'error' : undefined}
-            help={usernameError}
-          >
-            <Input
-              placeholder='Enter Twitch username'
-              disabled={!!recipientUsername}
-              onChange={handleUsernameChange}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name='giftSenderName'
-            label='Your Name (Optional)'
-            tooltip='This will be shown to the recipient'
-            rules={[
-              {
-                validator: (_, value) => {
-                  // Client-side validation for immediate user feedback
-                  // Server will also validate to ensure security
-                  if (value && checkForProfanity(value)) {
-                    return Promise.reject('Please remove inappropriate language from your name')
-                  }
-                  return Promise.resolve()
-                },
-              },
-            ]}
-          >
-            <Input placeholder='Your name or leave blank to gift anonymously' />
-          </Form.Item>
-
-          <Form.Item
-            name='giftMessage'
-            label='Gift Message (Optional)'
-            tooltip='A personal message to include with your gift'
-            rules={[
-              {
-                validator: (_, value) => {
-                  // Client-side validation for immediate user feedback
-                  // Server will also validate to ensure security
-                  if (value && checkForProfanity(value)) {
-                    return Promise.reject('Please remove inappropriate language from your message')
-                  }
-                  return Promise.resolve()
-                },
-              },
-            ]}
-          >
-            <Input.TextArea
-              placeholder='Add a personal message'
-              rows={3}
-              maxLength={200}
-              showCount
-            />
-          </Form.Item>
-
-          {formError && (
-            <Form.Item>
-              <div className='ant-form-item-explain ant-form-item-explain-error'>
-                <div role='alert' className='ant-form-item-explain-error'>
-                  {formError}
-                </div>
+            <Form.Item
+              name='quantity'
+              label='Duration'
+              tooltip='How many months of Pro the recipient will receive'
+            >
+              <div className='flex items-center'>
+                <InputNumber
+                  min={1}
+                  max={100}
+                  value={quantity}
+                  onChange={(value) => {
+                    const newQuantity = Number(value) || 1
+                    setQuantity(newQuantity)
+                    form.setFieldsValue({ quantity: newQuantity })
+                  }}
+                  style={{ width: 100 }}
+                />
+                <Text className='ml-2'>months</Text>
               </div>
             </Form.Item>
-          )}
 
-          <Form.Item>
-            {usernameError ? (
-              <Tooltip title='Please change the recipient username to continue'>
+            <Form.Item
+              name='recipientUsername'
+              label="Recipient's Username"
+              rules={[{ required: true, message: "Please enter the recipient's username" }]}
+              tooltip='Enter the Twitch username of the streamer you want to gift to'
+              validateStatus={usernameError ? 'error' : undefined}
+              help={usernameError}
+            >
+              <Input
+                placeholder='Enter Twitch username'
+                disabled={!!recipientUsername}
+                onChange={handleUsernameChange}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name='giftSenderName'
+              label='Your Name (Optional)'
+              tooltip='This will be shown to the recipient'
+              rules={[
+                {
+                  validator: (_, value) => {
+                    // Client-side validation for immediate user feedback
+                    // Server will also validate to ensure security
+                    if (value && checkForProfanity(value)) {
+                      return Promise.reject('Please remove inappropriate language from your name')
+                    }
+                    return Promise.resolve()
+                  },
+                },
+              ]}
+            >
+              <Input
+                placeholder='Your name or leave blank to gift anonymously'
+                onChange={handleSenderNameChange}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name='giftMessage'
+              label='Gift Message (Optional)'
+              tooltip='A personal message to include with your gift'
+              rules={[
+                {
+                  validator: (_, value) => {
+                    // Client-side validation for immediate user feedback
+                    // Server will also validate to ensure security
+                    if (value && checkForProfanity(value)) {
+                      return Promise.reject(
+                        'Please remove inappropriate language from your message',
+                      )
+                    }
+                    return Promise.resolve()
+                  },
+                },
+              ]}
+            >
+              <Input.TextArea
+                placeholder='Add a personal message'
+                rows={3}
+                maxLength={200}
+                showCount
+                onChange={handleGiftMessageChange}
+              />
+            </Form.Item>
+
+            {formError && (
+              <Form.Item>
+                <div className='ant-form-item-explain ant-form-item-explain-error'>
+                  <div role='alert' className='ant-form-item-explain-error'>
+                    {formError}
+                  </div>
+                </div>
+              </Form.Item>
+            )}
+
+            <Form.Item>
+              {usernameError ? (
+                <Tooltip title='Please change the recipient username to continue'>
+                  <Button
+                    type='primary'
+                    htmlType='submit'
+                    loading={isSubmitting}
+                    size='large'
+                    block
+                    disabled={true}
+                  >
+                    Continue to Payment
+                  </Button>
+                </Tooltip>
+              ) : (
                 <Button
                   type='primary'
                   htmlType='submit'
                   loading={isSubmitting}
                   size='large'
                   block
-                  disabled={true}
+                  disabled={isSubmitting}
                 >
                   Continue to Payment
                 </Button>
-              </Tooltip>
-            ) : (
-              <Button
-                type='primary'
-                htmlType='submit'
-                loading={isSubmitting}
-                size='large'
-                block
-                disabled={isSubmitting}
-              >
-                Continue to Payment
-              </Button>
-            )}
-          </Form.Item>
-        </Form>
+              )}
+            </Form.Item>
+          </Form>
+        </Card>
+        <Card>
+          <Title level={4}>Gift Subscription Preview</Title>
+          <Paragraph>
+            Here's how your gift will appear in the streamer's Twitch chat and overlay when they
+            receive it:
+          </Paragraph>
 
-        <div className='text-center text-xs'>
-          This is a one-time payment. The gift subscription will not auto-renew, and you will not be
-          charged again.
-        </div>
-      </Card>
+          <div className='space-y-6'>
+            <div>
+              <Text strong className='mb-2 block'>
+                Twitch Chat
+              </Text>
+              <TwitchChat responses={[giftChatMessage]} />
+            </div>
 
-      <Card>
-        <Title level={4}>Why Gift Dotabod Pro?</Title>
-        <Space direction='vertical' size='middle'>
-          <div>
-            <Text strong>Support Your Favorite Streamer</Text>
-            <Paragraph>
-              Help them enhance their stream with professional Dota 2 overlays and analytics.
-            </Paragraph>
+            <div>
+              <Text strong className='mb-2 block'>
+                Stream Overlay
+              </Text>
+              <div className='rounded-md bg-gray-800 p-4'>
+                <div className='relative h-52 w-full overflow-hidden flex items-center justify-center'>
+                  <GiftSubscriptionAlert
+                    senderName={senderName}
+                    giftType='monthly'
+                    giftQuantity={quantity}
+                    giftMessage={giftMessage}
+                    preview={true}
+                    className='scale-75'
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <Text strong>Immediate Access</Text>
-            <Paragraph>
-              Your gift provides immediate access to all Dotabod Pro features for the duration you
-              choose.
-            </Paragraph>
-          </div>
-          <div>
-            <Text strong>No Recurring Charges</Text>
-            <Paragraph>
-              You pay once for the duration you choose. No recurring charges for you or the
-              recipient.
-            </Paragraph>
-          </div>
-          <div>
-            <Text strong>Subscription Extension</Text>
-            <Paragraph>
-              Multiple gifts extend the recipient's Pro subscription duration. They'll enjoy Pro
-              features longer.
-            </Paragraph>
-          </div>
-        </Space>
-      </Card>
+        </Card>
+      </div>
 
-      <Card className='mt-4'>
-        <Title level={4}>How Gift Subscriptions Work</Title>
-        <div className='space-y-3'>
-          <div>
-            <Text strong>For New Users:</Text>
-            <Paragraph>
-              If the recipient has never subscribed to Dotabod Pro, they will need to set up a
-              subscription after receiving your gift. The credits will be automatically applied, so
-              they won't be charged for the duration of your gift.
-            </Paragraph>
-          </div>
+      <div className='max-w-5xl flex flex-col justify-center gap-4 self-center'>
+        <Card>
+          <Title level={4}>Why Gift Dotabod Pro?</Title>
+          <Space direction='vertical' size='middle'>
+            <div>
+              <Text strong>Support {recipientUsername ? displayName : 'Streamers'}</Text>
+              <Paragraph>
+                Help them elevate their stream with professional Dota 2 overlays and analytics.
+              </Paragraph>
+            </div>
+            <div>
+              <Text strong>No Recurring Charges</Text>
+              <Paragraph>
+                You pay once for the duration you choose. No recurring charges for you or the
+                recipient.
+              </Paragraph>
+            </div>
+            <div>
+              <Text strong>Subscription Extension</Text>
+              <Paragraph>
+                Multiple gifts extend the recipient's Pro subscription duration. They'll enjoy Pro
+                features longer.
+              </Paragraph>
+            </div>
+          </Space>
+        </Card>
 
-          <div>
-            <Text strong>For Existing Subscribers:</Text>
-            <Paragraph>
-              If the recipient is already a Pro subscriber, the gift credits will automatically be
-              applied to their account and used when their subscription renews.
-            </Paragraph>
-          </div>
+        <Card className='mt-4'>
+          <Title level={4}>How Gift Subscriptions Work</Title>
+          <div className='space-y-3'>
+            <div>
+              <Text strong>For New Users:</Text>
+              <Paragraph>
+                If the recipient has never subscribed to Dotabod Pro, they will need to set up a
+                subscription after receiving your gift. The credits will be automatically applied,
+                so they won't be charged for the duration of your gift.
+              </Paragraph>
+            </div>
 
-          <div>
-            <Text strong>Not Valid for Lifetime Purchases:</Text>
-            <Paragraph>
-              Gift credits can only be applied toward monthly Pro subscriptions, not toward lifetime
-              purchases.
-            </Paragraph>
+            <div>
+              <Text strong>For Existing Subscribers:</Text>
+              <Paragraph>
+                If the recipient is already a Pro subscriber, the gift credits will automatically be
+                applied to their account and used when their subscription renews.
+              </Paragraph>
+            </div>
+
+            <div>
+              <Text strong>Not Valid for Lifetime Purchases:</Text>
+              <Paragraph>
+                Gift credits can only be applied toward monthly Pro subscriptions, not toward
+                lifetime purchases.
+              </Paragraph>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }
