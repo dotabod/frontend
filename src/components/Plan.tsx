@@ -268,11 +268,6 @@ function Plan({
                 <li>Your current subscription will be automatically canceled</li>
                 <li>Your access to Pro features will continue uninterrupted</li>
                 <li>You won't be charged any recurring fees in the future</li>
-                {hasCreditBalance && (
-                  <li>
-                    Your {formattedCreditBalance} credit balance will be applied to this purchase
-                  </li>
-                )}
               </ul>
               <p className='mt-4'>Would you like to proceed with the upgrade?</p>
             </div>
