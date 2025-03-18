@@ -200,66 +200,24 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
   // Calculate trial period based on grace period
   const now = new Date()
 
-  // Check if the user has an active gift subscription
-  const queryClient = tx || prisma
-  const hasActiveGiftSubscription = await queryClient.subscription.findFirst({
-    where: {
-      userId,
-      isGift: true,
-      status: { in: ['ACTIVE', 'TRIALING'] },
-    },
-    select: { id: true, currentPeriodEnd: true },
-  })
-
-  // Trial period logic:
-  // 1. If creating a gift subscription, never apply trial days
-  // 2. If user has an active gift subscription and is self-subscribing, set trial to match gift expiration
-  // 3. If we're in the grace period, use days until grace period ends as trial
-  // 4. Otherwise use standard 14-day trial for new self-subscriptions
+  // Simplified trial period logic
   let trialDays = 0
 
   if (isGift) {
-    // Never apply trial days to gift subscriptions
+    // No trial for gift purchases
     trialDays = 0
-    console.log(`Creating a gift subscription for user ${userId}. No trial period applied.`)
-  } else if (hasActiveGiftSubscription && isRecurring) {
-    // For users with active gift subscriptions who are self-subscribing,
-    // set trial period to match their gift expiration date
-    // This ensures they don't get charged until their gift expires
-    if (hasActiveGiftSubscription.currentPeriodEnd) {
-      const giftEndTime = hasActiveGiftSubscription.currentPeriodEnd.getTime()
-      const nowTime = now.getTime()
-      trialDays = Math.ceil((giftEndTime - nowTime) / (1000 * 60 * 60 * 24))
-
-      // Ensure we have at least 1 day of trial if gift is about to expire
-      trialDays = Math.max(1, trialDays)
-
-      console.log(
-        `User ${userId} has active gift subscription expiring on ${hasActiveGiftSubscription.currentPeriodEnd.toISOString()}. Setting trial period to ${trialDays} days.`,
-      )
-    }
   } else if (isInGracePeriod()) {
+    // If we're in the grace period, use days until grace period ends as trial
     trialDays = Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   } else if (isRecurring) {
     // Standard trial for new self-subscriptions
     trialDays = 14
   }
 
-  // Get gift subscription count for the user
-  const giftCount = hasActiveGiftSubscription
-    ? await queryClient.subscription.count({
-        where: {
-          userId,
-          isGift: true,
-          status: { in: ['ACTIVE', 'TRIALING'] },
-        },
-      })
-    : 0
-
-  // Build success URL with all necessary parameters
+  // Build success URL with simplified parameters
   const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${
     isRecurring && trialDays > 0
-  }&trialDays=${trialDays}&hasGifts=${!!hasActiveGiftSubscription}&giftCount=${giftCount}`
+  }&trialDays=${trialDays}`
 
   const cancelUrl = referer?.includes('/dashboard')
     ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
@@ -291,13 +249,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
-      hasActiveGiftSubscription: hasActiveGiftSubscription ? 'true' : 'false',
       isGift: isGift ? 'true' : 'false',
-      ...(hasActiveGiftSubscription?.currentPeriodEnd
-        ? {
-            giftExpirationDate: hasActiveGiftSubscription.currentPeriodEnd.toISOString(),
-          }
-        : {}),
     },
   })
 
