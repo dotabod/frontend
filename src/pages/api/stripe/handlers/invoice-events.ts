@@ -1,7 +1,6 @@
-import type { Prisma } from '@prisma/client'
+import { type Prisma, SubscriptionStatus } from '@prisma/client'
 import { stripe } from '@/lib/stripe-server'
 import { withErrorHandling } from '../utils/error-handling'
-import { SubscriptionService } from '../services/subscription-service'
 import type Stripe from 'stripe'
 
 /**
@@ -24,56 +23,19 @@ export async function handleInvoiceEvent(
         const userId = (customer as Stripe.Customer).metadata?.userId
         if (!userId) return false
 
-        const subscriptionService = new SubscriptionService(tx)
+        // Map Stripe status to our internal status
+        const status = mapStripeStatus(subscription.status)
         const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
 
         // Update the subscription record with the latest status
         await tx.subscription.updateMany({
           where: { stripeSubscriptionId: subscription.id },
           data: {
-            status: subscriptionService.mapStripeStatus(subscription.status),
+            status,
             currentPeriodEnd,
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
           },
         })
-
-        // Check if the user has a gift subscription that extends beyond this subscription
-        const hasGiftExtendingBeyondSubscription = await subscriptionService.hasGiftExtendingBeyond(
-          userId,
-          currentPeriodEnd,
-        )
-
-        // If this is a payment attempt for a subscription that should be paused due to a gift,
-        // void the invoice and ensure the subscription is paused
-        if (hasGiftExtendingBeyondSubscription && invoice.status === 'open') {
-          // Get the latest gift subscription to determine when to resume billing
-          const giftSubscription = await tx.subscription.findFirst({
-            where: {
-              userId,
-              isGift: true,
-              status: { in: ['ACTIVE', 'TRIALING'] },
-            },
-            orderBy: { currentPeriodEnd: 'desc' },
-            select: { currentPeriodEnd: true },
-          })
-
-          if (giftSubscription?.currentPeriodEnd) {
-            // Void the invoice to prevent charging the user
-            await stripe.invoices.voidInvoice(invoice.id)
-            console.log(
-              `Voided invoice ${invoice.id} for user ${userId} with active gift subscription`,
-            )
-
-            // Ensure the subscription is paused until after the gift expires
-            await subscriptionService.pauseForGift(
-              subscription.id,
-              giftSubscription.currentPeriodEnd,
-              {
-                invoiceVoided: 'true',
-              },
-            )
-          }
-        }
 
         return true
       },
@@ -81,4 +43,30 @@ export async function handleInvoiceEvent(
       invoice.customer as string,
     )) !== null
   )
+}
+
+/**
+ * Maps a Stripe subscription status to our internal status
+ * @param status The Stripe subscription status
+ * @returns The mapped status
+ */
+function mapStripeStatus(status: string): SubscriptionStatus {
+  switch (status) {
+    case 'active':
+      return SubscriptionStatus.ACTIVE
+    case 'trialing':
+      return SubscriptionStatus.TRIALING
+    case 'past_due':
+      return SubscriptionStatus.PAST_DUE
+    case 'canceled':
+      return SubscriptionStatus.CANCELED
+    case 'unpaid':
+      return SubscriptionStatus.PAST_DUE
+    case 'incomplete':
+      return SubscriptionStatus.PAST_DUE
+    case 'incomplete_expired':
+      return SubscriptionStatus.CANCELED
+    default:
+      return SubscriptionStatus.CANCELED
+  }
 }

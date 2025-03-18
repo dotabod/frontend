@@ -3,7 +3,6 @@ import { stripe } from '@/lib/stripe-server'
 import { getSubscriptionTier } from '@/utils/subscription'
 import { withErrorHandling } from '../utils/error-handling'
 import type Stripe from 'stripe'
-import { SubscriptionService } from '../services/subscription-service'
 
 /**
  * Handles a subscription event from Stripe
@@ -25,32 +24,6 @@ export async function handleSubscriptionEvent(
   return (
     (await withErrorHandling(
       async () => {
-        // Check if this is a new subscription being created
-        const isNewSubscription =
-          subscription.status === 'trialing' && subscription.metadata?.isNewSubscription === 'true'
-
-        // If this is a new subscription, check for existing gift subscriptions
-        if (isNewSubscription) {
-          await adjustForExistingGiftSubscriptions(subscription, userId, tx)
-        }
-
-        // Check if this is a subscription resuming from a paused state due to a gift
-        if (
-          subscription.status === 'active' &&
-          subscription.metadata?.pausedForGift === 'true' &&
-          subscription.pause_collection === null
-        ) {
-          console.log(`Subscription ${subscription.id} is resuming after gift expiration`)
-          // Update the metadata to remove the pausedForGift flag
-          await stripe.subscriptions.update(subscription.id, {
-            metadata: {
-              ...subscription.metadata,
-              pausedForGift: 'false',
-              resumedAt: new Date().toISOString(),
-            },
-          })
-        }
-
         // Get the price ID from the subscription
         const priceId = subscription.items.data[0]?.price.id ?? null
 
@@ -76,9 +49,13 @@ export async function handleSubscriptionEvent(
               metadata: subscription.metadata,
             },
           })
+
+          console.log(
+            `Updated subscription ${existingSubscription.id} status to ${mapStripeStatus(subscription.status)}`,
+          )
         } else {
           // Create a new subscription record
-          await tx.subscription.create({
+          const newSubscription = await tx.subscription.create({
             data: {
               userId,
               status: mapStripeStatus(subscription.status),
@@ -92,6 +69,10 @@ export async function handleSubscriptionEvent(
               metadata: subscription.metadata,
             },
           })
+
+          console.log(
+            `Created new subscription record ${newSubscription.id} for Stripe subscription ${subscription.id}`,
+          )
         }
 
         return true
@@ -100,22 +81,6 @@ export async function handleSubscriptionEvent(
       userId,
     )) !== null
   )
-}
-
-/**
- * Adjusts a new subscription for existing gift subscriptions
- * @param subscription The Stripe subscription
- * @param userId The user ID
- * @param tx The transaction client
- */
-async function adjustForExistingGiftSubscriptions(
-  subscription: Stripe.Subscription,
-  userId: string,
-  tx: Prisma.TransactionClient,
-): Promise<void> {
-  // Use the SubscriptionService to adjust the trial period
-  const subscriptionService = new SubscriptionService(tx)
-  await subscriptionService.adjustTrialForGifts(subscription.id, userId)
 }
 
 /**
@@ -152,6 +117,8 @@ export async function handleSubscriptionDeleted(
             },
           },
         })
+
+        console.log(`Marked subscription ${existingSubscription.id} as canceled`)
       }
 
       return true
