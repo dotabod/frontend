@@ -213,15 +213,17 @@ export const GiftSubscriptionForm = ({
 
   return (
     <div className='mx-auto pb-12 flex flex-col gap-4'>
-      {canceled && (
-        <Alert
-          message='Payment Canceled'
-          description="Your gift subscription payment was canceled. You can try again when you're ready."
-          type='info'
-          showIcon
-          className='mb-8'
-        />
-      )}
+      <div className='flex flex-row justify-center gap-4'>
+        {canceled && (
+          <Alert
+            message='Payment Canceled'
+            description="Your gift subscription payment was canceled. You can try again when you're ready."
+            type='info'
+            showIcon
+            className='mb-8'
+          />
+        )}
+      </div>
 
       <div className='flex flex-row justify-center gap-4'>
         <Card>
