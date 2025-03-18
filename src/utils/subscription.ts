@@ -214,7 +214,7 @@ interface SubscriptionPriceId {
 }
 
 // Add gift subscription price IDs
-const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
+export const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',

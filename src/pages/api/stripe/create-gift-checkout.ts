@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { GIFT_PRICE_IDS } from '@/utils/subscription'
 
 // Initialize the profanity matcher
 const profanityMatcher = new RegExpMatcher({
@@ -29,7 +30,6 @@ const sanitizeInput = (text: string | undefined): string => {
 const giftCheckoutSchema = z.object({
   recipientUsername: z.string().min(1, 'Recipient username is required'),
   priceId: z.string().min(1, 'Price ID is required'),
-  giftDuration: z.enum(['monthly', 'annual', 'lifetime']).default('monthly'),
   giftMessage: z.string().optional(),
   giftSenderName: z.string().optional(),
   giftSenderEmail: z.string().email().optional(),
@@ -52,14 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const validationResult = giftCheckoutSchema.safeParse(body)
 
     if (!validationResult.success) {
-      // Check if the error is related to giftDuration
       const errors = validationResult.error.format()
-      if (errors.giftDuration) {
-        return res.status(400).json({
-          error: 'Invalid gift duration',
-          message: 'Only monthly, annual, or lifetime gift subscriptions are supported.',
-        })
-      }
 
       return res.status(400).json({
         error: 'Invalid request data',
@@ -67,15 +60,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    const {
-      recipientUsername,
-      priceId,
-      giftDuration,
-      giftMessage,
-      giftSenderName,
-      giftSenderEmail,
-      quantity,
-    } = validationResult.data
+    const { recipientUsername, priceId, giftMessage, giftSenderName, giftSenderEmail, quantity } =
+      validationResult.data
 
     // Check for profanity in gift message and sender name
     if (giftMessage && checkForProfanity(giftMessage)) {
@@ -135,6 +121,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Always use one-time payment mode for gift credits
     const finalQuantity = quantity
+
+    // Get gift duration from price ID using GIFT_PRICE_IDS
+    // Determine gift duration based on which price ID field matches
+    const giftPriceInfo = GIFT_PRICE_IDS[0]
+    const giftDuration =
+      priceId === giftPriceInfo?.lifetime
+        ? 'lifetime'
+        : priceId === giftPriceInfo?.annual
+          ? 'annual'
+          : 'monthly'
 
     // Create the checkout session
     const checkoutSession = await stripe.checkout.sessions.create({

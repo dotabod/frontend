@@ -107,7 +107,6 @@ export const GiftSubscriptionForm = ({
       const result = await createGiftCheckoutSession({
         recipientUsername: values.recipientUsername,
         priceId,
-        giftDuration: activePeriod,
         giftMessage: values.giftMessage,
         giftSenderName: values.giftSenderName,
         quantity: values.quantity || 1,
