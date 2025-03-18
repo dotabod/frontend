@@ -159,7 +159,7 @@ export function getRequiredTier(feature?: FeatureTier | GenericFeature): Subscri
 }
 
 // Add this constant at the top with other constants
-export const GRACE_PERIOD_END = new Date('2025-01-30T23:59:59.999Z')
+export const GRACE_PERIOD_END = new Date('2025-04-30T23:59:59.999Z')
 
 export function canAccessFeature(
   feature: FeatureTier | GenericFeature,
