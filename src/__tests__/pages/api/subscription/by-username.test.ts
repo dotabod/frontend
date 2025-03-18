@@ -99,6 +99,7 @@ describe('subscription/by-username API', () => {
       locale: '',
       kick: null,
       youtube: null,
+      proExpiration: null,
     })
 
     // Mock no subscription found
@@ -150,20 +151,23 @@ describe('subscription/by-username API', () => {
       locale: '',
       kick: null,
       youtube: null,
+      proExpiration: null,
     })
 
     // Mock active PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
       tier: SUBSCRIPTION_TIERS.PRO,
       status: 'ACTIVE',
+      id: 'sub_123',
       stripeSubscriptionId: 'sub_123',
       transactionType: 'RECURRING',
-      isGift: false,
       createdAt: new Date(),
       stripeCustomerId: null,
       stripePriceId: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
+      giftDetails: null,
+      metadata: {},
     })
 
     // Mock not in grace period
@@ -179,7 +183,6 @@ describe('subscription/by-username API', () => {
       isPro: true,
       isGracePeriodPro: false,
       isLifetime: false,
-      isGift: false,
       inGracePeriod: false,
     })
   })
@@ -212,20 +215,23 @@ describe('subscription/by-username API', () => {
       locale: '',
       kick: null,
       youtube: null,
+      proExpiration: null,
     })
 
     // Mock lifetime PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
       tier: SUBSCRIPTION_TIERS.PRO,
+      id: 'sub-123',
       status: 'ACTIVE',
       stripeSubscriptionId: null,
       transactionType: 'LIFETIME',
-      isGift: false,
       createdAt: new Date(),
       stripeCustomerId: null,
       stripePriceId: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
+      giftDetails: null,
+      metadata: {},
     })
 
     // Mock not in grace period
@@ -241,7 +247,6 @@ describe('subscription/by-username API', () => {
       isPro: true,
       isGracePeriodPro: false,
       isLifetime: true,
-      isGift: false,
       inGracePeriod: false,
     })
   })
@@ -274,20 +279,27 @@ describe('subscription/by-username API', () => {
       locale: '',
       kick: null,
       youtube: null,
+      proExpiration: null,
     })
-
     // Mock gift PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'sub-123',
       tier: SUBSCRIPTION_TIERS.PRO,
       status: 'ACTIVE',
       stripeSubscriptionId: null,
       transactionType: 'RECURRING',
-      isGift: true,
       createdAt: new Date(),
       stripeCustomerId: null,
       stripePriceId: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
+      giftDetails: {
+        senderName: 'user-999',
+        giftMessage: null,
+        giftType: 'subscription',
+        giftQuantity: 1,
+      },
+      metadata: {},
     })
 
     // Mock not in grace period
@@ -303,7 +315,6 @@ describe('subscription/by-username API', () => {
       isPro: true,
       isGracePeriodPro: false,
       isLifetime: false,
-      isGift: true,
       inGracePeriod: false,
     })
   })
@@ -336,20 +347,22 @@ describe('subscription/by-username API', () => {
       locale: '',
       kick: null,
       youtube: null,
+      proExpiration: null,
     })
-
     // Mock FREE tier subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: SUBSCRIPTION_TIERS.FREE,
       status: null,
       stripeSubscriptionId: null,
       transactionType: 'RECURRING' as const,
-      isGift: false,
       stripeCustomerId: null,
       stripePriceId: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     // Mock in grace period
@@ -365,7 +378,6 @@ describe('subscription/by-username API', () => {
       isPro: false,
       isGracePeriodPro: true,
       isLifetime: false,
-      isGift: false,
       inGracePeriod: true,
     })
   })

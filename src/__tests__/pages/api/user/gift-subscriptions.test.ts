@@ -109,7 +109,6 @@ describe('gift-subscriptions API', () => {
       giftCount: 0,
       hasLifetime: false,
       giftMessage: '',
-      proExpiration: null,
       giftSubscriptions: [],
     })
   })
@@ -189,7 +188,6 @@ describe('gift-subscriptions API', () => {
       giftCount: 1,
       hasLifetime: false,
       giftMessage: `Your Pro subscription is active until ${endDate.toLocaleDateString()}`,
-      proExpiration: endDate.toISOString(),
       giftSubscriptions: [
         {
           id: 'sub-123',
@@ -306,7 +304,6 @@ describe('gift-subscriptions API', () => {
       giftCount: 2,
       hasLifetime: false,
       giftMessage: `Your Pro subscription is active until ${endDate1.toLocaleDateString()}`,
-      proExpiration: endDate1.toISOString(),
       giftSubscriptions: [
         {
           id: 'sub-123',
