@@ -210,7 +210,7 @@ const CommandsPage: NextPageWithLayout = () => {
               className='rounded-full flex'
             />
             <div className='flex-grow'>
-              <div className='flex flex-row items-center space-x-4'>
+              <div className='flex flex-wrap gap-2 flex-row items-center space-x-4'>
                 <Link
                   target='_blank'
                   href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
@@ -237,7 +237,7 @@ const CommandsPage: NextPageWithLayout = () => {
               </span>
             </div>
             <div>
-              <div className='flex space-x-2'>
+              <div className='flex flex-wrap gap-2'>
                 <Link
                   target='_blank'
                   href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
