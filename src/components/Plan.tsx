@@ -571,7 +571,7 @@ function Plan({
 
       {/* Crypto interest button */}
       {tier !== SUBSCRIPTION_TIERS.FREE && (
-        <div className='mt-3 text-center'>
+        <div className='mt-3 flex flex-col gap-2 text-center'>
           <Tooltip
             title={
               cryptoInterest?.interested
@@ -579,24 +579,29 @@ function Plan({
                 : "Let us know if you'd like to pay with cryptocurrency"
             }
           >
-            <Button
-              type='link'
-              size='small'
-              icon={<Bitcoin size={16} />}
-              onClick={handleCryptoInterest}
-              loading={loadingCryptoInterest}
-              disabled={cryptoInterest?.interested}
-              className={clsx(
-                'text-xs',
-                featured
-                  ? 'text-purple-300 hover:text-purple-200'
-                  : 'text-gray-400 hover:text-gray-300',
-              )}
-            >
-              {cryptoInterest?.interested
-                ? `Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`
-                : `Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 1} interested)`}
-            </Button>
+            {!cryptoInterest?.interested ? (
+              <Button
+                type='link'
+                size='small'
+                icon={<Bitcoin size={16} />}
+                onClick={handleCryptoInterest}
+                loading={loadingCryptoInterest}
+                className={clsx(
+                  'text-xs',
+                  featured
+                    ? 'text-purple-300 hover:text-purple-200'
+                    : 'text-gray-400 hover:text-gray-300',
+                )}
+              >
+                <span className='break-words'>
+                  {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 1} interested)`}
+                </span>
+              </Button>
+            ) : (
+              <span className='text-xs break-words'>
+                {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
+              </span>
+            )}
           </Tooltip>
         </div>
       )}

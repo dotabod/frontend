@@ -30,10 +30,10 @@ export default function CommandsCard({
               <span>{command.title}</span>
               <div>
                 {command.allowed === 'mods' && (
-                  <>
+                  <div className='flex gap-2 flex-wrap'>
                     <Tag color='green'>Mods</Tag>
                     <Tag color='red'>Streamer</Tag>
-                  </>
+                  </div>
                 )}
                 {command.allowed === 'all' && <Tag>All</Tag>}
               </div>

@@ -30,7 +30,7 @@ export function TierSwitch({
   const handleChange = externalOnChange ?? updateSetting
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center flex-wrap gap-2 ${className}`}>
       <Switch checked={isChecked} onChange={handleChange} disabled={isDisabled} />
       {label && <span>{label}</span>}
       {!hideTierBadge && <TierBadge requiredTier={tierAccess.requiredTier} />}

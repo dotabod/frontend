@@ -358,7 +358,7 @@ const TroubleshootPage = () => {
               </Form.Item>
 
               <Form.Item>
-                <div className='flex gap-3 items-center'>
+                <div className='flex flex-wrap gap-3 items-center'>
                   <Button type='primary' htmlType='submit' loading={submitting}>
                     Submit Ticket
                   </Button>

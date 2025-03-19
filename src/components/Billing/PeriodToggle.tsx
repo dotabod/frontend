@@ -29,50 +29,43 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
     <RadioGroup
       value={activePeriod}
       onChange={onChange}
-      className='grid grid-cols-3 bg-gray-800/50 p-1 rounded-lg'
+      className='flex flex-col sm:grid sm:grid-cols-3 rounded-lg'
     >
       {['monthly', 'annual', 'lifetime'].map((period) => (
-        <Radio
+        <div
           key={period}
-          value={period}
-          className={clsx(
-            'cursor-pointer px-8 py-2 text-sm transition-colors rounded-md flex items-center gap-2',
-            'focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900',
-            activePeriod === period
-              ? 'bg-purple-500 text-gray-900 font-semibold shadow-lg'
-              : 'text-gray-300 hover:bg-gray-700/50',
-          )}
+          className={clsx('relative py-1.5 sm:py-0 sm:flex sm:flex-col', 'sm:min-h-[3.5rem]')}
         >
-          <div className='relative flex flex-col items-center gap-1'>
+          <Radio
+            value={period}
+            className={clsx(
+              'bg-gray-800/50 cursor-pointer px-3 sm:px-4 md:px-8 py-2 text-sm transition-colors rounded-md',
+              'w-full flex items-center justify-center',
+              'focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900',
+              activePeriod === period
+                ? 'bg-purple-500 text-gray-900 font-semibold shadow-lg'
+                : 'text-gray-300 hover:bg-gray-700/50',
+            )}
+          >
             <span className='first-letter:uppercase'>{period}</span>
-            {period === 'annual' && (
-              <div
-                className={clsx(
-                  'absolute -bottom-8 text-xs whitespace-nowrap',
-                  activePeriod === period ? 'text-purple-400' : 'text-purple-300',
-                )}
-              >
-                Save up to{' '}
-                {Math.max(
-                  ...plans
-                    .filter((plan) => plan.price.monthly !== '$0')
-                    .map((plan) => calculateSavings(plan.price.monthly, plan.price.annual)),
-                )}
-                %
-              </div>
+          </Radio>
+
+          <div
+            className={clsx(
+              'text-center text-xs pt-1 mt-1 sm:h-6 bg-initial',
+              activePeriod === period ? 'text-purple-400' : 'text-purple-300',
             )}
-            {period === 'lifetime' && (
-              <div
-                className={clsx(
-                  'absolute -bottom-8 text-xs whitespace-nowrap',
-                  activePeriod === period ? 'text-purple-400' : 'text-purple-300',
-                )}
-              >
-                Pay once, use forever
-              </div>
-            )}
+          >
+            {period === 'annual' &&
+              `Save up to ${Math.max(
+                ...plans
+                  .filter((plan) => plan.price.monthly !== '$0')
+                  .map((plan) => calculateSavings(plan.price.monthly, plan.price.annual)),
+              )}%`}
+
+            {period === 'lifetime' && 'Pay once, use forever'}
           </div>
-        </Radio>
+        </div>
       ))}
     </RadioGroup>
   )
