@@ -33,7 +33,7 @@ export default function GiftAlertOverlay() {
 
   // Handle notification display
   useEffect(() => {
-    if (data?.hasNotification && !activeNotification) {
+    if (data?.hasNotification && !activeNotification && data?.notification?.id) {
       const currentNotification = data.notification
       setActiveNotification(currentNotification)
 
