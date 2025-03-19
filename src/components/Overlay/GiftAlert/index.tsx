@@ -36,7 +36,7 @@ export const GiftAlert = ({ userId }: GiftAlertProps) => {
 
   // Handle notification display
   useEffect(() => {
-    if (data?.hasNotification && !activeNotification) {
+    if (data?.hasNotification && !activeNotification && data?.notification?.id) {
       setActiveNotification(data.notification)
 
       // Slow down polling when displaying a notification
