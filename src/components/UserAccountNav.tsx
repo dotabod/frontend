@@ -2,8 +2,7 @@ import { signOut, useSession } from 'next-auth/react'
 
 import { fetcher } from '@/lib/fetcher'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { Dropdown, Badge, Skeleton, Button } from 'antd'
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
+import { Dropdown, Badge, Skeleton, Button, Popover, Tabs, Empty, Space } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
 import clsx from 'clsx'
 import type { Session } from 'next-auth'
@@ -151,21 +150,11 @@ const UserButton = ({ user }: UserButtonProps) => {
 
   return (
     <div className='flex items-center'>
-      {/* Notification Bell with Headless UI Popover */}
-      <Popover className='relative mr-4'>
-        <PopoverButton className='flex items-center justify-center'>
-          <div className='cursor-pointer'>
-            <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
-              <BellOutlined style={{ fontSize: '20px', color: '#fff' }} />
-            </Badge>
-          </div>
-        </PopoverButton>
-
-        <PopoverPanel
-          transition
-          className='absolute right-0 z-10 mt-5 w-screen max-w-sm transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in'
-        >
-          <div className='w-full rounded-xl bg-gray-900 p-4 text-sm/6 ring-1 shadow-lg ring-gray-700/5'>
+      {/* Notification Bell with Ant Design Popover */}
+      <Popover
+        trigger='click'
+        content={
+          <div className='w-full max-w-sm'>
             <div className='flex justify-between items-center mb-3'>
               <h3 className='font-semibold text-white text-lg'>Notifications</h3>
               {totalUnreadNotifications > 0 && (
@@ -175,54 +164,27 @@ const UserButton = ({ user }: UserButtonProps) => {
               )}
             </div>
 
-            {/* Add notification filter tabs */}
-            <div className='flex space-x-2 mb-4 border-b border-gray-700'>
-              <button
-                type='button'
-                onClick={() => {
-                  setActiveTab('all')
-                  setCurrentPage(1)
-                }}
-                className={clsx(
-                  'px-3 py-2 text-sm font-medium transition-colors',
-                  activeTab === 'all'
-                    ? 'text-white border-b-2 border-blue-500'
-                    : 'text-gray-400 hover:text-white',
-                )}
-              >
-                All
-              </button>
-              <button
-                type='button'
-                onClick={() => {
-                  setActiveTab('unread')
-                  setCurrentPage(1)
-                }}
-                className={clsx(
-                  'px-3 py-2 text-sm font-medium transition-colors',
-                  activeTab === 'unread'
-                    ? 'text-white border-b-2 border-blue-500'
-                    : 'text-gray-400 hover:text-white',
-                )}
-              >
-                Unread {totalUnreadNotifications > 0 && `(${totalUnreadNotifications})`}
-              </button>
-              <button
-                type='button'
-                onClick={() => {
-                  setActiveTab('read')
-                  setCurrentPage(1)
-                }}
-                className={clsx(
-                  'px-3 py-2 text-sm font-medium transition-colors',
-                  activeTab === 'read'
-                    ? 'text-white border-b-2 border-blue-500'
-                    : 'text-gray-400 hover:text-white',
-                )}
-              >
-                Read
-              </button>
-            </div>
+            <Tabs
+              defaultActiveKey='all'
+              onChange={(key) => {
+                setActiveTab(key as 'all' | 'unread' | 'read')
+                setCurrentPage(1)
+              }}
+              items={[
+                {
+                  key: 'all',
+                  label: 'All',
+                },
+                {
+                  key: 'unread',
+                  label: `Unread ${totalUnreadNotifications > 0 ? `(${totalUnreadNotifications})` : ''}`,
+                },
+                {
+                  key: 'read',
+                  label: 'Read',
+                },
+              ]}
+            />
 
             {notificationError ? (
               <div className='py-6 text-center text-gray-400'>
@@ -255,7 +217,8 @@ const UserButton = ({ user }: UserButtonProps) => {
                       {!notification.read && (
                         <Button
                           onClick={() => dismissNotification(notification.id)}
-                          className='mt-2 px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors'
+                          className='mt-2'
+                          size='small'
                         >
                           Dismiss
                         </Button>
@@ -265,53 +228,54 @@ const UserButton = ({ user }: UserButtonProps) => {
 
                 {totalFilteredNotifications > pageSize && (
                   <div className='flex justify-between items-center mt-4'>
-                    <button
-                      type='button'
-                      className={clsx(
-                        'px-3 py-1 text-xs rounded-md transition-colors',
-                        currentPage === 1
-                          ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                          : 'bg-gray-700 hover:bg-gray-600 text-white',
-                      )}
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    >
-                      Previous
-                    </button>
-                    <span className='text-gray-400 text-xs'>
-                      Page {currentPage} of {Math.ceil(totalFilteredNotifications / pageSize)}
-                    </span>
-                    <button
-                      type='button'
-                      className={clsx(
-                        'px-3 py-1 text-xs rounded-md transition-colors',
-                        currentPage >= Math.ceil(totalFilteredNotifications / pageSize)
-                          ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                          : 'bg-gray-700 hover:bg-gray-600 text-white',
-                      )}
-                      disabled={currentPage >= Math.ceil(totalFilteredNotifications / pageSize)}
-                      onClick={() =>
-                        setCurrentPage((prev) =>
-                          Math.min(prev + 1, Math.ceil(totalFilteredNotifications / pageSize)),
-                        )
-                      }
-                    >
-                      Next
-                    </button>
+                    <Space>
+                      <Button
+                        type='text'
+                        size='small'
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      >
+                        Previous
+                      </Button>
+                      <span className='text-gray-400 text-xs'>
+                        Page {currentPage} of {Math.ceil(totalFilteredNotifications / pageSize)}
+                      </span>
+                      <Button
+                        type='text'
+                        size='small'
+                        disabled={currentPage >= Math.ceil(totalFilteredNotifications / pageSize)}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, Math.ceil(totalFilteredNotifications / pageSize)),
+                          )
+                        }
+                      >
+                        Next
+                      </Button>
+                    </Space>
                   </div>
                 )}
               </div>
             ) : (
-              <div className='py-6 text-center text-gray-400'>
-                {activeTab === 'all'
-                  ? 'No notifications'
-                  : activeTab === 'unread'
-                    ? 'No unread notifications'
-                    : 'No read notifications'}
-              </div>
+              <Empty
+                description={
+                  activeTab === 'all'
+                    ? 'No notifications'
+                    : activeTab === 'unread'
+                      ? 'No unread notifications'
+                      : 'No read notifications'
+                }
+                className='py-6'
+              />
             )}
           </div>
-        </PopoverPanel>
+        }
+      >
+        <div className='cursor-pointer mr-4'>
+          <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
+            <BellOutlined style={{ fontSize: '20px', color: '#fff' }} />
+          </Badge>
+        </div>
       </Popover>
 
       {/* User Profile with loading skeleton */}
