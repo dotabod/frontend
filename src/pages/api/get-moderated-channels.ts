@@ -4,7 +4,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { GENERIC_FEATURE_TIERS } from '@/utils/subscription'
+import { GENERIC_FEATURE_TIERS, isInGracePeriod } from '@/utils/subscription'
 import { SubscriptionStatus } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -95,27 +95,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
-  // Get channels that have the required tier
-  const eligibleChannels = await prisma.account.findMany({
-    where: {
-      user: {
-        subscription: {
-          some: {
-            tier: GENERIC_FEATURE_TIERS.managers,
-            status: {
-              in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
-            },
-          },
-        },
-      },
-    },
-    select: {
-      providerAccountId: true,
-    },
-  })
-
-  const eligibleChannelIds = new Set(eligibleChannels.map((c) => c.providerAccountId))
-
   if (session?.user?.isImpersonating) {
     return res.status(403).json({ message: 'Forbidden' })
   }
@@ -163,10 +142,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const response = await getModeratedChannels(providerAccountId, accessToken)
 
+  // Handle the case where response might not be an array
+  let filteredResponse = Array.isArray(response) ? [...response] : []
+
+  if (!Array.isArray(response)) {
+    return res.status(200).json([])
+  }
+
   // Filter response to only include channels with required tier
-  const filteredResponse = Array.isArray(response)
-    ? response.filter((channel) => eligibleChannelIds.has(channel.providerAccountId))
-    : response
+  if (!isInGracePeriod()) {
+    // Get channels that have the required tier
+    const eligibleChannels = await prisma.account.findMany({
+      where: {
+        user: {
+          subscription: {
+            some: {
+              tier: GENERIC_FEATURE_TIERS.managers,
+              status: {
+                in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
+              },
+            },
+          },
+        },
+      },
+      select: {
+        providerAccountId: true,
+      },
+    })
+
+    const eligibleChannelIds = new Set(eligibleChannels.map((c) => c.providerAccountId))
+    filteredResponse = response.filter((channel) =>
+      eligibleChannelIds.has(channel.providerAccountId),
+    )
+  }
 
   return res.status(200).json(filteredResponse)
 }
