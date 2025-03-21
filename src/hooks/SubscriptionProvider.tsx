@@ -1,5 +1,6 @@
 import { type SubscriptionRow, isSubscriptionActive } from '@/utils/subscription'
 import type { Subscription } from '@prisma/client'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { createContext, useEffect, useState } from 'react'
 
@@ -13,6 +14,7 @@ export const SubscriptionContext = createContext<SubscriptionContextType | null>
 
 export function SubscriptionProviderMain({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const session = useSession()
   const { userId } = router.query
   const [subscription, setSubscription] = useState<SubscriptionRow | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -32,8 +34,8 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
       }
       setIsLoading(false)
     }
-    router.isReady && getSubscription()
-  }, [userId, router.isReady])
+    router.isReady && (session.data?.user?.id || userId) && getSubscription()
+  }, [userId, router.isReady, session.data?.user?.id])
 
   return (
     <SubscriptionContext.Provider
