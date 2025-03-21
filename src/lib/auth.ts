@@ -70,6 +70,37 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
     error: '/error',
   },
+  events: {
+    async signIn({ user }) {
+      if (user.id) {
+        try {
+          fetch(`${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}/resubscribe`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: user.id }),
+          }).catch((error) => {
+            console.error('Error calling resubscribe endpoint:', error)
+            captureException(error, {
+              extra: {
+                userId: user.id,
+              },
+            })
+          })
+        } catch (error) {
+          console.error('Error calling resubscribe endpoint:', error)
+          captureException(error, {
+            extra: {
+              userId: user.id,
+            },
+          })
+        } finally {
+          console.log('Resubscribed to the bot', user.id)
+        }
+      }
+    },
+  },
   providers: [
     CredentialsProvider({
       name: 'impersonate',
