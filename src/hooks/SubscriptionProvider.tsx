@@ -13,8 +13,8 @@ interface SubscriptionContextType {
 export const SubscriptionContext = createContext<SubscriptionContextType | null>(null)
 
 export function SubscriptionProviderMain({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
   const session = useSession()
+  const router = useRouter()
   const { userId } = router.query
   const [subscription, setSubscription] = useState<SubscriptionRow | null>(null)
   const [isLoading, setIsLoading] = useState(false)

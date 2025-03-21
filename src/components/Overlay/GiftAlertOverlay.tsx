@@ -3,7 +3,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import GiftSubscriptionAlert from './GiftAlert/GiftSubscriptionAlert'
 
-export default function GiftAlertOverlay() {
+export function GiftAlertOverlayForDashboard() {
   return (
     <Card title='Gift Subscription Alerts' feature='showGiftAlerts'>
       <div className='space-y-4'>

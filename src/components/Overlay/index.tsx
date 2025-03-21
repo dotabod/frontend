@@ -31,17 +31,11 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
-import { useRouter } from 'next/router'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
-import { useLastFm } from '@/lib/hooks/useLastFm'
 
 const OverlayPage = () => {
-  const router = useRouter()
-  const { userId } = router.query
   const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
-
   const { notification } = App.useApp()
-
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { original, error } = useUpdateSetting()
   const { height, width } = useWindowSize()
@@ -277,7 +271,7 @@ const OverlayPage = () => {
           overflow: hidden;
         }
       `}</style>
-      {showGiftAlerts && <GiftAlert userId={typeof userId === 'string' ? userId : undefined} />}
+      {showGiftAlerts && <GiftAlert />}
       <AnimatePresence>
         {connected !== true && (
           <Center

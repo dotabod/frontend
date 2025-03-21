@@ -14,12 +14,10 @@ const giftAlertSchema = z.object({
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions)
-    if (!session) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
     const userId = (req.query.id as string) || session?.user?.id || (req.query.token as string)
+
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      return res.status(400).json({ error: 'User is required' })
     }
 
     // For GET requests, retrieve the latest unread gift notification
@@ -63,7 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const notification = await prisma.notification.findFirst({
         where: {
           id: notificationId,
-          userId: session.user.id,
+          userId,
         },
       })
 

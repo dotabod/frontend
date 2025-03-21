@@ -1,6 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 type LastFmTrackType = {
   artist: string
@@ -14,6 +15,8 @@ export function useLastFm() {
   const [track, setTrack] = useState<LastFmTrackType | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  const { userId } = router.query
 
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const { data: username } = useUpdateSetting(Settings.lastFmUsername)
@@ -27,7 +30,7 @@ export function useLastFm() {
         setLoading(true)
         setError(null)
 
-        const response = await fetch('/api/lastfm/now-playing')
+        const response = await fetch(`/api/lastfm/now-playing?id=${userId ?? ''}`)
 
         if (!response.ok) {
           const errorData = await response.json()
@@ -37,6 +40,11 @@ export function useLastFm() {
         }
 
         const trackData = await response.json()
+        if (trackData?.error) {
+          setError(trackData.error)
+          setTrack(null)
+          return
+        }
         setTrack(trackData)
       } catch (err) {
         console.error('Error fetching Last.fm data:', err)
