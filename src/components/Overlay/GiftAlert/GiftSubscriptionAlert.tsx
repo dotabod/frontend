@@ -92,8 +92,8 @@ const GiftSubscriptionAlert = ({
               </p>
 
               {giftMessage && (
-                <div className='mt-2 p-2 bg-purple-800 rounded-md'>
-                  <p className='italic text-gray-200'>"{giftMessage}"</p>
+                <div className='p-2 bg-purple-800 rounded-md'>
+                  <span className='text-gray-200 text-2xl'>{giftMessage}</span>
                 </div>
               )}
             </div>

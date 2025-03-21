@@ -201,11 +201,17 @@ export const GiftSubscriptionForm = ({
   const giftChatMessage = (
     <>
       {senderName === 'Anonymous' ? (
-        <span>A gift sub for Dotabod Pro was just gifted anonymously!</span>
+        <span className='space-x-1'>
+          <span>A gift sub for Dotabod Pro was just gifted anonymously!</span>
+          {giftMessage && <span>{giftMessage}</span>}
+        </span>
       ) : (
-        <span>
-          A gift sub for Dotabod Pro was just gifted by{' '}
-          <span className='text-purple-400 font-semibold'>{senderName}</span>!
+        <span className='space-x-1'>
+          <span>
+            A gift sub for Dotabod Pro was just gifted by{' '}
+            <span className='text-purple-400 font-semibold'>{senderName}</span>!
+          </span>
+          {giftMessage && <span>{giftMessage}</span>}
         </span>
       )}
     </>
