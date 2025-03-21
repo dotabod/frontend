@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { useLastFm } from '@/lib/hooks/useLastFm'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import type { blockType } from '@/lib/devConsts'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 export const AnimatedLastFm = ({
   className = 'absolute',
@@ -14,6 +16,7 @@ export const AnimatedLastFm = ({
   className?: string
   block: blockType
 }) => {
+  const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const res = useTransformRes()
   const style = mainScreen ? { fontSize: res({ w: 18 }) } : {}
   const { track } = useLastFm()
@@ -73,6 +76,8 @@ export const AnimatedLastFm = ({
       height: res({ h: 100 }),
     }
   }
+
+  if (!isEnabled || !track) return null
 
   return (
     <div

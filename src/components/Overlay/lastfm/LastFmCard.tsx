@@ -35,11 +35,10 @@ const LastFmCard = ({
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const res = useTransformRes()
   const [imageLoaded, setImageLoaded] = useState(false)
-
-  if (!isEnabled || !track) return null
-
   const fontSize = res({ h: compact ? 14 : 16 })
   const imageSize = res({ h: compact ? 64 : 128 })
+
+  if (!isEnabled || !track) return null
 
   return (
     <div
