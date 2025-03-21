@@ -38,7 +38,7 @@ export default function LastFmOverlay() {
   }
 
   return (
-    <Card title='Last.fm' className='w-full'>
+    <Card title='Last.fm' className='w-full' feature='lastFmOverlay'>
       <Paragraph type='secondary' className='mb-4'>
         Show your currently playing music from Last.fm on your overlay. Connect your Last.fm account
         to display what you're listening to while streaming.
@@ -46,8 +46,17 @@ export default function LastFmOverlay() {
 
       <div className={clsx('py-4 transition-all')}>
         <div className='flex flex-col items-start space-y-3 md:space-y-4'>
-          <div className='flex items-center space-x-2'>
-            <TierSwitch settingKey={Settings.lastFmOverlay} label='Show Last.fm now playing' />
+          <div className='flex flex-col items-start space-y-2'>
+            <TierSwitch
+              hideTierBadge
+              settingKey={Settings.lastFmOverlay}
+              label='Show Last.fm now playing'
+            />
+            <TierSwitch
+              hideTierBadge
+              settingKey={Settings.commandLastFm}
+              label='Enable !song command'
+            />
           </div>
 
           <div className='w-full max-w-sm'>
