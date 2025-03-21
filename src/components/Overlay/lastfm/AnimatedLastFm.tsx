@@ -48,14 +48,14 @@ export const AnimatedLastFm = ({
       right: res({ w: 199 }),
     },
     playing: {
-      right: res({ w: 160 }),
-      width: res({ w: 350 }),
-      height: res({ h: 100 }),
+      right: res({ w: 175 }),
+      width: res({ w: 368 }),
+      height: res({ h: 65 }),
     },
     spectator: {
-      right: res({ w: 160 }),
-      width: res({ w: 350 }),
-      height: res({ h: 100 }),
+      right: res({ w: 175 }),
+      width: res({ w: 368 }),
+      height: res({ h: 65 }),
     },
   }
 
@@ -73,7 +73,7 @@ export const AnimatedLastFm = ({
       right: res({ w: 0 }),
       left: undefined,
       width: res({ w: 350 }),
-      height: res({ h: 100 }),
+      height: res({ h: 65 }),
     }
   }
 
