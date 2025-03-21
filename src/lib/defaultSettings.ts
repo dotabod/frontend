@@ -41,6 +41,7 @@ export const commands = {
   commandPing: true,
   commandDotabod: true,
   commandMute: true,
+  commandLastFm: true,
 }
 export type CommandKeys = keyof typeof commands
 
@@ -138,6 +139,9 @@ export const defaultSettings = {
   queueBlockerFindMatch: false,
   queueBlockerFindMatchText: 'Ranked match / All pick / Europe East, Russia',
   showGiftAlerts: true,
+  lastFmOverlay: false,
+  lastFmUsername: '',
+  lastFmRefreshRate: 30, // in seconds
   crypto_payment_interest: {
     interested: false,
     tier: 'PRO',

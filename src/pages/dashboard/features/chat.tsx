@@ -1,5 +1,6 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
+import LastFmCommands from '@/components/Dashboard/Features/LastFmCommands'
 import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Head from 'next/head'
@@ -17,6 +18,9 @@ const FeaturesPage: NextPageWithLayout = () => (
     />
 
     <ChatterCard />
+    <div className='mt-6'>
+      <LastFmCommands />
+    </div>
   </>
 )
 

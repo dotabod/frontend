@@ -7,6 +7,7 @@ import RoshCard from '@/components/Dashboard/Features/RoshCard'
 import Header from '@/components/Dashboard/Header'
 import BetsOverlay from '@/components/Overlay/BetsOverlay'
 import GiftAlertOverlay from '@/components/Overlay/GiftAlertOverlay'
+import LastFmOverlay from '@/components/Overlay/LastFmOverlay'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
@@ -33,6 +34,7 @@ const FeaturesPage: NextPageWithLayout = () => (
       <QueueCard />
       <NotablePlayersCard />
       <GiftAlertOverlay />
+      <LastFmOverlay />
     </div>
   </>
 )

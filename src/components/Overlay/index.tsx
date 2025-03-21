@@ -32,6 +32,8 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
 import { useRouter } from 'next/router'
+import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
+import { useLastFm } from '@/lib/hooks/useLastFm'
 
 const OverlayPage = () => {
   const router = useRouter()
@@ -351,6 +353,10 @@ const OverlayPage = () => {
           aegis={aegis}
           notablePlayers={notablePlayers}
         />
+
+        <RestrictFeature feature='lastFmOverlay'>
+          <AnimatedLastFm block={block} />
+        </RestrictFeature>
 
         {isDev && (
           <Image
