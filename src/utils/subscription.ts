@@ -51,6 +51,11 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
   'mmr-tracker': SUBSCRIPTION_TIERS.FREE,
 
+  commandLastFm: SUBSCRIPTION_TIERS.PRO,
+  lastFmUsername: SUBSCRIPTION_TIERS.PRO,
+  lastFmOverlay: SUBSCRIPTION_TIERS.PRO,
+  lastFmRefreshRate: SUBSCRIPTION_TIERS.PRO,
+
   // Pro Tier Features
   bets: SUBSCRIPTION_TIERS.PRO,
   'picks-blocker': SUBSCRIPTION_TIERS.PRO,
