@@ -15,7 +15,7 @@ import {
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
 import {
@@ -105,8 +105,6 @@ export const useSocket = ({
   const router = useRouter()
   const { userId } = router.query
   const dispatch = useDispatch()
-  const lastPollOrBetTimeRef = useRef(0)
-  const pollBetTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
@@ -116,22 +114,6 @@ export const useSocket = ({
 
     let lastReceivedTime = Date.now()
     let reconnectTimeout: NodeJS.Timeout | undefined
-
-    // Function to check if poll/bet data is stale
-    const checkPollBetTimeout = () => {
-      if (lastPollOrBetTimeRef.current === 0) return
-
-      const now = Date.now()
-      const timeElapsed = now - lastPollOrBetTimeRef.current
-
-      // If more than 1 minute has passed since last poll/bet update
-      if (timeElapsed > 60000) {
-        console.log('No poll/bet updates for over 1 minute, assuming ended')
-        setPollData(null)
-        setBetData(null)
-        lastPollOrBetTimeRef.current = 0
-      }
-    }
 
     console.log('Connecting to socket init...', { userId })
 
@@ -162,9 +144,6 @@ export const useSocket = ({
         socket?.disconnect()
         socket?.connect()
       }
-
-      // Also check if poll/bet data is stale
-      checkPollBetTimeout()
     }, 15000)
 
     // Update lastReceivedTime whenever we get any data
@@ -295,25 +274,9 @@ export const useSocket = ({
     socket.on('channelPollOrBet', (data: TwitchEventData, eventName: string) => {
       updateLastReceived()
       console.log('twitchEvent', { eventName, data })
-
-      // If it's an End or Lock event, clear the data
-      if (eventName.includes('End') || eventName.includes('Lock')) {
-        const func = eventName.includes('Poll') ? setPollData : setBetData
-        func(null)
-
-        // If this ends both poll and bet, reset the time tracker
-        if (
-          (eventName.includes('Poll') && !setBetData) ||
-          (eventName.includes('Prediction') && !setPollData)
-        ) {
-          lastPollOrBetTimeRef.current = 0
-        }
-      } else {
-        // Otherwise update the data and timestamp
-        const func = eventName.includes('Poll') ? setPollData : setBetData
-        func(data)
-        lastPollOrBetTimeRef.current = Date.now()
-      }
+      const func = eventName.includes('Poll') ? setPollData : setBetData
+      const newData = eventName.includes('End') || eventName.includes('Lock') ? null : data
+      func(newData)
     })
 
     socket.on('update-medal', (deets: RankType) => {
@@ -347,9 +310,6 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearTimeout(reconnectTimeout)
-      if (pollBetTimeoutRef.current) {
-        clearTimeout(pollBetTimeoutRef.current)
-      }
 
       // Don't disconnect the socket on every effect cleanup
       // Only clean up event handlers
