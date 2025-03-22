@@ -13,46 +13,10 @@ import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
-export interface Scene {
+interface Scene {
   sceneIndex: number // Scene index
   sceneUuid: string // Unique identifier
   sceneName: string // Scene name
-}
-
-export interface SceneItemResponse {
-  inputKind: string
-  isGroup: null
-  sceneItemBlendMode: string
-  sceneItemEnabled: boolean
-  sceneItemId: number
-  sceneItemIndex: number
-  sceneItemLocked: boolean
-  sceneItemTransform: SceneItemTransform
-  sourceName: string
-  sourceType: string
-  sourceUuid: string
-}
-
-export interface SceneItemTransform {
-  alignment: number
-  boundsAlignment: number
-  boundsHeight: number
-  boundsType: string
-  boundsWidth: number
-  cropBottom: number
-  cropLeft: number
-  cropRight: number
-  cropToBounds: boolean
-  cropTop: number
-  height: number
-  positionX: number
-  positionY: number
-  rotation: number
-  scaleX: number
-  scaleY: number
-  sourceHeight: number
-  sourceWidth: number
-  width: number
 }
 
 const ObsSetup: React.FC = () => {

@@ -4,21 +4,61 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Empty, Input, Segmented, Spin } from 'antd'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
+import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
+import { createGiftLink } from '@/utils/gift-links'
 
 const CommandsPage: NextPageWithLayout = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
+  const [subscriptionInfo, setSubscriptionInfo] = useState<{
+    isPro: boolean
+    isLifetime: boolean
+    isGracePeriodPro: boolean
+    inGracePeriod: boolean
+    loading: boolean
+  }>({
+    isPro: false,
+    isLifetime: false,
+    isGracePeriodPro: false,
+    inGracePeriod: false,
+    loading: true,
+  })
   const router = useRouter()
   const { username } = router.query
   const { data, loading, error, notFound } = useGetSettingsByUsername()
+
+  // Fetch subscription information
+  useEffect(() => {
+    if (username && typeof username === 'string') {
+      fetch(`/api/subscription/by-username?username=${username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setSubscriptionInfo({
+            isPro: data.isPro || false,
+            isLifetime: data.isLifetime || false,
+            isGracePeriodPro: data.isGracePeriodPro || false,
+            inGracePeriod: data.inGracePeriod || false,
+            loading: false,
+          })
+        })
+        .catch(() => {
+          setSubscriptionInfo({
+            isPro: false,
+            isLifetime: false,
+            isGracePeriodPro: false,
+            inGracePeriod: false,
+            loading: false,
+          })
+        })
+    }
+  }, [username])
 
   useEffect(() => {
     // Only redirect to 404 if username exists in query and we've finished loading
@@ -29,8 +69,40 @@ const CommandsPage: NextPageWithLayout = () => {
 
   if (loading || error || !data) {
     return (
-      <div className='p-6 flex justify-center items-center min-h-screen'>
-        <Spin size='large' tip='Loading user data...' />
+      <div className='p-6'>
+        <div className='mb-12 space-y-4'>
+          <div className='flex flex-row items-center space-x-2'>
+            <Skeleton.Avatar active size={80} shape='circle' />
+            <div className='flex-grow'>
+              <div className='flex flex-row items-center space-x-4'>
+                <Skeleton.Button active size='large' shape='round' />
+                <Skeleton.Button active size='small' shape='round' style={{ width: 60 }} />
+              </div>
+              <Skeleton.Input active size='small' style={{ width: 200, marginTop: 8 }} />
+            </div>
+            <div>
+              <div className='flex space-x-2'>
+                <Skeleton.Button active size='default' shape='default' style={{ width: 140 }} />
+                <Skeleton.Button active size='default' shape='default' style={{ width: 160 }} />
+              </div>
+            </div>
+          </div>
+          <Skeleton active paragraph={{ rows: 1 }} />
+        </div>
+
+        <div className='flex items-baseline sm:gap-6 gap-2 max-w-full flex-wrap mb-4'>
+          <Skeleton.Button active size='default' shape='default' style={{ width: 200 }} />
+          <Skeleton.Button active size='default' shape='default' style={{ width: 200 }} />
+          <Skeleton.Input active size='default' style={{ width: 300 }} />
+        </div>
+
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10'>
+          {['sk1', 'sk2', 'sk3', 'sk4', 'sk5', 'sk6', 'sk7', 'sk8'].map((key) => (
+            <div key={key} className='border border-gray-700 rounded-lg p-4'>
+              <Skeleton active paragraph={{ rows: 3 }} />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -69,6 +141,45 @@ const CommandsPage: NextPageWithLayout = () => {
       })
     })
 
+  // Determine what subscription badge to show
+  const getSubscriptionBadge = () => {
+    if (subscriptionInfo.loading) return null
+    if (subscriptionInfo.isPro) {
+      if (subscriptionInfo.isGracePeriodPro) {
+        return (
+          <Tooltip title='Using Pro features during free trial period'>
+            <Tag color='blue' className='flex! gap-1 items-center py-0.5'>
+              <CrownIcon size={14} className='inline-block flex-shrink-0' />
+              <span>Free Trial</span>
+            </Tag>
+          </Tooltip>
+        )
+      }
+
+      if (subscriptionInfo.isLifetime) {
+        return (
+          <Tooltip title='Lifetime Pro Subscriber'>
+            <Tag color='gold' className='flex! gap-1 items-center py-0.5'>
+              <CrownIcon size={14} className='inline-block flex-shrink-0' />
+              <span>Lifetime Pro</span>
+            </Tag>
+          </Tooltip>
+        )
+      }
+
+      return (
+        <Tooltip title='Pro Subscriber'>
+          <Tag color='gold' className='flex! gap-1 items-center py-0.5'>
+            <CrownIcon size={14} className='inline-block flex-shrink-0' />
+            <span>Pro</span>
+          </Tag>
+        </Tooltip>
+      )
+    }
+
+    return null
+  }
+
   return (
     <>
       <Head>
@@ -98,8 +209,8 @@ const CommandsPage: NextPageWithLayout = () => {
               height={80}
               className='rounded-full flex'
             />
-            <div>
-              <div className='flex flex-row items-center space-x-4'>
+            <div className='flex-grow'>
+              <div className='flex flex-wrap gap-2 flex-row items-center space-x-4'>
                 <Link
                   target='_blank'
                   href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
@@ -116,6 +227,7 @@ const CommandsPage: NextPageWithLayout = () => {
                 >
                   {data?.stream_online ? 'Live' : 'Offline'}
                 </span>
+                {getSubscriptionBadge()}
               </div>
               <span>
                 Using Dotabod since{' '}
@@ -124,12 +236,34 @@ const CommandsPage: NextPageWithLayout = () => {
                   : new Date(data.createdAt).toLocaleDateString()}
               </span>
             </div>
+            <div>
+              <div className='flex flex-wrap gap-2'>
+                <Link
+                  target='_blank'
+                  href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
+                  passHref
+                >
+                  <Button icon={<ExternalLinkIcon size={16} />} className='flex items-center'>
+                    View on Twitch
+                  </Button>
+                </Link>
+                <Link href={createGiftLink(username as string)} passHref>
+                  <Button
+                    type='primary'
+                    icon={<GiftIcon size={16} />}
+                    className='flex items-center'
+                  >
+                    Gift Subscription
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
           <div className='text-gray-300'>
             All commands available to use in Twitch chat with Dotabod.
           </div>
         </div>
-        <div className='flex items-baseline sm:space-x-6 space-y-2 max-w-full flex-wrap mb-4'>
+        <div className='flex items-baseline sm:gap-6 gap-2 max-w-full flex-wrap mb-4'>
           <Segmented
             value={enabled}
             onChange={(v) => setEnabled(v as string)}

@@ -64,6 +64,7 @@ const settingsSchema = {
   commandProfile: z.boolean(),
   commandLGS: z.boolean(),
   commandSteam: z.boolean(),
+  commandLastFm: z.boolean(),
   commandWL: z.boolean(),
   commandXPM: z.boolean(),
   'minimap-blocker': z.boolean(),
@@ -110,6 +111,10 @@ const settingsSchema = {
   commandShard: z.boolean(),
   commandAghs: z.boolean(),
   commandWinProbability: z.boolean(),
+  showGiftAlerts: z.boolean(),
+  lastFmOverlay: z.boolean(),
+  lastFmUsername: z.string().max(45).optional(),
+  lastFmRefreshRate: z.number().min(5).max(60),
 }
 
 type SettingKeys = keyof typeof settingsSchema

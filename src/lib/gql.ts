@@ -9,19 +9,6 @@ export const DELETE_EMOTE_SET = gql`
   }
 `
 
-export const UPDATE_EMOTE_SET = gql`
-  mutation UpdateEmoteSet($id: ObjectID!, $data: UpdateEmoteSetInput!) {
-    emoteSet(id: $id) {
-      update(data: $data) {
-        id
-        name
-        __typename
-      }
-      __typename
-    }
-  }
-`
-
 export const GET_EMOTE_SET_FOR_CARD = gql`
   query GetEmoteSetForCard($id: ObjectID!, $limit: Int) {
     emoteSet(id: $id) {

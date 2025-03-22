@@ -599,6 +599,21 @@ const CommandDetail: Record<
       />
     ),
   },
+  commandLastFm: {
+    key: 'commandLastFm',
+    title: 'Last.fm Now Playing',
+    description: 'Show what music you are currently listening to on Last.fm.',
+    cmd: '!song',
+    alias: ['music'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!song'
+        response='Now playing: Artist Name - Track Title (Album Name)'
+      />
+    ),
+  },
   commandFacet: {
     key: 'commandFacet',
     title: 'Facet Information',

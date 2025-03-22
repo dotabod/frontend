@@ -53,18 +53,14 @@ const store = configureStore({
 
 // Export actions separately for easy access
 export const {
-  setTest,
-  setPreview,
   setMinimapStatus,
-  setMinimapSettings,
+
   setMinimapDataHeroes,
   setMinimapDataHeroUnits,
   setMinimapDataBuildings,
   setMinimapDataCreeps,
   setMinimapDataCouriers,
 } = appSlice.actions
-
-export const selectIsTest = (state) => state.isTest
 
 export const selectIsPreview = (state) => state.isPreview
 

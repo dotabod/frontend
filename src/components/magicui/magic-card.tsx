@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import type React from 'react'
 
-export interface MagicCardProps {
+interface MagicCardProps {
   children: React.ReactNode
   className?: string
   gradientSize?: number

@@ -93,7 +93,7 @@ export async function getMatchData(matchId: string, heroId: number) {
   }
 }
 
-export async function createJob(matchId: string): Promise<number> {
+async function createJob(matchId: string): Promise<number> {
   // Check if we already have a job request in progress for this match
   if (jobRequestCache.has(matchId)) {
     console.log(`[MMR] Using existing job request for matchId: ${matchId}`)
@@ -161,7 +161,7 @@ export async function createJob(matchId: string): Promise<number> {
   return jobPromise
 }
 
-export async function getJobStatus(jobId: number): Promise<boolean> {
+async function getJobStatus(jobId: number): Promise<boolean> {
   // Check if we already have a job status check in progress
   if (jobStatusCache.has(jobId)) {
     console.log(`[MMR] Using existing job status check for jobId: ${jobId}`)
@@ -228,16 +228,4 @@ export async function getJobStatus(jobId: number): Promise<boolean> {
   })
 
   return statusPromise
-}
-
-// Add a function to clear cache for a specific match or all matches
-export function clearMatchCache(matchId?: string) {
-  if (matchId) {
-    matchDataCache.delete(matchId)
-    jobRequestCache.delete(matchId)
-  } else {
-    matchDataCache.clear()
-    jobRequestCache.clear()
-    jobStatusCache.clear()
-  }
 }

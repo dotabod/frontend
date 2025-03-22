@@ -8,7 +8,8 @@ export default function WinLossOverlay() {
   return (
     <Card title='Win/loss'>
       <div className='subtitle'>
-        Show your win/loss ratio in chat. Turning this off will also disable the !wl command.
+        Show your win/loss ratio on your overlay, in the bottom right corner. Turning this off will
+        also disable the !wl command.
       </div>
 
       <div className={clsx('py-4 transition-all')}>

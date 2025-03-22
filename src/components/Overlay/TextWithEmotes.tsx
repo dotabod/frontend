@@ -1,11 +1,11 @@
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-export interface Cdn {
+interface Cdn {
   low: string
   medium: string
   high: string
 }
 
-export interface Emote {
+interface Emote {
   type: string
   id: string
   code: string
@@ -13,7 +13,7 @@ export interface Emote {
   cdn: Cdn
 }
 
-export type Emotes = Emote[]
+type Emotes = Emote[]
 
 export const TextWithEmotes = ({
   emotes,

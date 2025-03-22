@@ -12,6 +12,7 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { clsx } from 'clsx'
 import { MinimapBlocker } from './blocker/MinimapBlocker'
+
 export const InGameOverlays = ({
   wl,
   block,

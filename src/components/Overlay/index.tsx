@@ -4,6 +4,7 @@ import type { PollData } from '@/components/Overlay/PollOverlay'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import { InGameV2 } from '@/components/Overlay/blocker/InGameV2'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
+import { GiftAlert } from '@/components/Overlay/GiftAlert'
 import { Settings } from '@/lib/defaultSettings'
 import {
   type blockType,
@@ -32,10 +33,11 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
 import { OverlayV2 } from './blocker/PickBlockerV2'
+import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
 
 const OverlayPage = () => {
+  const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
   const { notification } = App.useApp()
-
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { original, error } = useUpdateSetting()
   const { height, width } = useWindowSize()
@@ -271,7 +273,23 @@ const OverlayPage = () => {
           overflow: hidden;
         }
       `}</style>
+      {showGiftAlerts && <GiftAlert />}
       <AnimatePresence>
+        {connected !== true && (
+          <Center
+            key='connecting-spinner'
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+            }}
+          >
+            <Spin size='large' tip='Connecting to Dotabod...' />
+          </Center>
+        )}
         <motion.div
           key='not-detected'
           {...motionProps}
@@ -334,13 +352,17 @@ const OverlayPage = () => {
           notablePlayers={notablePlayers}
         />
 
+        <RestrictFeature feature='lastFmOverlay'>
+          <AnimatedLastFm block={block} />
+        </RestrictFeature>
+
         {isDev && (
           <Image
             key='dev-image'
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/21-9-playing.png`}
+            src='/images/dev/21-9-playing.png'
           />
         )}
       </AnimatePresence>

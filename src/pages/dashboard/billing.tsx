@@ -1,23 +1,45 @@
 import { BillingPlans } from '@/components/Billing/BillingPlans'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
-import { SubscriptionStatus } from '@/components/Subscription/SubscriptionStatus'
+import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { Card } from '@/ui/card'
-import { getSubscriptionStatusInfo, isSubscriptionActive } from '@/utils/subscription'
-import { Alert, Button, Divider, Space, Typography } from 'antd'
-import { ExternalLinkIcon } from 'lucide-react'
+import { getSubscriptionStatusInfo } from '@/utils/subscription'
+import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
+import type { JsonValue } from '@prisma/client/runtime/library'
+import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
 
-const { Title, Text } = Typography
+const { Title } = Typography
+
+// Define the subscription type with metadata for type safety
+interface SubscriptionWithMetadata {
+  id?: string
+  userId?: string
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
+  tier?: SubscriptionTier
+  status?: SubscriptionStatus | null
+  transactionType?: TransactionType | null
+  currentPeriodEnd?: Date | null
+  cancelAtPeriodEnd?: boolean
+  metadata?: JsonValue
+}
 
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { data: session } = useSession()
-  const { subscription, isLifetimePlan } = useSubscriptionContext()
+  const {
+    subscription: rawSubscription,
+    creditBalance: contextCreditBalance,
+    formattedCreditBalance,
+  } = useSubscriptionContext()
+
+  // Cast subscription to the type with metadata
+  const subscription = rawSubscription as unknown as SubscriptionWithMetadata
 
   const statusInfo = getSubscriptionStatusInfo(
     subscription?.status,
@@ -51,6 +73,14 @@ const BillingPage = () => {
     return null
   }
 
+  // Empty gift info to pass to SubscriptionAlerts (to maintain compatibility)
+  const emptyGiftInfo = {
+    hasGifts: false,
+    giftCount: 0,
+    giftMessage: '',
+    hasLifetime: false,
+  }
+
   return (
     <>
       <Head>
@@ -59,47 +89,14 @@ const BillingPage = () => {
 
       <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
-      <Card className='mb-6 shadow-xs'>
-        <Space direction='vertical' size='large' className='w-full'>
-          <SubscriptionStatus />
-
-          {/* Only show manage subscription button for recurring subscriptions with Stripe */}
-          {isSubscriptionActive({ status: subscription?.status }) &&
-            subscription?.stripeSubscriptionId &&
-            !isLifetimePlan && (
-              <>
-                <Divider className='my-2' />
-                <div className='flex justify-between items-center'>
-                  <Text>Need to update payment method or cancel?</Text>
-                  <Button
-                    type='primary'
-                    size='middle'
-                    icon={<ExternalLinkIcon size={14} />}
-                    onClick={handlePortalAccess}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Loading...' : 'Manage subscription'}
-                  </Button>
-                </div>
-              </>
-            )}
-        </Space>
-      </Card>
-
-      {statusInfo?.type === 'warning' && (
-        <Alert
-          message='Subscription Ending Soon'
-          description='Your subscription will end soon. Renew to keep access to all Pro features.'
-          type='warning'
-          showIcon
-          className='mb-6'
-          action={
-            <Button size='small' type='primary' onClick={handlePortalAccess}>
-              Renew Now
-            </Button>
-          }
+      <div>
+        <SubscriptionAlerts
+          giftInfo={emptyGiftInfo}
+          statusInfo={statusInfo}
+          handlePortalAccess={handlePortalAccess}
+          isLoading={isLoading}
         />
-      )}
+      </div>
 
       <div className='mt-6'>
         <Title level={4} className='mb-4'>

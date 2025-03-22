@@ -16,7 +16,7 @@ export type RankType = {
   }
 }
 
-export const ranks = [
+const ranks = [
   { range: [0, 153], title: 'Herald☆1', image: '11.png' },
   { range: [154, 307], title: 'Herald☆2', image: '12.png' },
   { range: [308, 461], title: 'Herald☆3', image: '13.png' },
@@ -54,7 +54,7 @@ export const ranks = [
   { range: [5430, 5629], title: 'Divine☆5', image: '75.png' },
 ]
 
-export const leaderRanks = [
+const leaderRanks = [
   { range: [1, 1], image: '92.png', sparklingEffect: true },
   { range: [2, 10], image: '92.png', sparklingEffect: true },
   { range: [11, 100], image: '91.png', sparklingEffect: true },
@@ -62,7 +62,7 @@ export const leaderRanks = [
   { range: [1001, 100000], image: '80.png', sparklingEffect: false },
 ]
 
-export function lookupLeaderRank({
+function lookupLeaderRank({
   mmr,
   standing,
 }: {

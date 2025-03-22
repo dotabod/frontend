@@ -8,21 +8,22 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
+import type { StatusInfo } from '@/components/Subscription/types'
 
 // Add type safety for chatters
-export type ChatterKeys = keyof typeof defaultSettings.chatters
+type ChatterKeys = keyof typeof defaultSettings.chatters
 export type ChatterSettingKeys = `chatters.${ChatterKeys}`
 
 export const SUBSCRIPTION_TIERS = SubscriptionTier
 
 export type SubscriptionRow = Subscription
 
-export const TIER_LEVELS: Record<SubscriptionTier, number> = {
+const TIER_LEVELS: Record<SubscriptionTier, number> = {
   [SUBSCRIPTION_TIERS.FREE]: 0,
   [SUBSCRIPTION_TIERS.PRO]: 1,
 }
 
-export const PRICE_PERIODS = {
+const PRICE_PERIODS = {
   MONTHLY: 'monthly',
   ANNUAL: 'annual',
   LIFETIME: 'lifetime',
@@ -47,9 +48,15 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandMute: SUBSCRIPTION_TIERS.FREE,
   commandPing: SUBSCRIPTION_TIERS.FREE,
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
+  showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
+  'mmr-tracker': SUBSCRIPTION_TIERS.FREE,
+
+  commandLastFm: SUBSCRIPTION_TIERS.PRO,
+  lastFmUsername: SUBSCRIPTION_TIERS.PRO,
+  lastFmOverlay: SUBSCRIPTION_TIERS.PRO,
+  lastFmRefreshRate: SUBSCRIPTION_TIERS.PRO,
 
   // Pro Tier Features
-  'mmr-tracker': SUBSCRIPTION_TIERS.PRO,
   bets: SUBSCRIPTION_TIERS.PRO,
   'picks-blocker': SUBSCRIPTION_TIERS.PRO,
   rosh: SUBSCRIPTION_TIERS.PRO,
@@ -204,14 +211,25 @@ export function isSubscriptionActive(
   return false
 }
 
-export interface SubscriptionPriceId {
+interface SubscriptionPriceId {
   tier: SubscriptionTier
   monthly: string
   annual: string
   lifetime: string
 }
 
-export const PRICE_IDS: SubscriptionPriceId[] = [
+// Add gift subscription price IDs
+export const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
+  {
+    tier: SUBSCRIPTION_TIERS.PRO,
+    // Can only gift monthly for now
+    monthly: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
+    annual: '',
+    lifetime: '',
+  },
+]
+
+const PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
@@ -224,7 +242,8 @@ export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,
 ): string {
-  const price = PRICE_IDS.find((p) => p.tier === tier)
+  const priceList = PRICE_IDS
+  const price = priceList.find((p) => p.tier === tier)
   if (!price) throw new Error(`No price found for tier ${tier}`)
   if (period === 'monthly') return price.monthly
   if (period === 'annual') return price.annual
@@ -233,29 +252,48 @@ export function getPriceId(
 
 export function getCurrentPeriod(priceId?: string | null): PricePeriod {
   if (!priceId) return 'monthly'
-  if (PRICE_IDS.some((price) => price.monthly === priceId)) return 'monthly'
-  if (PRICE_IDS.some((price) => price.annual === priceId)) return 'annual'
-  if (PRICE_IDS.some((price) => price.lifetime === priceId)) return 'lifetime'
-  return 'annual' // Default to annual if no match found
+
+  // Check both regular and gift price IDs
+  const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS]
+
+  if (allPriceIds.some((price) => price.monthly === priceId)) return 'monthly'
+  if (allPriceIds.some((price) => price.annual === priceId)) return 'annual'
+  if (allPriceIds.some((price) => price.lifetime === priceId)) return 'lifetime'
+
+  return 'monthly' // Default to monthly if no match found
 }
 
 // Validation
-if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
-  throw new Error('Missing required Stripe price IDs in environment variables')
-}
+// if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
+//   throw new Error(
+//     `Missing required Stripe price IDs in environment variables, found: ${PRICE_IDS.filter(
+//       (price) => !price.monthly || !price.annual || !price.lifetime,
+//     )}`,
+//   )
+// }
 
 export async function getSubscription(userId: string, tx?: Prisma.TransactionClient) {
-  const subscription = await (tx || prisma).subscription.findFirst({
+  const db = tx || prisma
+
+  // Find all active subscriptions for the user
+  const subscriptions = await db.subscription.findMany({
     where: {
       userId,
       OR: [
-        // Active or trialing subscriptions
-        { status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] } },
-        // Include lifetime subscriptions
-        { transactionType: 'LIFETIME' },
+        // Active or trialing subscriptions - exclude gift markers
+        {
+          status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+          isGift: false,
+        },
+        // Include lifetime subscriptions that are not canceled
+        {
+          transactionType: 'LIFETIME',
+          status: { in: [SubscriptionStatus.ACTIVE] },
+        },
       ],
     },
     select: {
+      id: true,
       tier: true,
       status: true,
       transactionType: true,
@@ -265,32 +303,64 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       stripeCustomerId: true,
       createdAt: true,
       stripeSubscriptionId: true,
+      metadata: true,
+      giftDetails: {
+        select: {
+          senderName: true,
+          giftType: true,
+          giftQuantity: true,
+          giftMessage: true,
+        },
+      },
     },
     orderBy: [
-      // Prioritize lifetime subscriptions first
-      { transactionType: 'desc' },
-      // Then active subscriptions
+      // Prioritize active status first
       { status: 'asc' },
+      // Then prioritize lifetime subscriptions
+      { transactionType: 'desc' },
       // Then most recent
       { createdAt: 'desc' },
     ],
   })
 
-  if (!subscription && isInGracePeriod()) {
-    return {
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: SubscriptionStatus.TRIALING,
-      transactionType: TransactionType.RECURRING,
-      currentPeriodEnd: GRACE_PERIOD_END,
-      cancelAtPeriodEnd: true,
-      stripePriceId: '',
-      stripeCustomerId: '',
-      createdAt: new Date(),
-      stripeSubscriptionId: null,
-    }
+  // Prioritize active or trialing subscriptions
+  const activeSubscription = subscriptions.find(
+    (sub) =>
+      (sub.status === SubscriptionStatus.ACTIVE || sub.status === SubscriptionStatus.TRIALING) &&
+      sub.stripeSubscriptionId,
+  )
+
+  if (activeSubscription) {
+    return activeSubscription
   }
 
-  return subscription
+  // If no active subscription found, check if we should create a virtual subscription
+  // If no subscriptions found
+  if (subscriptions.length === 0) {
+    // Handle grace period
+    if (isInGracePeriod()) {
+      return {
+        tier: SUBSCRIPTION_TIERS.PRO,
+        status: SubscriptionStatus.TRIALING,
+        transactionType: TransactionType.RECURRING,
+        currentPeriodEnd: GRACE_PERIOD_END,
+        cancelAtPeriodEnd: true,
+        stripePriceId: '',
+        stripeCustomerId: '',
+        createdAt: new Date(),
+        stripeSubscriptionId: null,
+        isGift: false,
+        giftDetails: null,
+        isVirtual: true, // Mark as virtual subscription for grace period
+        isGracePeriodVirtual: true, // Specifically mark as grace period virtual subscription
+      }
+    }
+
+    return null
+  }
+
+  // Return the first subscription (based on our ordering)
+  return subscriptions[0]
 }
 
 export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
@@ -299,12 +369,20 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
   return Math.round(((monthly - annual) / monthly) * 100)
 }
 
-// Add these types at the top with other types
-export type SubscriptionStatusInfo = {
-  message?: string
-  type: 'success' | 'warning' | 'error' | 'info'
-  badge: 'gold' | 'blue' | 'red' | 'default'
+// Add a function to check if we're in the grace period
+export function isInGracePeriod(): boolean {
+  return new Date() < GRACE_PERIOD_END
 }
+
+// Format the grace period date in a consistent way with other dates
+export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
+
+// Get the day after grace period ends (for consistent messaging with subscription dates)
+export const gracePeriodEndNextDay = (() => {
+  const nextDay = new Date(GRACE_PERIOD_END)
+  nextDay.setDate(nextDay.getDate() + 1)
+  return formatDate(nextDay)
+})()
 
 // Update the getSubscriptionStatusInfo function
 export function getSubscriptionStatusInfo(
@@ -313,19 +391,8 @@ export function getSubscriptionStatusInfo(
   currentPeriodEnd?: Date | null,
   transactionType?: string | null,
   stripeSubscriptionId?: string | null,
-): SubscriptionStatusInfo | null {
-  // If we're in the grace period but user doesn't have a paid plan, show grace period message
-  if (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId)) {
-    return {
-      message: `Free Pro access until ${gracePeriodPrettyDate}`,
-      type: 'info',
-      badge: 'gold',
-    }
-  }
-
-  if (!status) return null
-
-  // Check for lifetime subscription
+): StatusInfo | null {
+  // Check for lifetime subscription first (highest priority)
   if (
     transactionType === 'LIFETIME' ||
     (status === SubscriptionStatus.ACTIVE &&
@@ -339,23 +406,27 @@ export function getSubscriptionStatusInfo(
     }
   }
 
-  // Format date in a more user-friendly way
-  const formatDate = (date: Date): string => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+  // Check if this is a virtual subscription created for the grace period
+  const isVirtualGracePeriodSubscription =
+    isInGracePeriod() &&
+    status === SubscriptionStatus.TRIALING &&
+    !stripeSubscriptionId &&
+    currentPeriodEnd &&
+    new Date(currentPeriodEnd).getTime() === new Date(GRACE_PERIOD_END).getTime()
+
+  // If we're in the grace period but user doesn't have a paid plan, show grace period message
+  if (
+    isVirtualGracePeriodSubscription ||
+    (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId))
+  ) {
+    return {
+      message: `Free Pro access until ${gracePeriodPrettyDate}`,
+      type: 'info',
+      badge: 'gold',
     }
-    return new Date(date).toLocaleDateString(undefined, options)
   }
 
-  const endDate = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'unknown'
-
-  // Check if subscription is ending within 10 days
-  const isEndingSoon =
-    currentPeriodEnd &&
-    cancelAtPeriodEnd &&
-    (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) <= 10
+  if (!status) return null
 
   // Calculate days remaining for better messaging
   const daysRemaining = currentPeriodEnd
@@ -363,6 +434,13 @@ export function getSubscriptionStatusInfo(
         (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
     : 0
+
+  // Check if subscription is ending within 10 days
+  const isEndingSoon = currentPeriodEnd && cancelAtPeriodEnd && daysRemaining <= 10
+
+  // Format end date
+  const endDate = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'unknown'
+
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
@@ -376,7 +454,9 @@ export function getSubscriptionStatusInfo(
           ? isEndingSoon
             ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
             : `Subscription ends on ${endDate}`
-          : `Renews on ${endDate}`,
+          : currentPeriodEnd
+            ? `Renews on ${endDate}`
+            : 'Active subscription',
         type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
         badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
       }
@@ -427,22 +507,20 @@ export function getSubscriptionTier(
   status: SubscriptionStatus | null,
 ): SubscriptionTier {
   if (isSubscriptionActive({ status })) {
-    const tierFromPrice = PRICE_IDS.find((price) =>
+    // Check both regular and gift price IDs
+    const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS]
+
+    const tierFromPrice = allPriceIds.find((price) =>
       [price.monthly, price.annual, price.lifetime].includes(priceId || ''),
     )?.tier
 
-    return tierFromPrice || SUBSCRIPTION_TIERS.FREE
+    return tierFromPrice || SUBSCRIPTION_TIERS.PRO
   }
 
   return SUBSCRIPTION_TIERS.FREE
 }
 
-// Add a function to check if we're in the grace period
-export function isInGracePeriod(): boolean {
-  return new Date() < GRACE_PERIOD_END
-}
-
-// Update the hasPaidSubscription check to include lifetime transactions
+// Update the hasPaidSubscription check
 export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): boolean {
   if (!subscription) return false
 
@@ -454,5 +532,3 @@ export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): bool
 
   return false
 }
-
-export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)

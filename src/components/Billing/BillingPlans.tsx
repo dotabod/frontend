@@ -27,6 +27,7 @@ export const plans = [
     features: [
       'Multi-language support',
       'Win-loss record display overlay',
+      'MMR tracking with each match',
       'Basic rank display with mmr',
       'Basic minimap blocker',
       'Basic game events in chat (kills, bounties, match outcome)',
@@ -72,7 +73,6 @@ export const plans = [
       'Stream delay customization',
       'Auto OBS scene switcher',
       'Auto Roshan and Aegis timers',
-      'MMR tracking with each match',
       'Advanced game events (Midas, Rosh events, Neutral items)',
       'Manager access',
       <span key='beta-features' className='flex items-center gap-1'>
@@ -123,7 +123,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
             </>
           ) : hasActivePlan ? (
             <p className='mt-2 text-lg text-purple-400'>
-              <SubscriptionStatus showAlert={false} />
+              <SubscriptionStatus />
             </p>
           ) : (
             <p className='mt-2 text-lg text-gray-400'>

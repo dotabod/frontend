@@ -32,6 +32,21 @@ const nextConfig = {
     'rc-tooltip',
     'rc-tree',
     'rc-table',
+    'rc-input',
+    'rc-textarea',
+    'rc-input-number',
+    'rc-mentions',
+    'rc-menu',
+    'rc-motion',
+    '@rc-component/mini-decimal',
+    '@rc-component/trigger',
+    '@rc-component/portal',
+    '@rc-component/context',
+    '@rc-component/tour',
+    '@rc-component/color-picker',
+    '@rc-component/mutate-observer',
+    '@rc-component/async-validator',
+    '@rc-component/qrcode',
   ],
   webpack: (config, { dev, isServer }) => {
     // Fix for the "Cannot read properties of null (reading '1')" error in production
@@ -59,6 +74,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.7tv.app',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lastfm.freetls.fastly.net',
       },
       {
         protocol: 'https',

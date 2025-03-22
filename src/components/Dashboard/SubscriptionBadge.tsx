@@ -5,10 +5,21 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { plans } from '../Billing/BillingPlans'
+import { CrownIcon, Wallet } from 'lucide-react'
+import { useMemo } from 'react'
+
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
-  const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()
   const { data } = useSession()
+  const { subscription, isLifetimePlan, hasActivePlan, inGracePeriod, isLoading } =
+    useSubscriptionContext()
   const currentPlan = plans.find((plan) => plan.tier === subscription?.tier)
+
+  // Check if a credit balance exists
+  const creditBalance = useMemo(() => {
+    if (!subscription?.metadata || typeof subscription.metadata !== 'object') return 0
+    return Number((subscription.metadata as Record<string, unknown>).creditBalance || 0)
+  }, [subscription?.metadata])
+
   const statusInfo = getSubscriptionStatusInfo(
     subscription?.status,
     subscription?.cancelAtPeriodEnd,
@@ -42,6 +53,66 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     }
   }
 
+  // Get the appropriate subscription badge based on subscription type
+  const getSubscriptionBadge = () => {
+    // Priority order: Lifetime > Gift > Pro > Grace Period
+    if (subscription?.transactionType === 'LIFETIME') {
+      return {
+        icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Lifetime Pro',
+        color: 'black',
+        tooltip: 'Lifetime Pro Subscriber',
+      }
+    }
+
+    // If user has a regular subscription and credit balance
+    if (hasActivePlan && creditBalance > 0) {
+      return {
+        icon: (
+          <div className='relative'>
+            <CrownIcon size={14} className='inline-block flex-shrink-0' />
+            <Wallet size={10} className='absolute -top-1 -right-2 text-amber-400' />
+          </div>
+        ),
+        text: 'Pro + Credit',
+        color: 'gold',
+        tooltip: 'Pro Subscriber with Credit Balance',
+      }
+    }
+
+    if (hasActivePlan) {
+      return {
+        icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Pro',
+        color: 'gold',
+        tooltip: 'Pro Subscriber',
+      }
+    }
+
+    if (creditBalance > 0) {
+      return {
+        icon: <Wallet size={14} className='inline-block flex-shrink-0' />,
+        text: 'Credit Balance',
+        color: 'green',
+        tooltip: 'Credit balance available - subscribe to use it',
+      }
+    }
+
+    if (inGracePeriod) {
+      return {
+        icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
+        text: 'Free Trial',
+        color: 'blue',
+        tooltip: 'Using Pro features during free trial period',
+      }
+    }
+
+    return null
+  }
+
+  // Get the badge details
+  const badgeDetails = getSubscriptionBadge()
+
   // logo for lifetime is https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp
   // otehrwise its the current plan logo
   const logo =
@@ -70,19 +141,28 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     </div>
   ) : (
     <div className={`${commonClasses} justify-center`}>
-      <Tooltip {...tooltipProps}>
+      <Tooltip title={badgeDetails?.tooltip || tooltipProps.title}>
         <Link href='/dashboard/billing' className='no-underline'>
           <Tag
-            color={statusInfo?.badge}
+            color={badgeDetails?.color || statusInfo?.badge}
             className='px-3 py-1.5 rounded-md transition-all duration-200 hover:shadow-md'
           >
             <div className={`${commonClasses} justify-center`}>
               <div className='flex items-center gap-2'>
-                {logo}
-                <span className='font-medium'>{currentPlan?.name} Plan</span>
+                {badgeDetails?.icon ? (
+                  <>
+                    {badgeDetails.icon}
+                    <span className='font-medium'>{badgeDetails.text}</span>
+                  </>
+                ) : (
+                  <>
+                    {logo}
+                    <span className='font-medium'>{currentPlan?.name} Plan</span>
+                  </>
+                )}
               </div>
             </div>
-            {statusInfo?.message && (
+            {!badgeDetails && statusInfo?.message && (
               <div className='text-center text-xs mt-1 opacity-90 break-words'>
                 {statusInfo.message}
               </div>

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
 import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
+import { useSession } from 'next-auth/react'
 
 interface UpdateProps {
   path?: any
@@ -126,10 +127,15 @@ export function useUpdateSetting<T = boolean>(
 ): UpdateSettingResult<T> {
   const router = useRouter()
   const { subscription } = useSubscription()
+  const session = useSession()
 
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
-  const url = userId ? `/api/settings?id=${userId}` : '/api/settings'
+  const url = userId
+    ? `/api/settings?id=${userId}`
+    : session.data?.user?.id
+      ? '/api/settings'
+      : null
 
   const {
     data,

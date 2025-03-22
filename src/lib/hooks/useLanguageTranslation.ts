@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 import { fetcher } from '../fetcher'
 
-export interface Project {
+interface Project {
   translateDuplicates: number
   tagsDetection: number
   glossaryAccess: boolean
@@ -43,7 +43,7 @@ export interface Project {
   targetLanguages: Language[]
 }
 
-export interface Language {
+interface Language {
   id: string
   name: string
   editorCode: string
@@ -60,11 +60,11 @@ export interface Language {
   dialectOf: null | string
 }
 
-export interface LanguageMapping {
+interface LanguageMapping {
   uk: Uk
 }
 
-export interface Uk {
+interface Uk {
   name: string
   two_letters_code: string
   three_letters_code: string
@@ -75,7 +75,7 @@ export interface Uk {
   osx_locale: string
 }
 
-export interface NotificationSettings {
+interface NotificationSettings {
   translatorNewStrings: boolean
   managerNewStrings: boolean
   managerLanguageCompleted: boolean
@@ -96,14 +96,6 @@ export interface CrowdinLanguage {
     }
     translationProgress: number
     approvalProgress: number
-  }
-}
-
-export interface TranslationData {
-  data: CrowdinLanguage[]
-  pagination: {
-    offset: number
-    limit: number
   }
 }
 
