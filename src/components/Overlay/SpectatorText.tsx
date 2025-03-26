@@ -1,6 +1,6 @@
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
-import { type blockType, isDev } from '@/lib/devConsts'
+import type { blockType } from '@/lib/devConsts'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
@@ -17,7 +17,7 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 
-  if (block?.type !== 'spectator' && !isDev) return null
+  if (block?.type !== 'spectator') return null
 
   const styles: Position = {
     bottom: isXL
