@@ -29,7 +29,7 @@ export const usePlayerPositions = () => {
 }
 
 export const useOverlayPositions = () => {
-  const res = useTransformRes()
+  const res = useTransformRes({ returnInput: false })
 
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])

@@ -81,6 +81,25 @@ export const Clock = styled.div`
   width: 205px;
 `
 
+export const InGameOutsideCenterV2 = ({ children }: { children: React.ReactNode }) => {
+  const contentRef = useRef<HTMLDivElement>(null)
+  const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)
+
+  useWindowResize(resizeHandler)
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
 export const InGameV2 = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)

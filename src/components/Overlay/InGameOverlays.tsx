@@ -1,7 +1,7 @@
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
-import { InGameV2 } from '@/components/Overlay/blocker/InGameV2'
+import { InGameV2, InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
@@ -32,27 +32,29 @@ export const InGameOverlays = ({
 
   return (
     <>
-      <InGameV2>
+      <InGameOutsideCenterV2>
         <SpectatorText key='spectator-class' block={block} />
-      </InGameV2>
+      </InGameOutsideCenterV2>
 
-      <RestrictFeature feature='rosh'>
-        <AnimateRosh
-          key='animate-rosh-class'
-          block={block}
-          roshan={roshan}
-          paused={paused}
-          onComplete={() => {
-            if (roshan?.minS) {
-              setRoshan({ ...roshan, minS: 0 })
-            } else {
-              setRoshan({ ...roshan, minS: 0, maxS: 0 })
-            }
-          }}
-        />
-      </RestrictFeature>
+      <InGameOutsideCenterV2>
+        <RestrictFeature feature='rosh'>
+          <AnimateRosh
+            key='animate-rosh-class'
+            block={block}
+            roshan={roshan}
+            paused={paused}
+            onComplete={() => {
+              if (roshan?.minS) {
+                setRoshan({ ...roshan, minS: 0 })
+              } else {
+                setRoshan({ ...roshan, minS: 0, maxS: 0 })
+              }
+            }}
+          />
+        </RestrictFeature>
+      </InGameOutsideCenterV2>
 
-      <InGameV2>
+      <InGameOutsideCenterV2>
         <RestrictFeature feature='aegis'>
           <AnimatedAegis
             key='animate-aegis-class'
@@ -67,7 +69,7 @@ export const InGameOverlays = ({
             }}
           />
         </RestrictFeature>
-      </InGameV2>
+      </InGameOutsideCenterV2>
 
       <InGameV2>
         <RestrictFeature feature='notablePlayersOverlay'>
@@ -75,13 +77,13 @@ export const InGameOverlays = ({
         </RestrictFeature>
       </InGameV2>
 
-      <InGameV2>
+      <InGameOutsideCenterV2>
         <RestrictFeature feature='minimap-blocker'>
           <MinimapBlocker block={block} key='minimap-blocker-class' />
         </RestrictFeature>
-      </InGameV2>
+      </InGameOutsideCenterV2>
 
-      <InGameV2>
+      <InGameOutsideCenterV2>
         <div
           className={clsx('absolute flex items-end justify-end', isRight && 'justify-start!')}
           id='ingame-wl-mmr-card'
@@ -103,7 +105,7 @@ export const InGameOverlays = ({
             />
           </RestrictFeature>
         </div>
-      </InGameV2>
+      </InGameOutsideCenterV2>
     </>
   )
 }
