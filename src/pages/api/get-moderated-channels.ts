@@ -99,7 +99,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 
-  if (search && (!session?.user?.role || !session.user.role.includes('admin'))) {
+  if (search && (!session?.user?.role || !session.user.role?.includes('admin'))) {
     return res.status(403).json({ message: 'Forbidden' })
   }
 

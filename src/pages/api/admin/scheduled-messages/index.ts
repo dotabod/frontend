@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  if (!session || !session.user || !session.user.role.includes('admin')) {
+  if (!session || !session.user || !session.user.role?.includes('admin')) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 

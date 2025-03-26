@@ -23,7 +23,7 @@ declare module 'next-auth' {
       name: string
       isImpersonating: boolean
       twitchId: UserId
-      role: UserRole
+      role?: 'admin' | 'user'
       locale: UserId
       scope: string
     }
