@@ -318,7 +318,7 @@ const OverlayPage = () => {
           width={width}
           height={height}
           alt={`${block.type} dev screenshot`}
-          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : block.type}.png`}
+          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
         />
       </>
     ) : null
@@ -442,7 +442,7 @@ const OverlayPage = () => {
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : block.type}.png`}
+            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
           />
         )}
       </AnimatePresence>
