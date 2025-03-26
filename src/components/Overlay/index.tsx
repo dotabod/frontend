@@ -432,9 +432,11 @@ const OverlayPage = () => {
           notablePlayers={notablePlayers}
         />
 
-        <RestrictFeature feature='lastFmOverlay'>
-          <AnimatedLastFm block={block} />
-        </RestrictFeature>
+        <OverlayV2>
+          <RestrictFeature feature='lastFmOverlay'>
+            <AnimatedLastFm block={block} />
+          </RestrictFeature>
+        </OverlayV2>
 
         {isDev && (
           <Image
