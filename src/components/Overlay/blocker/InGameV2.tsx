@@ -36,7 +36,7 @@ export const TopHud = styled.div`
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  width: 1510px;
+  width: 1010px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,14 +45,14 @@ export const TopHud = styled.div`
 
 export const TeamContainer = styled.div`
   display: flex;
-  gap: 7px;
+  gap: 1px;
 `
 
 export const TopHudHero = styled.div<{ $isRadiant: boolean }>`
-  ${isDev ? 'border: 1px solid yellow;' : ''}
+  ${isDev ? 'border: 1px solid red;' : ''}
   cursor: pointer;
-  height: 73px;
-  width: 115px;
+  height: 40px;
+  width: 60px;
   margin: 0 1px;
   transform-origin: center center;
   position: relative;
@@ -77,42 +77,18 @@ const ContentWrap = styled.div`
 `
 
 export const Clock = styled.div`
-  width: 276px;
+  ${isDev ? 'border: 1px solid red;' : ''}
+  width: 205px;
 `
 
-export const InGameV2TopHud = () => {
-  const heroIndicesRadiant = [0, 1, 2, 3, 4]
-  const heroIndicesDire = [5, 6, 7, 8, 9]
-
-  return (
-    <TopHud>
-      <TeamContainer>
-        {heroIndicesRadiant.map((heroId) => (
-          <React.Fragment key={heroId}>
-            <TopHudHero $isRadiant />
-          </React.Fragment>
-        ))}
-      </TeamContainer>
-
-      <Clock />
-
-      <TeamContainer>
-        {heroIndicesDire.map((heroId) => (
-          <React.Fragment key={heroId}>
-            <TopHudHero $isRadiant={false} />
-          </React.Fragment>
-        ))}
-      </TeamContainer>
-    </TopHud>
-  )
-}
-
-export function InGameV2({ children }: { children: React.ReactNode }) {
+export const InGameV2 = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)
 
   useWindowResize(resizeHandler)
 
+  const heroIndicesRadiant = [0, 1, 2, 3, 4]
+  const heroIndicesDire = [5, 6, 7, 8, 9]
   return (
     <div
       style={{
@@ -126,6 +102,26 @@ export function InGameV2({ children }: { children: React.ReactNode }) {
         id='main_box'
         style={{ transform: `translate(-50%, -50%) scale(${uiRescale})` }}
       >
+        <TopHud>
+          <TeamContainer>
+            {heroIndicesRadiant.map((heroId) => (
+              <React.Fragment key={heroId}>
+                <TopHudHero $isRadiant />
+              </React.Fragment>
+            ))}
+          </TeamContainer>
+
+          <Clock />
+
+          <TeamContainer>
+            {heroIndicesDire.map((heroId) => (
+              <React.Fragment key={heroId}>
+                <TopHudHero $isRadiant={false} />
+              </React.Fragment>
+            ))}
+          </TeamContainer>
+        </TopHud>
+
         {children}
       </ContentWrap>
     </div>
