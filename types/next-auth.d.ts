@@ -12,6 +12,7 @@ declare module 'next-auth/jwt' {
     twitchId: UserId
     locale: UserId
     scope: string
+    role?: 'admin' | 'user'
   }
 }
 
