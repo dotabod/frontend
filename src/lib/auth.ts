@@ -403,7 +403,7 @@ export const authOptions: NextAuthOptions = {
         email: newUser.email,
         picture: newUser.image,
         isImpersonating,
-        role: provider?.admin?.role,
+        role: provider?.admin?.role || 'user',
         scope: account?.scope,
       }
     },

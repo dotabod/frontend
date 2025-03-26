@@ -3,9 +3,8 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Typography } from 'antd'
 import clsx from 'clsx'
-import Image from 'next/image'
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 const { Text } = Typography
 
@@ -110,49 +109,95 @@ const LastFmCard = ({
   track,
   className = '',
   transparent = true,
-  compact = true,
 }: LastFmCardProps) => {
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const res = useTransformRes()
   const [imageLoaded, setImageLoaded] = useState(false)
-  const fontSize = res({ h: compact ? 14 : 16 })
-  const imageSize = res({ h: compact ? 64 : 128 })
+  const [imageError, setImageError] = useState(false)
+  const fontSize = res({ h: 14 })
+  const imageSize = res({ h: 54 })
+  const fallbackImage = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
+  const prevAlbumArtRef = useRef<string | undefined>('')
+
+  // Function to verify if the URL is valid
+  const isValidImageUrl = useCallback((url?: string) => {
+    if (!url) return false
+    return url.startsWith('http://') || url.startsWith('https://')
+  }, [])
+
+  // Function to decide what image src to use
+  const getImageSrc = useCallback(() => {
+    const src = imageError || !isValidImageUrl(track?.albumArt) ? fallbackImage : track?.albumArt
+    console.log('Calculated image src:', src)
+    return src
+  }, [imageError, isValidImageUrl, track?.albumArt])
+
+  useEffect(() => {
+    // Reset image states when album art changes
+    if (track?.albumArt !== prevAlbumArtRef.current) {
+      prevAlbumArtRef.current = track?.albumArt
+      setImageLoaded(false)
+      setImageError(false)
+    }
+  }, [track])
 
   if (!isEnabled || !track) return null
 
   return (
     <div
       className={clsx(
+        'p-2',
         'rounded-lg text-sm shadow-lg transition-all duration-300',
         !transparent && 'bg-gray-900/80 backdrop-blur-md',
         !className && mainScreen && 'bg-transparent p-0 leading-none',
         transparent && 'bg-transparent',
         className,
-        'max-w-[320px] border border-gray-700/40 hover:border-gray-500/60 hover:shadow-lg hover:shadow-gray-700/20',
+        'max-w-[320px] shadow-lg shadow-gray-700/20',
       )}
     >
-      <div className={clsx('flex items-center gap-3', compact && 'gap-2')}>
+      <div className={clsx('flex items-center gap-2')}>
         <AnimatePresence mode='wait'>
-          {track.albumArt && (
-            <motion.div
-              key={track.albumArt}
-              className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: imageLoaded ? 1 : 0, scale: imageLoaded ? 1 : 0.8 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-            >
-              <Image
-                src={track.albumArt}
-                alt={`${track.album || 'Album'} cover`}
-                width={imageSize}
-                height={imageSize}
-                className={clsx('rounded object-cover', compact && 'rounded-sm')}
-                onLoad={() => setImageLoaded(true)}
-                onLoadingComplete={() => setImageLoaded(true)}
-              />
-            </motion.div>
-          )}
+          <motion.div
+            key={track.albumArt || 'no-art'}
+            className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              width: track.albumArt ? imageSize : 0,
+              marginRight: track.albumArt ? undefined : 0,
+            }}
+            exit={{ opacity: 0, scale: 0.8, width: 0, marginRight: 0 }}
+            transition={{
+              duration: 0.4,
+              ease: [0.4, 0, 0.2, 1],
+              width: {
+                duration: 0.3,
+                ease: 'easeInOut',
+              },
+            }}
+          >
+            {track.albumArt && (
+              <div className='relative' style={{ width: imageSize, height: imageSize }}>
+                <motion.img
+                  src={getImageSrc()}
+                  alt={`${track.album || 'Album'} cover`}
+                  width={imageSize}
+                  height={imageSize}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: imageLoaded ? 1 : 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={clsx('rounded object-cover', 'rounded-sm', 'absolute top-0 left-0')}
+                  onError={() => {
+                    setImageError(true)
+                    setImageLoaded(true)
+                  }}
+                  onLoad={() => setImageLoaded(true)}
+                />
+              </div>
+            )}
+          </motion.div>
         </AnimatePresence>
         <div className='flex-1 overflow-hidden' style={{ fontSize }}>
           <AnimatePresence mode='wait'>
@@ -167,7 +212,7 @@ const LastFmCard = ({
               <Text
                 strong
                 className={clsx(
-                  'block',
+                  'block m-0 p-0',
                   transparent ? 'text-white drop-shadow-sm' : 'text-gray-100',
                 )}
               >
@@ -175,23 +220,12 @@ const LastFmCard = ({
               </Text>
               <Text
                 className={clsx(
-                  'block',
-                  compact ? 'text-xs' : 'text-sm',
+                  'block m-0 p-0 text-xs -mt-1',
                   transparent ? 'text-gray-200/90 drop-shadow-sm' : 'text-gray-300',
                 )}
               >
                 <ScrollingText text={track.artist} />
               </Text>
-              {track.album && !compact && (
-                <Text
-                  className={clsx(
-                    'block text-xs italic',
-                    transparent ? 'text-gray-300/70' : 'text-gray-400',
-                  )}
-                >
-                  <ScrollingText text={track.album} />
-                </Text>
-              )}
             </motion.div>
           </AnimatePresence>
         </div>
