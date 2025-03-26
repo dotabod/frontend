@@ -10,11 +10,6 @@ import prisma from '@/lib/db'
  * It should only be used in development.
  */
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Only allow in development environment
-  if (process.env.NODE_ENV !== 'development') {
-    return res.status(403).json({ message: 'This endpoint is only available in development mode' })
-  }
-
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
     return res.status(401).json({ message: 'Unauthorized' })
