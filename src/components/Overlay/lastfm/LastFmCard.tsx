@@ -157,36 +157,47 @@ const LastFmCard = ({
     >
       <div className={clsx('flex items-center gap-2')}>
         <AnimatePresence mode='wait'>
-          {track.albumArt && (
-            <motion.div
-              key={imageError ? 'fallback' : track.albumArt}
-              className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-            >
+          <motion.div
+            key={track.albumArt || 'no-art'}
+            className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              width: track.albumArt ? imageSize : 0,
+              marginRight: track.albumArt ? undefined : 0,
+            }}
+            exit={{ opacity: 0, scale: 0.8, width: 0, marginRight: 0 }}
+            transition={{
+              duration: 0.4,
+              ease: [0.4, 0, 0.2, 1],
+              width: {
+                duration: 0.3,
+                ease: 'easeInOut',
+              },
+            }}
+          >
+            {track.albumArt && (
               <div className='relative' style={{ width: imageSize, height: imageSize }}>
-                <img
+                <motion.img
                   src={getImageSrc()}
                   alt={`${track.album || 'Album'} cover`}
                   width={imageSize}
                   height={imageSize}
-                  className={clsx(
-                    'rounded object-cover',
-                    'rounded-sm',
-                    !imageLoaded && 'opacity-0',
-                    'absolute top-0 left-0',
-                  )}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: imageLoaded ? 1 : 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={clsx('rounded object-cover', 'rounded-sm', 'absolute top-0 left-0')}
                   onError={() => {
                     setImageError(true)
-                    setImageLoaded(true) // Set to true to hide skeleton
+                    setImageLoaded(true)
                   }}
                   onLoad={() => setImageLoaded(true)}
                 />
               </div>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
         </AnimatePresence>
         <div className='flex-1 overflow-hidden' style={{ fontSize }}>
           <AnimatePresence mode='wait'>
