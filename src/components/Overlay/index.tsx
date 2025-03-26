@@ -24,7 +24,7 @@ import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 import { Center } from '@mantine/core'
 import * as Sentry from '@sentry/nextjs'
-import { Alert, App, Spin } from 'antd'
+import { Alert, App, InputNumber, Select, Spin } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
@@ -32,6 +32,86 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
+
+const DevControls = ({
+  block,
+  setBlock,
+}: { block: blockType; setBlock: (block: blockType) => void }) => {
+  if (!isDev) return null
+
+  const { data: refreshRate, updateSetting } = useUpdateSetting<number>(Settings.lastFmRefreshRate)
+
+  const handleTeamChange = (value: 'radiant' | 'dire' | null) => {
+    setBlock({ ...block, team: value })
+  }
+
+  const handleTypeChange = (value: blockType['type']) => {
+    setBlock({ ...block, type: value })
+  }
+
+  const handleIntervalChange = (value: number | null) => {
+    if (value) {
+      updateSetting(value)
+    }
+  }
+
+  return (
+    <motion.div
+      className='fixed top-4 left-4 z-50 flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
+      {...motionProps}
+    >
+      {/* Block controls group */}
+      <div className='flex flex-col gap-2'>
+        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
+          Block Controls
+        </div>
+        <div className='flex gap-2'>
+          <Select
+            value={block.team}
+            onChange={handleTeamChange}
+            options={[
+              { value: 'radiant', label: 'Radiant' },
+              { value: 'dire', label: 'Dire' },
+              { value: null, label: 'None' },
+            ]}
+            style={{ width: 120 }}
+            placeholder='Select team'
+          />
+          <Select
+            value={block.type}
+            onChange={handleTypeChange}
+            options={[
+              { value: 'picks', label: 'Picks' },
+              { value: 'playing', label: 'Playing' },
+              { value: 'strategy', label: 'Strategy' },
+              { value: 'strategy-2', label: 'Strategy 2' },
+              { value: 'spectator', label: 'Spectator' },
+              { value: null, label: 'None' },
+            ]}
+            style={{ width: 120 }}
+            placeholder='Select type'
+          />
+        </div>
+      </div>
+
+      {/* LastFM settings group */}
+      <div className='flex flex-col gap-2'>
+        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
+          LastFM Settings
+        </div>
+        <InputNumber
+          value={typeof refreshRate === 'number' ? refreshRate : 30}
+          onChange={handleIntervalChange}
+          min={1}
+          max={300}
+          style={{ width: 120 }}
+          addonAfter='sec'
+          placeholder='LastFM interval'
+        />
+      </div>
+    </motion.div>
+  )
+}
 
 const OverlayPage = () => {
   const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
@@ -271,6 +351,7 @@ const OverlayPage = () => {
           overflow: hidden;
         }
       `}</style>
+      <DevControls block={block} setBlock={setBlock} />
       {showGiftAlerts && <GiftAlert />}
       <AnimatePresence>
         {connected !== true && (
