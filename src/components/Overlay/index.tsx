@@ -29,8 +29,9 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
+import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
 
 const DevControls = ({
@@ -40,6 +41,9 @@ const DevControls = ({
   if (!isDev) return null
 
   const { data: refreshRate, updateSetting } = useUpdateSetting<number>(Settings.lastFmRefreshRate)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
   const handleTeamChange = (value: 'radiant' | 'dire' | null) => {
     setBlock({ ...block, team: value })
@@ -55,13 +59,65 @@ const DevControls = ({
     }
   }
 
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true)
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      })
+    },
+    [position],
+  )
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging) {
+        setPosition({
+          x: e.clientX - dragStart.x,
+          y: e.clientY - dragStart.y,
+        })
+      }
+    },
+    [isDragging, dragStart],
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp])
+
   return (
     <motion.div
-      className='fixed top-4 left-4 z-50 flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
-      {...motionProps}
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        position: 'fixed',
+        top: '1rem',
+        left: '1rem',
+        zIndex: 50,
+      }}
+      className='flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
     >
+      <div
+        onMouseDown={handleMouseDown}
+        className='absolute top-0 right-0 left-0 h-6 bg-gray-800/50 rounded-t-lg flex items-center justify-center text-xs text-gray-400 cursor-move select-none'
+      >
+        Drag to move
+      </div>
+
       {/* Block controls group */}
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-2 mt-4'>
         <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
           Block Controls
         </div>
@@ -317,7 +373,7 @@ const OverlayPage = () => {
           width={width}
           height={height}
           alt={`${block.type} dev screenshot`}
-          src={`/images/dev/${block.type === 'spectator' ? 'playing' : block.type}.png`}
+          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
         />
       </>
     ) : null
@@ -392,29 +448,31 @@ const OverlayPage = () => {
           </div>
         </motion.div>
 
-        <RestrictFeature feature='livePolls'>
-          <PollOverlays
-            pollData={pollData}
-            setBetData={setBetData}
-            setPollData={setPollData}
-            betData={betData}
-            radiantWinChance={radiantWinChance}
+        <OverlayV2>
+          <RestrictFeature feature='livePolls'>
+            <PollOverlays
+              pollData={pollData}
+              setBetData={setBetData}
+              setPollData={setPollData}
+              betData={betData}
+              radiantWinChance={radiantWinChance}
+            />
+          </RestrictFeature>
+
+          <MainScreenOverlays
+            key='main-screen-overlays'
+            block={block}
+            wl={wl}
+            rankImageDetails={rankImageDetails}
           />
-        </RestrictFeature>
 
-        <MainScreenOverlays
-          key='main-screen-overlays'
-          block={block}
-          wl={wl}
-          rankImageDetails={rankImageDetails}
-        />
-
-        <PickScreenOverlays
-          block={block}
-          key='hero-blocker-class'
-          rankImageDetails={rankImageDetails}
-          wl={wl}
-        />
+          <PickScreenOverlays
+            block={block}
+            key='hero-blocker-class'
+            rankImageDetails={rankImageDetails}
+            wl={wl}
+          />
+        </OverlayV2>
 
         <InGameOverlays
           key='in-game-overlays'
@@ -429,9 +487,11 @@ const OverlayPage = () => {
           notablePlayers={notablePlayers}
         />
 
-        <RestrictFeature feature='lastFmOverlay'>
-          <AnimatedLastFm block={block} />
-        </RestrictFeature>
+        <OverlayV2>
+          <RestrictFeature feature='lastFmOverlay'>
+            <AnimatedLastFm block={block} />
+          </RestrictFeature>
+        </OverlayV2>
 
         {isDev && (
           <Image
@@ -439,7 +499,7 @@ const OverlayPage = () => {
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${block.type === 'spectator' ? 'playing' : block.type}.png`}
+            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
           />
         )}
       </AnimatePresence>

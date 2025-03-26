@@ -13,7 +13,7 @@ interface Position {
 }
 
 export const SpectatorText = ({ block }: { block: blockType }) => {
-  const res = useTransformRes()
+  const res = useTransformRes({ returnInput: false })
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 

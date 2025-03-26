@@ -41,7 +41,7 @@ export default function OBSOverlay() {
   }, [router.query.overlayType])
 
   const CopyInstructions = () => (
-    <div className='flex flex-col items-center space-x-4 md:flex-row'>
+    <div className='flex flex-col items-center gap-4 md:flex-row'>
       <CopyButton value={copyURL}>
         {({ copied, copy }) => (
           <Button
@@ -56,7 +56,7 @@ export default function OBSOverlay() {
           </Button>
         )}
       </CopyButton>
-      <div className='mt-4 space-x-2 text-xs md:mt-0'>
+      <div className='mt-4 gap-2 text-xs md:mt-0'>
         <Tag color='red'>Warning</Tag>
         <span>Do not share or show this URL on stream</span>
       </div>
@@ -65,7 +65,7 @@ export default function OBSOverlay() {
 
   const OBSVideo = () => (
     <div className='space-y-2'>
-      <div className='flex items-center space-x-2'>
+      <div className='flex items-center gap-2'>
         <Tag className='text-xs!'>Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
@@ -92,7 +92,7 @@ export default function OBSOverlay() {
 
   const OBSText = () => (
     <div className='space-y-2'>
-      <div className='flex items-center space-x-2'>
+      <div className='flex items-center gap-2'>
         <Tag className='text-xs!'>Note</Tag>
         <span>OBS and Streamlabs have the same instructions</span>
       </div>
@@ -168,7 +168,7 @@ export default function OBSOverlay() {
 
   return (
     <Card>
-      <div className='mb-4 space-x-2'>
+      <div className='mb-4 flex items-center gap-2'>
         <span>
           <b>Why?</b> Dotabod can show game related overlays on your stream. Your medal, the
           blockers, prediction polls, and more. Some commands like !hero require the overlay.
@@ -210,7 +210,7 @@ export default function OBSOverlay() {
           ]}
         />
       </div>
-      <p className='space-x-2'>
+      <p className='flex items-center gap-2'>
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}

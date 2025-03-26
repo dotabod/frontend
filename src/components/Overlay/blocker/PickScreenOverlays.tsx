@@ -1,4 +1,5 @@
 import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
+import { PickScreenV2 } from '@/components/Overlay/blocker/PickBlockerV2'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { RestrictFeature } from '@/components/RestrictFeature'
@@ -41,7 +42,9 @@ export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type }
 
   return (
     <>
-      <div style={styles} className={clsx('absolute ')} id='picks-blocker-parent'>
+      <PickScreenV2 />
+
+      <div style={styles} className='absolute' id='picks-blocker-parent'>
         <div
           className={clsx(
             'flex h-full w-full items-end justify-end bg-slate-800/50 backdrop-blur-lg backdrop-filter',
@@ -69,7 +72,18 @@ export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type }
       </div>
       {shouldBlock && (
         <RestrictFeature feature='picks-blocker'>
-          <motion.div key='animated-hero-blocker' {...motionProps} className='absolute'>
+          <motion.div
+            id='animated-hero-blocker'
+            key='animated-hero-blocker'
+            {...motionProps}
+            style={{
+              height: '100%',
+              width: '100%',
+              overflow: 'hidden',
+              margin: 0,
+            }}
+            className='absolute'
+          >
             <HeroBlocker type={type} teamName={team} />
           </motion.div>
         </RestrictFeature>

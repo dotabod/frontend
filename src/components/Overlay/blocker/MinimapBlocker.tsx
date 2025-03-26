@@ -13,7 +13,7 @@ import Minimap from '../minimap'
 const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
-  const res = useTransformRes()
+  const res = useTransformRes({ returnInput: false })
 
   return (
     <Image
