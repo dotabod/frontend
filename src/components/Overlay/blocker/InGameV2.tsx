@@ -1,34 +1,7 @@
 import { isDev } from '@/lib/devConsts'
-import React, { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-
-export const useWindowResize = (callback: () => void) => {
-  useEffect(() => {
-    window.addEventListener('resize', callback)
-
-    // Initial call
-    callback()
-
-    // Clean up
-    return () => window.removeEventListener('resize', callback)
-  }, [callback])
-}
-
-export const useDynamicResizing = (ref: RefObject<HTMLDivElement | null>) => {
-  const [uiRescale, setUiRescale] = useState(1)
-
-  const resizeHandler = useCallback(() => {
-    const content = ref.current
-    if (!content) return
-
-    setUiRescale(
-      Math.min(window.innerWidth / content.offsetWidth, window.innerHeight / content.offsetHeight),
-    )
-  }, [ref])
-
-  return { uiRescale, resizeHandler }
-}
-
+import { useDynamicResizing, useWindowResize } from './hooks'
 export const TopHud = styled.div`
   position: absolute;
   top: 0;
@@ -76,6 +49,16 @@ const ContentWrap = styled.div`
   transform: translate(-50%, -40%);
 `
 
+const UltrawideContentWrap = styled.div`
+  min-width: 1920px;
+  height: 1080px;
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  overflow: visible;
+`
+
 export const Clock = styled.div`
   ${isDev ? 'border: 1px solid red;' : ''}
   width: 205px;
@@ -83,7 +66,20 @@ export const Clock = styled.div`
 
 export const InGameOutsideCenterV2 = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
+  const [contentWidth, setContentWidth] = useState(1920)
   const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)
+
+  const updateContentWidth = useCallback(() => {
+    const aspectRatio = window.innerWidth / window.innerHeight
+    const targetWidth = Math.max(1920, 1080 * aspectRatio)
+    setContentWidth(targetWidth)
+  }, [])
+
+  useEffect(() => {
+    updateContentWidth()
+    window.addEventListener('resize', updateContentWidth)
+    return () => window.removeEventListener('resize', updateContentWidth)
+  }, [updateContentWidth])
 
   useWindowResize(resizeHandler)
 
@@ -93,9 +89,19 @@ export const InGameOutsideCenterV2 = ({ children }: { children: React.ReactNode 
         position: 'absolute',
         width: '100%',
         height: '100%',
+        overflow: 'hidden',
       }}
     >
-      {children}
+      <UltrawideContentWrap
+        ref={contentRef}
+        id='main_box'
+        style={{
+          transform: `translate(-50%, -50%) scale(${uiRescale})`,
+          width: `${contentWidth}px`,
+        }}
+      >
+        {children}
+      </UltrawideContentWrap>
     </div>
   )
 }

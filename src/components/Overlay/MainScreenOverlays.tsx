@@ -4,12 +4,10 @@ import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { RestrictFeature } from '../RestrictFeature'
 
 export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
   const res = useTransformRes()
-  const { width } = useWindowSize()
   const { data: showQueueBlocker } = useUpdateSetting(Settings.queueBlocker)
 
   if (![null].includes(block.type)) return null
@@ -24,7 +22,7 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
       <div
         style={{
           height: res({ h: 61 }),
-          width: width,
+          width: '100%',
           top: 0,
         }}
         id='main-screen-overlay'
