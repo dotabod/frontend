@@ -502,6 +502,10 @@ const OverlayPage = () => {
             rankImageDetails={rankImageDetails}
             wl={wl}
           />
+
+          <RestrictFeature feature='lastFmOverlay'>
+            <AnimatedLastFm block={block} />
+          </RestrictFeature>
         </OverlayV2>
 
         <InGameOverlays
@@ -516,12 +520,6 @@ const OverlayPage = () => {
           aegis={aegis}
           notablePlayers={notablePlayers}
         />
-
-        <OverlayV2>
-          <RestrictFeature feature='lastFmOverlay'>
-            <AnimatedLastFm block={block} />
-          </RestrictFeature>
-        </OverlayV2>
 
         {isDev && showDevImage && (
           <Image
