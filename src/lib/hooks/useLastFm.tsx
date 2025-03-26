@@ -2,7 +2,6 @@ import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { isDev } from '../devConsts'
 
 type LastFmTrackType = {
   artist: string
@@ -73,7 +72,7 @@ export function useLastFm() {
     fetchNowPlaying()
 
     // Set up interval to fetch periodically
-    const intervalSeconds = isDev ? 35 : typeof refreshRate === 'number' ? refreshRate : 30
+    const intervalSeconds = typeof refreshRate === 'number' ? refreshRate : 30
     const intervalId = setInterval(fetchNowPlaying, intervalSeconds * 1000)
 
     return () => {

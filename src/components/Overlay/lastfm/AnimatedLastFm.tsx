@@ -30,22 +30,22 @@ export const AnimatedLastFm = ({
     }
   > = {
     picks: {
-      width: res({ w: 581 }),
-      height: res({ h: 200 }),
-      bottom: res({ h: 75 }),
+      width: res({ w: 379 }),
+      height: res({ h: 85 }),
+      bottom: res({ h: 125 }),
       right: res({ w: 199 }),
     },
     strategy: {
-      width: res({ w: 581 }),
-      height: res({ h: 200 }),
-      bottom: res({ h: 75 }),
+      width: res({ w: 379 }),
+      height: res({ h: 85 }),
+      bottom: res({ h: 125 }),
       right: res({ w: 199 }),
     },
     'strategy-2': {
-      width: res({ w: 160 }),
-      height: res({ h: 200 }),
-      bottom: res({ h: 75 }),
-      right: res({ w: 199 }),
+      width: res({ w: 381 }),
+      height: res({ h: 85 }),
+      bottom: res({ h: 125 }),
+      right: res({ w: 0 }),
     },
     playing: {
       right: res({ w: 175 }),
@@ -72,8 +72,8 @@ export const AnimatedLastFm = ({
     styles = {
       right: res({ w: 0 }),
       left: undefined,
-      width: res({ w: 247 }),
-      height: res({ h: 65 }),
+      width: res({ w: 305 }),
+      height: res({ h: 59 }),
     }
   }
 

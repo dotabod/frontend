@@ -1,7 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Typography, Skeleton } from 'antd'
+import { Typography } from 'antd'
 import clsx from 'clsx'
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -109,14 +109,13 @@ const LastFmCard = ({
   track,
   className = '',
   transparent = true,
-  compact = true,
 }: LastFmCardProps) => {
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const res = useTransformRes()
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
-  const fontSize = res({ h: compact ? 14 : 16 })
-  const imageSize = res({ h: compact ? 64 : 128 })
+  const fontSize = res({ h: 14 })
+  const imageSize = res({ h: 54 })
   const fallbackImage = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
   const prevAlbumArtRef = useRef<string | undefined>('')
 
@@ -147,15 +146,16 @@ const LastFmCard = ({
   return (
     <div
       className={clsx(
+        'p-2',
         'rounded-lg text-sm shadow-lg transition-all duration-300',
         !transparent && 'bg-gray-900/80 backdrop-blur-md',
         !className && mainScreen && 'bg-transparent p-0 leading-none',
         transparent && 'bg-transparent',
         className,
-        'max-w-[320px] border border-gray-700/40 hover:border-gray-500/60 hover:shadow-lg hover:shadow-gray-700/20',
+        'max-w-[320px] shadow-lg shadow-gray-700/20',
       )}
     >
-      <div className={clsx('flex items-center gap-3', compact && 'gap-2')}>
+      <div className={clsx('flex items-center gap-2')}>
         <AnimatePresence mode='wait'>
           {track.albumArt && (
             <motion.div
@@ -167,19 +167,6 @@ const LastFmCard = ({
               transition={{ duration: 0.4, ease: 'easeOut' }}
             >
               <div className='relative' style={{ width: imageSize, height: imageSize }}>
-                {!imageLoaded && !imageError && (
-                  <Skeleton.Image
-                    active
-                    style={{
-                      width: imageSize,
-                      height: imageSize,
-                      borderRadius: compact ? '0.125rem' : '0.375rem',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                    }}
-                  />
-                )}
                 <img
                   src={getImageSrc()}
                   alt={`${track.album || 'Album'} cover`}
@@ -187,7 +174,7 @@ const LastFmCard = ({
                   height={imageSize}
                   className={clsx(
                     'rounded object-cover',
-                    compact && 'rounded-sm',
+                    'rounded-sm',
                     !imageLoaded && 'opacity-0',
                     'absolute top-0 left-0',
                   )}
@@ -214,7 +201,7 @@ const LastFmCard = ({
               <Text
                 strong
                 className={clsx(
-                  'block',
+                  'block m-0 p-0',
                   transparent ? 'text-white drop-shadow-sm' : 'text-gray-100',
                 )}
               >
@@ -222,23 +209,12 @@ const LastFmCard = ({
               </Text>
               <Text
                 className={clsx(
-                  'block',
-                  compact ? 'text-xs' : 'text-sm',
+                  'block m-0 p-0 text-xs -mt-1',
                   transparent ? 'text-gray-200/90 drop-shadow-sm' : 'text-gray-300',
                 )}
               >
                 <ScrollingText text={track.artist} />
               </Text>
-              {track.album && !compact && (
-                <Text
-                  className={clsx(
-                    'block text-xs italic',
-                    transparent ? 'text-gray-300/70' : 'text-gray-400',
-                  )}
-                >
-                  <ScrollingText text={track.album} />
-                </Text>
-              )}
             </motion.div>
           </AnimatePresence>
         </div>

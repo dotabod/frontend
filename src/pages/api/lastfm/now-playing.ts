@@ -67,11 +67,21 @@ async function handler(
     const isNowPlaying = recentTrack['@attr']?.nowplaying === 'true'
 
     if (isNowPlaying) {
+      const albumArtUrl =
+        recentTrack.image.find((img) => img.size === 'medium')?.['#text'] ||
+        recentTrack.image[0]?.['#text'] ||
+        null
+
+      // Check if the album art URL contains the Last.fm placeholder image
+      const albumArt = albumArtUrl?.includes('2a96cbd8b46e442fc41c2b86b821562f')
+        ? null
+        : albumArtUrl
+
       return res.status(200).json({
         artist: recentTrack.artist['#text'],
         title: recentTrack.name,
         album: recentTrack.album['#text'],
-        albumArt: recentTrack.image[2]['#text'] || null, // Medium size image
+        albumArt,
         url: recentTrack.url,
       })
     }
