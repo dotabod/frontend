@@ -4,6 +4,7 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import clsx from 'clsx'
 import * as Flags from 'mantine-flagpack'
+import { HudBlocker } from '@/components/Overlay/blocker/HudBlocker'
 
 export type NotablePlayer = {
   heroId: number
@@ -33,6 +34,7 @@ export const NotablePlayers = ({
 
   return (
     <div id='notable-players'>
+      <HudBlocker />
       {(players || []).map((player, i) => {
         const FlagComp = player.country_code
           ? Flags[`${player.country_code.toUpperCase()}Flag`]

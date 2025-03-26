@@ -1,3 +1,4 @@
+import { isDev } from '@/lib/devConsts'
 import React, { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
@@ -48,7 +49,7 @@ export const TeamContainer = styled.div`
 `
 
 export const TopHudHero = styled.div<{ $isRadiant: boolean }>`
-  ${true ? 'border: 1px solid red;' : ''}
+  ${isDev ? 'border: 1px solid yellow;' : ''}
   cursor: pointer;
   height: 73px;
   width: 115px;
@@ -79,7 +80,7 @@ export const Clock = styled.div`
   width: 276px;
 `
 
-export const PickScreenV2 = () => {
+export const InGameV2TopHud = () => {
   const heroIndicesRadiant = [0, 1, 2, 3, 4]
   const heroIndicesDire = [5, 6, 7, 8, 9]
 

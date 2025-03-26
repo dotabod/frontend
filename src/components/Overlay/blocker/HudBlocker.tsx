@@ -1,4 +1,4 @@
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { isDev } from '@/lib/devConsts'
 import React, { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
@@ -48,7 +48,7 @@ export const TeamContainer = styled.div`
 `
 
 export const TopHudHero = styled.div<{ $isRadiant: boolean }>`
-  ${true ? 'border: 1px solid red;' : ''}
+  ${isDev ? 'border: 1px solid blue;' : ''}
   cursor: pointer;
   height: 40px;
   width: 60px;
@@ -80,7 +80,6 @@ export const Clock = styled.div`
 `
 
 export function HudBlocker() {
-  const res = useTransformRes()
   const contentRef = useRef<HTMLDivElement>(null)
   const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)
 

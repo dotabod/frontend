@@ -1,3 +1,4 @@
+import { isDev } from '@/lib/devConsts'
 import React, { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
@@ -48,7 +49,7 @@ export const TeamContainer = styled.div`
 `
 
 export const TopHudHero = styled.div<{ $isRadiant: boolean }>`
-  ${true ? 'border: 1px solid red;' : ''}
+  ${isDev ? 'border: 1px solid red;' : ''}
   cursor: pointer;
   height: 73px;
   width: 115px;
