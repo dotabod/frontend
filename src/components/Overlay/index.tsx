@@ -37,7 +37,14 @@ import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
 const DevControls = ({
   block,
   setBlock,
-}: { block: blockType; setBlock: (block: blockType) => void }) => {
+  showDevImage,
+  setShowDevImage,
+}: {
+  block: blockType
+  setBlock: (block: blockType) => void
+  showDevImage: boolean
+  setShowDevImage: (showDevImage: boolean) => void
+}) => {
   if (!isDev) return null
 
   const { data: refreshRate, updateSetting } = useUpdateSetting<number>(Settings.lastFmRefreshRate)
@@ -85,6 +92,10 @@ const DevControls = ({
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
   }, [])
+
+  const handleShowDevImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShowDevImage(e.target.checked)
+  }
 
   useEffect(() => {
     if (isDragging) {
@@ -165,6 +176,19 @@ const DevControls = ({
           placeholder='LastFM interval'
         />
       </div>
+
+      {/* Dev Image Toggle */}
+      <div className='flex items-center gap-2'>
+        <input
+          type='checkbox'
+          checked={showDevImage}
+          onChange={handleShowDevImageChange}
+          id='show-dev-image'
+        />
+        <label htmlFor='show-dev-image' className='text-xs text-gray-300'>
+          Show Dev Image
+        </label>
+      </div>
     </motion.div>
   )
 }
@@ -176,6 +200,7 @@ const OverlayPage = () => {
   const { original, error } = useUpdateSetting()
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
+  const [showDevImage, setShowDevImage] = useState(true)
 
   const [block, setBlock] = useState<blockType>({
     matchId: null,
@@ -407,7 +432,12 @@ const OverlayPage = () => {
           overflow: hidden;
         }
       `}</style>
-      <DevControls block={block} setBlock={setBlock} />
+      <DevControls
+        block={block}
+        setBlock={setBlock}
+        showDevImage={showDevImage}
+        setShowDevImage={setShowDevImage}
+      />
       {showGiftAlerts && <GiftAlert />}
       <AnimatePresence>
         {connected !== true && (
@@ -493,7 +523,7 @@ const OverlayPage = () => {
           </RestrictFeature>
         </OverlayV2>
 
-        {isDev && (
+        {isDev && showDevImage && (
           <Image
             key='dev-image'
             width={width}
