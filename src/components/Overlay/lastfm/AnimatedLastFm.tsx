@@ -72,7 +72,7 @@ export const AnimatedLastFm = ({
     styles = {
       right: res({ w: 0 }),
       left: undefined,
-      width: res({ w: 350 }),
+      width: res({ w: 247 }),
       height: res({ h: 65 }),
     }
   }

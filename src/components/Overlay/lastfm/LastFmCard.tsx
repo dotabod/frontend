@@ -1,11 +1,10 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Typography } from 'antd'
+import { Typography, Skeleton } from 'antd'
 import clsx from 'clsx'
-import Image from 'next/image'
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 const { Text } = Typography
 
@@ -115,8 +114,33 @@ const LastFmCard = ({
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const res = useTransformRes()
   const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const fontSize = res({ h: compact ? 14 : 16 })
   const imageSize = res({ h: compact ? 64 : 128 })
+  const fallbackImage = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
+  const prevAlbumArtRef = useRef<string | undefined>('')
+
+  // Function to verify if the URL is valid
+  const isValidImageUrl = useCallback((url?: string) => {
+    if (!url) return false
+    return url.startsWith('http://') || url.startsWith('https://')
+  }, [])
+
+  // Function to decide what image src to use
+  const getImageSrc = useCallback(() => {
+    const src = imageError || !isValidImageUrl(track?.albumArt) ? fallbackImage : track?.albumArt
+    console.log('Calculated image src:', src)
+    return src
+  }, [imageError, isValidImageUrl, track?.albumArt])
+
+  useEffect(() => {
+    // Reset image states when album art changes
+    if (track?.albumArt !== prevAlbumArtRef.current) {
+      prevAlbumArtRef.current = track?.albumArt
+      setImageLoaded(false)
+      setImageError(false)
+    }
+  }, [track])
 
   if (!isEnabled || !track) return null
 
@@ -135,22 +159,45 @@ const LastFmCard = ({
         <AnimatePresence mode='wait'>
           {track.albumArt && (
             <motion.div
-              key={track.albumArt}
+              key={imageError ? 'fallback' : track.albumArt}
               className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: imageLoaded ? 1 : 0, scale: imageLoaded ? 1 : 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
             >
-              <Image
-                src={track.albumArt}
-                alt={`${track.album || 'Album'} cover`}
-                width={imageSize}
-                height={imageSize}
-                className={clsx('rounded object-cover', compact && 'rounded-sm')}
-                onLoad={() => setImageLoaded(true)}
-                onLoadingComplete={() => setImageLoaded(true)}
-              />
+              <div className='relative' style={{ width: imageSize, height: imageSize }}>
+                {!imageLoaded && !imageError && (
+                  <Skeleton.Image
+                    active
+                    style={{
+                      width: imageSize,
+                      height: imageSize,
+                      borderRadius: compact ? '0.125rem' : '0.375rem',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                    }}
+                  />
+                )}
+                <img
+                  src={getImageSrc()}
+                  alt={`${track.album || 'Album'} cover`}
+                  width={imageSize}
+                  height={imageSize}
+                  className={clsx(
+                    'rounded object-cover',
+                    compact && 'rounded-sm',
+                    !imageLoaded && 'opacity-0',
+                    'absolute top-0 left-0',
+                  )}
+                  onError={() => {
+                    setImageError(true)
+                    setImageLoaded(true) // Set to true to hide skeleton
+                  }}
+                  onLoad={() => setImageLoaded(true)}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
