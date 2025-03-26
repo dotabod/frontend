@@ -51,7 +51,8 @@ const ContentWrap = styled.div`
 `
 
 export const Clock = styled.div`
-  width: 276px;
+  width: 281px;
+  ${isDev ? 'border: 1px solid red;' : ''}
 `
 
 export const PickScreenV2 = () => {
@@ -59,8 +60,8 @@ export const PickScreenV2 = () => {
   const heroIndicesDire = [5, 6, 7, 8, 9]
 
   return (
-    <TopHud>
-      <TeamContainer>
+    <TopHud id='pick-screen-hud'>
+      <TeamContainer id='pick-screen-radiant-team'>
         {heroIndicesRadiant.map((heroId) => (
           <React.Fragment key={heroId}>
             <TopHudHero $isRadiant />
@@ -68,9 +69,9 @@ export const PickScreenV2 = () => {
         ))}
       </TeamContainer>
 
-      <Clock />
+      <Clock id='pick-screen-clock' />
 
-      <TeamContainer>
+      <TeamContainer id='pick-screen-dire-team'>
         {heroIndicesDire.map((heroId) => (
           <React.Fragment key={heroId}>
             <TopHudHero $isRadiant={false} />
