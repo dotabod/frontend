@@ -72,7 +72,8 @@ export const plans = [
       'Win probability overlay with !wp command',
       'Stream delay customization',
       'Auto OBS scene switcher',
-      'Auto Roshan and Aegis timers',
+      'Auto Roshan and Aegis overlay timers and commands',
+      'Last.fm integration (overlay and !song command)',
       'Advanced game events (Midas, Rosh events, Neutral items)',
       'Manager access',
       <span key='beta-features' className='flex items-center gap-1'>
