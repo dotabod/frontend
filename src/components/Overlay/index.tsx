@@ -29,7 +29,7 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
@@ -43,6 +43,9 @@ const OverlayPage = () => {
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
   const [showDevImage, setShowDevImage] = useState(true)
+  const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)
+  const isFirstLoad = useRef(true)
+  const blockTypeChangeTimer = useRef<NodeJS.Timeout | null>(null)
 
   const [block, setBlock] = useState<blockType>({
     matchId: null,
@@ -94,6 +97,34 @@ const OverlayPage = () => {
 
     setIsOldObs(isOldOBS)
   }, [])
+
+  // Handle logic for showing MainScreenOverlays with a delay on first load
+  useEffect(() => {
+    // Clear any existing timers on component unmount or when block type changes
+    if (blockTypeChangeTimer.current) {
+      clearTimeout(blockTypeChangeTimer.current)
+      blockTypeChangeTimer.current = null
+    }
+
+    if (isFirstLoad.current) {
+      // On first load, wait 10 seconds before showing MainScreenOverlays
+      if (connected) {
+        blockTypeChangeTimer.current = setTimeout(() => {
+          setShowMainScreenOverlay(true)
+          isFirstLoad.current = false // No longer first load
+        }, 10000)
+      }
+    } else {
+      // After first load, show immediately
+      setShowMainScreenOverlay(true)
+    }
+
+    return () => {
+      if (blockTypeChangeTimer.current) {
+        clearTimeout(blockTypeChangeTimer.current)
+      }
+    }
+  }, [connected])
 
   // Refresh the page every 5 minutes if the socket is disconnected
   useEffect(() => {
@@ -331,12 +362,14 @@ const OverlayPage = () => {
             />
           </RestrictFeature>
 
-          <MainScreenOverlays
-            key='main-screen-overlays'
-            block={block}
-            wl={wl}
-            rankImageDetails={rankImageDetails}
-          />
+          {showMainScreenOverlay && (
+            <MainScreenOverlays
+              key='main-screen-overlays'
+              block={block}
+              wl={wl}
+              rankImageDetails={rankImageDetails}
+            />
+          )}
 
           <PickScreenOverlays
             block={block}
