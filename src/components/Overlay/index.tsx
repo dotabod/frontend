@@ -313,21 +313,6 @@ const OverlayPage = () => {
       />
       {showGiftAlerts && <GiftAlert />}
       <AnimatePresence>
-        {connected !== true && (
-          <Center
-            key='connecting-spinner'
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: 9999,
-            }}
-          >
-            <Spin size='large' tip='Connecting to Dotabod...' />
-          </Center>
-        )}
         <motion.div
           key='not-detected'
           {...motionProps}
