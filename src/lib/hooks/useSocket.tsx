@@ -1,5 +1,5 @@
 import { Settings } from '@/lib/defaultSettings'
-import { type blockType, isDev } from '@/lib/devConsts'
+import type { blockType } from '@/lib/devConsts'
 import { fetcher } from '@/lib/fetcher'
 import { getMatchData, matchDataCache } from '@/lib/hooks/openDotaAPI'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -281,19 +281,16 @@ export const useSocket = ({
 
     socket.on('update-medal', (deets: RankType) => {
       updateLastReceived()
-      if (isDev) return
       setRankImageDetails(getRankImage(deets))
     })
 
     socket.on('update-wl', (records: wlType) => {
       updateLastReceived()
-      if (isDev) return
       setWL(records)
     })
 
     socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
       updateLastReceived()
-      if (isDev) return
       // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
       if (!chanceDetails) {
         return setRadiantWinChance((prev) => ({ ...prev, visible: false }))

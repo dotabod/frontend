@@ -603,6 +603,5 @@ a:not(.ant-btn) {
 body, html, #root, .ant-app, #__next {
 	height: 100%;
 	width: 100%;
-	overflow: hidden;
 	margin: 0;
 }

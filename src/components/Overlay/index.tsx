@@ -24,174 +24,16 @@ import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 import { Center } from '@mantine/core'
 import * as Sentry from '@sentry/nextjs'
-import { Alert, App, InputNumber, Select, Spin } from 'antd'
+import { Alert, App, Spin } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
-
-const DevControls = ({
-  block,
-  setBlock,
-  showDevImage,
-  setShowDevImage,
-}: {
-  block: blockType
-  setBlock: (block: blockType) => void
-  showDevImage: boolean
-  setShowDevImage: (showDevImage: boolean) => void
-}) => {
-  if (!isDev) return null
-
-  const { data: refreshRate, updateSetting } = useUpdateSetting<number>(Settings.lastFmRefreshRate)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-
-  const handleTeamChange = (value: 'radiant' | 'dire' | null) => {
-    setBlock({ ...block, team: value })
-  }
-
-  const handleTypeChange = (value: blockType['type']) => {
-    setBlock({ ...block, type: value })
-  }
-
-  const handleIntervalChange = (value: number | null) => {
-    if (value) {
-      updateSetting(value)
-    }
-  }
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      setIsDragging(true)
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      })
-    },
-    [position],
-  )
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (isDragging) {
-        setPosition({
-          x: e.clientX - dragStart.x,
-          y: e.clientY - dragStart.y,
-        })
-      }
-    },
-    [isDragging, dragStart],
-  )
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false)
-  }, [])
-
-  const handleShowDevImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setShowDevImage(e.target.checked)
-  }
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp])
-
-  return (
-    <motion.div
-      style={{
-        transform: `translate(${position.x}px, ${position.y}px)`,
-        position: 'fixed',
-        top: '1rem',
-        left: '1rem',
-        zIndex: 50,
-      }}
-      className='flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
-    >
-      <div
-        onMouseDown={handleMouseDown}
-        className='absolute top-0 right-0 left-0 h-6 bg-gray-800/50 rounded-t-lg flex items-center justify-center text-xs text-gray-400 cursor-move select-none'
-      >
-        Drag to move
-      </div>
-
-      {/* Block controls group */}
-      <div className='flex flex-col gap-2 mt-4'>
-        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
-          Block Controls
-        </div>
-        <div className='flex gap-2'>
-          <Select
-            value={block.team}
-            onChange={handleTeamChange}
-            options={[
-              { value: 'radiant', label: 'Radiant' },
-              { value: 'dire', label: 'Dire' },
-              { value: null, label: 'None' },
-            ]}
-            style={{ width: 120 }}
-            placeholder='Select team'
-          />
-          <Select
-            value={block.type}
-            onChange={handleTypeChange}
-            options={[
-              { value: 'picks', label: 'Picks' },
-              { value: 'playing', label: 'Playing' },
-              { value: 'strategy', label: 'Strategy' },
-              { value: 'strategy-2', label: 'Strategy 2' },
-              { value: 'spectator', label: 'Spectator' },
-              { value: null, label: 'None' },
-            ]}
-            style={{ width: 120 }}
-            placeholder='Select type'
-          />
-        </div>
-      </div>
-
-      {/* LastFM settings group */}
-      <div className='flex flex-col gap-2'>
-        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
-          LastFM Settings
-        </div>
-        <InputNumber
-          value={typeof refreshRate === 'number' ? refreshRate : 30}
-          onChange={handleIntervalChange}
-          min={1}
-          max={300}
-          style={{ width: 120 }}
-          addonAfter='sec'
-          placeholder='LastFM interval'
-        />
-      </div>
-
-      {/* Dev Image Toggle */}
-      <div className='flex items-center gap-2'>
-        <input
-          type='checkbox'
-          checked={showDevImage}
-          onChange={handleShowDevImageChange}
-          id='show-dev-image'
-        />
-        <label htmlFor='show-dev-image' className='text-xs text-gray-300'>
-          Show Dev Image
-        </label>
-      </div>
-    </motion.div>
-  )
-}
+import { DevControls, DevModeToggle } from './DevControls'
 
 const OverlayPage = () => {
   const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
@@ -201,6 +43,9 @@ const OverlayPage = () => {
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
   const [showDevImage, setShowDevImage] = useState(true)
+  const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)
+  const isFirstLoad = useRef(true)
+  const blockTypeChangeTimer = useRef<NodeJS.Timeout | null>(null)
 
   const [block, setBlock] = useState<blockType>({
     matchId: null,
@@ -252,6 +97,34 @@ const OverlayPage = () => {
 
     setIsOldObs(isOldOBS)
   }, [])
+
+  // Handle logic for showing MainScreenOverlays with a delay on first load
+  useEffect(() => {
+    // Clear any existing timers on component unmount or when block type changes
+    if (blockTypeChangeTimer.current) {
+      clearTimeout(blockTypeChangeTimer.current)
+      blockTypeChangeTimer.current = null
+    }
+
+    if (isFirstLoad.current) {
+      // On first load, wait 10 seconds before showing MainScreenOverlays
+      if (connected) {
+        blockTypeChangeTimer.current = setTimeout(() => {
+          setShowMainScreenOverlay(true)
+          isFirstLoad.current = false // No longer first load
+        }, 10000)
+      }
+    } else {
+      // After first load, show immediately
+      setShowMainScreenOverlay(true)
+    }
+
+    return () => {
+      if (blockTypeChangeTimer.current) {
+        clearTimeout(blockTypeChangeTimer.current)
+      }
+    }
+  }, [connected])
 
   // Refresh the page every 5 minutes if the socket is disconnected
   useEffect(() => {
@@ -489,12 +362,14 @@ const OverlayPage = () => {
             />
           </RestrictFeature>
 
-          <MainScreenOverlays
-            key='main-screen-overlays'
-            block={block}
-            wl={wl}
-            rankImageDetails={rankImageDetails}
-          />
+          {showMainScreenOverlay && (
+            <MainScreenOverlays
+              key='main-screen-overlays'
+              block={block}
+              wl={wl}
+              rankImageDetails={rankImageDetails}
+            />
+          )}
 
           <PickScreenOverlays
             block={block}
@@ -502,6 +377,10 @@ const OverlayPage = () => {
             rankImageDetails={rankImageDetails}
             wl={wl}
           />
+
+          <RestrictFeature feature='lastFmOverlay'>
+            <AnimatedLastFm block={block} />
+          </RestrictFeature>
         </OverlayV2>
 
         <InGameOverlays
@@ -517,12 +396,6 @@ const OverlayPage = () => {
           notablePlayers={notablePlayers}
         />
 
-        <OverlayV2>
-          <RestrictFeature feature='lastFmOverlay'>
-            <AnimatedLastFm block={block} />
-          </RestrictFeature>
-        </OverlayV2>
-
         {isDev && showDevImage && (
           <Image
             key='dev-image'
@@ -533,6 +406,7 @@ const OverlayPage = () => {
           />
         )}
       </AnimatePresence>
+      <DevModeToggle />
     </>
   )
 }

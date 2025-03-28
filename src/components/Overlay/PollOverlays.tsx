@@ -3,15 +3,29 @@ import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { WinProbability } from './WinProbability'
 
 export const PollOverlays = ({ pollData, betData, radiantWinChance, setPollData, setBetData }) => {
   const res = useTransformRes()
-
+  const [isVisible, setIsVisible] = useState(true)
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
   const { data: isWinProbEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
 
-  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled)) return null
+  useEffect(() => {
+    if (pollData || betData) {
+      setIsVisible(true)
+      const timer = setTimeout(() => {
+        setIsVisible(false)
+        setPollData(null)
+        setBetData(null)
+      }, 30000) // 30 seconds
+
+      return () => clearTimeout(timer)
+    }
+  }, [pollData, betData, setPollData, setBetData])
+
+  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled) || !isVisible) return null
 
   return (
     <div

@@ -13,7 +13,7 @@ const CommandDetail: Record<
     key?: keyof typeof commands
     alias: string[]
     allowed: 'mods' | 'all'
-    response: (props: Record<string, unknown>) => React.ReactNode
+    response: (props: Record<string, unknown> | null, all?: boolean) => React.ReactNode
   }
 > = {
   commandDisable: {

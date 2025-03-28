@@ -1,0 +1,949 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma-mongo/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URL")
+}
+
+type CardsFavoriteTeamPacked {
+  high     Int
+  low      Int
+  unsigned Boolean
+}
+
+type CardsRecentBattleCupVictory {
+  account_id    Int
+  division_id   Int
+  skill_level   Int
+  streak        Int
+  team_id       Int
+  tournament_id Int
+  trophy_id     Int
+  valid_until   Int
+  win_date      Int
+}
+
+type DelayedGamesMatch {
+  bans            DelayedGamesMatchBans[]
+  game_mode       Int
+  game_state      Int
+  game_time       Int
+  is_player_draft Boolean
+  league_id       Int
+  league_node_id  Int
+  lobby_type      Int
+  match_id        String
+  picks           DelayedGamesMatchPicks[]
+  server_steam_id String
+  start_timestamp Int
+  timestamp       Int
+}
+
+type DelayedGamesMatchBans {
+  hero Int
+  team Int
+}
+
+type DelayedGamesMatchPicks {
+  hero Int
+  team Int
+}
+
+type DelayedGamesPlayers {
+  accountid Int
+  heroid    Int
+}
+
+type DelayedGamesTeams {
+  net_worth     Int
+  players       DelayedGamesTeamsPlayers[]
+  score         Int
+  team_id       Int
+  team_logo     String
+  team_logo_url String
+  team_name     String
+  team_number   Int
+  team_tag      String
+}
+
+type DelayedGamesTeamsPlayers {
+  abilities     Int[]
+  accountid     Int
+  assists_count Int
+  death_count   Int
+  denies_count  Int
+  /// Multiple data types found: Float: 0%, Int: 100% out of 4480 sampled entries
+  gold          Json
+  heroid        Int
+  items         Int[]
+  kill_count    Int
+  level         Int
+  lh_count      Int
+  name          String
+  net_worth     Int
+  playerid      Int
+  team          Int
+  team_slot     Int
+  /// Multiple data types found: Float: 98.9%, Int: 1.1% out of 4480 sampled entries
+  x             Json
+  /// Multiple data types found: Float: 98.9%, Int: 1.1% out of 4480 sampled entries
+  y             Json
+}
+
+type DumpData {
+  abilities DumpDataAbilities
+  buildings DumpDataBuildings
+  events    DumpDataEvents[]
+  hero      DumpDataHero
+  items     DumpDataItems
+  map       DumpDataMap
+  player    DumpDataPlayer
+}
+
+type DumpDataAbilities {
+  ability0 DumpDataAbilitiesAbility0?
+  ability1 DumpDataAbilitiesAbility1?
+  ability2 DumpDataAbilitiesAbility2?
+  ability3 DumpDataAbilitiesAbility3?
+  ability4 DumpDataAbilitiesAbility4?
+  ability5 DumpDataAbilitiesAbility5?
+  ability6 DumpDataAbilitiesAbility6?
+  ability7 DumpDataAbilitiesAbility7?
+  ability8 DumpDataAbilitiesAbility8?
+}
+
+type DumpDataAbilitiesAbility0 {
+  ability_active  Boolean
+  can_cast        Boolean
+  charge_cooldown Int?
+  charges         Int?
+  cooldown        Int
+  level           Int
+  max_charges     Int?
+  name            String
+  passive         Boolean
+  ultimate        Boolean
+}
+
+type DumpDataAbilitiesAbility1 {
+  ability_active  Boolean
+  can_cast        Boolean
+  charge_cooldown Int?
+  charges         Int?
+  cooldown        Int
+  level           Int
+  max_charges     Int?
+  name            String
+  passive         Boolean
+  ultimate        Boolean
+}
+
+type DumpDataAbilitiesAbility2 {
+  ability_active  Boolean
+  can_cast        Boolean
+  charge_cooldown Int?
+  charges         Int?
+  cooldown        Int
+  level           Int
+  max_charges     Int?
+  name            String
+  passive         Boolean
+  ultimate        Boolean
+}
+
+type DumpDataAbilitiesAbility3 {
+  ability_active  Boolean
+  can_cast        Boolean
+  charge_cooldown Int?
+  charges         Int?
+  cooldown        Int
+  level           Int
+  max_charges     Int?
+  name            String
+  passive         Boolean
+  ultimate        Boolean
+}
+
+type DumpDataAbilitiesAbility4 {
+  ability_active  Boolean
+  can_cast        Boolean
+  charge_cooldown Int?
+  charges         Int?
+  cooldown        Int
+  level           Int
+  max_charges     Int?
+  name            String
+  passive         Boolean
+  ultimate        Boolean
+}
+
+type DumpDataAbilitiesAbility5 {
+  ability_active  Boolean
+  can_cast        Boolean
+  charge_cooldown Int?
+  charges         Int?
+  cooldown        Int
+  level           Int
+  max_charges     Int?
+  name            String
+  passive         Boolean
+  ultimate        Boolean
+}
+
+type DumpDataAbilitiesAbility6 {
+  ability_active Boolean
+  can_cast       Boolean
+  cooldown       Int
+  level          Int
+  name           String
+  passive        Boolean
+  ultimate       Boolean
+}
+
+type DumpDataAbilitiesAbility7 {
+  ability_active Boolean
+  can_cast       Boolean
+  cooldown       Int
+  level          Int
+  name           String
+  passive        Boolean
+  ultimate       Boolean
+}
+
+type DumpDataAbilitiesAbility8 {
+  ability_active Boolean
+  can_cast       Boolean
+  cooldown       Int
+  level          Int
+  name           String
+  passive        Boolean
+  ultimate       Boolean
+}
+
+type DumpDataBuildings {
+  dire    DumpDataBuildingsDire?
+  radiant DumpDataBuildingsRadiant?
+}
+
+type DumpDataBuildingsDire {
+  bad_rax_melee_bot       DumpDataBuildingsDireBadRaxMeleeBot?
+  bad_rax_melee_mid       DumpDataBuildingsDireBadRaxMeleeMid?
+  bad_rax_melee_top       DumpDataBuildingsDireBadRaxMeleeTop?
+  bad_rax_range_bot       DumpDataBuildingsDireBadRaxRangeBot?
+  bad_rax_range_mid       DumpDataBuildingsDireBadRaxRangeMid?
+  bad_rax_range_top       DumpDataBuildingsDireBadRaxRangeTop?
+  dota_badguys_fort       DumpDataBuildingsDireDotaBadguysFort?
+  dota_badguys_tower1_bot DumpDataBuildingsDireDotaBadguysTower1Bot?
+  dota_badguys_tower1_mid DumpDataBuildingsDireDotaBadguysTower1Mid?
+  dota_badguys_tower1_top DumpDataBuildingsDireDotaBadguysTower1Top?
+  dota_badguys_tower2_bot DumpDataBuildingsDireDotaBadguysTower2Bot?
+  dota_badguys_tower2_mid DumpDataBuildingsDireDotaBadguysTower2Mid?
+  dota_badguys_tower2_top DumpDataBuildingsDireDotaBadguysTower2Top?
+  dota_badguys_tower3_bot DumpDataBuildingsDireDotaBadguysTower3Bot?
+  dota_badguys_tower3_mid DumpDataBuildingsDireDotaBadguysTower3Mid?
+  dota_badguys_tower3_top DumpDataBuildingsDireDotaBadguysTower3Top?
+  dota_badguys_tower4_bot DumpDataBuildingsDireDotaBadguysTower4Bot?
+  dota_badguys_tower4_top DumpDataBuildingsDireDotaBadguysTower4Top?
+}
+
+type DumpDataBuildingsDireBadRaxMeleeBot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireBadRaxMeleeMid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireBadRaxMeleeTop {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireBadRaxRangeBot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireBadRaxRangeMid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireBadRaxRangeTop {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysFort {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower1Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower1Mid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower1Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower2Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower2Mid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower2Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower3Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower3Mid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower3Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower4Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsDireDotaBadguysTower4Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiant {
+  dota_goodguys_fort       DumpDataBuildingsRadiantDotaGoodguysFort?
+  dota_goodguys_tower1_bot DumpDataBuildingsRadiantDotaGoodguysTower1Bot?
+  dota_goodguys_tower1_mid DumpDataBuildingsRadiantDotaGoodguysTower1Mid?
+  dota_goodguys_tower1_top DumpDataBuildingsRadiantDotaGoodguysTower1Top?
+  dota_goodguys_tower2_bot DumpDataBuildingsRadiantDotaGoodguysTower2Bot?
+  dota_goodguys_tower2_mid DumpDataBuildingsRadiantDotaGoodguysTower2Mid?
+  dota_goodguys_tower2_top DumpDataBuildingsRadiantDotaGoodguysTower2Top?
+  dota_goodguys_tower3_bot DumpDataBuildingsRadiantDotaGoodguysTower3Bot?
+  dota_goodguys_tower3_mid DumpDataBuildingsRadiantDotaGoodguysTower3Mid?
+  dota_goodguys_tower3_top DumpDataBuildingsRadiantDotaGoodguysTower3Top?
+  dota_goodguys_tower4_bot DumpDataBuildingsRadiantDotaGoodguysTower4Bot?
+  dota_goodguys_tower4_top DumpDataBuildingsRadiantDotaGoodguysTower4Top?
+  good_rax_melee_bot       DumpDataBuildingsRadiantGoodRaxMeleeBot?
+  good_rax_melee_mid       DumpDataBuildingsRadiantGoodRaxMeleeMid?
+  good_rax_melee_top       DumpDataBuildingsRadiantGoodRaxMeleeTop?
+  good_rax_range_bot       DumpDataBuildingsRadiantGoodRaxRangeBot?
+  good_rax_range_mid       DumpDataBuildingsRadiantGoodRaxRangeMid?
+  good_rax_range_top       DumpDataBuildingsRadiantGoodRaxRangeTop?
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysFort {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower1Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower1Mid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower1Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower2Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower2Mid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower2Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower3Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower3Mid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower3Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower4Bot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantDotaGoodguysTower4Top {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantGoodRaxMeleeBot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantGoodRaxMeleeMid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantGoodRaxMeleeTop {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantGoodRaxRangeBot {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantGoodRaxRangeMid {
+  health     Int
+  max_health Int
+}
+
+type DumpDataBuildingsRadiantGoodRaxRangeTop {
+  health     Int
+  max_health Int
+}
+
+type DumpDataEvents {
+  bounty_value       Int?
+  event_type         String
+  game_time          Int
+  killed_by_team     String?
+  killer_player_id   Int?
+  player_id          Int?
+  receiver_player_id Int?
+  sender_player_id   Int?
+  snatched           Boolean?
+  team               String?
+  team_gold          Int?
+  tip_amount         Int?
+}
+
+type DumpDataHero {
+  aghanims_scepter Boolean?
+  aghanims_shard   Boolean?
+  alive            Boolean?
+  attributes_level Int?
+  break            Boolean?
+  buyback_cooldown Int?
+  buyback_cost     Int?
+  disarmed         Boolean?
+  facet            Int?
+  has_debuff       Boolean?
+  health           Int?
+  health_percent   Int?
+  hexed            Boolean?
+  id               Int
+  level            Int?
+  magicimmune      Boolean?
+  mana             Int?
+  mana_percent     Int?
+  max_health       Int?
+  max_mana         Int?
+  muted            Boolean?
+  name             String?
+  respawn_seconds  Int?
+  silenced         Boolean?
+  smoked           Boolean?
+  stunned          Boolean?
+  talent_1         Boolean?
+  talent_2         Boolean?
+  talent_3         Boolean?
+  talent_4         Boolean?
+  talent_5         Boolean?
+  talent_6         Boolean?
+  talent_7         Boolean?
+  talent_8         Boolean?
+  xp               Int?
+  xpos             Int?
+  ypos             Int?
+}
+
+type DumpDataItems {
+  neutral0            DumpDataItemsNeutral0?
+  neutral1            DumpDataItemsNeutral1?
+  preserved_neutral10 DumpDataItemsPreservedNeutral10?
+  preserved_neutral6  DumpDataItemsPreservedNeutral6?
+  preserved_neutral7  DumpDataItemsPreservedNeutral7?
+  preserved_neutral8  DumpDataItemsPreservedNeutral8?
+  preserved_neutral9  DumpDataItemsPreservedNeutral9?
+  slot0               DumpDataItemsSlot0?
+  slot1               DumpDataItemsSlot1?
+  slot2               DumpDataItemsSlot2?
+  slot3               DumpDataItemsSlot3?
+  slot4               DumpDataItemsSlot4?
+  slot5               DumpDataItemsSlot5?
+  slot6               DumpDataItemsSlot6?
+  slot7               DumpDataItemsSlot7?
+  slot8               DumpDataItemsSlot8?
+  stash0              DumpDataItemsStash0?
+  stash1              DumpDataItemsStash1?
+  stash2              DumpDataItemsStash2?
+  stash3              DumpDataItemsStash3?
+  stash4              DumpDataItemsStash4?
+  stash5              DumpDataItemsStash5?
+  teleport0           DumpDataItemsTeleport0?
+}
+
+type DumpDataItemsNeutral0 {
+  can_cast   Boolean?
+  cooldown   Int?
+  item_level Int?
+  name       String
+  passive    Boolean?
+  purchaser  Int?
+}
+
+type DumpDataItemsNeutral1 {
+  charges      Int?
+  item_charges Int?
+  item_level   Int?
+  name         String
+  passive      Boolean?
+  purchaser    Int?
+}
+
+type DumpDataItemsPreservedNeutral10 {
+  name String
+}
+
+type DumpDataItemsPreservedNeutral6 {
+  name String
+}
+
+type DumpDataItemsPreservedNeutral7 {
+  name String
+}
+
+type DumpDataItemsPreservedNeutral8 {
+  name String
+}
+
+type DumpDataItemsPreservedNeutral9 {
+  name String
+}
+
+type DumpDataItemsSlot0 {
+  ability_charges Int?
+  can_cast        Boolean?
+  charge_cooldown Int?
+  charges         Int?
+  contains_rune   String?
+  cooldown        Int?
+  item_charges    Int?
+  item_level      Int?
+  max_charges     Int?
+  name            String
+  passive         Boolean?
+  purchaser       Int?
+}
+
+type DumpDataItemsSlot1 {
+  ability_charges Int?
+  can_cast        Boolean?
+  charge_cooldown Int?
+  charges         Int?
+  contains_rune   String?
+  cooldown        Int?
+  item_charges    Int?
+  item_level      Int?
+  max_charges     Int?
+  name            String
+  passive         Boolean?
+  purchaser       Int?
+}
+
+type DumpDataItemsSlot2 {
+  ability_charges Int?
+  can_cast        Boolean?
+  charge_cooldown Int?
+  charges         Int?
+  contains_rune   String?
+  cooldown        Int?
+  item_charges    Int?
+  item_level      Int?
+  max_charges     Int?
+  name            String
+  passive         Boolean?
+  purchaser       Int?
+}
+
+type DumpDataItemsSlot3 {
+  ability_charges Int?
+  can_cast        Boolean?
+  charge_cooldown Int?
+  charges         Int?
+  contains_rune   String?
+  cooldown        Int?
+  item_charges    Int?
+  item_level      Int?
+  max_charges     Int?
+  name            String
+  passive         Boolean?
+  purchaser       Int?
+}
+
+type DumpDataItemsSlot4 {
+  ability_charges Int?
+  can_cast        Boolean?
+  charge_cooldown Int?
+  charges         Int?
+  contains_rune   String?
+  cooldown        Int?
+  item_charges    Int?
+  item_level      Int?
+  max_charges     Int?
+  name            String
+  passive         Boolean?
+  purchaser       Int?
+}
+
+type DumpDataItemsSlot5 {
+  ability_charges Int?
+  can_cast        Boolean?
+  charge_cooldown Int?
+  charges         Int?
+  contains_rune   String?
+  cooldown        Int?
+  item_charges    Int?
+  item_level      Int?
+  max_charges     Int?
+  name            String
+  passive         Boolean?
+  purchaser       Int?
+}
+
+type DumpDataItemsSlot6 {
+  can_cast      Boolean?
+  charges       Int?
+  contains_rune String?
+  cooldown      Int?
+  item_charges  Int?
+  item_level    Int?
+  name          String
+  passive       Boolean?
+  purchaser     Int?
+}
+
+type DumpDataItemsSlot7 {
+  can_cast      Boolean?
+  charges       Int?
+  contains_rune String?
+  cooldown      Int?
+  item_charges  Int?
+  item_level    Int?
+  name          String
+  passive       Boolean?
+  purchaser     Int?
+}
+
+type DumpDataItemsSlot8 {
+  can_cast      Boolean?
+  charges       Int?
+  contains_rune String?
+  cooldown      Int?
+  item_charges  Int?
+  item_level    Int?
+  name          String
+  passive       Boolean?
+  purchaser     Int?
+}
+
+type DumpDataItemsStash0 {
+  can_cast     Boolean?
+  charges      Int?
+  cooldown     Int?
+  item_charges Int?
+  item_level   Int?
+  name         String
+  passive      Boolean?
+  purchaser    Int?
+}
+
+type DumpDataItemsStash1 {
+  can_cast     Boolean?
+  charges      Int?
+  cooldown     Int?
+  item_charges Int?
+  item_level   Int?
+  name         String
+  passive      Boolean?
+  purchaser    Int?
+}
+
+type DumpDataItemsStash2 {
+  can_cast     Boolean?
+  charges      Int?
+  cooldown     Int?
+  item_charges Int?
+  item_level   Int?
+  name         String
+  passive      Boolean?
+  purchaser    Int?
+}
+
+type DumpDataItemsStash3 {
+  name String
+}
+
+type DumpDataItemsStash4 {
+  name String
+}
+
+type DumpDataItemsStash5 {
+  name String
+}
+
+type DumpDataItemsTeleport0 {
+  can_cast     Boolean?
+  charges      Int?
+  cooldown     Int?
+  item_charges Int?
+  item_level   Int?
+  name         String
+  passive      Boolean?
+  purchaser    Int?
+}
+
+type DumpDataMap {
+  clock_time             Int
+  customgamename         String
+  daytime                Boolean
+  dire_score             Int
+  game_state             String
+  game_time              Int
+  matchid                String
+  name                   String
+  nightstalker_night     Boolean
+  paused                 Boolean
+  radiant_score          Int
+  ward_purchase_cooldown Int
+  win_team               String
+}
+
+type DumpDataPlayer {
+  accountid             String
+  activity              String
+  assists               Int
+  commands_issued       Int
+  deaths                Int
+  denies                Int
+  gold                  Int
+  gold_from_creep_kills Int
+  gold_from_hero_kills  Int
+  gold_from_income      Int
+  gold_from_shared      Int
+  gold_reliable         Int
+  gold_unreliable       Int
+  gpm                   Int
+  kill_list             DumpDataPlayerKillList
+  kill_streak           Int
+  kills                 Int
+  last_hits             Int
+  name                  String
+  player_slot           Int
+  steamid               String
+  team_name             String
+  team_slot             Int
+  xpm                   Int
+}
+
+type DumpDataPlayerKillList {
+  victimid_0 Int?
+  victimid_1 Int?
+  victimid_2 Int?
+  victimid_3 Int?
+  victimid_4 Int?
+  victimid_5 Int?
+  victimid_6 Int?
+  victimid_7 Int?
+  victimid_8 Int?
+  victimid_9 Int?
+}
+
+type DumpMatchPlayers {
+  accountid   Int
+  heroid      Int?
+  player_name String?
+  /// Multiple data types found: Float: 1.7%, Int: 98.3% out of 9350 sampled entries
+  playerid    Json?
+  rank        Int?
+}
+
+model cards {
+  id                        String                       @id @default(auto()) @map("_id") @db.ObjectId
+  account_id                Int
+  badge_points              Int
+  createdAt                 DateTime                     @db.Date
+  event_id                  Int
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  event_points              Json?
+  favorite_team_packed      CardsFavoriteTeamPacked
+  /// Field referred in an index, but found no data to define the type.
+  id_                       Json?                        @map("id")
+  is_plus_subscriber        Boolean
+  leaderboard_rank          Int
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  leaderboard_rank_core     Json?
+  lifetime_games            Int
+  plus_original_start_date  Int
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  previous_rank_tier        Json?
+  rank_tier                 Int
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  rank_tier_mmr_type        Json?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  rank_tier_peak            Json?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  rank_tier_score           Json?
+  recent_battle_cup_victory CardsRecentBattleCupVictory?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  slots                     Json?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  title                     Json?
+
+  @@index([createdAt(sort: Desc)], map: "createdAt_-1")
+  @@index([id], map: "id_1")
+}
+
+model commandstats {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  channel   String
+  channelId String
+  command   String
+  count     Int
+  date      String
+
+  @@index([channel, command, date], map: "channel_1_command_1_date_1_autocreated")
+}
+
+model delayedGames {
+  id          String                @id @default(auto()) @map("_id") @db.ObjectId
+  average_mmr Int?
+  createdAt   DateTime              @db.Date
+  match       DelayedGamesMatch
+  players     DelayedGamesPlayers[]
+  spectators  Int?
+  teams       DelayedGamesTeams[]
+
+  @@index([match.match_id], map: "match.match_id_1")
+  @@index([teams.players.accountid], map: "teams.players.accountid_1")
+  @@index([createdAt(sort: Desc)], map: "createdAt_-1")
+}
+
+model dump {
+  id           String             @id @default(auto()) @map("_id") @db.ObjectId
+  data         DumpData
+  matchId      String
+  matchPlayers DumpMatchPlayers[]
+  status       String
+  timestamp    Float
+}
+
+model gameModes {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  id_  Int    @map("id")
+  name String
+
+  @@index([id], map: "id_1")
+}
+
+model heroes {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  custom         Json?
+  id_            Int    @map("id")
+  localized_name String
+
+  @@index([id], map: "id_1")
+  @@index([custom, localized_name], map: "custom_1_localized_name_1")
+}
+
+model medals {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  rank_tier Int
+
+  @@index([rank_tier], map: "rank_tier_1")
+}
+
+model notablePlayers {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// Multiple data types found: Float: 0.1%, Int: 99.9% out of 1000 sampled entries
+  account_id        Json
+  addedBy           String?
+  avatar            String?
+  avatarfull        String?
+  avatarmedium      String?
+  channel           String?
+  cheese            Int?
+  country_code      String?
+  createdAt         DateTime? @db.Date
+  fantasy_role      Int?
+  fh_unavailable    Boolean?
+  full_history_time String?
+  is_locked         Boolean?
+  is_pro            Boolean?
+  last_login        String?
+  last_match_time   String?
+  loccountrycode    String?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  locked_until      Json?
+  name              String
+  personaname       String?
+  plus              Boolean?
+  profileurl        String?
+  steamid           String?
+  team_id           Int?
+  team_name         String?
+  team_tag          String?
+
+  @@index([account_id], map: "account_id_1")
+  @@index([channel], map: "channel_1")
+}
