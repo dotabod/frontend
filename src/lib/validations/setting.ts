@@ -42,6 +42,7 @@ const settingsSchema = {
       matchOutcome: z.object({ enabled: z.boolean() }),
       commandsReady: z.object({ enabled: z.boolean() }),
       neutralItems: z.object({ enabled: z.boolean() }),
+      dotapatch: z.object({ enabled: z.boolean() }),
     })
     .partial(),
   commandAPM: z.boolean(),

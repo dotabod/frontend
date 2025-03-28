@@ -311,6 +311,25 @@ export const chatterInfo = {
       </span>
     ),
   },
+  dotapatch: {
+    tooltip: 'When a new Dota 2 patch is available',
+    category: CATEGORIES.Event,
+    message: (
+      <span className='inline space-x-2'>
+        <Image
+          width={22}
+          height={22}
+          alt='PogChamp'
+          className='inline align-middle'
+          src='https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/dark/2.0'
+        />
+        <span>
+          A new Dota 2 patch has been released: 7.38c. Check out the patch notes at
+          https://www.dota2.com/patches
+        </span>
+      </span>
+    ),
+  },
 }
 
 const groupedChatterInfo = Object.entries(chatterInfo).reduce((acc, [key, value]) => {
