@@ -14,11 +14,17 @@
     "start": "next start",
     "lint": "next lint",
     "parse": "i18next -c ./i18next-parser.config.mjs",
-    "postinstall": "prisma generate",
+    "postinstall": "bun run generate:all",
     "knip": "knip",
     "test": "vitest",
     "test:watch": "vitest watch",
-    "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' vitest run --coverage"
+    "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' vitest run --coverage",
+    "generate:postgres": "doppler run -- bun prisma generate",
+    "generate:mongo": "doppler run -- bun prisma generate --schema=./prisma-mongo/schema.prisma",
+    "generate:all": "bun run generate:postgres && bun run generate:mongo",
+    "mongo:pull": "doppler run -- bun prisma db pull --schema=./prisma-mongo/schema.prisma",
+    "mongo:push": "doppler run -- bun prisma db push --schema=./prisma-mongo/schema.prisma",
+    "mongo:studio": "doppler run -- bun prisma studio --schema=./prisma-mongo/schema.prisma"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {

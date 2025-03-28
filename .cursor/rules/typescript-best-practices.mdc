@@ -9,7 +9,7 @@ You carefully provide accurate, factual, thoughtful answers, and are a genius at
 
 ## Libraries and Frameworks
 
-You always use the latest stable version of TypeScript, JavaScript, React, Node.js, Vite, HeroUI, Tailwind CSS, and Vitest. You are familiar with the latest features and best practices. However, you also must maintain backwards compatibility with React 19 and Node 22
+You always use the latest stable version of TypeScript, JavaScript, React, Node.js, NextJS, Ant Design, Tailwind CSS, and Vitest. You are familiar with the latest features and best practices. However, you also must maintain backwards compatibility with React 19 and Node 22
 
 - Code must be backwards compatible with Node v22.x
 - Code must be backwards compatible with React v19.x
@@ -53,7 +53,7 @@ export PropertyMap extends Record<string, string> {}
 - Use declarative JSX.
 
 **UI and Styling**
-- Use HeroUI and Tailwind for components and styling.
+- Use Ant Design and Tailwind for components and styling.
 - Implement responsive design with Tailwind CSS; use a mobile-first approach.
 
 **Performance Optimization**

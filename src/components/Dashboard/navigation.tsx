@@ -44,6 +44,7 @@ export const navigation = [
     name: 'Features',
     key: PARENT_KEYS.FEATURES,
     icon: SparklesIcon,
+    new: true,
     children: [
       {
         name: 'Main',
@@ -56,6 +57,11 @@ export const navigation = [
       {
         name: 'Chat',
         href: '/dashboard/features/chat',
+      },
+      {
+        name: 'Notable Players',
+        href: '/dashboard/notable-players',
+        new: true,
       },
       {
         name: 'Advanced',
@@ -84,7 +90,6 @@ export const navigation = [
     name: 'Account',
     key: PARENT_KEYS.ACCOUNT,
     icon: ShieldCheck,
-    new: true,
     children: [
       {
         name: 'Billing',
@@ -95,7 +100,6 @@ export const navigation = [
         name: 'Gift Pro',
         href: '/gift',
         icon: Gift,
-        new: true,
       },
       {
         name: 'Data',

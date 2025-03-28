@@ -1,6 +1,6 @@
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import { Settings } from '@/lib/defaultSettings'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import type { blockType } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import clsx from 'clsx'
 import * as Flags from 'mantine-flagpack'
@@ -21,13 +21,12 @@ export const NotablePlayers = ({
   block,
 }: {
   players: NotablePlayer[] | null
-  block: any
+  block: blockType
 }) => {
-  const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
   const { data: showFlags } = useUpdateSetting(Settings.notablePlayersOverlayFlags)
 
-  if (!isEnabled || !['spectator', 'playing'].includes(block.type)) {
+  if (!isEnabled || !['spectator', 'playing'].includes(block.type || '')) {
     return null
   }
 

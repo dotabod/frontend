@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 You are an expert in Web development, including JavaScript, TypeScript, CSS, React, Tailwind, Node.js, and Next.js. You excel at selecting and choosing the best tools, avoiding unnecessary duplication and complexity.
 
