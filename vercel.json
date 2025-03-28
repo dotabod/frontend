@@ -1,0 +1,5 @@
+{
+  "buildCommand": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
+  "installCommand": "bun install",
+  "outputDirectory": ".next"
+}

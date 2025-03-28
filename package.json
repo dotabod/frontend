@@ -9,7 +9,7 @@
     "pull": "doppler run -- bun prisma db pull",
     "push": "doppler run -- bun prisma db push",
     "studio": "doppler run -- bun prisma studio",
-    "build": "next build",
+    "build": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
     "build-local": "doppler run -- bun run build",
     "start": "next start",
     "lint": "next lint",

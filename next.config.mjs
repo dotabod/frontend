@@ -21,6 +21,26 @@ const nextConfig = {
       },
     },
   },
+  // Fix for Prisma engine not found error
+  output: 'standalone',
+  outputFileTracing: true,
+  // Tell Next.js to copy the Prisma engines to the standalone output
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/core-linux-x64-gnu',
+      'node_modules/@swc/core-linux-x64-musl',
+      'node_modules/esbuild-linux-64/bin',
+    ],
+  },
+  outputFileTracingIncludes: {
+    '*': [
+      'node_modules/.prisma/**/*',
+      'node_modules/.prisma-mongo/**/*',
+      'node_modules/@prisma/client/**/*',
+      '.prisma/client/**/*',
+      '.prisma-mongo/client/**/*',
+    ],
+  },
   transpilePackages: [
     'antd',
     '@ant-design',

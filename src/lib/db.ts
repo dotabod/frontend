@@ -9,8 +9,15 @@ declare let global: { prisma: PrismaClient }
 
 let prisma: PrismaClient
 
-if (process.env.VERCEL_ENV === 'production') {
-  prisma = new PrismaClient()
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient({
+    // Add this configuration to solve the engine not found issue
+    datasourceUrl: process.env.DATABASE_URL,
+  })
+  prismaMongo = new PrismaMongo({
+    // Add this configuration to solve the engine not found issue
+    datasourceUrl: process.env.MONGODB_URL,
+  })
 } else {
   if (!global.prisma) {
     global.prisma = new PrismaClient()
