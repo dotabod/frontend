@@ -331,16 +331,7 @@ function Plan({
     } finally {
       setRedirectingToCheckout(false)
     }
-  }, [
-    session,
-    tier,
-    activePeriod,
-    subscription,
-    isLifetimePlan,
-    modal,
-    hasCreditBalance,
-    formattedCreditBalance,
-  ])
+  }, [session, tier, activePeriod, subscription, isLifetimePlan, modal])
 
   // Function to handle crypto interest vote
   const handleCryptoInterest = async () => {
@@ -585,7 +576,7 @@ function Plan({
                 size='small'
                 icon={<Bitcoin size={16} />}
                 onClick={handleCryptoInterest}
-                loading={loadingCryptoInterest}
+                loading={session ? loadingCryptoInterest : false}
                 className={clsx(
                   'text-xs',
                   featured
