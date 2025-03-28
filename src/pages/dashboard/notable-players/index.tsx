@@ -21,12 +21,12 @@ import {
   Popconfirm,
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import type { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
+import type { NotablePlayer } from '@/lib/db'
 import { Card } from '@/ui/card'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import * as Flags from 'mantine-flagpack'
 
-const { Text, Title } = Typography
+const { Text } = Typography
 
 // Form schema for creating/updating a notable player
 const notablePlayerSchema = z.object({
@@ -40,9 +40,7 @@ type NotablePlayerFormValues = z.infer<typeof notablePlayerSchema>
 const NotablePlayersPage: NextPageWithLayout = () => {
   const { data: session } = useSession()
   const [isLoading, setIsLoading] = useState(true)
-  const [notablePlayers, setNotablePlayers] = useState<
-    NonNullable<Awaited<ReturnType<PrismaMongo['notablePlayers']['findFirst']>>>[]
-  >([])
+  const [notablePlayers, setNotablePlayers] = useState<NotablePlayer[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null)
@@ -77,9 +75,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
     setIsModalOpen(true)
   }
 
-  const handleOpenEditModal = (
-    player: NonNullable<Awaited<ReturnType<PrismaMongo['notablePlayers']['findFirst']>>>,
-  ) => {
+  const handleOpenEditModal = (player: NotablePlayer) => {
     form.setFieldsValue({
       account_id: player.account_id,
       name: player.name,
@@ -162,9 +158,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
     }
   }
 
-  const columns: ColumnsType<
-    NonNullable<Awaited<ReturnType<PrismaMongo['notablePlayers']['findFirst']>>>
-  > = [
+  const columns: ColumnsType<NotablePlayer> = [
     {
       title: 'Name',
       dataIndex: 'name',
