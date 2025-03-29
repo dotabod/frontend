@@ -13,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    // Find the user's linked Steam account
+    // Find the user's primary linked Steam account
     const user = await prisma.user.findUnique({
       where: {
         id: session.user.id,
@@ -23,36 +23,48 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    if (!user?.steam32Id) {
-      return res.status(200).json({ linked: false })
-    }
+    const primarySteam32Id = user?.steam32Id
 
-    // Get the Steam account details
-    const steamAccount = await prisma.steamAccount.findUnique({
+    // Get all Steam accounts linked to this user
+    // This includes both primary and secondary accounts
+    const steamAccounts = await prisma.steamAccount.findMany({
       where: {
-        steam32Id: user.steam32Id,
+        OR: [{ userId: session.user.id }, { connectedUserIds: { has: session.user.id } }],
       },
       select: {
         steam32Id: true,
         name: true,
+        userId: true,
       },
     })
 
-    if (!steamAccount) {
+    if (!steamAccounts || steamAccounts.length === 0) {
       return res.status(200).json({ linked: false })
     }
 
+    // Format the accounts data
+    const linkedAccounts = steamAccounts.map((account) => ({
+      steam32Id: account.steam32Id.toString(),
+      name: account.name,
+      isPrimary: account.steam32Id === primarySteam32Id,
+    }))
+
     return res.status(200).json({
       linked: true,
-      steam32Id: steamAccount.steam32Id.toString(),
-      profileData: {
-        name: steamAccount.name,
-        id: steamAccount.steam32Id.toString(),
-      },
+      accounts: linkedAccounts,
+      primaryAccount: primarySteam32Id
+        ? {
+            steam32Id: primarySteam32Id.toString(),
+            profileData: {
+              name: steamAccounts.find((a) => a.steam32Id === primarySteam32Id)?.name || 'Unknown',
+              id: primarySteam32Id.toString(),
+            },
+          }
+        : null,
     })
   } catch (error) {
     captureException(error)
-    console.error('Error fetching linked Steam account:', error)
+    console.error('Error fetching linked Steam accounts:', error)
     return res.status(500).json({ message: 'Internal server error' })
   }
 }

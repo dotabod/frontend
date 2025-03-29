@@ -117,8 +117,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })
 
         if (existingSteamAccount) {
-          // If it exists but belongs to a different user, link it to the current user as well
-          if (existingSteamAccount.userId !== session.user.id) {
+          // If it exists but doesn't include this user yet, add them to connectedUserIds
+          if (
+            existingSteamAccount.userId !== session.user.id &&
+            !existingSteamAccount.connectedUserIds.includes(session.user.id)
+          ) {
             await prisma.steamAccount.update({
               where: {
                 steam32Id: Number.parseInt(steam32Id, 10),
@@ -139,8 +142,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               userId: session.user.id,
             },
           })
+        }
 
-          // Update the user record with the steam32Id
+        // If user doesn't have a primary account yet, set this one as primary
+        const user = await prisma.user.findUnique({
+          where: {
+            id: session.user.id,
+          },
+          select: {
+            steam32Id: true,
+          },
+        })
+
+        if (!user?.steam32Id) {
           await prisma.user.update({
             where: {
               id: session.user.id,
