@@ -4,6 +4,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
+import { ranks } from '@/lib/ranks'
 
 interface OpenDotaProfile {
   profile: {
@@ -85,37 +86,25 @@ function estimateMMR(leaderboard_rank: number, region: Region): number {
   return Math.round(baseMMR)
 }
 
-// Estimate MMR from rank tier
-function estimateMMRFromRankTier(rankTier: number): number {
-  if (!rankTier) return 0
+export function rankTierToMmr(rankTier: string | number) {
+  if (!Number(rankTier)) {
+    return 0
+  }
+  const intRankTier = Number(rankTier)
 
-  // Extract medal and stars
-  const medal = Math.floor(rankTier / 10)
-  const stars = rankTier % 10
+  // Just gonna guess an immortal without standing is 6k mmr
+  if (intRankTier > 77) {
+    return 6000
+  }
 
-  // Uncalibrated
-  if (medal === 0) return 0
+  // Floor to 5
+  const stars = intRankTier % 10 > 5 ? 5 : intRankTier % 10
+  const rank = ranks.find((rank) =>
+    rank.image.startsWith(`${Math.floor(Number(intRankTier / 10))}${stars}`),
+  )
 
-  // Calculate based on ranges from ranks.ts
-  const baseMMR =
-    {
-      1: 0, // Herald
-      2: 770, // Guardian
-      3: 1540, // Crusader
-      4: 2310, // Archon
-      5: 3080, // Legend
-      6: 3850, // Ancient
-      7: 4630, // Divine
-      8: 5630, // Immortal
-    }[medal] || 0
-
-  // Add MMR for stars (roughly 154 MMR per star for most ranks)
-  // Divine has 200 MMR per star
-  const starMMR = medal === 7 ? 200 : 154
-  const additionalMMR = (stars - 1) * starMMR
-
-  // Return middle value for the rank tier
-  return baseMMR + (stars ? additionalMMR + starMMR / 2 : 0)
+  // Middle of range
+  return ((rank?.range[0] ?? 0) + (rank?.range[1] ?? 0)) / 2
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -157,7 +146,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Estimate MMR from rank tier if available
-    const estimatedMMR = profile.rank_tier ? estimateMMRFromRankTier(profile.rank_tier) : 0
+    const estimatedMMR = profile.rank_tier ? rankTierToMmr(profile.rank_tier) : 0
 
     // Update the steam account with the new MMR and leaderboard rank
     const updatedAccount = await prisma.steamAccount.update({
