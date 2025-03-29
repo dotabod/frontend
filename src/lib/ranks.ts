@@ -121,3 +121,26 @@ export function getRankImage(rank: RankType) {
     leaderboard: rank.standing,
   }
 }
+
+export function getRankTitle(rankTier: string | number): string {
+  if (!Number(rankTier)) {
+    return 'Uncalibrated'
+  }
+  const intRankTier = Number(rankTier)
+
+  // Immortal rank
+  if (intRankTier > 77) {
+    return 'Immortal'
+  }
+
+  // Floor to 5
+  // Extract the stars value from the rank tier (last digit of the number)
+  // If the stars value is greater than 5, cap it at 5 since ranks only go up to 5 stars
+  // For example: rank tier 53 means Legend 3, where 5 is the medal and 3 is the stars
+  const stars = intRankTier % 10 > 5 ? 5 : intRankTier % 10
+  const rank = ranks.find((rank) =>
+    rank.image.startsWith(`${Math.floor(Number(intRankTier / 10))}${stars}`),
+  )
+
+  return rank?.title ?? 'Unknown'
+}
