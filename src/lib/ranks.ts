@@ -122,8 +122,8 @@ export function getRankImage(rank: RankType) {
   }
 }
 
-export function getRankTitle(rankTier: string | number): string {
-  if (!Number(rankTier)) {
+export function getRankTitle(rankTier?: string | number): string {
+  if (!rankTier || Number(rankTier) === 0) {
     return 'Uncalibrated'
   }
   const intRankTier = Number(rankTier)

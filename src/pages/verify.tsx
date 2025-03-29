@@ -22,8 +22,8 @@ import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { getRankTitle } from '@/lib/ranks'
 import Link from 'next/link'
-import { StarOutlined, StarFilled, DeleteOutlined } from '@ant-design/icons'
-import { CheckCircle2, Circle } from 'lucide-react'
+import { StarOutlined, StarFilled, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import TwitchChat from '@/components/TwitchChat'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -175,9 +175,9 @@ const VerifyPage: NextPageWithLayout = () => {
           if (steam32Id) {
             // Show success notification
             notification.success({
-              message: 'Steam Account Verified',
+              message: 'Dotabod Verified!',
               description:
-                'Your Steam account has been successfully verified and linked to your profile.',
+                'Your Steam account has been successfully verified and linked to your profile',
             })
 
             // Track successful verification
@@ -412,7 +412,6 @@ const VerifyPage: NextPageWithLayout = () => {
 
   // Step 2: Redirect to Steam authentication
   const handleSteamLogin = () => {
-    setLoading(true)
     setActionLoading((prev) => ({ ...prev, linkSteam: true }))
 
     // Track attempt to authenticate with Steam
@@ -458,7 +457,7 @@ const VerifyPage: NextPageWithLayout = () => {
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <Container>
-        <div className='flex flex-col items-center justify-center min-h-[60vh]'>
+        <div className='flex flex-col min-h-[60vh]'>
           <Skeleton.Avatar active size={80} shape='circle' />
           <Skeleton.Input active style={{ width: 200, marginTop: 16 }} />
         </div>
@@ -470,9 +469,9 @@ const VerifyPage: NextPageWithLayout = () => {
   if (checkingAccount) {
     return (
       <Container>
-        <div className='flex flex-col items-center justify-center min-h-[60vh]'>
+        <div className='flex flex-col min-h-[60vh]'>
           <Title level={2} className='mb-6'>
-            Steam Verification
+            Dotabod Verification
           </Title>
           <Card className='w-full shadow-sm'>
             <Skeleton active avatar paragraph={{ rows: 4 }} />
@@ -484,9 +483,9 @@ const VerifyPage: NextPageWithLayout = () => {
 
   return (
     <Container>
-      <div className='flex flex-col items-center justify-center min-h-[60vh]'>
+      <div className='flex flex-col min-h-[60vh]'>
         <Title level={2} className='mb-6'>
-          Steam Verification
+          Dotabod Verification
         </Title>
 
         {/* Step 1: Twitch Authentication Status */}
@@ -509,26 +508,35 @@ const VerifyPage: NextPageWithLayout = () => {
           </Card>
         )}
 
+        {linkedAccounts.length > 0 && (
+          <Alert
+            type='success'
+            message="You're Dotabod Verified!"
+            description='Your Steam account has been successfully linked to Dotabod.'
+            showIcon
+            className='mb-4!'
+          />
+        )}
+
         {/* Step 2: Steam Authentication */}
-        <Card className='w-full shadow-sm hover:shadow-md transition-shadow'>
-          {!linkedAccounts.length && (
-            <div className='flex items-center mb-2!'>
-              <div className='mr-2 flex-shrink-0'>
-                {linkedAccounts.length > 0 ? (
-                  <span className='text-green-500'>
-                    <CheckCircle2 className='inline' />
-                  </span>
-                ) : (
-                  <span className='text-gray-500'>
-                    <Circle className='inline' />
-                  </span>
-                )}
-              </div>
-              <Title level={4} className='!m-0'>
-                Steam Authentication
-              </Title>
-            </div>
-          )}
+        <Card
+          title='Steam Authentication'
+          className='w-full shadow-sm hover:shadow-md transition-shadow'
+        >
+          <p>
+            {linkedAccounts.length > 0
+              ? 'You have successfully linked your Steam account to Dotabod. Now Dotabod will respond with your rank.'
+              : 'Link your Steam account to become Dotabod Verified.'}
+          </p>
+
+          <TwitchChat
+            command={`!rank ${session?.user?.name}`}
+            responses={[
+              linkedAccounts.length > 0
+                ? `@${session?.user?.name} is ${getRankTitle(linkedAccounts?.[0]?.profile?.rank_tier)}`
+                : `@${session?.user?.name}'s rank is unknown. Become Dotabod verified to get your rank!`,
+            ]}
+          />
 
           {linkedAccounts.length > 0 ? (
             <div>
@@ -579,7 +587,7 @@ const VerifyPage: NextPageWithLayout = () => {
                         </div>
                       }
                       title={
-                        <div className='flex items-center gap-2'>
+                        <div className='flex items-center gap-2 flex-wrap'>
                           <Text strong>
                             {account.name ||
                               account.profile?.profile.personaname ||
@@ -590,9 +598,12 @@ const VerifyPage: NextPageWithLayout = () => {
                               Primary
                             </Tag>
                           )}
+                          <Tag color='blue' icon={<CheckCircleOutlined />} className='ml-2'>
+                            Verified
+                          </Tag>
                         </div>
                       }
-                      description={`Steam32 ID: ${account.steam32Id}`}
+                      description={<>Steam ID: {account.steam32Id}</>}
                     />
 
                     {account.loading ? (
@@ -615,7 +626,7 @@ const VerifyPage: NextPageWithLayout = () => {
                         </div>
                       </Space>
                     ) : (
-                      <Text type='secondary'>Rank unavailable</Text>
+                      <Text type='secondary'>Uncalibrated</Text>
                     )}
                   </List.Item>
                 )}
@@ -674,13 +685,7 @@ const VerifyPage: NextPageWithLayout = () => {
               </div>
             </div>
           ) : (
-            <div className='flex flex-col gap-4'>
-              <Alert
-                type='info'
-                message='Link your Steam account to complete verification.'
-                className='mb-2'
-              />
-
+            <div className='flex flex-col gap-4 mt-4'>
               {loading ? (
                 <Skeleton.Button active size='large' style={{ width: '100%', height: 40 }} />
               ) : (
@@ -688,9 +693,8 @@ const VerifyPage: NextPageWithLayout = () => {
                   type='primary'
                   size='large'
                   onClick={handleSteamLogin}
-                  loading={loading}
-                  disabled={status !== 'authenticated'}
-                  className='mt-4 px-8 w-full md:w-auto'
+                  loading={loading || actionLoading.linkSteam}
+                  disabled={loading || actionLoading.linkSteam}
                 >
                   Authenticate with Steam
                 </Button>
@@ -736,8 +740,9 @@ VerifyPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       seo={{
-        title: 'Verify Account | Dotabod',
-        description: 'Verify your Twitch and Steam accounts to use Dotabod.',
+        title: 'Dotabod Verification | Dotabod',
+        description:
+          'Verify your Twitch and Steam accounts to become Dotabod Verified and unlock all features.',
         canonicalUrl: 'https://dotabod.com/verify',
       }}
     >

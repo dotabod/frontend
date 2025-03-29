@@ -94,7 +94,9 @@ export function rankTierToMmr(rankTier: string | number) {
 
   // Just gonna guess an immortal without standing is 6k mmr
   if (intRankTier > 77) {
-    return 6000
+    // Get the highest MMR from the ranks array
+    const highestRankMMR = ranks[ranks.length - 1]?.range[1] || 5619
+    return highestRankMMR + 50
   }
 
   // Floor to 5
