@@ -8,7 +8,6 @@ import {
   Button,
   Typography,
   Alert,
-  Spin,
   App,
   Divider,
   Tag,
@@ -16,6 +15,7 @@ import {
   Avatar,
   Space,
   Modal,
+  Skeleton,
 } from 'antd'
 import { captureException } from '@sentry/nextjs'
 import { useTrack } from '@/lib/track'
@@ -23,6 +23,7 @@ import { Card } from '@/ui/card'
 import { getRankTitle } from '@/lib/ranks'
 import Link from 'next/link'
 import { StarOutlined, StarFilled, DeleteOutlined } from '@ant-design/icons'
+import { CheckCircle2, Circle } from 'lucide-react'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -458,8 +459,8 @@ const VerifyPage: NextPageWithLayout = () => {
     return (
       <Container>
         <div className='flex flex-col items-center justify-center min-h-[60vh]'>
-          <Spin size='large' />
-          <Paragraph className='mt-4'>Connecting to Twitch...</Paragraph>
+          <Skeleton.Avatar active size={80} shape='circle' />
+          <Skeleton.Input active style={{ width: 200, marginTop: 16 }} />
         </div>
       </Container>
     )
@@ -470,8 +471,12 @@ const VerifyPage: NextPageWithLayout = () => {
     return (
       <Container>
         <div className='flex flex-col items-center justify-center min-h-[60vh]'>
-          <Spin size='large' />
-          <Paragraph className='mt-4'>Checking for linked accounts...</Paragraph>
+          <Title level={2} className='mb-6'>
+            Steam Verification
+          </Title>
+          <Card className='w-full shadow-sm'>
+            <Skeleton active avatar paragraph={{ rows: 4 }} />
+          </Card>
         </div>
       </Container>
     )
@@ -481,7 +486,7 @@ const VerifyPage: NextPageWithLayout = () => {
     <Container>
       <div className='flex flex-col items-center justify-center min-h-[60vh]'>
         <Title level={2} className='mb-6'>
-          Account Verification
+          Steam Verification
         </Title>
 
         {/* Step 1: Twitch Authentication Status */}
@@ -507,15 +512,19 @@ const VerifyPage: NextPageWithLayout = () => {
         {/* Step 2: Steam Authentication */}
         <Card className='w-full shadow-sm hover:shadow-md transition-shadow'>
           {!linkedAccounts.length && (
-            <div className='flex items-center mb-2'>
+            <div className='flex items-center mb-2!'>
               <div className='mr-2 flex-shrink-0'>
                 {linkedAccounts.length > 0 ? (
-                  <span className='text-green-500 text-2xl'>✓</span>
+                  <span className='text-green-500'>
+                    <CheckCircle2 className='inline' />
+                  </span>
                 ) : (
-                  <span className='text-gray-500 text-2xl'>○</span>
+                  <span className='text-gray-500'>
+                    <Circle className='inline' />
+                  </span>
                 )}
               </div>
-              <Title level={4} className='m-0'>
+              <Title level={4} className='!m-0'>
                 Steam Authentication
               </Title>
             </div>
@@ -587,7 +596,7 @@ const VerifyPage: NextPageWithLayout = () => {
                     />
 
                     {account.loading ? (
-                      <Spin size='small' />
+                      <Skeleton.Avatar active size={56} shape='circle' />
                     ) : account.profile && account.profile.rank_tier > 0 ? (
                       <Space align='center'>
                         <img
@@ -626,9 +635,42 @@ const VerifyPage: NextPageWithLayout = () => {
 
                 <Link href='/dashboard'>
                   <Button type='primary' size='large' className='px-8'>
-                    Go to Dashboard
+                    Go to Streamer's Dashboard
                   </Button>
                 </Link>
+              </div>
+            </div>
+          ) : loading ? (
+            // Skeleton placeholder for loading state
+            <div>
+              <Divider orientation='left'>Linked Accounts</Divider>
+              <List
+                className='max-w-3xl'
+                itemLayout='horizontal'
+                dataSource={[1, 2]}
+                renderItem={(item) => (
+                  <List.Item
+                    key={item}
+                    actions={[
+                      <Skeleton.Button key='action1' active style={{ width: 120 }} />,
+                      <Skeleton.Button key='action2' active style={{ width: 80 }} />,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={
+                        <div className='flex items-center'>
+                          <Skeleton.Avatar active size='large' />
+                        </div>
+                      }
+                      title={<Skeleton.Input active style={{ width: 200 }} />}
+                      description={<Skeleton.Input active style={{ width: 120 }} />}
+                    />
+                    <Skeleton.Avatar active size={56} shape='circle' />
+                  </List.Item>
+                )}
+              />
+              <div className='mt-6 flex'>
+                <Skeleton.Button active size='large' style={{ width: 200 }} />
               </div>
             </div>
           ) : (
@@ -639,16 +681,20 @@ const VerifyPage: NextPageWithLayout = () => {
                 className='mb-2'
               />
 
-              <Button
-                type='primary'
-                size='large'
-                onClick={handleSteamLogin}
-                loading={loading}
-                disabled={status !== 'authenticated'}
-                className='mt-4 px-8 w-full md:w-auto'
-              >
-                Authenticate with Steam
-              </Button>
+              {loading ? (
+                <Skeleton.Button active size='large' style={{ width: '100%', height: 40 }} />
+              ) : (
+                <Button
+                  type='primary'
+                  size='large'
+                  onClick={handleSteamLogin}
+                  loading={loading}
+                  disabled={status !== 'authenticated'}
+                  className='mt-4 px-8 w-full md:w-auto'
+                >
+                  Authenticate with Steam
+                </Button>
+              )}
             </div>
           )}
         </Card>
