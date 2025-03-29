@@ -60,17 +60,27 @@ interface LinkedAccount {
 }
 
 /**
- * Fetch player profile from OpenDota API
+ * Update player profile in our database and fetch OpenDota data from our backend
  */
-async function fetchOpenDotaProfile(accountId: number): Promise<OpenDotaProfile | null> {
+async function updatePlayerProfile(steam32Id: string | number): Promise<OpenDotaProfile | null> {
   try {
-    const response = await fetch(`https://api.opendota.com/api/players/${accountId}`)
+    const response = await fetch('/api/steam/update-profile-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ steam32Id }),
+    })
+
     if (!response.ok) {
-      throw new Error(`OpenDota API error: ${response.status}`)
+      throw new Error('Failed to update profile data')
     }
-    return (await response.json()) as OpenDotaProfile | null
+
+    const data = await response.json()
+    return data.profile as OpenDotaProfile
   } catch (error) {
-    throw new Error('Failed to fetch player profile')
+    console.error('Error updating profile data:', error)
+    return null
   }
 }
 
@@ -215,7 +225,7 @@ const VerifyPage: NextPageWithLayout = () => {
     handleSteamCallback()
   }, [router.query, status, router, notification, track])
 
-  // Fetch player profile from OpenDota API
+  // Fetch player profile from OpenDota API through our backend
   const fetchPlayerProfile = async (accountId: number) => {
     if (!accountId) return
 
@@ -227,7 +237,8 @@ const VerifyPage: NextPageWithLayout = () => {
     )
 
     try {
-      const profile = await fetchOpenDotaProfile(accountId)
+      // Use our backend API to fetch and save profile data in one call
+      const profile = await updatePlayerProfile(accountId)
 
       // Update account with profile data
       setLinkedAccounts((prevAccounts) =>
