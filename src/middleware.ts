@@ -10,6 +10,7 @@ export const config = {
   matcher: [
     '/',
     '/login',
+    '/verify',
     '/overlay/:path*',
     '/api/:path*',
     '/dashboard/:path*',

@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs'
 import { App, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect } from 'react'
+import { type ReactElement, useEffect, useCallback } from 'react'
 
 const Login: NextPageWithLayout = () => {
   const { status } = useSession()
@@ -14,7 +14,7 @@ const Login: NextPageWithLayout = () => {
   const router = useRouter()
   const { notification } = App.useApp()
 
-  const showError = () => {
+  const showError = useCallback(() => {
     Sentry.captureMessage('Login error', {
       tags: {
         page: 'login',
@@ -40,7 +40,7 @@ const Login: NextPageWithLayout = () => {
         </span>
       ),
     })
-  }
+  }, [notification])
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -68,7 +68,7 @@ const Login: NextPageWithLayout = () => {
         ),
       })
     }
-  }, [router.asPath, status])
+  }, [router.asPath, status, notification, showError])
 
   if (status === 'authenticated') return null
 
@@ -86,6 +86,12 @@ const Login: NextPageWithLayout = () => {
           </div>
           <div>
             <UserAuthForm />
+            <Typography.Paragraph style={{ textAlign: 'center', marginTop: '1rem' }}>
+              Need to verify your Steam account?{' '}
+              <a href='/verify' style={{ fontWeight: 'bold' }}>
+                Click here
+              </a>
+            </Typography.Paragraph>
           </div>
         </div>
       </div>
