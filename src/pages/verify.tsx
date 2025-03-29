@@ -94,6 +94,7 @@ const VerifyPage: NextPageWithLayout = () => {
   const [unlinkModalVisible, setUnlinkModalVisible] = useState(false)
   const { notification, modal } = App.useApp()
   const track = useTrack()
+  const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
 
   // Step 1: Authenticate with Twitch if not already authenticated
   useEffect(() => {
@@ -276,6 +277,9 @@ const VerifyPage: NextPageWithLayout = () => {
   // Set an account as primary
   const setPrimaryAccount = async (steam32Id: string) => {
     try {
+      // Set loading state for this specific action
+      setActionLoading((prev) => ({ ...prev, [`setPrimary_${steam32Id}`]: true }))
+
       const response = await fetch('/api/steam/set-primary-account', {
         method: 'POST',
         headers: {
@@ -306,6 +310,9 @@ const VerifyPage: NextPageWithLayout = () => {
         message: 'Update Failed',
         description: 'Failed to update your primary Steam account. Please try again.',
       })
+    } finally {
+      // Clear loading state
+      setActionLoading((prev) => ({ ...prev, [`setPrimary_${steam32Id}`]: false }))
     }
   }
 
@@ -323,17 +330,26 @@ const VerifyPage: NextPageWithLayout = () => {
     if (!accountToUnlink) return
 
     try {
+      // Set loading state for unlink modal buttons
+      setActionLoading((prev) => ({ ...prev, unlinkModal: true }))
       await unlinkAccount(accountToUnlink)
       setUnlinkModalVisible(false)
       setAccountToUnlink(null)
     } catch (error) {
       console.error('Error in unlink confirmation:', error)
+    } finally {
+      setActionLoading((prev) => ({ ...prev, unlinkModal: false }))
     }
   }
 
   // Unlink a Steam account
   const unlinkAccount = async (steam32Id: string) => {
     try {
+      // Set loading state for this specific action (if not already set by modal)
+      if (!actionLoading.unlinkModal) {
+        setActionLoading((prev) => ({ ...prev, [`unlink_${steam32Id}`]: true }))
+      }
+
       const response = await fetch('/api/steam/unlink-account', {
         method: 'POST',
         headers: {
@@ -346,10 +362,34 @@ const VerifyPage: NextPageWithLayout = () => {
         throw new Error('Failed to unlink account')
       }
 
-      // Remove the account from the list
-      setLinkedAccounts((prevAccounts) =>
-        prevAccounts.filter((account) => account.steam32Id !== steam32Id),
-      )
+      // Check if we're unlinking a primary account and have other accounts left
+      const unlinkingPrimary = linkedAccounts.find((a) => a.steam32Id === steam32Id)?.isPrimary
+      const remainingAccounts = linkedAccounts.filter((account) => account.steam32Id !== steam32Id)
+
+      if (unlinkingPrimary && remainingAccounts.length > 0) {
+        // Set the first remaining account as the new primary
+        const newPrimaryId = remainingAccounts[0].steam32Id
+
+        // Update the accounts list to mark new primary
+        setLinkedAccounts(
+          remainingAccounts.map((account, index) => ({
+            ...account,
+            isPrimary: index === 0, // Make the first account primary
+          })),
+        )
+
+        // Also update on the server
+        await fetch('/api/steam/set-primary-account', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ steam32Id: newPrimaryId }),
+        })
+      } else {
+        // Just remove the account from the list
+        setLinkedAccounts(remainingAccounts)
+      }
 
       notification.success({
         message: 'Account Unlinked',
@@ -361,12 +401,18 @@ const VerifyPage: NextPageWithLayout = () => {
         message: 'Unlink Failed',
         description: 'Failed to unlink your Steam account. Please try again.',
       })
+    } finally {
+      // Clear loading state if not handled by modal
+      if (!actionLoading.unlinkModal) {
+        setActionLoading((prev) => ({ ...prev, [`unlink_${steam32Id}`]: false }))
+      }
     }
   }
 
   // Step 2: Redirect to Steam authentication
   const handleSteamLogin = () => {
     setLoading(true)
+    setActionLoading((prev) => ({ ...prev, linkSteam: true }))
 
     // Track attempt to authenticate with Steam
     track('steam_auth_started')
@@ -439,58 +485,44 @@ const VerifyPage: NextPageWithLayout = () => {
         </Title>
 
         {/* Step 1: Twitch Authentication Status */}
-        <Card className='w-full mb-6'>
-          <div className='flex items-center mb-2'>
-            <div className='mr-2 flex-shrink-0'>
-              {status === 'authenticated' ? (
-                <span className='text-green-500 text-2xl'>✓</span>
-              ) : (
+        {status !== 'authenticated' && (
+          <Card className='w-full mb-6'>
+            <div className='flex items-center mb-2'>
+              <div className='mr-2 flex-shrink-0'>
                 <span className='text-gray-500 text-2xl'>○</span>
-              )}
+              </div>
+              <Title level={4} className='m-0'>
+                Twitch Authentication
+              </Title>
             </div>
-            <Title level={4} className='m-0'>
-              Twitch Authentication
-            </Title>
-          </div>
 
-          {status === 'authenticated' ? (
-            <Alert
-              type='success'
-              message={`Successfully authenticated as ${session?.user?.name}`}
-              className='mb-2'
-            />
-          ) : (
             <Alert
               type='info'
               message='Please authenticate with Twitch to continue.'
               className='mb-2'
             />
-          )}
-        </Card>
+          </Card>
+        )}
 
         {/* Step 2: Steam Authentication */}
         <Card className='w-full shadow-sm hover:shadow-md transition-shadow'>
-          <div className='flex items-center mb-2'>
-            <div className='mr-2 flex-shrink-0'>
-              {linkedAccounts.length > 0 ? (
-                <span className='text-green-500 text-2xl'>✓</span>
-              ) : (
-                <span className='text-gray-500 text-2xl'>○</span>
-              )}
+          {!linkedAccounts.length && (
+            <div className='flex items-center mb-2'>
+              <div className='mr-2 flex-shrink-0'>
+                {linkedAccounts.length > 0 ? (
+                  <span className='text-green-500 text-2xl'>✓</span>
+                ) : (
+                  <span className='text-gray-500 text-2xl'>○</span>
+                )}
+              </div>
+              <Title level={4} className='m-0'>
+                Steam Authentication
+              </Title>
             </div>
-            <Title level={4} className='m-0'>
-              Steam Authentication
-            </Title>
-          </div>
+          )}
 
           {linkedAccounts.length > 0 ? (
             <div>
-              <Alert
-                type='success'
-                message={`Successfully linked ${linkedAccounts.length > 1 ? `${linkedAccounts.length} Steam accounts` : 'Steam account'}`}
-                className='mb-4'
-              />
-
               <Divider orientation='left'>Linked Accounts</Divider>
 
               <List
@@ -507,6 +539,8 @@ const VerifyPage: NextPageWithLayout = () => {
                           type='text'
                           icon={<StarOutlined />}
                           onClick={() => setPrimaryAccount(account.steam32Id)}
+                          loading={!!actionLoading[`setPrimary_${account.steam32Id}`]}
+                          disabled={!!actionLoading[`setPrimary_${account.steam32Id}`]}
                           title='Set as primary account'
                         >
                           Set as Primary
@@ -518,6 +552,8 @@ const VerifyPage: NextPageWithLayout = () => {
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => showUnlinkConfirmation(account.steam32Id)}
+                        loading={!!actionLoading[`unlink_${account.steam32Id}`]}
+                        disabled={!!actionLoading[`unlink_${account.steam32Id}`]}
                         title='Unlink this account'
                       >
                         Unlink
@@ -582,6 +618,8 @@ const VerifyPage: NextPageWithLayout = () => {
                   size='large'
                   onClick={handleSteamLogin}
                   icon={<span className='mr-1'>+</span>}
+                  loading={loading || actionLoading.linkSteam}
+                  disabled={loading || actionLoading.linkSteam}
                 >
                   Link Another Account
                 </Button>
@@ -623,7 +661,14 @@ const VerifyPage: NextPageWithLayout = () => {
           onCancel={() => setUnlinkModalVisible(false)}
           okText='Unlink'
           cancelText='Cancel'
-          okButtonProps={{ danger: true }}
+          okButtonProps={{
+            danger: true,
+            loading: actionLoading.unlinkModal,
+            disabled: actionLoading.unlinkModal,
+          }}
+          cancelButtonProps={{
+            disabled: actionLoading.unlinkModal,
+          }}
         >
           <p>Are you sure you want to unlink this Steam account?</p>
           {accountToUnlink &&
