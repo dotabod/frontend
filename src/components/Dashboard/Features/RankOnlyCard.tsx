@@ -76,7 +76,6 @@ export const RankOnlyCard = () => {
           settingKey={Settings.rankOnly}
           checked={isEnabled}
           onChange={(checked) => {
-            console.log(checked, info?.enabled)
             setIsEnabled(checked)
 
             const updatedInfo = {
@@ -84,10 +83,7 @@ export const RankOnlyCard = () => {
               minimumRank: info?.minimumRank || 'Herald',
               minimumRankTier: info?.minimumRankTier || 10,
             }
-            // Only update if the enabled state is actually changing
-            if (info?.enabled !== checked) {
-              updateInfo(updatedInfo)
-            }
+            updateInfo(updatedInfo)
           }}
           label='Enable rank only mode'
         />
