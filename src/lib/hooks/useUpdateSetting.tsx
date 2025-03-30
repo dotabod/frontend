@@ -47,8 +47,8 @@ export const useUpdate = ({
     }
 
     let isNow = newValue
-    if (newValue === true) isNow = 'enabled'
-    if (newValue === false) isNow = 'disabled'
+    if (newValue === true || newValue?.enabled === true) isNow = 'enabled'
+    if (newValue === false || newValue?.enabled === false) isNow = 'disabled'
 
     const updateFn = async (data) => {
       const response = await fetch(customPath || path, {
@@ -92,6 +92,13 @@ export const useUpdateLocale = (props?: UpdateProps) => {
   })
 
   return { data, loading, update: updateSetting }
+}
+
+// Define type for rankOnly settings
+type RankOnlyInfo = {
+  enabled: boolean
+  minimumRank: string
+  minimumRankTier: number
 }
 
 interface UpdateSettingResult<T = boolean> {
@@ -152,6 +159,17 @@ export function useUpdateSetting<T = boolean>(
         return { ...data, mmr: newValue.value }
       }
 
+      if (key === Settings.rankOnly) {
+        return {
+          ...data,
+          rankOnly: {
+            enabled: newValue.value.enabled,
+            minimumRank: newValue.value.minimumRank,
+            minimumRankTier: newValue.value.minimumRankTier,
+          },
+        }
+      }
+
       // Handle chatter settings differently
       if (key?.startsWith('chatters.')) {
         const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
@@ -208,6 +226,21 @@ export function useUpdateSetting<T = boolean>(
       update(
         { value: { [chatterKey]: { enabled: newValue } } },
         `/api/settings/${Settings.chatters}`,
+      )
+      return
+    }
+
+    if (key === Settings.rankOnly) {
+      const rankInfo = newValue as RankOnlyInfo
+      update(
+        {
+          value: {
+            enabled: rankInfo.enabled,
+            minimumRank: rankInfo.minimumRank,
+            minimumRankTier: rankInfo.minimumRankTier,
+          },
+        },
+        `/api/settings/${Settings.rankOnly}`,
       )
       return
     }

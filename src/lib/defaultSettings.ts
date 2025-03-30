@@ -42,6 +42,7 @@ export const commands = {
   commandDotabod: true,
   commandMute: true,
   commandLastFm: false,
+  commandOnly: false,
 }
 export type CommandKeys = keyof typeof commands
 
@@ -149,6 +150,11 @@ export const defaultSettings = {
     interested: false,
     tier: 'PRO',
     transactionType: 'RECURRING',
+  },
+  rankOnly: {
+    enabled: false,
+    minimumRank: 'Herald',
+    minimumRankTier: 0,
   },
   ...commands,
 }

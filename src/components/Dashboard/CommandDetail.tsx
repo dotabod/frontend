@@ -11,7 +11,7 @@ const CommandDetail: Record<
     cmd: string
     // The existance means they can toggle it on and off
     key?: keyof typeof commands
-    alias: string[]
+    alias?: string[]
     allowed: 'mods' | 'all'
     response: (props: Record<string, unknown> | null, all?: boolean) => React.ReactNode
   }
@@ -599,21 +599,6 @@ const CommandDetail: Record<
       />
     ),
   },
-  commandLastFm: {
-    key: 'commandLastFm',
-    title: 'Last.fm Now Playing',
-    description: 'Show what music you are currently listening to on Last.fm.',
-    cmd: '!song',
-    alias: ['music'],
-    allowed: 'all',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        command='!song'
-        response='Now playing: Artist Name - Track Title (Album Name)'
-      />
-    ),
-  },
   commandFacet: {
     key: 'commandFacet',
     title: 'Facet Information',
@@ -702,6 +687,51 @@ const CommandDetail: Record<
         command='!aghs'
         response='Juggernaut aghs: Swiftslash · Performs a short Omnislash for 1 seconds.'
       />
+    ),
+  },
+  commandLastFm: {
+    key: 'commandLastFm',
+    title: 'Last.fm Now Playing',
+    description: 'Show what music you are currently listening to on Last.fm.',
+    cmd: '!song',
+    alias: ['music'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!song'
+        response='Now playing: Artist Name - Track Title (Album Name)'
+      />
+    ),
+  },
+  commandOnly: {
+    key: 'commandOnly',
+    title: 'Verified mode',
+    description:
+      'Enables or disables verified mode. When enabled, only users with the specified rank or higher can chat.',
+    cmd: '!only',
+    allowed: 'mods',
+    response: (props) => (
+      <div className='space-y-6'>
+        <TwitchChat
+          {...props}
+          modOnly
+          command='!only immortal'
+          response='Verified mode is now enabled. Only Immortal or higher ranks can chat.'
+        />
+        <TwitchChat
+          {...props}
+          modOnly
+          command='!only off'
+          response='Verified mode is now disabled. Everyone can chat.'
+        />
+        <TwitchChat
+          {...props}
+          modOnly
+          command='!only status'
+          response='Verified mode is currently enabled. Only Immortal+ ranks can chat.'
+        />
+      </div>
     ),
   },
 }

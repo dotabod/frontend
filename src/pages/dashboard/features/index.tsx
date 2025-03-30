@@ -8,6 +8,7 @@ import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>
@@ -22,6 +23,7 @@ const FeaturesPage: NextPageWithLayout = () => (
       <StreamDelayCard />
       <MmrTrackerCard />
       <BetsCard />
+      <RankOnlyCard />
       <IdeaCard />
     </div>
   </>

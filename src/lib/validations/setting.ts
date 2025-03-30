@@ -66,6 +66,7 @@ const settingsSchema = {
   commandLGS: z.boolean(),
   commandSteam: z.boolean(),
   commandLastFm: z.boolean(),
+  commandOnly: z.boolean(),
   commandWL: z.boolean(),
   commandXPM: z.boolean(),
   'minimap-blocker': z.boolean(),
@@ -116,6 +117,20 @@ const settingsSchema = {
   lastFmOverlay: z.boolean(),
   lastFmUsername: z.string().max(45).optional(),
   lastFmRefreshRate: z.number().min(5).max(60),
+  rankOnly: z.object({
+    enabled: z.boolean(),
+    minimumRank: z.enum([
+      'Herald',
+      'Guardian',
+      'Crusader',
+      'Archon',
+      'Legend',
+      'Ancient',
+      'Divine',
+      'Immortal',
+    ]),
+    minimumRankTier: z.number().min(0).max(100),
+  }),
 }
 
 type SettingKeys = keyof typeof settingsSchema

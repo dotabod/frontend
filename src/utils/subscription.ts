@@ -50,7 +50,8 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
   showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
   'mmr-tracker': SUBSCRIPTION_TIERS.FREE,
-
+  commandOnly: SUBSCRIPTION_TIERS.PRO,
+  rankOnly: SUBSCRIPTION_TIERS.PRO,
   commandLastFm: SUBSCRIPTION_TIERS.PRO,
   lastFmUsername: SUBSCRIPTION_TIERS.PRO,
   lastFmOverlay: SUBSCRIPTION_TIERS.PRO,
