@@ -48,6 +48,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       requiresRefresh = true
     }
 
+    // For now, always return no refresh
+    // TODO: Remove this once we have a way to check if the user has the correct scopes
+    requiresRefresh = false
+
     return res.status(200).json(requiresRefresh)
   } catch (error) {
     captureException(error)
