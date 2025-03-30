@@ -2,21 +2,15 @@ import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { GIFT_PRICE_IDS } from '@/utils/subscription'
-
-// Initialize the profanity matcher
-const profanityMatcher = new RegExpMatcher({
-  ...englishDataset.build(),
-  ...englishRecommendedTransformers,
-})
+import { detect } from 'curse-filter'
 
 // Function to check for profanity in text
 const checkForProfanity = (text: string | undefined): boolean => {
   if (!text) return false
-  return profanityMatcher.hasMatch(text)
+  return detect(text)
 }
 
 // Function to sanitize input

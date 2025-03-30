@@ -5,17 +5,11 @@ import { Alert, App, Button, Form, Input, Space, Typography, InputNumber, Toolti
 import { useState, useEffect } from 'react'
 import { Card } from '@/ui/card'
 import Link from 'next/link'
-import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity'
+import { detect } from 'curse-filter'
 import TwitchChat from '@/components/TwitchChat'
 import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscriptionAlert'
 
 const { Title, Text, Paragraph } = Typography
-
-// Initialize the profanity matcher
-const profanityMatcher = new RegExpMatcher({
-  ...englishDataset.build(),
-  ...englishRecommendedTransformers,
-})
 
 // Define the form values type
 interface GiftFormValues {
@@ -53,10 +47,8 @@ export const GiftSubscriptionForm = ({
   // Function to check for profanity in text
   const checkForProfanity = (text: string | undefined): boolean => {
     if (!text) return false
-    return profanityMatcher.hasMatch(text)
+    return detect(text)
   }
-
-  // Function to sanitize input (as an extra precaution)
 
   // Set the recipient username from props
   useEffect(() => {

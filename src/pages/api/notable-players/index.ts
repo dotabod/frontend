@@ -6,11 +6,17 @@ import { prismaMongo } from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+import { detect } from 'curse-filter'
 
 // Define validation schema for creating a notable player
 const createNotablePlayerSchema = z.object({
-  account_id: z.number(),
-  name: z.string().min(1),
+  name: z
+    .string()
+    .min(1)
+    .refine((name) => !name || !detect(name), {
+      message: 'Name contains inappropriate language. Please revise it.',
+    }),
+  account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
   country_code: z.string().max(3).optional(),
 })
 
