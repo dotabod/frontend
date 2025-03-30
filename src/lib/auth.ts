@@ -20,6 +20,7 @@ const chatBotScopes = [
   'user:manage:whispers',
   'moderator:read:chat_settings', // To check follower mode, emoji mode, etc
   'moderator:manage:chat_messages', // For the !plebs command
+  'moderator:manage:banned_users', // For !only command
   'moderator:manage:chat_settings', // To update slow mode, follower mode, etc
 ].join(' ')
 
