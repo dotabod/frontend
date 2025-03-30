@@ -4,7 +4,6 @@ import { captureException } from '@sentry/nextjs'
 import { get } from '@vercel/edge-config'
 import type { NextRequestWithAuth } from 'next-auth/middleware'
 import { withAuth } from 'next-auth/middleware'
-import { getSession } from 'next-auth/react'
 import { NextResponse } from 'next/server'
 
 export const config = {
@@ -41,7 +40,7 @@ export async function middleware(req: NextRequestWithAuth) {
     const isInMaintenanceMode = await get<boolean>('isInMaintenanceMode')
 
     // If is in maintenance mode, point the url pathname to the maintenance page
-    if (isInMaintenanceMode) {
+    if (isInMaintenanceMode && process.env.VERCEL_ENV === 'production') {
       // Check if the path starts with 'overlay' and return an empty page
       if (req.nextUrl.pathname.startsWith('/overlay')) {
         return new NextResponse(null, { status: 200 })
@@ -56,23 +55,29 @@ export async function middleware(req: NextRequestWithAuth) {
     // but log the error to the console
     console.error(error)
   }
+
   if (req.nextUrl.pathname.startsWith('/dashboard') || req.nextUrl.pathname.endsWith('/overlay')) {
-    const requestForNextAuth = {
-      headers: {
-        cookie: req.headers.get('cookie') ?? '',
+    // Use the token in the request directly to check role
+    // withAuth already adds the token and user to the request
+    const authResult = await withAuth(req, {
+      callbacks: {
+        authorized: ({ token }) => {
+          // If token exists but user is a 'chatter', deny access to dashboard
+          if (token?.role === 'chatter') {
+            return false
+          }
+          // Otherwise authorize if token exists
+          return !!token
+        },
       },
-    }
+    })
 
-    const session = await getSession({ req: requestForNextAuth })
-
-    // Check if user has 'chatter' scope - if so, restrict dashboard access
-    if (session?.user?.role === 'chatter') {
-      // Redirect chatters away from dashboard to the home page
+    // If authorization failed and the user is a chatter, redirect to verify with error
+    if (!authResult && req.nextauth?.token?.role === 'chatter') {
       return NextResponse.redirect(new URL('/verify?error=chatter', req.url))
     }
 
-    // Proceed with the authentication middleware for /dashboard paths
-    return withAuth(req)
+    return authResult
   }
 
   return NextResponse.next()
