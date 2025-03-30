@@ -34,7 +34,7 @@ const TwitchUser = ({
       <Link
         className='flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105'
         rel='noreferrer'
-        onClick={onClick}
+        onClick={userName === 'You?' ? onClick : undefined}
         href={userName === 'You?' ? '#' : `/${userName}`}
         target='_blank'
       >
