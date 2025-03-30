@@ -64,7 +64,6 @@
     "next-auth": "4.24.11",
     "next-mdx-remote": "^5.0.0",
     "obs-websocket-js": "^5.0.6",
-    "obscenity": "^0.4.3",
     "postcss-focus-visible": "^10.0.1",
     "react": "19.0.0",
     "react-countdown": "^2.3.6",
