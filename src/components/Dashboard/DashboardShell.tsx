@@ -22,6 +22,7 @@ import { navigation } from './navigation'
 import GiftNotification from '@/components/Subscription/GiftNotification'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
+import { useFeatureAccess } from '@/hooks/useSubscription'
 
 const { Header, Sider, Content } = Layout
 
@@ -140,6 +141,7 @@ export default function DashboardShell({
   const pageImage = seo?.ogImage || defaultOgImage
   const pageUrl = seo?.canonicalUrl || defaultUrl
   const pageType = seo?.ogType || 'website'
+  const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
@@ -165,11 +167,13 @@ export default function DashboardShell({
 
         return console.error(error)
       })
-      fetch('/api/make-dotabod-mod').catch((error) => {
-        captureException(error)
+      if (hasAutoModeratorAccess) {
+        fetch('/api/make-dotabod-mod').catch((error) => {
+          captureException(error)
 
-        return console.error(error)
-      })
+          return console.error(error)
+        })
+      }
     }
   }, [])
 
