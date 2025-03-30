@@ -48,6 +48,12 @@ const defaultScopes = [
   'user:write:chat',
 ].join(' ')
 
+const chatVerifyScopes = [
+  // Only roles that chatters who want to verify with Twitch need
+  'user:read:email',
+  'openid',
+].join(' ')
+
 const extractCookieValue = (cookieHeader: string | string[], name: string) => {
   const cookieStringFull = Array.isArray(cookieHeader)
     ? cookieHeader.find((header) => header.includes(name))
@@ -264,6 +270,18 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           scope: useBotScopes ? `${defaultScopes} ${chatBotScopes}` : defaultScopes,
+        },
+      },
+    }),
+    TwitchProvider({
+      id: 'twitch-viewer',
+      name: 'Twitch Viewer',
+      allowDangerousEmailAccountLinking: true,
+      clientId: process.env.TWITCH_CLIENT_ID,
+      clientSecret: process.env.TWITCH_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: chatVerifyScopes,
         },
       },
     }),
