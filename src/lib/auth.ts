@@ -25,9 +25,6 @@ const chatBotScopes = [
 ].join(' ')
 
 const defaultScopes = [
-  'moderator:manage:chat_messages', // For the !plebs command
-  'moderator:manage:banned_users', // For !only command
-  'moderator:manage:chat_settings', // To update slow mode, follower mode, etc
   'channel:bot', // Allows joining with Dotabod in the channel (new requirement by twitch)
   'channel:manage:ads', // Run ads automatically when a game ends
   'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
