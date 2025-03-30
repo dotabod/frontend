@@ -129,7 +129,7 @@ const CommandsPage: NextPageWithLayout = () => {
     .filter((command) => {
       const keysToSearch = ['alias', 'title', 'description', 'cmd']
       return keysToSearch.some((key) => {
-        const value = CommandDetail[command][key]
+        const value = CommandDetail[command][key] || ''
         if (Array.isArray(value)) {
           return value.some(
             (alias) =>

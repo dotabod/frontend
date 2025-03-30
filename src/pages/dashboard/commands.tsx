@@ -41,7 +41,7 @@ const CommandsPage = () => {
       const searchableKeys = ['alias', 'title', 'description', 'cmd']
 
       for (const key of searchableKeys) {
-        const value = CommandDetail[command][key]
+        const value = CommandDetail[command][key] || ''
 
         if (Array.isArray(value)) {
           for (const alias of value) {
