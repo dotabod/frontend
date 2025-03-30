@@ -48,7 +48,7 @@ const defaultScopes = [
   'user:write:chat',
 ].join(' ')
 
-const chatVerifyScopes = [
+export const chatVerifyScopes = [
   // Only roles that chatters who want to verify with Twitch need
   'user:read:email',
   'openid',
@@ -343,6 +343,7 @@ export const authOptions: NextAuthOptions = {
           displayName: true,
           Account: {
             select: {
+              scope: true,
               requires_refresh: true,
               providerAccountId: true,
             },
@@ -351,6 +352,39 @@ export const authOptions: NextAuthOptions = {
         },
       })
       const isImpersonating = account?.provider === 'impersonate'
+
+      const isLoggingInAsChatter = account?.scope
+        ?.split(' ')
+        .every((scope) => chatVerifyScopes.split(' ').includes(scope))
+
+      const alreadyHasStreamerScopes =
+        provider?.Account?.scope &&
+        provider.Account.scope.split(' ').length > chatVerifyScopes.split(' ').length &&
+        provider.Account.requires_refresh === false
+
+      const getRole = () => {
+        if (provider?.admin?.role) {
+          return provider.admin.role
+        }
+
+        if (alreadyHasStreamerScopes) {
+          return 'user'
+        }
+
+        if (isLoggingInAsChatter) {
+          return 'chatter'
+        }
+
+        return 'user'
+      }
+
+      const role = getRole()
+      const scopesToUpdate =
+        role === 'chatter'
+          ? chatVerifyScopes
+          : alreadyHasStreamerScopes && isLoggingInAsChatter
+            ? (provider?.Account?.scope ?? defaultScopes)
+            : (account?.scope ?? defaultScopes)
 
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
       if (
@@ -377,7 +411,12 @@ export const authOptions: NextAuthOptions = {
       const shouldRefresh =
         account && ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if ((shouldRefresh || process.env.VERCEL_ENV !== 'production') && !isImpersonating) {
+      if (
+        provider?.Account?.requires_refresh === true ||
+        ((shouldRefresh || process.env.VERCEL_ENV !== 'production') &&
+          !isImpersonating &&
+          role !== 'chatter')
+      ) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
 
@@ -385,21 +424,24 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Account is required')
         }
 
-        await prisma.account.update({
-          where: {
-            provider_providerAccountId: {
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
+        if (provider?.Account?.requires_refresh === true || !isLoggingInAsChatter) {
+          console.log('SETTING TO FALSE')
+          await prisma.account.update({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
             },
-          },
-          data: {
-            refresh_token: account.refresh_token,
-            access_token: account.access_token,
-            expires_at: account.expires_at,
-            scope: account.scope,
-            requires_refresh: false,
-          },
-        })
+            data: {
+              refresh_token: account.refresh_token,
+              access_token: account.access_token,
+              expires_at: account.expires_at,
+              scope: account.scope,
+              requires_refresh: false,
+            },
+          })
+        }
       }
 
       return {
@@ -410,8 +452,8 @@ export const authOptions: NextAuthOptions = {
         email: newUser.email,
         picture: newUser.image,
         isImpersonating,
-        role: provider?.admin?.role || 'user',
-        scope: account?.scope,
+        role,
+        scope: scopesToUpdate,
       }
     },
   },

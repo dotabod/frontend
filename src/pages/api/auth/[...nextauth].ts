@@ -11,7 +11,8 @@ export default async function auth(req, res) {
   const authOptions = { ...baseAuthOptions }
 
   // Check if the request is for the verify page
-  const isVerifyRequest = req.headers?.referer?.includes('verify')
+  const isVerifyRequest =
+    req.headers?.referer?.includes('verify') && !req.headers?.referer?.includes('error')
 
   if (isVerifyRequest) {
     // Find the Twitch provider

@@ -12,7 +12,7 @@ declare module 'next-auth/jwt' {
     twitchId: UserId
     locale: UserId
     scope: string
-    role?: 'admin' | 'user'
+    role?: 'admin' | 'user' | 'chatter'
   }
 }
 
@@ -24,7 +24,7 @@ declare module 'next-auth' {
       name: string
       isImpersonating: boolean
       twitchId: UserId
-      role?: 'admin' | 'user'
+      role?: 'admin' | 'user' | 'chatter'
       locale: UserId
       scope: string
     }

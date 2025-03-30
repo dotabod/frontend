@@ -24,6 +24,10 @@ const useMaybeSignout = (skip = false) => {
   useEffect(() => {
     if (session?.user?.isImpersonating) return
 
+    if (session?.user?.role === 'chatter') {
+      return
+    }
+
     const shouldSignOut =
       status === 'authenticated' &&
       ((session?.user?.scope?.length > 10 &&
@@ -33,7 +37,13 @@ const useMaybeSignout = (skip = false) => {
     if (shouldSignOut) {
       signOut({ callbackUrl: '/login?setup-scopes', redirect: true })
     }
-  }, [session?.user?.scope, session?.user?.isImpersonating, status, requiresRefresh])
+  }, [
+    session?.user?.scope,
+    session?.user?.isImpersonating,
+    status,
+    requiresRefresh,
+    session?.user?.role,
+  ])
 }
 
 export default useMaybeSignout

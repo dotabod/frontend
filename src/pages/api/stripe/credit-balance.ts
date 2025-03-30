@@ -22,12 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log('Fetching server session')
     const session = await getServerSession(req, res, authOptions)
-    console.log('Session retrieved', {
-      userId: session?.user?.id,
-      isImpersonating: session?.user?.isImpersonating,
-    })
 
     // Prevent impersonation for security
     if (session?.user?.isImpersonating) {

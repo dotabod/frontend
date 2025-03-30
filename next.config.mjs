@@ -23,7 +23,6 @@ const nextConfig = {
   },
   // Fix for Prisma engine not found error
   output: 'standalone',
-  outputFileTracing: true,
   // Tell Next.js to copy the Prisma engines to the standalone output
   outputFileTracingExcludes: {
     '*': [

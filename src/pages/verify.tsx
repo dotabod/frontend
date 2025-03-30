@@ -1,9 +1,9 @@
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import {
   Button,
   Typography,
@@ -96,6 +96,31 @@ const VerifyPage: NextPageWithLayout = () => {
   const { notification, modal } = App.useApp()
   const track = useTrack()
   const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
+  const [isSigningOut, setIsSigningOut] = useState(false)
+
+  const handleSignOut = useCallback(() => {
+    setIsSigningOut(true)
+    signOut({ callbackUrl: '/login' })
+  }, [])
+
+  useEffect(() => {
+    if (router.asPath.toLowerCase().includes('error=chatter')) {
+      notification.error({
+        key: 'chatter-error',
+        duration: 50000,
+        message: 'Login error',
+        description: (
+          <span>
+            You don't have access to the Streamer dashboard.{' '}
+            <Button loading={isSigningOut} onClick={handleSignOut}>
+              Click here to logout
+            </Button>{' '}
+            if you want to login as a streamer.
+          </span>
+        ),
+      })
+    }
+  }, [router.asPath, isSigningOut, notification, handleSignOut])
 
   // Step 1: Authenticate with Twitch if not already authenticated
   // We use minimal scopes needed for verification (user:read:email openid)

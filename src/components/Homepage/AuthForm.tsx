@@ -22,7 +22,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           signIn('twitch', {
             redirect: false,
             callbackUrl:
-              searchParams.get('from') || searchParams.get('callbackUrl') || '/dashboard',
+              searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
           })
             .catch((e) => {
               captureException(e)

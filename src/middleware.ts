@@ -4,6 +4,7 @@ import { captureException } from '@sentry/nextjs'
 import { get } from '@vercel/edge-config'
 import type { NextRequestWithAuth } from 'next-auth/middleware'
 import { withAuth } from 'next-auth/middleware'
+import { getSession } from 'next-auth/react'
 import { NextResponse } from 'next/server'
 
 export const config = {
@@ -56,6 +57,20 @@ export async function middleware(req: NextRequestWithAuth) {
     console.error(error)
   }
   if (req.nextUrl.pathname.startsWith('/dashboard') || req.nextUrl.pathname.endsWith('/overlay')) {
+    const requestForNextAuth = {
+      headers: {
+        cookie: req.headers.get('cookie') ?? '',
+      },
+    }
+
+    const session = await getSession({ req: requestForNextAuth })
+
+    // Check if user has 'chatter' scope - if so, restrict dashboard access
+    if (session?.user?.role === 'chatter') {
+      // Redirect chatters away from dashboard to the home page
+      return NextResponse.redirect(new URL('/verify?error=chatter', req.url))
+    }
+
     // Proceed with the authentication middleware for /dashboard paths
     return withAuth(req)
   }
