@@ -98,11 +98,12 @@ const VerifyPage: NextPageWithLayout = () => {
   const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
 
   // Step 1: Authenticate with Twitch if not already authenticated
-  // We use 'twitch-viewer' provider which requests minimal scopes needed for verification
+  // We use minimal scopes needed for verification (user:read:email openid)
   // This is different from the scopes requested for streamers who need more permissions
   useEffect(() => {
     if (status === 'unauthenticated') {
-      signIn('twitch-viewer', {
+      // Pass specific scopes as a query parameter
+      signIn('twitch', {
         redirect: false,
         callbackUrl: '/verify',
       }).catch((e) => {

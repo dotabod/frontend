@@ -273,18 +273,6 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
-    TwitchProvider({
-      id: 'twitch-viewer',
-      name: 'Twitch Viewer',
-      allowDangerousEmailAccountLinking: true,
-      clientId: process.env.TWITCH_CLIENT_ID,
-      clientSecret: process.env.TWITCH_CLIENT_SECRET,
-      authorization: {
-        params: {
-          scope: chatVerifyScopes,
-        },
-      },
-    }),
   ],
   callbacks: {
     async session({ token, session, ...rest }) {
