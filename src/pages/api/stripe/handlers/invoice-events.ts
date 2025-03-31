@@ -34,6 +34,7 @@ export async function handleInvoiceEvent(
             status,
             currentPeriodEnd,
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            updatedAt: new Date(),
           },
         })
 

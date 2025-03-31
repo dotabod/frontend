@@ -96,6 +96,7 @@ async function handlePatchRequest(
       await prisma.user.update({
         data: {
           mmr: validatedBody.value as number,
+          updatedAt: new Date(),
         },
         where: {
           id: userId,
@@ -114,11 +115,13 @@ async function handlePatchRequest(
       },
       update: {
         value: validatedBody.value,
+        updatedAt: new Date(),
       },
       create: {
         key: validatedBody.key,
         value: validatedBody.value,
         userId: userId,
+        updatedAt: new Date(),
       },
     })
 

@@ -34,6 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await prisma.user.update({
       data: {
         locale: body,
+        updatedAt: new Date(),
       },
       where: {
         id: session.user.id,

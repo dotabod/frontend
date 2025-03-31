@@ -60,7 +60,7 @@ export class CustomerService {
             // Update existing subscriptions with no customer ID
             await this.tx.subscription.updateMany({
               where: { userId: user.id, stripeCustomerId: null },
-              data: { stripeCustomerId: customerId },
+              data: { stripeCustomerId: customerId, updatedAt: new Date() },
             })
           }
         }

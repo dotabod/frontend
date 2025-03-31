@@ -121,7 +121,7 @@ async function ensureCustomer(
       // Update existing subscriptions with no customer ID
       await tx.subscription.updateMany({
         where: { userId: user.id, stripeCustomerId: null },
-        data: { stripeCustomerId: customerId },
+        data: { stripeCustomerId: customerId, updatedAt: new Date() },
       })
     }
   }

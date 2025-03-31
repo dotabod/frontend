@@ -130,6 +130,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 connectedUserIds: {
                   push: session.user.id,
                 },
+                updatedAt: new Date(),
               },
             })
           }
@@ -161,6 +162,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             },
             data: {
               steam32Id: Number.parseInt(steam32Id, 10),
+              updatedAt: new Date(),
             },
           })
         }

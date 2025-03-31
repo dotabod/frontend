@@ -92,6 +92,7 @@ export async function handleChargeRefunded(
                 where: { id: purchase.id },
                 data: {
                   status: SubscriptionStatus.CANCELED,
+                  updatedAt: new Date(),
                   metadata: {
                     ...((purchase.metadata as Record<string, unknown>) || {}),
                     refundedAt: new Date().toISOString(),
@@ -107,6 +108,7 @@ export async function handleChargeRefunded(
               await tx.subscription.update({
                 where: { id: purchase.id },
                 data: {
+                  updatedAt: new Date(),
                   metadata: {
                     ...((purchase.metadata as Record<string, unknown>) || {}),
                     partiallyRefundedAt: new Date().toISOString(),
@@ -272,6 +274,7 @@ async function handleGiftCreditRefund(
       await tx.giftTransaction.update({
         where: { id: giftTransaction.id },
         data: {
+          updatedAt: new Date(),
           metadata: {
             ...((giftTransaction.metadata as Record<string, unknown>) || {}),
             refundedAt: new Date().toISOString(),
@@ -310,6 +313,7 @@ async function handleGiftCreditRefund(
           },
           data: {
             status: SubscriptionStatus.CANCELED,
+            updatedAt: new Date(),
             metadata: {
               refundedAt: new Date().toISOString(),
               refundId: charge.refunds?.data?.[0]?.id || null,

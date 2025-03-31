@@ -47,6 +47,7 @@ export async function handleSubscriptionEvent(
               currentPeriodEnd: new Date(subscription.current_period_end * 1000),
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
               metadata: subscription.metadata,
+              updatedAt: new Date(),
             },
           })
 
@@ -115,6 +116,7 @@ export async function handleSubscriptionDeleted(
               ...((existingSubscription.metadata as Record<string, unknown>) || {}),
               canceledAt: new Date().toISOString(),
             },
+            updatedAt: new Date(),
           },
         })
 

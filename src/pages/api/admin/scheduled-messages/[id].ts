@@ -109,6 +109,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       updateData.isForAllUsers = false
     }
 
+    updateData.updatedAt = new Date()
+
     const updatedMessage = await prisma.scheduledMessage.update({
       where: { id },
       data: updateData,
@@ -136,7 +138,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // If the message is already being processed, mark it as cancelled
       await prisma.scheduledMessage.update({
         where: { id },
-        data: { status: 'CANCELLED' },
+        data: { status: 'CANCELLED', updatedAt: new Date() },
       })
 
       // Also mark all pending deliveries as cancelled
@@ -145,7 +147,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           scheduledMessageId: id,
           status: 'PENDING',
         },
-        data: { status: 'CANCELLED' },
+        data: { status: 'CANCELLED', updatedAt: new Date() },
       })
     }
 

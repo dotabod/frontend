@@ -100,7 +100,7 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
         } else {
           if (accounts.some((account) => account.steam32Id === update.steam32Id)) {
             return prisma.steamAccount.update({
-              data: { steam32Id: update.steam32Id, mmr: update.mmr },
+              data: { steam32Id: update.steam32Id, mmr: update.mmr, updatedAt: new Date() },
               where: { steam32Id: update.steam32Id },
               select: { steam32Id: true, mmr: true, name: true },
             })

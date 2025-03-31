@@ -38,6 +38,7 @@ export class SubscriptionService {
         transactionType: TransactionType.RECURRING,
         currentPeriodEnd,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        updatedAt: new Date(),
       },
       update: {
         status: status as SubscriptionStatus,
@@ -47,6 +48,7 @@ export class SubscriptionService {
         transactionType: TransactionType.RECURRING,
         currentPeriodEnd,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        updatedAt: new Date(),
       },
       select: {
         id: true,

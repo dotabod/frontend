@@ -44,6 +44,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
       data: {
         steam32Id: parsedSteam32Id,
+        updatedAt: new Date(),
       },
     })
 

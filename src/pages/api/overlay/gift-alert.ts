@@ -76,6 +76,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
         data: {
           isRead: true,
+          updatedAt: new Date(),
         },
       })
 

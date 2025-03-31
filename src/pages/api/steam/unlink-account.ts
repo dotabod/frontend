@@ -66,6 +66,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
           data: {
             steam32Id: otherAccount.steam32Id,
+            updatedAt: new Date(),
           },
         })
       } else {
@@ -76,6 +77,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
           data: {
             steam32Id: null,
+            updatedAt: new Date(),
           },
         })
       }
@@ -96,6 +98,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           data: {
             userId: newOwnerId,
             connectedUserIds: remainingUsers,
+            updatedAt: new Date(),
           },
         })
       } else {
@@ -116,6 +119,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           connectedUserIds: {
             set: steamAccount.connectedUserIds.filter((id) => id !== session.user.id),
           },
+          updatedAt: new Date(),
         },
       })
     }

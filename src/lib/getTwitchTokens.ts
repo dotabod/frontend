@@ -88,6 +88,7 @@ export async function getTwitchTokens(userId: string) {
           data: {
             Account: {
               update: {
+                updatedAt: new Date(),
                 access_token: newTokens.access_token,
                 refresh_token: newTokens.refresh_token,
               },

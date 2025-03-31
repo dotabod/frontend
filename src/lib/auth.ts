@@ -398,6 +398,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
           },
           data: {
+            updatedAt: new Date(),
             displayName: newUser.displayName,
           },
         })
@@ -434,6 +435,7 @@ export const authOptions: NextAuthOptions = {
               },
             },
             data: {
+              updatedAt: new Date(),
               refresh_token: account.refresh_token,
               access_token: account.access_token,
               expires_at: account.expires_at,
