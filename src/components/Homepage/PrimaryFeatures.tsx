@@ -22,9 +22,9 @@ const features = [
         bets automatically, letting you focus on the game.
       </span>
     ),
-    icon: () => (
+    icon: (props?: { className?: string }) => (
       <Image
-        className='ml-1 inline'
+        className={clsx('ml-1 inline', props?.className)}
         alt='peepogamba emote'
         height={32}
         width={32}
@@ -38,9 +38,9 @@ const features = [
     name: 'Active chatting',
     description:
       'Dotabod sends timely, context-aware chat messages to engage your audience with insights relevant to your gameplay—never spammy, always helpful.',
-    icon: () => (
+    icon: (props?: { className?: string }) => (
       <Image
-        className='ml-1 inline'
+        className={clsx('ml-1 inline', props?.className)}
         alt='chatting emote'
         height={40}
         width={40}
@@ -57,9 +57,9 @@ const features = [
         blockers.
       </span>
     ),
-    icon: () => (
+    icon: (props?: { className?: string }) => (
       <Image
-        className='ml-1 inline'
+        className={clsx('ml-1 inline', props?.className)}
         alt='ttours emote'
         height={32}
         width={32}
@@ -144,7 +144,13 @@ function BlockScreen({ custom, animated = false }) {
   )
 }
 
-function BetsScreen({ custom, animated = false }) {
+function BetsScreen({
+  custom,
+  animated = false,
+}: {
+  custom?: { isForwards: boolean; changeCount: number } | undefined
+  animated?: boolean
+}) {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
@@ -201,8 +207,8 @@ function OBSScreen({ custom, animated = false }) {
   )
 }
 
-function usePrevious(value) {
-  const ref = useRef()
+function usePrevious(value: number) {
+  const ref = useRef<number>(0)
 
   useEffect(() => {
     ref.current = value
@@ -287,15 +293,15 @@ function FeaturesDesktop() {
 
 function FeaturesMobile() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const slideContainerRef = useRef()
-  const slideRefs = useRef([])
+  const slideContainerRef = useRef<HTMLDivElement>(null)
+  const slideRefs = useRef<HTMLDivElement[]>([])
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setActiveIndex(slideRefs.current.indexOf(entry.target))
+            setActiveIndex(slideRefs.current.indexOf(entry.target as HTMLDivElement))
             break
           }
         }
@@ -315,7 +321,7 @@ function FeaturesMobile() {
     return () => {
       observer.disconnect()
     }
-  }, [slideContainerRef, slideRefs])
+  }, [])
 
   return (
     <>
@@ -325,11 +331,16 @@ function FeaturesMobile() {
       >
         {features.map((feature, featureIndex) => (
           <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={featureIndex}
-            ref={(ref) => (slideRefs.current[featureIndex] = ref)}
-            className='w-full flex-none snap-center px-4 sm:px-6'
+            ref={(ref) => {
+              if (ref) {
+                slideRefs.current[featureIndex] = ref
+              }
+            }}
+            className='w-full flex-none snap-center'
           >
-            <div className='relative transform overflow-hidden rounded-2xl bg-gray-800 px-5 py-6'>
+            <div className='relative transform overflow-hidden rounded-2xl bg-gray-800'>
               <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
                 <CircleBackground
                   color='#13B5C8'
@@ -337,7 +348,7 @@ function FeaturesMobile() {
                 />
               </div>
               <PhoneFrame className='relative mx-auto w-full max-w-[366px]'>
-                <feature.screen />
+                <feature.screen custom={undefined} animated={false} />
               </PhoneFrame>
               <div className='absolute inset-x-0 bottom-0 bg-gray-800/95 p-6 backdrop-blur-sm sm:p-10'>
                 <feature.icon />
@@ -352,6 +363,7 @@ function FeaturesMobile() {
         {features.map((_, featureIndex) => (
           <button
             type='button'
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={featureIndex}
             className={clsx(
               'relative h-0.5 w-4 rounded-full',
