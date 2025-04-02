@@ -16,9 +16,9 @@ const NotFound: NextPageWithLayout = () => {
   const mainNavLinks: NavLinkItem[] = [
     ['Features', '/#features'],
     ['Pricing', '/#pricing'],
-    ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
     ['FAQs', '/#faqs'],
     ['Blog', '/blog'],
+    ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
   ]
 
   // Additional helpful links
@@ -27,6 +27,7 @@ const NotFound: NextPageWithLayout = () => {
     ['Privacy Policy', '/privacy-policy'],
     ['Terms of Service', '/terms-of-service'],
     ['Cookie Policy', '/cookies'],
+    ['Discord', 'https://discord.dotabod.com'],
   ]
 
   const renderNavLink = (link: NavLinkItem, index: number, isMainNav = true) => {

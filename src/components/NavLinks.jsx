@@ -11,14 +11,15 @@ export function NavLinks({ bottom = false }) {
     additional.push(['Privacy Policy', '/privacy-policy'])
     additional.push(['Terms of Service', '/terms-of-service'])
     additional.push(['Cookie Policy', '/cookies'])
+    additional.push(['Discord', 'https://discord.dotabod.com'])
   }
 
   return [
     ['Features', '/#features'],
     ['Pricing', '/#pricing'],
-    ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
     ['FAQs', '/#faqs'],
     ['Blog', '/blog'],
+    ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
     ...additional,
   ].map(([label, href, tooltip], index) => {
     const isGiftLink = label === 'Gift Pro'

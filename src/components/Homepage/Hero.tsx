@@ -2,18 +2,17 @@ import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustra
 import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
-import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
 import { Button, Popover, Skeleton } from 'antd'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Container } from 'src/components/Container'
-import DiscordSvg from 'src/images/logos/discord.svg'
 import dotaLogo from 'src/images/logos/dota.svg'
 import TwitchSvg from 'src/images/logos/twitch.svg'
 import useSWR from 'swr'
 import { LiveIcon } from './LiveIcon'
+import { LucideHome, LucideTerminalSquare } from 'lucide-react'
 
 const TwitchUser = ({
   image,
@@ -151,7 +150,7 @@ export function Hero() {
               <Link href='/dashboard'>
                 <Button type='primary'>
                   <div className='flex items-center space-x-2'>
-                    <CursorArrowRaysIcon className='flex h-4 w-4' />
+                    <LucideHome className='flex h-4 w-4' />
                     {session?.status === 'authenticated' ? (
                       <span>Go to dashboard</span>
                     ) : (
@@ -160,18 +159,20 @@ export function Hero() {
                   </div>
                 </Button>
               </Link>
-              <Button href='https://discord.dotabod.com' target='_blank' className='space-x-2'>
-                <div className='flex items-center space-x-2'>
-                  <Image alt='discord' src={DiscordSvg} className='h-4 w-4' />
-                  <span>Join Discord</span>
-                </div>
-              </Button>
+              <Link href='/arteezy'>
+                <Button className='space-x-2'>
+                  <div className='flex items-center space-x-2'>
+                    <LucideTerminalSquare className='flex h-4 w-4' />
+                    <span>View commands</span>
+                  </div>
+                </Button>
+              </Link>
             </div>
           </div>
           <div className='relative row-span-1 lg:col-span-5 lg:row-span-2 xl:col-span-6'>
             <BackgroundIllustration className='absolute left-1/2 top-4 h-[1026px] w-[1026px] -translate-x-1/3 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ml-12 xl:-top-14 xl:ml-0' />
-            <div className='-mx-4 h-[238px] px-9 [mask-image:linear-gradient(to_bottom,white_60%,transparent)] sm:mx-0 lg:absolute lg:-inset-x-10 lg:-bottom-20 lg:-top-10 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32'>
-              <PhoneFrame className='mx-auto max-w-[266px] lg:max-w-[366px]' priority>
+            <div className='-mx-4 h-[180px] px-9 -mt-10 [mask-image:linear-gradient(to_bottom,white_60%,transparent)] sm:mx-0 lg:mt-0 lg:absolute lg:-inset-x-10 lg:-bottom-20 lg:-top-10 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32'>
+              <PhoneFrame className='mx-auto max-w-[180px] lg:max-w-[366px]' priority>
                 <Image
                   src={dotaLogo}
                   width={240}
@@ -195,7 +196,7 @@ export function Hero() {
         </div>
 
         <div className='relative lg:col-span-7 xl:col-span-6'>
-          {isLoading ? (
+          {isLoading || !users?.topLive?.length ? (
             <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start pt-4'>
               {[...Array(10)].map((_, i) => (
                 <li key={`skeleton-${i}`} className='relative'>
@@ -211,33 +212,33 @@ export function Hero() {
                 </li>
               ))}
             </ul>
+          ) : users?.topLive?.length && users?.topLive?.length > 0 ? (
+            <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start'>
+              {users?.topLive?.map(({ name, image }) => (
+                <TwitchUser
+                  key={name}
+                  last={false}
+                  name={name}
+                  image={image}
+                  onClick={() => {
+                    track('homepage - top live twitch profile')
+                  }}
+                />
+              ))}
+              {!userInTopLive && (
+                <TwitchUser
+                  key='You?'
+                  last={true}
+                  name='You?'
+                  onClick={() => {
+                    track('homepage - static twitch profile')
+                  }}
+                  image='/images/hero/default.png'
+                />
+              )}
+            </ul>
           ) : (
-            users?.topLive?.length && (
-              <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start'>
-                {users?.topLive?.map(({ name, image }) => (
-                  <TwitchUser
-                    key={name}
-                    last={false}
-                    name={name}
-                    image={image}
-                    onClick={() => {
-                      track('homepage - top live twitch profile')
-                    }}
-                  />
-                ))}
-                {!userInTopLive && (
-                  <TwitchUser
-                    key='You?'
-                    last={true}
-                    name='You?'
-                    onClick={() => {
-                      track('homepage - static twitch profile')
-                    }}
-                    image='/images/hero/default.png'
-                  />
-                )}
-              </ul>
-            )
+            <p className='text-center text-gray-300'>No top streamers found</p>
           )}
         </div>
       </Container>
