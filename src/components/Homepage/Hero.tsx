@@ -36,7 +36,6 @@ const TwitchUser = ({
         rel='noreferrer'
         onClick={userName === 'You?' ? onClick : undefined}
         href={userName === 'You?' ? '#' : `/${userName}`}
-        target='_blank'
       >
         <Image
           src={imagesrc}

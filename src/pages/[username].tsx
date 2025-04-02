@@ -7,7 +7,6 @@ import type { NextPageWithLayout } from '@/pages/_app'
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
 import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
@@ -199,12 +198,12 @@ const CommandsPage: NextPageWithLayout = () => {
       <div className='p-6'>
         <div className='mb-12 space-y-4'>
           <div className='flex flex-row items-center space-x-2'>
-            <Image
+            <img
               onError={(e) => {
                 e.currentTarget.src = '/images/hero/default.png'
               }}
               src={data?.image || '/images/hero/default.png'}
-              alt='Profile Picture'
+              alt='Profile'
               width={80}
               height={80}
               className='rounded-full flex'
