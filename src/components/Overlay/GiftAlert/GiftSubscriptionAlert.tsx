@@ -73,9 +73,6 @@ const GiftSubscriptionAlert = ({
             'flex flex-col items-center',
             className,
           )}
-          style={{
-            width: res({ w: 500 }),
-          }}
         >
           <div className='bg-purple-900 bg-opacity-90 rounded-lg p-4 shadow-lg border-2 border-purple-500'>
             <div className='flex items-center justify-center mb-2'>

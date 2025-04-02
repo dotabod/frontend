@@ -210,21 +210,21 @@ export const GiftSubscriptionForm = ({
   )
 
   return (
-    <div className='mx-auto pb-12 flex flex-col gap-4'>
-      <div className='flex flex-row justify-center gap-4'>
+    <div className='mx-auto pb-12 flex flex-wrap flex-col gap-4'>
+      <div className='flex flex-row justify-center gap-4 px-4 md:px-0'>
         {canceled && (
           <Alert
             message='Payment Canceled'
             description="Your gift subscription payment was canceled. You can try again when you're ready."
             type='info'
             showIcon
-            className='mb-8'
+            className='mb-8 w-full'
           />
         )}
       </div>
 
-      <div className='flex flex-row justify-center gap-4'>
-        <Card>
+      <div className='flex flex-col md:flex-row flex-wrap justify-center gap-4 px-4 md:px-0'>
+        <Card className='w-full md:w-auto'>
           <Title level={4}>
             {recipientUsername ? (
               <>
@@ -271,6 +271,7 @@ export const GiftSubscriptionForm = ({
                     form.setFieldsValue({ quantity: newQuantity })
                   }}
                   style={{ width: 100 }}
+                  className='w-24 sm:w-32'
                 />
                 <Text className='ml-2'>months</Text>
               </div>
@@ -288,6 +289,7 @@ export const GiftSubscriptionForm = ({
                 placeholder='Enter Twitch username'
                 disabled={!!recipientUsername}
                 onChange={handleUsernameChange}
+                className='w-full'
               />
             </Form.Item>
 
@@ -311,6 +313,7 @@ export const GiftSubscriptionForm = ({
               <Input
                 placeholder='Your name or leave blank to gift anonymously'
                 onChange={handleSenderNameChange}
+                className='w-full'
               />
             </Form.Item>
 
@@ -339,6 +342,7 @@ export const GiftSubscriptionForm = ({
                 maxLength={200}
                 showCount
                 onChange={handleGiftMessageChange}
+                className='w-full'
               />
             </Form.Item>
 
@@ -362,6 +366,7 @@ export const GiftSubscriptionForm = ({
                     size='large'
                     block
                     disabled={true}
+                    className='mt-2'
                   >
                     Continue to Payment
                   </Button>
@@ -374,6 +379,7 @@ export const GiftSubscriptionForm = ({
                   size='large'
                   block
                   disabled={isSubmitting}
+                  className='mt-2'
                 >
                   Continue to Payment
                 </Button>
@@ -381,7 +387,7 @@ export const GiftSubscriptionForm = ({
             </Form.Item>
           </Form>
         </Card>
-        <Card>
+        <Card className='w-full md:w-auto'>
           <Title level={4}>Gift Subscription Preview</Title>
           <Paragraph>
             Here's how your gift will appear in the streamer's Twitch chat and overlay when they
@@ -400,15 +406,15 @@ export const GiftSubscriptionForm = ({
               <Text strong className='mb-2 block'>
                 Stream Overlay
               </Text>
-              <div className='rounded-md bg-gray-800 p-4'>
-                <div className='relative h-52 w-full overflow-hidden flex items-center justify-center'>
+              <div className='rounded-md bg-gray-800 p-2 sm:p-4'>
+                <div className='relative h-40 sm:h-52 w-full overflow-hidden flex items-center justify-center'>
                   <GiftSubscriptionAlert
                     senderName={senderName}
                     giftType='monthly'
                     giftQuantity={quantity}
                     giftMessage={giftMessage}
                     preview={true}
-                    className='scale-75'
+                    className=''
                   />
                 </div>
               </div>
@@ -417,26 +423,26 @@ export const GiftSubscriptionForm = ({
         </Card>
       </div>
 
-      <div className='max-w-5xl flex flex-col justify-center gap-4 self-center'>
+      <div className='max-w-5xl w-full flex flex-col justify-center gap-4 self-center px-4 md:px-0'>
         <Card>
           <Title level={4}>Why Gift Dotabod Pro?</Title>
-          <Space direction='vertical' size='middle'>
-            <div>
+          <Space direction='vertical' size='middle' className='w-full'>
+            <div className='space-y-1'>
               <Text strong>Support {recipientUsername ? displayName : 'Streamers'}</Text>
-              <Paragraph>
+              <Paragraph className='text-sm sm:text-base'>
                 Help them elevate their stream with professional Dota 2 overlays and analytics.
               </Paragraph>
             </div>
-            <div>
+            <div className='space-y-1'>
               <Text strong>No Recurring Charges</Text>
-              <Paragraph>
+              <Paragraph className='text-sm sm:text-base'>
                 You pay once for the duration you choose. No recurring charges for you or the
                 recipient.
               </Paragraph>
             </div>
-            <div>
+            <div className='space-y-1'>
               <Text strong>Subscription Extension</Text>
-              <Paragraph>
+              <Paragraph className='text-sm sm:text-base'>
                 Multiple gifts extend the recipient's Pro subscription duration. They'll enjoy Pro
                 features longer.
               </Paragraph>
@@ -447,26 +453,26 @@ export const GiftSubscriptionForm = ({
         <Card className='mt-4'>
           <Title level={4}>How Gift Subscriptions Work</Title>
           <div className='space-y-3'>
-            <div>
+            <div className='space-y-1'>
               <Text strong>For New Users:</Text>
-              <Paragraph>
+              <Paragraph className='text-sm sm:text-base'>
                 If the recipient has never subscribed to Dotabod Pro, they will need to set up a
                 subscription after receiving your gift. The credits will be automatically applied,
                 so they won't be charged for the duration of your gift.
               </Paragraph>
             </div>
 
-            <div>
+            <div className='space-y-1'>
               <Text strong>For Existing Subscribers:</Text>
-              <Paragraph>
+              <Paragraph className='text-sm sm:text-base'>
                 If the recipient is already a Pro subscriber, the gift credits will automatically be
                 applied to their account and used when their subscription renews.
               </Paragraph>
             </div>
 
-            <div>
+            <div className='space-y-1'>
               <Text strong>Not Valid for Lifetime Purchases:</Text>
-              <Paragraph>
+              <Paragraph className='text-sm sm:text-base'>
                 Gift credits can only be applied toward monthly Pro subscriptions, not toward
                 lifetime purchases.
               </Paragraph>
