@@ -18,6 +18,10 @@ const Maintenance: NextPageWithLayout = () => (
 Maintenance.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Maintenance',
+        subtitle: 'Dotabod is currently undergoing scheduled maintenance. Please check back later.',
+      }}
       seo={{
         title: 'Maintenance | Dotabod',
         description:

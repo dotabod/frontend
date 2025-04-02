@@ -134,6 +134,10 @@ const NotFound: NextPageWithLayout = () => {
 NotFound.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Page Not Found',
+        subtitle: 'The page you are looking for could not be found.',
+      }}
       seo={{
         title: 'Page Not Found | Dotabod',
         description: 'The page you are looking for could not be found.',

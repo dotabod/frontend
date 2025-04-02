@@ -67,6 +67,10 @@ const AuthErrorPage: NextPageWithLayout = () => {
 AuthErrorPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Error',
+        subtitle: 'An error occurred while processing your request.',
+      }}
       seo={{
         title: 'Error | Dotabod',
         description: 'An error occurred while processing your request.',

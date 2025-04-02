@@ -310,7 +310,7 @@ const CommandsPage = () => {
       dontUseTitle
       ogImage={{
         title: usernameStr,
-        subtitle: 'List of commands and settings for this streamer.',
+        subtitle: 'Commands and settings available for this streamer.',
       }}
     >
       <PageContent />

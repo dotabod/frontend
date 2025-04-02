@@ -106,6 +106,10 @@ BlogIndex.getLayout = function getLayout(page: ReactElement) {
 
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Blog',
+        subtitle: 'Latest news, updates, and insights from the Dotabod team',
+      }}
       seo={{
         title: pageTitle,
         description: pageDescription,

@@ -101,6 +101,11 @@ const Login: NextPageWithLayout = () => {
 Login.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Sign In',
+        subtitle:
+          'Sign in to your Dotabod account to access your dashboard and manage your Dota 2 streaming tools.',
+      }}
       seo={{
         title: 'Sign In | Dotabod',
         description:

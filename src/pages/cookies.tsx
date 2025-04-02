@@ -268,6 +268,11 @@ const CookiePolicyPage: NextPageWithLayout = () => {
 CookiePolicyPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Cookie Policy',
+        subtitle:
+          'Learn about how Dotabod uses cookies and other tracking technologies to enhance your experience on our website.',
+      }}
       seo={{
         title: 'Cookie Policy | Dotabod',
         description:

@@ -1032,6 +1032,10 @@ const TermsOfService: NextPageWithLayout = () => (
 TermsOfService.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Terms of Service',
+        subtitle: 'Read the terms and conditions that govern your use of Dotabod services.',
+      }}
       seo={{
         title: 'Terms of Service | Dotabod',
         description: 'Read the terms and conditions that govern your use of Dotabod services.',

@@ -79,28 +79,15 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
   const pageTitle = `${meta.title} | Dotabod Blog`
   const canonicalUrl = `https://dotabod.com/blog/${meta.slug}`
 
-  // Generate dynamic OG image URL
-  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'https://dotabod.com'
-
-  const ogImageUrl = new URL('/api/og-image', baseUrl)
-  ogImageUrl.searchParams.set('title', meta.title)
-
-  // Add subtitle/description if available
-  if (meta.description) {
-    ogImageUrl.searchParams.set('subtitle', meta.description)
-  }
-
-  // Use the dynamically generated OG image or fall back to the one specified in frontmatter
-  const finalOgImage = meta.image || ogImageUrl.toString()
-
   return (
     <HomepageShell
+      ogImage={{
+        title: meta.title,
+        subtitle: meta.description,
+      }}
       seo={{
         title: pageTitle,
         description: meta.description,
-        ogImage: finalOgImage,
         canonicalUrl: canonicalUrl,
         ogType: 'article',
       }}

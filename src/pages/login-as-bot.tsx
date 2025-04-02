@@ -73,6 +73,11 @@ const Login: NextPageWithLayout = () => {
 Login.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Sign In (chat bot)',
+        subtitle:
+          'Sign in to your Dotabod chat bot account to access your dashboard and manage your Dota 2 streaming tools.',
+      }}
       seo={{
         title: 'Sign In (chat bot) | Dotabod',
         description:

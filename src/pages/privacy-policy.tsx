@@ -1098,6 +1098,10 @@ const PrivacyPolicy: NextPageWithLayout = () => (
 PrivacyPolicy.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Privacy Policy',
+        subtitle: 'Learn about how Dotabod collects, uses, and protects your personal information.',
+      }}
       seo={{
         title: 'Privacy Policy | Dotabod',
         description:

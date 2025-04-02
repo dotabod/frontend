@@ -239,6 +239,10 @@ const GiftSuccessPage: NextPageWithLayout = () => {
 GiftSuccessPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
+      ogImage={{
+        title: 'Gift Sent Successfully',
+        subtitle: 'Your gift has been sent successfully.',
+      }}
       seo={{
         title: 'Gift Sent Successfully | Dotabod',
         description: 'Your gift has been sent successfully.',
