@@ -308,20 +308,24 @@ export const authOptions: NextAuthOptions = {
       })
       const isImpersonating = account?.provider === 'impersonate'
 
+      // Check if user is logging in as a chatter by comparing scopes
       const isLoggingInAsChatter = account?.scope
-        ?.split(' ')
-        .every((scope) => chatVerifyScopes.split(' ').includes(scope))
+        ? account.scope.split(' ').length === chatVerifyScopes.split(' ').length &&
+          account.scope.split(' ').every((scope) => chatVerifyScopes.split(' ').includes(scope))
+        : false
 
+      // Check if user is logging in as a bot by comparing scopes
       const isLoggingInAsBot = account?.scope
-        ?.split(' ')
-        .some((scope) => chatBotScopes.split(' ').includes(scope))
+        ? account.scope.split(' ').length === chatBotScopes.split(' ').length &&
+          account.scope.split(' ').every((scope) => chatBotScopes.split(' ').includes(scope))
+        : false
 
       const alreadyHasStreamerScopes =
         provider?.Account?.scope &&
         provider.Account.scope.split(' ').length > chatVerifyScopes.split(' ').length &&
         provider.Account.requires_refresh === false
 
-      const getRole = (): 'bot' | 'user' | 'chatter' | 'admin' => {
+      const getRoleFromScopes = (): 'bot' | 'user' | 'chatter' | 'admin' => {
         if (provider?.admin?.role) {
           return provider.admin.role as 'admin'
         }
@@ -342,7 +346,7 @@ export const authOptions: NextAuthOptions = {
         return 'user'
       }
 
-      const roleFromScopes = getRole()
+      const roleFromScopes = getRoleFromScopes()
       const scopesToUpdate =
         roleFromScopes === 'chatter'
           ? chatVerifyScopes
