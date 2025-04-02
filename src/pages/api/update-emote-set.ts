@@ -56,7 +56,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ message: 'Twitch ID not found for user' })
     }
 
-    const stvResponse = await get7TVUser(twitchId)
+    let stvResponse: any = null
+    try {
+      stvResponse = await get7TVUser(twitchId)
+    } catch (error) {
+      return res.status(404).json({ message: '7TV user not found' })
+    }
 
     // Check if stvResponse is valid
     if (!stvResponse || !stvResponse.user) {
