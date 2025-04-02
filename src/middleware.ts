@@ -73,7 +73,7 @@ export async function middleware(req: NextRequestWithAuth) {
     })
 
     // If authorization failed and the user is a chatter, redirect to verify with error
-    if (!authResult && req.nextauth?.token?.role === 'chatter') {
+    if (authResult && !authResult.ok) {
       return NextResponse.redirect(new URL('/verify?error=chatter', req.url))
     }
 

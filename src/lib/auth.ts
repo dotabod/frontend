@@ -57,8 +57,6 @@ export const authOptions: NextAuthOptions = {
               userId: user.id,
             },
           })
-        } finally {
-          console.log('Resubscribed to the bot', user.id)
         }
       }
     },
@@ -320,6 +318,11 @@ export const authOptions: NextAuthOptions = {
           account.scope.split(' ').every((scope) => chatBotScopes.split(' ').includes(scope))
         : false
 
+      const isLoggingInAsStreamer = account?.scope
+        ? account.scope.split(' ').length === defaultScopes.split(' ').length &&
+          account.scope.split(' ').every((scope) => defaultScopes.split(' ').includes(scope))
+        : false
+
       const alreadyHasStreamerScopes =
         provider?.Account?.scope &&
         provider.Account.scope.split(' ').length > chatVerifyScopes.split(' ').length &&
@@ -339,6 +342,10 @@ export const authOptions: NextAuthOptions = {
           return 'user'
         }
 
+        if (isLoggingInAsStreamer) {
+          return 'user'
+        }
+
         if (isLoggingInAsChatter) {
           return 'chatter'
         }
@@ -347,6 +354,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       const roleFromScopes = getRoleFromScopes()
+
       const scopesToUpdate =
         roleFromScopes === 'chatter'
           ? chatVerifyScopes
@@ -362,8 +370,7 @@ export const authOptions: NextAuthOptions = {
       if (
         !isImpersonating &&
         provider?.displayName &&
-        provider.displayName !== newUser.displayName &&
-        account
+        provider.displayName !== newUser.displayName
       ) {
         await prisma.user.update({
           where: {

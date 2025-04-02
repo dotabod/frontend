@@ -15,12 +15,6 @@ const Login: NextPageWithLayout = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (status === 'authenticated') {
-      void router.push('/dashboard')
-    }
-  }, [router, status])
-
-  useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -45,8 +39,6 @@ const Login: NextPageWithLayout = () => {
       },
     )
   }
-
-  if (status === 'authenticated') return null
 
   return (
     <Container>
