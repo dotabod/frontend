@@ -7,52 +7,7 @@ import type { NextAuthOptions } from 'next-auth'
 import { decode, encode } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
-
-// Manually toggle this when logging in as the bot if we need to update scopes
-const useBotScopes = process.env.VERCEL_ENV !== 'production'
-
-// Do not delete this declaration
-const chatBotScopes = [
-  'channel:moderate',
-  'whispers:read',
-  'user:bot',
-  'whispers:edit',
-  'user:manage:whispers',
-  'moderator:read:chat_settings', // To check follower mode, emoji mode, etc
-  'moderator:manage:chat_messages', // For the !plebs command
-  'moderator:manage:banned_users', // For !only command
-  'moderator:manage:chat_settings', // To update slow mode, follower mode, etc
-].join(' ')
-
-const defaultScopes = [
-  'channel:bot', // Allows joining with Dotabod in the channel (new requirement by twitch)
-  'channel:manage:ads', // Run ads automatically when a game ends
-  'channel:manage:broadcast', // Create clips on rampage, update channel's game when playing dota, etc
-  'channel:manage:moderators', // To add Dotabod as a moderator (required)
-  'channel:manage:polls',
-  'channel:manage:predictions',
-  'channel:read:ads', // Determine if an ad is running
-  'channel:read:polls',
-  'channel:read:predictions',
-  'channel:read:vips', // Custom commands for VIPs
-  'chat:edit',
-  'chat:read',
-  'clips:edit', // Rampage clips, funny deaths, etc
-  'moderator:read:followers', // Save total followers for the user
-  'moderation:read', // Check if Dotabod is banned so we can disable it
-  'openid',
-  'user:read:broadcast', // We can check if twitch tooltips extension is enabled
-  'user:read:chat',
-  'user:read:email',
-  'user:read:moderated_channels', // Check where the user is a moderator, for dotabod mod dashboard (coming soon)
-  'user:write:chat',
-].join(' ')
-
-export const chatVerifyScopes = [
-  // Only roles that chatters who want to verify with Twitch need
-  'user:read:email',
-  'openid',
-].join(' ')
+import { chatVerifyScopes, defaultScopes, chatBotScopes } from './authScopes'
 
 const extractCookieValue = (cookieHeader: string | string[], name: string) => {
   const cookieStringFull = Array.isArray(cookieHeader)
@@ -269,7 +224,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: useBotScopes ? `${defaultScopes} ${chatBotScopes}` : defaultScopes,
+          scope: defaultScopes,
         },
       },
     }),
@@ -357,16 +312,25 @@ export const authOptions: NextAuthOptions = {
         ?.split(' ')
         .every((scope) => chatVerifyScopes.split(' ').includes(scope))
 
+      const isLoggingInAsBot = account?.scope
+        ?.split(' ')
+        .some((scope) => chatBotScopes.split(' ').includes(scope))
+
       const alreadyHasStreamerScopes =
         provider?.Account?.scope &&
         provider.Account.scope.split(' ').length > chatVerifyScopes.split(' ').length &&
         provider.Account.requires_refresh === false
 
-      const getRole = () => {
+      const getRole = (): 'bot' | 'user' | 'chatter' | 'admin' => {
         if (provider?.admin?.role) {
-          return provider.admin.role
+          return provider.admin.role as 'admin'
         }
 
+        if (isLoggingInAsBot) {
+          return 'bot'
+        }
+
+        // even if they login as chatter, since they have streamer scopes, we should treat them as a user
         if (alreadyHasStreamerScopes) {
           return 'user'
         }
@@ -378,13 +342,17 @@ export const authOptions: NextAuthOptions = {
         return 'user'
       }
 
-      const role = getRole()
+      const roleFromScopes = getRole()
       const scopesToUpdate =
-        role === 'chatter'
+        roleFromScopes === 'chatter'
           ? chatVerifyScopes
-          : alreadyHasStreamerScopes && isLoggingInAsChatter
-            ? (provider?.Account?.scope ?? defaultScopes)
-            : (account?.scope ?? defaultScopes)
+          : roleFromScopes === 'bot'
+            ? chatBotScopes
+            : alreadyHasStreamerScopes && isLoggingInAsChatter
+              ? // use old scopes
+                (provider?.Account?.scope ?? defaultScopes)
+              : // use new scopes
+                (account?.scope ?? defaultScopes)
 
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
       if (
@@ -408,42 +376,39 @@ export const authOptions: NextAuthOptions = {
       if (!twitchId) {
         throw new Error('Twitch ID is required')
       }
-      const isBotUser = twitchId === Number(process.env.TWITCH_BOT_PROVIDERID)
-      const shouldRefresh =
-        account && ((!useBotScopes && !isBotUser) || (useBotScopes && isBotUser))
 
-      if (
-        provider?.Account?.requires_refresh === true ||
-        ((shouldRefresh || process.env.VERCEL_ENV !== 'production') &&
-          !isImpersonating &&
-          role !== 'chatter')
-      ) {
+      let shouldRefresh = false
+      if (account) {
+        shouldRefresh = true
+
+        if (isLoggingInAsChatter && alreadyHasStreamerScopes) {
+          shouldRefresh = false
+        }
+
+        if (isImpersonating) {
+          shouldRefresh = false
+        }
+      }
+
+      if (shouldRefresh && account) {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
-
-        if (!account) {
-          throw new Error('Account is required')
-        }
-
-        if (provider?.Account?.requires_refresh === true || !isLoggingInAsChatter) {
-          console.log('SETTING TO FALSE')
-          await prisma.account.update({
-            where: {
-              provider_providerAccountId: {
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-              },
+        await prisma.account.update({
+          where: {
+            provider_providerAccountId: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
             },
-            data: {
-              updatedAt: new Date(),
-              refresh_token: account.refresh_token,
-              access_token: account.access_token,
-              expires_at: account.expires_at,
-              scope: account.scope,
-              requires_refresh: false,
-            },
-          })
-        }
+          },
+          data: {
+            updatedAt: new Date(),
+            refresh_token: account.refresh_token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            scope: account.scope,
+            requires_refresh: false,
+          },
+        })
       }
 
       return {
@@ -454,7 +419,7 @@ export const authOptions: NextAuthOptions = {
         email: newUser.email,
         picture: newUser.image,
         isImpersonating,
-        role,
+        role: roleFromScopes,
         scope: scopesToUpdate,
       }
     },

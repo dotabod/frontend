@@ -5,6 +5,7 @@ import type { NextPageWithLayout } from '@/pages/_app'
 import * as Sentry from '@sentry/nextjs'
 import { App, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useCallback } from 'react'
 
@@ -87,10 +88,8 @@ const Login: NextPageWithLayout = () => {
           <div>
             <UserAuthForm />
             <Typography.Paragraph style={{ textAlign: 'center', marginTop: '1rem' }}>
-              Need to verify your Steam account?{' '}
-              <a href='/verify' style={{ fontWeight: 'bold' }}>
-                Click here
-              </a>
+              Not a streamer? If you just want to become Dotabod Verified to show your rank in chat,{' '}
+              <Link href='/verify'>login here</Link>
             </Typography.Paragraph>
           </div>
         </div>

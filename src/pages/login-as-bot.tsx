@@ -1,0 +1,96 @@
+import { Container } from '@/components/Container'
+import HomepageShell from '@/components/Homepage/HomepageShell'
+import type { NextPageWithLayout } from '@/pages/_app'
+import { Button, Typography } from 'antd'
+import { signIn, useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { type ReactElement, useEffect, useState } from 'react'
+import { chatBotScopes } from '@/lib/authScopes'
+
+const Login: NextPageWithLayout = () => {
+  const { status } = useSession()
+  const router = useRouter()
+  const [countdown, setCountdown] = useState(6)
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      void router.push('/dashboard')
+    }
+  }, [router, status])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          void router.push('/login')
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [router])
+
+  const handleSignIn = () => {
+    setIsLoading(true)
+    void signIn(
+      'twitch',
+      { callbackUrl: '/dashboard' },
+      {
+        scope: chatBotScopes,
+      },
+    )
+  }
+
+  if (status === 'authenticated') return null
+
+  return (
+    <Container>
+      <div
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+      >
+        <div style={{ width: '100%', maxWidth: '32rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <Typography.Title level={2}>Sign in as a chat bot</Typography.Title>
+            <Typography.Paragraph style={{ fontSize: '1.125rem', color: 'var(--color-dark-300)' }}>
+              You probably want to sign in as a streamer,{' '}
+              <Link href='/login'>
+                <strong>login here</strong>
+              </Link>
+            </Typography.Paragraph>
+            <Typography.Paragraph style={{ fontSize: '1rem', color: 'var(--color-dark-300)' }}>
+              Redirecting to the streamer login page in {countdown} seconds...
+            </Typography.Paragraph>
+          </div>
+          <div>
+            Actually a chat bot?{' '}
+            <Button loading={isLoading} onClick={handleSignIn}>
+              login here
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Container>
+  )
+}
+
+Login.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <HomepageShell
+      seo={{
+        title: 'Sign In (chat bot) | Dotabod',
+        description:
+          'Sign in to your Dotabod chat bot account to access your dashboard and manage your Dota 2 streaming tools.',
+        canonicalUrl: 'https://dotabod.com/login-as-bot',
+      }}
+    >
+      {page}
+    </HomepageShell>
+  )
+}
+
+export default Login

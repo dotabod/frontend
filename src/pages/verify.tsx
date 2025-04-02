@@ -24,8 +24,9 @@ import { getRankTitle } from '@/lib/ranks'
 import Link from 'next/link'
 import { StarOutlined, StarFilled, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import TwitchChat from '@/components/TwitchChat'
+import { chatVerifyScopes } from '@/lib/authScopes'
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Text } = Typography
 
 const STEAM_OPEN_ID_URL = 'https://steamcommunity.com/openid/login'
 
@@ -128,10 +129,16 @@ const VerifyPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (status === 'unauthenticated') {
       // Pass specific scopes as a query parameter
-      signIn('twitch', {
-        redirect: false,
-        callbackUrl: '/verify',
-      }).catch((e) => {
+      signIn(
+        'twitch',
+        {
+          redirect: false,
+          callbackUrl: '/verify',
+        },
+        {
+          scope: chatVerifyScopes,
+        },
+      ).catch((e) => {
         captureException(e)
         console.error(e)
       })
