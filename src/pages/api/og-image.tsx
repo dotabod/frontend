@@ -33,7 +33,7 @@ export default async function handler(req: NextRequest) {
           position: 'relative',
         }}
       >
-        {/* Background with gradient */}
+        {/* Background with grid pattern */}
         <div
           style={{
             position: 'absolute',
@@ -43,13 +43,76 @@ export default async function handler(req: NextRequest) {
             height: '100%',
             background: 'linear-gradient(to bottom right, #1f2937, #111827)',
             opacity: 0.9,
-            zIndex: 1,
           }}
         />
+        <svg
+          aria-hidden='true'
+          style={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            inset: 0,
+            height: '100%',
+            width: '100%',
+            fill: 'rgba(156, 163, 175, 0.3)',
+            stroke: 'rgba(156, 163, 175, 0.3)',
+            maskImage: 'linear-gradient(to bottom right, white, transparent, transparent)',
+            WebkitMaskImage: 'linear-gradient(to bottom right, white, transparent, transparent)',
+          }}
+        >
+          <defs>
+            <pattern
+              id='grid-pattern'
+              width={20}
+              height={20}
+              patternUnits='userSpaceOnUse'
+              x={-1}
+              y={-1}
+            >
+              <path d='M.5 20V.5H20' fill='none' strokeDasharray='0' />
+            </pattern>
+          </defs>
+          <rect width='100%' height='100%' strokeWidth={0} fill='url(#grid-pattern)' />
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
+          <svg x={-1} y={-1} style={{ overflow: 'visible' }}>
+            {Array.from({ length: 20 }).flatMap((_, i) =>
+              Array.from({ length: 20 }).map((_, j) => (
+                <rect
+                  strokeWidth='0'
+                  key={`grid-${i}-${j}`}
+                  width={19}
+                  height={19}
+                  x={i * 20 + 1}
+                  y={j * 20 + 1}
+                />
+              )),
+            )}
+          </svg>
+        </svg>
 
-        {/* Background illustration (simplified) */}
+        {/* Dota logo in bottom right corner, partially cut off and faded */}
         <div
           style={{
+            display: 'flex',
+            position: 'absolute',
+            bottom: '-150px',
+            right: '-150px',
+            width: '400px',
+            height: '400px',
+            maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%)',
+          }}
+        >
+          <img
+            src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/images/dota.svg`}
+            alt='Dota Logo'
+            width={400}
+            height={400}
+          />
+        </div>
+        <div
+          style={{
+            display: 'flex',
             position: 'absolute',
             top: 0,
             left: 0,
@@ -58,7 +121,6 @@ export default async function handler(req: NextRequest) {
             backgroundImage: 'radial-gradient(#4B5563 1px, transparent 1px)',
             backgroundSize: '30px 30px',
             opacity: 0.1,
-            zIndex: 2,
           }}
         />
 
@@ -71,28 +133,9 @@ export default async function handler(req: NextRequest) {
             justifyContent: 'center',
             width: '100%',
             height: '100%',
-            zIndex: 10,
             padding: '60px',
           }}
         >
-          <div style={{ display: 'flex', marginBottom: 48, alignItems: 'center' }}>
-            <img
-              src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/dotabod.svg`}
-              alt='Dotabod Logo'
-              width={180}
-              height={180}
-            />
-            <span
-              style={{
-                fontSize: 88,
-                fontWeight: 'bold',
-                color: 'white',
-                marginLeft: 20,
-              }}
-            >
-              Dotabod
-            </span>
-          </div>
           {/* Template-specific content */}
           {children}
 
@@ -100,15 +143,41 @@ export default async function handler(req: NextRequest) {
           <div
             style={{
               position: 'absolute',
-              bottom: 20,
-              right: 20,
+              top: 20,
+              right: 40,
               fontSize: 24,
               color: 'rgba(255, 255, 255, 0.7)',
               fontWeight: 500,
-              zIndex: 10,
+              display: 'flex',
+              marginBottom: 48,
+              alignItems: 'center',
             }}
           >
-            dotabod.com
+            <img
+              src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/dotabod.svg`}
+              alt='Dotabod Logo'
+              width={85}
+              height={85}
+            />
+            <span
+              style={{
+                fontSize: 55,
+                fontWeight: 'bold',
+                color: 'white',
+                marginLeft: 20,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+              }}
+            >
+              <span>Dotabod</span>
+              <img
+                src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/images/emotes/peepofat.gif`}
+                alt='Peepofat'
+                width={55}
+                height={55}
+              />
+            </span>
           </div>
         </div>
       </div>
