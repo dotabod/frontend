@@ -80,10 +80,11 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
   const canonicalUrl = `https://dotabod.com/blog/${meta.slug}`
 
   // Generate dynamic OG image URL
-  const ogImageUrl = new URL(
-    '/api/og-image',
-    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL || 'https://dotabod.com',
-  )
+  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'https://dotabod.com'
+
+  const ogImageUrl = new URL('/api/og-image', baseUrl)
   ogImageUrl.searchParams.set('type', 'blog')
   ogImageUrl.searchParams.set('title', meta.title)
 
