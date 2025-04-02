@@ -47,7 +47,7 @@ export default async function handler(req: NextRequest) {
           }}
         />
 
-        {/* Pattern overlay */}
+        {/* Background illustration (simplified) */}
         <div
           style={{
             position: 'absolute',
@@ -67,15 +67,14 @@ export default async function handler(req: NextRequest) {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
             width: '100%',
             height: '100%',
             zIndex: 10,
-            padding: '40px',
+            padding: '60px',
           }}
         >
-          {/* Use welcome.png as the logo */}
           <div style={{ display: 'flex', marginBottom: 48, alignItems: 'center' }}>
             <img
               src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/dotabod.svg`}
@@ -85,7 +84,7 @@ export default async function handler(req: NextRequest) {
             />
             <span
               style={{
-                fontSize: 68,
+                fontSize: 88,
                 fontWeight: 'bold',
                 color: 'white',
                 marginLeft: 20,
@@ -94,7 +93,6 @@ export default async function handler(req: NextRequest) {
               Dotabod
             </span>
           </div>
-
           {/* Template-specific content */}
           {children}
 
@@ -127,7 +125,7 @@ export default async function handler(req: NextRequest) {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
+              alignItems: 'flex-start',
             }}
           >
             <h1
@@ -137,7 +135,6 @@ export default async function handler(req: NextRequest) {
                 margin: 0,
                 marginBottom: 24,
                 textShadow: '0px 4px 4px rgba(0, 0, 0, 0.5)',
-                textAlign: 'center',
               }}
             >
               {username}
@@ -147,7 +144,6 @@ export default async function handler(req: NextRequest) {
                 fontSize: 32,
                 color: '#9CA3AF',
                 margin: 0,
-                textAlign: 'center',
                 maxWidth: '80%',
                 textShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
               }}
@@ -165,7 +161,7 @@ export default async function handler(req: NextRequest) {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
+              alignItems: 'flex-start',
             }}
           >
             <h1
@@ -175,7 +171,6 @@ export default async function handler(req: NextRequest) {
                 margin: 0,
                 marginBottom: 24,
                 textShadow: '0px 4px 4px rgba(0, 0, 0, 0.5)',
-                textAlign: 'center',
               }}
             >
               Get Dotabod Verified
@@ -185,7 +180,6 @@ export default async function handler(req: NextRequest) {
                 fontSize: 32,
                 color: '#9CA3AF',
                 margin: 0,
-                textAlign: 'center',
                 maxWidth: '80%',
                 textShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
               }}
@@ -196,40 +190,226 @@ export default async function handler(req: NextRequest) {
         )
         break
 
-      default:
-        // Generic template that uses title and subtitle parameters
+      case 'streamer':
+        // New template for streamer homepage similar to the screenshot
         content = (
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
+              alignItems: 'flex-start',
+              width: '100%',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '12px',
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: 72,
+                  fontWeight: 'bold',
+                  color: 'white',
+                  margin: 0,
+                  textShadow: '0px 4px 4px rgba(0, 0, 0, 0.5)',
+                }}
+              >
+                Welcome, streamers
+              </h1>
+              <img
+                src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/images/emotes/peepoclap.webp`}
+                width={72}
+                height={72}
+                alt='peepoclap'
+                style={{ marginLeft: '16px' }}
+              />
+            </div>
+
+            <p
+              style={{
+                fontSize: 28,
+                color: '#9CA3AF',
+                margin: 0,
+                marginTop: 24,
+                marginBottom: 32,
+                maxWidth: '70%',
+                lineHeight: 1.4,
+              }}
+            >
+              By leveraging insights from the Dota 2 official API, Dotabod will know exactly when to
+              hide sensitive streamer information or engage with your Twitch audience.
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                marginTop: 16,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f43f5e',
+                  color: 'white',
+                  padding: '10px 24px',
+                  borderRadius: '6px',
+                  fontSize: 24,
+                  fontWeight: 'bold',
+                }}
+              >
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  style={{ marginRight: '8px' }}
+                >
+                  <title>Home Icon</title>
+                  <path
+                    d='M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15'
+                    stroke='white'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+                Get started
+              </div>
+            </div>
+
+            {/* Placeholder for the Dota logo in a phone frame - simplified for OG image */}
+            <div
+              style={{
+                position: 'absolute',
+                right: 80,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 240,
+                height: 240,
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                borderRadius: 120,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <img
+                src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/dotabod.svg`}
+                width={160}
+                height={160}
+                alt='Dotabod Logo'
+              />
+            </div>
+          </div>
+        )
+        break
+
+      default:
+        // Updated default template that resembles the streamer layout but uses title and subtitle parameters
+        content = (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              width: '100%',
             }}
           >
             <h1
               style={{
-                fontSize: 64,
+                fontSize: 72,
+                fontWeight: 'bold',
                 color: 'white',
                 margin: 0,
                 marginBottom: 24,
                 textShadow: '0px 4px 4px rgba(0, 0, 0, 0.5)',
-                textAlign: 'center',
               }}
             >
               {title || 'Dotabod'}
             </h1>
-            <h2
+            <p
               style={{
-                fontSize: 32,
+                fontSize: 28,
                 color: '#9CA3AF',
                 margin: 0,
-                textAlign: 'center',
-                maxWidth: '80%',
-                textShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
+                marginTop: 24,
+                marginBottom: 32,
+                maxWidth: '70%',
+                lineHeight: 1.4,
               }}
             >
               {subtitle || 'Enhance Your Dota 2 Streaming Experience'}
-            </h2>
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                marginTop: 16,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f43f5e',
+                  color: 'white',
+                  padding: '10px 24px',
+                  borderRadius: '6px',
+                  fontSize: 24,
+                  fontWeight: 'bold',
+                }}
+              >
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  style={{ marginRight: '8px' }}
+                >
+                  <title>Home Icon</title>
+                  <path
+                    d='M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15'
+                    stroke='white'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+                Get started
+              </div>
+            </div>
+
+            {/* Placeholder for the Dota logo in a phone frame - simplified for OG image */}
+            <div
+              style={{
+                position: 'absolute',
+                right: 80,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 240,
+                height: 240,
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                borderRadius: 120,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <img
+                src={`${host?.includes('localhost') ? 'http' : 'https'}://${host}/dotabod.svg`}
+                width={160}
+                height={160}
+                alt='Dotabod Logo'
+              />
+            </div>
           </div>
         )
     }
