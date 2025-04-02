@@ -120,6 +120,13 @@ export function Hero() {
   }>('/api/featured-users', fetcher)
   const track = useTrack()
 
+  // Check if the logged-in user is already in the top streamers list
+  const userInTopLive =
+    session.data?.user?.name &&
+    users?.topLive?.some(
+      (user) => user.name.toLowerCase() === session.data?.user?.name?.toLowerCase(),
+    )
+
   return (
     <div className='overflow-hidden py-4 sm:py-4 lg:pb-4 xl:pb-4'>
       <Container>
@@ -218,15 +225,17 @@ export function Hero() {
                     }}
                   />
                 ))}
-                <TwitchUser
-                  key='You?'
-                  last={true}
-                  name='You?'
-                  onClick={() => {
-                    track('homepage - static twitch profile')
-                  }}
-                  image='/images/hero/default.png'
-                />
+                {!userInTopLive && (
+                  <TwitchUser
+                    key='You?'
+                    last={true}
+                    name='You?'
+                    onClick={() => {
+                      track('homepage - static twitch profile')
+                    }}
+                    image='/images/hero/default.png'
+                  />
+                )}
               </ul>
             )
           )}

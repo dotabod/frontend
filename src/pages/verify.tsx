@@ -506,7 +506,7 @@ const VerifyPage: NextPageWithLayout = () => {
       <Container>
         <div className='flex flex-col min-h-[60vh]'>
           <Title level={2} className='mb-6'>
-            Dotabod Verification
+            Get Dotabod Verified
           </Title>
           <Card className='w-full shadow-sm'>
             <Skeleton active avatar paragraph={{ rows: 4 }} />
@@ -520,7 +520,7 @@ const VerifyPage: NextPageWithLayout = () => {
     <Container>
       <div className='flex flex-col min-h-[60vh]'>
         <Title level={2} className='mb-6'>
-          Dotabod Verification
+          Get Dotabod Verified
         </Title>
 
         {/* Step 1: Twitch Authentication Status */}
@@ -775,7 +775,7 @@ VerifyPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       seo={{
-        title: 'Dotabod Verification | Dotabod',
+        title: 'Get verified | Dotabod',
         description:
           'Verify your Twitch and Steam accounts to become Dotabod Verified and unlock all features.',
         canonicalUrl: 'https://dotabod.com/verify',
