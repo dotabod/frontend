@@ -197,7 +197,7 @@ const CommandsPage: NextPageWithLayout = () => {
       </Head>
       <div className='p-6'>
         <div className='mb-12 space-y-4'>
-          <div className='flex flex-row items-center space-x-2'>
+          <div className='flex flex-row flex-wrap items-center space-x-2'>
             <img
               onError={(e) => {
                 e.currentTarget.src = '/images/hero/default.png'
