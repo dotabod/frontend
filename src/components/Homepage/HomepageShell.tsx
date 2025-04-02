@@ -56,11 +56,12 @@ const HomepageShell = ({
     if (ogImage.subtitle) params.append('subtitle', ogImage.subtitle)
     if (ogImage.username || username) params.append('username', ogImage.username || username || '')
 
-    defaultOgImage = `/api/og-image?${params.toString()}`
+    // Ensure the URL has the full origin for absolute URLs
+    defaultOgImage = `${host}/api/og-image?${params.toString()}`
   }
   // For backward compatibility - if only username is provided
   else if (username) {
-    defaultOgImage = `/api/og-image?type=profile&username=${encodeURIComponent(username)}`
+    defaultOgImage = `${host}/api/og-image?type=profile&username=${encodeURIComponent(username)}`
   }
 
   const defaultUrl = !process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
@@ -71,6 +72,8 @@ const HomepageShell = ({
   const pageTitle = seo?.title || (title as string) || defaultTitle
   const pageDescription = seo?.description || defaultDescription
   const pageImage = seo?.ogImage || defaultOgImage
+  // Ensure pageImage is an absolute URL
+  const absolutePageImage = pageImage.startsWith('http') ? pageImage : `${host}${pageImage}`
   const pageUrl = seo?.canonicalUrl || defaultUrl
   const pageType = seo?.ogType || 'website'
 
@@ -88,13 +91,13 @@ const HomepageShell = ({
         <meta property='og:url' content={pageUrl} />
         <meta property='og:title' content={pageTitle} />
         <meta property='og:description' content={pageDescription} />
-        <meta property='og:image' content={pageImage} />
+        <meta property='og:image' content={absolutePageImage} />
 
         <meta property='twitter:card' content='summary_large_image' />
         <meta property='twitter:url' content={pageUrl} />
         <meta property='twitter:title' content={pageTitle} />
         <meta property='twitter:description' content={pageDescription} />
-        <meta property='twitter:image' content={pageImage} />
+        <meta property='twitter:image' content={absolutePageImage} />
 
         {!seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
 

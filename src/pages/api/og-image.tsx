@@ -118,6 +118,50 @@ export default async function handler(req: NextRequest) {
     let content: React.ReactNode
 
     switch (pageType) {
+      case 'blog':
+        // Template for blog posts
+        content = (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              width: '100%',
+              maxWidth: '900px',
+            }}
+          >
+            <h1
+              style={{
+                fontSize: 64,
+                fontWeight: 'bold',
+                color: 'white',
+                margin: 0,
+                marginBottom: 24,
+                textShadow: '0px 4px 4px rgba(0, 0, 0, 0.5)',
+                lineHeight: 1.2,
+              }}
+            >
+              {title || 'Blog Post'}
+            </h1>
+            {subtitle && (
+              <p
+                style={{
+                  fontSize: 28,
+                  color: '#9CA3AF',
+                  margin: 0,
+                  marginTop: 0,
+                  maxWidth: '80%',
+                  lineHeight: 1.4,
+                  textShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                {subtitle}
+              </p>
+            )}
+          </div>
+        )
+        break
+
       case 'profile':
         // Template for user profiles ([username].tsx)
         content = (
