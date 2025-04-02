@@ -781,7 +781,6 @@ VerifyPage.getLayout = function getLayout(page: ReactElement) {
         canonicalUrl: 'https://dotabod.com/verify',
       }}
       ogImage={{
-        type: 'verify',
         title: 'Get Dotabod Verified',
         subtitle: 'Link your Steam account to become Dotabod Verified',
       }}

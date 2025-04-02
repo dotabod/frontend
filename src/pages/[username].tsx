@@ -309,8 +309,8 @@ const CommandsPage = () => {
     <HomepageShell
       dontUseTitle
       ogImage={{
-        type: 'profile',
-        username: usernameStr,
+        title: usernameStr,
+        subtitle: 'List of commands and settings for this streamer.',
       }}
     >
       <PageContent />

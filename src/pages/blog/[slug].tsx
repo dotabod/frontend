@@ -85,7 +85,6 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
     : 'https://dotabod.com'
 
   const ogImageUrl = new URL('/api/og-image', baseUrl)
-  ogImageUrl.searchParams.set('type', 'blog')
   ogImageUrl.searchParams.set('title', meta.title)
 
   // Add subtitle/description if available
