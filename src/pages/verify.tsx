@@ -777,8 +777,13 @@ VerifyPage.getLayout = function getLayout(page: ReactElement) {
       seo={{
         title: 'Get verified | Dotabod',
         description:
-          'Verify your Twitch and Steam accounts to become Dotabod Verified and unlock all features.',
+          'Verify your Twitch and Steam accounts to become Dotabod Verified and share your rank in chat!',
         canonicalUrl: 'https://dotabod.com/verify',
+      }}
+      ogImage={{
+        type: 'verify',
+        title: 'Get Dotabod Verified',
+        subtitle: 'Link your Steam account to become Dotabod Verified',
       }}
     >
       {page}

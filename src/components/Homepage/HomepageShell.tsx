@@ -17,24 +17,55 @@ interface SEOProps {
   noindex?: boolean
 }
 
+interface OGImageProps {
+  type?: string
+  title?: string
+  subtitle?: string
+  username?: string
+}
+
 const HomepageShell = ({
   title,
   dontUseTitle,
   children,
   seo,
+  username,
+  ogImage,
 }: {
   dontUseTitle?: boolean
   title?: ReactNode
   children?: ReactNode
   seo?: SEOProps
+  username?: string
+  ogImage?: OGImageProps
 }) => {
   useMaybeSignout()
 
   const defaultTitle = 'Dotabod - Enhance Your Dota 2 Streaming Experience'
   const defaultDescription =
     'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!'
-  const defaultOgImage = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/images/welcome.png`
-  const defaultUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
+  // Generate dynamic OG image URL using parameters
+  let defaultOgImage = '/images/welcome.png'
+  const host = typeof window !== 'undefined' ? window.location.origin : ''
+
+  // If ogImage props are provided, build a custom OG image URL
+  if (ogImage) {
+    const params = new URLSearchParams()
+    if (ogImage.type) params.append('type', ogImage.type)
+    if (ogImage.title) params.append('title', ogImage.title)
+    if (ogImage.subtitle) params.append('subtitle', ogImage.subtitle)
+    if (ogImage.username || username) params.append('username', ogImage.username || username || '')
+
+    defaultOgImage = `/api/og-image?${params.toString()}`
+  }
+  // For backward compatibility - if only username is provided
+  else if (username) {
+    defaultOgImage = `/api/og-image?type=profile&username=${encodeURIComponent(username)}`
+  }
+
+  const defaultUrl = !process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
+    ? host
+    : `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
 
   // Use SEO props if provided, otherwise use defaults
   const pageTitle = seo?.title || (title as string) || defaultTitle

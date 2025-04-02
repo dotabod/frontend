@@ -3,16 +3,15 @@ import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
-import type { NextPageWithLayout } from '@/pages/_app'
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
 import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createGiftLink } from '@/utils/gift-links'
 
-const CommandsPage: NextPageWithLayout = () => {
+const PageContent = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
@@ -301,8 +300,22 @@ const CommandsPage: NextPageWithLayout = () => {
   )
 }
 
-CommandsPage.getLayout = function getLayout(page: ReactElement) {
-  return <HomepageShell dontUseTitle>{page}</HomepageShell>
+const CommandsPage = () => {
+  const router = useRouter()
+  const { username } = router.query
+  const usernameStr = typeof username === 'string' ? username : ''
+
+  return (
+    <HomepageShell
+      dontUseTitle
+      ogImage={{
+        type: 'profile',
+        username: usernameStr,
+      }}
+    >
+      <PageContent />
+    </HomepageShell>
+  )
 }
 
 export default CommandsPage

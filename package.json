@@ -47,6 +47,7 @@
     "@twurple/eventsub-base": "7.2.1",
     "@vercel/analytics": "^1.5.0",
     "@vercel/edge-config": "^1.4.0",
+    "@vercel/og": "^0.6.8",
     "antd": "^5.24.3",
     "axios": "^1.8.2",
     "canvas-confetti": "^1.9.3",
