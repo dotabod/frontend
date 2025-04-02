@@ -3,10 +3,11 @@ import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { CursorArrowRaysIcon } from '@heroicons/react/24/outline'
-import { Button, Skeleton } from 'antd'
-import { useSession } from 'next-auth/react'
+import { Button, Popover, Skeleton } from 'antd'
+import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
 import { Container } from 'src/components/Container'
 import DiscordSvg from 'src/images/logos/discord.svg'
 import dotaLogo from 'src/images/logos/dota.svg'
@@ -28,14 +29,68 @@ const TwitchUser = ({
   const session = useSession()
   const userName = last ? session?.data?.user?.name || name : name
   const imagesrc = last ? session?.data?.user?.image || image : image
+  const [open, setOpen] = useState(false)
+  const track = useTrack()
+
+  const handleSignIn = () => {
+    track('homepage - signin from popover')
+    void signIn('twitch', { callbackUrl: '/dashboard' })
+  }
+
+  const popoverContent = (
+    <div className='flex flex-col items-center py-2 px-4'>
+      <p className='mb-4 text-center'>Sign in to get started with your own Dotabod experience!</p>
+      <Button type='primary' onClick={handleSignIn}>
+        Sign in with Twitch
+      </Button>
+    </div>
+  )
+
+  if (userName === 'You?') {
+    return (
+      <li className='relative'>
+        <Popover
+          content={popoverContent}
+          title='Join the community!'
+          trigger='click'
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <button
+            type='button'
+            className='flex w-full flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105 cursor-pointer'
+            onClick={() => {
+              if (onClick) onClick({} as unknown as React.MouseEvent<HTMLAnchorElement, MouseEvent>)
+              setOpen(true)
+            }}
+          >
+            <Image
+              src={imagesrc}
+              onError={(e) => {
+                e.currentTarget.src = '/images/hero/default.png'
+              }}
+              width={50}
+              height={50}
+              alt={userName}
+              unoptimized
+              className='rounded-lg shadow-lg'
+            />
+            <span className='text-xs text-gray-300 transition-colors duration-300 ease-in-out group-hover:text-primary-foreground'>
+              {userName}
+            </span>
+          </button>
+        </Popover>
+      </li>
+    )
+  }
 
   return (
     <li className='relative'>
       <Link
         className='flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105'
         rel='noreferrer'
-        onClick={userName === 'You?' ? onClick : undefined}
-        href={userName === 'You?' ? '#' : `/${userName}`}
+        onClick={onClick}
+        href={`/${userName}`}
       >
         <Image
           src={imagesrc}
@@ -135,8 +190,8 @@ export function Hero() {
         <div className='relative lg:col-span-7 xl:col-span-6'>
           {isLoading ? (
             <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start pt-4'>
-              {[...Array(10)].map((_, index) => (
-                <li key={index} className='relative'>
+              {[...Array(10)].map((_, i) => (
+                <li key={`skeleton-${i}`} className='relative'>
                   <div className='flex flex-col items-center space-y-2 px-4 py-2'>
                     <Skeleton.Avatar active size={50} shape='square' style={{ borderRadius: 8 }} />
                     <Skeleton.Input
@@ -167,8 +222,7 @@ export function Hero() {
                   key='You?'
                   last={true}
                   name='You?'
-                  onClick={(e) => {
-                    e.preventDefault()
+                  onClick={() => {
                     track('homepage - static twitch profile')
                   }}
                   image='/images/hero/default.png'
