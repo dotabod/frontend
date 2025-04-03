@@ -1,6 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
-import { Badge, Tag, Tooltip } from 'antd'
+import { Badge, Tag, Tooltip, Skeleton } from 'antd'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -143,31 +143,41 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     <div className={`${commonClasses} justify-center`}>
       <Tooltip title={badgeDetails?.tooltip || tooltipProps.title}>
         <Link href='/dashboard/billing' className='no-underline'>
-          <Tag
-            color={badgeDetails?.color || statusInfo?.badge}
-            className='px-3 py-1.5 rounded-md transition-all duration-200 hover:shadow-md'
-          >
-            <div className={`${commonClasses} justify-center`}>
-              <div className='flex items-center gap-2'>
-                {badgeDetails?.icon ? (
-                  <>
-                    {badgeDetails.icon}
-                    <span className='font-medium'>{badgeDetails.text}</span>
-                  </>
-                ) : (
-                  <>
-                    {logo}
-                    <span className='font-medium'>{currentPlan?.name} Plan</span>
-                  </>
-                )}
+          {isLoading || !currentPlan ? (
+            <Skeleton.Button
+              active
+              size='small'
+              shape='default'
+              block
+              className='px-3 py-1.5 rounded-md transition-all duration-200 w-full min-w-[130px]'
+            />
+          ) : (
+            <Tag
+              color={badgeDetails?.color || statusInfo?.badge}
+              className='px-3 py-1.5 rounded-md transition-all duration-200 hover:shadow-md w-full'
+            >
+              <div className={`${commonClasses} justify-center w-full`}>
+                <div className='flex items-center justify-center gap-4 w-full'>
+                  {badgeDetails?.icon ? (
+                    <div className='flex items-center justify-between w-full'>
+                      {badgeDetails.icon}
+                      <span className='font-medium'>{badgeDetails.text}</span>
+                    </div>
+                  ) : (
+                    <div className='flex items-center justify-between w-full'>
+                      {logo}
+                      <span className='font-medium'>{currentPlan?.name} Plan</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            {!badgeDetails && statusInfo?.message && (
-              <div className='text-center text-xs mt-1 opacity-90 break-words'>
-                {statusInfo.message}
-              </div>
-            )}
-          </Tag>
+              {!badgeDetails && statusInfo?.message && (
+                <div className='text-center text-xs mt-1 opacity-90 break-words w-full'>
+                  {statusInfo.message}
+                </div>
+              )}
+            </Tag>
+          )}
         </Link>
       </Tooltip>
     </div>

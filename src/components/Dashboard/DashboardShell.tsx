@@ -342,7 +342,7 @@ export default function DashboardShell({
           <div className='logo' />
 
           <div className='flex flex-col items-end'>
-            <div className='w-full md:max-w-xs'>
+            <div className='w-full'>
               <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center gap-2'>
                 {!collapsed ? (
                   <Link href='/'>
@@ -353,9 +353,8 @@ export default function DashboardShell({
                     <Logomark className='h-full w-auto' aria-hidden='true' />
                   </Link>
                 )}
-
-                <SubscriptionBadge collapsed={collapsed} />
               </div>
+              <SubscriptionBadge collapsed={collapsed} />
 
               {!collapsed ? (
                 <div className='flex justify-center py-2'>
