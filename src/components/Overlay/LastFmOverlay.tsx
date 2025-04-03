@@ -40,7 +40,7 @@ export default function LastFmOverlay() {
   }
 
   return (
-    <Card title='Last.fm' className='w-full' feature='lastFmOverlay'>
+    <Card title='Spotify / Youtube' className='w-full' feature='lastFmOverlay'>
       <Paragraph type='secondary' className='mb-4'>
         Show your currently playing music from Last.fm on your overlay. Connect your Last.fm account
         to display what you're listening to while streaming.
@@ -52,7 +52,7 @@ export default function LastFmOverlay() {
             <TierSwitch
               hideTierBadge
               settingKey={Settings.lastFmOverlay}
-              label='Show Last.fm now playing'
+              label='Show currently playing song'
             />
             <TierSwitch
               hideTierBadge
