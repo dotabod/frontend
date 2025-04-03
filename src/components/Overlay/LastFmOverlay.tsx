@@ -75,6 +75,26 @@ export default function LastFmOverlay() {
                   >
                     {`https://www.last.fm/user/${username || ''}`}
                   </a>
+                  <div className='mt-2'>
+                    Connect your music services to Last.fm:{' '}
+                    <a
+                      href='https://www.last.fm/settings/applications'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-500 hover:underline'
+                    >
+                      Spotify
+                    </a>{' '}
+                    |{' '}
+                    <a
+                      href='https://chromewebstore.google.com/detail/lastfm-scrobbler-for-yout/kjhnjfldmodoikafpfhfehngokaiegok'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-500 hover:underline'
+                    >
+                      YouTube
+                    </a>
+                  </div>
                 </>
               }
               htmlFor='lastfm-username'
