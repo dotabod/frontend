@@ -132,7 +132,9 @@ export default function DashboardShell({
   const defaultTitle = 'Dashboard | Dotabod'
   const defaultDescription =
     'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.'
-  const host = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL || window.location.host
+  const host =
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ||
+    (typeof window !== 'undefined' ? window.location.host : 'dotabod.com')
   const defaultOgImage = `https://${host}/images/welcome.png`
   const defaultUrl = `https://${host}/dashboard`
 
