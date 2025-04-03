@@ -5,7 +5,7 @@ import { Input, Typography, Form } from 'antd'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import { Card } from '@/ui/card'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useState } from 'react'
 
 const { Paragraph } = Typography
@@ -13,6 +13,7 @@ const { Paragraph } = Typography
 export default function LastFmOverlay() {
   const { data: username, updateSetting } = useUpdateSetting<string>(Settings.lastFmUsername)
   const [inputValue, setInputValue] = useState('')
+  const initializedRef = useRef(false)
   const sampleTrack = {
     artist: 'Artist Name',
     title: 'Track Title',
@@ -20,12 +21,13 @@ export default function LastFmOverlay() {
     albumArt: 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif',
   }
 
-  // Set input value once when username is loaded
+  // Set input value only once when username is first loaded
   useEffect(() => {
-    if (username !== undefined && inputValue === '') {
+    if (username !== undefined && !initializedRef.current) {
       setInputValue(username)
+      initializedRef.current = true
     }
-  }, [username, inputValue])
+  }, [username])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
