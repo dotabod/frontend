@@ -28,12 +28,13 @@ export function TierSwitch({
   const isDisabled = externalDisabled || !tierAccess.hasAccess
   const isChecked = externalChecked ?? enabled
   const handleChange = externalOnChange ?? updateSetting
-
   return (
-    <div className={`flex items-center flex-wrap gap-2 ${className}`}>
-      <Switch checked={isChecked} onChange={handleChange} disabled={isDisabled} />
-      {label && <span>{label}</span>}
-      {!hideTierBadge && <TierBadge requiredTier={tierAccess.requiredTier} />}
+    <div className={`flex items-center gap-2 ${className || ''}`}>
+      <div className='flex items-center gap-2 flex-nowrap'>
+        <Switch checked={isChecked} onChange={handleChange} disabled={isDisabled} />
+        {!hideTierBadge && <TierBadge requiredTier={tierAccess.requiredTier} />}
+        {label && <span className='flex-1'>{label}</span>}
+      </div>
     </div>
   )
 }
