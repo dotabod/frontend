@@ -116,7 +116,7 @@ export default function ChatBot() {
   )
   const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')
   const { error: updateEmoteSetError } = useSWR(
-    hasAuto7TVAccess ? '/api/update-emote-set' : null,
+    hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,
     (url) => {
       track('updateEmoteSet called')
       return fetcher(url)
