@@ -66,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         include: {
           settings: true,
           SteamAccount: true,
-          Bet: true,
+          matches: true,
           streams: true,
           subscription: true,
           approvedModerators: true,
