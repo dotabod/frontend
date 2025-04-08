@@ -226,7 +226,6 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: isRecurring ? 'subscription' : 'payment',
-    payment_method_types: ['card'],
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl,
     cancel_url: cancelUrl,
