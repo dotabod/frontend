@@ -52,13 +52,13 @@ model User {
   locale                            String              @default("en")
   kick                              BigInt?             @unique
   youtube                           String?             @unique
-  proExpiration                     DateTime?           @map("pro_expiration") // NEW FIELD: Tracks streamer pro access expiration
+  proExpiration                     DateTime?           @map("pro_expiration")
   MessageDelivery                   MessageDelivery[]
   scheduledMessages                 ScheduledMessage[]
   Account                           Account?
   admin                             admin?
   approvedModerators                ApprovedModerator[] @relation("UserApprovedModerators")
-  Bet                               Bet[]
+  matches                           matches[]
   mods_mods_mod_user_idTousers      mods[]              @relation("mods_mod_user_idTousers")
   mods_mods_streamer_user_idTousers mods[]              @relation("mods_streamer_user_idTousers")
   notifications                     Notification[]
@@ -117,33 +117,6 @@ model SteamAccount {
 
   @@index([userId])
   @@map("steam_accounts")
-}
-
-model Bet {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @default(now()) @map("updated_at")
-  matchId       String
-  predictionId  String?
-  won           Boolean?
-  myTeam        String
-  userId        String
-  lobby_type    Int?     @db.SmallInt
-  steam32Id     BigInt?
-  is_party      Boolean  @default(false)
-  hero_slot     Int?     @db.SmallInt
-  is_doubledown Boolean  @default(false)
-  radiant_score Int?     @db.SmallInt
-  dire_score    Int?     @db.SmallInt
-  kda           Json?
-  hero_name     String?
-  game_mode     Int?     @db.SmallInt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@unique([matchId, userId])
-  @@index([won, lobby_type, createdAt, id], map: "idx_bets_on_won_lobbytype_createdat_id")
-  @@index([updatedAt])
-  @@map("bets")
 }
 
 model mods {
@@ -208,7 +181,7 @@ model Subscription {
   createdAt            DateTime            @default(now()) @map("created_at")
   updatedAt            DateTime            @default(now()) @map("updated_at")
   isGift               Boolean             @default(false)
-  metadata             Json? // Additional gift metadata if needed
+  metadata             Json?
   giftDetails          GiftSubscription?
   user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -220,35 +193,35 @@ model Subscription {
 }
 
 model GiftSubscription {
-  id             String           @id @default(dbgenerated("gen_random_uuid()"))
-  subscriptionId String           @unique
-  senderName     String           @default("Anonymous")
+  id             String            @id @default(dbgenerated("gen_random_uuid()"))
+  subscriptionId String            @unique
+  senderName     String            @default("Anonymous")
   giftMessage    String?
-  giftType       String           @default("monthly")
-  createdAt      DateTime         @default(now()) @map("created_at")
-  updatedAt      DateTime         @default(now()) @map("updated_at")
-  giftQuantity   Int              @default(1)
-  gifterId       String?          // Added field to store the gifter's user ID
-  subscription   Subscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-  notification   Notification?
+  giftType       String            @default("monthly")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @default(now()) @map("updated_at")
+  giftQuantity   Int               @default(1)
+  gifterId       String?
+  subscription   Subscription      @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   transactions   GiftTransaction[]
+  notification   Notification?
 
   @@index([subscriptionId])
   @@map("gift_subscriptions")
 }
 
 model GiftTransaction {
-  id                 String          @id @default(dbgenerated("gen_random_uuid()"))
+  id                 String           @id @default(dbgenerated("gen_random_uuid()"))
   giftSubscriptionId String
   recipientId        String
   gifterId           String?
   giftType           String
   giftQuantity       Int
   amount             Int
-  currency           String          @default("usd")
+  currency           String           @default("usd")
   stripeSessionId    String?
-  createdAt          DateTime        @default(now()) @map("created_at")
-  updatedAt          DateTime        @default(now()) @map("updated_at")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @default(now()) @map("updated_at")
   metadata           Json?
   giftSubscription   GiftSubscription @relation(fields: [giftSubscriptionId], references: [id], onDelete: Cascade)
 
@@ -314,6 +287,55 @@ model MessageDelivery {
   @@index([scheduledMessageId])
   @@index([userId])
   @@index([status])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model advanced_bets {
+  id              Int       @id @default(autoincrement())
+  match_id        String    @db.Uuid
+  bet_type        String
+  predictionid    String?
+  title           String
+  outcome_1       String
+  outcome_2       String
+  winning_outcome Int?
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime? @db.Timestamptz(6)
+  data            Json?     @default("{}")
+  matches         matches   @relation(fields: [match_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([bet_type], map: "idx_advanced_bets_bet_type")
+  @@index([match_id], map: "idx_advanced_bets_match_id")
+  @@index([predictionid], map: "idx_advanced_bets_predictionid")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model matches {
+  id            String          @id(map: "bets_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  matchId       String
+  predictionId  String?
+  won           Boolean?
+  myTeam        String
+  userId        String
+  lobby_type    Int?            @db.SmallInt
+  steam32Id     BigInt?
+  is_party      Boolean         @default(false)
+  hero_slot     Int?            @db.SmallInt
+  is_doubledown Boolean         @default(false)
+  radiant_score Int?            @db.SmallInt
+  dire_score    Int?            @db.SmallInt
+  kda           Json?
+  hero_name     String?
+  game_mode     Int?            @db.SmallInt
+  advanced_bets advanced_bets[]
+  users         User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "bets_userId_fkey")
+
+  @@unique([matchId, userId], map: "bets_matchId_userId_key")
+  @@index([updated_at], map: "bets_updated_at_idx")
+  @@index([won, lobby_type, created_at, id], map: "idx_bets_on_won_lobbytype_createdat_id")
 }
 
 enum SubscriptionStatus {
