@@ -363,145 +363,218 @@ function Plan({
     return false
   }
 
-  const handleSubscribe = useCallback(async () => {
-    if (redirectingToCheckout) return // Prevent multiple calls while redirecting
-    setRedirectingToCheckout(true)
+  const handleSubscribe = useCallback(
+    async (overrideCryptoPreference?: boolean) => {
+      if (redirectingToCheckout) return // Prevent multiple calls while redirecting
+      setRedirectingToCheckout(true)
 
-    try {
-      if (!session) {
-        await signIn('twitch', {
-          callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}${payWithCrypto ? '&crypto=true' : ''}`,
-        })
-        return
-      }
+      // Use the override value if provided, otherwise use the state value
+      const usePayWithCrypto =
+        overrideCryptoPreference !== undefined ? overrideCryptoPreference : payWithCrypto
 
-      // If free plan, redirect to dashboard
-      if (tier === SUBSCRIPTION_TIERS.FREE) {
-        window.location.href = '/dashboard'
-        return
-      }
-
-      // Handle crypto payment scenarios
-      if (isPaidWithCrypto && payWithCrypto && hasActivePlan) {
-        // Case 1: Pay next invoice early (same period)
-        if (isCurrentPlan) {
-          // Redirect to the next invoice payment page
-          const response = await fetch('/api/stripe/crypto-invoice', {
-            method: 'POST',
+      try {
+        if (!session) {
+          await signIn('twitch', {
+            callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}${usePayWithCrypto ? '&crypto=true' : ''}`,
           })
+          return
+        }
 
-          if (!response.ok) {
-            throw new Error('Failed to fetch invoice information')
+        // If free plan, redirect to dashboard
+        if (tier === SUBSCRIPTION_TIERS.FREE) {
+          window.location.href = '/dashboard'
+          return
+        }
+
+        // Handle crypto payment scenarios
+        if (isPaidWithCrypto && usePayWithCrypto && hasActivePlan) {
+          // Case 1: Pay next invoice early (same period)
+          if (isCurrentPlan) {
+            // Redirect to the next invoice payment page
+            const response = await fetch('/api/stripe/crypto-invoice', {
+              method: 'POST',
+            })
+
+            if (!response.ok) {
+              throw new Error('Failed to fetch invoice information')
+            }
+
+            const { url } = await response.json()
+            window.location.href = url
+            return
           }
 
-          const { url } = await response.json()
-          window.location.href = url
-          return
-        }
+          // Case 2: Upgrade from monthly to annual or vice versa
+          const currentIsPeriod =
+            subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+              ? 'monthly'
+              : 'annual'
 
-        // Case 2: Upgrade from monthly to annual or vice versa
-        const currentIsPeriod =
-          subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
-            ? 'monthly'
-            : 'annual'
+          if (currentIsPeriod !== activePeriod && activePeriod !== 'lifetime') {
+            modal.confirm({
+              title: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+              content: (
+                <div className='space-y-2 mt-2'>
+                  <p>
+                    You currently have an active {currentIsPeriod} subscription. Here's what will
+                    happen:
+                  </p>
+                  <ul className='list-disc pl-4 space-y-1'>
+                    <li>You'll be charged for a new {activePeriod} subscription</li>
+                    <li>Once payment is complete, your subscription will be extended</li>
+                    <li>Your access to Pro features will continue uninterrupted</li>
+                    <li className='text-amber-400'>
+                      Any pending invoice for your current plan will be automatically canceled
+                    </li>
+                  </ul>
+                  <p className='mt-4'>Would you like to proceed with the upgrade?</p>
+                </div>
+              ),
+              okText: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+              cancelText: 'Cancel',
+              onOk: async () => {
+                try {
+                  const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
+                  const response = await createCheckoutSession(priceId, session.user.id, 'crypto')
 
-        if (currentIsPeriod !== activePeriod && activePeriod !== 'lifetime') {
-          modal.confirm({
-            title: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
-            content: (
-              <div className='space-y-2 mt-2'>
-                <p>
-                  You currently have an active {currentIsPeriod} subscription. Here's what will
-                  happen:
-                </p>
-                <ul className='list-disc pl-4 space-y-1'>
-                  <li>You'll be charged for a new {activePeriod} subscription</li>
-                  <li>Once payment is complete, your subscription will be extended</li>
-                  <li>Your access to Pro features will continue uninterrupted</li>
-                  <li className='text-amber-400'>
-                    Any pending invoice for your current plan will be automatically canceled
-                  </li>
-                </ul>
-                <p className='mt-4'>Would you like to proceed with the upgrade?</p>
-              </div>
-            ),
-            okText: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
-            cancelText: 'Cancel',
-            onOk: async () => {
-              try {
-                const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
-                const response = await createCheckoutSession(priceId, session.user.id, 'crypto')
+                  if (!response.url) {
+                    throw new Error('Failed to create checkout session')
+                  }
 
-                if (!response.url) {
-                  throw new Error('Failed to create checkout session')
+                  window.location.href = response.url
+                } catch (error) {
+                  console.error('Checkout session creation error:', error)
+                  notification.error({
+                    message: 'Checkout Error',
+                    description: 'Failed to create checkout session. Please try again later.',
+                    placement: 'bottomRight',
+                  })
                 }
-
-                window.location.href = response.url
-              } catch (error) {
-                console.error('Checkout session creation error:', error)
-                notification.error({
-                  message: 'Checkout Error',
-                  description: 'Failed to create checkout session. Please try again later.',
-                  placement: 'bottomRight',
-                })
-              }
-            },
-            className: 'text-base',
-            width: 500,
-          })
-          setRedirectingToCheckout(false)
-          return
+              },
+              className: 'text-base',
+              width: 500,
+            })
+            setRedirectingToCheckout(false)
+            return
+          }
         }
-      }
 
-      // Case 3: User has a traditional payment subscription but wants to switch to crypto
-      // AND change from monthly to annual or vice versa
-      if (
-        hasActivePlan &&
-        !isPaidWithCrypto &&
-        payWithCrypto &&
-        tier === SUBSCRIPTION_TIERS.PRO &&
-        activePeriod !== 'lifetime'
-      ) {
-        // Determine current period from regular subscription
-        const currentRegularPeriod =
-          subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', false)
-            ? 'monthly'
-            : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', false)
-              ? 'annual'
-              : 'unknown'
+        // Case 3: User has a traditional payment subscription but wants to switch to crypto
+        // AND change from monthly to annual or vice versa
+        if (
+          hasActivePlan &&
+          !isPaidWithCrypto &&
+          usePayWithCrypto &&
+          tier === SUBSCRIPTION_TIERS.PRO &&
+          activePeriod !== 'lifetime'
+        ) {
+          // Determine current period from regular subscription
+          const currentRegularPeriod =
+            subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', false)
+              ? 'monthly'
+              : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', false)
+                ? 'annual'
+                : 'unknown'
 
-        if (currentRegularPeriod !== activePeriod && currentRegularPeriod !== 'unknown') {
+          if (currentRegularPeriod !== activePeriod && currentRegularPeriod !== 'unknown') {
+            modal.confirm({
+              title: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+              content: (
+                <div className='space-y-2 mt-2'>
+                  <p>
+                    You're switching from a regular {currentRegularPeriod} plan to a crypto{' '}
+                    {activePeriod} plan. Here's what will happen:
+                  </p>
+                  <ul className='list-disc pl-4 space-y-1'>
+                    <li>You'll be charged for a new crypto-based {activePeriod} subscription</li>
+                    <li>Your current regular subscription will be canceled</li>
+                    <li>Future payments will be made with cryptocurrency (USDC)</li>
+                    <li>Your access to Pro features will continue uninterrupted</li>
+                    <li className='text-amber-400'>
+                      Crypto subscriptions do not auto-renew - you'll receive an invoice to pay
+                      manually
+                    </li>
+                  </ul>
+                  <p className='mt-4'>Would you like to proceed with this change?</p>
+                </div>
+              ),
+              okText: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+              cancelText: 'Cancel',
+              onOk: async () => {
+                try {
+                  // Get the correct price ID for crypto payment
+                  const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
+
+                  // Set the previous subscription ID in the metadata
+                  const response = await createCheckoutSession(priceId, session.user.id, 'crypto')
+
+                  if (!response.url) {
+                    throw new Error('Failed to create checkout session')
+                  }
+
+                  window.location.href = response.url
+                } catch (error) {
+                  console.error('Checkout session creation error:', error)
+                  notification.error({
+                    message: 'Checkout Error',
+                    description: 'Failed to create checkout session. Please try again later.',
+                    placement: 'bottomRight',
+                  })
+                }
+              },
+              className: 'text-base',
+              width: 550,
+            })
+            setRedirectingToCheckout(false)
+            return
+          }
+        }
+
+        // Case 4: User has a crypto subscription but wants to switch to traditional finance
+        if (
+          hasActivePlan &&
+          isPaidWithCrypto &&
+          !usePayWithCrypto &&
+          tier === SUBSCRIPTION_TIERS.PRO &&
+          activePeriod !== 'lifetime'
+        ) {
+          // Determine current period from crypto subscription
+          const currentCryptoPeriod =
+            subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+              ? 'monthly'
+              : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true)
+                ? 'annual'
+                : 'unknown'
+
           modal.confirm({
-            title: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+            title: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
             content: (
               <div className='space-y-2 mt-2'>
                 <p>
-                  You're switching from a regular {currentRegularPeriod} plan to a crypto{' '}
+                  You're switching from a crypto {currentCryptoPeriod} plan to a regular{' '}
                   {activePeriod} plan. Here's what will happen:
                 </p>
                 <ul className='list-disc pl-4 space-y-1'>
-                  <li>You'll be charged for a new crypto-based {activePeriod} subscription</li>
-                  <li>Your current regular subscription will be canceled</li>
-                  <li>Future payments will be made with cryptocurrency (USDC)</li>
-                  <li>Your access to Pro features will continue uninterrupted</li>
-                  <li className='text-amber-400'>
-                    Crypto subscriptions do not auto-renew - you'll receive an invoice to pay
-                    manually
+                  <li>You'll be charged for a new subscription with your payment card</li>
+                  <li>Your current crypto subscription will remain active until its end date</li>
+                  <li>Any pending crypto invoices will be automatically canceled</li>
+                  <li>Future payments will be automatically charged to your card</li>
+                  <li className='text-green-400'>
+                    Your subscription will auto-renew - no need to manually pay invoices
                   </li>
                 </ul>
                 <p className='mt-4'>Would you like to proceed with this change?</p>
               </div>
             ),
-            okText: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+            okText: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
             cancelText: 'Cancel',
             onOk: async () => {
               try {
-                // Get the correct price ID for crypto payment
-                const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
+                // Get the correct price ID for regular payment
+                const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, false)
 
-                // Set the previous subscription ID in the metadata
-                const response = await createCheckoutSession(priceId, session.user.id, 'crypto')
+                // Create checkout session for regular payment
+                const response = await createCheckoutSession(priceId, session.user.id)
 
                 if (!response.url) {
                   throw new Error('Failed to create checkout session')
@@ -523,194 +596,128 @@ function Plan({
           setRedirectingToCheckout(false)
           return
         }
-      }
 
-      // Case 4: User has a crypto subscription but wants to switch to traditional finance
-      if (
-        hasActivePlan &&
-        isPaidWithCrypto &&
-        !payWithCrypto &&
-        tier === SUBSCRIPTION_TIERS.PRO &&
-        activePeriod !== 'lifetime'
-      ) {
-        // Determine current period from crypto subscription
-        const currentCryptoPeriod =
-          subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
-            ? 'monthly'
-            : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true)
-              ? 'annual'
-              : 'unknown'
+        // Special case for upgrading to lifetime
+        if (
+          subscription?.stripePriceId &&
+          !isLifetimePlan &&
+          tier === SUBSCRIPTION_TIERS.PRO &&
+          activePeriod === 'lifetime' &&
+          isSubscriptionActive({ status: subscription?.status })
+        ) {
+          // Show confirmation modal before proceeding
+          modal.confirm({
+            title: 'Upgrade to Lifetime Access',
+            content: (
+              <div className='space-y-2 mt-2'>
+                <p>You currently have an active subscription. Here's what will happen:</p>
+                <ul className='list-disc pl-4 space-y-1'>
+                  <li>You'll be charged once for lifetime access</li>
+                  <li>Your current subscription will be automatically canceled</li>
+                  <li>Your access to Pro features will continue uninterrupted</li>
+                  <li>You won't be charged any recurring fees in the future</li>
+                  {isPaidWithCrypto && usePayWithCrypto && (
+                    <li className='text-amber-400'>
+                      Any pending invoice for your current plan will be automatically canceled
+                    </li>
+                  )}
+                </ul>
+                <p className='mt-4'>Would you like to proceed with the upgrade?</p>
+              </div>
+            ),
+            okText: 'Upgrade to Lifetime',
+            cancelText: 'Cancel',
+            onOk: async () => {
+              try {
+                // Create new checkout session for lifetime upgrade
+                const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', usePayWithCrypto)
+                const response = await createCheckoutSession(
+                  priceId,
+                  session.user.id,
+                  usePayWithCrypto ? 'crypto' : undefined,
+                )
 
-        modal.confirm({
-          title: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
-          content: (
-            <div className='space-y-2 mt-2'>
-              <p>
-                You're switching from a crypto {currentCryptoPeriod} plan to a regular{' '}
-                {activePeriod} plan. Here's what will happen:
-              </p>
-              <ul className='list-disc pl-4 space-y-1'>
-                <li>You'll be charged for a new subscription with your payment card</li>
-                <li>Your current crypto subscription will remain active until its end date</li>
-                <li>Any pending crypto invoices will be automatically canceled</li>
-                <li>Future payments will be automatically charged to your card</li>
-                <li className='text-green-400'>
-                  Your subscription will auto-renew - no need to manually pay invoices
-                </li>
-              </ul>
-              <p className='mt-4'>Would you like to proceed with this change?</p>
-            </div>
-          ),
-          okText: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
-          cancelText: 'Cancel',
-          onOk: async () => {
-            try {
-              // Get the correct price ID for regular payment
-              const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, false)
+                if (!response.url) {
+                  throw new Error('Failed to create checkout session')
+                }
 
-              // Create checkout session for regular payment
-              const response = await createCheckoutSession(priceId, session.user.id)
-
-              if (!response.url) {
-                throw new Error('Failed to create checkout session')
+                window.location.href = response.url
+              } catch (error) {
+                console.error('Checkout session creation error:', error)
+                notification.error({
+                  message: 'Checkout Error',
+                  description: 'Failed to create checkout session. Please try again later.',
+                  placement: 'bottomRight',
+                })
+                setRedirectingToCheckout(false)
               }
-
-              window.location.href = response.url
-            } catch (error) {
-              console.error('Checkout session creation error:', error)
-              notification.error({
-                message: 'Checkout Error',
-                description: 'Failed to create checkout session. Please try again later.',
-                placement: 'bottomRight',
-              })
-            }
-          },
-          className: 'text-base',
-          width: 550,
-        })
-        setRedirectingToCheckout(false)
-        return
-      }
-
-      // Special case for upgrading to lifetime
-      if (
-        subscription?.stripePriceId &&
-        !isLifetimePlan &&
-        tier === SUBSCRIPTION_TIERS.PRO &&
-        activePeriod === 'lifetime' &&
-        isSubscriptionActive({ status: subscription?.status })
-      ) {
-        // Show confirmation modal before proceeding
-        modal.confirm({
-          title: 'Upgrade to Lifetime Access',
-          content: (
-            <div className='space-y-2 mt-2'>
-              <p>You currently have an active subscription. Here's what will happen:</p>
-              <ul className='list-disc pl-4 space-y-1'>
-                <li>You'll be charged once for lifetime access</li>
-                <li>Your current subscription will be automatically canceled</li>
-                <li>Your access to Pro features will continue uninterrupted</li>
-                <li>You won't be charged any recurring fees in the future</li>
-                {isPaidWithCrypto && payWithCrypto && (
-                  <li className='text-amber-400'>
-                    Any pending invoice for your current plan will be automatically canceled
-                  </li>
-                )}
-              </ul>
-              <p className='mt-4'>Would you like to proceed with the upgrade?</p>
-            </div>
-          ),
-          okText: 'Upgrade to Lifetime',
-          cancelText: 'Cancel',
-          onOk: async () => {
-            try {
-              // Create new checkout session for lifetime upgrade
-              const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', payWithCrypto)
-              const response = await createCheckoutSession(
-                priceId,
-                session.user.id,
-                payWithCrypto ? 'crypto' : undefined,
-              )
-
-              if (!response.url) {
-                throw new Error('Failed to create checkout session')
-              }
-
-              window.location.href = response.url
-            } catch (error) {
-              console.error('Checkout session creation error:', error)
-              notification.error({
-                message: 'Checkout Error',
-                description: 'Failed to create checkout session. Please try again later.',
-                placement: 'bottomRight',
-              })
-              setRedirectingToCheckout(false)
-            }
-          },
-          className: 'text-base',
-          width: 500,
-        })
-        setRedirectingToCheckout(false)
-        return
-      }
-
-      // If user has an active paid subscription, redirect to portal
-      if (
-        isSubscriptionActive({ status: subscription?.status }) &&
-        subscription?.stripeSubscriptionId
-      ) {
-        const response = await fetch('/api/stripe/portal', {
-          method: 'POST',
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to create portal session')
+            },
+            className: 'text-base',
+            width: 500,
+          })
+          setRedirectingToCheckout(false)
+          return
         }
 
-        const { url } = await response.json()
-        window.location.href = url
-        return
+        // If user has an active paid subscription, redirect to portal
+        if (
+          isSubscriptionActive({ status: subscription?.status }) &&
+          subscription?.stripeSubscriptionId
+        ) {
+          const response = await fetch('/api/stripe/portal', {
+            method: 'POST',
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to create portal session')
+          }
+
+          const { url } = await response.json()
+          window.location.href = url
+          return
+        }
+
+        // For new subscriptions, create checkout session
+        const priceId = getPriceId(
+          tier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
+          activePeriod,
+          usePayWithCrypto,
+        )
+        const response = await createCheckoutSession(
+          priceId,
+          session.user.id,
+          usePayWithCrypto ? 'crypto' : undefined,
+        )
+
+        if (!response.url) {
+          throw new Error('Failed to create checkout session')
+        }
+
+        window.location.href = response.url
+      } catch (error) {
+        console.error('Subscription error:', error)
+        notification.error({
+          message: 'Subscription Error',
+          description: 'Failed to process subscription request. Please try again later.',
+          placement: 'bottomRight',
+        })
+        setRedirectingToCheckout(false) // Reset redirecting state on error
       }
-
-      // For new subscriptions, create checkout session
-      const priceId = getPriceId(
-        tier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
-        activePeriod,
-        payWithCrypto,
-      )
-      const response = await createCheckoutSession(
-        priceId,
-        session.user.id,
-        payWithCrypto ? 'crypto' : undefined,
-      )
-
-      if (!response.url) {
-        throw new Error('Failed to create checkout session')
-      }
-
-      window.location.href = response.url
-    } catch (error) {
-      console.error('Subscription error:', error)
-      notification.error({
-        message: 'Subscription Error',
-        description: 'Failed to process subscription request. Please try again later.',
-        placement: 'bottomRight',
-      })
-      setRedirectingToCheckout(false) // Reset redirecting state on error
-    }
-  }, [
-    session,
-    tier,
-    activePeriod,
-    subscription,
-    isLifetimePlan,
-    modal,
-    payWithCrypto,
-    hasActivePlan,
-    isCurrentPlan,
-    isPaidWithCrypto,
-    redirectingToCheckout, // Add redirectingToCheckout to dependencies
-  ])
+    },
+    [
+      session,
+      tier,
+      activePeriod,
+      subscription,
+      isLifetimePlan,
+      modal,
+      payWithCrypto,
+      hasActivePlan,
+      isCurrentPlan,
+      isPaidWithCrypto,
+      redirectingToCheckout,
+    ],
+  )
 
   // Add effect to handle auto-subscription based on URL parameters
   useEffect(() => {
@@ -727,18 +734,13 @@ function Plan({
       // Mark that we've started the subscription process
       subscriptionStarted.current = true
 
-      // Set crypto payment option if specified in URL
-      if (crypto === 'true' && tier === SUBSCRIPTION_TIERS.PRO) {
-        setPayWithCrypto(true)
-      }
-
       // Remove the query parameters to prevent repeated subscription attempts
       const { pathname } = router
       router.replace(pathname, undefined, { shallow: true })
       message.success('Redirecting to checkout...')
 
-      // Trigger subscription process
-      handleSubscribe()
+      // Trigger subscription process with crypto preference from URL
+      handleSubscribe(crypto === 'true')
     }
   }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 
@@ -897,7 +899,7 @@ function Plan({
         <Tooltip title='Your credit balance will be automatically applied at checkout'>
           <Button
             loading={redirectingToCheckout}
-            onClick={handleSubscribe}
+            onClick={() => handleSubscribe()}
             disabled={isButtonDisabled()}
             size={featured ? 'large' : 'middle'}
             color={featured ? 'danger' : 'default'}
@@ -917,7 +919,7 @@ function Plan({
       ) : (
         <Button
           loading={redirectingToCheckout}
-          onClick={handleSubscribe}
+          onClick={() => handleSubscribe()}
           disabled={isButtonDisabled()}
           size={featured ? 'large' : 'middle'}
           color={featured ? 'danger' : 'default'}
