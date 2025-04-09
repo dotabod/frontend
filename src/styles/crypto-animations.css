@@ -1,0 +1,189 @@
+@keyframes sparkle {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.7); }
+  100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes border-glow {
+  0% { border-color: rgba(139, 92, 246, 0.3); }
+  50% { border-color: rgba(245, 158, 11, 0.7); }
+  100% { border-color: rgba(139, 92, 246, 0.3); }
+}
+
+@keyframes text-fade {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-sparkle {
+  animation: sparkle 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 4s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+.crypto-active {
+  background: linear-gradient(to bottom right, rgba(76, 29, 149, 0.15), rgba(124, 58, 237, 0.15), rgba(76, 29, 149, 0.15)) !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3) !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+}
+
+.crypto-active-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%239c6ef8' fill-opacity='0.4'%3E%3Cpath d='M20 0c11.046 0 20 8.954 20 20s-8.954 20-20 20S0 31.046 0 20 8.954 0 20 0zm5 16v-2h-3v-2h-4v2h-2v8h2v2h4v-2h3v-2h-3v-1h3v-2h-3v-1h3zm-9 0v6h2v-6h-2zm6 0v6h2v-6h-2z'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size: 40px 40px !important;
+  opacity: 0.15 !important;
+}
+
+.crypto-switch.ant-switch-checked {
+  background: #8b5cf6 !important;
+}
+
+.crypto-toggle-container {
+  background: rgba(124, 58, 237, 0.15);
+  border-radius: 28px;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  transition: all 0.3s ease;
+}
+
+.crypto-button {
+  background: linear-gradient(to right, #7c3aed, #8b5cf6) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.crypto-button:hover {
+  background: linear-gradient(to right, #8b5cf6, #a78bfa) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+.crypto-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(30deg);
+  transition: all 0.3s ease;
+}
+
+.crypto-button:hover::after {
+  transform: rotate(30deg) translate(50%, 50%);
+}
+
+.crypto-check {
+  color: #a78bfa !important;
+  transition: all 0.3s ease;
+}
+
+.crypto-price {
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  color: white !important;
+}
+
+/* New styles for payment success notification */
+.crypto-notification {
+  background: rgba(30, 27, 38, 0.95) !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.crypto-success-notification {
+  position: relative;
+  padding: 10px;
+  border-radius: 6px;
+  color: white;
+  overflow: hidden;
+}
+
+.crypto-gradient-text {
+  background: linear-gradient(90deg, #8b5cf6, #f59e0b, #8b5cf6);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-fade 3s linear infinite;
+}
+
+/* Global crypto theme styles - applied temporarily after payment */
+.crypto-payment-success .ant-btn-primary {
+  background: linear-gradient(to right, #7c3aed, #8b5cf6) !important;
+  border-color: #8b5cf6 !important;
+}
+
+.crypto-payment-success .ant-progress-bg {
+  background: linear-gradient(to right, #7c3aed, #8b5cf6) !important;
+}
+
+.crypto-payment-success .setup-complete-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to bottom right, rgba(76, 29, 149, 0.05), rgba(124, 58, 237, 0.05), rgba(76, 29, 149, 0.05)) !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.2) !important;
+  animation: glow 4s ease-in-out infinite;
+}
+
+.crypto-payment-success .setup-complete-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%239c6ef8' fill-opacity='0.1'%3E%3Cpath d='M20 0c11.046 0 20 8.954 20 20s-8.954 20-20 20S0 31.046 0 20 8.954 0 20 0zm5 16v-2h-3v-2h-4v2h-2v8h2v2h4v-2h3v-2h-3v-1h3v-2h-3v-1h3zm-9 0v6h2v-6h-2zm6 0v6h2v-6h-2z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 40px 40px;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}

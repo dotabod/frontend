@@ -23,8 +23,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // GET: Fetch gift notifications and subscription status
     if (req.method === 'GET') {
-      console.log(`Fetching gift notifications for user ${userId}`)
-
       try {
         // Check if we should include read notifications
         const includeRead = req.query.includeRead === 'true'
@@ -106,7 +104,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
         const { notificationId } = validationResult.data
-        console.log(`Marking notification ${notificationId} as read for user ${userId}`)
 
         // Find the notification and ensure it belongs to the user
         const notification = await prisma.notification.findFirst({

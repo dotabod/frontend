@@ -5,11 +5,16 @@ import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 import { Prisma, type TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import type Stripe from 'stripe'
+
+// Add crypto as a supported payment method type
+type ExtendedPaymentMethodType = Stripe.Checkout.SessionCreateParams.PaymentMethodType | 'crypto'
 
 interface CheckoutRequestBody {
   priceId: string
   period?: string
   isGift?: boolean
+  paymentMethod?: string
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -28,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Parse and validate request body
-    const { priceId, isGift } = (await req.body) as CheckoutRequestBody
+    const { priceId, isGift, paymentMethod } = (await req.body) as CheckoutRequestBody
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID is required' })
     }
@@ -37,6 +42,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const price = await stripe.prices.retrieve(priceId)
     const isRecurring = price.type === 'recurring'
     const isLifetime = !isRecurring
+    // Check if user wants to pay with crypto
+    const isCryptoPayment = paymentMethod === 'crypto'
 
     // Handle customer and subscription logic in a transaction
     const checkoutUrl = await prisma.$transaction(
@@ -57,6 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           twitchId: session.user.twitchId ?? '',
           referer: req.headers.referer,
           isGift,
+          isCryptoPayment,
           tx,
         })
       },
@@ -174,6 +182,7 @@ interface CheckoutSessionParams {
   twitchId: string
   referer?: string
   isGift?: boolean
+  isCryptoPayment: boolean
   tx?: Prisma.TransactionClient
 }
 
@@ -192,8 +201,57 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     twitchId,
     referer,
     isGift,
+    isCryptoPayment,
     tx,
   } = params
+
+  // Cancel any pending crypto invoices if this is an upgrade with crypto payment
+  if (isCryptoPayment && subscriptionData?.stripePriceId && tx) {
+    try {
+      // Get existing subscription metadata to find renewal invoice ID
+      const existingSubscription = await tx.subscription.findFirst({
+        where: {
+          userId,
+          stripeCustomerId: customerId,
+          NOT: { status: 'CANCELED' },
+        },
+        select: {
+          metadata: true,
+        },
+      })
+
+      const metadata = (existingSubscription?.metadata as Record<string, unknown>) || {}
+      const renewalInvoiceId = metadata.renewalInvoiceId as string
+
+      // If there's a pending invoice, cancel it
+      if (renewalInvoiceId) {
+        console.log(
+          `Canceling pending invoice ${renewalInvoiceId} for user ${userId} due to subscription upgrade`,
+        )
+
+        try {
+          // Void the invoice to prevent it from being finalized
+          await stripe.invoices.voidInvoice(renewalInvoiceId)
+          console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+        } catch (invoiceError) {
+          // If invoice is already finalized, try to mark it as uncollectible instead
+          try {
+            const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+            if (invoice.status === 'open') {
+              await stripe.invoices.markUncollectible(renewalInvoiceId)
+              console.log(`Marked invoice ${renewalInvoiceId} as uncollectible`)
+            }
+          } catch (markError) {
+            console.error(`Failed to handle invoice ${renewalInvoiceId}:`, markError)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error canceling pending invoices:', error)
+      // Continue with checkout creation even if invoice cancellation fails
+      // We'll handle any duplicate payments through customer support
+    }
+  }
 
   const baseUrl = process.env.NEXTAUTH_URL ?? ''
 
@@ -214,29 +272,36 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     trialDays = 14
   }
 
+  if (isCryptoPayment) {
+    trialDays = 0
+  }
+
   // Build success URL with simplified parameters
-  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&trial=${
-    isRecurring && trialDays > 0
-  }&trialDays=${trialDays}`
+  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&crypto=${
+    isCryptoPayment ? 'true' : 'false'
+  }&trial=${isRecurring && trialDays > 0}&trialDays=${trialDays}`
 
   const cancelUrl = referer?.includes('/dashboard')
     ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
     : `${baseUrl || 'https://dotabod.com'}/?paid=false`
 
+  // @ts-ignore crypto payment method types are not supported in the latest stripe types
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
-    mode: isRecurring ? 'subscription' : 'payment',
+    mode: isRecurring && !isCryptoPayment ? 'subscription' : 'payment',
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl,
     cancel_url: cancelUrl,
-    subscription_data: isRecurring
-      ? {
-          ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
-          trial_settings: {
-            end_behavior: { missing_payment_method: 'cancel' },
-          },
-        }
-      : undefined,
+    payment_method_types: isCryptoPayment ? ['crypto'] : undefined,
+    subscription_data:
+      isRecurring && !isCryptoPayment
+        ? {
+            ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
+            trial_settings: {
+              end_behavior: { missing_payment_method: 'cancel' },
+            },
+          }
+        : undefined,
     allow_promotion_codes: true,
     metadata: {
       userId,
@@ -249,6 +314,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       isGift: isGift ? 'true' : 'false',
+      isCryptoPayment: isCryptoPayment ? 'true' : 'false',
     },
   })
 

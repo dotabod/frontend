@@ -9,6 +9,7 @@ import { handleChargeSucceeded, handleChargeRefunded } from './handlers/charge-e
 import { handleCustomerDeleted } from './handlers/customer-events'
 import type Stripe from 'stripe'
 import type { Prisma } from '@prisma/client'
+import { SubscriptionStatus } from '@prisma/client'
 
 export const config = {
   api: {
@@ -24,10 +25,32 @@ const relevantEvents = new Set<Stripe.Event.Type>([
   'customer.deleted',
   'invoice.payment_succeeded',
   'invoice.payment_failed',
+  'invoice.marked_uncollectible',
+  'invoice.overdue',
   'checkout.session.completed',
   'charge.succeeded',
   'charge.refunded',
 ])
+
+/**
+ * Helper function to find a user by Stripe customer ID
+ */
+async function findUserByCustomerId(
+  customerId: string,
+  tx: Prisma.TransactionClient,
+): Promise<{ id: string } | null> {
+  // Find a subscription with this customer ID
+  const subscription = await tx.subscription.findFirst({
+    where: { stripeCustomerId: customerId },
+    select: { userId: true },
+  })
+
+  if (subscription) {
+    return { id: subscription.userId }
+  }
+
+  return null
+}
 
 /**
  * Verifies the webhook signature and constructs the event
@@ -71,36 +94,102 @@ async function processWebhookEvent(
   // Now TypeScript knows event.type is one of our supported types
   switch (event.type) {
     case 'customer.deleted':
-      await handleCustomerDeleted(event.data.object as Stripe.Customer, tx)
+      await handleCustomerDeleted(event.data.object, tx)
       break
     case 'customer.subscription.created':
     case 'customer.subscription.updated': {
       // For subscription.updated events, we need to check if this is a subscription
       // resuming from a paused state due to a gift expiration
-      const subscription = event.data.object as Stripe.Subscription
+      const subscription = event.data.object
+
+      // Handle switching from crypto to regular payments
+      if (event.type === 'customer.subscription.created') {
+        // Try to find any active crypto subscriptions for this user
+        const user = await findUserByCustomerId(subscription.customer as string, tx)
+
+        if (user) {
+          // Find any active crypto subscriptions
+          const activeCryptoSubscriptions = await tx.subscription.findMany({
+            where: {
+              userId: user.id,
+              NOT: {
+                status: SubscriptionStatus.CANCELED,
+              },
+              metadata: {
+                path: ['isCryptoPayment'],
+                equals: 'true',
+              },
+            },
+          })
+
+          // Cancel any crypto subscriptions and their associated invoices
+          for (const cryptoSub of activeCryptoSubscriptions) {
+            console.log(
+              `Canceling crypto subscription ${cryptoSub.id} due to new regular subscription`,
+            )
+
+            // Cancel any pending invoices
+            if (cryptoSub.metadata) {
+              const metadata = (cryptoSub.metadata as Record<string, unknown>) || {}
+              const renewalInvoiceId = metadata.renewalInvoiceId as string
+
+              if (renewalInvoiceId) {
+                try {
+                  console.log(
+                    `Voiding crypto invoice ${renewalInvoiceId} due to switch to regular payments`,
+                  )
+                  await stripe.invoices.voidInvoice(renewalInvoiceId)
+                } catch (invoiceError) {
+                  console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                }
+              }
+            }
+
+            // Mark the subscription as canceled
+            await tx.subscription.update({
+              where: { id: cryptoSub.id },
+              data: {
+                status: SubscriptionStatus.CANCELED,
+                cancelAtPeriodEnd: true,
+                updatedAt: new Date(),
+                metadata: {
+                  ...(typeof cryptoSub.metadata === 'object' ? cryptoSub.metadata : {}),
+                  switchedToRegular: 'true',
+                  switchedAt: new Date().toISOString(),
+                },
+              },
+            })
+
+            console.log(`Successfully canceled crypto subscription ${cryptoSub.id}`)
+          }
+        }
+      }
+
       await handleSubscriptionEvent(subscription, tx)
       break
     }
     case 'customer.subscription.deleted':
-      await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, tx)
+      await handleSubscriptionDeleted(event.data.object, tx)
       break
     case 'invoice.payment_succeeded':
     case 'invoice.payment_failed':
-      await handleInvoiceEvent(event.data.object as Stripe.Invoice, tx)
+    case 'invoice.marked_uncollectible':
+    case 'invoice.overdue':
+      await handleInvoiceEvent(event.data.object, tx)
       break
     case 'checkout.session.completed': {
       // For checkout.session.completed events, process the checkout session
-      const session = event.data.object as Stripe.Checkout.Session
+      const session = event.data.object
 
       // Process the checkout session (this will now handle gift credits via customer balance)
       await handleCheckoutCompleted(session, tx)
       break
     }
     case 'charge.succeeded':
-      await handleChargeSucceeded(event.data.object as Stripe.Charge, tx)
+      await handleChargeSucceeded(event.data.object, tx)
       break
     case 'charge.refunded':
-      await handleChargeRefunded(event.data.object as Stripe.Charge, tx)
+      await handleChargeRefunded(event.data.object, tx)
       break
   }
 }

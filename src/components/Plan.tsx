@@ -1,7 +1,5 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   calculateSavings,
@@ -14,16 +12,47 @@ import {
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
 } from '@/utils/subscription'
-import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
-import { App, Button, notification, Tooltip } from 'antd'
+import { SubscriptionStatus, type SubscriptionTier } from '@prisma/client'
+import { App, Button, notification, Tooltip, Switch, Popover } from 'antd'
 import clsx from 'clsx'
-import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
+import { Bitcoin, CheckIcon, Wallet, Info, Sparkles } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import useSWR from 'swr'
 import { Logomark } from './Logo'
+import '@/styles/crypto-animations.css'
+
+// Sparkle animation component with unique IDs
+const CryptoSparkle = ({ visible }: { visible: boolean }) => {
+  if (!visible) return null
+
+  return (
+    <div className='absolute inset-0 pointer-events-none overflow-hidden'>
+      <div className='absolute top-0 left-0 w-full h-full'>
+        {Array.from({ length: 8 }).map(() => {
+          // Generate unique identifier for each sparkle
+          const uniqueId = `sparkle-${Math.random().toString(36).substring(2, 9)}`
+          return (
+            <span
+              key={uniqueId}
+              className='absolute block rounded-full bg-purple-400 opacity-0 animate-sparkle'
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: `${Math.random() * 5 + 2}px`,
+                height: `${Math.random() * 5 + 2}px`,
+                animationDelay: `${Math.random() * 1.5}s`,
+                animationDuration: `${Math.random() * 1 + 1.5}s`,
+              }}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 function Plan({
   name,
@@ -61,17 +90,37 @@ function Plan({
   const { message, modal } = App.useApp()
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
-  const savings = calculateSavings(price.monthly, price.annual)
   const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
-  const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR(
-    '/api/get-total-crypto-interest',
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      revalidateIfStale: false,
-    },
-  )
+
+  // Check if the current subscription was paid with crypto by comparing price IDs
+  const isPaidWithCrypto = useMemo(() => {
+    // Only check for crypto payments on Pro tier subscriptions
+    if (!subscription?.stripePriceId || tier === SUBSCRIPTION_TIERS.FREE) return false
+
+    // Check if the subscription's price ID matches one with crypto payment
+    const monthlyPriceWithCrypto = getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+    const annualPriceWithCrypto = getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true)
+    const lifetimePriceWithCrypto = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', true)
+
+    return [monthlyPriceWithCrypto, annualPriceWithCrypto, lifetimePriceWithCrypto].includes(
+      subscription.stripePriceId,
+    )
+  }, [subscription?.stripePriceId, tier])
+
+  // Initialize payWithCrypto state based on subscription data
+  // Only enable for Pro tier and default to true if user already has a crypto subscription
+  const [payWithCrypto, setPayWithCrypto] = useState(() => {
+    return tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto
+  })
+
+  // Update payWithCrypto when subscription data changes
+  useEffect(() => {
+    if (tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto) {
+      setPayWithCrypto(true)
+    }
+  }, [tier, isPaidWithCrypto])
+
+  const savings = calculateSavings(price.monthly, price.annual)
 
   // Fetch credit balance
   const { data: creditBalanceData } = useSWR(
@@ -85,28 +134,29 @@ function Plan({
   )
 
   const creditBalance = creditBalanceData?.balance || 0
-  const formattedCreditBalance =
-    creditBalance > 0 ? `$${(Math.abs(creditBalance) / 100).toFixed(2)}` : '$0.00'
+  const formattedCreditBalance = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Math.max(0, creditBalance) / 100)
 
   const router = useRouter()
   // Add ref to track if subscription process has started
   const subscriptionStarted = useRef(false)
-  const {
-    data: cryptoInterest,
-    loading: loadingCryptoInterest,
-    updateSetting: updateCryptoInterest,
-  } = useUpdateSetting<{
-    interested: boolean
-    tier: SubscriptionTier
-    transactionType: TransactionType
-  }>(Settings.crypto_payment_interest)
 
+  // Determine if the crypto payment setting matches the current subscription's payment method
+  const paymentMethodMatches = payWithCrypto === isPaidWithCrypto
+
+  // Check if this is the current plan taking into account both period and payment method
   const isCurrentPlan =
     subscription?.tier === tier &&
+    paymentMethodMatches && // Add check for payment method matching
     activePeriod ===
       (isLifetimePlan
         ? 'lifetime'
-        : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual')
+        : subscription?.stripePriceId ===
+            getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', payWithCrypto)
           ? 'annual'
           : 'monthly')
 
@@ -118,12 +168,24 @@ function Plan({
     if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
       const now = new Date()
 
+      // If crypto payment is selected, show no trial message
+      if (payWithCrypto) {
+        return (
+          <>
+            {description}
+            <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+              Note: Free trial is not available with crypto payments
+            </span>
+          </>
+        )
+      }
+
       // If user has credit balance and is considering a subscription
       if (hasCreditBalance && !hasActivePlan) {
         return (
           <>
             {description}
-            <span className='block mt-1 text-purple-400'>
+            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out'>
               You have {formattedCreditBalance} credit that will be applied at checkout
             </span>
           </>
@@ -135,7 +197,7 @@ function Plan({
         return (
           <>
             {description}
-            <span className='block mt-1 text-purple-400'>
+            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out'>
               You have {formattedCreditBalance} credit that will be applied to your next invoice
             </span>
           </>
@@ -153,7 +215,7 @@ function Plan({
         return (
           <>
             {description}
-            <span className='block mt-1 text-purple-400'>
+            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
               Includes free trial until {gracePeriodPrettyDate} ({daysUntilEnd} days)
             </span>
           </>
@@ -164,7 +226,9 @@ function Plan({
         return (
           <>
             {description}
-            <span className='block mt-1 text-purple-400'>Includes 14-day free trial</span>
+            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+              Includes 14-day free trial
+            </span>
           </>
         )
       }
@@ -185,7 +249,75 @@ function Plan({
 
     // If user has a paid subscription for this plan
     if (hasActivePlan && isCurrentPlan) {
+      // For crypto payments, offer to pay the next invoice early
+      if (isPaidWithCrypto && payWithCrypto) {
+        return 'Pay next invoice early'
+      }
       return 'Manage plan'
+    }
+
+    // For users with active crypto subscriptions but viewing different periods
+    if (hasActivePlan && isPaidWithCrypto && payWithCrypto && isProTier) {
+      if (isLifetimePeriod) {
+        return 'Upgrade to lifetime'
+      }
+
+      // Determine if switching between monthly and annual
+      const currentIsPeriod =
+        subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+          ? 'monthly'
+          : 'annual'
+
+      if (currentIsPeriod !== activePeriod) {
+        return `Switch to ${activePeriod} plan`
+      }
+    }
+
+    // Case: User is switching from traditional finance to crypto
+    if (hasActivePlan && !isPaidWithCrypto && payWithCrypto && isProTier) {
+      if (isLifetimePeriod) {
+        return 'Get lifetime access with crypto'
+      }
+
+      // Get the current period
+      const currentRegularPeriod =
+        subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', false)
+          ? 'monthly'
+          : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', false)
+            ? 'annual'
+            : 'unknown'
+
+      if (currentRegularPeriod === activePeriod) {
+        return 'Switch to crypto payments'
+      }
+
+      return `Switch to crypto ${activePeriod} plan`
+    }
+
+    // Case: User is switching from crypto to traditional finance
+    if (hasActivePlan && isPaidWithCrypto && !payWithCrypto && isProTier) {
+      if (isLifetimePeriod) {
+        return 'Get lifetime access'
+      }
+
+      // Get the current period
+      const currentCryptoPeriod =
+        subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+          ? 'monthly'
+          : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true)
+            ? 'annual'
+            : 'unknown'
+
+      if (currentCryptoPeriod === activePeriod) {
+        return 'Switch to regular payments'
+      }
+
+      return `Switch to regular ${activePeriod} plan`
+    }
+
+    // If crypto is selected, reflect that in the button text
+    if (payWithCrypto && isProTier) {
+      return isLifetimePeriod ? 'Get lifetime access with crypto' : 'Subscribe with crypto'
     }
 
     // If user has credit balance available
@@ -233,7 +365,9 @@ function Plan({
   }
 
   const handleSubscribe = useCallback(async () => {
+    if (redirectingToCheckout) return // Prevent multiple calls while redirecting
     setRedirectingToCheckout(true)
+
     try {
       if (!session) {
         await signIn('twitch', {
@@ -245,6 +379,217 @@ function Plan({
       // If free plan, redirect to dashboard
       if (tier === SUBSCRIPTION_TIERS.FREE) {
         window.location.href = '/dashboard'
+        return
+      }
+
+      // Handle crypto payment scenarios
+      if (isPaidWithCrypto && payWithCrypto && hasActivePlan) {
+        // Case 1: Pay next invoice early (same period)
+        if (isCurrentPlan) {
+          // Redirect to the next invoice payment page
+          const response = await fetch('/api/stripe/crypto-invoice', {
+            method: 'POST',
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch invoice information')
+          }
+
+          const { url } = await response.json()
+          window.location.href = url
+          return
+        }
+
+        // Case 2: Upgrade from monthly to annual or vice versa
+        const currentIsPeriod =
+          subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+            ? 'monthly'
+            : 'annual'
+
+        if (currentIsPeriod !== activePeriod && activePeriod !== 'lifetime') {
+          modal.confirm({
+            title: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+            content: (
+              <div className='space-y-2 mt-2'>
+                <p>
+                  You currently have an active {currentIsPeriod} subscription. Here's what will
+                  happen:
+                </p>
+                <ul className='list-disc pl-4 space-y-1'>
+                  <li>You'll be charged for a new {activePeriod} subscription</li>
+                  <li>Once payment is complete, your subscription will be extended</li>
+                  <li>Your access to Pro features will continue uninterrupted</li>
+                  <li className='text-amber-400'>
+                    Any pending invoice for your current plan will be automatically canceled
+                  </li>
+                </ul>
+                <p className='mt-4'>Would you like to proceed with the upgrade?</p>
+              </div>
+            ),
+            okText: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+            cancelText: 'Cancel',
+            onOk: async () => {
+              try {
+                const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
+                const response = await createCheckoutSession(priceId, session.user.id, 'crypto')
+
+                if (!response.url) {
+                  throw new Error('Failed to create checkout session')
+                }
+
+                window.location.href = response.url
+              } catch (error) {
+                console.error('Checkout session creation error:', error)
+                notification.error({
+                  message: 'Checkout Error',
+                  description: 'Failed to create checkout session. Please try again later.',
+                  placement: 'bottomRight',
+                })
+              }
+            },
+            className: 'text-base',
+            width: 500,
+          })
+          setRedirectingToCheckout(false)
+          return
+        }
+      }
+
+      // Case 3: User has a traditional payment subscription but wants to switch to crypto
+      // AND change from monthly to annual or vice versa
+      if (
+        hasActivePlan &&
+        !isPaidWithCrypto &&
+        payWithCrypto &&
+        tier === SUBSCRIPTION_TIERS.PRO &&
+        activePeriod !== 'lifetime'
+      ) {
+        // Determine current period from regular subscription
+        const currentRegularPeriod =
+          subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', false)
+            ? 'monthly'
+            : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', false)
+              ? 'annual'
+              : 'unknown'
+
+        if (currentRegularPeriod !== activePeriod && currentRegularPeriod !== 'unknown') {
+          modal.confirm({
+            title: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+            content: (
+              <div className='space-y-2 mt-2'>
+                <p>
+                  You're switching from a regular {currentRegularPeriod} plan to a crypto{' '}
+                  {activePeriod} plan. Here's what will happen:
+                </p>
+                <ul className='list-disc pl-4 space-y-1'>
+                  <li>You'll be charged for a new crypto-based {activePeriod} subscription</li>
+                  <li>Your current regular subscription will be canceled</li>
+                  <li>Future payments will be made with cryptocurrency (USDC)</li>
+                  <li>Your access to Pro features will continue uninterrupted</li>
+                  <li className='text-amber-400'>
+                    Crypto subscriptions do not auto-renew - you'll receive an invoice to pay
+                    manually
+                  </li>
+                </ul>
+                <p className='mt-4'>Would you like to proceed with this change?</p>
+              </div>
+            ),
+            okText: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+            cancelText: 'Cancel',
+            onOk: async () => {
+              try {
+                // Get the correct price ID for crypto payment
+                const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
+
+                // Set the previous subscription ID in the metadata
+                const response = await createCheckoutSession(priceId, session.user.id, 'crypto')
+
+                if (!response.url) {
+                  throw new Error('Failed to create checkout session')
+                }
+
+                window.location.href = response.url
+              } catch (error) {
+                console.error('Checkout session creation error:', error)
+                notification.error({
+                  message: 'Checkout Error',
+                  description: 'Failed to create checkout session. Please try again later.',
+                  placement: 'bottomRight',
+                })
+              }
+            },
+            className: 'text-base',
+            width: 550,
+          })
+          setRedirectingToCheckout(false)
+          return
+        }
+      }
+
+      // Case 4: User has a crypto subscription but wants to switch to traditional finance
+      if (
+        hasActivePlan &&
+        isPaidWithCrypto &&
+        !payWithCrypto &&
+        tier === SUBSCRIPTION_TIERS.PRO &&
+        activePeriod !== 'lifetime'
+      ) {
+        // Determine current period from crypto subscription
+        const currentCryptoPeriod =
+          subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
+            ? 'monthly'
+            : subscription?.stripePriceId === getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true)
+              ? 'annual'
+              : 'unknown'
+
+        modal.confirm({
+          title: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+          content: (
+            <div className='space-y-2 mt-2'>
+              <p>
+                You're switching from a crypto {currentCryptoPeriod} plan to a regular{' '}
+                {activePeriod} plan. Here's what will happen:
+              </p>
+              <ul className='list-disc pl-4 space-y-1'>
+                <li>You'll be charged for a new subscription with your payment card</li>
+                <li>Your current crypto subscription will remain active until its end date</li>
+                <li>Any pending crypto invoices will be automatically canceled</li>
+                <li>Future payments will be automatically charged to your card</li>
+                <li className='text-green-400'>
+                  Your subscription will auto-renew - no need to manually pay invoices
+                </li>
+              </ul>
+              <p className='mt-4'>Would you like to proceed with this change?</p>
+            </div>
+          ),
+          okText: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+          cancelText: 'Cancel',
+          onOk: async () => {
+            try {
+              // Get the correct price ID for regular payment
+              const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, false)
+
+              // Create checkout session for regular payment
+              const response = await createCheckoutSession(priceId, session.user.id)
+
+              if (!response.url) {
+                throw new Error('Failed to create checkout session')
+              }
+
+              window.location.href = response.url
+            } catch (error) {
+              console.error('Checkout session creation error:', error)
+              notification.error({
+                message: 'Checkout Error',
+                description: 'Failed to create checkout session. Please try again later.',
+                placement: 'bottomRight',
+              })
+            }
+          },
+          className: 'text-base',
+          width: 550,
+        })
+        setRedirectingToCheckout(false)
         return
       }
 
@@ -267,6 +612,11 @@ function Plan({
                 <li>Your current subscription will be automatically canceled</li>
                 <li>Your access to Pro features will continue uninterrupted</li>
                 <li>You won't be charged any recurring fees in the future</li>
+                {isPaidWithCrypto && payWithCrypto && (
+                  <li className='text-amber-400'>
+                    Any pending invoice for your current plan will be automatically canceled
+                  </li>
+                )}
               </ul>
               <p className='mt-4'>Would you like to proceed with the upgrade?</p>
             </div>
@@ -274,15 +624,29 @@ function Plan({
           okText: 'Upgrade to Lifetime',
           cancelText: 'Cancel',
           onOk: async () => {
-            // Create new checkout session for lifetime upgrade
-            const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime')
-            const response = await createCheckoutSession(priceId, session.user.id)
+            try {
+              // Create new checkout session for lifetime upgrade
+              const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', payWithCrypto)
+              const response = await createCheckoutSession(
+                priceId,
+                session.user.id,
+                payWithCrypto ? 'crypto' : undefined,
+              )
 
-            if (!response.url) {
-              throw new Error('Failed to create checkout session')
+              if (!response.url) {
+                throw new Error('Failed to create checkout session')
+              }
+
+              window.location.href = response.url
+            } catch (error) {
+              console.error('Checkout session creation error:', error)
+              notification.error({
+                message: 'Checkout Error',
+                description: 'Failed to create checkout session. Please try again later.',
+                placement: 'bottomRight',
+              })
+              setRedirectingToCheckout(false)
             }
-
-            window.location.href = response.url
           },
           className: 'text-base',
           width: 500,
@@ -313,8 +677,13 @@ function Plan({
       const priceId = getPriceId(
         tier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
         activePeriod,
+        payWithCrypto,
       )
-      const response = await createCheckoutSession(priceId, session.user.id)
+      const response = await createCheckoutSession(
+        priceId,
+        session.user.id,
+        payWithCrypto ? 'crypto' : undefined,
+      )
 
       if (!response.url) {
         throw new Error('Failed to create checkout session')
@@ -328,45 +697,21 @@ function Plan({
         description: 'Failed to process subscription request. Please try again later.',
         placement: 'bottomRight',
       })
-    } finally {
-      setRedirectingToCheckout(false)
+      setRedirectingToCheckout(false) // Reset redirecting state on error
     }
-  }, [session, tier, activePeriod, subscription, isLifetimePlan, modal])
-
-  // Function to handle crypto interest vote
-  const handleCryptoInterest = async () => {
-    if (!session) {
-      message.info('Please sign in to register your interest in crypto payments')
-      return
-    }
-
-    try {
-      // Call the update function without chaining .then()
-      await updateCryptoInterest({
-        interested: true,
-        tier: tier,
-        transactionType:
-          activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
-      })
-
-      // Optimistically update the UI
-      if (cryptoInterestData) {
-        mutateCryptoInterestData(
-          {
-            ...cryptoInterestData,
-            userCount: cryptoInterestData.userCount + 1,
-          },
-          false,
-        )
-      }
-    } catch (error) {
-      console.error('Error registering crypto interest:', error)
-      notification.error({
-        message: 'Error',
-        description: 'Failed to register your interest. Please try again later.',
-      })
-    }
-  }
+  }, [
+    session,
+    tier,
+    activePeriod,
+    subscription,
+    isLifetimePlan,
+    modal,
+    payWithCrypto,
+    hasActivePlan,
+    isCurrentPlan,
+    isPaidWithCrypto,
+    redirectingToCheckout, // Add redirectingToCheckout to dependencies
+  ])
 
   // Add effect to handle auto-subscription based on URL parameters
   useEffect(() => {
@@ -396,12 +741,24 @@ function Plan({
   return (
     <section
       className={clsx(
-        'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5',
+        'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5 relative',
         featured
           ? 'order-first bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
           : 'bg-gray-800/50 backdrop-blur-xl',
+        payWithCrypto && 'crypto-active transition-all duration-500',
       )}
     >
+      {/* Crypto background effect when crypto is toggled on */}
+      <div
+        className={clsx(
+          'absolute inset-0 transition-opacity duration-500 opacity-0 pointer-events-none',
+          payWithCrypto && 'crypto-active-bg',
+        )}
+      />
+
+      {/* Crypto sparkle animation */}
+      <CryptoSparkle visible={payWithCrypto} />
+
       <h3
         className={clsx(
           'flex items-center text-sm font-semibold',
@@ -423,18 +780,26 @@ function Plan({
         ) : (
           <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
         )}
-        <span className='ml-4'>{name}</span>
+        <span className={clsx('ml-4', payWithCrypto && 'animate-pulse-soft')}>{name}</span>
         {inGracePeriod &&
+          !payWithCrypto &&
           tier === SUBSCRIPTION_TIERS.PRO &&
           !hasActivePlan &&
           activePeriod !== 'lifetime' && (
-            <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
+            <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full transition-opacity duration-300'>
               Free until {gracePeriodPrettyDate}
             </span>
           )}
         {hasActivePlan && isCurrentPlan && (
-          <span className='ml-2 text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full'>
-            Your plan
+          <span
+            className={clsx(
+              'ml-2 text-xs px-2 py-0.5 rounded-full transition-all duration-300',
+              payWithCrypto
+                ? 'bg-gradient-to-r from-purple-500/30 to-amber-500/30 text-amber-300 border border-amber-500/40'
+                : 'bg-green-500/20 text-green-300',
+            )}
+          >
+            {payWithCrypto ? '⚡ Your plan' : 'Your plan'}
           </span>
         )}
         {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' && (
@@ -448,6 +813,7 @@ function Plan({
         className={clsx(
           'relative mt-5 flex text-4xl font-bold tracking-tight',
           featured ? 'text-white' : 'text-gray-100',
+          payWithCrypto && 'crypto-price',
         )}
       >
         {price.monthly === price.annual ? (
@@ -514,6 +880,7 @@ function Plan({
                 className={clsx(
                   'h-6 w-6 flex-none',
                   featured ? 'text-purple-400' : 'text-purple-500',
+                  payWithCrypto && 'crypto-check animate-pulse-soft',
                 )}
               />
               <span className='ml-4'>{feature}</span>
@@ -535,8 +902,10 @@ function Plan({
               featured
                 ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+              payWithCrypto && 'border-purple-400 animate-float crypto-button',
             )}
             aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+            icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}
           >
             {buttonText}
           </Button>
@@ -553,47 +922,90 @@ function Plan({
             featured
               ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
               : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+            payWithCrypto && 'crypto-button',
+            payWithCrypto && !hasActivePlan && 'animate-float',
           )}
           aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+          icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}
         >
           {buttonText}
         </Button>
       )}
 
-      {/* Crypto interest button */}
       {tier !== SUBSCRIPTION_TIERS.FREE && (
         <div className='mt-3 flex flex-col gap-2 text-center'>
-          <Tooltip
-            title={
-              cryptoInterest?.interested
-                ? "We'll add crypto payments if enough people want it. Check back soon!"
-                : "Let us know if you'd like to pay with cryptocurrency"
-            }
-          >
-            {!cryptoInterest?.interested ? (
-              <Button
-                type='link'
+          {/* Payment method selection - only show for Pro tier */}
+          {tier === SUBSCRIPTION_TIERS.PRO && (
+            <div
+              className={clsx(
+                'flex items-center border border-transparent justify-center space-x-1 mt-2 mb-2 py-2 px-4 rounded-full transition-all duration-300',
+                (payWithCrypto && 'crypto-toggle-container animate-glow') || '-mt-1!',
+              )}
+            >
+              <Switch
                 size='small'
-                icon={<Bitcoin size={16} />}
-                onClick={handleCryptoInterest}
-                loading={session ? loadingCryptoInterest : false}
+                checked={payWithCrypto}
+                onChange={setPayWithCrypto}
                 className={clsx(
-                  'text-xs',
-                  featured
-                    ? 'text-purple-300 hover:text-purple-200'
-                    : 'text-gray-400 hover:text-gray-300',
+                  'transition-colors duration-300',
+                  featured ? 'bg-purple-600' : '',
+                  payWithCrypto && 'crypto-switch',
                 )}
+              />
+              <span
+                className={clsx(
+                  'text-xs ml-2 cursor-pointer transition-all duration-300',
+                  featured ? 'text-purple-300' : 'text-gray-400',
+                  payWithCrypto && 'text-purple-300 font-medium',
+                )}
+                onClick={() => setPayWithCrypto(!payWithCrypto)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setPayWithCrypto(!payWithCrypto)
+                  }
+                }}
               >
-                <span className='break-words'>
-                  {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 1} interested)`}
-                </span>
-              </Button>
-            ) : (
-              <span className='text-xs break-words'>
-                {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
+                {payWithCrypto ? (
+                  <span className='flex items-center gap-1'>
+                    <Bitcoin size={14} className='text-purple-300 animate-pulse' />
+                    <span>Pay with Crypto</span>
+                    <Sparkles size={14} className='text-purple-300 animate-sparkle' />
+                  </span>
+                ) : (
+                  <span>Pay with Crypto</span>
+                )}
               </span>
-            )}
-          </Tooltip>
+              <Popover
+                content={
+                  <div className='max-w-xs'>
+                    <p className='text-sm'>
+                      {activePeriod === 'lifetime'
+                        ? 'Make a one-time payment with USDC stablecoin.'
+                        : "For recurring subscriptions, you'll receive invoices to pay with USDC stablecoin."}
+                    </p>
+                    <p className='text-sm mt-2 text-amber-500'>
+                      Note: Free trials are not available with crypto payments.
+                    </p>
+                  </div>
+                }
+                title={
+                  <span className='flex items-center gap-2'>
+                    <Bitcoin
+                      size={16}
+                      className={payWithCrypto ? 'text-purple-400 animate-spin-slow' : ''}
+                    />
+                    Crypto Payments
+                  </span>
+                }
+              >
+                <Info
+                  size={14}
+                  className='text-gray-400 cursor-pointer ml-1 transition-opacity duration-300 hover:text-gray-300'
+                />
+              </Popover>
+            </div>
+          )}
         </div>
       )}
     </section>

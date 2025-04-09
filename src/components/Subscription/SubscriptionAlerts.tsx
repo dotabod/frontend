@@ -1,6 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { gracePeriodEndNextDay, GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
-import { Button, Alert } from 'antd'
+import { Button, Alert, Skeleton } from 'antd'
 import { ExternalLinkIcon, GiftIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
 import type { GiftInfo, StatusInfo, GiftSubInfo } from './types'
 import type { SubscriptionWithGiftDetails } from './types'
@@ -40,24 +40,6 @@ function GracePeriodInfo({
       Your gift subscription will activate on {gracePeriodEndNextDay} - you will not be charged
       until after your gift expires.
     </p>
-  )
-}
-
-// Reusable component for gift sender information
-function GiftSenderInfo({
-  senderName,
-  giftMessage,
-}: {
-  senderName?: string
-  giftMessage?: string
-}) {
-  return (
-    <>
-      {senderName && senderName !== 'Anonymous' && (
-        <p className='mt-1 text-sm'>Gift from: {senderName}</p>
-      )}
-      {giftMessage && <p className='mt-1 italic text-sm text-indigo-400'>"{giftMessage}"</p>}
-    </>
   )
 }
 
@@ -103,7 +85,6 @@ export function SubscriptionAlerts({
   statusInfo,
   handlePortalAccess,
   isLoading,
-  giftSubInfo,
   hideManageButton = false,
 }: SubscriptionAlertsProps) {
   const {
@@ -113,28 +94,13 @@ export function SubscriptionAlerts({
     hasActivePlan,
     creditBalance,
     formattedCreditBalance,
+    isLoading: subContextIsLoading,
   } = useSubscriptionContext()
 
   // Only show manage subscription button for recurring subscriptions with Stripe
   const showManageButton =
     !hideManageButton && hasActivePlan && subscription?.stripeSubscriptionId && !isLifetimePlan
 
-  // Helper function to find the latest gift end date
-  const getLatestGiftEndDate = () => {
-    if (!giftInfo.giftSubscriptions?.length) return null
-
-    return giftInfo.giftSubscriptions.reduce(
-      (latest, gift) => {
-        if (!gift.endDate) return latest
-        if (!latest) return gift.endDate
-        return new Date(gift.endDate) > new Date(latest) ? gift.endDate : latest
-      },
-      null as Date | null,
-    )
-  }
-
-  // Extract latest gift end date if available
-  const latestGiftEndDate = getLatestGiftEndDate()
 
   // Check if grace period virtual subscription
   const isVirtualGracePeriodSubscription =
@@ -204,6 +170,14 @@ export function SubscriptionAlerts({
   }
 
   const GiftSubtitle = createCreditAlert()
+
+  if (subContextIsLoading) {
+    return (
+      <div className='space-y-4 gap-4 flex flex-col'>
+        <Skeleton.Input active size="large" className="w-full" />
+      </div>
+    )
+  }
 
   return (
     <div className='space-y-4 gap-4 flex flex-col'>

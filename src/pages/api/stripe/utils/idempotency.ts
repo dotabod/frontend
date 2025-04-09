@@ -14,6 +14,12 @@ export async function processEventIdempotently(
   processor: (tx: Prisma.TransactionClient) => Promise<void>,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
+  // Always process dev events
+  if (process.env.NODE_ENV === 'development') {
+    await processor(tx)
+    return true
+  }
+
   try {
     // Check if we've already processed this event
     const existingEvent = await tx.webhookEvent.findUnique({
@@ -49,7 +55,7 @@ export async function processEventIdempotently(
     }
 
     // Process the event
-    await processor(tx)
+    await await tx
     return true
   } catch (error) {
     console.error(`Error processing event ${eventId} (${eventType}):`, error)

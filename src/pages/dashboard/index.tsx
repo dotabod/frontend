@@ -16,8 +16,59 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState, useCallback } from 'react'
 import useSWR from 'swr'
+import '@/styles/crypto-animations.css'
+import { Bitcoin } from 'lucide-react'
 
 const { Title, Text, Paragraph } = Typography
+
+// Custom crypto confetti function
+const triggerCryptoConfetti = () => {
+  const end = Date.now() + 3 * 1000
+  // Crypto-themed colors - purples and golds
+  const colors = ['#8b5cf6', '#a78bfa', '#f59e0b', '#fbbf24']
+
+  const frame = () => {
+    if (Date.now() > end) return
+
+    // More particles for crypto
+    confetti({
+      particleCount: 6,
+      angle: 60,
+      spread: 70,
+      startVelocity: 75,
+      origin: { x: 0, y: 0.5 },
+      colors: colors,
+      shapes: ['circle', 'square'],
+      scalar: 1.2,
+    })
+    confetti({
+      particleCount: 6,
+      angle: 120,
+      spread: 70,
+      startVelocity: 75,
+      origin: { x: 1, y: 0.5 },
+      colors: colors,
+      shapes: ['circle', 'square'],
+      scalar: 1.2,
+    })
+
+    // Add some "bitcoin" shaped confetti (smaller circles) in gold
+    confetti({
+      particleCount: 4,
+      angle: 90,
+      spread: 360,
+      startVelocity: 40,
+      origin: { x: 0.5, y: 0.5 },
+      colors: ['#f59e0b', '#fbbf24'],
+      shapes: ['circle'],
+      scalar: 0.7,
+    })
+
+    requestAnimationFrame(frame)
+  }
+
+  frame()
+}
 
 const SetupPage = () => {
   const session = useSession()
@@ -33,6 +84,8 @@ const SetupPage = () => {
   const [active, setActive] = useState(0)
   const router = useRouter()
   const didJustPay = router.query.paid === 'true'
+  // Check if payment was made with crypto
+  const paidWithCrypto = router.query.crypto === 'true'
   // isTrial comes from the checkout API's success URL: ?trial=${isRecurring && trialDays > 0}
   // It will be true for recurring subscriptions with a trial period (grace period or standard 14-day trial)
   // It will be false for lifetime purchases or subscriptions with no trial (like when a user already has a gift sub)
@@ -106,7 +159,7 @@ const SetupPage = () => {
     )
   }, [router.query.step])
 
-  // Trigger confetti animation
+  // Standard confetti animation
   const triggerConfetti = useCallback(() => {
     const end = Date.now() + 2 * 1000
     const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
@@ -137,6 +190,21 @@ const SetupPage = () => {
     frame()
   }, [])
 
+  // Crypto notification element with animations
+  const CryptoSuccessContent = useCallback(
+    ({ message, description }: { message: string; description: string }) => (
+      <div className="crypto-success-notification animate-glow">
+        <div className="flex items-center">
+          <Bitcoin className="mr-2 text-amber-400 animate-spin-slow" size={24} />
+          <div className="crypto-gradient-text font-bold text-lg">{message}</div>
+        </div>
+        <div className="mt-2 pl-8">{description}</div>
+        <div className="absolute top-0 left-0 w-full h-full crypto-active-bg pointer-events-none" />
+      </div>
+    ),
+    []
+  )
+
   // Consolidated useEffect for confetti and payment notifications
   useEffect(() => {
     // Track if confetti has been triggered in this effect run
@@ -152,7 +220,12 @@ const SetupPage = () => {
     if (didJustPay) {
       // Only trigger confetti if it hasn't been triggered yet
       if (!confettiTriggered) {
-        triggerConfetti()
+        // Use crypto-themed confetti for crypto payments
+        if (paidWithCrypto) {
+          triggerCryptoConfetti()
+        } else {
+          triggerConfetti()
+        }
       }
 
       // Create a more descriptive message based on the subscription type
@@ -170,12 +243,34 @@ const SetupPage = () => {
         description = 'Thanks for supporting Dotabod! All premium features are now unlocked.'
       }
 
-      notification.success({
-        key: 'paid',
-        message: 'Dotabod Pro Unlocked',
-        description,
-        duration: 55,
-      })
+      // Special notification styling for crypto payments
+      if (paidWithCrypto) {
+        notification.open({
+          key: 'paid',
+          message: '',
+          description: (
+            <CryptoSuccessContent
+              message="Dotabod Pro Unlocked with Crypto"
+              description={description}
+            />
+          ),
+          duration: 55,
+          className: 'crypto-notification',
+        })
+
+        // Add body class for temporary crypto theme
+        document.body.classList.add('crypto-payment-success')
+        setTimeout(() => {
+          document.body.classList.remove('crypto-payment-success')
+        }, 60000) // Remove after 1 minute
+      } else {
+        notification.success({
+          key: 'paid',
+          message: 'Dotabod Pro Unlocked',
+          description,
+          duration: 55,
+        })
+      }
 
       // Clear the query params but preserve the step
       const step = router.query.step
@@ -198,6 +293,8 @@ const SetupPage = () => {
     triggerConfetti,
     hasGiftSubs,
     giftCount,
+    paidWithCrypto,
+    CryptoSuccessContent,
   ])
 
   if (session?.data?.user?.isImpersonating) {

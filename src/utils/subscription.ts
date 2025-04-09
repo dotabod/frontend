@@ -240,11 +240,21 @@ const PRICE_IDS: SubscriptionPriceId[] = [
   },
 ]
 
+export const CRYPTO_PRICE_IDS: SubscriptionPriceId[] = [
+  {
+    tier: SUBSCRIPTION_TIERS.PRO,
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_CRYPTO_PRICE_ID || '',
+    annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_CRYPTO_PRICE_ID || '',
+    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_CRYPTO_PRICE_ID || '',
+  },
+]
+
 export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,
+  payWithCrypto: boolean,
 ): string {
-  const priceList = PRICE_IDS
+  const priceList = payWithCrypto ? CRYPTO_PRICE_IDS : PRICE_IDS
   const price = priceList.find((p) => p.tier === tier)
   if (!price) throw new Error(`No price found for tier ${tier}`)
   if (period === 'monthly') return price.monthly
@@ -256,7 +266,7 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
   if (!priceId) return 'monthly'
 
   // Check both regular and gift price IDs
-  const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS]
+  const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS, ...CRYPTO_PRICE_IDS]
 
   if (allPriceIds.some((price) => price.monthly === priceId)) return 'monthly'
   if (allPriceIds.some((price) => price.annual === priceId)) return 'annual'
@@ -510,7 +520,7 @@ export function getSubscriptionTier(
 ): SubscriptionTier {
   if (isSubscriptionActive({ status })) {
     // Check both regular and gift price IDs
-    const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS]
+    const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS, ...CRYPTO_PRICE_IDS]
 
     const tierFromPrice = allPriceIds.find((price) =>
       [price.monthly, price.annual, price.lifetime].includes(priceId || ''),

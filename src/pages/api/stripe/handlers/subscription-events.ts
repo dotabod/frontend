@@ -44,9 +44,14 @@ export async function handleSubscriptionEvent(
               status: mapStripeStatus(subscription.status),
               tier: getSubscriptionTier(priceId, mapStripeStatus(subscription.status)),
               stripePriceId: priceId || '',
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodEnd: new Date(subscription.items.data[0]?.current_period_end * 1000),
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
-              metadata: subscription.metadata,
+              metadata: {
+                ...subscription.metadata,
+                // Store collection method to know this is a crypto invoice-based subscription
+                collectionMethod: subscription.collection_method,
+                isCryptoPayment: subscription.metadata?.isCryptoPayment || 'false',
+              },
               updatedAt: new Date(),
             },
           })
@@ -64,10 +69,15 @@ export async function handleSubscriptionEvent(
               stripePriceId: priceId || '',
               stripeCustomerId: customerId,
               transactionType: TransactionType.RECURRING,
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodEnd: new Date(subscription.items.data[0]?.current_period_end * 1000),
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
               stripeSubscriptionId: subscription.id,
-              metadata: subscription.metadata,
+              metadata: {
+                ...subscription.metadata,
+                // Store collection method to know this is a crypto invoice-based subscription
+                collectionMethod: subscription.collection_method,
+                isCryptoPayment: subscription.metadata?.isCryptoPayment || 'false',
+              },
             },
           })
 

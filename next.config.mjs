@@ -41,31 +41,32 @@ const nextConfig = {
     ],
   },
   transpilePackages: [
-    'antd',
     '@ant-design',
     '@ant-design/cssinjs',
-    'rc-util',
-    'rc-pagination',
-    'rc-picker',
-    'rc-notification',
-    'rc-tooltip',
-    'rc-tree',
-    'rc-table',
-    'rc-input',
-    'rc-textarea',
+    '@rc-component/async-validator',
+    '@rc-component/color-picker',
+    '@rc-component/context',
+    '@rc-component/mini-decimal',
+    '@rc-component/mutate-observer',
+    '@rc-component/portal',
+    '@rc-component/qrcode',
+    '@rc-component/tour',
+    '@rc-component/util',
+    '@rc-component/trigger',
+    'antd',
     'rc-input-number',
+    'rc-input',
     'rc-mentions',
     'rc-menu',
     'rc-motion',
-    '@rc-component/mini-decimal',
-    '@rc-component/trigger',
-    '@rc-component/portal',
-    '@rc-component/context',
-    '@rc-component/tour',
-    '@rc-component/color-picker',
-    '@rc-component/mutate-observer',
-    '@rc-component/async-validator',
-    '@rc-component/qrcode',
+    'rc-notification',
+    'rc-pagination',
+    'rc-picker',
+    'rc-table',
+    'rc-textarea',
+    'rc-tooltip',
+    'rc-tree',
+    'rc-util',
   ],
   webpack: (config, { dev, isServer }) => {
     // Fix for the "Cannot read properties of null (reading '1')" error in production
@@ -127,7 +128,7 @@ export default withSentryConfig(
     project: 'dotabod-frontend',
 
     release: {
-      name: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
+      name: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
     },
 
     // Only print logs for uploading source maps in CI
@@ -151,7 +152,7 @@ export default withSentryConfig(
     // Hides source maps from generated client bundles
     sourcemaps: {
       assets: './**/*.map',
-      deleteSourcemapsAfterUpload: true
+      deleteSourcemapsAfterUpload: true,
     },
 
     // Automatically tree-shake Sentry logger statements to reduce bundle size
