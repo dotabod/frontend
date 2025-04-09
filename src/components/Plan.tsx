@@ -370,7 +370,7 @@ function Plan({
     try {
       if (!session) {
         await signIn('twitch', {
-          callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}`,
+          callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}${payWithCrypto ? '&crypto=true' : ''}`,
         })
         return
       }
@@ -714,7 +714,7 @@ function Plan({
 
   // Add effect to handle auto-subscription based on URL parameters
   useEffect(() => {
-    const { plan, period } = router.query
+    const { plan, period, crypto } = router.query
 
     // Check if URL parameters match this plan's tier and period
     if (
@@ -726,6 +726,11 @@ function Plan({
     ) {
       // Mark that we've started the subscription process
       subscriptionStarted.current = true
+
+      // Set crypto payment option if specified in URL
+      if (crypto === 'true' && tier === SUBSCRIPTION_TIERS.PRO) {
+        setPayWithCrypto(true)
+      }
 
       // Remove the query parameters to prevent repeated subscription attempts
       const { pathname } = router
