@@ -13,37 +13,49 @@ export default function Banner() {
     useState<CountdownTime>(null)
 
   // Create dates only once during component initialization, not on every render
-  const { BAN_END_DATE, effectiveGracePeriodEnd, currentDate } = useMemo(() => {
-    const now = new Date()
+  const { BAN_END_DATE, effectiveGracePeriodEnd, currentDate, CRYPTO_ANNOUNCEMENT_DATE } =
+    useMemo(() => {
+      const now = new Date()
 
-    // Set dates based on environment
-    // In development, set the ban end date to be a few hours from now for testing
-    const banEndDate =
-      process.env.NODE_ENV === 'development'
-        ? (() => {
-            const devEndDate = new Date(now)
-            devEndDate.setMinutes(devEndDate.getMinutes() + 5) // 2 hours from now
-            return devEndDate
-          })()
-        : new Date('2025-04-06T17:13:42Z') // Production date: April 6, 2025
+      // Set dates based on environment
+      // In development, set the ban end date to be a few hours from now for testing
+      const banEndDate =
+        process.env.NODE_ENV === 'development'
+          ? (() => {
+              const devEndDate = new Date(now)
+              devEndDate.setMinutes(devEndDate.getMinutes() + 5) // 2 hours from now
+              return devEndDate
+            })()
+          : new Date('2025-04-06T17:13:42Z') // Production date: April 6, 2025
 
-    // In development, set the grace period end date to be 4 hours from now (after ban end)
-    const devGracePeriodEnd = (() => {
-      const devGraceEndDate = new Date(now)
-      devGraceEndDate.setHours(devGraceEndDate.getHours() + 4) // 4 hours from now
-      return devGraceEndDate
-    })()
+      // In development, set the grace period end date to be 4 hours from now (after ban end)
+      const devGracePeriodEnd = (() => {
+        const devGraceEndDate = new Date(now)
+        devGraceEndDate.setHours(devGraceEndDate.getHours() + 4) // 4 hours from now
+        return devGraceEndDate
+      })()
 
-    // Use imported GRACE_PERIOD_END for production, dev date for development
-    const gracePeriodEnd =
-      process.env.NODE_ENV === 'development' ? devGracePeriodEnd : GRACE_PERIOD_END
+      // Use imported GRACE_PERIOD_END for production, dev date for development
+      const gracePeriodEnd =
+        process.env.NODE_ENV === 'development' ? devGracePeriodEnd : GRACE_PERIOD_END
 
-    return {
-      BAN_END_DATE: banEndDate,
-      effectiveGracePeriodEnd: gracePeriodEnd,
-      currentDate: now,
-    }
-  }, [])
+      // Crypto announcement date
+      const cryptoAnnouncementDate =
+        process.env.NODE_ENV === 'development'
+          ? (() => {
+              const devCryptoDate = new Date(now)
+              devCryptoDate.setHours(devCryptoDate.getHours() + 1) // 1 hour from now for testing
+              return devCryptoDate
+            })()
+          : new Date('2025-04-09T12:00:00Z') // Production date: April 9, 2025
+
+      return {
+        BAN_END_DATE: banEndDate,
+        effectiveGracePeriodEnd: gracePeriodEnd,
+        currentDate: now,
+        CRYPTO_ANNOUNCEMENT_DATE: cryptoAnnouncementDate,
+      }
+    }, [])
 
   // Helper to check if two dates have the same month and day - memoized to prevent recreation
   const isSameMonthAndDay = useCallback((date1: Date, date2: Date) => {
@@ -113,6 +125,66 @@ export default function Banner() {
   // Don't show any banner if dismissed
   if (dismissed) {
     return null
+  }
+
+  // Check if it's within the crypto announcement period (7 days before to 7 days after)
+  const cryptoStartDate = new Date(CRYPTO_ANNOUNCEMENT_DATE)
+  cryptoStartDate.setDate(cryptoStartDate.getDate() - 7)
+  const cryptoEndDate = new Date(CRYPTO_ANNOUNCEMENT_DATE)
+  cryptoEndDate.setDate(cryptoEndDate.getDate() + 7)
+
+  // Prioritize crypto banner during its announcement period
+  if (currentDate >= cryptoStartDate && currentDate <= cryptoEndDate) {
+    return (
+      <div className='relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-800 px-6 sm:before:flex-1'>
+        <div
+          aria-hidden='true'
+          className='absolute top-1/2 left-[max(-7rem,calc(50%-52rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl'
+        >
+          <div
+            style={{
+              clipPath:
+                'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
+            }}
+            className='aspect-577/310 w-[36.0625rem] bg-gradient-to-r from-blue-600 to-teal-500 opacity-40'
+          />
+        </div>
+        <div
+          aria-hidden='true'
+          className='absolute top-1/2 left-[max(45rem,calc(50%+8rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl'
+        >
+          <div
+            style={{
+              clipPath:
+                'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
+            }}
+            className='aspect-577/310 w-[36.0625rem] bg-gradient-to-r from-blue-600 to-teal-500 opacity-40'
+          />
+        </div>
+        <p className='text-sm/6 text-gray-100 my-0!'>
+          New! Pay for Dotabod Pro with cryptocurrency.{' '}
+          <Link
+            href='/blog/crypto-payments-launch'
+            className='font-semibold whitespace-nowrap text-teal-300 hover:text-teal-200'
+          >
+            Learn More&nbsp;<span aria-hidden='true'>&rarr;</span>
+          </Link>
+        </p>
+        <div className='flex flex-1 justify-end'>
+          <button
+            type='button'
+            className='-m-3 p-3 focus-visible:outline-offset-[-4px]'
+            onClick={(e) => {
+              e.preventDefault()
+              setDismissed(true)
+            }}
+          >
+            <span className='sr-only'>Dismiss</span>
+            <XMarkIcon aria-hidden='true' className='size-5 text-gray-200' />
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Show countdown banner on ban end date
@@ -360,6 +432,11 @@ export default function Banner() {
         </div>
       </div>
     )
+  }
+
+  // Don't show any banner after grace period ends
+  if (currentDate > effectiveGracePeriodEnd) {
+    return null
   }
 
   // Don't show any banner after grace period ends
