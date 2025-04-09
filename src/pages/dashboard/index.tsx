@@ -16,7 +16,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState, useCallback } from 'react'
 import useSWR from 'swr'
-import '@/styles/crypto-animations.css'
 import { Bitcoin } from 'lucide-react'
 
 const { Title, Text, Paragraph } = Typography
@@ -193,16 +192,16 @@ const SetupPage = () => {
   // Crypto notification element with animations
   const CryptoSuccessContent = useCallback(
     ({ message, description }: { message: string; description: string }) => (
-      <div className="crypto-success-notification animate-glow">
-        <div className="flex items-center">
-          <Bitcoin className="mr-2 text-amber-400 animate-spin-slow" size={24} />
-          <div className="crypto-gradient-text font-bold text-lg">{message}</div>
+      <div className='crypto-success-notification animate-glow'>
+        <div className='flex items-center'>
+          <Bitcoin className='mr-2 text-amber-400 animate-spin-slow' size={24} />
+          <div className='crypto-gradient-text font-bold text-lg'>{message}</div>
         </div>
-        <div className="mt-2 pl-8">{description}</div>
-        <div className="absolute top-0 left-0 w-full h-full crypto-active-bg pointer-events-none" />
+        <div className='mt-2 pl-8'>{description}</div>
+        <div className='absolute top-0 left-0 w-full h-full crypto-active-bg pointer-events-none' />
       </div>
     ),
-    []
+    [],
   )
 
   // Consolidated useEffect for confetti and payment notifications
@@ -250,7 +249,7 @@ const SetupPage = () => {
           message: '',
           description: (
             <CryptoSuccessContent
-              message="Dotabod Pro Unlocked with Crypto"
+              message='Dotabod Pro Unlocked with Crypto'
               description={description}
             />
           ),

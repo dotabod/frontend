@@ -22,7 +22,6 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import useSWR from 'swr'
 import { Logomark } from './Logo'
-import '@/styles/crypto-animations.css'
 
 // Sparkle animation component with unique IDs
 const CryptoSparkle = ({ visible }: { visible: boolean }) => {
