@@ -55,29 +55,29 @@ export async function middleware(req: NextRequestWithAuth) {
     // but log the error to the console
     console.error(error)
   }
-
   if (req.nextUrl.pathname.startsWith('/dashboard') || req.nextUrl.pathname.endsWith('/overlay')) {
     // Use the token in the request directly to check role
     // withAuth already adds the token and user to the request
-    const authResult = await withAuth(req, {
+    const onlyChatterRole = await withAuth(req, {
       callbacks: {
         authorized: ({ token }) => {
-          // If token exists but user is a 'chatter', deny access to dashboard
-          if (token?.role === 'chatter') {
+          // Only check for 'chatter' role if the token exists (user is logged in)
+          if (token && token.role === 'chatter') {
             return false
           }
           // Otherwise authorize if token exists
-          return !!token
+          return true
         },
       },
     })
 
-    // If authorization failed and the user is a chatter, redirect to verify with error
-    if (authResult && !authResult.ok) {
+    // If authorization failed and the user is logged in but is a chatter, redirect to verify with error
+    if (onlyChatterRole && !onlyChatterRole.ok) {
       return NextResponse.redirect(new URL('/verify?error=chatter', req.url))
     }
 
-    return authResult
+    // Proceed with the authentication middleware for /dashboard paths
+    return withAuth(req)
   }
 
   return NextResponse.next()
