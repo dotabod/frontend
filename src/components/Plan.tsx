@@ -4,50 +4,61 @@ import { createCheckoutSession } from '@/lib/stripe'
 import {
   calculateSavings,
   getPriceId,
-  GRACE_PERIOD_END,
   gracePeriodPrettyDate,
-  isInGracePeriod,
   isSubscriptionActive,
   type PricePeriod,
   SUBSCRIPTION_TIERS,
   type SubscriptionRow,
 } from '@/utils/subscription'
 import { SubscriptionStatus, type SubscriptionTier } from '@prisma/client'
-import { App, Button, notification, Tooltip, Switch, Popover } from 'antd'
+import { App, Button, notification, Tooltip } from 'antd'
 import clsx from 'clsx'
-import { Bitcoin, CheckIcon, Wallet, Info, Sparkles } from 'lucide-react'
+import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import useSWR from 'swr'
 import { Logomark } from './Logo'
+import ErrorBoundary from './ErrorBoundary'
+import CryptoToggle from './CryptoToggle'
+import { PlanDescription } from './PlanDescription'
 
 // Sparkle animation component with unique IDs
 const CryptoSparkle = ({ visible }: { visible: boolean }) => {
+  // Create a fixed array of sparkles with pre-determined keys
+  // This prevents the random key generation on each render that could cause issues
+  const sparkles = useMemo(() => {
+    return Array.from({ length: 8 }).map((_, index) => ({
+      id: `sparkle-${index}`,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      width: `${Math.random() * 5 + 2}px`,
+      height: `${Math.random() * 5 + 2}px`,
+      delay: `${Math.random() * 1.5}s`,
+      duration: `${Math.random() * 1 + 1.5}s`,
+    }))
+  }, []) // Empty dependency array means this only runs once
+
   if (!visible) return null
 
   return (
     <div className='absolute inset-0 pointer-events-none overflow-hidden'>
       <div className='absolute top-0 left-0 w-full h-full'>
-        {Array.from({ length: 8 }).map(() => {
-          // Generate unique identifier for each sparkle
-          const uniqueId = `sparkle-${Math.random().toString(36).substring(2, 9)}`
-          return (
-            <span
-              key={uniqueId}
-              className='absolute block rounded-full bg-purple-400 opacity-0 animate-sparkle'
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                width: `${Math.random() * 5 + 2}px`,
-                height: `${Math.random() * 5 + 2}px`,
-                animationDelay: `${Math.random() * 1.5}s`,
-                animationDuration: `${Math.random() * 1 + 1.5}s`,
-              }}
-            />
-          )
-        })}
+        {sparkles.map((sparkle) => (
+          <span
+            key={sparkle.id}
+            className='absolute block rounded-full bg-purple-400 opacity-0 animate-sparkle'
+            style={{
+              top: sparkle.top,
+              left: sparkle.left,
+              width: sparkle.width,
+              height: sparkle.height,
+              animationDelay: sparkle.delay,
+              animationDuration: sparkle.duration,
+            }}
+          />
+        ))}
       </div>
     </div>
   )
@@ -161,79 +172,6 @@ function Plan({
 
   // Check if user has credit balance
   const hasCreditBalance = creditBalance > 0
-
-  // Update description display to show trial and credit info
-  const displayDescription = () => {
-    if (tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime') {
-      const now = new Date()
-
-      // If crypto payment is selected, show no trial message
-      if (payWithCrypto) {
-        return (
-          <>
-            {description}
-            <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Note: Free trial is not available with crypto payments
-            </span>
-          </>
-        )
-      }
-
-      // If user has credit balance and is considering a subscription
-      if (hasCreditBalance && !hasActivePlan) {
-        return (
-          <>
-            {description}
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out'>
-              You have {formattedCreditBalance} credit that will be applied at checkout
-            </span>
-          </>
-        )
-      }
-
-      // If user has an active subscription and credit balance
-      if (hasActivePlan && hasCreditBalance) {
-        return (
-          <>
-            {description}
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out'>
-              You have {formattedCreditBalance} credit that will be applied to your next invoice
-            </span>
-          </>
-        )
-      }
-
-      if (
-        isInGracePeriod() &&
-        (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
-      ) {
-        // Calculate days until grace period ends
-        const daysUntilEnd = Math.ceil(
-          (GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-        )
-        return (
-          <>
-            {description}
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Includes free trial until {gracePeriodPrettyDate} ({daysUntilEnd} days)
-            </span>
-          </>
-        )
-      }
-
-      if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
-        return (
-          <>
-            {description}
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Includes 14-day free trial
-            </span>
-          </>
-        )
-      }
-    }
-    return description
-  }
 
   // Update button text logic
   const getSimplifiedButtonText = () => {
@@ -745,158 +683,193 @@ function Plan({
   }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 
   return (
-    <section
-      className={clsx(
-        'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5 relative',
-        featured
-          ? 'order-first bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
-          : 'bg-gray-800/50 backdrop-blur-xl',
-        payWithCrypto && 'crypto-active transition-all duration-500',
-      )}
-    >
-      {/* Crypto background effect when crypto is toggled on */}
-      <div
+    <ErrorBoundary>
+      <section
         className={clsx(
-          'absolute inset-0 transition-opacity duration-500 opacity-0 pointer-events-none',
-          payWithCrypto && 'crypto-active-bg',
-        )}
-      />
-
-      {/* Crypto sparkle animation */}
-      <CryptoSparkle visible={payWithCrypto} />
-
-      <h3
-        className={clsx(
-          'flex items-center text-sm font-semibold',
-          featured ? 'text-purple-400' : 'text-gray-100',
+          'flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg shadow-gray-900/5 relative',
+          featured
+            ? 'order-first bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 ring-2 ring-purple-500 lg:order-none'
+            : 'bg-gray-800/50 backdrop-blur-xl',
+          payWithCrypto && 'crypto-active transition-all duration-500',
         )}
       >
-        {logo ? (
-          activePeriod === 'lifetime' && tier === SUBSCRIPTION_TIERS.PRO ? (
-            <Image
-              src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
-              width={24}
-              height={24}
-              alt='Lifetime'
-              className='rounded-sm'
-            />
-          ) : (
-            logo
-          )
-        ) : (
-          <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
-        )}
-        <span className={clsx('ml-4', payWithCrypto && 'animate-pulse-soft')}>{name}</span>
-        {inGracePeriod &&
-          !payWithCrypto &&
-          tier === SUBSCRIPTION_TIERS.PRO &&
-          !hasActivePlan &&
-          activePeriod !== 'lifetime' && (
-            <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full transition-opacity duration-300'>
-              Free until {gracePeriodPrettyDate}
-            </span>
-          )}
-        {hasActivePlan && isCurrentPlan && (
-          <span
-            className={clsx(
-              'ml-2 text-xs px-2 py-0.5 rounded-full transition-all duration-300',
-              payWithCrypto
-                ? 'bg-gradient-to-r from-purple-500/30 to-amber-500/30 text-amber-300 border border-amber-500/40'
-                : 'bg-green-500/20 text-green-300',
-            )}
-          >
-            {payWithCrypto ? '⚡ Your plan' : 'Your plan'}
-          </span>
-        )}
-        {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' && (
-          <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full flex items-center gap-1'>
-            <Wallet size={12} />
-            Credit: {formattedCreditBalance}
-          </span>
-        )}
-      </h3>
-      <p
-        className={clsx(
-          'relative mt-5 flex text-4xl font-bold tracking-tight',
-          featured ? 'text-white' : 'text-gray-100',
-          payWithCrypto && 'crypto-price',
-        )}
-      >
-        {price.monthly === price.annual ? (
-          price.monthly
-        ) : (
-          <>
-            <span
-              aria-hidden={activePeriod === 'annual' || activePeriod === 'lifetime'}
-              className={clsx(
-                'transition duration-300',
-                (activePeriod === 'annual' || activePeriod === 'lifetime') &&
-                  'pointer-events-none translate-x-6 opacity-0 select-none',
-              )}
-            >
-              {price.monthly}
-              <span className='text-sm'> / month</span>
-            </span>
-            <span
-              aria-hidden={activePeriod !== 'annual'}
-              className={clsx(
-                'absolute top-0 left-0 transition duration-300',
-                activePeriod === 'annual'
-                  ? 'translate-x-0 opacity-100'
-                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
-              )}
-            >
-              {price.annual}
-              <span className='text-sm'> / year</span>
-            </span>
-            <span
-              aria-hidden={activePeriod !== 'lifetime'}
-              className={clsx(
-                'absolute top-0 left-0 transition duration-300',
-                activePeriod === 'lifetime'
-                  ? 'translate-x-0 opacity-100'
-                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
-              )}
-            >
-              {price.lifetime}
-              <span className='text-sm'> one-time</span>
-            </span>
-          </>
-        )}
-      </p>
-      {activePeriod === 'annual' && !Number.isNaN(savings) && (
-        <p className={clsx('-mt-10 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-          Saving {savings}%
-        </p>
-      )}
-      <p className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-        {displayDescription()}
-      </p>
-      <div className='order-last mt-6'>
-        <ol
+        {/* Crypto background effect when crypto is toggled on */}
+        <div
           className={clsx(
-            '-my-2 divide-y text-sm',
-            featured ? 'divide-gray-700/50 text-gray-300' : 'divide-gray-700/30 text-gray-300',
+            'absolute inset-0 transition-opacity duration-500 opacity-0 pointer-events-none',
+            payWithCrypto && 'crypto-active-bg',
+          )}
+        />
+
+        {/* Crypto sparkle animation */}
+        <CryptoSparkle visible={payWithCrypto} />
+
+        <h3
+          className={clsx(
+            'flex items-center text-sm font-semibold',
+            featured ? 'text-purple-400' : 'text-gray-100',
           )}
         >
-          {features.map((feature, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <li key={index} className='flex py-2'>
-              <CheckIcon
-                className={clsx(
-                  'h-6 w-6 flex-none',
-                  featured ? 'text-purple-400' : 'text-purple-500',
-                  payWithCrypto && 'crypto-check animate-pulse-soft',
-                )}
+          {logo ? (
+            activePeriod === 'lifetime' && tier === SUBSCRIPTION_TIERS.PRO ? (
+              <Image
+                src='https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp'
+                width={24}
+                height={24}
+                alt='Lifetime'
+                className='rounded-sm'
               />
-              <span className='ml-4'>{feature}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
+            ) : (
+              logo
+            )
+          ) : (
+            <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
+          )}
+          <span className={clsx('ml-4', payWithCrypto && 'animate-pulse-soft')}>{name}</span>
+          {inGracePeriod &&
+            !payWithCrypto &&
+            tier === SUBSCRIPTION_TIERS.PRO &&
+            !hasActivePlan &&
+            activePeriod !== 'lifetime' && (
+              <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full transition-opacity duration-300'>
+                Free until {gracePeriodPrettyDate}
+              </span>
+            )}
+          {hasActivePlan && isCurrentPlan && (
+            <span
+              className={clsx(
+                'ml-2 text-xs px-2 py-0.5 rounded-full transition-all duration-300',
+                payWithCrypto
+                  ? 'bg-gradient-to-r from-purple-500/30 to-amber-500/30 text-amber-300 border border-amber-500/40'
+                  : 'bg-green-500/20 text-green-300',
+              )}
+            >
+              {payWithCrypto ? '⚡ Your plan' : 'Your plan'}
+            </span>
+          )}
+          {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' && (
+            <span className='ml-2 text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full flex items-center gap-1'>
+              <Wallet size={12} />
+              Credit: {formattedCreditBalance}
+            </span>
+          )}
+        </h3>
 
-      {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan ? (
-        <Tooltip title='Your credit balance will be automatically applied at checkout'>
+        {/* Price display with transitions */}
+        <div className='relative mt-5'>
+          <p
+            className={clsx(
+              'flex text-4xl font-bold tracking-tight',
+              featured ? 'text-white' : 'text-gray-100',
+              payWithCrypto && 'crypto-price',
+            )}
+          >
+            {price.monthly === price.annual ? (
+              price.monthly
+            ) : (
+              <>
+                <span
+                  aria-hidden={activePeriod === 'annual' || activePeriod === 'lifetime'}
+                  className={clsx(
+                    'transition duration-300',
+                    (activePeriod === 'annual' || activePeriod === 'lifetime') &&
+                      'pointer-events-none translate-x-6 opacity-0 select-none',
+                  )}
+                >
+                  {price.monthly}
+                  <span className='text-sm'> / month</span>
+                </span>
+                <span
+                  aria-hidden={activePeriod !== 'annual'}
+                  className={clsx(
+                    'absolute top-0 left-0 transition duration-300',
+                    activePeriod === 'annual'
+                      ? 'translate-x-0 opacity-100'
+                      : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+                  )}
+                >
+                  {price.annual}
+                  <span className='text-sm'> / year</span>
+                </span>
+                <span
+                  aria-hidden={activePeriod !== 'lifetime'}
+                  className={clsx(
+                    'absolute top-0 left-0 transition duration-300',
+                    activePeriod === 'lifetime'
+                      ? 'translate-x-0 opacity-100'
+                      : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+                  )}
+                >
+                  {price.lifetime}
+                  <span className='text-sm'> one-time</span>
+                </span>
+              </>
+            )}
+          </p>
+        </div>
+
+        {activePeriod === 'annual' && !Number.isNaN(savings) && (
+          <p className={clsx('-mt-10 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+            Saving {savings}%
+          </p>
+        )}
+        <p className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+          <PlanDescription
+            tier={tier}
+            activePeriod={activePeriod}
+            payWithCrypto={payWithCrypto}
+            description={description}
+            hasCreditBalance={hasCreditBalance}
+            formattedCreditBalance={formattedCreditBalance}
+            hasTrial={hasTrial}
+          />
+        </p>
+
+        <div className='order-last mt-6'>
+          <ol
+            className={clsx(
+              '-my-2 divide-y text-sm',
+              featured ? 'divide-gray-700/50 text-gray-300' : 'divide-gray-700/30 text-gray-300',
+            )}
+          >
+            {features.map((feature, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              <li key={index} className='flex py-2'>
+                <CheckIcon
+                  className={clsx(
+                    'h-6 w-6 flex-none',
+                    featured ? 'text-purple-400' : 'text-purple-500',
+                    payWithCrypto && 'crypto-check animate-pulse-soft',
+                  )}
+                />
+                <span className='ml-4'>{feature}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan ? (
+          <Tooltip title='Your credit balance will be automatically applied at checkout'>
+            <Button
+              loading={redirectingToCheckout}
+              onClick={() => handleSubscribe()}
+              disabled={isButtonDisabled()}
+              size={featured ? 'large' : 'middle'}
+              color={featured ? 'danger' : 'default'}
+              className={clsx(
+                'mt-6 w-full',
+                featured
+                  ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+                  : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
+                payWithCrypto && 'border-purple-400 animate-float crypto-button',
+              )}
+              aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+              icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}
+            >
+              {buttonText}
+            </Button>
+          </Tooltip>
+        ) : (
           <Button
             loading={redirectingToCheckout}
             onClick={() => handleSubscribe()}
@@ -904,117 +877,35 @@ function Plan({
             size={featured ? 'large' : 'middle'}
             color={featured ? 'danger' : 'default'}
             className={clsx(
-              'mt-6 w-full',
+              'mt-6',
               featured
                 ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-              payWithCrypto && 'border-purple-400 animate-float crypto-button',
+              payWithCrypto && 'crypto-button',
+              payWithCrypto && !hasActivePlan && 'animate-float',
             )}
             aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
             icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}
           >
             {buttonText}
           </Button>
-        </Tooltip>
-      ) : (
-        <Button
-          loading={redirectingToCheckout}
-          onClick={() => handleSubscribe()}
-          disabled={isButtonDisabled()}
-          size={featured ? 'large' : 'middle'}
-          color={featured ? 'danger' : 'default'}
-          className={clsx(
-            'mt-6',
-            featured
-              ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
-              : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-            payWithCrypto && 'crypto-button',
-            payWithCrypto && !hasActivePlan && 'animate-float',
-          )}
-          aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
-          icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}
-        >
-          {buttonText}
-        </Button>
-      )}
+        )}
 
-      {tier !== SUBSCRIPTION_TIERS.FREE && (
-        <div className='mt-3 flex flex-col gap-2 text-center'>
-          {/* Payment method selection - only show for Pro tier */}
-          {tier === SUBSCRIPTION_TIERS.PRO && (
-            <div
-              className={clsx(
-                'flex items-center border border-transparent justify-center space-x-1 mt-2 mb-2 py-2 px-4 rounded-full transition-all duration-300',
-                (payWithCrypto && 'crypto-toggle-container animate-glow') || '-mt-1!',
-              )}
-            >
-              <Switch
-                size='small'
-                checked={payWithCrypto}
-                onChange={setPayWithCrypto}
-                className={clsx(
-                  'transition-colors duration-300',
-                  featured ? 'bg-purple-600' : '',
-                  payWithCrypto && 'crypto-switch',
-                )}
+        {tier !== SUBSCRIPTION_TIERS.FREE && (
+          <div className='mt-3 flex flex-col gap-2 text-center'>
+            {/* Payment method selection - only show for Pro tier */}
+            {tier === SUBSCRIPTION_TIERS.PRO && (
+              <CryptoToggle
+                payWithCrypto={payWithCrypto}
+                setPayWithCrypto={setPayWithCrypto}
+                activePeriod={activePeriod}
+                featured={featured}
               />
-              <span
-                className={clsx(
-                  'text-xs ml-2 cursor-pointer transition-all duration-300',
-                  featured ? 'text-purple-300' : 'text-gray-400',
-                  payWithCrypto && 'text-purple-300 font-medium',
-                )}
-                onClick={() => setPayWithCrypto(!payWithCrypto)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    setPayWithCrypto(!payWithCrypto)
-                  }
-                }}
-              >
-                {payWithCrypto ? (
-                  <span className='flex items-center gap-1'>
-                    <Bitcoin size={14} className='text-purple-300 animate-pulse' />
-                    <span>Pay with Crypto</span>
-                    <Sparkles size={14} className='text-purple-300 animate-sparkle' />
-                  </span>
-                ) : (
-                  <span>Pay with Crypto</span>
-                )}
-              </span>
-              <Popover
-                content={
-                  <div className='max-w-xs'>
-                    <p className='text-sm'>
-                      {activePeriod === 'lifetime'
-                        ? 'Make a one-time payment with USDC stablecoin.'
-                        : "For recurring subscriptions, you'll receive invoices to pay with USDC stablecoin."}
-                    </p>
-                    <p className='text-sm mt-2 text-amber-500'>
-                      Note: Free trials are not available with crypto payments.
-                    </p>
-                  </div>
-                }
-                title={
-                  <span className='flex items-center gap-2'>
-                    <Bitcoin
-                      size={16}
-                      className={payWithCrypto ? 'text-purple-400 animate-spin-slow' : ''}
-                    />
-                    Crypto Payments
-                  </span>
-                }
-              >
-                <Info
-                  size={14}
-                  className='text-gray-400 cursor-pointer ml-1 transition-opacity duration-300 hover:text-gray-300'
-                />
-              </Popover>
-            </div>
-          )}
-        </div>
-      )}
-    </section>
+            )}
+          </div>
+        )}
+      </section>
+    </ErrorBoundary>
   )
 }
 
