@@ -113,8 +113,20 @@ const faqs = [
         steps={[
           'Try removing and re-adding your overlay.',
           'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your screen.',
-          'Check your OBS version, you must be on v29 or higher.',
-          <span key={2}>
+          <span key={3}>
+            Check your OBS version. If you're using OBS v31 or above, you may experience blank overlays due to Chromium changes.
+            <div className="mt-2">
+              <a
+                href="https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                Download OBS 30.2.3
+              </a> and run the installer to downgrade - no need to uninstall first.
+            </div>
+          </span>,
+          <span key={4}>
             Check that you placed the cfg file in the correct folder. It goes in{' '}
             <Tag>/gamestate_integration/</Tag> not in <Tag>/cfg/</Tag>
           </span>,

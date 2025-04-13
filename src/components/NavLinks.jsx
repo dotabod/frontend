@@ -1,10 +1,17 @@
 import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
 
 export function NavLinks({ bottom = false }) {
+  // Only track hover state on client-side
+  const [isMounted, setIsMounted] = useState(false)
   const [hoveredIndex, setHoveredIndex] = useState(null)
+
+  // Ensure animations only happen client-side
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const additional = []
   if (bottom) {
@@ -23,31 +30,34 @@ export function NavLinks({ bottom = false }) {
     ...additional,
   ].map(([label, href, tooltip], index) => {
     const isGiftLink = label === 'Gift Pro'
+    const uniqueKey = `navlink-${label.replace(/\s+/g, '-').toLowerCase()}`
 
     return (
-      <Tooltip key={label} title={tooltip} disabled={!tooltip} position='top'>
+      <Tooltip key={uniqueKey} title={tooltip} disabled={!tooltip} position='top'>
         <a
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
           className='relative -mx-3 -my-2 flex items-center rounded-lg px-3 py-2 text-sm text-gray-300! transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]'
-          onMouseEnter={() => setHoveredIndex(index)}
-          onMouseLeave={() => setHoveredIndex(null)}
+          onMouseEnter={() => isMounted && setHoveredIndex(index)}
+          onMouseLeave={() => isMounted && setHoveredIndex(null)}
         >
-          <AnimatePresence>
-            {hoveredIndex === index && (
-              <motion.span
-                key={index}
-                className='absolute inset-0 rounded-lg bg-gray-700'
-                layoutId='hoverBackground'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.15 } }}
-                exit={{
-                  opacity: 0,
-                  transition: { duration: 0.15, delay: 0.2 },
-                }}
-              />
-            )}
-          </AnimatePresence>
+          {isMounted && (
+            <AnimatePresence>
+              {hoveredIndex === index && (
+                <motion.span
+                  key={uniqueKey}
+                  className='absolute inset-0 rounded-lg bg-gray-700'
+                  layoutId={`hoverBackground-${bottom ? 'bottom' : 'top'}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, transition: { duration: 0.15 } }}
+                  exit={{
+                    opacity: 0,
+                    transition: { duration: 0.15, delay: 0.2 },
+                  }}
+                />
+              )}
+            </AnimatePresence>
+          )}
 
           <span className='relative z-10 flex items-center gap-2'>
             {isGiftLink && <GiftIcon className="h-4 w-4" />}

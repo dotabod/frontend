@@ -4,7 +4,7 @@ import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
-import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
+import { ReloadOutlined } from '@ant-design/icons'; // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, Select, Space, Spin, Tooltip, message } from 'antd'
 import { useSession } from 'next-auth/react'
@@ -19,6 +19,23 @@ interface Scene {
   sceneName: string // Scene name
 }
 
+// Define structured error types
+type ErrorCode =
+  | 'CONNECTION_ERROR'
+  | 'CONNECTION_CLOSED'
+  | 'VERSION_TOO_OLD'
+  | 'VERSION_TOO_NEW'
+  | 'FETCH_SCENES_ERROR'
+  | 'ADD_TO_SCENE_ERROR'
+  | 'UNKNOWN_ERROR'
+
+interface ObsError {
+  code: ErrorCode
+  message: string
+  details?: string
+  actionable: boolean
+}
+
 const ObsSetup: React.FC = () => {
   const track = useTrack()
   const [connected, setConnected] = useState(false)
@@ -27,7 +44,7 @@ const ObsSetup: React.FC = () => {
   const [scenes, setScenes] = useState<Scene[]>([])
   const [selectedScenes, setSelectedScenes] = useState<string[]>([])
   const [scenesWithSource, setScenesWithSource] = useState<string[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<ObsError | null>(null)
   const [form] = Form.useForm()
   const [obs, setObs] = useState<OBSWebSocket | null>(null)
   const user = useSession()?.data?.user
@@ -58,27 +75,32 @@ const ObsSetup: React.FC = () => {
     } else if (!obs && obsPort && obsPassword) {
       setObs(new OBSWebSocket())
     }
-  }, [obsPort, obsPassword, form, obs, obsPassword])
+  }, [obsPort, obsPassword, form, obs])
 
   useEffect(() => {
     if (!obs || !hasAccess) return
 
-    const handleConnectionClosed = (error?: any) => {
+    const handleConnectionClosed = (error?: Error) => {
       console.log('OBS connection closed', error)
       setConnected(false)
-      if (error) {
-        setError(`Connection to OBS lost: ${error.message || 'Unknown error'}`)
-        track('obs/connection_closed', { error: error.message })
-      } else {
-        setError('Connection to OBS lost. Please check your OBS is running.')
-        track('obs/connection_closed', { error: 'No error details' })
-      }
+      setError({
+        code: 'CONNECTION_CLOSED',
+        message: 'Connection to OBS lost',
+        details: error?.message || 'Unknown error',
+        actionable: true
+      })
+      track('obs/connection_closed', { error: error?.message || 'No error details' })
     }
 
-    const handleConnectionError = (error: any) => {
+    const handleConnectionError = (error: Error) => {
       console.log('OBS connection error:', error)
       setConnected(false)
-      setError(`Connection error: ${error.message || 'Unknown error'}`)
+      setError({
+        code: 'CONNECTION_ERROR',
+        message: 'Connection error',
+        details: error.message || 'Unknown error',
+        actionable: true
+      })
       track('obs/connection_error', { error: error.message })
     }
 
@@ -108,10 +130,26 @@ const ObsSetup: React.FC = () => {
           (major === 30 && minor < 2) ||
           (major === 30 && minor === 2 && patch < 3)
         ) {
-          setError('OBS version 30.2.3 or above is required')
+          setError({
+            code: 'VERSION_TOO_OLD',
+            message: 'OBS version 30.2.3 or above is required',
+            actionable: true
+          })
           console.log('Error: OBS version 30.2.3 or above is required')
           track('obs/version_error', { version: obsVersion })
           return
+        }
+
+        // Check if version is too new (31.0 or above)
+        if (major >= 31) {
+          setError({
+            code: 'VERSION_TOO_NEW',
+            message: 'OBS version 31 or above may cause blank overlay issues. If your overlay loads correctly, you can ignore this warning',
+            actionable: false
+          })
+          console.log('Warning: OBS version 31 or above may cause blank overlay issues')
+          track('obs/version_warning', { version: obsVersion })
+          // Not returning here to allow continued setup
         }
 
         const videoSettings = await obs.call('GetVideoSettings')
@@ -121,12 +159,21 @@ const ObsSetup: React.FC = () => {
         setBaseHeight(fetchedBaseHeight)
 
         await fetchScenes(fetchedBaseWidth, fetchedBaseHeight)
-        setError(null)
+
+        // Only clear errors that are actionable
+        if (error?.actionable) {
+          setError(null)
+        }
       } catch (err: unknown) {
-        const error = err as Error
-        setError(error.message || 'Error connecting to OBS')
-        console.log('Error:', error)
-        track('obs/connection_error', { error: error.message })
+        const errorObj = err as Error
+        setError({
+          code: 'CONNECTION_ERROR',
+          message: 'Error connecting to OBS',
+          details: errorObj.message,
+          actionable: true
+        })
+        console.log('Error:', errorObj)
+        track('obs/connection_error', { error: errorObj.message })
       }
     }
 
@@ -145,7 +192,7 @@ const ObsSetup: React.FC = () => {
 
       setConnected(false)
     }
-  }, [obs, hasAccess, form, track])
+  }, [obs, hasAccess, form, track, error])
 
   // Modify fetchScenes to accept baseWidth and baseHeight
   const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
@@ -175,13 +222,21 @@ const ObsSetup: React.FC = () => {
         }
       }
 
-      setError(null)
+      // Only clear errors that are actionable
+      if (error?.actionable) {
+        setError(null)
+      }
     } catch (err: unknown) {
-      const error = err as Error
-      setError('Error fetching scenes')
-      console.log('Error:', error)
-      Sentry.captureException(error)
-      track('obs/fetch_scenes_error', { error: error.message })
+      const errorObj = err as Error
+      setError({
+        code: 'FETCH_SCENES_ERROR',
+        message: 'Error fetching scenes',
+        details: errorObj.message,
+        actionable: true
+      })
+      console.log('Error:', errorObj)
+      Sentry.captureException(errorObj)
+      track('obs/fetch_scenes_error', { error: errorObj.message })
     }
   }
 
@@ -259,11 +314,16 @@ const ObsSetup: React.FC = () => {
           message.success(`New browser source created and added to scene: ${selectedScene}`)
         }
       } catch (err: unknown) {
-        const error = err as Error
-        setError(error.message || 'Error adding browser source to scene')
-        console.log('Error:', error)
-        Sentry.captureException(error)
-        track('obs/add_to_scene_error', { error: error.message })
+        const errorObj = err as Error
+        setError({
+          code: 'ADD_TO_SCENE_ERROR',
+          message: 'Error adding browser source to scene',
+          details: errorObj.message,
+          actionable: true
+        })
+        console.log('Error:', errorObj)
+        Sentry.captureException(errorObj)
+        track('obs/add_to_scene_error', { error: errorObj.message })
       }
     }
 
@@ -295,9 +355,9 @@ const ObsSetup: React.FC = () => {
           scenesWithOverlay.push(scene)
         }
       } catch (err: unknown) {
-        const error = err as Error
-        console.log(`Error checking scene "${scene}":`, error)
-        Sentry.captureException(error)
+        const errorObj = err as Error
+        console.log(`Error checking scene "${scene}":`, errorObj)
+        Sentry.captureException(errorObj)
         // Continue checking other scenes even if one fails
       }
     }
@@ -322,6 +382,78 @@ const ObsSetup: React.FC = () => {
     updatePassword(`${values.password}`)
 
     track('obs/connect', { port: values.port })
+  }
+
+  // Helper function to render error action buttons based on error code
+  const renderErrorAction = () => {
+    if (!error) return null
+
+    switch (error.code) {
+      case 'CONNECTION_ERROR':
+      case 'CONNECTION_CLOSED':
+      case 'FETCH_SCENES_ERROR':
+      case 'ADD_TO_SCENE_ERROR':
+      case 'UNKNOWN_ERROR':
+        return <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
+
+      case 'VERSION_TOO_OLD':
+        return (
+          <Button type='primary' href='https://obsproject.com/download' target='_blank'>
+            Update OBS
+          </Button>
+        )
+
+      case 'VERSION_TOO_NEW':
+        return (
+          <Button
+            type='primary'
+            href='https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe'
+            target='_blank'
+          >
+            Download OBS 30.2.3
+          </Button>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  // Helper function to get the alert type based on error code
+  const getAlertType = () => {
+    if (!error) return 'info'
+
+    switch (error.code) {
+      case 'VERSION_TOO_NEW':
+        return 'warning'
+      case 'VERSION_TOO_OLD':
+      case 'CONNECTION_ERROR':
+      case 'CONNECTION_CLOSED':
+      case 'FETCH_SCENES_ERROR':
+      case 'ADD_TO_SCENE_ERROR':
+      case 'UNKNOWN_ERROR':
+        return 'error'
+      default:
+        return 'info'
+    }
+  }
+
+  // Helper to render additional info based on error code
+  const renderAdditionalInfo = () => {
+    if (!error) return null
+
+    switch (error.code) {
+      case 'VERSION_TOO_NEW':
+        return (
+          <Alert
+            message='Some users experience completely blank overlays in OBS v31+ due to Chromium changes. If your overlay appears correctly, you can continue using your current version. Otherwise, download v30.2.3 and run the installer to downgrade - no need to uninstall first.'
+            type='info'
+            showIcon
+          />
+        )
+      default:
+        return null
+    }
   }
 
   return (
@@ -359,34 +491,36 @@ const ObsSetup: React.FC = () => {
 
           {error && (
             <Alert
-              message={`${error}. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.`}
-              type='error'
+              message={`${error.message}${error.code !== 'VERSION_TOO_NEW' ? '. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.' : ''}`}
+              type={getAlertType()}
               showIcon
               action={
                 <div className='space-x-4'>
-                  <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
-                  {error.includes('OBS version') && (
-                    <Button type='primary' href='https://obsproject.com/download' target='_blank'>
-                      Update OBS
-                    </Button>
-                  )}
+                  {renderErrorAction()}
                 </div>
               }
             />
           )}
 
-          {error && !error.includes('OBS version') && (
+          {/* Show version recommendation alert if no errors or if error is non-actionable */}
+          {(!error || !error.actionable) && (
             <Alert
-              message='Are you on the latest version of OBS? v30.2.3 or above is required.'
+              message='OBS v30.2.3 is recommended. Versions below 30.2.3 or 31.0 and above are not supported.'
               type='warning'
               showIcon
               action={
-                <Button type='primary' href='https://obsproject.com/download' target='_blank'>
-                  Update OBS
+                <Button
+                  type='primary'
+                  href='https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe'
+                  target='_blank'
+                >
+                  Download OBS 30.2.3
                 </Button>
               }
             />
           )}
+
+          {renderAdditionalInfo()}
         </Space>
         <Spin spinning={l0 || l1} tip='Loading'>
           {!connected && (
@@ -436,7 +570,7 @@ const ObsSetup: React.FC = () => {
               </Form.Item>
             </Space>
           )}
-          {!error && connected && scenes.length > 1 && (
+          {!error?.actionable && connected && scenes.length > 1 && (
             <Form.Item
               label={
                 <Space>
@@ -484,7 +618,7 @@ const ObsSetup: React.FC = () => {
                     disabled: scenesWithSource.includes(scene.sceneUuid),
                   }))}
                 />
-                {!error && connected && scenes.length > 1 && (
+                {!error?.actionable && connected && scenes.length > 1 && (
                   <Button
                     type='primary'
                     onClick={async () => {

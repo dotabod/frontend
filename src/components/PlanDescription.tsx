@@ -7,6 +7,7 @@ import {
 import { SubscriptionStatus } from '@prisma/client'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import ErrorBoundary from './ErrorBoundary'
+import { useState, useEffect } from 'react'
 
 interface PlanDescriptionProps {
   tier: string
@@ -28,29 +29,51 @@ export const PlanDescription = ({
   hasTrial,
 }: PlanDescriptionProps) => {
   const { subscription, hasActivePlan } = useSubscriptionContext()
+  const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
+  const [messageType, setMessageType] = useState<string>('none')
 
-  // Determine which message to show
-  const showProContent = tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime'
-
-  // Determine message type - use a string identifier instead of conditional rendering
-  let messageType = 'none'
-
-  if (showProContent) {
-    if (payWithCrypto) {
-      messageType = 'crypto'
-    } else if (hasCreditBalance && !hasActivePlan) {
-      messageType = 'credit-checkout'
-    } else if (hasActivePlan && hasCreditBalance) {
-      messageType = 'credit-invoice'
-    } else if (
-      isInGracePeriod() &&
-      (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
-    ) {
-      messageType = 'grace-period'
-    } else if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
-      messageType = 'trial'
+  // Calculate days remaining and determine message type on client-side only
+  useEffect(() => {
+    // Calculate days remaining if in grace period
+    if (isInGracePeriod()) {
+      setDaysRemaining(
+        Math.ceil((GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+      )
     }
-  }
+
+    // Determine which message to show
+    const showProContent = tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime'
+
+    // Determine message type
+    let newMessageType = 'none'
+
+    if (showProContent) {
+      if (payWithCrypto) {
+        newMessageType = 'crypto'
+      } else if (hasCreditBalance && !hasActivePlan) {
+        newMessageType = 'credit-checkout'
+      } else if (hasActivePlan && hasCreditBalance) {
+        newMessageType = 'credit-invoice'
+      } else if (
+        isInGracePeriod() &&
+        (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)
+      ) {
+        newMessageType = 'grace-period'
+      } else if (hasTrial && (!subscription || subscription.status !== SubscriptionStatus.ACTIVE)) {
+        newMessageType = 'trial'
+      }
+    }
+
+    setMessageType(newMessageType)
+  }, [
+    tier,
+    activePeriod,
+    payWithCrypto,
+    hasCreditBalance,
+    hasActivePlan,
+    hasTrial,
+    subscription
+  ])
 
   return (
     <ErrorBoundary>
@@ -79,11 +102,7 @@ export const PlanDescription = ({
 
           {messageType === 'grace-period' && (
             <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Includes free trial until {gracePeriodPrettyDate} (
-              {Math.ceil(
-                (GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-              )}{' '}
-              days)
+              Includes free trial until {gracePeriodPrettyDate} {daysRemaining !== null && `(${daysRemaining} days)`}
             </span>
           )}
 
