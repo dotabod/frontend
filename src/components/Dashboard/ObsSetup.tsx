@@ -4,7 +4,7 @@ import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
-import { ReloadOutlined } from '@ant-design/icons'; // Icon for refresh button
+import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, Select, Space, Spin, Tooltip, message } from 'antd'
 import { useSession } from 'next-auth/react'
@@ -87,7 +87,7 @@ const ObsSetup: React.FC = () => {
         code: 'CONNECTION_CLOSED',
         message: 'Connection to OBS lost',
         details: error?.message || 'Unknown error',
-        actionable: true
+        actionable: true,
       })
       track('obs/connection_closed', { error: error?.message || 'No error details' })
     }
@@ -99,7 +99,7 @@ const ObsSetup: React.FC = () => {
         code: 'CONNECTION_ERROR',
         message: 'Connection error',
         details: error.message || 'Unknown error',
-        actionable: true
+        actionable: true,
       })
       track('obs/connection_error', { error: error.message })
     }
@@ -118,6 +118,7 @@ const ObsSetup: React.FC = () => {
           eventSubscriptions: 0b1111111111111111,
         })
         setConnected(true)
+        setError(null) // Clear any previous connection errors
 
         track('obs/connect_success', { port: obsPortValue })
 
@@ -133,7 +134,7 @@ const ObsSetup: React.FC = () => {
           setError({
             code: 'VERSION_TOO_OLD',
             message: 'OBS version 30.2.3 or above is required',
-            actionable: true
+            actionable: true,
           })
           console.log('Error: OBS version 30.2.3 or above is required')
           track('obs/version_error', { version: obsVersion })
@@ -144,12 +145,12 @@ const ObsSetup: React.FC = () => {
         if (major >= 31) {
           setError({
             code: 'VERSION_TOO_NEW',
-            message: 'OBS version 31 or above may cause blank overlay issues. If your overlay loads correctly, you can ignore this warning',
-            actionable: false
+            message:
+              'OBS version 31 or above may cause blank overlay issues. If your overlay loads correctly, you can ignore this warning',
+            actionable: false,
           })
           console.log('Warning: OBS version 31 or above may cause blank overlay issues')
           track('obs/version_warning', { version: obsVersion })
-          // Not returning here to allow continued setup
         }
 
         const videoSettings = await obs.call('GetVideoSettings')
@@ -159,18 +160,13 @@ const ObsSetup: React.FC = () => {
         setBaseHeight(fetchedBaseHeight)
 
         await fetchScenes(fetchedBaseWidth, fetchedBaseHeight)
-
-        // Only clear errors that are actionable
-        if (error?.actionable) {
-          setError(null)
-        }
       } catch (err: unknown) {
         const errorObj = err as Error
         setError({
           code: 'CONNECTION_ERROR',
           message: 'Error connecting to OBS',
           details: errorObj.message,
-          actionable: true
+          actionable: true,
         })
         console.log('Error:', errorObj)
         track('obs/connection_error', { error: errorObj.message })
@@ -192,7 +188,7 @@ const ObsSetup: React.FC = () => {
 
       setConnected(false)
     }
-  }, [obs, hasAccess, form, track, error])
+  }, [obs, hasAccess, form, track])
 
   // Modify fetchScenes to accept baseWidth and baseHeight
   const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
@@ -232,7 +228,7 @@ const ObsSetup: React.FC = () => {
         code: 'FETCH_SCENES_ERROR',
         message: 'Error fetching scenes',
         details: errorObj.message,
-        actionable: true
+        actionable: true,
       })
       console.log('Error:', errorObj)
       Sentry.captureException(errorObj)
@@ -319,7 +315,7 @@ const ObsSetup: React.FC = () => {
           code: 'ADD_TO_SCENE_ERROR',
           message: 'Error adding browser source to scene',
           details: errorObj.message,
-          actionable: true
+          actionable: true,
         })
         console.log('Error:', errorObj)
         Sentry.captureException(errorObj)
@@ -494,11 +490,7 @@ const ObsSetup: React.FC = () => {
               message={`${error.message}${error.code !== 'VERSION_TOO_NEW' ? '. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.' : ''}`}
               type={getAlertType()}
               showIcon
-              action={
-                <div className='space-x-4'>
-                  {renderErrorAction()}
-                </div>
-              }
+              action={<div className='space-x-4'>{renderErrorAction()}</div>}
             />
           )}
 
