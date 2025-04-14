@@ -3,7 +3,6 @@ import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import type { PollData } from '@/components/Overlay/PollOverlay'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
-import { GiftAlert } from '@/components/Overlay/GiftAlert'
 import { Settings } from '@/lib/defaultSettings'
 import {
   type blockType,
@@ -29,11 +28,11 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { RestrictFeature } from '../RestrictFeature'
+import { DevControls, DevModeToggle } from './DevControls'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
-import { DevControls, DevModeToggle } from './DevControls'
 
 const OverlayPage = () => {
   const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
@@ -156,7 +155,7 @@ const OverlayPage = () => {
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard: 'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? false),
+      leaderboard: 'standing' in rank ? rank.standing : steamAccount?.leaderboard_rank ?? false,
       notLoaded: false,
     }
 
@@ -271,7 +270,7 @@ const OverlayPage = () => {
           width={width}
           height={height}
           alt={`${block.type} dev screenshot`}
-          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
+          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : block.type ?? 'main-menu'}.png`}
         />
       </>
     ) : null
@@ -311,7 +310,6 @@ const OverlayPage = () => {
         showDevImage={showDevImage}
         setShowDevImage={setShowDevImage}
       />
-      {showGiftAlerts && <GiftAlert />}
       <AnimatePresence>
         <motion.div
           key='not-detected'
@@ -387,7 +385,7 @@ const OverlayPage = () => {
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
+            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : block.type ?? 'main-menu'}.png`}
           />
         )}
       </AnimatePresence>
