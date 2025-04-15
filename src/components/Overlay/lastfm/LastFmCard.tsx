@@ -178,7 +178,7 @@ const LastFmCard = ({
             }}
           >
             {track.albumArt && (
-              <div className='relative' style={{ width: imageSize, height: imageSize }}>
+              <div className='relative'>
                 <motion.img
                   src={getImageSrc()}
                   alt={`${track.album || 'Album'} cover`}
@@ -188,7 +188,7 @@ const LastFmCard = ({
                   animate={{ opacity: imageLoaded ? 1 : 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className={clsx('rounded object-cover', 'rounded-sm', 'absolute top-0 left-0')}
+                  className='rounded object-cover rounded-sm'
                   onError={() => {
                     setImageError(true)
                     setImageLoaded(true)

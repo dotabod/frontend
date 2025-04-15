@@ -1,12 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
 import clsx from 'clsx'
 import LastFmCard from './lastfm/LastFmCard'
-import { Input, Typography, Form } from 'antd'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import { Card } from '@/ui/card'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useEffect, useRef } from 'react'
 import { useState } from 'react'
+import { Form, Input, Typography } from 'antd'
 
 const { Paragraph } = Typography
 
@@ -39,6 +39,8 @@ export default function LastFmOverlay() {
     }
   }
 
+  const hasUsername = username && username.trim() !== ''
+
   return (
     <Card title='Spotify / Youtube' className='w-full' feature='lastFmOverlay'>
       <Paragraph type='secondary' className='mb-4'>
@@ -67,14 +69,23 @@ export default function LastFmOverlay() {
               colon={false}
               help={
                 <>
-                  Enter your Last.fm username to display your currently playing tracks.{' '}
-                  <a
-                    href={`https://www.last.fm/user/${username || ''}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    {`https://www.last.fm/user/${username || ''}`}
-                  </a>
+                  {hasUsername ? (
+                    <>
+                      Enter your Last.fm username to display your currently playing tracks.{' '}
+                      <a
+                        href={`https://www.last.fm/user/${username || ''}`}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                      >
+                        {`https://www.last.fm/user/${username || ''}`}
+                      </a>
+                    </>
+                  ) : (
+                    <span className='text-amber-600'>
+                      Enter your Last.fm username to start displaying your currently playing tracks
+                      on your stream.
+                    </span>
+                  )}
                   <div className='mt-2'>
                     Connect your music services to Last.fm:{' '}
                     <a
@@ -114,6 +125,11 @@ export default function LastFmOverlay() {
 
       <div className='my-6 flex justify-center space-x-4'>
         <LastFmCard track={sampleTrack} />
+        <div className='w-full max-w-sm text-center'>
+          <div className='mt-4 text-xs text-gray-400'>
+            This will appear on your stream when music is playing
+          </div>
+        </div>
       </div>
     </Card>
   )
