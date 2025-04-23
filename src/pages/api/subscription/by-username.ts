@@ -2,8 +2,12 @@ import prisma from '@/lib/db'
 import { SUBSCRIPTION_TIERS, getSubscription, isInGracePeriod } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Add cache headers to heavily reduce function invocations
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
+  
   try {
     const { username } = req.query
 
@@ -64,3 +68,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Internal Server Error' })
   }
 }
+
+export default withMethods(['GET'], handler)
