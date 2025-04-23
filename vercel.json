@@ -28,10 +28,12 @@
       "maxDuration": 5
     }
   },
-  "crons": [
+  "routes": [
     {
-      "path": "/api/cron/flush-auth-caches",
-      "schedule": "0 */6 * * *"
+      "src": "/api/cron/flush-auth-caches",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
     }
   ]
 }

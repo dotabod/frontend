@@ -4,7 +4,7 @@ import { decode } from 'next-auth/jwt'
 import { LRUCache } from 'lru-cache'
 
 // Create a session cache to avoid repeated JWT decoding and DB calls
-const sessionCache = new LRUCache<string, Session | null>({
+export const sessionCache = new LRUCache<string, any>({
   max: 500, // Store up to 500 sessions
   ttl: 1000 * 60 * 5, // Cache for 5 minutes
 })
