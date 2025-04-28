@@ -258,8 +258,9 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           </div>
         ) : (
           <Table
+            rowKey='id'
             columns={columns}
-            dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
+            dataSource={notablePlayers}
             pagination={{
               pageSize: 10,
               hideOnSinglePage: true,
