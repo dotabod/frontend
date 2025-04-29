@@ -46,6 +46,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null)
   const [form] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
+  const [pageSize, setPageSize] = useState(10)
 
   // Fetch notable players on component mount
   useEffect(() => {
@@ -261,7 +262,9 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             columns={columns}
             dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
             pagination={{
-              pageSize: 10,
+              pageSize,
+              onShowSizeChange: (current, size) => setPageSize(size),
+              showSizeChanger: true,
               hideOnSinglePage: true,
               position: ['bottomCenter'],
             }}
