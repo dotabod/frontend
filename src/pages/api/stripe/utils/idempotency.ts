@@ -7,14 +7,17 @@ import { debugLog } from './debugLog'
  * @param eventType The Stripe event type
  * @param processor The function to process the event
  * @param tx The transaction client
- * @returns True if the event was processed, false if it was already processed
+ * @returns 
+ *   - true if the event was newly processed successfully
+ *   - { skipped: true, processedAt: Date } if already processed (not an error)
+ *   - false if there was an error during processing
  */
 export async function processEventIdempotently(
   eventId: string,
   eventType: string,
   processor: (tx: Prisma.TransactionClient) => Promise<void>,
   tx: Prisma.TransactionClient,
-): Promise<boolean> {
+): Promise<boolean | { skipped: boolean; processedAt: Date }> {
   debugLog(`Entering processEventIdempotently for event ${eventId} (${eventType})`)
 
   // Always process dev events
@@ -36,7 +39,8 @@ export async function processEventIdempotently(
       debugLog(
         `Event ${eventId} (${eventType}) already processed, skipping. Recorded at: ${existingEvent.processedAt}`,
       )
-      return true // Already processed, but not an error
+      // Return a special value to indicate "already processed" (not an error but also didn't process now)
+      return { skipped: true, processedAt: existingEvent.processedAt }
     }
     debugLog(`No existing record found for event ${eventId}. Proceeding to record.`)
 
@@ -56,10 +60,24 @@ export async function processEventIdempotently(
       // If the error is a unique constraint violation, it means another concurrent
       // process has already recorded this event, so we can safely skip processing
       if (error.code === 'P2002' && error.meta?.target?.includes('stripeEventId')) {
+        // Try to fetch the existing record to get its processedAt
+        const existingEventRetry = await tx.webhookEvent.findUnique({
+          where: {
+            stripeEventId: eventId,
+          },
+        })
+        
+        if (existingEventRetry) {
+          debugLog(
+            `Event ${eventId} (${eventType}) already being processed by another request. Recorded at: ${existingEventRetry.processedAt}`,
+          )
+          return { skipped: true, processedAt: existingEventRetry.processedAt }
+        }
+        
         debugLog(
           `Event ${eventId} (${eventType}) already being processed by another request (unique constraint violation), skipping`,
         )
-        return true // Already being processed, but not an error
+        return { skipped: true, processedAt: new Date() }
       }
       throw error // Re-throw other errors
     }
