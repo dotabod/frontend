@@ -287,7 +287,7 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
 // Create a cache for subscription data to reduce DB queries
 import { LRUCache } from 'lru-cache'
 
-export const subscriptionCache = new LRUCache<string, any>({
+const subscriptionCache = new LRUCache<string, any>({
   max: 500, // Cache up to 500 subscription records
   ttl: 1000 * 60 * 5, // Cache for 5 minutes
 })

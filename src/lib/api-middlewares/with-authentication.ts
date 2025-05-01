@@ -7,7 +7,7 @@ import { LRUCache } from 'lru-cache'
 
 // Create an in-memory cache for session/auth data to reduce DB hits
 // This dramatically reduces function invocations by caching auth results
-export const authCache = new LRUCache<string, boolean>({
+const authCache = new LRUCache<string, boolean>({
   max: 500, // Store up to 500 authentication results
   ttl: 1000 * 60 * 5, // Cache for 5 minutes
 })
