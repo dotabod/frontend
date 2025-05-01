@@ -7,7 +7,7 @@ import { debugLog } from './debugLog'
  * @param eventType The Stripe event type
  * @param processor The function to process the event
  * @param tx The transaction client
- * @returns 
+ * @returns
  *   - true if the event was newly processed successfully
  *   - { skipped: true, processedAt: Date } if already processed (not an error)
  *   - false if there was an error during processing
@@ -66,14 +66,14 @@ export async function processEventIdempotently(
             stripeEventId: eventId,
           },
         })
-        
+
         if (existingEventRetry) {
           debugLog(
             `Event ${eventId} (${eventType}) already being processed by another request. Recorded at: ${existingEventRetry.processedAt}`,
           )
           return { skipped: true, processedAt: existingEventRetry.processedAt }
         }
-        
+
         debugLog(
           `Event ${eventId} (${eventType}) already being processed by another request (unique constraint violation), skipping`,
         )
