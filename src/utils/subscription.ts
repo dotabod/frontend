@@ -316,6 +316,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       createdAt: true,
       stripeSubscriptionId: true,
       metadata: true,
+      isGift: true,
       giftDetails: {
         select: {
           senderName: true,

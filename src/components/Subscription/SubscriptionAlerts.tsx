@@ -1,9 +1,10 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { gracePeriodEndNextDay, GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
-import { Button, Alert, Skeleton } from 'antd'
+import { Button, Alert, Skeleton, message } from 'antd'
 import { ExternalLinkIcon, GiftIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
 import type { GiftInfo, StatusInfo, GiftSubInfo } from './types'
 import type { SubscriptionWithGiftDetails } from './types'
+import { useState } from 'react'
 
 // Reusable component for subscription alert messages
 function SubscriptionAlertMessage({
@@ -96,11 +97,11 @@ export function SubscriptionAlerts({
     formattedCreditBalance,
     isLoading: subContextIsLoading,
   } = useSubscriptionContext()
+  const [isApplyingCredits, setIsApplyingCredits] = useState(false)
 
   // Only show manage subscription button for recurring subscriptions with Stripe
   const showManageButton =
     !hideManageButton && hasActivePlan && subscription?.stripeSubscriptionId && !isLifetimePlan
-
 
   // Check if grace period virtual subscription
   const isVirtualGracePeriodSubscription =
@@ -135,6 +136,49 @@ export function SubscriptionAlerts({
     return `max-w-2xl rounded-lg border-2 ${styles[type]} shadow-sm`
   }
 
+  // Function to handle applying credits
+  const handleApplyCredits = async () => {
+    setIsApplyingCredits(true)
+    message.loading({ content: 'Applying credits...', key: 'applyCredits' })
+    try {
+      const response = await fetch('/api/stripe/apply-gift-credit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Reload the page to show updated subscription status
+        message.success({
+          content: 'Credits applied successfully!',
+          key: 'applyCredits',
+          duration: 2,
+        })
+        window.location.reload()
+      } else {
+        // Show error if needed
+        console.error('Failed to apply credits:', result.error || result.message)
+        message.error({
+          content: 'There was an issue applying your credits. Please try again or contact support.',
+          key: 'applyCredits',
+          duration: 5,
+        })
+      }
+    } catch (error) {
+      console.error('Error applying credits:', error)
+      message.error({
+        content: 'There was an issue applying your credits. Please try again or contact support.',
+        key: 'applyCredits',
+        duration: 5,
+      })
+    } finally {
+      setIsApplyingCredits(false)
+    }
+  }
+
   // Create gift credit alert
   const createCreditAlert = () => {
     if (isInGracePeriod()) return null
@@ -161,6 +205,20 @@ export function SubscriptionAlerts({
                 ? 'This credit will be applied to your next invoice automatically.'
                 : "If you don't have an active subscription, it will be applied at checkout when you subscribe."}
             </p>
+
+            {/* Add Apply Credits button if user doesn't have an active plan */}
+            {!hasActivePlan && (
+              <Button
+                type='primary'
+                size='small'
+                className='mt-2 bg-indigo-600 hover:bg-indigo-700'
+                onClick={handleApplyCredits}
+                loading={isApplyingCredits}
+                disabled={isApplyingCredits}
+              >
+                {isApplyingCredits ? 'Applying...' : 'Apply Credits Now'}
+              </Button>
+            )}
           </div>
         }
         type='info'
@@ -174,7 +232,7 @@ export function SubscriptionAlerts({
   if (subContextIsLoading) {
     return (
       <div className='space-y-4 gap-4 flex flex-col'>
-        <Skeleton.Input active size="large" className="w-full" />
+        <Skeleton.Input active size='large' className='w-full' />
       </div>
     )
   }

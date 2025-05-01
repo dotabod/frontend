@@ -149,6 +149,42 @@ export class GiftService {
             },
           })
 
+          // Check if we should automatically apply the credits
+          // We do this by checking if the user has an active subscription
+          const existingSubscription = await this.tx.subscription.findFirst({
+            where: {
+              userId: recipientUserId,
+              status: { in: ['ACTIVE', 'TRIALING'] },
+              isGift: false,
+            },
+          })
+
+          // If the user doesn't have an active subscription, attempt to apply the credits automatically
+          // We'll do this after the transaction completes to avoid complications
+          if (!existingSubscription) {
+            // Schedule automatic application of credits for after this transaction completes
+            setTimeout(async () => {
+              try {
+                // Call the apply-gift-credit API endpoint
+                const autoApplyResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/stripe/apply-gift-credit`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    userId: recipientUserId,
+                  }),
+                })
+
+                const result = await autoApplyResponse.json()
+                console.log('Auto-applied gift credits result:', result)
+              } catch (autoApplyError) {
+                console.error('Failed to auto-apply gift credits:', autoApplyError)
+                // Don't fail the overall process if auto-apply fails
+              }
+            }, 500) // Small delay to ensure transaction completes
+          }
+
           return true
         },
         `processGiftCheckout(${session.id})`,
