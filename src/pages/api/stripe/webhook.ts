@@ -213,6 +213,8 @@ async function getRawBody(req: NextApiRequest): Promise<string> {
  * @param res The outgoing response
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.error('--- STDERR TEST ---')
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
