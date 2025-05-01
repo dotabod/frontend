@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 import { CustomerService } from '../services/customer-service'
 import type Stripe from 'stripe'
+import { debugLog } from '../utils/debugLog'
 
 /**
  * Handles a customer deleted event from Stripe
@@ -12,6 +13,11 @@ export async function handleCustomerDeleted(
   customer: Stripe.Customer,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
+  debugLog('Entering handleCustomerDeleted', { customerId: customer.id })
   const customerService = new CustomerService(tx)
-  return await customerService.handleCustomerDeleted(customer)
+  debugLog('Instantiated CustomerService')
+  const result = await customerService.handleCustomerDeleted(customer)
+  debugLog('Finished customerService.handleCustomerDeleted', { result })
+  debugLog('Exiting handleCustomerDeleted', { customerId: customer.id, result })
+  return result
 }

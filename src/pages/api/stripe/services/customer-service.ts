@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 import { stripe } from '@/lib/stripe-server'
 import { withErrorHandling } from '../utils/error-handling'
 import type Stripe from 'stripe'
+import { debugLog } from '../utils/debugLog'
 
 /**
  * Service for managing customer-related operations
@@ -112,38 +113,61 @@ export class CustomerService {
    * @returns True if the operation was successful, false otherwise
    */
   async handleCustomerDeleted(customer: Stripe.Customer): Promise<boolean> {
+    debugLog('Entering CustomerService.handleCustomerDeleted', { customerId: customer.id })
     const userId = customer.metadata?.userId
-    if (!userId) return false
+    if (!userId) {
+      debugLog('No userId found in customer metadata, exiting.', { customerId: customer.id })
+      return false
+    }
+    debugLog('Found userId in metadata', { userId, customerId: customer.id })
 
-    return (
-      (await withErrorHandling(
-        async () => {
-          // Delete subscriptions associated with this customer
-          await this.tx.subscription.deleteMany({
-            where: {
-              OR: [{ userId }, { stripeCustomerId: customer.id }],
-            },
-          })
+    const result = await withErrorHandling(
+      async () => {
+        debugLog('Inside withErrorHandling for handleCustomerDeleted', {
+          userId,
+          customerId: customer.id,
+        })
+        // Delete subscriptions associated with this customer
+        debugLog('Deleting subscriptions for customer', { userId, customerId: customer.id })
+        const deleteResult = await this.tx.subscription.deleteMany({
+          where: {
+            OR: [{ userId }, { stripeCustomerId: customer.id }],
+          },
+        })
+        debugLog('Deleted subscriptions', {
+          count: deleteResult.count,
+          userId,
+          customerId: customer.id,
+        })
 
-          // Check if there are any remaining active subscriptions (e.g., gift subscriptions)
-          // that aren't associated with this customer
-          const remainingSubscriptions = await this.tx.subscription.findMany({
-            where: {
-              userId,
-              status: { in: ['ACTIVE', 'TRIALING'] },
-              stripeCustomerId: { not: customer.id },
-            },
-          })
+        // Check if there are any remaining active subscriptions (e.g., gift subscriptions)
+        // that aren't associated with this customer
+        debugLog('Checking for remaining active subscriptions', { userId, customerId: customer.id })
+        const remainingSubscriptions = await this.tx.subscription.findMany({
+          where: {
+            userId,
+            status: { in: ['ACTIVE', 'TRIALING'] },
+            stripeCustomerId: { not: customer.id },
+          },
+        })
 
-          console.log(
-            `User ${userId} has ${remainingSubscriptions.length} remaining active subscriptions after customer deletion`,
-          )
+        debugLog(
+          `User ${userId} has ${remainingSubscriptions.length} remaining active subscriptions after customer deletion`,
+        )
 
-          return true
-        },
-        `handleCustomerDeleted(${customer.id})`,
-        userId,
-      )) !== null
+        return true
+      },
+      `handleCustomerDeleted(${customer.id})`,
+      userId,
     )
+
+    debugLog('Result from withErrorHandling', { result, userId, customerId: customer.id })
+    const finalResult = result !== null
+    debugLog('Exiting CustomerService.handleCustomerDeleted', {
+      finalResult,
+      userId,
+      customerId: customer.id,
+    })
+    return finalResult
   }
 }
