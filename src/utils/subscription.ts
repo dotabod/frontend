@@ -184,6 +184,13 @@ export function canAccessFeature(
     }
   }
 
+  if (isFreeFeature) {
+    return {
+      hasAccess: true,
+      requiredTier,
+    }
+  }
+
   // Return early if feature is free or subscription is invalid
   if (
     isFreeFeature ||
