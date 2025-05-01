@@ -21,12 +21,6 @@ const nextConfig = {
       },
     },
   },
-  // Add proper caching config
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
-  },
   // Fix for Prisma engine not found error
   output: 'standalone',
   // Tell Next.js to copy the Prisma engines to the standalone output

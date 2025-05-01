@@ -1,41 +1,5 @@
 {
   "buildCommand": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
   "installCommand": "bun install",
-  "outputDirectory": ".next",
-  "functions": {
-    "api/auth/[...nextauth].ts": {
-      "memory": 1024,
-      "maxDuration": 10
-    },
-    "api/settings/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 10
-    },
-    "api/lastfm/now-playing.ts": {
-      "memory": 512,
-      "maxDuration": 5
-    },
-    "api/settings/[settingKey].ts": {
-      "memory": 512,
-      "maxDuration": 5
-    },
-    "api/stripe/subscription.ts": {
-      "memory": 512,
-      "maxDuration": 5
-    },
-    "api/subscription/by-username.ts": {
-      "memory": 512,
-      "maxDuration": 5
-    },
-    "api/test-emote-set.ts": {
-      "memory": 512,
-      "maxDuration": 5
-    }
-  },
-  "crons": [
-    {
-      "path": "/api/cron/flush-auth-caches",
-      "schedule": "0 */6 * * *"
-    }
-  ]
+  "outputDirectory": ".next"
 }

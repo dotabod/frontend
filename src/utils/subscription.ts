@@ -284,21 +284,7 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
 //   )
 // }
 
-// Create a cache for subscription data to reduce DB queries
-import { LRUCache } from 'lru-cache'
-
-const subscriptionCache = new LRUCache<string, any>({
-  max: 500, // Cache up to 500 subscription records
-  ttl: 1000 * 60 * 5, // Cache for 5 minutes
-})
-
 export async function getSubscription(userId: string, tx?: Prisma.TransactionClient) {
-  // Check cache first
-  const cachedSubscription = subscriptionCache.get(userId)
-  if (cachedSubscription) {
-    return cachedSubscription
-  }
-  
   const db = tx || prisma
 
   // Find all active subscriptions for the user
@@ -386,14 +372,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   }
 
   // Return the first subscription (based on our ordering)
-  const result = subscriptions[0]
-  
-  // Cache the result to avoid future DB queries
-  if (result) {
-    subscriptionCache.set(userId, result)
-  }
-  
-  return result
+  return subscriptions[0]
 }
 
 export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
@@ -403,13 +382,8 @@ export function calculateSavings(monthlyPrice: string, annualPrice: string): num
 }
 
 // Add a function to check if we're in the grace period
-// Memoized version to avoid repeated date calculations
-let gracePeriodResult: boolean | null = null
 export function isInGracePeriod(): boolean {
-  if (gracePeriodResult === null) {
-    gracePeriodResult = new Date() < GRACE_PERIOD_END
-  }
-  return gracePeriodResult
+  return new Date() < GRACE_PERIOD_END
 }
 
 // Format the grace period date in a consistent way with other dates

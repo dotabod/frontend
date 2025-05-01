@@ -18,37 +18,9 @@ export const config = {
     '/install',
     '/[username]',
   ],
-  // Configure region to reduce cold starts
-  regions: ['iad1'],
 }
 
 export async function middleware(req: NextRequestWithAuth) {
-  // Add cache headers for API responses that don't change frequently
-  const response = NextResponse.next()
-  
-  // Add cache headers for specific API routes
-  if (req.nextUrl.pathname.startsWith('/api/')) {
-    const pathSegments = req.nextUrl.pathname.split('/')
-    const apiRoute = pathSegments[2]
-    
-    // Cache heavily used endpoints
-    if (
-      ['settings', 'languages', 'getLanguageProgress', 'check-ban', 'test-emote-set'].includes(apiRoute)
-    ) {
-      response.headers.set('Cache-Control', 's-maxage=60, stale-while-revalidate=600')
-    }
-    
-    // Cache last.fm requests longer (avoids polling overhead)
-    if (apiRoute === 'lastfm') {
-      response.headers.set('Cache-Control', 's-maxage=15, stale-while-revalidate=30')
-    }
-    
-    // Subscription status can be cached briefly
-    if (apiRoute === 'subscription') {
-      response.headers.set('Cache-Control', 's-maxage=30, stale-while-revalidate=300')
-    }
-  }
-  
   // Redirect literal [username] path to login page
   if (req.nextUrl.pathname === '/[username]') {
     return NextResponse.redirect(new URL('/login', req.url))
@@ -108,5 +80,5 @@ export async function middleware(req: NextRequestWithAuth) {
     return withAuth(req)
   }
 
-  return response // Return the response with cache headers instead of NextResponse.next()
+  return NextResponse.next()
 }

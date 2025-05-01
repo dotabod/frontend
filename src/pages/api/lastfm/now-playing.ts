@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-import { withMethods } from '@/lib/api-middlewares/with-methods'
 
 type LastFmResponse = {
   artist: string
@@ -97,12 +96,4 @@ async function handler(
   }
 }
 
-// Add explicit cache headers and method restrictions
-async function wrappedHandler(req: NextApiRequest, res: NextApiResponse) {
-  // Set cache headers to reduce function invocations
-  res.setHeader('Cache-Control', 's-maxage=15, stale-while-revalidate=30')
-  
-  return handler(req, res)
-}
-
-export default withMethods(['GET'], withAuthentication(wrappedHandler))
+export default withAuthentication(handler)
