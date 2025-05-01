@@ -3,27 +3,31 @@
   "installCommand": "bun install",
   "outputDirectory": ".next",
   "functions": {
-    "src/pages/api/auth/[[...]].js": {
+    "api/auth/[...nextauth].ts": {
       "memory": 1024,
       "maxDuration": 10
     },
-    "src/pages/api/settings/*.js": {
+    "api/settings/**/*.ts": {
       "memory": 1024,
       "maxDuration": 10
     },
-    "src/pages/api/lastfm/*.js": {
+    "api/lastfm/now-playing.ts": {
       "memory": 512,
       "maxDuration": 5
     },
-    "src/pages/api/stripe/subscription.js": {
+    "api/settings/[settingKey].ts": {
       "memory": 512,
       "maxDuration": 5
     },
-    "src/pages/api/subscription/*.js": {
+    "api/stripe/subscription.ts": {
       "memory": 512,
       "maxDuration": 5
     },
-    "src/pages/api/test-emote-set.js": {
+    "api/subscription/by-username.ts": {
+      "memory": 512,
+      "maxDuration": 5
+    },
+    "api/test-emote-set.ts": {
       "memory": 512,
       "maxDuration": 5
     }
