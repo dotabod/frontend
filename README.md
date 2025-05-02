@@ -56,6 +56,6 @@ We welcome contributions from the community! Whether you want to submit a bug re
 
 This project is licensed under the [MIT License](LICENSE).
 
-![Alt](https://repobeats.axiom.co/api/embed/ea30ccaa0e412de306ca98de53ea20d18cfdfa37.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/ea30ccaa0e412de306ca98de53ea20d18cfdfa37.svg 'Repobeats analytics image')
 
 <img alt="Vercel Logo" width="132" height="26" src="public/images/vercel.svg">
