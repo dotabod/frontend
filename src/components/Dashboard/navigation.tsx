@@ -117,7 +117,7 @@ export const navigation = [
     children: [
       {
         name: 'Help',
-        href: '/dashboard/troubleshoot',
+        href: '/dashboard/help',
         icon: QuestionMarkCircleIcon,
       },
       {

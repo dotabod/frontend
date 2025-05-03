@@ -73,6 +73,7 @@ export function Header() {
                               </span>
                             </MobileNavLink>
                             <MobileNavLink href='/#faqs'>FAQs</MobileNavLink>
+                            <MobileNavLink href='/contact'>Contact Us</MobileNavLink>
                             <MobileNavLink href='/blog'>Blog</MobileNavLink>
                             <MobileNavLink href='/privacy-policy'>Privacy Policy</MobileNavLink>
                             <MobileNavLink href='/terms-of-service'>Terms of Service</MobileNavLink>

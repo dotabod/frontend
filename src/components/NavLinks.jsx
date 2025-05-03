@@ -2,6 +2,7 @@ import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
+import Link from 'next/link'
 
 export function NavLinks({ bottom = false }) {
   // Only track hover state on client-side
@@ -22,11 +23,10 @@ export function NavLinks({ bottom = false }) {
   }
 
   return [
-    ['Features', '/#features'],
     ['Pricing', '/#pricing'],
-    ['FAQs', '/#faqs'],
     ['Blog', '/blog'],
     ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
+    ['Contact Us', '/contact', 'Contact Dotabod'],
     ...additional,
   ].map(([label, href, tooltip], index) => {
     const isGiftLink = label === 'Gift Pro'
@@ -34,7 +34,7 @@ export function NavLinks({ bottom = false }) {
 
     return (
       <Tooltip key={uniqueKey} title={tooltip} disabled={!tooltip} position='top'>
-        <a
+        <Link
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}
           className='relative -mx-3 -my-2 flex items-center rounded-lg px-3 py-2 text-sm text-gray-300! transition-colors delay-150 hover:text-gray-500 hover:delay-[0ms]'
@@ -63,7 +63,7 @@ export function NavLinks({ bottom = false }) {
             {isGiftLink && <GiftIcon className="h-4 w-4" />}
             {label}
           </span>
-        </a>
+        </Link>
       </Tooltip>
     )
   })
