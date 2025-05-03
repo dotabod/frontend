@@ -47,3 +47,5 @@ next-env.d.ts
 
 public/install.ps1
 !src/lib/private/install.ps1
+
+**/.claude/settings.local.json

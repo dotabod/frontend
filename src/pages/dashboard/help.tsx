@@ -114,16 +114,18 @@ const faqs = [
           'Try removing and re-adding your overlay.',
           'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your screen.',
           <span key={3}>
-            Check your OBS version. If you're using OBS v31 or above, you may experience blank overlays due to Chromium changes.
-            <div className="mt-2">
+            Check your OBS version. If you're using OBS v31 or above, you may experience blank
+            overlays due to Chromium changes.
+            <div className='mt-2'>
               <a
-                href="https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe"
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-500 hover:underline"
+                href='https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe'
+                target='_blank'
+                rel='noreferrer'
+                className='text-blue-500 hover:underline'
               >
                 Download OBS 30.2.3
-              </a> and run the installer to downgrade - no need to uninstall first.
+              </a>{' '}
+              and run the installer to downgrade - no need to uninstall first.
             </div>
           </span>,
           <span key={4}>
@@ -167,11 +169,9 @@ const faqs = [
             person may have the Steam account linked. Dotabod will tell you who is using your
             account from{' '}
             <Link href='/dashboard/features'>the MMR tracker in the Features page</Link>. You can
-            then ask them to remove it from their account. Or, join our{' '}
-            <a target='_blank' href='https://help.dotabod.com' rel='noreferrer'>
-              Discord server
-            </a>{' '}
-            and type /unlink-steam.
+            then ask them to remove it from their account. Or, visit our{' '}
+            <Link href='/dashboard/help'>help page</Link> for assistance with unlinking your Steam
+            account.
           </span>,
         ]}
       />

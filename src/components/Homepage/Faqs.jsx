@@ -81,8 +81,8 @@ export function Faqs() {
           </h2>
           <p className='mt-2 text-lg text-gray-300'>
             If you have anything else you want to ask,{' '}
-            <Link href='https://help.dotabod.com' className='text-gray-200 underline'>
-              reach out to us on discord
+            <Link href='/dashboard/help' className='text-gray-200 underline'>
+              reach out to us through our help page
             </Link>
             .
           </p>

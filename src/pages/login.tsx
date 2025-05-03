@@ -7,7 +7,7 @@ import { App, Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect, useCallback } from 'react'
+import { type ReactElement, useCallback, useEffect } from 'react'
 
 const Login: NextPageWithLayout = () => {
   const { status } = useSession()
@@ -33,11 +33,8 @@ const Login: NextPageWithLayout = () => {
           <a href='https://www.twitch.tv/settings/security' target='_blank' rel='noreferrer'>
             Twitch
           </a>{' '}
-          to a new one and try logging in again. If you need more help, reach out to us on{' '}
-          <a href='https://help.dotabod.com' target='_blank' rel='noreferrer'>
-            Discord
-          </a>
-          .
+          to a new one and try logging in again. If you need more help, reach out to us through our{' '}
+          <Link href='/contact'>contact page</Link>.
         </span>
       ),
     })
@@ -60,11 +57,7 @@ const Login: NextPageWithLayout = () => {
         description: (
           <span>
             You've been logged out. Please login again to relink your account to Twitch. Reach out
-            to us on{' '}
-            <a href='https://help.dotabod.com' target='_blank' rel='noreferrer'>
-              Discord
-            </a>{' '}
-            for more help.
+            to us through our <Link href='/contact'>contact page</Link> for more help.
           </span>
         ),
       })
