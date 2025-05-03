@@ -30,6 +30,10 @@ export async function middleware(req: NextRequestWithAuth) {
     return NextResponse.redirect(new URL('/api/install', req.url))
   }
 
+  if (req.nextUrl.pathname === '/dashboard/troubleshoot') {
+    return NextResponse.redirect(new URL('/dashboard/help', req.url))
+  }
+
   if (!process.env.EDGE_CONFIG) {
     req.nextUrl.pathname = '/missing-edge-config'
     return NextResponse.rewrite(req.nextUrl)
