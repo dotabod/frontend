@@ -5,6 +5,12 @@ import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
 
+// Define the expected response shape for credit balance
+interface CreditBalanceResponse {
+  formatted: string
+  balance: number
+}
+
 interface SubscriptionContextType {
   subscription: SubscriptionRow | null
   isLoading: boolean
@@ -28,14 +34,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const isFree = !isPro
 
   const { data: session } = useSession()
-  // Fetch credit balance
-  const { data: creditBalanceData } = useSWR(
-    session?.user ? '/api/stripe/credit-balance' : null,
+  const creditBalanceKey = session?.user ? '/api/stripe/credit-balance' : null
+  // Fetch credit balance and specify the response type
+  const { data: creditBalanceData } = useSWR<CreditBalanceResponse>( // Add type argument here
+    creditBalanceKey,
     fetcher,
     {
       revalidateOnFocus: false,
       revalidateIfStale: false,
-      refreshInterval: 60000, // Refresh every minute
     },
   )
 

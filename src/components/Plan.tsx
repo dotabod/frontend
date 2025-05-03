@@ -1,5 +1,4 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { fetcher } from '@/lib/fetcher'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   calculateSavings,
@@ -18,7 +17,6 @@ import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
-import useSWR from 'swr'
 import { Logomark } from './Logo'
 import ErrorBoundary from './ErrorBoundary'
 import CryptoToggle from './CryptoToggle'
@@ -100,7 +98,14 @@ function Plan({
   const { message, modal } = App.useApp()
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
-  const { subscription, inGracePeriod, hasActivePlan, isLifetimePlan } = useSubscriptionContext()
+  const {
+    subscription,
+    inGracePeriod,
+    hasActivePlan,
+    isLifetimePlan,
+    creditBalance,
+    formattedCreditBalance,
+  } = useSubscriptionContext()
 
   // Check if the current subscription was paid with crypto by comparing price IDs
   const isPaidWithCrypto = useMemo(() => {
@@ -131,25 +136,6 @@ function Plan({
   }, [tier, isPaidWithCrypto])
 
   const savings = calculateSavings(price.monthly, price.annual)
-
-  // Fetch credit balance
-  const { data: creditBalanceData } = useSWR(
-    session?.user ? '/api/stripe/credit-balance' : null,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-      refreshInterval: 60000, // Refresh every minute
-    },
-  )
-
-  const creditBalance = creditBalanceData?.balance || 0
-  const formattedCreditBalance = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Math.max(0, creditBalance) / 100)
 
   const router = useRouter()
   // Add ref to track if subscription process has started
