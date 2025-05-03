@@ -41,8 +41,11 @@ const UserButton = ({ user }: UserButtonProps) => {
     error: notificationError,
     mutate: refreshGiftNotifications,
   } = useSWR('/api/gift-notifications?includeRead=true', fetcher, {
-    dedupingInterval: 5000, // 5 seconds
-    focusThrottleInterval: 10000, // 10 seconds
+    // Configuration to fetch only once on mount
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    // Keep error handling
     loadingTimeout: 8000, // 8 seconds
     errorRetryInterval: 5000, // 5 seconds
     errorRetryCount: 3,
