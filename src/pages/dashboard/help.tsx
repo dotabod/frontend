@@ -416,7 +416,7 @@ TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
       seo={{
         title: 'Troubleshoot | Dotabod Dashboard',
         description: 'Troubleshoot and resolve issues with your Dotabod setup.',
-        canonicalUrl: 'https://dotabod.com/dashboard/troubleshoot',
+        canonicalUrl: 'https://dotabod.com/dashboard/help',
         noindex: true,
       }}
     >

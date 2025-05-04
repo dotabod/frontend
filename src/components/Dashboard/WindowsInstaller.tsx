@@ -21,8 +21,8 @@ const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
       title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',
       description: errorWithoutSuccess ? (
         <span>
-          Please try again or reach out from the{' '}
-          <Link href='/dashboard/troubleshoot'>help page</Link> for more help.
+          Please try again or reach out from the <Link href='/dashboard/help'>help page</Link> for
+          more help.
         </span>
       ) : (
         <div>
@@ -197,7 +197,7 @@ const WindowsInstaller = () => {
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
-          <Link href='/dashboard/troubleshoot'>from the help page</Link>, and then try{' '}
+          <Link href='/dashboard/help'>from the help page</Link>, and then try{' '}
           <Link onClick={() => track('setup/manual_steps')} href='/dashboard?step=2&gsiType=manual'>
             the manual steps
           </Link>

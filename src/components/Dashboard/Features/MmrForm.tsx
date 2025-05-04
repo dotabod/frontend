@@ -255,7 +255,7 @@ const MmrForm = ({ hideText = false }) => {
               showIcon
               message='No steam account found yet'
               action={
-                <Link href='/dashboard/troubleshoot'>
+                <Link href='/dashboard/help'>
                   <Button>Read help</Button>
                 </Link>
               }

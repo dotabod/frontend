@@ -214,7 +214,7 @@ export default function OBSOverlay() {
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}
-          <Link target='_blank' href='/dashboard/troubleshoot'>
+          <Link target='_blank' href='/dashboard/help'>
             from the help page
           </Link>
           , and then try{' '}

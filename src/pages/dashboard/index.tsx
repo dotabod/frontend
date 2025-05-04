@@ -433,10 +433,7 @@ const SetupPage = () => {
                       </li>
                       <li>
                         Having trouble? Visit the{' '}
-                        <Link
-                          href='/dashboard/troubleshoot'
-                          className='text-blue-500 hover:underline'
-                        >
+                        <Link href='/dashboard/help' className='text-blue-500 hover:underline'>
                           Troubleshooting page
                         </Link>{' '}
                         to get help.
