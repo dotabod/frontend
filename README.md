@@ -9,8 +9,8 @@ Dotabod is a platform designed to enhance the experience of Dota 2 streamers and
 ## Requirements
 
 - Node: Expected version "^18.0.0 || ^20.0.0 || >=22.0.0". If it's a fresh install then >= v22 is recommended as it has long term support.
-- Yarn: `npm install -g yarn` to install yarn globally
-- Bun: `npm install -g bun` to install bun globally
+- Yarn: [https://classic.yarnpkg.com/lang/en/docs/install](https://classic.yarnpkg.com/lang/en/docs/install)
+- Bun: [https://bun.sh/](https://bun.sh/)
 
 ## Installation 🛠️
 
