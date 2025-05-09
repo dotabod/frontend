@@ -148,7 +148,7 @@ export type FeatureTier = keyof typeof FEATURE_TIERS
 export const GENERIC_FEATURE_TIERS = {
   managers: SUBSCRIPTION_TIERS.PRO,
   autoOBS: SUBSCRIPTION_TIERS.PRO,
-  autoInstaller: SUBSCRIPTION_TIERS.PRO,
+  autoInstaller: SUBSCRIPTION_TIERS.FREE,
   autoModerator: SUBSCRIPTION_TIERS.PRO,
   auto7TV: SUBSCRIPTION_TIERS.PRO,
 } as const
