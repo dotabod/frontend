@@ -25,6 +25,7 @@ export const plans = [
     },
     tier: SUBSCRIPTION_TIERS.FREE,
     features: [
+      'Automated setup (Dota 2)',
       'Multi-language support',
       'Win-loss record display overlay',
       'MMR tracking with each match',
@@ -64,7 +65,7 @@ export const plans = [
     },
     features: [
       'All Free features',
-      'Automated setup (Dota 2, OBS, 7TV, Twitch)',
+      'Automated setup (OBS, 7TV, Twitch)',
       'Auto twitch predictions for each match',
       'Pro commands (!hero, !np, !items, !gm, !smurfs)',
       'Advanced overlays (XL Minimap, Anti-snipe blockers)',
