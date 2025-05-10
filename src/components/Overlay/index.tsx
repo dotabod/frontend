@@ -199,10 +199,13 @@ const OverlayPage = () => {
   }, [])
 
   useEffect(() => {
-    if (!is404) {
+    if (error && !is404) {
       Sentry.captureException(new Error('Error in overlay page fetching settings'), {
         extra: {
-          error,
+          errorFromHook: error,
+          status: (error as any)?.status,
+          message: (error as any)?.message,
+          is404Calculated: is404,
           originalData: original,
         },
       })
