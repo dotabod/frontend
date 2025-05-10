@@ -33,81 +33,25 @@ import { RestrictFeature } from '../RestrictFeature'
 import { DevControls, DevModeToggle } from './DevControls'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
+import { InvalidOverlayPage, checkForInvalidOverlay } from '@/lib/overlayUtils'
 
 interface PotentialError {
   status?: number
   message?: string
 }
 
-// Separate component for invalid overlay pages to avoid hooks errors
-const InvalidOverlayPage = () => {
-  const { notification } = App.useApp()
-
-  notification.open({
-    key: 'auth-error',
-    type: 'error',
-    duration: 0,
-    placement: 'bottomLeft',
-    message: 'Authentication failed',
-    description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
-  })
-
-  return (
-    <>
-      <Head>
-        <title>Dotabod | Invalid Overlay URL</title>
-        <meta name='robots' content='noindex' />
-      </Head>
-      <style global jsx>{`
-        html, body {
-          overflow: hidden;
-          background-color: transparent;
-        }
-      `}</style>
-      <div className='hidden'>Invalid Dotabod overlay URL. Please check your OBS settings.</div>
-    </>
-  )
-}
-
-// Check for invalid overlay URLs in localStorage
-const checkForInvalidOverlay = (): boolean => {
-  if (typeof window === 'undefined' || !window.localStorage) return false
-
-  try {
-    const pathKey = `invalid_overlay_${window.location.pathname}`
-    const cachedData = localStorage.getItem(pathKey)
-
-    if (cachedData) {
-      const data = JSON.parse(cachedData)
-      const timestamp = data.timestamp
-      const now = Date.now()
-
-      // If the cached 404 is less than 1 day old, consider it valid
-      if (timestamp && now - timestamp < 86400000) {
-        return true
-      }
-
-      // Cached data is too old, remove it
-      localStorage.removeItem(pathKey)
-    }
-  } catch (e) {
-    // Ignore storage errors
-  }
-
-  return false
-}
-
-// Check before the component even renders
-const isInvalidOverlayPage = checkForInvalidOverlay()
-
-// Apply styles directly if invalid overlay
-if (isInvalidOverlayPage && typeof document !== 'undefined') {
-  document.body.style.backgroundColor = 'transparent'
-}
+// Check before the component even renders - this check is now primarily for _app.tsx
+// OverlayPage will rely on the determination made in _app.tsx, passed via props or context if necessary,
+// or _app.tsx will render InvalidOverlayPage directly.
+// For now, we keep a local check as a fallback or if this page is accessed directly not through _app standard flow.
+const isInvalidLocalCheck = checkForInvalidOverlay(
+  typeof window !== 'undefined' ? window.location.pathname : '',
+)
 
 const OverlayPage = () => {
   // Immediately render the invalid page without expensive hooks if URL is known to be invalid
-  if (isInvalidOverlayPage) {
+  // This specific check might become redundant if _app.tsx handles it robustly.
+  if (isInvalidLocalCheck) {
     return <InvalidOverlayPage />
   }
 

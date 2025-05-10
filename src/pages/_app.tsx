@@ -23,6 +23,11 @@ import type { ReactElement, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { type Root, createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
+import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
+
+const isInvalidLocalCheck = checkForInvalidOverlay(
+  typeof window !== 'undefined' ? window.location.pathname : '',
+)
 
 // Define a type for the container with _reactRoot property
 interface ContainerWithRoot extends Element {
@@ -105,6 +110,19 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
       </MantineProvider>
     </ConfigProvider>
   )
+
+  if (isInvalidLocalCheck) {
+    // If it's a known invalid overlay, render the InvalidOverlayPage directly
+    // and bypass the main layout and providers that might make API calls.
+    // We also ensure it is mounted to avoid hydration issues with this conditional rendering path.
+    return (
+      <StyleProvider cache={clientCache} hashPriority='high'>
+        <AntProvider>
+          <InvalidOverlayPage />
+        </AntProvider>
+      </StyleProvider>
+    )
+  }
 
   return (
     <SessionProvider session={session}>
