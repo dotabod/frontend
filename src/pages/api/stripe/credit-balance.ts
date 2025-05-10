@@ -57,17 +57,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Retrieve the customer from Stripe to get their balance
-    const customer = await stripe.customers.retrieve(customerId)
-    if (customer.deleted) {
+    let typedCustomer: Stripe.Customer | null = null;
+    let balance = 0;
+
+    try {
+      const customer = await stripe.customers.retrieve(customerId)
+      if (customer.deleted) {
+        return res.status(200).json({
+          balance: 0,
+          formatted: '$0.00',
+        })
+      }
+
+      // Get the customer's balance (negative value = available credit)
+      typedCustomer = customer as Stripe.Customer
+      balance = typedCustomer.balance || 0
+    } catch (stripeError) {
+      console.error('Stripe customer retrieval error:', stripeError)
+      // If the customer doesn't exist or there's a mode mismatch, return zero balance
       return res.status(200).json({
         balance: 0,
         formatted: '$0.00',
       })
     }
-
-    // Get the customer's balance (negative value = available credit)
-    const typedCustomer = customer as Stripe.Customer
-    const balance = typedCustomer.balance || 0
 
     // Format the balance for display
     // The balance is in cents, and negative values represent credits

@@ -19,8 +19,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (username) {
     if (req.method === 'GET') {
       try {
-        // Attempt to find a user with the specified conditions
-        const data = await prisma.user.findFirstOrThrow({
+        // Use findFirst instead of findFirstOrThrow to handle not found cases gracefully
+        const data = await prisma.user.findFirst({
           select: {
             displayName: true,
             name: true,
