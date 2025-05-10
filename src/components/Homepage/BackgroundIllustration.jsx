@@ -1,7 +1,7 @@
-import { useId } from 'react'
-
 export function BackgroundIllustration(props) {
-  const id = useId()
+  // Use static IDs for the gradients
+  const gradientId1 = 'bg-gradient-1'
+  const gradientId2 = 'bg-gradient-2'
 
   return (
     <div {...props}>
@@ -18,12 +18,12 @@ export function BackgroundIllustration(props) {
         />
         <path
           d='M513 1025C230.23 1025 1 795.77 1 513'
-          stroke={`url(#${id}-gradient-1)`}
+          stroke={`url(#${gradientId1})`}
           strokeLinecap='round'
         />
         <defs>
           <linearGradient
-            id={`${id}-gradient-1`}
+            id={gradientId1}
             x1='1'
             y1='513'
             x2='1'
@@ -48,12 +48,12 @@ export function BackgroundIllustration(props) {
         />
         <path
           d='M913 513c0 220.914-179.086 400-400 400'
-          stroke={`url(#${id}-gradient-2)`}
+          stroke={`url(#${gradientId2})`}
           strokeLinecap='round'
         />
         <defs>
           <linearGradient
-            id={`${id}-gradient-2`}
+            id={gradientId2}
             x1='913'
             y1='513'
             x2='913'

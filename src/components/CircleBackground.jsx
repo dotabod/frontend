@@ -1,7 +1,6 @@
-import { useId } from 'react'
-
 export function CircleBackground({ color, width = 558, height = 558, ...props }) {
-  const id = useId()
+  // Use a static ID for the gradient
+  const id = 'circle-gradient-static'
 
   return (
     <svg
