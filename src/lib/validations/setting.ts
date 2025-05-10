@@ -84,7 +84,7 @@ const settingsSchema = {
   'minimap-xl': z.boolean(),
   onlyParty: z.boolean(),
   livePolls: z.boolean(),
-  streamDelay: z.number().min(0).max(60000),
+  streamDelay: z.number().min(0).max(300000),
   commandDelay: z.boolean(),
   commandBuilds: z.boolean(),
   showRankMmr: z.boolean(),
