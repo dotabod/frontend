@@ -34,8 +34,83 @@ import { DevControls, DevModeToggle } from './DevControls'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
 
+interface PotentialError {
+  status?: number
+  message?: string
+}
+
+// Separate component for invalid overlay pages to avoid hooks errors
+const InvalidOverlayPage = () => {
+  const { notification } = App.useApp()
+
+  notification.open({
+    key: 'auth-error',
+    type: 'error',
+    duration: 0,
+    placement: 'bottomLeft',
+    message: 'Authentication failed',
+    description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+  })
+
+  return (
+    <>
+      <Head>
+        <title>Dotabod | Invalid Overlay URL</title>
+        <meta name='robots' content='noindex' />
+      </Head>
+      <style global jsx>{`
+        html, body {
+          overflow: hidden;
+          background-color: transparent;
+        }
+      `}</style>
+      <div className='hidden'>Invalid Dotabod overlay URL. Please check your OBS settings.</div>
+    </>
+  )
+}
+
+// Check for invalid overlay URLs in localStorage
+const checkForInvalidOverlay = (): boolean => {
+  if (typeof window === 'undefined' || !window.localStorage) return false
+
+  try {
+    const pathKey = `invalid_overlay_${window.location.pathname}`
+    const cachedData = localStorage.getItem(pathKey)
+
+    if (cachedData) {
+      const data = JSON.parse(cachedData)
+      const timestamp = data.timestamp
+      const now = Date.now()
+
+      // If the cached 404 is less than 1 day old, consider it valid
+      if (timestamp && now - timestamp < 86400000) {
+        return true
+      }
+
+      // Cached data is too old, remove it
+      localStorage.removeItem(pathKey)
+    }
+  } catch (e) {
+    // Ignore storage errors
+  }
+
+  return false
+}
+
+// Check before the component even renders
+const isInvalidOverlayPage = checkForInvalidOverlay()
+
+// Apply styles directly if invalid overlay
+if (isInvalidOverlayPage && typeof document !== 'undefined') {
+  document.body.style.backgroundColor = 'transparent'
+}
+
 const OverlayPage = () => {
-  const { data: showGiftAlerts } = useUpdateSetting(Settings.showGiftAlerts)
+  // Immediately render the invalid page without expensive hooks if URL is known to be invalid
+  if (isInvalidOverlayPage) {
+    return <InvalidOverlayPage />
+  }
+
   const { notification } = App.useApp()
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { original, error } = useUpdateSetting()
@@ -155,7 +230,7 @@ const OverlayPage = () => {
     const rankDetails = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard: 'standing' in rank ? rank.standing : steamAccount?.leaderboard_rank ?? false,
+      leaderboard: 'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? false),
       notLoaded: false,
     }
 
@@ -203,8 +278,8 @@ const OverlayPage = () => {
       Sentry.captureException(new Error('Error in overlay page fetching settings'), {
         extra: {
           errorFromHook: error,
-          status: (error as any)?.status,
-          message: (error as any)?.message,
+          status: (error as PotentialError)?.status,
+          message: (error as PotentialError)?.message,
           is404Calculated: is404,
           originalData: original,
         },
@@ -212,6 +287,23 @@ const OverlayPage = () => {
     }
 
     if (is404) {
+      // For 404 errors, add local storage cache to prevent repeated API calls
+      if (typeof window !== 'undefined' && window.localStorage) {
+        try {
+          // Store the invalid URL in local storage with timestamp
+          const pathKey = `invalid_overlay_${window.location.pathname}`
+          localStorage.setItem(
+            pathKey,
+            JSON.stringify({
+              timestamp: Date.now(),
+              status: 404,
+            }),
+          )
+        } catch (e) {
+          // Ignore storage errors
+        }
+      }
+
       notification.open({
         key: 'auth-error',
         type: 'error',
@@ -219,14 +311,6 @@ const OverlayPage = () => {
         placement: 'bottomLeft',
         message: 'Authentication failed',
         description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
-      })
-      // Capture a soft error to Sentry for 404 accounts
-      Sentry.captureMessage('Account not found in overlay', {
-        level: 'warning',
-        extra: {
-          error,
-          originalData: original,
-        },
       })
     } else {
       notification.destroy('auth-error')
@@ -258,6 +342,27 @@ const OverlayPage = () => {
 
   useOBS({ block, connected })
 
+  if (is404) {
+    // Return minimal content for 404s to reduce resource usage
+    // This helps when users mistype URLs or accounts are deleted
+    return (
+      <>
+        <Head>
+          <title>Dotabod | Invalid Overlay URL</title>
+          <meta name='robots' content='noindex' />
+        </Head>
+        <style global jsx>{`
+          html,
+          body {
+            overflow: hidden;
+            background-color: transparent;
+          }
+        `}</style>
+        <div className='hidden'>Invalid Dotabod overlay URL. Please check your OBS settings.</div>
+      </>
+    )
+  }
+
   if (isDotabodDisabled) {
     return isDev ? (
       <>
@@ -273,28 +378,13 @@ const OverlayPage = () => {
           width={width}
           height={height}
           alt={`${block.type} dev screenshot`}
-          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : block.type ?? 'main-menu'}.png`}
+          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
         />
       </>
     ) : null
   }
 
-  if (is404) {
-    return (
-      <>
-        <Head>
-          <title>Dotabod | Stream overlays</title>
-        </Head>
-        <style global jsx>{`
-          html,
-          body {
-            overflow: hidden;
-          }
-        `}</style>
-      </>
-    )
-  }
-
+  // Main overlay content for valid users
   return (
     <>
       <Head>
@@ -388,7 +478,7 @@ const OverlayPage = () => {
             width={width}
             height={height}
             alt={`${block.type} dev screenshot`}
-            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : block.type ?? 'main-menu'}.png`}
+            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}
           />
         )}
       </AnimatePresence>
