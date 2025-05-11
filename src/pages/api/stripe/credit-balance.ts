@@ -1,10 +1,10 @@
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscription } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
-import prisma from '@/lib/db'
 
 /**
  * API endpoint to fetch a user's credit balance from Stripe

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
 import { CircleBackground } from '@/components/CircleBackground'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 // Mock useId to return a consistent ID for testing
 vi.mock('react', async () => {

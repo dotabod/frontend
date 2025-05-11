@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the actual page component to avoid subscription utility issues
 vi.mock('@/pages/dashboard/billing', () => ({

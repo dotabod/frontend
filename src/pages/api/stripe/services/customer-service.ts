@@ -1,8 +1,8 @@
-import type { Prisma } from '@prisma/client'
 import { stripe } from '@/lib/stripe-server'
-import { withErrorHandling } from '../utils/error-handling'
+import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
 import { debugLog } from '../utils/debugLog'
+import { withErrorHandling } from '../utils/error-handling'
 
 /**
  * Service for managing customer-related operations

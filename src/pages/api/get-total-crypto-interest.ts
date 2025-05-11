@@ -13,7 +13,7 @@ async function getTotalCryptoInterest() {
     })
 
     // Calculate total interest from all users
-    let totalInterest = cryptoInterestSettings
+    const totalInterest = cryptoInterestSettings
 
     return { totalInterest, userCount: cryptoInterestSettings }
   } catch (error) {

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
-import { vi } from 'vitest'
 import React from 'react'
+import { vi } from 'vitest'
 
 // Mock the framer-motion
 vi.mock('framer-motion', () => ({

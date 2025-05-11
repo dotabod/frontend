@@ -1,11 +1,11 @@
 import LastFmCard from '@/components/Overlay/lastfm/LastFmCard'
-import { motionProps } from '@/ui/utils'
-import { motion } from 'framer-motion'
+import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
 import { useLastFm } from '@/lib/hooks/useLastFm'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import type { blockType } from '@/lib/devConsts'
-import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { motionProps } from '@/ui/utils'
+import { motion } from 'framer-motion'
 
 export const AnimatedLastFm = ({
   className = 'absolute',

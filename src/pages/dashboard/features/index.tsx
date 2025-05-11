@@ -3,12 +3,12 @@ import BetsCard from '@/components/Dashboard/Features/BetsCard'
 import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
 import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
 import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
+import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
-import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>

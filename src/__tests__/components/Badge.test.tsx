@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
 import { Badge } from '@/components/Badge'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 // Mock the useTransformRes hook
 vi.mock('@/lib/hooks/useTransformRes', () => ({

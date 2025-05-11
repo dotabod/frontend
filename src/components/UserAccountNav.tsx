@@ -1,15 +1,15 @@
 import { signOut, useSession } from 'next-auth/react'
 
 import { fetcher } from '@/lib/fetcher'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { Dropdown, Badge, Skeleton, Button, Popover, Tabs, Empty, Space } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
+import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { Badge, Button, Dropdown, Empty, Popover, Skeleton, Space, Tabs } from 'antd'
 import clsx from 'clsx'
 import type { Session } from 'next-auth'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { useState, useEffect } from 'react'
 
 // Define the notification type
 interface GiftNotification {

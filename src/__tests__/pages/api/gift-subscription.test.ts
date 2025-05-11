@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { calculateGiftEndDate, aggregateGiftDuration } from '@/lib/gift-subscription'
+import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 import { isInGracePeriod } from '@/utils/subscription'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the subscription utility functions
 vi.mock('@/utils/subscription', () => ({

@@ -1,12 +1,12 @@
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { chatBotScopes } from '@/lib/authScopes'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Button, Typography } from 'antd'
 import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type ReactElement, useEffect, useState } from 'react'
-import { chatBotScopes } from '@/lib/authScopes'
 
 const Login: NextPageWithLayout = () => {
   const { status } = useSession()

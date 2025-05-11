@@ -1,5 +1,5 @@
-import { Card } from '@/ui/card'
 import { Settings } from '@/lib/defaultSettings'
+import { Card } from '@/ui/card'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import GiftSubscriptionAlert from './GiftAlert/GiftSubscriptionAlert'
 

@@ -1,10 +1,10 @@
 import { Settings } from '@/lib/defaultSettings'
 import { type blockType, isDev } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Button, Checkbox, InputNumber, Select, type CheckboxChangeEvent } from 'antd'
+import { Button, Checkbox, type CheckboxChangeEvent, InputNumber, Select } from 'antd'
 import { motion } from 'framer-motion'
-import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 
 export const DevControls = ({
   block,

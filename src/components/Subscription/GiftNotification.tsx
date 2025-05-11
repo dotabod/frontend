@@ -1,6 +1,6 @@
-import type React from 'react'
-import { Typography, Space, App } from 'antd'
 import { GiftOutlined } from '@ant-design/icons'
+import { App, Space, Typography } from 'antd'
+import type React from 'react'
 import { useEffect } from 'react'
 
 const { Text, Paragraph } = Typography

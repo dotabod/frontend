@@ -1,12 +1,12 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
-import { Badge, Tag, Tooltip, Skeleton } from 'antd'
+import { Badge, Skeleton, Tag, Tooltip } from 'antd'
+import { CrownIcon, Wallet } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { plans } from '../Billing/BillingPlans'
-import { CrownIcon, Wallet } from 'lucide-react'
 import { useMemo } from 'react'
+import { plans } from '../Billing/BillingPlans'
 
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const { data } = useSession()

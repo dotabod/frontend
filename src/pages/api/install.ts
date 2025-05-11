@@ -1,7 +1,7 @@
-import { withMethods } from '@/lib/api-middlewares/with-methods'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

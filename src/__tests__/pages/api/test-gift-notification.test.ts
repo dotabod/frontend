@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createMocks } from 'node-mocks-http'
 import handler from '@/pages/api/test-gift-notification'
 import type { SubscriptionStatus, SubscriptionTier } from '@prisma/client'
+import { createMocks } from 'node-mocks-http'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/lib/api-middlewares/with-authentication', () => ({

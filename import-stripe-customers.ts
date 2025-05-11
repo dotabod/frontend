@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 
-import { stripe } from './src/lib/stripe-server'
 import { PrismaClient, SubscriptionStatus, TransactionType } from '@prisma/client'
-import { getSubscriptionTier } from './src/utils/subscription'
-import type Stripe from 'stripe'
 // Reverted import
 import cliProgress from 'cli-progress'
+import type Stripe from 'stripe'
+import { stripe } from './src/lib/stripe-server'
+import { getSubscriptionTier } from './src/utils/subscription'
 
 const prisma = new PrismaClient()
 

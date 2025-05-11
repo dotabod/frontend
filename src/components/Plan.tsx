@@ -1,26 +1,26 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { createCheckoutSession } from '@/lib/stripe'
 import { isFeatureEnabled } from '@/lib/featureFlags'
+import { createCheckoutSession } from '@/lib/stripe'
 import {
+  type PricePeriod,
+  SUBSCRIPTION_TIERS,
+  type SubscriptionRow,
   calculateSavings,
   getPriceId,
   gracePeriodPrettyDate,
   isSubscriptionActive,
-  type PricePeriod,
-  SUBSCRIPTION_TIERS,
-  type SubscriptionRow,
 } from '@/utils/subscription'
 import { SubscriptionStatus, type SubscriptionTier } from '@prisma/client'
-import { App, Button, notification, Tooltip } from 'antd'
+import { App, Button, Tooltip, notification } from 'antd'
 import clsx from 'clsx'
 import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
-import { Logomark } from './Logo'
-import ErrorBoundary from './ErrorBoundary'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CryptoToggle from './CryptoToggle'
+import ErrorBoundary from './ErrorBoundary'
+import { Logomark } from './Logo'
 import { PlanDescription } from './PlanDescription'
 
 // Sparkle animation component with unique IDs

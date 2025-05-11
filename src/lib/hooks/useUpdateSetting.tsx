@@ -3,11 +3,11 @@ import { type SettingKeys, Settings } from '@/lib/defaultSettings'
 import { type ChatterSettingKeys, type FeatureTier, canAccessFeature } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import { App } from 'antd'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
 import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
-import { useSession } from 'next-auth/react'
 
 interface UpdateProps {
   path?: any

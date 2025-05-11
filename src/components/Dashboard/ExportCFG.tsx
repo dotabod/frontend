@@ -5,8 +5,8 @@ import { AppleOutlined, LinuxOutlined, WindowsOutlined } from '@ant-design/icons
 import { Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import WindowsInstaller from './WindowsInstaller'
 import { TierBadge } from './Features/TierBadge'
+import WindowsInstaller from './WindowsInstaller'
 
 function InstallPage() {
   const track = useTrack()

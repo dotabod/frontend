@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
 import {
-  SubscriptionStatus,
-  TransactionType,
-  SubscriptionTier,
   type Subscription,
+  SubscriptionStatus,
+  SubscriptionTier,
+  TransactionType,
 } from '@prisma/client'
+import { describe, expect, it, vi } from 'vitest'
 
 // We need to mock the module before importing it
 vi.mock('@/utils/subscription', async () => {
@@ -30,7 +30,7 @@ vi.mock('@/lib/db', () => ({
 
 // Import mocked modules
 import prisma from '@/lib/db'
-import { getSubscription, GRACE_PERIOD_END } from '@/utils/subscription'
+import { GRACE_PERIOD_END, getSubscription } from '@/utils/subscription'
 
 // Define an interface for the virtual subscription that includes isVirtual property
 interface VirtualSubscription {

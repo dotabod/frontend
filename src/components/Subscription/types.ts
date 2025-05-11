@@ -1,6 +1,6 @@
-import type { JsonValue } from '@prisma/client/runtime/library'
-import type { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import type { SubscriptionStatus, TransactionType } from '@prisma/client'
+import type { JsonValue } from '@prisma/client/runtime/library'
 
 // Shared gift subscription info type
 export interface GiftInfo {

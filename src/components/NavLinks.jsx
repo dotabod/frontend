@@ -1,8 +1,8 @@
 import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
 import { GiftIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export function NavLinks({ bottom = false }) {
   // Only track hover state on client-side

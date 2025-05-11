@@ -1,13 +1,13 @@
 import { plans } from '@/components/Billing/BillingPlans'
-import { createGiftCheckoutSession } from '@/lib/gift-subscription'
-import { SUBSCRIPTION_TIERS, type PricePeriod } from '@/utils/subscription'
-import { Alert, App, Button, Form, Input, Space, Typography, InputNumber, Tooltip } from 'antd'
-import { useState, useEffect } from 'react'
-import { Card } from '@/ui/card'
-import Link from 'next/link'
-import { detect } from 'curse-filter'
-import TwitchChat from '@/components/TwitchChat'
 import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscriptionAlert'
+import TwitchChat from '@/components/TwitchChat'
+import { createGiftCheckoutSession } from '@/lib/gift-subscription'
+import { Card } from '@/ui/card'
+import { type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import { Alert, App, Button, Form, Input, InputNumber, Space, Tooltip, Typography } from 'antd'
+import { detect } from 'curse-filter'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const { Title, Text, Paragraph } = Typography
 

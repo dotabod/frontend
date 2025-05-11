@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createMocks } from 'node-mocks-http'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import handler from '@/pages/api/overlay/gift-alert'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { createMocks } from 'node-mocks-http'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/lib/db', () => ({
@@ -26,9 +26,9 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+import { getServerSession } from '@/lib/api/getServerSession'
 // Import the mocked dependencies for direct manipulation
 import prisma from '@/lib/db'
-import { getServerSession } from '@/lib/api/getServerSession'
 
 describe('overlay/gift-alert API', () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { createMocks } from 'node-mocks-http'
 import handler from '@/pages/api/user/gift-subscriptions'
-import type { User, Subscription, GiftSubscription } from '@prisma/client'
+import type { GiftSubscription, Subscription, User } from '@prisma/client'
+import { createMocks } from 'node-mocks-http'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock prisma
 vi.mock('@/lib/db', () => ({

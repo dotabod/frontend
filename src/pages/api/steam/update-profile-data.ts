@@ -1,10 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { captureException } from '@sentry/nextjs'
 import { ranks } from '@/lib/ranks'
+import { captureException } from '@sentry/nextjs'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 interface OpenDotaProfile {
   profile: {

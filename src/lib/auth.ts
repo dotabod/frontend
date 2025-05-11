@@ -7,7 +7,7 @@ import type { NextAuthOptions } from 'next-auth'
 import { decode, encode } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
-import { chatVerifyScopes, defaultScopes, chatBotScopes } from './authScopes'
+import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
 
 const extractCookieValue = (cookieHeader: string | string[], name: string) => {
   const cookieStringFull = Array.isArray(cookieHeader)

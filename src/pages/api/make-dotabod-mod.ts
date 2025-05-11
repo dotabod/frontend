@@ -5,8 +5,8 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { captureException } from '@sentry/nextjs'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
+import { captureException } from '@sentry/nextjs'
 async function addModerator(broadcasterId: string | undefined, accessToken: string) {
   if (!broadcasterId) {
     throw new Error('Broadcaster ID is required')

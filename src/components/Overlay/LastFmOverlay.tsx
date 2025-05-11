@@ -1,12 +1,12 @@
 import { Settings } from '@/lib/defaultSettings'
-import clsx from 'clsx'
-import LastFmCard from './lastfm/LastFmCard'
-import { TierSwitch } from '../Dashboard/Features/TierSwitch'
-import { Card } from '@/ui/card'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Card } from '@/ui/card'
+import { Form, Input, Typography } from 'antd'
+import clsx from 'clsx'
 import { useEffect, useRef } from 'react'
 import { useState } from 'react'
-import { Form, Input, Typography } from 'antd'
+import { TierSwitch } from '../Dashboard/Features/TierSwitch'
+import LastFmCard from './lastfm/LastFmCard'
 
 const { Paragraph } = Typography
 

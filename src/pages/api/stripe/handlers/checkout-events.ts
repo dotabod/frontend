@@ -1,16 +1,16 @@
-import type { Prisma } from '@prisma/client'
 import { stripe } from '@/lib/stripe-server'
-import { withErrorHandling } from '../utils/error-handling'
-import { GiftService } from '../services/gift-service'
-import { handleSubscriptionEvent } from './subscription-events'
-import type Stripe from 'stripe'
+import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
+import type Stripe from 'stripe'
+import { GiftService } from '../services/gift-service'
+import { withErrorHandling } from '../utils/error-handling'
 import {
-  createLifetimePurchase,
   createCryptoSubscription,
+  createLifetimePurchase,
   findExistingCryptoSubscription,
   isLifetimePrice,
 } from '../utils/subscription-utils'
+import { handleSubscriptionEvent } from './subscription-events'
 
 /**
  * Handles a checkout session completed event from Stripe

@@ -3,8 +3,8 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Typography } from 'antd'
 import clsx from 'clsx'
-import { motion, AnimatePresence, useAnimationControls } from 'framer-motion'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { AnimatePresence, motion, useAnimationControls } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 const { Text } = Typography
 

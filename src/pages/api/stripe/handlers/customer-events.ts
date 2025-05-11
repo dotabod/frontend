@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client'
-import { CustomerService } from '../services/customer-service'
 import type Stripe from 'stripe'
+import { CustomerService } from '../services/customer-service'
 import { debugLog } from '../utils/debugLog'
 
 /**

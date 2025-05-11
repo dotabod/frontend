@@ -1,7 +1,7 @@
-import { type Prisma, SubscriptionStatus } from '@prisma/client'
 import { stripe } from '@/lib/stripe-server'
-import { withErrorHandling } from '../utils/error-handling'
+import { type Prisma, SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
+import { withErrorHandling } from '../utils/error-handling'
 
 /**
  * Handles an invoice event from Stripe (payment succeeded or failed)

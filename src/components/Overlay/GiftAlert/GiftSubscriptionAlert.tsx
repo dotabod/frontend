@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { GiftIcon } from 'lucide-react'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { clsx } from 'clsx'
+import { AnimatePresence, motion } from 'framer-motion'
+import { GiftIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface GiftSubscriptionAlertProps {
   senderName: string

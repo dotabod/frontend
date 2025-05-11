@@ -1,9 +1,9 @@
-import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscriptionTier } from '@/utils/subscription'
-import { withErrorHandling } from '../utils/error-handling'
+import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type Stripe from 'stripe'
 import { debugLog } from '../utils/debugLog'
+import { withErrorHandling } from '../utils/error-handling'
 
 /**
  * Handles a subscription event from Stripe

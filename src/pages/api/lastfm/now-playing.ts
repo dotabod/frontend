@@ -1,9 +1,9 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 type LastFmResponse = {
   artist: string

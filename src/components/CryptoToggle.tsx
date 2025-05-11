@@ -1,7 +1,7 @@
-import { Bitcoin, Info, Sparkles } from 'lucide-react'
 import { Popover, Switch } from 'antd'
 import clsx from 'clsx'
-import { memo, useState, useEffect } from 'react'
+import { Bitcoin, Info, Sparkles } from 'lucide-react'
+import { memo, useEffect, useState } from 'react'
 import ErrorBoundary from './ErrorBoundary'
 
 interface CryptoToggleProps {

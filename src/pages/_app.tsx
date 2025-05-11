@@ -14,6 +14,7 @@ import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { App as AntProvider, ConfigProvider, unstableSetRender } from 'antd'
 import 'antd/dist/reset.css'
 import 'focus-visible'
+import { InvalidOverlayPage, checkForInvalidOverlay } from '@/lib/overlayUtils'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
@@ -23,7 +24,6 @@ import type { ReactElement, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { type Root, createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
 
 const isInvalidLocalCheck = checkForInvalidOverlay(
   typeof window !== 'undefined' ? window.location.pathname : '',

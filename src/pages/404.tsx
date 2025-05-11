@@ -1,11 +1,11 @@
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
-import type { ReactElement } from 'react'
-import Link from 'next/link'
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Tooltip } from 'antd'
+import { AnimatePresence, motion } from 'framer-motion'
 import { GiftIcon } from 'lucide-react'
+import Link from 'next/link'
+import type { ReactElement } from 'react'
+import { useState } from 'react'
 
 type NavLinkItem = [string, string, string?]
 

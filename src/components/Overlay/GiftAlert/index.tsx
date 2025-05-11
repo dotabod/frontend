@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
 import { fetcher } from '@/lib/fetcher'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import GiftSubscriptionAlert from './GiftSubscriptionAlert'
-import { useRouter } from 'next/router'
 
 interface GiftNotification {
   id: string

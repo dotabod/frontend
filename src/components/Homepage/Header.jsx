@@ -1,7 +1,7 @@
 import { Popover, PopoverButton } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import Link from 'next/link'
 import { GiftIcon } from 'lucide-react'
+import Link from 'next/link'
 
 import { Container } from 'src/components/Container'
 import { Logo } from 'src/components/Logo'

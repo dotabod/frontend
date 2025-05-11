@@ -1,7 +1,7 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 
 type LastFmTrackType = {
   artist: string

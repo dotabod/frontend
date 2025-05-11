@@ -19,6 +19,7 @@ import { useOBS } from '@/lib/hooks/useOBS'
 import { type WinChance, useSocket } from '@/lib/hooks/useSocket'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
+import { InvalidOverlayPage, checkForInvalidOverlay } from '@/lib/overlayUtils'
 import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 import { Center } from '@mantine/core'
@@ -33,7 +34,6 @@ import { RestrictFeature } from '../RestrictFeature'
 import { DevControls, DevModeToggle } from './DevControls'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
-import { InvalidOverlayPage, checkForInvalidOverlay } from '@/lib/overlayUtils'
 
 interface PotentialError {
   status?: number

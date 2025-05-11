@@ -1,7 +1,7 @@
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
-import { InGameV2, InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
+import { InGameOutsideCenterV2, InGameV2 } from '@/components/Overlay/blocker/InGameV2'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'

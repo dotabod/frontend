@@ -4,13 +4,13 @@ import Header from '@/components/Dashboard/Header'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
+import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import type { JsonValue } from '@prisma/client/runtime/library'
 import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
-import type { JsonValue } from '@prisma/client/runtime/library'
-import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
 
 const { Title } = Typography
 
