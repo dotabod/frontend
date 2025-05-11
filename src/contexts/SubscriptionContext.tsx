@@ -36,7 +36,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const { data: session } = useSession()
   const creditBalanceKey = session?.user ? '/api/stripe/credit-balance' : null
   // Fetch credit balance and specify the response type
-  const { data: creditBalanceData } = useSWR<CreditBalanceResponse>( // Add type argument here
+  const { data: creditBalanceData } = useSWR<CreditBalanceResponse>(
+    // Add type argument here
     creditBalanceKey,
     fetcher,
     {

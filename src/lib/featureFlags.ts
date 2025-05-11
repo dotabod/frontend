@@ -1,6 +1,6 @@
 /**
  * Feature flags configuration
- * 
+ *
  * Add feature flags here and set their default values.
  * Features should be disabled by default unless explicitly enabled.
  */
@@ -16,7 +16,7 @@ export type FeatureFlags = {
  * Default feature flags configuration
  */
 export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
-  enableCryptoPayments: false
+  enableCryptoPayments: false,
 }
 
 /**

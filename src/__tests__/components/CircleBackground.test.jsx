@@ -13,7 +13,7 @@ vi.mock('react', async () => {
 
 describe('CircleBackground', () => {
   it('renders an SVG element with correct attributes', () => {
-    render(<CircleBackground color="#123456" data-testid="circle-bg" />)
+    render(<CircleBackground color='#123456' data-testid='circle-bg' />)
 
     const svg = screen.getByTestId('circle-bg')
     expect(svg).toBeInTheDocument()
@@ -25,7 +25,7 @@ describe('CircleBackground', () => {
   })
 
   it('uses the provided color for gradient and stroke', () => {
-    render(<CircleBackground color="#123456" data-testid="circle-bg" />)
+    render(<CircleBackground color='#123456' data-testid='circle-bg' />)
 
     const svg = screen.getByTestId('circle-bg')
     const stopElement = svg.querySelector('stop')
@@ -36,7 +36,7 @@ describe('CircleBackground', () => {
   })
 
   it('applies custom width and height', () => {
-    render(<CircleBackground color="#123456" width={300} height={400} data-testid="circle-bg" />)
+    render(<CircleBackground color='#123456' width={300} height={400} data-testid='circle-bg' />)
 
     const svg = screen.getByTestId('circle-bg')
     expect(svg).toHaveAttribute('width', '300')
@@ -46,11 +46,11 @@ describe('CircleBackground', () => {
   it('passes additional props to the SVG element', () => {
     render(
       <CircleBackground
-        color="#123456"
-        className="custom-class"
-        id="custom-id"
-        data-testid="circle-bg"
-      />
+        color='#123456'
+        className='custom-class'
+        id='custom-id'
+        data-testid='circle-bg'
+      />,
     )
 
     const svg = screen.getByTestId('circle-bg')

@@ -67,8 +67,8 @@ export function Header() {
                             <MobileNavLink href='/#features'>Features</MobileNavLink>
                             <MobileNavLink href='/#pricing'>Pricing</MobileNavLink>
                             <MobileNavLink href='/gift'>
-                              <span className="flex items-center gap-2">
-                                <GiftIcon className="h-4 w-4" />
+                              <span className='flex items-center gap-2'>
+                                <GiftIcon className='h-4 w-4' />
                                 Gift Pro
                               </span>
                             </MobileNavLink>

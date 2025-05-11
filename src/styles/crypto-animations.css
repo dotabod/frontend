@@ -1,42 +1,85 @@
 @keyframes sparkle {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(0); opacity: 0; }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 @keyframes pulse {
-  0% { opacity: 0.7; }
-  50% { opacity: 1; }
-  100% { opacity: 0.7; }
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes glow {
-  0% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.7); }
-  100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
+  0% {
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.3);
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes border-glow {
-  0% { border-color: rgba(139, 92, 246, 0.3); }
-  50% { border-color: rgba(245, 158, 11, 0.7); }
-  100% { border-color: rgba(139, 92, 246, 0.3); }
+  0% {
+    border-color: rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    border-color: rgba(245, 158, 11, 0.7);
+  }
+  100% {
+    border-color: rgba(139, 92, 246, 0.3);
+  }
 }
 
 @keyframes text-fade {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-sparkle {
@@ -64,7 +107,12 @@
 }
 
 .crypto-active {
-  background: linear-gradient(to bottom right, rgba(76, 29, 149, 0.15), rgba(124, 58, 237, 0.15), rgba(76, 29, 149, 0.15)) !important;
+  background: linear-gradient(
+    to bottom right,
+    rgba(76, 29, 149, 0.15),
+    rgba(124, 58, 237, 0.15),
+    rgba(76, 29, 149, 0.15)
+  ) !important;
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.3) !important;
   border: 1px solid rgba(139, 92, 246, 0.2) !important;
 }
@@ -104,7 +152,7 @@
 }
 
 .crypto-button::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
@@ -168,14 +216,19 @@
 .crypto-payment-success .setup-complete-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(to bottom right, rgba(76, 29, 149, 0.05), rgba(124, 58, 237, 0.05), rgba(76, 29, 149, 0.05)) !important;
+  background: linear-gradient(
+    to bottom right,
+    rgba(76, 29, 149, 0.05),
+    rgba(124, 58, 237, 0.05),
+    rgba(76, 29, 149, 0.05)
+  ) !important;
   border: 1px solid rgba(139, 92, 246, 0.2) !important;
   box-shadow: 0 0 30px rgba(139, 92, 246, 0.2) !important;
   animation: glow 4s ease-in-out infinite;
 }
 
 .crypto-payment-success .setup-complete-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

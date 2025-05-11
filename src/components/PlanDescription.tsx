@@ -37,7 +37,7 @@ export const PlanDescription = ({
     // Calculate days remaining if in grace period
     if (isInGracePeriod()) {
       setDaysRemaining(
-        Math.ceil((GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+        Math.ceil((GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
       )
     }
 
@@ -65,15 +65,7 @@ export const PlanDescription = ({
     }
 
     setMessageType(newMessageType)
-  }, [
-    tier,
-    activePeriod,
-    payWithCrypto,
-    hasCreditBalance,
-    hasActivePlan,
-    hasTrial,
-    subscription
-  ])
+  }, [tier, activePeriod, payWithCrypto, hasCreditBalance, hasActivePlan, hasTrial, subscription])
 
   return (
     <ErrorBoundary>
@@ -102,7 +94,8 @@ export const PlanDescription = ({
 
           {messageType === 'grace-period' && (
             <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Includes free trial until {gracePeriodPrettyDate} {daysRemaining !== null && `(${daysRemaining} days)`}
+              Includes free trial until {gracePeriodPrettyDate}{' '}
+              {daysRemaining !== null && `(${daysRemaining} days)`}
             </span>
           )}
 

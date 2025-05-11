@@ -46,8 +46,11 @@ export function Footer() {
             </div>
           </div>
         </div>
-        <div className="py-4 text-center text-xs text-gray-400">
-          <p>Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is not affiliated with Valve Corporation.</p>
+        <div className='py-4 text-center text-xs text-gray-400'>
+          <p>
+            Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is
+            not affiliated with Valve Corporation.
+          </p>
         </div>
       </Container>
     </footer>

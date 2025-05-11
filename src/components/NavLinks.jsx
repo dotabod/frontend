@@ -60,7 +60,7 @@ export function NavLinks({ bottom = false }) {
           )}
 
           <span className='relative z-10 flex items-center gap-2'>
-            {isGiftLink && <GiftIcon className="h-4 w-4" />}
+            {isGiftLink && <GiftIcon className='h-4 w-4' />}
             {label}
           </span>
         </Link>

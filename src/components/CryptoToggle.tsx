@@ -14,7 +14,13 @@ interface CryptoToggleProps {
 
 // Create a dedicated component for the crypto toggle to better isolate DOM changes
 const CryptoToggle = memo(
-  ({ payWithCrypto, setPayWithCrypto, activePeriod, featured = false, isEnabled = false }: CryptoToggleProps) => {
+  ({
+    payWithCrypto,
+    setPayWithCrypto,
+    activePeriod,
+    featured = false,
+    isEnabled = false,
+  }: CryptoToggleProps) => {
     // If feature is disabled, don't render the component
     if (!isEnabled) return null
 

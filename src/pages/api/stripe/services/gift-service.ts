@@ -166,15 +166,18 @@ export class GiftService {
             setTimeout(async () => {
               try {
                 // Call the apply-gift-credit API endpoint
-                const autoApplyResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/stripe/apply-gift-credit`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
+                const autoApplyResponse = await fetch(
+                  `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      userId: recipientUserId,
+                    }),
                   },
-                  body: JSON.stringify({
-                    userId: recipientUserId,
-                  }),
-                })
+                )
 
                 const result = await autoApplyResponse.json()
                 console.log('Auto-applied gift credits result:', result)

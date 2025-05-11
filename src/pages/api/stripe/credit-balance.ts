@@ -57,8 +57,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Retrieve the customer from Stripe to get their balance
-    let typedCustomer: Stripe.Customer | null = null;
-    let balance = 0;
+    let typedCustomer: Stripe.Customer | null = null
+    let balance = 0
 
     try {
       const customer = await stripe.customers.retrieve(customerId)
