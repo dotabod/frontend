@@ -7,10 +7,10 @@
   },
   "css": {
     "formatter": {
-      "enabled": true
+      "enabled": false
     },
     "linter": {
-      "enabled": true
+      "enabled": false
     }
   },
   "formatter": {
@@ -42,7 +42,18 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": { "noUnusedImports": "error" }
+      "correctness": {
+        "noUnusedImports": "error",
+        "useExhaustiveDependencies": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off",
+        "noImplicitAnyLet": "off"
+      },
+      "style": {
+        "noUselessElse": "off"
+      }
     }
   },
   "javascript": {

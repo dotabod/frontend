@@ -331,7 +331,6 @@ function FeaturesMobile() {
       >
         {features.map((feature, featureIndex) => (
           <div
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={featureIndex}
             ref={(ref) => {
               if (ref) {
@@ -363,7 +362,6 @@ function FeaturesMobile() {
         {features.map((_, featureIndex) => (
           <button
             type='button'
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={featureIndex}
             className={clsx(
               'relative h-0.5 w-4 rounded-full',

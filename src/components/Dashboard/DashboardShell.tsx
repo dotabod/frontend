@@ -181,7 +181,6 @@ export default function DashboardShell({
   }, [])
 
   // Update selected menu item and open parent menu when route changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: adding openKeys causes too many re-renders
   useEffect(() => {
     const { pathname } = router
     const { key, parentKey } = findBestMatchingMenuItem(pathname)

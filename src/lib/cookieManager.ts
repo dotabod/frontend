@@ -309,8 +309,7 @@ declare global {
   interface Window {
     _ga_enabled?: boolean
     _hubspot_enabled?: boolean
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    dataLayer?: Array<Object>
+    dataLayer?: Record<string, any>[] | undefined
     gtag?: (command: string, ...args: Array<unknown>) => void
     HubSpotConsentConfig?: {
       setTrackingCookiesAllowed: (allowed: boolean) => void

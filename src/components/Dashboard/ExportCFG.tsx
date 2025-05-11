@@ -32,7 +32,6 @@ function InstallPage() {
     }
   }, [router.query.gsiType])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run this effect once on load
   useEffect(() => {
     const determinePlatform = () => {
       // @ts-expect-error userAgentData is not yet in the TS types

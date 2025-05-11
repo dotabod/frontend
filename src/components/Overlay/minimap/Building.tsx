@@ -43,6 +43,7 @@ const Building = ({ data, team }) => {
         src={`/images/overlay/minimap/blocker/icons/buildings/${
           isEnemy ? 'enemy_' : ''
         }${image}.png`}
+        alt={`${isEnemy ? 'Enemy' : 'Friendly'} ${buildingType()} building`}
         onError={handleImageError}
         style={{ display: imageError ? 'none' : 'block' }}
       />

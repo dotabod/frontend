@@ -27,7 +27,7 @@ export default class MyDocument extends Document {
       styles: (
         <>
           {initialProps.styles}
-          {/* eslint-disable-next-line react/no-danger */}
+          {/* biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation> */}
           <style data-type='antd-cssinjs' dangerouslySetInnerHTML={{ __html: style }} />
         </>
       ),

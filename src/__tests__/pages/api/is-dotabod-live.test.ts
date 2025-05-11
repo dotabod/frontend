@@ -120,18 +120,9 @@ describe('is-dotabod-live API', () => {
     // Mock the prisma response to throw an error
     const mockError = new Error('Database error')
 
-    // Create a mock implementation that calls the catch handler
+    // Create a mock implementation that rejects with an error
     vi.mocked(prisma.user.findFirst).mockImplementation(() => {
-      return {
-        then: () => {
-          return {
-            catch: (callback) => {
-              callback(mockError)
-              return undefined
-            },
-          }
-        },
-      } as any
+      return Promise.reject(mockError) as any
     })
 
     await handler(req, res)

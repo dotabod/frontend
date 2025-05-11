@@ -17,14 +17,14 @@
  */
 
 import * as Sentry from '@sentry/nextjs'
-import Error from 'next/error'
+import NextErrorComponent from 'next/error'
 
 const CustomErrorComponent = (props) => {
   // If you're using a Nextjs version prior to 12.2.1, uncomment this to
   // compensate for https://github.com/vercel/next.js/issues/8592
   // Sentry.captureUnderscoreErrorException(props);
 
-  return <Error statusCode={props.statusCode} />
+  return <NextErrorComponent statusCode={props.statusCode} />
 }
 
 CustomErrorComponent.getInitialProps = async (contextData) => {
@@ -33,7 +33,7 @@ CustomErrorComponent.getInitialProps = async (contextData) => {
   await Sentry.captureUnderscoreErrorException(contextData)
 
   // This will contain the status code of the response
-  return Error.getInitialProps(contextData)
+  return NextErrorComponent.getInitialProps(contextData)
 }
 
 export default CustomErrorComponent
