@@ -1,5 +1,6 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { createCheckoutSession } from '@/lib/stripe'
+import { isFeatureEnabled } from '@/lib/featureFlags'
 import {
   calculateSavings,
   getPriceId,
@@ -122,18 +123,24 @@ function Plan({
     )
   }, [subscription?.stripePriceId, tier])
 
-  // Initialize payWithCrypto state based on subscription data
-  // Only enable for Pro tier and default to true if user already has a crypto subscription
+  // Check if crypto payments feature is enabled
+  const isCryptoPaymentsEnabled = isFeatureEnabled('enableCryptoPayments')
+
+  // Initialize payWithCrypto state based on subscription data and feature flag
+  // Only enable for Pro tier and default to true if user already has a crypto subscription AND feature is enabled
   const [payWithCrypto, setPayWithCrypto] = useState(() => {
-    return tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto
+    return isCryptoPaymentsEnabled && tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto
   })
 
-  // Update payWithCrypto when subscription data changes
+  // Update payWithCrypto when subscription data changes or feature flag status changes
   useEffect(() => {
-    if (tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto) {
+    if (isCryptoPaymentsEnabled && tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto) {
       setPayWithCrypto(true)
+    } else if (!isCryptoPaymentsEnabled) {
+      // Ensure crypto payment is disabled when feature is disabled
+      setPayWithCrypto(false)
     }
-  }, [tier, isPaidWithCrypto])
+  }, [tier, isPaidWithCrypto, isCryptoPaymentsEnabled])
 
   const savings = calculateSavings(price.monthly, price.annual)
 
@@ -879,13 +886,14 @@ function Plan({
 
         {tier !== SUBSCRIPTION_TIERS.FREE && (
           <div className='mt-3 flex flex-col gap-2 text-center'>
-            {/* Payment method selection - only show for Pro tier */}
+            {/* Payment method selection - only show for Pro tier and if feature is enabled */}
             {tier === SUBSCRIPTION_TIERS.PRO && (
               <CryptoToggle
                 payWithCrypto={payWithCrypto}
                 setPayWithCrypto={setPayWithCrypto}
                 activePeriod={activePeriod}
                 featured={featured}
+                isEnabled={isCryptoPaymentsEnabled}
               />
             )}
           </div>

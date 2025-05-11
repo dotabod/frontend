@@ -20,6 +20,7 @@ interface Post {
   description: string
   date: string
   author?: string
+  draft?: boolean
 }
 
 interface BlogIndexProps {
@@ -146,8 +147,11 @@ export const getStaticProps: GetStaticProps = async () => {
         description: data.description || '',
         date: date,
         author: data.author || null,
+        draft: Boolean(data.draft),
       }
     })
+    // Filter out draft posts
+    .filter((post) => !post.draft)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return {

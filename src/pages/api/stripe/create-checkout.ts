@@ -2,6 +2,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import { featureFlags } from '@/lib/featureFlags'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 import { Prisma, type TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -42,8 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const price = await stripe.prices.retrieve(priceId)
     const isRecurring = price.type === 'recurring'
     const isLifetime = !isRecurring
-    // Check if user wants to pay with crypto
-    const isCryptoPayment = paymentMethod === 'crypto'
+    // Check if user wants to pay with crypto and if feature is enabled
+    const isCryptoPayment = paymentMethod === 'crypto' && featureFlags.enableCryptoPayments
 
     // Handle customer and subscription logic in a transaction
     const checkoutUrl = await prisma.$transaction(

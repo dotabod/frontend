@@ -2,11 +2,17 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import { featureFlags } from '@/lib/featureFlags'
 import { CRYPTO_PRICE_IDS } from '@/utils/subscription'
 import type { NextApiRequest, NextApiResponse } from 'next'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  // Check if crypto payments feature is enabled
+  if (!featureFlags.enableCryptoPayments) {
+    return res.status(403).json({ error: 'Crypto payments are currently disabled' })
   }
 
   try {

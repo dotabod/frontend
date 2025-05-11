@@ -3,6 +3,7 @@ title: Introducing Cryptocurrency and Expanded Payment Options
 description: Pay for your Dotabod subscription with cryptocurrencies and many more payment methods
 date: 2025-04-10
 author: Dotabod Team
+draft: true
 ---
 
 ## Cryptocurrency and Expanded Payment Methods Now Available

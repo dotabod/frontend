@@ -103,6 +103,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   const paths = filenames
     .filter((filename) => filename.endsWith('.md'))
+    .filter((filename) => {
+      // Filter out draft posts
+      const filePath = path.join(postsDirectory, filename)
+      const fileContents = fs.readFileSync(filePath, 'utf8')
+      const { data } = matter(fileContents)
+      return !data.draft
+    })
     .map((filename) => ({
       params: {
         slug: filename.replace(/\.md$/, ''),
@@ -121,6 +128,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const fileContents = fs.readFileSync(filePath, 'utf8')
 
   const { content, data } = matter(fileContents)
+
+  // Check if post is a draft
+  if (data.draft) {
+    return {
+      notFound: true,
+    }
+  }
 
   // Process the frontmatter data to ensure all values are serializable
   const processedData = { ...data }
