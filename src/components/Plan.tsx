@@ -826,7 +826,6 @@ function Plan({
             )}
           >
             {features.map((feature, index) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
               <li key={index} className='flex py-2'>
                 <CheckIcon
                   className={clsx(
