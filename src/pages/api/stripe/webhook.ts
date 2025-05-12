@@ -28,6 +28,7 @@ const relevantEvents = new Set<Stripe.Event.Type>([
   'invoice.payment_failed',
   'invoice.marked_uncollectible',
   'invoice.overdue',
+  'invoice.paid', // Added for Boomfi crypto payments
   'checkout.session.completed',
   'charge.succeeded',
   'charge.refunded',
@@ -199,7 +200,8 @@ async function processWebhookEvent(
     case 'invoice.payment_succeeded':
     case 'invoice.payment_failed':
     case 'invoice.marked_uncollectible':
-    case 'invoice.overdue': {
+    case 'invoice.overdue':
+    case 'invoice.paid': {
       const invoice = event.data.object
       debugLog(`Calling handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
       await handleInvoiceEvent(event.data.object, tx)

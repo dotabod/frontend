@@ -12,7 +12,7 @@
     "build": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
     "build-local": "doppler run -- bun run build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome check --write",
     "parse": "i18next -c ./i18next-parser.config.mjs",
     "postinstall": "bun run generate:all",
     "knip": "knip",

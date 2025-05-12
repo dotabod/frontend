@@ -206,8 +206,109 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     tx,
   } = params
 
+  // If this is a crypto payment, use the Boomfi flow with invoices
+  if (isCryptoPayment) {
+    return await createBoomfiInvoice({
+      customerId,
+      priceId,
+      isRecurring,
+      isLifetime,
+      subscriptionData,
+      userId,
+      email,
+      name,
+      image,
+      locale,
+      twitchId,
+      referer,
+      tx,
+    })
+  }
+
+  // Handle regular Stripe checkout
+  const baseUrl = process.env.NEXTAUTH_URL ?? ''
+
+  // Calculate trial period based on grace period
+  const now = new Date()
+
+  // Simplified trial period logic
+  let trialDays = 0
+
+  if (isGift) {
+    // No trial for gift purchases
+    trialDays = 0
+  } else if (isInGracePeriod()) {
+    // If we're in the grace period, use days until grace period ends as trial
+    trialDays = Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  } else if (isRecurring) {
+    // Standard trial for new self-subscriptions
+    trialDays = 14
+  }
+
+  // Build success URL with simplified parameters
+  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&crypto=false&trial=${isRecurring && trialDays > 0}&trialDays=${trialDays}`
+
+  const cancelUrl = referer?.includes('/dashboard')
+    ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
+    : `${baseUrl || 'https://dotabod.com'}/?paid=false`
+
+  const session = await stripe.checkout.sessions.create({
+    customer: customerId,
+    mode: isRecurring ? 'subscription' : 'payment',
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    subscription_data: isRecurring
+      ? {
+          ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
+          trial_settings: {
+            end_behavior: { missing_payment_method: 'cancel' },
+          },
+        }
+      : undefined,
+    allow_promotion_codes: true,
+    metadata: {
+      userId,
+      email,
+      name,
+      image,
+      locale,
+      twitchId,
+      isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
+      isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      isGift: isGift ? 'true' : 'false',
+      isCryptoPayment: 'false',
+    },
+  })
+
+  return session.url ?? ''
+}
+
+/**
+ * Creates an invoice with a Boomfi payment link for crypto payments
+ */
+async function createBoomfiInvoice(
+  params: Omit<CheckoutSessionParams, 'isGift' | 'isCryptoPayment'>,
+): Promise<string> {
+  const {
+    customerId,
+    priceId,
+    isRecurring,
+    isLifetime,
+    subscriptionData,
+    userId,
+    email,
+    name,
+    image,
+    locale,
+    twitchId,
+    referer,
+    tx,
+  } = params
+
   // Cancel any pending crypto invoices if this is an upgrade with crypto payment
-  if (isCryptoPayment && subscriptionData?.stripePriceId && tx) {
+  if (subscriptionData?.stripePriceId && tx) {
     try {
       // Get existing subscription metadata to find renewal invoice ID
       const existingSubscription = await tx.subscription.findFirst({
@@ -249,61 +350,40 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       }
     } catch (error) {
       console.error('Error canceling pending invoices:', error)
-      // Continue with checkout creation even if invoice cancellation fails
+      // Continue with invoice creation even if invoice cancellation fails
       // We'll handle any duplicate payments through customer support
     }
   }
 
-  const baseUrl = process.env.NEXTAUTH_URL ?? ''
+  // Get subscription period type
+  const { getCurrentPeriod } = await import('@/utils/subscription')
+  const pricePeriod = getCurrentPeriod(priceId)
 
-  // Calculate trial period based on grace period
-  const now = new Date()
-
-  // Simplified trial period logic
-  let trialDays = 0
-
-  if (isGift) {
-    // No trial for gift purchases
-    trialDays = 0
-  } else if (isInGracePeriod()) {
-    // If we're in the grace period, use days until grace period ends as trial
-    trialDays = Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  } else if (isRecurring) {
-    // Standard trial for new self-subscriptions
-    trialDays = 14
+  // Fetch the price details to get the amount
+  const price = await stripe.prices.retrieve(priceId)
+  if (!price.unit_amount) {
+    throw new Error('Price has no unit amount')
   }
 
-  if (isCryptoPayment) {
-    trialDays = 0
+  // Fetch the product to get the Boomfi payment link
+  const boomfiPaylink = price.metadata?.boomfi_paylink
+
+  if (!boomfiPaylink) {
+    throw new Error('Product does not have a Boomfi payment link configured in metadata')
   }
 
-  // Build success URL with simplified parameters
-  const successUrl = `${baseUrl || 'https://dotabod.com'}/dashboard?paid=true&crypto=${
-    isCryptoPayment ? 'true' : 'false'
-  }&trial=${isRecurring && trialDays > 0}&trialDays=${trialDays}`
+  // Generate the full Boomfi payment URL with customer identifier
+  const boomfiPaymentUrl = `${boomfiPaylink}${boomfiPaylink.includes('?') ? '&' : '?'}customer_ident=${customerId}`
 
-  const cancelUrl = referer?.includes('/dashboard')
-    ? `${baseUrl || 'https://dotabod.com'}/dashboard/billing?paid=false`
-    : `${baseUrl || 'https://dotabod.com'}/?paid=false`
+  // Set the due date to be 7 days from now
+  const dueDate = new Date()
+  dueDate.setDate(dueDate.getDate() + 7)
 
-  // @ts-ignore crypto payment method types are not supported in the latest stripe types
-  const session = await stripe.checkout.sessions.create({
+  // Create a Stripe invoice for the customer with crypto metadata
+  const invoiceParams: Stripe.InvoiceCreateParams = {
     customer: customerId,
-    mode: isRecurring && !isCryptoPayment ? 'subscription' : 'payment',
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: successUrl,
-    cancel_url: cancelUrl,
-    payment_method_types: isCryptoPayment ? ['crypto'] : undefined,
-    subscription_data:
-      isRecurring && !isCryptoPayment
-        ? {
-            ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
-            trial_settings: {
-              end_behavior: { missing_payment_method: 'cancel' },
-            },
-          }
-        : undefined,
-    allow_promotion_codes: true,
+    collection_method: 'send_invoice', // Critical: use send_invoice instead of charge_automatically
+    due_date: Math.floor(dueDate.getTime() / 1000), // Set due date to 7 days from now
     metadata: {
       userId,
       email,
@@ -311,13 +391,46 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       image,
       locale,
       twitchId,
+      isCryptoPayment: 'true',
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
-      isGift: isGift ? 'true' : 'false',
-      isCryptoPayment: isCryptoPayment ? 'true' : 'false',
+      pricePeriod,
+      boomfiPaymentUrl, // Include the Boomfi payment URL in the metadata
+    },
+    footer:
+      'If paying with crypto, upon successful payment, your subscription will be activated automatically.',
+    payment_settings: {
+      payment_method_types: [], // Empty array disables all payment methods, effectively disabling the hosted payment page link
+    },
+  }
+
+  // Create the invoice
+  const invoice = await stripe.invoices.create(invoiceParams)
+
+  if (!invoice || !invoice.id) {
+    console.error('Stripe invoice creation failed or invoice ID is missing.', {
+      invoiceDetails: invoice,
+    })
+    throw new Error('Stripe invoice creation failed or invoice ID is missing.')
+  }
+
+  // Add the line item using the price ID directly
+  await stripe.invoiceItems.create({
+    customer: customerId,
+    invoice: invoice.id,
+    price_data: {
+      product: price.product as string,
+      unit_amount: price.unit_amount,
+      currency: price.currency,
     },
   })
 
-  return session.url ?? ''
+  // Finalize the invoice so it's ready to be viewed
+  const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+    auto_advance: false, // Don't automatically try to charge the customer
+  })
+
+  // Return the Boomfi payment URL instead of the hosted invoice URL
+  return boomfiPaymentUrl
 }
