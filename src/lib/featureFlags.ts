@@ -16,7 +16,7 @@ export type FeatureFlags = {
  * Default feature flags configuration
  */
 export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
-  enableCryptoPayments: process.env.NODE_ENV !== 'production',
+  enableCryptoPayments: false,
 }
 
 /**

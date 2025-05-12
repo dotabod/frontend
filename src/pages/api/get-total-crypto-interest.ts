@@ -5,10 +5,14 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function getTotalCryptoInterest() {
   try {
-    // Get all settings with crypto interest data
+    // Get all settings with crypto interest data where interested is true
     const cryptoInterestSettings = await prisma.setting.count({
       where: {
         key: 'crypto_payment_interest',
+        value: {
+          path: ['interested'],
+          equals: true,
+        },
       },
     })
 

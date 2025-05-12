@@ -224,6 +224,41 @@ function Plan({
     }
   }
 
+  // Function to handle removal of crypto interest
+  const handleRemoveCryptoInterest = async () => {
+    if (!session) {
+      message.info('Please sign in to update your crypto payment preferences')
+      return
+    }
+
+    try {
+      // Call the update function to set interested to false
+      updateCryptoInterest({
+        interested: false,
+        tier: tier,
+        transactionType:
+          activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
+      })
+
+      // Optimistically update the UI
+      if (cryptoInterestData && cryptoInterestData.userCount > 0) {
+        mutateCryptoInterestData(
+          {
+            ...cryptoInterestData,
+            userCount: cryptoInterestData.userCount - 1,
+          },
+          false,
+        )
+      }
+    } catch (error) {
+      console.error('Error removing crypto interest:', error)
+      notification.error({
+        message: 'Error',
+        description: 'Failed to update your interest status. Please try again later.',
+      })
+    }
+  }
+
   // Update button text logic
   const getSimplifiedButtonText = () => {
     const isLifetimePeriod = activePeriod === 'lifetime'
@@ -962,7 +997,7 @@ function Plan({
             <Tooltip
               title={
                 cryptoInterest?.interested
-                  ? "We'll add crypto payments if enough people want it. Check back soon!"
+                  ? "We'll add crypto payments if enough people want it. Click to remove your interest."
                   : "Let us know if you'd like to pay with cryptocurrency"
               }
             >
@@ -985,9 +1020,25 @@ function Plan({
                   </span>
                 </Button>
               ) : (
-                <span className='text-xs break-words'>
-                  {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
-                </span>
+                <div className='flex flex-col gap-1 items-center'>
+                  <span className='text-xs break-words'>
+                    {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
+                  </span>
+                  <Button
+                    type='link'
+                    size='small'
+                    onClick={handleRemoveCryptoInterest}
+                    loading={session ? loadingCryptoInterest : false}
+                    className={clsx(
+                      'text-xs!',
+                      featured
+                        ? 'text-purple-300/70 hover:text-purple-200'
+                        : 'text-gray-400/70 hover:text-gray-300',
+                    )}
+                  >
+                    Remove my interest
+                  </Button>
+                </div>
               )}
             </Tooltip>
           </div>
