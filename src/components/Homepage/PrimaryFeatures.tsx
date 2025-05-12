@@ -388,7 +388,7 @@ export function PrimaryFeatures() {
     <section
       id='features'
       aria-label='Features for streaing all your Dota'
-      className='bg-gray-900 py-20 sm:py-32'
+      className='bg-gray-900 py-20'
     >
       <Container>
         <div className='mx-auto max-w-2xl lg:mx-0 lg:max-w-3xl'>

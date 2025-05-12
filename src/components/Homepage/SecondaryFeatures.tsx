@@ -174,7 +174,7 @@ export function SecondaryFeatures() {
     <section
       id='secondary-features'
       aria-label='Features for building a portfolio'
-      className='py-20 sm:py-32'
+      className='py-20'
     >
       <Container>
         <div className='mx-auto max-w-2xl sm:text-center'>

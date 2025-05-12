@@ -72,7 +72,7 @@ export function Faqs() {
     <section
       id='faqs'
       aria-labelledby='faqs-title'
-      className='border-t border-gray-500 py-20 sm:py-32'
+      className='border-t border-gray-500 py-20'
     >
       <Container>
         <div className='mx-auto max-w-2xl lg:mx-0'>
