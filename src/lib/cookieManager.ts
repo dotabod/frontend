@@ -309,7 +309,7 @@ declare global {
   interface Window {
     _ga_enabled?: boolean
     _hubspot_enabled?: boolean
-    dataLayer?: Record<string, any>[] | undefined
+    dataLayer?: Record<string, any>[]
     gtag?: (command: string, ...args: Array<unknown>) => void
     HubSpotConsentConfig?: {
       setTrackingCookiesAllowed: (allowed: boolean) => void
