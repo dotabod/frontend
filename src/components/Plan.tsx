@@ -10,7 +10,7 @@ import {
   gracePeriodPrettyDate,
   isSubscriptionActive,
 } from '@/utils/subscription'
-import { SubscriptionStatus, type SubscriptionTier } from '@prisma/client'
+import { SubscriptionStatus, TransactionType, type SubscriptionTier } from '@prisma/client'
 import { App, Button, Tooltip, notification } from 'antd'
 import clsx from 'clsx'
 import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
@@ -22,6 +22,10 @@ import CryptoToggle from './CryptoToggle'
 import ErrorBoundary from './ErrorBoundary'
 import { Logomark } from './Logo'
 import { PlanDescription } from './PlanDescription'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { fetcher } from '@/lib/fetcher'
+import useSWR from 'swr'
 
 // Sparkle animation component with unique IDs
 const CryptoSparkle = ({ visible }: { visible: boolean }) => {
@@ -96,6 +100,25 @@ function Plan({
   subscription?: SubscriptionRow | null
   hasTrial?: boolean
 }) {
+  const {
+    data: cryptoInterest,
+    loading: loadingCryptoInterest,
+    updateSetting: updateCryptoInterest,
+  } = useUpdateSetting<{
+    interested: boolean
+    tier: SubscriptionTier
+    transactionType: TransactionType
+  }>(Settings.crypto_payment_interest)
+  const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR(
+    '/api/get-total-crypto-interest',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    },
+  )
+
   const { message, modal } = App.useApp()
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
@@ -165,6 +188,41 @@ function Plan({
 
   // Check if user has credit balance
   const hasCreditBalance = creditBalance > 0
+
+  // Function to handle crypto interest vote
+  const handleCryptoInterest = async () => {
+    if (!session) {
+      message.info('Please sign in to register your interest in crypto payments')
+      return
+    }
+
+    try {
+      // Call the update function without chaining .then()
+      updateCryptoInterest({
+        interested: true,
+        tier: tier,
+        transactionType:
+          activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
+      })
+
+      // Optimistically update the UI
+      if (cryptoInterestData) {
+        mutateCryptoInterestData(
+          {
+            ...cryptoInterestData,
+            userCount: cryptoInterestData.userCount + 1,
+          },
+          false,
+        )
+      }
+    } catch (error) {
+      console.error('Error registering crypto interest:', error)
+      notification.error({
+        message: 'Error',
+        description: 'Failed to register your interest. Please try again later.',
+      })
+    }
+  }
 
   // Update button text logic
   const getSimplifiedButtonText = () => {
@@ -883,7 +941,7 @@ function Plan({
           </Button>
         )}
 
-        {tier !== SUBSCRIPTION_TIERS.FREE && (
+        {isCryptoPaymentsEnabled && tier !== SUBSCRIPTION_TIERS.FREE && (
           <div className='mt-3 flex flex-col gap-2 text-center'>
             {/* Payment method selection - only show for Pro tier and if feature is enabled */}
             {tier === SUBSCRIPTION_TIERS.PRO && (
@@ -895,6 +953,43 @@ function Plan({
                 isEnabled={isCryptoPaymentsEnabled}
               />
             )}
+          </div>
+        )}
+
+        {/* Crypto interest button */}
+        {!isCryptoPaymentsEnabled && tier !== SUBSCRIPTION_TIERS.FREE && (
+          <div className='mt-3 flex flex-col gap-2 text-center'>
+            <Tooltip
+              title={
+                cryptoInterest?.interested
+                  ? "We'll add crypto payments if enough people want it. Check back soon!"
+                  : "Let us know if you'd like to pay with cryptocurrency"
+              }
+            >
+              {!cryptoInterest?.interested ? (
+                <Button
+                  type='link'
+                  size='small'
+                  icon={<Bitcoin size={16} />}
+                  onClick={handleCryptoInterest}
+                  loading={session ? loadingCryptoInterest : false}
+                  className={clsx(
+                    'text-xs',
+                    featured
+                      ? 'text-purple-300 hover:text-purple-200'
+                      : 'text-gray-400 hover:text-gray-300',
+                  )}
+                >
+                  <span className='break-words'>
+                    {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 1} interested)`}
+                  </span>
+                </Button>
+              ) : (
+                <span className='text-xs break-words'>
+                  {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
+                </span>
+              )}
+            </Tooltip>
           </div>
         )}
       </section>
