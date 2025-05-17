@@ -78,33 +78,41 @@ export function calculateGiftEndDate(
   quantity: number,
   startDate: Date = new Date(),
 ): Date {
+  // Create a new date for safer manipulation
+  const endDate = new Date(startDate.valueOf());
+  const originalDay = startDate.getDate();
+
+  // Lifetime subscription (add 100 years)
   if (giftType === 'lifetime') {
-    // For lifetime subscriptions, set a far future date (at least 100 years)
-    const lifetimeDate = new Date(startDate)
-    lifetimeDate.setFullYear(lifetimeDate.getFullYear() + 100)
-    return lifetimeDate
+    endDate.setFullYear(endDate.getFullYear() + 100);
+    return endDate;
   }
 
-  const endDate = new Date(startDate)
-  const originalDay = startDate.getDate()
-
+  // Annual subscription (add years)
   if (giftType === 'annual') {
-    // For annual subscriptions, add years
-    endDate.setFullYear(endDate.getFullYear() + quantity)
-  } else {
-    // For monthly subscriptions
-    // Set to first of month to avoid skipping months
-    endDate.setDate(1)
-    endDate.setMonth(endDate.getMonth() + quantity)
-
-    // Get the last day of the target month
-    const lastDayOfMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate()
-
-    // Set to either original day or last day of month, whichever is smaller
-    endDate.setDate(Math.min(originalDay, lastDayOfMonth))
+    endDate.setFullYear(endDate.getFullYear() + quantity);
+    return endDate;
   }
 
-  return endDate
+  // For other months, use a safer approach to add months
+  // Calculate target month and year
+  const totalMonths = startDate.getMonth() + quantity;
+  const targetMonth = totalMonths % 12;
+  const yearsToAdd = Math.floor(totalMonths / 12);
+
+  // Set to 1st of month first to avoid month skipping issues
+  endDate.setDate(1);
+  endDate.setMonth(targetMonth);
+  endDate.setFullYear(startDate.getFullYear() + yearsToAdd);
+
+  // Get the last day of the target month
+  const lastDayOfMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
+
+  // Set to either original day or last day of month, whichever is smaller
+  const finalDay = Math.min(originalDay, lastDayOfMonth);
+  endDate.setDate(finalDay);
+
+  return endDate;
 }
 
 /**
