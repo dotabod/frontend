@@ -42,7 +42,6 @@ export class GiftService {
             if (lineItems.data.length > 0) {
               const actualQuantity = lineItems.data[0].quantity || 1
               if (actualQuantity !== giftQuantity) {
-                console.log(`Customer adjusted quantity from ${giftQuantity} to ${actualQuantity}`)
                 giftQuantity = actualQuantity
               }
             }
@@ -180,7 +179,6 @@ export class GiftService {
                 )
 
                 const result = await autoApplyResponse.json()
-                console.log('Auto-applied gift credits result:', result)
               } catch (autoApplyError) {
                 console.error('Failed to auto-apply gift credits:', autoApplyError)
                 // Don't fail the overall process if auto-apply fails
@@ -248,7 +246,6 @@ export class GiftService {
         metadata,
       })
 
-      console.log(`Added ${amount} cents credit to customer ${customerId}`, balanceTransaction)
       return balanceTransaction
     } catch (error) {
       console.error(`Failed to add credit to customer ${customerId}:`, error)
