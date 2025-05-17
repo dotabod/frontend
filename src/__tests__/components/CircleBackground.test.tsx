@@ -15,7 +15,7 @@ describe('CircleBackground', () => {
   it('renders an SVG element with correct attributes', () => {
     render(<CircleBackground color='#123456' data-testid='circle-bg' />)
 
-    const svg = screen.getByTestId('circle-bg')
+    const svg = screen.getByTestId('circle-bg') as SVGSVGElement
     expect(svg).toBeInTheDocument()
     expect(svg.tagName).toBe('svg')
     expect(svg).toHaveAttribute('viewBox', '0 0 558 558')
@@ -27,18 +27,22 @@ describe('CircleBackground', () => {
   it('uses the provided color for gradient and stroke', () => {
     render(<CircleBackground color='#123456' data-testid='circle-bg' />)
 
-    const svg = screen.getByTestId('circle-bg')
+    const svg = screen.getByTestId('circle-bg') as SVGSVGElement
     const stopElement = svg.querySelector('stop')
-    expect(stopElement).toHaveAttribute('stop-color', '#123456')
+    expect(stopElement).not.toBeNull()
+    if (stopElement) {
+      expect(stopElement).toHaveAttribute('stop-color', '#123456')
+    }
 
     const pathElements = svg.querySelectorAll('path')
+    expect(pathElements.length).toBeGreaterThan(0)
     expect(pathElements[0]).toHaveAttribute('stroke', '#123456')
   })
 
   it('applies custom width and height', () => {
     render(<CircleBackground color='#123456' width={300} height={400} data-testid='circle-bg' />)
 
-    const svg = screen.getByTestId('circle-bg')
+    const svg = screen.getByTestId('circle-bg') as SVGSVGElement
     expect(svg).toHaveAttribute('width', '300')
     expect(svg).toHaveAttribute('height', '400')
   })
@@ -53,7 +57,7 @@ describe('CircleBackground', () => {
       />,
     )
 
-    const svg = screen.getByTestId('circle-bg')
+    const svg = screen.getByTestId('circle-bg') as SVGSVGElement
     expect(svg).toHaveAttribute('class', 'custom-class')
     expect(svg).toHaveAttribute('id', 'custom-id')
   })
