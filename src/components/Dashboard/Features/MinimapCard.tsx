@@ -1,15 +1,29 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+import { Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { TierBadge } from './TierBadge'
+import { TierSlider } from './TierSlider'
 import { TierSwitch } from './TierSwitch'
 
 export default function MinimapCard(): React.ReactNode {
   const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
   const { data: minimapSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: minimapXl } = useUpdateSetting(Settings['minimap-xl'])
+  const { data: minimapOpacity } = useUpdateSetting<number>(Settings['minimap-opacity'])
+
+  // Local state for real-time opacity preview
+  const [localOpacity, setLocalOpacity] = useState<number>(minimapOpacity ?? 1)
+
+  // Update local opacity when the setting changes
+  useEffect(() => {
+    if (minimapOpacity !== undefined) {
+      setLocalOpacity(minimapOpacity)
+    }
+  }, [minimapOpacity])
 
   const switches = [
     {
@@ -34,6 +48,28 @@ export default function MinimapCard(): React.ReactNode {
     },
   ]
 
+  // Handle opacity changes from the slider
+  const handleOpacityChange = (value: number) => {
+    setLocalOpacity(value)
+  }
+
+  // Get description text based on opacity value
+  const getOpacityDescription = () => {
+    if (localOpacity >= 0.95) {
+      return 'Maximum protection: Minimap completely hidden from viewers'
+    }
+    if (localOpacity >= 0.80) {
+      return 'High protection: Most minimap details are hidden from viewers'
+    }
+    if (localOpacity >= 0.70) {
+      return "Optimal setting: Chat can see hero positions but snipers can't see wards"
+    }
+    if (localOpacity >= 0.50) {
+      return 'Medium protection: Some minimap details visible but wards are hidden'
+    }
+    return 'Low protection: Minimap is mostly visible to viewers'
+  }
+
   return (
     <Card>
       <div className='title'>
@@ -50,6 +86,22 @@ export default function MinimapCard(): React.ReactNode {
           ))}
         </div>
       </div>
+      <div className='mb-6'>
+        <TierSlider
+          settingKey={Settings['minimap-opacity']}
+          min={0}
+          max={1}
+          step={0.05}
+          label={
+            <span className='flex items-center gap-2'>
+              Blocker intensity
+              <Tag color='green'>New</Tag>
+            </span>
+          }
+          onChange={handleOpacityChange}
+          helpText={getOpacityDescription()}
+        />
+      </div>
 
       <div
         className={clsx(
@@ -64,6 +116,7 @@ export default function MinimapCard(): React.ReactNode {
               minimapSimple && 'opacity-60',
               'rounded-xl border-2 border-transparent transition-all',
             )}
+            style={{ opacity: localOpacity }}
             alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
@@ -73,6 +126,7 @@ export default function MinimapCard(): React.ReactNode {
           />
           <span>Complex minimap</span>
         </div>
+
         <div className='flex flex-col items-center space-y-4'>
           <Image
             className={clsx(
@@ -80,6 +134,7 @@ export default function MinimapCard(): React.ReactNode {
               !minimapSimple && 'opacity-60',
               'rounded-xl border-2 border-transparent transition-all',
             )}
+            style={{ opacity: localOpacity }}
             alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
