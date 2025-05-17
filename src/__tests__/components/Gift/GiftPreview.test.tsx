@@ -1,6 +1,6 @@
-import { GiftPreview } from '@/components/Gift/GiftSubscriptionForm'
+import { GiftPreview } from '@/components/Gift/GiftSubscriptionForm/GiftPreview'
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/components/Overlay/GiftAlert/GiftSubscriptionAlert', () => ({
   default: ({ senderName }: { senderName: string }) => <div>Alert {senderName}</div>,

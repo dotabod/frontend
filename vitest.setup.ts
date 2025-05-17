@@ -11,6 +11,24 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => children,
 }))
 
+// Mock the Prisma Mongo client
+vi.mock('.prisma-mongo/client', () => {
+  const mockPrismaMongoClient = vi.fn(() => ({
+    $disconnect: vi.fn().mockResolvedValue(undefined),
+    cards: {
+      findUnique: vi.fn().mockResolvedValue({ id: 'mock-card-id' }),
+    },
+    notablePlayers: {
+      findUnique: vi.fn().mockResolvedValue({ id: 'mock-player-id' }),
+    },
+    // Add other methods as needed
+  }))
+
+  return {
+    PrismaClient: mockPrismaMongoClient,
+  }
+})
+
 // Mock any other dependencies as needed
 vi.mock('@/lib/hooks/useTransformRes', () => ({
   useTransformRes: () => (params: Record<string, unknown>) => params,
