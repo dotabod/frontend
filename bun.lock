@@ -30,7 +30,6 @@
         "cli-progress": "^3.12.0",
         "clsx": "^2.1.1",
         "curse-filter": "^6.0.0",
-        "date-fns": "^4.1.0",
         "dayjs": "^1.11.13",
         "focus-visible": "^5.2.1",
         "framer-motion": "^12.6.3",
@@ -924,7 +923,6 @@
 
     "curse-filter": ["curse-filter@6.0.0", "", {}, "sha512-4dKAxbefhQxLMwkCRIUpsRpIYtdzObw2Bb4hj7X41kp2FGuwIlnej3jNM2TpaZj+OFfoSPAHWx5liwblhMCocQ=="],
 
-    "date-fns": ["date-fns@4.1.0", "", {}, "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg=="],
 
     "dayjs": ["dayjs@1.11.13", "", {}, "sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg=="],
 
