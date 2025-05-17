@@ -29,7 +29,9 @@ const CodeBlock = () => {
               <span style={{ color: 'var(--color-purple-400)' }}>-c</span>
               <span style={{ color: '#F8F8F2' }}> </span>
               <span style={{ color: '#E9F284' }}>"</span>
-              <span style={{ color: '#F1FA8C' }}>irm https://{window.location.host}/install | iex</span>
+              <span style={{ color: '#F1FA8C' }}>
+                irm https://{window.location.host}/install | iex
+              </span>
               <span style={{ color: '#E9F284' }}>"</span>
             </span>
           </code>

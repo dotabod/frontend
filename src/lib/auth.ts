@@ -1,6 +1,7 @@
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
+import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { captureException } from '@sentry/nextjs'
 import type { NextAuthOptions } from 'next-auth'
@@ -8,12 +9,8 @@ import { decode, encode } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
-import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 
-const extractCookieValue = (
-  cookieHeader: string | string[] | undefined,
-  name: string,
-) => {
+const extractCookieValue = (cookieHeader: string | string[] | undefined, name: string) => {
   if (!cookieHeader) return ''
 
   const cookieStringFull = Array.isArray(cookieHeader)
@@ -287,11 +284,7 @@ export const authOptions: NextAuthOptions = {
 
       const newUser = {
         email: twitchProfile?.email ?? twitchUser.email,
-        name:
-          twitchProfile?.preferred_username ??
-          twitchUser.name ??
-          twitchUser.displayName ??
-          '',
+        name: twitchProfile?.preferred_username ?? twitchUser.name ?? twitchUser.displayName ?? '',
         displayName:
           twitchProfile?.preferred_username ??
           twitchUser.displayName ??

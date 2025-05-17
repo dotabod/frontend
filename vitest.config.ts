@@ -15,14 +15,7 @@ export default defineConfig({
     unstubEnvs: true,
     // Load environment variables from .env files
     env: loadEnv('', process.cwd(), ''),
-    exclude: [
-      '.next/',
-      'node_modules/',
-      '.api/',
-      'vitest.setup.ts',
-      '**/*.d.ts',
-      '**/*.config.*'
-    ],
+    exclude: ['.next/', 'node_modules/', '.api/', 'vitest.setup.ts', '**/*.d.ts', '**/*.config.*'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -42,7 +35,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '.prisma-mongo/client': path.resolve(__dirname, './node_modules/.prisma-mongo/client')
+      '.prisma-mongo/client': path.resolve(__dirname, './node_modules/.prisma-mongo/client'),
     },
   },
 })

@@ -1,6 +1,6 @@
 import { FeatureList } from '@/components/Plan'
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 describe('FeatureList', () => {
   it('renders provided features', () => {

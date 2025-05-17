@@ -34,17 +34,22 @@ export const GiftPreview = ({ senderName, giftMessage, quantity }: GiftPreviewPr
     <Card className='w-full md:w-auto'>
       <Title level={4}>Gift Subscription Preview</Title>
       <Paragraph>
-        Here's how your gift will appear in the streamer's Twitch chat and overlay when they receive it:
+        Here's how your gift will appear in the streamer's Twitch chat and overlay when they receive
+        it:
       </Paragraph>
 
       <div className='space-y-6'>
         <div>
-          <Text strong className='mb-2 block'>Twitch Chat</Text>
+          <Text strong className='mb-2 block'>
+            Twitch Chat
+          </Text>
           <TwitchChat responses={[giftChatMessage]} />
         </div>
 
         <div>
-          <Text strong className='mb-2 block'>Stream Overlay</Text>
+          <Text strong className='mb-2 block'>
+            Stream Overlay
+          </Text>
           <div className='rounded-md bg-gray-800 p-2 sm:p-4'>
             <div className='relative h-40 sm:h-52 w-full overflow-hidden flex items-center justify-center'>
               <GiftSubscriptionAlert

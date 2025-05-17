@@ -1,6 +1,5 @@
 import { plans } from '@/components/Billing/BillingPlans'
 
-import { GiftPreview } from './GiftPreview'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { Card } from '@/ui/card'
 import { type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
@@ -8,6 +7,7 @@ import { Alert, App, Button, Form, Input, InputNumber, Space, Tooltip, Typograph
 import { detect } from 'curse-filter'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { GiftPreview } from './GiftPreview'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -188,7 +188,6 @@ export const GiftSubscriptionForm = ({
   }
 
   const displayName = recipientDisplayName || recipientUsername || 'this streamer'
-
 
   return (
     <div className='mx-auto pb-12 flex flex-wrap flex-col gap-4'>

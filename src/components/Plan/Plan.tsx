@@ -1,5 +1,8 @@
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
+import { Settings } from '@/lib/defaultSettings'
 import { isFeatureEnabled } from '@/lib/featureFlags'
+import { fetcher } from '@/lib/fetcher'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   type PricePeriod,
@@ -10,7 +13,7 @@ import {
   gracePeriodPrettyDate,
   isSubscriptionActive,
 } from '@/utils/subscription'
-import { SubscriptionStatus, TransactionType, type SubscriptionTier } from '@prisma/client'
+import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
 import { App, Button, Tooltip, notification } from 'antd'
 import clsx from 'clsx'
 import { Bitcoin, Wallet } from 'lucide-react'
@@ -18,16 +21,12 @@ import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import useSWR from 'swr'
 import CryptoToggle from '../CryptoToggle'
 import ErrorBoundary from '../ErrorBoundary'
 import { Logomark } from '../Logo'
-import { PlanDescription } from '../PlanDescription'
-import { PriceDisplay } from './PriceDisplay'
 import { FeatureList } from './FeatureList'
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { fetcher } from '@/lib/fetcher'
-import useSWR from 'swr'
+import { PriceDisplay } from './PriceDisplay'
 
 // Sparkle animation component with unique IDs
 const CryptoSparkle = ({ visible }: { visible: boolean }) => {
@@ -856,11 +855,7 @@ function Plan({
           hasTrial={hasTrial}
         />
 
-        <FeatureList
-          features={features}
-          featured={featured}
-          payWithCrypto={payWithCrypto}
-        />
+        <FeatureList features={features} featured={featured} payWithCrypto={payWithCrypto} />
 
         {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan ? (
           <Tooltip title='Your credit balance will be automatically applied at checkout'>
