@@ -19,6 +19,7 @@
     "test": "bun run vitest",
     "test:watch": "bun run vitest watch",
     "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' bun run vitest run --coverage",
+    "prepare": "lefthook install",
     "generate:postgres": "bun prisma generate",
     "generate:mongo": "bun prisma generate --schema=./prisma-mongo/schema.prisma",
     "generate:all": "bun run generate:postgres && bun run generate:mongo",
@@ -104,7 +105,8 @@
     "postcss": "^8.5.3",
     "prisma": "^6.6.0",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.1",
+    "lefthook": "^1.5.8"
   },
   "trustedDependencies": [
     "@biomejs/biome",
