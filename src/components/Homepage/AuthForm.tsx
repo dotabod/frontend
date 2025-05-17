@@ -24,14 +24,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             callbackUrl:
               searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
           })
-            .catch((e) => {
-              captureException(e)
-              console.log(e)
-              setIsLoading(false)
-            })
             .then((e) => {
               console.log(e)
             })
+            .catch((e) => {
+              captureException(e)
+              console.log(e)
+            })
+            .finally(() => setIsLoading(false))
         }}
       >
         <span className='space-x-2'>
