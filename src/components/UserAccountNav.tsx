@@ -25,9 +25,10 @@ interface GiftNotification {
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   user: Session['user']
   icon?: React.ReactNode
+  className?: string
 }
 
-const UserButton = ({ user }: UserButtonProps) => {
+const UserButton = ({ user, className }: UserButtonProps) => {
   const [imageLoaded, setImageLoaded] = useState(false)
   const { data, isLoading: isSettingsLoading } = useSWR('/api/settings', fetcher, {
     revalidateIfStale: false,
@@ -152,7 +153,7 @@ const UserButton = ({ user }: UserButtonProps) => {
   }
 
   return (
-    <div className='flex items-center'>
+    <div className={clsx('flex items-center', className)}>
       {/* Notification Bell with Ant Design Popover */}
       <Popover
         trigger='click'
@@ -361,10 +362,14 @@ const UserButton = ({ user }: UserButtonProps) => {
 
 UserButton.displayName = 'UserButton'
 
-export function UserAccountNav() {
+interface UserAccountNavProps {
+  className?: string
+}
+
+export function UserAccountNav({ className }: UserAccountNavProps) {
   const user = useSession()?.data?.user
 
   if (!user) return null
 
-  return <UserButton user={user} />
+  return <UserButton user={user} className={className} />
 }

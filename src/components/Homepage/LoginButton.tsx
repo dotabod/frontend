@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { Button } from 'antd'
 import clsx from 'clsx'
 import { signIn, useSession } from 'next-auth/react'
@@ -18,7 +19,7 @@ export function LoginButton({ className, ...props }: LoginButtonProps) {
   const router = useRouter()
 
   if (user) {
-    return <UserAccountNav user={{ ...user }} className={className} />
+    return <UserAccountNav className={className} />
   }
 
   return (
@@ -31,13 +32,13 @@ export function LoginButton({ className, ...props }: LoginButtonProps) {
           ? signIn('twitch', {
               redirect: false,
               callbackUrl:
-                searchParams.get('from') || searchParams.get('callbackUrl') || '/dashboard',
+                searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
             })
               .then((e) => {
                 console.log(e)
               })
               .catch((e) => {
-                captureException(e)
+                Sentry.captureException(e)
                 console.log(e)
               })
               .finally(() => setLoading(false))

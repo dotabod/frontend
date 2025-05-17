@@ -85,9 +85,7 @@ describe('update-followers API', () => {
     })
 
     // Mock getSession to return null (not authenticated)
-    vi.mocked(getServerSession).mockResolvedValueOnce({
-      user: null,
-    })
+    vi.mocked(getServerSession).mockResolvedValueOnce(null)
 
     await handler(req, res)
 
@@ -104,7 +102,13 @@ describe('update-followers API', () => {
       user: {
         id: 'user-123',
         isImpersonating: true,
+        name: '',
+        image: '',
+        twitchId: '',
+        locale: '',
+        scope: '',
       },
+      expires: '',
     })
 
     await handler(req, res)
@@ -123,7 +127,13 @@ describe('update-followers API', () => {
       user: {
         id: 'user-123',
         isImpersonating: false,
+        name: '',
+        image: '',
+        twitchId: '',
+        locale: '',
+        scope: '',
       },
+      expires: '',
     })
     // Mock getTwitchTokens to return tokens
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
@@ -175,7 +185,13 @@ describe('update-followers API', () => {
       user: {
         id: 'user-123',
         isImpersonating: false,
+        name: '',
+        image: '',
+        twitchId: '',
+        locale: '',
+        scope: '',
       },
+      expires: '',
     })
     // Mock getTwitchTokens to return tokens
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
@@ -209,14 +225,18 @@ describe('update-followers API', () => {
       user: {
         id: 'user-123',
         isImpersonating: false,
+        name: '',
+        image: '',
+        twitchId: '',
+        locale: '',
+        scope: '',
       },
+      expires: '',
     })
-
     // Mock getTwitchTokens to return an error
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
-      providerAccountId: null,
-      accessToken: null,
-      error: 'Failed to get Twitch tokens',
+      message: 'Failed to get Twitch tokens',
+      error: 'Twitch token error',
     })
 
     await handler(req, res)
@@ -242,7 +262,13 @@ describe('update-followers API', () => {
       user: {
         id: 'user-123',
         isImpersonating: false,
+        name: '',
+        image: '',
+        twitchId: '',
+        locale: '',
+        scope: '',
       },
+      expires: '',
     })
 
     // Mock getTwitchTokens to throw an error

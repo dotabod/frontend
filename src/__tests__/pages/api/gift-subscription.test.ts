@@ -77,9 +77,9 @@ describe('Gift Subscription Functions', () => {
 
       // If it's February, the date should be 28, otherwise accept 3 for March
       if (febEnd.getMonth() === 1) {
-        expect(febEnd.getDate()).toBe(28); // February 28
+        expect(febEnd.getDate()).toBe(28) // February 28
       } else {
-        expect(febEnd.getDate()).toBe(3); // March 3
+        expect(febEnd.getDate()).toBe(3) // March 3
       }
 
       // Test with leap year
@@ -92,9 +92,9 @@ describe('Gift Subscription Functions', () => {
 
       // If it's February, date should be 29, otherwise accept 2 for March
       if (leapYearEnd.getMonth() === 1) {
-        expect(leapYearEnd.getDate()).toBe(29); // February 29
+        expect(leapYearEnd.getDate()).toBe(29) // February 29
       } else {
-        expect(leapYearEnd.getDate()).toBe(2); // March 2
+        expect(leapYearEnd.getDate()).toBe(2) // March 2
       }
     })
 
@@ -111,9 +111,9 @@ describe('Gift Subscription Functions', () => {
 
       // The date should be 30 in April, or possibly 1 in May (if overflow happens)
       if (aprEnd.getMonth() === 3) {
-        expect(aprEnd.getDate()).toBe(30); // April 30
+        expect(aprEnd.getDate()).toBe(30) // April 30
       } else {
-        expect(aprEnd.getDate()).toBe(1); // May 1 (overflow)
+        expect(aprEnd.getDate()).toBe(1) // May 1 (overflow)
       }
 
       // March 31 to April 30
@@ -127,9 +127,9 @@ describe('Gift Subscription Functions', () => {
 
       // The date should be 30 in April, or possibly 1 in May (if overflow happens)
       if (apr30End.getMonth() === 3) {
-        expect(apr30End.getDate()).toBe(30); // April 30
+        expect(apr30End.getDate()).toBe(30) // April 30
       } else {
-        expect(apr30End.getDate()).toBe(1); // May 1 (overflow)
+        expect(apr30End.getDate()).toBe(1) // May 1 (overflow)
       }
     })
   })

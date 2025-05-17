@@ -125,6 +125,7 @@ describe('install/[token] API', () => {
     } as Session)
     // Use proper type for subscription
     vi.mocked(getSubscription).mockResolvedValue({
+      id: 'subscription-id',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
@@ -135,6 +136,8 @@ describe('install/[token] API', () => {
       transactionType: 'RECURRING' as const,
       isGift: false,
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValue({
@@ -169,6 +172,7 @@ describe('install/[token] API', () => {
     } as Session)
     // Use proper type for subscription
     vi.mocked(getSubscription).mockResolvedValue({
+      id: 'subscription-id',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
@@ -179,6 +183,8 @@ describe('install/[token] API', () => {
       transactionType: 'RECURRING' as const,
       isGift: false,
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValue({
@@ -221,6 +227,7 @@ describe('install/[token] API', () => {
 
     // Use proper type for subscription
     vi.mocked(getSubscription).mockResolvedValue({
+      id: 'subscription-id',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
@@ -231,6 +238,8 @@ describe('install/[token] API', () => {
       transactionType: 'RECURRING' as const,
       isGift: false,
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValue({
@@ -258,6 +267,7 @@ describe('install/[token] API', () => {
       stream_start_date: null,
       beta_tester: false,
       kick: null,
+      proExpiration: null,
     })
 
     await handler(req, res)
@@ -322,6 +332,7 @@ describe('install/[token] API', () => {
 
     // Use proper type for subscription
     vi.mocked(getSubscription).mockResolvedValue({
+      id: 'subscription-id',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
@@ -332,6 +343,8 @@ describe('install/[token] API', () => {
       transactionType: 'RECURRING' as const,
       isGift: false,
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValue({
@@ -359,6 +372,7 @@ describe('install/[token] API', () => {
       stream_start_date: null,
       beta_tester: false,
       kick: null,
+      proExpiration: null,
     })
 
     await handler(req, res)

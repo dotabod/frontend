@@ -168,6 +168,7 @@ describe('subscription/by-username API', () => {
       cancelAtPeriodEnd: false,
       giftDetails: null,
       metadata: {},
+      isGift: false,
     })
 
     // Mock not in grace period
@@ -232,6 +233,7 @@ describe('subscription/by-username API', () => {
       cancelAtPeriodEnd: false,
       giftDetails: null,
       metadata: {},
+      isGift: false,
     })
 
     // Mock not in grace period
@@ -283,7 +285,7 @@ describe('subscription/by-username API', () => {
     })
     // Mock gift PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
-      id: 'sub-123',
+      id: 'sub_123',
       tier: SUBSCRIPTION_TIERS.PRO,
       status: 'ACTIVE',
       stripeSubscriptionId: null,
@@ -300,6 +302,7 @@ describe('subscription/by-username API', () => {
         giftQuantity: 1,
       },
       metadata: {},
+      isGift: false,
     })
 
     // Mock not in grace period
@@ -363,6 +366,7 @@ describe('subscription/by-username API', () => {
       createdAt: new Date(),
       giftDetails: null,
       metadata: {},
+      isGift: false,
     })
 
     // Mock in grace period

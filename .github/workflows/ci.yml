@@ -18,5 +18,7 @@ jobs:
         run: bun install --no-progress --frozen-lockfile
       - name: Run Biome
         run: biome ci .
+      - name: Run TypeScript type check
+        run: bun run typecheck
       - name: Run tests
         run: bun run test

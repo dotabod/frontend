@@ -117,7 +117,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         twitchId: 'twitch-123',
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -155,7 +155,7 @@ describe('update-emote-set API', () => {
         image: 'image-url',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -163,6 +163,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'FREE',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -173,6 +174,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -198,7 +201,7 @@ describe('update-emote-set API', () => {
         image: 'image-url',
         isImpersonating: false,
         twitchId: '',
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -206,6 +209,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -216,6 +220,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -241,7 +247,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -249,6 +255,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -259,6 +266,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -289,7 +298,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -297,6 +306,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -307,6 +317,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -338,7 +350,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -346,6 +358,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -356,6 +369,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -383,7 +398,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -391,6 +406,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -401,6 +417,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -434,7 +452,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -442,6 +460,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -452,6 +471,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -501,7 +522,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -509,6 +530,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -519,6 +541,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -582,7 +606,7 @@ describe('update-emote-set API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -590,6 +614,7 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      id: 'subscription-123',
       tier: 'PRO',
       stripeCustomerId: null,
       stripePriceId: null,
@@ -600,6 +625,8 @@ describe('update-emote-set API', () => {
       isGift: false,
       transactionType: 'RECURRING',
       createdAt: new Date(),
+      giftDetails: null,
+      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({

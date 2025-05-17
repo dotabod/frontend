@@ -137,7 +137,7 @@ describe('Dashboard Billing Page', () => {
           image: 'https://example.com/avatar.png',
           isImpersonating: false,
           twitchId: '',
-          role: 'USER',
+          role: 'user',
           locale: 'en',
           scope: '',
         },
