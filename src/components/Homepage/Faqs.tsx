@@ -70,11 +70,7 @@ const faqs = [
 
 export const Faqs: FC = () => {
   return (
-    <section
-      id='faqs'
-      aria-labelledby='faqs-title'
-      className='border-t border-gray-500 py-20'
-    >
+    <section id='faqs' aria-labelledby='faqs-title' className='border-t border-gray-500 py-20'>
       <Container>
         <div className='mx-auto max-w-2xl lg:mx-0'>
           <h2 id='faqs-title' className='text-3xl font-medium tracking-tight text-gray-200'>

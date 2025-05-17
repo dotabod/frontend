@@ -35,7 +35,9 @@ describe('Banner', () => {
   it('renders the banner when date is before grace period end', () => {
     render(<Banner />)
 
-    expect(screen.getByText('Dotabod is experiencing a temporary service disruption until April 6.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Dotabod is experiencing a temporary service disruption until April 6.'),
+    ).toBeInTheDocument()
     expect(screen.getByText('Learn More')).toBeInTheDocument()
     expect(screen.getByText('Learn More').closest('a')).toHaveAttribute(
       'href',
@@ -59,6 +61,8 @@ describe('Banner', () => {
     fireEvent.click(dismissButton)
 
     // Banner should be hidden after clicking dismiss
-    expect(screen.queryByText('Dotabod is experiencing a temporary service disruption until April 6.')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Dotabod is experiencing a temporary service disruption until April 6.'),
+    ).not.toBeInTheDocument()
   })
 })

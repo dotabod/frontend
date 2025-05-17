@@ -7,9 +7,7 @@ vi.mock('@/components/Overlay/GiftAlert/GiftSubscriptionAlert', () => ({
 }))
 
 vi.mock('@/components/TwitchChat', () => ({
-  default: ({ responses }: { responses: React.ReactNode[] }) => (
-    <div>{responses}</div>
-  ),
+  default: ({ responses }: { responses: React.ReactNode[] }) => <div>{responses}</div>,
 }))
 
 describe('GiftPreview', () => {
