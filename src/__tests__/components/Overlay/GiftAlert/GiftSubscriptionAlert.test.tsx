@@ -8,6 +8,8 @@ describe('GiftSubscriptionAlert', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllTimers()
     vi.restoreAllMocks()
     cleanup()
   })
