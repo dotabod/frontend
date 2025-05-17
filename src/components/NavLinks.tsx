@@ -19,7 +19,7 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
     setIsMounted(true)
   }, [])
 
-  const additional = []
+  const additional: Array<[string, string, string?]> = []
   if (bottom) {
     additional.push(['Privacy Policy', '/privacy-policy'])
     additional.push(['Terms of Service', '/terms-of-service'])
@@ -31,14 +31,14 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
     ['Pricing', '/#pricing'],
     ['Blog', '/blog'],
     ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
-    ['Contact Us', '/contact', 'Contact Dotabod'],
+    ['Contact Us', '/contact'],
     ...additional,
   ].map(([label, href, tooltip], index) => {
     const isGiftLink = label === 'Gift Pro'
     const uniqueKey = `navlink-${label.replace(/\s+/g, '-').toLowerCase()}`
 
     return (
-      <Tooltip key={uniqueKey} title={tooltip} disabled={!tooltip} position='top'>
+      <Tooltip key={uniqueKey} title={tooltip} placement='top'>
         <Link
           href={href}
           target={href.startsWith('http') ? '_blank' : undefined}

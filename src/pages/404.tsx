@@ -19,7 +19,7 @@ const NotFound: NextPageWithLayout = () => {
     ['FAQs', '/#faqs'],
     ['Blog', '/blog'],
     ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
-    ['Contact Us', '/contact', 'Contact Dotabod'],
+    ['Contact Us', '/contact'],
   ]
 
   // Additional helpful links

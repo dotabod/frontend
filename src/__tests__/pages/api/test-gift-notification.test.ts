@@ -78,6 +78,7 @@ describe('test-gift-notification API', () => {
       giftQuantity: 1,
       createdAt: mockDate,
       updatedAt: mockDate,
+      gifterId: null,
     })
 
     vi.mocked(prisma.notification.create).mockResolvedValue({
@@ -128,7 +129,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['user'],
+        role: 'user',
         locale: 'en',
         scope: 'user',
       },
@@ -154,7 +155,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['admin'],
+        role: 'admin',
         locale: 'en',
         scope: 'user',
       },
@@ -185,7 +186,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['admin'],
+        role: 'admin',
         locale: 'en',
         scope: 'user',
       },
@@ -219,7 +220,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['admin'],
+        role: 'admin',
         locale: 'en',
         scope: 'user',
       },
@@ -236,6 +237,7 @@ describe('test-gift-notification API', () => {
       giftQuantity: 2,
       createdAt: mockDate,
       updatedAt: mockDate,
+      gifterId: null,
     })
 
     const { req, res } = createMocks({
@@ -271,7 +273,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['admin'],
+        role: 'admin',
         locale: 'en',
         scope: 'user',
       },
@@ -288,6 +290,7 @@ describe('test-gift-notification API', () => {
       giftQuantity: 1,
       createdAt: mockDate,
       updatedAt: mockDate,
+      gifterId: null,
     })
     vi.mocked(prisma.subscription.findMany).mockResolvedValue([
       {
@@ -349,7 +352,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['admin'],
+        role: 'admin',
         locale: 'en',
         scope: 'user',
       },
@@ -375,6 +378,7 @@ describe('test-gift-notification API', () => {
       createdAt: mockDate,
       updatedAt: mockDate,
       isGift: true,
+      metadata: null,
     })
 
     vi.mocked(prisma.giftSubscription.create).mockResolvedValue({
@@ -386,6 +390,7 @@ describe('test-gift-notification API', () => {
       giftQuantity: 1,
       createdAt: mockDate,
       updatedAt: mockDate,
+      gifterId: null,
     })
 
     const { req, res } = createMocks({
@@ -412,7 +417,7 @@ describe('test-gift-notification API', () => {
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
         twitchId: 'twitch-123',
-        role: ['admin'],
+        role: 'admin',
         locale: 'en',
         scope: 'user',
       },

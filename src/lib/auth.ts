@@ -5,7 +5,7 @@ import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { captureException } from '@sentry/nextjs'
 import type { NextAuthOptions } from 'next-auth'
-import { decode, encode } from 'next-auth/jwt'
+import { type JWT, decode, encode } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
@@ -244,7 +244,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         const encryptedId = await encode({
           token: {
-            image: token.picture ?? '',
+            image: token.picture ?? token.image ?? '',
             name: '',
             id: token.id,
             isImpersonating: token.isImpersonating,
@@ -261,7 +261,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token?.isImpersonating ? encryptedId : token.id
         session.user.name = token.name
         session.user.email = token?.isImpersonating ? '' : token.email
-        session.user.image = token.picture ?? ''
+        session.user.image = token.picture ?? token.image ?? ''
         session.user.scope = token.scope
       }
 
@@ -433,17 +433,19 @@ export const authOptions: NextAuthOptions = {
         })
       }
 
-      return {
+      const result = {
         locale: provider?.locale,
-        twitchId: twitchId,
+        twitchId: String(twitchId),
         id: user.id,
         name: newUser.displayName || newUser.name,
         email: newUser.email,
-        picture: newUser.image,
+        image: newUser.image || '',
         isImpersonating,
         role: roleFromScopes,
         scope: scopesToUpdate,
       }
+
+      return result as JWT
     },
   },
 }
