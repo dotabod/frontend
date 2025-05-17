@@ -20,7 +20,6 @@ import {
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import axios from 'axios'
-import { format } from 'date-fns'
 import dayjs from 'dayjs'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
@@ -182,7 +181,7 @@ const AdminPage = () => {
       title: 'Send At',
       dataIndex: 'sendAt',
       key: 'sendAt',
-      render: (text) => (text ? format(new Date(text), 'PPpp') : 'When online'),
+      render: (text) => (text ? dayjs(text).format('YYYY-MM-DD HH:mm:ss') : 'When online'),
     },
     {
       title: 'Recipient',
