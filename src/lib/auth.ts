@@ -8,6 +8,7 @@ import { decode, encode } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
+import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 
 const extractCookieValue = (
   cookieHeader: string | string[] | undefined,
@@ -269,7 +270,6 @@ export const authOptions: NextAuthOptions = {
 
       return session
     },
-    // @ts-ignore
     async jwt({ token, account, user, profile }) {
       // Save a db lookup
       if (token.id) return token
@@ -282,19 +282,23 @@ export const authOptions: NextAuthOptions = {
         return token
       }
 
+      const twitchProfile = profile as TwitchProfile | undefined
+      const twitchUser = user as TwitchUser
+
       const newUser = {
-        email: profile?.email || user.email,
-        // @ts-ignore from twitch?
-        name: profile?.preferred_username || user.name || user.displayName,
+        email: twitchProfile?.email ?? twitchUser.email,
+        name:
+          twitchProfile?.preferred_username ??
+          twitchUser.name ??
+          twitchUser.displayName ??
+          '',
         displayName:
-          // @ts-ignore from twitch?
-          profile?.preferred_username ||
-          // @ts-ignore from twitch?
-          user.displayName ||
-          token.name ||
-          user.name,
-        // @ts-ignore from twitch?
-        image: profile?.picture || user.image,
+          twitchProfile?.preferred_username ??
+          twitchUser.displayName ??
+          token.name ??
+          twitchUser.name ??
+          '',
+        image: twitchProfile?.picture ?? twitchUser.image,
       }
 
       const provider = await prisma.user.findFirst({
