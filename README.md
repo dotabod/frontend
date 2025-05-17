@@ -21,19 +21,19 @@ Dotabod is a platform designed to enhance the experience of Dota 2 streamers and
 1. Install dependencies
 
   ```bash
-  yarn install
+  bun install
   ```
 
 1. Setup your postgres database
 
   ```bash
-  yarn prisma db push
+  bun prisma db push
   ```
 
 1. Start the development server
 
   ```bash
-  yarn dev
+  bun run dev
   ```
 
 1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
