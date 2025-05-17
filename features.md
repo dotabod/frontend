@@ -29,6 +29,7 @@ Semi-transparent blocker that auto places itself over your minimap to deter peop
 - Right side minimap
 - Battlepass hud
 - Complex minimap option
+- Minimap opacity control
 
 ## Picks
 

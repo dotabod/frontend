@@ -21,6 +21,7 @@ function Minimap({ block }: { block: blockType }) {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
+  const { data: fogOpacity } = useUpdateSetting<number>(Settings['minimap-opacity'])
 
   const isPreview = useSelector(selectIsPreview)
   const settings = useSelector(selectSettings)
@@ -46,7 +47,7 @@ function Minimap({ block }: { block: blockType }) {
           isPreview ? preview : '',
         ].join(' ')}
       >
-        <div className={fog} />
+        <div className={fog} style={{ ['--minimap-opacity' as any]: fogOpacity }} />
 
         {buildings.map((building, index) => (
           <Building team={block?.team} data={building} key={`minimap-building-${index}`} />

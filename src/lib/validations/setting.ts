@@ -82,6 +82,7 @@ const settingsSchema = {
   rosh: z.boolean(),
   'minimap-simple': z.boolean(),
   'minimap-xl': z.boolean(),
+  'minimap-opacity': z.number().min(0).max(1),
   onlyParty: z.boolean(),
   livePolls: z.boolean(),
   streamDelay: z.number().min(0).max(300000),

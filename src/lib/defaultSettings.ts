@@ -126,6 +126,7 @@ export const defaultSettings = {
   rosh: true,
   'minimap-simple': false,
   'minimap-xl': false,
+  'minimap-opacity': 0.25,
   onlyParty: false,
   livePolls: true,
   streamDelay: 0,

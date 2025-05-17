@@ -13,6 +13,7 @@ import Minimap from '../minimap'
 const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
+  const { data: opacityLevel } = useUpdateSetting<number>(Settings['minimap-opacity'])
   const res = useTransformRes({ returnInput: false })
 
   return (
@@ -42,6 +43,9 @@ const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
       src={`/images/overlay/minimap/738-${isSimple ? 'Simple' : 'Complex'}-${
         isXL ? 'X' : ''
       }Large-AntiStreamSnipeMap.png`}
+      style={{
+        opacity: opacityLevel ?? 0.25,
+      }}
     />
   )
 }
