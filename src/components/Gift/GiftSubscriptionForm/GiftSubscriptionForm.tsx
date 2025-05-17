@@ -1,6 +1,6 @@
 import { plans } from '@/components/Billing/BillingPlans'
-import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscriptionAlert'
-import TwitchChat from '@/components/TwitchChat'
+
+import { GiftPreview } from './GiftPreview'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { Card } from '@/ui/card'
 import { type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
@@ -189,25 +189,6 @@ export const GiftSubscriptionForm = ({
 
   const displayName = recipientDisplayName || recipientUsername || 'this streamer'
 
-  // Create gift message preview for Twitch chat
-  const giftChatMessage = (
-    <>
-      {senderName === 'Anonymous' ? (
-        <span className='space-x-1'>
-          <span>A gift sub for Dotabod Pro was just gifted anonymously!</span>
-          {giftMessage && <span>{giftMessage}</span>}
-        </span>
-      ) : (
-        <span className='space-x-1'>
-          <span>
-            A gift sub for Dotabod Pro was just gifted by{' '}
-            <span className='text-purple-400 font-semibold'>{senderName}</span>!
-          </span>
-          {giftMessage && <span>{giftMessage}</span>}
-        </span>
-      )}
-    </>
-  )
 
   return (
     <div className='mx-auto pb-12 flex flex-wrap flex-col gap-4'>
@@ -387,40 +368,7 @@ export const GiftSubscriptionForm = ({
             </Form.Item>
           </Form>
         </Card>
-        <Card className='w-full md:w-auto'>
-          <Title level={4}>Gift Subscription Preview</Title>
-          <Paragraph>
-            Here's how your gift will appear in the streamer's Twitch chat and overlay when they
-            receive it:
-          </Paragraph>
-
-          <div className='space-y-6'>
-            <div>
-              <Text strong className='mb-2 block'>
-                Twitch Chat
-              </Text>
-              <TwitchChat responses={[giftChatMessage]} />
-            </div>
-
-            <div>
-              <Text strong className='mb-2 block'>
-                Stream Overlay
-              </Text>
-              <div className='rounded-md bg-gray-800 p-2 sm:p-4'>
-                <div className='relative h-40 sm:h-52 w-full overflow-hidden flex items-center justify-center'>
-                  <GiftSubscriptionAlert
-                    senderName={senderName}
-                    giftType='monthly'
-                    giftQuantity={quantity}
-                    giftMessage={giftMessage}
-                    preview={true}
-                    className=''
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
+        <GiftPreview senderName={senderName} giftMessage={giftMessage} quantity={quantity} />
       </div>
 
       <div className='max-w-5xl w-full flex flex-col justify-center gap-4 self-center px-4 md:px-0'>
