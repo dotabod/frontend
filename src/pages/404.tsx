@@ -12,7 +12,7 @@ type NavLinkItem = [string, string, string?]
 const NotFound: NextPageWithLayout = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
-  // Using the same navigation links as in NavLinks.jsx
+  // Using the same navigation links as in NavLinks.tsx
   const mainNavLinks: NavLinkItem[] = [
     ['Features', '/#features'],
     ['Pricing', '/#pricing'],

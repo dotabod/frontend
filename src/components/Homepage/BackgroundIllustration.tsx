@@ -1,4 +1,6 @@
-export function BackgroundIllustration(props) {
+import type { HTMLAttributes } from 'react'
+
+export function BackgroundIllustration(props: HTMLAttributes<HTMLDivElement>) {
   // Use static IDs for the gradients
   const gradientId1 = 'bg-gradient-1'
   const gradientId2 = 'bg-gradient-2'

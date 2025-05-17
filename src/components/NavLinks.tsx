@@ -3,11 +3,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { GiftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import type { FC } from 'react'
 
-export function NavLinks({ bottom = false }) {
+interface NavLinksProps {
+  bottom?: boolean
+}
+
+export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
   // Only track hover state on client-side
   const [isMounted, setIsMounted] = useState(false)
-  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   // Ensure animations only happen client-side
   useEffect(() => {

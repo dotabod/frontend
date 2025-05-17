@@ -1,7 +1,11 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 
-export default function ModImage({ className = '' }) {
+interface ModImageProps {
+  className?: string
+}
+
+export default function ModImage({ className = '' }: ModImageProps) {
   return (
     <Image
       height={18}
