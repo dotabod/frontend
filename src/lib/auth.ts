@@ -9,11 +9,24 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
 
-const extractCookieValue = (cookieHeader: string | string[], name: string) => {
+const extractCookieValue = (
+  cookieHeader: string | string[] | undefined,
+  name: string,
+) => {
+  if (!cookieHeader) return ''
+
   const cookieStringFull = Array.isArray(cookieHeader)
     ? cookieHeader.find((header) => header.includes(name))
     : cookieHeader
-  return name + cookieStringFull?.split(name)[1].split(';')[0]
+
+  if (!cookieStringFull) return ''
+
+  const match = cookieStringFull
+    .split(';')
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${name}=`))
+
+  return match ?? ''
 }
 
 if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
