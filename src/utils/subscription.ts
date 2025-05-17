@@ -93,6 +93,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   livePolls: SUBSCRIPTION_TIERS.PRO,
   'minimap-simple': SUBSCRIPTION_TIERS.PRO,
   'minimap-xl': SUBSCRIPTION_TIERS.FREE,
+  'minimap-opacity': SUBSCRIPTION_TIERS.PRO,
   notablePlayersOverlay: SUBSCRIPTION_TIERS.PRO,
   notablePlayersOverlayFlags: SUBSCRIPTION_TIERS.PRO,
   notablePlayersOverlayFlagsCmd: SUBSCRIPTION_TIERS.PRO,

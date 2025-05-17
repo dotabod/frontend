@@ -4,6 +4,7 @@ import { Card } from '@/ui/card'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { TierBadge } from './TierBadge'
+import { TierNumber } from './TierNumber'
 import { TierSwitch } from './TierSwitch'
 
 export default function MinimapCard(): React.ReactNode {
@@ -92,6 +93,16 @@ export default function MinimapCard(): React.ReactNode {
             <span>Simple minimap</span>
           </div>
         </div>
+      </div>
+
+      <div className='mt-6'>
+        <TierNumber
+          settingKey={Settings['minimap-opacity']}
+          min={0}
+          max={1}
+          step={0.05}
+          label='Minimap opacity'
+        />
       </div>
     </Card>
   )
