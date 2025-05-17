@@ -58,13 +58,13 @@ export default function MinimapCard(): React.ReactNode {
     if (localOpacity >= 0.95) {
       return 'Maximum protection: Minimap completely hidden from viewers'
     }
-    if (localOpacity >= 0.80) {
+    if (localOpacity >= 0.8) {
       return 'High protection: Most minimap details are hidden from viewers'
     }
-    if (localOpacity >= 0.70) {
+    if (localOpacity >= 0.7) {
       return "Optimal setting: Chat can see hero positions but snipers can't see wards"
     }
-    if (localOpacity >= 0.50) {
+    if (localOpacity >= 0.5) {
       return 'Medium protection: Some minimap details visible but wards are hidden'
     }
     return 'Low protection: Minimap is mostly visible to viewers'

@@ -44,7 +44,7 @@ const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
         isXL ? 'X' : ''
       }Large-AntiStreamSnipeMap.png`}
       style={{
-        opacity: opacityLevel ?? 0.70,
+        opacity: opacityLevel ?? 0.7,
       }}
     />
   )
