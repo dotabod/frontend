@@ -1,13 +1,13 @@
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+import { Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { TierBadge } from './TierBadge'
 import { TierSlider } from './TierSlider'
 import { TierSwitch } from './TierSwitch'
-import { Tag } from 'antd'
 
 export default function MinimapCard(): React.ReactNode {
   const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
@@ -56,18 +56,18 @@ export default function MinimapCard(): React.ReactNode {
   // Get description text based on opacity value
   const getOpacityDescription = () => {
     if (localOpacity >= 0.95) {
-      return "Maximum protection: Minimap completely hidden from viewers"
+      return 'Maximum protection: Minimap completely hidden from viewers'
     }
     if (localOpacity >= 0.75) {
-      return "High protection: Most minimap details are hidden from viewers"
+      return 'High protection: Most minimap details are hidden from viewers'
     }
     if (localOpacity >= 0.5) {
-      return "Medium protection: Some minimap details visible but wards are hidden"
+      return 'Medium protection: Some minimap details visible but wards are hidden'
     }
     if (localOpacity >= 0.25) {
       return "Optimal setting: Chat can see hero positions but snipers can't see wards"
     }
-    return "Low protection: Minimap is mostly visible to viewers"
+    return 'Low protection: Minimap is mostly visible to viewers'
   }
 
   return (
@@ -93,9 +93,9 @@ export default function MinimapCard(): React.ReactNode {
           max={1}
           step={0.05}
           label={
-            <span className="flex items-center gap-2">
+            <span className='flex items-center gap-2'>
               Blocker intensity
-              <Tag color="green">New</Tag>
+              <Tag color='green'>New</Tag>
             </span>
           }
           onChange={handleOpacityChange}
@@ -127,7 +127,6 @@ export default function MinimapCard(): React.ReactNode {
           <span>Complex minimap</span>
         </div>
 
-
         <div className='flex flex-col items-center space-y-4'>
           <Image
             className={clsx(
@@ -149,7 +148,6 @@ export default function MinimapCard(): React.ReactNode {
           </div>
         </div>
       </div>
-
     </Card>
   )
 }

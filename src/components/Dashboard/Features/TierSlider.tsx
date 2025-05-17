@@ -76,7 +76,7 @@ export function TierSlider({
   return (
     <div className={`space-y-1 ${className ?? ''}`}>
       {label && (
-        <div className="flex items-center">
+        <div className='flex items-center'>
           <label htmlFor={sliderId} className='block text-sm'>
             {label}
           </label>
@@ -87,7 +87,7 @@ export function TierSlider({
           )}
         </div>
       )}
-      <div className="py-2">
+      <div className='py-2'>
         <Slider
           id={sliderId}
           value={localValue}
