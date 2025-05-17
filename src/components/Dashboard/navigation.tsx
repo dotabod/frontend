@@ -53,6 +53,7 @@ export const navigation = [
       {
         name: 'Overlay',
         href: '/dashboard/features/overlay',
+        new: true,
       },
       {
         name: 'Chat',
@@ -61,7 +62,6 @@ export const navigation = [
       {
         name: 'Notable Players',
         href: '/dashboard/notable-players',
-        new: true,
       },
       {
         name: 'Advanced',
