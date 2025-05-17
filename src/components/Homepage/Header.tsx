@@ -2,6 +2,7 @@ import { Popover, PopoverButton } from '@headlessui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GiftIcon } from 'lucide-react'
 import Link from 'next/link'
+import type { FC } from 'react'
 
 import { Container } from 'src/components/Container'
 import { Logo } from 'src/components/Logo'
@@ -11,7 +12,7 @@ import { LoginButton } from './LoginButton'
 import { MenuIcon } from './MenuIcon'
 import { MobileNavLink } from './MobileNavLink'
 
-export function Header() {
+export const Header: FC = () => {
   return (
     <header className='bg-gray-800'>
       <nav>

@@ -1,7 +1,10 @@
 import { PopoverButton } from '@headlessui/react'
 import Link from 'next/link'
+import type { ComponentProps } from 'react'
 
-export function MobileNavLink({ children, ...props }) {
+interface MobileNavLinkProps extends ComponentProps<typeof Link> {}
+
+export function MobileNavLink({ children, ...props }: MobileNavLinkProps) {
   return (
     <PopoverButton
       as={Link}

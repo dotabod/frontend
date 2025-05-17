@@ -1,4 +1,12 @@
-export function CircleBackground({ color, width = 558, height = 558, ...props }) {
+import type { SVGProps } from 'react'
+
+interface CircleBackgroundProps extends SVGProps<SVGSVGElement> {
+  color: string
+  width?: number
+  height?: number
+}
+
+export function CircleBackground({ color, width = 558, height = 558, ...props }: CircleBackgroundProps) {
   // Use a static ID for the gradient
   const id = 'circle-gradient-static'
 

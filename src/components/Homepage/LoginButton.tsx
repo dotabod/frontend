@@ -4,9 +4,14 @@ import { signIn, useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import type { ComponentProps } from 'react'
 import { UserAccountNav } from '../UserAccountNav'
 
-export function LoginButton({ className, ...props }) {
+interface LoginButtonProps extends ComponentProps<typeof Button> {
+  className?: string
+}
+
+export function LoginButton({ className, ...props }: LoginButtonProps) {
   const searchParams = useSearchParams()
   const user = useSession()?.data?.user
   const [loading, setLoading] = useState(false)
