@@ -1,0 +1,13 @@
+import { FeatureList } from '@/components/Plan'
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+
+describe('FeatureList', () => {
+  it('renders provided features', () => {
+    const features = ['One', 'Two']
+    render(<FeatureList features={features} featured={false} payWithCrypto={false} />)
+
+    expect(screen.getByText('One')).toBeInTheDocument()
+    expect(screen.getByText('Two')).toBeInTheDocument()
+  })
+})

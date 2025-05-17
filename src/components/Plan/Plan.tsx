@@ -13,15 +13,17 @@ import {
 import { SubscriptionStatus, TransactionType, type SubscriptionTier } from '@prisma/client'
 import { App, Button, Tooltip, notification } from 'antd'
 import clsx from 'clsx'
-import { Bitcoin, CheckIcon, Wallet } from 'lucide-react'
+import { Bitcoin, Wallet } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import CryptoToggle from './CryptoToggle'
-import ErrorBoundary from './ErrorBoundary'
-import { Logomark } from './Logo'
-import { PlanDescription } from './PlanDescription'
+import CryptoToggle from '../CryptoToggle'
+import ErrorBoundary from '../ErrorBoundary'
+import { Logomark } from '../Logo'
+import { PlanDescription } from '../PlanDescription'
+import { PriceDisplay } from './PriceDisplay'
+import { FeatureList } from './FeatureList'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { fetcher } from '@/lib/fetcher'
@@ -841,97 +843,24 @@ function Plan({
           )}
         </h3>
 
-        {/* Price display with transitions */}
-        <div className='relative mt-5'>
-          <p
-            className={clsx(
-              'flex text-4xl font-bold tracking-tight',
-              featured ? 'text-white' : 'text-gray-100',
-              payWithCrypto && 'crypto-price',
-            )}
-          >
-            {price.monthly === price.annual ? (
-              price.monthly
-            ) : (
-              <>
-                <span
-                  aria-hidden={activePeriod === 'annual' || activePeriod === 'lifetime'}
-                  className={clsx(
-                    'transition duration-300',
-                    (activePeriod === 'annual' || activePeriod === 'lifetime') &&
-                      'pointer-events-none translate-x-6 opacity-0 select-none',
-                  )}
-                >
-                  {price.monthly}
-                  <span className='text-sm'> / month</span>
-                </span>
-                <span
-                  aria-hidden={activePeriod !== 'annual'}
-                  className={clsx(
-                    'absolute top-0 left-0 transition duration-300',
-                    activePeriod === 'annual'
-                      ? 'translate-x-0 opacity-100'
-                      : 'pointer-events-none -translate-x-6 opacity-0 select-none',
-                  )}
-                >
-                  {price.annual}
-                  <span className='text-sm'> / year</span>
-                </span>
-                <span
-                  aria-hidden={activePeriod !== 'lifetime'}
-                  className={clsx(
-                    'absolute top-0 left-0 transition duration-300',
-                    activePeriod === 'lifetime'
-                      ? 'translate-x-0 opacity-100'
-                      : 'pointer-events-none -translate-x-6 opacity-0 select-none',
-                  )}
-                >
-                  {price.lifetime}
-                  <span className='text-sm'> one-time</span>
-                </span>
-              </>
-            )}
-          </p>
-        </div>
+        <PriceDisplay
+          price={price}
+          activePeriod={activePeriod}
+          savings={savings}
+          tier={tier}
+          featured={featured}
+          payWithCrypto={payWithCrypto}
+          description={description}
+          hasCreditBalance={hasCreditBalance}
+          formattedCreditBalance={formattedCreditBalance}
+          hasTrial={hasTrial}
+        />
 
-        {activePeriod === 'annual' && !Number.isNaN(savings) && (
-          <p className={clsx('-mt-10 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-            Saving {savings}%
-          </p>
-        )}
-        <p className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-          <PlanDescription
-            tier={tier}
-            activePeriod={activePeriod}
-            payWithCrypto={payWithCrypto}
-            description={description}
-            hasCreditBalance={hasCreditBalance}
-            formattedCreditBalance={formattedCreditBalance}
-            hasTrial={hasTrial}
-          />
-        </p>
-
-        <div className='order-last mt-6'>
-          <ol
-            className={clsx(
-              '-my-2 divide-y text-sm',
-              featured ? 'divide-gray-700/50 text-gray-300' : 'divide-gray-700/30 text-gray-300',
-            )}
-          >
-            {features.map((feature, index) => (
-              <li key={index} className='flex py-2'>
-                <CheckIcon
-                  className={clsx(
-                    'h-6 w-6 flex-none',
-                    featured ? 'text-purple-400' : 'text-purple-500',
-                    payWithCrypto && 'crypto-check animate-pulse-soft',
-                  )}
-                />
-                <span className='ml-4'>{feature}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <FeatureList
+          features={features}
+          featured={featured}
+          payWithCrypto={payWithCrypto}
+        />
 
         {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && !hasActivePlan ? (
           <Tooltip title='Your credit balance will be automatically applied at checkout'>
