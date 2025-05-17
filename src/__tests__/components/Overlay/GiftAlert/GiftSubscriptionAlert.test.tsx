@@ -49,7 +49,7 @@ describe('GiftSubscriptionAlert', () => {
       />,
     )
 
-    expect(screen.getByText('"Enjoy your subscription!"')).toBeInTheDocument()
+    expect(screen.getByText('Enjoy your subscription!')).toBeInTheDocument()
   })
 
   it('calls onComplete callback after timeout', () => {

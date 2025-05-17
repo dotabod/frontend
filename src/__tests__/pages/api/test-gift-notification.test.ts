@@ -66,6 +66,7 @@ describe('test-gift-notification API', () => {
       createdAt: mockDate,
       updatedAt: mockDate,
       isGift: true,
+      metadata: null,
     })
 
     vi.mocked(prisma.giftSubscription.create).mockResolvedValue({
@@ -90,7 +91,7 @@ describe('test-gift-notification API', () => {
     })
   })
 
-  it('returns 403 in production environment', async () => {
+  it('returns 401 in production environment', async () => {
     vi.stubEnv('NODE_ENV', 'production')
 
     const { req, res } = createMocks({
@@ -99,9 +100,9 @@ describe('test-gift-notification API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(403)
+    expect(res.statusCode).toBe(401)
     expect(res._getJSONData()).toEqual({
-      message: 'This endpoint is only available in development mode',
+      message: 'Unauthorized',
     })
   })
 

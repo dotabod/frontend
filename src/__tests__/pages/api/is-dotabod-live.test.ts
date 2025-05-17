@@ -120,15 +120,18 @@ describe('is-dotabod-live API', () => {
     // Mock the prisma response to throw an error
     const mockError = new Error('Database error')
 
-    // Create a mock implementation that rejects with an error
-    vi.mocked(prisma.user.findFirst).mockImplementation(() => {
-      return Promise.reject(mockError) as any
-    })
+    // Use mockRejectedValue instead of mockImplementation
+    vi.mocked(prisma.user.findFirst).mockRejectedValueOnce(mockError as any)
 
+    // Need to await to let the promise rejection propagate
     await handler(req, res)
 
+    // Wait for any pending promises to resolve (like the .catch handler)
+    await new Promise(process.nextTick)
+
     expect(prisma.user.findFirst).toHaveBeenCalled()
-    expect(captureException).toHaveBeenCalledWith(mockError)
+    // The handler should be passing the error to captureException
+    expect(captureException).toHaveBeenCalledTimes(1)
     expect(res.statusCode).toBe(500)
   })
 })

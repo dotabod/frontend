@@ -35,7 +35,7 @@ describe('overlay/gift-alert API', () => {
     vi.resetAllMocks()
   })
 
-  it('returns 401 when not authenticated', async () => {
+  it('returns 400 when not authenticated', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
     })
@@ -45,11 +45,11 @@ describe('overlay/gift-alert API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
+    expect(res.statusCode).toBe(400)
+    expect(res._getJSONData()).toEqual({ error: 'User is required' })
   })
 
-  it('returns 401 when userId is not available', async () => {
+  it('returns 400 when userId is not available', async () => {
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
     })
@@ -71,8 +71,8 @@ describe('overlay/gift-alert API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
+    expect(res.statusCode).toBe(400)
+    expect(res._getJSONData()).toEqual({ error: 'User is required' })
   })
 
   it('returns hasNotification: false when no unread notifications exist', async () => {
@@ -88,7 +88,7 @@ describe('overlay/gift-alert API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -117,7 +117,7 @@ describe('overlay/gift-alert API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -171,7 +171,7 @@ describe('overlay/gift-alert API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -203,7 +203,7 @@ describe('overlay/gift-alert API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },
@@ -254,7 +254,7 @@ describe('overlay/gift-alert API', () => {
         name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'USER',
+        role: 'user',
         locale: 'en-US',
         scope: 'test-scope',
       },

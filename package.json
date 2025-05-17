@@ -16,9 +16,9 @@
     "parse": "i18next -c ./i18next-parser.config.mjs",
     "postinstall": "bun run generate:all",
     "knip": "knip",
-    "test": "vitest",
-    "test:watch": "vitest watch",
-    "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' vitest run --coverage",
+    "test": "bun run vitest",
+    "test:watch": "bun run vitest watch",
+    "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' bun run vitest run --coverage",
     "generate:postgres": "bun prisma generate",
     "generate:mongo": "bun prisma generate --schema=./prisma-mongo/schema.prisma",
     "generate:all": "bun run generate:postgres && bun run generate:mongo",
@@ -88,6 +88,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@types/canvas-confetti": "^1.9.0",

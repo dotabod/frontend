@@ -158,10 +158,11 @@ describe('update-followers API', () => {
         },
       },
     )
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: 'user-123' },
-      data: { followers: 100 },
-    })
+    expect(prisma.user.update).toHaveBeenCalled()
+    const updateCall = vi.mocked(prisma.user.update).mock.calls[0][0]
+    expect(updateCall.where).toEqual({ id: 'user-123' })
+    expect(updateCall.data.followers).toBe(100)
+    expect(updateCall.data.updatedAt).toBeDefined()
   })
 
   it('handles Twitch API errors gracefully', async () => {
