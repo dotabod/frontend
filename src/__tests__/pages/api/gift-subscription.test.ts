@@ -142,7 +142,7 @@ describe('Gift Subscription Functions', () => {
       // Should add 3 months to existing expiration
       expect(newExpiration.getFullYear()).toBe(2023)
       expect(newExpiration.getMonth()).toBe(10) // November (0-indexed)
-      expect(newExpiration.getDate()).toBe(14) // Actual result is 14, not 15
+      expect(newExpiration.getDate()).toBe(15)
     })
 
     it('starts from current date if no existing expiration', () => {
@@ -152,7 +152,7 @@ describe('Gift Subscription Functions', () => {
       // Should add 2 months to now
       expect(newExpiration.getFullYear()).toBe(2023)
       expect(newExpiration.getMonth()).toBe(7) // August (0-indexed)
-      expect(newExpiration.getDate()).toBe(14) // Actual result is 14, not 15
+      expect(newExpiration.getDate()).toBe(15)
     })
 
     it('starts from current date if existing expiration is in the past', () => {
@@ -163,7 +163,7 @@ describe('Gift Subscription Functions', () => {
       // Should add 2 months to now, ignoring past expiration
       expect(newExpiration.getFullYear()).toBe(2023)
       expect(newExpiration.getMonth()).toBe(7) // August (0-indexed)
-      expect(newExpiration.getDate()).toBe(14) // Actual result is 14, not 15
+      expect(newExpiration.getDate()).toBe(15)
     })
 
     it('always returns far future date for lifetime gifts', () => {
