@@ -69,6 +69,7 @@ export const plans = [
       'Auto twitch predictions for each match',
       'Pro commands (!hero, !np, !items, !gm, !smurfs)',
       'Advanced overlays (XL Minimap, Anti-snipe blockers)',
+      'Minimap blocker intensity control',
       'Notable players overlay with flags',
       'Win probability overlay with !wp command',
       'Stream delay customization',

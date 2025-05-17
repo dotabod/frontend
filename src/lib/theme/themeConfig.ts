@@ -34,6 +34,15 @@ const themeConfig: ThemeConfig = {
       colorPrimaryHover: 'var(--color-purple-300)',
       colorPrimaryActive: 'var(--color-purple-300)',
     },
+    Slider: {
+      trackBg: 'rgb(107, 33, 168)',
+      trackHoverBg: 'rgb(126, 34, 206)',
+      handleColor: 'white',
+      handleActiveColor: 'white',
+      railBg: 'rgba(255, 255, 255, 0.25)',
+      railHoverBg: 'rgba(255, 255, 255, 0.35)',
+      dotBorderColor: 'rgb(107, 33, 168)',
+    },
   },
   token: {
     colorPrimary: 'rgb(85, 24, 103)',
