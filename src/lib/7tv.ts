@@ -154,7 +154,6 @@ export async function verifyEmoteInSet(
   emoteSetId: string,
   emoteName: string,
 ) {
-  console.log(`Verifying emote ${emoteName} in set ${emoteSetId}...`)
   const userEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
     id: emoteSetId,
     limit: 20,
@@ -164,10 +163,6 @@ export async function verifyEmoteInSet(
     throw new Error('Emote set not found')
   }
 
-  console.log(
-    'Current emotes in set:',
-    userEmoteSet.emoteSet.emotes.map((e) => e.name),
-  )
   const emote = userEmoteSet.emoteSet.emotes.find((e) => e.name === emoteName)
   if (!emote) {
     throw new Error(`Emote ${emoteName} not found in set`)
