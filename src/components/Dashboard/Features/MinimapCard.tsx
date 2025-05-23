@@ -120,7 +120,7 @@ export default function MinimapCard(): React.ReactNode {
             alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
-            src={`/images/overlay/minimap/738-${'Complex'}-${
+            src={`/images/overlay/minimap/739-${'Complex'}-${
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
@@ -138,7 +138,7 @@ export default function MinimapCard(): React.ReactNode {
             alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
-            src={`/images/overlay/minimap/738-${'Simple'}-${
+            src={`/images/overlay/minimap/739-${'Simple'}-${
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
