@@ -8,6 +8,7 @@ import { handleCheckoutCompleted } from './handlers/checkout-events'
 import { handleCustomerDeleted } from './handlers/customer-events'
 import { handleInvoiceEvent } from './handlers/invoice-events'
 import { handleSubscriptionDeleted, handleSubscriptionEvent } from './handlers/subscription-events'
+import { verifyWebhook } from './services/webhook-service'
 import { debugLog } from './utils/debugLog'
 import { processEventIdempotently } from './utils/idempotency'
 import { withTransaction } from './utils/transaction'
@@ -53,40 +54,6 @@ async function findUserByCustomerId(
 
   return null
 }
-
-/**
- * Verifies the webhook signature and constructs the event
- * @param req The incoming request
- * @returns The verified event or an error
- */
-async function verifyWebhook(
-  req: NextApiRequest,
-): Promise<{ event?: Stripe.Event; error?: string }> {
-  debugLog('Entering verifyWebhook')
-  const signature = req.headers['stripe-signature'] as string
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-
-  if (!signature || !webhookSecret) {
-    debugLog('Missing signature or webhook secret')
-    return { error: 'Webhook configuration error' }
-  }
-
-  try {
-    debugLog('Getting raw body')
-    const rawBody = await getRawBody(req)
-    debugLog('Constructing webhook event')
-    const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
-    debugLog('Webhook event constructed successfully', { eventId: event.id })
-    debugLog('Exiting verifyWebhook successfully')
-    return { event }
-  } catch (err) {
-    console.error('Webhook verification failed:', err)
-    debugLog('Webhook verification failed', { error: err })
-    debugLog('Exiting verifyWebhook with error')
-    return { error: 'Webhook verification failed' }
-  }
-}
-
 /**
  * Processes a webhook event based on its type
  * @param event The Stripe event
@@ -232,25 +199,6 @@ async function processWebhookEvent(
   }
   debugLog(`Exiting processWebhookEvent for event ${event.id} (${event.type})`)
 }
-
-/**
- * Gets the raw body from the request
- * @param req The incoming request
- * @returns The raw body as a string
- */
-async function getRawBody(req: NextApiRequest): Promise<string> {
-  const chunks: Uint8Array[] = []
-  for await (const chunk of req) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
-  }
-  return Buffer.concat(chunks).toString()
-}
-
-/**
- * Main webhook handler
- * @param req The incoming request
- * @param res The outgoing response
- */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     debugLog('Webhook handler received non-POST request')
