@@ -118,6 +118,7 @@ const settingsSchema = {
   lastFmOverlay: z.boolean(),
   lastFmUsername: z.string().max(45).optional(),
   lastFmRefreshRate: z.number().min(5).max(60),
+  disableAutoClipping: z.boolean(),
   rankOnly: z.object({
     enabled: z.boolean(),
     minimumRank: z.enum([

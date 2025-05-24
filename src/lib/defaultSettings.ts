@@ -147,6 +147,7 @@ export const defaultSettings = {
   lastFmOverlay: false,
   lastFmUsername: '',
   lastFmRefreshRate: 30, // in seconds
+  disableAutoClipping: false,
   crypto_payment_interest: {
     interested: false,
     tier: 'PRO',

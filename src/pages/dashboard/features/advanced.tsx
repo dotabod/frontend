@@ -1,4 +1,5 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
+import ClippingCard from '@/components/Dashboard/Features/ClippingCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
@@ -27,6 +28,7 @@ const FeaturesPage: NextPageWithLayout = () => (
       title='Advanced features'
     />
 
+    <ClippingCard />
     <SceneSwitcher />
   </>
 )
