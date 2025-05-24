@@ -1,7 +1,7 @@
 'use client'
 
 import { type SettingMetadata, getSearchableText, settingsMetadata } from '@/lib/settingsMetadata'
-import { Input, type InputRef, List, Empty, Typography, Popover } from 'antd'
+import { Empty, Input, type InputRef, List, Popover, Typography } from 'antd'
 import clsx from 'clsx'
 import { ChevronRight, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -70,7 +70,7 @@ export function SettingsSearch() {
       let charIndex = 0
       let firstFoundIndex = -1
       let lastFoundIndex = -1
-      let maxGap = 2 // Maximum gap between consecutive characters
+      const maxGap = 2 // Maximum gap between consecutive characters
 
       for (let i = 0; i < searchableText.length && charIndex < chars.length; i++) {
         if (searchableText[i] === chars[charIndex]) {
@@ -131,7 +131,8 @@ export function SettingsSearch() {
       // After navigation, scroll to the section if specified
       if (result.page.section) {
         setTimeout(() => {
-          const element = document.getElementById(result.page.section!)
+          if (!result.page.section) return
+          const element = document.getElementById(result.page.section)
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' })
             // Add a highlight effect
@@ -207,8 +208,15 @@ export function SettingsSearch() {
 
   // Scroll selected item into view when selectedIndex changes
   useEffect(() => {
-    if (isOpen && searchResults.length > 0 && listContainerRef.current && isKeyboardNavigationRef.current) {
-      const selectedElement = listContainerRef.current.querySelector(`[data-index="${selectedIndex}"]`) as HTMLElement
+    if (
+      isOpen &&
+      searchResults.length > 0 &&
+      listContainerRef.current &&
+      isKeyboardNavigationRef.current
+    ) {
+      const selectedElement = listContainerRef.current.querySelector(
+        `[data-index="${selectedIndex}"]`,
+      ) as HTMLElement
       if (selectedElement) {
         selectedElement.scrollIntoView({
           behavior: 'smooth',
@@ -257,12 +265,8 @@ export function SettingsSearch() {
             image={<Settings className='mx-auto h-8 w-8 text-gray-400' />}
             description={
               <div className='text-center'>
-                <p className='text-sm text-gray-300'>
-                  No settings found for "{query}"
-                </p>
-                <p className='text-xs text-gray-400 mt-1'>
-                  Try searching with different keywords
-                </p>
+                <p className='text-sm text-gray-300'>No settings found for "{query}"</p>
+                <p className='text-xs text-gray-400 mt-1'>Try searching with different keywords</p>
               </div>
             }
           />
@@ -277,7 +281,7 @@ export function SettingsSearch() {
             Search Results
           </Typography.Text>
           <List
-            size="small"
+            size='small'
             dataSource={searchResults}
             renderItem={(result, index) => (
               <List.Item
@@ -285,7 +289,7 @@ export function SettingsSearch() {
                 data-index={index}
                 className={clsx(
                   'cursor-pointer rounded-md mx-2 transition-colors',
-                  selectedIndex === index && 'bg-gray-700'
+                  selectedIndex === index && 'bg-gray-700',
                 )}
                 onClick={() => navigateToSetting(result)}
                 onMouseEnter={() => setSelectedIndex(index)}
@@ -300,9 +304,7 @@ export function SettingsSearch() {
                   title={
                     <div className='flex items-center justify-between'>
                       <div className='flex items-center gap-2'>
-                        <span className='text-sm text-gray-100'>
-                          {result.label}
-                        </span>
+                        <span className='text-sm text-gray-100'>{result.label}</span>
                         <span className='text-xs text-gray-400'>
                           {getCategoryLabel(result.category)}
                         </span>
@@ -310,11 +312,7 @@ export function SettingsSearch() {
                       <ChevronRight className='h-4 w-4 text-gray-400' />
                     </div>
                   }
-                  description={
-                    <span className='text-xs text-gray-300'>
-                      {result.description}
-                    </span>
-                  }
+                  description={<span className='text-xs text-gray-300'>{result.description}</span>}
                 />
               </List.Item>
             )}
@@ -337,7 +335,7 @@ export function SettingsSearch() {
             setIsOpen(false)
           }
         }}
-        placement="bottomLeft"
+        placement='bottomLeft'
       >
         <Input.Search
           ref={searchInputRef}
@@ -348,7 +346,7 @@ export function SettingsSearch() {
           }}
           onFocus={() => setIsOpen(true)}
           placeholder='Search settings... (⌘K)'
-          size="large"
+          size='large'
           style={{
             backgroundColor: '#1f2937',
             borderColor: '#374151',
