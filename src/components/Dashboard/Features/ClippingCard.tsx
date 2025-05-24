@@ -62,10 +62,12 @@ export default function ClippingCard(): React.ReactNode {
               </p>
               <ul className='list-disc ml-5'>
                 <li>
-                  <code className='bg-gray-800 px-1 py-0.5 rounded'>!np</code> - Notable players (list of player names)
+                  <code className='bg-gray-800 px-1 py-0.5 rounded'>!np</code> - Notable players
+                  (list of player names)
                 </li>
                 <li>
-                  <code className='bg-gray-800 px-1 py-0.5 rounded'>!gm</code> - Game medals (list of player ranks)
+                  <code className='bg-gray-800 px-1 py-0.5 rounded'>!gm</code> - Game medals (list
+                  of player ranks)
                 </li>
               </ul>
               <p className='mt-2 text-xs'>

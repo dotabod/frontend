@@ -19,11 +19,21 @@ const FeaturesPage: NextPageWithLayout = () => (
     <Header subtitle='Customize the options your stream receives.' title='Main features' />
 
     <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
-      <LanguageCard />
-      <StreamDelayCard />
-      <MmrTrackerCard />
-      <BetsCard />
-      <RankOnlyCard />
+      <div id='language'>
+        <LanguageCard />
+      </div>
+      <div id='stream-delay'>
+        <StreamDelayCard />
+      </div>
+      <div id='mmr-tracker'>
+        <MmrTrackerCard />
+      </div>
+      <div id='bets'>
+        <BetsCard />
+      </div>
+      <div id='rank-only'>
+        <RankOnlyCard />
+      </div>
       <IdeaCard />
     </div>
   </>

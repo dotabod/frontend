@@ -24,17 +24,39 @@ const FeaturesPage: NextPageWithLayout = () => (
     <Header subtitle='Enhance your stream with these overlay features' title='Overlay' />
 
     <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
-      <MinimapCard />
-      <PicksCard />
-      <WinLossOverlay />
-      <WinProbabilityOverlay />
-      <MmrOverlay />
-      <BetsOverlay />
-      <RoshCard />
-      <QueueCard />
-      <NotablePlayersCard />
-      <GiftAlertOverlayForDashboard />
-      <LastFmOverlay />
+      <div id='minimap'>
+        <MinimapCard />
+      </div>
+      <div id='picks'>
+        <PicksCard />
+      </div>
+      <div id='wl'>
+        <WinLossOverlay />
+      </div>
+      <div id='win-probability'>
+        <WinProbabilityOverlay />
+      </div>
+      <div id='mmr-overlay'>
+        <MmrOverlay />
+      </div>
+      <div id='bets-overlay'>
+        <BetsOverlay />
+      </div>
+      <div id='rosh'>
+        <RoshCard />
+      </div>
+      <div id='queue-blocker'>
+        <QueueCard />
+      </div>
+      <div id='notable-players'>
+        <NotablePlayersCard />
+      </div>
+      <div id='gift-alert'>
+        <GiftAlertOverlayForDashboard />
+      </div>
+      <div id='lastfm'>
+        <LastFmOverlay />
+      </div>
     </div>
   </>
 )

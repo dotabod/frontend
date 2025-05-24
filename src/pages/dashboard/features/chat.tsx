@@ -16,7 +16,9 @@ const FeaturesPage: NextPageWithLayout = () => (
       title='Chatter'
     />
 
-    <ChatterCard />
+    <div id='chatter'>
+      <ChatterCard />
+    </div>
   </>
 )
 

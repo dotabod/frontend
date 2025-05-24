@@ -22,6 +22,7 @@ import { useRouter } from 'next/router'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { SettingsSearch } from './SettingsSearch'
 import { navigation } from './navigation'
 
 const { Header, Sider, Content } = Layout
@@ -394,10 +395,12 @@ export default function DashboardShell({
             className={clsx(
               'bg-gray-900!',
               broken && !collapsed && 'hidden!',
-              'flex w-full items-center justify-between p-8!',
+              'flex w-full items-center justify-between gap-4 p-8!',
             )}
           >
-            <div />
+            <div className='w-full max-w-lg'>
+              <SettingsSearch />
+            </div>
 
             <div className='w-fit py-2'>
               <UserAccountNav />
