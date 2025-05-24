@@ -95,7 +95,7 @@ export const Header: FC = () => {
                 </>
               )}
             </Popover>
-            <LoginButton className='hidden lg:block' />
+            <LoginButton className='hidden lg:flex' />
           </div>
         </Container>
       </nav>
