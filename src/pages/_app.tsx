@@ -1,3 +1,4 @@
+import ErrorBoundary from '@/components/ErrorBoundary'
 import SentrySession from '@/components/SentrySession'
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
 import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
@@ -62,6 +63,11 @@ const clientCache = createCache()
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
+  // Guard against undefined Component
+  if (!Component) {
+    return <div>Loading...</div>
+  }
+
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -105,7 +111,9 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
       <MantineProvider>
         <Provider store={store}>
-          <AntProvider>{getLayout(<Component {...pageProps} />)}</AntProvider>
+          <AntProvider>
+            <ErrorBoundary>{getLayout(<Component {...pageProps} />)}</ErrorBoundary>
+          </AntProvider>
         </Provider>
       </MantineProvider>
     </ConfigProvider>
