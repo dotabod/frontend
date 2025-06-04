@@ -20,11 +20,11 @@ export default function StreamDelayCard() {
       <div className='subtitle mb-2'>Increase the delay that Dotabod responds to game events.</div>
 
       <Form layout='vertical'>
-        <Form.Item label='Delay in seconds' colon={false} help='5 minutes max'>
+        <Form.Item label='Delay in seconds' colon={false} help='50 minutes max'>
           {!loading && (
             <InputNumber
               min={0}
-              max={300}
+              max={3000}
               placeholder='0 seconds'
               className='w-[200px]! transition-all'
               defaultValue={Math.abs(Number(delay) || 0) / 1000}
