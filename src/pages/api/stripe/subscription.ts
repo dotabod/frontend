@@ -8,11 +8,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const session = await getServerSession(req, res, authOptions)
 
-    // Check for authentication
-    if (!session?.user?.id) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
-
     // Get the effective user ID
     // When impersonating, we want the subscription of the user being viewed (query param)
     // When not impersonating, we want the current user's subscription
