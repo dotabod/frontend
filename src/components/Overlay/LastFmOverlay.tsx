@@ -106,6 +106,18 @@ export default function LastFmOverlay() {
                       YouTube
                     </a>
                   </div>
+                  <div className='mt-2 text-amber-600'>
+                    Important: You must disable "Hide recent listening information" in your{' '}
+                    <a
+                      href='https://www.last.fm/settings/privacy'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-500 hover:underline'
+                    >
+                      Last.fm privacy settings
+                    </a>{' '}
+                    for your currently playing tracks to be visible.
+                  </div>
                 </>
               }
               htmlFor='lastfm-username'
