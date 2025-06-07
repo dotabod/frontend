@@ -7,6 +7,7 @@ import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subs
 import { Prisma, type TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
+import { CustomerService } from './services/customer-service'
 
 // Add crypto as a supported payment method type
 type ExtendedPaymentMethodType = Stripe.Checkout.SessionCreateParams.PaymentMethodType | 'crypto'
@@ -49,7 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Handle customer and subscription logic in a transaction
     const checkoutUrl = await prisma.$transaction(
       async (tx) => {
-        const customerId = await ensureCustomer(session.user, tx)
+        const customerService = new CustomerService(tx)
+        const customerId = await customerService.ensureCustomer(session.user)
         const subscriptionData = await getSubscription(session.user.id, tx)
         return await createCheckoutSession({
           customerId,
@@ -80,87 +82,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error('Checkout creation failed:', error)
     return res.status(500).json({ error: 'Failed to create checkout session' })
   }
-}
-
-async function ensureCustomer(
-  user: {
-    id: string
-    email?: string | null
-    name?: string | null
-    image?: string | null
-    locale?: string | null
-    twitchId?: string | null
-  },
-  tx: Prisma.TransactionClient,
-): Promise<string> {
-  // Look for any existing subscription to get a customer ID
-  const subscription = await tx.subscription.findFirst({
-    where: { userId: user.id },
-    select: { stripeCustomerId: true },
-    orderBy: { createdAt: 'desc' }, // Use the most recent subscription
-  })
-
-  let customerId = subscription?.stripeCustomerId
-
-  // Verify existing customer
-  if (customerId) {
-    try {
-      await stripe.customers.retrieve(customerId)
-    } catch (error) {
-      console.error('Invalid customer ID found:', error)
-      customerId = null
-    }
-  }
-
-  // Create or find customer if needed
-  if (!customerId && user.email) {
-    const existingCustomers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    })
-
-    if (existingCustomers.data.length > 0) {
-      customerId = existingCustomers.data[0].id
-    } else {
-      const newCustomer = await createStripeCustomer(user)
-      customerId = newCustomer.id
-    }
-
-    if (!subscription?.stripeCustomerId) {
-      // Update existing subscriptions with no customer ID
-      await tx.subscription.updateMany({
-        where: { userId: user.id, stripeCustomerId: null },
-        data: { stripeCustomerId: customerId, updatedAt: new Date() },
-      })
-    }
-  }
-
-  if (!customerId) {
-    throw new Error('Unable to establish customer ID')
-  }
-
-  return customerId
-}
-
-async function createStripeCustomer(user: {
-  id: string
-  email?: string | null
-  name?: string | null
-  image?: string | null
-  locale?: string | null
-  twitchId?: string | null
-}) {
-  return stripe.customers.create({
-    email: user.email ?? undefined,
-    metadata: {
-      userId: user.id,
-      email: user.email ?? '',
-      name: user.name ?? '',
-      image: user.image ?? '',
-      locale: user.locale ?? '',
-      twitchId: user.twitchId ?? '',
-    },
-  })
 }
 
 interface CheckoutSessionParams {

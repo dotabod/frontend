@@ -1,6 +1,7 @@
 import { stripe } from '@/lib/stripe-server'
 import { type Prisma, SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
+import { SubscriptionService } from '../services/subscription-service'
 import { withErrorHandling } from '../utils/error-handling'
 import {
   createCryptoSubscription,
@@ -45,7 +46,7 @@ export async function handleInvoiceEvent(
         if (!userId) return false
 
         // Map Stripe status to our internal status
-        const status = mapStripeStatus(subscription.status)
+        const status = SubscriptionService.mapStripeStatus(subscription.status)
         const currentPeriodEnd = new Date(subscription.items.data[0]?.current_period_end * 1000)
 
         // Update the subscription record with the latest status
@@ -342,26 +343,6 @@ async function handleCryptoInvoiceEvent(
  * @param status The Stripe subscription status
  * @returns The mapped status
  */
-function mapStripeStatus(status: string): SubscriptionStatus {
-  switch (status) {
-    case 'active':
-      return SubscriptionStatus.ACTIVE
-    case 'trialing':
-      return SubscriptionStatus.TRIALING
-    case 'past_due':
-      return SubscriptionStatus.PAST_DUE
-    case 'canceled':
-      return SubscriptionStatus.CANCELED
-    case 'unpaid':
-      return SubscriptionStatus.PAST_DUE
-    case 'incomplete':
-      return SubscriptionStatus.PAST_DUE
-    case 'incomplete_expired':
-      return SubscriptionStatus.CANCELED
-    default:
-      return SubscriptionStatus.CANCELED
-  }
-}
 
 /**
  * Handles a Boomfi crypto invoice.paid event
