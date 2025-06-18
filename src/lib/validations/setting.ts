@@ -85,7 +85,7 @@ const settingsSchema = {
   'minimap-opacity': z.number().min(0).max(1),
   onlyParty: z.boolean(),
   livePolls: z.boolean(),
-  streamDelay: z.number().min(0).max(3000),
+  streamDelay: z.number().min(0).max(3_000_000),
   commandDelay: z.boolean(),
   commandBuilds: z.boolean(),
   showRankMmr: z.boolean(),
