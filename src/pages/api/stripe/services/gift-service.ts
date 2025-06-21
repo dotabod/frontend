@@ -252,4 +252,96 @@ export class GiftService {
       throw error
     }
   }
+
+  /**
+   * Handles refunds for gift credit charges
+   */
+  async processGiftRefund(charge: Stripe.Charge): Promise<void> {
+    if (charge.amount_refunded <= 0) return
+
+    const paymentIntent = typeof charge.payment_intent === 'string' ? charge.payment_intent : null
+    if (!paymentIntent) return
+
+    const sessions = await stripe.checkout.sessions.list({
+      payment_intent: paymentIntent,
+      limit: 1,
+    })
+    if (sessions.data.length === 0) return
+
+    const session = sessions.data[0]
+    if (session.metadata?.isGift !== 'true') return
+    const recipientUserId = session.metadata?.recipientUserId
+    if (!recipientUserId) return
+
+    const user = await this.tx.user.findUnique({
+      where: { id: recipientUserId },
+      include: {
+        subscription: {
+          where: { stripeCustomerId: { not: null } },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    })
+
+    const customerId = user?.subscription[0]?.stripeCustomerId
+    if (!customerId) return
+
+    const giftTransaction = await this.tx.giftTransaction.findFirst({
+      where: {
+        OR: [
+          { metadata: { path: ['checkoutSessionId'], equals: session.id } },
+          { metadata: { path: ['paymentIntentId'], equals: paymentIntent } },
+          { stripeSessionId: session.id },
+        ],
+      },
+      include: { giftSubscription: true },
+    })
+
+    if (!giftTransaction) return
+
+    const originalAmount = giftTransaction.amount
+    const refundProportion = charge.amount_refunded / charge.amount
+    const refundAmount = Math.round(originalAmount * refundProportion)
+
+    await this.tx.giftTransaction.update({
+      where: { id: giftTransaction.id },
+      data: {
+        updatedAt: new Date(),
+        metadata: {
+          ...((giftTransaction.metadata as Record<string, unknown>) || {}),
+          refundedAt: new Date().toISOString(),
+          refundAmount: refundAmount.toString(),
+          refundProportion: refundProportion.toString(),
+          refundId: charge.refunds?.data?.[0]?.id || null,
+        },
+      },
+    })
+
+    await stripe.customers.createBalanceTransaction(customerId, {
+      amount: refundAmount,
+      currency: giftTransaction.currency,
+      description: `Refund of gift credit from ${giftTransaction.giftSubscription?.senderName || 'Anonymous'}`,
+      metadata: {
+        originalTransactionId: giftTransaction.id,
+        refundId: charge.refunds?.data?.[0]?.id || null,
+        refundedAt: new Date().toISOString(),
+        isRefund: 'true',
+      },
+    })
+
+    if (charge.refunded && giftTransaction.giftSubscriptionId) {
+      await this.tx.subscription.updateMany({
+        where: { giftDetails: { id: giftTransaction.giftSubscriptionId } },
+        data: {
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: new Date(),
+          metadata: {
+            refundedAt: new Date().toISOString(),
+            refundId: charge.refunds?.data?.[0]?.id || null,
+          },
+        },
+      })
+    }
+  }
 }
