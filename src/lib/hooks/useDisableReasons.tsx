@@ -198,10 +198,12 @@ export function useDisableReasons() {
 
       case 'ACCOUNT_SHARING':
         return {
-          title: 'Account sharing detected',
-          description: `The Dota account "${metadata?.account_name || 'Unknown'}" is being used on multiple PCs with Dotabod GSI files. This creates conflicts and has been disabled.${metadata?.recurrence_count ? ` (Recurrence #${metadata.recurrence_count})` : ''}`,
+          title: 'Multiple Steam accounts detected',
+          description: metadata?.blocked_steam32_id
+            ? `Multiple people are using Dotabod GSI files for this stream. Steam account "${metadata?.account_name || 'Unknown'}" was blocked to prevent conflicts. Only the first account per stream is allowed.`
+            : 'Multiple Steam accounts are sending game data to this stream. Additional accounts are blocked to prevent conflicts.',
           action:
-            'Use !clearsharing command, but you MUST delete the Dotabod GSI config file from the other PC first, or this will happen again',
+            'Use !clearsharing to reset, but ensure only one person has the Dotabod GSI config file',
           severity: 'high' as const,
         }
 
