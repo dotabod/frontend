@@ -189,6 +189,15 @@ export function useDisableReasons() {
           severity: 'high' as const,
         }
 
+      case 'ACCOUNT_SHARING':
+        return {
+          title: 'Account sharing detected',
+          description: `The Dota account "${metadata?.account_name || 'Unknown'}" is being used on multiple PCs with Dotabod GSI files. This creates conflicts and has been disabled.${metadata?.recurrence_count ? ` (Recurrence #${metadata.recurrence_count})` : ''}`,
+          action:
+            'Use !clearsharing command, but you MUST delete the Dotabod GSI config file from the other PC first, or this will happen again',
+          severity: 'high' as const,
+        }
+
       default:
         return {
           title: 'Feature disabled',
