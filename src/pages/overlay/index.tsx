@@ -1,10 +1,10 @@
+import { Spin } from 'antd'
+import Head from 'next/head'
+import { useSession } from 'next-auth/react'
+import type { ReactElement } from 'react'
+import { useEffect, useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
-import { Spin } from 'antd'
-import { useSession } from 'next-auth/react'
-import Head from 'next/head'
-import { useEffect, useState } from 'react'
-import type { ReactElement } from 'react'
 
 const OverlayPage = () => {
   const { data } = useSession()

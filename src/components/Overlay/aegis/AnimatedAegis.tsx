@@ -1,10 +1,10 @@
-import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
+import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 
 interface AnimatedAegisProps {
   block: blockType

@@ -1,5 +1,5 @@
-import { selectHeroUnits, selectMainHero, selectSettings } from '@/lib/redux/store'
 import { useSelector } from 'react-redux'
+import { selectHeroUnits, selectMainHero, selectSettings } from '@/lib/redux/store'
 
 function Hero({ data, team }) {
   const heroUnits = useSelector(selectHeroUnits)

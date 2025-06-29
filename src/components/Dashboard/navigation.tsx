@@ -1,4 +1,3 @@
-import Discord from '@/images/logos/Discord'
 import { BeakerIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import {
   Cookie,
@@ -10,6 +9,7 @@ import {
   NewspaperIcon,
   ShieldCheck,
 } from 'lucide-react'
+import Discord from '@/images/logos/Discord'
 
 // Add a const for parent keys
 export const PARENT_KEYS = {

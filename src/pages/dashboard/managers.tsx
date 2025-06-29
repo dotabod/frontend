@@ -1,3 +1,9 @@
+import { Button, notification, Select, Tag } from 'antd'
+import Head from 'next/head'
+import { useSession } from 'next-auth/react'
+import type { ReactElement } from 'react'
+import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
@@ -6,12 +12,6 @@ import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { canAccessFeature } from '@/utils/subscription'
-import { Button, Select, Tag, notification } from 'antd'
-import { useSession } from 'next-auth/react'
-import Head from 'next/head'
-import type { ReactElement } from 'react'
-import { useEffect, useState } from 'react'
-import useSWR from 'swr'
 
 const ModeratorsPage = () => {
   const track = useTrack()

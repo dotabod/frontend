@@ -1,6 +1,6 @@
-import handler from '@/pages/api/is-dotabod-live'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import handler from '@/pages/api/is-dotabod-live'
 
 // Mock the prisma client
 vi.mock('@/lib/db', () => ({
@@ -21,9 +21,9 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (_methods: string[], handler: any) => handler,
 }))
 
+import { captureException } from '@sentry/nextjs'
 // Import the mocked modules
 import prisma from '@/lib/db'
-import { captureException } from '@sentry/nextjs'
 
 describe('is-dotabod-live API', () => {
   beforeEach(() => {

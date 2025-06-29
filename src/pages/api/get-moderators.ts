@@ -1,12 +1,12 @@
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
-import { authOptions } from '@/lib/auth'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { canAccessFeature, getSubscription } from '@/utils/subscription'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
+import { getServerSession } from '@/lib/api/getServerSession'
+import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { authOptions } from '@/lib/auth'
+import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 const TWITCH_MODERATED_CHANNELS_URL = 'https://api.twitch.tv/helix/moderation/moderators'
 
@@ -21,7 +21,7 @@ export async function getModerators(userId: string | undefined, accessToken: str
       user_login: string
       user_name: string
     }[] = []
-    let after: string | undefined = undefined
+    let after: string | undefined
     const first = 100 // Maximum items per page
 
     do {

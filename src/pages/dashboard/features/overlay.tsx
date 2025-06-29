@@ -1,3 +1,5 @@
+import Head from 'next/head'
+import type { ReactElement } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import MinimapCard from '@/components/Dashboard/Features/MinimapCard'
 import NotablePlayersCard from '@/components/Dashboard/Features/NotablePlayers'
@@ -12,8 +14,6 @@ import MmrOverlay from '@/components/Overlay/MmrOverlay'
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
 import type { NextPageWithLayout } from '@/pages/_app'
-import Head from 'next/head'
-import type { ReactElement } from 'react'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>

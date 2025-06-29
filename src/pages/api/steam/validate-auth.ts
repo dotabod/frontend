@@ -1,10 +1,10 @@
-import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
-import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
+import { getServerSession } from '@/lib/api/getServerSession'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/db'
 
 // Constants for OpenID verification
 const STEAM_OPENID_URL = 'https://steamcommunity.com/openid/login'

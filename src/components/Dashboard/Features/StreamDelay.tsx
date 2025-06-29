@@ -1,9 +1,9 @@
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Card } from '@/ui/card'
 import { Form, Input, InputNumber } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Card } from '@/ui/card'
 
 export default function StreamDelayCard() {
   const { data: delay, loading, updateSetting } = useUpdateSetting<number>(Settings.streamDelay)

@@ -1,9 +1,9 @@
-import prisma from '@/lib/db'
-import { stripe } from '@/lib/stripe-server'
 import type { PrismaClient } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import type { Stripe } from 'stripe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import prisma from '@/lib/db'
+import { stripe } from '@/lib/stripe-server'
 
 // Mock the webhook handler directly
 vi.mock('@/pages/api/stripe/webhook', () => ({

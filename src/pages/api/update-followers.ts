@@ -1,12 +1,11 @@
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-
+import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { captureException } from '@sentry/nextjs'
 
 // Helper function to fetch follower count for a user
 async function fetchFollowerCount(providerAccountId, accessToken) {

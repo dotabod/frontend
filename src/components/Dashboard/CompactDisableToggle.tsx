@@ -1,8 +1,8 @@
+import { Switch, Tooltip } from 'antd'
+import useSWR from 'swr'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Switch, Tooltip } from 'antd'
-import useSWR from 'swr'
 
 export function CompactDisableToggle() {
   const { data } = useSWR('/api/check-ban', fetcher, {

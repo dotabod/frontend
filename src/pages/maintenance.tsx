@@ -1,8 +1,8 @@
+import { Alert } from 'antd'
+import type { ReactElement } from 'react'
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Alert } from 'antd'
-import type { ReactElement } from 'react'
 
 const Maintenance: NextPageWithLayout = () => (
   <Container className='py-24'>

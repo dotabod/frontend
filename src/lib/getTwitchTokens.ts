@@ -1,6 +1,6 @@
-import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import fetch from 'node-fetch'
+import prisma from '@/lib/db'
 
 const TWITCH_VALIDATE_URL = 'https://id.twitch.tv/oauth2/validate'
 const TWITCH_TOKEN_URL = 'https://id.twitch.tv/oauth2/token'

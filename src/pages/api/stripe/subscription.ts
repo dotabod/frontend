@@ -1,8 +1,8 @@
-import { getServerSession } from '@/lib/api/getServerSession'
-import { authOptions } from '@/lib/auth'
-import { SUBSCRIPTION_TIERS, getSubscription, isSubscriptionActive } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from '@/lib/api/getServerSession'
+import { authOptions } from '@/lib/auth'
+import { getSubscription, isSubscriptionActive, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

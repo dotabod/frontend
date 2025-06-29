@@ -1,9 +1,3 @@
-import { Settings } from '@/lib/defaultSettings'
-import type { blockType } from '@/lib/devConsts'
-import { fetcher } from '@/lib/fetcher'
-import { getMatchData, matchDataCache } from '@/lib/hooks/openDotaAPI'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { type RankType, getRankImage } from '@/lib/ranks'
 import { captureException } from '@sentry/nextjs'
 import {
   EventSubChannelPollBeginEvent,
@@ -18,12 +12,18 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
+import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
+import { fetcher } from '@/lib/fetcher'
+import { getMatchData, matchDataCache } from '@/lib/hooks/openDotaAPI'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { getRankImage, type RankType } from '@/lib/ranks'
 import {
   setMinimapDataBuildings,
   setMinimapDataCouriers,
   setMinimapDataCreeps,
-  setMinimapDataHeroUnits,
   setMinimapDataHeroes,
+  setMinimapDataHeroUnits,
   setMinimapStatus,
 } from '../redux/store'
 

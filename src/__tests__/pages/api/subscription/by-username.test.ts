@@ -1,6 +1,6 @@
-import handler from '@/pages/api/subscription/by-username'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import handler from '@/pages/api/subscription/by-username'
 
 // Mock prisma
 vi.mock('@/lib/db', () => ({
@@ -23,7 +23,7 @@ vi.mock('@/utils/subscription', () => ({
 
 // Import mocked modules
 import prisma from '@/lib/db'
-import { SUBSCRIPTION_TIERS, getSubscription, isInGracePeriod } from '@/utils/subscription'
+import { getSubscription, isInGracePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 describe('subscription/by-username API', () => {
   beforeEach(() => {

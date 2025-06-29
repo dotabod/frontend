@@ -1,3 +1,6 @@
+import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { useSelector } from 'react-redux'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
@@ -5,9 +8,6 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { selectStatus } from '@/lib/redux/store'
 import { motionProps } from '@/ui/utils'
-import { motion } from 'framer-motion'
-import Image from 'next/image'
-import { useSelector } from 'react-redux'
 import Minimap from '../minimap'
 
 const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {

@@ -1,9 +1,3 @@
-import { Input } from '@/components/Input'
-import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
-import { Settings } from '@/lib/defaultSettings'
-import { fetcher } from '@/lib/fetcher'
-import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { type RankType, getRankDetail, getRankImage } from '@/lib/ranks'
 import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { useForm } from '@mantine/form'
 import type { SteamAccount } from '@prisma/client'
@@ -15,6 +9,12 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useDebouncedCallback } from 'use-debounce'
+import { Input } from '@/components/Input'
+import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
+import { Settings } from '@/lib/defaultSettings'
+import { fetcher } from '@/lib/fetcher'
+import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
 
 // Add type for form values
 interface FormValues {

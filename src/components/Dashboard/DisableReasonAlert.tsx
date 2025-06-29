@@ -1,6 +1,6 @@
-import { type DisableNotification, useDisableReasons } from '@/lib/hooks/useDisableReasons'
 import { CheckCircleOutlined } from '@ant-design/icons'
 import { Alert, Button, Space } from 'antd'
+import { type DisableNotification, useDisableReasons } from '@/lib/hooks/useDisableReasons'
 
 interface DisableReasonAlertProps {
   notification: DisableNotification

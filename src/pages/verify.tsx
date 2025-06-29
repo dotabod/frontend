@@ -1,11 +1,3 @@
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import TwitchChat from '@/components/TwitchChat'
-import { chatVerifyScopes } from '@/lib/authScopes'
-import { getRankTitle } from '@/lib/ranks'
-import { useTrack } from '@/lib/track'
-import type { NextPageWithLayout } from '@/pages/_app'
-import { Card } from '@/ui/card'
 import { CheckCircleOutlined, DeleteOutlined, StarFilled, StarOutlined } from '@ant-design/icons'
 import { captureException } from '@sentry/nextjs'
 import {
@@ -21,10 +13,18 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { signIn, useSession } from 'next-auth/react'
 import { type ReactElement, useCallback, useEffect, useState } from 'react'
+import { Container } from '@/components/Container'
+import HomepageShell from '@/components/Homepage/HomepageShell'
+import TwitchChat from '@/components/TwitchChat'
+import { chatVerifyScopes } from '@/lib/authScopes'
+import { getRankTitle } from '@/lib/ranks'
+import { useTrack } from '@/lib/track'
+import type { NextPageWithLayout } from '@/pages/_app'
+import { Card } from '@/ui/card'
 
 const { Title, Text } = Typography
 

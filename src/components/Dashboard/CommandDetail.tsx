@@ -1,7 +1,7 @@
+import Image from 'next/image'
 import { chatterInfo } from '@/components/Dashboard/Features/ChatterCard'
 import TwitchChat from '@/components/TwitchChat'
 import type { CommandKeys, commands } from '@/lib/defaultSettings'
-import Image from 'next/image'
 
 const CommandDetail: Record<
   CommandKeys,

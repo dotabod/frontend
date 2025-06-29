@@ -1,9 +1,9 @@
-import handler from '@/pages/api/install/[token]'
 import type { SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import handler from '@/pages/api/install/[token]'
 
 // Mock the auth module to prevent environment variable checks
 vi.mock('@/lib/auth', () => ({
@@ -45,11 +45,11 @@ vi.mock('@/utils/subscription', () => ({
   canAccessFeature: vi.fn(),
 }))
 
+import { captureException } from '@sentry/nextjs'
 import { getServerSession } from '@/lib/api/getServerSession'
 // Import the mocked modules
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
-import { captureException } from '@sentry/nextjs'
 
 describe('install/[token] API', () => {
   beforeEach(() => {

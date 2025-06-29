@@ -1,6 +1,6 @@
-import handler from '@/pages/api/update-emote-set'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import handler from '@/pages/api/update-emote-set'
 
 // Mock the middleware
 vi.mock('@/lib/api-middlewares/with-authentication', () => ({
@@ -77,11 +77,11 @@ vi.mock('@/lib/getTwitchTokens', () => ({
   CLIENT_SECRET: 'mock-client-secret',
 }))
 
+import { GraphQLClient } from 'graphql-request'
 // Import mocked modules
 import { get7TVUser, getOrCreateEmoteSet } from '@/lib/7tv'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
-import { GraphQLClient } from 'graphql-request'
 
 describe('update-emote-set API', () => {
   let mockRequest: ReturnType<typeof vi.fn>

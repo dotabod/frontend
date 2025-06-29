@@ -1,9 +1,9 @@
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { useTrack } from '@/lib/track'
-import type { NextPageWithLayout } from '@/pages/_app'
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
+import HomepageShell from '@/components/Homepage/HomepageShell'
+import { useTrack } from '@/lib/track'
+import type { NextPageWithLayout } from '@/pages/_app'
 
 const AuthErrorPage: NextPageWithLayout = () => {
   const router = useRouter()

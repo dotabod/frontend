@@ -1,10 +1,10 @@
+import { Button, Collapse, Space, Table, Tag, Typography } from 'antd'
+import type { ReactElement } from 'react'
+import { useEffect, useState } from 'react'
 import { getCookieCategories } from '@/components/CookieConsent'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { showCookieConsentBanner, showCookieConsentSettings } from '@/lib/cookieManager'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Button, Collapse, Space, Table, Tag, Typography } from 'antd'
-import type { ReactElement } from 'react'
-import { useEffect, useState } from 'react'
 
 const { Title, Paragraph, Text } = Typography
 const { Panel } = Collapse

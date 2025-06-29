@@ -1,13 +1,13 @@
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { Button, Modal, message, Space, Typography } from 'antd'
+import Head from 'next/head'
+import { signOut, useSession } from 'next-auth/react'
+import type { ReactElement } from 'react'
+import { useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { Button, Modal, Space, Typography, message } from 'antd'
-import { signOut, useSession } from 'next-auth/react'
-import Head from 'next/head'
-import type { ReactElement } from 'react'
-import { useState } from 'react'
 
 const { Title, Text, Paragraph } = Typography
 const { confirm } = Modal

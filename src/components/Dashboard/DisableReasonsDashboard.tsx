@@ -1,5 +1,5 @@
-import { useDisableReasons } from '@/lib/hooks/useDisableReasons'
 import { Badge, Card, Empty, Spin, Typography } from 'antd'
+import { useDisableReasons } from '@/lib/hooks/useDisableReasons'
 import { DisableReasonAlerts } from './DisableReasonAlert'
 
 const { Title, Text } = Typography

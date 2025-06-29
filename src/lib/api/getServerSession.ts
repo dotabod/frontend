@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { type AuthOptions, type Session, getServerSession as getNextServerSession } from 'next-auth'
+import { type AuthOptions, getServerSession as getNextServerSession, type Session } from 'next-auth'
 import { decode } from 'next-auth/jwt'
 
 export const getServerSession = async (...args: [NextApiRequest, NextApiResponse, AuthOptions]) => {

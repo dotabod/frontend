@@ -1,3 +1,7 @@
+import { Button, Progress, Select, Spin } from 'antd'
+import clsx from 'clsx'
+import Image from 'next/image'
+import { forwardRef } from 'react'
 import NumberTicker from '@/components/magicui/number-ticker'
 import useLanguageTranslations, {
   type CrowdinLanguage,
@@ -5,10 +9,6 @@ import useLanguageTranslations, {
 } from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Button, Progress, Select, Spin } from 'antd'
-import clsx from 'clsx'
-import Image from 'next/image'
-import { forwardRef } from 'react'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   label: string

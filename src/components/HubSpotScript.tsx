@@ -1,6 +1,6 @@
-import { useCookiePreferences } from '@/lib/cookieManager'
 import Script from 'next/script'
 import { useEffect } from 'react'
+import { useCookiePreferences } from '@/lib/cookieManager'
 
 const HubSpotScript = () => {
   const { preferences, hasConsented } = useCookiePreferences()

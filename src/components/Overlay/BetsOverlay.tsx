@@ -1,8 +1,8 @@
+import clsx from 'clsx'
+import Image from 'next/image'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import clsx from 'clsx'
-import Image from 'next/image'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 
 export default function BetsOverlay() {

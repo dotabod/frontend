@@ -1,12 +1,12 @@
+import { SubscriptionStatus } from '@prisma/client'
+import { useEffect, useState } from 'react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import {
   GRACE_PERIOD_END,
-  SUBSCRIPTION_TIERS,
   gracePeriodPrettyDate,
   isInGracePeriod,
+  SUBSCRIPTION_TIERS,
 } from '@/utils/subscription'
-import { SubscriptionStatus } from '@prisma/client'
-import { useEffect, useState } from 'react'
 import ErrorBoundary from './ErrorBoundary'
 
 interface PlanDescriptionProps {

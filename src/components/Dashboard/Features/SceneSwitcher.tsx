@@ -1,9 +1,9 @@
-import { type SettingKeys, Settings, defaultSettings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Card } from '@/ui/card'
 import { Input, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
+import { defaultSettings, type SettingKeys, Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Card } from '@/ui/card'
 import { TierInput } from './TierInput'
 import { TierSwitch } from './TierSwitch'
 

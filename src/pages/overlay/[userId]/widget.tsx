@@ -1,3 +1,8 @@
+import { clsx } from 'clsx'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import type { Socket } from 'socket.io-client'
+import io from 'socket.io-client'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { RestrictFeature } from '@/components/RestrictFeature'
@@ -7,12 +12,7 @@ import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 import type { wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { type RankType, getRankDetail, getRankImage } from '@/lib/ranks'
-import { clsx } from 'clsx'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import type { Socket } from 'socket.io-client'
-import io from 'socket.io-client'
+import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
 
 let socket: Socket | null = null
 function WidgetPage() {

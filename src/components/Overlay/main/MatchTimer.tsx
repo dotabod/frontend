@@ -1,9 +1,9 @@
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { motionProps } from '@/ui/utils'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { zeroPad } from 'react-countdown'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { motionProps } from '@/ui/utils'
 
 export const MatchTimer = ({ res }) => {
   const [duration, setDuration] = useState(0)

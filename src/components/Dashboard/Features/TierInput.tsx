@@ -1,7 +1,7 @@
+import { Input, type InputProps } from 'antd'
 import type { SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import type { ChatterSettingKeys } from '@/utils/subscription'
-import { Input, type InputProps } from 'antd'
 import { TierBadge } from './TierBadge'
 
 interface TierInputProps extends Omit<InputProps, 'onChange'> {

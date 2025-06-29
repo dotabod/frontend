@@ -1,10 +1,9 @@
+import { Form, Input, Typography } from 'antd'
+import clsx from 'clsx'
+import { useEffect, useRef, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
-import { Form, Input, Typography } from 'antd'
-import clsx from 'clsx'
-import { useEffect, useRef } from 'react'
-import { useState } from 'react'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import LastFmCard from './lastfm/LastFmCard'
 

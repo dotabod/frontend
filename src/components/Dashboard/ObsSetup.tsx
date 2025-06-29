@@ -1,17 +1,17 @@
+import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
+import * as Sentry from '@sentry/nextjs'
+import { Alert, Button, Form, Input, message, Select, Space, Spin, Tooltip } from 'antd'
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
+import OBSWebSocket from 'obs-websocket-js'
+import { useEffect, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
-import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
-import * as Sentry from '@sentry/nextjs'
-import { Alert, Button, Form, Input, Select, Space, Spin, Tooltip, message } from 'antd'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import OBSWebSocket from 'obs-websocket-js'
-import { useEffect, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
 
 interface Scene {
   sceneIndex: number // Scene index

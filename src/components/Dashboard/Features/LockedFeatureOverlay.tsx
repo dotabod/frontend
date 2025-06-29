@@ -1,7 +1,7 @@
-import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import { Button } from 'antd'
 import Link from 'next/link'
+import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import { TierBadge } from './TierBadge'
 
 interface LockedFeatureOverlayProps {

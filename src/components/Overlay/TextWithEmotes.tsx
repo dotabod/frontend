@@ -1,4 +1,5 @@
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+
 interface Cdn {
   low: string
   medium: string

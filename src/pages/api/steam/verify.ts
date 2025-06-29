@@ -1,11 +1,10 @@
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-
-import { withMethods } from '@/lib/api-middlewares/with-methods'
+import * as z from 'zod'
 import { getServerSession } from '@/lib/api/getServerSession'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { captureException } from '@sentry/nextjs'
-import * as z from 'zod'
 
 const steamVerifySchema = z.object({
   steam32Id: z.string().transform((val) => Number.parseInt(val, 10)),

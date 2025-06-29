@@ -151,7 +151,7 @@ async function importStripeCustomers(): Promise<void> {
 async function fetchAllStripeCustomers(): Promise<Stripe.Customer[]> {
   const customers: Stripe.Customer[] = []
   let hasMore = true
-  let startingAfter: string | undefined = undefined
+  let startingAfter: string | undefined
 
   while (hasMore) {
     const response = await stripe.customers.list({
@@ -177,7 +177,7 @@ async function fetchAllSubscriptionsGroupedByCustomer(): Promise<
   console.log('Fetching all subscriptions from Stripe...')
   const subscriptionMap = new Map<string, Stripe.Subscription[]>()
   let hasMore = true
-  let startingAfter: string | undefined = undefined
+  let startingAfter: string | undefined
   let count = 0
 
   while (hasMore) {
@@ -218,7 +218,7 @@ async function fetchAllRelevantCheckoutSessionsGroupedByCustomer(): Promise<
   console.log('Fetching all completed checkout sessions from Stripe...')
   const sessionMap = new Map<string, Stripe.Checkout.Session[]>()
   let hasMore = true
-  let startingAfter: string | undefined = undefined
+  let startingAfter: string | undefined
   let fetchedCount = 0
   let relevantCount = 0
 

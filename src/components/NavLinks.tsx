@@ -2,8 +2,8 @@ import { Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GiftIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import type { FC } from 'react'
+import { useEffect, useState } from 'react'
 
 interface NavLinksProps {
   bottom?: boolean

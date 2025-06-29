@@ -1,10 +1,10 @@
-import { Settings } from '@/lib/defaultSettings'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Typography } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Settings } from '@/lib/defaultSettings'
+import { useTransformRes } from '@/lib/hooks/useTransformRes'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 const { Text } = Typography
 

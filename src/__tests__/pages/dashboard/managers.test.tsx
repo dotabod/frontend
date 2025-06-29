@@ -1,8 +1,8 @@
-import { canAccessFeature } from '@/utils/subscription'
 import { render } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { canAccessFeature } from '@/utils/subscription'
 
 // Mock the actual page component to avoid useSubscription issues
 vi.mock('@/pages/dashboard/managers', () => ({

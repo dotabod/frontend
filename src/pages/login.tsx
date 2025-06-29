@@ -1,13 +1,13 @@
+import * as Sentry from '@sentry/nextjs'
+import { App, Typography } from 'antd'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
+import { type ReactElement, useCallback, useEffect } from 'react'
 import { Container } from '@/components/Container'
 import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
-import * as Sentry from '@sentry/nextjs'
-import { App, Typography } from 'antd'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { type ReactElement, useCallback, useEffect } from 'react'
 
 const Login: NextPageWithLayout = () => {
   const { status } = useSession()

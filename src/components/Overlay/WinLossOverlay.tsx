@@ -1,6 +1,6 @@
+import clsx from 'clsx'
 import { Settings } from '@/lib/defaultSettings'
 import { Card } from '@/ui/card'
-import clsx from 'clsx'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import WinLossCard from './wl/WinLossCard'
 

@@ -1,9 +1,9 @@
-import SetupPage from '@/pages/dashboard/index'
 import { render, screen } from '@testing-library/react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import SetupPage from '@/pages/dashboard/index'
 
 // Mock the dependencies
 vi.mock('next-auth/react', () => ({

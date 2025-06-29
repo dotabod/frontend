@@ -2,9 +2,9 @@
 
 import { captureException } from '@sentry/nextjs'
 import { get } from '@vercel/edge-config'
+import { NextResponse } from 'next/server'
 import type { NextRequestWithAuth } from 'next-auth/middleware'
 import { withAuth } from 'next-auth/middleware'
-import { NextResponse } from 'next/server'
 
 export const config = {
   matcher: [

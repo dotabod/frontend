@@ -1,3 +1,6 @@
+import * as Sentry from '@sentry/nextjs'
+import type { GraphQLClient } from 'graphql-request'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import {
   create7TVClient,
   get7TVUser,
@@ -7,9 +10,6 @@ import {
 } from '@/lib/7tv'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { CHANGE_EMOTE_IN_SET, DELETE_EMOTE_SET } from '@/lib/gql'
-import * as Sentry from '@sentry/nextjs'
-import type { GraphQLClient } from 'graphql-request'
-import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function deleteEmoteSet(client: GraphQLClient, emoteSetId: string) {
   try {

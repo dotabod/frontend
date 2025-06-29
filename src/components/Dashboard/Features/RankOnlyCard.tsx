@@ -1,9 +1,9 @@
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Card } from '@/ui/card'
 import { Button, Form, Select, Spin } from 'antd'
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Card } from '@/ui/card'
 import { TierSwitch } from './TierSwitch'
 
 // Rank mapping used to determine minimumRankTier from selected rank

@@ -1,10 +1,10 @@
+import { motion } from 'framer-motion'
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
-import { motion } from 'framer-motion'
 
 interface Position {
   bottom: number

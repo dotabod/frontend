@@ -1,6 +1,6 @@
-import { Input } from '@/components/Input'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { Input } from '@/components/Input'
 
 // Mock the antd Input component
 vi.mock('antd', () => ({

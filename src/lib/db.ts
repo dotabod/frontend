@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
+import { PrismaClient } from '@prisma/client'
 
 // Define globals for both clients
 type GlobalWithPrisma = typeof globalThis & {

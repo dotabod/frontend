@@ -1,6 +1,6 @@
-import { stripe } from '@/lib/stripe-server'
 import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type Stripe from 'stripe'
+import { stripe } from '@/lib/stripe-server'
 
 /**
  * Verifies if a price ID represents a lifetime subscription

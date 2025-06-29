@@ -1,14 +1,14 @@
+import { GraphQLClient } from 'graphql-request'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { emotesRequired } from '@/components/Dashboard/ChatBot'
 import type { EmoteSetResponse } from '@/lib/7tv'
 import { get7TVUser, getOrCreateEmoteSet } from '@/lib/7tv'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD, UPDATE_USER_CONNECTION } from '@/lib/gql'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
-import { GraphQLClient } from 'graphql-request'
-import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

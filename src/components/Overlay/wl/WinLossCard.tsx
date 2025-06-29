@@ -1,8 +1,8 @@
+import clsx from 'clsx'
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import clsx from 'clsx'
 
 type WLType = {
   mainScreen?: boolean

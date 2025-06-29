@@ -1,11 +1,11 @@
 'use client'
 
-import { type SettingMetadata, getSearchableText, settingsMetadata } from '@/lib/settingsMetadata'
 import { Empty, Input, type InputRef, List, Popover, Typography } from 'antd'
 import clsx from 'clsx'
 import { ChevronRight, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { getSearchableText, type SettingMetadata, settingsMetadata } from '@/lib/settingsMetadata'
 
 interface SearchResult extends SettingMetadata {
   score: number

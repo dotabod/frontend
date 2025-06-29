@@ -1,8 +1,8 @@
-import { useTrack } from '@/lib/track'
 import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import { Button, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useTrack } from '@/lib/track'
 
 const CodeBlock = () => {
   const track = useTrack()

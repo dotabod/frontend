@@ -1,3 +1,5 @@
+import Head from 'next/head'
+import type { ReactElement } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import BetsCard from '@/components/Dashboard/Features/BetsCard'
 import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
@@ -7,8 +9,6 @@ import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
-import Head from 'next/head'
-import type { ReactElement } from 'react'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>

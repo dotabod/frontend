@@ -1,4 +1,3 @@
-import { COOKIE_EVENTS, type CookiePreferences, useCookiePreferences } from '@/lib/cookieManager'
 import {
   Alert,
   Button,
@@ -15,6 +14,7 @@ import {
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { COOKIE_EVENTS, type CookiePreferences, useCookiePreferences } from '@/lib/cookieManager'
 
 const { Title, Paragraph } = Typography
 const { TabPane } = Tabs

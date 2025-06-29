@@ -1,6 +1,6 @@
+import { Card, Typography } from 'antd'
 import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscriptionAlert'
 import TwitchChat from '@/components/TwitchChat'
-import { Card, Typography } from 'antd'
 
 const { Title, Paragraph, Text } = Typography
 

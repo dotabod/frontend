@@ -1,11 +1,11 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
+import * as z from 'zod'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
-import type { NextApiRequest, NextApiResponse } from 'next'
-import * as z from 'zod'
 
 const approvedModeratorSchema = z.array(z.number())
 

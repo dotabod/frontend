@@ -1,15 +1,15 @@
-import { useSubscription } from '@/hooks/useSubscription'
-import {
-  type FeatureTier,
-  type GenericFeature,
-  SUBSCRIPTION_TIERS,
-  getRequiredTier,
-  isSubscriptionActive,
-} from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import { Button, Tag, Tooltip } from 'antd'
 import { CrownIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useSubscription } from '@/hooks/useSubscription'
+import {
+  type FeatureTier,
+  type GenericFeature,
+  getRequiredTier,
+  isSubscriptionActive,
+  SUBSCRIPTION_TIERS,
+} from '@/utils/subscription'
 
 export const TierBadge: React.FC<{
   requiredTier?: SubscriptionTier | null

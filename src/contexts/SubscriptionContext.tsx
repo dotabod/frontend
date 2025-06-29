@@ -1,9 +1,9 @@
+import { useSession } from 'next-auth/react'
+import { createContext, type ReactNode, useContext } from 'react'
+import useSWR from 'swr'
 import { useSubscription as useSubscriptionData } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
-import { type SubscriptionRow, hasPaidPlan, isInGracePeriod } from '@/utils/subscription'
-import { useSession } from 'next-auth/react'
-import { type ReactNode, createContext, useContext } from 'react'
-import useSWR from 'swr'
+import { hasPaidPlan, isInGracePeriod, type SubscriptionRow } from '@/utils/subscription'
 
 // Define the expected response shape for credit balance
 interface CreditBalanceResponse {

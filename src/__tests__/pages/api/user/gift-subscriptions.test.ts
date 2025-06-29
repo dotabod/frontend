@@ -1,7 +1,7 @@
-import handler from '@/pages/api/user/gift-subscriptions'
 import type { GiftSubscription, Subscription, User } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import handler from '@/pages/api/user/gift-subscriptions'
 
 // Mock prisma
 vi.mock('@/lib/db', () => ({
@@ -30,9 +30,9 @@ vi.mock('@/utils/formatDate', () => ({
   formatDate: vi.fn((date) => '2025-01-01'),
 }))
 
+import { getServerSession } from 'next-auth'
 // Import mocked modules
 import prisma from '@/lib/db'
-import { getServerSession } from 'next-auth'
 
 describe('gift-subscriptions API', () => {
   beforeEach(() => {

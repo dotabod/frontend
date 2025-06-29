@@ -1,9 +1,9 @@
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from '@/lib/api/getServerSession'
+import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
-import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function getApprovedModerators(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

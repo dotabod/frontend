@@ -1,14 +1,13 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
-
 import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 import { CircleBackground } from 'src/components/CircleBackground'
 import { Container } from 'src/components/Container'
 import { AppScreen } from 'src/components/Homepage/AppScreen'
 import { PhoneFrame } from 'src/components/Homepage/PhoneFrame'
+import { useDebouncedCallback } from 'use-debounce'
 
 const MotionAppScreenHeader = motion(AppScreen.Header)
 const MotionAppScreenBody = motion(AppScreen.Body)

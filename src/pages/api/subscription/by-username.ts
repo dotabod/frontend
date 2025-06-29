@@ -1,7 +1,7 @@
-import prisma from '@/lib/db'
-import { SUBSCRIPTION_TIERS, getSubscription, isInGracePeriod } from '@/utils/subscription'
 import type { SubscriptionTier } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import prisma from '@/lib/db'
+import { getSubscription, isInGracePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

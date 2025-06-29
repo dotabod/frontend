@@ -1,6 +1,6 @@
+import { useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useState } from 'react'
 
 const Building = ({ data, team }) => {
   const [imageError, setImageError] = useState(false)

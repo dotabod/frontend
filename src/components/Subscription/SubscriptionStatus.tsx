@@ -1,7 +1,7 @@
-import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { getCurrentPeriod } from '@/utils/subscription'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
+import { getCurrentPeriod } from '@/utils/subscription'
 
 // Define a type for credit balance
 interface CreditBalance {

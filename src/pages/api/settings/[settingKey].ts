@@ -1,14 +1,14 @@
+import { captureException } from '@sentry/nextjs'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import * as z from 'zod'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
 import { getSubscription } from '@/utils/subscription'
-import { captureException } from '@sentry/nextjs'
-import type { NextApiRequest, NextApiResponse } from 'next'
-import * as z from 'zod'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)

@@ -1,7 +1,3 @@
-import type { StatusInfo } from '@/components/Subscription/types'
-import prisma from '@/lib/db'
-import type { SettingKeys, defaultSettings } from '@/lib/defaultSettings'
-import { formatDate } from '@/utils/formatDate'
 import {
   type Prisma,
   type Subscription,
@@ -9,6 +5,10 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
+import type { StatusInfo } from '@/components/Subscription/types'
+import prisma from '@/lib/db'
+import type { defaultSettings, SettingKeys } from '@/lib/defaultSettings'
+import { formatDate } from '@/utils/formatDate'
 
 // Add type safety for chatters
 type ChatterKeys = keyof typeof defaultSettings.chatters

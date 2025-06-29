@@ -1,8 +1,8 @@
-import { type SubscriptionRow, isSubscriptionActive } from '@/utils/subscription'
 import type { Subscription } from '@prisma/client'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
 import { createContext, useEffect, useState } from 'react'
+import { isSubscriptionActive, type SubscriptionRow } from '@/utils/subscription'
 
 interface SubscriptionContextType {
   subscription: SubscriptionRow | null

@@ -1,9 +1,9 @@
+import { AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { PollOverlay } from '@/components/Overlay/PollOverlay'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
 import { WinProbability } from './WinProbability'
 
 export const PollOverlays = ({ pollData, betData, radiantWinChance, setPollData, setBetData }) => {

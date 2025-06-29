@@ -1,10 +1,9 @@
-import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { GRACE_PERIOD_END, gracePeriodEndNextDay, isInGracePeriod } from '@/utils/subscription'
-import { Alert, Button, Skeleton, message } from 'antd'
+import { Alert, Button, message, Skeleton } from 'antd'
 import { CheckCircleIcon, ClockIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import { useState } from 'react'
-import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
-import type { SubscriptionWithGiftDetails } from './types'
+import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
+import { GRACE_PERIOD_END, gracePeriodEndNextDay, isInGracePeriod } from '@/utils/subscription'
+import type { GiftInfo, GiftSubInfo, StatusInfo, SubscriptionWithGiftDetails } from './types'
 
 // Reusable component for subscription alert messages
 function SubscriptionAlertMessage({

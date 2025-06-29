@@ -1,10 +1,10 @@
+import Head from 'next/head'
+import type { ReactNode } from 'react'
 import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
-import Head from 'next/head'
-import type { ReactNode } from 'react'
 import HubSpotIdentification from '../HubSpotIdentification'
 import HubSpotScript from '../HubSpotScript'
 

@@ -1,10 +1,10 @@
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Card } from '@/ui/card'
 import { Button, Form, Spin, Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
+import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Card } from '@/ui/card'
 import { Input } from '../../Input'
 import { TierSwitch } from './TierSwitch'
 

@@ -1,3 +1,5 @@
+import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
 import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
 import { PickScreenV2 } from '@/components/Overlay/blocker/PickBlockerV2'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
@@ -7,8 +9,6 @@ import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
-import { clsx } from 'clsx'
-import { motion } from 'framer-motion'
 
 export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type } }) => {
   const res = useTransformRes()

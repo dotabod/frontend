@@ -1,9 +1,8 @@
-import handler from '@/pages/api/test-emote-set'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 // Import types first
 import type { EmoteSetResponse } from '@/lib/7tv'
+import handler from '@/pages/api/test-emote-set'
 
 // Mock modules with vi.mock
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
@@ -34,6 +33,7 @@ vi.mock('@sentry/nextjs', () => ({
   withScope: vi.fn((callback) => callback({ setTag: vi.fn(), setContext: vi.fn() })),
 }))
 
+import { captureException, withScope } from '@sentry/nextjs'
 // Import mocked modules after vi.mock declarations
 import {
   create7TVClient,
@@ -42,7 +42,6 @@ import {
   isSevenTVError,
   verifyEmoteInSet,
 } from '@/lib/7tv'
-import { captureException, withScope } from '@sentry/nextjs'
 
 describe('test-emote-set API', () => {
   beforeEach(() => {

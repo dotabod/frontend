@@ -1,12 +1,12 @@
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
-import { authOptions } from '@/lib/auth'
-import { prismaMongo } from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import { detect } from 'curse-filter'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+import { getServerSession } from '@/lib/api/getServerSession'
+import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { authOptions } from '@/lib/auth'
+import { prismaMongo } from '@/lib/db'
 
 // Define validation schema for updating a notable player
 const updateNotablePlayerSchema = z.object({

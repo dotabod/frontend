@@ -1,7 +1,7 @@
-import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { Typography } from 'antd'
-import { useSession } from 'next-auth/react'
 import Image from 'next/image'
+import { useSession } from 'next-auth/react'
+import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import DownloadButton from './DownloadButton'
 
 export default function UnixInstaller() {

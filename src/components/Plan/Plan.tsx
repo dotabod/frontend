@@ -1,3 +1,12 @@
+import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
+import { App, Button, notification, Tooltip } from 'antd'
+import clsx from 'clsx'
+import { Bitcoin, Wallet } from 'lucide-react'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { signIn, useSession } from 'next-auth/react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import useSWR from 'swr'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Settings } from '@/lib/defaultSettings'
 import { isFeatureEnabled } from '@/lib/featureFlags'
@@ -5,23 +14,14 @@ import { fetcher } from '@/lib/fetcher'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
-  type PricePeriod,
-  SUBSCRIPTION_TIERS,
-  type SubscriptionRow,
   calculateSavings,
   getPriceId,
   gracePeriodPrettyDate,
   isSubscriptionActive,
+  type PricePeriod,
+  SUBSCRIPTION_TIERS,
+  type SubscriptionRow,
 } from '@/utils/subscription'
-import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
-import { App, Button, Tooltip, notification } from 'antd'
-import clsx from 'clsx'
-import { Bitcoin, Wallet } from 'lucide-react'
-import { signIn, useSession } from 'next-auth/react'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import useSWR from 'swr'
 import CryptoToggle from '../CryptoToggle'
 import ErrorBoundary from '../ErrorBoundary'
 import { Logomark } from '../Logo'

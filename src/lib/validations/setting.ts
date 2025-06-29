@@ -1,5 +1,5 @@
-import { type SubscriptionRow, canAccessFeature } from '@/utils/subscription'
 import * as z from 'zod'
+import { canAccessFeature, type SubscriptionRow } from '@/utils/subscription'
 
 // Define schemas for each specific setting
 const settingsSchema = {

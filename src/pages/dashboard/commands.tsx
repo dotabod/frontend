@@ -1,11 +1,11 @@
+import { Empty, Input, Segmented } from 'antd'
+import Head from 'next/head'
+import { type ReactElement, useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import Header from '@/components/Dashboard/Header'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
-import { Empty, Input, Segmented } from 'antd'
-import Head from 'next/head'
-import { type ReactElement, useState } from 'react'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 
 const CommandsPage = () => {

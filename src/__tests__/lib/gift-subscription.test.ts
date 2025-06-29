@@ -1,5 +1,5 @@
-import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 import { describe, expect, it } from 'vitest'
+import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 
 describe('Gift Subscription Utilities', () => {
   describe('calculateGiftEndDate', () => {

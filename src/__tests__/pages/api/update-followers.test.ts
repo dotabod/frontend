@@ -1,6 +1,6 @@
-import handler from '@/pages/api/update-followers'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import handler from '@/pages/api/update-followers'
 
 // Mock the middleware
 vi.mock('@/lib/api-middlewares/with-authentication', () => ({
@@ -48,10 +48,10 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+import { captureException } from '@sentry/nextjs'
 import { getServerSession } from '@/lib/api/getServerSession'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { captureException } from '@sentry/nextjs'
 
 describe('update-followers API', () => {
   beforeEach(() => {

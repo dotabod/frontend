@@ -1,7 +1,7 @@
+import { Collapse, Tag } from 'antd'
 import type CommandDetail from '@/components/Dashboard/CommandDetail'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { Collapse, Tag } from 'antd'
 import { TierSwitch } from './TierSwitch'
 
 export default function CommandsCard({

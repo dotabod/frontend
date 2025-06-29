@@ -1,6 +1,6 @@
-import Banner from '@/components/Banner'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import Banner from '@/components/Banner'
 
 // Mock the GRACE_PERIOD_END constant
 vi.mock('@/utils/subscription', () => ({

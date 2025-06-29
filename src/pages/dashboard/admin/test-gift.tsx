@@ -1,6 +1,3 @@
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { fetcher } from '@/lib/fetcher'
-import type { NextPageWithLayout } from '@/pages/_app'
 import {
   Alert,
   Button,
@@ -8,16 +5,19 @@ import {
   Input,
   InputNumber,
   Layout,
+  message,
   Select,
   Space,
   Typography,
-  message,
 } from 'antd'
-import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import { useSession } from 'next-auth/react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
+import { fetcher } from '@/lib/fetcher'
+import type { NextPageWithLayout } from '@/pages/_app'
 
 const { Content } = Layout
 const { Title, Text, Paragraph } = Typography

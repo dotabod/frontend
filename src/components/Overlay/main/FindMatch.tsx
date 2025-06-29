@@ -1,8 +1,8 @@
+import { motion } from 'framer-motion'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
-import { motion } from 'framer-motion'
 import { MatchTimer } from './MatchTimer'
 
 export const FindMatch = () => {

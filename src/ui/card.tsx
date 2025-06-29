@@ -1,10 +1,10 @@
+import clsx from 'clsx'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useState } from 'react'
 import { LockedFeatureOverlay } from '@/components/Dashboard/Features/LockedFeatureOverlay'
 import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import type { FeatureTier, GenericFeature } from '@/utils/subscription'
-import clsx from 'clsx'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
 
 interface CardProps {
   title?: React.ReactNode

@@ -1,6 +1,3 @@
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import UserSelector from '@/components/Dashboard/UserSelector'
-import { Card } from '@/ui/card'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import type { ScheduledMessage } from '@prisma/client'
 import type { TabsProps } from 'antd'
@@ -10,20 +7,23 @@ import {
   Form,
   Input,
   Modal,
+  message,
   Progress,
   Space,
   Table,
   Tabs,
   Tooltip,
   Typography,
-  message,
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import DashboardShell from '@/components/Dashboard/DashboardShell'
+import UserSelector from '@/components/Dashboard/UserSelector'
+import { Card } from '@/ui/card'
 
 const { Title } = Typography
 const { TextArea } = Input
