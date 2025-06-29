@@ -46,7 +46,11 @@ const Text = ({
   pos = null,
   className = '',
   children,
-}: { pos?: number | null; className?: string; children: React.ReactNode }) => (
+}: {
+  pos?: number | null
+  className?: string
+  children: React.ReactNode
+}) => (
   <div
     className={clsx(
       'text-shadow relative flex translate-x-[-50%] flex-col text-center text-sm text-white duration-[2s] ease-in-out',
@@ -58,11 +62,7 @@ const Text = ({
   </div>
 )
 
-export const WinProbability = ({
-  radiantWinChance,
-}: {
-  radiantWinChance: WinChance
-}) => {
+export const WinProbability = ({ radiantWinChance }: { radiantWinChance: WinChance }) => {
   const { data: isEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
   const res = useTransformRes()
 

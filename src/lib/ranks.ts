@@ -62,13 +62,7 @@ const leaderRanks = [
   { range: [1001, 100000], image: '80.png', sparklingEffect: false },
 ]
 
-function lookupLeaderRank({
-  mmr,
-  standing,
-}: {
-  mmr: number
-  standing: number | null
-}) {
+function lookupLeaderRank({ mmr, standing }: { mmr: number; standing: number | null }) {
   const lowestImmortalRank = leaderRanks[leaderRanks.length - 1]
   const defaultNotFound = { myRank: lowestImmortalRank, mmr, standing }
 

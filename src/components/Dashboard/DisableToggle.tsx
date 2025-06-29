@@ -1,5 +1,6 @@
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
+import { useDisableReasons } from '@/lib/hooks/useDisableReasons'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { App, Button, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
@@ -55,6 +56,7 @@ export function DisableToggle() {
     revalidateOnReconnect: false,
   })
   const isLive = settingsData?.stream_online
+  const { getDisableReasonExplanation } = useDisableReasons()
 
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
 
@@ -75,26 +77,55 @@ export function DisableToggle() {
 
   useEffect(() => {
     if (isDotabodDisabled) {
+      // Show enhanced notification with disable reason if available
+      const disableReason = data?.disableReason
+      const disableMetadata = data?.disableMetadata
+
+      let message = 'Dotabod is currently disabled.'
+      let description = (
+        <div className='space-y-2'>
+          <span>
+            Click the toggle to enable it. You will not receive any game events or commands until
+            you do.
+          </span>
+          <Toggle />
+        </div>
+      )
+
+      if (disableReason) {
+        const explanation = getDisableReasonExplanation(disableReason, disableMetadata)
+        message = explanation.title
+        description = (
+          <div className='space-y-2'>
+            <span>{explanation.description}</span>
+            {explanation.action && (
+              <span>
+                <strong>Action needed:</strong> {explanation.action}
+              </span>
+            )}
+            <Toggle />
+          </div>
+        )
+      }
+
       notification.open({
         key: 'dotabod-disabled',
         type: 'warning',
         duration: 0,
         placement: 'bottomLeft',
-        message: 'Dotabod is currently disabled.',
-        description: (
-          <div className='space-y-2'>
-            <span>
-              Click the toggle to enable it. You will not receive any game events or commands until
-              you do.
-            </span>
-            <Toggle />
-          </div>
-        ),
+        message,
+        description,
       })
     } else {
       notification.destroy('dotabod-disabled')
     }
-  }, [isDotabodDisabled, notification])
+  }, [
+    isDotabodDisabled,
+    data?.disableReason,
+    data?.disableMetadata,
+    notification,
+    getDisableReasonExplanation,
+  ])
 
   const botuser = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? 'dotabod' : 'dotabod_test'
 

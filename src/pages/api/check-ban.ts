@@ -4,6 +4,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/db'
 import { captureException } from '@sentry/nextjs'
 import { getTwitchTokens } from '../../lib/getTwitchTokens'
 
@@ -49,7 +50,31 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (error) {
       return res.status(403).json({ message: 'Forbidden' })
     }
-    const response = await checkBan(providerAccountId, accessToken)
+
+    const banResponse = await checkBan(providerAccountId, accessToken)
+
+    // Also check for disable reasons related to bot bans
+    const commandDisableSetting = await prisma.setting.findFirst({
+      where: {
+        userId: session.user.id,
+        key: 'commandDisable',
+      },
+      select: {
+        value: true,
+        disableReason: true,
+        autoDisabledAt: true,
+        disableMetadata: true,
+      },
+    })
+
+    const response = {
+      ...banResponse,
+      disabled: commandDisableSetting?.value === true,
+      disableReason: commandDisableSetting?.disableReason,
+      disabledAt: commandDisableSetting?.autoDisabledAt,
+      disableMetadata: commandDisableSetting?.disableMetadata,
+    }
+
     return res.status(200).json(response)
   } catch (error) {
     captureException(error)

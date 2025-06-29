@@ -5,7 +5,10 @@ import Image from 'next/image'
 export function HeroBlocker({
   teamName,
   type,
-}: { teamName: 'radiant' | 'dire'; type?: blockType['type'] }) {
+}: {
+  teamName: 'radiant' | 'dire'
+  type?: blockType['type']
+}) {
   const res = useTransformRes()
 
   if (!type) return null

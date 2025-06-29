@@ -15,13 +15,7 @@ interface Emote {
 
 type Emotes = Emote[]
 
-export const TextWithEmotes = ({
-  emotes,
-  text,
-}: {
-  emotes: Emotes
-  text: string
-}) => {
+export const TextWithEmotes = ({ emotes, text }: { emotes: Emotes; text: string }) => {
   const res = useTransformRes()
 
   const textWithEmotes = text.split(' ').map((word) => {

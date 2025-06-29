@@ -2,13 +2,7 @@ import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { MagicCard } from './magic-card'
 
-const BentoGrid = ({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) => {
+const BentoGrid = ({ children, className }: { children: ReactNode; className?: string }) => {
   return (
     <div className={clsx('grid w-full auto-rows-[22rem] grid-cols-3 gap-4', className)}>
       {children}

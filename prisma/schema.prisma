@@ -66,6 +66,7 @@ model User {
   SteamAccount                      SteamAccount[]
   streams                           streams?
   subscription                      Subscription[]
+  disableNotifications              DisableNotification[] @relation("UserDisableNotifications")
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
@@ -90,16 +91,21 @@ model ApprovedModerator {
 }
 
 model Setting {
-  id        String   @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
-  key       String
-  value     Json?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id               String    @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @map("updated_at")
+  key              String
+  value            Json?
+  userId           String
+  disableReason    DisableReason? @map("disable_reason")
+  autoDisabledAt   DateTime? @map("auto_disabled_at")
+  autoDisabledBy   String?   @map("auto_disabled_by")
+  disableMetadata  Json?     @map("disable_metadata")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([key, userId])
   @@index([userId], map: "idx_settings_on_userid")
+  @@index([disableReason], map: "idx_settings_on_disable_reason")
   @@map("settings")
 }
 
@@ -248,6 +254,25 @@ model Notification {
   @@map("notifications")
 }
 
+model DisableNotification {
+  id           String    @id @default(dbgenerated("gen_random_uuid()"))
+  userId       String    @map("user_id")
+  settingKey   String    @map("setting_key")
+  reason       DisableReason
+  metadata     Json?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  acknowledged Boolean   @default(false)
+  resolvedAt   DateTime? @map("resolved_at")
+  autoResolved Boolean   @default(false) @map("auto_resolved")
+  user         User      @relation("UserDisableNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([acknowledged])
+  @@index([reason])
+  @@index([settingKey])
+  @@map("disable_notifications")
+}
+
 model WebhookEvent {
   id            String   @id @default(uuid())
   stripeEventId String   @unique
@@ -364,4 +389,19 @@ enum MessageStatus {
   DELIVERED
   FAILED
   CANCELLED
+}
+
+enum DisableReason {
+  TOKEN_REVOKED
+  MANUAL_DISABLE
+  STREAM_OFFLINE
+  CHAT_PERMISSION_DENIED
+  SUBSCRIPTION_INSUFFICIENT
+  API_ERROR
+  INVALID_TOKEN
+  CACHE_CLEARED
+  BOT_BANNED
+  GAME_STATE
+  RANK_RESTRICTION
+  ACCOUNT_SHARING
 }
