@@ -155,7 +155,7 @@ export function useDisableReasons() {
               : metadata?.drop_reason === 'user_warned'
                 ? 'Dotabod cannot send messages because the bot account is currently warned and must acknowledge the warning first.'
                 : metadata?.drop_reason === 'banned_phone_alias'
-                  ? 'Dotabod cannot send messages because the bot\'s phone number is banned from your channel.'
+                  ? "Dotabod cannot send messages because the bot's phone number is banned from your channel."
                   : `Dotabod cannot send messages due to: ${metadata?.drop_reason_message || 'chat permission restrictions'}.`,
           action:
             metadata?.drop_reason === 'followers_only_mode'
@@ -163,7 +163,7 @@ export function useDisableReasons() {
               : metadata?.drop_reason === 'user_warned'
                 ? 'The Dotabod bot account needs to acknowledge its warning in your Twitch channel'
                 : metadata?.drop_reason === 'banned_phone_alias'
-                  ? 'Unban the Dotabod bot\'s phone number in your Twitch channel moderation settings'
+                  ? "Unban the Dotabod bot's phone number in your Twitch channel moderation settings"
                   : 'Check your channel settings and ensure Dotabod has proper permissions',
           severity: 'high' as const,
         }

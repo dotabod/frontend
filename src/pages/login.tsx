@@ -29,11 +29,15 @@ const Login: NextPageWithLayout = () => {
       description: (
         <span>
           We couldn't log you in. First, try to login with{' '}
-          <a href='https://support.google.com/chrome/answer/95464?hl=en&co=GENIE.Platform%3DDesktop' target='_blank' rel='noreferrer'>
+          <a
+            href='https://support.google.com/chrome/answer/95464?hl=en&co=GENIE.Platform%3DDesktop'
+            target='_blank'
+            rel='noreferrer'
+          >
             Incognito mode in Chrome
           </a>
-          . If that doesn't work, maybe you already have an account on Dotabod with this
-          email. Try to update your email on{' '}
+          . If that doesn't work, maybe you already have an account on Dotabod with this email. Try
+          to update your email on{' '}
           <a href='https://www.twitch.tv/settings/security' target='_blank' rel='noreferrer'>
             Twitch
           </a>{' '}
