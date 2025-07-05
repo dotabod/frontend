@@ -28,12 +28,16 @@ const Login: NextPageWithLayout = () => {
       message: 'Login error',
       description: (
         <span>
-          We couldn't log you in. It looks like you already have an account on Dotabod with this
-          email. Please update your email on{' '}
+          We couldn't log you in. First, try to login with{' '}
+          <a href='https://support.google.com/chrome/answer/95464?hl=en&co=GENIE.Platform%3DDesktop' target='_blank' rel='noreferrer'>
+            Incognito mode in Chrome
+          </a>
+          . If that doesn't work, maybe you already have an account on Dotabod with this
+          email. Try to update your email on{' '}
           <a href='https://www.twitch.tv/settings/security' target='_blank' rel='noreferrer'>
             Twitch
           </a>{' '}
-          to a new one and try logging in again. If you need more help, reach out to us through our{' '}
+          to a new one and then try again. If you need more help, reach out to us through our{' '}
           <Link href='/contact'>contact page</Link>.
         </span>
       ),
