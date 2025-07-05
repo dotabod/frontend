@@ -1,4 +1,5 @@
 import { CheckCircleOutlined } from '@ant-design/icons'
+import type { DisableReason } from '@prisma/client'
 import { Alert, Button, Space } from 'antd'
 import { type DisableNotification, useDisableReasons } from '@/lib/hooks/useDisableReasons'
 
@@ -19,7 +20,10 @@ export function DisableReasonAlert({
 }: DisableReasonAlertProps) {
   const { getDisableReasonExplanation } = useDisableReasons()
 
-  const explanation = getDisableReasonExplanation(notification.reason, notification.metadata)
+  const explanation = getDisableReasonExplanation(
+    notification.reason as DisableReason,
+    notification.metadata,
+  )
 
   const handleAcknowledge = () => {
     onAcknowledge?.(notification.id)
