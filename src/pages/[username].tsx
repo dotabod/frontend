@@ -1,5 +1,6 @@
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
 import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
+import { type GetStaticPaths, type GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -8,10 +9,34 @@ import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
+import prisma from '@/lib/db'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
+import { getSubscription } from '@/utils/subscription'
 
-const PageContent = () => {
+interface PageContentProps {
+  userData?: {
+    displayName: string | null
+    name: string
+    stream_online: boolean
+    image: string | null
+    createdAt: string
+    mmr?: number
+    settings: Array<{
+      key: string
+      value: any
+    }>
+  } | null
+  subscriptionInfo?: {
+    isPro: boolean
+    isLifetime: boolean
+    isGracePeriodPro: boolean
+    inGracePeriod: boolean
+  }
+  username?: string
+}
+
+const PageContent = ({ userData: ssrUserData, subscriptionInfo: ssrSubscriptionInfo, username: ssrUsername }: PageContentProps = {}) => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
@@ -22,19 +47,24 @@ const PageContent = () => {
     inGracePeriod: boolean
     loading: boolean
   }>({
-    isPro: false,
-    isLifetime: false,
-    isGracePeriodPro: false,
-    inGracePeriod: false,
-    loading: true,
+    isPro: ssrSubscriptionInfo?.isPro || false,
+    isLifetime: ssrSubscriptionInfo?.isLifetime || false,
+    isGracePeriodPro: ssrSubscriptionInfo?.isGracePeriodPro || false,
+    inGracePeriod: ssrSubscriptionInfo?.inGracePeriod || false,
+    loading: !ssrSubscriptionInfo,
   })
   const router = useRouter()
   const { username } = router.query
   const { data, loading, error, notFound } = useGetSettingsByUsername()
 
-  // Fetch subscription information
+  // Use SSR data if available, otherwise fall back to client-side data
+  const finalUserData = ssrUserData || data
+  const finalUsername = ssrUsername || (typeof username === 'string' ? username : '')
+  const finalLoading = ssrUserData ? false : loading
+
+  // Fetch subscription information only if we don't have SSR data
   useEffect(() => {
-    if (username && typeof username === 'string') {
+    if (!ssrSubscriptionInfo && username && typeof username === 'string') {
       fetch(`/api/subscription/by-username?username=${username}`)
         .then((res) => res.json())
         .then((data) => {
@@ -56,16 +86,16 @@ const PageContent = () => {
           })
         })
     }
-  }, [username])
+  }, [username, ssrSubscriptionInfo])
 
   useEffect(() => {
-    // Only redirect to 404 if username exists in query and we've finished loading
-    if (username && !loading && (notFound || data?.error || error)) {
+    // Only redirect to 404 if username exists in query and we've finished loading (for client-side only)
+    if (!ssrUserData && username && !finalLoading && (notFound || finalUserData?.error || error)) {
       router.push('/404')
     }
-  }, [data, loading, router, notFound, error, username])
+  }, [finalUserData, finalLoading, router, notFound, error, username, ssrUserData])
 
-  if (loading || error || !data) {
+  if (finalLoading || error || !finalUserData) {
     return (
       <div className='p-6'>
         <div className='mb-12 space-y-4'>
@@ -105,16 +135,16 @@ const PageContent = () => {
     )
   }
 
-  const commands = data?.settings
+  const commands = finalUserData?.settings
     ? Object.keys(CommandDetail).map((command) => {
-        const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
+        const isEnabled = getValueOrDefault(CommandDetail[command].key, finalUserData?.settings)
         return { command, isEnabled: !!isEnabled }
       })
     : []
 
   const filteredCommands = Object.keys(CommandDetail)
     .filter((command) => {
-      const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
+      const isEnabled = getValueOrDefault(CommandDetail[command].key, finalUserData?.settings)
       if (enabled === 'Enabled') return isEnabled === true
       if (enabled === 'Disabled') return isEnabled === false
       return true
@@ -181,7 +211,7 @@ const PageContent = () => {
   return (
     <>
       <Head>
-        <title>{`Commands for ${loading || !data?.displayName ? '...' : data.displayName} - Dotabod`}</title>
+        <title>{`Commands for ${finalLoading || !finalUserData?.displayName ? '...' : finalUserData.displayName} - Dotabod`}</title>
         <meta
           name='description'
           content='An exhaustive list of all commands available using Twitch chat.'
@@ -216,7 +246,7 @@ const PageContent = () => {
                   className='flex flex-row items-center space-x-2'
                 >
                   <h1 className='text-2xl font-bold leading-6'>
-                    {loading || !data?.displayName ? 'Loading...' : data.displayName}
+                    {finalLoading || !finalUserData?.displayName ? 'Loading...' : finalUserData.displayName}
                   </h1>
                   <ExternalLinkIcon className='flex' size={15} />
                 </Link>
@@ -229,9 +259,9 @@ const PageContent = () => {
               </div>
               <span>
                 Using Dotabod since{' '}
-                {loading || !data?.createdAt
+                {finalLoading || !finalUserData?.createdAt
                   ? '...'
-                  : new Date(data.createdAt).toLocaleDateString()}
+                  : new Date(finalUserData.createdAt).toLocaleDateString()}
               </span>
             </div>
             <div>
@@ -289,7 +319,7 @@ const PageContent = () => {
               readonly
               key={key}
               id={key}
-              publicLoading={loading}
+              publicLoading={finalLoading}
               publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
               command={CommandDetail[key]}
             />
@@ -300,22 +330,177 @@ const PageContent = () => {
   )
 }
 
-const CommandsPage = () => {
+interface UserProfileProps {
+  userData: {
+    displayName: string | null
+    name: string
+    stream_online: boolean
+    image: string | null
+    createdAt: string
+    mmr?: number
+    settings: Array<{
+      key: string
+      value: any
+    }>
+  } | null
+  subscriptionInfo: {
+    isPro: boolean
+    isLifetime: boolean
+    isGracePeriodPro: boolean
+    inGracePeriod: boolean
+  }
+  username: string
+}
+
+const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps) => {
   const router = useRouter()
-  const { username } = router.query
-  const usernameStr = typeof username === 'string' ? username : ''
+
+  // If we're in fallback mode, show loading
+  if (router.isFallback) {
+    return (
+      <HomepageShell>
+        <div className='p-6'>
+          <Skeleton active />
+        </div>
+      </HomepageShell>
+    )
+  }
+
+  // If no user data, show 404
+  if (!userData) {
+    return (
+      <HomepageShell>
+        <div className='p-6'>
+          <Empty description='User not found' />
+        </div>
+      </HomepageShell>
+    )
+  }
+
+  const pageTitle = `${userData.displayName || userData.name} - ${userData.mmr || 0} MMR | Dotabod`
+  const pageDescription = `View ${userData.displayName || userData.name}'s Dota 2 commands and stream stats on Dotabod. ${userData.stream_online ? 'Currently live streaming!' : 'Stream offline.'}`
 
   return (
-    <HomepageShell
-      dontUseTitle
-      ogImage={{
-        title: usernameStr,
-        subtitle: 'Commands and settings available for this streamer.',
-      }}
-    >
-      <PageContent />
-    </HomepageShell>
+    <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name='description' content={pageDescription} />
+        <meta property='og:title' content={pageTitle} />
+        <meta property='og:description' content={pageDescription} />
+        <meta property='og:image' content={userData.image || '/images/hero/default.png'} />
+        <meta property='og:url' content={`https://dotabod.com/${username}`} />
+        <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:title' content={pageTitle} />
+        <meta property='twitter:description' content={pageDescription} />
+        <meta property='twitter:image' content={userData.image || '/images/hero/default.png'} />
+        <link rel='canonical' href={`https://dotabod.com/${username}`} />
+      </Head>
+      <HomepageShell
+        dontUseTitle
+        ogImage={{
+          title: userData.displayName || userData.name,
+          subtitle: 'Commands and settings available for this streamer.',
+        }}
+      >
+        <PageContent userData={userData} subscriptionInfo={subscriptionInfo} username={username} />
+      </HomepageShell>
+    </>
   )
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Pre-build only the most popular users for fastest loading
+  const topUsers = await prisma.user.findMany({
+    where: {
+      AND: [
+        { followers: { gte: 500 } }, // Higher threshold for pre-building
+        { stream_online: true }, // Focus on currently active streamers
+      ]
+    },
+    select: { name: true },
+    orderBy: { followers: 'desc' },
+    take: 500, // Pre-build only top 500 most popular active users
+  })
+
+  const paths = topUsers.map((user) => ({
+    params: { username: user.name },
+  }))
+
+  return {
+    paths,
+    fallback: 'blocking', // Generate other 29,950+ pages on-demand with ISR
+  }
+}
+
+export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params }) => {
+  const username = params?.username as string
+
+  if (!username) {
+    return { notFound: true }
+  }
+
+  try {
+    // Fetch user data
+    const userData = await prisma.user.findFirst({
+      select: {
+        id: true,
+        displayName: true,
+        name: true,
+        stream_online: true,
+        image: true,
+        createdAt: true,
+        mmr: true,
+        settings: {
+          select: {
+            key: true,
+            value: true,
+          },
+          where: {
+            key: {
+              startsWith: 'command',
+            },
+          },
+        },
+      },
+      where: {
+        name: username.toLowerCase(),
+      },
+    })
+
+    if (!userData) {
+      return { notFound: true }
+    }
+
+    // Fetch subscription info
+    const subscription = await getSubscription(userData.id)
+    console.log(subscription)
+    const subscriptionInfo = {
+      isPro: subscription?.tier === 'PRO',
+      isLifetime: subscription?.transactionType === 'LIFETIME',
+      isGracePeriodPro: false,
+      inGracePeriod: false,
+    }
+
+    return {
+      props: {
+        userData: {
+          displayName: userData.displayName,
+          name: userData.name,
+          stream_online: userData.stream_online,
+          image: userData.image,
+          createdAt: userData.createdAt.toISOString(),
+          mmr: userData.mmr,
+          settings: userData.settings,
+        },
+        subscriptionInfo,
+        username: username.toLowerCase(),
+      },
+      revalidate: 600, // Revalidate every 10 minutes
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error)
+    return { notFound: true }
+  }
 }
 
 export default CommandsPage
