@@ -95,7 +95,7 @@ const HomepageShell = ({
         <meta property='twitter:description' content={pageDescription} />
         <meta property='twitter:image' content={absolutePageImage} />
 
-        {!seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
+        {seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
 
         {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
         <style global jsx>{`

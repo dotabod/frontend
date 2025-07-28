@@ -318,7 +318,7 @@ export default function DashboardShell({
         {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
 
         {/* Dashboard pages should generally not be indexed by search engines */}
-        {!seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
+        {seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
       </Head>
       <Banner />
       <HubSpotScript />
