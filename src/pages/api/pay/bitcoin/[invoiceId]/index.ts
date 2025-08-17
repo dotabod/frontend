@@ -9,9 +9,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const invoiceId = req.query.invoiceId as string
     const token = req.query.token as string
 
-    console.log('invoiceId', invoiceId)
-    console.log('token', token)
-
     // Verify token
     const tokenData = verifyPaylinkToken(invoiceId, token)
     if (!tokenData) {

@@ -8,14 +8,12 @@ export const runtime = 'nodejs'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const rawBody = await req.body
-    let event: OpenNodeCharge
+    // In Next.js, req.body is already parsed for application/json content-type
+    const event: OpenNodeCharge = req.body
 
-    try {
-      event = JSON.parse(rawBody)
-    } catch {
-      console.error('Invalid JSON', rawBody)
-      res.status(500).json({ error: 'Invalid JSON' })
+    if (!event || typeof event !== 'object') {
+      console.error('Invalid webhook body', req.body)
+      res.status(400).json({ error: 'Invalid webhook body' })
       return
     }
 
