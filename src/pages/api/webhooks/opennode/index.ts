@@ -14,13 +14,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       event = JSON.parse(rawBody)
     } catch {
-      res.status(400).json({ error: 'Invalid JSON' })
+      console.error('Invalid JSON', rawBody)
+      res.status(500).json({ error: 'Invalid JSON' })
       return
     }
 
     // Verify OpenNode signature
     const isValid = await verifyOpenNodeWebhook(event)
     if (!isValid) {
+      console.error('Invalid signature', event)
       res.status(400).json({ error: 'Invalid signature' })
       return
     }
