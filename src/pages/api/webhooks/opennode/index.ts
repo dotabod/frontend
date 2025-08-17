@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const charge =  event || {}
     const status: string = charge.status
     const chargeId: string = charge.id
+    // @ts-ignore OpenNode charge metadata is not typed
     const invoiceId: string | undefined = charge.metadata?.stripe_invoice_id
 
     if (!chargeId || !invoiceId) {

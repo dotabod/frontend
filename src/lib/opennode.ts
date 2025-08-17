@@ -1,4 +1,4 @@
-import { createCharge, setCredentials, signatureIsValid } from 'opennode'
+import { createCharge, setCredentials, signatureIsValid, chargeInfo } from 'opennode'
 
 if (!process.env.OPENNODE_API_KEY) {
   throw new Error('OPENNODE_API_KEY is not set')
@@ -60,6 +60,21 @@ export async function verifyOpenNodeWebhook(eventData: any): Promise<boolean> {
     return false
   }
 }
+
+/**
+ * Gets the status of an OpenNode charge
+ */
+export async function getOpenNodeChargeStatus(chargeId: string): Promise<OpenNodeCharge | null> {
+  try {
+    const response = await chargeInfo(chargeId)
+
+    return { ...response, hosted_checkout_url: buildCheckoutUrl(response.id) }
+  } catch (error) {
+    console.error('Failed to get OpenNode charge status:', error)
+    return null
+  }
+}
+
 
 /**
  * Constructs hosted checkout URL with options

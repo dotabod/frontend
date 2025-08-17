@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       customer_email: invoice.customer_email || undefined,
       notif_email: invoice.customer_email || undefined,
       callback_url: `${process.env.NEXTAUTH_URL}/api/webhooks/opennode`,
-      success_url: `${process.env.NEXTAUTH_URL}/dashboard?paid=true&crypto=true`,
+      success_url: `${process.env.NEXTAUTH_URL}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
       auto_settle: false, // Configure based on treasury policy
       ttl: 60, // 1 hour expiration
       metadata: {

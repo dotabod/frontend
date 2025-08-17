@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
 import { BillingPlans } from '@/components/Billing/BillingPlans'
+import { PaymentStatusAlert } from '@/components/Billing/PaymentStatusAlert'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
@@ -90,6 +91,7 @@ const BillingPage = () => {
       <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
 
       <div>
+        <PaymentStatusAlert />
         <SubscriptionAlerts
           giftInfo={emptyGiftInfo}
           statusInfo={statusInfo}
