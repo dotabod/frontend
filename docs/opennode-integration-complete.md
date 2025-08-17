@@ -318,7 +318,7 @@ async function createOpenNodeInvoice(
 
 ### 4. OpenNode Payment Route
 
-**File**: `app/api/pay/bitcoin/[invoiceId]/route.ts`
+**File**: `pages/api/pay/bitcoin/[invoiceId]/route.ts`
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server'
@@ -407,7 +407,7 @@ export async function GET(
 
 ### 5. OpenNode Webhook Handler
 
-**File**: `app/api/webhooks/opennode/route.ts`
+**File**: `pages/api/webhooks/opennode/route.ts`
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server'
@@ -681,12 +681,12 @@ OPENNODE_CHECKOUT_HIDE_FIAT="false"
 
 ## Migration Checklist
 
-- [ ] Add OpenNode dependency: `npm install opennode`
+- [x] Add OpenNode dependency: `npm install opennode`
 - [ ] Create `src/lib/paylink.ts` utility functions
 - [ ] Create `src/lib/opennode.ts` SDK integration
 - [ ] Add database schema and run migration
-- [ ] Implement `app/api/pay/bitcoin/[invoiceId]/route.ts`
-- [ ] Implement `app/api/webhooks/opennode/route.ts`
+- [ ] Implement `pages/api/pay/bitcoin/[invoiceId]/route.ts`
+- [ ] Implement `pages/api/webhooks/opennode/route.ts`
 - [ ] Replace `createBoomfiInvoice()` with `createOpenNodeInvoice()`
 - [ ] Update `handleInvoiceEvent()` to process OpenNode payments
 - [ ] Add OpenNode environment variables

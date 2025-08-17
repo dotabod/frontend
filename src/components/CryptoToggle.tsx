@@ -21,9 +21,6 @@ const CryptoToggle = memo(
     featured = false,
     isEnabled = false,
   }: CryptoToggleProps) => {
-    // If feature is disabled, don't render the component
-    if (!isEnabled) return null
-
     // Use local state to track if we're in the middle of toggling
     const [isToggling, setIsToggling] = useState(false)
 
@@ -41,6 +38,9 @@ const CryptoToggle = memo(
         if (timer) clearTimeout(timer)
       }
     }, [isToggling])
+
+    // If feature is disabled, don't render the component
+    if (!isEnabled) return null
 
     const handleToggle = () => {
       // Only allow toggle if we're not already toggling

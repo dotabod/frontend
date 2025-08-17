@@ -34,45 +34,64 @@ model Account {
 }
 
 model User {
-  id                                String              @id @default(dbgenerated("gen_random_uuid()"))
-  displayName                       String?             @unique(map: "users_name_key")
-  email                             String?             @unique
+  id                                String                @id @default(dbgenerated("gen_random_uuid()"))
+  displayName                       String?               @unique(map: "users_name_key")
+  email                             String?               @unique
   image                             String?
-  createdAt                         DateTime            @default(now()) @map("created_at")
-  updatedAt                         DateTime            @default(now()) @map("updated_at")
-  mmr                               Int                 @default(0) @db.SmallInt
+  createdAt                         DateTime              @default(now()) @map("created_at")
+  updatedAt                         DateTime              @default(now()) @map("updated_at")
+  mmr                               Int                   @default(0) @db.SmallInt
   steam32Id                         Int?
   followers                         Int?
-  stream_delay                      Int?                @default(0) @db.SmallInt
-  name                              String              @unique(map: "users_username_key") @default("")
+  stream_delay                      Int?                  @default(0) @db.SmallInt
+  name                              String                @unique(map: "users_username_key") @default("")
   emailVerified                     DateTime?
-  stream_online                     Boolean             @default(false)
-  stream_start_date                 DateTime?           @db.Timestamp(6)
-  beta_tester                       Boolean             @default(false)
-  locale                            String              @default("en")
-  kick                              BigInt?             @unique
-  youtube                           String?             @unique
-  proExpiration                     DateTime?           @map("pro_expiration")
+  stream_online                     Boolean               @default(false)
+  stream_start_date                 DateTime?             @db.Timestamp(6)
+  beta_tester                       Boolean               @default(false)
+  locale                            String                @default("en")
+  kick                              BigInt?               @unique
+  youtube                           String?               @unique
+  proExpiration                     DateTime?             @map("pro_expiration")
+  currentViewers                    Int?                  @default(0)
+  hideFromLeaderboard               Boolean               @default(false)
+  lastStreamCheck                   DateTime?
+  streamPlatform                    String?
+  twitchUsername                    String?               @unique
+  kickUsername                      String?               @unique
+  streamCategory                    String?
+  streamStartedAt                   DateTime?
+  streamTitle                       String?
+  youtubeChannelId                  String?               @unique
   MessageDelivery                   MessageDelivery[]
   scheduledMessages                 ScheduledMessage[]
   Account                           Account?
   admin                             admin?
-  approvedModerators                ApprovedModerator[] @relation("UserApprovedModerators")
+  approvedModerators                ApprovedModerator[]   @relation("UserApprovedModerators")
+  disableNotifications              DisableNotification[] @relation("UserDisableNotifications")
   matches                           matches[]
-  mods_mods_mod_user_idTousers      mods[]              @relation("mods_mod_user_idTousers")
-  mods_mods_streamer_user_idTousers mods[]              @relation("mods_streamer_user_idTousers")
+  mods_mods_mod_user_idTousers      mods[]                @relation("mods_mod_user_idTousers")
+  mods_mods_streamer_user_idTousers mods[]                @relation("mods_streamer_user_idTousers")
   notifications                     Notification[]
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
   subscription                      Subscription[]
-  disableNotifications              DisableNotification[] @relation("UserDisableNotifications")
+  OpenNodeCharge                    OpenNodeCharge[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([id], map: "idx_users_on_id")
   @@index([name], map: "idx_users_on_name")
   @@index([locale])
   @@index([stream_online])
+  @@index([mmr(sort: Desc)], map: "idx_users_mmr_desc")
+  @@index([stream_online, mmr(sort: Desc)], map: "idx_users_stream_online_mmr_desc")
+  @@index([hideFromLeaderboard])
+  @@index([kickUsername])
+  @@index([lastStreamCheck])
+  @@index([streamPlatform])
+  @@index([twitchUsername])
+  @@index([youtubeChannelId])
   @@map("users")
 }
 
@@ -91,17 +110,17 @@ model ApprovedModerator {
 }
 
 model Setting {
-  id               String    @id @default(dbgenerated("gen_random_uuid()"))
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @default(now()) @map("updated_at")
-  key              String
-  value            Json?
-  userId           String
-  disableReason    DisableReason? @map("disable_reason")
-  autoDisabledAt   DateTime? @map("auto_disabled_at")
-  autoDisabledBy   String?   @map("auto_disabled_by")
-  disableMetadata  Json?     @map("disable_metadata")
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id              String         @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @default(now()) @map("updated_at")
+  key             String
+  value           Json?
+  userId          String
+  autoDisabledAt  DateTime?      @map("auto_disabled_at")
+  autoDisabledBy  String?        @map("auto_disabled_by")
+  disableMetadata Json?          @map("disable_metadata")
+  disableReason   DisableReason? @map("disable_reason")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([key, userId])
   @@index([userId], map: "idx_settings_on_userid")
@@ -255,16 +274,16 @@ model Notification {
 }
 
 model DisableNotification {
-  id           String    @id @default(dbgenerated("gen_random_uuid()"))
-  userId       String    @map("user_id")
-  settingKey   String    @map("setting_key")
-  reason       DisableReason
+  id           String        @id @default(dbgenerated("gen_random_uuid()"))
+  userId       String        @map("user_id")
+  settingKey   String        @map("setting_key")
   metadata     Json?
-  createdAt    DateTime  @default(now()) @map("created_at")
-  acknowledged Boolean   @default(false)
-  resolvedAt   DateTime? @map("resolved_at")
-  autoResolved Boolean   @default(false) @map("auto_resolved")
-  user         User      @relation("UserDisableNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  acknowledged Boolean       @default(false)
+  resolvedAt   DateTime?     @map("resolved_at")
+  autoResolved Boolean       @default(false) @map("auto_resolved")
+  reason       DisableReason
+  user         User          @relation("UserDisableNotifications", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([acknowledged])
@@ -361,6 +380,28 @@ model matches {
   @@unique([matchId, userId], map: "bets_matchId_userId_key")
   @@index([updated_at], map: "bets_updated_at_idx")
   @@index([won, lobby_type, created_at, id], map: "idx_bets_on_won_lobbytype_createdat_id")
+}
+
+model OpenNodeCharge {
+  id                String    @id @default(dbgenerated("gen_random_uuid()"))
+  openNodeChargeId  String    @unique
+  stripeInvoiceId   String    @unique
+  stripeCustomerId  String
+  userId            String
+  amount            Float
+  currency          String
+  status            String
+  hostedCheckoutUrl String?
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+  lastWebhookAt     DateTime? @map("last_webhook_at")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeInvoiceId])
+  @@index([userId])
+  @@index([status])
+  @@map("opennode_charges")
 }
 
 enum SubscriptionStatus {
