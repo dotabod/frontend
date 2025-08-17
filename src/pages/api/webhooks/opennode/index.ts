@@ -14,13 +14,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       event = JSON.parse(rawBody)
     } catch {
-      return res.status(400).json({ error: 'Invalid JSON' })
+      res.status(400).json({ error: 'Invalid JSON' })
+      return
     }
 
     // Verify OpenNode signature
     const isValid = await verifyOpenNodeWebhook(event)
     if (!isValid) {
-      return res.status(400).json({ error: 'Invalid signature' })
+      res.status(400).json({ error: 'Invalid signature' })
+      return
     }
 
     const charge =  event || {}
@@ -29,7 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const invoiceId: string | undefined = charge.metadata?.stripe_invoice_id
 
     if (!chargeId || !invoiceId) {
-      return res.status(200).json({ message: 'OK' })
+      res.status(200).json({ message: 'OK' })
+      return
     }
 
     console.log(`Processing OpenNode webhook: charge ${chargeId} status ${status}`)
@@ -63,9 +66,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    return res.status(200).json({ message: 'OK' })
+    res.status(200).json({ message: 'OK' })
+    return
   } catch (error) {
     console.error('OpenNode webhook processing failed:', error)
-    return res.status(500).json({ error: 'Webhook processing failed' })
+    res.status(500).json({ error: 'Webhook processing failed' })
+    return
   }
 }

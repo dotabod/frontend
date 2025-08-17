@@ -15,7 +15,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Verify token
     const tokenData = verifyPaylinkToken(invoiceId, token)
     if (!tokenData) {
-      return res.status(401).json({ error: 'Invalid or expired token' })
+      res.status(401).json({ error: 'Invalid or expired token' })
+      return
     }
 
     // Fetch and validate Stripe invoice
@@ -25,7 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       !['draft', 'open'].includes(invoice.status!) ||
       (invoice.amount_remaining || 0) <= 0
     ) {
-      return res.status(400).json({ error: 'Invoice not payable' })
+      res.status(400).json({ error: 'Invoice not payable' })
+      return
     }
 
     // Check for existing OpenNode charge
@@ -39,7 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         existingCharge.openNodeChargeId,
         existingCharge.hostedCheckoutUrl || undefined,
       )
-      return res.redirect(checkoutUrl)
+      res.redirect(checkoutUrl)
+      return
     }
 
     // Create new OpenNode charge
@@ -80,9 +83,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Redirect to OpenNode checkout
     const checkoutUrl = buildCheckoutUrl(charge.id, charge.hosted_checkout_url)
-    return res.redirect(checkoutUrl)
+    res.redirect(checkoutUrl)
+    return
   } catch (error) {
     console.error('OpenNode charge creation failed:', error)
-    return res.status(500).json({ error: 'Payment processing failed' })
+    res.status(500).json({ error: 'Payment processing failed' })
+    return
   }
 }
