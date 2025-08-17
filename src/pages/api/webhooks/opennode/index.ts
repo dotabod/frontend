@@ -21,8 +21,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isValid = await verifyOpenNodeWebhook(event)
     if (!isValid) {
       console.error('Invalid signature', event)
-      res.status(400).json({ error: 'Invalid signature' })
-      return
+
+      // In development, log the signature verification failure but continue processing
+      // This allows testing with OpenNode's webhook simulator
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Signature verification failed in development - continuing processing')
+      } else {
+        res.status(400).json({ error: 'Invalid signature' })
+        return
+      }
     }
 
     const charge =  event || {}

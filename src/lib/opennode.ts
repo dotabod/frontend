@@ -54,7 +54,19 @@ export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promis
  */
 export async function verifyOpenNodeWebhook(eventData: any): Promise<boolean> {
   try {
-    return signatureIsValid(eventData) as boolean
+    const isValid = signatureIsValid(eventData) as boolean
+
+    // Add debugging info in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('OpenNode signature verification:', {
+        chargeId: eventData.id,
+        hashedOrder: eventData.hashed_order,
+        isValid,
+        description: eventData.description,
+      })
+    }
+
+    return isValid
   } catch (error) {
     console.error('OpenNode signature verification failed:', error)
     return false
