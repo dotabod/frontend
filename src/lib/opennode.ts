@@ -7,7 +7,7 @@ if (!process.env.OPENNODE_API_KEY) {
 // Initialize OpenNode client
 setCredentials(
   process.env.OPENNODE_API_KEY,
-  process.env.NODE_ENV === 'production' ? 'live' : 'dev',
+  process.env.VERCEL_ENV === 'production' ? 'live' : 'dev',
 )
 
 export interface OpenNodeChargeParams {
@@ -57,7 +57,7 @@ export async function verifyOpenNodeWebhook(eventData: any): Promise<boolean> {
     const isValid = signatureIsValid(eventData) as boolean
 
     // Add debugging info in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.VERCEL_ENV !== 'production') {
       console.log('OpenNode signature verification:', {
         chargeId: eventData.id,
         hashedOrder: eventData.hashed_order,
@@ -94,9 +94,9 @@ export async function getOpenNodeChargeStatus(chargeId: string): Promise<OpenNod
 export function buildCheckoutUrl(chargeId: string, hostedUrl?: string): string {
   const baseUrl =
     hostedUrl ||
-    (process.env.NODE_ENV === 'development'
-      ? `https://checkout.dev.opennode.com/${chargeId}`
-      : `https://checkout.opennode.com/${chargeId}`)
+    (process.env.VERCEL_ENV === 'production'
+      ? `https://checkout.opennode.com/${chargeId}`
+      : `https://checkout.dev.opennode.com/${chargeId}`)
 
   const params: string[] = []
   if (process.env.OPENNODE_CHECKOUT_DEFAULT_LN === 'true') params.push('ln=1')

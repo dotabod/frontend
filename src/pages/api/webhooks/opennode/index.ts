@@ -24,11 +24,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // In development, log the signature verification failure but continue processing
       // This allows testing with OpenNode's webhook simulator
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Signature verification failed in development - continuing processing')
-      } else {
+      if (process.env.VERCEL_ENV === 'production') {
         res.status(400).json({ error: 'Invalid signature' })
         return
+      } else {
+        console.warn('Signature verification failed in development - continuing processing')
       }
     }
 

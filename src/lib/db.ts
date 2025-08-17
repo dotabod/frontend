@@ -16,7 +16,7 @@ export const prismaMongo = globalForPrisma.prismaMongo || new PrismaMongo()
 
 // Only store the instances on the global object in development to prevent
 // multiple instances during hot-reloading
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.VERCEL_ENV !== 'production') {
   globalForPrisma.prisma = prisma
   globalForPrisma.prismaMongo = prismaMongo
 }
