@@ -6,7 +6,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
+import { ChatMessagesOverlay } from '@/components/Overlay/ChatMessagesOverlay'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import type { PollData } from '@/components/Overlay/PollOverlay'
@@ -406,6 +408,12 @@ const OverlayPage = () => {
           <RestrictFeature feature='lastFmOverlay'>
             <AnimatedLastFm block={block} />
           </RestrictFeature>
+
+          <InGameOutsideCenterV2>
+            <RestrictFeature feature='autoTranslate'>
+              <ChatMessagesOverlay chatMessages={chatMessages} />
+            </RestrictFeature>
+          </InGameOutsideCenterV2>
         </OverlayV2>
 
         <InGameOverlays
@@ -419,7 +427,6 @@ const OverlayPage = () => {
           setAegis={setAegis}
           aegis={aegis}
           notablePlayers={notablePlayers}
-          chatMessages={chatMessages}
         />
 
         {isDev && showDevImage && (

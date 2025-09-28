@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
-import type { blockType } from '@/lib/devConsts'
+import { isDev } from '@/lib/devConsts'
 import type { ChatMessage } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -13,18 +13,13 @@ interface Position {
   right?: number | null
 }
 
-export const ChatMessagesOverlay = ({
-  block,
-  chatMessages,
-}: {
-  block: blockType
-  chatMessages: ChatMessage[]
-}) => {
+export const ChatMessagesOverlay = ({ chatMessages }: { chatMessages: ChatMessage[] }) => {
   const res = useTransformRes({ returnInput: false })
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const { data: isEnabled } = useUpdateSetting(Settings.autoTranslate)
 
-  if (!block.type || chatMessages.length === 0 || !isEnabled) return null
+  // Show messages if autoTranslate is enabled OR if we're in dev mode (for testing)
+  if (chatMessages.length === 0 || (!isEnabled && !isDev)) return null
 
   const styles: Position = {
     bottom: res({
@@ -43,7 +38,7 @@ export const ChatMessagesOverlay = ({
     <motion.div
       key='chat-messages-overlay'
       {...motionProps}
-      className='absolute z-10'
+      className='absolute z-50'
       id='chat-messages-overlay'
       style={{
         bottom: styles.bottom,

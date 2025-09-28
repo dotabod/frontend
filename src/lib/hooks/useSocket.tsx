@@ -9,7 +9,7 @@ import {
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
 import { Settings } from '@/lib/defaultSettings'
@@ -114,6 +114,9 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
+
+  // Ref to store timeout IDs for chat message cleanup
+  const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   useEffect(() => {
     if (!userId) return
@@ -253,7 +256,25 @@ export const useSocket = ({
     })
     socket.on('chatMessage', (data: ChatMessage) => {
       updateLastReceived()
-      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), data])
+      const messageWithTimestamp = {
+        ...data,
+        timestamp: data.timestamp || Date.now(),
+      }
+
+      // Add message to state
+      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), messageWithTimestamp])
+
+      // Set up timeout to remove message after 10 seconds
+      const messageId = messageWithTimestamp.timestamp.toString()
+      const timeoutId = setTimeout(() => {
+        setChatMessages((prev: ChatMessage[]) =>
+          prev.filter((msg) => (msg.timestamp || 0).toString() !== messageId),
+        )
+        messageTimeoutsRef.current.delete(messageId)
+      }, 10000) // 10 seconds
+
+      // Store timeout ID for cleanup
+      messageTimeoutsRef.current.set(messageId, timeoutId)
     })
     socket.on('roshan-killed', (data) => {
       updateLastReceived()
@@ -317,6 +338,12 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearTimeout(reconnectTimeout)
+
+      // Clear all message timeouts
+      messageTimeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      messageTimeoutsRef.current.clear()
 
       // Don't disconnect the socket on every effect cleanup
       // Only clean up event handlers

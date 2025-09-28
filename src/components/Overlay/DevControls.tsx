@@ -1,7 +1,7 @@
 import { Button, Checkbox, type CheckboxChangeEvent, Input, InputNumber, Select } from 'antd'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { type blockType, isDev } from '@/lib/devConsts'
 import type { ChatMessage } from '@/lib/hooks/useSocket'
@@ -31,6 +31,9 @@ export const DevControls = ({
     typeof localStorage !== 'undefined' && localStorage.getItem('isDev') === 'true',
   )
   const [testChatMessage, setTestChatMessage] = useState('')
+
+  // Ref to store timeout IDs for chat message cleanup (same as socket handler)
+  const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   const handleTeamChange = (value: 'radiant' | 'dire' | null) => {
     setBlock({ ...block, team: value })
@@ -94,24 +97,59 @@ export const DevControls = ({
 
   const handleAddTestChatMessage = () => {
     if (testChatMessage.trim()) {
-      const newMessage: ChatMessage = {
+      const messageWithTimestamp = {
         message: testChatMessage.trim(),
         timestamp: Date.now(),
       }
-      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), newMessage])
+
+      // Add message to state
+      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), messageWithTimestamp])
+
+      // Set up timeout to remove message after 10 seconds
+      const messageId = messageWithTimestamp.timestamp.toString()
+      const timeoutId = setTimeout(() => {
+        setChatMessages((prev: ChatMessage[]) =>
+          prev.filter((msg) => (msg.timestamp || 0).toString() !== messageId),
+        )
+        messageTimeoutsRef.current.delete(messageId)
+      }, 10000) // 10 seconds
+
+      // Store timeout ID for cleanup
+      messageTimeoutsRef.current.set(messageId, timeoutId)
       setTestChatMessage('')
     }
   }
 
   const handleAddSampleMessage = (message: string) => {
-    const newMessage: ChatMessage = {
+    const messageWithTimestamp = {
       message,
       timestamp: Date.now(),
     }
-    setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), newMessage])
+
+    // Add message to state
+    setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), messageWithTimestamp])
+
+    // Set up timeout to remove message after 10 seconds
+    const messageId = messageWithTimestamp.timestamp.toString()
+    const timeoutId = setTimeout(() => {
+      setChatMessages((prev: ChatMessage[]) =>
+        prev.filter((msg) => (msg.timestamp || 0).toString() !== messageId),
+      )
+      messageTimeoutsRef.current.delete(messageId)
+    }, 10000) // 10 seconds
+
+    // Store timeout ID for cleanup
+    messageTimeoutsRef.current.set(messageId, timeoutId)
   }
 
   const handleClearChatMessages = () => {
+    // Clear all timeouts
+    messageTimeoutsRef.current.forEach((timeoutId) => {
+      clearTimeout(timeoutId)
+    })
+    messageTimeoutsRef.current.clear()
+
+    // Clear messages
     setChatMessages([])
   }
 
@@ -124,6 +162,12 @@ export const DevControls = ({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
+
+      // Clear all message timeouts on unmount
+      messageTimeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      messageTimeoutsRef.current.clear()
     }
   }, [isDragging, handleMouseMove, handleMouseUp])
 

@@ -52,15 +52,15 @@ export default function AutoTranslateCard(): React.ReactNode {
       feature='autoTranslate'
     >
       <div className='subtitle'>
-        Automatically translate chat messages to a language of your choice (default English) for
-        better understanding during streams.
+        Automatically translate in-game chat messages to a language of your choice (default English)
+        for better understanding during streams.
       </div>
 
       <div className='mb-4'>
         <p className='text-sm text-gray-300 mb-4'>
-          When enabled, Dotabod will translate incoming chat messages from other languages to your
-          selected target language and display them on the overlay. This helps viewers understand
-          conversations in international streams.
+          When enabled, Dotabod will translate incoming in-game chat messages from other languages
+          to your selected target language and display them on the overlay. This helps viewers
+          understand conversations in international streams.
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export default function AutoTranslateCard(): React.ReactNode {
             placeholder='Select target language'
           />
           <p className='text-xs text-gray-400 mt-1'>
-            Chat messages will be translated to this language on the overlay.
+            Chat messages from your games will be translated to this language on the overlay.
           </p>
         </div>
       )}
@@ -108,7 +108,7 @@ export default function AutoTranslateCard(): React.ReactNode {
           description={
             <div>
               <p className='mb-2'>
-                Chat messages will be translated and displayed on your overlay in{' '}
+                Chat messages from your games will be translated and displayed on your overlay in{' '}
                 <strong>
                   {LANGUAGE_OPTIONS.find((lang) => lang.value === targetLanguage)?.label ||
                     'English'}
@@ -126,9 +126,9 @@ export default function AutoTranslateCard(): React.ReactNode {
 
       <div className='mt-4 p-3 bg-gray-800 rounded-md'>
         <p className='text-xs text-gray-400'>
-          <strong>How it works:</strong> Dotabod uses Google Translate to convert chat messages in
-          real-time. Translated messages appear on your stream overlay, helping international
-          viewers understand conversations.
+          <strong>How it works:</strong> Dotabod uses Google Translate to convert incoming in-game
+          chat messages in real-time. Translated messages appear on your stream overlay, helping
+          international viewers understand conversations.
         </p>
       </div>
     </Card>
