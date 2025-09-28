@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 import { InGameOutsideCenterV2, InGameV2 } from '@/components/Overlay/blocker/InGameV2'
+import { ChatMessagesOverlay } from '@/components/Overlay/ChatMessagesOverlay'
 import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
@@ -23,6 +24,7 @@ export const InGameOverlays = ({
   setAegis,
   aegis,
   notablePlayers,
+  chatMessages,
 }) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
@@ -105,6 +107,12 @@ export const InGameOverlays = ({
             />
           </RestrictFeature>
         </div>
+      </InGameOutsideCenterV2>
+
+      <InGameOutsideCenterV2>
+        <RestrictFeature feature='autoTranslate'>
+          <ChatMessagesOverlay block={block} chatMessages={chatMessages} />
+        </RestrictFeature>
       </InGameOutsideCenterV2>
     </>
   )

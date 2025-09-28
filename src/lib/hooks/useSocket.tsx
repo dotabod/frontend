@@ -89,6 +89,11 @@ type TwitchEventData = {
   // Add other properties as needed
 }
 
+export type ChatMessage = {
+  message: string
+  timestamp?: number
+}
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -101,6 +106,7 @@ export const useSocket = ({
   setRankImageDetails,
   setWL,
   setRadiantWinChance,
+  setChatMessages,
 }) => {
   const router = useRouter()
   const { userId } = router.query
@@ -245,6 +251,10 @@ export const useSocket = ({
       updateLastReceived()
       setAegis(data)
     })
+    socket.on('chatMessage', (data: ChatMessage) => {
+      updateLastReceived()
+      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), data])
+    })
     socket.on('roshan-killed', (data) => {
       updateLastReceived()
       setRoshan(data)
@@ -266,7 +276,7 @@ export const useSocket = ({
       setConnected(false)
     })
 
-    socket.on('refresh-settings', (key: typeof Settings) => {
+    socket.on('refresh-settings', (_key: typeof Settings) => {
       updateLastReceived()
       mutate()
     })
@@ -325,6 +335,7 @@ export const useSocket = ({
       socket?.off('paused')
       socket?.off('notable-players')
       socket?.off('aegis-picked-up')
+      socket?.off('chatMessage')
       socket?.off('roshan-killed')
       socket?.off('auth_error')
       socket?.off('refresh-settings')
@@ -337,7 +348,7 @@ export const useSocket = ({
   }, [userId]) // Only depend on userId
 }
 
-const events = {
+const _events = {
   subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
   subscribeToChannelPredictionProgressEvents: EventSubChannelPredictionProgressEvent,
   subscribeToChannelPredictionLockEvents: EventSubChannelPredictionLockEvent,

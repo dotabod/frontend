@@ -1,9 +1,10 @@
-import { Button, Checkbox, type CheckboxChangeEvent, InputNumber, Select } from 'antd'
+import { Button, Checkbox, type CheckboxChangeEvent, Input, InputNumber, Select } from 'antd'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { type blockType, isDev } from '@/lib/devConsts'
+import type { ChatMessage } from '@/lib/hooks/useSocket'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 export const DevControls = ({
@@ -11,14 +12,16 @@ export const DevControls = ({
   setBlock,
   showDevImage,
   setShowDevImage,
+  chatMessages,
+  setChatMessages,
 }: {
   block: blockType
   setBlock: (block: blockType) => void
   showDevImage: boolean
   setShowDevImage: (showDevImage: boolean) => void
+  chatMessages: ChatMessage[]
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
 }) => {
-  if (!isDev) return null
-
   const { data: refreshRate, updateSetting } = useUpdateSetting<number>(Settings.lastFmRefreshRate)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
@@ -27,6 +30,7 @@ export const DevControls = ({
   const [devModeEnabled, setDevModeEnabled] = useState(
     typeof localStorage !== 'undefined' && localStorage.getItem('isDev') === 'true',
   )
+  const [testChatMessage, setTestChatMessage] = useState('')
 
   const handleTeamChange = (value: 'radiant' | 'dire' | null) => {
     setBlock({ ...block, team: value })
@@ -88,6 +92,29 @@ export const DevControls = ({
     router.reload()
   }
 
+  const handleAddTestChatMessage = () => {
+    if (testChatMessage.trim()) {
+      const newMessage: ChatMessage = {
+        message: testChatMessage.trim(),
+        timestamp: Date.now(),
+      }
+      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), newMessage])
+      setTestChatMessage('')
+    }
+  }
+
+  const handleAddSampleMessage = (message: string) => {
+    const newMessage: ChatMessage = {
+      message,
+      timestamp: Date.now(),
+    }
+    setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), newMessage])
+  }
+
+  const handleClearChatMessages = () => {
+    setChatMessages([])
+  }
+
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove)
@@ -99,6 +126,8 @@ export const DevControls = ({
       window.removeEventListener('mouseup', handleMouseUp)
     }
   }, [isDragging, handleMouseMove, handleMouseUp])
+
+  if (!isDev) return null
 
   return (
     <motion.div
@@ -192,6 +221,45 @@ export const DevControls = ({
 
       {/* Reload Button */}
       <Button onClick={handleReload}>Reload Page</Button>
+
+      {/* Chat Messages Testing group */}
+      <div className='flex flex-col gap-2'>
+        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
+          Chat Messages Testing
+        </div>
+        <div className='flex gap-2'>
+          <Input
+            value={testChatMessage}
+            onChange={(e) => setTestChatMessage(e.target.value)}
+            placeholder='Enter test chat message'
+            style={{ width: 200 }}
+            onPressEnter={handleAddTestChatMessage}
+          />
+          <Button onClick={handleAddTestChatMessage} size='small'>
+            Add Message
+          </Button>
+        </div>
+        <div className='flex gap-2'>
+          <Button onClick={handleClearChatMessages} size='small' danger>
+            Clear Messages
+          </Button>
+          <span className='text-xs text-gray-400 self-center'>{chatMessages.length} messages</span>
+        </div>
+        <div className='flex flex-wrap gap-1'>
+          <Button size='small' onClick={() => handleAddSampleMessage('Hello everyone!')}>
+            Sample 1
+          </Button>
+          <Button size='small' onClick={() => handleAddSampleMessage('Good luck team!')}>
+            Sample 2
+          </Button>
+          <Button size='small' onClick={() => handleAddSampleMessage('Nice play!')}>
+            Sample 3
+          </Button>
+          <Button size='small' onClick={() => handleAddSampleMessage('GG WP')}>
+            Sample 4
+          </Button>
+        </div>
+      </div>
     </motion.div>
   )
 }

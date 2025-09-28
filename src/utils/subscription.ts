@@ -35,6 +35,8 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   // Free Tier Features
   'minimap-blocker': SUBSCRIPTION_TIERS.FREE,
   chatter: SUBSCRIPTION_TIERS.FREE,
+  autoTranslate: SUBSCRIPTION_TIERS.FREE,
+  translationLanguage: SUBSCRIPTION_TIERS.FREE,
   'only-block-ranked': SUBSCRIPTION_TIERS.PRO,
   commandCommands: SUBSCRIPTION_TIERS.FREE,
   commandMmr: SUBSCRIPTION_TIERS.FREE,
@@ -452,9 +454,7 @@ export function getSubscriptionStatusInfo(
 
   // Calculate days remaining for better messaging
   const daysRemaining = currentPeriodEnd
-    ? Math.ceil(
-        (new Date(currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-      )
+    ? Math.ceil((new Date(currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : 0
 
   // Check if subscription is ending within 10 days

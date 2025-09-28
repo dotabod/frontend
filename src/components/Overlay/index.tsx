@@ -24,7 +24,7 @@ import {
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { useOBS } from '@/lib/hooks/useOBS'
-import { useSocket, type WinChance } from '@/lib/hooks/useSocket'
+import { type ChatMessage, useSocket, type WinChance } from '@/lib/hooks/useSocket'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
@@ -88,6 +88,8 @@ const OverlayPage = () => {
     },
   ])
   const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)
+
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
 
   const [rankImageDetails, setRankImageDetails] = useState<{
     image: string | null
@@ -243,7 +245,7 @@ const OverlayPage = () => {
               status: 404,
             }),
           )
-        } catch (e) {
+        } catch (_e) {
           // Ignore storage errors
         }
       }
@@ -282,6 +284,7 @@ const OverlayPage = () => {
     setNotablePlayers,
     setWL,
     setRadiantWinChance,
+    setChatMessages,
   })
 
   useOBS({ block, connected })
@@ -346,6 +349,8 @@ const OverlayPage = () => {
         setBlock={setBlock}
         showDevImage={showDevImage}
         setShowDevImage={setShowDevImage}
+        chatMessages={chatMessages}
+        setChatMessages={setChatMessages}
       />
       <AnimatePresence>
         <motion.div
@@ -414,6 +419,7 @@ const OverlayPage = () => {
           setAegis={setAegis}
           aegis={aegis}
           notablePlayers={notablePlayers}
+          chatMessages={chatMessages}
         />
 
         {isDev && showDevImage && (

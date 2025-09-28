@@ -1,4 +1,4 @@
-import { type GetServerSideProps } from 'next'
+import type { GetServerSideProps } from 'next'
 
 // This page should never render, it only returns XML
 const StaticSitemap = () => null
@@ -43,7 +43,7 @@ ${staticPages
     <lastmod>${page.lastmod}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
-  </url>`
+  </url>`,
   )
   .join('\n')}
 </urlset>`
@@ -58,7 +58,7 @@ ${staticPages
     }
   } catch (error) {
     console.error('Error generating static sitemap:', error)
-    
+
     // Return a basic sitemap if there's an error
     const basicSitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
