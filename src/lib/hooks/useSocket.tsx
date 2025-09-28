@@ -268,7 +268,7 @@ export const useSocket = ({
       const messageId = messageWithTimestamp.timestamp.toString()
       const timeoutId = setTimeout(() => {
         setChatMessages((prev: ChatMessage[]) =>
-          prev.filter((msg) => (msg.timestamp || 0).toString() !== messageId),
+          prev.filter((msg) => msg.timestamp?.toString() !== messageId),
         )
         messageTimeoutsRef.current.delete(messageId)
       }, 10000) // 10 seconds

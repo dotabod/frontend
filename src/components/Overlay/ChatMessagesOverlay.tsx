@@ -61,12 +61,13 @@ export const ChatMessagesOverlay = ({ chatMessages }: { chatMessages: ChatMessag
           <AnimatePresence>
             {chatMessages.map((msg, index) => (
               <motion.div
-                key={`${msg.timestamp}-${index}`}
+                key={msg.timestamp?.toString() || `msg-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 className='text-white font-medium'
+                layout
               >
                 {msg.message}
               </motion.div>
