@@ -150,6 +150,7 @@ export const defaultSettings = {
   disableAutoClipping: false,
   autoTranslate: false,
   translationLanguage: 'en',
+  translateOnOverlay: false,
   crypto_payment_interest: {
     interested: false,
     tier: 'PRO',

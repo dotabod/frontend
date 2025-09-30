@@ -33,10 +33,12 @@ const LANGUAGE_OPTIONS = localePatchSchema.options.map((locale) => ({
  * ```
  */
 export default function AutoTranslateCard(): React.ReactNode {
-  const { data: isEnabled } = useUpdateSetting(Settings.autoTranslate)
+  const { data: isChatTranslateEnabled } = useUpdateSetting(Settings.autoTranslate)
   const { data: targetLanguage, updateSetting: updateLanguage } = useUpdateSetting<string>(
     Settings.translationLanguage,
   )
+
+  const { data: isOverlayTranslateEnabled } = useUpdateSetting(Settings.translateOnOverlay)
 
   const handleLanguageChange = (value: string) => {
     updateLanguage(value)
@@ -52,15 +54,14 @@ export default function AutoTranslateCard(): React.ReactNode {
       feature='autoTranslate'
     >
       <div className='subtitle'>
-        Automatically translate in-game chat messages to a language of your choice (default English)
-        for better understanding during streams.
+        Translate in-game chat messages to help international viewers understand conversations.
       </div>
 
       <div className='mb-4'>
         <p className='text-sm text-gray-300 mb-4'>
+          Choose how you want translations to appear: in your chat, on your stream overlay, or both.
           When enabled, Dotabod will translate incoming in-game chat messages from other languages
-          to your selected target language and display them on the overlay. This helps viewers
-          understand conversations in international streams.
+          to your selected target language, helping international viewers understand conversations.
         </p>
       </div>
 
@@ -68,14 +69,25 @@ export default function AutoTranslateCard(): React.ReactNode {
         <TierSwitch
           hideTierBadge
           settingKey={Settings.autoTranslate}
-          label='Enable automatic translation'
+          label='Translate messages in chat'
         />
-        <Tag color={isEnabled ? 'green' : 'red'}>
-          {isEnabled ? 'Translation Enabled' : 'Translation Disabled'}
+        <Tag color={isChatTranslateEnabled ? 'green' : 'red'}>
+          {isChatTranslateEnabled ? 'Chat: On' : 'Chat: Off'}
         </Tag>
       </div>
 
-      {isEnabled && (
+      <div className='flex items-center space-x-2 mb-4'>
+        <TierSwitch
+          hideTierBadge
+          settingKey={Settings.translateOnOverlay}
+          label='Show translations on overlay'
+        />
+        <Tag color={isOverlayTranslateEnabled ? 'blue' : 'gray'}>
+          {isOverlayTranslateEnabled ? 'Overlay: On' : 'Overlay: Off'}
+        </Tag>
+      </div>
+
+      {(isChatTranslateEnabled || isOverlayTranslateEnabled) && (
         <div className='mb-4'>
           <label
             htmlFor='translation-language-select'
@@ -102,18 +114,22 @@ export default function AutoTranslateCard(): React.ReactNode {
         </div>
       )}
 
-      {isEnabled && (
+      {(isChatTranslateEnabled || isOverlayTranslateEnabled) && (
         <Alert
           message='Translation Active'
           description={
             <div>
               <p className='mb-2'>
-                Chat messages from your games will be translated and displayed on your overlay in{' '}
+                Chat messages from your games will be translated to{' '}
                 <strong>
                   {LANGUAGE_OPTIONS.find((lang) => lang.value === targetLanguage)?.label ||
                     'English'}
                 </strong>
-                .
+                {isChatTranslateEnabled && isOverlayTranslateEnabled
+                  ? ' and displayed in chat and on your overlay.'
+                  : isChatTranslateEnabled
+                    ? ' and displayed in chat.'
+                    : ' and displayed on your overlay.'}
               </p>
             </div>
           }
@@ -127,8 +143,8 @@ export default function AutoTranslateCard(): React.ReactNode {
       <div className='mt-4 p-3 bg-gray-800 rounded-md'>
         <p className='text-xs text-gray-400'>
           <strong>How it works:</strong> Dotabod uses DeepL to convert incoming in-game chat
-          messages in real-time. Translated messages appear on your stream overlay, helping
-          international viewers understand conversations.
+          messages in real-time. Independently toggle where you want translations to appear - in
+          chat, on your stream overlay, or both.
         </p>
       </div>
     </Card>
