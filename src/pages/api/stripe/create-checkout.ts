@@ -418,10 +418,10 @@ async function createOpenNodeInvoice(
   })
 
   // Finalize the invoice
-  const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+  await stripe.invoices.finalizeInvoice(invoice.id, {
     auto_advance: false,
   })
 
-  // Return the Stripe hosted invoice URL (not the bitcoin payment URL directly)
-  return finalizedInvoice.hosted_invoice_url || `https://invoice.stripe.com/${invoice.id}`
+  // For crypto payments, finalize the invoice for record-keeping but return the bitcoin payment link directly
+  return bitcoinPayLink
 }
