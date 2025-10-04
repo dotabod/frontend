@@ -57,6 +57,44 @@ export async function handleCheckoutCompleted(
                 invoice_now: false,
                 prorate: true,
               })
+
+              // Also void any pending renewal invoices for the previous subscription
+              const previousSubscription = await tx.subscription.findFirst({
+                where: {
+                  stripeSubscriptionId: session.metadata.previousSubscriptionId,
+                },
+              })
+
+              if (previousSubscription?.metadata) {
+                const metadata = (previousSubscription.metadata as Record<string, unknown>) || {}
+                const renewalInvoiceId = metadata.renewalInvoiceId as string
+
+                if (renewalInvoiceId) {
+                  try {
+                    console.log(
+                      `Voiding renewal invoice ${renewalInvoiceId} for previous subscription during lifetime upgrade`,
+                    )
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                  } catch (invoiceError) {
+                    // If invoice is already finalized, try to mark it as uncollectible
+                    try {
+                      const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+                      if (invoice.status === 'open') {
+                        await stripe.invoices.markUncollectible(renewalInvoiceId)
+                        console.log(
+                          `Marked invoice ${renewalInvoiceId} as uncollectible after upgrade`,
+                        )
+                      }
+                    } catch (markError) {
+                      console.error(
+                        `Failed to handle invoice ${renewalInvoiceId} during upgrade:`,
+                        markError,
+                      )
+                    }
+                  }
+                }
+              }
             } catch (error) {
               console.error('Failed to cancel previous subscription:', error)
             }
