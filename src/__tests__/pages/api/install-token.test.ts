@@ -277,7 +277,7 @@ describe('install/[token] API', () => {
       streamCategory: null,
       streamStartedAt: null,
       streamTitle: null,
-      youtubeChannelId: null
+      youtubeChannelId: null,
     })
 
     await handler(req, res)
@@ -392,7 +392,7 @@ describe('install/[token] API', () => {
       streamCategory: null,
       streamStartedAt: null,
       streamTitle: null,
-      youtubeChannelId: null
+      youtubeChannelId: null,
     })
 
     await handler(req, res)

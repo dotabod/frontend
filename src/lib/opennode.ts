@@ -1,4 +1,4 @@
-import { createCharge, setCredentials, signatureIsValid, chargeInfo } from 'opennode'
+import { chargeInfo, createCharge, setCredentials, signatureIsValid } from 'opennode'
 
 if (!process.env.OPENNODE_API_KEY) {
   throw new Error('OPENNODE_API_KEY is not set')
@@ -86,7 +86,6 @@ export async function getOpenNodeChargeStatus(chargeId: string): Promise<OpenNod
     return null
   }
 }
-
 
 /**
  * Constructs hosted checkout URL with options

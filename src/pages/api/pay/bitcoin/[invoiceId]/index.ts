@@ -1,8 +1,8 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/db'
 import { buildCheckoutUrl, createOpenNodeCharge } from '@/lib/opennode'
 import { verifyPaylinkToken } from '@/lib/paylink'
 import { stripe } from '@/lib/stripe-server'
-import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

@@ -1,8 +1,8 @@
-import prisma from '@/lib/db';
-import { verifyOpenNodeWebhook } from '@/lib/opennode';
-import { stripe } from '@/lib/stripe-server';
-import { NextApiRequest, NextApiResponse } from 'next';
-import type { OpenNodeCharge } from 'opennode/dist/types/v1';
+import type { NextApiRequest, NextApiResponse } from 'next'
+import type { OpenNodeCharge } from 'opennode/dist/types/v1'
+import prisma from '@/lib/db'
+import { verifyOpenNodeWebhook } from '@/lib/opennode'
+import { stripe } from '@/lib/stripe-server'
 
 export const runtime = 'nodejs'
 
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    const charge =  event || {}
+    const charge = event || {}
     const status: string = charge.status
     const chargeId: string = charge.id
     // @ts-ignore OpenNode charge metadata is not typed

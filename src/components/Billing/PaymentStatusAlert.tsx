@@ -80,16 +80,16 @@ export const PaymentStatusAlert = () => {
 
   if (loading && !paymentStatus) {
     return (
-      <div className="mb-6">
+      <div className='mb-6'>
         <Alert
-          message="Checking payment status..."
+          message='Checking payment status...'
           description={
-            <div className="flex items-center gap-2">
-              <Spin size="small" />
+            <div className='flex items-center gap-2'>
+              <Spin size='small' />
               <span>Please wait while we verify your Bitcoin payment</span>
             </div>
           }
-          type="info"
+          type='info'
           showIcon
         />
       </div>
@@ -98,14 +98,14 @@ export const PaymentStatusAlert = () => {
 
   if (error) {
     return (
-      <div className="mb-6">
+      <div className='mb-6'>
         <Alert
-          message="Unable to check payment status"
+          message='Unable to check payment status'
           description={error}
-          type="error"
+          type='error'
           showIcon
           action={
-            <Button size="small" onClick={() => fetchPaymentStatus(invoice as string)}>
+            <Button size='small' onClick={() => fetchPaymentStatus(invoice as string)}>
               Retry
             </Button>
           }
@@ -136,22 +136,22 @@ export const PaymentStatusAlert = () => {
   }
 
   return (
-    <div className="mb-6">
+    <div className='mb-6'>
       <Alert
         message={
-          <div className="flex items-center justify-between">
+          <div className='flex items-center justify-between'>
             <span>{paymentStatus.statusInfo.message}</span>
-            {paymentStatus.statusInfo.type === 'processing' && (
-              <Spin size="small" />
-            )}
+            {paymentStatus.statusInfo.type === 'processing' && <Spin size='small' />}
           </div>
         }
         description={
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <p>{paymentStatus.statusInfo.description}</p>
-            <div className="text-sm text-gray-400">
+            <div className='text-sm text-gray-400'>
               <div>Invoice: {paymentStatus.invoice.number || paymentStatus.invoiceId}</div>
-              <div>Amount: {paymentStatus.amount} {paymentStatus.currency.toUpperCase()}</div>
+              <div>
+                Amount: {paymentStatus.amount} {paymentStatus.currency.toUpperCase()}
+              </div>
               <div>Charge ID: {paymentStatus.chargeId}</div>
             </div>
           </div>
@@ -161,14 +161,14 @@ export const PaymentStatusAlert = () => {
         closable
         onClose={handleDismiss}
         action={
-          <div className="flex gap-2">
+          <div className='flex gap-2'>
             {paymentStatus.statusInfo.canRetry && (
-              <Button size="small" onClick={handleRetry}>
+              <Button size='small' onClick={handleRetry}>
                 Get New Payment Link
               </Button>
             )}
             {paymentStatus.statusInfo.type === 'processing' && (
-              <Button size="small" onClick={() => fetchPaymentStatus(paymentStatus.invoiceId)}>
+              <Button size='small' onClick={() => fetchPaymentStatus(paymentStatus.invoiceId)}>
                 Refresh Status
               </Button>
             )}
