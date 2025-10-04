@@ -39,8 +39,10 @@ export interface OpenNodeCharge {
  */
 export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promise<OpenNodeCharge> {
   try {
-    console.log('OPENNODE_API_KEY', process.env.OPENNODE_API_KEY)
-    console.log('Creating OpenNode charge', params)
+    if (process.env.VERCEL_ENV !== 'production') {
+      console.log('OPENNODE_API_KEY', process.env.OPENNODE_API_KEY)
+      console.log('Creating OpenNode charge', params)
+    }
     const response = await createCharge(params)
     return { ...response, hosted_checkout_url: buildCheckoutUrl(response.id) }
   } catch (error) {
