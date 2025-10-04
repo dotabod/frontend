@@ -162,6 +162,7 @@ export const defaultSettings = {
     minimumRankTier: 0,
   },
   ...commands,
+  autoCommandsOnMatchStart: [],
 }
 
 export type SettingKeys = keyof typeof defaultSettings

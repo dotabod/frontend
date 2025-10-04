@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import type { ReactElement } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import AutoTranslateCard from '@/components/Dashboard/Features/AutoTranslateCard'
+import { AutoCommandsCard } from '@/components/Dashboard/Features/AutoCommandsCard'
 import ClippingCard from '@/components/Dashboard/Features/ClippingCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import Header from '@/components/Dashboard/Header'
@@ -31,6 +31,7 @@ const FeaturesPage: NextPageWithLayout = () => (
 
     <ClippingCard />
     <SceneSwitcher />
+    <AutoCommandsCard />
   </>
 )
 

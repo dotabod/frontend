@@ -122,6 +122,7 @@ const settingsSchema = {
   autoTranslate: z.boolean(),
   translateOnOverlay: z.boolean(),
   translationLanguage: z.string().max(5),
+  autoCommandsOnMatchStart: z.array(z.string().max(45)),
   rankOnly: z.object({
     enabled: z.boolean(),
     minimumRank: z.enum([
