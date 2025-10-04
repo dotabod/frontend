@@ -33,6 +33,25 @@ export async function handleCheckoutCompleted(
   const userId = session.metadata?.userId
   if (!userId) return false
 
+  const cancelInvoiceIfPending = async (invoiceId: string, context: string) => {
+    try {
+      console.log(`Attempting to cancel invoice ${invoiceId} (${context})`)
+      const invoice = await stripe.invoices.retrieve(invoiceId)
+
+      if (invoice.status === 'draft') {
+        await stripe.invoices.del(invoiceId)
+        console.log(`Deleted draft invoice ${invoiceId} (${context})`)
+      } else if (invoice.status === 'open') {
+        await stripe.invoices.voidInvoice(invoiceId)
+        console.log(`Voided open invoice ${invoiceId} (${context})`)
+      } else {
+        console.log(`Invoice ${invoiceId} is already ${invoice.status} (${context})`)
+      }
+    } catch (error) {
+      console.error(`Failed to cancel invoice ${invoiceId} (${context}):`, error)
+    }
+  }
+
   return (
     (await withErrorHandling(
       async () => {
@@ -70,32 +89,10 @@ export async function handleCheckoutCompleted(
                 const renewalInvoiceId = metadata.renewalInvoiceId as string
 
                 if (renewalInvoiceId) {
-                  try {
-                    console.log(
-                      `Canceling renewal invoice ${renewalInvoiceId} for previous subscription during lifetime upgrade`,
-                    )
-                    // First, retrieve the invoice to check its status
-                    const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-
-                    if (invoice.status === 'draft') {
-                      // Draft invoices must be deleted, not voided
-                      await stripe.invoices.del(renewalInvoiceId)
-                      console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
-                    } else if (invoice.status === 'open') {
-                      // Open invoices can be voided
-                      await stripe.invoices.voidInvoice(renewalInvoiceId)
-                      console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
-                    } else {
-                      console.log(
-                        `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
-                      )
-                    }
-                  } catch (invoiceError) {
-                    console.error(
-                      `Failed to cancel invoice ${renewalInvoiceId} during upgrade:`,
-                      invoiceError,
-                    )
-                  }
+                  await cancelInvoiceIfPending(
+                    renewalInvoiceId,
+                    'previous subscription during lifetime upgrade',
+                  )
                 }
               }
             } catch (error) {
@@ -116,6 +113,33 @@ export async function handleCheckoutCompleted(
               session.id,
               tx,
             )
+
+            let existingSubscriptionMetadata: Record<string, unknown> = {}
+            let existingRenewalInvoiceId: string | null = null
+
+            if (
+              existingSubscription?.metadata &&
+              typeof existingSubscription.metadata === 'object' &&
+              existingSubscription.metadata !== null &&
+              !Array.isArray(existingSubscription.metadata)
+            ) {
+              existingSubscriptionMetadata = {
+                ...(existingSubscription.metadata as Record<string, unknown>),
+              }
+
+              const potentialRenewalInvoiceId = existingSubscriptionMetadata.renewalInvoiceId
+
+              if (typeof potentialRenewalInvoiceId === 'string' && potentialRenewalInvoiceId) {
+                console.log(
+                  `Found renewal invoice ${potentialRenewalInvoiceId} on existing crypto subscription ${existingSubscription.id}`,
+                )
+                await cancelInvoiceIfPending(
+                  potentialRenewalInvoiceId,
+                  `existing crypto subscription ${existingSubscription.id} after checkout ${session.id}`,
+                )
+                existingRenewalInvoiceId = potentialRenewalInvoiceId
+              }
+            }
 
             // Get line items to determine the true price period directly from the checkout session
             const purchasedPriceId = lineItems.data[0]?.price?.id ?? null
@@ -239,45 +263,6 @@ export async function handleCheckoutCompleted(
               `Crypto payment for session ${session.id}, detected as lifetime: ${isLifetime}`,
             )
 
-            // If the user has an existing subscription with a pending invoice, cancel it
-            if (existingSubscription?.metadata) {
-              const metadata = (existingSubscription.metadata as Record<string, unknown>) || {}
-              const renewalInvoiceId = metadata.renewalInvoiceId as string
-
-              if (renewalInvoiceId) {
-                try {
-                  console.log(
-                    `Canceling pending invoice ${renewalInvoiceId} for user ${userId} after successful checkout`,
-                  )
-                  // Retrieve the invoice to check its status
-                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-
-                  if (invoice.status === 'draft') {
-                    // Draft invoices must be deleted, not voided
-                    await stripe.invoices.del(renewalInvoiceId)
-                    console.log(
-                      `Successfully deleted draft invoice ${renewalInvoiceId} after upgrade`,
-                    )
-                  } else if (invoice.status === 'open') {
-                    // Open invoices can be voided
-                    await stripe.invoices.voidInvoice(renewalInvoiceId)
-                    console.log(
-                      `Successfully voided open invoice ${renewalInvoiceId} after upgrade`,
-                    )
-                  } else {
-                    console.log(
-                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
-                    )
-                  }
-                } catch (invoiceError) {
-                  console.error(
-                    `Failed to cancel invoice ${renewalInvoiceId} after upgrade:`,
-                    invoiceError,
-                  )
-                }
-              }
-            }
-
             // Double-check the product name/description to ensure we're creating the right type of subscription
             if (isLifetime) {
               console.log(`Lifetime price detected for crypto payment in session ${session.id}`)
@@ -320,6 +305,27 @@ export async function handleCheckoutCompleted(
                   }
                 }
 
+                const baseMetadata =
+                  typeof subscription.metadata === 'object' &&
+                  subscription.metadata !== null &&
+                  !Array.isArray(subscription.metadata)
+                    ? { ...(subscription.metadata as Record<string, unknown>) }
+                    : {}
+
+                const renewalInvoiceId =
+                  typeof baseMetadata.renewalInvoiceId === 'string'
+                    ? (baseMetadata.renewalInvoiceId as string)
+                    : null
+
+                if (renewalInvoiceId) {
+                  await cancelInvoiceIfPending(
+                    renewalInvoiceId,
+                    `subscription ${subscription.id} during lifetime upgrade`,
+                  )
+                  delete baseMetadata.renewalInvoiceId
+                  delete baseMetadata.renewalDueDate
+                }
+
                 // Update subscription status in our database
                 await tx.subscription.update({
                   where: { id: subscription.id },
@@ -328,7 +334,7 @@ export async function handleCheckoutCompleted(
                     cancelAtPeriodEnd: true,
                     updatedAt: new Date(),
                     metadata: {
-                      ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                      ...baseMetadata,
                       upgradedToLifetime: 'true',
                       upgradedAt: new Date().toISOString(),
                     },
@@ -338,38 +344,6 @@ export async function handleCheckoutCompleted(
                 console.log(
                   `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
                 )
-
-                // If it's a crypto subscription with a renewal invoice, cancel the invoice
-                if (subscription.metadata) {
-                  const metadata = (subscription.metadata as Record<string, unknown>) || {}
-                  const renewalInvoiceId = metadata.renewalInvoiceId as string
-
-                  if (renewalInvoiceId) {
-                    try {
-                      console.log(
-                        `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
-                      )
-                      // Retrieve the invoice to check its status
-                      const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-
-                      if (invoice.status === 'draft') {
-                        // Draft invoices must be deleted, not voided
-                        await stripe.invoices.del(renewalInvoiceId)
-                        console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
-                      } else if (invoice.status === 'open') {
-                        // Open invoices can be voided
-                        await stripe.invoices.voidInvoice(renewalInvoiceId)
-                        console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
-                      } else {
-                        console.log(
-                          `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
-                        )
-                      }
-                    } catch (invoiceError) {
-                      console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
-                    }
-                  }
-                }
               }
 
               // Create lifetime purchase
@@ -404,6 +378,23 @@ export async function handleCheckoutCompleted(
                 ) {
                   console.log(`Processing subscription upgrade from ${oldPeriod} to ${newPeriod}`)
 
+                  const sanitizedMetadata: Record<string, unknown> = {
+                    ...existingSubscriptionMetadata,
+                  }
+
+                  if ('renewalInvoiceId' in sanitizedMetadata) {
+                    delete sanitizedMetadata.renewalInvoiceId
+                  }
+
+                  if ('renewalDueDate' in sanitizedMetadata) {
+                    delete sanitizedMetadata.renewalDueDate
+                  }
+
+                  if (existingRenewalInvoiceId) {
+                    sanitizedMetadata.previousRenewalInvoiceId = existingRenewalInvoiceId
+                    sanitizedMetadata.previousRenewalInvoiceCanceledAt = new Date().toISOString()
+                  }
+
                   // Cancel the existing subscription
                   await tx.subscription.update({
                     where: { id: existingSubscription.id },
@@ -412,9 +403,7 @@ export async function handleCheckoutCompleted(
                       cancelAtPeriodEnd: true,
                       updatedAt: new Date(),
                       metadata: {
-                        ...(typeof existingSubscription.metadata === 'object'
-                          ? existingSubscription.metadata
-                          : {}),
+                        ...sanitizedMetadata,
                         upgradedTo: newPeriod,
                         upgradedAt: new Date().toISOString(),
                         previousPriceId: existingPriceId,
@@ -506,6 +495,27 @@ export async function handleCheckoutCompleted(
                 }
               }
 
+              const baseMetadata =
+                typeof subscription.metadata === 'object' &&
+                subscription.metadata !== null &&
+                !Array.isArray(subscription.metadata)
+                  ? { ...(subscription.metadata as Record<string, unknown>) }
+                  : {}
+
+              const renewalInvoiceId =
+                typeof baseMetadata.renewalInvoiceId === 'string'
+                  ? (baseMetadata.renewalInvoiceId as string)
+                  : null
+
+              if (renewalInvoiceId) {
+                await cancelInvoiceIfPending(
+                  renewalInvoiceId,
+                  `subscription ${subscription.id} during lifetime upgrade`,
+                )
+                delete baseMetadata.renewalInvoiceId
+                delete baseMetadata.renewalDueDate
+              }
+
               // Update subscription status in our database
               await tx.subscription.update({
                 where: { id: subscription.id },
@@ -514,7 +524,7 @@ export async function handleCheckoutCompleted(
                   cancelAtPeriodEnd: true,
                   updatedAt: new Date(),
                   metadata: {
-                    ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                    ...baseMetadata,
                     upgradedToLifetime: 'true',
                     upgradedAt: new Date().toISOString(),
                   },
@@ -524,38 +534,6 @@ export async function handleCheckoutCompleted(
               console.log(
                 `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
               )
-
-              // If it's a crypto subscription with a renewal invoice, cancel the invoice
-              if (subscription.metadata) {
-                const metadata = (subscription.metadata as Record<string, unknown>) || {}
-                const renewalInvoiceId = metadata.renewalInvoiceId as string
-
-                if (renewalInvoiceId) {
-                  try {
-                    console.log(
-                      `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
-                    )
-                    // Retrieve the invoice to check its status
-                    const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-
-                    if (invoice.status === 'draft') {
-                      // Draft invoices must be deleted, not voided
-                      await stripe.invoices.del(renewalInvoiceId)
-                      console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
-                    } else if (invoice.status === 'open') {
-                      // Open invoices can be voided
-                      await stripe.invoices.voidInvoice(renewalInvoiceId)
-                      console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
-                    } else {
-                      console.log(
-                        `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
-                      )
-                    }
-                  } catch (invoiceError) {
-                    console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
-                  }
-                }
-              }
             }
 
             // Create the lifetime purchase
