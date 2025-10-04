@@ -16,7 +16,7 @@ export type FeatureFlags = {
  * Default feature flags configuration
  */
 export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
-  enableCryptoPayments: false,
+  enableCryptoPayments: true,
 }
 
 /**

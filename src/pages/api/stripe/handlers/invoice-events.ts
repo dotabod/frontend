@@ -18,7 +18,16 @@ export async function handleInvoiceEvent(
   invoice: Stripe.Invoice,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
-  // Check for Boomfi crypto payment
+  // Check for OpenNode crypto payment
+  if (
+    invoice.status === 'paid' &&
+    invoice.metadata?.paymentProvider === 'opennode' &&
+    invoice.metadata?.isCryptoPayment === 'true'
+  ) {
+    return await handleOpenNodeInvoicePaid(invoice, tx)
+  }
+
+  // Check for Boomfi crypto payment (legacy - will be removed)
   if (
     invoice.status === 'paid' &&
     invoice.custom_fields?.some((field) => field.name === 'boomfi_invoice_id')
@@ -156,6 +165,14 @@ async function handleCryptoInvoiceEvent(
           console.log(
             `Processing paid crypto invoice ${invoice.id} for subscription ${subscription.id}`,
           )
+
+          // Check if this is a lifetime subscription - lifetime subscriptions should never generate renewal invoices
+          if (subscription.transactionType === 'LIFETIME') {
+            console.log(
+              `Skipping renewal invoice creation for lifetime subscription ${subscription.id}`,
+            )
+            return true
+          }
 
           // Get price ID and period from the subscription
           const priceId = subscription.stripePriceId
@@ -364,6 +381,272 @@ function mapStripeStatus(status: string): SubscriptionStatus {
 }
 
 /**
+ * Handles an OpenNode crypto invoice.paid event
+ * @param invoice The Stripe invoice object with OpenNode metadata
+ * @param tx The transaction client
+ * @returns True if the operation was successful, false otherwise
+ */
+async function handleOpenNodeInvoicePaid(
+  invoice: Stripe.Invoice,
+  tx: Prisma.TransactionClient,
+): Promise<boolean> {
+  const customerId = invoice.customer as string
+  const userId = invoice.metadata?.userId
+
+  if (!userId) {
+    console.error(`Missing userId in OpenNode invoice metadata: ${invoice.id}`)
+    return false
+  }
+
+  console.log(
+    `Processing OpenNode invoice.paid event for invoice ${invoice.id} with userId ${userId}`,
+  )
+
+  return (
+    (await withErrorHandling(
+      async () => {
+        // First, try to get price ID from invoice metadata (most reliable for crypto payments)
+        let priceId: string | null = invoice.metadata?.stripePriceId || null
+
+        // If not in metadata, extract from line items (fallback for regular invoices)
+        if (!priceId) {
+          if (!invoice.lines?.data || invoice.lines.data.length === 0) {
+            console.error(`No line items found in invoice ${invoice.id}`)
+            return false
+          }
+
+          const lineItem = invoice.lines.data[0]
+
+          // Extract price ID based on the parent type (new Stripe TypeScript types)
+          if (
+            lineItem.parent &&
+            lineItem.pricing &&
+            'price_details' in lineItem.pricing &&
+            lineItem.pricing.price_details
+          ) {
+            priceId = lineItem.pricing.price_details.price
+          }
+        }
+
+        if (!priceId) {
+          console.error(`No price ID found in OpenNode invoice ${invoice.id}`)
+          return false
+        }
+
+        console.log(`Found price ID ${priceId} in OpenNode invoice ${invoice.id}`)
+
+        // Check if this is a lifetime purchase
+        const isLifetime = await isLifetimePrice(priceId)
+
+        if (isLifetime) {
+          // Handle lifetime purchase - reuse existing BoomFi logic
+          console.log(`OpenNode invoice ${invoice.id} is for a lifetime purchase`)
+
+          // Find and cancel all active subscriptions
+          const activeSubscriptions = await tx.subscription.findMany({
+            where: {
+              userId,
+              NOT: { status: SubscriptionStatus.CANCELED },
+            },
+          })
+
+          // Cancel each active subscription and void any pending renewal invoices
+          for (const subscription of activeSubscriptions) {
+            if (
+              subscription.stripeSubscriptionId &&
+              !subscription.stripeSubscriptionId.startsWith('crypto_')
+            ) {
+              try {
+                await stripe.subscriptions.cancel(subscription.stripeSubscriptionId, {
+                  invoice_now: false,
+                  prorate: true,
+                })
+              } catch (error) {
+                console.error(
+                  `Failed to cancel Stripe subscription ${subscription.stripeSubscriptionId}:`,
+                  error,
+                )
+              }
+            }
+
+            // Void/delete any pending renewal invoices for crypto subscriptions
+            if (subscription.metadata) {
+              const metadata = (subscription.metadata as Record<string, unknown>) || {}
+              const renewalInvoiceId = metadata.renewalInvoiceId as string
+
+              if (renewalInvoiceId) {
+                try {
+                  console.log(
+                    `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                  )
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                    )
+                  }
+                } catch (invoiceError) {
+                  console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
+                }
+              }
+            }
+
+            await tx.subscription.update({
+              where: { id: subscription.id },
+              data: {
+                status: SubscriptionStatus.CANCELED,
+                cancelAtPeriodEnd: true,
+                updatedAt: new Date(),
+                metadata: {
+                  ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                  upgradedToLifetime: 'true',
+                  upgradedAt: new Date().toISOString(),
+                  openNodeInvoiceId: invoice.id ?? '',
+                },
+              },
+            })
+          }
+
+          // Create lifetime purchase
+          await createLifetimePurchase(userId, customerId, priceId, tx)
+          console.log(`Successfully created lifetime purchase for user ${userId}`)
+          return true
+        } else {
+          // Handle recurring subscription - reuse existing crypto subscription logic
+          console.log(`OpenNode invoice ${invoice.id} is for a regular subscription`)
+
+          // Find existing crypto subscription
+          const existingSubscription = await tx.subscription.findFirst({
+            where: {
+              userId,
+              stripeCustomerId: customerId,
+              metadata: { path: ['isCryptoPayment'], equals: 'true' },
+              NOT: { status: SubscriptionStatus.CANCELED },
+            },
+          })
+
+          const { getCurrentPeriod } = await import('@/utils/subscription')
+          const pricePeriod = getCurrentPeriod(priceId)
+
+          if (existingSubscription) {
+            // Handle renewal/upgrade
+            const existingPriceId = existingSubscription.stripePriceId
+            const existingPeriod = existingPriceId ? getCurrentPeriod(existingPriceId) : 'unknown'
+
+            if (existingPeriod !== pricePeriod) {
+              // This is an upgrade, cancel existing and create new
+              await tx.subscription.update({
+                where: { id: existingSubscription.id },
+                data: {
+                  status: SubscriptionStatus.CANCELED,
+                  cancelAtPeriodEnd: true,
+                  updatedAt: new Date(),
+                  metadata: {
+                    ...(typeof existingSubscription.metadata === 'object'
+                      ? existingSubscription.metadata
+                      : {}),
+                    upgradedTo: pricePeriod,
+                    upgradedAt: new Date().toISOString(),
+                    openNodeInvoiceId: invoice.id ?? '',
+                  },
+                },
+              })
+
+              // Create fake session for createCryptoSubscription
+              const fakeSession: Partial<Stripe.Checkout.Session> = {
+                id: `opennode_${invoice.id}`,
+                customer: customerId,
+                metadata: { userId, isCryptoPayment: 'true', openNodeInvoiceId: invoice.id ?? '' },
+              }
+
+              return await createCryptoSubscription(
+                userId,
+                fakeSession as Stripe.Checkout.Session,
+                priceId,
+                customerId,
+                tx,
+                existingSubscription.currentPeriodEnd || new Date(),
+              )
+            } else {
+              // This is a renewal - extend existing subscription
+              return await handleCryptoRenewal(invoice, existingSubscription, tx, pricePeriod)
+            }
+          } else {
+            // New crypto subscription
+            const fakeSession: Partial<Stripe.Checkout.Session> = {
+              id: `opennode_${invoice.id}`,
+              customer: customerId,
+              metadata: { userId, isCryptoPayment: 'true', openNodeInvoiceId: invoice.id ?? '' },
+            }
+
+            return await createCryptoSubscription(
+              userId,
+              fakeSession as Stripe.Checkout.Session,
+              priceId,
+              customerId,
+              tx,
+            )
+          }
+        }
+      },
+      `handleOpenNodeInvoicePaid(${invoice.id})`,
+      userId || customerId,
+    )) !== null
+  )
+}
+
+/**
+ * Handles crypto subscription renewal logic
+ */
+async function handleCryptoRenewal(
+  invoice: Stripe.Invoice,
+  subscription: any,
+  tx: Prisma.TransactionClient,
+  pricePeriod: string,
+): Promise<boolean> {
+  const isAnnual = pricePeriod === 'annual'
+  const baseDate =
+    subscription.currentPeriodEnd instanceof Date
+      ? subscription.currentPeriodEnd
+      : new Date(subscription.currentPeriodEnd || Date.now())
+
+  const newPeriodEnd = new Date(baseDate)
+  if (isAnnual) {
+    newPeriodEnd.setFullYear(newPeriodEnd.getFullYear() + 1)
+  } else {
+    newPeriodEnd.setMonth(newPeriodEnd.getMonth() + 1)
+  }
+
+  // Update subscription with new period end
+  await tx.subscription.update({
+    where: { id: subscription.id },
+    data: {
+      status: SubscriptionStatus.ACTIVE,
+      currentPeriodEnd: newPeriodEnd,
+      cancelAtPeriodEnd: true,
+      metadata: {
+        ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+        lastRenewalInvoiceId: invoice.id ?? '',
+        renewedAt: new Date().toISOString(),
+      },
+      updatedAt: new Date(),
+    },
+  })
+
+  return true
+}
+
+/**
  * Handles a Boomfi crypto invoice.paid event
  * @param invoice The Stripe invoice object with Boomfi fields
  * @param tx The transaction client
@@ -396,23 +679,27 @@ async function handleBoomfiInvoicePaid(
   return (
     (await withErrorHandling(
       async () => {
-        // Extract the product ID from line items
-        if (!invoice.lines?.data || invoice.lines.data.length === 0) {
-          console.error(`No line items found in invoice ${invoice.id}`)
-          return false
-        }
+        // First, try to get price ID from invoice metadata (most reliable for crypto payments)
+        let priceId: string | null = invoice.metadata?.stripePriceId || null
 
-        const lineItem = invoice.lines.data[0]
-        let priceId: string | null = null
+        // If not in metadata, extract from line items (fallback)
+        if (!priceId) {
+          if (!invoice.lines?.data || invoice.lines.data.length === 0) {
+            console.error(`No line items found in invoice ${invoice.id}`)
+            return false
+          }
 
-        // Extract price ID based on the parent type (new Stripe TypeScript types)
-        if (
-          lineItem.parent &&
-          lineItem.pricing &&
-          'price_details' in lineItem.pricing &&
-          lineItem.pricing.price_details
-        ) {
-          priceId = lineItem.pricing.price_details.price
+          const lineItem = invoice.lines.data[0]
+
+          // Extract price ID based on the parent type (new Stripe TypeScript types)
+          if (
+            lineItem.parent &&
+            lineItem.pricing &&
+            'price_details' in lineItem.pricing &&
+            lineItem.pricing.price_details
+          ) {
+            priceId = lineItem.pricing.price_details.price
+          }
         }
 
         if (!priceId) {
@@ -484,18 +771,34 @@ async function handleBoomfiInvoicePaid(
               `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
             )
 
-            // If it's a crypto subscription with a renewal invoice, void the invoice
+            // If it's a crypto subscription with a renewal invoice, cancel the invoice
             if (subscription.metadata) {
               const metadata = (subscription.metadata as Record<string, unknown>) || {}
               const renewalInvoiceId = metadata.renewalInvoiceId as string
 
               if (renewalInvoiceId) {
                 try {
-                  console.log(`Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`)
-                  await stripe.invoices.voidInvoice(renewalInvoiceId)
-                  console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                  console.log(
+                    `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                  )
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                    )
+                  }
                 } catch (invoiceError) {
-                  console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                  console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
                 }
               }
             }

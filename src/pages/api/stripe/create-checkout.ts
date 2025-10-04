@@ -5,6 +5,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { featureFlags } from '@/lib/featureFlags'
+import { generatePaylinkUrl } from '@/lib/paylink'
 import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 
@@ -206,9 +207,9 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     tx,
   } = params
 
-  // If this is a crypto payment, use the Boomfi flow with invoices
+  // If this is a crypto payment, use the OpenNode flow with invoices
   if (isCryptoPayment) {
-    return await createBoomfiInvoice({
+    return await createOpenNodeInvoice({
       customerId,
       priceId,
       isRecurring,
@@ -286,9 +287,9 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
 }
 
 /**
- * Creates an invoice with a Boomfi payment link for crypto payments
+ * Creates an invoice with an OpenNode payment link for crypto payments
  */
-async function createBoomfiInvoice(
+async function createOpenNodeInvoice(
   params: Omit<CheckoutSessionParams, 'isGift' | 'isCryptoPayment'>,
 ): Promise<string> {
   const {
@@ -307,41 +308,30 @@ async function createBoomfiInvoice(
     tx,
   } = params
 
-  // Cancel any pending crypto invoices if this is an upgrade with crypto payment
+  // Cancel any pending crypto invoices if this is an upgrade
   if (subscriptionData?.stripePriceId && tx) {
     try {
-      // Get existing subscription metadata to find renewal invoice ID
       const existingSubscription = await tx.subscription.findFirst({
         where: {
           userId,
           stripeCustomerId: customerId,
           NOT: { status: 'CANCELED' },
         },
-        select: {
-          metadata: true,
-        },
+        select: { metadata: true },
       })
 
       const metadata = (existingSubscription?.metadata as Record<string, unknown>) || {}
       const renewalInvoiceId = metadata.renewalInvoiceId as string
 
-      // If there's a pending invoice, cancel it
       if (renewalInvoiceId) {
-        console.log(
-          `Canceling pending invoice ${renewalInvoiceId} for user ${userId} due to subscription upgrade`,
-        )
-
+        console.log(`Canceling pending invoice ${renewalInvoiceId} for user ${userId}`)
         try {
-          // Void the invoice to prevent it from being finalized
           await stripe.invoices.voidInvoice(renewalInvoiceId)
-          console.log(`Successfully voided invoice ${renewalInvoiceId}`)
         } catch (invoiceError) {
-          // If invoice is already finalized, try to mark it as uncollectible instead
           try {
             const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
             if (invoice.status === 'open') {
               await stripe.invoices.markUncollectible(renewalInvoiceId)
-              console.log(`Marked invoice ${renewalInvoiceId} as uncollectible`)
             }
           } catch (markError) {
             console.error(`Failed to handle invoice ${renewalInvoiceId}:`, markError)
@@ -350,40 +340,27 @@ async function createBoomfiInvoice(
       }
     } catch (error) {
       console.error('Error canceling pending invoices:', error)
-      // Continue with invoice creation even if invoice cancellation fails
-      // We'll handle any duplicate payments through customer support
     }
   }
 
-  // Get subscription period type
+  // Get subscription period and price details
   const { getCurrentPeriod } = await import('@/utils/subscription')
   const pricePeriod = getCurrentPeriod(priceId)
-
-  // Fetch the price details to get the amount
   const price = await stripe.prices.retrieve(priceId)
+
   if (!price.unit_amount) {
     throw new Error('Price has no unit amount')
   }
 
-  // Fetch the product to get the Boomfi payment link
-  const boomfiPaylink = price.metadata?.boomfi_paylink
-
-  if (!boomfiPaylink) {
-    throw new Error('Product does not have a Boomfi payment link configured in metadata')
-  }
-
-  // Generate the full Boomfi payment URL with customer identifier
-  const boomfiPaymentUrl = `${boomfiPaylink}${boomfiPaylink.includes('?') ? '&' : '?'}customer_ident=${customerId}`
-
-  // Set the due date to be 7 days from now
+  // Set due date to 7 days from now
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 7)
 
-  // Create a Stripe invoice for the customer with crypto metadata
+  // Create Stripe invoice
   const invoiceParams: Stripe.InvoiceCreateParams = {
     customer: customerId,
-    collection_method: 'send_invoice', // Critical: use send_invoice instead of charge_automatically
-    due_date: Math.floor(dueDate.getTime() / 1000), // Set due date to 7 days from now
+    collection_method: 'send_invoice',
+    due_date: Math.floor(dueDate.getTime() / 1000),
     metadata: {
       userId,
       email,
@@ -392,30 +369,25 @@ async function createBoomfiInvoice(
       locale,
       twitchId,
       isCryptoPayment: 'true',
+      paymentProvider: 'opennode',
+      stripePriceId: priceId, // Store the actual price ID for later retrieval
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       pricePeriod,
-      boomfiPaymentUrl, // Include the Boomfi payment URL in the metadata
     },
-    footer:
-      'If paying with crypto, upon successful payment, your subscription will be activated automatically.',
     payment_settings: {
-      payment_method_types: [], // Empty array disables all payment methods, effectively disabling the hosted payment page link
+      payment_method_types: [], // Disable Stripe payment methods
     },
   }
 
-  // Create the invoice
   const invoice = await stripe.invoices.create(invoiceParams)
 
-  if (!invoice || !invoice.id) {
-    console.error('Stripe invoice creation failed or invoice ID is missing.', {
-      invoiceDetails: invoice,
-    })
-    throw new Error('Stripe invoice creation failed or invoice ID is missing.')
+  if (!invoice?.id) {
+    throw new Error('Stripe invoice creation failed')
   }
 
-  // Add the line item using the price ID directly
+  // Add line item
   await stripe.invoiceItems.create({
     customer: customerId,
     invoice: invoice.id,
@@ -426,11 +398,30 @@ async function createBoomfiInvoice(
     },
   })
 
-  // Finalize the invoice so it's ready to be viewed
-  const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
-    auto_advance: false, // Don't automatically try to charge the customer
+  // Generate signed payment link (1 hour TTL)
+  const bitcoinPayLink = generatePaylinkUrl(invoice.id, 60)
+
+  // Update invoice with OpenNode payment link
+  await stripe.invoices.update(invoice.id, {
+    description: `Pay with Bitcoin: ${bitcoinPayLink}`,
+    footer: `Prefer Bitcoin? Click here: ${bitcoinPayLink}`,
+    custom_fields: [
+      {
+        name: 'Bitcoin Payment (OpenNode)',
+        value: bitcoinPayLink,
+      },
+    ],
+    metadata: {
+      ...invoiceParams.metadata,
+      bitcoin_pay_url: bitcoinPayLink,
+    },
   })
 
-  // Return the Boomfi payment URL instead of the hosted invoice URL
-  return boomfiPaymentUrl
+  // Finalize the invoice
+  const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+    auto_advance: false,
+  })
+
+  // Return the Stripe hosted invoice URL (not the bitcoin payment URL directly)
+  return finalizedInvoice.hosted_invoice_url || `https://invoice.stripe.com/${invoice.id}`
 }

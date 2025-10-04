@@ -268,6 +268,16 @@ describe('install/[token] API', () => {
       beta_tester: false,
       kick: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
 
     await handler(req, res)
@@ -373,6 +383,16 @@ describe('install/[token] API', () => {
       beta_tester: false,
       kick: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
 
     await handler(req, res)

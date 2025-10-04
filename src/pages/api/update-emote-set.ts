@@ -175,7 +175,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({
       message: 'Internal server error',
       error: errorMessage,
-      stack: process.env.NODE_ENV === 'development' ? errorStack : undefined,
+      stack: process.env.VERCEL_ENV !== 'production' ? errorStack : undefined,
     })
   }
 }

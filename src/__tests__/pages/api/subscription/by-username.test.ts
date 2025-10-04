@@ -100,6 +100,16 @@ describe('subscription/by-username API', () => {
       kick: null,
       youtube: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
 
     // Mock no subscription found
@@ -152,6 +162,16 @@ describe('subscription/by-username API', () => {
       kick: null,
       youtube: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
 
     // Mock active PRO subscription
@@ -217,6 +237,16 @@ describe('subscription/by-username API', () => {
       kick: null,
       youtube: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
 
     // Mock lifetime PRO subscription
@@ -282,6 +312,16 @@ describe('subscription/by-username API', () => {
       kick: null,
       youtube: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
     // Mock gift PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
@@ -351,6 +391,16 @@ describe('subscription/by-username API', () => {
       kick: null,
       youtube: null,
       proExpiration: null,
+      currentViewers: null,
+      hideFromLeaderboard: false,
+      lastStreamCheck: null,
+      streamPlatform: null,
+      twitchUsername: null,
+      kickUsername: null,
+      streamCategory: null,
+      streamStartedAt: null,
+      streamTitle: null,
+      youtubeChannelId: null,
     })
     // Mock FREE tier subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({

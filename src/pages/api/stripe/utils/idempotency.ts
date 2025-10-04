@@ -21,7 +21,7 @@ export async function processEventIdempotently(
   debugLog(`Entering processEventIdempotently for event ${eventId} (${eventType})`)
 
   // Always process dev events
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.VERCEL_ENV !== 'production') {
     await processor(tx)
     return true
   }
