@@ -166,6 +166,14 @@ async function handleCryptoInvoiceEvent(
             `Processing paid crypto invoice ${invoice.id} for subscription ${subscription.id}`,
           )
 
+          // Check if this is a lifetime subscription - lifetime subscriptions should never generate renewal invoices
+          if (subscription.transactionType === 'LIFETIME') {
+            console.log(
+              `Skipping renewal invoice creation for lifetime subscription ${subscription.id}`,
+            )
+            return true
+          }
+
           // Get price ID and period from the subscription
           const priceId = subscription.stripePriceId
           // Extract and use metadata safely
@@ -438,7 +446,7 @@ async function handleOpenNodeInvoicePaid(
             },
           })
 
-          // Cancel each active subscription
+          // Cancel each active subscription and void any pending renewal invoices
           for (const subscription of activeSubscriptions) {
             if (
               subscription.stripeSubscriptionId &&
@@ -454,6 +462,22 @@ async function handleOpenNodeInvoicePaid(
                   `Failed to cancel Stripe subscription ${subscription.stripeSubscriptionId}:`,
                   error,
                 )
+              }
+            }
+
+            // Void any pending renewal invoices for crypto subscriptions
+            if (subscription.metadata) {
+              const metadata = (subscription.metadata as Record<string, unknown>) || {}
+              const renewalInvoiceId = metadata.renewalInvoiceId as string
+
+              if (renewalInvoiceId) {
+                try {
+                  console.log(`Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`)
+                  await stripe.invoices.voidInvoice(renewalInvoiceId)
+                  console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                } catch (invoiceError) {
+                  console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                }
               }
             }
 
@@ -475,6 +499,7 @@ async function handleOpenNodeInvoicePaid(
 
           // Create lifetime purchase
           await createLifetimePurchase(userId, customerId, priceId, tx)
+          console.log(`Successfully created lifetime purchase for user ${userId}`)
           return true
         } else {
           // Handle recurring subscription - reuse existing crypto subscription logic
