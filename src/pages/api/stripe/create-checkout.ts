@@ -370,6 +370,7 @@ async function createOpenNodeInvoice(
       twitchId,
       isCryptoPayment: 'true',
       paymentProvider: 'opennode',
+      stripePriceId: priceId, // Store the actual price ID for later retrieval
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',

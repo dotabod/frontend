@@ -405,23 +405,27 @@ async function handleOpenNodeInvoicePaid(
   return (
     (await withErrorHandling(
       async () => {
-        // Extract price ID from line items
-        if (!invoice.lines?.data || invoice.lines.data.length === 0) {
-          console.error(`No line items found in invoice ${invoice.id}`)
-          return false
-        }
+        // First, try to get price ID from invoice metadata (most reliable for crypto payments)
+        let priceId: string | null = invoice.metadata?.stripePriceId || null
 
-        const lineItem = invoice.lines.data[0]
-        let priceId: string | null = null
+        // If not in metadata, extract from line items (fallback for regular invoices)
+        if (!priceId) {
+          if (!invoice.lines?.data || invoice.lines.data.length === 0) {
+            console.error(`No line items found in invoice ${invoice.id}`)
+            return false
+          }
 
-        // Extract price ID based on the parent type (new Stripe TypeScript types)
-        if (
-          lineItem.parent &&
-          lineItem.pricing &&
-          'price_details' in lineItem.pricing &&
-          lineItem.pricing.price_details
-        ) {
-          priceId = lineItem.pricing.price_details.price
+          const lineItem = invoice.lines.data[0]
+
+          // Extract price ID based on the parent type (new Stripe TypeScript types)
+          if (
+            lineItem.parent &&
+            lineItem.pricing &&
+            'price_details' in lineItem.pricing &&
+            lineItem.pricing.price_details
+          ) {
+            priceId = lineItem.pricing.price_details.price
+          }
         }
 
         if (!priceId) {
@@ -659,23 +663,27 @@ async function handleBoomfiInvoicePaid(
   return (
     (await withErrorHandling(
       async () => {
-        // Extract the product ID from line items
-        if (!invoice.lines?.data || invoice.lines.data.length === 0) {
-          console.error(`No line items found in invoice ${invoice.id}`)
-          return false
-        }
+        // First, try to get price ID from invoice metadata (most reliable for crypto payments)
+        let priceId: string | null = invoice.metadata?.stripePriceId || null
 
-        const lineItem = invoice.lines.data[0]
-        let priceId: string | null = null
+        // If not in metadata, extract from line items (fallback)
+        if (!priceId) {
+          if (!invoice.lines?.data || invoice.lines.data.length === 0) {
+            console.error(`No line items found in invoice ${invoice.id}`)
+            return false
+          }
 
-        // Extract price ID based on the parent type (new Stripe TypeScript types)
-        if (
-          lineItem.parent &&
-          lineItem.pricing &&
-          'price_details' in lineItem.pricing &&
-          lineItem.pricing.price_details
-        ) {
-          priceId = lineItem.pricing.price_details.price
+          const lineItem = invoice.lines.data[0]
+
+          // Extract price ID based on the parent type (new Stripe TypeScript types)
+          if (
+            lineItem.parent &&
+            lineItem.pricing &&
+            'price_details' in lineItem.pricing &&
+            lineItem.pricing.price_details
+          ) {
+            priceId = lineItem.pricing.price_details.price
+          }
         }
 
         if (!priceId) {
