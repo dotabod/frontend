@@ -79,38 +79,40 @@ export function calculateGiftEndDate(
   startDate: Date = new Date(),
 ): Date {
   // Create a new date for safer manipulation
-  const endDate = new Date(startDate.valueOf())
-  const originalDay = startDate.getDate()
+  const endDate = new Date(startDate.getTime())
+  const originalDay = startDate.getUTCDate()
 
   // Lifetime subscription (add 100 years)
   if (giftType === 'lifetime') {
-    endDate.setFullYear(endDate.getFullYear() + 100)
+    endDate.setUTCFullYear(endDate.getUTCFullYear() + 100)
     return endDate
   }
 
   // Annual subscription (add years)
   if (giftType === 'annual') {
-    endDate.setFullYear(endDate.getFullYear() + quantity)
+    endDate.setUTCFullYear(endDate.getUTCFullYear() + quantity)
     return endDate
   }
 
-  // For other months, use a safer approach to add months
+  // For monthly subscriptions, use a safer approach to add months
   // Calculate target month and year
-  const totalMonths = startDate.getMonth() + quantity
+  const totalMonths = startDate.getUTCMonth() + quantity
   const targetMonth = totalMonths % 12
   const yearsToAdd = Math.floor(totalMonths / 12)
 
   // Set to 1st of month first to avoid month skipping issues
-  endDate.setDate(1)
-  endDate.setMonth(targetMonth)
-  endDate.setFullYear(startDate.getFullYear() + yearsToAdd)
+  endDate.setUTCDate(1)
+  endDate.setUTCMonth(targetMonth)
+  endDate.setUTCFullYear(startDate.getUTCFullYear() + yearsToAdd)
 
   // Get the last day of the target month
-  const lastDayOfMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate()
+  const lastDayOfMonth = new Date(
+    Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 0),
+  ).getUTCDate()
 
   // Set to either original day or last day of month, whichever is smaller
   const finalDay = Math.min(originalDay, lastDayOfMonth)
-  endDate.setDate(finalDay)
+  endDate.setUTCDate(finalDay)
 
   return endDate
 }
