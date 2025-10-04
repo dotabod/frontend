@@ -58,7 +58,7 @@ export async function handleCheckoutCompleted(
                 prorate: true,
               })
 
-              // Also void any pending renewal invoices for the previous subscription
+              // Also void/delete any pending renewal invoices for the previous subscription
               const previousSubscription = await tx.subscription.findFirst({
                 where: {
                   stripeSubscriptionId: session.metadata.previousSubscriptionId,
@@ -72,26 +72,29 @@ export async function handleCheckoutCompleted(
                 if (renewalInvoiceId) {
                   try {
                     console.log(
-                      `Voiding renewal invoice ${renewalInvoiceId} for previous subscription during lifetime upgrade`,
+                      `Canceling renewal invoice ${renewalInvoiceId} for previous subscription during lifetime upgrade`,
                     )
-                    await stripe.invoices.voidInvoice(renewalInvoiceId)
-                    console.log(`Successfully voided invoice ${renewalInvoiceId}`)
-                  } catch (invoiceError) {
-                    // If invoice is already finalized, try to mark it as uncollectible
-                    try {
-                      const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-                      if (invoice.status === 'open') {
-                        await stripe.invoices.markUncollectible(renewalInvoiceId)
-                        console.log(
-                          `Marked invoice ${renewalInvoiceId} as uncollectible after upgrade`,
-                        )
-                      }
-                    } catch (markError) {
-                      console.error(
-                        `Failed to handle invoice ${renewalInvoiceId} during upgrade:`,
-                        markError,
+                    // First, retrieve the invoice to check its status
+                    const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                    if (invoice.status === 'draft') {
+                      // Draft invoices must be deleted, not voided
+                      await stripe.invoices.del(renewalInvoiceId)
+                      console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                    } else if (invoice.status === 'open') {
+                      // Open invoices can be voided
+                      await stripe.invoices.voidInvoice(renewalInvoiceId)
+                      console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                    } else {
+                      console.log(
+                        `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
                       )
                     }
+                  } catch (invoiceError) {
+                    console.error(
+                      `Failed to cancel invoice ${renewalInvoiceId} during upgrade:`,
+                      invoiceError,
+                    )
                   }
                 }
               }
@@ -246,25 +249,31 @@ export async function handleCheckoutCompleted(
                   console.log(
                     `Canceling pending invoice ${renewalInvoiceId} for user ${userId} after successful checkout`,
                   )
-                  // Try to void the invoice first
-                  await stripe.invoices.voidInvoice(renewalInvoiceId)
-                  console.log(`Successfully voided invoice ${renewalInvoiceId} after upgrade`)
-                } catch (invoiceError) {
-                  // If invoice is already finalized, try to mark it as uncollectible
-                  try {
-                    const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-                    if (invoice.status === 'open') {
-                      await stripe.invoices.markUncollectible(renewalInvoiceId)
-                      console.log(
-                        `Marked invoice ${renewalInvoiceId} as uncollectible after upgrade`,
-                      )
-                    }
-                  } catch (markError) {
-                    console.error(
-                      `Failed to handle invoice ${renewalInvoiceId} after upgrade:`,
-                      markError,
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(
+                      `Successfully deleted draft invoice ${renewalInvoiceId} after upgrade`,
+                    )
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(
+                      `Successfully voided open invoice ${renewalInvoiceId} after upgrade`,
+                    )
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
                     )
                   }
+                } catch (invoiceError) {
+                  console.error(
+                    `Failed to cancel invoice ${renewalInvoiceId} after upgrade:`,
+                    invoiceError,
+                  )
                 }
               }
             }
@@ -330,7 +339,7 @@ export async function handleCheckoutCompleted(
                   `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
                 )
 
-                // If it's a crypto subscription with a renewal invoice, void the invoice
+                // If it's a crypto subscription with a renewal invoice, cancel the invoice
                 if (subscription.metadata) {
                   const metadata = (subscription.metadata as Record<string, unknown>) || {}
                   const renewalInvoiceId = metadata.renewalInvoiceId as string
@@ -338,12 +347,26 @@ export async function handleCheckoutCompleted(
                   if (renewalInvoiceId) {
                     try {
                       console.log(
-                        `Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                        `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
                       )
-                      await stripe.invoices.voidInvoice(renewalInvoiceId)
-                      console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                      // Retrieve the invoice to check its status
+                      const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                      if (invoice.status === 'draft') {
+                        // Draft invoices must be deleted, not voided
+                        await stripe.invoices.del(renewalInvoiceId)
+                        console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                      } else if (invoice.status === 'open') {
+                        // Open invoices can be voided
+                        await stripe.invoices.voidInvoice(renewalInvoiceId)
+                        console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                      } else {
+                        console.log(
+                          `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                        )
+                      }
                     } catch (invoiceError) {
-                      console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                      console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
                     }
                   }
                 }
@@ -502,7 +525,7 @@ export async function handleCheckoutCompleted(
                 `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
               )
 
-              // If it's a crypto subscription with a renewal invoice, void the invoice
+              // If it's a crypto subscription with a renewal invoice, cancel the invoice
               if (subscription.metadata) {
                 const metadata = (subscription.metadata as Record<string, unknown>) || {}
                 const renewalInvoiceId = metadata.renewalInvoiceId as string
@@ -510,12 +533,26 @@ export async function handleCheckoutCompleted(
                 if (renewalInvoiceId) {
                   try {
                     console.log(
-                      `Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                      `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
                     )
-                    await stripe.invoices.voidInvoice(renewalInvoiceId)
-                    console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                    // Retrieve the invoice to check its status
+                    const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                    if (invoice.status === 'draft') {
+                      // Draft invoices must be deleted, not voided
+                      await stripe.invoices.del(renewalInvoiceId)
+                      console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                    } else if (invoice.status === 'open') {
+                      // Open invoices can be voided
+                      await stripe.invoices.voidInvoice(renewalInvoiceId)
+                      console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                    } else {
+                      console.log(
+                        `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                      )
+                    }
                   } catch (invoiceError) {
-                    console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                    console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
                   }
                 }
               }

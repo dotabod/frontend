@@ -469,18 +469,34 @@ async function handleOpenNodeInvoicePaid(
               }
             }
 
-            // Void any pending renewal invoices for crypto subscriptions
+            // Void/delete any pending renewal invoices for crypto subscriptions
             if (subscription.metadata) {
               const metadata = (subscription.metadata as Record<string, unknown>) || {}
               const renewalInvoiceId = metadata.renewalInvoiceId as string
 
               if (renewalInvoiceId) {
                 try {
-                  console.log(`Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`)
-                  await stripe.invoices.voidInvoice(renewalInvoiceId)
-                  console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                  console.log(
+                    `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                  )
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                    )
+                  }
                 } catch (invoiceError) {
-                  console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                  console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
                 }
               }
             }
@@ -755,18 +771,34 @@ async function handleBoomfiInvoicePaid(
               `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
             )
 
-            // If it's a crypto subscription with a renewal invoice, void the invoice
+            // If it's a crypto subscription with a renewal invoice, cancel the invoice
             if (subscription.metadata) {
               const metadata = (subscription.metadata as Record<string, unknown>) || {}
               const renewalInvoiceId = metadata.renewalInvoiceId as string
 
               if (renewalInvoiceId) {
                 try {
-                  console.log(`Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`)
-                  await stripe.invoices.voidInvoice(renewalInvoiceId)
-                  console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                  console.log(
+                    `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                  )
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                    )
+                  }
                 } catch (invoiceError) {
-                  console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                  console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
                 }
               }
             }
