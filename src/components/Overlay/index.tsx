@@ -6,7 +6,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
+import { ChatMessagesOverlay } from '@/components/Overlay/ChatMessagesOverlay'
 import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
 import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import type { PollData } from '@/components/Overlay/PollOverlay'
@@ -24,7 +26,7 @@ import {
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { useOBS } from '@/lib/hooks/useOBS'
-import { useSocket, type WinChance } from '@/lib/hooks/useSocket'
+import { type ChatMessage, useSocket, type WinChance } from '@/lib/hooks/useSocket'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
@@ -88,6 +90,8 @@ const OverlayPage = () => {
     },
   ])
   const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)
+
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
 
   const [rankImageDetails, setRankImageDetails] = useState<{
     image: string | null
@@ -243,7 +247,7 @@ const OverlayPage = () => {
               status: 404,
             }),
           )
-        } catch (e) {
+        } catch (_e) {
           // Ignore storage errors
         }
       }
@@ -282,6 +286,7 @@ const OverlayPage = () => {
     setNotablePlayers,
     setWL,
     setRadiantWinChance,
+    setChatMessages,
   })
 
   useOBS({ block, connected })
@@ -346,6 +351,8 @@ const OverlayPage = () => {
         setBlock={setBlock}
         showDevImage={showDevImage}
         setShowDevImage={setShowDevImage}
+        chatMessages={chatMessages}
+        setChatMessages={setChatMessages}
       />
       <AnimatePresence>
         <motion.div
@@ -401,6 +408,12 @@ const OverlayPage = () => {
           <RestrictFeature feature='lastFmOverlay'>
             <AnimatedLastFm block={block} />
           </RestrictFeature>
+
+          <InGameOutsideCenterV2>
+            <RestrictFeature feature='autoTranslate'>
+              <ChatMessagesOverlay chatMessages={chatMessages} />
+            </RestrictFeature>
+          </InGameOutsideCenterV2>
         </OverlayV2>
 
         <InGameOverlays

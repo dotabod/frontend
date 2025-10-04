@@ -31,7 +31,7 @@ export const emotesRequired = [
   { label: 'Chatting', id: '01FAK9C8MR0004HKF2ZK1YPQ5A' },
   { label: 'massivePIDAS', id: '01G0KP1N5R000167A5H0K2MX85' },
   { label: 'Sadge', id: '01FHNBZRW8000C3ZWT2Z63JS92' },
-  { label: 'EZ', id: '01GB9W6V0000098BZVD7GKTW0F' },
+  { label: 'EZ', id: '01F9FS6EEG0006XXD6DX0K9Y04' },
   { label: 'Clap', id: '01F6NE9AER000CKKT9BSDYGT0J' },
   { label: 'peepoGamble', id: '01F96A83PG0007ECJ7AZB0NR4S' },
   { label: 'PauseChamp', id: '01F6QWHR20000EB9BSAR8G1DKZ' },

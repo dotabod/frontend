@@ -1,4 +1,3 @@
-import { Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -92,12 +91,7 @@ export default function MinimapCard(): React.ReactNode {
           min={0}
           max={1}
           step={0.05}
-          label={
-            <span className='flex items-center gap-2'>
-              Blocker intensity
-              <Tag color='green'>New</Tag>
-            </span>
-          }
+          label={<span className='flex items-center gap-2'>Blocker intensity</span>}
           onChange={handleOpacityChange}
           helpText={getOpacityDescription()}
         />
