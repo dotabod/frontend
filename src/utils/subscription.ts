@@ -145,6 +145,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   winProbabilityOverlayIntervalMinutes: SUBSCRIPTION_TIERS.PRO,
   crypto_payment_interest: SUBSCRIPTION_TIERS.FREE,
   disableAutoClipping: SUBSCRIPTION_TIERS.FREE,
+  autoCommandsOnMatchStart: SUBSCRIPTION_TIERS.PRO,
 } as const
 
 export type FeatureTier = keyof typeof FEATURE_TIERS
