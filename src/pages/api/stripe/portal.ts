@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscription } from '@/utils/subscription'
+import prisma from '@/lib/db'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -18,12 +19,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Get or create Stripe customer ID
-    // First check if user has a subscription record
+    // Get customer ID from subscription
     const subscription = await getSubscription(session.user.id)
-    const customerId = subscription?.stripeCustomerId
+    let customerId = subscription?.stripeCustomerId
 
-    console.log({ subscription })
+    // If no customer ID from subscription, check if user has any previous subscriptions with a customer ID
+    if (!customerId) {
+      const subscriptionWithCustomerId = await prisma.subscription.findFirst({
+        where: {
+          userId: session.user.id,
+          stripeCustomerId: { not: null },
+        },
+        select: { stripeCustomerId: true },
+      })
+
+      customerId = subscriptionWithCustomerId?.stripeCustomerId || null
+    }
+
+    // If still no customer ID, check OpenNode charges table for stripe customer data
+    if (!customerId) {
+      const openNodeChargeWithCustomerId = await prisma.openNodeCharge.findFirst({
+        where: {
+          userId: session.user.id,
+          stripeCustomerId: { not: '' },
+        },
+        select: { stripeCustomerId: true },
+        orderBy: { createdAt: 'desc' }, // Get the most recent one
+      })
+
+      customerId = openNodeChargeWithCustomerId?.stripeCustomerId || null
+    }
+
+    console.log({ subscription, customerId })
 
     if (!customerId) {
       return res.status(400).json({ error: 'No Stripe customer found' })

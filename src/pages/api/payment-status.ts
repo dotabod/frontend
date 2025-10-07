@@ -130,6 +130,13 @@ function getStatusInfo(status: string) {
           'You paid more than required. Your subscription is active and we will process the refund.',
         canRetry: false,
       }
+    case 'unpaid':
+      return {
+        message: 'Payment is pending',
+        type: 'info',
+        description: 'The payment is pending.',
+        canRetry: false,
+      }
     default:
       return {
         message: 'Payment status unknown',

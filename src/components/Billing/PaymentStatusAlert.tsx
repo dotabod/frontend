@@ -149,9 +149,7 @@ export const PaymentStatusAlert = () => {
             <p>{paymentStatus.statusInfo.description}</p>
             <div className='text-sm text-gray-400'>
               <div>Invoice: {paymentStatus.invoice.number || paymentStatus.invoiceId}</div>
-              <div>
-                Amount: {paymentStatus.amount} {paymentStatus.currency.toUpperCase()}
-              </div>
+              <div>Amount: {paymentStatus.invoice.amount} {paymentStatus.currency.toUpperCase()}</div>
               <div>Charge ID: {paymentStatus.chargeId}</div>
             </div>
           </div>

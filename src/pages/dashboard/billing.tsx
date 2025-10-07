@@ -6,12 +6,13 @@ import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
 import { BillingPlans } from '@/components/Billing/BillingPlans'
-import { PaymentStatusAlert } from '@/components/Billing/PaymentStatusAlert'
+import { InvoiceManagement } from '@/components/Billing/InvoiceManagement'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
+import { PaymentStatusAlert } from '@/components/Billing/PaymentStatusAlert'
 
 const { Title } = Typography
 
@@ -96,6 +97,10 @@ const BillingPage = () => {
           giftInfo={emptyGiftInfo}
           statusInfo={statusInfo}
           handlePortalAccess={handlePortalAccess}
+          isLoading={isLoading}
+        />
+        <InvoiceManagement
+          onPortalAccess={handlePortalAccess}
           isLoading={isLoading}
         />
       </div>
