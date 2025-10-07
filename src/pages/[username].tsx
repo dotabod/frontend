@@ -1,6 +1,6 @@
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
 import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
-import { type GetStaticPaths, type GetStaticProps } from 'next'
+import type { GetStaticPaths, GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
-import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import prisma from '@/lib/db'
+import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
@@ -36,7 +36,11 @@ interface PageContentProps {
   username?: string
 }
 
-const PageContent = ({ userData: ssrUserData, subscriptionInfo: ssrSubscriptionInfo, username: ssrUsername }: PageContentProps = {}) => {
+const PageContent = ({
+  userData: ssrUserData,
+  subscriptionInfo: ssrSubscriptionInfo,
+  username: ssrUsername,
+}: PageContentProps = {}) => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
@@ -246,7 +250,9 @@ const PageContent = ({ userData: ssrUserData, subscriptionInfo: ssrSubscriptionI
                   className='flex flex-row items-center space-x-2'
                 >
                   <h1 className='text-2xl font-bold leading-6'>
-                    {finalLoading || !finalUserData?.displayName ? 'Loading...' : finalUserData.displayName}
+                    {finalLoading || !finalUserData?.displayName
+                      ? 'Loading...'
+                      : finalUserData.displayName}
                   </h1>
                   <ExternalLinkIcon className='flex' size={15} />
                 </Link>
@@ -415,7 +421,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
       AND: [
         { followers: { gte: 500 } }, // Higher threshold for pre-building
         { stream_online: true }, // Focus on currently active streamers
-      ]
+      ],
     },
     select: { name: true },
     orderBy: { followers: 'desc' },

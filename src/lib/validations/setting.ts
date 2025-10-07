@@ -119,6 +119,10 @@ const settingsSchema = {
   lastFmUsername: z.string().max(45).optional(),
   lastFmRefreshRate: z.number().min(5).max(60),
   disableAutoClipping: z.boolean(),
+  autoTranslate: z.boolean(),
+  translateOnOverlay: z.boolean(),
+  translationLanguage: z.string().max(5),
+  autoCommandsOnMatchStart: z.array(z.string().max(45)),
   rankOnly: z.object({
     enabled: z.boolean(),
     minimumRank: z.enum([

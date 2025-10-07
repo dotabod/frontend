@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -89,7 +89,8 @@ function getStatusInfo(status: string) {
       return {
         message: 'Payment is processing on the blockchain',
         type: 'processing',
-        description: 'Your Bitcoin payment has been received and is being confirmed on the blockchain. This usually takes 10-30 minutes.',
+        description:
+          'Your Bitcoin payment has been received and is being confirmed on the blockchain. This usually takes 10-30 minutes.',
         canRetry: false,
       }
     case 'paid':
@@ -125,7 +126,8 @@ function getStatusInfo(status: string) {
       return {
         message: 'Payment amount exceeded',
         type: 'warning',
-        description: 'You paid more than required. Your subscription is active and we will process the refund.',
+        description:
+          'You paid more than required. Your subscription is active and we will process the refund.',
         canRetry: false,
       }
     default:

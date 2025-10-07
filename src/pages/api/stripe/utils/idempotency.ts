@@ -1,5 +1,5 @@
-import type { Prisma } from '@prisma/client';
-import { debugLog } from './debugLog';
+import type { Prisma } from '@prisma/client'
+import { debugLog } from './debugLog'
 
 /**
  * Processes a webhook event idempotently, ensuring it's only processed once

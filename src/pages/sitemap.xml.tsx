@@ -1,4 +1,4 @@
-import { type GetServerSideProps } from 'next'
+import type { GetServerSideProps } from 'next'
 import prisma from '@/lib/db'
 
 // This page should never render, it only returns XML
@@ -16,18 +16,18 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         OR: [
           { followers: { gte: 1 } },
           { settings: { some: {} } },
-          { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } } // Created within last year
-        ]
+          { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } }, // Created within last year
+        ],
       },
     })
 
     const USERS_PER_SITEMAP = 5000 // 5k users per sitemap file
     const numSitemaps = Math.ceil(totalUsers / USERS_PER_SITEMAP)
-    
+
     // Generate sitemap index XML with optimized structure for 30k+ users
     // For now, we'll use a manageable number of static sitemaps
     const maxSitemaps = Math.min(numSitemaps, 6) // Limit to 6 sitemaps (30k users max)
-    
+
     const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
@@ -39,7 +39,7 @@ ${Array.from({ length: maxSitemaps }, (_, i) => i + 1)
     (page) => `  <sitemap>
     <loc>https://dotabod.com/sitemaps/users-${page}.xml</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
-  </sitemap>`
+  </sitemap>`,
   )
   .join('\n')}
 </sitemapindex>`
@@ -54,7 +54,7 @@ ${Array.from({ length: maxSitemaps }, (_, i) => i + 1)
     }
   } catch (error) {
     console.error('Error generating sitemap index:', error)
-    
+
     // Return a basic sitemap index if there's an error
     const basicSitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

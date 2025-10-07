@@ -9,7 +9,7 @@ import {
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
 import { Settings } from '@/lib/defaultSettings'
@@ -89,6 +89,11 @@ type TwitchEventData = {
   // Add other properties as needed
 }
 
+export type ChatMessage = {
+  message: string
+  timestamp?: number
+}
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -101,6 +106,7 @@ export const useSocket = ({
   setRankImageDetails,
   setWL,
   setRadiantWinChance,
+  setChatMessages,
 }) => {
   const router = useRouter()
   const { userId } = router.query
@@ -108,6 +114,9 @@ export const useSocket = ({
 
   // can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
+
+  // Ref to store timeout IDs for chat message cleanup
+  const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   useEffect(() => {
     if (!userId) return
@@ -245,6 +254,28 @@ export const useSocket = ({
       updateLastReceived()
       setAegis(data)
     })
+    socket.on('chatMessage', (data: ChatMessage) => {
+      updateLastReceived()
+      const messageWithTimestamp = {
+        ...data,
+        timestamp: data.timestamp || Date.now(),
+      }
+
+      // Add message to state
+      setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), messageWithTimestamp])
+
+      // Set up timeout to remove message after 10 seconds
+      const messageId = messageWithTimestamp.timestamp.toString()
+      const timeoutId = setTimeout(() => {
+        setChatMessages((prev: ChatMessage[]) =>
+          prev.filter((msg) => msg.timestamp?.toString() !== messageId),
+        )
+        messageTimeoutsRef.current.delete(messageId)
+      }, 10000) // 10 seconds
+
+      // Store timeout ID for cleanup
+      messageTimeoutsRef.current.set(messageId, timeoutId)
+    })
     socket.on('roshan-killed', (data) => {
       updateLastReceived()
       setRoshan(data)
@@ -266,7 +297,7 @@ export const useSocket = ({
       setConnected(false)
     })
 
-    socket.on('refresh-settings', (key: typeof Settings) => {
+    socket.on('refresh-settings', (_key: typeof Settings) => {
       updateLastReceived()
       mutate()
     })
@@ -308,6 +339,12 @@ export const useSocket = ({
       clearInterval(connectionMonitor)
       clearTimeout(reconnectTimeout)
 
+      // Clear all message timeouts
+      messageTimeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      messageTimeoutsRef.current.clear()
+
       // Don't disconnect the socket on every effect cleanup
       // Only clean up event handlers
       socket?.off('connect')
@@ -325,6 +362,7 @@ export const useSocket = ({
       socket?.off('paused')
       socket?.off('notable-players')
       socket?.off('aegis-picked-up')
+      socket?.off('chatMessage')
       socket?.off('roshan-killed')
       socket?.off('auth_error')
       socket?.off('refresh-settings')
@@ -337,7 +375,7 @@ export const useSocket = ({
   }, [userId]) // Only depend on userId
 }
 
-const events = {
+const _events = {
   subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
   subscribeToChannelPredictionProgressEvents: EventSubChannelPredictionProgressEvent,
   subscribeToChannelPredictionLockEvents: EventSubChannelPredictionLockEvent,

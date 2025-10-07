@@ -136,34 +136,34 @@ describe('Gift Subscription Functions', () => {
 
   describe('aggregateGiftDuration', () => {
     it('extends existing expiration date', () => {
-      const existingExpiration = new Date('2023-08-15') // 2 months from now
+      const existingExpiration = new Date('2023-08-15T00:00:00Z') // 2 months from now
       const newExpiration = aggregateGiftDuration('monthly', 3, existingExpiration)
 
       // Should add 3 months to existing expiration
-      expect(newExpiration.getFullYear()).toBe(2023)
-      expect(newExpiration.getMonth()).toBe(10) // November (0-indexed)
-      expect(newExpiration.getDate()).toBe(15)
+      expect(newExpiration.getUTCFullYear()).toBe(2023)
+      expect(newExpiration.getUTCMonth()).toBe(10) // November (0-indexed)
+      expect(newExpiration.getUTCDate()).toBe(15)
     })
 
     it('starts from current date if no existing expiration', () => {
-      const now = new Date('2023-06-15')
+      const now = new Date('2023-06-15T00:00:00Z')
       const newExpiration = aggregateGiftDuration('monthly', 2, null, now)
 
       // Should add 2 months to now
-      expect(newExpiration.getFullYear()).toBe(2023)
-      expect(newExpiration.getMonth()).toBe(7) // August (0-indexed)
-      expect(newExpiration.getDate()).toBe(15)
+      expect(newExpiration.getUTCFullYear()).toBe(2023)
+      expect(newExpiration.getUTCMonth()).toBe(7) // August (0-indexed)
+      expect(newExpiration.getUTCDate()).toBe(15)
     })
 
     it('starts from current date if existing expiration is in the past', () => {
-      const now = new Date('2023-06-15')
-      const pastExpiration = new Date('2023-05-15') // 1 month ago
+      const now = new Date('2023-06-15T00:00:00Z')
+      const pastExpiration = new Date('2023-05-15T00:00:00Z') // 1 month ago
       const newExpiration = aggregateGiftDuration('monthly', 2, pastExpiration, now)
 
       // Should add 2 months to now, ignoring past expiration
-      expect(newExpiration.getFullYear()).toBe(2023)
-      expect(newExpiration.getMonth()).toBe(7) // August (0-indexed)
-      expect(newExpiration.getDate()).toBe(15)
+      expect(newExpiration.getUTCFullYear()).toBe(2023)
+      expect(newExpiration.getUTCMonth()).toBe(7) // August (0-indexed)
+      expect(newExpiration.getUTCDate()).toBe(15)
     })
 
     it('always returns far future date for lifetime gifts', () => {

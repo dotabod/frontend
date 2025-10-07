@@ -122,40 +122,9 @@ vi.mock('@/pages/api/stripe/webhook', () => {
   }
 })
 
+import { calculateGiftEndDate } from '@/lib/gift-subscription'
 // Import the mocked handler
 import handler, { config } from '@/pages/api/stripe/webhook'
-
-// Define the calculateGiftEndDate function for testing
-function calculateGiftEndDate(
-  giftType: string,
-  quantity: number,
-  startDate: Date = new Date(),
-): Date {
-  const endDate = new Date(startDate)
-
-  if (giftType === 'monthly') {
-    endDate.setMonth(endDate.getMonth() + quantity)
-  } else if (giftType === 'annual') {
-    endDate.setFullYear(endDate.getFullYear() + quantity)
-  }
-
-  // Handle month length differences
-  const originalDay = startDate.getDate()
-  const endDay = endDate.getDate()
-
-  if (endDay < originalDay) {
-    const endMonth = endDate.getMonth()
-    const lastDayOfMonth = new Date(endDate.getFullYear(), endMonth + 1, 0).getDate()
-
-    if (originalDay <= lastDayOfMonth) {
-      endDate.setDate(originalDay)
-    } else {
-      endDate.setDate(lastDayOfMonth)
-    }
-  }
-
-  return endDate
-}
 
 describe('Stripe webhook handler', () => {
   beforeEach(() => {
@@ -413,23 +382,23 @@ describe('Stripe webhook handler', () => {
     })
 
     it('should handle month-end edge cases correctly', () => {
-      // Test with January 31 (should become February 28/29)
+      // Test with January 31 (should become February 28 in non-leap year)
       const startDate = new Date('2025-01-31T00:00:00Z')
       const endDate = calculateGiftEndDate('monthly', 1, startDate)
 
       // Check the result
-      expect(endDate.getFullYear()).toBe(2025)
-      expect(endDate.getMonth()).toBe(2) // March is month 2 (0-indexed)
-      expect(endDate.getDate()).toBe(31)
+      expect(endDate.getUTCFullYear()).toBe(2025)
+      expect(endDate.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
+      expect(endDate.getUTCDate()).toBe(28)
 
       // Test with a leap year
       const leapYearStart = new Date('2024-01-31T00:00:00Z')
       const leapYearEnd = calculateGiftEndDate('monthly', 1, leapYearStart)
 
       // Check the result
-      expect(leapYearEnd.getFullYear()).toBe(2024)
-      expect(leapYearEnd.getMonth()).toBe(2) // March is month 2 (0-indexed)
-      expect(leapYearEnd.getDate()).toBe(31)
+      expect(leapYearEnd.getUTCFullYear()).toBe(2024)
+      expect(leapYearEnd.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
+      expect(leapYearEnd.getUTCDate()).toBe(29)
     })
 
     it('should handle existing trial subscriptions correctly', () => {

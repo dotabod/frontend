@@ -1,4 +1,4 @@
-import { type GetServerSideProps } from 'next'
+import type { GetServerSideProps } from 'next'
 import prisma from '@/lib/db'
 
 // This page should never render, it only returns XML
@@ -23,13 +23,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         OR: [
           { followers: { gte: 1 } },
           { settings: { some: {} } },
-          { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } } // Created within last year
-        ]
+          { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } }, // Created within last year
+        ],
       },
-      orderBy: [
-        { followers: 'desc' },
-        { updatedAt: 'desc' }
-      ],
+      orderBy: [{ followers: 'desc' }, { updatedAt: 'desc' }],
       take: USERS_PER_SITEMAP,
       skip: offset,
     })
@@ -51,12 +48,16 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     // Generate sitemap XML
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${users.map(user => `  <url>
+${users
+  .map(
+    (user) => `  <url>
     <loc>https://dotabod.com/${user.name}</loc>
     <lastmod>${user.updatedAt.toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`).join('\n')}
+  </url>`,
+  )
+  .join('\n')}
 </urlset>`
 
     res.setHeader('Content-Type', 'application/xml')

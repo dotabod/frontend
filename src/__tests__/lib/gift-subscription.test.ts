@@ -34,23 +34,23 @@ describe('Gift Subscription Utilities', () => {
       console.log('End date day:', endDate.getDate())
 
       // Check the result - should be February 28 in a non-leap year
-      expect(endDate.getFullYear()).toBe(2025)
-      expect(endDate.getMonth()).toBe(1) // February is month 1 (0-indexed)
-      expect(endDate.getDate()).toBe(28) // Last day of February 2025
+      expect(endDate.getUTCFullYear()).toBe(2025)
+      expect(endDate.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
+      expect(endDate.getUTCDate()).toBe(28) // Last day of February 2025
 
       // Test with a leap year
       const leapYearStart = new Date('2024-01-31T00:00:00Z')
       const leapYearEnd = calculateGiftEndDate('monthly', 1, leapYearStart)
 
       console.log('Leap year end date:', leapYearEnd.toISOString())
-      console.log('Leap year end date year:', leapYearEnd.getFullYear())
-      console.log('Leap year end date month:', leapYearEnd.getMonth())
-      console.log('Leap year end date day:', leapYearEnd.getDate())
+      console.log('Leap year end date year:', leapYearEnd.getUTCFullYear())
+      console.log('Leap year end date month:', leapYearEnd.getUTCMonth())
+      console.log('Leap year end date day:', leapYearEnd.getUTCDate())
 
       // Check the result - should be February 29 in a leap year
-      expect(leapYearEnd.getFullYear()).toBe(2024)
-      expect(leapYearEnd.getMonth()).toBe(1) // February is month 1 (0-indexed)
-      expect(leapYearEnd.getDate()).toBe(29) // Last day of February 2024 (leap year)
+      expect(leapYearEnd.getUTCFullYear()).toBe(2024)
+      expect(leapYearEnd.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
+      expect(leapYearEnd.getUTCDate()).toBe(29) // Last day of February 2024 (leap year)
     })
 
     it('should handle lifetime gift subscriptions correctly', () => {

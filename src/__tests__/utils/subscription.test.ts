@@ -115,7 +115,7 @@ describe('Subscription priority logic', () => {
       streamCategory: null,
       streamStartedAt: null,
       streamTitle: null,
-      youtubeChannelId: null
+      youtubeChannelId: null,
     })
 
     vi.mocked(prisma.subscription.findMany).mockResolvedValue([
@@ -165,7 +165,7 @@ describe('Subscription priority logic', () => {
       streamCategory: null,
       streamStartedAt: null,
       streamTitle: null,
-      youtubeChannelId: null
+      youtubeChannelId: null,
     })
 
     // Return empty array to simulate no subscriptions

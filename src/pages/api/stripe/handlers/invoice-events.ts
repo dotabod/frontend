@@ -166,6 +166,14 @@ async function handleCryptoInvoiceEvent(
             `Processing paid crypto invoice ${invoice.id} for subscription ${subscription.id}`,
           )
 
+          // Check if this is a lifetime subscription - lifetime subscriptions should never generate renewal invoices
+          if (subscription.transactionType === 'LIFETIME') {
+            console.log(
+              `Skipping renewal invoice creation for lifetime subscription ${subscription.id}`,
+            )
+            return true
+          }
+
           // Get price ID and period from the subscription
           const priceId = subscription.stripePriceId
           // Extract and use metadata safely
@@ -397,23 +405,27 @@ async function handleOpenNodeInvoicePaid(
   return (
     (await withErrorHandling(
       async () => {
-        // Extract price ID from line items
-        if (!invoice.lines?.data || invoice.lines.data.length === 0) {
-          console.error(`No line items found in invoice ${invoice.id}`)
-          return false
-        }
+        // First, try to get price ID from invoice metadata (most reliable for crypto payments)
+        let priceId: string | null = invoice.metadata?.stripePriceId || null
 
-        const lineItem = invoice.lines.data[0]
-        let priceId: string | null = null
+        // If not in metadata, extract from line items (fallback for regular invoices)
+        if (!priceId) {
+          if (!invoice.lines?.data || invoice.lines.data.length === 0) {
+            console.error(`No line items found in invoice ${invoice.id}`)
+            return false
+          }
 
-        // Extract price ID based on the parent type (new Stripe TypeScript types)
-        if (
-          lineItem.parent &&
-          lineItem.pricing &&
-          'price_details' in lineItem.pricing &&
-          lineItem.pricing.price_details
-        ) {
-          priceId = lineItem.pricing.price_details.price
+          const lineItem = invoice.lines.data[0]
+
+          // Extract price ID based on the parent type (new Stripe TypeScript types)
+          if (
+            lineItem.parent &&
+            lineItem.pricing &&
+            'price_details' in lineItem.pricing &&
+            lineItem.pricing.price_details
+          ) {
+            priceId = lineItem.pricing.price_details.price
+          }
         }
 
         if (!priceId) {
@@ -438,7 +450,7 @@ async function handleOpenNodeInvoicePaid(
             },
           })
 
-          // Cancel each active subscription
+          // Cancel each active subscription and void any pending renewal invoices
           for (const subscription of activeSubscriptions) {
             if (
               subscription.stripeSubscriptionId &&
@@ -454,6 +466,38 @@ async function handleOpenNodeInvoicePaid(
                   `Failed to cancel Stripe subscription ${subscription.stripeSubscriptionId}:`,
                   error,
                 )
+              }
+            }
+
+            // Void/delete any pending renewal invoices for crypto subscriptions
+            if (subscription.metadata) {
+              const metadata = (subscription.metadata as Record<string, unknown>) || {}
+              const renewalInvoiceId = metadata.renewalInvoiceId as string
+
+              if (renewalInvoiceId) {
+                try {
+                  console.log(
+                    `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                  )
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                    )
+                  }
+                } catch (invoiceError) {
+                  console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
+                }
               }
             }
 
@@ -475,6 +519,7 @@ async function handleOpenNodeInvoicePaid(
 
           // Create lifetime purchase
           await createLifetimePurchase(userId, customerId, priceId, tx)
+          console.log(`Successfully created lifetime purchase for user ${userId}`)
           return true
         } else {
           // Handle recurring subscription - reuse existing crypto subscription logic
@@ -634,23 +679,27 @@ async function handleBoomfiInvoicePaid(
   return (
     (await withErrorHandling(
       async () => {
-        // Extract the product ID from line items
-        if (!invoice.lines?.data || invoice.lines.data.length === 0) {
-          console.error(`No line items found in invoice ${invoice.id}`)
-          return false
-        }
+        // First, try to get price ID from invoice metadata (most reliable for crypto payments)
+        let priceId: string | null = invoice.metadata?.stripePriceId || null
 
-        const lineItem = invoice.lines.data[0]
-        let priceId: string | null = null
+        // If not in metadata, extract from line items (fallback)
+        if (!priceId) {
+          if (!invoice.lines?.data || invoice.lines.data.length === 0) {
+            console.error(`No line items found in invoice ${invoice.id}`)
+            return false
+          }
 
-        // Extract price ID based on the parent type (new Stripe TypeScript types)
-        if (
-          lineItem.parent &&
-          lineItem.pricing &&
-          'price_details' in lineItem.pricing &&
-          lineItem.pricing.price_details
-        ) {
-          priceId = lineItem.pricing.price_details.price
+          const lineItem = invoice.lines.data[0]
+
+          // Extract price ID based on the parent type (new Stripe TypeScript types)
+          if (
+            lineItem.parent &&
+            lineItem.pricing &&
+            'price_details' in lineItem.pricing &&
+            lineItem.pricing.price_details
+          ) {
+            priceId = lineItem.pricing.price_details.price
+          }
         }
 
         if (!priceId) {
@@ -722,18 +771,34 @@ async function handleBoomfiInvoicePaid(
               `Marked subscription ${subscription.id} as canceled due to lifetime upgrade`,
             )
 
-            // If it's a crypto subscription with a renewal invoice, void the invoice
+            // If it's a crypto subscription with a renewal invoice, cancel the invoice
             if (subscription.metadata) {
               const metadata = (subscription.metadata as Record<string, unknown>) || {}
               const renewalInvoiceId = metadata.renewalInvoiceId as string
 
               if (renewalInvoiceId) {
                 try {
-                  console.log(`Voiding renewal invoice ${renewalInvoiceId} due to lifetime upgrade`)
-                  await stripe.invoices.voidInvoice(renewalInvoiceId)
-                  console.log(`Successfully voided invoice ${renewalInvoiceId}`)
+                  console.log(
+                    `Canceling renewal invoice ${renewalInvoiceId} due to lifetime upgrade`,
+                  )
+                  // Retrieve the invoice to check its status
+                  const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+                  if (invoice.status === 'draft') {
+                    // Draft invoices must be deleted, not voided
+                    await stripe.invoices.del(renewalInvoiceId)
+                    console.log(`Successfully deleted draft invoice ${renewalInvoiceId}`)
+                  } else if (invoice.status === 'open') {
+                    // Open invoices can be voided
+                    await stripe.invoices.voidInvoice(renewalInvoiceId)
+                    console.log(`Successfully voided open invoice ${renewalInvoiceId}`)
+                  } else {
+                    console.log(
+                      `Invoice ${renewalInvoiceId} is already ${invoice.status}, no action needed`,
+                    )
+                  }
                 } catch (invoiceError) {
-                  console.error(`Failed to void invoice ${renewalInvoiceId}:`, invoiceError)
+                  console.error(`Failed to cancel invoice ${renewalInvoiceId}:`, invoiceError)
                 }
               }
             }
