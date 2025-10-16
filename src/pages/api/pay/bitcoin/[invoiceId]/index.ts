@@ -52,8 +52,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       description: `Invoice ${invoice.number || invoice.id}`,
       customer_email: invoice.customer_email || undefined,
       notif_email: invoice.customer_email || undefined,
-      callback_url: `${process.env.NEXTAUTH_URL}/api/webhooks/opennode`,
-      success_url: `${process.env.NEXTAUTH_URL}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
+      callback_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/webhooks/opennode`,
+      success_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
       auto_settle: false, // Configure based on treasury policy
       ttl: 60, // 1 hour expiration
       metadata: {
@@ -62,7 +62,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         user_id: invoice.metadata?.userId,
       },
     }
-    console.log('OpenNode Charge Params', opendodtacharge)
     const charge = await createOpenNodeCharge(opendodtacharge)
 
     // Store charge mapping
@@ -77,8 +76,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       hostedCheckoutUrl: charge.hosted_checkout_url,
       metadata: charge.metadata,
     }
-
-    console.log('OpenNode Charge Data', opennodeData)
 
     await prisma.openNodeCharge.create({
       data: opennodeData,
