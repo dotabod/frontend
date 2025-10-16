@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const amount = (invoice.amount_remaining || 0) / 100
     const currency = (invoice.currency || 'usd').toUpperCase()
 
-    const charge = await createOpenNodeCharge({
+    const opendodtacharge = {
       amount,
       currency,
       description: `Invoice ${invoice.number || invoice.id}`,
@@ -61,21 +61,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         customer_id: invoice.customer,
         user_id: invoice.metadata?.userId,
       },
-    })
+    }
+    console.log('OpenNode Charge Params', opendodtacharge)
+    const charge = await createOpenNodeCharge(opendodtacharge)
 
     // Store charge mapping
+    const opennodeData = {
+      openNodeChargeId: charge.id,
+      stripeInvoiceId: invoice.id || '',
+      stripeCustomerId: invoice.customer as string,
+      userId: invoice.metadata?.userId || '',
+      amount: charge.amount,
+      currency: charge.currency,
+      status: charge.status,
+      hostedCheckoutUrl: charge.hosted_checkout_url,
+      metadata: charge.metadata,
+    }
+
+    console.log('OpenNode Charge Data', opennodeData)
+
     await prisma.openNodeCharge.create({
-      data: {
-        openNodeChargeId: charge.id,
-        stripeInvoiceId: invoice.id || '',
-        stripeCustomerId: invoice.customer as string,
-        userId: invoice.metadata?.userId || '',
-        amount: charge.amount,
-        currency: charge.currency,
-        status: charge.status,
-        hostedCheckoutUrl: charge.hosted_checkout_url,
-        metadata: charge.metadata,
-      },
+      data: opennodeData,
     })
 
     // Redirect to OpenNode checkout
