@@ -137,6 +137,7 @@ const settingsSchema = {
     ]),
     minimumRankTier: z.number().min(0).max(100),
   }),
+  discardZeroBets: z.boolean(),
 }
 
 type SettingKeys = keyof typeof settingsSchema

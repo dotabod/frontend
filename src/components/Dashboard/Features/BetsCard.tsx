@@ -36,6 +36,14 @@ export default function BetsCard() {
         <TierSwitch hideTierBadge settingKey={Settings.bets} label='Enable auto gamba' />
       </div>
 
+      <div className={clsx(!isEnabled && 'opacity-40', 'mt-5 flex items-center space-x-2')}>
+        <TierSwitch
+          hideTierBadge
+          settingKey={Settings.discardZeroBets}
+          label='Discard predictions when one side has zero predictions'
+        />
+      </div>
+
       <div className={clsx(!isEnabled && 'opacity-40', 'mt-6')}>
         <Spin spinning={loading} tip='Loading'>
           <Form

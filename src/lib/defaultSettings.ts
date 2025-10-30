@@ -161,6 +161,7 @@ export const defaultSettings = {
     minimumRank: 'Herald',
     minimumRankTier: 0,
   },
+  discardZeroBets: false,
   ...commands,
   autoCommandsOnMatchStart: [],
 }
