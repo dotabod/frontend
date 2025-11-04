@@ -19,14 +19,6 @@ const HubSpotScript = () => {
       // Always enable identification regardless of cookie preferences
       identificationEnabled: true,
     }
-
-    // If user has made a choice about cookies and doesn't want marketing
-    if (hasConsented && !preferences.marketing) {
-      // Use doNotTrack with the correct parameters to disable tracking but keep identification
-      // According to docs: doNotTrack can take an object parameter { track: true, identify: false }
-      // This disables tracking but allows identification
-      window._hsq.push(['doNotTrack', { track: true, identify: false }])
-    }
   }, [hasConsented, preferences.marketing])
 
   return (

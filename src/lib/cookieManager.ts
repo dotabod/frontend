@@ -128,19 +128,8 @@ const initializeThirdPartyScripts = (prefs: CookiePreferences): void => {
     })
   }
 
-  // Set HubSpot consent for tracking (but allow chat functionality)
-  if (window.HubSpotConsentConfig) {
-    window.HubSpotConsentConfig.setTrackingCookiesAllowed(prefs.marketing)
-  }
-
-  // If HubSpot tracking is disabled but the script is loaded, set doNotTrack
-  if (!prefs.marketing && window._hsq) {
-    window._hsq.push(['doNotTrack', true])
-  }
-
   // Set flags to indicate enabled/disabled state
   window._ga_enabled = prefs.analytics
-  window._hubspot_enabled = prefs.marketing
 
   // Dispatch event for other components to react to consent changes
   const event = new Event('consentUpdate')
@@ -219,67 +208,11 @@ const applyPreferences = (prefs: CookiePreferences): void => {
     }
   }
 
-  // Handle HubSpot - only remove tracking cookies, keep chat functionality
-  if (!prefs.marketing) {
-    const allCookies = getAllCookies()
-
-    // List of HubSpot tracking cookies to remove
-    const trackingCookies = [
-      'hubspotutk', // Main tracking cookie for visitor identification
-      '__hstc', // Main tracking cookie
-      '__hssc', // Session cookie
-      '__hssrc', // Session cookie
-    ]
-
-    // List of cookie prefixes to check
-    const trackingPrefixes = [
-      '__hs_opt_out', // Opt-out cookie
-      '__hs_do_not_track', // Do not track cookie
-      '__hs_initial_opt_in', // Initial opt-in cookie
-    ]
-
-    for (const cookieName of Object.keys(allCookies)) {
-      // Check if it's a tracking cookie (but not a chat cookie)
-      const isTrackingCookie =
-        trackingCookies.includes(cookieName) ||
-        trackingPrefixes.some((prefix) => cookieName.startsWith(prefix)) ||
-        (cookieName.includes('hubspot') && !cookieName.includes('chat'))
-
-      // Don't remove chat-related cookies
-      const isChatCookie =
-        cookieName.includes('hs-messages') ||
-        cookieName.includes('messagesUtk') ||
-        cookieName.includes('hs-chat')
-
-      if (isTrackingCookie && !isChatCookie) {
-        removeCookie(cookieName)
-        removeCookie(cookieName, '/', getDomain())
-        removeCookie(cookieName, '/', 'localhost')
-
-        // Also try to remove from .domain.com (with leading dot)
-        const domain = getDomain()
-        if (domain && !domain.startsWith('.')) {
-          removeCookie(cookieName, '/', `.${domain}`)
-        }
-      }
-    }
-
-    // If HubSpot is loaded, try to disable tracking but keep chat
-    if (window.HubSpotConsentConfig) {
-      window.HubSpotConsentConfig.setTrackingCookiesAllowed(false)
-    }
-
-    // Tell HubSpot not to track this user
-    if (window._hsq) {
-      window._hsq.push(['doNotTrack', true])
-    }
-  }
-
   // Handle preference cookies
   if (!prefs.preferences) {
     const allCookies = getAllCookies()
     for (const cookieName of Object.keys(allCookies)) {
-      if (cookieName.includes('preferences') || cookieName.includes('hs-messages')) {
+      if (cookieName.includes('preferences')) {
         removeCookie(cookieName)
         removeCookie(cookieName, '/', getDomain())
         removeCookie(cookieName, '/', 'localhost')
