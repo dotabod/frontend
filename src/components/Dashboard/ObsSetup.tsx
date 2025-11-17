@@ -9,6 +9,11 @@ import { useDebouncedCallback } from 'use-debounce'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
+import {
+  queryLnaPermission,
+  shouldCheckLna,
+  type LnaPermissionState,
+} from '@/lib/lna'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
@@ -47,6 +52,8 @@ const ObsSetup: React.FC = () => {
   const [error, setError] = useState<ObsError | null>(null)
   const [form] = Form.useForm()
   const [obs, setObs] = useState<OBSWebSocket | null>(null)
+  const [lnaPermissionState, setLnaPermissionState] = useState<LnaPermissionState | null>(null)
+  const [lnaChecked, setLnaChecked] = useState(false)
   const user = useSession()?.data?.user
   const overlayUrl = useBaseUrl(`overlay/${user ? user.id : ''}`)
   const { hasAccess } = useFeatureAccess('autoOBS')
@@ -65,6 +72,37 @@ const ObsSetup: React.FC = () => {
   const debouncedFormSubmit = useDebouncedCallback((value) => {
     form.submit()
   }, 600)
+
+  // Check LNA permission state on mount
+  useEffect(() => {
+    const checkLnaPermission = async () => {
+      if (!shouldCheckLna()) {
+        setLnaChecked(true)
+        return
+      }
+
+      try {
+        const state = await queryLnaPermission()
+        setLnaPermissionState(state)
+        setLnaChecked(true)
+
+        // Track permission state for monitoring
+        if (state === 'granted') {
+          track('lna/obs_status_granted')
+        } else if (state === 'denied') {
+          track('lna/obs_status_denied')
+        } else if (state === 'prompt') {
+          track('lna/obs_status_prompt_shown')
+        }
+      } catch (err) {
+        // If permission query fails, treat as unsupported
+        setLnaPermissionState('unsupported')
+        setLnaChecked(true)
+      }
+    }
+
+    checkLnaPermission()
+  }, [track])
 
   useEffect(() => {
     const formPassword = form.getFieldValue('password')
@@ -109,6 +147,20 @@ const ObsSetup: React.FC = () => {
     obs.on('ConnectionError', handleConnectionError)
 
     const connectObs = async () => {
+      // Check LNA permission before connecting (for future WebSocket gating)
+      // Note: Currently WebSockets are not yet gated by LNA, but we prepare for it
+      if (shouldCheckLna() && lnaChecked && lnaPermissionState === 'denied') {
+        setError({
+          code: 'CONNECTION_ERROR',
+          message: 'Local network access denied',
+          details:
+            'Your browser has denied permission to connect to OBS. Please allow local network access in your browser settings.',
+          actionable: true,
+        })
+        track('obs/lna_denied_blocked')
+        return
+      }
+
       try {
         const obsHost = 'localhost'
         const obsPortValue = form.getFieldValue('port') || 4455
@@ -188,7 +240,7 @@ const ObsSetup: React.FC = () => {
 
       setConnected(false)
     }
-  }, [obs, hasAccess, form, track])
+  }, [obs, hasAccess, form, track, lnaChecked, lnaPermissionState])
 
   // Modify fetchScenes to accept baseWidth and baseHeight
   const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
@@ -463,6 +515,35 @@ const ObsSetup: React.FC = () => {
         className='space-y-2'
       >
         <Space direction='vertical' size='middle' className='mb-4'>
+          {lnaChecked && lnaPermissionState === 'denied' && !connected && (
+            <Alert
+              className='max-w-2xl'
+              message='Local network access denied'
+              description={
+                <span>
+                  Your browser has denied permission to connect to OBS. Please allow local network
+                  access in your browser settings and refresh this page.{' '}
+                  <Link href='/dashboard/help'>Learn more about fixing this issue</Link>.
+                </span>
+              }
+              type='error'
+              showIcon
+            />
+          )}
+          {lnaChecked && lnaPermissionState === 'prompt' && !connected && (
+            <Alert
+              className='max-w-2xl'
+              message='Browser permission required'
+              description={
+                <span>
+                  Chrome will ask for permission to connect to OBS on your computer when you attempt
+                  to connect. Please click &quot;Allow&quot; when prompted.
+                </span>
+              }
+              type='info'
+              showIcon
+            />
+          )}
           {!error && scenesWithSource.length > 0 && (
             <Alert
               message='Overlay setup complete'

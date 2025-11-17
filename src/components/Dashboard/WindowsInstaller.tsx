@@ -9,6 +9,12 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useFeatureAccess } from '@/hooks/useSubscription'
+import {
+  buildLocalFetchOptions,
+  queryLnaPermission,
+  shouldCheckLna,
+  type LnaPermissionState,
+} from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
 import CodeBlock from './CodeBlock'
@@ -90,6 +96,8 @@ const WindowsInstaller = () => {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
+  const [lnaPermissionState, setLnaPermissionState] = useState<LnaPermissionState | null>(null)
+  const [lnaChecked, setLnaChecked] = useState(false)
   const errorWithoutSuccess = error && !success
 
   // Single instance check effect
@@ -112,6 +120,37 @@ const WindowsInstaller = () => {
     }
   }, [router])
 
+  // Check LNA permission state on mount
+  useEffect(() => {
+    const checkLnaPermission = async () => {
+      if (!shouldCheckLna()) {
+        setLnaChecked(true)
+        return
+      }
+
+      try {
+        const state = await queryLnaPermission()
+        setLnaPermissionState(state)
+        setLnaChecked(true)
+
+        // Track permission state for monitoring
+        if (state === 'granted') {
+          track('lna/status_granted')
+        } else if (state === 'denied') {
+          track('lna/status_denied')
+        } else if (state === 'prompt') {
+          track('lna/status_prompt_shown')
+        }
+      } catch (err) {
+        // If permission query fails, treat as unsupported
+        setLnaPermissionState('unsupported')
+        setLnaChecked(true)
+      }
+    }
+
+    checkLnaPermission()
+  }, [track])
+
   // Status check effect
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -119,11 +158,22 @@ const WindowsInstaller = () => {
     const checkStatus = async () => {
       if (!hasAccess || success || error || !sanitizedPort) return
 
+      // Don't proceed if LNA permission was denied
+      if (lnaPermissionState === 'denied') {
+        return
+      }
+
       try {
-        const response = await fetch(`http://localhost:${sanitizedPort}/status`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        })
+        const response = await fetch(
+          `http://localhost:${sanitizedPort}/status`,
+          buildLocalFetchOptions(
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            },
+            'loopback',
+          ),
+        )
 
         if (response.ok) {
           track('setup/installer_check_success')
@@ -142,7 +192,10 @@ const WindowsInstaller = () => {
       try {
         const response = await fetch(
           `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data.user.id)}`,
-          { method: 'GET', headers: { 'Content-Type': 'application/json' } },
+          buildLocalFetchOptions(
+            { method: 'GET', headers: { 'Content-Type': 'application/json' } },
+            'loopback',
+          ),
         )
 
         if (!response.ok) {
@@ -160,14 +213,31 @@ const WindowsInstaller = () => {
       }
     }
 
-    if (hasAccess && !success && !error && sanitizedPort) {
+    // Only start polling if LNA check is complete and permission is not denied
+    if (
+      hasAccess &&
+      !success &&
+      !error &&
+      sanitizedPort &&
+      lnaChecked &&
+      lnaPermissionState !== 'denied'
+    ) {
       interval = setInterval(checkStatus, 3000)
     }
 
     return () => {
       clearInterval(interval)
     }
-  }, [success, error, sanitizedPort, session?.data?.user?.id, hasAccess, track])
+  }, [
+    success,
+    error,
+    sanitizedPort,
+    session?.data?.user?.id,
+    hasAccess,
+    track,
+    lnaChecked,
+    lnaPermissionState,
+  ])
 
   return (
     <FeatureWrapper feature='autoInstaller'>
@@ -185,6 +255,35 @@ const WindowsInstaller = () => {
           currentStep={currentStep}
         />
       </div>
+      {lnaChecked && lnaPermissionState === 'denied' && (
+        <Alert
+          className='max-w-2xl mb-4'
+          message='Local network access denied'
+          description={
+            <span>
+              Your browser has denied permission to connect to the Dotabod installer. Please allow
+              local network access in your browser settings and refresh this page.{' '}
+              <Link href='/dashboard/help'>Learn more about fixing this issue</Link>.
+            </span>
+          }
+          type='error'
+          showIcon
+        />
+      )}
+      {lnaChecked && lnaPermissionState === 'prompt' && !success && (
+        <Alert
+          className='max-w-2xl mb-4'
+          message='Browser permission required'
+          description={
+            <span>
+              Chrome will ask for permission to connect to the Dotabod installer on your computer.
+              Please click &quot;Allow&quot; when prompted to continue with the installation.
+            </span>
+          }
+          type='info'
+          showIcon
+        />
+      )}
       {success && (
         <Alert
           className='max-w-2xl'

@@ -207,6 +207,37 @@ const faqs = [
       </div>
     ),
   },
+  {
+    question: 'Chrome says "Local network access denied" or installer/OBS won\'t connect?',
+    answer: (
+      <StepComponent
+        steps={[
+          <span key={0}>
+            Chrome 142+ requires permission to connect to localhost. If you see a permission prompt,
+            click &quot;Allow&quot; when Chrome asks to &quot;Look for and connect to any device on
+            your local network&quot;.
+          </span>,
+          <span key={1}>
+            If you previously denied the permission, you can fix it:
+            <ol className='list-decimal list-inside mt-2 space-y-1'>
+              <li>Click the lock icon or site icon in Chrome&apos;s address bar</li>
+              <li>Go to &quot;Site settings&quot;</li>
+              <li>Find &quot;Look for and connect to devices on your local network&quot;</li>
+              <li>Change it to &quot;Allow&quot;</li>
+              <li>Refresh the Dotabod page</li>
+            </ol>
+          </span>,
+          <span key={2}>
+            This permission is needed for:
+            <ul className='list-disc list-inside mt-2 space-y-1'>
+              <li>Windows installer to connect to the local installer service</li>
+              <li>OBS setup to connect to OBS WebSocket server running on your computer</li>
+            </ul>
+          </span>,
+        ]}
+      />
+    ),
+  },
 ]
 
 const TroubleshootPage = () => {
