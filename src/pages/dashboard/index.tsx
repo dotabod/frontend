@@ -1,4 +1,4 @@
-import { Alert, App, Button, Collapse, Progress, Steps, Typography } from 'antd'
+import { Alert, App, Button, Collapse, Progress, Steps, Tag, Typography } from 'antd'
 import confetti from 'canvas-confetti'
 import { Bitcoin } from 'lucide-react'
 import Head from 'next/head'
@@ -331,18 +331,43 @@ const SetupPage = () => {
                 🎉
               </span>
             </Title>
-            <Progress
-              percent={100}
-              status='success'
-              strokeColor='#52c41a'
-              className='mb-4 max-w-md mx-auto'
-            />
+            <div className='mb-4'>
+              <Progress
+                percent={75}
+                status='active'
+                strokeColor='#1890ff'
+                className='mb-2 max-w-md mx-auto'
+              />
+              <div className='text-center text-sm text-gray-400'>Setup: 3/4 steps complete</div>
+            </div>
+
+            <div className='mb-6 flex justify-center'>
+              <div className='flex flex-wrap items-center justify-center gap-4 text-sm'>
+                <div className='flex items-center gap-1'>
+                  <span className='text-green-500'>✅</span>
+                  <span>Stream</span>
+                </div>
+                <div className='flex items-center gap-1'>
+                  <span className='text-green-500'>✅</span>
+                  <span>Dota 2</span>
+                </div>
+                <div className='flex items-center gap-1'>
+                  <span className='text-green-500'>✅</span>
+                  <span>OBS</span>
+                </div>
+                <div className='flex items-center gap-1'>
+                  <span className='text-yellow-500'>⏳</span>
+                  <span className='font-semibold'>Connect Steam</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {!isLive && (
             <div className='flex flex-row items-center justify-center mb-6'>
               <Alert
-                message='Your stream is offline, and Dotabod will only work once you start streaming and go online.'
+                message='Your stream is offline'
+                description='Dotabod and Steam connection require your stream to be live.'
                 type='warning'
                 showIcon
                 className='max-w-2xl'
@@ -350,9 +375,34 @@ const SetupPage = () => {
             </div>
           )}
 
+          <div className='flex flex-row items-center justify-center mb-6'>
+            <Alert
+              type='info'
+              showIcon
+              className='max-w-2xl'
+              message='⏳ Final Step: Connect Your Steam Account'
+              description={
+                <div>
+                  <div className='mb-2'>
+                    <strong>Stream Status:</strong>
+                    {isLive ? (
+                      <span className='ml-2 text-green-500'>✅ Online - Ready to connect!</span>
+                    ) : (
+                      <span className='ml-2 text-red-500'>❌ Offline - Start streaming first</span>
+                    )}
+                  </div>
+                  <div>
+                    Play any Dota 2 match or demo a hero (while streaming) to connect your Steam
+                    account. This only needs to be done once!
+                  </div>
+                </div>
+              }
+            />
+          </div>
+
           <div className='mb-6 text-center'>
             <Title level={4}>
-              You're all set up and ready to go!
+              Technical setup finished!
               <Image
                 className='inline ml-2'
                 alt='ok emote'
@@ -363,16 +413,28 @@ const SetupPage = () => {
               />
             </Title>
             <Paragraph>
-              Dotabod is now configured and will enhance your streaming experience.
+              Your Dotabod configuration is complete. Now connect your Steam account to start using
+              Dotabod.
             </Paragraph>
           </div>
 
           <div className='mb-8'>
-            <Title level={4}>What's next?</Title>
+            <Title level={4}>Complete Your Setup</Title>
             <div className='flex flex-col md:flex-row gap-4 justify-center'>
               <Card className='flex-1 hover:shadow-md transition-shadow'>
-                <Title level={5}>Start Playing</Title>
-                <Paragraph>Jump right into a match and see Dotabod in action!</Paragraph>
+                <Title level={5}>Connect Your Steam Account</Title>
+                <Paragraph>
+                  Play a match or demo a hero to connect your Steam account and complete your
+                  Dotabod setup.
+                </Paragraph>
+                {!isLive && (
+                  <Alert
+                    type='warning'
+                    showIcon
+                    message='Stream must be online to connect'
+                    className='mb-3'
+                  />
+                )}
                 <Link
                   href='steam://run/570'
                   onClick={() => {
@@ -393,8 +455,11 @@ const SetupPage = () => {
               </Card>
 
               <Card className='flex-1 hover:shadow-md transition-shadow'>
-                <Title level={5}>Test Dotabod First</Title>
-                <Paragraph>Want to make sure everything works before going live?</Paragraph>
+                <Title level={5}>Verify Your Setup</Title>
+                <Paragraph>
+                  Check the live preview to confirm everything is working correctly. This will also
+                  connect your Steam account.
+                </Paragraph>
                 <Link href='/overlay'>
                   <Button
                     onClick={() => {
@@ -415,31 +480,98 @@ const SetupPage = () => {
               track('setup/collapse_test_dotabod')
             }}
             accordion
+            defaultActiveKey={['1']}
             items={[
               {
-                label: 'How to test Dotabod',
+                key: '1',
+                label: 'How to connect your Steam account',
                 children: (
                   <>
-                    <ol className='list-decimal list-inside mb-4'>
-                      <li className='mb-2'>
-                        Demo any hero to get Dotabod to recognize your Steam account.
-                      </li>
-                      <li className='mb-2'>
-                        While demoing, visit the{' '}
-                        <Link href='/overlay' className='text-blue-500 hover:underline'>
-                          Live Preview page
-                        </Link>{' '}
-                        to confirm the overlay is showing.
-                      </li>
-                      <li>
-                        Having trouble? Visit the{' '}
-                        <Link href='/dashboard/help' className='text-blue-500 hover:underline'>
-                          Troubleshooting page
-                        </Link>{' '}
-                        to get help.
-                      </li>
-                    </ol>
-                    <div className='flex flex-col items-center justify-center'>
+                    {!isLive ? (
+                      <Alert
+                        type='error'
+                        showIcon
+                        className='mb-4'
+                        message='Your Twitch stream must be online to connect Steam'
+                        description='Steam accounts only connect when your stream is live. Start streaming first, then follow the steps below.'
+                      />
+                    ) : (
+                      <Alert
+                        type='success'
+                        showIcon
+                        className='mb-4'
+                        message='Your stream is online!'
+                        description="You're ready to connect your Steam account. Follow the steps below."
+                      />
+                    )}
+
+                    <Alert
+                      type='info'
+                      showIcon
+                      className='mb-4'
+                      message='Your Steam account connects automatically when you play.'
+                      description='After this first connection, all future matches and Steam accounts auto-connect - no setup needed!'
+                    />
+
+                    <div className='mb-4'>
+                      <strong>Choose one:</strong>
+                      <ol className='list-decimal list-inside mt-2 space-y-3'>
+                        <li>
+                          <strong>Quick 2-minute test:</strong> Demo any hero, type{' '}
+                          <Tag>!facet</Tag> in chat to confirm it works
+                        </li>
+                        <li>
+                          <strong>Skip testing:</strong> Just play your first match - your Steam
+                          account will connect automatically
+                        </li>
+                      </ol>
+                      {!isLive && (
+                        <div className='mt-3 text-yellow-500'>
+                          ⚠️ Remember: Your stream must be online for either option to work!
+                        </div>
+                      )}
+                    </div>
+
+                    <div className='mb-4'>
+                      <strong>Verify it worked:</strong>
+                      <ol className='list-decimal list-inside mt-2 space-y-2'>
+                        <li>
+                          Visit the{' '}
+                          <Link
+                            href='/dashboard/features'
+                            className='text-blue-500 hover:underline'
+                          >
+                            Features page → MMR Tracker
+                          </Link>
+                        </li>
+                        <li>Your Steam account should appear with your avatar and MMR</li>
+                      </ol>
+                    </div>
+
+                    <Alert
+                      type='warning'
+                      showIcon
+                      className='mt-4'
+                      message="If your account doesn't appear after playing:"
+                      description={
+                        <div className='space-y-2'>
+                          <div>✅ First, confirm your stream was online when you played</div>
+                          <div>
+                            ❌ If yes and it still didn't work, the PowerShell script may have
+                            failed. Contact support with a screenshot of your PowerShell output.
+                          </div>
+                          <div className='mt-2'>
+                            <Link href='/dashboard/help'>
+                              <Button size='small' type='primary'>
+                                Get Help
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      }
+                    />
+
+                    <div className='flex flex-col items-center justify-center mt-4'>
                       <Image
                         alt='crystal maiden demo hero'
                         width={2384}

@@ -195,8 +195,17 @@ const OverlayPage = () => {
         duration: 0,
         placement: 'bottomLeft',
         message: 'Twitch stream is offline',
-        description:
-          'Dotabod is disabled until you go live on Twitch. Not streaming on Twitch? Type !online in your Twitch chat to enable Dotabod.',
+        description: (
+          <div>
+            <div>
+              Dotabod is disabled until you go live on Twitch. Not streaming on Twitch? Type !online
+              in your Twitch chat to enable Dotabod.
+            </div>
+            <div className='mt-2 text-sm'>
+              Note: Steam account connection also requires your stream to be online.
+            </div>
+          </div>
+        ),
       })
 
       // Refresh page every 5 minutes to check if stream is online
