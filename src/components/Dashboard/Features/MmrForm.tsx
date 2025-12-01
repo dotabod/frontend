@@ -9,12 +9,14 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useDebouncedCallback } from 'use-debounce'
+import { AccessibleEmoji } from '@/components/AccessibleEmoji'
 import { Input } from '@/components/Input'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
+import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 
 // Add type for form values
 interface FormValues {
@@ -74,13 +76,19 @@ const EmptyAccountsState = ({ hideText }: { hideText: boolean }) => {
               <li>
                 <strong>Start streaming</strong> - Your Twitch stream must be online{' '}
                 {isLive ? (
-                  <span className='text-green-500'>✅ (currently online)</span>
+                  <span className='inline-flex items-center gap-1 text-green-500'>
+                    <AccessibleEmoji emoji='✅' label='Online' />
+                    (currently online)
+                  </span>
                 ) : (
-                  <span className='text-red-500'>❌ (currently offline)</span>
+                  <span className='inline-flex items-center gap-1 text-red-500'>
+                    <AccessibleEmoji emoji='❌' label='Offline' />
+                    (currently offline)
+                  </span>
                 )}
               </li>
               <li>
-                <strong>Play Dota 2</strong> - Play any match OR demo a hero (2-minute test)
+                <strong>Play Dota 2</strong> - Play any match or demo a hero (2-minute test)
               </li>
               <li>
                 <strong>Account appears here</strong> - Your Steam account will show automatically

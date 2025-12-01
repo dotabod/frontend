@@ -21,7 +21,13 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import {
+  PowerShellFailureMessage,
+  PowerShellSetupStep,
+  PowerShellTroubleshootingContent,
+} from '@/components/Dashboard/PowerShellTroubleshooting'
 import { fetcher } from '@/lib/fetcher'
+import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { Card } from '@/ui/card'
 
 // Define form values interface
@@ -104,10 +110,7 @@ const faqs = [
             </span>,
             <span key={3}>
               <strong>Done forever!</strong>
-              <div className='mt-1 text-sm'>
-                All future matches and Steam accounts will auto-connect (even when offline). Switch
-                Steam accounts anytime - they connect automatically!
-              </div>
+              <div className='mt-1 text-sm'>{STEAM_CONNECTION_MESSAGES.autoConnectOffline}</div>
             </span>,
           ]}
         />
@@ -117,17 +120,7 @@ const faqs = [
           showIcon
           className='mt-4'
           message='Already played (while streaming) but account still not appearing?'
-          description={
-            <div>
-              <p>Your PowerShell script likely failed. To get help:</p>
-              <ol className='mt-2 list-inside list-decimal space-y-1'>
-                <li>Confirm your stream was online when you played</li>
-                <li>Take a screenshot of your PowerShell output</li>
-                <li>Describe what happened when you ran the script</li>
-                <li>Use the form below to contact support with these details</li>
-              </ol>
-            </div>
-          }
+          description={<PowerShellTroubleshootingContent />}
         />
       </div>
     ),
@@ -222,14 +215,7 @@ const faqs = [
         />
         <StepComponent
           steps={[
-            <span key={0}>
-              <strong>Check if you completed setup</strong>
-              <div className='mt-1 text-sm'>
-                Did you run the PowerShell script from{' '}
-                <Link href='/dashboard?step=2'>Dashboard Setup (Step 2)</Link>? If not, complete
-                setup first.
-              </div>
-            </span>,
+            <PowerShellSetupStep />,
             <span key={1}>
               <strong>Check cfg file location</strong>
               <div className='mt-1 text-sm'>
@@ -252,8 +238,7 @@ const faqs = [
             <span key={3}>
               <strong>Still not working?</strong>
               <div className='mt-1 text-sm'>
-                Your PowerShell script may have failed. Take a screenshot of the PowerShell output
-                and contact support with details about what happened.
+                <PowerShellFailureMessage />
               </div>
             </span>,
           ]}

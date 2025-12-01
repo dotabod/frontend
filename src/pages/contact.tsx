@@ -152,7 +152,10 @@ const ContactPage: React.FC = () => {
                 name='message'
                 label={<span className='text-gray-200'>Message</span>}
                 rules={[
-                  { required: true, message: 'Please enter your message - we need details to help you effectively' },
+                  {
+                    required: true,
+                    message: 'Please enter your message - we need details to help you effectively',
+                  },
                   {
                     min: 80,
                     message:
@@ -163,7 +166,10 @@ const ContactPage: React.FC = () => {
                       if (!value) {
                         return Promise.resolve()
                       }
-                      const wordCount = value.trim().split(/\s+/).filter((word) => word.length > 0).length
+                      const wordCount = value
+                        .trim()
+                        .split(/\s+/)
+                        .filter((word) => word.length > 0).length
                       if (wordCount < 2) {
                         return Promise.reject(new Error('Message must contain at least 2 words'))
                       }

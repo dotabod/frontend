@@ -125,4 +125,3 @@ export function buildLocalFetchOptions(
 export function shouldCheckLna(): boolean {
   return isSecureContext() && isChromeLnaEnabled() && 'permissions' in navigator
 }
-

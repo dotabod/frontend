@@ -8,12 +8,15 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { AccessibleEmoji } from '@/components/AccessibleEmoji'
 import ChatBot from '@/components/Dashboard/ChatBot'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
+import { PowerShellTroubleshootingContent } from '@/components/Dashboard/PowerShellTroubleshooting'
 import { fetcher } from '@/lib/fetcher'
+import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
@@ -344,19 +347,19 @@ const SetupPage = () => {
             <div className='mb-6 flex justify-center'>
               <div className='flex flex-wrap items-center justify-center gap-4 text-sm'>
                 <div className='flex items-center gap-1'>
-                  <span className='text-green-500'>✅</span>
+                  <AccessibleEmoji emoji='✅' label='Completed' className='text-green-500' />
                   <span>Stream</span>
                 </div>
                 <div className='flex items-center gap-1'>
-                  <span className='text-green-500'>✅</span>
+                  <AccessibleEmoji emoji='✅' label='Completed' className='text-green-500' />
                   <span>Dota 2</span>
                 </div>
                 <div className='flex items-center gap-1'>
-                  <span className='text-green-500'>✅</span>
+                  <AccessibleEmoji emoji='✅' label='Completed' className='text-green-500' />
                   <span>OBS</span>
                 </div>
                 <div className='flex items-center gap-1'>
-                  <span className='text-yellow-500'>⏳</span>
+                  <AccessibleEmoji emoji='⏳' label='In Progress' className='text-yellow-500' />
                   <span className='font-semibold'>Connect Steam</span>
                 </div>
               </div>
@@ -380,20 +383,31 @@ const SetupPage = () => {
               type='info'
               showIcon
               className='max-w-2xl'
-              message='⏳ Final Step: Connect Your Steam Account'
+              message={
+                <span>
+                  <AccessibleEmoji emoji='⏳' label='Final Step' className='mr-2' />
+                  Final Step: Connect Your Steam Account
+                </span>
+              }
               description={
                 <div>
                   <div className='mb-2'>
                     <strong>Stream Status:</strong>
                     {isLive ? (
-                      <span className='ml-2 text-green-500'>✅ Online - Ready to connect!</span>
+                      <span className='ml-2 inline-flex items-center gap-1 text-green-500'>
+                        <AccessibleEmoji emoji='✅' label='Online' />
+                        Online - Ready to connect!
+                      </span>
                     ) : (
-                      <span className='ml-2 text-red-500'>❌ Offline - Start streaming first</span>
+                      <span className='ml-2 inline-flex items-center gap-1 text-red-500'>
+                        <AccessibleEmoji emoji='❌' label='Offline' />
+                        Offline - Start streaming first
+                      </span>
                     )}
                   </div>
                   <div>
-                    Play any Dota 2 match or demo a hero (while streaming) to connect your Steam
-                    account. This only needs to be done once!
+                    Play any match or demo a hero (while streaming) to connect your Steam account.
+                    This only needs to be done once!
                   </div>
                 </div>
               }
@@ -555,10 +569,20 @@ const SetupPage = () => {
                       message="If your account doesn't appear after playing:"
                       description={
                         <div className='space-y-2'>
-                          <div>✅ First, confirm your stream was online when you played</div>
-                          <div>
-                            ❌ If yes and it still didn't work, the PowerShell script may have
-                            failed. Contact support with a screenshot of your PowerShell output.
+                          <div className='flex items-center gap-2'>
+                            <AccessibleEmoji
+                              emoji='✅'
+                              label='Success'
+                              className='text-green-500'
+                            />
+                            <span>First, confirm your stream was online when you played</span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <AccessibleEmoji emoji='❌' label='Error' className='text-red-500' />
+                            <span>
+                              If yes and it still didn't work, the PowerShell script may have
+                              failed. Contact support with a screenshot of your PowerShell output.
+                            </span>
                           </div>
                           <div className='mt-2'>
                             <Link href='/dashboard/help'>
