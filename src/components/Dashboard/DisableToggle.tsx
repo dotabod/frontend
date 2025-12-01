@@ -69,8 +69,8 @@ export function DisableToggle() {
         type: 'warning',
         duration: 0,
         placement: 'bottomLeft',
-        message: 'Your stream is offline.',
-        description: 'Dotabod will only work once you start streaming and go online.',
+        message: 'Your stream is offline',
+        description: 'Dotabod and Steam connection require your stream to be live.',
       })
     }
   }, [isLive, notification])

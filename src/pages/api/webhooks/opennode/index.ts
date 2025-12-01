@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const charge = event || {}
     const status: string = charge.status
     const chargeId: string = charge.id
-    // @ts-ignore OpenNode charge metadata is not typed
+    // @ts-expect-error OpenNode charge metadata is not typed
     const invoiceId: string | undefined = charge.metadata?.stripe_invoice_id
 
     if (!chargeId || !invoiceId) {
@@ -103,9 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.log('⚠️ Stripe webhook did not create subscription, processing manually')
 
           // Import handleInvoiceEvent
-          const { handleInvoiceEvent } = await import(
-            '@/pages/api/stripe/handlers/invoice-events'
-          )
+          const { handleInvoiceEvent } = await import('@/pages/api/stripe/handlers/invoice-events')
 
           // Retrieve invoice with full details
           const invoice = await stripe.invoices.retrieve(invoiceId)
@@ -127,7 +125,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             lastWebhookAt: new Date(),
             metadata: {
-              ...(existingCharge?.metadata as Record<string, unknown> || {}),
+              ...((existingCharge?.metadata as Record<string, unknown>) || {}),
               processedSuccessfully: true,
               stripeInvoiceMarkedPaid,
               subscriptionCreated,
@@ -146,7 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             lastWebhookAt: new Date(),
             metadata: {
-              ...(existingCharge?.metadata as Record<string, unknown> || {}),
+              ...((existingCharge?.metadata as Record<string, unknown>) || {}),
               lastError: error instanceof Error ? error.message : String(error),
               errorStack: error instanceof Error ? error.stack : undefined,
               stripeInvoiceMarkedPaid,

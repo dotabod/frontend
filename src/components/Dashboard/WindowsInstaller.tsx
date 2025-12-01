@@ -11,9 +11,9 @@ import { type ReactNode, useEffect, useState } from 'react'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import {
   buildLocalFetchOptions,
+  type LnaPermissionState,
   queryLnaPermission,
   shouldCheckLna,
-  type LnaPermissionState,
 } from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'

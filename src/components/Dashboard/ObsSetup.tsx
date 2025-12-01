@@ -9,12 +9,8 @@ import { useDebouncedCallback } from 'use-debounce'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
-import {
-  queryLnaPermission,
-  shouldCheckLna,
-  type LnaPermissionState,
-} from '@/lib/lna'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { type LnaPermissionState, queryLnaPermission, shouldCheckLna } from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
 
