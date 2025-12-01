@@ -429,6 +429,13 @@ const TermsOfService: NextPageWithLayout = () => (
           price changes to you in accordance with applicable law.
         </div>
         <br />
+        <div>
+          <strong>Gifted Credits</strong>
+        </div>
+        <div>
+          Gift subscriptions and other gifted credits extend the recipient's access to Dotabod Pro but are not refundable.
+        </div>
+        <br />
         <div id='prohibited'>
           <strong>7. PROHIBITED ACTIVITIES</strong>
         </div>
