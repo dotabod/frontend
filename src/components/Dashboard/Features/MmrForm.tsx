@@ -44,6 +44,72 @@ const SteamAvatar = ({ data: response, id }) => {
   )
 }
 
+const EmptyAccountsState = ({ hideText }: { hideText: boolean }) => {
+  const { data } = useSWR('/api/settings', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
+  const isLive = data?.stream_online
+
+  return (
+    <div className={clsx('mb-4', hideText && 'hidden')}>
+      <Alert
+        type='info'
+        showIcon
+        message='No Steam account detected yet'
+        description={
+          <div>
+            <p className='mb-3'>
+              <strong>To connect your Steam account:</strong>
+            </p>
+            <ol className='mb-3 list-inside list-decimal space-y-2'>
+              <li>
+                <strong>Run the setup</strong> - Go to{' '}
+                <Link href='/dashboard?step=2' className='underline'>
+                  Dashboard Setup (Step 2)
+                </Link>{' '}
+                and run the PowerShell script
+              </li>
+              <li>
+                <strong>Start streaming</strong> - Your Twitch stream must be online{' '}
+                {isLive ? (
+                  <span className='text-green-500'>✅ (currently online)</span>
+                ) : (
+                  <span className='text-red-500'>❌ (currently offline)</span>
+                )}
+              </li>
+              <li>
+                <strong>Play Dota 2</strong> - Play any match OR demo a hero (2-minute test)
+              </li>
+              <li>
+                <strong>Account appears here</strong> - Your Steam account will show automatically
+              </li>
+            </ol>
+            <p className='mb-3 text-sm text-gray-400'>
+              💡 After this first connection, all future matches and Steam accounts auto-connect
+              forever!
+            </p>
+            <div className='flex flex-wrap gap-2'>
+              <Link href='/dashboard?step=2'>
+                <Button size='small' type='primary'>
+                  Go to Setup
+                </Button>
+              </Link>
+              <Link href='steam://run/570'>
+                <Button size='small'>Launch Dota 2</Button>
+              </Link>
+              <Link href='/dashboard/help'>
+                <Button size='small'>View Help</Button>
+              </Link>
+            </div>
+          </div>
+        }
+      />
+    </div>
+  )
+}
+
 const MmrForm = ({ hideText = false }) => {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
   const [accounts, setAccounts] = useState<SteamAccount[]>([])
@@ -249,18 +315,7 @@ const MmrForm = ({ hideText = false }) => {
 
       {form.values.accounts.length === 0 && (
         <div className='mt-6'>
-          <div className={clsx('mb-4', hideText && 'hidden')}>
-            <Alert
-              type='warning'
-              showIcon
-              message='No steam account found yet'
-              action={
-                <Link href='/dashboard/help'>
-                  <Button>Read help</Button>
-                </Link>
-              }
-            />
-          </div>
+          <EmptyAccountsState hideText={hideText} />
           <div className='flex gap-4 transition-all'>
             <MMRBadge
               leaderboard={null}

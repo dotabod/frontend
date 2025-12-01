@@ -64,17 +64,72 @@ const faqs = [
   {
     question: 'How to connect my steam account?',
     answer: (
-      <StepComponent
-        steps={[
-          <span key={0}>
-            Demo any hero and type <Tag>!facet</Tag> in your chat to confirm Dotabod can find you.
-          </span>,
-          <span key={1}>
-            While demoing, visit the <Link href='/overlay'>Live Preview page</Link> to confirm the
-            overlay is showing.
-          </span>,
-        ]}
-      />
+      <div>
+        <Alert
+          type='warning'
+          showIcon
+          className='mb-3'
+          message='Your Twitch stream MUST be online to connect Steam'
+          description='Steam accounts only connect when you are live streaming.'
+        />
+
+        <Alert
+          type='info'
+          showIcon
+          className='mb-3'
+          message='Your Steam account connects automatically when you play.'
+        />
+
+        <StepComponent
+          steps={[
+            <span key={0}>
+              <strong>Start streaming on Twitch</strong>
+              <div className='mt-1 text-sm'>
+                Make sure your stream is live before attempting to connect your Steam account.
+              </div>
+            </span>,
+            <span key={1}>
+              <strong>Play any Dota 2 match or demo a hero</strong>
+              <div className='mt-1 text-sm'>
+                While streaming, your Steam account will be detected automatically. Type{' '}
+                <Tag>!facet</Tag> in chat to confirm Dotabod can find you.
+              </div>
+            </span>,
+            <span key={2}>
+              <strong>Check Features MMR Tracker</strong>
+              <div className='mt-1 text-sm'>
+                Go to <Link href='/dashboard/features'>Features page</Link> and confirm your Steam
+                account appears with your avatar and MMR.
+              </div>
+            </span>,
+            <span key={3}>
+              <strong>Done forever!</strong>
+              <div className='mt-1 text-sm'>
+                All future matches and Steam accounts will auto-connect (even when offline). Switch
+                Steam accounts anytime - they connect automatically!
+              </div>
+            </span>,
+          ]}
+        />
+
+        <Alert
+          type='error'
+          showIcon
+          className='mt-4'
+          message='Already played (while streaming) but account still not appearing?'
+          description={
+            <div>
+              <p>Your PowerShell script likely failed. To get help:</p>
+              <ol className='mt-2 list-inside list-decimal space-y-1'>
+                <li>Confirm your stream was online when you played</li>
+                <li>Take a screenshot of your PowerShell output</li>
+                <li>Describe what happened when you ran the script</li>
+                <li>Use the form below to contact support with these details</li>
+              </ol>
+            </div>
+          }
+        />
+      </div>
     ),
   },
   {
@@ -157,24 +212,80 @@ const faqs = [
   {
     question: 'Dotabod keeps saying play a match, no steam id?',
     answer: (
-      <StepComponent
-        steps={[
-          <span key={0}>
-            You probably placed the cfg file in the wrong folder.{' '}
-            <Link href='/dashboard?step=2'>Follow Step 2</Link> of setup again. Don't forget to
-            reboot Dota after saving the cfg in the right folder.
-          </span>,
-          <span key={2}>
-            Still nothing? Could your Steam account be linked to another Dotabod user? Only one
-            person may have the Steam account linked. Dotabod will tell you who is using your
-            account from{' '}
-            <Link href='/dashboard/features'>the MMR tracker in the Features page</Link>. You can
-            then ask them to remove it from their account. Or, visit our{' '}
-            <Link href='/dashboard/help'>help page</Link> for assistance with unlinking your Steam
-            account.
-          </span>,
-        ]}
-      />
+      <div>
+        <Alert
+          type='warning'
+          showIcon
+          className='mb-3'
+          message='First: Make sure your stream was online when you played'
+          description='Steam accounts only connect when your Twitch stream is live. If your stream was offline, start streaming and play again.'
+        />
+        <StepComponent
+          steps={[
+            <span key={0}>
+              <strong>Check if you completed setup</strong>
+              <div className='mt-1 text-sm'>
+                Did you run the PowerShell script from{' '}
+                <Link href='/dashboard?step=2'>Dashboard Setup (Step 2)</Link>? If not, complete
+                setup first.
+              </div>
+            </span>,
+            <span key={1}>
+              <strong>Check cfg file location</strong>
+              <div className='mt-1 text-sm'>
+                The cfg file might be in the wrong folder.{' '}
+                <Link href='/dashboard?step=2'>Follow Step 2</Link> again. The file goes in{' '}
+                <Tag>/gamestate_integration/</Tag> not in <Tag>/cfg/</Tag>. Reboot Dota after saving
+                the cfg in the right folder.
+              </div>
+            </span>,
+            <span key={2}>
+              <strong>Check for account conflicts</strong>
+              <div className='mt-1 text-sm'>
+                Could your Steam account be linked to another Dotabod user? Only one person may have
+                the Steam account linked. Check{' '}
+                <Link href='/dashboard/features'>the MMR tracker in the Features page</Link> to see
+                who is using your account. You can ask them to remove it or{' '}
+                <Link href='/dashboard/help'>contact support</Link> for help unlinking.
+              </div>
+            </span>,
+            <span key={3}>
+              <strong>Still not working?</strong>
+              <div className='mt-1 text-sm'>
+                Your PowerShell script may have failed. Take a screenshot of the PowerShell output
+                and contact support with details about what happened.
+              </div>
+            </span>,
+          ]}
+        />
+      </div>
+    ),
+  },
+  {
+    question: 'Why does my stream need to be online to connect Steam?',
+    answer: (
+      <div>
+        <p className='mb-3'>
+          Dotabod is a streaming tool, so it only activates when you are live on Twitch. This
+          includes detecting and connecting your Steam account.
+        </p>
+        <Alert
+          type='info'
+          showIcon
+          message='Good news: You only need to be streaming for the FIRST connection.'
+          description='After your Steam account connects once (while streaming), all future matches will work automatically - even if you play offline or switch Steam accounts!'
+        />
+        <p className='mt-3'>
+          <strong>Typical flow:</strong>
+        </p>
+        <ol className='mt-2 list-inside list-decimal space-y-1'>
+          <li>Run PowerShell script (can be done offline)</li>
+          <li>Start streaming on Twitch</li>
+          <li>Play a match or demo a hero</li>
+          <li>Steam account connects and appears in MMR Tracker</li>
+          <li>Future matches auto-connect regardless of stream status!</li>
+        </ol>
+      </div>
     ),
   },
   {
