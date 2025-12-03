@@ -64,7 +64,7 @@
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.487.0",
     "mantine-flagpack": "^4.1.1",
-    "next": "15.2.4",
+    "next": "^15.2.4",
     "next-auth": "4.24.11",
     "next-mdx-remote": "^5.0.0",
     "obs-websocket-js": "^5.0.7",
