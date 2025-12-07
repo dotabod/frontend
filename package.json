@@ -80,7 +80,7 @@
     "remark-gfm": "^4.0.1",
     "retry": "^0.13.1",
     "socket.io-client": "^4.8.1",
-    "stripe": "^18.5.0",
+    "stripe": "^18.0.0",
     "styled-components": "^6.1.19",
     "swr": "^2.3.7",
     "tailwindcss": "^4.1.17",
