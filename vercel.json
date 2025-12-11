@@ -1,5 +1,10 @@
 {
   "buildCommand": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
   "installCommand": "npm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "functions": {
+    "src/pages/api/**/*.ts": {
+      "memory": 512
+    }
+  }
 }
