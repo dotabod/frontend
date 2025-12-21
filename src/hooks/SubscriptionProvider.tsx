@@ -1,7 +1,9 @@
 import type { Subscription } from '@prisma/client'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useMemo } from 'react'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/fetcher'
 import { isSubscriptionActive, type SubscriptionRow } from '@/utils/subscription'
 
 interface SubscriptionContextType {
@@ -16,26 +18,26 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
   const session = useSession()
   const router = useRouter()
   const { userId } = router.query
-  const [subscription, setSubscription] = useState<SubscriptionRow | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    async function getSubscription() {
-      setIsLoading(true)
-      const response = await fetch(`/api/stripe/subscription?id=${userId ?? ''}`)
-      if (response.ok) {
-        const data: Subscription = await response.json()
-        // Create date objects for currentPeriodEnd
-        const subscriptionData = {
-          ...data,
-          currentPeriodEnd: data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
-        }
-        setSubscription(subscriptionData)
-      }
-      setIsLoading(false)
+  const shouldFetch = router.isReady && (session.data?.user?.id || userId)
+  const { data, isLoading } = useSWR<Subscription>(
+    shouldFetch ? `/api/stripe/subscription?id=${userId ?? ''}` : null,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
-    router.isReady && (session.data?.user?.id || userId) && getSubscription()
-  }, [userId, router.isReady, session.data?.user?.id])
+  )
+
+  // Transform data to add proper Date objects for currentPeriodEnd
+  const subscription = useMemo<SubscriptionRow | null>(() => {
+    if (!data) return null
+    return {
+      ...data,
+      currentPeriodEnd: data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
+    }
+  }, [data])
 
   return (
     <SubscriptionContext.Provider
