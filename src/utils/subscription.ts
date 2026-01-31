@@ -308,7 +308,7 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       OR: [
         // Active or trialing subscriptions - exclude gift markers
         {
-          status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+          status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING, SubscriptionStatus.PAST_DUE] },
           isGift: false,
         },
         // Include lifetime subscriptions that are not canceled
@@ -487,7 +487,7 @@ export function getSubscriptionStatusInfo(
       }
     case SubscriptionStatus.PAST_DUE:
       return {
-        message: 'Payment past due',
+        message: 'Payment failed - Update required',
         type: 'error',
         badge: 'red',
       }

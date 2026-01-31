@@ -340,6 +340,24 @@ export function SubscriptionAlerts({
             }
           />
         )}
+
+      {/* Error alert for PAST_DUE subscription */}
+      {statusInfo?.type === 'error' &&
+        subscription?.status === 'PAST_DUE' &&
+        subscription?.stripeSubscriptionId &&
+        !hideManageButton && (
+          <Alert
+            message='Payment Failed'
+            description='Your payment method failed. Update your payment method to restore access to Pro features.'
+            type='error'
+            showIcon
+            action={
+              <Button size='small' type='primary' danger onClick={handlePortalAccess}>
+                Update Payment
+              </Button>
+            }
+          />
+        )}
     </div>
   )
 }
