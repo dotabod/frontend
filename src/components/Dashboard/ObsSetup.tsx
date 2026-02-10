@@ -1,6 +1,6 @@
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
-import { Alert, Button, Form, Input, message, Select, Space, Spin, Tooltip } from 'antd'
+import { Alert, Button, Form, Input, message, Select, Space, Spin, Tooltip, Tag } from 'antd'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import OBSWebSocket from 'obs-websocket-js'
@@ -65,7 +65,7 @@ const ObsSetup: React.FC = () => {
     updateSetting: updatePassword,
   } = useUpdateSetting<string>(Settings.obsServerPassword)
 
-  const debouncedFormSubmit = useDebouncedCallback((value) => {
+  const debouncedFormSubmit = useDebouncedCallback(() => {
     form.submit()
   }, 600)
 
@@ -590,6 +590,38 @@ const ObsSetup: React.FC = () => {
           )}
 
           {renderAdditionalInfo()}
+
+          <Alert
+            message='Regional blocking may prevent overlays or widgets'
+            description={
+              <span>
+                Some networks block Cloudflare-hosted assets which can cause the overlay in OBS to
+                not appear. If this applies to you, try the community tool{' '}
+                <a
+                  href='https://github.com/Flowseal/zapret-discord-youtube'
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-blue-500 hover:underline'
+                >
+                  zapret-discord-youtube
+                </a>{' '}
+                and add <Tag>dotabod.com</Tag> and <Tag>gsi.dotabod.com</Tag> to{' '}
+                <code>lists/list-general.txt</code> on separate lines. If that doesn't help, some
+                users found success with the{' '}
+                <a
+                  href='https://github.com/Flowseal/zapret-discord-youtube/releases/tag/1.9.0b'
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-blue-500 hover:underline'
+                >
+                  v1.9.0b
+                </a>
+                .
+              </span>
+            }
+            type='info'
+            showIcon
+          />
         </Space>
         <Spin spinning={l0 || l1} tip='Loading'>
           {!connected && (

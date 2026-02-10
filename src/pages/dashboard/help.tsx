@@ -160,10 +160,10 @@ const faqs = [
       <StepComponent
         steps={[
           'Try removing and re-adding your overlay.',
-          'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your screen.',
+          'In OBS, right click the dotabod browser source, click "Transform", and click "Fit to content" so it resizes and fills your canvas.',
           <span key={3}>
             Check your OBS version. If you're using OBS v31 or above, you may experience blank
-            overlays due to Chromium changes.
+            overlays due to Chromium changes,
             <div className='mt-2'>
               <a
                 href='https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe'
@@ -181,6 +181,33 @@ const faqs = [
             <Tag>/gamestate_integration/</Tag> not in <Tag>/cfg/</Tag>
           </span>,
           'Restart the Dota client and Steam.',
+          <span key={5}>
+            <strong>Regional blocking note</strong>
+            <div className='mt-1 text-sm'>
+              Some networks and ISPs block Cloudflare-hosted assets causing the OBS overlay to not
+              appear. If that applies to you, try the community tool{' '}
+              <a
+                href='https://github.com/Flowseal/zapret-discord-youtube'
+                target='_blank'
+                rel='noreferrer'
+                className='text-blue-500 hover:underline'
+              >
+                zapret-discord-youtube
+              </a>{' '}
+              and add <Tag>dotabod.com</Tag> and <Tag>gsi.dotabod.com</Tag> to{' '}
+              <code>lists/list-general.txt</code> on separate lines. If that doesn't help, some
+              users reported success with{' '}
+              <a
+                href='https://github.com/Flowseal/zapret-discord-youtube/releases/tag/1.9.0b'
+                target='_blank'
+                rel='noreferrer'
+                className='text-blue-500 hover:underline'
+              >
+                v1.9.0b
+              </a>
+              .
+            </div>
+          </span>,
           "The Dotabod browser source in OBS might have to be moved up above your other sources so it doesn't get blocked.",
         ]}
       />
