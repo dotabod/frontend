@@ -27,7 +27,7 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   )
 
   // Transform data to add proper Date objects for currentPeriodEnd
