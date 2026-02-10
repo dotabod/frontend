@@ -12,6 +12,7 @@ import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { TierBadge } from './Features/TierBadge'
 import { ObsSetup } from './ObsSetup'
+import RegionalBlockingNote from './RegionalBlockingNote'
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -151,6 +152,10 @@ export default function OBSOverlay() {
         </p>
 
         <CopyInstructions />
+
+        <div className='mt-4'>
+          <RegionalBlockingNote />
+        </div>
       </div>
 
       <div className='flex flex-col items-center space-y-4'>
