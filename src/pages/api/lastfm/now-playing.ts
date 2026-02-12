@@ -17,15 +17,16 @@ async function handler(
   res: NextApiResponse<LastFmResponse | { error: string }>,
 ) {
   try {
-    const session = await getServerSession(req, res, authOptions)
-    const isPublicOverlayRequest = (Boolean(req.query.id) || Boolean(req.query.token)) && !session?.user?.id
+    const publicUserId = (req.query.id as string) || (req.query.token as string)
+    const session = publicUserId ? null : await getServerSession(req, res, authOptions)
+    const isPublicOverlayRequest = Boolean(publicUserId)
     if (isPublicOverlayRequest) {
       res.setHeader('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=45')
     } else {
       res.setHeader('Cache-Control', 'private, max-age=15, stale-while-revalidate=30')
     }
 
-    const userId = (req.query.id as string) || session?.user?.id || (req.query.token as string)
+    const userId = publicUserId || session?.user?.id
 
     if (!userId) {
       return res.status(400).json({ error: 'Username is required' })

@@ -6,15 +6,15 @@ import { getSubscription, isSubscriptionActive, SUBSCRIPTION_TIERS } from '@/uti
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const session = await getServerSession(req, res, authOptions)
+    const userId = req.query.id as string | undefined
+    const session = userId ? null : await getServerSession(req, res, authOptions)
 
     // Get the effective user ID
     // When impersonating, we want the subscription of the user being viewed (query param)
     // When not impersonating, we want the current user's subscription
-    const userId = req.query.id as string | undefined
     const userIdToUse = userId || session?.user?.id
 
-    const isPublicOverlayRequest = Boolean(userId) && !session?.user?.id
+    const isPublicOverlayRequest = Boolean(userId)
     if (isPublicOverlayRequest) {
       res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
     } else {

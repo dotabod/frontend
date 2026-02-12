@@ -9,7 +9,7 @@ import { chatBotScopes } from '@/lib/authScopes'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const Login: NextPageWithLayout = () => {
-  const { status } = useSession()
+  useSession()
   const router = useRouter()
   const [countdown, setCountdown] = useState(6)
   const [isLoading, setIsLoading] = useState(false)

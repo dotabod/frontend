@@ -94,7 +94,7 @@ const VerifyPage: NextPageWithLayout = () => {
   const [checkingAccount, setCheckingAccount] = useState(false)
   const [accountToUnlink, setAccountToUnlink] = useState<string | null>(null)
   const [unlinkModalVisible, setUnlinkModalVisible] = useState(false)
-  const { notification, modal } = App.useApp()
+  const { notification } = App.useApp()
   const track = useTrack()
   const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
   const [isSigningOut, setIsSigningOut] = useState(false)
@@ -205,7 +205,7 @@ const VerifyPage: NextPageWithLayout = () => {
             throw new Error(error.message || 'Steam authentication validation failed')
           }
 
-          const { steam32Id, profileData } = await response.json()
+          const { steam32Id } = await response.json()
 
           if (steam32Id) {
             // Show success notification

@@ -11,7 +11,7 @@ import type { NextPageWithLayout } from '@/pages/_app'
 
 const Login: NextPageWithLayout = () => {
   const { status } = useSession()
-  const { message } = App.useApp()
+  App.useApp()
   const router = useRouter()
   const { notification } = App.useApp()
 

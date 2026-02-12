@@ -32,9 +32,9 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      dedupingInterval: 15000,
-      focusThrottleInterval: 30000,
-      errorRetryInterval: 10000,
+      dedupingInterval: 60000,
+      focusThrottleInterval: 120000,
+      errorRetryInterval: 30000,
       errorRetryCount: 1,
     },
   )
