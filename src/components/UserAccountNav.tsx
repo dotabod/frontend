@@ -9,7 +9,7 @@ import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
-import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS, STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
 // Define the notification type
 interface GiftNotification {
@@ -42,10 +42,8 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     error: notificationError,
     mutate: refreshGiftNotifications,
   } = useSWR('/api/gift-notifications?includeRead=true', fetcher, {
+    ...STABLE_SWR_OPTIONS,
     // Configuration to fetch only once on mount
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    revalidateIfStale: false,
     // Keep error handling
     loadingTimeout: 8000, // 8 seconds
     errorRetryInterval: 5000, // 5 seconds
@@ -72,7 +70,6 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     return () => clearTimeout(timer)
   }, [imageLoaded])
 
-  const hasNotifications = giftNotificationData?.hasNotification || false
   const notifications = (giftNotificationData?.notifications || []) as GiftNotification[]
   const totalUnreadNotifications = notifications.filter((n) => !n.read).length
 

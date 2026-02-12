@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { fetcher } from '@/lib/fetcher'
+import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const { Content } = Layout
@@ -24,7 +25,7 @@ const { Title, Text, Paragraph } = Typography
 const { Option } = Select
 
 const TestGiftPage: NextPageWithLayout = () => {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const [loading, setLoading] = useState(false)
   const [giftType, setGiftType] = useState<string>('monthly')
   const [giftMessage, setGiftMessage] = useState<string>(
@@ -37,6 +38,7 @@ const TestGiftPage: NextPageWithLayout = () => {
   const { data: giftNotificationData } = useSWR(
     status === 'authenticated' ? '/api/gift-notifications' : null,
     fetcher,
+    STABLE_SWR_OPTIONS,
   )
 
   const [hasLifetime, setHasLifetime] = useState(false)

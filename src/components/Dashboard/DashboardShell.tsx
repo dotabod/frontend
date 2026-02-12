@@ -12,7 +12,6 @@ import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
 import { CompactDisableToggle } from '@/components/Dashboard/CompactDisableToggle'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
-import type { PARENT_KEYS } from '@/components/Dashboard/navigation'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import HubSpotIdentification from '@/components/HubSpotIdentification'
 import HubSpotScript from '@/components/HubSpotScript'
@@ -21,6 +20,7 @@ import GiftNotification from '@/components/Subscription/GiftNotification'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
+import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import { navigation } from './navigation'
 import { SettingsSearch } from './SettingsSearch'
@@ -73,9 +73,6 @@ const shouldHideForImpersonator = (itemName: string) => {
   return ['Setup', 'Managers', 'Billing', 'Data', 'Account', 'Admin'].includes(itemName)
 }
 
-const shouldShowAdminItems = (itemKey: keyof typeof PARENT_KEYS, role?: string[]) => {
-  return itemKey === 'ADMIN' && role?.includes('admin')
-}
 
 // Create mapping dynamically from navigation structure
 const PATH_TO_PARENT_KEY: Record<string, string> = {}
@@ -197,11 +194,7 @@ export default function DashboardShell({
   const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
     status === 'authenticated' ? '/api/gift-notifications' : null,
     fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
+    STABLE_SWR_OPTIONS,
   )
 
   const [hasGiftNotification, setHasGiftNotification] = useState(false)

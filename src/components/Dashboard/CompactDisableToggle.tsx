@@ -2,14 +2,10 @@ import { Switch, Tooltip } from 'antd'
 import useSWR from 'swr'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { STABLE_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 export function CompactDisableToggle() {
-  const { data } = useSWR('/api/check-ban', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data } = useSWR('/api/check-ban', fetcher, STABLE_SWR_OPTIONS)
 
   const { data: isDotabodDisabled, updateSetting } = useUpdateSetting(Settings.commandDisable)
 

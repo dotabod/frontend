@@ -25,6 +25,8 @@ export const SETTINGS_SWR_OPTIONS = {
   errorRetryCount: 1,
 } as const
 
+export const STABLE_SWR_OPTIONS = SETTINGS_SWR_OPTIONS
+
 export const useUpdate = ({
   path,
   revalidate = false,
