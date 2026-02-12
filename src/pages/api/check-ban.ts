@@ -1,7 +1,6 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from '@/lib/api/getServerSession'
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -45,6 +44,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    res.setHeader('Cache-Control', 'private, max-age=15, stale-while-revalidate=30')
+
     const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
     if (error) {
       return res.status(403).json({ message: 'Forbidden' })
@@ -81,4 +82,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(['GET'], withAuthentication(handler))
+export default withMethods(['GET'], handler)

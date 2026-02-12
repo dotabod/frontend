@@ -18,6 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  res.setHeader('Cache-Control', 'private, max-age=30, stale-while-revalidate=60')
+
   try {
     const session = await getServerSession(req, res, authOptions)
 

@@ -112,7 +112,6 @@ const TwitchUser = ({
 
 export function Hero() {
   const session = useSession()
-  const name = session.data?.user?.name || 'streamers'
   // get users from api/featured-users
   const { data: users, isLoading } = useSWR<{
     topLive: { name: string; image: string }[]
@@ -153,7 +152,7 @@ export function Hero() {
               </p>
             </div>
             <div className='mt-8 flex flex-wrap gap-x-6 gap-y-4'>
-              <Link href='/dashboard'>
+              <Link href='/dashboard' prefetch={false}>
                 <Button type='primary'>
                   <div className='flex items-center space-x-2'>
                     <LucideHome className='flex h-4 w-4' />

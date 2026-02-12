@@ -72,6 +72,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    res.setHeader('Cache-Control', 'private, max-age=60, stale-while-revalidate=120')
+
     const languageProgress = await fetchLanguageProgress(languageId as string)
     const project = await fetchProject()
     const { total, percentage } = await getTotalUsersForLanguage(languageId as string)

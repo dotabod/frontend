@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 import { getServerSession } from '@/lib/api/getServerSession'
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -24,6 +23,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // GET: Fetch gift notifications and subscription status
     if (req.method === 'GET') {
       try {
+        res.setHeader('Cache-Control', 'private, max-age=15, stale-while-revalidate=30')
+
         // Check if we should include read notifications
         const includeRead = req.query.includeRead === 'true'
 
@@ -142,4 +143,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(['GET', 'POST'], withAuthentication(handler))
+export default withMethods(['GET', 'POST'], handler)

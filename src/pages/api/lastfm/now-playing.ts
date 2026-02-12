@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from '@/lib/api/getServerSession'
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
@@ -19,6 +18,13 @@ async function handler(
 ) {
   try {
     const session = await getServerSession(req, res, authOptions)
+    const isPublicOverlayRequest = (Boolean(req.query.id) || Boolean(req.query.token)) && !session?.user?.id
+    if (isPublicOverlayRequest) {
+      res.setHeader('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=45')
+    } else {
+      res.setHeader('Cache-Control', 'private, max-age=15, stale-while-revalidate=30')
+    }
+
     const userId = (req.query.id as string) || session?.user?.id || (req.query.token as string)
 
     if (!userId) {
@@ -96,4 +102,4 @@ async function handler(
   }
 }
 
-export default withAuthentication(handler)
+export default handler
