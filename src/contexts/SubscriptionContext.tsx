@@ -3,6 +3,7 @@ import { createContext, type ReactNode, useContext } from 'react'
 import useSWR from 'swr'
 import { useSubscription as useSubscriptionData } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
+import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { hasPaidPlan, isInGracePeriod, type SubscriptionRow } from '@/utils/subscription'
 
 // Define the expected response shape for credit balance
@@ -40,10 +41,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     // Add type argument here
     creditBalanceKey,
     fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-    },
+    STABLE_SWR_OPTIONS,
   )
 
   const formattedCreditBalance = creditBalanceData?.formatted || '$0.00'

@@ -11,7 +11,11 @@ import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
-import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import {
+  STABLE_SWR_OPTIONS,
+  useUpdateAccount,
+  useUpdateSetting,
+} from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/help'
 import { Card } from '@/ui/card'
@@ -108,11 +112,7 @@ export default function ChatBot() {
   const { error: makeDotabodModError, isLoading: makeDotabodModLoading } = useSWR(
     hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null,
     fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
+    STABLE_SWR_OPTIONS,
   )
   const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')
   const { error: updateEmoteSetError } = useSWR(
@@ -121,11 +121,7 @@ export default function ChatBot() {
       track('updateEmoteSet called')
       return fetcher(url)
     },
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
+    STABLE_SWR_OPTIONS,
   )
   const [activeKey7TV, setActiveKey7TV] = useState('auto')
   const [activeKeyMod, setActiveKeyMod] = useState('auto')
@@ -216,7 +212,7 @@ export default function ChatBot() {
     return () => clearInterval(intervalId)
   }, [stvUrl, updateEmoteSetError])
 
-  const { data: mmr, loading: loadingMmr } = useUpdateSetting(Settings.mmr)
+  const { data: mmr } = useUpdateSetting(Settings.mmr)
 
   const stepOneComplete =
     accountData?.accounts?.length > 0

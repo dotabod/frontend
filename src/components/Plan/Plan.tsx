@@ -11,7 +11,7 @@ import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Settings } from '@/lib/defaultSettings'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { fetcher } from '@/lib/fetcher'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { STABLE_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   calculateSavings,
@@ -113,11 +113,7 @@ function Plan({
   const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR(
     '/api/get-total-crypto-interest',
     fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      revalidateIfStale: false,
-    },
+    STABLE_SWR_OPTIONS,
   )
 
   const { message, modal } = App.useApp()

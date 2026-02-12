@@ -14,7 +14,12 @@ import { Input } from '@/components/Input'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
-import { SETTINGS_SWR_OPTIONS, useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import {
+  SETTINGS_SWR_OPTIONS,
+  STABLE_SWR_OPTIONS,
+  useUpdateAccount,
+  useUpdateSetting,
+} from '@/lib/hooks/useUpdateSetting'
 import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
 
 // Add type for form values
@@ -124,11 +129,7 @@ const MmrForm = ({ hideText = false }) => {
 
   const steamIds = accounts.map((a) => a.steam32Id)
   const path = `/api/steam/${steamIds.join('/')}`
-  const { data: steamData } = useSWR(steamIds.length ? path : null, fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data: steamData } = useSWR(steamIds.length ? path : null, fetcher, STABLE_SWR_OPTIONS)
 
   useEffect(() => {
     if (data?.accounts) {
