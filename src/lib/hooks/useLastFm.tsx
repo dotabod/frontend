@@ -72,7 +72,8 @@ export function useLastFm() {
     fetchNowPlaying()
 
     // Set up interval to fetch periodically
-    const intervalSeconds = typeof refreshRate === 'number' ? refreshRate : 30
+    const configuredInterval = typeof refreshRate === 'number' ? refreshRate : 30
+    const intervalSeconds = Math.max(30, configuredInterval)
     const intervalId = setInterval(fetchNowPlaying, intervalSeconds * 1000)
 
     return () => {

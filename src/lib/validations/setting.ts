@@ -114,7 +114,6 @@ const settingsSchema = {
   commandShard: z.boolean(),
   commandAghs: z.boolean(),
   commandWinProbability: z.boolean(),
-  showGiftAlerts: z.boolean(),
   lastFmOverlay: z.boolean(),
   lastFmUsername: z.string().max(45).optional(),
   lastFmRefreshRate: z.number().min(5).max(60),

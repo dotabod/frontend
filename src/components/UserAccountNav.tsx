@@ -9,6 +9,7 @@ import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
 // Define the notification type
 interface GiftNotification {
@@ -29,11 +30,11 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
 
 const UserButton = ({ user, className }: UserButtonProps) => {
   const [imageLoaded, setImageLoaded] = useState(false)
-  const { data, isLoading: isSettingsLoading } = useSWR('/api/settings', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data, isLoading: isSettingsLoading } = useSWR(
+    '/api/settings',
+    fetcher,
+    SETTINGS_SWR_OPTIONS,
+  )
 
   // Fetch gift notifications with dedupingInterval to prevent request pileup
   const {
@@ -49,7 +50,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     loadingTimeout: 8000, // 8 seconds
     errorRetryInterval: 5000, // 5 seconds
     errorRetryCount: 3,
-    onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+    onErrorRetry: (_error, _key, _config, revalidate, { retryCount }) => {
       // Only retry up to 3 times
       if (retryCount >= 3) return
 

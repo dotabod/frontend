@@ -1,9 +1,9 @@
 import {
-  type Prisma,
-  type Subscription,
-  SubscriptionStatus,
-  SubscriptionTier,
-  TransactionType,
+    type Prisma,
+    type Subscription,
+    SubscriptionStatus,
+    SubscriptionTier,
+    TransactionType,
 } from '@prisma/client'
 import type { StatusInfo } from '@/components/Subscription/types'
 import prisma from '@/lib/db'
@@ -51,7 +51,6 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandMute: SUBSCRIPTION_TIERS.FREE,
   commandPing: SUBSCRIPTION_TIERS.FREE,
   commandDotabod: SUBSCRIPTION_TIERS.FREE,
-  showGiftAlerts: SUBSCRIPTION_TIERS.FREE,
   'mmr-tracker': SUBSCRIPTION_TIERS.FREE,
   commandOnly: SUBSCRIPTION_TIERS.PRO,
   rankOnly: SUBSCRIPTION_TIERS.PRO,

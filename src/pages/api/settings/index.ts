@@ -19,6 +19,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (username) {
     if (req.method === 'GET') {
       try {
+        res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
+
         // Use findFirst instead of findFirstOrThrow to handle not found cases gracefully
         const data = await prisma.user.findFirst({
           select: {
@@ -65,6 +67,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'GET') {
     try {
+      const isPublicOverlayRequest = Boolean(userId) && !session?.user?.id
+      if (isPublicOverlayRequest) {
+        res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
+      } else {
+        res.setHeader('Cache-Control', 'private, no-store')
+      }
+
       const data = await prisma.user.findFirst({
         select: {
           stream_online: true,

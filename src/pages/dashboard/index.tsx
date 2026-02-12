@@ -14,9 +14,8 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
-import { PowerShellTroubleshootingContent } from '@/components/Dashboard/PowerShellTroubleshooting'
 import { fetcher } from '@/lib/fetcher'
-import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
@@ -76,11 +75,7 @@ const SetupPage = () => {
   const session = useSession()
   const { notification } = App.useApp()
   const track = useTrack()
-  const { data } = useSWR('/api/settings', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
   const isLive = data?.stream_online
 
   const [active, setActive] = useState(0)

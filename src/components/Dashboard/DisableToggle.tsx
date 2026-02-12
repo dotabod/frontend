@@ -5,15 +5,11 @@ import useSWR from 'swr'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useDisableReasons } from '@/lib/hooks/useDisableReasons'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { TierSwitch } from './Features/TierSwitch'
 
 const Toggle = () => {
-  const { data } = useSWR('/api/check-ban', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data } = useSWR('/api/check-ban', fetcher, SETTINGS_SWR_OPTIONS)
   const {
     data: isDotabodDisabled,
     loading,
@@ -43,18 +39,10 @@ const Toggle = () => {
 }
 
 export function DisableToggle() {
-  const { data } = useSWR('/api/check-ban', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data } = useSWR('/api/check-ban', fetcher, SETTINGS_SWR_OPTIONS)
   const { notification } = App.useApp()
   const user = useSession()?.data?.user
-  const { data: settingsData } = useSWR('/api/settings', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data: settingsData } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
   const isLive = settingsData?.stream_online
   const { getDisableReasonExplanation } = useDisableReasons()
 

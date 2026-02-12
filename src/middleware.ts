@@ -12,7 +12,6 @@ export const config = {
     '/login',
     '/verify',
     '/overlay/:path*',
-    '/api/:path*',
     '/dashboard/:path*',
     '/dashboard/admin/:path*',
     '/install',

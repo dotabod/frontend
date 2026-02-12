@@ -15,22 +15,30 @@ interface UpdateProps {
   dataTransform?: (data, newValue) => any
 }
 
+export const SETTINGS_SWR_OPTIONS = {
+  revalidateIfStale: false,
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 15000,
+  focusThrottleInterval: 30000,
+  errorRetryInterval: 10000,
+  errorRetryCount: 1,
+} as const
+
 export const useUpdate = ({
   path,
   revalidate = false,
-  dataTransform = (data, newValue) => newValue,
+  dataTransform = (_data, newValue) => newValue,
 }: UpdateProps) => {
   const router = useRouter()
   const { data, error } = useSWR(router.isReady ? path : null, fetcher, {
-    revalidateIfStale: false,
+    ...SETTINGS_SWR_OPTIONS,
     shouldRetryOnError(err) {
       if (err.status === 404 || err.status === 403) {
         return false
       }
       return true
     },
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
   })
   const { mutate } = useSWRConfig()
   const { message } = App.useApp()

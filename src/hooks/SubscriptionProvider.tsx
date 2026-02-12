@@ -20,13 +20,22 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
   const { userId } = router.query
 
   const shouldFetch = router.isReady && (session.data?.user?.id || userId)
+  const subscriptionPath = shouldFetch
+    ? userId
+      ? `/api/stripe/subscription?id=${userId}`
+      : '/api/stripe/subscription'
+    : null
   const { data, isLoading } = useSWR<Subscription>(
-    shouldFetch ? `/api/stripe/subscription?id=${userId ?? ''}` : null,
+    subscriptionPath,
     fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
+      dedupingInterval: 15000,
+      focusThrottleInterval: 30000,
+      errorRetryInterval: 10000,
+      errorRetryCount: 1,
     },
   )
 

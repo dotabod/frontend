@@ -1,15 +1,15 @@
 import { MessageOutlined } from '@ant-design/icons'
 import {
-  Alert,
-  Button,
-  Divider,
-  Form,
-  Input,
-  message,
-  type StepProps,
-  Steps,
-  type StepsProps,
-  Tag,
+    Alert,
+    Button,
+    Divider,
+    Form,
+    Input,
+    message,
+    type StepProps,
+    Steps,
+    type StepsProps,
+    Tag,
 } from 'antd'
 import axios from 'axios'
 import Head from 'next/head'
@@ -22,11 +22,12 @@ import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import {
-  PowerShellFailureMessage,
-  PowerShellSetupStep,
-  PowerShellTroubleshootingContent,
+    PowerShellFailureMessage,
+    PowerShellSetupStep,
+    PowerShellTroubleshootingContent,
 } from '@/components/Dashboard/PowerShellTroubleshooting'
 import { fetcher } from '@/lib/fetcher'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { Card } from '@/ui/card'
 
@@ -365,11 +366,7 @@ const faqs = [
 
 const TroubleshootPage = () => {
   const session = useSession()
-  const { data } = useSWR('/api/settings', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
   const isLive = data?.stream_online
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)

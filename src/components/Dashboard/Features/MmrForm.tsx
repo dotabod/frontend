@@ -14,9 +14,8 @@ import { Input } from '@/components/Input'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
-import { useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS, useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
-import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 
 // Add type for form values
 interface FormValues {
@@ -47,11 +46,7 @@ const SteamAvatar = ({ data: response, id }) => {
 }
 
 const EmptyAccountsState = ({ hideText }: { hideText: boolean }) => {
-  const { data } = useSWR('/api/settings', fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  })
+  const { data } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
   const isLive = data?.stream_online
 
   return (

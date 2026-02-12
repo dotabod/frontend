@@ -14,6 +14,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userId = req.query.id as string | undefined
     const userIdToUse = userId || session?.user?.id
 
+    const isPublicOverlayRequest = Boolean(userId) && !session?.user?.id
+    if (isPublicOverlayRequest) {
+      res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
+    } else {
+      res.setHeader('Cache-Control', 'private, no-store')
+    }
+
     if (!userIdToUse) {
       return res.status(401).json({ error: 'Unauthorized' })
     }

@@ -133,7 +133,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   }
 
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session} refetchOnWindowFocus={false} refetchWhenOffline={false}>
       <SubscriptionProviderMain>
         <SubscriptionProvider>
           <StyleProvider cache={clientCache} hashPriority='high'>
