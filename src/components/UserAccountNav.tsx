@@ -284,7 +284,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
         menu={{
           items: [
             {
-              label: <Link href='/dashboard'>Dashboard</Link>,
+              label: <Link href='/dashboard' prefetch={false}>Dashboard</Link>,
               key: 'dashboard',
             },
             {
@@ -300,7 +300,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
           ],
         }}
       >
-        <Link href='/dashboard'>
+        <Link href='/dashboard' prefetch={false}>
           <div className='flex items-center cursor-pointer'>
             <div className='relative'>
               {isLive && (

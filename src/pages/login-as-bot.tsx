@@ -50,7 +50,7 @@ const Login: NextPageWithLayout = () => {
             <Typography.Title level={2}>Sign in as a chat bot</Typography.Title>
             <Typography.Paragraph style={{ fontSize: '1.125rem', color: 'var(--color-dark-300)' }}>
               You probably want to sign in as a streamer,{' '}
-              <Link href='/login'>
+              <Link href='/login' prefetch={false}>
                 <strong>login here</strong>
               </Link>
             </Typography.Paragraph>

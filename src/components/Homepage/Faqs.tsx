@@ -78,7 +78,7 @@ export const Faqs: FC = () => {
           </h2>
           <p className='mt-2 text-lg text-gray-300'>
             If you have anything else you want to ask,{' '}
-            <Link href='/dashboard/help' className='text-gray-200 underline'>
+            <Link href='/dashboard/help' prefetch={false} className='text-gray-200 underline'>
               reach out to us through our help page
             </Link>
             .

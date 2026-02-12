@@ -679,7 +679,7 @@ const VerifyPage: NextPageWithLayout = () => {
                   Link Another Account
                 </Button>
 
-                <Link href='/dashboard'>
+                <Link href='/dashboard' prefetch={false}>
                   <Button type='primary' size='large' className='px-8'>
                     Go to Streamer's Dashboard
                   </Button>

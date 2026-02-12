@@ -90,7 +90,7 @@ const Login: NextPageWithLayout = () => {
             <UserAuthForm />
             <Typography.Paragraph style={{ textAlign: 'center', marginTop: '1rem' }}>
               Not a streamer? If you just want to become Dotabod Verified to show your rank in chat,{' '}
-              <Link href='/verify'>login here</Link>
+              <Link href='/verify' prefetch={false}>login here</Link>
             </Typography.Paragraph>
           </div>
         </div>

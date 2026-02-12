@@ -79,7 +79,9 @@ export const Header: FC = () => {
                             <MobileNavLink href='/privacy-policy'>Privacy Policy</MobileNavLink>
                             <MobileNavLink href='/terms-of-service'>Terms of Service</MobileNavLink>
                             <MobileNavLink href='/cookies'>Cookie Policy</MobileNavLink>
-                            <MobileNavLink href='/dashboard'>Dashboard</MobileNavLink>
+                            <MobileNavLink href='/dashboard' prefetch={false}>
+                              Dashboard
+                            </MobileNavLink>
                             <MobileNavLink href='https://github.com/dotabod'>Github</MobileNavLink>
                             <MobileNavLink href='https://discord.dotabod.com'>
                               Discord

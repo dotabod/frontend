@@ -33,7 +33,7 @@ export function Footer() {
             </div>
             <div className='ml-8 lg:w-64'>
               <p className='text-base font-semibold'>
-                <Link href='/dashboard' className='text-gray-200!'>
+                <Link href='/dashboard' prefetch={false} className='text-gray-200!'>
                   <span className='absolute inset-0 sm:rounded-2xl' />
                   <span>Be a better streamer</span>
                 </Link>
