@@ -1,7 +1,6 @@
 import type { SubscriptionTier } from '@prisma/client'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
 import { useSubscription } from '@/hooks/useSubscription'
 import { type SettingKeys, Settings } from '@/lib/defaultSettings'
@@ -144,13 +143,15 @@ export function useUpdateSetting<T = boolean>(
 ): UpdateSettingResult<T> {
   const router = useRouter()
   const { subscription } = useSubscription()
-  const session = useSession()
 
   // This is only used to get user settings from the OBS overlay
-  const { userId } = router.query
+  const queryUserId = router.query.userId
+  const userId = Array.isArray(queryUserId) ? queryUserId[0] : queryUserId
+  const routeNeedsSettings =
+    router.pathname.startsWith('/dashboard') || router.pathname.startsWith('/overlay')
   const url = userId
     ? `/api/settings?id=${userId}`
-    : session.data?.user?.id
+    : router.isReady && routeNeedsSettings
       ? '/api/settings'
       : null
 

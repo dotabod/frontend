@@ -1,13 +1,10 @@
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import { NavLinks } from 'src/components/NavLinks'
 import { QrCodeBorder } from './QrCodeBorder'
 
 export function Footer() {
-  const { status } = useSession()
-
   return (
     <footer className='border-t border-gray-500 bg-gray-900'>
       <Container>
@@ -38,11 +35,7 @@ export function Footer() {
                   <span>Be a better streamer</span>
                 </Link>
               </p>
-              {status === 'authenticated' ? (
-                <p className='mt-1 text-sm text-gray-300'>View your dashboard to get started.</p>
-              ) : (
-                <p className='mt-1 text-sm text-gray-300'>Login to our dashboard to get started.</p>
-              )}
+              <p className='mt-1 text-sm text-gray-300'>Login to our dashboard to get started.</p>
             </div>
           </div>
         </div>

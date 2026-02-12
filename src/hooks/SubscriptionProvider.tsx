@@ -1,6 +1,5 @@
 import type { Subscription } from '@prisma/client'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { createContext, useMemo } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
@@ -15,11 +14,14 @@ interface SubscriptionContextType {
 export const SubscriptionContext = createContext<SubscriptionContextType | null>(null)
 
 export function SubscriptionProviderMain({ children }: { children: React.ReactNode }) {
-  const session = useSession()
   const router = useRouter()
-  const { userId } = router.query
+  const queryUserId = router.query.userId
+  const userId = Array.isArray(queryUserId) ? queryUserId[0] : queryUserId
 
-  const shouldFetch = router.isReady && (session.data?.user?.id || userId)
+  const routeNeedsSubscription =
+    router.pathname.startsWith('/dashboard') || router.pathname.startsWith('/overlay')
+
+  const shouldFetch = router.isReady && (Boolean(userId) || routeNeedsSubscription)
   const subscriptionPath = shouldFetch
     ? userId
       ? `/api/stripe/subscription?id=${userId}`

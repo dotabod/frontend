@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import { createContext, type ReactNode, useContext } from 'react'
 import useSWR from 'swr'
 import { useSubscription as useSubscriptionData } from '@/hooks/useSubscription'
@@ -27,6 +27,7 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined)
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
+  const router = useRouter()
   const { subscription, isLoading } = useSubscriptionData()
   const inGracePeriod = isInGracePeriod()
   const hasActivePlan = hasPaidPlan(subscription)
@@ -34,8 +35,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const isPro = subscription?.tier === 'PRO' || inGracePeriod
   const isFree = !isPro
 
-  const { data: session } = useSession()
-  const creditBalanceKey = session?.user ? '/api/stripe/credit-balance' : null
+  const creditBalanceKey =
+    router.isReady && router.pathname.startsWith('/dashboard')
+      ? '/api/stripe/credit-balance'
+      : null
   // Fetch credit balance and specify the response type
   const { data: creditBalanceData } = useSWR<CreditBalanceResponse>(
     // Add type argument here
