@@ -1,7 +1,6 @@
 // middleware.ts
 
 import { captureException } from '@sentry/nextjs'
-import { get } from '@vercel/edge-config'
 import { NextResponse } from 'next/server'
 import type { NextRequestWithAuth } from 'next-auth/middleware'
 import { withAuth } from 'next-auth/middleware'
@@ -21,6 +20,7 @@ export const config = {
 
 export async function middleware(req: NextRequestWithAuth) {
   const pathname = req.nextUrl.pathname
+  const isMaintenanceMode = process.env.IS_IN_MAINTENANCE_MODE === 'true'
 
   // Redirect literal [username] path to login page
   if (pathname === '/[username]') {
@@ -44,17 +44,13 @@ export async function middleware(req: NextRequestWithAuth) {
     pathname.startsWith('/overlay')
 
   if (shouldCheckMaintenance) {
-    if (!process.env.EDGE_CONFIG) {
-      req.nextUrl.pathname = '/missing-edge-config'
-      return NextResponse.rewrite(req.nextUrl)
+    if (process.env.VERCEL_ENV !== 'production') {
+      return NextResponse.next()
     }
 
     try {
-      // Check whether the maintenance page should be shown
-      const isInMaintenanceMode = await get<boolean>('isInMaintenanceMode')
-
       // If is in maintenance mode, point the url pathname to the maintenance page
-      if (isInMaintenanceMode && process.env.VERCEL_ENV === 'production') {
+      if (isMaintenanceMode) {
         // Check if the path starts with 'overlay' and return an empty page
         if (pathname.startsWith('/overlay')) {
           return new NextResponse(null, { status: 200 })
@@ -65,8 +61,6 @@ export async function middleware(req: NextRequestWithAuth) {
       }
     } catch (error) {
       captureException(error)
-      // show the default page if EDGE_CONFIG env var is missing,
-      // but log the error to the console
       console.error(error)
     }
   }
