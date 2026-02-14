@@ -1,8 +1,9 @@
 import { MessageOutlined } from '@ant-design/icons'
 import { Button, Divider, Form, Input, message } from 'antd'
 import axios from 'axios'
+import { useSession } from 'next-auth/react'
 import type React from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { Card } from '@/ui/card'
 
@@ -16,6 +17,15 @@ const ContactPage: React.FC = () => {
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
   const [isChatWidgetOpen, setIsChatWidgetOpen] = useState(false)
+  const { data: session } = useSession()
+
+  // Effect to set email field value when session loads
+  useEffect(() => {
+    if (session?.user?.email) {
+      form.setFieldsValue({ email: session.user.email })
+    }
+    // Re-run effect if session email or form instance changes
+  }, [session?.user?.email, form])
 
   // Function to handle form submission to HubSpot
   const handleSubmit = async (values: ContactFormValues) => {
@@ -32,7 +42,7 @@ const ContactPage: React.FC = () => {
         fields: [
           {
             name: 'email',
-            value: values.email,
+            value: values.email || session?.user?.email || session?.user?.name,
           },
           {
             name: 'TICKET.subject',
