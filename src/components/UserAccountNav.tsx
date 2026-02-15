@@ -4,6 +4,7 @@ import { Badge, Button, Dropdown, Empty, Popover, Skeleton, Space, Tabs } from '
 import clsx from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import type { Session } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
@@ -29,9 +30,12 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
 }
 
 const UserButton = ({ user, className }: UserButtonProps) => {
+  const router = useRouter()
   const [imageLoaded, setImageLoaded] = useState(false)
+
+  const shouldFetchSettings = router.isReady && router.pathname.startsWith('/dashboard')
   const { data, isLoading: isSettingsLoading } = useSWR(
-    '/api/settings',
+    shouldFetchSettings ? '/api/settings' : null,
     fetcher,
     SETTINGS_SWR_OPTIONS,
   )

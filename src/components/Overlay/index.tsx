@@ -59,7 +59,9 @@ const OverlayPage = () => {
   }
 
   const { notification } = App.useApp()
-  const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
+  const { data: isDotabodDisabled, mutate: refreshSettings } = useUpdateSetting(
+    Settings.commandDisable,
+  )
   const { original, error } = useUpdateSetting()
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
@@ -149,24 +151,24 @@ const OverlayPage = () => {
     }
   }, [connected])
 
-  // Refresh the page every 5 minutes if the socket is disconnected
+  // Refresh settings every 5 minutes if the socket is disconnected
   useEffect(() => {
-    let reloadTimeout: NodeJS.Timeout | null = null
+    let refreshTimeout: NodeJS.Timeout | null = null
 
     if (!connected) {
-      reloadTimeout = setTimeout(() => {
-        window.location.reload()
+      refreshTimeout = setTimeout(() => {
+        refreshSettings()
       }, 300000)
-    } else if (reloadTimeout) {
-      clearTimeout(reloadTimeout)
+    } else if (refreshTimeout) {
+      clearTimeout(refreshTimeout)
     }
 
     return () => {
-      if (reloadTimeout) {
-        clearTimeout(reloadTimeout)
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout)
       }
     }
-  }, [connected])
+  }, [connected, refreshSettings])
 
   useEffect(() => {
     if (!original) return
@@ -186,7 +188,7 @@ const OverlayPage = () => {
     setRankImageDetails(rankDetails)
   }, [original])
 
-  useStreamOfflineNotification(original?.stream_online, notification)
+  useStreamOfflineNotification(original?.stream_online, notification, refreshSettings)
 
   useEffect(() => {
     setIsInIframe(window.self !== window.top)

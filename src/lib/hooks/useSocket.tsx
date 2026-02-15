@@ -331,7 +331,7 @@ export const useSocket = ({
 
     socket.on('refresh', () => {
       updateLastReceived()
-      router.reload()
+      mutate()
     })
 
     // Clean up

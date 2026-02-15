@@ -16,9 +16,10 @@ const StreamOfflineMessage = () => (
 export const useStreamOfflineNotification = (
   streamOnline: boolean | undefined,
   notification: ReturnType<typeof App.useApp>['notification'],
+  onRefresh?: () => void,
 ) => {
   useEffect(() => {
-    let reloadTimeout: NodeJS.Timeout | null = null
+    let refreshTimeout: NodeJS.Timeout | null = null
 
     if (streamOnline === false) {
       notification.open({
@@ -30,21 +31,21 @@ export const useStreamOfflineNotification = (
         description: <StreamOfflineMessage />,
       })
 
-      // Refresh page every 5 minutes to check if stream is online
-      reloadTimeout = setTimeout(() => {
-        window.location.reload()
+      // Refresh settings every 5 minutes to check if stream is online
+      refreshTimeout = setTimeout(() => {
+        onRefresh?.()
       }, 300000)
     } else {
       notification.destroy('stream-offline')
-      if (reloadTimeout) {
-        clearTimeout(reloadTimeout)
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout)
       }
     }
 
     return () => {
-      if (reloadTimeout) {
-        clearTimeout(reloadTimeout)
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout)
       }
     }
-  }, [streamOnline, notification])
+  }, [streamOnline, notification, onRefresh])
 }
