@@ -17,6 +17,7 @@ import 'antd/dist/reset.css'
 import 'focus-visible'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
+import { useRouter } from 'next/router'
 import Script from 'next/script'
 import type { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
@@ -63,10 +64,14 @@ const clientCache = createCache()
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
+  const router = useRouter()
+
   // Guard against undefined Component
   if (!Component) {
     return <div>Loading...</div>
   }
+
+  const isPublicOverlayRoute = router.pathname === '/overlay/[userId]'
 
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
@@ -83,7 +88,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   // Use a simple layout during SSR, and the full layout after mounting on the client
   const content = (
     <ConfigProvider theme={themeConfig}>
-      <SentrySession />
+      {!isPublicOverlayRoute && <SentrySession />}
 
       {/* Only load Vercel Analytics if explicit consent has been given */}
       {hasConsented && cookieConsent.analytics && <VercelAnalytics />}
@@ -132,15 +137,23 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
     )
   }
 
+  const appContent = (
+    <SubscriptionProviderMain>
+      <SubscriptionProvider>
+        <StyleProvider cache={clientCache} hashPriority='high'>
+          {mounted ? content : <div style={{ visibility: 'hidden' }}>{content}</div>}
+        </StyleProvider>
+      </SubscriptionProvider>
+    </SubscriptionProviderMain>
+  )
+
+  if (isPublicOverlayRoute) {
+    return appContent
+  }
+
   return (
     <SessionProvider session={session} refetchOnWindowFocus={false} refetchWhenOffline={false}>
-      <SubscriptionProviderMain>
-        <SubscriptionProvider>
-          <StyleProvider cache={clientCache} hashPriority='high'>
-            {mounted ? content : <div style={{ visibility: 'hidden' }}>{content}</div>}
-          </StyleProvider>
-        </SubscriptionProvider>
-      </SubscriptionProviderMain>
+      {appContent}
     </SessionProvider>
   )
 }
