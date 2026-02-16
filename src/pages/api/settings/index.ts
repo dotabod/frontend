@@ -1,4 +1,5 @@
 import { captureException } from '@sentry/nextjs'
+import type { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 import { getServerSession } from '@/lib/api/getServerSession'
@@ -7,7 +8,103 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
-import { FEATURE_TIERS, getSubscription } from '@/utils/subscription'
+import {
+  FEATURE_TIERS,
+  getSubscription,
+  GRACE_PERIOD_END,
+  isInGracePeriod,
+  isSubscriptionActive,
+  SUBSCRIPTION_TIERS,
+} from '@/utils/subscription'
+
+const subscriptionRelationQuery = {
+  where: {
+    OR: [
+      {
+        status: {
+          in: ['ACTIVE', 'TRIALING', 'PAST_DUE'],
+        },
+        isGift: false,
+      },
+      {
+        transactionType: 'LIFETIME',
+        status: { in: ['ACTIVE'] },
+      },
+    ],
+  },
+  select: {
+    id: true,
+    tier: true,
+    status: true,
+    transactionType: true,
+    currentPeriodEnd: true,
+    cancelAtPeriodEnd: true,
+    stripePriceId: true,
+    stripeCustomerId: true,
+    createdAt: true,
+    stripeSubscriptionId: true,
+    metadata: true,
+    isGift: true,
+    giftDetails: {
+      select: {
+        senderName: true,
+        giftType: true,
+        giftQuantity: true,
+        giftMessage: true,
+      },
+    },
+  },
+  orderBy: [
+    { status: 'asc' },
+    { transactionType: 'desc' },
+    { createdAt: 'desc' },
+  ],
+} satisfies Prisma.SubscriptionFindManyArgs
+
+type SettingsSubscriptionRow = Prisma.SubscriptionGetPayload<{
+  select: typeof subscriptionRelationQuery.select
+}>
+
+function getSettingsSubscription(subscriptions: SettingsSubscriptionRow[]) {
+  const activeSubscription = subscriptions.find(
+    (sub) =>
+      (sub.status === 'ACTIVE' || sub.status === 'TRIALING') &&
+      sub.stripeSubscriptionId,
+  )
+
+  const subscription = activeSubscription || subscriptions[0] || null
+
+  if (!subscription && isInGracePeriod()) {
+    return {
+      tier: SUBSCRIPTION_TIERS.PRO,
+      status: 'TRIALING' as const,
+      transactionType: 'RECURRING' as const,
+      currentPeriodEnd: GRACE_PERIOD_END,
+      cancelAtPeriodEnd: true,
+      stripePriceId: '',
+      stripeCustomerId: '',
+      createdAt: new Date(),
+      stripeSubscriptionId: null,
+      isGift: false,
+      giftDetails: null,
+      isVirtual: true,
+      isGracePeriodVirtual: true,
+    }
+  }
+
+  if (!subscription || !isSubscriptionActive(subscription)) {
+    return {
+      tier: SUBSCRIPTION_TIERS.FREE,
+      status: null,
+      stripePriceId: '',
+    }
+  }
+
+  return {
+    ...subscription,
+    tier: subscription.tier,
+  }
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -39,6 +136,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 },
               },
             },
+            subscription: {
+              ...subscriptionRelationQuery,
+            },
           },
           where: {
             name: username.toLowerCase(),
@@ -49,7 +149,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           return res.json({})
         }
 
-        return res.json(data)
+        const subscription = getSettingsSubscription(data.subscription)
+
+        const { subscription: _subscriptionRows, ...userData } = data
+
+        return res.json({
+          ...userData,
+          subscription,
+        })
       } catch (error) {
         captureException(error)
         console.error(error)
@@ -66,7 +173,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'GET') {
     try {
-      const isPublicOverlayRequest = Boolean(userId) && !session?.user?.id
+      const resolvedUserId = userId ?? session?.user?.id
+      if (!resolvedUserId) {
+        return res.status(403).json({ message: 'Unauthorized' })
+      }
+
+      const isPublicOverlayRequest = Boolean(userId)
       if (isPublicOverlayRequest) {
         res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
       } else {
@@ -95,11 +207,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               steam32Id: true,
             },
           },
+          subscription: {
+            ...subscriptionRelationQuery,
+          },
           mmr: true,
           steam32Id: true,
         },
         where: {
-          id: userId ?? session?.user?.id,
+          id: resolvedUserId,
         },
       })
 
@@ -114,7 +229,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         )
       }
 
-      return res.json(data)
+      const subscription = getSettingsSubscription(data.subscription)
+
+      const { subscription: _subscriptionRows, ...userData } = data
+
+      return res.json({
+        ...userData,
+        subscription,
+      })
     } catch (error) {
       captureException(error)
       console.error('Error fetching user:', error)
