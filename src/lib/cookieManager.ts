@@ -46,7 +46,7 @@ const setCookie = (
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + expires)
 
-  // Set the cookie
+  // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
   document.cookie = `${name}=${encodeURIComponent(value)};expires=${expiryDate.toUTCString()};path=${path};`
 }
 
@@ -86,23 +86,24 @@ const removeCookie = (name: string, path = '/', domain?: string): void => {
   const expires = 'expires=Thu, 01 Jan 1970 00:00:00 GMT'
 
   if (domain) {
+    // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
     document.cookie = `${name}=; ${expires}; path=${path}; domain=${domain};`
   } else {
-    // Without specifying domain
+    // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
     document.cookie = `${name}=; ${expires}; path=${path};`
 
-    // Also try with current domain
     const currentDomain = window.location.hostname
+    // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
     document.cookie = `${name}=; ${expires}; path=${path}; domain=${currentDomain};`
 
-    // Also try with root domain (for subdomains)
     if (currentDomain.split('.').length > 2) {
       const rootDomain = currentDomain.split('.').slice(-2).join('.')
+      // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
       document.cookie = `${name}=; ${expires}; path=${path}; domain=.${rootDomain};`
     }
   }
 
-  // Also try with different paths
+  // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
   document.cookie = `${name}=; ${expires}; path=/;`
 }
 

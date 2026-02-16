@@ -1,4 +1,3 @@
-import { Typography } from 'antd'
 import confetti from 'canvas-confetti'
 import { ArrowRightIcon, CakeIcon, ClockIcon, GiftIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -10,8 +9,6 @@ import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscripti
 import TwitchChat from '@/components/TwitchChat'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
-
-const { Paragraph } = Typography
 
 const GiftSuccessPage: NextPageWithLayout = () => {
   const router = useRouter()

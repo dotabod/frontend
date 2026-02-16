@@ -27,7 +27,6 @@ import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { Card } from '@/ui/card'
 
 const { Title } = Typography
-const { TextArea } = Input
 
 interface FormValues {
   message: string

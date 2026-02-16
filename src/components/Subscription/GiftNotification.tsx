@@ -3,7 +3,7 @@ import { App, Space, Typography } from 'antd'
 import type React from 'react'
 import { useEffect } from 'react'
 
-const { Text, Paragraph } = Typography
+const { Text } = Typography
 
 interface GiftNotificationProps {
   senderName: string
@@ -21,7 +21,6 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
   giftType,
   giftQuantity = 1,
   onDismiss,
-  hasLifetime = false,
   totalNotifications = 1,
 }) => {
   // Use App's notification API

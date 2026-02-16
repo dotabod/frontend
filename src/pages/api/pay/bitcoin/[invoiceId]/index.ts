@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const invoice = await stripe.invoices.retrieve(invoiceId)
     if (
       !invoice ||
-      !['draft', 'open'].includes(invoice.status!) ||
+      !['draft', 'open'].includes(invoice.status ?? '') ||
       (invoice.amount_remaining || 0) <= 0
     ) {
       res.status(400).json({ error: 'Invoice not payable' })

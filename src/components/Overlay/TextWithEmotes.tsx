@@ -23,6 +23,7 @@ export const TextWithEmotes = ({ emotes, text }: { emotes: Emotes; text: string 
     const emote = emotes.find((e) => e.code === word)
     if (emote) {
       return (
+        // biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
         <img
           key={emote.id}
           src={emote.cdn.medium}

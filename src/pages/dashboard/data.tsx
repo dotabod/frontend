@@ -10,7 +10,7 @@ import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 
-const { Title, Text, Paragraph } = Typography
+const { Text, Paragraph } = Typography
 const { confirm } = Modal
 
 const DataPage = () => {

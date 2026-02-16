@@ -122,6 +122,7 @@ const NotFound: NextPageWithLayout = () => {
       </main>
       <div className='hidden lg:relative lg:col-start-2 lg:row-start-1 lg:row-end-4 lg:block'>
         <div className='absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10' />
+        {/* biome-ignore lint/performance/noImgElement: Static 404 page image, next/image optimization unnecessary */}
         <img
           src='/images/404.webp'
           alt='Lost in space illustration'

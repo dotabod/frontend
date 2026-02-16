@@ -93,6 +93,7 @@ export default function ModeratedChannels() {
 
   const renderOptionLabel = (imageSrc, name) => (
     <div className='flex flex-row items-center gap-2'>
+      {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
       <img
         alt='User Profile'
         width={30}

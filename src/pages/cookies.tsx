@@ -1,4 +1,4 @@
-import { Button, Collapse, Space, Table, Tag, Typography } from 'antd'
+import { Button, Collapse, Space, Table, Tag } from 'antd'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { getCookieCategories } from '@/components/CookieConsent'
@@ -6,7 +6,6 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { showCookieConsentBanner, showCookieConsentSettings } from '@/lib/cookieManager'
 import type { NextPageWithLayout } from '@/pages/_app'
 
-const { Title, Paragraph, Text } = Typography
 const { Panel } = Collapse
 
 // Simple component to manage cookie preferences via the banner

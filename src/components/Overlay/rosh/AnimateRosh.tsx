@@ -17,6 +17,7 @@ interface AnimateRoshProps {
 
 export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshProps) => {
   const isDevMode = useIsDevMode()
+  const { data: isEnabled } = useUpdateSetting(Settings.rosh)
 
   if (!roshan) return null
 
@@ -27,8 +28,6 @@ export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshPr
     onComplete,
     paused,
   }
-
-  const { data: isEnabled } = useUpdateSetting(Settings.rosh)
 
   if (!isEnabled || (block.type !== 'playing' && !isDevMode)) {
     return null

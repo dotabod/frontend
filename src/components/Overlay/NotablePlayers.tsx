@@ -33,9 +33,9 @@ export const NotablePlayers = ({
   return (
     <div id='notable-players'>
       {(players || []).map((player, i) => {
-        const FlagComp = player.country_code
-          ? Flags[`${player.country_code.toUpperCase()}Flag`]
-          : null
+        const flagKey = `${player.country_code?.toUpperCase()}Flag`
+        // biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
+        const FlagComp = player.country_code ? Flags[flagKey] : null
 
         return (
           <PlayerTopbar key={i} position={player.position}>

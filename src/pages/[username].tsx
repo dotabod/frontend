@@ -231,6 +231,7 @@ const PageContent = ({
       <div className='p-6'>
         <div className='mb-12 space-y-4'>
           <div className='flex flex-row flex-wrap items-center space-x-2'>
+            {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
             <img
               onError={(e) => {
                 e.currentTarget.src = '/images/hero/default.png'

@@ -72,19 +72,14 @@ const CryptoToggle = memo(
               payWithCrypto && 'crypto-switch',
             )}
           />
-          <span
+          <button
+            type='button'
             className={clsx(
-              'text-xs ml-2 cursor-pointer transition-all duration-300',
+              'text-xs ml-2 cursor-pointer transition-all duration-300 bg-transparent border-0 p-0 font-inherit',
               featured ? 'text-purple-300' : 'text-gray-400',
               payWithCrypto && 'text-purple-300 font-medium',
             )}
             onClick={() => setPayWithCrypto(!payWithCrypto)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setPayWithCrypto(!payWithCrypto)
-              }
-            }}
           >
             {payWithCrypto ? (
               <span className='flex items-center gap-1' key='crypto-pay-on'>
@@ -95,7 +90,7 @@ const CryptoToggle = memo(
             ) : (
               <span key='crypto-pay-off'>Pay with Crypto</span>
             )}
-          </span>
+          </button>
           <Popover
             content={
               <div className='max-w-xs'>

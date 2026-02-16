@@ -27,9 +27,7 @@ const PollColors = [
   '#c60000',
 ]
 const PollTimer = ({ minutes, seconds, completed }) =>
-  completed ? (
-    <></>
-  ) : (
+  completed ? null : (
     <span className='font-outline-2 text-slate-50'>
       {zeroPad(minutes)}:{zeroPad(seconds)}
     </span>

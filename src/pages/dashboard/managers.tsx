@@ -39,7 +39,7 @@ const ModeratorsPage = () => {
   >('/api/get-moderators', fetcher)
 
   // Fetch moderated channels to determine if user is a mod
-  const { data: moderatedChannels, isLoading: loadingModeratedChannels } = useSWR<
+  useSWR<
     {
       providerAccountId: string
       name: string

@@ -10,8 +10,7 @@ import { plans } from '../Billing/BillingPlans'
 
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const { data } = useSession()
-  const { subscription, isLifetimePlan, hasActivePlan, inGracePeriod, isLoading } =
-    useSubscriptionContext()
+  const { subscription, hasActivePlan, inGracePeriod, isLoading } = useSubscriptionContext()
   const currentPlan = plans.find((plan) => plan.tier === subscription?.tier)
 
   // Check if a credit balance exists

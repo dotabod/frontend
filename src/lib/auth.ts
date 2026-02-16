@@ -240,7 +240,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ token, session, ...rest }) {
+    async session({ token, session }) {
       if (token) {
         const encryptedId = await encode({
           token: {

@@ -5,7 +5,7 @@ import { DisableReasonAlerts } from './DisableReasonAlert'
 const { Title, Text } = Typography
 
 export function DisableReasonsDashboard() {
-  const { data, loading, unacknowledgedCount, unresolvedCount } = useDisableReasons()
+  const { data, loading, unacknowledgedCount } = useDisableReasons()
 
   if (loading) {
     return (

@@ -647,6 +647,7 @@ const VerifyPage: NextPageWithLayout = () => {
                       <Skeleton.Avatar active size={56} shape='circle' />
                     ) : account.profile && account.profile.rank_tier > 0 ? (
                       <Space align='center'>
+                        {/* biome-ignore lint/performance/noImgElement: Dynamic rank image URL from external API */}
                         <img
                           src={getRankImageUrl(account.profile.rank_tier)}
                           alt='Rank Medal'

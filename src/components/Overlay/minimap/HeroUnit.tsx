@@ -23,6 +23,7 @@ const HeroUnit = ({ data, team }) => {
       style={{ bottom: data.yposP, left: data.xposP, ...rotation }}
     >
       {isBrewling && (
+        // biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
         <img
           className={`icon ${isEnemy ? 'enemy' : ''}`}
           src={getBrewlingIcon()}

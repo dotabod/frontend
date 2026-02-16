@@ -38,6 +38,7 @@ const Building = ({ data, team }) => {
       className={`container-building ${isXL ? 'xl' : ''}`}
       style={{ bottom: data.yposP, left: data.xposP }}
     >
+      {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
       <img
         className={`icon ${buildingType()}`}
         src={`/images/overlay/minimap/blocker/icons/buildings/${

@@ -21,7 +21,7 @@ import CodeBlock from './CodeBlock'
 
 const { Step } = Steps
 
-const InstallationSteps = ({ success, currentStep, errorWithoutSuccess }) => {
+const InstallationSteps = ({ success: _success, currentStep, errorWithoutSuccess }) => {
   const steps = [
     {
       title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',

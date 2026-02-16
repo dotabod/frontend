@@ -244,7 +244,7 @@ const faqs = [
         />
         <StepComponent
           steps={[
-            <PowerShellSetupStep />,
+            <PowerShellSetupStep key={0} />,
             <span key={1}>
               <strong>Check cfg file location</strong>
               <div className='mt-1 text-sm'>

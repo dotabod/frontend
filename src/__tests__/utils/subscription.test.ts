@@ -31,22 +31,6 @@ vi.mock('@/lib/db', () => ({
 import prisma from '@/lib/db'
 import { getSubscription } from '@/utils/subscription'
 
-// Define an interface for the virtual subscription that includes isVirtual property
-interface VirtualSubscription {
-  tier: SubscriptionTier
-  status: SubscriptionStatus
-  transactionType: TransactionType
-  currentPeriodEnd: Date
-  cancelAtPeriodEnd: boolean
-  stripePriceId: string
-  stripeCustomerId: string
-  createdAt: Date
-  stripeSubscriptionId: null
-  giftDetails: null
-  isVirtual: boolean
-  isGracePeriodVirtual: boolean
-}
-
 describe('Subscription priority logic', () => {
   it('should prioritize non-gift active subscription over gift subscription', async () => {
     // Setup test data

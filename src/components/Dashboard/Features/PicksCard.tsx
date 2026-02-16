@@ -6,7 +6,7 @@ import { Card } from '@/ui/card'
 import { TierSwitch } from './TierSwitch'
 
 export default function PicksCard() {
-  const { data: isEnabled, loading, updateSetting } = useUpdateSetting(Settings['picks-blocker'])
+  const { data: isEnabled } = useUpdateSetting(Settings['picks-blocker'])
 
   return (
     <Card title='Picks' feature='picks-blocker'>

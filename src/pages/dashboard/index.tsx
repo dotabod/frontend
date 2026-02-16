@@ -21,7 +21,7 @@ import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
 
-const { Title, Text, Paragraph } = Typography
+const { Title, Paragraph } = Typography
 
 // Custom crypto confetti function
 const triggerCryptoConfetti = () => {

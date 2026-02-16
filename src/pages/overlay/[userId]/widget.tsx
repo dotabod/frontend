@@ -22,10 +22,6 @@ interface WidgetPageProps {
 }
 
 function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
-  if (maintenanceBlank) {
-    return null
-  }
-
   const { mutate } = useUpdateSetting(Settings.commandWL)
   const router = useRouter()
   const { userId } = router.query
@@ -53,6 +49,7 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
   })
 
   useEffect(() => {
+    if (maintenanceBlank) return
     if (!userId) return
 
     console.log('Connecting to socket init...')
@@ -80,17 +77,20 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
         notLoaded: false,
       })
     })
-  }, [userId])
+  }, [maintenanceBlank, userId])
 
   useEffect(() => {
+    if (maintenanceBlank) return
+
     return () => {
       socket?.off('update-wl')
       socket?.off('refresh-settings')
       socket?.off('update-medal')
     }
-  }, [])
+  }, [maintenanceBlank])
 
   useEffect(() => {
+    if (maintenanceBlank) return
     if (!original) return
 
     const steamAccount = original.SteamAccount?.[0]
@@ -106,7 +106,11 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
     }
 
     setRankImageDetails(rankDetails)
-  }, [original])
+  }, [maintenanceBlank, original])
+
+  if (maintenanceBlank) {
+    return null
+  }
 
   return (
     <div>

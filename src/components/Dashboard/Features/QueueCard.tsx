@@ -11,11 +11,9 @@ import { TierSwitch } from './TierSwitch'
 export default function QueueCard() {
   const { data: isEnabled, loading } = useUpdateSetting(Settings.queueBlocker)
   const { data: isFindingMatchEnabled } = useUpdateSetting(Settings.queueBlockerFindMatch)
-  const {
-    data: findMatchText,
-    updateSetting: updateFindMatchText,
-    tierAccess,
-  } = useUpdateSetting(Settings.queueBlockerFindMatchText)
+  const { data: findMatchText, updateSetting: updateFindMatchText } = useUpdateSetting(
+    Settings.queueBlockerFindMatchText,
+  )
 
   const [form] = Form.useForm()
   useEffect(() => form.resetFields(), [findMatchText])

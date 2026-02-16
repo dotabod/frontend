@@ -12,6 +12,7 @@ export default function IdeaCard() {
         <a href='https://discord.dotabod.com'>Tell us on Discord</a> what you&apos;d like to see!
       </div>
       <div className='flex flex-col items-center space-y-4'>
+        {/* biome-ignore lint/performance/noImgElement: Base64 data URI image, not compatible with next/image */}
         <img
           className={clsx(
             'h-[150px]! w-[400px]! rounded-xl border-2 border-transparent transition-all',

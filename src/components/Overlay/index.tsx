@@ -52,12 +52,6 @@ const isInvalidLocalCheck = checkForInvalidOverlay(
 )
 
 const OverlayPage = () => {
-  // Immediately render the invalid page without expensive hooks if URL is known to be invalid
-  // This specific check might become redundant if _app.tsx handles it robustly.
-  if (isInvalidLocalCheck) {
-    return <InvalidOverlayPage />
-  }
-
   const { notification } = App.useApp()
   const { data: isDotabodDisabled, mutate: refreshSettings } = useUpdateSetting(
     Settings.commandDisable,
@@ -264,6 +258,11 @@ const OverlayPage = () => {
   })
 
   useOBS({ block, connected })
+
+  // This specific check might become redundant if _app.tsx handles it robustly.
+  if (isInvalidLocalCheck) {
+    return <InvalidOverlayPage />
+  }
 
   if (is404) {
     // Return minimal content for 404s to reduce resource usage

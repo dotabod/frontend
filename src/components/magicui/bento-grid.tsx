@@ -27,7 +27,6 @@ const BentoCard = ({
   background,
   Icon,
   description,
-  href,
   cta,
   disableHover = true,
 }: BentoGridItemProps) => (

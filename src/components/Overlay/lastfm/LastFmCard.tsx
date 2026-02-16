@@ -179,6 +179,7 @@ const LastFmCard = ({
           >
             {track.albumArt && (
               <div className='relative'>
+                {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
                 <motion.img
                   src={getImageSrc()}
                   alt={`${track.album || 'Album'} cover`}

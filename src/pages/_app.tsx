@@ -66,11 +66,6 @@ const clientCache = createCache()
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
   const router = useRouter()
 
-  // Guard against undefined Component
-  if (!Component) {
-    return <div>Loading...</div>
-  }
-
   const isPublicOverlayRoute = router.pathname === '/overlay/[userId]'
 
   useEffect(() => {
@@ -81,9 +76,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
     }
   }, [router])
 
-  // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout ?? ((page) => page)
-
   // Fix for hydration issues
   const [mounted, setMounted] = useState(false)
   // Get cookie preferences
@@ -92,6 +84,14 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Guard against undefined Component
+  if (!Component) {
+    return <div>Loading...</div>
+  }
+
+  // Use the layout defined at the page level, if available
+  const getLayout = Component.getLayout ?? ((page) => page)
 
   // Use a simple layout during SSR, and the full layout after mounting on the client
   const content = (

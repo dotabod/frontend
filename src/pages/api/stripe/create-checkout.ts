@@ -9,9 +9,6 @@ import { generatePaylinkUrl } from '@/lib/paylink'
 import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 
-// Add crypto as a supported payment method type
-type ExtendedPaymentMethodType = Stripe.Checkout.SessionCreateParams.PaymentMethodType | 'crypto'
-
 interface CheckoutRequestBody {
   priceId: string
   period?: string
@@ -304,7 +301,6 @@ async function createOpenNodeInvoice(
     image,
     locale,
     twitchId,
-    referer,
     tx,
   } = params
 

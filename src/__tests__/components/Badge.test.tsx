@@ -11,7 +11,8 @@ vi.mock('@/lib/hooks/useTransformRes', () => ({
 vi.mock('next/image', () => ({
   default: (props: any) => {
     // Just pass all props to the img element
-    // biome-ignore lint/a11y/useAltText: <explanation>
+    // biome-ignore lint/a11y/useAltText: test mock img element
+    // biome-ignore lint/performance/noImgElement: test mock for next/image
     return <img data-testid={props['data-testid'] || 'mock-image'} {...props} />
   },
 }))

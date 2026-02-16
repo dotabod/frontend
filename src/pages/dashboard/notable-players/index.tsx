@@ -177,6 +177,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       dataIndex: 'country_code',
       key: 'country_code',
       render: (text) => {
+        // biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
         const FlagComp = text ? Flags[`${text.toUpperCase()}Flag`] : null
         return FlagComp ? <FlagComp w={30} radius={2} /> : '-'
       },

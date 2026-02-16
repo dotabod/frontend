@@ -10,7 +10,7 @@ import { selectStatus } from '@/lib/redux/store'
 import { motionProps } from '@/ui/utils'
 import Minimap from '../minimap'
 
-const OriginalMinimapBlocker = ({ block }: { block: blockType }) => {
+const OriginalMinimapBlocker = ({ block: _block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: opacityLevel } = useUpdateSetting<number>(Settings['minimap-opacity'])

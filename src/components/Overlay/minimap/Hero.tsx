@@ -45,6 +45,7 @@ function Hero({ data, team }) {
       {!(isBrewmaster && hasBrewlings) && (
         <>
           {displayType === 'custom' && (
+            // biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
             <img
               title={data.name}
               alt='hero icon'
@@ -55,6 +56,7 @@ function Hero({ data, team }) {
               src={pointerIcon}
             />
           )}
+          {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
           <img
             title={data.name}
             alt='hero icon'

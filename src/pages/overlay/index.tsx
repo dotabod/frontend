@@ -13,15 +13,13 @@ interface OverlayPageProps {
 }
 
 const OverlayPage = ({ maintenanceBlank }: OverlayPageProps) => {
-  if (maintenanceBlank) {
-    return null
-  }
-
   const { data } = useSession()
   const [scale, setScale] = useState(1) // Initial scale is 1
   const [isLoading, setIsLoading] = useState(true) // Initial state is loading
 
   useEffect(() => {
+    if (maintenanceBlank) return
+
     const resizeListener = () => {
       // Assuming headerHeight and sideNavWidth are known or can be dynamically calculated
       const headerHeight = 309 // Example height of the header
@@ -47,7 +45,11 @@ const OverlayPage = ({ maintenanceBlank }: OverlayPageProps) => {
 
     // Cleanup function to remove event listener
     return () => window.removeEventListener('resize', resizeListener)
-  }, [])
+  }, [maintenanceBlank])
+
+  if (maintenanceBlank) {
+    return null
+  }
 
   // Calculate scaled dimensions
   const scaledWidth = 1920 * scale

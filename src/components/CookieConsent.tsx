@@ -7,7 +7,6 @@ import {
   Drawer,
   Space,
   Table,
-  Tabs,
   Tag,
   Typography,
 } from 'antd'
@@ -17,7 +16,6 @@ import { useEffect, useState } from 'react'
 import { COOKIE_EVENTS, type CookiePreferences, useCookiePreferences } from '@/lib/cookieManager'
 
 const { Title, Paragraph } = Typography
-const { TabPane } = Tabs
 
 // Define window with our custom properties
 declare global {

@@ -34,11 +34,7 @@ interface SubscriptionWithMetadata {
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { data: session } = useSession()
-  const {
-    subscription: rawSubscription,
-    creditBalance: contextCreditBalance,
-    formattedCreditBalance,
-  } = useSubscriptionContext()
+  const { subscription: rawSubscription } = useSubscriptionContext()
 
   // Cast subscription to the type with metadata
   const subscription = rawSubscription as unknown as SubscriptionWithMetadata

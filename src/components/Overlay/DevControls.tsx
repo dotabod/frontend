@@ -193,7 +193,11 @@ export const DevControls = ({
       }}
       className='flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
     >
+      {/* biome-ignore lint/a11y/useSemanticElements: Draggable handle for window positioning */}
       <div
+        role='button'
+        tabIndex={0}
+        aria-label='Drag to move window'
         onMouseDown={handleMouseDown}
         className='absolute top-0 right-0 left-0 h-6 bg-gray-800/50 rounded-t-lg flex items-center justify-center text-xs text-gray-400 cursor-move select-none'
       >

@@ -10,11 +10,7 @@ import { TierSwitch } from './Features/TierSwitch'
 
 const Toggle = () => {
   const { data } = useSWR('/api/check-ban', fetcher, SETTINGS_SWR_OPTIONS)
-  const {
-    data: isDotabodDisabled,
-    loading,
-    updateSetting,
-  } = useUpdateSetting(Settings.commandDisable)
+  const { data: isDotabodDisabled, updateSetting } = useUpdateSetting(Settings.commandDisable)
 
   const checkBanOrDisable = isDotabodDisabled || data?.banned
 
