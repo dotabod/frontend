@@ -1,5 +1,6 @@
 import { captureException } from '@sentry/nextjs'
-import { Layout, Menu, type MenuProps, Tag, theme } from 'antd'
+import { CopyButton } from '@mantine/core'
+import { Button, Layout, Menu, type MenuProps, Tag, theme } from 'antd'
 import clsx from 'clsx'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -20,6 +21,7 @@ import GiftNotification from '@/components/Subscription/GiftNotification'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
+import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import { navigation } from './navigation'
@@ -120,6 +122,7 @@ export default function DashboardShell({
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [broken, setBroken] = useState(false)
+  const copyOverlayUrl = useBaseUrl(`overlay/${data?.user?.id ?? ''}`)
   const {
     token: { colorBgLayout },
   } = theme.useToken()
@@ -395,7 +398,19 @@ export default function DashboardShell({
               <SettingsSearch />
             </div>
 
-            <div className='w-fit py-2'>
+            <div className='flex w-fit items-center gap-3 py-2'>
+              <CopyButton value={copyOverlayUrl}>
+                {({ copied, copy }) => (
+                  <Button
+                    type='dashed'
+                    size='small'
+                    className={clsx(copied && 'border-green-600! text-green-600!')}
+                    onClick={copy}
+                  >
+                    {copied ? 'Overlay URL copied' : 'Copy Overlay URL'}
+                  </Button>
+                )}
+              </CopyButton>
               <UserAccountNav />
             </div>
           </Header>
