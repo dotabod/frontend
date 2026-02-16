@@ -1,7 +1,19 @@
 import type { PollData } from '@/components/Overlay/PollOverlay'
 
-// Enable dev mode when explicitly enabled via localStorage
-export const isDev = typeof localStorage !== 'undefined' && localStorage.getItem('isDev') === 'true'
+const DEV_MODE_STORAGE_KEY = 'isDev'
+
+export const isDev = () => {
+  if (typeof window === 'undefined') return false
+
+  const storage = window.localStorage
+  if (!storage || typeof storage.getItem !== 'function') return false
+
+  try {
+    return storage.getItem(DEV_MODE_STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
 
 export type blockType = {
   matchId: number | null

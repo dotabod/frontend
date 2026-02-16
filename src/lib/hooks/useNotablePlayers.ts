@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { NotablePlayer } from '@/components/Overlay/NotablePlayers'
 import { isDev } from '@/lib/devConsts'
 
@@ -53,7 +53,13 @@ const devPlayers: NotablePlayer[] = [
 ]
 
 export const useNotablePlayers = () => {
-  const [notablePlayers, setNotablePlayers] = useState<NotablePlayer[]>(isDev ? devPlayers : [])
+  const [notablePlayers, setNotablePlayers] = useState<NotablePlayer[]>([])
+
+  useEffect(() => {
+    if (!isDev()) return
+
+    setNotablePlayers(devPlayers)
+  }, [])
 
   return { notablePlayers, setNotablePlayers }
 }

@@ -15,14 +15,14 @@ import type { PollData } from '@/components/Overlay/PollOverlay'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import { Settings } from '@/lib/defaultSettings'
 import {
-  type blockType,
-  devBlockTypes,
-  devPoll,
-  devRadiantWinChance,
-  devRank,
-  devWL,
-  isDev,
+    type blockType,
+    devBlockTypes,
+    devPoll,
+    devRadiantWinChance,
+    devRank,
+    devWL,
 } from '@/lib/devConsts'
+import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { useOBS } from '@/lib/hooks/useOBS'
@@ -109,6 +109,7 @@ const OverlayPage = () => {
   })
 
   const [isInIframe, setIsInIframe] = useState(false)
+  const isDevMode = useIsDevMode()
   const is404 = error && typeof error === 'object' && 'status' in error && error.status === 404
 
   // Add detection for OBS environment
@@ -239,13 +240,13 @@ const OverlayPage = () => {
   }, [error, notification, is404, original])
 
   useEffect(() => {
-    if (!isDev) return
+    if (!isDevMode) return
     setWL(devWL)
     setPollData(devPoll)
     setBlock(devBlockTypes)
     setRankImageDetails(devRank)
     setRadiantWinChance(devRadiantWinChance)
-  }, [])
+  }, [isDevMode])
 
   useSocket({
     setAegis,
@@ -286,7 +287,7 @@ const OverlayPage = () => {
   }
 
   if (isDotabodDisabled) {
-    return isDev ? (
+    return isDevMode ? (
       <>
         <motion.div
           className={clsx('absolute right-0 mt-9 block max-w-xs')}
@@ -402,7 +403,7 @@ const OverlayPage = () => {
           notablePlayers={notablePlayers}
         />
 
-        {isDev && showDevImage && (
+        {isDevMode && showDevImage && (
           <Image
             key='dev-image'
             width={width}

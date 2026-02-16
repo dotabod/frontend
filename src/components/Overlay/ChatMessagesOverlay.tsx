@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
-import { isDev } from '@/lib/devConsts'
+import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import type { ChatMessage } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -14,12 +14,13 @@ interface Position {
 }
 
 export const ChatMessagesOverlay = ({ chatMessages }: { chatMessages: ChatMessage[] }) => {
+  const isDevMode = useIsDevMode()
   const res = useTransformRes({ returnInput: false })
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const { data: isEnabled } = useUpdateSetting(Settings.autoTranslate)
 
   // Show messages if autoTranslate is enabled OR if we're in dev mode (for testing)
-  if (chatMessages.length === 0 || (!isEnabled && !isDev)) return null
+  if (chatMessages.length === 0 || (!isEnabled && !isDevMode)) return null
 
   const styles: Position = {
     bottom: res({

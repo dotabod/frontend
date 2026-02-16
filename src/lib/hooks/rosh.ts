@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isDev } from '@/lib/devConsts'
 
 const devTotalTimer = 480000
@@ -16,10 +16,20 @@ interface AegisState {
 
 export const useRoshan = () => {
   const [roshan, setRoshan] = useState<RoshanState>({
-    minS: isDev ? devTotalTimer / 1000 : 0,
-    maxS: isDev ? devTotalTimer / 1000 : 0,
-    count: isDev ? 1 : 0,
+    minS: 0,
+    maxS: 0,
+    count: 0,
   })
+
+  useEffect(() => {
+    if (!isDev()) return
+
+    setRoshan({
+      minS: devTotalTimer / 1000,
+      maxS: devTotalTimer / 1000,
+      count: 1,
+    })
+  }, [])
 
   const safeSetRoshan = (value: RoshanState | ((prev: RoshanState) => RoshanState)) => {
     if (value) {
@@ -32,9 +42,18 @@ export const useRoshan = () => {
 
 export const useAegis = () => {
   const [aegis, setAegis] = useState<AegisState>({
-    expireS: isDev ? 300 : 0,
-    playerId: isDev ? 5 : null,
+    expireS: 0,
+    playerId: null,
   })
+
+  useEffect(() => {
+    if (!isDev()) return
+
+    setAegis({
+      expireS: 300,
+      playerId: 5,
+    })
+  }, [])
 
   const safeSetAegis = (value: AegisState | ((prev: AegisState) => AegisState)) => {
     if (value) {

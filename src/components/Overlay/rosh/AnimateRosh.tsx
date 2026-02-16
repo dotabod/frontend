@@ -1,6 +1,7 @@
 import { RoshCounter } from '@/components/Overlay/rosh/RoshCounter'
 import { Settings } from '@/lib/defaultSettings'
-import { type blockType, isDev } from '@/lib/devConsts'
+import { type blockType } from '@/lib/devConsts'
+import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 interface AnimateRoshProps {
@@ -15,6 +16,8 @@ interface AnimateRoshProps {
 }
 
 export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshProps) => {
+  const isDevMode = useIsDevMode()
+
   if (!roshan) return null
 
   const props = {
@@ -27,7 +30,7 @@ export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshPr
 
   const { data: isEnabled } = useUpdateSetting(Settings.rosh)
 
-  if (!isEnabled || (block.type !== 'playing' && !isDev)) {
+  if (!isEnabled || (block.type !== 'playing' && !isDevMode)) {
     return null
   }
 

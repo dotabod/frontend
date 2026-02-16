@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { isDev } from '@/lib/devConsts'
+import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useDynamicResizing, useWindowResize } from './hooks'
 export const TopHud = styled.div`
   position: absolute;
@@ -21,8 +21,8 @@ export const TeamContainer = styled.div`
   gap: 1px;
 `
 
-export const TopHudHero = styled.div<{ $isRadiant: boolean }>`
-  ${isDev ? 'border: 1px solid red;' : ''}
+export const TopHudHero = styled.div<{ $isRadiant: boolean; $isDevMode: boolean }>`
+  ${({ $isDevMode }) => ($isDevMode ? 'border: 1px solid red;' : '')}
   cursor: pointer;
   height: 40px;
   width: 60px;
@@ -59,8 +59,8 @@ const UltrawideContentWrap = styled.div`
   overflow: visible;
 `
 
-export const Clock = styled.div`
-  ${isDev ? 'border: 1px solid red;' : ''}
+export const Clock = styled.div<{ $isDevMode: boolean }>`
+  ${({ $isDevMode }) => ($isDevMode ? 'border: 1px solid red;' : '')}
   width: 205px;
 `
 
@@ -109,6 +109,7 @@ export const InGameOutsideCenterV2 = ({ children }: { children: React.ReactNode 
 export const InGameV2 = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)
+  const isDevMode = useIsDevMode()
 
   useWindowResize(resizeHandler)
 
@@ -131,17 +132,17 @@ export const InGameV2 = ({ children }: { children: React.ReactNode }) => {
           <TeamContainer>
             {heroIndicesRadiant.map((heroId) => (
               <React.Fragment key={heroId}>
-                <TopHudHero $isRadiant />
+                <TopHudHero $isRadiant $isDevMode={isDevMode} />
               </React.Fragment>
             ))}
           </TeamContainer>
 
-          <Clock />
+          <Clock $isDevMode={isDevMode} />
 
           <TeamContainer>
             {heroIndicesDire.map((heroId) => (
               <React.Fragment key={heroId}>
-                <TopHudHero $isRadiant={false} />
+                <TopHudHero $isRadiant={false} $isDevMode={isDevMode} />
               </React.Fragment>
             ))}
           </TeamContainer>

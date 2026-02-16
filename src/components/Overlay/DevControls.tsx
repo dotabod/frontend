@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
-import { type blockType, isDev } from '@/lib/devConsts'
+import { type blockType } from '@/lib/devConsts'
+import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import type { ChatMessage } from '@/lib/hooks/useSocket'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
@@ -27,9 +28,8 @@ export const DevControls = ({
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const router = useRouter()
-  const [devModeEnabled, setDevModeEnabled] = useState(
-    typeof localStorage !== 'undefined' && localStorage.getItem('isDev') === 'true',
-  )
+  const isDevMode = useIsDevMode()
+  const [devModeEnabled, setDevModeEnabled] = useState(false)
   const [testChatMessage, setTestChatMessage] = useState('')
 
   // Ref to store timeout IDs for chat message cleanup (same as socket handler)
@@ -83,11 +83,16 @@ export const DevControls = ({
   const handleDevModeToggle = (e: CheckboxChangeEvent) => {
     const isEnabled = e.target.checked
     setDevModeEnabled(isEnabled)
+    const storage = window.localStorage
+
     if (isEnabled) {
-      localStorage.setItem('isDev', 'true')
-    } else {
-      localStorage.removeItem('isDev')
+      if (storage && typeof storage.setItem === 'function') {
+        storage.setItem('isDev', 'true')
+      }
+    } else if (storage && typeof storage.removeItem === 'function') {
+      storage.removeItem('isDev')
     }
+
     router.reload()
   }
 
@@ -154,6 +159,10 @@ export const DevControls = ({
   }
 
   useEffect(() => {
+    setDevModeEnabled(isDevMode)
+  }, [isDevMode])
+
+  useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseup', handleMouseUp)
@@ -171,7 +180,7 @@ export const DevControls = ({
     }
   }, [isDragging, handleMouseMove, handleMouseUp])
 
-  if (!isDev) return null
+  if (!isDevMode) return null
 
   return (
     <motion.div
@@ -311,11 +320,17 @@ export const DevControls = ({
 // Dev mode toggle button for development environment
 export const DevModeToggle = () => {
   const router = useRouter()
+  const isDevMode = useIsDevMode()
 
-  if (typeof process === 'undefined' || process.env.NODE_ENV !== 'development' || isDev) return null
+  if (typeof process === 'undefined' || process.env.NODE_ENV !== 'development' || isDevMode)
+    return null
 
   const enableDevMode = () => {
-    localStorage.setItem('isDev', 'true')
+    const storage = window.localStorage
+    if (storage && typeof storage.setItem === 'function') {
+      storage.setItem('isDev', 'true')
+    }
+
     router.reload()
   }
 

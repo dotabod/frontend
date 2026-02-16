@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import styled from 'styled-components'
-import { isDev } from '@/lib/devConsts'
+import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useDynamicResizing, useWindowResize } from './hooks'
 
 export const TopHud = styled.div`
@@ -22,8 +22,8 @@ export const TeamContainer = styled.div`
   gap: 7px;
 `
 
-export const TopHudHero = styled.div<{ $isRadiant: boolean }>`
-  ${isDev ? 'border: 1px solid red;' : ''}
+export const TopHudHero = styled.div<{ $isRadiant: boolean; $isDevMode: boolean }>`
+  ${({ $isDevMode }) => ($isDevMode ? 'border: 1px solid red;' : '')}
   cursor: pointer;
   height: 73px;
   width: 115px;
@@ -50,12 +50,13 @@ const ContentWrap = styled.div`
   transform: translate(-50%, -40%);
 `
 
-export const Clock = styled.div`
+export const Clock = styled.div<{ $isDevMode: boolean }>`
   width: 281px;
-  ${isDev ? 'border: 1px solid red;' : ''}
+  ${({ $isDevMode }) => ($isDevMode ? 'border: 1px solid red;' : '')}
 `
 
 export const PickScreenV2 = () => {
+  const isDevMode = useIsDevMode()
   const heroIndicesRadiant = [0, 1, 2, 3, 4]
   const heroIndicesDire = [5, 6, 7, 8, 9]
 
@@ -64,17 +65,17 @@ export const PickScreenV2 = () => {
       <TeamContainer id='pick-screen-radiant-team'>
         {heroIndicesRadiant.map((heroId) => (
           <React.Fragment key={heroId}>
-            <TopHudHero $isRadiant />
+            <TopHudHero $isRadiant $isDevMode={isDevMode} />
           </React.Fragment>
         ))}
       </TeamContainer>
 
-      <Clock id='pick-screen-clock' />
+      <Clock id='pick-screen-clock' $isDevMode={isDevMode} />
 
       <TeamContainer id='pick-screen-dire-team'>
         {heroIndicesDire.map((heroId) => (
           <React.Fragment key={heroId}>
-            <TopHudHero $isRadiant={false} />
+            <TopHudHero $isRadiant={false} $isDevMode={isDevMode} />
           </React.Fragment>
         ))}
       </TeamContainer>
