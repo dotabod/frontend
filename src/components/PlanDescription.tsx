@@ -36,9 +36,7 @@ export const PlanDescription = ({
   useEffect(() => {
     // Calculate days remaining if in grace period
     if (isInGracePeriod()) {
-      setDaysRemaining(
-        Math.ceil((GRACE_PERIOD_END.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)),
-      )
+      setDaysRemaining(Math.ceil((GRACE_PERIOD_END.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     }
 
     // Determine which message to show

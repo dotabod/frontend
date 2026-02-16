@@ -150,7 +150,7 @@ const SetupPage = () => {
   const maxStepIndex = 3
 
   useEffect(() => {
-    const parsedStep = Number.parseInt(router.query.step as string)
+    const parsedStep = Number.parseInt(router.query.step as string, 10)
 
     setActive(
       !Number.isNaN(parsedStep) && parsedStep > 0 ? Math.min(parsedStep - 1, maxStepIndex) : 0,

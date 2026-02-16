@@ -22,7 +22,7 @@ export const usePlayerPositions = () => {
   // repeat(5, 111px) 356px repeat(5, 111px)
   const playerPositions = [
     ...firstFive, // left
-    ...firstFive.map((w, i) => w + gapSize), // right
+    ...firstFive.map((w, _i) => w + gapSize), // right
   ].map((w) => res({ w }))
 
   return { playerPositions }

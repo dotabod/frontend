@@ -83,7 +83,7 @@ export async function queryLnaPermission(): Promise<LnaPermissionState> {
       name: 'local-network-access' as PermissionName,
     })
     return result.state as LnaPermissionState
-  } catch (error) {
+  } catch (_error) {
     // Permission name not recognized or other error
     return 'unsupported'
   }

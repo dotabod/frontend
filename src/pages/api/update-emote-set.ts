@@ -59,7 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let stvResponse: any = null
     try {
       stvResponse = await get7TVUser(twitchId)
-    } catch (error) {
+    } catch (_error) {
       return res.status(404).json({ message: '7TV user not found' })
     }
 
@@ -115,7 +115,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.log('Adding emotes to emote set...')
       const failedEmotes: Array<{ name: string; error: unknown }> = []
       await Promise.all(
-        emotesRequired.map(async (emote, index) => {
+        emotesRequired.map(async (emote, _index) => {
           try {
             console.log(`Adding emote ${emote.label}...`)
             await client.request(CHANGE_EMOTE_IN_SET, {

@@ -24,7 +24,7 @@ const GiftSubscriptionAlert = ({
   preview = false,
 }: GiftSubscriptionAlertProps) => {
   const [visible, setVisible] = useState(true)
-  const res = useTransformRes()
+  const _res = useTransformRes()
 
   // Format the gift type for display
   const formatGiftType = () => {

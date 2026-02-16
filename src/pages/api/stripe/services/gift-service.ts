@@ -52,7 +52,7 @@ export class GiftService {
 
           // Get the payment amount from the checkout session
           const paymentAmount = session.amount_total || 0
-          const currency = session.currency || 'usd'
+          const _currency = session.currency || 'usd'
 
           // Find the recipient user
           const recipientUser = await this.tx.user.findUnique({
@@ -178,7 +178,7 @@ export class GiftService {
                   },
                 )
 
-                const result = await autoApplyResponse.json()
+                const _result = await autoApplyResponse.json()
               } catch (autoApplyError) {
                 console.error('Failed to auto-apply gift credits:', autoApplyError)
                 // Don't fail the overall process if auto-apply fails

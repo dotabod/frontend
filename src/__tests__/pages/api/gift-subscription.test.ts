@@ -181,7 +181,7 @@ describe('Gift Subscription Functions', () => {
       vi.mocked(isInGracePeriod).mockReturnValue(true)
 
       const now = new Date('2023-06-15')
-      const gracePeriodEnd = new Date('2025-04-30T23:59:59.999Z')
+      const _gracePeriodEnd = new Date('2025-04-30T23:59:59.999Z')
 
       // When in grace period, gift should start after grace period ends
       const webhook = async () => {

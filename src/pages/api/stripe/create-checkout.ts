@@ -327,7 +327,7 @@ async function createOpenNodeInvoice(
         console.log(`Canceling pending invoice ${renewalInvoiceId} for user ${userId}`)
         try {
           await stripe.invoices.voidInvoice(renewalInvoiceId)
-        } catch (invoiceError) {
+        } catch (_invoiceError) {
           try {
             const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
             if (invoice.status === 'open') {

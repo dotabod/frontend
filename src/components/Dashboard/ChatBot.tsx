@@ -508,20 +508,16 @@ export default function ChatBot() {
                                 showIcon
                               />
                             </div>
+                          ) : !user?.hasDotabodEmoteSet ? (
+                            <div className='flex flex-row gap-4'>
+                              <Spin size='small' spinning={true} />
+                              <p>
+                                Dotabod will automatically add the following emotes after the
+                                previous steps are completed.
+                              </p>
+                            </div>
                           ) : (
-                            <>
-                              {!user?.hasDotabodEmoteSet ? (
-                                <div className='flex flex-row gap-4'>
-                                  <Spin size='small' spinning={true} />
-                                  <p>
-                                    Dotabod will automatically add the following emotes after the
-                                    previous steps are completed.
-                                  </p>
-                                </div>
-                              ) : (
-                                <div>All required emotes have been added to your channel!</div>
-                              )}
-                            </>
+                            <div>All required emotes have been added to your channel!</div>
                           )}
                         </div>
                       </div>

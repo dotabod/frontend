@@ -9,7 +9,7 @@ vi.mock('@/lib/api-middlewares/with-authentication', () => ({
 }))
 
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
-  withMethods: (methods, fn) => fn,
+  withMethods: (_methods, fn) => fn,
 }))
 
 vi.mock('@/lib/api/getServerSession', () => ({

@@ -464,14 +464,14 @@ async function runSingleChargeMode(): Promise<void> {
   const invoice = await stripe.invoices.retrieve(charge.stripeInvoiceId)
 
   console.log('✅ Stripe invoice retrieved')
-  console.log('   Invoice ID: ' + invoice.id)
-  console.log('   Status: ' + invoice.status)
-  console.log('   Customer ID: ' + invoice.customer)
+  console.log(`   Invoice ID: ${invoice.id}`)
+  console.log(`   Status: ${invoice.status}`)
+  console.log(`   Customer ID: ${invoice.customer}`)
   console.log('   Metadata:')
-  console.log('     - userId: ' + (invoice.metadata?.userId || 'N/A'))
-  console.log('     - stripePriceId: ' + (invoice.metadata?.stripePriceId || 'N/A'))
-  console.log('     - paymentProvider: ' + (invoice.metadata?.paymentProvider || 'N/A'))
-  console.log('     - isCryptoPayment: ' + (invoice.metadata?.isCryptoPayment || 'N/A'))
+  console.log(`     - userId: ${invoice.metadata?.userId || 'N/A'}`)
+  console.log(`     - stripePriceId: ${invoice.metadata?.stripePriceId || 'N/A'}`)
+  console.log(`     - paymentProvider: ${invoice.metadata?.paymentProvider || 'N/A'}`)
+  console.log(`     - isCryptoPayment: ${invoice.metadata?.isCryptoPayment || 'N/A'}`)
   console.log()
 
   // Step 5: Validate invoice metadata

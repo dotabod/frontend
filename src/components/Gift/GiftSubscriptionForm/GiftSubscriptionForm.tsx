@@ -174,7 +174,7 @@ export const GiftSubscriptionForm = ({
   }
 
   // Calculate the total price based on quantity and period
-  const calculateTotalPrice = () => {
+  const _calculateTotalPrice = () => {
     const basePrice = plans.find((p) => p.tier === selectedTier)?.price[activePeriod] || '$0'
 
     // Extract the numeric value from the price string (e.g., "$5" -> 5)

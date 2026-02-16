@@ -190,7 +190,7 @@ export function SettingsSearch() {
 
   // Handle click outside - simplified since Popover handles this
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (_e: MouseEvent) => {
       // Only handle cases where we want to close on outside click
       if (isOpen && !query) {
         setIsOpen(false)

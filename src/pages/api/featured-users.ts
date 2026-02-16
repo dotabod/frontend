@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         matches: {
           some: {
             updated_at: {
-              gte: new Date(new Date().getTime() - 60 * 60 * 1000), // 1 hour ago
+              gte: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
             },
           },
         },

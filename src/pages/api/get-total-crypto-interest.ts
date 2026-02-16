@@ -26,7 +26,7 @@ async function getTotalCryptoInterest() {
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(_req: NextApiRequest, res: NextApiResponse) {
   try {
     const { totalInterest, userCount } = await getTotalCryptoInterest()
 

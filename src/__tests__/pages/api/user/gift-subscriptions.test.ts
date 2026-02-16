@@ -27,7 +27,7 @@ vi.mock('@/lib/auth', () => ({
 
 // Mock formatDate
 vi.mock('@/utils/formatDate', () => ({
-  formatDate: vi.fn((date) => '2025-01-01'),
+  formatDate: vi.fn((_date) => '2025-01-01'),
 }))
 
 import { getServerSession } from 'next-auth'

@@ -39,12 +39,12 @@ interface FormValues {
 const AdminPage = () => {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const [_loading, setLoading] = useState(true)
   const [messages, setMessages] = useState<ScheduledMessage[]>([])
   const [form] = Form.useForm()
   const [openDialog, setOpenDialog] = useState(false)
   const [editingMessage, setEditingMessage] = useState<ScheduledMessage | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [_submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return

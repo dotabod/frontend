@@ -207,7 +207,7 @@ async function checkSingleCharge(): Promise<void> {
     console.log('Metadata:')
     const metadata = charge.metadata as Record<string, unknown>
     for (const [key, value] of Object.entries(metadata)) {
-      console.log('  • ' + key + ': ' + JSON.stringify(value))
+      console.log(`  • ${key}: ${JSON.stringify(value)}`)
     }
   }
   console.log()
@@ -222,11 +222,11 @@ async function checkSingleCharge(): Promise<void> {
     console.log('✅ Stripe invoice found')
     console.log()
     console.log(`Invoice ID:       ${invoice.id}`)
-    console.log('Status:           ' + invoice.status)
-    console.log('Customer ID:      ' + invoice.customer)
-    console.log('Amount Due:       ' + invoice.amount_due + ' ' + invoice.currency?.toUpperCase())
-    console.log('Amount Paid:      ' + invoice.amount_paid + ' ' + invoice.currency?.toUpperCase())
-    console.log('Created:          ' + new Date(invoice.created * 1000).toISOString())
+    console.log(`Status:           ${invoice.status}`)
+    console.log(`Customer ID:      ${invoice.customer}`)
+    console.log(`Amount Due:       ${invoice.amount_due} ${invoice.currency?.toUpperCase()}`)
+    console.log(`Amount Paid:      ${invoice.amount_paid} ${invoice.currency?.toUpperCase()}`)
+    console.log(`Created:          ${new Date(invoice.created * 1000).toISOString()}`)
 
     if (invoice.metadata) {
       console.log('Metadata:')
@@ -291,7 +291,7 @@ async function checkSingleCharge(): Promise<void> {
         if (Object.keys(metadata).length > 0) {
           console.log('  Metadata:')
           for (const [key, value] of Object.entries(metadata)) {
-            console.log('    • ' + key + ': ' + JSON.stringify(value))
+            console.log(`    • ${key}: ${JSON.stringify(value)}`)
           }
         }
       }
@@ -385,7 +385,7 @@ async function checkSingleCharge(): Promise<void> {
     console.log()
     console.log('  # Actual fix:')
     console.log(
-      '  doppler run -- bun run scripts/fix-opennode-payment.ts ' + charge.stripeInvoiceId,
+      `  doppler run -- bun run scripts/fix-opennode-payment.ts ${charge.stripeInvoiceId}`,
     )
     console.log()
   }

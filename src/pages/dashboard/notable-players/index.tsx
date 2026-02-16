@@ -264,7 +264,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
             pagination={{
               pageSize,
-              onShowSizeChange: (current, size) => setPageSize(size),
+              onShowSizeChange: (_current, size) => setPageSize(size),
               showSizeChanger: true,
               hideOnSinglePage: true,
               position: ['bottomCenter'],

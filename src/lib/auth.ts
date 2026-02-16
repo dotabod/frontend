@@ -86,7 +86,7 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials, req) {
-        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0')
+        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0', 10)
         if (!channelToImpersonate) {
           captureException(new Error('Invalid channel ID'))
           throw new Error('ACCESS_DENIED')

@@ -26,7 +26,7 @@ async function getTotalUsersForLanguage(languageId: string) {
   }
 }
 
-async function fetchLanguageProgress(languageId: string) {
+async function fetchLanguageProgress(_languageId: string) {
   const url = `${CROWDIN_API_BASE_URL}/projects/${projectId}/languages/progress?limit=50`
   const response = await fetch(url, {
     headers: {

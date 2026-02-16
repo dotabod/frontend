@@ -54,7 +54,7 @@ export const checkForInvalidOverlay = (pathname: string): boolean => {
       // Cached data is too old, remove it
       localStorage.removeItem(pathKey)
     }
-  } catch (e) {
+  } catch (_e) {
     // Ignore storage errors
   }
 

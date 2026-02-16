@@ -54,7 +54,7 @@ type Region =
   | 'PERU'
   | 'BRAZIL'
 
-function estimateMMR(leaderboard_rank: number, region: Region): number {
+function _estimateMMR(leaderboard_rank: number, region: Region): number {
   // Max leaderboard rank is 5000
   if (leaderboard_rank <= 0 || leaderboard_rank > 5000) return 8500
 

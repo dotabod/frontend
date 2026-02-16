@@ -18,7 +18,7 @@ function handleNavigation(url: URL) {
     } else {
       replay.start()
     }
-  } catch (e) {
+  } catch (_e) {
     // Sentry.captureException(e)
   }
 }

@@ -26,7 +26,7 @@ export const devBlockTypes: blockType = {
   type: 'playing',
 }
 export const devPoll: PollData = {
-  endDate: new Date().getTime() + 300000,
+  endDate: Date.now() + 300000,
   title: 'Will we win with Muerta?',
   choices: [
     {

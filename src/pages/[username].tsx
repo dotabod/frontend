@@ -63,7 +63,7 @@ const PageContent = ({
 
   // Use SSR data if available, otherwise fall back to client-side data
   const finalUserData = ssrUserData || data
-  const finalUsername = ssrUsername || (typeof username === 'string' ? username : '')
+  const _finalUsername = ssrUsername || (typeof username === 'string' ? username : '')
   const finalLoading = ssrUserData ? false : loading
 
   // Fetch subscription information only if we don't have SSR data

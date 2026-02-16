@@ -91,7 +91,7 @@ const ObsSetup: React.FC = () => {
         } else if (state === 'prompt') {
           track('lna/obs_status_prompt_shown')
         }
-      } catch (err) {
+      } catch (_err) {
         // If permission query fails, treat as unsupported
         setLnaPermissionState('unsupported')
         setLnaChecked(true)
