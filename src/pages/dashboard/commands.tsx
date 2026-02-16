@@ -7,6 +7,7 @@ import Header from '@/components/Dashboard/Header'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const CommandsPage = () => {
   const [permission, setPermission] = useState('All')
@@ -116,5 +117,7 @@ CommandsPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default CommandsPage

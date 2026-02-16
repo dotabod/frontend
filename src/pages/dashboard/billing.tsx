@@ -12,6 +12,7 @@ import Header from '@/components/Dashboard/Header'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Title } = Typography
 
@@ -124,5 +125,7 @@ BillingPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default BillingPage

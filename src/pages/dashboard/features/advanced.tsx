@@ -7,6 +7,7 @@ import ClippingCard from '@/components/Dashboard/Features/ClippingCard'
 import SceneSwitcher from '@/components/Dashboard/Features/SceneSwitcher'
 import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>
@@ -38,5 +39,7 @@ const FeaturesPage: NextPageWithLayout = () => (
 FeaturesPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default FeaturesPage

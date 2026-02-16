@@ -24,6 +24,7 @@ import { useEffect, useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import UserSelector from '@/components/Dashboard/UserSelector'
 import { Card } from '@/ui/card'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Title } = Typography
 const { TextArea } = Input
@@ -410,5 +411,7 @@ AdminPage.getLayout = function getLayout(page: React.ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess({ requireAdmin: true })
 
 export default AdminPage

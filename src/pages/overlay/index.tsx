@@ -1,12 +1,22 @@
 import { Spin } from 'antd'
+import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import { getOverlayMaintenanceProps } from '@/lib/server/maintenance'
 
-const OverlayPage = () => {
+interface OverlayPageProps {
+  maintenanceBlank: boolean
+}
+
+const OverlayPage = ({ maintenanceBlank }: OverlayPageProps) => {
+  if (maintenanceBlank) {
+    return null
+  }
+
   const { data } = useSession()
   const [scale, setScale] = useState(1) // Initial scale is 1
   const [isLoading, setIsLoading] = useState(true) // Initial state is loading
@@ -84,3 +94,6 @@ OverlayPage.getLayout = function getLayout(page: ReactElement) {
 }
 
 export default OverlayPage
+
+export const getServerSideProps: GetServerSideProps<OverlayPageProps> = async () =>
+  getOverlayMaintenanceProps({})

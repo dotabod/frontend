@@ -8,6 +8,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Title, Text, Paragraph } = Typography
 const { confirm } = Modal
@@ -192,5 +193,7 @@ DataPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default DataPage

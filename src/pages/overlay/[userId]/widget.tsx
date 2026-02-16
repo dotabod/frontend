@@ -1,4 +1,5 @@
 import { clsx } from 'clsx'
+import type { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import type { Socket } from 'socket.io-client'
@@ -13,9 +14,18 @@ import type { wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
+import { getOverlayMaintenanceProps } from '@/lib/server/maintenance'
 
 let socket: Socket | null = null
-function WidgetPage() {
+interface WidgetPageProps {
+  maintenanceBlank: boolean
+}
+
+function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
+  if (maintenanceBlank) {
+    return null
+  }
+
   const { mutate } = useUpdateSetting(Settings.commandWL)
   const router = useRouter()
   const { userId } = router.query
@@ -133,3 +143,6 @@ function WidgetPage() {
 }
 
 export default WidgetPage
+
+export const getServerSideProps: GetServerSideProps<WidgetPageProps> = async () =>
+  getOverlayMaintenanceProps({})

@@ -73,6 +73,14 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
   const isPublicOverlayRoute = router.pathname === '/overlay/[userId]'
 
+  useEffect(() => {
+    const pathOnly = router.asPath.split('?')[0].toLowerCase()
+
+    if (pathOnly === '/[username]') {
+      void router.replace('/login')
+    }
+  }, [router])
+
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
 

@@ -13,6 +13,23 @@ import { withSentryConfig } from '@sentry/nextjs'
 const nextConfig = {
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE: process.env.IS_IN_MAINTENANCE_MODE,
+  },
+  async redirects() {
+    return [
+      {
+        source: '/install',
+        destination: '/api/install',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/troubleshoot',
+        destination: '/dashboard/help',
+        permanent: false,
+      },
+    ]
+  },
   experimental: {
     forceSwcTransforms: false,
     turbo: {

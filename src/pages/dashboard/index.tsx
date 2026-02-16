@@ -19,6 +19,7 @@ import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -708,5 +709,7 @@ SetupPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default SetupPage

@@ -25,6 +25,7 @@ import Header from '@/components/Dashboard/Header'
 import type { NotablePlayer } from '@/lib/db'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Text } = Typography
 
@@ -368,5 +369,7 @@ NotablePlayersPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default NotablePlayersPage

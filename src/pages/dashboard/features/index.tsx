@@ -9,6 +9,7 @@ import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import Header from '@/components/Dashboard/Header'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>
@@ -42,5 +43,7 @@ const FeaturesPage: NextPageWithLayout = () => (
 FeaturesPage.getLayout = function getLayout(page: ReactElement) {
   return <DashboardShell>{page}</DashboardShell>
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default FeaturesPage

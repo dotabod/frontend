@@ -1,6 +1,7 @@
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
 import { Card } from '@/ui/card'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const ManageChannel = () => {
   return (
@@ -25,5 +26,7 @@ ManageChannel.getLayout = function getLayout(page: React.ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess({ requireAdmin: true })
 
 export default ManageChannel

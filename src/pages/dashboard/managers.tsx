@@ -12,6 +12,7 @@ import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { canAccessFeature } from '@/utils/subscription'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const ModeratorsPage = () => {
   const track = useTrack()
@@ -250,5 +251,7 @@ ModeratorsPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default ModeratorsPage

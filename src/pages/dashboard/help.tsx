@@ -30,6 +30,7 @@ import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { Card } from '@/ui/card'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 // Define form values interface
 interface FormValues {
@@ -575,5 +576,7 @@ TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
     </DashboardShell>
   )
 }
+
+export const getServerSideProps = requireDashboardAccess()
 
 export default TroubleshootPage
