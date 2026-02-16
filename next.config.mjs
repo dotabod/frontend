@@ -15,6 +15,7 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE: process.env.IS_IN_MAINTENANCE_MODE,
+    NEXT_PUBLIC_LASTFM_API_KEY: process.env.LASTFM_API_KEY,
   },
   async redirects() {
     return [
@@ -27,6 +28,14 @@ const nextConfig = {
         source: '/dashboard/troubleshoot',
         destination: '/dashboard/help',
         permanent: false,
+      },
+    ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/lastfm-proxy/:path*',
+        destination: 'https://ws.audioscrobbler.com/:path*',
       },
     ]
   },

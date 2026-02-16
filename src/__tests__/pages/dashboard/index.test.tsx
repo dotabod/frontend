@@ -25,6 +25,10 @@ vi.mock('@/lib/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
+vi.mock('@/lib/server/dashboardAccess', () => ({
+  requireDashboardAccess: vi.fn(() => async () => ({ props: {} })),
+}))
+
 // Mock environment variables
 vi.mock('@/utils/env', () => ({
   env: {
