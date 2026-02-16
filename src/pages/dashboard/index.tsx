@@ -16,10 +16,10 @@ import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Title, Text, Paragraph } = Typography
 

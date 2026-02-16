@@ -23,9 +23,9 @@ import CommandDetail from '@/components/Dashboard/CommandDetail'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import type { NotablePlayer } from '@/lib/db'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Text } = Typography
 

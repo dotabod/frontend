@@ -2,8 +2,8 @@ import { useRouter } from 'next/router'
 import { createContext, useMemo } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
-import { isSubscriptionActive, type SubscriptionRow } from '@/utils/subscription'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { isSubscriptionActive, type SubscriptionRow } from '@/utils/subscription'
 
 interface SubscriptionContextType {
   subscription: SubscriptionRow | null

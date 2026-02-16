@@ -9,10 +9,10 @@ import Header from '@/components/Dashboard/Header'
 import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
 import { useSubscription } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { canAccessFeature } from '@/utils/subscription'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const ModeratorsPage = () => {
   const track = useTrack()

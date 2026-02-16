@@ -8,8 +8,8 @@ import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
 import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import Header from '@/components/Dashboard/Header'
-import type { NextPageWithLayout } from '@/pages/_app'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import type { NextPageWithLayout } from '@/pages/_app'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>

@@ -18,8 +18,8 @@ import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { fetcher } from '@/lib/fetcher'
 import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
-import type { NextPageWithLayout } from '@/pages/_app'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import type { NextPageWithLayout } from '@/pages/_app'
 
 const { Content } = Layout
 const { Title, Text, Paragraph } = Typography

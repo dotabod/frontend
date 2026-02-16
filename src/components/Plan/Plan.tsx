@@ -14,13 +14,13 @@ import { fetcher } from '@/lib/fetcher'
 import { STABLE_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
-    calculateSavings,
-    getPriceId,
-    gracePeriodPrettyDate,
-    isSubscriptionActive,
-    type PricePeriod,
-    SUBSCRIPTION_TIERS,
-    type SubscriptionRow,
+  calculateSavings,
+  getPriceId,
+  gracePeriodPrettyDate,
+  isSubscriptionActive,
+  type PricePeriod,
+  SUBSCRIPTION_TIERS,
+  type SubscriptionRow,
 } from '@/utils/subscription'
 import CryptoToggle from '../CryptoToggle'
 import ErrorBoundary from '../ErrorBoundary'

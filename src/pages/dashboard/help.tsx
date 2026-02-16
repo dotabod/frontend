@@ -1,15 +1,15 @@
 import { MessageOutlined } from '@ant-design/icons'
 import {
-    Alert,
-    Button,
-    Divider,
-    Form,
-    Input,
-    message,
-    type StepProps,
-    Steps,
-    type StepsProps,
-    Tag,
+  Alert,
+  Button,
+  Divider,
+  Form,
+  Input,
+  message,
+  type StepProps,
+  Steps,
+  type StepsProps,
+  Tag,
 } from 'antd'
 import axios from 'axios'
 import Head from 'next/head'
@@ -22,15 +22,15 @@ import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import {
-    PowerShellFailureMessage,
-    PowerShellSetupStep,
-    PowerShellTroubleshootingContent,
+  PowerShellFailureMessage,
+  PowerShellSetupStep,
+  PowerShellTroubleshootingContent,
 } from '@/components/Dashboard/PowerShellTroubleshooting'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { Card } from '@/ui/card'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 // Define form values interface
 interface FormValues {

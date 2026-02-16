@@ -3,18 +3,18 @@ import MainOverlay from '@/components/Overlay'
 import { getOverlayMaintenanceProps } from '@/lib/server/maintenance'
 
 interface OverlayUserPageProps {
-	maintenanceBlank: boolean
+  maintenanceBlank: boolean
 }
 
 const OverlayUserPage = ({ maintenanceBlank }: OverlayUserPageProps) => {
-	if (maintenanceBlank) {
-		return null
-	}
+  if (maintenanceBlank) {
+    return null
+  }
 
-	return <MainOverlay />
+  return <MainOverlay />
 }
 
 export default OverlayUserPage
 
 export const getServerSideProps: GetServerSideProps<OverlayUserPageProps> = async () =>
-	getOverlayMaintenanceProps({})
+  getOverlayMaintenanceProps({})

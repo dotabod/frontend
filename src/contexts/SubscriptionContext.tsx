@@ -36,9 +36,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const isFree = !isPro
 
   const creditBalanceKey =
-    router.isReady && router.pathname.startsWith('/dashboard')
-      ? '/api/stripe/credit-balance'
-      : null
+    router.isReady && router.pathname.startsWith('/dashboard') ? '/api/stripe/credit-balance' : null
   // Fetch credit balance and specify the response type
   const { data: creditBalanceData } = useSWR<CreditBalanceResponse>(
     // Add type argument here

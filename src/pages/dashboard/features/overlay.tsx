@@ -13,8 +13,8 @@ import LastFmOverlay from '@/components/Overlay/LastFmOverlay'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 import WinProbabilityOverlay from '@/components/Overlay/WinProbabilityOverlay'
-import type { NextPageWithLayout } from '@/pages/_app'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import type { NextPageWithLayout } from '@/pages/_app'
 
 const FeaturesPage: NextPageWithLayout = () => (
   <>

@@ -2,8 +2,6 @@ import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, message, Select, Space, Spin, Tooltip } from 'antd'
 import Link from 'next/link'
-import RegionalBlockingNote from './RegionalBlockingNote'
-
 import { useSession } from 'next-auth/react'
 import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
@@ -15,6 +13,7 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { type LnaPermissionState, queryLnaPermission, shouldCheckLna } from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
+import RegionalBlockingNote from './RegionalBlockingNote'
 
 interface Scene {
   sceneIndex: number // Scene index

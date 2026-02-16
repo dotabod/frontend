@@ -288,7 +288,11 @@ const UserButton = ({ user, className }: UserButtonProps) => {
         menu={{
           items: [
             {
-              label: <Link href='/dashboard' prefetch={false}>Dashboard</Link>,
+              label: (
+                <Link href='/dashboard' prefetch={false}>
+                  Dashboard
+                </Link>
+              ),
               key: 'dashboard',
             },
             {

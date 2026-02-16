@@ -1,9 +1,9 @@
 import {
-    type Prisma,
-    type Subscription,
-    SubscriptionStatus,
-    SubscriptionTier,
-    TransactionType,
+  type Prisma,
+  type Subscription,
+  SubscriptionStatus,
+  SubscriptionTier,
+  TransactionType,
 } from '@prisma/client'
 import type { StatusInfo } from '@/components/Subscription/types'
 import prisma from '@/lib/db'

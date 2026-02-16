@@ -15,8 +15,8 @@ export default function RegionalBlockingNote() {
           >
             zapret-discord-youtube
           </a>{' '}
-          — add <Tag>dotabod.com</Tag> and <Tag>gsi.dotabod.com</Tag> to <code>lists/list-general.txt</code>.
-          If that doesn't work, try the older release{' '}
+          — add <Tag>dotabod.com</Tag> and <Tag>gsi.dotabod.com</Tag> to{' '}
+          <code>lists/list-general.txt</code>. If that doesn't work, try the older release{' '}
           <a
             href='https://github.com/Flowseal/zapret-discord-youtube/releases/tag/1.9.0b'
             target='_blank'

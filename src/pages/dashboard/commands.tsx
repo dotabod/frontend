@@ -5,9 +5,9 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import Header from '@/components/Dashboard/Header'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { getValueOrDefault } from '@/lib/settings'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const CommandsPage = () => {
   const [permission, setPermission] = useState('All')

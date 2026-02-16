@@ -6,9 +6,9 @@ import type { ReactElement } from 'react'
 import { useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
 const { Title, Text, Paragraph } = Typography
 const { confirm } = Modal

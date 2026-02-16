@@ -11,8 +11,8 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { getSubscriptionStatusInfo } from '@/utils/subscription'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { getSubscriptionStatusInfo } from '@/utils/subscription'
 
 const { Title } = Typography
 

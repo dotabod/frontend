@@ -1,5 +1,5 @@
-import { captureException } from '@sentry/nextjs'
 import type { Prisma } from '@prisma/client'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 import { getServerSession } from '@/lib/api/getServerSession'
@@ -10,8 +10,8 @@ import { Settings } from '@/lib/defaultSettings'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
 import {
   FEATURE_TIERS,
-  getSubscription,
   GRACE_PERIOD_END,
+  getSubscription,
   isInGracePeriod,
   isSubscriptionActive,
   SUBSCRIPTION_TIERS,
@@ -54,11 +54,7 @@ const subscriptionRelationQuery = {
       },
     },
   },
-  orderBy: [
-    { status: 'asc' },
-    { transactionType: 'desc' },
-    { createdAt: 'desc' },
-  ],
+  orderBy: [{ status: 'asc' }, { transactionType: 'desc' }, { createdAt: 'desc' }],
 } satisfies Prisma.SubscriptionFindManyArgs
 
 type SettingsSubscriptionRow = Prisma.SubscriptionGetPayload<{
@@ -67,9 +63,7 @@ type SettingsSubscriptionRow = Prisma.SubscriptionGetPayload<{
 
 function getSettingsSubscription(subscriptions: SettingsSubscriptionRow[]) {
   const activeSubscription = subscriptions.find(
-    (sub) =>
-      (sub.status === 'ACTIVE' || sub.status === 'TRIALING') &&
-      sub.stripeSubscriptionId,
+    (sub) => (sub.status === 'ACTIVE' || sub.status === 'TRIALING') && sub.stripeSubscriptionId,
   )
 
   const subscription = activeSubscription || subscriptions[0] || null

@@ -1,5 +1,5 @@
-import { captureException } from '@sentry/nextjs'
 import { CopyButton } from '@mantine/core'
+import { captureException } from '@sentry/nextjs'
 import { Button, Layout, Menu, type MenuProps, Tag, theme } from 'antd'
 import clsx from 'clsx'
 import Head from 'next/head'
@@ -22,8 +22,8 @@ import { UserAccountNav } from '@/components/UserAccountNav'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
-import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
+import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { navigation } from './navigation'
 import { SettingsSearch } from './SettingsSearch'
 
@@ -74,7 +74,6 @@ function getItem(item, collapsed = false, isChild = false) {
 const shouldHideForImpersonator = (itemName: string) => {
   return ['Setup', 'Managers', 'Billing', 'Data', 'Account', 'Admin'].includes(itemName)
 }
-
 
 // Create mapping dynamically from navigation structure
 const PATH_TO_PARENT_KEY: Record<string, string> = {}
