@@ -62,16 +62,16 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
     })
 
     socket.on('update-wl', (records: wlType) => {
-      if (isDev) return
+      if (isDev()) return
       setWL(records)
     })
 
-    socket.on('refresh-settings', (key: typeof Settings) => {
+    socket.on('refresh-settings', () => {
       mutate()
     })
 
     socket.on('update-medal', (deets: RankType) => {
-      if (isDev) return
+      if (isDev()) return
       const rankDetails = getRankImage(deets)
       setRankImageDetails({
         image: rankDetails.image,
