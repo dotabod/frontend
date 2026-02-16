@@ -2,11 +2,6 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Banner from '@/components/Banner'
 
-// Mock the GRACE_PERIOD_END constant
-vi.mock('@/utils/subscription', () => ({
-  GRACE_PERIOD_END: new Date('2025-04-30'),
-}))
-
 // Mock next/link
 vi.mock('next/link', () => ({
   default: ({
@@ -22,9 +17,9 @@ vi.mock('next/link', () => ({
 
 describe('Banner', () => {
   beforeEach(() => {
-    // Mock the current date to be before the grace period end
+    // Mock the current date to be within the crypto announcement period (Oct 4, 2025 ± 7 days)
     vi.useFakeTimers()
-    vi.setSystemTime(new Date('2025-01-01'))
+    vi.setSystemTime(new Date('2025-10-04T12:00:00Z'))
   })
 
   afterEach(() => {
@@ -32,21 +27,19 @@ describe('Banner', () => {
     vi.restoreAllMocks()
   })
 
-  it('renders the banner when date is before grace period end', () => {
+  it('renders the banner when date is within crypto announcement period', () => {
     render(<Banner />)
 
-    expect(
-      screen.getByText('Dotabod is experiencing a temporary service disruption until April 6.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('New! Pay for Dotabod Pro with cryptocurrency.')).toBeInTheDocument()
     expect(screen.getByText('Learn More')).toBeInTheDocument()
     expect(screen.getByText('Learn More').closest('a')).toHaveAttribute(
       'href',
-      '/blog/dotabod-banned',
+      '/blog/crypto-payments-launch',
     )
   })
 
-  it('does not render the banner when date is after grace period end', () => {
-    vi.setSystemTime(new Date('2025-05-01'))
+  it('does not render the banner when date is outside crypto announcement period', () => {
+    vi.setSystemTime(new Date('2025-11-01'))
 
     const { container } = render(<Banner />)
     expect(container.firstChild).toBeNull()
@@ -62,7 +55,7 @@ describe('Banner', () => {
 
     // Banner should be hidden after clicking dismiss
     expect(
-      screen.queryByText('Dotabod is experiencing a temporary service disruption until April 6.'),
+      screen.queryByText('New! Pay for Dotabod Pro with cryptocurrency.'),
     ).not.toBeInTheDocument()
   })
 })

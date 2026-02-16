@@ -128,6 +128,7 @@ vi.mock('antd', () => {
       Paragraph: ({ children }) => <p>{children}</p>,
     },
     Progress: () => <div>Progress</div>,
+    Tag: ({ children, ...props }) => <span {...props}>{children}</span>,
   }
 })
 

@@ -21,6 +21,7 @@
     "test": "npm run vitest",
     "test:watch": "npm run vitest watch",
     "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' npm run vitest run --coverage",
+    "vitest": "vitest run",
     "generate:postgres": "npx prisma generate",
     "generate:mongo": "npx prisma generate --schema=./prisma-mongo/schema.prisma",
     "generate:all": "npm run generate:postgres && npm run generate:mongo",
