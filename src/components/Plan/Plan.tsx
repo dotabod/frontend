@@ -14,13 +14,13 @@ import { fetcher } from '@/lib/fetcher'
 import { STABLE_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
-  calculateSavings,
-  getPriceId,
-  gracePeriodPrettyDate,
-  isSubscriptionActive,
-  type PricePeriod,
-  SUBSCRIPTION_TIERS,
-  type SubscriptionRow,
+    calculateSavings,
+    getPriceId,
+    gracePeriodPrettyDate,
+    isSubscriptionActive,
+    type PricePeriod,
+    SUBSCRIPTION_TIERS,
+    type SubscriptionRow,
 } from '@/utils/subscription'
 import CryptoToggle from '../CryptoToggle'
 import ErrorBoundary from '../ErrorBoundary'
@@ -128,20 +128,47 @@ function Plan({
     formattedCreditBalance,
   } = useSubscriptionContext()
 
-  // Check if the current subscription was paid with crypto by comparing price IDs
+  // Check if the current subscription was paid with crypto.
+  // Prefer explicit subscription metadata and only fall back to price IDs when
+  // crypto price IDs are distinct from regular price IDs.
   const isPaidWithCrypto = useMemo(() => {
-    // Only check for crypto payments on Pro tier subscriptions
-    if (!subscription?.stripePriceId || tier === SUBSCRIPTION_TIERS.FREE) return false
+    if (tier === SUBSCRIPTION_TIERS.FREE) return false
 
-    // Check if the subscription's price ID matches one with crypto payment
-    const monthlyPriceWithCrypto = getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true)
-    const annualPriceWithCrypto = getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true)
-    const lifetimePriceWithCrypto = getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', true)
+    const metadata =
+      subscription?.metadata &&
+      typeof subscription.metadata === 'object' &&
+      !Array.isArray(subscription.metadata)
+        ? (subscription.metadata as Record<string, unknown>)
+        : null
 
-    return [monthlyPriceWithCrypto, annualPriceWithCrypto, lifetimePriceWithCrypto].includes(
-      subscription.stripePriceId,
-    )
-  }, [subscription?.stripePriceId, tier])
+    // Strong signal: crypto subscriptions set this metadata flag server-side
+    const isCryptoFromMetadata =
+      metadata?.isCryptoPayment === true || metadata?.isCryptoPayment === 'true'
+
+    if (isCryptoFromMetadata) return true
+
+    if (!subscription?.stripePriceId) return false
+
+    const regularPriceIds = [
+      getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', false),
+      getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', false),
+      getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', false),
+    ]
+
+    const cryptoPriceIds = [
+      getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', true),
+      getPriceId(SUBSCRIPTION_TIERS.PRO, 'annual', true),
+      getPriceId(SUBSCRIPTION_TIERS.PRO, 'lifetime', true),
+    ]
+
+    // If crypto IDs overlap with regular IDs in config, treat price ID matching
+    // as ambiguous and avoid forcing crypto state in the UI.
+    const hasDistinctCryptoPrice =
+      cryptoPriceIds.includes(subscription.stripePriceId) &&
+      !regularPriceIds.includes(subscription.stripePriceId)
+
+    return hasDistinctCryptoPrice
+  }, [subscription?.metadata, subscription?.stripePriceId, tier])
 
   // Check if crypto payments feature is enabled
   const isCryptoPaymentsEnabled = isFeatureEnabled('enableCryptoPayments')
