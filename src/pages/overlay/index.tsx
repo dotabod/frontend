@@ -1,53 +1,43 @@
 import { Spin } from 'antd'
-import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
-import { getOverlayMaintenanceProps } from '@/lib/server/maintenance'
 
-interface OverlayPageProps {
-  maintenanceBlank: boolean
-}
+const isMaintenanceMode = process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'true'
 
-const OverlayPage = ({ maintenanceBlank }: OverlayPageProps) => {
+const OverlayPage = () => {
   const { data } = useSession()
-  const [scale, setScale] = useState(1) // Initial scale is 1
-  const [isLoading, setIsLoading] = useState(true) // Initial state is loading
+  const [scale, setScale] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (maintenanceBlank) return
+    if (isMaintenanceMode) return
 
     const resizeListener = () => {
-      // Assuming headerHeight and sideNavWidth are known or can be dynamically calculated
-      const headerHeight = 309 // Example height of the header
-      const sideNavWidth = 380 // Example width of the side navigation
+      const headerHeight = 309
+      const sideNavWidth = 380
 
-      // Adjust window dimensions by subtracting the sizes of header and side navigation
       const adjustedWidth = window.innerWidth - sideNavWidth
       const adjustedHeight = window.innerHeight - headerHeight
 
-      // Calculate the scale ratio based on adjusted window size and content size (1920x1080)
       const scaleX = adjustedWidth / 1920
       const scaleY = adjustedHeight / 1080
-      const newScale = Math.min(scaleX, scaleY) // Use the smaller scale to ensure content fits in both dimensions
+      const newScale = Math.min(scaleX, scaleY)
 
       setScale(newScale)
     }
 
-    // Set initial scale
     resizeListener()
 
-    // Add event listener
     window.addEventListener('resize', resizeListener)
 
-    // Cleanup function to remove event listener
     return () => window.removeEventListener('resize', resizeListener)
-  }, [maintenanceBlank])
+  }, [])
 
-  if (maintenanceBlank) {
+  if (isMaintenanceMode) {
     return null
   }
 
@@ -96,6 +86,3 @@ OverlayPage.getLayout = function getLayout(page: ReactElement) {
 }
 
 export default OverlayPage
-
-export const getServerSideProps: GetServerSideProps<OverlayPageProps> = async () =>
-  getOverlayMaintenanceProps({})

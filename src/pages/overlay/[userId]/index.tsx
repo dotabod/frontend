@@ -1,13 +1,7 @@
-import type { GetServerSideProps } from 'next'
 import MainOverlay from '@/components/Overlay'
-import { getOverlayMaintenanceProps } from '@/lib/server/maintenance'
 
-interface OverlayUserPageProps {
-  maintenanceBlank: boolean
-}
-
-const OverlayUserPage = ({ maintenanceBlank }: OverlayUserPageProps) => {
-  if (maintenanceBlank) {
+const OverlayUserPage = () => {
+  if (process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'true') {
     return null
   }
 
@@ -15,6 +9,3 @@ const OverlayUserPage = ({ maintenanceBlank }: OverlayUserPageProps) => {
 }
 
 export default OverlayUserPage
-
-export const getServerSideProps: GetServerSideProps<OverlayUserPageProps> = async () =>
-  getOverlayMaintenanceProps({})

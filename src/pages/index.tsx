@@ -1,4 +1,3 @@
-import type { GetServerSideProps } from 'next'
 import type { ReactElement } from 'react'
 import { Faqs } from '@/components/Homepage/Faqs'
 import { Hero } from '@/components/Homepage/Hero'
@@ -6,7 +5,6 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import { PrimaryFeatures } from '@/components/Homepage/PrimaryFeatures'
 import { SecondaryFeatures } from '@/components/Homepage/SecondaryFeatures'
 import { Pricing } from '@/components/Pricing'
-import { getMaintenanceRedirect } from '@/lib/server/maintenance'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const Index: NextPageWithLayout = () => (
@@ -40,5 +38,3 @@ Index.getLayout = function getLayout(page: ReactElement) {
 }
 
 export default Index
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => getMaintenanceRedirect(ctx)

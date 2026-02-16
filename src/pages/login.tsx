@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
 import { App, Typography } from 'antd'
-import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
@@ -8,7 +7,6 @@ import { type ReactElement, useCallback, useEffect } from 'react'
 import { Container } from '@/components/Container'
 import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
-import { getMaintenanceRedirect } from '@/lib/server/maintenance'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const Login: NextPageWithLayout = () => {
@@ -124,5 +122,3 @@ Login.getLayout = function getLayout(page: ReactElement) {
 }
 
 export default Login
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => getMaintenanceRedirect(ctx)

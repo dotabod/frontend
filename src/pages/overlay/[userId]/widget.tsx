@@ -1,5 +1,4 @@
 import { clsx } from 'clsx'
-import type { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import type { Socket } from 'socket.io-client'
@@ -14,14 +13,12 @@ import type { wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
-import { getOverlayMaintenanceProps } from '@/lib/server/maintenance'
+
+const isMaintenanceMode = process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'true'
 
 let socket: Socket | null = null
-interface WidgetPageProps {
-  maintenanceBlank: boolean
-}
 
-function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
+function WidgetPage() {
   const { mutate } = useUpdateSetting(Settings.commandWL)
   const router = useRouter()
   const { userId } = router.query
@@ -49,7 +46,7 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
   })
 
   useEffect(() => {
-    if (maintenanceBlank) return
+    if (isMaintenanceMode) return
     if (!userId) return
 
     console.log('Connecting to socket init...')
@@ -77,20 +74,20 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
         notLoaded: false,
       })
     })
-  }, [maintenanceBlank, userId])
+  }, [userId])
 
   useEffect(() => {
-    if (maintenanceBlank) return
+    if (isMaintenanceMode) return
 
     return () => {
       socket?.off('update-wl')
       socket?.off('refresh-settings')
       socket?.off('update-medal')
     }
-  }, [maintenanceBlank])
+  }, [])
 
   useEffect(() => {
-    if (maintenanceBlank) return
+    if (isMaintenanceMode) return
     if (!original) return
 
     const steamAccount = original.SteamAccount?.[0]
@@ -106,9 +103,9 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
     }
 
     setRankImageDetails(rankDetails)
-  }, [maintenanceBlank, original])
+  }, [original])
 
-  if (maintenanceBlank) {
+  if (isMaintenanceMode) {
     return null
   }
 
@@ -147,6 +144,3 @@ function WidgetPage({ maintenanceBlank }: WidgetPageProps) {
 }
 
 export default WidgetPage
-
-export const getServerSideProps: GetServerSideProps<WidgetPageProps> = async () =>
-  getOverlayMaintenanceProps({})

@@ -13,7 +13,6 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { signIn, useSession } from 'next-auth/react'
@@ -23,7 +22,6 @@ import HomepageShell from '@/components/Homepage/HomepageShell'
 import TwitchChat from '@/components/TwitchChat'
 import { chatVerifyScopes } from '@/lib/authScopes'
 import { getRankTitle } from '@/lib/ranks'
-import { getMaintenanceRedirect } from '@/lib/server/maintenance'
 import { useTrack } from '@/lib/track'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
@@ -794,5 +792,3 @@ VerifyPage.getLayout = function getLayout(page: ReactElement) {
 }
 
 export default VerifyPage
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => getMaintenanceRedirect(ctx)

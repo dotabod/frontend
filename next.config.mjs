@@ -18,7 +18,7 @@ const nextConfig = {
     NEXT_PUBLIC_LASTFM_API_KEY: process.env.LASTFM_API_KEY,
   },
   async redirects() {
-    return [
+    const redirects = [
       {
         source: '/install',
         destination: '/api/install',
@@ -30,6 +30,16 @@ const nextConfig = {
         permanent: false,
       },
     ]
+
+    if (process.env.IS_IN_MAINTENANCE_MODE === 'true') {
+      redirects.push(
+        { source: '/', destination: '/maintenance', permanent: false },
+        { source: '/login', destination: '/maintenance', permanent: false },
+        { source: '/verify', destination: '/maintenance', permanent: false },
+      )
+    }
+
+    return redirects
   },
   async rewrites() {
     return [
