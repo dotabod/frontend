@@ -1,5 +1,5 @@
-import type { Prisma } from '@prisma/client'
-import { debugLog } from './debugLog'
+import type { Prisma } from '@prisma/client';
+import { debugLog } from './debugLog';
 
 /**
  * Processes a webhook event idempotently, ensuring it's only processed once
@@ -27,6 +27,8 @@ export async function processEventIdempotently(
   }
 
   try {
+    let eventRecordCreated = false
+
     // Check if we've already processed this event
     debugLog(`Checking for existing webhookEvent record for event ${eventId}`)
     const existingEvent = await tx.webhookEvent.findUnique({
@@ -54,6 +56,7 @@ export async function processEventIdempotently(
           processedAt: new Date(),
         },
       })
+      eventRecordCreated = true
       debugLog(`Successfully created webhookEvent record for event ${eventId}`)
     } catch (error) {
       debugLog(`Error creating webhookEvent record for event ${eventId}`, { error })
@@ -84,7 +87,25 @@ export async function processEventIdempotently(
 
     // Process the event
     debugLog(`Calling processor function for event ${eventId} (${eventType})`)
-    await processor(tx)
+    try {
+      await processor(tx)
+    } catch (processingError) {
+      if (eventRecordCreated) {
+        try {
+          await tx.webhookEvent.delete({
+            where: { stripeEventId: eventId },
+          })
+          debugLog(`Deleted webhookEvent record for failed event ${eventId}`)
+        } catch (deleteError) {
+          debugLog(`Failed to delete webhookEvent record for failed event ${eventId}`, {
+            deleteError,
+          })
+        }
+      }
+
+      throw processingError
+    }
+
     debugLog(`Processor function finished successfully for event ${eventId} (${eventType})`)
     return true
   } catch (error) {

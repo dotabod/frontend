@@ -105,10 +105,18 @@ async function processWebhookEvent(
 
   // Now TypeScript knows event.type is one of our supported types
   debugLog(`Processing relevant event ${event.id} (${event.type})`)
+
+  const assertHandled = (handled: boolean, context: string) => {
+    if (!handled) {
+      throw new Error(`Webhook handler reported failure for ${context} on event ${event.id}`)
+    }
+  }
+
   switch (event.type) {
     case 'customer.deleted': {
       debugLog(`Calling handleCustomerDeleted for event ${event.id}`)
-      await handleCustomerDeleted(event.data.object, tx)
+      const handled = await handleCustomerDeleted(event.data.object, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleCustomerDeleted for event ${event.id}`)
       break
     }
@@ -186,14 +194,16 @@ async function processWebhookEvent(
       }
 
       debugLog(`Calling handleSubscriptionEvent for subscription ${subscription.id}`)
-      await handleSubscriptionEvent(subscription, tx)
+      const handled = await handleSubscriptionEvent(subscription, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleSubscriptionEvent for subscription ${subscription.id}`)
       break
     }
     case 'customer.subscription.deleted': {
       const subscription = event.data.object
       debugLog(`Calling handleSubscriptionDeleted for subscription ${subscription.id}`)
-      await handleSubscriptionDeleted(event.data.object, tx)
+      const handled = await handleSubscriptionDeleted(event.data.object, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleSubscriptionDeleted for subscription ${subscription.id}`)
       break
     }
@@ -204,28 +214,32 @@ async function processWebhookEvent(
     case 'invoice.paid': {
       const invoice = event.data.object
       debugLog(`Calling handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
-      await handleInvoiceEvent(event.data.object, tx)
+      const handled = await handleInvoiceEvent(event.data.object, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
       break
     }
     case 'checkout.session.completed': {
       const session = event.data.object
       debugLog(`Calling handleCheckoutCompleted for session ${session.id}`)
-      await handleCheckoutCompleted(session, tx)
+      const handled = await handleCheckoutCompleted(session, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleCheckoutCompleted for session ${session.id}`)
       break
     }
     case 'charge.succeeded': {
       const chargeSucceeded = event.data.object
       debugLog(`Calling handleChargeSucceeded for charge ${chargeSucceeded.id}`)
-      await handleChargeSucceeded(event.data.object, tx)
+      const handled = await handleChargeSucceeded(event.data.object, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleChargeSucceeded for charge ${chargeSucceeded.id}`)
       break
     }
     case 'charge.refunded': {
       const chargeRefunded = event.data.object
       debugLog(`Calling handleChargeRefunded for charge ${chargeRefunded.id}`)
-      await handleChargeRefunded(event.data.object, tx)
+      const handled = await handleChargeRefunded(event.data.object, tx)
+      assertHandled(handled, event.type)
       debugLog(`Finished handleChargeRefunded for charge ${chargeRefunded.id}`)
       break
     }
@@ -295,12 +309,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     debugLog(`Idempotent processing result for event ${event.id} (${event.type}):`, result)
 
-    if (result === null) {
+    if (result === false) {
       console.error(`Webhook processing failed for event ${event.id} (${event.type})`)
-      debugLog(`Webhook processing marked as failed for event ${event.id}, responding 200 OK.`)
-      // Return 200 to prevent Stripe from retrying, as we've already recorded the event
-      // We'll handle the failure through our own monitoring and recovery process
-      return res.status(200).json({ received: true, processed: false })
+      debugLog(`Webhook processing marked as failed for event ${event.id}, responding 500.`)
+      return res.status(500).json({ error: 'Webhook processing failed', received: true })
     }
 
     // Handle the case where the event was already processed

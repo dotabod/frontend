@@ -43,16 +43,20 @@ export class CustomerService {
           }
         }
 
-        // Create or find customer if needed
-        if (!customerId && user.email) {
-          const existingCustomers = await stripe.customers.list({
-            email: user.email,
-            limit: 1,
-          })
+        // Create or find customer if needed (email is optional)
+        if (!customerId) {
+          if (user.email) {
+            const existingCustomers = await stripe.customers.list({
+              email: user.email,
+              limit: 1,
+            })
 
-          if (existingCustomers.data.length > 0) {
-            customerId = existingCustomers.data[0].id
-          } else {
+            if (existingCustomers.data.length > 0) {
+              customerId = existingCustomers.data[0].id
+            }
+          }
+
+          if (!customerId) {
             const newCustomer = await this.createStripeCustomer(user)
             customerId = newCustomer.id
           }
