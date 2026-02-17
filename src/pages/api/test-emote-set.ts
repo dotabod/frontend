@@ -58,15 +58,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const stvResponse = await get7TVUser(twitchId)
     const userId = stvResponse.user.id
 
+    let result: { emoteSetId: string; created: boolean }
     try {
-      const result = await getOrCreateEmoteSet({
+      result = await getOrCreateEmoteSet({
         client,
         userId,
         twitchId,
         name: `TestEmoteSet${Date.now()}`.replace(/\s+/g, ''),
       })
-      emoteSetId = result.emoteSetId
-      createdNewSet = result.created
     } catch (error) {
       if (error instanceof Error && error.message.includes('permission')) {
         console.log('User does not have permission to use personal emote sets, skipping test')
@@ -74,6 +73,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
       throw error
     }
+
+    // Capture emoteSetId and createdNewSet immediately after successful creation
+    // This ensures cleanup happens even if subsequent operations fail
+    emoteSetId = result.emoteSetId
+    createdNewSet = result.created
 
     // Add emotes to the set
     console.log('Adding emotes to emote set...')
