@@ -316,7 +316,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Handle the case where the event was already processed
-    if (typeof result === 'object' && result.skipped) {
+    if (result && typeof result === 'object' && result.skipped) {
       debugLog(
         `Event ${event.id} (${event.type}) was already processed at ${result.processedAt}. Responding 200 OK.`,
       )
