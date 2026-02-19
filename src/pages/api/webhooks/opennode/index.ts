@@ -50,7 +50,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { openNodeChargeId: chargeId },
     })
 
-    if (existingCharge?.lastWebhookAt && existingCharge?.status === status) {
+    const existingMetadata = (existingCharge?.metadata as Record<string, unknown>) || {}
+    const alreadyProcessedSuccessfully = existingMetadata.processedSuccessfully === true
+
+    if (
+      existingCharge?.lastWebhookAt &&
+      existingCharge?.status === status &&
+      (status !== 'paid' && status !== 'confirmed' ? true : alreadyProcessedSuccessfully)
+    ) {
       console.log(
         `Charge ${chargeId} already processed at ${existingCharge.lastWebhookAt} with status ${status}`,
       )
@@ -110,7 +117,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           // Process using transaction
           await prisma.$transaction(async (tx) => {
-            await handleInvoiceEvent(invoice, tx)
+            const handled = await handleInvoiceEvent(invoice, tx)
+            if (!handled) {
+              throw new Error(`Manual invoice handling returned false for ${invoiceId}`)
+            }
           })
 
           subscriptionCreated = true
@@ -125,10 +135,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             lastWebhookAt: new Date(),
             metadata: {
-              ...((existingCharge?.metadata as Record<string, unknown>) || {}),
+              ...existingMetadata,
               processedSuccessfully: true,
               stripeInvoiceMarkedPaid,
               subscriptionCreated,
+              invoiceId,
+              chargeId,
               processedAt: new Date().toISOString(),
             },
           },
@@ -142,22 +154,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await prisma.openNodeCharge.update({
           where: { openNodeChargeId: chargeId },
           data: {
-            lastWebhookAt: new Date(),
             metadata: {
-              ...((existingCharge?.metadata as Record<string, unknown>) || {}),
+              ...existingMetadata,
+              processedSuccessfully: false,
               lastError: error instanceof Error ? error.message : String(error),
               errorStack: error instanceof Error ? error.stack : undefined,
               stripeInvoiceMarkedPaid,
               subscriptionCreated,
+              invoiceId,
+              chargeId,
               failedAt: new Date().toISOString(),
             },
           },
         })
 
-        // Don't return error - we've logged it and can recover manually
-        console.log(
-          '⚠️ Error logged in database. Use recovery script if needed: scripts/fix-opennode-payment.ts',
-        )
+        // Return non-2xx so OpenNode retries the webhook for transient failures
+        res.status(500).json({ error: 'Failed to process OpenNode payment' })
+        return
       }
     } else {
       // For non-payment statuses, just update lastWebhookAt

@@ -28,7 +28,10 @@ export async function handleChargeSucceeded(
   }
 
   const userId = charge.metadata?.userId
-  if (!userId) return false
+  if (!userId) {
+    console.log(`Skipping charge.succeeded ${charge.id}: missing userId metadata`)
+    return true
+  }
 
   return (
     (await withErrorHandling(

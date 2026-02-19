@@ -41,7 +41,12 @@ export async function handleInvoiceEvent(
   }
 
   // Regular subscription invoices
-  if (!invoice.lines.data[0]?.subscription) return false
+  if (!invoice.lines.data[0]?.subscription) {
+    console.log(
+      `Skipping invoice event ${invoice.id}: no subscription on first line item (status: ${invoice.status})`,
+    )
+    return true
+  }
 
   return (
     (await withErrorHandling(
@@ -49,10 +54,6 @@ export async function handleInvoiceEvent(
         const subscription = await stripe.subscriptions.retrieve(
           invoice.lines.data[0]?.subscription as string,
         )
-        const customer = await stripe.customers.retrieve(subscription.customer as string)
-        const userId = (customer as Stripe.Customer).metadata?.userId
-        if (!userId) return false
-
         // Map Stripe status to our internal status
         const status = mapStripeStatus(subscription.status)
         const currentPeriodEnd = new Date(subscription.items.data[0]?.current_period_end * 1000)
@@ -87,7 +88,20 @@ async function handleCryptoInvoiceEvent(
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
   const customerId = invoice.customer as string
-  const userId = invoice.metadata?.userId
+  const resolvedUser = await resolveUserIdForCryptoInvoice(invoice, tx)
+  const userId = resolvedUser?.userId ?? null
+
+  if (resolvedUser) {
+    console.log(
+      JSON.stringify({
+        event: 'crypto_user_resolution',
+        invoiceId: invoice.id,
+        customerId,
+        source: resolvedUser.source,
+        userId,
+      }),
+    )
+  }
 
   if (!userId) {
     console.error(`Missing userId in crypto invoice metadata: ${invoice.id}`)
@@ -380,6 +394,60 @@ function mapStripeStatus(status: string): SubscriptionStatus {
   }
 }
 
+type CryptoUserResolutionSource =
+  | 'invoice_metadata'
+  | 'customer_metadata'
+  | 'opennode_charge'
+  | 'subscription_lookup'
+
+async function resolveUserIdForCryptoInvoice(
+  invoice: Stripe.Invoice,
+  tx: Prisma.TransactionClient,
+): Promise<{ userId: string; source: CryptoUserResolutionSource } | null> {
+  if (invoice.metadata?.userId) {
+    return { userId: invoice.metadata.userId, source: 'invoice_metadata' }
+  }
+
+  const customerId = typeof invoice.customer === 'string' ? invoice.customer : null
+
+  if (!customerId) {
+    return null
+  }
+
+  try {
+    const customer = await stripe.customers.retrieve(customerId)
+    if (!customer.deleted && customer.metadata?.userId) {
+      return { userId: customer.metadata.userId, source: 'customer_metadata' }
+    }
+  } catch (error) {
+    console.error(`Failed to resolve userId from customer ${customerId}:`, error)
+  }
+
+  const openNodeCharge = await tx.openNodeCharge.findUnique({
+    where: { stripeInvoiceId: invoice.id },
+    select: { userId: true },
+  })
+
+  if (openNodeCharge?.userId) {
+    return { userId: openNodeCharge.userId, source: 'opennode_charge' }
+  }
+
+  const existingSubscription = await tx.subscription.findFirst({
+    where: {
+      stripeCustomerId: customerId,
+      NOT: { status: SubscriptionStatus.CANCELED },
+    },
+    orderBy: { updatedAt: 'desc' },
+    select: { userId: true },
+  })
+
+  if (existingSubscription?.userId) {
+    return { userId: existingSubscription.userId, source: 'subscription_lookup' }
+  }
+
+  return null
+}
+
 /**
  * Handles an OpenNode crypto invoice.paid event
  * @param invoice The Stripe invoice object with OpenNode metadata
@@ -391,7 +459,20 @@ async function handleOpenNodeInvoicePaid(
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
   const customerId = invoice.customer as string
-  const userId = invoice.metadata?.userId
+  const resolvedUser = await resolveUserIdForCryptoInvoice(invoice, tx)
+  const userId = resolvedUser?.userId ?? null
+
+  if (resolvedUser) {
+    console.log(
+      JSON.stringify({
+        event: 'opennode_user_resolution',
+        invoiceId: invoice.id,
+        customerId,
+        source: resolvedUser.source,
+        userId,
+      }),
+    )
+  }
 
   if (!userId) {
     console.error(`Missing userId in OpenNode invoice metadata: ${invoice.id}`)
