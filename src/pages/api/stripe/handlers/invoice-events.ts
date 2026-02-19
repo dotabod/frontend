@@ -40,8 +40,10 @@ export async function handleInvoiceEvent(
     return await handleCryptoInvoiceEvent(invoice, tx)
   }
 
+  const subscriptionId = getInvoiceSubscriptionId(invoice)
+
   // Regular subscription invoices
-  if (!invoice.lines.data[0]?.subscription) {
+  if (!subscriptionId) {
     console.log(
       `Skipping invoice event ${invoice.id}: no subscription on first line item (status: ${invoice.status})`,
     )
@@ -51,9 +53,7 @@ export async function handleInvoiceEvent(
   return (
     (await withErrorHandling(
       async () => {
-        const subscription = await stripe.subscriptions.retrieve(
-          invoice.lines.data[0]?.subscription as string,
-        )
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
         // Map Stripe status to our internal status
         const status = mapStripeStatus(subscription.status)
         const currentPeriodEnd = new Date(subscription.items.data[0]?.current_period_end * 1000)
@@ -75,6 +75,29 @@ export async function handleInvoiceEvent(
       invoice.customer as string,
     )) !== null
   )
+}
+
+function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const firstLineItem = invoice.lines.data[0]
+
+  if (!firstLineItem) {
+    return null
+  }
+
+  if (firstLineItem.subscription) {
+    return firstLineItem.subscription as string
+  }
+
+  const parent = firstLineItem.parent
+  if (
+    parent &&
+    parent.type === 'subscription_item_details' &&
+    parent.subscription_item_details?.subscription
+  ) {
+    return parent.subscription_item_details.subscription
+  }
+
+  return null
 }
 
 /**
