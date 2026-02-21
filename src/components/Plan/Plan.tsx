@@ -28,19 +28,20 @@ import { Logomark } from '../Logo'
 import { FeatureList } from './FeatureList'
 import { PriceDisplay } from './PriceDisplay'
 
+
 // Sparkle animation component with unique IDs
 const CryptoSparkle = ({ visible }: { visible: boolean }) => {
   // Create a fixed array of sparkles with pre-determined keys
-  // This prevents the random key generation on each render that could cause issues
+  // This prevents non-deterministic SSR/client output that causes hydration mismatches
   const sparkles = useMemo(() => {
     return Array.from({ length: 8 }).map((_, index) => ({
       id: `sparkle-${index}`,
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      width: `${Math.random() * 5 + 2}px`,
-      height: `${Math.random() * 5 + 2}px`,
-      delay: `${Math.random() * 1.5}s`,
-      duration: `${Math.random() * 1 + 1.5}s`,
+      top: `${(index * 17 + 11) % 100}%`,
+      left: `${(index * 23 + 7) % 100}%`,
+      width: `${2 + (index % 6)}px`,
+      height: `${2 + ((index + 2) % 6)}px`,
+      delay: `${(index % 6) * 0.2}s`,
+      duration: `${1.5 + (index % 4) * 0.25}s`,
     }))
   }, []) // Empty dependency array means this only runs once
 
@@ -889,11 +890,12 @@ function Plan({
               size={featured ? 'large' : 'middle'}
               color={featured ? 'danger' : 'default'}
               className={clsx(
-                'mt-6 w-full',
+                'w-full',
+                payWithCrypto && !hasActivePlan ? 'mt-8' : 'mt-6',
                 featured
                   ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
-                payWithCrypto && 'border-purple-400 animate-float crypto-button',
+                payWithCrypto && 'border-purple-400 animate-glow crypto-button',
               )}
               aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
               icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}
@@ -909,12 +911,12 @@ function Plan({
             size={featured ? 'large' : 'middle'}
             color={featured ? 'danger' : 'default'}
             className={clsx(
-              'mt-6',
+              payWithCrypto && !hasActivePlan ? 'mt-8' : 'mt-6',
               featured
                 ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-100',
               payWithCrypto && 'crypto-button',
-              payWithCrypto && !hasActivePlan && 'animate-float',
+              payWithCrypto && !hasActivePlan && 'animate-glow',
             )}
             aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
             icon={payWithCrypto ? <Bitcoin size={16} className='animate-pulse' /> : undefined}

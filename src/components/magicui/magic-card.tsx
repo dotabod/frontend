@@ -22,8 +22,7 @@ export function MagicCard({
   const mouseY = useMotionValue(0)
 
   return (
-    <button
-      type='button'
+    <div
       onMouseMove={(e) => {
         const { left, top } = e.currentTarget.getBoundingClientRect()
 
@@ -41,6 +40,6 @@ export function MagicCard({
     `,
         }}
       />
-    </button>
+    </div>
   )
 }

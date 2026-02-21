@@ -1,4 +1,4 @@
-import { Popover, Typography } from 'antd'
+import { Popover } from 'antd'
 import { SparklesIcon } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
@@ -10,7 +10,6 @@ import { Settings } from '@/lib/defaultSettings'
 import { chatterInfo } from '../Dashboard/Features/ChatterCard'
 import { MMRBadge } from '../Overlay/rank/MMRBadge'
 
-const { Link } = Typography
 
 export function SecondaryFeatures() {
   const features: BentoGridItemProps[] = [
@@ -34,10 +33,10 @@ export function SecondaryFeatures() {
             />
           }
         >
-          <Link className='flex space-x-1' onClick={(e) => e.preventDefault()}>
+          <button type='button' className='flex items-center space-x-1 text-purple-300'>
             <SparklesIcon className='text-purple-200' height={22} />
-            <span className='text-purple-300'>Preview</span>
-          </Link>
+            <span>Preview</span>
+          </button>
         </Popover>
       ),
       description:
@@ -58,12 +57,10 @@ export function SecondaryFeatures() {
             />
           }
         >
-          <Link onClick={(e) => e.preventDefault()}>
-            <span className='flex items-center space-x-1'>
-              <SparklesIcon className='text-purple-200' height={22} />
-              <span className='text-purple-300'>Preview</span>
-            </span>
-          </Link>
+          <button type='button' className='flex items-center space-x-1 text-purple-300'>
+            <SparklesIcon className='text-purple-200' height={22} />
+            <span>Preview</span>
+          </button>
         </Popover>
       ),
       background: (
@@ -134,10 +131,10 @@ export function SecondaryFeatures() {
             </div>
           }
         >
-          <Link className='flex items-center! space-x-1' onClick={(e) => e.preventDefault()}>
+          <button type='button' className='flex items-center space-x-1 text-purple-300'>
             <SparklesIcon className='text-purple-200' height={22} />
-            <span className='text-purple-300'>Preview</span>
-          </Link>
+            <span>Preview</span>
+          </button>
         </Popover>
       ),
       disableHover: false,

@@ -42,9 +42,10 @@ const HomepageShell = ({
   const defaultTitle = 'Dotabod - Enhance Your Dota 2 Streaming Experience'
   const defaultDescription =
     'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!'
+  const host = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL || 'dotabod.com'
+  const baseUrl = `https://${host}`
   // Generate dynamic OG image URL using parameters
   let defaultOgImage = '/images/welcome.png'
-  const host = typeof window !== 'undefined' ? window.location.origin : ''
 
   // If ogImage props are provided, build a custom OG image URL
   if (ogImage) {
@@ -52,16 +53,15 @@ const HomepageShell = ({
     if (ogImage.title) params.append('title', ogImage.title)
     if (ogImage.subtitle) params.append('subtitle', ogImage.subtitle)
 
-    // Ensure the URL has the full origin for absolute URLs
-    defaultOgImage = `${host}/api/og-image?${params.toString()}`
+    defaultOgImage = `/api/og-image?${params.toString()}`
   }
   // For backward compatibility - if only username is provided
   else if (username) {
-    defaultOgImage = `${host}/api/og-image?title=${encodeURIComponent(username)}&subtitle=Commands, MMR Tracking, Live Stats, and more!`
+    defaultOgImage = `/api/og-image?title=${encodeURIComponent(username)}&subtitle=Commands, MMR Tracking, Live Stats, and more!`
   }
 
   const defaultUrl = !process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
-    ? host
+    ? baseUrl
     : `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
 
   // Use SEO props if provided, otherwise use defaults
@@ -69,7 +69,7 @@ const HomepageShell = ({
   const pageDescription = seo?.description || defaultDescription
   const pageImage = seo?.ogImage || defaultOgImage
   // Ensure pageImage is an absolute URL
-  const absolutePageImage = pageImage.startsWith('http') ? pageImage : `${host}${pageImage}`
+  const absolutePageImage = pageImage.startsWith('http') ? pageImage : `${baseUrl}${pageImage}`
   const pageUrl = seo?.canonicalUrl || defaultUrl
   const pageType = seo?.ogType || 'website'
 

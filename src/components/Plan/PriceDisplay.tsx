@@ -93,7 +93,7 @@ export const PriceDisplay = ({
           Saving {savings}%
         </p>
       )}
-      <p className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+      <div className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
         <PlanDescription
           tier={tier}
           activePeriod={activePeriod}
@@ -103,7 +103,7 @@ export const PriceDisplay = ({
           formattedCreditBalance={formattedCreditBalance}
           hasTrial={hasTrial}
         />
-      </p>
+      </div>
     </>
   )
 }

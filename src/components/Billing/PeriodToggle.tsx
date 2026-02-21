@@ -1,4 +1,3 @@
-import { Radio, RadioGroup } from '@headlessui/react'
 import clsx from 'clsx'
 import { useEffect } from 'react'
 import { plans } from '@/components/Billing/BillingPlans'
@@ -17,6 +16,8 @@ interface PeriodToggleProps {
 }
 
 export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodToggleProps) {
+  const periods: PricePeriod[] = ['monthly', 'annual', 'lifetime']
+
   // Set initial period based on subscription
   useEffect(() => {
     if (isSubscriptionActive({ status: subscription?.status })) {
@@ -26,18 +27,22 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
   }, [subscription, onChange])
 
   return (
-    <RadioGroup
-      value={activePeriod}
-      onChange={onChange}
+    <div
+      role='radiogroup'
+      aria-label='Billing period'
       className='flex flex-col sm:grid sm:grid-cols-3 rounded-lg'
     >
-      {['monthly', 'annual', 'lifetime'].map((period) => (
+      {periods.map((period) => (
         <div
           key={period}
           className={clsx('relative py-1.5 sm:py-0 sm:flex sm:flex-col', 'sm:min-h-[3.5rem]')}
         >
-          <Radio
-            value={period}
+          <button
+            type='button'
+            role='radio'
+            aria-checked={activePeriod === period}
+            tabIndex={activePeriod === period ? 0 : -1}
+            onClick={() => onChange(period)}
             className={clsx(
               'bg-gray-800/50 cursor-pointer px-3 sm:px-4 md:px-8 py-2 text-sm transition-colors rounded-md',
               'w-full flex items-center justify-center',
@@ -48,7 +53,7 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
             )}
           >
             <span className='first-letter:uppercase'>{period}</span>
-          </Radio>
+          </button>
 
           <div
             className={clsx(
@@ -67,6 +72,6 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
           </div>
         </div>
       ))}
-    </RadioGroup>
+    </div>
   )
 }

@@ -193,7 +193,7 @@ export function Hero() {
                 <div className='flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left'>
                   <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
                   <span>
-                    Trusted by Over {new Intl.NumberFormat().format(20000)} Twitch Streamers
+                    Trusted by Over {new Intl.NumberFormat('en-US').format(30000)} Twitch Streamers
                     Including:
                   </span>
                   <LiveIcon />

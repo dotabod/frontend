@@ -206,40 +206,37 @@ const CookieConsent = () => {
     <>
       {visible && !showSettings && (
         <Alert
-          message='Cookie Consent Required'
+          message='Cookie preferences'
           description={
             <div>
               <Paragraph>
-                <strong>Your privacy matters to us.</strong> This website uses cookies to enhance
-                your browsing experience. We only use strictly necessary cookies by default, which
-                are essential for the website to function properly. For analytics, marketing, and
-                preference cookies, we need your explicit consent. No non-essential cookies are set
-                until you provide consent. For more information, please read our{' '}
+                We use necessary cookies by default. You can choose whether to allow analytics,
+                marketing, and preference cookies. Learn more in our{' '}
                 <Link href='/cookies'>Cookie Policy</Link>.
               </Paragraph>
-              <Space wrap>
-                <Button type='primary' onClick={handleAcceptAll}>
-                  Accept All Cookies
+              <Space size='small' wrap>
+                <Button size='small' type='primary' onClick={handleAcceptAll}>
+                  Accept all
                 </Button>
-                <Button onClick={handleRejectAll}>Reject Non-Essential Cookies</Button>
-                <Button type='link' onClick={handleManagePreferences}>
-                  Customize Cookie Preferences
+                <Button size='small' onClick={handleRejectAll}>
+                  Reject non-essential
+                </Button>
+                <Button size='small' type='link' onClick={handleManagePreferences}>
+                  Customize
                 </Button>
               </Space>
             </div>
           }
           showIcon
-          banner
           style={{
             position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 16,
+            left: 16,
             zIndex: 1001,
+            width: 'min(420px, calc(100vw - 32px))',
             margin: 0,
-            padding: '16px 24px',
-            borderRadius: 0,
-            borderTop: '1px solid #d9d9d9',
+            padding: 12,
+            borderRadius: 8,
           }}
           closable={false}
         />
