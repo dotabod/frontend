@@ -246,4 +246,111 @@ describe('getBillingSummaryInfo', () => {
     expect(summary.canManageInStripe).toBe(false)
     expect(summary.creditMessage).toContain('$25.00')
   })
+
+  it('summarizes a canceled subscription — does not fall through to Free plan copy', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.CANCELED,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-03-01T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: null,
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.headline).toBe('Your subscription has been canceled')
+    expect(summary.statusLabel).toBe('Canceled')
+    expect(summary.tone).toBe('info')
+    expect(summary.canManageInStripe).toBe(true)
+  })
+
+  it('summarizes an incomplete subscription with warning tone', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.INCOMPLETE,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: 'sub_123',
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.headline).toBe('Your payment is incomplete')
+    expect(summary.statusLabel).toBe('Incomplete')
+    expect(summary.tone).toBe('warning')
+    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.portalButtonLabel).toBe('Update payment method')
+  })
+
+  it('summarizes an incomplete-expired subscription with error tone', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.INCOMPLETE_EXPIRED,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-03-01T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: null,
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.headline).toBe('Your subscription setup expired')
+    expect(summary.statusLabel).toBe('Expired')
+    expect(summary.tone).toBe('error')
+  })
+
+  it('summarizes an unpaid subscription with error tone and pay-invoice CTA', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.UNPAID,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: 'sub_123',
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.headline).toBe('Your invoice is unpaid')
+    expect(summary.statusLabel).toBe('Unpaid')
+    expect(summary.tone).toBe('error')
+    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.portalButtonLabel).toBe('Pay invoice')
+  })
+
+  it('summarizes a paused subscription with warning tone', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.PAUSED,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: 'sub_123',
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.headline).toBe('Your subscription is paused')
+    expect(summary.statusLabel).toBe('Paused')
+    expect(summary.tone).toBe('warning')
+    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.portalButtonLabel).toBe('Resume subscription')
+  })
 })

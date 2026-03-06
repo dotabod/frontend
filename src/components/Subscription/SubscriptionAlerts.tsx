@@ -2,7 +2,7 @@ import { Alert, Button, message, Skeleton } from 'antd'
 import { ClockIcon, GiftIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { GRACE_PERIOD_END, gracePeriodEndNextDay, isInGracePeriod } from '@/utils/subscription'
+import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
 import type { GiftInfo, GiftSubInfo, StatusInfo, SubscriptionWithGiftDetails } from './types'
 
 // Reusable component for subscription alert messages
@@ -250,11 +250,6 @@ export function SubscriptionAlerts({
             description={
               <div className='mt-1 text-indigo-300'>
                 <p>You can keep using Pro features right now without opening Stripe.</p>
-                <GracePeriodInfo
-                  inGracePeriod={inGracePeriod}
-                  giftCoversPostGracePeriod={false}
-                  gracePeriodEndNextDay={gracePeriodEndNextDay}
-                />
               </div>
             }
             type='info'

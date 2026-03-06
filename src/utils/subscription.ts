@@ -730,6 +730,118 @@ export function getBillingSummaryInfo({
     }
   }
 
+  if (status === SubscriptionStatus.CANCELED) {
+    return {
+      headline: 'Your subscription has been canceled',
+      description:
+        'Your access has ended. If you want Pro features back, choose a plan below to resubscribe.',
+      planLabel,
+      statusLabel: 'Canceled',
+      nextStepLabel: 'Next step',
+      nextStepValue: hasCreditBalance
+        ? 'Use your available credit on a new Pro plan'
+        : 'Choose a Pro plan below',
+      tone: 'info',
+      canManageInStripe: hasStripeCustomer,
+      portalButtonLabel: 'Open billing portal',
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      portalHelpText: hasStripeCustomer
+        ? 'Stripe still has your invoices and previous payment details on file.'
+        : 'There is no Stripe billing profile attached to this account.',
+      creditMessage,
+    }
+  }
+
+  if (status === SubscriptionStatus.INCOMPLETE) {
+    return {
+      headline: 'Your payment is incomplete',
+      description:
+        'Your subscription was not fully set up because the initial payment did not go through. Update your payment method to activate it.',
+      planLabel,
+      statusLabel: 'Incomplete',
+      nextStepLabel: 'Next step',
+      nextStepValue: hasStripeCustomer ? 'Update your payment method in Stripe' : 'Contact support',
+      tone: 'warning',
+      canManageInStripe: hasStripeCustomer,
+      portalButtonLabel: 'Update payment method',
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      portalHelpText: hasStripeCustomer
+        ? 'Use Stripe to update your payment method and complete the subscription setup.'
+        : 'There is no Stripe billing profile attached to this account.',
+      creditMessage,
+    }
+  }
+
+  if (status === SubscriptionStatus.INCOMPLETE_EXPIRED) {
+    return {
+      headline: 'Your subscription setup expired',
+      description:
+        'The initial payment window passed without a successful charge and the subscription was closed. Start a new subscription below.',
+      planLabel,
+      statusLabel: 'Expired',
+      nextStepLabel: 'Next step',
+      nextStepValue: 'Choose a Pro plan below',
+      tone: 'error',
+      canManageInStripe: hasStripeCustomer,
+      portalButtonLabel: 'Open billing portal',
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      portalHelpText: hasStripeCustomer
+        ? 'Stripe still has your previous payment details on file.'
+        : 'There is no Stripe billing profile attached to this account.',
+      creditMessage,
+    }
+  }
+
+  if (status === SubscriptionStatus.UNPAID) {
+    return {
+      headline: 'Your invoice is unpaid',
+      description:
+        'An outstanding invoice needs to be settled to restore Pro access. Update your payment method in Stripe.',
+      planLabel,
+      statusLabel: 'Unpaid',
+      nextStepLabel: 'Next step',
+      nextStepValue: hasStripeCustomer ? 'Pay outstanding invoice in Stripe' : 'Contact support',
+      tone: 'error',
+      canManageInStripe: hasStripeCustomer,
+      portalButtonLabel: 'Pay invoice',
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      portalHelpText: hasStripeCustomer
+        ? 'Use Stripe to pay the outstanding invoice or update your payment method.'
+        : 'There is no Stripe billing profile attached to this account.',
+      creditMessage,
+    }
+  }
+
+  if (status === SubscriptionStatus.PAUSED) {
+    return {
+      headline: 'Your subscription is paused',
+      description:
+        'Pro features are not active while your subscription is paused. Resume your subscription in Stripe when you are ready.',
+      planLabel,
+      statusLabel: 'Paused',
+      nextStepLabel: 'Next step',
+      nextStepValue: hasStripeCustomer ? 'Resume subscription in Stripe' : 'Contact support',
+      tone: 'warning',
+      canManageInStripe: hasStripeCustomer,
+      portalButtonLabel: 'Resume subscription',
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      portalHelpText: hasStripeCustomer
+        ? 'Use Stripe to resume your subscription or update your billing details.'
+        : 'There is no Stripe billing profile attached to this account.',
+      creditMessage,
+    }
+  }
+
   return {
     headline: 'You are on the Free plan',
     description:

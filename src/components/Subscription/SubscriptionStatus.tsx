@@ -58,14 +58,16 @@ function SubscriptionStatusComponent() {
     stripePriceId: subscription?.stripePriceId,
     tier: subscription?.tier,
     inGracePeriod,
-    creditBalance: contextCreditBalance || creditBalance.amount,
+    creditBalance: contextCreditBalance ?? creditBalance.amount,
     formattedCreditBalance:
-      formattedCreditBalance !== '$0.00' ? formattedCreditBalance : creditBalance.formattedAmount,
+      formattedCreditBalance && formattedCreditBalance !== '$0.00'
+        ? formattedCreditBalance
+        : creditBalance.formattedAmount,
   })
 
   const subtitle = summary.creditMessage
-    ? `${summary.headline} ${summary.creditMessage}`
-    : `${summary.headline} ${summary.nextStepLabel}: ${summary.nextStepValue}`
+    ? `${summary.headline} — ${summary.creditMessage}`
+    : `${summary.headline} — ${summary.nextStepLabel}: ${summary.nextStepValue}`
 
   return (
     <div className='flex flex-col gap-4'>
