@@ -98,9 +98,10 @@ export function SubscriptionAlerts({
   } = useSubscriptionContext()
   const [isApplyingCredits, setIsApplyingCredits] = useState(false)
 
-  // Only show manage subscription button for recurring subscriptions with Stripe
-  const showManageButton =
-    !hideManageButton && hasActivePlan && subscription?.stripeSubscriptionId && !isLifetimePlan
+  const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
+
+  // Show manage button when user has a Stripe billing profile
+  const showManageButton = !hideManageButton && hasStripeCustomer && !isLifetimePlan
 
   // Check if grace period virtual subscription
   const isVirtualGracePeriodSubscription =
@@ -344,7 +345,7 @@ export function SubscriptionAlerts({
       {/* Error alert for PAST_DUE subscription */}
       {statusInfo?.type === 'error' &&
         subscription?.status === 'PAST_DUE' &&
-        subscription?.stripeSubscriptionId &&
+        hasStripeCustomer &&
         !hideManageButton && (
           <Alert
             message='Payment Failed'

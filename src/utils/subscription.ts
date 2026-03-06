@@ -1,9 +1,9 @@
 import {
-  type Prisma,
-  type Subscription,
-  SubscriptionStatus,
-  SubscriptionTier,
-  TransactionType,
+    type Prisma,
+    type Subscription,
+    SubscriptionStatus,
+    SubscriptionTier,
+    TransactionType,
 } from '@prisma/client'
 import type { StatusInfo } from '@/components/Subscription/types'
 import prisma from '@/lib/db'
@@ -474,7 +474,7 @@ export function getSubscriptionStatusInfo(
   switch (status) {
     case SubscriptionStatus.TRIALING:
       return {
-        message: cancelAtPeriodEnd ? `Trial ends on ${endDate}` : `Trial until ${endDate}`,
+        message: cancelAtPeriodEnd ? `Trial ends on ${endDate}` : `Trial access until ${endDate}`,
         type: 'info',
         badge: 'gold',
       }
@@ -492,7 +492,7 @@ export function getSubscriptionStatusInfo(
       }
     case SubscriptionStatus.PAST_DUE:
       return {
-        message: 'Payment failed - Update required',
+        message: 'Payment failed - update payment method to avoid cancellation',
         type: 'error',
         badge: 'red',
       }

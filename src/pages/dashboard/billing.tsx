@@ -1,6 +1,6 @@
 import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
 import type { JsonValue } from '@prisma/client/runtime/library'
-import { Typography } from 'antd'
+import { message, Typography } from 'antd'
 import Head from 'next/head'
 import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
@@ -54,14 +54,34 @@ const BillingPage = () => {
         method: 'POST',
       })
 
+      const payload = await response.json().catch(() => null)
+
       if (!response.ok) {
-        throw new Error('Failed to create portal session')
+        if (payload?.code === 'NO_STRIPE_CUSTOMER') {
+          message.info(
+            payload?.guidance ||
+              'No Stripe billing profile was found for your account. Contact support if charges continue.',
+          )
+          return
+        }
+
+        message.error(
+          payload?.guidance ||
+            payload?.error ||
+            'Unable to open billing settings right now. Please try again.',
+        )
+        return
       }
 
-      const { url } = await response.json()
-      window.location.href = url
+      if (!payload?.url) {
+        message.error('Billing portal URL was not returned. Please try again.')
+        return
+      }
+
+      window.location.href = payload.url
     } catch (error) {
       console.error('Error accessing customer portal:', error)
+      message.error('Unable to open billing settings right now. Please try again.')
     } finally {
       setIsLoading(false)
     }

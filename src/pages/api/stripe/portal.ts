@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscription } from '@/utils/subscription'
 
@@ -18,15 +19,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Get or create Stripe customer ID
-    // First check if user has a subscription record
+    // First check current subscription context
     const subscription = await getSubscription(session.user.id)
-    const customerId = subscription?.stripeCustomerId
+    let customerId = subscription?.stripeCustomerId
 
-    console.log({ subscription })
+    // Fallback to historical records in case the user no longer has
+    // an active/trialing row but still has a Stripe customer account
+    if (!customerId) {
+      const historicalSubscription = await prisma.subscription.findFirst({
+        where: {
+          userId: session.user.id,
+          stripeCustomerId: { not: null },
+        },
+        select: { stripeCustomerId: true },
+        orderBy: { updatedAt: 'desc' },
+      })
+
+      customerId = historicalSubscription?.stripeCustomerId || null
+    }
 
     if (!customerId) {
-      return res.status(400).json({ error: 'No Stripe customer found' })
+      return res.status(400).json({
+        error: 'No Stripe customer found',
+        code: 'NO_STRIPE_CUSTOMER',
+        guidance: 'No active Stripe billing profile found. If you need help, contact support.',
+      })
     }
 
     // Ensure return URL has explicit https:// scheme
@@ -42,6 +59,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ url: portalSession.url })
   } catch (error) {
     console.error('Error creating portal session:', error)
-    return res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({
+      error: 'Failed to create Stripe portal session',
+      code: 'PORTAL_SESSION_FAILED',
+      guidance: 'Please try again in a moment. If this keeps happening, contact support.',
+    })
   }
 }
