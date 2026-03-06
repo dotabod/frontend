@@ -1,5 +1,5 @@
 import { Alert, Button, message, Skeleton } from 'antd'
-import { CheckCircleIcon, ClockIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
+import { ClockIcon, GiftIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { GRACE_PERIOD_END, gracePeriodEndNextDay, isInGracePeriod } from '@/utils/subscription'
@@ -43,34 +43,6 @@ function GracePeriodInfo({
   )
 }
 
-// Credit Balance Information component
-function CreditBalanceInfo({
-  amount,
-  formattedAmount,
-}: {
-  amount?: number
-  formattedAmount?: string
-}) {
-  if (!amount || amount <= 0) return null
-
-  return (
-    <div className='mt-2 border-t border-indigo-800/50 pt-2'>
-      <p className='flex items-center gap-1 text-sm'>
-        <GiftIcon className='h-4 w-4 text-indigo-400' />
-        <span className='font-medium text-indigo-300'>Credit Balance</span>
-      </p>
-      <p className='mt-1 text-sm'>
-        You have {formattedAmount} credit balance that will be automatically applied to your
-        subscription.
-      </p>
-      <p className='mt-1 text-xs text-indigo-400'>
-        If you currently have an active subscription, this credit will be applied to your next
-        invoice. If you don't have a subscription, this credit will be applied when you subscribe.
-      </p>
-    </div>
-  )
-}
-
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
   statusInfo: StatusInfo | null
@@ -84,7 +56,7 @@ export function SubscriptionAlerts({
   giftInfo,
   statusInfo,
   handlePortalAccess,
-  isLoading,
+  isLoading: _isLoading,
   hideManageButton = false,
 }: SubscriptionAlertsProps) {
   const {
@@ -97,13 +69,8 @@ export function SubscriptionAlerts({
     isLoading: subContextIsLoading,
   } = useSubscriptionContext()
   const [isApplyingCredits, setIsApplyingCredits] = useState(false)
-
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
 
-  // Show manage button when user has a Stripe billing profile
-  const showManageButton = !hideManageButton && hasStripeCustomer && !isLifetimePlan
-
-  // Check if grace period virtual subscription
   const isVirtualGracePeriodSubscription =
     (subscription as unknown as SubscriptionWithGiftDetails)?.isGracePeriodVirtual ||
     (inGracePeriod &&
@@ -111,18 +78,6 @@ export function SubscriptionAlerts({
       !subscription?.stripeSubscriptionId &&
       subscription?.currentPeriodEnd &&
       new Date(subscription.currentPeriodEnd).getTime() === new Date(GRACE_PERIOD_END).getTime())
-
-  // Show grace period alert when appropriate
-  const shouldShowGracePeriodAlert =
-    !isLifetimePlan &&
-    inGracePeriod &&
-    !isVirtualGracePeriodSubscription &&
-    !(
-      giftInfo.hasGifts &&
-      giftInfo.giftSubscriptions?.some(
-        (gift) => gift.endDate && new Date(gift.endDate) > new Date(),
-      )
-    )
 
   // Helper function to create alert styles based on type
   const getAlertStyles = (type: 'success' | 'info' | 'warning' | 'error') => {
@@ -227,8 +182,6 @@ export function SubscriptionAlerts({
     )
   }
 
-  const GiftSubtitle = createCreditAlert()
-
   if (subContextIsLoading) {
     return (
       <div className='space-y-4 gap-4 flex flex-col'>
@@ -239,90 +192,11 @@ export function SubscriptionAlerts({
 
   return (
     <div className='space-y-4 gap-4 flex flex-col'>
-      {/* Manage subscription button */}
-      {showManageButton && (
-        <Button
-          type='primary'
-          size='middle'
-          icon={<ExternalLinkIcon size={14} />}
-          onClick={handlePortalAccess}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Loading...' : 'Manage subscription'}
-        </Button>
-      )}
-
       {/* Credit Balance Alert */}
-      {creditBalance > 0 && createCreditAlert()}
-
-      {/* Primary subscription status alert - prioritize showing the most important information */}
-      {/* For lifetime gift subscriptions */}
-      {isLifetimePlan ? (
-        /* For regular lifetime subscriptions */
-        <Alert
-          className={getAlertStyles('success')}
-          message={
-            <SubscriptionAlertMessage
-              icon={<CheckCircleIcon size={18} className='text-emerald-400' />}
-              text='Lifetime Access'
-              color='text-emerald-300'
-            />
-          }
-          description='Thank you for being a lifetime supporter!'
-          type='success'
-          showIcon={false}
-        />
-      ) : statusInfo?.message ? (
-        <Alert
-          className={getAlertStyles(statusInfo.type)}
-          message={
-            <SubscriptionAlertMessage
-              icon={
-                statusInfo.type === 'success' ? (
-                  <CheckCircleIcon size={18} className='text-emerald-400' />
-                ) : (
-                  <ClockIcon size={18} className='text-indigo-400' />
-                )
-              }
-              text={statusInfo.message}
-              color='text-indigo-300'
-            />
-          }
-          description={
-            <div className='mt-1 text-indigo-300'>
-              {subscription?.metadata &&
-              (subscription.metadata as Record<string, unknown>).giftExtendedUntil ? (
-                <p>
-                  Your subscription will {subscription.cancelAtPeriodEnd ? 'end' : 'renew'} on{' '}
-                  {subscription.currentPeriodEnd &&
-                    new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-                </p>
-              ) : (
-                subscription?.currentPeriodEnd && (
-                  <p>
-                    Your subscription will {subscription.cancelAtPeriodEnd ? 'end' : 'renew'} on{' '}
-                    {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-                  </p>
-                )
-              )}
-
-              {/* Add credit balance information if available */}
-              <CreditBalanceInfo amount={creditBalance} formattedAmount={formattedCreditBalance} />
-
-              <GracePeriodInfo
-                inGracePeriod={inGracePeriod}
-                giftCoversPostGracePeriod={false}
-                gracePeriodEndNextDay={gracePeriodEndNextDay}
-              />
-            </div>
-          }
-          type={statusInfo.type}
-          showIcon={false}
-        />
-      ) : null}
-
-      {/* Grace period alert */}
-      {shouldShowGracePeriodAlert && GiftSubtitle}
+      {creditBalance > 0 &&
+        !hasActivePlan &&
+        !isVirtualGracePeriodSubscription &&
+        createCreditAlert()}
 
       {/* Warning alert for subscription ending soon */}
       {statusInfo?.type === 'warning' &&
@@ -357,6 +231,34 @@ export function SubscriptionAlerts({
                 Update Payment
               </Button>
             }
+          />
+        )}
+
+      {!isLifetimePlan &&
+        inGracePeriod &&
+        !subscription?.stripeSubscriptionId &&
+        !giftInfo.hasGifts && (
+          <Alert
+            className={getAlertStyles('info')}
+            message={
+              <SubscriptionAlertMessage
+                icon={<ClockIcon size={18} className='text-indigo-400' />}
+                text='Complimentary Pro access is active'
+                color='text-indigo-300'
+              />
+            }
+            description={
+              <div className='mt-1 text-indigo-300'>
+                <p>You can keep using Pro features right now without opening Stripe.</p>
+                <GracePeriodInfo
+                  inGracePeriod={inGracePeriod}
+                  giftCoversPostGracePeriod={false}
+                  gracePeriodEndNextDay={gracePeriodEndNextDay}
+                />
+              </div>
+            }
+            type='info'
+            showIcon={false}
           />
         )}
     </div>

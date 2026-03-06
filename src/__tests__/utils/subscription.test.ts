@@ -29,7 +29,7 @@ vi.mock('@/lib/db', () => ({
 
 // Import mocked modules
 import prisma from '@/lib/db'
-import { getSubscription } from '@/utils/subscription'
+import { getBillingSummaryInfo, getSubscription } from '@/utils/subscription'
 
 describe('Subscription priority logic', () => {
   it('should prioritize non-gift active subscription over gift subscription', async () => {
@@ -161,5 +161,89 @@ describe('Subscription priority logic', () => {
     // The actual behavior is that result is null when there are no subscriptions
     // and we're not in the grace period
     expect(result).toBeNull()
+  })
+})
+
+describe('getBillingSummaryInfo', () => {
+  it('summarizes an active paid subscription with Stripe management', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.ACTIVE,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-04-20T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: 'sub_123',
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.headline).toBe('Your Pro plan is active')
+    expect(summary.nextStepLabel).toBe('Renews')
+    expect(summary.nextStepValue).toBe('April 20, 2026')
+    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.portalButtonLabel).toBe('Open billing portal')
+  })
+
+  it('summarizes a payment issue with the right urgency', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.PAST_DUE,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2026-04-20T00:00:00.000Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: 'sub_123',
+      stripeCustomerId: 'cus_123',
+      stripePriceId: 'price_123',
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.tone).toBe('error')
+    expect(summary.statusLabel).toBe('Payment issue')
+    expect(summary.portalButtonLabel).toBe('Update payment method')
+  })
+
+  it('summarizes complimentary access when grace-period access exists without Stripe', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.TRIALING,
+      cancelAtPeriodEnd: true,
+      currentPeriodEnd: new Date('2025-04-30T23:59:59.999Z'),
+      transactionType: TransactionType.RECURRING,
+      stripeSubscriptionId: null,
+      stripeCustomerId: null,
+      stripePriceId: null,
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: true,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+    })
+
+    expect(summary.statusLabel).toBe('Complimentary access')
+    expect(summary.canManageInStripe).toBe(false)
+    expect(summary.portalSummaryLabel).toBe('No Stripe billing profile yet')
+  })
+
+  it('summarizes lifetime access without a Stripe portal dependency', () => {
+    const summary = getBillingSummaryInfo({
+      status: SubscriptionStatus.ACTIVE,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: new Date('2099-01-01T00:00:00.000Z'),
+      transactionType: TransactionType.LIFETIME,
+      stripeSubscriptionId: null,
+      stripeCustomerId: null,
+      stripePriceId: null,
+      tier: SubscriptionTier.PRO,
+      inGracePeriod: false,
+      creditBalance: 2500,
+      formattedCreditBalance: '$25.00',
+    })
+
+    expect(summary.headline).toBe('You have lifetime access to Dotabod Pro')
+    expect(summary.canManageInStripe).toBe(false)
+    expect(summary.creditMessage).toContain('$25.00')
   })
 })

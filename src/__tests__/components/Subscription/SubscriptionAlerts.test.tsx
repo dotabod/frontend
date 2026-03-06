@@ -17,7 +17,7 @@ vi.mock('antd', () => ({
     </div>
   ),
   Button: ({ children, onClick, disabled }) => (
-    <button onClick={onClick} disabled={disabled}>
+    <button type='button' onClick={onClick} disabled={disabled}>
       {children}
     </button>
   ),
@@ -39,11 +39,11 @@ describe('SubscriptionAlerts', () => {
     hasLifetime: false,
   }
 
-  it('shows Manage subscription when Stripe customer exists without stripeSubscriptionId', () => {
+  it('shows credit guidance when a member has credit and no active plan', () => {
     useSubscriptionContextMock.mockReturnValue({
       subscription: {
-        status: 'TRIALING',
-        stripeCustomerId: 'cus_123',
+        status: 'CANCELED',
+        stripeCustomerId: null,
         stripeSubscriptionId: null,
         currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
         cancelAtPeriodEnd: false,
@@ -51,25 +51,22 @@ describe('SubscriptionAlerts', () => {
       isLifetimePlan: false,
       inGracePeriod: false,
       hasActivePlan: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      creditBalance: 5000,
+      formattedCreditBalance: '$50.00',
       isLoading: false,
     })
 
     render(
       <SubscriptionAlerts
         giftInfo={giftInfo}
-        statusInfo={{
-          message: 'Trial access until Apr 1, 2026',
-          type: 'info',
-          badge: 'gold',
-        }}
+        statusInfo={null}
         handlePortalAccess={vi.fn()}
         isLoading={false}
       />,
     )
 
-    expect(screen.getByRole('button', { name: /manage subscription/i })).toBeInTheDocument()
+    expect(screen.getByText(/credit balance available/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /apply credits now/i })).toBeInTheDocument()
   })
 
   it('shows Update Payment action for PAST_DUE with Stripe customer and no stripeSubscriptionId', () => {
@@ -103,5 +100,39 @@ describe('SubscriptionAlerts', () => {
     )
 
     expect(screen.getByRole('button', { name: /update payment/i })).toBeInTheDocument()
+  })
+
+  it('shows Renew Now when a subscription is ending soon and actions are enabled', () => {
+    useSubscriptionContextMock.mockReturnValue({
+      subscription: {
+        status: 'ACTIVE',
+        stripeCustomerId: 'cus_123',
+        stripeSubscriptionId: 'sub_123',
+        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
+        cancelAtPeriodEnd: true,
+        isGift: false,
+      },
+      isLifetimePlan: false,
+      inGracePeriod: false,
+      hasActivePlan: true,
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+      isLoading: false,
+    })
+
+    render(
+      <SubscriptionAlerts
+        giftInfo={giftInfo}
+        statusInfo={{
+          message: 'Ending in 4 days',
+          type: 'warning',
+          badge: 'red',
+        }}
+        handlePortalAccess={vi.fn()}
+        isLoading={false}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /renew now/i })).toBeInTheDocument()
   })
 })

@@ -28,7 +28,6 @@ import { Logomark } from '../Logo'
 import { FeatureList } from './FeatureList'
 import { PriceDisplay } from './PriceDisplay'
 
-
 // Sparkle animation component with unique IDs
 const CryptoSparkle = ({ visible }: { visible: boolean }) => {
   // Create a fixed array of sparkles with pre-determined keys

@@ -10,7 +10,6 @@ import { Settings } from '@/lib/defaultSettings'
 import { chatterInfo } from '../Dashboard/Features/ChatterCard'
 import { MMRBadge } from '../Overlay/rank/MMRBadge'
 
-
 export function SecondaryFeatures() {
   const features: BentoGridItemProps[] = [
     {

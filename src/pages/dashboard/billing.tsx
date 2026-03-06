@@ -5,6 +5,7 @@ import Head from 'next/head'
 import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
+import { BillingOverview } from '@/components/Billing/BillingOverview'
 import { BillingPlans } from '@/components/Billing/BillingPlans'
 import { PaymentStatusAlert } from '@/components/Billing/PaymentStatusAlert'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
@@ -105,21 +106,26 @@ const BillingPage = () => {
         <title>Dotabod | Billing</title>
       </Head>
 
-      <Header title='Billing' subtitle='View and manage your Dotabod Pro plans' />
+      <Header
+        title='Billing'
+        subtitle='See your current subscription at a glance and jump into Stripe when you need to change billing details.'
+      />
 
-      <div>
+      <div className='space-y-6'>
         <PaymentStatusAlert />
+        <BillingOverview isLoading={isLoading} onOpenPortal={handlePortalAccess} />
         <SubscriptionAlerts
           giftInfo={emptyGiftInfo}
           statusInfo={statusInfo}
           handlePortalAccess={handlePortalAccess}
           isLoading={isLoading}
+          hideManageButton
         />
       </div>
 
       <div className='mt-6'>
         <Title level={4} className='mb-4'>
-          Available Plans
+          Change plan
         </Title>
         <BillingPlans showTitle={false} />
       </div>

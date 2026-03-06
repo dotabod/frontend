@@ -91,34 +91,34 @@ const CryptoToggle = memo(
               <span key='crypto-pay-off'>Pay with Crypto</span>
             )}
           </button>
-            <Popover
-              content={
-                <div className='max-w-xs'>
-                  <p className='text-sm'>
-                    {activePeriod === 'lifetime'
-                      ? 'Make a one-time payment with USDC stablecoin.'
-                      : "For recurring subscriptions, you'll receive invoices to pay with USDC stablecoin."}
-                  </p>
-                  <p className='text-sm mt-2 text-amber-500'>
-                    Note: Free trials are not available with crypto payments.
-                  </p>
-                </div>
-              }
-              title={
-                <span className='flex items-center gap-2'>
-                  <Bitcoin
-                    size={16}
-                    className={payWithCrypto ? 'text-purple-400 animate-spin-slow' : ''}
-                  />
-                  Crypto Payments
-                </span>
-              }
-            >
-              <Info
-                size={14}
-                className='text-gray-400 cursor-pointer ml-1 transition-opacity duration-300 hover:text-gray-300'
-              />
-            </Popover>
+          <Popover
+            content={
+              <div className='max-w-xs'>
+                <p className='text-sm'>
+                  {activePeriod === 'lifetime'
+                    ? 'Make a one-time payment with USDC stablecoin.'
+                    : "For recurring subscriptions, you'll receive invoices to pay with USDC stablecoin."}
+                </p>
+                <p className='text-sm mt-2 text-amber-500'>
+                  Note: Free trials are not available with crypto payments.
+                </p>
+              </div>
+            }
+            title={
+              <span className='flex items-center gap-2'>
+                <Bitcoin
+                  size={16}
+                  className={payWithCrypto ? 'text-purple-400 animate-spin-slow' : ''}
+                />
+                Crypto Payments
+              </span>
+            }
+          >
+            <Info
+              size={14}
+              className='text-gray-400 cursor-pointer ml-1 transition-opacity duration-300 hover:text-gray-300'
+            />
+          </Popover>
         </div>
       </ErrorBoundary>
     )
