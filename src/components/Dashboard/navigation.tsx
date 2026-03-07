@@ -70,7 +70,7 @@ export const navigation = [
     ],
   },
   {
-    name: 'Bot Settings',
+    name: 'Chat & Team',
     key: PARENT_KEYS.BOT_SETTINGS,
     icon: SparklesIcon,
     children: [
@@ -79,7 +79,7 @@ export const navigation = [
         href: '/dashboard/commands',
       },
       {
-        name: 'Managers',
+        name: 'Team Access',
         href: '/dashboard/managers',
       },
     ],

@@ -9,20 +9,35 @@ export default function CommandsCard({
   command,
   readonly,
   publicIsEnabled,
+  isOpen,
+  onClose,
 }: {
   readonly?: boolean
   id: string
   command: (typeof CommandDetail)[keyof typeof CommandDetail]
   publicIsEnabled?: boolean
   publicLoading?: boolean
+  isOpen?: boolean
+  onClose?: () => void
 }): React.ReactNode {
   const { data: isEnabled, updateSetting } = useUpdateSetting(command.key)
   const { hasAccess } = useFeatureAccess(command.key)
 
   return (
-    <Collapse bordered={false} className='bg-transparent'>
+    <Collapse
+      bordered={false}
+      className='bg-transparent'
+      activeKey={isOpen ? [id] : undefined}
+      onChange={(keys) => {
+        if (isOpen && !keys.includes(id)) onClose?.()
+      }}
+    >
       <Collapse.Panel
-        className='rounded-lg! border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-xs hover:shadow-gray-500'
+        className={`rounded-lg! border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-xs hover:shadow-gray-500${
+          readonly && (typeof publicIsEnabled !== 'undefined' ? !publicIsEnabled : !isEnabled)
+            ? ' opacity-50'
+            : ''
+        }`}
         style={{ padding: 0 }}
         header={
           <div className='flex justify-between'>
@@ -38,14 +53,27 @@ export default function CommandsCard({
                 {command.allowed === 'all' && <Tag>All</Tag>}
               </div>
             </div>
-            {command.key && (
-              <TierSwitch
-                settingKey={command.key}
-                disabled={readonly || !hasAccess}
-                checked={typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled}
-                onChange={!readonly && hasAccess ? updateSetting : undefined}
-              />
-            )}
+            {command.key &&
+              (readonly ? (
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    (typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled)
+                      ? 'bg-green-950 text-green-400 ring-1 ring-green-800'
+                      : 'bg-gray-800 text-gray-600'
+                  }`}
+                >
+                  {(typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled)
+                    ? 'Enabled'
+                    : 'Disabled'}
+                </span>
+              ) : (
+                <TierSwitch
+                  settingKey={command.key}
+                  disabled={!hasAccess}
+                  checked={typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled}
+                  onChange={hasAccess ? updateSetting : undefined}
+                />
+              ))}
           </div>
         }
         key={id}

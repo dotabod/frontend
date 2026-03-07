@@ -21,15 +21,22 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
   const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: Container with hover behavior for locked feature overlay
+    // biome-ignore lint/a11y/useSemanticElements: Container with hover/focus behavior for locked feature overlay
     <div
       role='button'
       tabIndex={0}
       className={clsx('relative', className)}
       onMouseEnter={() => !hasAccess && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => !hasAccess && setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
       {...props}
     >
+      {!hasAccess && !isHovered && requiredTier && (
+        <div className='absolute top-2 right-2 z-10 pointer-events-none'>
+          <TierBadge tooltip={false} requiredTier={requiredTier} />
+        </div>
+      )}
       {children}
       <AnimatePresence>
         {!hasAccess && isHovered && (

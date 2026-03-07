@@ -2,6 +2,7 @@
 
 import clsx from 'clsx'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
+import { useEffect, useRef } from 'react'
 import type React from 'react'
 
 interface MagicCardProps {
@@ -20,15 +21,32 @@ export function MagicCard({
 }: MagicCardProps) {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const card = cardRef.current
+
+    if (!card) {
+      return
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const { left, top } = card.getBoundingClientRect()
+
+      mouseX.set(event.clientX - left)
+      mouseY.set(event.clientY - top)
+    }
+
+    card.addEventListener('mousemove', handleMouseMove)
+
+    return () => {
+      card.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [mouseX, mouseY])
 
   return (
     <div
-      onMouseMove={(e) => {
-        const { left, top } = e.currentTarget.getBoundingClientRect()
-
-        mouseX.set(e.clientX - left)
-        mouseY.set(e.clientY - top)
-      }}
+      ref={cardRef}
       className={clsx('group relative flex size-full overflow-hidden', className)}
     >
       <div className='relative pointer-events-none z-20 w-full'>{children}</div>

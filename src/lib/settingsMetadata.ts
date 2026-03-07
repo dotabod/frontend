@@ -810,8 +810,8 @@ export const settingsMetadata: SettingMetadata[] = [
     label: 'Queue Blocker',
     description: 'Hide queue timer and information',
     searchTerms: ['queue', 'blocker', 'hide', 'timer', 'matchmaking'],
-    category: 'advanced',
-    page: { path: '/dashboard/features/advanced', section: 'queue-blocker' },
+    category: 'overlay',
+    page: { path: '/dashboard/features/overlay', section: 'queue-blocker' },
   },
   {
     key: 'disableAutoClipping',

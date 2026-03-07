@@ -23,26 +23,6 @@ function SubscriptionAlertMessage({
   )
 }
 
-// Reusable component for grace period information
-function GracePeriodInfo({
-  inGracePeriod,
-  giftCoversPostGracePeriod,
-  gracePeriodEndNextDay,
-}: {
-  inGracePeriod: boolean
-  giftCoversPostGracePeriod?: boolean | null
-  gracePeriodEndNextDay: string
-}) {
-  if (!inGracePeriod || !giftCoversPostGracePeriod) return null
-
-  return (
-    <p className='mt-2 text-sm'>
-      Your gift subscription will activate on {gracePeriodEndNextDay} - you will not be charged
-      until after your gift expires.
-    </p>
-  )
-}
-
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
   statusInfo: StatusInfo | null

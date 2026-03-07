@@ -5,6 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { Container } from '@/components/Container'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -13,6 +14,17 @@ import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
+
+const FEATURED_COMMAND_KEYS = [
+  'commandMmr',
+  'commandWL',
+  'commandHero',
+  'commandNP',
+  'commandLGS',
+  'commandBuilds',
+  'commandProfile',
+  'commandDotabuff',
+] as const
 
 interface PageContentProps {
   userData?: {
@@ -44,6 +56,7 @@ const PageContent = ({
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
+  const [openCardKey, setOpenCardKey] = useState<string | null>(null)
   const [subscriptionInfo, setSubscriptionInfo] = useState<{
     isPro: boolean
     isLifetime: boolean
@@ -63,7 +76,6 @@ const PageContent = ({
 
   // Use SSR data if available, otherwise fall back to client-side data
   const finalUserData = ssrUserData || data
-  const _finalUsername = ssrUsername || (typeof username === 'string' ? username : '')
   const finalLoading = ssrUserData ? false : loading
 
   // Fetch subscription information only if we don't have SSR data
@@ -155,7 +167,7 @@ const PageContent = ({
     })
     .filter((command) => {
       if (permission === 'Mods') return CommandDetail[command].allowed === 'mods'
-      if (permission === 'Plebs') return CommandDetail[command].allowed === 'all'
+      if (permission === 'Viewers') return CommandDetail[command].allowed === 'all'
       return true
     })
     .filter((command) => {
@@ -172,6 +184,10 @@ const PageContent = ({
         return value.toLowerCase().includes(searchTerm)
       })
     })
+
+  const enabledFeaturedCommands = FEATURED_COMMAND_KEYS.filter(
+    (key) => commands.find((c) => c.command === key)?.isEnabled,
+  )
 
   // Determine what subscription badge to show
   const getSubscriptionBadge = () => {
@@ -215,10 +231,10 @@ const PageContent = ({
   return (
     <>
       <Head>
-        <title>{`Commands for ${finalLoading || !finalUserData?.displayName ? '...' : finalUserData.displayName} - Dotabod`}</title>
+        <title>{`${finalLoading || !finalUserData?.displayName ? '...' : finalUserData.displayName}'s Dota 2 Commands — Dotabod`}</title>
         <meta
           name='description'
-          content='An exhaustive list of all commands available using Twitch chat.'
+          content={`Chat commands available in ${finalUserData?.displayName || 'this streamer'}'s Twitch channel via Dotabod.`}
         />
         {username && typeof username === 'string' && (
           <link rel='canonical' href={`https://dotabod.com/${username}`} />
@@ -228,63 +244,93 @@ const PageContent = ({
           content={username === '[username]' ? 'noindex, nofollow' : 'index, follow'}
         />
       </Head>
-      <div className='p-6'>
-        <div className='mb-12 space-y-4'>
-          <div className='flex flex-row flex-wrap items-center space-x-2'>
-            {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
-            <img
-              onError={(e) => {
-                e.currentTarget.src = '/images/hero/default.png'
-              }}
-              src={data?.image || '/images/hero/default.png'}
-              alt='Profile'
-              width={80}
-              height={80}
-              className='rounded-full flex'
-            />
-            <div className='flex-grow'>
-              <div className='flex flex-wrap gap-2 flex-row items-center space-x-4'>
-                <Link
-                  target='_blank'
-                  href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
-                  passHref
-                  className='flex flex-row items-center space-x-2'
-                >
-                  <h1 className='text-2xl font-bold leading-6'>
-                    {finalLoading || !finalUserData?.displayName
-                      ? 'Loading...'
-                      : finalUserData.displayName}
-                  </h1>
-                  <ExternalLinkIcon className='flex' size={15} />
-                </Link>
-                <span
-                  className={`rounded-md px-2 py-0.5 text-xs ${data?.stream_online ? 'bg-red-700' : 'bg-gray-700'}`}
-                >
-                  {data?.stream_online ? 'Live' : 'Offline'}
+
+      {/* Full-width hero */}
+      <div className='relative border-b border-gray-700/50 bg-gradient-to-br from-gray-950 to-gray-800'>
+        <Container className='py-10 sm:py-14'>
+          <div className='flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10'>
+            {/* Avatar with live ring */}
+            <div className='relative flex-shrink-0 self-start'>
+              <div
+                className={`absolute -inset-1.5 rounded-full ${
+                  finalUserData?.stream_online ? 'animate-pulse bg-red-500/30' : 'bg-gray-600/10'
+                }`}
+              />
+              {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
+              <img
+                onError={(e) => {
+                  e.currentTarget.src = '/images/hero/default.png'
+                }}
+                src={finalUserData?.image || '/images/hero/default.png'}
+                alt='Profile'
+                width={100}
+                height={100}
+                className='relative rounded-full ring-2 ring-gray-700'
+              />
+              {finalUserData?.stream_online && (
+                <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-2 py-px text-[10px] font-bold uppercase tracking-wide text-white'>
+                  Live
                 </span>
+              )}
+            </div>
+
+            {/* Identity, stats, CTAs */}
+            <div className='min-w-0 flex-grow'>
+              <div className='mb-1 flex flex-wrap items-center gap-2'>
+                <h1 className='text-3xl font-bold text-white sm:text-4xl'>
+                  {finalLoading || !finalUserData?.displayName
+                    ? 'Loading...'
+                    : finalUserData.displayName}
+                </h1>
+                {!finalUserData?.stream_online && (
+                  <span className='rounded-md bg-gray-700 px-2 py-0.5 text-xs text-gray-400'>
+                    Offline
+                  </span>
+                )}
                 {getSubscriptionBadge()}
               </div>
-              <span>
-                Using Dotabod since{' '}
-                {finalLoading || !finalUserData?.createdAt
-                  ? '...'
-                  : new Date(finalUserData.createdAt).toLocaleDateString()}
-              </span>
-            </div>
-            <div>
-              <div className='flex flex-wrap gap-2'>
+
+              <div className='mb-6 flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-400'>
+                {finalUserData?.mmr != null && finalUserData.mmr > 0 && (
+                  <span>⚔ {finalUserData.mmr.toLocaleString()} MMR</span>
+                )}
+                <span>
+                  Using Dotabod since{' '}
+                  {finalLoading || !finalUserData?.createdAt
+                    ? '...'
+                    : new Date(finalUserData.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                </span>
+                {!finalLoading && commands.length > 0 && (
+                  <span>{commands.filter((c) => c.isEnabled).length} commands active</span>
+                )}
+              </div>
+
+              <div className='flex flex-wrap gap-3'>
                 <Link
                   target='_blank'
-                  href={!loading && data ? `https://twitch.tv/${data?.name}` : ''}
+                  href={finalUserData ? `https://twitch.tv/${finalUserData.name}` : ''}
                   passHref
                 >
-                  <Button icon={<ExternalLinkIcon size={16} />} className='flex items-center'>
-                    View on Twitch
+                  <Button
+                    size='large'
+                    icon={<ExternalLinkIcon size={16} />}
+                    className='flex items-center'
+                  >
+                    Watch on Twitch
                   </Button>
                 </Link>
-                <Link href={createGiftLink(username as string)} passHref>
+                <Link
+                  href={createGiftLink(
+                    (ssrUsername || (typeof username === 'string' ? username : '')) as string,
+                  )}
+                  passHref
+                >
                   <Button
                     type='primary'
+                    size='large'
                     icon={<GiftIcon size={16} />}
                     className='flex items-center'
                   >
@@ -294,11 +340,46 @@ const PageContent = ({
               </div>
             </div>
           </div>
-          <div className='text-gray-300'>
-            All commands available to use in Twitch chat with Dotabod.
+        </Container>
+      </div>
+
+      {/* Page content */}
+      <Container className='py-8'>
+        {/* Featured commands strip */}
+        {!finalLoading && enabledFeaturedCommands.length > 0 && (
+          <div className='mb-10'>
+            <p className='mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500'>
+              Popular commands
+            </p>
+            <div className='-mx-1 flex gap-3 overflow-x-auto px-1 pb-2'>
+              {enabledFeaturedCommands.map((key) => (
+                <button
+                  key={key}
+                  type='button'
+                  onClick={() => {
+                    setOpenCardKey(key)
+                    setTimeout(() => {
+                      document
+                        .getElementById(`command-card-${key}`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    }, 50)
+                  }}
+                  className='w-48 flex-shrink-0 cursor-pointer rounded-lg border border-gray-700 bg-gray-900/80 px-4 py-3 text-left hover:border-purple-500 hover:bg-gray-900 transition-colors'
+                >
+                  <div className='mb-1 font-mono text-sm font-semibold text-purple-400'>
+                    {CommandDetail[key].cmd}
+                  </div>
+                  <div className='line-clamp-2 text-xs text-gray-400'>
+                    {CommandDetail[key].description}
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className='flex items-baseline sm:gap-6 gap-2 max-w-full flex-wrap mb-4'>
+        )}
+
+        {/* Filter bar */}
+        <div className='mb-6 flex flex-wrap items-center gap-3'>
           <Segmented
             value={enabled}
             onChange={(v) => setEnabled(v as string)}
@@ -307,32 +388,65 @@ const PageContent = ({
           <Segmented
             value={permission}
             onChange={(v) => setPermission(v as string)}
-            options={['All', 'Mods', 'Plebs']}
+            options={['All', 'Mods', 'Viewers']}
           />
           <Input
             placeholder='Search commands...'
             value={searchTerm}
             maxLength={200}
-            style={{ width: 300 }}
+            style={{ width: 260 }}
             onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
           />
+          {!finalLoading && (
+            <span className='ml-auto text-sm text-gray-500'>
+              {filteredCommands.length} of {Object.keys(CommandDetail).length} commands
+            </span>
+          )}
         </div>
+
         {filteredCommands.length < 1 && (
-          <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
+          <Empty
+            description={
+              enabled === 'Enabled'
+                ? `${finalUserData?.displayName || 'This streamer'} has no enabled commands matching your search.`
+                : 'No matching commands found.'
+            }
+            imageStyle={{ height: 60 }}
+          />
         )}
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10'>
+
+        <div className='mb-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
           {filteredCommands.map((key) => (
-            <CommandsCard
-              readonly
-              key={key}
-              id={key}
-              publicLoading={finalLoading}
-              publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
-              command={CommandDetail[key]}
-            />
+            <div id={`command-card-${key}`} key={key}>
+              <CommandsCard
+                readonly
+                id={key}
+                isOpen={openCardKey === key}
+                onClose={() => setOpenCardKey(null)}
+                publicLoading={finalLoading}
+                publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
+                command={CommandDetail[key]}
+              />
+            </div>
           ))}
         </div>
-      </div>
+
+        {/* Bottom conversion CTA */}
+        <div className='mb-10 rounded-xl border border-gray-700 bg-gray-900 p-8 text-center'>
+          <h2 className='mb-2 text-xl font-bold text-white'>
+            Want these commands for your stream?
+          </h2>
+          <p className='mx-auto mb-5 max-w-md text-sm text-gray-400'>
+            Dotabod adds real-time stats, automated predictions, and smart chat commands to your
+            Dota 2 stream — free to get started.
+          </p>
+          <Link href='/dashboard'>
+            <Button type='primary' size='large'>
+              Set up Dotabod for free
+            </Button>
+          </Link>
+        </div>
+      </Container>
     </>
   )
 }
@@ -480,7 +594,6 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
 
     // Fetch subscription info
     const subscription = await getSubscription(userData.id)
-    console.log(subscription)
     const subscriptionInfo = {
       isPro: subscription?.tier === 'PRO',
       isLifetime: subscription?.transactionType === 'LIFETIME',

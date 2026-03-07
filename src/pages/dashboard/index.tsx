@@ -316,8 +316,8 @@ const SetupPage = () => {
       description: 'Set up your overlay',
     },
     {
-      title: 'All done!',
-      description: 'Ready to go',
+      title: 'Connect Steam',
+      description: 'Auto-connects when you play',
       content: (
         <Card className='setup-complete-card'>
           <div className='text-center mb-6'>
@@ -325,7 +325,7 @@ const SetupPage = () => {
               <span role='img' aria-label='party popper'>
                 🎉
               </span>{' '}
-              Setup Complete!{' '}
+              Technical Setup Done!{' '}
               <span role='img' aria-label='party popper'>
                 🎉
               </span>
@@ -337,7 +337,9 @@ const SetupPage = () => {
                 strokeColor='#1890ff'
                 className='mb-2 max-w-md mx-auto'
               />
-              <div className='text-center text-sm text-gray-400'>Setup: 3/4 steps complete</div>
+              <div className='text-center text-sm text-gray-400'>
+                Technical setup done &mdash; Steam connects automatically when you play
+              </div>
             </div>
 
             <div className='mb-6 flex justify-center'>
