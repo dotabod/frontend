@@ -324,7 +324,7 @@ export const chatterInfo = {
           src='https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/dark/2.0'
         />
         <span>
-          A new Dota 2 patch has been released: 7.38c. Check out the patch notes at
+          A new Dota 2 patch has been released: 7.41. Check out the patch notes at
           https://www.dota2.com/patches
         </span>
       </span>
