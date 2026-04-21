@@ -17,6 +17,7 @@ interface PeriodToggleProps {
 
 export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodToggleProps) {
   const periods: PricePeriod[] = ['monthly', 'annual', 'lifetime']
+  const radioGroupName = 'billing-period'
 
   // Set initial period based on subscription
   useEffect(() => {
@@ -27,33 +28,35 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
   }, [subscription, onChange])
 
   return (
-    <div
-      role='radiogroup'
-      aria-label='Billing period'
-      className='flex flex-col sm:grid sm:grid-cols-3 rounded-lg'
-    >
+    <fieldset className='flex flex-col sm:grid sm:grid-cols-3 rounded-lg'>
+      <legend className='sr-only'>Billing period</legend>
       {periods.map((period) => (
         <div
           key={period}
           className={clsx('relative py-1.5 sm:py-0 sm:flex sm:flex-col', 'sm:min-h-[3.5rem]')}
         >
-          <button
-            type='button'
-            role='radio'
-            aria-checked={activePeriod === period}
-            tabIndex={activePeriod === period ? 0 : -1}
-            onClick={() => onChange(period)}
-            className={clsx(
-              'bg-gray-800/50 cursor-pointer px-3 sm:px-4 md:px-8 py-2 text-sm transition-colors rounded-md',
-              'w-full flex items-center justify-center',
-              'focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900',
-              activePeriod === period
-                ? 'bg-purple-500 text-gray-900 font-semibold shadow-lg'
-                : 'text-gray-300 hover:bg-gray-700/50',
-            )}
-          >
-            <span className='first-letter:uppercase'>{period}</span>
-          </button>
+          <label className='block'>
+            <input
+              type='radio'
+              name={radioGroupName}
+              value={period}
+              checked={activePeriod === period}
+              onChange={() => onChange(period)}
+              className='peer sr-only'
+            />
+            <span
+              className={clsx(
+                'bg-gray-800/50 cursor-pointer px-3 sm:px-4 md:px-8 py-2 text-sm transition-colors rounded-md',
+                'flex w-full items-center justify-center',
+                'peer-focus-visible:outline-hidden peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900',
+                activePeriod === period
+                  ? 'bg-purple-500 text-gray-900 font-semibold shadow-lg'
+                  : 'text-gray-300 hover:bg-gray-700/50',
+              )}
+            >
+              <span className='first-letter:uppercase'>{period}</span>
+            </span>
+          </label>
 
           <div
             className={clsx(
@@ -72,6 +75,6 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
           </div>
         </div>
       ))}
-    </div>
+    </fieldset>
   )
 }

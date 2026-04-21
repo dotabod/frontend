@@ -573,7 +573,7 @@ const ObsSetup: React.FC = () => {
           )}
 
           {/* Show version recommendation alert if no errors or if error is non-actionable */}
-          {(!error || !error.actionable) && (
+          {!error?.actionable && (
             <Alert
               message='OBS v30.2.3 is recommended. Versions below 30.2.3 or 31.0 and above are not supported.'
               type='warning'

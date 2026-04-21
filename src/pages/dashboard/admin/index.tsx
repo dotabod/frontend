@@ -48,7 +48,7 @@ const AdminPage = () => {
   useEffect(() => {
     if (status === 'loading') return
 
-    if (!session?.user?.role || !session.user.role?.includes('admin')) {
+    if (!session?.user?.role?.includes('admin')) {
       router.push('/404')
       return
     }
@@ -381,7 +381,7 @@ const AdminPage = () => {
     },
   ]
 
-  if (!session?.user?.role || !session.user.role?.includes('admin')) {
+  if (!session?.user?.role?.includes('admin')) {
     return null
   }
 

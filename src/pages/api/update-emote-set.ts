@@ -64,7 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Check if stvResponse is valid
-    if (!stvResponse || !stvResponse.user) {
+    if (!stvResponse?.user) {
       console.error('Failed to get 7TV user:', stvResponse)
       return res.status(404).json({ message: '7TV user not found' })
     }
@@ -78,7 +78,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         name: 'DotabodEmotes',
       })
 
-      if (!result || !result.emoteSetId) {
+      if (!result?.emoteSetId) {
         console.error('Failed to get or create emote set:', result)
         return res.status(500).json({ message: 'Failed to get or create emote set' })
       }

@@ -163,7 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
 
         // Ensure the subscription was created successfully
-        if (!newStripeSubscription || !newStripeSubscription.id) {
+        if (!newStripeSubscription?.id) {
           throw new Error('Failed to create Stripe subscription object.')
         }
 
@@ -258,7 +258,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
 
         // Ensure the subscription was created successfully
-        if (!newStripeSubscription || !newStripeSubscription.id) {
+        if (!newStripeSubscription?.id) {
           throw new Error('Failed to create Stripe subscription object.')
         }
 
