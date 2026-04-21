@@ -29,7 +29,7 @@ export async function getMatchData(matchId: string, heroId: number) {
     const opendotaMatch = await axios(`https://api.opendota.com/api/matches/${matchId}`)
 
     // If the match data is incomplete, we might need to request parsing
-    if (!opendotaMatch.data || !opendotaMatch.data.players) {
+    if (!opendotaMatch.data?.players) {
       console.log(`[MMR] Match ${matchId} data incomplete, attempting to request parsing`)
       try {
         const jobId = await createJob(matchId)

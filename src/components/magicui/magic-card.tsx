@@ -2,8 +2,8 @@
 
 import clsx from 'clsx'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
-import { useEffect, useRef } from 'react'
 import type React from 'react'
+import { useEffect, useRef } from 'react'
 
 interface MagicCardProps {
   children: React.ReactNode
@@ -45,10 +45,7 @@ export function MagicCard({
   }, [mouseX, mouseY])
 
   return (
-    <div
-      ref={cardRef}
-      className={clsx('group relative flex size-full overflow-hidden', className)}
-    >
+    <div ref={cardRef} className={clsx('group relative flex size-full overflow-hidden', className)}>
       <div className='relative pointer-events-none z-20 w-full'>{children}</div>
       <motion.div
         className='absolute pointer-events-none -inset-px opacity-0 transition duration-300 group-hover:opacity-100'
