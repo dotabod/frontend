@@ -473,6 +473,13 @@ interface UserProfileProps {
   username: string
 }
 
+function isMaintenanceModeEnabled() {
+  return (
+    process.env.IS_IN_MAINTENANCE_MODE === 'true' ||
+    process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'true'
+  )
+}
+
 const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps) => {
   const router = useRouter()
 
@@ -530,6 +537,13 @@ const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  if (isMaintenanceModeEnabled()) {
+    return {
+      paths: [],
+      fallback: 'blocking',
+    }
+  }
+
   // Pre-build only the most popular users for fastest loading
   const topUsers = await prisma.user.findMany({
     where: {
@@ -555,6 +569,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params }) => {
   const username = params?.username as string
+
+  if (isMaintenanceModeEnabled()) {
+    return {
+      redirect: {
+        destination: '/maintenance',
+        permanent: false,
+      },
+    }
+  }
 
   if (!username) {
     return { notFound: true }
