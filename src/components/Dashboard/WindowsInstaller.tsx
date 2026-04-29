@@ -18,6 +18,7 @@ import {
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
 import CodeBlock from './CodeBlock'
+import type { SetupStepProgressState } from './SetupProgressShell'
 
 const { Step } = Steps
 
@@ -86,7 +87,11 @@ const InstallationSteps = ({ success: _success, currentStep, errorWithoutSuccess
   )
 }
 
-const WindowsInstaller = () => {
+interface WindowsInstallerProps {
+  onProgressChange?: (progress: SetupStepProgressState) => void
+}
+
+const WindowsInstaller = ({ onProgressChange }: WindowsInstallerProps) => {
   const { hasAccess } = useFeatureAccess('autoInstaller')
   const track = useTrack()
   const router = useRouter()
@@ -239,12 +244,63 @@ const WindowsInstaller = () => {
     lnaPermissionState,
   ])
 
+  useEffect(() => {
+    const progress: SetupStepProgressState = success
+      ? {
+          label: 'Game sync installed',
+          detail: 'The Dotabod installer is running and this step is ready to go.',
+          completedCount: 2,
+          totalCount: 2,
+          isComplete: true,
+          needsAttention: false,
+        }
+      : errorWithoutSuccess || lnaPermissionState === 'denied'
+        ? {
+            label: 'Installer needs attention',
+            detail:
+              error ??
+              'Local network access was denied, so the automatic installer cannot connect yet.',
+            completedCount: currentStep,
+            totalCount: 2,
+            isComplete: false,
+            needsAttention: true,
+          }
+        : lnaPermissionState === 'prompt'
+          ? {
+              label: 'Waiting for browser permission',
+              detail: 'Chrome may ask to access local devices before the installer can continue.',
+              completedCount: currentStep,
+              totalCount: 2,
+              isComplete: false,
+              needsAttention: false,
+            }
+          : currentStep > 0
+            ? {
+                label: 'Installer running',
+                detail: 'Dotabod is processing the installer steps and verifying the token.',
+                completedCount: currentStep,
+                totalCount: 2,
+                isComplete: false,
+                needsAttention: false,
+              }
+            : {
+                label: 'Ready for installer launch',
+                detail: 'Run the installer command to connect Dota 2 game data automatically.',
+                completedCount: 0,
+                totalCount: 2,
+                isComplete: false,
+                needsAttention: false,
+              }
+
+    onProgressChange?.(progress)
+  }, [currentStep, error, errorWithoutSuccess, lnaPermissionState, onProgressChange, success])
+
   return (
     <FeatureWrapper feature='autoInstaller'>
-      <p>
-        <b>Why?</b> This step is necessary to ensure that Dota 2 knows which data Dotabod requires.
-        It&apos;s a Valve approved way of getting game data.
-      </p>
+      <div className='mb-4 rounded-xl border border-violet-800/30 bg-violet-950/20 px-4 py-3 text-sm text-gray-300'>
+        Run the installer command, approve local access if Chrome asks, and Dotabod will verify the
+        connection automatically.
+      </div>
       <div className='flex flex-row justify-center pt-4'>
         <CodeBlock />
       </div>
@@ -292,7 +348,7 @@ const WindowsInstaller = () => {
           showIcon
         />
       )}
-      <p className='space-x-2'>
+      <p className='space-x-2 text-xs text-gray-500'>
         <QuestionCircleOutlined />
         <span>
           Having trouble? Let us know what happened{' '}

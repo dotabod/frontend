@@ -1,5 +1,4 @@
 import { Typography } from 'antd'
-import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import DownloadButton from './DownloadButton'
@@ -38,19 +37,9 @@ export default function UnixInstaller() {
 
   return (
     <>
-      <div className='mb-4 space-x-2'>
-        <span>
-          <b>Why?</b> This step is necessary to ensure that Dota 2 knows which data Dotabod
-          requires. It&apos;s a Valve approved way of getting game data.
-        </span>
-        <Image
-          className='inline'
-          alt='ok emote'
-          unoptimized
-          src='https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp'
-          width={28}
-          height={28}
-        />
+      <div className='mb-4 rounded-xl border border-gray-800 bg-gray-900/70 px-4 py-3 text-sm text-gray-300'>
+        This path works on macOS, Linux, or anytime you want to place the Valve-approved config file
+        yourself.
       </div>
       <div className='space-y-4'>
         <div className='flex flex-col items-center space-y-4'>

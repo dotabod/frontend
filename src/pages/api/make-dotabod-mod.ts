@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
-async function addModerator(broadcasterId: string | undefined, accessToken: string) {
+async function getModeratorStatus(broadcasterId: string | undefined, accessToken: string) {
   if (!broadcasterId) {
     throw new Error('Broadcaster ID is required')
   }
@@ -18,19 +18,32 @@ async function addModerator(broadcasterId: string | undefined, accessToken: stri
     'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
   }
 
+  const checkResponse = await fetch(checkUrl, { method: 'GET', headers })
+  if (!checkResponse.ok) {
+    throw new Error(`Failed to get moderators: ${checkResponse.statusText}`)
+  }
+
+  const checkData = await checkResponse.json()
+  const isModerator = Boolean(checkData.data && checkData.data.length > 0)
+
+  return {
+    headers,
+    isModerator,
+  }
+}
+
+async function addModerator(broadcasterId: string | undefined, accessToken: string) {
+  if (!broadcasterId) {
+    throw new Error('Broadcaster ID is required')
+  }
+
+  const { headers, isModerator } = await getModeratorStatus(broadcasterId, accessToken)
+
   try {
-    // Check if the user is already a moderator
-    const checkResponse = await fetch(checkUrl, { method: 'GET', headers })
-    if (!checkResponse.ok) {
-      throw new Error(`Failed to get moderators: ${checkResponse.statusText}`)
-    }
-    const checkData = await checkResponse.json()
-    if (checkData.data && checkData.data.length > 0) {
-      // The user is already a moderator
+    if (isModerator) {
       return { status: 'OK', message: 'User is already a moderator' }
     }
 
-    // If the user is not a moderator, add them as a moderator
     const url = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${broadcasterId}&user_id=${process.env.TWITCH_BOT_PROVIDERID}`
     const response = await fetch(url, { method: 'POST', headers })
     if (!response.ok) {
@@ -67,7 +80,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (error) {
       return res.status(403).json({ message: 'Forbidden' })
     }
+
+    const moderatorStatus = await getModeratorStatus(providerAccountId, accessToken)
+
+    if (moderatorStatus.isModerator) {
+      return res.status(200).json({ status: 'OK', message: 'User is already a moderator' })
+    }
+
     const response = await addModerator(providerAccountId, accessToken)
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        status: 'FORBIDDEN',
+        message: 'Automatic moderator setup is part of Dotabod Pro',
+      })
+    }
+
     return res.status(200).json(response)
   } catch (error) {
     captureException(error)

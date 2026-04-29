@@ -103,6 +103,10 @@ vi.mock('@/components/Dashboard/OBSOverlay', () => ({
   default: () => <div data-testid='obs-overlay'>OBS Overlay</div>,
 }))
 
+vi.mock('@/components/Dashboard/SteamConnectStep', () => ({
+  SteamConnectStep: () => <div data-testid='steam-connect-step'>Steam Connect</div>,
+}))
+
 vi.mock('@/components/Dashboard/Header', () => ({
   default: () => <div data-testid='dashboard-header'>Dashboard Header</div>,
 }))
@@ -125,13 +129,6 @@ vi.mock('antd', () => {
     Alert: ({ children }) => <div>{children}</div>,
     Button: ({ children }) => <button type='button'>{children}</button>,
     Collapse: ({ children }) => <div>{children}</div>,
-    Steps: ({ children }) => <div>{children}</div>,
-    Typography: {
-      Title: ({ children }) => <h1>{children}</h1>,
-      Text: ({ children }) => <span>{children}</span>,
-      Paragraph: ({ children }) => <p>{children}</p>,
-    },
-    Progress: () => <div>Progress</div>,
     Tag: ({ children, ...props }) => <span {...props}>{children}</span>,
   }
 })
@@ -219,6 +216,8 @@ describe('Dashboard Index Page', () => {
   it('renders the dashboard page', () => {
     render(<SetupPage />)
     expect(screen.getByTestId('dashboard-header')).toBeInTheDocument()
+    expect(screen.getByText('Step 1 of 4')).toBeInTheDocument()
+    expect(screen.getByText('Setup journey')).toBeInTheDocument()
     expect(screen.getByTestId('chat-bot')).toBeInTheDocument()
   })
 })

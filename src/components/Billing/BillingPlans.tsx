@@ -19,7 +19,7 @@ export const plans = [
     featured: false,
     price: { monthly: '$0', annual: '$0', lifetime: '$0' },
     description:
-      'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
+      'Start free with the core overlays, commands, and chat features that make your stream feel more alive.',
     button: {
       label: 'Get started for free',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.FREE}`,
@@ -27,16 +27,16 @@ export const plans = [
     tier: SUBSCRIPTION_TIERS.FREE,
     features: [
       'Automated setup (Dota 2)',
-      'Multi-language support',
+      '40+ language support',
       'Win-loss record display overlay',
       'MMR tracking with each match',
-      'Basic rank display with mmr',
+      'Basic rank display with MMR',
       'Basic minimap blocker',
-      'Basic game events in chat (kills, bounties, match outcome)',
+      'Game-aware chat reactions for core moments',
       'Essential commands (!mmr, !wl, !ranked, !online, !spectators)',
       'Hero stats commands (!dotabuff, !opendota, !builds)',
       'Game stats commands (!gpm, !xpm, !apm)',
-      'Manual setup process',
+      'A clear path to upgrade later for automation and advanced protection',
     ],
     logo: (
       <Image
@@ -59,7 +59,7 @@ export const plans = [
     },
     tier: SUBSCRIPTION_TIERS.PRO,
     description:
-      'Complete toolkit for serious streamers who need advanced features and automation.',
+      'Unlock the premium automation, anti-snipe, and game-intelligence layer for serious Dota streams.',
     button: {
       label: 'Subscribe',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.PRO}`,
@@ -69,7 +69,7 @@ export const plans = [
       'Automated setup (OBS, 7TV, Twitch)',
       'Auto twitch predictions for each match',
       'Pro commands (!hero, !np, !items, !gm, !smurfs)',
-      'Advanced overlays (XL Minimap, Anti-snipe blockers)',
+      'Advanced anti-snipe suite (XL minimap, picks, queue blockers)',
       'Minimap blocker intensity control',
       'Notable players overlay with flags',
       'Win probability overlay with !wp command',
@@ -77,6 +77,7 @@ export const plans = [
       'Auto OBS scene switcher',
       'Auto Roshan and Aegis overlay timers and commands',
       'Spotify / Youtube integration (overlay and !song command)',
+      'Auto-translation and more creator-friendly international features',
       'Advanced game events (Midas, Rosh events, Neutral items)',
       'Manager access',
       <span key='beta-features' className='flex items-center gap-1'>
@@ -113,7 +114,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
       {showTitle && (
         <div className='mx-auto max-w-2xl text-center'>
           <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
-            Simple pricing for every Dota 2 streamer
+            Start free, upgrade when you want the full premium toolkit
           </h2>
 
           {inGracePeriod && !hasActivePlan ? (
@@ -131,7 +132,8 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
             </p>
           ) : (
             <p className='mt-2 text-lg text-gray-400'>
-              Choose the plan that best fits your streaming needs
+              Free gets you live fast. Pro unlocks the deeper automation, anti-snipe protection, and
+              advanced stream UX features.
             </p>
           )}
         </div>

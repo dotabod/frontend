@@ -1,17 +1,19 @@
 import { Button, Collapse, Tag } from 'antd'
-import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle2, Clock4, PartyPopper, WifiOff } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { CheckCircle2, Clock4, WifiOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
+import type { SetupStepProgressState } from './SetupProgressShell'
 
 interface SteamConnectStepProps {
   isLive: boolean
+  onProgressChange?: (progress: SetupStepProgressState) => void
 }
 
 const STEP_PILLS = [
@@ -21,18 +23,58 @@ const STEP_PILLS = [
   { label: 'Steam', done: false },
 ] as const
 
-export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
+export function SteamConnectStep({ isLive, onProgressChange }: SteamConnectStepProps) {
   const track = useTrack()
   const [launched, setLaunched] = useState(false)
 
   // Poll for Steam link after the user clicks Launch — stops once linked
-  const { data: linkedData } = useSWR(
-    launched ? '/api/steam/get-linked-account' : null,
-    fetcher,
-    { refreshInterval: (data) => (data?.linked ? 0 : 4000) },
-  )
+  const { data: linkedData } = useSWR(launched ? '/api/steam/get-linked-account' : null, fetcher, {
+    refreshInterval: (data) => (data?.linked ? 0 : 4000),
+  })
   const isLinked = linkedData?.linked === true
   const linkedName = linkedData?.primaryAccount?.profileData?.name
+  const showFinalStepPulse = !isLinked
+
+  useEffect(() => {
+    const progress: SetupStepProgressState = isLinked
+      ? {
+          label: 'Steam connected',
+          detail: `Dotabod is ready to track matches${linkedName ? ` for ${linkedName}` : ''}.`,
+          completedCount: 2,
+          totalCount: 2,
+          isComplete: true,
+          needsAttention: false,
+        }
+      : !isLive
+        ? {
+            label: 'Go live to connect',
+            detail: 'Steam only links while your Twitch stream is live.',
+            completedCount: 0,
+            totalCount: 2,
+            isComplete: false,
+            needsAttention: true,
+          }
+        : launched
+          ? {
+              label: 'Waiting for Steam connection',
+              detail: 'Open Dota 2 and demo a hero or play a match to finish linking.',
+              completedCount: 1,
+              totalCount: 2,
+              isComplete: false,
+              needsAttention: false,
+            }
+          : {
+              label: 'Launch Dota 2 to connect',
+              detail:
+                'Technical setup is done — one quick in-game check will finish Steam linking.',
+              completedCount: 0,
+              totalCount: 2,
+              isComplete: false,
+              needsAttention: false,
+            }
+
+    onProgressChange?.(progress)
+  }, [isLinked, isLive, launched, linkedName, onProgressChange])
 
   return (
     <motion.div
@@ -44,6 +86,22 @@ export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
         {/* ── HERO REGION ──────────────────────────────────────────────── */}
         <div className='relative px-6 pt-10 pb-8 border-b border-gray-800'>
           <div className='pointer-events-none absolute inset-0 [background:radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(139,92,246,0.10),transparent)]' />
+          {showFinalStepPulse && (
+            <>
+              <motion.div
+                aria-hidden='true'
+                animate={{ opacity: [0.16, 0.34, 0.16], scale: [0.92, 1.04, 0.96] }}
+                className='pointer-events-none absolute left-1/2 top-8 h-36 w-36 -translate-x-1/2 rounded-full bg-violet-500/15 blur-3xl'
+                transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+              />
+              <motion.div
+                aria-hidden='true'
+                animate={{ opacity: [0.45, 0, 0.45], scale: [0.72, 1.18, 0.72] }}
+                className='pointer-events-none absolute left-1/2 top-9 h-24 w-24 -translate-x-1/2 rounded-full border border-violet-400/30'
+                transition={{ duration: 2.4, repeat: Number.POSITIVE_INFINITY, ease: 'easeOut' }}
+              />
+            </>
+          )}
 
           {/* Step progress trail */}
           <div className='relative flex flex-wrap items-center justify-center gap-2 mb-7'>
@@ -70,6 +128,19 @@ export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
 
           {/* Headline */}
           <div className='relative text-center'>
+            {!isLinked && (
+              <motion.div
+                animate={{ y: [0, -2, 0] }}
+                className='mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/40 bg-violet-950/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-200'
+                transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+              >
+                <span className='relative flex h-2 w-2'>
+                  <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-300/70' />
+                  <span className='relative inline-flex h-2 w-2 rounded-full bg-violet-200' />
+                </span>
+                Final connection check
+              </motion.div>
+            )}
             <AnimatePresence mode='wait'>
               {isLinked ? (
                 <motion.div
@@ -79,14 +150,16 @@ export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
                   transition={{ duration: 0.35 }}
                 >
                   <div className='flex justify-center mb-3'>
-                    <PartyPopper size={32} className='text-emerald-400' />
+                    <div className='flex h-12 w-12 items-center justify-center rounded-full border border-emerald-700/40 bg-emerald-950/50 shadow-[0_0_30px_rgba(16,185,129,0.16)]'>
+                      <CheckCircle2 size={26} className='text-emerald-300' strokeWidth={2.4} />
+                    </div>
                   </div>
                   <h2 className='text-2xl font-bold text-white mb-2'>
                     Steam connected{linkedName ? ` — ${linkedName}` : ''}!
                   </h2>
                   <p className='text-gray-400 max-w-md mx-auto text-sm leading-relaxed'>
-                    You're all set. Dotabod will now track your matches automatically every time you
-                    stream.
+                    You&apos;re all set. Dotabod will now track your matches automatically every
+                    time you stream.
                   </p>
                 </motion.div>
               ) : (
@@ -96,12 +169,10 @@ export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <h2 className='text-2xl font-bold text-white mb-2'>
-                    Connect your Steam account
-                  </h2>
+                  <h2 className='text-2xl font-bold text-white mb-2'>Connect your Steam account</h2>
                   <p className='text-gray-400 max-w-md mx-auto text-sm leading-relaxed'>
-                    Technical setup is complete. Two quick steps and Steam links automatically —
-                    no account details needed.
+                    You made it to the final step. Launch Dota 2, demo any hero, and Dotabod will
+                    link Steam automatically — no account details needed.
                   </p>
                 </motion.div>
               )}
@@ -165,10 +236,7 @@ export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
                         setLaunched(true)
                         setTimeout(() => {
                           if (!document.hidden) {
-                            window.open(
-                              'https://store.steampowered.com/app/570/Dota_2/',
-                              '_blank',
-                            )
+                            window.open('https://store.steampowered.com/app/570/Dota_2/', '_blank')
                           }
                         }, 500)
                       }}
@@ -280,10 +348,11 @@ export function SteamConnectStep({ isLive }: SteamConnectStepProps) {
                           Why demo a hero instead of a real match?
                         </p>
                         <p className='text-xs text-gray-500 leading-relaxed'>
-                          Demo hero mode (<strong className='text-gray-400'>Play → Demo a Hero</strong>{' '}
-                          in the Dota 2 menu) triggers the game state integration instantly without
-                          needing a real match. It's the fastest way to verify everything works in
-                          about 2 minutes. Playing a normal match works too — it just takes longer.
+                          Demo hero mode (
+                          <strong className='text-gray-400'>Play → Demo a Hero</strong> in the Dota
+                          2 menu) triggers the game state integration instantly without needing a
+                          real match. It's the fastest way to verify everything works in about 2
+                          minutes. Playing a normal match works too — it just takes longer.
                         </p>
                       </div>
 

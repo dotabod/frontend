@@ -12,7 +12,7 @@ const CodeBlock = () => {
     track('install/copy_windows_installer')
 
     navigator.clipboard
-      .writeText(`powershell -c "irm https://${window.location.host}/install | iex"`)
+      .writeText(`powershell -c "irm -useb https://${window.location.host}/install | iex"`)
       .then(() => {
         setCopied(true)
         setTimeout(() => setCopied(false), 2500)
@@ -30,7 +30,7 @@ const CodeBlock = () => {
               <span style={{ color: '#F8F8F2' }}> </span>
               <span style={{ color: '#E9F284' }}>"</span>
               <span style={{ color: '#F1FA8C' }}>
-                irm https://{window.location.host}/install | iex
+                irm -useb https://{window.location.host}/install | iex
               </span>
               <span style={{ color: '#E9F284' }}>"</span>
             </span>

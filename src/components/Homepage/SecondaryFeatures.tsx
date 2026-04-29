@@ -1,192 +1,117 @@
-import { Popover } from 'antd'
-import { SparklesIcon } from 'lucide-react'
-import Image from 'next/image'
-import React from 'react'
+import { Button } from 'antd'
+import { Gift, Globe2, Music4, Settings2, ShieldEllipsis, Users } from 'lucide-react'
+import Link from 'next/link'
 import { Container } from 'src/components/Container'
-import CommandDetail from 'src/components/Dashboard/CommandDetail'
-import TwitchChat from 'src/components/TwitchChat'
-import { BentoCard, BentoGrid, type BentoGridItemProps } from '@/components/magicui/bento-grid'
-import { Settings } from '@/lib/defaultSettings'
-import { chatterInfo } from '../Dashboard/Features/ChatterCard'
-import { MMRBadge } from '../Overlay/rank/MMRBadge'
+import { MagicCard } from '@/components/magicui/magic-card'
+
+const discoverabilityCards = [
+  {
+    description:
+      '50+ game-aware chat reactions keep the stream lively with kills, power spikes, Roshan events, and more.',
+    highlights: ['Contextual chatter', 'Predictions callouts', 'Command moments'],
+    icon: ShieldEllipsis,
+    title: 'The bot actually has personality',
+  },
+  {
+    description:
+      'Support 40+ languages and translate messages on stream so more of your audience can follow the action.',
+    highlights: ['40+ languages', 'Auto-translation', 'Overlay-ready'],
+    icon: Globe2,
+    title: 'Built for international audiences',
+  },
+  {
+    description:
+      'Let trusted moderators manage settings and commands without giving them access to everything in your account.',
+    highlights: ['Manager access', 'Safer collaboration', 'Dashboard control'],
+    icon: Users,
+    title: 'Let your team help without chaos',
+  },
+  {
+    description:
+      'Gift subscriptions make it easier for your community to support the stream and make those moments visible on stream.',
+    highlights: ['Gift flow', 'On-stream alerts', 'Community moments'],
+    icon: Gift,
+    title: 'Turn support into visible community hype',
+  },
+  {
+    description:
+      'Connect music overlays and the !song command so viewers can follow what you are playing while you queue or grind.',
+    highlights: ['!song command', 'Overlay support', 'Last.fm and media hooks'],
+    icon: Music4,
+    title: 'More than gameplay: useful creator extras',
+  },
+  {
+    description:
+      'Automate the annoying setup work, from 7TV and Twitch permissions to Dota 2 config and overlay prep.',
+    highlights: ['7TV setup', 'Twitch automation', 'Dota 2 GSI export'],
+    icon: Settings2,
+    title: 'Setup feels like a product, not a checklist',
+  },
+]
 
 export function SecondaryFeatures() {
-  const features: BentoGridItemProps[] = [
-    {
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          {CommandDetail[Settings.commandWL].response({}, false)}
-        </div>
-      ),
-      name: 'Real-Time Win/Loss Overlay',
-      disableHover: false,
-      cta: (
-        <Popover
-          className='self-end'
-          content={
-            <Image
-              alt='wl overlay'
-              width={534}
-              height={82}
-              src='/images/dashboard/wl-overlay.png'
-            />
-          }
-        >
-          <button type='button' className='flex items-center space-x-1 text-purple-300'>
-            <SparklesIcon className='text-purple-200' height={22} />
-            <span>Preview</span>
-          </button>
-        </Popover>
-      ),
-      description:
-        'Instantly display your ranked or unranked win-loss record, current MMR, and progress to next rank on stream with one simple command.',
-      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2',
-    },
-    {
-      name: 'MMR badge and tracking',
-      disableHover: false,
-      cta: (
-        <Popover
-          content={
-            <Image
-              alt='mmr tracker'
-              width={534}
-              height={82}
-              src='/images/dashboard/mmr-tracker.png'
-            />
-          }
-        >
-          <button type='button' className='flex items-center space-x-1 text-purple-300'>
-            <SparklesIcon className='text-purple-200' height={22} />
-            <span>Preview</span>
-          </button>
-        </Popover>
-      ),
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          {CommandDetail[Settings.commandMmr].response()}
-          <div className='mt-6 flex justify-center space-x-4'>
-            <MMRBadge image='55.png' rank={3860} className='self-center rounded-md!' />
-            <MMRBadge
-              image='92.png'
-              className='self-center rounded-md!'
-              leaderboard={1}
-              rank={13150}
-            />
-          </div>
-        </div>
-      ),
-      description: 'Show off your current rank, or leaderboard standing on stream.',
-      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-2 lg:col-end-3',
-    },
-    {
-      name: 'Instant Smurf Detection',
-      description:
-        'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          {CommandDetail[Settings.commandSmurfs].response()}
-        </div>
-      ),
-      className: 'lg:row-start-1 lg:row-end-2 lg:col-start-3 lg:col-end-4',
-    },
-    {
-      name: 'Dotabod has things to say',
-      description: 'But only when the game conditions meet the correct parameters.',
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          <TwitchChat
-            responses={[
-              chatterInfo.smoke.message,
-              chatterInfo.passiveDeath.message,
-              chatterInfo.pause.message,
-              chatterInfo.powerTreads.message,
-            ]}
-          />
-        </div>
-      ),
-      className: 'lg:row-start-2 lg:row-end-3 lg:col-start-3 lg:col-end-4',
-    },
-    {
-      name: 'Roshan & Aegis Timers',
-      cta: (
-        <Popover
-          content={
-            <div className='flex flex-col items-center space-y-4 text-white'>
-              <Image
-                alt='aegis timer'
-                width={372}
-                height={141}
-                src='/images/dashboard/just-aegis-timer.png'
-              />
-              <span>Aegis timer</span>
-              <Image
-                alt='rosh timer'
-                width={336}
-                height={249}
-                src='/images/dashboard/rosh-timer.png'
-              />
-              <span>Roshan timer</span>
-            </div>
-          }
-        >
-          <button type='button' className='flex items-center space-x-1 text-purple-300'>
-            <SparklesIcon className='text-purple-200' height={22} />
-            <span>Preview</span>
-          </button>
-        </Popover>
-      ),
-      disableHover: false,
-      description: 'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
-      className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          <TwitchChat
-            responses={[
-              <React.Fragment key={1}>
-                <span>{chatterInfo.roshanKilled.message}</span>
-              </React.Fragment>,
-              <React.Fragment key={2}>
-                <span>{chatterInfo.roshPickup.message}</span>
-              </React.Fragment>,
-            ]}
-          />
-        </div>
-      ),
-    },
-    {
-      name: 'In-Game Medal Tracking',
-      description: CommandDetail[Settings.commandGM].description,
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          {CommandDetail[Settings.commandGM].response()}
-        </div>
-      ),
-      className: 'lg:row-start-3 lg:row-end-4 lg:col-start-3 lg:col-end-4',
-    },
-  ]
-
   return (
     <section
-      id='secondary-features'
-      aria-label='Features for building a portfolio'
-      className='py-20'
+      id='discover'
+      aria-labelledby='discover-title'
+      className='border-t border-white/10 bg-linear-to-b from-gray-900 to-slate-950 py-20 sm:py-24'
     >
       <Container>
-        <div className='mx-auto max-w-2xl sm:text-center'>
-          <h2 className='text-3xl font-medium tracking-tight text-gray-200'>
-            But wait, there&apos;s more.
+        <div className='mx-auto max-w-3xl text-center'>
+          <p className='text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300'>
+            Discover more
+          </p>
+          <h2
+            id='discover-title'
+            className='mt-3 text-3xl font-semibold tracking-tight text-gray-100 sm:text-4xl'
+          >
+            Dotabod has depth, and the coolest parts should not be hidden three menus deep.
           </h2>
-          <p className='mt-2 text-lg text-gray-300'>
-            Under active development and speaking to multiple Dota 2 personalities, features are
-            being added as they are requested.
+          <p className='mt-4 text-lg leading-8 text-gray-400'>
+            Beyond overlays and predictions, there is a full layer of creator tooling here: team
+            workflows, international audience support, gifting, music integrations, and setup
+            automation that makes the whole product feel more premium.
           </p>
         </div>
-        <BentoGrid className='lg:grid-rows-3'>
-          {features.map((feature, i) => (
-            <BentoCard key={i} {...feature} />
-          ))}
-        </BentoGrid>
+
+        <div className='mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+          {discoverabilityCards.map((card) => {
+            const Icon = card.icon
+
+            return (
+              <div
+                key={card.title}
+                className='overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03]'
+              >
+                <MagicCard className='min-h-full'>
+                  <div className='flex h-full flex-col p-6'>
+                    <div className='inline-flex w-fit rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-3 text-cyan-200'>
+                      <Icon className='h-5 w-5' />
+                    </div>
+                    <h3 className='mt-5 text-xl font-semibold text-white'>{card.title}</h3>
+                    <p className='mt-3 text-sm leading-6 text-gray-400'>{card.description}</p>
+                    <div className='mt-5 flex flex-wrap gap-2'>
+                      {card.highlights.map((highlight) => (
+                        <span
+                          key={highlight}
+                          className='rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs font-medium text-gray-300'
+                        >
+                          {highlight}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </MagicCard>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className='mt-10 flex justify-center'>
+          <Link href='/dashboard' prefetch={false}>
+            <Button size='large'>Browse the full feature set</Button>
+          </Link>
+        </div>
       </Container>
     </section>
   )

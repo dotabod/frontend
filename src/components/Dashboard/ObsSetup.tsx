@@ -14,6 +14,7 @@ import { type LnaPermissionState, queryLnaPermission, shouldCheckLna } from '@/l
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
 import RegionalBlockingNote from './RegionalBlockingNote'
+import type { SetupStepProgressState } from './SetupProgressShell'
 
 interface Scene {
   sceneIndex: number // Scene index
@@ -38,7 +39,11 @@ interface ObsError {
   actionable: boolean
 }
 
-const ObsSetup: React.FC = () => {
+interface ObsSetupProps {
+  onProgressChange?: (progress: SetupStepProgressState) => void
+}
+
+const ObsSetup: React.FC<ObsSetupProps> = ({ onProgressChange }) => {
   const track = useTrack()
   const [connected, setConnected] = useState(false)
   const [baseWidth, setBaseWidth] = useState<number | null>(null)
@@ -500,6 +505,56 @@ const ObsSetup: React.FC = () => {
         return null
     }
   }
+
+  useEffect(() => {
+    const progress: SetupStepProgressState =
+      scenesWithSource.length > 0
+        ? {
+            label: 'Overlay added',
+            detail: `Overlay ready on ${scenesWithSource.length} scene${scenesWithSource.length > 1 ? 's' : ''}.`,
+            completedCount: 2,
+            totalCount: 2,
+            isComplete: true,
+            needsAttention: false,
+          }
+        : error?.actionable
+          ? {
+              label: 'OBS needs attention',
+              detail: error.message,
+              completedCount: connected ? 1 : 0,
+              totalCount: 2,
+              isComplete: false,
+              needsAttention: true,
+            }
+          : connected
+            ? {
+                label: 'Choose your OBS scene',
+                detail: 'OBS is connected — pick the scene where Dota 2 is captured.',
+                completedCount: 1,
+                totalCount: 2,
+                isComplete: false,
+                needsAttention: false,
+              }
+            : lnaChecked && lnaPermissionState === 'prompt'
+              ? {
+                  label: 'Waiting for browser permission',
+                  detail: 'Chrome may ask for local access before OBS can connect.',
+                  completedCount: 0,
+                  totalCount: 2,
+                  isComplete: false,
+                  needsAttention: false,
+                }
+              : {
+                  label: 'Ready for OBS connection',
+                  detail: 'Connect OBS WebSocket and let Dotabod add the browser source for you.',
+                  completedCount: 0,
+                  totalCount: 2,
+                  isComplete: false,
+                  needsAttention: false,
+                }
+
+    onProgressChange?.(progress)
+  }, [connected, error, lnaChecked, lnaPermissionState, onProgressChange, scenesWithSource.length])
 
   return (
     <FeatureWrapper feature='autoOBS'>

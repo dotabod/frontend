@@ -1,43 +1,40 @@
 import type { SubscriptionTier } from '@prisma/client'
-import { Button } from 'antd'
-import Link from 'next/link'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
-import { TierBadge } from './TierBadge'
+import { UpgradePromptContent } from './UpgradePromptContent'
 
 interface LockedFeatureOverlayProps {
   requiredTier?: SubscriptionTier | null
   message?: React.ReactNode
 }
 
-export function LockedFeatureOverlay({
-  requiredTier,
-  message = (
-    <span>
-      To use this feature, upgrade your plan and access the most powerful features of Dotabod for
-      your stream
-    </span>
-  ),
-}: LockedFeatureOverlayProps) {
+function getOverlayMessage(requiredTier: SubscriptionTier) {
+  if (requiredTier === SUBSCRIPTION_TIERS.PRO) {
+    return 'This feature is part of Dotabod Pro.'
+  }
+
+  return `This feature unlocks with ${requiredTier.toLowerCase()}.`
+}
+
+export function LockedFeatureOverlay({ requiredTier, message }: LockedFeatureOverlayProps) {
   if (!requiredTier || requiredTier === SUBSCRIPTION_TIERS.FREE) {
     return null
   }
 
   return (
-    <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg backdrop-blur-md z-10'>
-      <div className='flex flex-col items-center gap-6 p-8 max-w-lg'>
-        <TierBadge tooltip={false} requiredTier={requiredTier} />
+    <div className='absolute inset-0 z-10 overflow-hidden rounded-lg bg-black/72 backdrop-blur-lg'>
+      <div className='flex h-full w-full items-center justify-center p-2 sm:p-3'>
+        <div className='relative flex max-h-full w-full items-center justify-center overflow-auto rounded-[24px] border border-white/10 bg-gray-950/72 p-3 shadow-2xl shadow-black/50 sm:p-4'>
+          <div className='pointer-events-none absolute inset-0 bg-linear-to-br from-purple-500/10 via-transparent to-amber-400/10' />
 
-        <div className='text-center'>
-          <p className='text-white text-lg font-medium mb-2'>{message}</p>
-          <Link href='/dashboard/billing'>
-            <Button
-              type='primary'
-              size='large'
-              className='shadow-lg hover:scale-105 transition-transform duration-200'
-            >
-              Upgrade now
-            </Button>
-          </Link>
+          <div className='relative flex w-full max-w-lg flex-col gap-3 sm:gap-4'>
+            <div className='px-1 text-center text-sm text-gray-300 sm:text-[15px]'>
+              {message ?? <span>{getOverlayMessage(requiredTier)}</span>}
+            </div>
+
+            <div className='flex justify-center'>
+              <UpgradePromptContent requiredTier={requiredTier} variant='overlay' />
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { App, Button, Progress, Steps } from 'antd'
+import { App, Button } from 'antd'
 import confetti from 'canvas-confetti'
 import { Bitcoin } from 'lucide-react'
 import Head from 'next/head'
@@ -10,10 +10,14 @@ import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import ChatBot from '@/components/Dashboard/ChatBot'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { SteamConnectStep } from '@/components/Dashboard/SteamConnectStep'
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
+import {
+  SetupProgressShell,
+  type SetupStepProgressState,
+} from '@/components/Dashboard/SetupProgressShell'
+import { SteamConnectStep } from '@/components/Dashboard/SteamConnectStep'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
@@ -77,6 +81,7 @@ const SetupPage = () => {
   const isLive = data?.stream_online
 
   const [active, setActive] = useState(0)
+  const [stepProgress, setStepProgress] = useState<Record<number, SetupStepProgressState>>({})
   const router = useRouter()
   const didJustPay = router.query.paid === 'true'
   // Check if payment was made with crypto
@@ -146,6 +151,49 @@ const SetupPage = () => {
 
   const maxStepIndex = 3
 
+  const updateStepProgress = useCallback((stepIndex: number, progress: SetupStepProgressState) => {
+    setStepProgress((previousProgress) => {
+      const previousStepProgress = previousProgress[stepIndex]
+
+      if (
+        previousStepProgress &&
+        previousStepProgress.label === progress.label &&
+        previousStepProgress.detail === progress.detail &&
+        previousStepProgress.completedCount === progress.completedCount &&
+        previousStepProgress.totalCount === progress.totalCount &&
+        previousStepProgress.isComplete === progress.isComplete &&
+        previousStepProgress.needsAttention === progress.needsAttention
+      ) {
+        return previousProgress
+      }
+
+      return {
+        ...previousProgress,
+        [stepIndex]: progress,
+      }
+    })
+  }, [])
+
+  const handleStreamProgressChange = useCallback(
+    (progress: SetupStepProgressState) => updateStepProgress(0, progress),
+    [updateStepProgress],
+  )
+
+  const handleDotaProgressChange = useCallback(
+    (progress: SetupStepProgressState) => updateStepProgress(1, progress),
+    [updateStepProgress],
+  )
+
+  const handleObsProgressChange = useCallback(
+    (progress: SetupStepProgressState) => updateStepProgress(2, progress),
+    [updateStepProgress],
+  )
+
+  const handleSteamProgressChange = useCallback(
+    (progress: SetupStepProgressState) => updateStepProgress(3, progress),
+    [updateStepProgress],
+  )
+
   useEffect(() => {
     const parsedStep = Number.parseInt(router.query.step as string, 10)
 
@@ -153,37 +201,6 @@ const SetupPage = () => {
       !Number.isNaN(parsedStep) && parsedStep > 0 ? Math.min(parsedStep - 1, maxStepIndex) : 0,
     )
   }, [router.query.step])
-
-  // Standard confetti animation
-  const triggerConfetti = useCallback(() => {
-    const end = Date.now() + 2 * 1000
-    const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
-
-    const frame = () => {
-      if (Date.now() > end) return
-
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        startVelocity: 60,
-        origin: { x: 0, y: 0.5 },
-        colors: colors,
-      })
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        startVelocity: 60,
-        origin: { x: 1, y: 0.5 },
-        colors: colors,
-      })
-
-      requestAnimationFrame(frame)
-    }
-
-    frame()
-  }, [])
 
   // Crypto notification element with animations
   const CryptoSuccessContent = useCallback(
@@ -202,25 +219,18 @@ const SetupPage = () => {
 
   // Consolidated useEffect for confetti and payment notifications
   useEffect(() => {
-    // Track if confetti has been triggered in this effect run
-    let confettiTriggered = false
-
-    // Case 1: User reaches the final step
-    if (active === maxStepIndex && !didJustPay) {
-      triggerConfetti()
-      confettiTriggered = true
-    }
-
-    // Case 2: User just completed a payment
+    // User just completed a payment
     if (didJustPay) {
-      // Only trigger confetti if it hasn't been triggered yet
-      if (!confettiTriggered) {
-        // Use crypto-themed confetti for crypto payments
-        if (paidWithCrypto) {
-          triggerCryptoConfetti()
-        } else {
-          triggerConfetti()
-        }
+      if (paidWithCrypto) {
+        triggerCryptoConfetti()
+      } else {
+        confetti({
+          particleCount: 90,
+          spread: 60,
+          startVelocity: 45,
+          origin: { x: 0.5, y: 0.3 },
+          colors: ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'],
+        })
       }
 
       // Create a more descriptive message based on the subscription type
@@ -285,42 +295,57 @@ const SetupPage = () => {
     notification,
     router,
     trialDays,
-    triggerConfetti,
     hasGiftSubs,
     giftCount,
     paidWithCrypto,
     CryptoSuccessContent,
   ])
 
-  if (session?.data?.user?.isImpersonating) {
-    return null
-  }
-
   const steps = [
     {
       title: 'Stream',
-      content: <ChatBot />,
+      content: <ChatBot onProgressChange={handleStreamProgressChange} />,
       description: 'Connect your stream',
+      progress: stepProgress[0],
     },
     {
       title: 'Dota 2',
-      content: <ExportCFG />,
+      content: <ExportCFG onProgressChange={handleDotaProgressChange} />,
       description: 'Configure game settings',
+      progress: stepProgress[1],
     },
     {
       title: 'OBS',
-      content: <OBSOverlay />,
+      content: <OBSOverlay onProgressChange={handleObsProgressChange} />,
       description: 'Set up your overlay',
+      progress: stepProgress[2],
     },
     {
       title: 'Connect Steam',
       description: 'Auto-connects when you play',
-      content: <SteamConnectStep isLive={isLive} />,
+      content: <SteamConnectStep isLive={isLive} onProgressChange={handleSteamProgressChange} />,
+      progress: stepProgress[3],
     },
   ]
 
+  useEffect(() => {
+    track('setup/progress_viewed', { step: active, totalSteps: steps.length })
+  }, [track, active, steps.length])
+
+  const isSetupComplete = steps.every((step) => step.progress?.isComplete)
+
+  if (session?.data?.user?.isImpersonating) {
+    return null
+  }
+
+  const handleProgressStepChange = (newActiveStep: number) => {
+    setActive(newActiveStep)
+    updateStepInUrl(newActiveStep)
+    track('setup/change_step', { step: newActiveStep })
+  }
+
   const NavigationButtons = (
-    <div className='flex justify-between mx-auto'>
+    <div className='flex justify-between gap-4'>
       <div>
         {active > 0 && (
           <Button size='large' onClick={prevStep}>
@@ -366,26 +391,23 @@ const SetupPage = () => {
         title='Setup'
       />
 
-      <div className='mb-4'>
-        <Progress percent={Math.round((active / (steps.length - 1)) * 100)} showInfo={false} />
+      <div className='mb-10 space-y-4'>
+        <SetupProgressShell
+          activeStep={active}
+          className='mb-0'
+          isSetupComplete={isSetupComplete}
+          onStepChange={handleProgressStepChange}
+          steps={steps}
+        />
+
+        <div className='overflow-hidden rounded-[1.75rem] border border-gray-800/80 bg-black/20 shadow-[0_18px_70px_rgba(0,0,0,0.22)]'>
+          <div>{steps[active].content}</div>
+
+          <div className='border-t border-gray-800/80 bg-gray-950/40 px-4 py-4 md:px-6'>
+            {NavigationButtons}
+          </div>
+        </div>
       </div>
-
-      <Steps
-        current={active}
-        onChange={(newActiveStep) => {
-          setActive(newActiveStep)
-          updateStepInUrl(newActiveStep)
-          track('setup/change_step', { step: newActiveStep })
-        }}
-        items={steps}
-        className='flex justify-center mb-8!'
-      />
-
-      {NavigationButtons}
-
-      <div className='mb-10'>{steps[active].content}</div>
-
-      {NavigationButtons}
     </>
   )
 }

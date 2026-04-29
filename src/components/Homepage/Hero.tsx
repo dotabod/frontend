@@ -1,18 +1,70 @@
 import { Button, Popover, Skeleton } from 'antd'
-import { LucideHome, LucideTerminalSquare } from 'lucide-react'
+import {
+  LucideHome,
+  LucideShield,
+  LucideSparkles,
+  LucideTerminalSquare,
+  LucideZap,
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { signIn, useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { Container } from 'src/components/Container'
-import dotaLogo from 'src/images/logos/dota.svg'
 import TwitchSvg from 'src/images/logos/twitch.svg'
 import useSWR from 'swr'
 import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustration'
-import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
 import { LiveIcon } from './LiveIcon'
+
+const highlightPills = [
+  {
+    icon: LucideZap,
+    label: 'Automated predictions, overlays, and setup',
+  },
+  {
+    icon: LucideShield,
+    label: 'Anti-snipe protection for ranked games',
+  },
+  {
+    icon: LucideSparkles,
+    label: 'Live game intelligence that feels premium on stream',
+  },
+]
+
+const heroStats = [
+  {
+    label: 'Twitch streamers trust Dotabod',
+    value: '30,000+',
+  },
+  {
+    label: 'Game-aware chat moments',
+    value: '50+',
+  },
+  {
+    label: 'Languages supported',
+    value: '40+',
+  },
+]
+
+const spotlightCards = [
+  {
+    description:
+      'Auto predictions, OBS scene switching, and setup that removes busywork before you go live.',
+    title: 'Automation engine',
+  },
+  {
+    description:
+      'Minimap, hero picks, and queue blockers help protect your ranked sessions from stream snipers.',
+    title: 'Anti-snipe suite',
+  },
+  {
+    description:
+      'Roshan timers, win probability, MMR overlays, and notable players keep viewers locked in.',
+    title: 'Game intelligence',
+  },
+]
 
 const TwitchUser = ({
   image,
@@ -112,7 +164,6 @@ const TwitchUser = ({
 
 export function Hero() {
   const session = useSession()
-  // get users from api/featured-users
   const { data: users, isLoading } = useSWR<{
     topLive: { name: string; image: string }[]
   }>('/api/featured-users', fetcher)
@@ -126,83 +177,143 @@ export function Hero() {
     )
 
   return (
-    <div className='overflow-hidden py-4 sm:py-4 lg:pb-4 xl:pb-4'>
+    <section className='relative overflow-hidden border-b border-white/10 bg-linear-to-b from-slate-950 via-gray-900 to-gray-900 py-10 sm:py-14 lg:py-20'>
+      <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.14),transparent_26%)]' />
       <Container>
-        <div className='lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20 items-center'>
-          <div className='relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6'>
-            <div className='space-y-4'>
-              <h1 className='text-4xl font-bold tracking-tight text-gray-200 sm:text-5xl'>
-                The greatest tool for Dota 2 streamers
+        <div className='relative z-10 grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10'>
+          <div className='max-w-3xl'>
+            <div className='inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-100'>
+              <LucideSparkles className='h-4 w-4 text-cyan-300' />
+              Premium Dota 2 stream tools for creators who want more than basic overlays
+            </div>
+
+            <div className='mt-6 space-y-5'>
+              <h1 className='max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl xl:text-6xl'>
+                Make every Dota 2 match feel like a premium production.
               </h1>
-              <h2 className='flex items-center gap-2 text-2xl font-medium tracking-tight text-gray-200'>
-                Smart Predictions • MMR Tracking • Interactive Chat
-                <Image
-                  src='/images/emotes/peepoclap.webp'
-                  unoptimized
-                  width={38}
-                  height={38}
-                  alt='peepoclap'
-                  className='inline-block'
-                />
-              </h2>
-              <p className='text-lg text-gray-300'>
-                Join thousands of streamers using Dotabod to enhance their streams with automated
-                predictions, real-time stats, and dynamic overlays that keep viewers engaged and
-                coming back for more.
+              <p className='max-w-2xl text-lg leading-8 text-gray-300 sm:text-xl'>
+                Dotabod automates predictions, protects your ranked games, and turns live match data
+                into overlays, chat moments, and viewer-friendly experiences that feel sharp from
+                the first minute on stream.
               </p>
             </div>
-            <div className='mt-8 flex flex-wrap gap-x-6 gap-y-4'>
+
+            <div className='mt-8 grid gap-3 sm:grid-cols-3'>
+              {highlightPills.map((pill) => {
+                const Icon = pill.icon
+
+                return (
+                  <div
+                    key={pill.label}
+                    className='rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-sm text-gray-200 shadow-[0_10px_50px_-30px_rgba(34,211,238,0.55)]'
+                  >
+                    <Icon className='mb-3 h-5 w-5 text-cyan-300' />
+                    <p>{pill.label}</p>
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className='mt-8 flex flex-wrap gap-x-4 gap-y-4'>
               <Link href='/dashboard' prefetch={false}>
-                <Button type='primary'>
+                <Button type='primary' size='large'>
                   <div className='flex items-center space-x-2'>
                     <LucideHome className='flex h-4 w-4' />
                     {session?.status === 'authenticated' ? (
-                      <span>Go to dashboard</span>
+                      <span>Open dashboard</span>
                     ) : (
-                      <span>Get started</span>
+                      <span>Get started free</span>
                     )}
                   </div>
                 </Button>
               </Link>
               <Link href='/arteezy'>
-                <Button className='space-x-2'>
+                <Button size='large' className='space-x-2'>
                   <div className='flex items-center space-x-2'>
                     <LucideTerminalSquare className='flex h-4 w-4' />
-                    <span>View commands</span>
+                    <span>Explore live commands</span>
                   </div>
                 </Button>
               </Link>
-            </div>
-          </div>
-          <div className='relative row-span-1 lg:col-span-5 lg:row-span-2 xl:col-span-6'>
-            <BackgroundIllustration className='absolute left-1/2 top-4 h-[1026px] w-[1026px] -translate-x-1/3 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ml-12 xl:-top-14 xl:ml-0' />
-            <div className='-mx-4 h-[180px] px-9 -mt-10 [mask-image:linear-gradient(to_bottom,white_60%,transparent)] sm:mx-0 lg:mt-0 lg:absolute lg:-inset-x-10 lg:-bottom-20 lg:-top-10 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32'>
-              <PhoneFrame className='mx-auto max-w-[180px] lg:max-w-[366px]' priority>
-                <Image
-                  src={dotaLogo}
-                  width={240}
-                  height={240}
-                  alt='dota logo'
-                  className='pointer-events-none absolute inset-0 h-full w-full'
-                />
-              </PhoneFrame>
+              <Link href='/#pricing' scroll>
+                <Button size='large' type='text' className='!text-gray-200 hover:!text-white'>
+                  Compare plans
+                </Button>
+              </Link>
             </div>
 
-            <div key='twitch-streamer-list'>
-              <div className='relative lg:col-span-7 xl:col-span-6'>
-                <div className='flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left'>
-                  <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
-                  <span>
-                    Trusted by Over {new Intl.NumberFormat('en-US').format(30000)} Twitch Streamers
-                    Including:
+            <dl className='mt-10 grid gap-4 sm:grid-cols-3'>
+              {heroStats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className='rounded-2xl border border-white/10 bg-black/20 px-4 py-5 backdrop-blur-sm'
+                >
+                  <dt className='text-sm text-gray-400'>{stat.label}</dt>
+                  <dd className='mt-2 text-2xl font-semibold text-white'>{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className='relative'>
+            <BackgroundIllustration className='absolute left-1/2 top-1/2 h-[920px] w-[920px] -translate-x-1/2 -translate-y-1/2 stroke-gray-300/50 [mask-image:linear-gradient(to_bottom,white_30%,transparent_85%)]' />
+            <div className='relative space-y-4'>
+              <div className='rounded-[2rem] border border-white/10 bg-linear-to-br from-white/[0.08] via-white/[0.03] to-transparent p-5 shadow-[0_30px_120px_-60px_rgba(34,211,238,0.45)] backdrop-blur-xl sm:p-6'>
+                <div className='flex items-center justify-between gap-3'>
+                  <div>
+                    <p className='text-sm font-semibold uppercase tracking-[0.24em] text-cyan-300'>
+                      Live on stream
+                    </p>
+                    <h2 className='mt-2 text-2xl font-semibold text-white'>
+                      The core toolkit viewers actually notice
+                    </h2>
+                  </div>
+                  <span className='rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300'>
+                    Ready fast
                   </span>
-                  <LiveIcon />
+                </div>
+
+                <div className='mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950'>
+                  <Image
+                    src='/images/dashboard/bets.png'
+                    alt='Dotabod predictions dashboard preview'
+                    width={1200}
+                    height={760}
+                    priority
+                    className='h-auto w-full object-cover'
+                  />
+                </div>
+
+                <div className='mt-4 grid gap-3 sm:grid-cols-3'>
+                  {spotlightCards.map((card) => (
+                    <div
+                      key={card.title}
+                      className='rounded-2xl border border-white/10 bg-black/20 p-4'
+                    >
+                      <h3 className='text-sm font-semibold uppercase tracking-[0.22em] text-gray-200'>
+                        {card.title}
+                      </h3>
+                      <p className='mt-2 text-sm leading-6 text-gray-400'>{card.description}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className='relative lg:col-span-7 xl:col-span-6'>
+              <div
+                key='twitch-streamer-list'
+                className='rounded-[2rem] border border-white/10 bg-black/25 p-5 backdrop-blur-xl sm:p-6'
+              >
+                <div className='flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-200'>
+                  <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
+                  <span>
+                    Trusted by over {new Intl.NumberFormat('en-US').format(30000)} Twitch streamers,
+                    including live creators using Dotabod right now
+                  </span>
+                  <LiveIcon />
+                </div>
+
                 {isLoading || !users?.topLive?.length ? (
-                  <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start pt-4'>
+                  <ul className='flex flex-wrap justify-start pt-4'>
                     {[...Array(10)].map((_, i) => (
                       <li key={`skeleton-${i}`} className='relative'>
                         <div className='flex flex-col items-center space-y-2 px-4 py-2'>
@@ -223,7 +334,7 @@ export function Hero() {
                     ))}
                   </ul>
                 ) : users?.topLive?.length && users?.topLive?.length > 0 ? (
-                  <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start'>
+                  <ul className='flex flex-wrap justify-start'>
                     {users?.topLive?.map(({ name, image }) => (
                       <TwitchUser
                         key={name}
@@ -248,13 +359,13 @@ export function Hero() {
                     )}
                   </ul>
                 ) : (
-                  <p className='text-center text-gray-300'>No top streamers found</p>
+                  <p className='pt-4 text-center text-gray-300'>No top streamers found</p>
                 )}
               </div>
             </div>
           </div>
         </div>
       </Container>
-    </div>
+    </section>
   )
 }

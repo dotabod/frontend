@@ -25,7 +25,7 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
     <div
       role='button'
       tabIndex={0}
-      className={clsx('relative', className)}
+      className={clsx('relative overflow-hidden', className)}
       onMouseEnter={() => !hasAccess && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => !hasAccess && setIsHovered(true)}
@@ -45,7 +45,7 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className='absolute inset-0'
+            className='absolute inset-0 overflow-hidden'
           >
             <LockedFeatureOverlay requiredTier={requiredTier} />
           </motion.div>
@@ -56,7 +56,7 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
 }
 
 export function Card({ className, feature, title, children, ...props }: CardProps) {
-  const { requiredTier } = useFeatureAccess(feature)
+  const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
   return (
     <FeatureWrapper
@@ -71,7 +71,7 @@ export function Card({ className, feature, title, children, ...props }: CardProp
       {title && (
         <div className='title'>
           <h3>{title}</h3>
-          {requiredTier && <TierBadge requiredTier={requiredTier} />}
+          {requiredTier && hasAccess && <TierBadge requiredTier={requiredTier} />}
         </div>
       )}
       {children}
