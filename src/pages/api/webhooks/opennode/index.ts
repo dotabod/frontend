@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { OpenNodeCharge } from 'opennode/dist/types/v1'
 import prisma from '@/lib/db'
 import { verifyOpenNodeWebhook } from '@/lib/opennode'
-import { stripe } from '@/lib/stripe-server'
+import { isOpenNodePaymentConfirmed, processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 
 export const runtime = 'nodejs'
 
@@ -65,118 +65,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    // Update charge status in database
-    await prisma.openNodeCharge.updateMany({
-      where: { openNodeChargeId: chargeId },
-      data: {
-        status,
-      },
-    })
-
     // Handle payment confirmation
-    if (status === 'paid' || status === 'confirmed') {
-      let stripeInvoiceMarkedPaid = false
-      let subscriptionCreated = false
-
+    if (isOpenNodePaymentConfirmed(status)) {
       try {
-        // Mark Stripe invoice as paid out-of-band
-        await stripe.invoices.pay(
-          invoiceId,
-          { paid_out_of_band: true },
-          { idempotencyKey: chargeId },
-        )
-
-        stripeInvoiceMarkedPaid = true
-        console.log(`✅ Marked Stripe invoice ${invoiceId} as paid via OpenNode charge ${chargeId}`)
-
-        // Wait a moment for Stripe webhook to fire
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-
-        // Check if subscription was created by Stripe webhook
-        const subscription = await prisma.subscription.findFirst({
-          where: {
-            userId: existingCharge?.userId,
-            stripeCustomerId: existingCharge?.stripeCustomerId,
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        })
-
-        subscriptionCreated = !!subscription
-
-        // If Stripe webhook didn't create subscription, do it manually
-        if (!subscriptionCreated) {
-          console.log('⚠️ Stripe webhook did not create subscription, processing manually')
-
-          // Import handleInvoiceEvent
-          const { handleInvoiceEvent } = await import('@/pages/api/stripe/handlers/invoice-events')
-
-          // Retrieve invoice with full details
-          const invoice = await stripe.invoices.retrieve(invoiceId)
-
-          // Process using transaction
-          await prisma.$transaction(async (tx) => {
-            const handled = await handleInvoiceEvent(invoice, tx)
-            if (!handled) {
-              throw new Error(`Manual invoice handling returned false for ${invoiceId}`)
-            }
-          })
-
-          subscriptionCreated = true
-          console.log('✅ Subscription created manually')
-        } else {
-          console.log('✅ Subscription was created by Stripe webhook')
+        if (!existingCharge) {
+          throw new Error(`OpenNode charge ${chargeId} not found for invoice ${invoiceId}`)
         }
 
-        // Update charge record with success
-        await prisma.openNodeCharge.update({
-          where: { openNodeChargeId: chargeId },
-          data: {
-            lastWebhookAt: new Date(),
-            metadata: {
-              ...existingMetadata,
-              processedSuccessfully: true,
-              stripeInvoiceMarkedPaid,
-              subscriptionCreated,
-              invoiceId,
-              chargeId,
-              processedAt: new Date().toISOString(),
-            },
-          },
-        })
-
+        await processConfirmedOpenNodePayment(existingCharge, status)
         console.log('✅ Successfully processed OpenNode payment')
       } catch (error) {
         console.error(`❌ Failed to process OpenNode payment ${chargeId}:`, error)
-
-        // Store error for debugging
-        await prisma.openNodeCharge.update({
-          where: { openNodeChargeId: chargeId },
-          data: {
-            metadata: {
-              ...existingMetadata,
-              processedSuccessfully: false,
-              lastError: error instanceof Error ? error.message : String(error),
-              errorStack: error instanceof Error ? error.stack : undefined,
-              stripeInvoiceMarkedPaid,
-              subscriptionCreated,
-              invoiceId,
-              chargeId,
-              failedAt: new Date().toISOString(),
-            },
-          },
-        })
-
         // Return non-2xx so OpenNode retries the webhook for transient failures
         res.status(500).json({ error: 'Failed to process OpenNode payment' })
         return
       }
     } else {
       // For non-payment statuses, just update lastWebhookAt
-      await prisma.openNodeCharge.update({
+      await prisma.openNodeCharge.updateMany({
         where: { openNodeChargeId: chargeId },
         data: {
+          status,
           lastWebhookAt: new Date(),
         },
       })

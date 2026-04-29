@@ -97,7 +97,10 @@ export async function handleChargeSucceeded(
                     console.log(
                       `Creating lifetime subscription for verified crypto lifetime payment ${charge.id}`,
                     )
-                    await createLifetimePurchase(userId, charge.customer as string, priceId, tx)
+                    await createLifetimePurchase(userId, charge.customer as string, priceId, tx, {
+                      chargeId: charge.id,
+                      checkoutSessionId: session.id,
+                    })
                   } else {
                     console.log(
                       `WARNING: Price ${priceId} detected as lifetime but product name "${productName}" doesn't match. Skipping lifetime creation.`,
@@ -141,7 +144,10 @@ export async function handleChargeSucceeded(
 
               // If it is a lifetime price, create the lifetime subscription with the correct price ID
               console.log(`Creating lifetime subscription for verified lifetime price ${priceId}`)
-              await createLifetimePurchase(userId, charge.customer as string, priceId, tx)
+              await createLifetimePurchase(userId, charge.customer as string, priceId, tx, {
+                chargeId: charge.id,
+                checkoutSessionId: session.id,
+              })
               return true
             }
           }

@@ -74,7 +74,26 @@ export async function createLifetimePurchase(
   customerId: string,
   priceId: string | null,
   tx: Prisma.TransactionClient,
+  metadata?: Prisma.InputJsonObject,
 ): Promise<{ id: string }> {
+  const existingLifetimePurchase = await tx.subscription.findFirst({
+    where: {
+      userId,
+      status: SubscriptionStatus.ACTIVE,
+      transactionType: TransactionType.LIFETIME,
+    },
+    select: {
+      id: true,
+    },
+  })
+
+  if (existingLifetimePurchase) {
+    console.log(
+      `Skipping duplicate lifetime purchase for user ${userId}; active lifetime subscription ${existingLifetimePurchase.id} already exists`,
+    )
+    return existingLifetimePurchase
+  }
+
   // Lifetime subscriptions don't expire for 100 years
   const farFutureDate = new Date()
   farFutureDate.setFullYear(farFutureDate.getFullYear() + 100)
@@ -93,6 +112,7 @@ export async function createLifetimePurchase(
       transactionType: TransactionType.LIFETIME,
       currentPeriodEnd: farFutureDate,
       cancelAtPeriodEnd: false,
+      ...(metadata ? { metadata } : {}),
     },
     select: {
       id: true,

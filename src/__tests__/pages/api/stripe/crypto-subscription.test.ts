@@ -37,6 +37,9 @@ vi.mock('@/lib/stripe-server', () => ({
       create: vi.fn(),
       update: vi.fn(),
     },
+    prices: {
+      retrieve: vi.fn(),
+    },
     invoiceItems: {
       create: vi.fn(),
     },
@@ -64,6 +67,9 @@ describe('Crypto Subscription Utilities', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(stripe.prices.retrieve as any).mockResolvedValue({
+      unit_amount: 600,
+    })
   })
 
   afterEach(() => {
@@ -131,6 +137,10 @@ describe('Crypto Subscription Utilities', () => {
     beforeEach(() => {
       // Mock getCurrentPeriod to return 'monthly' for crypto_monthly
       ;(getCurrentPeriod as any).mockReturnValue('monthly')
+      ;(stripe.prices.retrieve as any).mockResolvedValue({
+        unit_amount: 600,
+      })
+      mockTx.subscription.findFirst.mockResolvedValue(null)
     })
 
     it('should create a monthly crypto subscription successfully', async () => {
@@ -252,6 +262,35 @@ describe('Crypto Subscription Utilities', () => {
           tier: 'PRO',
           cancelAtPeriodEnd: false,
           currentPeriodEnd: expect.any(Date),
+        },
+        select: {
+          id: true,
+        },
+      })
+    })
+
+    it('should not create a duplicate lifetime crypto subscription', async () => {
+      ;(getCurrentPeriod as any).mockReturnValue('lifetime')
+
+      mockTx.subscription.findFirst.mockResolvedValue({
+        id: 'existing_lifetime_sub',
+      })
+
+      const result = await createCryptoSubscription(
+        mockUserId,
+        mockSession,
+        'crypto_lifetime',
+        mockCustomerId,
+        mockTx as any,
+      )
+
+      expect(result).toBe(true)
+      expect(mockTx.subscription.create).not.toHaveBeenCalled()
+      expect(mockTx.subscription.findFirst).toHaveBeenCalledWith({
+        where: {
+          userId: mockUserId,
+          status: 'ACTIVE',
+          transactionType: 'LIFETIME',
         },
         select: {
           id: true,

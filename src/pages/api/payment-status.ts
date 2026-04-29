@@ -3,6 +3,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getOpenNodeChargeStatus } from '@/lib/opennode'
+import { isOpenNodePaymentConfirmed, processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 import { stripe } from '@/lib/stripe-server'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -27,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Get Stripe invoice to verify user ownership
-    const invoice = await stripe.invoices.retrieve(invoiceId)
+    let invoice = await stripe.invoices.retrieve(invoiceId)
     if (invoice.metadata?.userId !== session.user.id) {
       res.status(403).json({ error: 'Access denied' })
       return
@@ -59,13 +60,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const currentStatus = chargeStatus?.status || openNodeCharge.status
 
+    if (isOpenNodePaymentConfirmed(currentStatus)) {
+      try {
+        await processConfirmedOpenNodePayment(
+          { ...openNodeCharge, status: currentStatus },
+          currentStatus,
+        )
+        invoice = await stripe.invoices.retrieve(invoiceId)
+      } catch (error) {
+        console.error('Confirmed OpenNode payment activation failed:', error)
+        res.status(500).json({
+          error: 'Payment confirmed, but subscription activation failed. Please contact support.',
+        })
+        return
+      }
+    }
+
+    const invoiceAmount = ((invoice.total || invoice.amount_due || 0) as number) / 100
+
     // Return user-friendly status information
     res.status(200).json({
       invoiceId,
       chargeId: openNodeCharge.openNodeChargeId,
       status: currentStatus,
-      amount: openNodeCharge.amount,
-      currency: openNodeCharge.currency,
+      amount: invoiceAmount || openNodeCharge.amount,
+      currency: invoice.currency || openNodeCharge.currency,
       createdAt: openNodeCharge.createdAt,
       statusInfo: getStatusInfo(currentStatus),
       invoice: {

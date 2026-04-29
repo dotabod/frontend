@@ -1,4 +1,4 @@
-import { type Prisma, SubscriptionStatus } from '@prisma/client'
+import { Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type Stripe from 'stripe'
 import { stripe } from '@/lib/stripe-server'
 import { withErrorHandling } from '../utils/error-handling'
@@ -18,6 +18,10 @@ export async function handleInvoiceEvent(
   invoice: Stripe.Invoice,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
+  if (invoice.id) {
+    await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${invoice.id}))`)
+  }
+
   // Check for OpenNode crypto payment
   if (
     invoice.status === 'paid' &&
@@ -546,11 +550,28 @@ async function handleOpenNodeInvoicePaid(
           // Handle lifetime purchase - reuse existing BoomFi logic
           console.log(`OpenNode invoice ${invoice.id} is for a lifetime purchase`)
 
+          const existingLifetimePurchase = await tx.subscription.findFirst({
+            where: {
+              userId,
+              status: SubscriptionStatus.ACTIVE,
+              transactionType: TransactionType.LIFETIME,
+            },
+            select: { id: true },
+          })
+
+          if (existingLifetimePurchase) {
+            console.log(
+              `Skipping OpenNode lifetime creation for invoice ${invoice.id}; active lifetime subscription ${existingLifetimePurchase.id} already exists`,
+            )
+            return true
+          }
+
           // Find and cancel all active subscriptions
           const activeSubscriptions = await tx.subscription.findMany({
             where: {
               userId,
               NOT: { status: SubscriptionStatus.CANCELED },
+              transactionType: { not: TransactionType.LIFETIME },
             },
           })
 
@@ -622,7 +643,11 @@ async function handleOpenNodeInvoicePaid(
           }
 
           // Create lifetime purchase
-          await createLifetimePurchase(userId, customerId, priceId, tx)
+          await createLifetimePurchase(userId, customerId, priceId, tx, {
+            isCryptoPayment: 'true',
+            paymentProvider: 'opennode',
+            openNodeInvoiceId: invoice.id ?? '',
+          })
           console.log(`Successfully created lifetime purchase for user ${userId}`)
           return true
         } else {
@@ -820,6 +845,22 @@ async function handleBoomfiInvoicePaid(
         if (isLifetime) {
           console.log(`Boomfi invoice ${invoice.id} is for a lifetime purchase`)
 
+          const existingLifetimePurchase = await tx.subscription.findFirst({
+            where: {
+              userId,
+              status: SubscriptionStatus.ACTIVE,
+              transactionType: TransactionType.LIFETIME,
+            },
+            select: { id: true },
+          })
+
+          if (existingLifetimePurchase) {
+            console.log(
+              `Skipping Boomfi lifetime creation for invoice ${invoice.id}; active lifetime subscription ${existingLifetimePurchase.id} already exists`,
+            )
+            return true
+          }
+
           // Find and cancel all active subscriptions
           const activeSubscriptions = await tx.subscription.findMany({
             where: {
@@ -827,6 +868,7 @@ async function handleBoomfiInvoicePaid(
               NOT: {
                 status: SubscriptionStatus.CANCELED,
               },
+              transactionType: { not: TransactionType.LIFETIME },
             },
           })
 
@@ -910,7 +952,11 @@ async function handleBoomfiInvoicePaid(
 
           // Create lifetime purchase
           console.log(`Creating lifetime subscription for user ${userId} from Boomfi invoice`)
-          await createLifetimePurchase(userId, customerId, priceId, tx)
+          await createLifetimePurchase(userId, customerId, priceId, tx, {
+            isCryptoPayment: 'true',
+            paymentProvider: 'boomfi',
+            boomfiInvoiceId: invoice.id ?? '',
+          })
           return true
         } else {
           // Handle non-lifetime subscriptions from Boomfi
