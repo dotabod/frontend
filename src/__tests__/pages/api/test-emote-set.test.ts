@@ -1,10 +1,9 @@
+import { captureException, withScope } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-// Import types first
-import type { EmoteSetResponse } from '@/lib/7tv'
+import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import handler from '@/pages/api/test-emote-set'
 
-// Mock modules with vi.mock
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (methods, handler) => (req, res) => {
     if (!methods.includes(req.method)) {
@@ -16,16 +15,13 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
 }))
 
 vi.mock('@/lib/7tv', () => ({
-  create7TVClient: vi.fn(() => 'mock-client'),
+  create7TVClient: vi.fn(),
   get7TVUser: vi.fn(),
-  getOrCreateEmoteSet: vi.fn(),
-  isSevenTVError: vi.fn(),
-  verifyEmoteInSet: vi.fn(),
 }))
 
 vi.mock('@/lib/gql', () => ({
   CHANGE_EMOTE_IN_SET: 'mock-change-emote-query',
-  DELETE_EMOTE_SET: 'mock-delete-emote-set-query',
+  GET_EMOTE_SET_FOR_CARD: 'mock-get-emote-set-query',
 }))
 
 vi.mock('@sentry/nextjs', () => ({
@@ -33,22 +29,35 @@ vi.mock('@sentry/nextjs', () => ({
   withScope: vi.fn((callback) => callback({ setTag: vi.fn(), setContext: vi.fn() })),
 }))
 
-import { captureException, withScope } from '@sentry/nextjs'
-// Import mocked modules after vi.mock declarations
-import {
-  create7TVClient,
-  get7TVUser,
-  getOrCreateEmoteSet,
-  isSevenTVError,
-  verifyEmoteInSet,
-} from '@/lib/7tv'
+const TEST_EMOTE_NAME = 'DOTABOD_TEST'
+const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
+
+function mockEmoteSet(emotes: Array<{ name: string }> = []) {
+  return {
+    emoteSet: {
+      emote_count: emotes.length,
+      capacity: 100,
+      flags: 0,
+      name: 'ActiveEmoteSet',
+      emotes: emotes.map((emote) => ({
+        id: 'test-emote-id',
+        name: emote.name,
+        data: {
+          id: TEST_EMOTE_ID,
+          name: emote.name,
+          host: {
+            url: 'https://example.com',
+            files: [{ name: '1x.webp', format: 'WEBP' }],
+          },
+        },
+      })),
+    },
+  }
+}
 
 describe('test-emote-set API', () => {
   beforeEach(() => {
-    // Reset all mocks before each test
     vi.resetAllMocks()
-
-    // Setup environment variables using vi.stubEnv
     vi.stubEnv('NODE_ENV', 'development')
     vi.stubEnv('CRON_SECRET', 'test-secret')
     vi.stubEnv('CRON_TWITCH_ID', 'test-twitch-id')
@@ -56,13 +65,11 @@ describe('test-emote-set API', () => {
   })
 
   afterEach(() => {
-    // Clean up after each test
     vi.clearAllMocks()
     vi.unstubAllEnvs()
   })
 
   it('returns 401 when authorization header is missing in production', async () => {
-    // Set environment for this specific test
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('VERCEL_ENV', 'production')
 
@@ -105,7 +112,6 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 403 when CRON_TWITCH_ID is missing', async () => {
-    // Use vi.stubEnv with undefined instead of delete operator
     vi.stubEnv('CRON_TWITCH_ID', undefined)
 
     const { req, res } = createMocks({
@@ -119,7 +125,6 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 500 when SEVENTV_AUTH is missing', async () => {
-    // Use vi.stubEnv with undefined instead of delete operator
     vi.stubEnv('SEVENTV_AUTH', undefined)
 
     const { req, res } = createMocks({
@@ -132,148 +137,154 @@ describe('test-emote-set API', () => {
     expect(res._getJSONData()).toEqual({ message: 'Server configuration error' })
   })
 
-  it('returns 200 when user lacks permission to use personal emote sets', async () => {
-    const { req, res } = createMocks({
-      method: 'GET',
-    })
-
-    // Mock get7TVUser to return a user
-    vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'test-user-id' },
-    })
-
-    // Mock getOrCreateEmoteSet to throw a permission error
-    vi.mocked(getOrCreateEmoteSet).mockRejectedValueOnce(
-      new Error('User does not have permission to use personal emote sets'),
-    )
-
-    await handler(req, res)
-
-    expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ message: 'Test skipped - user lacks permissions' })
-    expect(get7TVUser).toHaveBeenCalledWith('test-twitch-id')
-    expect(getOrCreateEmoteSet).toHaveBeenCalled()
-  })
-
-  it('returns 200 when user lacks permission to modify emote sets', async () => {
-    const { req, res } = createMocks({
-      method: 'GET',
-    })
-
-    // Mock get7TVUser to return a user
-    vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'test-user-id' },
-    })
-
-    // Mock getOrCreateEmoteSet to return an emote set
-    vi.mocked(getOrCreateEmoteSet).mockResolvedValueOnce({
-      emoteSetId: 'test-emote-set-id',
-      created: true,
-    })
-
-    // Mock client.request to throw a permission error
-    const mockClient = {
-      request: vi.fn().mockRejectedValueOnce({
-        response: {
-          errors: [{ extensions: { code: 'LACKING_PRIVILEGES' } }],
-        },
-      }),
-    }
-
-    // Use proper type casting
+  it('returns 500 when the user has no active emote set', async () => {
+    const mockClient = { request: vi.fn() }
     vi.mocked(create7TVClient).mockReturnValueOnce(
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
-    vi.mocked(isSevenTVError).mockReturnValueOnce(true)
-
-    await handler(req, res)
-
-    expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ message: 'Test skipped - user lacks permissions' })
-    expect(get7TVUser).toHaveBeenCalledWith('test-twitch-id')
-    expect(getOrCreateEmoteSet).toHaveBeenCalled()
-    expect(mockClient.request).toHaveBeenCalled()
-  })
-
-  it('successfully completes the emote set test', async () => {
-    const { req, res } = createMocks({
-      method: 'GET',
-    })
-
-    // Mock get7TVUser to return a user
     vi.mocked(get7TVUser).mockResolvedValueOnce({
       user: { id: 'test-user-id' },
     })
 
-    // Mock getOrCreateEmoteSet to return an emote set
-    vi.mocked(getOrCreateEmoteSet).mockResolvedValueOnce({
-      emoteSetId: 'test-emote-set-id',
-      created: true,
+    const { req, res } = createMocks({
+      method: 'GET',
     })
 
-    // Mock client.request for adding emote
-    const mockClient = {
-      request: vi.fn().mockResolvedValueOnce({}),
-    }
+    await handler(req, res)
 
-    // Use proper type casting
+    expect(res.statusCode).toBe(500)
+    expect(res._getJSONData()).toEqual({
+      message: 'Internal server error',
+      error: 'No active 7TV emote set found',
+    })
+    expect(mockClient.request).not.toHaveBeenCalled()
+  })
+
+  it('adds, verifies, and removes a test emote in the active set without creating sets', async () => {
+    const mockClient = {
+      request: vi
+        .fn()
+        .mockResolvedValueOnce(mockEmoteSet())
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))
+        .mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))
+        .mockResolvedValueOnce({}),
+    }
     vi.mocked(create7TVClient).mockReturnValueOnce(
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
+    vi.mocked(get7TVUser).mockResolvedValueOnce({
+      user: { id: 'test-user-id' },
+      emote_set: { id: 'active-emote-set-id' },
+    })
 
-    // Create a properly typed mock EmoteSetResponse
-    const mockEmoteSetResponse: EmoteSetResponse = {
-      emoteSet: {
-        emote_count: 1,
-        capacity: 10,
-        flags: 0,
-        name: 'TestEmoteSet',
-        emotes: [
-          {
-            id: 'test-emote-id',
-            name: 'TESTER',
-            data: {
-              id: 'test-data-id',
-              name: 'TESTER',
-              host: {
-                url: 'https://example.com',
-                files: [
-                  {
-                    name: 'test-file',
-                    format: 'webp',
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-    }
-
-    vi.mocked(verifyEmoteInSet).mockResolvedValueOnce(mockEmoteSetResponse)
+    const { req, res } = createMocks({
+      method: 'GET',
+    })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({ message: 'Emote set test completed successfully' })
     expect(get7TVUser).toHaveBeenCalledWith('test-twitch-id')
-    expect(getOrCreateEmoteSet).toHaveBeenCalled()
+    expect(create7TVClient).toHaveBeenCalledWith('test-auth-token')
     expect(mockClient.request).toHaveBeenCalledWith('mock-change-emote-query', {
-      id: 'test-emote-set-id',
+      id: 'active-emote-set-id',
       action: 'ADD',
-      name: 'TESTER',
-      emote_id: '60ae4ec30e35477634988c18',
+      name: TEST_EMOTE_NAME,
+      emote_id: TEST_EMOTE_ID,
     })
-    expect(verifyEmoteInSet).toHaveBeenCalledWith(mockClient, 'test-emote-set-id', 'TESTER')
+    expect(mockClient.request).toHaveBeenCalledWith('mock-change-emote-query', {
+      id: 'active-emote-set-id',
+      action: 'REMOVE',
+      name: TEST_EMOTE_NAME,
+      emote_id: TEST_EMOTE_ID,
+    })
   })
 
-  it('handles errors during the emote set test', async () => {
+  it('cleans up a stale test emote before retrying the write test', async () => {
+    const mockClient = {
+      request: vi
+        .fn()
+        .mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))
+        .mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))
+        .mockResolvedValueOnce({}),
+    }
+    vi.mocked(create7TVClient).mockReturnValueOnce(
+      mockClient as unknown as ReturnType<typeof create7TVClient>,
+    )
+    vi.mocked(get7TVUser).mockResolvedValueOnce({
+      user: { id: 'test-user-id' },
+      emote_set: { id: 'active-emote-set-id' },
+    })
+
     const { req, res } = createMocks({
       method: 'GET',
     })
 
-    // Mock get7TVUser to throw an error
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    const mutationCalls = mockClient.request.mock.calls.filter(
+      ([query]) => query === 'mock-change-emote-query',
+    )
+    expect(mutationCalls.map(([, variables]) => variables.action)).toEqual([
+      'REMOVE',
+      'ADD',
+      'REMOVE',
+    ])
+  })
+
+  it('attempts cleanup when verification fails after adding the test emote', async () => {
+    const mockClient = {
+      request: vi
+        .fn()
+        .mockResolvedValueOnce(mockEmoteSet())
+        .mockResolvedValueOnce({})
+        .mockRejectedValueOnce(new Error('Verification failed'))
+        .mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))
+        .mockResolvedValueOnce({}),
+    }
+    vi.mocked(create7TVClient).mockReturnValueOnce(
+      mockClient as unknown as ReturnType<typeof create7TVClient>,
+    )
+    vi.mocked(get7TVUser).mockResolvedValueOnce({
+      user: { id: 'test-user-id' },
+      emote_set: { id: 'active-emote-set-id' },
+    })
+
+    const { req, res } = createMocks({
+      method: 'GET',
+    })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(500)
+    expect(res._getJSONData()).toEqual({
+      message: 'Internal server error',
+      error: 'Verification failed',
+    })
+    expect(mockClient.request).toHaveBeenLastCalledWith('mock-change-emote-query', {
+      id: 'active-emote-set-id',
+      action: 'REMOVE',
+      name: TEST_EMOTE_NAME,
+      emote_id: TEST_EMOTE_ID,
+    })
+  })
+
+  it('handles errors during the emote set test', async () => {
+    const mockClient = { request: vi.fn() }
+    vi.mocked(create7TVClient).mockReturnValueOnce(
+      mockClient as unknown as ReturnType<typeof create7TVClient>,
+    )
     vi.mocked(get7TVUser).mockRejectedValueOnce(new Error('Test error'))
+
+    const { req, res } = createMocks({
+      method: 'GET',
+    })
 
     await handler(req, res)
 

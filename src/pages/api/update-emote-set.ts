@@ -2,12 +2,12 @@ import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { emotesRequired } from '@/components/Dashboard/ChatBot'
 import type { EmoteSetResponse } from '@/lib/7tv'
-import { get7TVUser, getOrCreateEmoteSet } from '@/lib/7tv'
+import { get7TVUser } from '@/lib/7tv'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
-import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD, UPDATE_USER_CONNECTION } from '@/lib/gql'
+import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -70,22 +70,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     try {
-      console.log('Attempting to get or create emote set...')
-      const result = await getOrCreateEmoteSet({
-        client,
-        userId: stvResponse.user.id,
-        twitchId,
-        name: 'DotabodEmotes',
-      })
+      // Add to the channel's active set. Creating and assigning a separate set changes the
+      // streamer's visible 7TV emotes.
+      const activeEmoteSetId = stvResponse.emote_set?.id
 
-      if (!result?.emoteSetId) {
-        console.error('Failed to get or create emote set:', result)
-        return res.status(500).json({ message: 'Failed to get or create emote set' })
+      if (!activeEmoteSetId) {
+        console.error('7TV user does not have an active emote set:', stvResponse)
+        return res.status(400).json({ message: 'No active 7TV emote set found' })
       }
 
-      console.log('Checking existing emotes in the emote set...')
+      console.log('Checking existing emotes in the active emote set...')
       const userEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
-        id: result.emoteSetId,
+        id: activeEmoteSetId,
         limit: 100,
       })) as EmoteSetResponse
       if (!userEmoteSet) {
@@ -98,17 +94,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       )
 
       if (emotesAlreadyInSet) {
-        const activeConnection = userEmoteSet.emoteSet.owner?.connections?.find(
-          (c) => c.id === twitchId,
-        )
-        if (!activeConnection) {
-          await client.request(UPDATE_USER_CONNECTION, {
-            id: stvResponse.user.id,
-            conn_id: `${twitchId}`,
-            d: { emote_set_id: result.emoteSetId },
-          })
-          console.log('Updated user connection')
-        }
         return res.status(200).json({ message: 'Emote set already updated' })
       }
 
@@ -119,7 +104,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           try {
             console.log(`Adding emote ${emote.label}...`)
             await client.request(CHANGE_EMOTE_IN_SET, {
-              id: result.emoteSetId,
+              id: activeEmoteSetId,
               action: 'ADD',
               name: emote.label,
               emote_id: emote.id,
@@ -134,7 +119,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.log('Verifying emote set update...')
 
       const updatedEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
-        id: result.emoteSetId,
+        id: activeEmoteSetId,
         limit: 100,
       })) as EmoteSetResponse
       if (!updatedEmoteSet) {

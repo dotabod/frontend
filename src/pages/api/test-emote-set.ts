@@ -1,25 +1,38 @@
 import * as Sentry from '@sentry/nextjs'
 import type { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import {
-  create7TVClient,
-  get7TVUser,
-  getOrCreateEmoteSet,
-  isSevenTVError,
-  verifyEmoteInSet,
-} from '@/lib/7tv'
+import type { EmoteSetResponse } from '@/lib/7tv'
+import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { CHANGE_EMOTE_IN_SET, DELETE_EMOTE_SET } from '@/lib/gql'
+import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
 
-async function deleteEmoteSet(client: GraphQLClient, emoteSetId: string) {
-  try {
-    console.log('Deleting emote set...')
-    await client.request(DELETE_EMOTE_SET, { id: emoteSetId })
-    console.log('Deleted emote set ID:', emoteSetId)
-  } catch (error) {
-    console.error(`Failed to delete emote set ID ${emoteSetId}:`, error)
-    Sentry.captureException(error)
+const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
+const TEST_EMOTE_NAME = 'DOTABOD_TEST'
+
+async function getEmoteSet(client: GraphQLClient, emoteSetId: string) {
+  return (await client.request(GET_EMOTE_SET_FOR_CARD, {
+    id: emoteSetId,
+    limit: 1000,
+  })) as EmoteSetResponse
+}
+
+function hasTestEmote(emoteSet: EmoteSetResponse) {
+  return emoteSet.emoteSet.emotes.some((emote) => emote.name === TEST_EMOTE_NAME)
+}
+
+async function removeTestEmoteIfPresent(client: GraphQLClient, emoteSetId: string) {
+  const emoteSet = await getEmoteSet(client, emoteSetId)
+
+  if (!hasTestEmote(emoteSet)) {
+    return
   }
+
+  await client.request(CHANGE_EMOTE_IN_SET, {
+    id: emoteSetId,
+    action: 'REMOVE',
+    name: TEST_EMOTE_NAME,
+    emote_id: TEST_EMOTE_ID,
+  })
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -51,60 +64,42 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const client = create7TVClient(authToken)
-  let emoteSetId: string | null = null
-  let createdNewSet = false
+  let userId = 'N/A'
+  let activeEmoteSetId = 'N/A'
+  let addedTestEmote = false
 
   try {
     const stvResponse = await get7TVUser(twitchId)
-    const userId = stvResponse.user.id
+    userId = stvResponse.user.id
+    activeEmoteSetId = stvResponse.emote_set?.id || 'N/A'
 
-    let result: { emoteSetId: string; created: boolean }
-    try {
-      result = await getOrCreateEmoteSet({
-        client,
-        userId,
-        twitchId,
-        name: `TestEmoteSet${Date.now()}`.replace(/\s+/g, ''),
-      })
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('permission')) {
-        console.log('User does not have permission to use personal emote sets, skipping test')
-        return res.status(200).json({ message: 'Test skipped - user lacks permissions' })
-      }
-      throw error
+    if (!stvResponse.emote_set?.id) {
+      throw new Error('No active 7TV emote set found')
     }
 
-    // Capture emoteSetId and createdNewSet immediately after successful creation
-    // This ensures cleanup happens even if subsequent operations fail
-    emoteSetId = result.emoteSetId
-    createdNewSet = result.created
+    console.log('Removing stale test emote if needed...')
+    await removeTestEmoteIfPresent(client, stvResponse.emote_set.id)
 
-    // Add emotes to the set
-    console.log('Adding emotes to emote set...')
-    try {
-      console.log('Attempting to add TESTER emote...')
-      await client.request(CHANGE_EMOTE_IN_SET, {
-        id: emoteSetId,
-        action: 'ADD',
-        name: 'TESTER',
-        emote_id: '60ae4ec30e35477634988c18',
-      })
-      console.log('Successfully added TESTER emote')
-    } catch (error) {
-      console.error('Error adding TESTER emote:', error)
-      if (
-        isSevenTVError(error) &&
-        error.response.errors[0]?.extensions?.code === 'LACKING_PRIVILEGES'
-      ) {
-        console.log('User does not have permission to modify emote sets, skipping test')
-        return res.status(200).json({ message: 'Test skipped - user lacks permissions' })
-      }
-      throw error
+    console.log('Adding test emote to active emote set...')
+    await client.request(CHANGE_EMOTE_IN_SET, {
+      id: stvResponse.emote_set.id,
+      action: 'ADD',
+      name: TEST_EMOTE_NAME,
+      emote_id: TEST_EMOTE_ID,
+    })
+    addedTestEmote = true
+
+    console.log('Verifying test emote addition...')
+    const emoteSet = await getEmoteSet(client, stvResponse.emote_set.id)
+    if (!hasTestEmote(emoteSet)) {
+      throw new Error(`Emote ${TEST_EMOTE_NAME} not found in set`)
     }
 
-    console.log('Verifying emote addition...')
-    await verifyEmoteInSet(client, emoteSetId, 'TESTER')
-    console.log('Emote set update verified successfully')
+    console.log('Removing test emote from active emote set...')
+    await removeTestEmoteIfPresent(client, stvResponse.emote_set.id)
+    addedTestEmote = false
+
+    console.log('Emote set write test completed successfully')
 
     res.status(200).json({ message: 'Emote set test completed successfully' })
   } catch (error: unknown) {
@@ -113,27 +108,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       scope.setTag('test-related', 'true')
       scope.setContext('testDetails', {
         twitchId,
-        userId: 'N/A',
-        emoteSetId: emoteSetId || 'N/A',
+        userId,
+        emoteSetId: activeEmoteSetId,
       })
       Sentry.captureException(error)
     })
     const errorMessage = error instanceof Error ? error.message : String(error)
     res.status(500).json({ message: 'Internal server error', error: errorMessage })
   } finally {
-    if (emoteSetId && createdNewSet) {
+    if (addedTestEmote && activeEmoteSetId !== 'N/A') {
       try {
-        await deleteEmoteSet(client, emoteSetId)
+        await removeTestEmoteIfPresent(client, activeEmoteSetId)
       } catch (error) {
-        if (
-          isSevenTVError(error) &&
-          error.response.errors[0]?.extensions?.code === 'LACKING_PRIVILEGES'
-        ) {
-          console.log('User does not have permission to delete emote sets, skipping cleanup')
-        } else {
-          console.error(`Failed to delete emote set ID ${emoteSetId}:`, error)
-          Sentry.captureException(error)
-        }
+        console.error(`Failed to remove test emote from set ID ${activeEmoteSetId}:`, error)
+        Sentry.captureException(error)
       }
     }
   }

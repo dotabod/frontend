@@ -2,6 +2,13 @@ import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/update-emote-set'
 
+const mockChatBotModule = vi.hoisted(() => ({
+  emotesRequired: [
+    { id: 'emote1', label: 'Emote1' },
+    { id: 'emote2', label: 'Emote2' },
+  ],
+}))
+
 // Mock the middleware
 vi.mock('@/lib/api-middlewares/with-authentication', () => ({
   withAuthentication: (handler) => handler,
@@ -29,7 +36,6 @@ vi.mock('@/lib/auth', () => ({
 // Mock the 7TV library functions
 vi.mock('@/lib/7tv', () => ({
   get7TVUser: vi.fn(),
-  getOrCreateEmoteSet: vi.fn(),
 }))
 
 // Mock GraphQL client and gql
@@ -60,10 +66,9 @@ vi.mock('@/utils/subscription', () => ({
 
 // Mock ChatBot emotes
 vi.mock('@/components/Dashboard/ChatBot', () => ({
-  emotesRequired: [
-    { id: 'emote1', label: 'Emote1' },
-    { id: 'emote2', label: 'Emote2' },
-  ],
+  get emotesRequired() {
+    return mockChatBotModule.emotesRequired
+  },
 }))
 
 // Mock getTwitchTokens to avoid environment variable issues
@@ -79,7 +84,7 @@ vi.mock('@/lib/getTwitchTokens', () => ({
 
 import { GraphQLClient } from 'graphql-request'
 // Import mocked modules
-import { get7TVUser, getOrCreateEmoteSet } from '@/lib/7tv'
+import { get7TVUser } from '@/lib/7tv'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
@@ -88,6 +93,10 @@ describe('update-emote-set API', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    mockChatBotModule.emotesRequired = [
+      { id: 'emote1', label: 'Emote1' },
+      { id: 'emote2', label: 'Emote2' },
+    ]
 
     // Setup environment variables for testing
     vi.stubEnv('SEVENTV_AUTH', 'test-auth-token')
@@ -275,10 +284,7 @@ describe('update-emote-set API', () => {
       requiredTier: 'PRO',
     })
 
-    // Mock the ChatBot module
-    vi.mock('@/components/Dashboard/ChatBot', () => ({
-      emotesRequired: [],
-    }))
+    mockChatBotModule.emotesRequired = []
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -335,11 +341,8 @@ describe('update-emote-set API', () => {
 
     await handler(req, res)
 
-    // Restore original value
-    vi.unstubAllEnvs()
-
-    expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ message: 'No emotes defined for addition' })
+    expect(res.statusCode).toBe(500)
+    expect(res._getJSONData()).toEqual({ message: 'Server configuration error' })
   })
 
   it('returns 404 when 7TV user is not found', async () => {
@@ -386,11 +389,11 @@ describe('update-emote-set API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(400)
-    expect(res._getJSONData().message).toBe('No emotes defined for addition')
+    expect(res.statusCode).toBe(404)
+    expect(res._getJSONData().message).toBe('7TV user not found')
   })
 
-  it('returns 500 when emote set creation fails', async () => {
+  it('returns 400 when the 7TV user has no active emote set', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
       user: {
         id: 'user-123',
@@ -430,10 +433,6 @@ describe('update-emote-set API', () => {
       user: { id: 'stvuser-123' },
     })
 
-    vi.mocked(getOrCreateEmoteSet).mockRejectedValueOnce(
-      new Error('Failed to get or create emote set'),
-    )
-
     const { req, res } = createMocks({
       method: 'GET',
     })
@@ -441,7 +440,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData().message).toBe('No emotes defined for addition')
+    expect(res._getJSONData().message).toBe('No active 7TV emote set found')
   })
 
   it('returns 200 when emotes are already in set', async () => {
@@ -482,22 +481,17 @@ describe('update-emote-set API', () => {
 
     vi.mocked(get7TVUser).mockResolvedValueOnce({
       user: { id: 'stvuser-123' },
-    })
-
-    vi.mocked(getOrCreateEmoteSet).mockResolvedValueOnce({
-      emoteSetId: 'emote-set-123',
-      created: false,
+      emote_set: { id: 'active-set-123' },
     })
 
     // Mock GraphQL client
-    mockRequest.mockImplementation((query) => {
-      if (query.includes('GetEmoteSetForCard')) {
+    mockRequest.mockImplementation((query, variables) => {
+      const queryText = String(query)
+      if (queryText.includes('GetEmoteSetForCard')) {
+        expect(variables).toMatchObject({ id: 'active-set-123' })
         return {
           emoteSet: {
             emotes: [{ name: 'Emote1' }, { name: 'Emote2' }],
-            owner: {
-              connections: [{ id: 'twitch-123' }],
-            },
           },
         }
       }
@@ -510,8 +504,11 @@ describe('update-emote-set API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(400)
-    expect(res._getJSONData().message).toBe('No emotes defined for addition')
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData().message).toBe('Emote set already updated')
+    const requestedQueries = mockRequest.mock.calls.map(([query]) => String(query))
+    expect(requestedQueries.some((query) => query.includes('UpdateUserConnection'))).toBe(false)
+    expect(requestedQueries.some((query) => query.includes('ChangeEmoteInSet'))).toBe(false)
   })
 
   it('successfully updates emote set', async () => {
@@ -552,26 +549,21 @@ describe('update-emote-set API', () => {
 
     vi.mocked(get7TVUser).mockResolvedValueOnce({
       user: { id: 'stvuser-123' },
-    })
-
-    vi.mocked(getOrCreateEmoteSet).mockResolvedValueOnce({
-      emoteSetId: 'emote-set-123',
-      created: false,
+      emote_set: { id: 'active-set-123' },
     })
 
     // Mock GraphQL client
-    let requestCount = 0
-    mockRequest.mockImplementation((query) => {
-      requestCount++
-      if (query.includes('GetEmoteSetForCard')) {
+    let getEmoteSetRequestCount = 0
+    mockRequest.mockImplementation((query, variables) => {
+      const queryText = String(query)
+      if (queryText.includes('GetEmoteSetForCard')) {
+        expect(variables).toMatchObject({ id: 'active-set-123' })
+        getEmoteSetRequestCount++
         // First call: no emotes
-        if (requestCount === 1) {
+        if (getEmoteSetRequestCount === 1) {
           return {
             emoteSet: {
               emotes: [],
-              owner: {
-                connections: [{ id: 'twitch-123' }],
-              },
             },
           }
         }
@@ -579,9 +571,6 @@ describe('update-emote-set API', () => {
         return {
           emoteSet: {
             emotes: [{ name: 'Emote1' }, { name: 'Emote2' }],
-            owner: {
-              connections: [{ id: 'twitch-123' }],
-            },
           },
         }
       }
@@ -594,8 +583,15 @@ describe('update-emote-set API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(400)
-    expect(res._getJSONData().message).toBe('No emotes defined for addition')
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData().message).toBe('Emote set updated successfully')
+    const addEmoteCalls = mockRequest.mock.calls.filter(([query]) =>
+      String(query).includes('ChangeEmoteInSet'),
+    )
+    expect(addEmoteCalls).toHaveLength(2)
+    expect(addEmoteCalls[0][1]).toMatchObject({ id: 'active-set-123' })
+    const requestedQueries = mockRequest.mock.calls.map(([query]) => String(query))
+    expect(requestedQueries.some((query) => query.includes('UpdateUserConnection'))).toBe(false)
   })
 
   it('handles errors when adding emotes', async () => {
@@ -636,26 +632,21 @@ describe('update-emote-set API', () => {
 
     vi.mocked(get7TVUser).mockResolvedValueOnce({
       user: { id: 'stvuser-123' },
-    })
-
-    vi.mocked(getOrCreateEmoteSet).mockResolvedValueOnce({
-      emoteSetId: 'emote-set-123',
-      created: false,
+      emote_set: { id: 'active-set-123' },
     })
 
     // Mock GraphQL client
-    let requestCount = 0
-    mockRequest.mockImplementation((query) => {
-      requestCount++
-      if (query.includes('GetEmoteSetForCard')) {
+    let getEmoteSetRequestCount = 0
+    mockRequest.mockImplementation((query, variables) => {
+      const queryText = String(query)
+      if (queryText.includes('GetEmoteSetForCard')) {
+        expect(variables).toMatchObject({ id: 'active-set-123' })
+        getEmoteSetRequestCount++
         // First call: no emotes
-        if (requestCount === 1) {
+        if (getEmoteSetRequestCount === 1) {
           return {
             emoteSet: {
               emotes: [],
-              owner: {
-                connections: [{ id: 'twitch-123' }],
-              },
             },
           }
         }
@@ -663,13 +654,10 @@ describe('update-emote-set API', () => {
         return {
           emoteSet: {
             emotes: [],
-            owner: {
-              connections: [{ id: 'twitch-123' }],
-            },
           },
         }
       }
-      if (query.includes('ChangeEmoteInSet')) {
+      if (queryText.includes('ChangeEmoteInSet')) {
         throw new Error('Failed to add emote')
       }
       return {}
@@ -681,7 +669,10 @@ describe('update-emote-set API', () => {
 
     await handler(req, res)
 
-    expect(res.statusCode).toBe(400)
-    expect(res._getJSONData().message).toBe('No emotes defined for addition')
+    expect(res.statusCode).toBe(500)
+    expect(res._getJSONData()).toMatchObject({
+      message: 'Failed to add some emotes',
+      missingEmotes: ['Emote1', 'Emote2'],
+    })
   })
 })
