@@ -70,11 +70,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       stripeInvoiceId: invoice.id || '',
       stripeCustomerId: invoice.customer as string,
       userId: invoice.metadata?.userId || '',
-      amount: charge.amount,
-      currency: charge.currency,
+      amount,
+      currency,
       status: charge.status,
       hostedCheckoutUrl: charge.hosted_checkout_url,
-      metadata: charge.metadata,
+      metadata: {
+        ...charge.metadata,
+        openNodeAmount: charge.amount,
+        openNodeCurrency: charge.currency,
+      },
     }
 
     await prisma.openNodeCharge.create({

@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client'
-import { SubscriptionStatus } from '@prisma/client'
+import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type Stripe from 'stripe'
 import { stripe } from '@/lib/stripe-server'
 import { GiftService } from '../services/gift-service'
@@ -274,6 +274,7 @@ export async function handleCheckoutCompleted(
                   NOT: {
                     status: SubscriptionStatus.CANCELED,
                   },
+                  transactionType: { not: TransactionType.LIFETIME },
                 },
               })
 
@@ -348,7 +349,9 @@ export async function handleCheckoutCompleted(
 
               // Create lifetime purchase
               console.log(`Creating lifetime subscription for user ${userId}`)
-              await createLifetimePurchase(userId, session.customer as string, priceId, tx)
+              await createLifetimePurchase(userId, session.customer as string, priceId, tx, {
+                checkoutSessionId: session.id,
+              })
               return true
             }
 
@@ -466,6 +469,7 @@ export async function handleCheckoutCompleted(
                 NOT: {
                   status: SubscriptionStatus.CANCELED,
                 },
+                transactionType: { not: TransactionType.LIFETIME },
               },
             })
 
@@ -540,7 +544,9 @@ export async function handleCheckoutCompleted(
             console.log(
               `Creating lifetime purchase for user ${userId} because price ID ${priceId} is a lifetime price`,
             )
-            await createLifetimePurchase(userId, session.customer as string, priceId, tx)
+            await createLifetimePurchase(userId, session.customer as string, priceId, tx, {
+              checkoutSessionId: session.id,
+            })
             return true
           }
 
