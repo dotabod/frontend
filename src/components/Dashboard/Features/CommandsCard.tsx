@@ -40,8 +40,8 @@ export default function CommandsCard({
         }`}
         style={{ padding: 0 }}
         header={
-          <div className='flex justify-between'>
-            <div className='flex space-x-2'>
+          <div className='flex items-center justify-between gap-3'>
+            <div className='flex min-w-0 flex-1 flex-wrap items-center gap-2'>
               <span>{command.title}</span>
               <div>
                 {command.allowed === 'mods' && (
@@ -56,7 +56,7 @@ export default function CommandsCard({
             {command.key &&
               (readonly ? (
                 <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${
                     (typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled)
                       ? 'bg-green-950 text-green-400 ring-1 ring-green-800'
                       : 'bg-gray-800 text-gray-600'
