@@ -92,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Cannot edit a message that has already been sent' })
     }
 
-    const updateData: Record<string, any> = {}
+    const updateData: Record<string, unknown> = {}
     if (message) updateData.message = message
     if (sendAt) updateData.sendAt = new Date(sendAt)
 

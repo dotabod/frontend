@@ -14,7 +14,26 @@ type LastFmTrackType = {
 const LASTFM_API_KEY = process.env.NEXT_PUBLIC_LASTFM_API_KEY
 const LASTFM_PLACEHOLDER_HASH = '2a96cbd8b46e442fc41c2b86b821562f'
 
-function parseLastFmResponse(data: any): LastFmTrackType | null {
+type LastFmImage = {
+  size: string
+  '#text': string
+}
+
+type LastFmResponse = {
+  error?: number
+  recenttracks?: {
+    track: Array<{
+      '#attr'?: { nowplaying: string }
+      artist: { '#text': string }
+      name: string
+      album: { '#text': string }
+      image?: LastFmImage[]
+      url?: string
+    }>
+  }
+}
+
+function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | null {
   if (data?.error) return null
 
   const tracks = data?.recenttracks?.track
@@ -25,7 +44,7 @@ function parseLastFmResponse(data: any): LastFmTrackType | null {
   if (!isNowPlaying) return null
 
   const albumArtUrl =
-    recentTrack.image?.find((img: any) => img.size === 'medium')?.['#text'] ||
+    recentTrack.image?.find((img: LastFmImage) => img.size === 'medium')?.['#text'] ||
     recentTrack.image?.[0]?.['#text'] ||
     null
 

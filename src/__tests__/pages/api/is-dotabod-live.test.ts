@@ -1,3 +1,4 @@
+import type { NextApiHandler } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/is-dotabod-live'
@@ -18,7 +19,7 @@ vi.mock('@sentry/nextjs', () => ({
 
 // Mock the withMethods middleware
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
-  withMethods: (_methods: string[], handler: any) => handler,
+  withMethods: (_methods: string[], handler: NextApiHandler) => handler,
 }))
 
 import { captureException } from '@sentry/nextjs'
@@ -51,8 +52,7 @@ describe('is-dotabod-live API', () => {
 
     // Mock the prisma response
     const mockPrismaResponse = { stream_online: true }
-    const mockPrismaPromise = Promise.resolve(mockPrismaResponse)
-    vi.mocked(prisma.user.findFirst).mockReturnValue(mockPrismaPromise as any)
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockPrismaResponse)
 
     await handler(req, res)
 
@@ -73,9 +73,7 @@ describe('is-dotabod-live API', () => {
     })
 
     // Mock the prisma response
-    const mockPrismaResponse = { stream_online: false }
-    const mockPrismaPromise = Promise.resolve(mockPrismaResponse)
-    vi.mocked(prisma.user.findFirst).mockReturnValue(mockPrismaPromise as any)
+    vi.mocked(prisma.user.findFirst).mockResolvedValue({ stream_online: false })
 
     await handler(req, res)
 
@@ -96,8 +94,7 @@ describe('is-dotabod-live API', () => {
     })
 
     // Mock the prisma response to return null
-    const mockPrismaPromise = Promise.resolve(null)
-    vi.mocked(prisma.user.findFirst).mockReturnValue(mockPrismaPromise as any)
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
 
     await handler(req, res)
 
@@ -121,7 +118,7 @@ describe('is-dotabod-live API', () => {
     const mockError = new Error('Database error')
 
     // Use mockRejectedValue instead of mockImplementation
-    vi.mocked(prisma.user.findFirst).mockRejectedValueOnce(mockError as any)
+    vi.mocked(prisma.user.findFirst).mockRejectedValueOnce(mockError)
 
     // Need to await to let the promise rejection propagate
     await handler(req, res)

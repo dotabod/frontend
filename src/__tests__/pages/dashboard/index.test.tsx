@@ -179,7 +179,7 @@ describe('Dashboard Index Page', () => {
       },
       status: 'authenticated',
       update: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useSession>)
 
     // Mock useRouter
     vi.mocked(useRouter).mockReturnValue({
@@ -204,7 +204,7 @@ describe('Dashboard Index Page', () => {
       isReady: true,
       isPreview: false,
       forward: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useRouter>)
 
     // Mock useSWR
     vi.mocked(useSWR).mockReturnValue({
@@ -213,7 +213,7 @@ describe('Dashboard Index Page', () => {
       isLoading: false,
       isValidating: false,
       mutate: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useSWR>)
   })
 
   it('renders the dashboard page', () => {

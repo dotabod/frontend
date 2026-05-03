@@ -14,7 +14,7 @@ type BentoGridItemProps = {
   name: ReactNode
   className: string
   background?: ReactNode
-  Icon?: any
+  Icon?: React.ComponentType
   description: ReactNode
   href?: string
   cta?: ReactNode

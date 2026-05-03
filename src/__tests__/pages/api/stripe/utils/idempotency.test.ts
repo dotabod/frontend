@@ -1,8 +1,9 @@
+import type { Prisma } from '@prisma/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { processEventIdempotently } from '@/pages/api/stripe/utils/idempotency'
 
 describe('processEventIdempotently', () => {
-  const mockTx = {
+  const mockTx: Pick<Prisma.TransactionClient, 'webhookEvent'> = {
     webhookEvent: {
       findUnique: vi.fn(),
       create: vi.fn(),
@@ -26,7 +27,7 @@ describe('processEventIdempotently', () => {
       async () => {
         throw new Error('processor failed')
       },
-      mockTx as any,
+      mockTx,
     )
 
     expect(result).toBe(false)

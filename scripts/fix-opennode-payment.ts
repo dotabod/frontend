@@ -181,8 +181,8 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
           { paid_out_of_band: true },
           { idempotencyKey: charge.openNodeChargeId },
         )
-      } catch (error: any) {
-        if (error.code !== 'invoice_already_paid') {
+      } catch (error: unknown) {
+        if (error instanceof Error && 'code' in error && error.code !== 'invoice_already_paid') {
           throw error
         }
       }
@@ -231,8 +231,9 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
     result.success = true
     result.subscriptionId = subscription.id
     return result
-  } catch (error: any) {
-    result.error = error.message || 'Unknown error'
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    result.error = err.message || 'Unknown error'
     return result
   }
 }
@@ -370,7 +371,7 @@ async function runSingleChargeMode(): Promise<void> {
 
   // Step 1: Find the OpenNode charge
   console.log('Step 1: Finding OpenNode charge...')
-  let charge
+  let charge: OpenNodeCharge | null = null
 
   if (chargeId) {
     charge = await prisma.openNodeCharge.findUnique({
@@ -525,8 +526,8 @@ async function runSingleChargeMode(): Promise<void> {
         { idempotencyKey: charge.openNodeChargeId },
       )
       console.log('✅ Marked Stripe invoice as paid (out-of-band)')
-    } catch (error: any) {
-      if (error.code === 'invoice_already_paid') {
+    } catch (error: unknown) {
+      if (error instanceof Error && 'code' in error && error.code === 'invoice_already_paid') {
         console.log('⚠️  Invoice is already paid (Stripe API confirmed)')
       } else {
         throw error

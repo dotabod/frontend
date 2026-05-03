@@ -9,9 +9,9 @@ import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
 
 interface UpdateProps {
-  path?: any
+  path?: string
   revalidate?: boolean
-  dataTransform?: (data, newValue) => any
+  dataTransform?: (data: unknown, newValue: unknown) => unknown
 }
 
 export const SETTINGS_SWR_OPTIONS = {
@@ -292,6 +292,6 @@ export function useGetSettingsByUsername() {
     data,
     loading,
     error,
-    notFound: error && (error as any)?.status === 404,
+    notFound: error && (error as { status?: number })?.status === 404,
   }
 }

@@ -8,7 +8,7 @@ vi.mock('next/link', () => ({
     children,
     href,
     ...props
-  }: React.PropsWithChildren<{ href: string; [key: string]: any }>) => (
+  }: React.PropsWithChildren<{ href: string } & React.AnchorHTMLAttributes<HTMLAnchorElement>>) => (
     <a href={href} {...props}>
       {children}
     </a>

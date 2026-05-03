@@ -9,7 +9,7 @@ export interface DisableNotification {
   userId: string
   settingKey: string
   reason: string
-  metadata?: any
+  metadata?: Record<string, unknown>
   createdAt: string
   acknowledged: boolean
   resolvedAt?: string
@@ -21,7 +21,7 @@ export interface DisabledSetting {
   disableReason: string
   autoDisabledAt: string
   autoDisabledBy: string
-  disableMetadata?: any
+  disableMetadata?: Record<string, unknown>
 }
 
 export interface DisableReasonsData {
@@ -117,107 +117,110 @@ export function useDisableReasons() {
     [data, mutate],
   )
 
-  const getDisableReasonExplanation = useCallback((reason: DisableReason, metadata?: any) => {
-    switch (reason) {
-      case 'TOKEN_REVOKED':
-        return {
-          title: 'App permissions revoked',
-          description:
-            "You removed Dotabod's access to your Twitch account. Please reconnect to restore functionality.",
-          action: 'Reconnect your Twitch account',
-          severity: 'high' as const,
-        }
+  const getDisableReasonExplanation = useCallback(
+    (reason: DisableReason, metadata?: Record<string, unknown>) => {
+      switch (reason) {
+        case 'TOKEN_REVOKED':
+          return {
+            title: 'App permissions revoked',
+            description:
+              "You removed Dotabod's access to your Twitch account. Please reconnect to restore functionality.",
+            action: 'Reconnect your Twitch account',
+            severity: 'high' as const,
+          }
 
-      case 'MANUAL_DISABLE':
-        return {
-          title: 'Manually disabled',
-          description: `Dotabod was disabled by ${metadata?.disabled_by || 'a moderator'} using the ${metadata?.command || '!disable'} command.`,
-          action: 'Use !enable command to re-enable',
-          severity: 'medium' as const,
-        }
+        case 'MANUAL_DISABLE':
+          return {
+            title: 'Manually disabled',
+            description: `Dotabod was disabled by ${metadata?.disabled_by || 'a moderator'} using the ${metadata?.command || '!disable'} command.`,
+            action: 'Use !enable command to re-enable',
+            severity: 'medium' as const,
+          }
 
-      case 'STREAM_OFFLINE':
-        return {
-          title: 'Stream is offline',
-          description: 'This feature only works when you are streaming live on Twitch.',
-          action: 'Start streaming to re-enable',
-          severity: 'low' as const,
-        }
+        case 'STREAM_OFFLINE':
+          return {
+            title: 'Stream is offline',
+            description: 'This feature only works when you are streaming live on Twitch.',
+            action: 'Start streaming to re-enable',
+            severity: 'low' as const,
+          }
 
-      case 'CHAT_PERMISSION_DENIED':
-        return {
-          title: 'Chat permission denied',
-          description:
-            metadata?.drop_reason === 'followers_only_mode'
-              ? 'Dotabod cannot send messages because your channel is in followers-only mode and the bot is not a moderator.'
-              : metadata?.drop_reason === 'user_warned'
-                ? 'Dotabod cannot send messages because the bot account is currently warned and must acknowledge the warning first.'
-                : metadata?.drop_reason === 'banned_phone_alias'
-                  ? "Dotabod cannot send messages because the bot's phone number is banned from your channel."
-                  : `Dotabod cannot send messages due to: ${metadata?.drop_reason_message || 'chat permission restrictions'}.`,
-          action:
-            metadata?.drop_reason === 'followers_only_mode'
-              ? 'Make Dotabod a moderator or disable followers-only mode'
-              : metadata?.drop_reason === 'user_warned'
-                ? 'The Dotabod bot account needs to acknowledge its warning in your Twitch channel'
-                : metadata?.drop_reason === 'banned_phone_alias'
-                  ? "Unban the Dotabod bot's phone number in your Twitch channel moderation settings"
-                  : 'Check your channel settings and ensure Dotabod has proper permissions',
-          severity: 'high' as const,
-        }
+        case 'CHAT_PERMISSION_DENIED':
+          return {
+            title: 'Chat permission denied',
+            description:
+              metadata?.drop_reason === 'followers_only_mode'
+                ? 'Dotabod cannot send messages because your channel is in followers-only mode and the bot is not a moderator.'
+                : metadata?.drop_reason === 'user_warned'
+                  ? 'Dotabod cannot send messages because the bot account is currently warned and must acknowledge the warning first.'
+                  : metadata?.drop_reason === 'banned_phone_alias'
+                    ? "Dotabod cannot send messages because the bot's phone number is banned from your channel."
+                    : `Dotabod cannot send messages due to: ${metadata?.drop_reason_message || 'chat permission restrictions'}.`,
+            action:
+              metadata?.drop_reason === 'followers_only_mode'
+                ? 'Make Dotabod a moderator or disable followers-only mode'
+                : metadata?.drop_reason === 'user_warned'
+                  ? 'The Dotabod bot account needs to acknowledge its warning in your Twitch channel'
+                  : metadata?.drop_reason === 'banned_phone_alias'
+                    ? "Unban the Dotabod bot's phone number in your Twitch channel moderation settings"
+                    : 'Check your channel settings and ensure Dotabod has proper permissions',
+            severity: 'high' as const,
+          }
 
-      case 'SUBSCRIPTION_INSUFFICIENT':
-        return {
-          title: 'Subscription required',
-          description: `This feature requires a ${metadata?.required_tier || 'Pro'} subscription. Your current tier is ${metadata?.current_tier || 'Free'}.`,
-          action: `Upgrade to ${metadata?.required_tier || 'Pro'}`,
-          severity: 'medium' as const,
-        }
+        case 'SUBSCRIPTION_INSUFFICIENT':
+          return {
+            title: 'Subscription required',
+            description: `This feature requires a ${metadata?.required_tier || 'Pro'} subscription. Your current tier is ${metadata?.current_tier || 'Free'}.`,
+            action: `Upgrade to ${metadata?.required_tier || 'Pro'}`,
+            severity: 'medium' as const,
+          }
 
-      case 'API_ERROR':
-        return {
-          title: 'API error occurred',
-          description: `Failed to communicate with ${metadata?.api_endpoint || 'external service'}: ${metadata?.error_message || 'Unknown error'}`,
-          action: 'Contact support if this persists',
-          severity: 'medium' as const,
-        }
+        case 'API_ERROR':
+          return {
+            title: 'API error occurred',
+            description: `Failed to communicate with ${metadata?.api_endpoint || 'external service'}: ${metadata?.error_message || 'Unknown error'}`,
+            action: 'Contact support if this persists',
+            severity: 'medium' as const,
+          }
 
-      case 'INVALID_TOKEN':
-        return {
-          title: 'Authentication expired',
-          description: 'Your Twitch authentication has expired and needs to be refreshed.',
-          action: 'Refresh your connection in settings',
-          severity: 'high' as const,
-        }
+        case 'INVALID_TOKEN':
+          return {
+            title: 'Authentication expired',
+            description: 'Your Twitch authentication has expired and needs to be refreshed.',
+            action: 'Refresh your connection in settings',
+            severity: 'high' as const,
+          }
 
-      case 'BOT_BANNED':
-        return {
-          title: 'Bot is banned',
-          description: 'The Dotabod bot has been banned from your Twitch channel.',
-          action: 'Unban the Dotabod bot in your Twitch moderation settings',
-          severity: 'high' as const,
-        }
+        case 'BOT_BANNED':
+          return {
+            title: 'Bot is banned',
+            description: 'The Dotabod bot has been banned from your Twitch channel.',
+            action: 'Unban the Dotabod bot in your Twitch moderation settings',
+            severity: 'high' as const,
+          }
 
-      case 'ACCOUNT_SHARING':
-        return {
-          title: 'Multiple Steam accounts detected',
-          description: metadata?.blocked_steam32_id
-            ? `Multiple people are using Dotabod GSI files for this stream. Steam account "${metadata?.account_name || 'Unknown'}" was blocked to prevent conflicts. Only the first account per stream is allowed.`
-            : 'Multiple Steam accounts are sending game data to this stream. Additional accounts are blocked to prevent conflicts.',
-          action:
-            'Use !clearsharing to reset, but ensure only one person has the Dotabod GSI config file',
-          severity: 'high' as const,
-        }
+        case 'ACCOUNT_SHARING':
+          return {
+            title: 'Multiple Steam accounts detected',
+            description: metadata?.blocked_steam32_id
+              ? `Multiple people are using Dotabod GSI files for this stream. Steam account "${metadata?.account_name || 'Unknown'}" was blocked to prevent conflicts. Only the first account per stream is allowed.`
+              : 'Multiple Steam accounts are sending game data to this stream. Additional accounts are blocked to prevent conflicts.',
+            action:
+              'Use !clearsharing to reset, but ensure only one person has the Dotabod GSI config file',
+            severity: 'high' as const,
+          }
 
-      default:
-        return {
-          title: 'Feature disabled',
-          description: 'This feature has been automatically disabled.',
-          action: 'Check your settings or contact support',
-          severity: 'medium' as const,
-        }
-    }
-  }, [])
+        default:
+          return {
+            title: 'Feature disabled',
+            description: 'This feature has been automatically disabled.',
+            action: 'Check your settings or contact support',
+            severity: 'medium' as const,
+          }
+      }
+    },
+    [],
+  )
 
   return {
     data,

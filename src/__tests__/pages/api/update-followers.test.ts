@@ -145,13 +145,13 @@ describe('update-followers API', () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ total: 100 }),
-    } as any)
+    } as unknown as Response)
 
     // Mock prisma.user.update
     vi.mocked(prisma.user.update).mockResolvedValueOnce({
       id: 'user-123',
       followers: 100,
-    } as any)
+    } as unknown as User)
 
     await handler(req, res)
 
@@ -203,7 +203,7 @@ describe('update-followers API', () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: false,
       statusText: 'Unauthorized',
-    } as any)
+    } as unknown as Response)
 
     await handler(req, res)
 

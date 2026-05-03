@@ -53,10 +53,11 @@ export async function getModerators(userId: string | undefined, accessToken: str
     } while (after)
 
     return allModerators
-  } catch (error: any) {
-    captureException(error)
-    console.error('Failed to get moderated channels:', error)
-    return { message: 'Failed to get moderated channels', error: error.message }
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    captureException(err)
+    console.error('Failed to get moderated channels:', err)
+    return { message: 'Failed to get moderated channels', error: err.message }
   }
 }
 

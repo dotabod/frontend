@@ -1,4 +1,4 @@
-import type { SubscriptionStatus, SubscriptionTier } from '@prisma/client'
+import type { GiftSubscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/test-gift-notification'
@@ -316,8 +316,8 @@ describe('test-gift-notification API', () => {
           giftQuantity: 1,
           createdAt: mockDate,
           updatedAt: mockDate,
-        },
-      } as any,
+        } as GiftSubscription,
+      },
     ])
 
     const { req, res } = createMocks({

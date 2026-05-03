@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -47,7 +48,7 @@ vi.mock('@/lib/stripe-server', () => ({
 }))
 
 describe('Crypto Subscription Utilities', () => {
-  const mockTx = {
+  const mockTx: Pick<Prisma.TransactionClient, 'subscription' | 'transaction'> = {
     subscription: {
       findFirst: vi.fn(),
       findMany: vi.fn(),
@@ -67,9 +68,9 @@ describe('Crypto Subscription Utilities', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(stripe.prices.retrieve as any).mockResolvedValue({
+    vi.mocked(stripe.prices.retrieve).mockResolvedValue({
       unit_amount: 600,
-    })
+    } as Stripe.Price)
   })
 
   afterEach(() => {
@@ -91,7 +92,7 @@ describe('Crypto Subscription Utilities', () => {
         'user_123',
         'cus_test_123',
         'cs_test_123',
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toEqual(mockSubscription)
@@ -122,7 +123,7 @@ describe('Crypto Subscription Utilities', () => {
         'user_123',
         'cus_test_123',
         'cs_test_123',
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toBeNull()
@@ -136,10 +137,10 @@ describe('Crypto Subscription Utilities', () => {
 
     beforeEach(() => {
       // Mock getCurrentPeriod to return 'monthly' for crypto_monthly
-      ;(getCurrentPeriod as any).mockReturnValue('monthly')
-      ;(stripe.prices.retrieve as any).mockResolvedValue({
+      vi.mocked(getCurrentPeriod).mockReturnValue('monthly')
+      vi.mocked(stripe.prices.retrieve).mockResolvedValue({
         unit_amount: 600,
-      })
+      } as Stripe.Price)
       mockTx.subscription.findFirst.mockResolvedValue(null)
     })
 
@@ -156,8 +157,8 @@ describe('Crypto Subscription Utilities', () => {
       }
 
       // Mock Stripe invoice creation
-      ;(stripe.invoices.create as any).mockResolvedValue(mockInvoice)
-      ;(stripe.invoiceItems.create as any).mockResolvedValue({})
+      vi.mocked(stripe.invoices.create).mockResolvedValue(mockInvoice as Stripe.Invoice)
+      vi.mocked(stripe.invoiceItems.create).mockResolvedValue({} as Stripe.InvoiceItem)
 
       // Mock subscription creation
       mockTx.subscription.create.mockResolvedValue(mockSubscription)
@@ -167,7 +168,7 @@ describe('Crypto Subscription Utilities', () => {
         mockSession,
         mockPriceId,
         mockCustomerId,
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toBe(true)
@@ -189,7 +190,7 @@ describe('Crypto Subscription Utilities', () => {
     })
 
     it('should create an annual crypto subscription successfully', async () => {
-      ;(getCurrentPeriod as any).mockReturnValue('annual')
+      vi.mocked(getCurrentPeriod).mockReturnValue('annual')
 
       const mockInvoice = {
         id: 'in_test_123',
@@ -202,16 +203,16 @@ describe('Crypto Subscription Utilities', () => {
         status: 'ACTIVE',
       }
 
-      ;(stripe.invoices.create as any).mockResolvedValue(mockInvoice)
-      ;(stripe.invoiceItems.create as any).mockResolvedValue({})
+      vi.mocked(stripe.invoices.create).mockResolvedValue(mockInvoice as Stripe.Invoice)
+      vi.mocked(stripe.invoiceItems.create).mockResolvedValue({} as Stripe.InvoiceItem)
       mockTx.subscription.create.mockResolvedValue(mockSubscription)
 
       const result = await createCryptoSubscription(
         mockUserId,
         mockSession,
-        'crypto_annual',
+        mockPriceId,
         mockCustomerId,
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toBe(true)
@@ -233,7 +234,7 @@ describe('Crypto Subscription Utilities', () => {
     })
 
     it('should handle lifetime crypto subscription', async () => {
-      ;(getCurrentPeriod as any).mockReturnValue('lifetime')
+      vi.mocked(getCurrentPeriod).mockReturnValue('lifetime')
 
       const mockSubscription = {
         id: 'sub_123',
@@ -248,7 +249,7 @@ describe('Crypto Subscription Utilities', () => {
         mockSession,
         'crypto_lifetime',
         mockCustomerId,
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toBe(true)
@@ -270,7 +271,7 @@ describe('Crypto Subscription Utilities', () => {
     })
 
     it('should not create a duplicate lifetime crypto subscription', async () => {
-      ;(getCurrentPeriod as any).mockReturnValue('lifetime')
+      vi.mocked(getCurrentPeriod).mockReturnValue('lifetime')
 
       mockTx.subscription.findFirst.mockResolvedValue({
         id: 'existing_lifetime_sub',
@@ -281,7 +282,7 @@ describe('Crypto Subscription Utilities', () => {
         mockSession,
         'crypto_lifetime',
         mockCustomerId,
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toBe(true)
@@ -299,32 +300,26 @@ describe('Crypto Subscription Utilities', () => {
     })
 
     it('should return false when invoice creation fails (creates subscription without renewal)', async () => {
-      ;(stripe.invoices.create as any).mockRejectedValue(new Error('Stripe error'))
+      vi.mocked(stripe.invoices.create).mockRejectedValue(new Error('Stripe error'))
 
       const result = await createCryptoSubscription(
         mockUserId,
         mockSession,
         mockPriceId,
         mockCustomerId,
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toBe(true) // Function still succeeds but creates subscription without renewal
     })
 
     it('should throw error when subscription creation fails for regular subscriptions', async () => {
-      ;(stripe.invoices.create as any).mockResolvedValue({ id: 'in_test_123' })
-      ;(stripe.invoiceItems.create as any).mockResolvedValue({})
+      vi.mocked(stripe.invoices.create).mockResolvedValue({ id: 'in_test_123' } as Stripe.Invoice)
+      vi.mocked(stripe.invoiceItems.create).mockResolvedValue({} as Stripe.InvoiceItem)
       mockTx.subscription.create.mockRejectedValue(new Error('Database error'))
 
       await expect(
-        createCryptoSubscription(
-          mockUserId,
-          mockSession,
-          mockPriceId,
-          mockCustomerId,
-          mockTx as any,
-        ),
+        createCryptoSubscription(mockUserId, mockSession, mockPriceId, mockCustomerId, mockTx),
       ).rejects.toThrow('Database error')
     })
   })
@@ -369,7 +364,7 @@ describe('Crypto Subscription Utilities', () => {
       mockTx.subscription.update.mockResolvedValue({ ...existingSubscription, status: 'CANCELED' })
 
       // Mock new annual subscription creation
-      ;(getCurrentPeriod as any).mockImplementation((priceId: string) => {
+      vi.mocked(getCurrentPeriod).mockImplementation((priceId: string) => {
         if (priceId === 'crypto_monthly') return 'monthly'
         if (priceId === 'crypto_annual') return 'annual'
         return 'monthly'
@@ -378,8 +373,8 @@ describe('Crypto Subscription Utilities', () => {
       const mockInvoice = { id: 'in_new_123', status: 'draft' }
       const mockNewSubscription = { id: 'sub_new', stripeSubscriptionId: 'crypto_cs_test_123' }
 
-      ;(stripe.invoices.create as any).mockResolvedValue(mockInvoice)
-      ;(stripe.invoiceItems.create as any).mockResolvedValue({})
+      vi.mocked(stripe.invoices.create).mockResolvedValue(mockInvoice as Stripe.Invoice)
+      vi.mocked(stripe.invoiceItems.create).mockResolvedValue({} as Stripe.InvoiceItem)
       mockTx.subscription.create.mockResolvedValue(mockNewSubscription)
 
       // This would be called from checkout-events.ts upgrade logic
@@ -405,7 +400,7 @@ describe('Crypto Subscription Utilities', () => {
         mockSession,
         'crypto_annual',
         'cus_test_123',
-        mockTx as any,
+        mockTx,
         existingSubscription.currentPeriodEnd,
       )
 
@@ -444,7 +439,7 @@ describe('Crypto Subscription Utilities', () => {
       mockTx.subscription.findFirst.mockResolvedValue(existingSubscription)
       mockTx.subscription.update.mockResolvedValue({ ...existingSubscription, status: 'CANCELED' })
 
-      ;(getCurrentPeriod as any).mockImplementation((priceId: string) => {
+      vi.mocked(getCurrentPeriod).mockImplementation((priceId: string) => {
         if (priceId === 'crypto_annual') return 'annual'
         if (priceId === 'crypto_monthly') return 'monthly'
         return 'monthly'
@@ -453,8 +448,8 @@ describe('Crypto Subscription Utilities', () => {
       const mockInvoice = { id: 'in_new_456', status: 'draft' }
       const mockNewSubscription = { id: 'sub_new', stripeSubscriptionId: 'crypto_cs_test_123' }
 
-      ;(stripe.invoices.create as any).mockResolvedValue(mockInvoice)
-      ;(stripe.invoiceItems.create as any).mockResolvedValue({})
+      vi.mocked(stripe.invoices.create).mockResolvedValue(mockInvoice as Stripe.Invoice)
+      vi.mocked(stripe.invoiceItems.create).mockResolvedValue({} as Stripe.InvoiceItem)
       mockTx.subscription.create.mockResolvedValue(mockNewSubscription)
 
       // Cancel existing subscription
@@ -479,7 +474,7 @@ describe('Crypto Subscription Utilities', () => {
         mockSession,
         'crypto_monthly',
         'cus_test_123',
-        mockTx as any,
+        mockTx,
         existingSubscription.currentPeriodEnd,
       )
 
@@ -516,7 +511,7 @@ describe('Crypto Subscription Utilities', () => {
 
       mockTx.subscription.findFirst.mockResolvedValue(existingSubscription)
 
-      ;(getCurrentPeriod as any).mockImplementation((priceId: string) => {
+      vi.mocked(getCurrentPeriod).mockImplementation((priceId: string) => {
         if (priceId === 'crypto_lifetime') return 'lifetime'
         if (priceId === 'crypto_monthly') return 'monthly'
         return 'monthly'
@@ -528,7 +523,7 @@ describe('Crypto Subscription Utilities', () => {
         'user_123',
         'cus_test_123',
         'cs_test_123',
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toEqual(existingSubscription)
@@ -550,14 +545,14 @@ describe('Crypto Subscription Utilities', () => {
 
       mockTx.subscription.findFirst.mockResolvedValue(existingSubscription)
 
-      ;(getCurrentPeriod as any).mockReturnValue('monthly')
+      vi.mocked(getCurrentPeriod).mockReturnValue('monthly')
 
       // Same period should not trigger upgrade logic
       const result = await findExistingCryptoSubscription(
         'user_123',
         'cus_test_123',
         'cs_test_123',
-        mockTx as any,
+        mockTx,
       )
 
       expect(result).toEqual(existingSubscription)

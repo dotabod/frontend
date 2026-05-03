@@ -1,7 +1,14 @@
 import Image from 'next/image'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
-export const Badge = ({ image, ...props }) => {
+interface BadgeProps {
+  image: string
+}
+
+export const Badge = ({
+  image,
+  ...props
+}: BadgeProps & Omit<React.ComponentProps<typeof Image>, 'src'>) => {
   const res = useTransformRes()
 
   if (!image) return null

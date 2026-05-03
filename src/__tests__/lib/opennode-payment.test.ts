@@ -1,3 +1,4 @@
+import type { OpenNodeCharge } from '@prisma/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => {
@@ -38,7 +39,7 @@ vi.mock('@/pages/api/stripe/handlers/invoice-events', () => ({
 
 import { processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 
-const baseCharge = {
+const baseCharge: OpenNodeCharge = {
   id: 'row_1',
   openNodeChargeId: 'charge_1',
   stripeInvoiceId: 'in_1',
@@ -80,7 +81,7 @@ describe('processConfirmedOpenNodePayment', () => {
     })
     mocks.stripe.invoices.pay.mockResolvedValue(paidInvoice)
 
-    const result = await processConfirmedOpenNodePayment(baseCharge as any, 'paid')
+    const result = await processConfirmedOpenNodePayment(baseCharge, 'paid')
 
     expect(result.reason).toBe('processed')
     expect(mocks.stripe.invoices.pay).toHaveBeenCalledWith(
@@ -103,15 +104,14 @@ describe('processConfirmedOpenNodePayment', () => {
   })
 
   it('skips work that was already processed successfully', async () => {
-    const result = await processConfirmedOpenNodePayment(
-      {
-        ...baseCharge,
-        status: 'paid',
-        lastWebhookAt: new Date('2026-04-29T20:01:00.000Z'),
-        metadata: { processedSuccessfully: true },
-      } as any,
-      'paid',
-    )
+    const processedCharge: OpenNodeCharge = {
+      ...baseCharge,
+      status: 'paid',
+      lastWebhookAt: new Date('2026-04-29T20:01:00.000Z'),
+      metadata: { processedSuccessfully: true },
+    }
+
+    const result = await processConfirmedOpenNodePayment(processedCharge, 'paid')
 
     expect(result.reason).toBe('already_processed')
     expect(mocks.stripe.invoices.pay).not.toHaveBeenCalled()
@@ -133,7 +133,7 @@ describe('processConfirmedOpenNodePayment', () => {
 
     mocks.stripe.invoices.retrieve.mockResolvedValue(paidInvoice)
 
-    const result = await processConfirmedOpenNodePayment(baseCharge as any, 'confirmed')
+    const result = await processConfirmedOpenNodePayment(baseCharge, 'confirmed')
 
     expect(result.reason).toBe('processed')
     expect(mocks.stripe.invoices.pay).not.toHaveBeenCalled()

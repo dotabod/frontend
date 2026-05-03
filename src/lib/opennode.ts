@@ -22,7 +22,7 @@ export interface OpenNodeChargeParams {
   success_url: string
   auto_settle?: boolean
   ttl?: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface OpenNodeCharge {
@@ -31,7 +31,7 @@ export interface OpenNodeCharge {
   amount: number
   currency: string
   hosted_checkout_url: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 /**
@@ -54,7 +54,7 @@ export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promis
 /**
  * Verifies OpenNode webhook signature
  */
-export async function verifyOpenNodeWebhook(eventData: any): Promise<boolean> {
+export async function verifyOpenNodeWebhook(eventData: unknown): Promise<boolean> {
   try {
     const isValid = signatureIsValid(eventData) as boolean
 

@@ -157,7 +157,7 @@ async function checkSingleCharge(): Promise<void> {
   console.log('📋 OpenNode Charge Information')
   console.log('-'.repeat(80))
 
-  let charge
+  let charge: OpenNodeCharge | null = null
 
   if (chargeId) {
     charge = await prisma.openNodeCharge.findUnique({
@@ -251,9 +251,10 @@ async function checkSingleCharge(): Promise<void> {
       console.log(`⚠️  Invoice has unexpected status: ${invoice.status}`)
     }
     console.log()
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error(String(error))
     console.log('❌ Failed to retrieve Stripe invoice')
-    console.log(`   Error: ${error.message}`)
+    console.log(`   Error: ${err.message}`)
     console.log()
   }
 

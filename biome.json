@@ -49,9 +49,9 @@
         "useExhaustiveDependencies": "off"
       },
       "suspicious": {
-        "noExplicitAny": "off",
+        "noExplicitAny": "error",
         "noArrayIndexKey": "off",
-        "noImplicitAnyLet": "off"
+        "noImplicitAnyLet": "error"
       },
       "style": {
         "noUselessElse": "off",

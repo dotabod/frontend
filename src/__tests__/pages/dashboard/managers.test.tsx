@@ -141,7 +141,7 @@ describe('Dashboard Managers Page', () => {
       },
       status: 'authenticated',
       update: vi.fn(),
-    } as any)
+    } as unknown as ReturnType<typeof useSession>)
 
     // Mock canAccessFeature
     vi.mocked(canAccessFeature).mockReturnValue({
@@ -150,7 +150,7 @@ describe('Dashboard Managers Page', () => {
     })
 
     // Mock useSWR for different endpoints
-    vi.mocked(useSWR).mockImplementation((url: any) => {
+    vi.mocked(useSWR).mockImplementation((url: string) => {
       if (url === '/api/get-approved-moderators') {
         return {
           data: [],

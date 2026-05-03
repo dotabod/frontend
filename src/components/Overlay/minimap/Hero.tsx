@@ -27,7 +27,7 @@ function Hero({ data, team }) {
     ? '/images/overlay/minimap/blocker/icons/arrows/enemy-pointer.png'
     : '/images/overlay/minimap/blocker/icons/arrows/hero-pointer.png'
 
-  let heroIcon
+  let heroIcon: string
   if (displayType === 'default') {
     if (isEnemy) {
       heroIcon = '/images/overlay/minimap/blocker/icons/arrows/enemy.png'

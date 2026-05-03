@@ -739,7 +739,7 @@ async function handleOpenNodeInvoicePaid(
  */
 async function handleCryptoRenewal(
   invoice: Stripe.Invoice,
-  subscription: any,
+  subscription: Prisma.SubscriptionGetPayload<object>,
   tx: Prisma.TransactionClient,
   pricePeriod: string,
 ): Promise<boolean> {

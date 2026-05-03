@@ -36,7 +36,7 @@ interface PageContentProps {
     mmr?: number
     settings: Array<{
       key: string
-      value: any
+      value: unknown
     }>
   } | null
   subscriptionInfo?: {
@@ -461,7 +461,7 @@ interface UserProfileProps {
     mmr?: number
     settings: Array<{
       key: string
-      value: any
+      value: unknown
     }>
   } | null
   subscriptionInfo: {

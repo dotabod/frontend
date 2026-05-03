@@ -8,7 +8,7 @@ export const useTrack = () => {
   const { preferences } = useCookiePreferences()
 
   const track = useCallback(
-    (event: string, properties?: any) => {
+    (event: string, properties?: Record<string, unknown>) => {
       // Only track if analytics is enabled
       if (!preferences.analytics) return
 

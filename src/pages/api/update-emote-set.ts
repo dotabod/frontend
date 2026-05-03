@@ -56,7 +56,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ message: 'Twitch ID not found for user' })
     }
 
-    let stvResponse: any = null
+    let stvResponse: EmoteSetResponse | null = null
     try {
       stvResponse = await get7TVUser(twitchId)
     } catch (_error) {

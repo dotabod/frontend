@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { stripe } from '@/lib/stripe-server'
 import { CustomerService } from '@/pages/api/stripe/services/customer-service'
@@ -13,7 +14,7 @@ vi.mock('@/lib/stripe-server', () => ({
 }))
 
 describe('CustomerService.ensureCustomer', () => {
-  const mockTx = {
+  const mockTx: Pick<Prisma.TransactionClient, 'subscription'> = {
     subscription: {
       findFirst: vi.fn(),
       updateMany: vi.fn(),
@@ -30,9 +31,9 @@ describe('CustomerService.ensureCustomer', () => {
 
     vi.mocked(stripe.customers.create).mockResolvedValue({
       id: 'cus_no_email',
-    } as any)
+    } as Stripe.Customer)
 
-    const service = new CustomerService(mockTx as any)
+    const service = new CustomerService(mockTx)
 
     const customerId = await service.ensureCustomer({
       id: 'user-1',

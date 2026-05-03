@@ -1,3 +1,3 @@
 interface Window {
-  _hsq: any[]
+  _hsq: unknown[]
 }

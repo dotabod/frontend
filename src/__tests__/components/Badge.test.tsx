@@ -9,7 +9,7 @@ vi.mock('@/lib/hooks/useTransformRes', () => ({
 
 // Mock next/image
 vi.mock('next/image', () => ({
-  default: (props: any) => {
+  default: (props: React.ComponentProps<'img'>) => {
     // Just pass all props to the img element
     // biome-ignore lint/a11y/useAltText: test mock img element
     // biome-ignore lint/performance/noImgElement: test mock for next/image
