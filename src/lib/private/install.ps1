@@ -176,7 +176,7 @@ function Start-DotabodInstaller {
     param ([string]$Url)
     try {
       Write-Log "Checking connectivity to $Url" "DEBUG"
-      $response = Invoke-WebRequest -Uri $Url -TimeoutSec 5
+      $response = Invoke-WebRequest -Uri $Url -TimeoutSec 5 -UseBasicParsing
       if ($response.StatusCode -eq 200) {
         Write-Log "Successfully connected to $Url" "DEBUG"
         return $true
@@ -276,7 +276,7 @@ function Start-DotabodInstaller {
 
     Write-Log "FileUrl: $fileUrl" "DEBUG"
 
-    $response = Invoke-WebRequest -Uri $fileUrl -Method Head
+    $response = Invoke-WebRequest -Uri $fileUrl -Method Head -UseBasicParsing
     if ($null -eq $response) {
       Write-Log "Failed to get a response from $fileUrl" "ERROR"
       return $false
@@ -399,7 +399,7 @@ function Start-DotabodInstaller {
     }
 
     # Continue with the logic to save the new file
-    $response = Invoke-WebRequest -Uri $fileUrl -Method Get
+    $response = Invoke-WebRequest -Uri $fileUrl -Method Get -UseBasicParsing
     if ($null -eq $response) {
       Write-Log "Failed to get a response from $fileUrl" "ERROR"
       return $false
