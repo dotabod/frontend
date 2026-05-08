@@ -8,7 +8,7 @@ interface BadgeProps {
 export const Badge = ({
   image,
   ...props
-}: BadgeProps & Omit<React.ComponentProps<typeof Image>, 'src'>) => {
+}: BadgeProps & Omit<React.ComponentProps<typeof Image>, 'src' | 'alt'>) => {
   const res = useTransformRes()
 
   if (!image) return null
