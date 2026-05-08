@@ -139,7 +139,9 @@ export default function ChatBot() {
     }
   }, [router.query.modType, router.query.sevenTvType])
 
-  const updateUrlWithModType = (newType: 'auto' | 'manual') => {
+  const updateUrlWithModType = (newType: string) => {
+    if (newType !== 'auto' && newType !== 'manual') return
+
     router.replace(
       {
         pathname: router.pathname,
@@ -150,7 +152,9 @@ export default function ChatBot() {
     )
   }
 
-  const updateUrlWith7TVType = (newType: 'auto' | 'manual') => {
+  const updateUrlWith7TVType = (newType: string) => {
+    if (newType !== 'auto' && newType !== 'manual') return
+
     router.replace(
       {
         pathname: router.pathname,
