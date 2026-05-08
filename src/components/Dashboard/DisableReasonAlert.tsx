@@ -82,7 +82,7 @@ export function DisableReasonAlert({
         <strong>Feature:</strong> {formatSettingName(notification.settingKey)}
       </p>
       <p>{explanation.description}</p>
-      {notification.metadata?.additional_info && (
+      {typeof notification.metadata?.additional_info === 'string' && (
         <p>
           <em>{notification.metadata.additional_info}</em>
         </p>

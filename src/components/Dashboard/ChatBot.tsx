@@ -54,6 +54,10 @@ type Emote = {
   id: string
 }
 
+type TabType = 'auto' | 'manual'
+
+const isTabType = (value: string): value is TabType => value === 'auto' || value === 'manual'
+
 const EmoteList: React.FC<{
   emotes: Emote[]
   user: User | null
@@ -131,15 +135,17 @@ export default function ChatBot() {
     const parsedMod = router.query.modType as string
     const parsed7TV = router.query.sevenTvType as string
 
-    if (parsedMod === 'auto' || parsedMod === 'manual') {
+    if (isTabType(parsedMod)) {
       setActiveKeyMod(parsedMod)
     }
-    if (parsed7TV === 'auto' || parsed7TV === 'manual') {
+    if (isTabType(parsed7TV)) {
       setActiveKey7TV(parsed7TV)
     }
   }, [router.query.modType, router.query.sevenTvType])
 
-  const updateUrlWithModType = (newType: 'auto' | 'manual') => {
+  const updateUrlWithModType = (newType: string) => {
+    if (!isTabType(newType)) return
+
     router.replace(
       {
         pathname: router.pathname,
@@ -150,7 +156,9 @@ export default function ChatBot() {
     )
   }
 
-  const updateUrlWith7TVType = (newType: 'auto' | 'manual') => {
+  const updateUrlWith7TVType = (newType: string) => {
+    if (!isTabType(newType)) return
+
     router.replace(
       {
         pathname: router.pathname,

@@ -1,6 +1,7 @@
 import clsx from 'clsx'
+import type { HTMLAttributes } from 'react'
 
-export const Card = ({ children, className = '', ...props }) => {
+export const Card = ({ children, className = '', ...props }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       className={clsx(
