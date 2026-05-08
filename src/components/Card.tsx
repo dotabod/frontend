@@ -1,9 +1,7 @@
 import clsx from 'clsx'
 import type { HTMLAttributes } from 'react'
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {}
-
-export const Card = ({ children, className = '', ...props }: CardProps) => {
+export const Card = ({ children, className = '', ...props }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       className={clsx(
