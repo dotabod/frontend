@@ -471,7 +471,7 @@ const TroubleshootPage = () => {
       message.error('There was an error submitting your message. Please try again.')
 
       // Check if it might be due to content blockers
-      if (error.message?.includes('Network Error') || error.message?.includes('Failed to fetch')) {
+      if ((error as Error).message?.includes('Network Error') || (error as Error).message?.includes('Failed to fetch')) {
         message.warning('This may be due to ad blockers or privacy settings in your browser')
       }
     } finally {

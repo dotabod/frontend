@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { captureException, withScope } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

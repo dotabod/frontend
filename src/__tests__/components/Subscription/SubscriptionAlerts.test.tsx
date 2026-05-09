@@ -9,14 +9,30 @@ vi.mock('@/contexts/SubscriptionContext', () => ({
 }))
 
 vi.mock('antd', () => ({
-  Alert: ({ message, description, action }) => (
+  Alert: ({
+    message,
+    description,
+    action,
+  }: {
+    message: React.ReactNode
+    description: React.ReactNode
+    action: React.ReactNode
+  }) => (
     <div>
       <div>{message}</div>
       <div>{description}</div>
       <div>{action}</div>
     </div>
   ),
-  Button: ({ children, onClick, disabled }) => (
+  Button: ({
+    children,
+    onClick,
+    disabled,
+  }: {
+    children: React.ReactNode
+    onClick?: () => void
+    disabled?: boolean
+  }) => (
     <button type='button' onClick={onClick} disabled={disabled}>
       {children}
     </button>

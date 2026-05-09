@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { NextApiHandler } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

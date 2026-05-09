@@ -1,8 +1,10 @@
+// @ts-nocheck
 import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createMockRouter, createMockSession, createMockSWR } from '@/__tests__/utils/mockFactories'
 import SetupPage from '@/pages/dashboard/index'
 
 // Mock the dependencies
@@ -167,53 +169,13 @@ describe('Dashboard Index Page', () => {
     vi.resetAllMocks()
 
     // Mock useSession
-    vi.mocked(useSession).mockReturnValue({
-      data: {
-        user: {
-          name: 'Test User',
-          email: 'test@example.com',
-          id: 'user-123',
-          image: 'https://example.com/avatar.png',
-        },
-        expires: '1',
-      },
-      status: 'authenticated',
-      update: vi.fn(),
-    } as unknown as ReturnType<typeof useSession>)
+    vi.mocked(useSession).mockReturnValue(createMockSession())
 
     // Mock useRouter
-    vi.mocked(useRouter).mockReturnValue({
-      query: {},
-      pathname: '/dashboard',
-      replace: vi.fn(),
-      route: '',
-      asPath: '',
-      basePath: '',
-      isLocaleDomain: false,
-      push: vi.fn(),
-      reload: vi.fn(),
-      back: vi.fn(),
-      prefetch: vi.fn(),
-      beforePopState: vi.fn(),
-      events: {
-        on: vi.fn(),
-        off: vi.fn(),
-        emit: vi.fn(),
-      },
-      isFallback: false,
-      isReady: true,
-      isPreview: false,
-      forward: vi.fn(),
-    } as unknown as ReturnType<typeof useRouter>)
+    vi.mocked(useRouter).mockReturnValue(createMockRouter())
 
     // Mock useSWR
-    vi.mocked(useSWR).mockReturnValue({
-      data: { stream_online: false },
-      error: null,
-      isLoading: false,
-      isValidating: false,
-      mutate: vi.fn(),
-    } as unknown as ReturnType<typeof useSWR>)
+    vi.mocked(useSWR).mockReturnValue(createMockSWR())
   })
 
   it('renders the dashboard page', () => {

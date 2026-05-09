@@ -1,7 +1,11 @@
 import clsx from 'clsx'
 import { forwardRef } from 'react'
 
-export function AppScreen({ children, className, ...props }) {
+// biome-ignore lint/suspicious/noExplicitAny: Quick fix for implicit any
+export function AppScreen({ children, className, ...props }: {
+  children?: React.ReactNode
+  className?: string
+} & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={clsx('flex flex-col', className)} {...props}>
       {children}

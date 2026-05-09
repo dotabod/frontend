@@ -4,7 +4,9 @@ import { Input } from '@/components/Input'
 
 // Mock the antd Input component
 vi.mock('antd', () => ({
-  Input: (props) => <input data-testid={props['data-testid']} {...props} />,
+  Input: (props: React.InputHTMLAttributes<HTMLInputElement> & { 'data-testid'?: string }) => (
+    <input data-testid={props['data-testid']} {...props} />
+  ),
 }))
 
 describe('Input', () => {

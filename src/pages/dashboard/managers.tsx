@@ -95,7 +95,7 @@ const ModeratorsPage = () => {
   }
 
   // If user is impersonating, return null (this is handled by the parent component)
-  if (session?.data?.user?.isImpersonating) {
+  if ((session?.data?.user as { isImpersonating?: boolean })?.isImpersonating) {
     return null
   }
 

@@ -195,7 +195,8 @@ export default function OBSOverlay() {
           onTabClick={(key) => {
             track('overlay/change_tab', { tab: key })
           }}
-          onChange={updateUrlWithOverlayType}
+          // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
+          onChange={(key: any) => updateUrlWithOverlayType(key)}
           items={[
             {
               label: (

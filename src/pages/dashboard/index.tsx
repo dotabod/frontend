@@ -115,7 +115,7 @@ const SetupPage = () => {
     : 0
 
   const updateStepInUrl = useCallback(
-    (newActiveStep) => {
+    (newActiveStep: number) => {
       // Update the URL without adding a new history entry
       router.replace(
         {

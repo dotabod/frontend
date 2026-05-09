@@ -84,7 +84,7 @@ export function DisableReasonAlert({
       <p>{explanation.description}</p>
       {notification.metadata?.additional_info && (
         <p>
-          <em>{notification.metadata.additional_info}</em>
+          <em>{String(notification.metadata.additional_info)}</em>
         </p>
       )}
       <p>

@@ -1,6 +1,9 @@
 import clsx from 'clsx'
 
-export const Card = ({ children, className = '', ...props }) => {
+export const Card = ({ children, className = '', ...props }: {
+  children: React.ReactNode
+  className?: string
+} & React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       className={clsx(

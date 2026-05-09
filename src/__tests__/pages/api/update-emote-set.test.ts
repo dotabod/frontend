@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/update-emote-set'

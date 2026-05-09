@@ -163,7 +163,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
               title: 'Name',
               dataIndex: 'name',
               key: 'name',
-              render: (text, record) => (
+              render: (text: React.ReactNode, record: { pattern?: boolean }) => (
                 <span>
                   {text} {record.pattern && <Tag color='blue'>Pattern</Tag>}
                 </span>
@@ -177,7 +177,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
                 text: cat,
                 value: cat,
               })),
-              onFilter: (value, record) => record.category === value,
+              onFilter: (value: string, record: { category: string }) => record.category === value,
             },
             {
               title: 'Domain',

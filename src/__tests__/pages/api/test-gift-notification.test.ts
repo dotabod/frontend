@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { GiftSubscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'

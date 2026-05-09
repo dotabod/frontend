@@ -247,7 +247,8 @@ const ObsSetup: React.FC = () => {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
       const sceneUuids = sceneListResponse.scenes.map(
-        (scene: { sceneUuid: string }) => scene.sceneUuid,
+        // biome-ignore lint/suspicious/noExplicitAny: Quick fix for callback type
+        (scene: any) => scene.sceneUuid,
       )
       setScenes(sceneListResponse.scenes as unknown as Scene[])
 

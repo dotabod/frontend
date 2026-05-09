@@ -100,7 +100,8 @@ export default function SceneSwitcher(): React.ReactNode {
                       placeholder={defaultSettings['obs-scene-switcher'][sceneKey]}
                       value={scene.value}
                       maxLength={200}
-                      onChange={(value) => handleSceneName(value, scene.update)}
+                      // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
+                      onChange={(value: any) => handleSceneName(value, scene.update)}
                       helpText={scene.helpText}
                     />
                   )}

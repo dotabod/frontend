@@ -166,7 +166,7 @@ const ContactPage: React.FC = () => {
                       if (!value) {
                         return Promise.resolve()
                       }
-                      const wordCount = value
+                      const wordCount = (value as string)
                         .trim()
                         .split(/\s+/)
                         .filter((word) => word.length > 0).length

@@ -332,14 +332,14 @@ export const chatterInfo = {
   },
 }
 
-const groupedChatterInfo = Object.entries(chatterInfo).reduce((acc, [key, value]) => {
-  const { category } = value
+const groupedChatterInfo = Object.entries(chatterInfo).reduce((acc, [key, value]: [string, { category: string; enabled: boolean }]) => {
+  const { category } = value as { category: string }
   if (!acc[category]) {
     acc[category] = []
   }
-  acc[category].push({ ...value, id: key })
+  acc[category].push({ ...value as object, id: key })
   return acc
-}, {})
+}, {} as Record<string, { id: string }[]>)
 
 export default function ChatterCard() {
   const { data: isEnabled } = useUpdateSetting(Settings.chatter)

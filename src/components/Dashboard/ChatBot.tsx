@@ -21,7 +21,7 @@ import { StepComponent } from '@/pages/dashboard/help'
 import { Card } from '@/ui/card'
 import MmrForm from './Features/MmrForm'
 
-const SevenTVBaseEmoteURL = (id) => `https://cdn.7tv.app/emote/${id}/2x.webp`
+const SevenTVBaseEmoteURL = (id: string) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
 export const emotesRequired = [
   { label: 'HECANT', id: '01G4FZG870000487MWX9F93YF7' },
@@ -216,7 +216,7 @@ export default function ChatBot() {
 
   const stepOneComplete =
     accountData?.accounts?.length > 0
-      ? accountData?.accounts?.filter((a) => a.mmr > 0).length > 0
+      ? accountData?.accounts?.filter((a: { mmr: number }) => a.mmr > 0).length > 0
       : !!mmr
   const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
   const stepTwoComplete = user?.id
@@ -235,7 +235,8 @@ export default function ChatBot() {
           onTabClick={(key) => {
             track('chatbot/change_mod_tab', { tab: key })
           }}
-          onChange={updateUrlWithModType}
+          // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
+          onChange={(key: any) => updateUrlWithModType(key)}
           items={[
             {
               label: (
@@ -378,7 +379,8 @@ export default function ChatBot() {
           onTabClick={(key) => {
             track('chatbot/change_7tv_tab', { tab: key })
           }}
-          onChange={updateUrlWith7TVType}
+          // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
+          onChange={(key: any) => updateUrlWith7TVType(key)}
           items={[
             {
               label: (

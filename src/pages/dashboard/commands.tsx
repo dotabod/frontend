@@ -17,7 +17,7 @@ const CommandsPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredCommands = Object.keys(CommandDetail)
-    .filter((command) => {
+    .filter((command: string) => {
       const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
       if (enabled === 'Enabled' && CommandDetail[command].key) {
         return isEnabled === true
@@ -27,7 +27,7 @@ const CommandsPage = () => {
       }
       return true
     })
-    .filter((command) => {
+    .filter((command: string) => {
       if (permission === 'Mods') {
         return CommandDetail[command].allowed === 'mods'
       }
@@ -36,7 +36,7 @@ const CommandsPage = () => {
       }
       return true
     })
-    .filter((command) => {
+    .filter((command: string) => {
       if (!searchTerm) return true
 
       const searchableKeys = ['alias', 'title', 'description', 'cmd']
@@ -95,7 +95,7 @@ const CommandsPage = () => {
       )}
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3'>
-        {filteredCommands.map((key) => (
+        {filteredCommands.map((key: string) => (
           <CommandsCard key={key} id={key} command={CommandDetail[key]} />
         ))}
       </div>

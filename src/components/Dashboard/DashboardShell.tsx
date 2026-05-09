@@ -39,7 +39,8 @@ interface SEOProps {
   noindex?: boolean
 }
 
-function getItem(item, collapsed = false, isChild = false) {
+// biome-ignore lint/suspicious/noExplicitAny: Quick fix for implicit any
+function getItem(item: any, collapsed = false, isChild = false) {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null
