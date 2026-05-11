@@ -21,6 +21,19 @@ interface Scene {
   sceneName: string // Scene name
 }
 
+interface SceneItem {
+  sourceName: string
+}
+
+interface ObsInput {
+  inputName: string
+}
+
+interface ObsConnectFormValues {
+  port: number | string
+  password: string
+}
+
 // Define structured error types
 type ErrorCode =
   | 'CONNECTION_ERROR'
@@ -246,10 +259,7 @@ const ObsSetup: React.FC = () => {
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
-      const sceneUuids = sceneListResponse.scenes.map(
-        // biome-ignore lint/suspicious/noExplicitAny: Quick fix for callback type
-        (scene: any) => scene.sceneUuid,
-      )
+      const sceneUuids = sceneListResponse.scenes.map((scene: Scene) => scene.sceneUuid)
       setScenes(sceneListResponse.scenes as unknown as Scene[])
 
       // Check each scene for the existence of the browser source
@@ -309,7 +319,7 @@ const ObsSetup: React.FC = () => {
 
         // Check if the browser source already exists in the selected scene
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay',
+          (item: SceneItem) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -320,7 +330,7 @@ const ObsSetup: React.FC = () => {
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
         const existingInput = inputListResponse.inputs.find(
-          (input: any) => input.inputName === '[dotabod] main overlay',
+          (input: ObsInput) => input.inputName === '[dotabod] main overlay',
         )
 
         if (existingInput) {
@@ -394,7 +404,7 @@ const ObsSetup: React.FC = () => {
         })
 
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: any) => item.sourceName === '[dotabod] main overlay',
+          (item: SceneItem) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -412,7 +422,7 @@ const ObsSetup: React.FC = () => {
     return scenesWithOverlay
   }
 
-  const handleFormSubmit = (values: any) => {
+  const handleFormSubmit = (values: ObsConnectFormValues) => {
     if (!hasAccess) {
       message.error('Pro subscription required for this feature')
       return

@@ -39,8 +39,17 @@ interface SEOProps {
   noindex?: boolean
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Quick fix for implicit any
-function getItem(item: any, collapsed = false, isChild = false) {
+type NavigationItem = {
+  name?: string
+  key?: string
+  href?: string
+  new?: boolean
+  icon?: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
+  onClick?: () => void
+  children?: NavigationItem[]
+}
+
+function getItem(item: NavigationItem, collapsed = false, isChild = false) {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null
@@ -67,7 +76,7 @@ function getItem(item: any, collapsed = false, isChild = false) {
     key: item.href || item.key,
     icon,
     label: label,
-    children: item.children?.map((child: any) => getItem(child, collapsed, true)),
+    children: item.children?.map((child) => getItem(child, collapsed, true)),
   }
 }
 
@@ -263,9 +272,9 @@ export default function DashboardShell({
 
   if (status !== 'authenticated') return null
 
-  const filterNavigationItems = (items: any[]) =>
+  const filterNavigationItems = (items: NavigationItem[]): NavigationItem[] =>
     items
-      .map((item: any) => {
+      .map((item): NavigationItem | null => {
         if (!item.name) return item // Keep dividers
 
         // Hide parent items that should be restricted
@@ -277,7 +286,8 @@ export default function DashboardShell({
         // If item has children, filter them too
         if (item.children) {
           const filteredChildren = item.children.filter(
-            (child: any) => !(data?.user?.isImpersonating && shouldHideForImpersonator(child.name)),
+            (child) =>
+              !(data?.user?.isImpersonating && shouldHideForImpersonator(child.name || '')),
           )
 
           // If no children left after filtering, hide the parent item
@@ -291,7 +301,7 @@ export default function DashboardShell({
 
         return item
       })
-      .filter(Boolean) // Remove null items;
+      .filter((item): item is NavigationItem => Boolean(item)) // Remove null items;
 
   return (
     <>
@@ -372,7 +382,7 @@ export default function DashboardShell({
                   borderInlineEnd: 'none',
                 }}
                 mode='inline'
-                items={filterNavigationItems(navigation).map((item: any, i: number) => {
+                items={filterNavigationItems(navigation).map((item, i: number) => {
                   if (!item.name)
                     return {
                       key: item?.href || i,

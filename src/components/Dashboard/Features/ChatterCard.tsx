@@ -347,6 +347,8 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce(
   >,
 )
 
+type GroupedChatterItem = (typeof groupedChatterInfo)[string][number]
+
 export default function ChatterCard() {
   const { data: isEnabled } = useUpdateSetting(Settings.chatter)
   const { data: dbChatters, updateSetting: updateChatters } = useUpdateSetting<
@@ -376,7 +378,7 @@ export default function ChatterCard() {
           return (
             <Card key={categoryName} title={categoryName}>
               <div className='ml-4 flex flex-col space-y-3'>
-                {(groupedChatterInfo[categoryName] || []).map((value: any) => (
+                {(groupedChatterInfo[categoryName] || []).map((value: GroupedChatterItem) => (
                   <div key={value.id}>
                     <Tooltip title={value?.tooltip} placement='left'>
                       <div className='flex items-center space-x-3'>

@@ -9,7 +9,7 @@ export function withAuthentication(handler: NextApiHandler) {
     const userId = (req.query.id as string) || session?.user?.id || (req.query.token as string)
     const username = req.query.username as string
 
-    if (process.env.NEXT_PUBLIC_SENTRY_DSN && !!session?.user?.id) {
+    if (process.env.NEXT_PUBLIC_SENTRY_DSN && session?.user?.id) {
       Sentry.setUser({
         id: session?.user?.id,
         username: session?.user?.name,

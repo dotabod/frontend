@@ -77,6 +77,11 @@ const headerAnimation = {
 
 const maxZIndex = 2147483647
 
+type ScreenAnimationCustom = {
+  isForwards: boolean
+  changeCount: number
+}
+
 const bodyVariantBackwards = {
   opacity: 0.4,
   scale: 0.8,
@@ -85,7 +90,7 @@ const bodyVariantBackwards = {
   transition: { duration: 0.4 },
 }
 
-const bodyVariantForwards = (custom: any) => ({
+const bodyVariantForwards = (custom: ScreenAnimationCustom) => ({
   y: '100%',
   zIndex: maxZIndex - custom.changeCount,
   transition: { duration: 0.4 },
@@ -96,9 +101,9 @@ const bodyAnimation = {
   animate: 'animate',
   exit: 'exit',
   variants: {
-    initial: (custom: any) =>
+    initial: (custom: ScreenAnimationCustom) =>
       custom.isForwards ? bodyVariantForwards(custom) : bodyVariantBackwards,
-    animate: (custom: any) => ({
+    animate: (custom: ScreenAnimationCustom) => ({
       y: '0%',
       opacity: 1,
       scale: 1,
@@ -106,11 +111,18 @@ const bodyAnimation = {
       filter: 'blur(0px)',
       transition: { duration: 0.4 },
     }),
-    exit: (custom: any) => (custom.isForwards ? bodyVariantBackwards : bodyVariantForwards(custom)),
+    exit: (custom: ScreenAnimationCustom) =>
+      custom.isForwards ? bodyVariantBackwards : bodyVariantForwards(custom),
   },
 }
 
-function BlockScreen({ custom, animated = false }: { custom?: any; animated?: boolean }) {
+function BlockScreen({
+  custom,
+  animated = false,
+}: {
+  custom?: ScreenAnimationCustom
+  animated?: boolean
+}) {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
@@ -148,7 +160,7 @@ function BetsScreen({
   custom,
   animated = false,
 }: {
-  custom?: { isForwards: boolean; changeCount: number } | undefined
+  custom?: ScreenAnimationCustom
   animated?: boolean
 }) {
   return (
@@ -178,7 +190,13 @@ function BetsScreen({
   )
 }
 
-function OBSScreen({ custom, animated = false }: { custom?: any; animated?: boolean }) {
+function OBSScreen({
+  custom,
+  animated = false,
+}: {
+  custom?: ScreenAnimationCustom
+  animated?: boolean
+}) {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>

@@ -1,7 +1,6 @@
 import clsx from 'clsx'
 import { forwardRef } from 'react'
 
-// biome-ignore lint/suspicious/noExplicitAny: Quick fix for implicit any
 export function AppScreen({
   children,
   className,
