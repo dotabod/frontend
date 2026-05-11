@@ -36,6 +36,15 @@ export type EmoteSetResponse = {
   }
 }
 
+export type SevenTVUserResponse = {
+  user?: {
+    id: string
+  }
+  emote_set?: {
+    id?: string
+  }
+}
+
 type UserEmoteSetsResponse = {
   user: {
     emote_sets: Array<{
@@ -77,7 +86,7 @@ export async function get7TVUser(twitchId: string) {
   if (!response.ok) {
     throw new Error(`Failed to fetch user data: ${response.statusText}`)
   }
-  const stvResponse = await response.json()
+  const stvResponse = (await response.json()) as SevenTVUserResponse
   if (!stvResponse?.user?.id) {
     throw new Error('7tv user not found')
   }

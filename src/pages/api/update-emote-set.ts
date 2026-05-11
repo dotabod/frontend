@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { emotesRequired } from '@/components/Dashboard/ChatBot'
-import type { EmoteSetResponse } from '@/lib/7tv'
+import type { EmoteSetResponse, SevenTVUserResponse } from '@/lib/7tv'
 import { get7TVUser } from '@/lib/7tv'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
@@ -56,7 +56,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ message: 'Twitch ID not found for user' })
     }
 
-    let stvResponse: EmoteSetResponse | null = null
+    let stvResponse: SevenTVUserResponse | null = null
     try {
       stvResponse = await get7TVUser(twitchId)
     } catch (_error) {
@@ -140,7 +140,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(500).json({
           message: 'Failed to add some emotes',
           missingEmotes,
-          failedEmotes: failedEmotes.map((f) => ({ name: f.name, error: String(f.error) })),
+          failedEmotes: failedEmotes.map((f) => ({
+            name: f.name,
+            error: String(f.error),
+          })),
         })
       }
 

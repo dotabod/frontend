@@ -5,7 +5,15 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { motionProps } from '@/ui/utils'
 import { RoshTimer } from './RoshTimer'
 
-export const RoshCounter = ({ color, count, duration, onComplete, paused }) => {
+interface RoshCounterProps {
+  color: string
+  count: number
+  duration: number
+  onComplete: () => void
+  paused: boolean
+}
+
+export const RoshCounter = ({ color, count, duration, onComplete, paused }: RoshCounterProps) => {
   const res = useTransformRes()
   const { roshPosition: style } = useOverlayPositions()
 

@@ -51,10 +51,13 @@ if (SENTRY_DSN) {
   if (typeof window !== 'undefined') {
     if (window.navigation) {
       // Use the Navigation API if available
-      window.navigation.addEventListener('navigate', (event) => {
-        const url = new URL(event.destination.url)
-        handleNavigation(url)
-      })
+      window.navigation.addEventListener(
+        'navigate',
+        (event: Event & { destination: { url: string } }) => {
+          const url = new URL(event.destination.url)
+          handleNavigation(url)
+        },
+      )
     } else {
       // Fallback for browsers that do not support the Navigation API
       const handleFallbackNavigation = () => {

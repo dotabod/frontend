@@ -111,6 +111,9 @@ export async function getTwitchTokens(userId: string) {
     }
   } catch (error) {
     captureException(error)
-    return { message: 'Failed to get info', error: error.message }
+    return {
+      message: 'Failed to get info',
+      error: error instanceof Error ? error.message : String(error),
+    }
   }
 }

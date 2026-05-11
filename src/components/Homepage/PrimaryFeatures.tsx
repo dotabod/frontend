@@ -85,7 +85,7 @@ const bodyVariantBackwards = {
   transition: { duration: 0.4 },
 }
 
-const bodyVariantForwards = (custom) => ({
+const bodyVariantForwards = (custom: any) => ({
   y: '100%',
   zIndex: maxZIndex - custom.changeCount,
   transition: { duration: 0.4 },
@@ -96,8 +96,9 @@ const bodyAnimation = {
   animate: 'animate',
   exit: 'exit',
   variants: {
-    initial: (custom) => (custom.isForwards ? bodyVariantForwards(custom) : bodyVariantBackwards),
-    animate: (custom) => ({
+    initial: (custom: any) =>
+      custom.isForwards ? bodyVariantForwards(custom) : bodyVariantBackwards,
+    animate: (custom: any) => ({
       y: '0%',
       opacity: 1,
       scale: 1,
@@ -105,11 +106,11 @@ const bodyAnimation = {
       filter: 'blur(0px)',
       transition: { duration: 0.4 },
     }),
-    exit: (custom) => (custom.isForwards ? bodyVariantBackwards : bodyVariantForwards(custom)),
+    exit: (custom: any) => (custom.isForwards ? bodyVariantBackwards : bodyVariantForwards(custom)),
   },
 }
 
-function BlockScreen({ custom, animated = false }) {
+function BlockScreen({ custom, animated = false }: { custom?: any; animated?: boolean }) {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
@@ -177,7 +178,7 @@ function BetsScreen({
   )
 }
 
-function OBSScreen({ custom, animated = false }) {
+function OBSScreen({ custom, animated = false }: { custom?: any; animated?: boolean }) {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>

@@ -15,6 +15,8 @@ import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
 
+const commandKeys = Object.keys(CommandDetail) as Array<keyof typeof CommandDetail>
+
 const FEATURED_COMMAND_KEYS = [
   'commandMmr',
   'commandWL',
@@ -77,6 +79,16 @@ const PageContent = ({
   // Use SSR data if available, otherwise fall back to client-side data
   const finalUserData = ssrUserData || data
   const finalLoading = ssrUserData ? false : loading
+  const profile = finalUserData as {
+    displayName?: string | null
+    name?: string
+    stream_online?: boolean
+    image?: string | null
+    createdAt?: string
+    mmr?: number
+    settings?: Array<{ key: string; value: unknown }>
+    error?: unknown
+  }
 
   // Fetch subscription information only if we don't have SSR data
   useEffect(() => {
@@ -106,10 +118,10 @@ const PageContent = ({
 
   useEffect(() => {
     // Only redirect to 404 if username exists in query and we've finished loading (for client-side only)
-    if (!ssrUserData && username && !finalLoading && (notFound || finalUserData?.error || error)) {
+    if (!ssrUserData && username && !finalLoading && (notFound || profile?.error || error)) {
       router.push('/404')
     }
-  }, [finalUserData, finalLoading, router, notFound, error, username, ssrUserData])
+  }, [finalLoading, profile, router, notFound, error, username, ssrUserData])
 
   if (finalLoading || error || !finalUserData) {
     return (
@@ -151,29 +163,33 @@ const PageContent = ({
     )
   }
 
-  const commands = finalUserData?.settings
-    ? Object.keys(CommandDetail).map((command) => {
-        const isEnabled = getValueOrDefault(CommandDetail[command].key, finalUserData?.settings)
+  const commands = profile?.settings
+    ? commandKeys.map((command) => {
+        const commandDetail = CommandDetail[command]
+        const isEnabled = getValueOrDefault(commandDetail.key, profile.settings)
         return { command, isEnabled: !!isEnabled }
       })
     : []
 
-  const filteredCommands = Object.keys(CommandDetail)
+  const filteredCommands = commandKeys
     .filter((command) => {
-      const isEnabled = getValueOrDefault(CommandDetail[command].key, finalUserData?.settings)
+      const commandDetail = CommandDetail[command]
+      const isEnabled = getValueOrDefault(commandDetail.key, profile.settings)
       if (enabled === 'Enabled') return isEnabled === true
       if (enabled === 'Disabled') return isEnabled === false
       return true
     })
     .filter((command) => {
-      if (permission === 'Mods') return CommandDetail[command].allowed === 'mods'
-      if (permission === 'Viewers') return CommandDetail[command].allowed === 'all'
+      const commandDetail = CommandDetail[command]
+      if (permission === 'Mods') return commandDetail.allowed === 'mods'
+      if (permission === 'Viewers') return commandDetail.allowed === 'all'
       return true
     })
     .filter((command) => {
       const keysToSearch = ['alias', 'title', 'description', 'cmd']
+      const commandDetail = CommandDetail[command]
       return keysToSearch.some((key) => {
-        const value = CommandDetail[command][key] || ''
+        const value = commandDetail[key as keyof typeof commandDetail] || ''
         if (Array.isArray(value)) {
           return value.some(
             (alias) =>
@@ -181,7 +197,7 @@ const PageContent = ({
               `!${alias.toLowerCase()}`.includes(searchTerm),
           )
         }
-        return value.toLowerCase().includes(searchTerm)
+        return typeof value === 'string' && value.toLowerCase().includes(searchTerm)
       })
     })
 
@@ -231,10 +247,10 @@ const PageContent = ({
   return (
     <>
       <Head>
-        <title>{`${finalLoading || !finalUserData?.displayName ? '...' : finalUserData.displayName}'s Dota 2 Commands — Dotabod`}</title>
+        <title>{`${finalLoading || !profile?.displayName ? '...' : profile.displayName}'s Dota 2 Commands — Dotabod`}</title>
         <meta
           name='description'
-          content={`Chat commands available in ${finalUserData?.displayName || 'this streamer'}'s Twitch channel via Dotabod.`}
+          content={`Chat commands available in ${profile?.displayName || 'this streamer'}'s Twitch channel via Dotabod.`}
         />
         {username && typeof username === 'string' && (
           <link rel='canonical' href={`https://dotabod.com/${username}`} />
@@ -253,7 +269,7 @@ const PageContent = ({
             <div className='relative flex-shrink-0 self-start'>
               <div
                 className={`absolute -inset-1.5 rounded-full ${
-                  finalUserData?.stream_online ? 'animate-pulse bg-red-500/30' : 'bg-gray-600/10'
+                  profile?.stream_online ? 'animate-pulse bg-red-500/30' : 'bg-gray-600/10'
                 }`}
               />
               {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
@@ -261,13 +277,13 @@ const PageContent = ({
                 onError={(e) => {
                   e.currentTarget.src = '/images/hero/default.png'
                 }}
-                src={finalUserData?.image || '/images/hero/default.png'}
+                src={profile?.image || '/images/hero/default.png'}
                 alt='Profile'
                 width={100}
                 height={100}
                 className='relative rounded-full ring-2 ring-gray-700'
               />
-              {finalUserData?.stream_online && (
+              {profile?.stream_online && (
                 <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-2 py-px text-[10px] font-bold uppercase tracking-wide text-white'>
                   Live
                 </span>
@@ -278,11 +294,9 @@ const PageContent = ({
             <div className='min-w-0 flex-grow'>
               <div className='mb-1 flex flex-wrap items-center gap-2'>
                 <h1 className='text-3xl font-bold text-white sm:text-4xl'>
-                  {finalLoading || !finalUserData?.displayName
-                    ? 'Loading...'
-                    : finalUserData.displayName}
+                  {finalLoading || !profile?.displayName ? 'Loading...' : profile.displayName}
                 </h1>
-                {!finalUserData?.stream_online && (
+                {!profile?.stream_online && (
                   <span className='rounded-md bg-gray-700 px-2 py-0.5 text-xs text-gray-400'>
                     Offline
                   </span>
@@ -291,14 +305,14 @@ const PageContent = ({
               </div>
 
               <div className='mb-6 flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-400'>
-                {finalUserData?.mmr != null && finalUserData.mmr > 0 && (
-                  <span>⚔ {finalUserData.mmr.toLocaleString()} MMR</span>
+                {profile?.mmr != null && profile.mmr > 0 && (
+                  <span>⚔ {profile.mmr.toLocaleString()} MMR</span>
                 )}
                 <span>
                   Using Dotabod since{' '}
-                  {finalLoading || !finalUserData?.createdAt
+                  {finalLoading || !profile?.createdAt
                     ? '...'
-                    : new Date(finalUserData.createdAt).toLocaleDateString('en-US', {
+                    : new Date(profile.createdAt).toLocaleDateString('en-US', {
                         month: 'long',
                         year: 'numeric',
                       })}
@@ -311,7 +325,7 @@ const PageContent = ({
               <div className='flex flex-wrap gap-3'>
                 <Link
                   target='_blank'
-                  href={finalUserData ? `https://twitch.tv/${finalUserData.name}` : ''}
+                  href={profile ? `https://twitch.tv/${profile.name}` : ''}
                   passHref
                 >
                   <Button

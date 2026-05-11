@@ -67,7 +67,7 @@ function getItem(item: any, collapsed = false, isChild = false) {
     key: item.href || item.key,
     icon,
     label: label,
-    children: item.children?.map((child) => getItem(child, collapsed, true)),
+    children: item.children?.map((child: any) => getItem(child, collapsed, true)),
   }
 }
 
@@ -263,9 +263,9 @@ export default function DashboardShell({
 
   if (status !== 'authenticated') return null
 
-  const filterNavigationItems = (items) =>
+  const filterNavigationItems = (items: any[]) =>
     items
-      .map((item) => {
+      .map((item: any) => {
         if (!item.name) return item // Keep dividers
 
         // Hide parent items that should be restricted
@@ -277,7 +277,7 @@ export default function DashboardShell({
         // If item has children, filter them too
         if (item.children) {
           const filteredChildren = item.children.filter(
-            (child) => !(data?.user?.isImpersonating && shouldHideForImpersonator(child.name)),
+            (child: any) => !(data?.user?.isImpersonating && shouldHideForImpersonator(child.name)),
           )
 
           // If no children left after filtering, hide the parent item
@@ -372,7 +372,7 @@ export default function DashboardShell({
                   borderInlineEnd: 'none',
                 }}
                 mode='inline'
-                items={filterNavigationItems(navigation).map((item, i) => {
+                items={filterNavigationItems(navigation).map((item: any, i: number) => {
                   if (!item.name)
                     return {
                       key: item?.href || i,

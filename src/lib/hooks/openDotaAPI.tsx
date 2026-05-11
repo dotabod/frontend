@@ -61,7 +61,9 @@ export async function getMatchData(matchId: string, heroId: number) {
 
       // Extract player-specific stats if heroId is provided
       if (heroId) {
-        const player = opendotaMatch.data.players.find((p) => p.hero_id === heroId)
+        const player = opendotaMatch.data.players.find(
+          (p: { hero_id: number }) => p.hero_id === heroId,
+        )
         if (player) {
           moreData.kills = player.kills || 0
           moreData.deaths = player.deaths || 0

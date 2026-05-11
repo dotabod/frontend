@@ -90,15 +90,26 @@ function WidgetPage() {
     if (isMaintenanceMode) return
     if (!original) return
 
-    const steamAccount = original.SteamAccount?.[0]
-    const rank = getRankDetail(steamAccount?.mmr ?? original.mmr, steamAccount?.leaderboard_rank)
+    const steamAccount = original.SteamAccount
+    const rank = getRankDetail(
+      Number(steamAccount?.mmr ?? original.mmr ?? 0),
+      steamAccount?.leaderboard_rank ?? null,
+    )
 
     if (!rank) return
 
-    const rankDetails = {
+    const leaderboard =
+      'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? null)
+
+    const rankDetails: {
+      image: string
+      rank: number
+      leaderboard: number | null
+      notLoaded: boolean
+    } = {
       image: rank.myRank?.image ?? '0.png',
       rank: rank.mmr,
-      leaderboard: 'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? false),
+      leaderboard,
       notLoaded: false,
     }
 

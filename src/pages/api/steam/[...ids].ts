@@ -4,7 +4,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 
-function convertSteam32To64(steam32Id) {
+function convertSteam32To64(steam32Id: string | number) {
   return BigInt(steam32Id) + BigInt(76561197960265728)
 }
 
@@ -36,11 +36,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json({
       data:
-        json?.response?.players.map((player) => ({
-          avatar: player.avatarfull,
-          name: player.personaname,
-          id: `${BigInt(player.steamid) - BigInt(76561197960265728)}`,
-        })) || [],
+        json?.response?.players.map(
+          (player: { avatarfull: string; personaname: string; steamid: string }) => ({
+            avatar: player.avatarfull,
+            name: player.personaname,
+            id: `${BigInt(player.steamid) - BigInt(76561197960265728)}`,
+          }),
+        ) || [],
     })
   } catch (error) {
     captureException(error)

@@ -3,14 +3,16 @@ import { configureStore, createSlice } from '@reduxjs/toolkit'
 const initialState = {
   isTest: false,
   isPreview: false,
-  status: null,
-  settings: null,
-  heroes: null,
-  hero_units: null,
-  buildings: null,
-  creeps: null,
-  couriers: null,
+  status: null as null | { active?: boolean; hero: string },
+  settings: null as null | Record<string, unknown>,
+  heroes: null as null | Array<{ name: string }>,
+  hero_units: null as null | Array<{ unitname: string }>,
+  buildings: null as null | Array<Record<string, unknown>>,
+  creeps: null as null | Array<Record<string, unknown>>,
+  couriers: null as null | Array<Record<string, unknown>>,
 }
+
+type AppState = typeof initialState
 
 const appSlice = createSlice({
   name: 'app',
@@ -62,23 +64,23 @@ export const {
   setMinimapDataCouriers,
 } = appSlice.actions
 
-export const selectIsPreview = (state) => state.isPreview
+export const selectIsPreview = (state: AppState) => state.isPreview
 
-export const selectStatus = (state) => state.status
+export const selectStatus = (state: AppState) => state.status
 
-export const selectSettings = (state) => state.settings
+export const selectSettings = (state: AppState) => state.settings
 
-export const selectMainHero = (state) =>
+export const selectMainHero = (state: AppState) =>
   state.status ? state.status.hero.replace('npc_dota_hero_', '') : ''
 
-export const selectHeroes = (state) => (state.heroes ? state.heroes : [])
+export const selectHeroes = (state: AppState) => (state.heroes ? state.heroes : [])
 
-export const selectHeroUnits = (state) => (state.hero_units ? state.hero_units : [])
+export const selectHeroUnits = (state: AppState) => (state.hero_units ? state.hero_units : [])
 
-export const selectBuildings = (state) => (state.buildings ? state.buildings : [])
+export const selectBuildings = (state: AppState) => (state.buildings ? state.buildings : [])
 
-export const selectCreeps = (state) => (state.creeps ? state.creeps : [])
+export const selectCreeps = (state: AppState) => (state.creeps ? state.creeps : [])
 
-export const selectCouriers = (state) => (state.couriers ? state.couriers : [])
+export const selectCouriers = (state: AppState) => (state.couriers ? state.couriers : [])
 
 export default store

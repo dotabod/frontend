@@ -1,12 +1,32 @@
 import { AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { PollOverlay } from '@/components/Overlay/PollOverlay'
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import { type PollData, PollOverlay } from '@/components/Overlay/PollOverlay'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { WinProbability } from './WinProbability'
 
-export const PollOverlays = ({ pollData, betData, radiantWinChance, setPollData, setBetData }) => {
+type BetData = {
+  title: string
+  endDate: string
+  outcomes: { title: string; totalVotes: number; channelPoints: number }[]
+} | null
+
+interface PollOverlaysProps {
+  pollData: PollData | null | undefined
+  betData: BetData
+  radiantWinChance: { value: number; time: number; visible: boolean } | null | undefined
+  setPollData: Dispatch<SetStateAction<PollData | null>>
+  setBetData: Dispatch<SetStateAction<BetData>>
+}
+
+export const PollOverlays = ({
+  pollData,
+  betData,
+  radiantWinChance,
+  setPollData,
+  setBetData,
+}: PollOverlaysProps) => {
   const res = useTransformRes()
   const [isVisible, setIsVisible] = useState(true)
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
@@ -39,7 +59,9 @@ export const PollOverlays = ({ pollData, betData, radiantWinChance, setPollData,
       }}
     >
       <AnimatePresence key='poll-primary'>
-        {isWinProbEnabled && <WinProbability radiantWinChance={radiantWinChance} />}
+        {isWinProbEnabled && radiantWinChance && (
+          <WinProbability radiantWinChance={radiantWinChance} />
+        )}
         {pollData && (
           <PollOverlay
             key='poll-overlay'
@@ -54,7 +76,7 @@ export const PollOverlays = ({ pollData, betData, radiantWinChance, setPollData,
         {betData && (
           <PollOverlay
             key='bet-overlay'
-            endDate={betData.endDate}
+            endDate={Number(betData.endDate)}
             title={betData.title}
             choices={betData.outcomes}
             onComplete={() => {

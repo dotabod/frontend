@@ -1,4 +1,4 @@
-import type { SubscriptionTier } from '@prisma/client'
+import type { SteamAccount, SubscriptionTier } from '@prisma/client'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
@@ -9,9 +9,56 @@ import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
 
 interface UpdateProps {
-  path?: string
+  path?: string | null
   revalidate?: boolean
   dataTransform?: (data: unknown, newValue: unknown) => unknown
+}
+
+type SettingEntry = {
+  key: string
+  value: unknown
+}
+
+type SettingsData = {
+  settings?: SettingEntry[]
+  mmr?: number | null
+  rankOnly?: RankOnlyInfo
+  Account?: {
+    providerAccountId?: string
+  }
+  SteamAccount?: {
+    steam32Id: number
+    mmr: number
+    name: string | null
+    leaderboard_rank: number | null
+    connectedUserIds: string[]
+  }
+  stream_online?: boolean
+  beta_tester?: boolean
+  error?: unknown
+  [key: string]: unknown
+}
+
+type UserProfileData = {
+  displayName: string | null
+  name: string
+  stream_online: boolean
+  image: string | null
+  createdAt: string
+  mmr?: number | null
+  settings: SettingEntry[]
+  error?: unknown
+}
+
+type MutationValue = {
+  value: unknown
+}
+
+type AccountMutationValue = Pick<
+  SteamAccount,
+  'steam32Id' | 'mmr' | 'name' | 'leaderboard_rank' | 'connectedUserIds'
+> & {
+  delete?: boolean
 }
 
 export const SETTINGS_SWR_OPTIONS = {
@@ -26,13 +73,18 @@ export const SETTINGS_SWR_OPTIONS = {
 
 export const STABLE_SWR_OPTIONS = SETTINGS_SWR_OPTIONS
 
-export const useUpdate = ({
+export const useUpdate = <
+  TData extends Record<string, unknown> = Record<string, unknown>,
+  TNewValue = unknown,
+>({
   path,
   revalidate = false,
-  dataTransform = (_data, newValue) => newValue,
-}: UpdateProps) => {
+  dataTransform = (_data, newValue) => newValue as TData,
+}: UpdateProps & {
+  dataTransform?: (data: TData | undefined, newValue: TNewValue) => TData
+}) => {
   const router = useRouter()
-  const { data, error } = useSWR(router.isReady ? path : null, fetcher, {
+  const { data, error } = useSWR<TData>(router.isReady ? path : null, fetcher, {
     ...SETTINGS_SWR_OPTIONS,
     shouldRetryOnError(err) {
       if (err.status === 404 || err.status === 403) {
@@ -48,19 +100,24 @@ export const useUpdate = ({
   // This ensures loading becomes false when we get an error response
   const loading = data === undefined && !error
 
-  const updateSetting = (newValue, customPath = '') => {
+  const updateSetting = (newValue: TNewValue, customPath = '') => {
+    const targetPath = customPath || path
+    if (!targetPath) return
+
     const options: MutatorOptions = {
       optimisticData: dataTransform(data, newValue),
       rollbackOnError: true,
       revalidate,
     }
 
-    let isNow = newValue
-    if (newValue === true || newValue?.enabled === true) isNow = 'enabled'
-    if (newValue === false || newValue?.enabled === false) isNow = 'disabled'
+    const maybeEnabled = newValue as { enabled?: boolean } | undefined
+    let isNow: string | number =
+      typeof newValue === 'string' || typeof newValue === 'number' ? newValue : 'updated'
+    if (newValue === true || maybeEnabled?.enabled === true) isNow = 'enabled'
+    if (newValue === false || maybeEnabled?.enabled === false) isNow = 'disabled'
 
-    const updateFn = async (data) => {
-      const response = await fetch(customPath || path, {
+    const updateFn = async (currentData: TData | undefined) => {
+      const response = await fetch(targetPath, {
         method: 'PATCH',
         body: JSON.stringify(newValue),
       })
@@ -73,30 +130,34 @@ export const useUpdate = ({
           : 'Could not save your settings',
       })
 
-      return dataTransform(data, newValue)
+      return dataTransform(currentData, newValue)
     }
 
-    mutate(path, updateFn(data), options)
+    mutate(targetPath, updateFn(data), options)
   }
 
   return { data, loading, updateSetting, mutate, error }
 }
 
 export function useUpdateAccount() {
-  const { data, loading, updateSetting } = useUpdate({
+  const { data, loading, updateSetting } = useUpdate<
+    { accounts?: SteamAccount[] },
+    Array<AccountMutationValue>
+  >({
     path: '/api/settings/accounts',
     dataTransform: (data, newValue) => ({
-      accounts: newValue?.filter((a) => !a.delete) || data?.accounts,
+      accounts:
+        (newValue?.filter((a) => !a.delete) as SteamAccount[] | undefined) || data?.accounts,
     }),
   })
 
   return { data, loading, update: updateSetting }
 }
 
-export const useUpdateLocale = (props?: UpdateProps) => {
-  const { data, loading, updateSetting } = useUpdate({
+export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
+  const { data, loading, updateSetting } = useUpdate<{ locale?: string }, string>({
     path: '/api/settings/locale',
-    dataTransform: (data, newValue) => ({ locale: newValue || data }),
+    dataTransform: (data, newValue) => ({ locale: newValue || data?.locale }),
     ...props,
   })
 
@@ -112,22 +173,7 @@ type RankOnlyInfo = {
 
 interface UpdateSettingResult<T = boolean> {
   data: T
-  original: {
-    beta_tester?: boolean
-    settings?: Array<{
-      key: string
-      value: unknown
-    }>
-    SteamAccount?: {
-      steam32Id: number
-      mmr: number
-      name: string | null
-      leaderboard_rank: number | null
-      connectedUserIds: string[]
-    }
-    stream_online?: boolean
-    mmr?: number
-  }
+  original: SettingsData
   error: unknown
   loading: boolean
   updateSetting: (newValue: T) => void
@@ -161,7 +207,7 @@ export function useUpdateSetting<T = boolean>(
     loading,
     error,
     updateSetting: update,
-  } = useUpdate({
+  } = useUpdate<SettingsData, MutationValue>({
     path: url,
     dataTransform: (data, newValue) => {
       if (!data) return {}
@@ -261,7 +307,7 @@ export function useUpdateSetting<T = boolean>(
 
   return {
     data: value as T,
-    original: data || {},
+    original: (data || {}) as SettingsData,
     error,
     loading,
     updateSetting,
@@ -276,7 +322,7 @@ export function useGetSettings() {
   // This is only used to get user settings from the OBS overlay
   const { userId } = router.query
   const url = `/api/settings${userId ? `?id=${userId}` : ''}`
-  const { data, loading } = useUpdate({ path: url })
+  const { data, loading } = useUpdate<SettingsData>({ path: url })
   return { data, loading }
 }
 
@@ -285,7 +331,7 @@ export function useGetSettingsByUsername() {
 
   const { username } = router.query
   const url = `/api/settings${username ? `?username=${username}` : ''}`
-  const { data, loading, error } = useUpdate({ path: url })
+  const { data, loading, error } = useUpdate<UserProfileData>({ path: url })
 
   // Return error information to make it easier to handle in the component
   return {

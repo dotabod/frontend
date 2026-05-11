@@ -332,14 +332,20 @@ export const chatterInfo = {
   },
 }
 
-const groupedChatterInfo = Object.entries(chatterInfo).reduce((acc, [key, value]: [string, { category: string; enabled: boolean }]) => {
-  const { category } = value as { category: string }
-  if (!acc[category]) {
-    acc[category] = []
-  }
-  acc[category].push({ ...value as object, id: key })
-  return acc
-}, {} as Record<string, { id: string }[]>)
+const groupedChatterInfo = Object.entries(chatterInfo).reduce(
+  (acc, [key, value]) => {
+    const { category } = value
+    if (!acc[category]) {
+      acc[category] = []
+    }
+    acc[category].push({ ...value, id: key })
+    return acc
+  },
+  {} as Record<
+    string,
+    Array<{ id: string; tooltip: string; category: CATEGORIES; message: React.ReactNode }>
+  >,
+)
 
 export default function ChatterCard() {
   const { data: isEnabled } = useUpdateSetting(Settings.chatter)
@@ -370,7 +376,7 @@ export default function ChatterCard() {
           return (
             <Card key={categoryName} title={categoryName}>
               <div className='ml-4 flex flex-col space-y-3'>
-                {(groupedChatterInfo[categoryName] || []).map((value) => (
+                {(groupedChatterInfo[categoryName] || []).map((value: any) => (
                   <div key={value.id}>
                     <Tooltip title={value?.tooltip} placement='left'>
                       <div className='flex items-center space-x-3'>

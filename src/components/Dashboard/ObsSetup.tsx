@@ -309,7 +309,7 @@ const ObsSetup: React.FC = () => {
 
         // Check if the browser source already exists in the selected scene
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: { sourceName: string }) => item.sourceName === '[dotabod] main overlay',
+          (item: any) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -320,7 +320,7 @@ const ObsSetup: React.FC = () => {
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
         const existingInput = inputListResponse.inputs.find(
-          (input: { inputName: string }) => input.inputName === '[dotabod] main overlay',
+          (input: any) => input.inputName === '[dotabod] main overlay',
         )
 
         if (existingInput) {
@@ -394,7 +394,7 @@ const ObsSetup: React.FC = () => {
         })
 
         const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: { sourceName: string }) => item.sourceName === '[dotabod] main overlay',
+          (item: any) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -412,7 +412,7 @@ const ObsSetup: React.FC = () => {
     return scenesWithOverlay
   }
 
-  const handleFormSubmit = (values) => {
+  const handleFormSubmit = (values: any) => {
     if (!hasAccess) {
       message.error('Pro subscription required for this feature')
       return

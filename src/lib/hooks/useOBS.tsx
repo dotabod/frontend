@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
-export const useOBS = ({ connected, block }) => {
+export const useOBS = ({ connected, block }: { connected: boolean; block: blockType }) => {
   const router = useRouter()
   const { userId } = router.query
 
@@ -39,7 +40,7 @@ export const useOBS = ({ connected, block }) => {
         window.obsstudio.setCurrentScene(minimapName)
         return
       }
-      if (['picks', 'strategy', 'strategy-2'].includes(block.type)) {
+      if (block.type && ['picks', 'strategy', 'strategy-2'].includes(block.type)) {
         window.obsstudio.setCurrentScene(picksName)
         return
       }

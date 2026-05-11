@@ -52,15 +52,16 @@ SelectItem.displayName = 'SelectItem'
 export default function LanguageCard() {
   const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()
 
+  const languageId = localeOption?.locale ?? 'en-US'
   const { isLoading, data } = useLanguageTranslations({
-    languageId: localeOption?.locale,
+    languageId,
   })
   const languageProgress = getLanguageProgress(
     data && {
       ...data,
       total: data.total ?? 0, // Provide default value of 0 for undefined total
     },
-    localeOption?.locale,
+    languageId,
   )
 
   const arr = (data?.languageProgress ? Object.values(data.languageProgress) : []).map((x) => {

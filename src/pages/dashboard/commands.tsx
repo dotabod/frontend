@@ -9,17 +9,21 @@ import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { getValueOrDefault } from '@/lib/settings'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 
+const commandKeys = Object.keys(CommandDetail) as Array<keyof typeof CommandDetail>
+
 const CommandsPage = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const { data } = useUpdate({ path: '/api/settings' })
+  const settings = data?.settings as Array<{ key: string; value: unknown }> | undefined
 
   const [searchTerm, setSearchTerm] = useState('')
 
-  const filteredCommands = Object.keys(CommandDetail)
-    .filter((command: string) => {
-      const isEnabled = getValueOrDefault(CommandDetail[command].key, data?.settings)
-      if (enabled === 'Enabled' && CommandDetail[command].key) {
+  const filteredCommands = commandKeys
+    .filter((command) => {
+      const commandDetail = CommandDetail[command]
+      const isEnabled = getValueOrDefault(commandDetail.key, settings)
+      if (enabled === 'Enabled' && commandDetail.key) {
         return isEnabled === true
       }
       if (enabled === 'Disabled') {
@@ -27,22 +31,24 @@ const CommandsPage = () => {
       }
       return true
     })
-    .filter((command: string) => {
+    .filter((command) => {
+      const commandDetail = CommandDetail[command]
       if (permission === 'Mods') {
-        return CommandDetail[command].allowed === 'mods'
+        return commandDetail.allowed === 'mods'
       }
       if (permission === 'Plebs') {
-        return CommandDetail[command].allowed === 'all'
+        return commandDetail.allowed === 'all'
       }
       return true
     })
-    .filter((command: string) => {
+    .filter((command) => {
       if (!searchTerm) return true
 
       const searchableKeys = ['alias', 'title', 'description', 'cmd']
+      const commandDetail = CommandDetail[command]
 
       for (const key of searchableKeys) {
-        const value = CommandDetail[command][key] || ''
+        const value = commandDetail[key as keyof typeof commandDetail] || ''
 
         if (Array.isArray(value)) {
           for (const alias of value) {
@@ -53,7 +59,7 @@ const CommandsPage = () => {
               return true
             }
           }
-        } else if (value.toLowerCase().includes(searchTerm)) {
+        } else if (typeof value === 'string' && value.toLowerCase().includes(searchTerm)) {
           return true
         }
       }
@@ -95,7 +101,7 @@ const CommandsPage = () => {
       )}
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3'>
-        {filteredCommands.map((key: string) => (
+        {filteredCommands.map((key) => (
           <CommandsCard key={key} id={key} command={CommandDetail[key]} />
         ))}
       </div>

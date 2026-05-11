@@ -2,7 +2,11 @@ import clsx from 'clsx'
 import { forwardRef } from 'react'
 
 // biome-ignore lint/suspicious/noExplicitAny: Quick fix for implicit any
-export function AppScreen({ children, className, ...props }: {
+export function AppScreen({
+  children,
+  className,
+  ...props
+}: {
   children?: React.ReactNode
   className?: string
 } & React.HTMLAttributes<HTMLDivElement>) {

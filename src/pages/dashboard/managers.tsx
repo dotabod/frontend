@@ -87,7 +87,9 @@ const ModeratorsPage = () => {
         message: 'Error',
         description: 'Failed to approve moderators.',
       })
-      track('approve_moderators_failure', { error: error.message })
+      track('approve_moderators_failure', {
+        error: error instanceof Error ? error.message : String(error),
+      })
     } finally {
       setLoading(false)
       setSelectedModerators([])

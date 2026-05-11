@@ -12,13 +12,14 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { username, canceled } = router.query
   const { data, loading, error, notFound } = useGetSettingsByUsername()
+  const profile = data as { displayName?: string }
 
   // Redirect to 404 if user not found
   useEffect(() => {
-    if (username && !loading && (notFound || data?.error || error)) {
+    if (username && !loading && (notFound || error)) {
       router.push('/404')
     }
-  }, [data, loading, router, notFound, error, username])
+  }, [loading, router, notFound, error, username])
 
   if (loading) {
     return (
@@ -39,10 +40,10 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>{`Gift a subscription to ${!loading && data?.displayName ? data.displayName : username} - Dotabod`}</title>
+        <title>{`Gift a subscription to ${!loading && profile?.displayName ? profile.displayName : username} - Dotabod`}</title>
         <meta
           name='description'
-          content={`Support ${!loading && data?.displayName ? data.displayName : username} by gifting them Dotabod Pro!`}
+          content={`Support ${!loading && profile?.displayName ? profile.displayName : username} by gifting them Dotabod Pro!`}
         />
         {username && typeof username === 'string' && (
           <link rel='canonical' href={`https://dotabod.com/${username}/gift`} />
@@ -50,7 +51,7 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
       </Head>
       <GiftSubscriptionForm
         recipientUsername={typeof username === 'string' ? username : undefined}
-        recipientDisplayName={data?.displayName}
+        recipientDisplayName={profile?.displayName}
         canceled={canceled === 'true'}
         loading={loading}
       />

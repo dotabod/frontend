@@ -12,7 +12,7 @@ type LastFmTrackType = {
   artist: string
   title: string
   album?: string
-  albumArt?: string
+  albumArt?: string | null
   url?: string
 }
 
@@ -117,17 +117,20 @@ const LastFmCard = ({
   const fontSize = res({ h: 14 })
   const imageSize = res({ h: 54 })
   const fallbackImage = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
-  const prevAlbumArtRef = useRef<string | undefined>('')
+  const prevAlbumArtRef = useRef<string | null>('')
 
   // Function to verify if the URL is valid
-  const isValidImageUrl = useCallback((url?: string) => {
+  const isValidImageUrl = useCallback((url?: string | null) => {
     if (!url) return false
     return url.startsWith('http://') || url.startsWith('https://')
   }, [])
 
   // Function to decide what image src to use
   const getImageSrc = useCallback(() => {
-    const src = imageError || !isValidImageUrl(track?.albumArt) ? fallbackImage : track?.albumArt
+    const src: string =
+      imageError || !isValidImageUrl(track?.albumArt ?? null)
+        ? fallbackImage
+        : (track?.albumArt ?? fallbackImage)
     console.log('Calculated image src:', src)
     return src
   }, [imageError, isValidImageUrl, track?.albumArt])
@@ -135,7 +138,7 @@ const LastFmCard = ({
   useEffect(() => {
     // Reset image states when album art changes
     if (track?.albumArt !== prevAlbumArtRef.current) {
-      prevAlbumArtRef.current = track?.albumArt
+      prevAlbumArtRef.current = track?.albumArt ?? null
       setImageLoaded(false)
       setImageError(false)
     }

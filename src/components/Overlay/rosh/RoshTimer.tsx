@@ -1,8 +1,19 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
+import type { useTransformRes } from '@/lib/hooks/useTransformRes'
 
-export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }) => (
+type ResFn = ReturnType<typeof useTransformRes>
+
+interface RoshTimerProps {
+  color: string
+  roshanCount: number
+  res: ResFn
+  minutes: number
+  seconds: number
+}
+
+export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }: RoshTimerProps) => (
   <div className='flex flex-col items-center' id='rosh-timer'>
     {roshanCount > 0 ? (
       <div

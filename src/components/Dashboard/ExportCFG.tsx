@@ -63,7 +63,9 @@ function InstallPage() {
         destroyInactiveTabPane
         defaultActiveKey={activeKey}
         activeKey={activeKey}
-        onChange={updateUrlWithGsiType}
+        onChange={(key) => {
+          updateUrlWithGsiType(key as 'windows' | 'manual')
+        }}
         items={[
           {
             key: 'windows',

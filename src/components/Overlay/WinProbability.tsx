@@ -9,7 +9,14 @@ import { motionProps } from '@/ui/utils'
 import { AnimatedNumber } from './AnimatedNumber'
 import { TextWithEmotes } from './TextWithEmotes'
 
-const SeparatorImg = ({ pos, children, ...props }) => (
+const SeparatorImg = ({
+  pos,
+  children,
+  ...props
+}: {
+  pos: number
+  children: React.ReactNode
+} & React.ComponentProps<typeof Logomark>) => (
   <div
     className='relative bottom-[15px] duration-[2s] ease-in-out'
     style={{
@@ -28,14 +35,14 @@ const SeparatorImg = ({ pos, children, ...props }) => (
   </div>
 )
 
-const FillRadiant = ({ width }) => (
+const FillRadiant = ({ width }: { width: number }) => (
   <div
     className='rounded-l bg-linear-to-r from-green-500 to-lime-500 text-right'
     style={{ width: `${width}%`, transition: 'width 1.5s ease-in-out' }}
   />
 )
 
-const FillDire = ({ width }) => (
+const FillDire = ({ width }: { width: number }) => (
   <div
     className='rounded-r bg-linear-to-r from-red-600 to-red-500'
     style={{ width: `${width}%`, transition: 'width 1.5s ease-in-out' }}
@@ -71,7 +78,7 @@ export const WinProbability = ({ radiantWinChance }: { radiantWinChance: WinChan
   }
 
   // Make sure radiantWinChance.value is between 0 and 100
-  radiantWinChance.value = Math.min(Math.max(radiantWinChance.value, 0), 100)
+  const radiantWinChanceValue = Math.min(Math.max(radiantWinChance.value, 0), 100)
 
   return (
     <motion.div id='win-probability' key='wp-overlay-inner' {...motionProps}>
@@ -80,7 +87,7 @@ export const WinProbability = ({ radiantWinChance }: { radiantWinChance: WinChan
           radiantWinChance.visible ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <Text pos={radiantWinChance.value}>
+        <Text pos={radiantWinChanceValue}>
           <h1
             className='font-outline-2 text-center font-bold text-slate-50'
             style={{
@@ -91,21 +98,21 @@ export const WinProbability = ({ radiantWinChance }: { radiantWinChance: WinChan
           </h1>
         </Text>
         <div className='flex h-[5px] shadow-[0_0_10px_0_rgba(0,0,0,0.5)]'>
-          <FillRadiant width={radiantWinChance.value} />
-          <FillDire width={100 - radiantWinChance.value} />
+          <FillRadiant width={radiantWinChanceValue} />
+          <FillDire width={100 - radiantWinChanceValue} />
         </div>
-        <SeparatorImg alt='logo' pos={radiantWinChance.value}>
+        <SeparatorImg pos={radiantWinChanceValue}>
           <Text className='font-outline-2 flex-row! text-center font-bold text-green-400!'>
-            <AnimatedNumber from={100 - radiantWinChance.value} to={radiantWinChance.value} />
+            <AnimatedNumber from={100 - radiantWinChanceValue} to={radiantWinChanceValue} />
             <span>%</span>
           </Text>
           <Text className='font-outline-2 flex-row! text-center font-bold text-red-400!'>
-            <AnimatedNumber from={radiantWinChance.value} to={100 - radiantWinChance.value} />
+            <AnimatedNumber from={radiantWinChanceValue} to={100 - radiantWinChanceValue} />
             <span>%</span>
           </Text>
         </SeparatorImg>
 
-        <Text className='bottom-[20px]' pos={radiantWinChance.value}>
+        <Text className='bottom-[20px]' pos={radiantWinChanceValue}>
           <span className='font-outline-2 text-slate-50'>(2m delay)</span>
         </Text>
       </div>

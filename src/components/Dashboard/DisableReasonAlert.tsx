@@ -82,11 +82,11 @@ export function DisableReasonAlert({
         <strong>Feature:</strong> {formatSettingName(notification.settingKey)}
       </p>
       <p>{explanation.description}</p>
-      {notification.metadata?.additional_info && (
+      {notification.metadata?.additional_info != null ? (
         <p>
           <em>{String(notification.metadata.additional_info)}</em>
         </p>
-      )}
+      ) : null}
       <p>
         <small>Disabled at: {new Date(notification.createdAt).toLocaleString()}</small>
       </p>

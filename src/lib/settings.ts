@@ -7,6 +7,8 @@ type Setting = {
   value: unknown
 }
 
+type ChattersSettings = typeof defaultSettings.chatters
+
 export function getValueOrDefault(
   key: SettingKeys | ChatterSettingKeys | undefined,
   settings?: Setting[],
@@ -15,8 +17,12 @@ export function getValueOrDefault(
 
   // Handle chatter settings
   if (key.startsWith('chatters.')) {
-    const chattersData = settings?.find((s) => s.key === 'chatters')
-    const chatterKey = key.split('.')[1]
+    const chattersData = settings?.find((s) => s.key === 'chatters') as
+      | {
+          value?: Partial<Record<keyof ChattersSettings, { enabled?: boolean }>>
+        }
+      | undefined
+    const chatterKey = key.split('.')[1] as keyof ChattersSettings
     return (
       chattersData?.value?.[chatterKey]?.enabled ?? defaultSettings.chatters[chatterKey].enabled
     )
@@ -24,5 +30,5 @@ export function getValueOrDefault(
 
   // Handle regular settings
   const setting = settings?.find((s) => s.key === key)
-  return setting?.value ?? defaultSettings[key]
+  return setting?.value ?? defaultSettings[key as keyof typeof defaultSettings]
 }

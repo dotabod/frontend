@@ -86,7 +86,7 @@ export const MMRBadge = ({
           key='main-badge'
           width={res({ w: 75 })}
           height={res({ h: 75 })}
-          image={image}
+          image={image ?? '0.png'}
           style={{
             marginTop: res({ h: 20 }),
           }}
@@ -102,7 +102,7 @@ export const MMRBadge = ({
         key='card-badge'
         width={res({ w: 82 })}
         height={res({ h: 75 })}
-        image={image}
+        image={image ?? '0.png'}
         id='rank-badge'
       />
       <Numbers

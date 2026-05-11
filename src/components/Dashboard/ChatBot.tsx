@@ -213,11 +213,11 @@ export default function ChatBot() {
   }, [stvUrl, updateEmoteSetError])
 
   const { data: mmr } = useUpdateSetting(Settings.mmr)
+  const accountsWithMmr = accountData?.accounts as Array<{ mmr: number }> | undefined
 
+  const accountCount = accountData?.accounts?.length ?? 0
   const stepOneComplete =
-    accountData?.accounts?.length > 0
-      ? accountData?.accounts?.filter((a: { mmr: number }) => a.mmr > 0).length > 0
-      : !!mmr
+    accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : !!mmr
   const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor

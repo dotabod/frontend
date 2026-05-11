@@ -177,7 +177,8 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
                 text: cat,
                 value: cat,
               })),
-              onFilter: (value: string, record: { category: string }) => record.category === value,
+              onFilter: (value, record) =>
+                (record as { category: string }).category === String(value),
             },
             {
               title: 'Domain',

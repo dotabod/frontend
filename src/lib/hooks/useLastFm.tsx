@@ -7,7 +7,7 @@ type LastFmTrackType = {
   artist: string
   title: string
   album?: string
-  albumArt?: string
+  albumArt?: string | null
   url?: string
 }
 
@@ -40,7 +40,7 @@ function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | null {
   if (!tracks?.length) return null
 
   const recentTrack = tracks[0]
-  const isNowPlaying = recentTrack['@attr']?.nowplaying === 'true'
+  const isNowPlaying = recentTrack['#attr']?.nowplaying === 'true'
   if (!isNowPlaying) return null
 
   const albumArtUrl =

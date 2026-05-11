@@ -1,6 +1,12 @@
 import { Button } from 'antd'
 
-function JustButton({ url, data, user, extension = 'cfg', onClick = undefined }: {
+function JustButton({
+  url,
+  data,
+  user,
+  extension = 'cfg',
+  onClick = undefined,
+}: {
   url: string
   data?: { beta_tester?: boolean }
   user: { name: string }
@@ -28,7 +34,11 @@ function JustButton({ url, data, user, extension = 'cfg', onClick = undefined }:
   )
 }
 
-function DownloadButton({ url, data, user }: {
+function DownloadButton({
+  url,
+  data,
+  user,
+}: {
   url: string
   data?: { beta_tester?: boolean }
   user: { name: string }

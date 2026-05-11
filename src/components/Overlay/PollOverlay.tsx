@@ -42,13 +42,14 @@ export const PollOverlay = ({
   const [emotes, setEmotes] = useState([])
   const { data } = useGetSettings()
   const res = useTransformRes()
+  const providerAccountId = data?.Account?.providerAccountId
 
   useEffect(() => {
-    if (!data?.Account?.providerAccountId) return
+    if (!providerAccountId) return
 
     const emoteFetcher = new TwitchFetcher()
     emoteFetcher
-      .getEmotesByID(data?.Account?.providerAccountId, {
+      .getEmotesByID(providerAccountId, {
         '7tv': true,
         bttv: true,
       })
@@ -56,7 +57,7 @@ export const PollOverlay = ({
       .catch((_e) => {
         // Don't need to report on users that don't have a 7tv or bttv account
       })
-  }, [data?.Account?.providerAccountId])
+  }, [providerAccountId])
 
   const totalVotes = choices.reduce((acc, choice) => acc + (choice.totalVotes ?? 0), 0)
   const choicesWithPercent = choices.map((choice) => {

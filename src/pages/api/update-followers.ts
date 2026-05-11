@@ -8,7 +8,7 @@ import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 
 // Helper function to fetch follower count for a user
-async function fetchFollowerCount(providerAccountId, accessToken) {
+async function fetchFollowerCount(providerAccountId: string, accessToken: string) {
   const url = `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${Number(
     providerAccountId,
   )}`
@@ -36,6 +36,10 @@ async function fetchFollowerCount(providerAccountId, accessToken) {
 async function updateFollows(userId: string) {
   const { providerAccountId, accessToken, error } = await getTwitchTokens(userId)
   if (error) {
+    return
+  }
+
+  if (!providerAccountId || !accessToken) {
     return
   }
 

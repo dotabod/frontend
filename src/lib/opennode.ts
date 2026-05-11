@@ -44,7 +44,10 @@ export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promis
       console.log('Creating OpenNode charge', params)
     }
     const response = await createCharge(params)
-    return { ...response, hosted_checkout_url: buildCheckoutUrl(response.id) }
+    return {
+      ...response,
+      hosted_checkout_url: buildCheckoutUrl(response.id),
+    } as OpenNodeCharge
   } catch (error) {
     console.error('Failed to create OpenNode charge:', error)
     throw error
@@ -56,15 +59,22 @@ export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promis
  */
 export async function verifyOpenNodeWebhook(eventData: unknown): Promise<boolean> {
   try {
-    const isValid = signatureIsValid(eventData) as boolean
+    const webhookData = eventData as {
+      hashed_order: string
+      id?: string
+      description?: string
+    }
+    const isValid = signatureIsValid(
+      webhookData as unknown as Parameters<typeof signatureIsValid>[0],
+    ) as boolean
 
     // Add debugging info in development
     if (process.env.VERCEL_ENV !== 'production') {
       console.log('OpenNode signature verification:', {
-        chargeId: eventData.id,
-        hashedOrder: eventData.hashed_order,
+        chargeId: webhookData.id,
+        hashedOrder: webhookData.hashed_order,
         isValid,
-        description: eventData.description,
+        description: webhookData.description,
       })
     }
 
@@ -82,7 +92,10 @@ export async function getOpenNodeChargeStatus(chargeId: string): Promise<OpenNod
   try {
     const response = await chargeInfo(chargeId)
 
-    return { ...response, hosted_checkout_url: buildCheckoutUrl(response.id) }
+    return {
+      ...response,
+      hosted_checkout_url: buildCheckoutUrl(response.id),
+    } as OpenNodeCharge
   } catch (error) {
     console.error('Failed to get OpenNode charge status:', error)
     return null

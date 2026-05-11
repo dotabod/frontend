@@ -70,7 +70,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const stvResponse = await get7TVUser(twitchId)
-    userId = stvResponse.user.id
+    userId = stvResponse.user?.id ?? ''
     activeEmoteSetId = stvResponse.emote_set?.id || 'N/A'
 
     if (!stvResponse.emote_set?.id) {

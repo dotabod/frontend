@@ -73,7 +73,7 @@ export default function UnixInstaller() {
               <p>
                 Download the file and drag it into the &quot;gamestate_integration&quot; folder.
               </p>
-              <DownloadButton url={url} user={user} data={data} />
+              <DownloadButton url={url} user={user ?? { name: 'dotabod' }} data={data} />
             </li>
             <div className='space-y-4'>
               <div className='flex flex-col items-center space-y-4'>

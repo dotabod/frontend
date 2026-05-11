@@ -54,7 +54,7 @@ export function TierNumber({
       <InputNumber
         id={inputId}
         value={numberValue}
-        onChange={(value) => handleChange(value)}
+        onChange={(value) => handleChange(typeof value === 'number' ? value : null)}
         disabled={isDisabled}
         {...inputProps}
       />
