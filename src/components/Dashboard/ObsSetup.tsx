@@ -259,8 +259,9 @@ const ObsSetup: React.FC = () => {
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
-      const sceneUuids = sceneListResponse.scenes.map((scene: Scene) => scene.sceneUuid)
-      setScenes(sceneListResponse.scenes as unknown as Scene[])
+      const scenes = sceneListResponse.scenes as unknown as Scene[]
+      const sceneUuids = scenes.map((scene) => scene.sceneUuid)
+      setScenes(scenes)
 
       // Check each scene for the existence of the browser source
       const scenesWithOverlay = await checkScenesForSource(sceneUuids)
@@ -316,10 +317,11 @@ const ObsSetup: React.FC = () => {
         const sceneItemsResponse = await obs.call('GetSceneItemList', {
           sceneUuid: selectedScene,
         })
+        const sceneItems = sceneItemsResponse.sceneItems as unknown as SceneItem[]
 
         // Check if the browser source already exists in the selected scene
-        const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: SceneItem) => item.sourceName === '[dotabod] main overlay',
+        const existingSourceInScene = sceneItems.find(
+          (item) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {
@@ -329,9 +331,8 @@ const ObsSetup: React.FC = () => {
 
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
-        const existingInput = inputListResponse.inputs.find(
-          (input: ObsInput) => input.inputName === '[dotabod] main overlay',
-        )
+        const inputs = inputListResponse.inputs as unknown as ObsInput[]
+        const existingInput = inputs.find((input) => input.inputName === '[dotabod] main overlay')
 
         if (existingInput) {
           // If the input exists globally, add it to the selected scene
@@ -402,9 +403,10 @@ const ObsSetup: React.FC = () => {
         const sceneItemsResponse = await obs.call('GetSceneItemList', {
           sceneUuid: scene,
         })
+        const sceneItems = sceneItemsResponse.sceneItems as unknown as SceneItem[]
 
-        const existingSourceInScene = sceneItemsResponse.sceneItems.find(
-          (item: SceneItem) => item.sourceName === '[dotabod] main overlay',
+        const existingSourceInScene = sceneItems.find(
+          (item) => item.sourceName === '[dotabod] main overlay',
         )
 
         if (existingSourceInScene) {

@@ -52,7 +52,7 @@ type NavigationItem = {
 function getItem(item: NavigationItem, collapsed = false, isChild = false) {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
-  let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden='true' /> : null
+  let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden={true} /> : null
   if (collapsed && isChild) icon = null
 
   const label = item.href ? (
