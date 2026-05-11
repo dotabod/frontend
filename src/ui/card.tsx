@@ -56,8 +56,6 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
 }
 
 export function Card({ className, feature, title, children, ...props }: CardProps) {
-  const { requiredTier } = useFeatureAccess(feature)
-
   return (
     <FeatureWrapper
       feature={feature}
@@ -71,7 +69,6 @@ export function Card({ className, feature, title, children, ...props }: CardProp
       {title && (
         <div className='title'>
           <h3>{title}</h3>
-          {requiredTier && <TierBadge requiredTier={requiredTier} />}
         </div>
       )}
       {children}
