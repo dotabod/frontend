@@ -23,7 +23,7 @@ type LastFmResponse = {
   error?: number
   recenttracks?: {
     track: Array<{
-      '#attr'?: { nowplaying: string }
+      '@attr'?: { nowplaying: string }
       artist: { '#text': string }
       name: string
       album: { '#text': string }
@@ -33,14 +33,14 @@ type LastFmResponse = {
   }
 }
 
-function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | null {
+export function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | null {
   if (data?.error) return null
 
   const tracks = data?.recenttracks?.track
   if (!tracks?.length) return null
 
   const recentTrack = tracks[0]
-  const isNowPlaying = recentTrack['#attr']?.nowplaying === 'true'
+  const isNowPlaying = recentTrack['@attr']?.nowplaying === 'true'
   if (!isNowPlaying) return null
 
   const albumArtUrl =

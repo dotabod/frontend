@@ -1,9 +1,9 @@
-// @ts-nocheck
 import Image from 'next/image'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
 interface BadgeProps {
-  image: string
+  image?: string | null
+  alt?: string
 }
 
 export const Badge = ({

@@ -70,7 +70,7 @@ const OverlayPage = () => {
   const [pollData, setPollData] = useState<PollData | null>(null)
   const [betData, setBetData] = useState<{
     title: string
-    endDate: string
+    endDate: PollData['endDate']
     outcomes: { title: string; totalVotes: number; channelPoints: number }[]
   } | null>(null)
   const [paused, setPaused] = useState(false)
@@ -147,7 +147,7 @@ const OverlayPage = () => {
   useEffect(() => {
     if (!original) return
 
-    const steamAccount = original.SteamAccount
+    const steamAccount = original.SteamAccount?.[0]
     const rank = getRankDetail(
       steamAccount?.mmr ?? original.mmr ?? 0,
       steamAccount?.leaderboard_rank ?? null,

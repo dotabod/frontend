@@ -8,7 +8,7 @@ import { WinProbability } from './WinProbability'
 
 type BetData = {
   title: string
-  endDate: string
+  endDate: PollData['endDate']
   outcomes: { title: string; totalVotes: number; channelPoints: number }[]
 } | null
 
@@ -76,7 +76,7 @@ export const PollOverlays = ({
         {betData && (
           <PollOverlay
             key='bet-overlay'
-            endDate={Number(betData.endDate)}
+            endDate={betData.endDate}
             title={betData.title}
             choices={betData.outcomes}
             onComplete={() => {

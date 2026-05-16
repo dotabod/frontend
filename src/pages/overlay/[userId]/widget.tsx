@@ -90,7 +90,7 @@ function WidgetPage() {
     if (isMaintenanceMode) return
     if (!original) return
 
-    const steamAccount = original.SteamAccount
+    const steamAccount = original.SteamAccount?.[0]
     const rank = getRankDetail(
       Number(steamAccount?.mmr ?? original.mmr ?? 0),
       steamAccount?.leaderboard_rank ?? null,

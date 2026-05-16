@@ -26,13 +26,11 @@ type SettingsData = {
   Account?: {
     providerAccountId?: string
   }
-  SteamAccount?: {
+  SteamAccount?: Array<{
     steam32Id: number
     mmr: number
-    name: string | null
     leaderboard_rank: number | null
-    connectedUserIds: string[]
-  }
+  }>
   stream_online?: boolean
   beta_tester?: boolean
   error?: unknown
@@ -102,6 +100,7 @@ export const useUpdate = <
 
   const updateSetting = (newValue: TNewValue, customPath = '') => {
     const targetPath = customPath || path
+    const cachePath = path || targetPath
     if (!targetPath) return
 
     const options: MutatorOptions = {
@@ -133,7 +132,7 @@ export const useUpdate = <
       return dataTransform(currentData, newValue)
     }
 
-    mutate(targetPath, updateFn(data), options)
+    mutate(cachePath, updateFn(data), options)
   }
 
   return { data, loading, updateSetting, mutate, error }

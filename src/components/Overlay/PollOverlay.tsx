@@ -10,7 +10,7 @@ import { TextWithEmotes } from './TextWithEmotes'
 
 export type PollData = {
   title: string
-  endDate: number
+  endDate: number | string | Date
   choices: { title: string; totalVotes?: number }[]
 }
 
