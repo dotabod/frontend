@@ -36,7 +36,9 @@ describe('useUpdate', () => {
 
   it('patches custom setting endpoints while mutating the main settings cache', () => {
     const updateRef: {
-      current?: ReturnType<typeof useUpdate<Record<string, unknown>, { value: boolean }>>['updateSetting']
+      current?: ReturnType<
+        typeof useUpdate<Record<string, unknown>, { value: boolean }>
+      >['updateSetting']
     } = {}
 
     vi.mocked(useSWR).mockReturnValue({
