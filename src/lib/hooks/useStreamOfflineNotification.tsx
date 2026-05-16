@@ -16,11 +16,8 @@ const StreamOfflineMessage = () => (
 export const useStreamOfflineNotification = (
   streamOnline: boolean | undefined,
   notification: ReturnType<typeof App.useApp>['notification'],
-  onRefresh?: () => void,
 ) => {
   useEffect(() => {
-    let refreshTimeout: NodeJS.Timeout | null = null
-
     if (streamOnline === false) {
       notification.open({
         key: 'stream-offline',
@@ -30,22 +27,8 @@ export const useStreamOfflineNotification = (
         message: 'Twitch stream is offline',
         description: <StreamOfflineMessage />,
       })
-
-      // Refresh settings every 5 minutes to check if stream is online
-      refreshTimeout = setTimeout(() => {
-        onRefresh?.()
-      }, 300000)
     } else {
       notification.destroy('stream-offline')
-      if (refreshTimeout) {
-        clearTimeout(refreshTimeout)
-      }
     }
-
-    return () => {
-      if (refreshTimeout) {
-        clearTimeout(refreshTimeout)
-      }
-    }
-  }, [streamOnline, notification, onRefresh])
+  }, [streamOnline, notification])
 }

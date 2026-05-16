@@ -286,6 +286,8 @@ export const useSocket = ({
     })
     socket.on('connect', () => {
       console.log('Socket connected event fired')
+      updateLastReceived()
+      mutate()
       setConnected(true)
     })
     socket.on('connect_error', (error) => {

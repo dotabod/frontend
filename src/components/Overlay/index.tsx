@@ -53,9 +53,7 @@ const isInvalidLocalCheck = checkForInvalidOverlay(
 
 const OverlayPage = () => {
   const { notification } = App.useApp()
-  const { data: isDotabodDisabled, mutate: refreshSettings } = useUpdateSetting(
-    Settings.commandDisable,
-  )
+  const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { original, error } = useUpdateSetting()
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
@@ -146,25 +144,6 @@ const OverlayPage = () => {
     }
   }, [connected])
 
-  // Refresh settings every 5 minutes if the socket is disconnected
-  useEffect(() => {
-    let refreshTimeout: NodeJS.Timeout | null = null
-
-    if (!connected) {
-      refreshTimeout = setTimeout(() => {
-        refreshSettings()
-      }, 300000)
-    } else if (refreshTimeout) {
-      clearTimeout(refreshTimeout)
-    }
-
-    return () => {
-      if (refreshTimeout) {
-        clearTimeout(refreshTimeout)
-      }
-    }
-  }, [connected, refreshSettings])
-
   useEffect(() => {
     if (!original) return
 
@@ -194,7 +173,7 @@ const OverlayPage = () => {
     setRankImageDetails(rankDetails)
   }, [original])
 
-  useStreamOfflineNotification(original?.stream_online, notification, refreshSettings)
+  useStreamOfflineNotification(original?.stream_online, notification)
 
   useEffect(() => {
     setIsInIframe(window.self !== window.top)
