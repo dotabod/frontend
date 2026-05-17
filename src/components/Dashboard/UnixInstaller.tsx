@@ -1,40 +1,23 @@
 import { Typography } from 'antd'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import { buildGsiConfig } from '@/lib/gsiConfig'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import DownloadButton from './DownloadButton'
 
 export default function UnixInstaller() {
   const user = useSession()?.data?.user
   const { data } = useUpdate({ path: '/api/settings' })
+  const [url, setUrl] = useState('')
 
-  const fileData = `"Dotabod Configuration"
-{
-  "uri" "${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}"
-  "timeout" "5.0"
-  "buffer" "0.5"
-  "throttle" "0.5"
-  "heartbeat" "30.0"
-  "data"
-  {
-    "abilities" "1"
-    "buildings" "1"
-    "events" "1"
-    "hero" "1"
-    "items" "1"
-    "map" "1"
-    "player" "1"
-    "provider" "1"
-    "wearables" "1"
-  }
-  "auth"
-  {
-    "token" "${user?.id}"
-  }
-}
-`
-  const blob = new Blob([fileData], { type: 'text/plain' })
-  const url = URL.createObjectURL(blob)
+  useEffect(() => {
+    if (!user?.id) return
+    const blob = new Blob([buildGsiConfig(user.id)], { type: 'text/plain' })
+    const objectUrl = URL.createObjectURL(blob)
+    setUrl(objectUrl)
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [user?.id])
 
   return (
     <>

@@ -46,6 +46,7 @@ type NavigationItem = {
   new?: boolean
   icon?: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
   onClick?: () => void
+  hideForImpersonator?: boolean
   children?: NavigationItem[]
 }
 
@@ -78,11 +79,6 @@ function getItem(item: NavigationItem, collapsed = false, isChild = false) {
     label: label,
     children: item.children?.map((child) => getItem(child, collapsed, true)),
   }
-}
-
-// Add helper function to check if item should be hidden during impersonation
-const shouldHideForImpersonator = (itemName: string) => {
-  return ['Setup', 'Managers', 'Billing', 'Data', 'Account', 'Admin'].includes(itemName)
 }
 
 // Create mapping dynamically from navigation structure
@@ -272,36 +268,30 @@ export default function DashboardShell({
 
   if (status !== 'authenticated') return null
 
+  const isImpersonating = Boolean(data?.user?.isImpersonating)
+
   const filterNavigationItems = (items: NavigationItem[]): NavigationItem[] =>
     items
       .map((item): NavigationItem | null => {
         if (!item.name) return item // Keep dividers
 
-        // Hide parent items that should be restricted
-        if (data?.user?.isImpersonating && shouldHideForImpersonator(item.name)) return null
+        if (isImpersonating && item.hideForImpersonator) return null
 
-        // Hide admin items if user is not an admin
         if (data?.user?.role !== 'admin' && item.key === 'admin-menu') return null
 
-        // If item has children, filter them too
         if (item.children) {
           const filteredChildren = item.children.filter(
-            (child) =>
-              !(data?.user?.isImpersonating && shouldHideForImpersonator(child.name || '')),
+            (child) => !(isImpersonating && child.hideForImpersonator),
           )
 
-          // If no children left after filtering, hide the parent item
           if (filteredChildren.length === 0) return null
 
-          return {
-            ...item,
-            children: filteredChildren,
-          }
+          return { ...item, children: filteredChildren }
         }
 
         return item
       })
-      .filter((item): item is NavigationItem => Boolean(item)) // Remove null items;
+      .filter((item): item is NavigationItem => Boolean(item))
 
   return (
     <>

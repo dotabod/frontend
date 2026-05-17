@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-17T00:00:00Z",
+  "title": "Design System: Dotabod",
+  "extensions": {
+    "colorMeta": {
+      "twitch-purple": {
+        "role": "primary",
+        "displayName": "Twitch Purple",
+        "canonical": "oklch(0.627 0.265 303.9)",
+        "tonalRamp": [
+          "oklch(0.381 0.176 304.987)",
+          "oklch(0.438 0.218 303.724)",
+          "oklch(0.496 0.265 301.924)",
+          "oklch(0.558 0.288 302.321)",
+          "oklch(0.627 0.265 303.9)",
+          "oklch(0.714 0.203 305.504)",
+          "oklch(0.785 0.115 303.9)",
+          "oklch(0.827 0.119 306.383)",
+          "oklch(0.902 0.063 306.703)",
+          "oklch(0.946 0.033 307.174)"
+        ]
+      },
+      "twitch-purple-soft": {
+        "role": "primary",
+        "displayName": "Twitch Purple Soft",
+        "canonical": "oklch(0.827 0.119 306.383)",
+        "tonalRamp": [
+          "oklch(0.402 0.224 304.5)",
+          "oklch(0.496 0.265 301.924)",
+          "oklch(0.558 0.288 302.321)",
+          "oklch(0.627 0.265 303.9)",
+          "oklch(0.714 0.203 305.504)",
+          "oklch(0.785 0.115 303.9)",
+          "oklch(0.827 0.119 306.383)",
+          "oklch(0.902 0.063 306.703)"
+        ]
+      },
+      "twitch-purple-deep": {
+        "role": "primary",
+        "displayName": "Twitch Purple Deep",
+        "canonical": "oklch(0.295 0.113 309)",
+        "tonalRamp": [
+          "oklch(0.205 0.07 309)",
+          "oklch(0.247 0.09 309)",
+          "oklch(0.295 0.113 309)",
+          "oklch(0.345 0.137 309)",
+          "oklch(0.402 0.16 309)",
+          "oklch(0.46 0.184 309)",
+          "oklch(0.52 0.207 309)",
+          "oklch(0.582 0.23 309)"
+        ]
+      },
+      "surface-base": {
+        "role": "neutral",
+        "displayName": "Surface Base",
+        "canonical": "oklch(0.205 0 0)",
+        "tonalRamp": [
+          "oklch(0.145 0 0)",
+          "oklch(0.205 0 0)",
+          "oklch(0.269 0 0)",
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Surface Raised",
+        "canonical": "oklch(0.269 0 0)",
+        "tonalRamp": [
+          "oklch(0.145 0 0)",
+          "oklch(0.205 0 0)",
+          "oklch(0.269 0 0)",
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)"
+        ]
+      },
+      "surface-hover": {
+        "role": "neutral",
+        "displayName": "Surface Hover",
+        "canonical": "oklch(0.371 0 0)",
+        "tonalRamp": [
+          "oklch(0.205 0 0)",
+          "oklch(0.269 0 0)",
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)",
+          "oklch(0.922 0 0)"
+        ]
+      },
+      "ink-primary": {
+        "role": "neutral",
+        "displayName": "Ink Primary",
+        "canonical": "oklch(0.922 0 0)",
+        "tonalRamp": [
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)",
+          "oklch(0.922 0 0)",
+          "oklch(0.97 0 0)",
+          "oklch(0.985 0 0)"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "oklch(0.87 0 0)",
+        "tonalRamp": [
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)",
+          "oklch(0.922 0 0)",
+          "oklch(0.97 0 0)",
+          "oklch(0.985 0 0)"
+        ]
+      },
+      "ink-tertiary": {
+        "role": "neutral",
+        "displayName": "Ink Tertiary",
+        "canonical": "oklch(0.708 0 0)",
+        "tonalRamp": [
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)",
+          "oklch(0.922 0 0)"
+        ]
+      },
+      "ink-quiet": {
+        "role": "neutral",
+        "displayName": "Ink Quiet",
+        "canonical": "oklch(0.556 0 0)",
+        "tonalRamp": [
+          "oklch(0.269 0 0)",
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.87 0 0)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.371 0 0)",
+        "tonalRamp": [
+          "oklch(0.269 0 0)",
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)"
+        ]
+      },
+      "hairline-hover": {
+        "role": "neutral",
+        "displayName": "Hairline Hover",
+        "canonical": "oklch(0.439 0 0)",
+        "tonalRamp": [
+          "oklch(0.371 0 0)",
+          "oklch(0.439 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)"
+        ]
+      },
+      "state-success": {
+        "role": "tertiary",
+        "displayName": "State Success",
+        "canonical": "oklch(0.432 0.095 166.913)",
+        "tonalRamp": [
+          "oklch(0.262 0.051 172.552)",
+          "oklch(0.378 0.077 168.94)",
+          "oklch(0.432 0.095 166.913)",
+          "oklch(0.508 0.118 165.612)",
+          "oklch(0.596 0.145 163.225)",
+          "oklch(0.696 0.17 162.48)",
+          "oklch(0.792 0.209 151.711)",
+          "oklch(0.871 0.15 154.449)"
+        ]
+      },
+      "state-info": {
+        "role": "tertiary",
+        "displayName": "State Info",
+        "canonical": "oklch(0.398 0.195 277)",
+        "tonalRamp": [
+          "oklch(0.257 0.09 281.288)",
+          "oklch(0.359 0.144 278.697)",
+          "oklch(0.398 0.195 277)",
+          "oklch(0.457 0.24 277.023)",
+          "oklch(0.511 0.262 276.966)",
+          "oklch(0.585 0.233 277.117)",
+          "oklch(0.673 0.182 276.935)",
+          "oklch(0.785 0.115 274.713)"
+        ]
+      },
+      "state-warning": {
+        "role": "tertiary",
+        "displayName": "State Warning",
+        "canonical": "oklch(0.476 0.114 70)",
+        "tonalRamp": [
+          "oklch(0.279 0.077 45.635)",
+          "oklch(0.414 0.112 45.904)",
+          "oklch(0.476 0.114 70)",
+          "oklch(0.555 0.163 48.998)",
+          "oklch(0.666 0.179 58.318)",
+          "oklch(0.769 0.188 70.08)",
+          "oklch(0.879 0.169 91.605)",
+          "oklch(0.945 0.129 101.54)"
+        ]
+      },
+      "state-error": {
+        "role": "tertiary",
+        "displayName": "State Error",
+        "canonical": "oklch(0.444 0.177 26)",
+        "tonalRamp": [
+          "oklch(0.258 0.092 26.042)",
+          "oklch(0.396 0.141 25.723)",
+          "oklch(0.444 0.177 26)",
+          "oklch(0.505 0.213 27.518)",
+          "oklch(0.577 0.245 27.325)",
+          "oklch(0.637 0.237 25.331)",
+          "oklch(0.704 0.191 22.216)",
+          "oklch(0.808 0.114 19.571)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero-scale page titles. Sparingly used; most dashboard pages start at Headline."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Primary page title. The Header component's title slot."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles and section sub-headers."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default reading size for paragraph copy and form text."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Meta rows, helper text, inline timestamps."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase eyebrows above metric values. The only place uppercase is allowed."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-card",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "The only resting shadow in the system. Almost invisible against the dark base; presence registers when removed."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1), 0 0 0 1px oklch(0.556 0 0 / 0.1)",
+        "purpose": "Card hover companion. Adds a faint inner border tint on top of the ambient shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quart",
+        "value": "cubic-bezier(0.165, 0.84, 0.44, 1)",
+        "purpose": "Default exponential ease-out curve for state transitions, hover lifts, and panel reveals."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Tap-feedback transitions: color shifts on press, link hover colors."
+      },
+      {
+        "name": "duration-default",
+        "value": "200ms",
+        "purpose": "Default state transition. Card border resolves, button background lightens."
+      },
+      {
+        "name": "duration-deliberate",
+        "value": "300ms",
+        "purpose": "Panel reveal, drawer slide, accordion expand."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single most important action on a screen. Reserved for one CTA per view.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Open Stripe billing</button>",
+      "css": ".ds-btn-primary { background: oklch(0.295 0.113 309); color: oklch(0.922 0 0); font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; padding: 0.375rem 1rem; border: 1px solid transparent; border-radius: 0.375rem; cursor: pointer; transition: background 200ms cubic-bezier(0.165, 0.84, 0.44, 1), color 200ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-primary:hover { background: oklch(0.827 0.119 306.383); color: oklch(0.205 0 0); } .ds-btn-primary:focus-visible { outline: 2px solid oklch(0.827 0.119 306.383); outline-offset: 2px; } .ds-btn-primary:active { background: oklch(0.402 0.16 309); }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "The workhorse. Most buttons on the dashboard use this variant.",
+      "html": "<button class=\"ds-btn-default\" type=\"button\">Download my data</button>",
+      "css": ".ds-btn-default { background: oklch(0.269 0 0); color: oklch(0.922 0 0); font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; padding: 0.375rem 1rem; border: 1px solid oklch(0.371 0 0); border-radius: 0.375rem; cursor: pointer; transition: background 200ms cubic-bezier(0.165, 0.84, 0.44, 1), color 200ms cubic-bezier(0.165, 0.84, 0.44, 1), border-color 200ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-default:hover { background: oklch(0.371 0 0); color: oklch(0.827 0.119 306.383); border-color: oklch(0.439 0 0); } .ds-btn-default:focus-visible { outline: 2px solid oklch(0.827 0.119 306.383); outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive actions only. Delete account, cancel subscription, hard discard.",
+      "html": "<button class=\"ds-btn-danger\" type=\"button\">Delete my account</button>",
+      "css": ".ds-btn-danger { background: transparent; color: oklch(0.704 0.191 22.216); font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; padding: 0.375rem 1rem; border: 1px solid oklch(0.444 0.177 26); border-radius: 0.375rem; cursor: pointer; transition: background 200ms cubic-bezier(0.165, 0.84, 0.44, 1), color 200ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-danger:hover { background: oklch(0.444 0.177 26); color: oklch(0.922 0 0); } .ds-btn-danger:focus-visible { outline: 2px solid oklch(0.637 0.237 25.331); outline-offset: 2px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Default surface for grouped content. Flat at rest; border resolves on hover.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card__title\">Export your data</h3><p class=\"ds-card__body\">You'll get a JSON file with everything Dotabod has stored about your account.</p></article>",
+      "css": ".ds-card { background: oklch(0.205 0 0); color: oklch(0.87 0 0); padding: 1.25rem; border: 1px solid transparent; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); transition: border-color 200ms cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 200ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-card:hover { border-color: oklch(0.439 0 0); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1), 0 0 0 1px oklch(0.556 0 0 / 0.1); } .ds-card__title { font: 500 1.125rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; color: oklch(0.922 0 0); margin: 0 0 0.5rem; } .ds-card__body { font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; color: oklch(0.87 0 0); margin: 0; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Single-line text input. AntD default under darkAlgorithm.",
+      "html": "<label class=\"ds-input-wrap\"><span class=\"ds-input-label\">Twitch channel</span><input class=\"ds-input\" type=\"text\" placeholder=\"yourname\" /></label>",
+      "css": ".ds-input-wrap { display: flex; flex-direction: column; gap: 0.375rem; } .ds-input-label { font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; color: oklch(0.87 0 0); } .ds-input { background: oklch(0.269 0 0); color: oklch(0.922 0 0); font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; padding: 0.375rem 0.75rem; border: 1px solid oklch(0.371 0 0); border-radius: 0.375rem; outline: none; transition: border-color 200ms cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 200ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-input::placeholder { color: oklch(0.556 0 0); } .ds-input:hover { border-color: oklch(0.439 0 0); } .ds-input:focus-visible { border-color: oklch(0.627 0.265 303.9); box-shadow: 0 0 0 2px oklch(0.627 0.265 303.9 / 0.2); }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill-shaped state indicator. Always border + tinted background + text, never a stripe.",
+      "html": "<span class=\"ds-chip ds-chip--success\">Active</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid; font: 500 0.75rem/1rem Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.025em; } .ds-chip--success { background: oklch(0.262 0.051 172.552 / 0.4); border-color: oklch(0.432 0.095 166.913); color: oklch(0.871 0.15 154.449); } .ds-chip--info { background: oklch(0.257 0.09 281.288 / 0.4); border-color: oklch(0.398 0.195 277); color: oklch(0.785 0.115 274.713); } .ds-chip--warning { background: oklch(0.279 0.077 45.635 / 0.4); border-color: oklch(0.476 0.114 70); color: oklch(0.879 0.169 91.605); } .ds-chip--error { background: oklch(0.258 0.092 26.042 / 0.4); border-color: oklch(0.444 0.177 26); color: oklch(0.808 0.114 19.571); }"
+    },
+    {
+      "name": "Eyebrow Label",
+      "kind": "custom",
+      "refersTo": "label-eyebrow",
+      "description": "Uppercase tracked label that sits above a metric value. The system's only legitimate uppercase usage.",
+      "html": "<div class=\"ds-eyebrow-group\"><span class=\"ds-eyebrow\">What's next</span><div class=\"ds-eyebrow-value\">Renews May 20</div><p class=\"ds-eyebrow-hint\">Your subscription continues automatically.</p></div>",
+      "css": ".ds-eyebrow-group { display: flex; flex-direction: column; gap: 0.25rem; } .ds-eyebrow { font: 500 0.75rem/1rem Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.556 0 0); } .ds-eyebrow-value { font: 600 1.125rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; color: oklch(0.922 0 0); } .ds-eyebrow-hint { font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; color: oklch(0.708 0 0); margin: 0; }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sidebar entry. Default reads quietly; hover deepens; selected sits in surface-hover with primary ink.",
+      "html": "<a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M2 3.5C2 2.67 2.67 2 3.5 2h9c.83 0 1.5.67 1.5 1.5v9c0 .83-.67 1.5-1.5 1.5h-9C2.67 14 2 13.33 2 12.5v-9z\" /><path d=\"M5.5 8h5M5.5 5.5h5M5.5 10.5h3\" /></svg><span>Billing</span></a>",
+      "css": ".ds-nav-item { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.375rem; font: 400 0.875rem/1.5rem Inter, ui-sans-serif, system-ui, sans-serif; color: oklch(0.87 0 0); text-decoration: none; transition: background 200ms cubic-bezier(0.165, 0.84, 0.44, 1), color 200ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-nav-item:hover { background: oklch(0.371 0 0); color: oklch(0.922 0 0); } .ds-nav-item--active { background: oklch(0.439 0 0); color: oklch(0.922 0 0); } .ds-nav-icon { width: 1rem; height: 1rem; flex: 0 0 auto; color: currentColor; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Streamer's Console",
+    "overview": "Dotabod's dashboard is the quiet panel a Dota 2 streamer keeps open on a second monitor. The streamer is on camera. The dashboard is not. It earns its place by staying out of the way: dim gray surfaces, plain Inter copy, a single saturated purple that only shows up when something matters. Settings load, take a click, and the streamer is back to the game. The system rejects the StreamElements/Streamlabs lineage, no neon accents, no RGB borders, no dense feature menus advertising themselves. It also rejects corporate-SaaS chrome: no faceless gradients, no glassmorphism, no hero-metric template. The dashboard is a utility, not a stage.",
+    "keyCharacteristics": [
+      "Dark by default, single-theme (AntD darkAlgorithm); no light variant.",
+      "Achromatic grays carry 90%+ of the surface; purple appears as signal, not decoration.",
+      "Cards rest flat; hover is the only thing that ever lifts.",
+      "Sentence case in copy, in labels, in buttons. No SHOUTING TYPOGRAPHY.",
+      "Inter only. No display script, no retro mono, no domain-themed faces."
+    ],
+    "rules": [
+      {
+        "name": "The One Purple Rule",
+        "body": "Twitch Purple appears on no more than 10% of any given screen. If two things on a screen would draw the eye to purple, one of them is wrong. Active rail markers, the primary CTA, and inline links are allowed; everything else uses Ink Secondary or a state tone.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Rainbow Rule",
+        "body": "The animate-border-rgb utility in tailwind.css is reserved for Pro upsell theatrics and the marketing surface. It is forbidden anywhere in the authenticated dashboard.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted-Neutral Rule",
+        "body": "All neutrals come from Tailwind's zero-chroma OKLCH gray ramp. Do not introduce a parallel slate, zinc, stone, or the legacy dark-* ramp from tailwind.css. The latter exists for historical compatibility and must not be extended.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sentence-Case Rule",
+        "body": "Headings, buttons, and labels are sentence case. Not Title Case, not ALL CAPS, except for the deliberate uppercase Label role (eyebrows above metric blocks) which is the only place uppercase is allowed.",
+        "section": "typography"
+      },
+      {
+        "name": "The 65-75ch Rule",
+        "body": "Body copy wraps at 65-75ch. Section subtitles use max-w-3xl as the practical cap.",
+        "section": "typography"
+      },
+      {
+        "name": "The Single-Voice Rule",
+        "body": "Inter only. Do not pair with a display serif, mono, or script in the dashboard. The OBS overlay's Radiance face is a separate surface; do not import it here.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "Surfaces never carry a shadow as decoration. If a shadow exists at rest, it exists at the lowest visible value. If a shadow grows, it grows on hover, never on click.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No-Glow Rule",
+        "body": "No backdrop-filter blur, no glow halos, no box-shadow larger than shadow-lg. Glassmorphism is forbidden.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep Twitch Purple to less than or equal to 10% of any screen. Use Ink Secondary for ordinary state and reserve purple for active/CTA/link.",
+      "Do use full borders for callouts and state tones (border, not border-left).",
+      "Do use sentence case in all labels, buttons, headings, and toasts.",
+      "Do keep neutrals on Tailwind's OKLCH gray ramp. The dark-* ramp is legacy; do not extend it.",
+      "Do use AntD's components under darkAlgorithm. Override at the themeConfig.ts level, not by overriding AntD class names in CSS.",
+      "Do keep cards flat at rest. Reveal depth on hover with the existing transparent-to-hairline-hover border transition.",
+      "Do describe consequences in plain voice for destructive actions ('This permanently deletes your match history. You can't undo this.').",
+      "Do match copy to PRODUCT.md's voice: helpful, technical, no-fluff."
+    ],
+    "donts": [
+      "Don't use side-stripe borders (border-left or border-right greater than 1px as a colored accent). Use a full border with the state tone.",
+      "Don't use gradient text (background-clip: text on a gradient). The dashboard has one solid accent.",
+      "Don't use the animate-border-rgb utility on any authenticated dashboard surface. It belongs to marketing/upsell only.",
+      "Don't apply glassmorphism, no backdrop-filter: blur, no glass cards. Cards are opaque on surface-base.",
+      "Don't import the Radiance or RadianceM fonts into the dashboard. They are reserved for the OBS overlay's Dota UI.",
+      "Don't use the hero-metric template (giant number, small label, gradient accent). It is the SaaS cliche PRODUCT.md explicitly rejects.",
+      "Don't build identical card grids of icon + heading + text. Vary the surface by what it actually needs to communicate.",
+      "Don't use modals where an inline disclosure would do. The only modals in the dashboard are destructive confirms; everything else should be inline or progressive.",
+      "Don't use ALL CAPS outside the Label role. SHOUTING TYPOGRAPHY is forbidden in headings, buttons, and toasts.",
+      "Don't use em dashes in copy. Use commas, colons, semicolons, periods, or parentheses.",
+      "Don't copy the StreamElements/Streamlabs aesthetic. No neon, no RGB everything, no ad-stuffed sidebars, no dense feature menus advertising themselves.",
+      "Don't mirror corporate-SaaS chrome either, no faceless gradients, no Salesforce-grade density, no formal jargon in errors.",
+      "Don't introduce a parallel color ramp (slate/zinc/stone, or a custom new ramp). One ramp. One accent. One state set."
+    ]
+  }
+}

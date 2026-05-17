@@ -13,7 +13,6 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { type LnaPermissionState, queryLnaPermission, shouldCheckLna } from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
-import RegionalBlockingNote from './RegionalBlockingNote'
 
 interface Scene {
   sceneIndex: number // Scene index
@@ -604,8 +603,6 @@ const ObsSetup: React.FC = () => {
           )}
 
           {renderAdditionalInfo()}
-
-          <RegionalBlockingNote />
         </Space>
         <Spin spinning={l0 || l1} tip='Loading'>
           {!connected && (

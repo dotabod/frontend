@@ -18,8 +18,7 @@ export const plans = [
     name: 'Free',
     featured: false,
     price: { monthly: '$0', annual: '$0', lifetime: '$0' },
-    description:
-      'Perfect for casual streamers who want to try out basic Dota 2 streaming features.',
+    description: 'The core overlay, MMR tracking, and basic chat commands. No card required.',
     button: {
       label: 'Get started for free',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.FREE}`,
@@ -58,8 +57,7 @@ export const plans = [
       lifetime: '$99',
     },
     tier: SUBSCRIPTION_TIERS.PRO,
-    description:
-      'Complete toolkit for serious streamers who need advanced features and automation.',
+    description: 'Everything in Free, plus auto-predictions, advanced overlays, and pro commands.',
     button: {
       label: 'Subscribe',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.PRO}`,
@@ -113,16 +111,16 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
       {showTitle && (
         <div className='mx-auto max-w-2xl text-center'>
           <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
-            Simple pricing for every Dota 2 streamer
+            Two plans. Free for the essentials, Pro for the rest.
           </h2>
 
           {inGracePeriod && !hasActivePlan ? (
             <>
               <p className='mt-2 text-lg text-yellow-400 font-medium'>
-                Enjoy complimentary access to all Pro features until {gracePeriodPrettyDate}
+                You have free access to all Pro features until {gracePeriodPrettyDate}.
               </p>
               <p className='mt-2 text-lg text-gray-400'>
-                Subscribe today to continue using Pro features after the trial period ends
+                Subscribe before then to keep Pro features after the trial ends.
               </p>
             </>
           ) : hasActivePlan ? (
@@ -130,9 +128,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
               <SubscriptionStatus />
             </p>
           ) : (
-            <p className='mt-2 text-lg text-gray-400'>
-              Choose the plan that best fits your streaming needs
-            </p>
+            <p className='mt-2 text-lg text-gray-400'>Pick the plan that fits how you stream.</p>
           )}
         </div>
       )}

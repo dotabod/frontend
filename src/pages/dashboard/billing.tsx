@@ -17,6 +17,8 @@ import { getSubscriptionStatusInfo } from '@/utils/subscription'
 
 const { Title } = Typography
 
+const PORTAL_FALLBACK_ERROR = "We couldn't open Stripe billing. Try again in a moment."
+
 // Define the subscription type with metadata for type safety
 interface SubscriptionWithMetadata {
   id?: string
@@ -61,28 +63,24 @@ const BillingPage = () => {
         if (payload?.code === 'NO_STRIPE_CUSTOMER') {
           message.info(
             payload?.guidance ||
-              'No Stripe billing profile was found for your account. Contact support if charges continue.',
+              "We don't have a Stripe billing profile on file for your account. Contact support if you're still being charged.",
           )
           return
         }
 
-        message.error(
-          payload?.guidance ||
-            payload?.error ||
-            'Unable to open billing settings right now. Please try again.',
-        )
+        message.error(payload?.guidance || payload?.error || PORTAL_FALLBACK_ERROR)
         return
       }
 
       if (!payload?.url) {
-        message.error('Billing portal URL was not returned. Please try again.')
+        message.error("Stripe didn't return a billing URL. Try again in a moment.")
         return
       }
 
       window.location.href = payload.url
     } catch (error) {
       console.error('Error accessing customer portal:', error)
-      message.error('Unable to open billing settings right now. Please try again.')
+      message.error(PORTAL_FALLBACK_ERROR)
     } finally {
       setIsLoading(false)
     }
@@ -108,7 +106,7 @@ const BillingPage = () => {
 
       <Header
         title='Billing'
-        subtitle='See your current subscription at a glance and jump into Stripe when you need to change billing details.'
+        subtitle='Your current plan, renewal date, and a shortcut to Stripe for payment details and invoices.'
       />
 
       <div className='space-y-6'>
@@ -125,7 +123,7 @@ const BillingPage = () => {
 
       <div className='mt-6'>
         <Title level={4} className='mb-4'>
-          Change plan
+          Compare plans
         </Title>
         <BillingPlans showTitle={false} />
       </div>

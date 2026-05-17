@@ -54,7 +54,7 @@ const CodeBlock = () => {
       <div className='flex flex-row justify-between items-center'>
         <Link
           target='_blank'
-          href='https://github.com/dotabod/frontend/blob/master/public/install.ps1'
+          href='https://github.com/dotabod/frontend/blob/master/src/lib/private/install.ps1'
           className=' text-gray-400!'
         >
           View source

@@ -3,7 +3,7 @@ import {
   LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
-import { Alert, Steps } from 'antd'
+import { Alert, Steps, Typography } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
@@ -241,10 +241,30 @@ const WindowsInstaller = () => {
 
   return (
     <FeatureWrapper feature='autoInstaller'>
-      <p>
-        <b>Why?</b> This step is necessary to ensure that Dota 2 knows which data Dotabod requires.
-        It&apos;s a Valve approved way of getting game data.
-      </p>
+      <div className='mb-4 space-y-2'>
+        <p>
+          Run this command to install Dota 2&apos;s Game State Integration config. The script is
+          short, the source is{' '}
+          <Link
+            target='_blank'
+            href='https://github.com/dotabod/frontend/blob/master/src/lib/private/install.ps1'
+          >
+            public on GitHub
+          </Link>
+          , and here&apos;s what it does on your computer:
+        </p>
+        <ul className='ml-4 list-disc text-sm text-gray-400 space-y-1'>
+          <li>Opens a local page in your browser so this account can authenticate the install</li>
+          <li>
+            Writes one config file into your Dota 2 folder (the file Valve provides for streamer
+            integrations)
+          </li>
+          <li>
+            Adds the <Typography.Text code>-gamestateintegration</Typography.Text> launch option to
+            Dota 2, then exits
+          </li>
+        </ul>
+      </div>
       <div className='flex flex-row justify-center pt-4'>
         <CodeBlock />
       </div>
@@ -258,12 +278,13 @@ const WindowsInstaller = () => {
       {lnaChecked && lnaPermissionState === 'denied' && (
         <Alert
           className='max-w-2xl mb-4'
-          message='Local network access denied'
+          message='Browser blocked the installer connection'
           description={
             <span>
-              Your browser has denied permission to connect to the Dotabod installer. Please allow
-              local network access in your browser settings and refresh this page.{' '}
-              <Link href='/dashboard/help'>Learn more about fixing this issue</Link>.
+              The Dotabod installer runs on your own computer, and your browser needs permission to
+              talk to it. Allow local network access in your browser settings and refresh this page,
+              or use the manual steps below instead.{' '}
+              <Link href='/dashboard/help'>How to fix this</Link>.
             </span>
           }
           type='error'
@@ -273,13 +294,8 @@ const WindowsInstaller = () => {
       {lnaChecked && lnaPermissionState === 'prompt' && !success && (
         <Alert
           className='max-w-2xl mb-4'
-          message='Browser permission required'
-          description={
-            <span>
-              Chrome will ask for permission to connect to the Dotabod installer on your computer.
-              Please click &quot;Allow&quot; when prompted to continue with the installation.
-            </span>
-          }
+          message="When your browser asks, click 'Allow'"
+          description='Your browser needs one-time permission to connect to the installer running on your computer. Without it, the install will silently fail.'
           type='info'
           showIcon
         />
@@ -287,22 +303,26 @@ const WindowsInstaller = () => {
       {success && (
         <Alert
           className='max-w-2xl'
-          message='The Dotabod installer is running! You can continue on to the next step.'
+          message='Config installed. Continue to the next step.'
           type='success'
           showIcon
         />
       )}
-      <p className='space-x-2'>
-        <QuestionCircleOutlined />
-        <span>
-          Having trouble? Let us know what happened{' '}
-          <Link href='/dashboard/help'>from the help page</Link>, and then try{' '}
-          <Link onClick={() => track('setup/manual_steps')} href='/dashboard?step=2&gsiType=manual'>
-            the manual steps
-          </Link>
-          .
-        </span>
-      </p>
+      {!success && (
+        <p className='mt-4 text-sm text-gray-400 flex items-start gap-2 max-w-2xl'>
+          <QuestionCircleOutlined className='mt-0.5 shrink-0' />
+          <span>
+            Script not working? Use{' '}
+            <Link
+              onClick={() => track('setup/manual_steps')}
+              href='/dashboard?step=2&gsiType=manual'
+            >
+              the manual install
+            </Link>{' '}
+            instead, or <Link href='/dashboard/help'>tell us what you saw</Link>.
+          </span>
+        </p>
+      )}
       {error && (
         <Alert
           className='max-w-2xl'

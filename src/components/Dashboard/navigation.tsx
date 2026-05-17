@@ -27,6 +27,7 @@ export const navigation = [
     name: 'Admin',
     key: PARENT_KEYS.ADMIN,
     icon: ShieldCheck,
+    hideForImpersonator: true,
     children: [
       { name: 'Scheduled Messages', href: '/dashboard/admin' },
       { name: 'Manage Channel', href: '/dashboard/admin/manage-channel' },
@@ -39,28 +40,27 @@ export const navigation = [
     name: 'Setup',
     href: '/dashboard',
     icon: BeakerIcon,
+    hideForImpersonator: true,
   },
   {
     name: 'Features',
     key: PARENT_KEYS.FEATURES,
     icon: SparklesIcon,
-    new: true,
     children: [
       {
-        name: 'Main',
+        name: 'Overview',
         href: '/dashboard/features',
       },
       {
-        name: 'Overlay',
+        name: 'Stream overlay',
         href: '/dashboard/features/overlay',
-        new: true,
       },
       {
-        name: 'Chat',
+        name: 'Chat features',
         href: '/dashboard/features/chat',
       },
       {
-        name: 'Notable Players',
+        name: 'Notable players',
         href: '/dashboard/notable-players',
       },
       {
@@ -70,17 +70,18 @@ export const navigation = [
     ],
   },
   {
-    name: 'Chat & Team',
+    name: 'Bot & team',
     key: PARENT_KEYS.BOT_SETTINGS,
     icon: SparklesIcon,
     children: [
       {
-        name: 'Commands',
+        name: 'Chat commands',
         href: '/dashboard/commands',
       },
       {
-        name: 'Team Access',
+        name: 'Team access',
         href: '/dashboard/managers',
+        hideForImpersonator: true,
       },
     ],
   },
@@ -90,43 +91,46 @@ export const navigation = [
     name: 'Account',
     key: PARENT_KEYS.ACCOUNT,
     icon: ShieldCheck,
+    hideForImpersonator: true,
     children: [
       {
         name: 'Billing',
         href: '/dashboard/billing',
         icon: DollarSignIcon,
+        hideForImpersonator: true,
       },
       {
-        name: 'Gift Pro',
+        name: 'Gift a subscription',
         href: '/gift',
         icon: Gift,
       },
       {
-        name: 'Data',
+        name: 'Your data',
         href: '/dashboard/data',
         icon: HardDriveIcon,
+        hideForImpersonator: true,
       },
     ],
   },
 
   // Help & Resources
   {
-    name: 'Help & Resources',
+    name: 'Help',
     key: PARENT_KEYS.HELP,
     icon: QuestionMarkCircleIcon,
     children: [
       {
-        name: 'Help',
+        name: 'Help center',
         href: '/dashboard/help',
         icon: QuestionMarkCircleIcon,
       },
       {
-        name: 'Discord',
+        name: 'Discord community',
         href: 'https://discord.dotabod.com',
         icon: Discord,
       },
       {
-        name: 'Github',
+        name: 'GitHub',
         href: 'https://github.com/dotabod/',
         icon: Github,
       },
@@ -136,7 +140,7 @@ export const navigation = [
         icon: NewspaperIcon,
       },
       {
-        name: 'Status',
+        name: 'Service status',
         href: 'https://status.dotabod.com',
         icon: Info,
       },

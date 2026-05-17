@@ -1,4 +1,4 @@
-import { Alert, App, Button, Collapse, Progress, Steps, Tag, Typography } from 'antd'
+import { App, Button, Progress, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import { Bitcoin } from 'lucide-react'
 import Head from 'next/head'
@@ -8,20 +8,18 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { AccessibleEmoji } from '@/components/AccessibleEmoji'
 import ChatBot from '@/components/Dashboard/ChatBot'
+import ConnectSteam from '@/components/Dashboard/ConnectSteam'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
+import { useSteamLinkedAccount } from '@/lib/hooks/useSteamLinkedAccount'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { useTrack } from '@/lib/track'
-import { Card } from '@/ui/card'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
-
-const { Title, Paragraph } = Typography
 
 // Custom crypto confetti function
 const triggerCryptoConfetti = () => {
@@ -78,6 +76,8 @@ const SetupPage = () => {
   const track = useTrack()
   const { data } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
   const isLive = data?.stream_online
+  const { data: steamStatus } = useSteamLinkedAccount()
+  const steamLinked = Boolean(steamStatus?.linked)
 
   const [active, setActive] = useState(0)
   const router = useRouter()
@@ -203,27 +203,12 @@ const SetupPage = () => {
     [],
   )
 
-  // Consolidated useEffect for confetti and payment notifications
   useEffect(() => {
-    // Track if confetti has been triggered in this effect run
-    let confettiTriggered = false
-
-    // Case 1: User reaches the final step
-    if (active === maxStepIndex && !didJustPay) {
-      triggerConfetti()
-      confettiTriggered = true
-    }
-
-    // Case 2: User just completed a payment
     if (didJustPay) {
-      // Only trigger confetti if it hasn't been triggered yet
-      if (!confettiTriggered) {
-        // Use crypto-themed confetti for crypto payments
-        if (paidWithCrypto) {
-          triggerCryptoConfetti()
-        } else {
-          triggerConfetti()
-        }
+      if (paidWithCrypto) {
+        triggerCryptoConfetti()
+      } else {
+        triggerConfetti()
       }
 
       // Create a more descriptive message based on the subscription type
@@ -282,7 +267,6 @@ const SetupPage = () => {
       )
     }
   }, [
-    active,
     didJustPay,
     isTrial,
     notification,
@@ -318,310 +302,8 @@ const SetupPage = () => {
     {
       title: 'Connect Steam',
       description: 'Auto-connects when you play',
-      content: (
-        <Card className='setup-complete-card'>
-          <div className='text-center mb-6'>
-            <Title level={2}>
-              <span role='img' aria-label='party popper'>
-                🎉
-              </span>{' '}
-              Technical Setup Done!{' '}
-              <span role='img' aria-label='party popper'>
-                🎉
-              </span>
-            </Title>
-            <div className='mb-4'>
-              <Progress
-                percent={75}
-                status='active'
-                strokeColor='#1890ff'
-                className='mb-2 max-w-md mx-auto'
-              />
-              <div className='text-center text-sm text-gray-400'>
-                Technical setup done &mdash; Steam connects automatically when you play
-              </div>
-            </div>
-
-            <div className='mb-6 flex justify-center'>
-              <div className='flex flex-wrap items-center justify-center gap-4 text-sm'>
-                <div className='flex items-center gap-1'>
-                  <AccessibleEmoji emoji='✅' label='Completed' className='text-green-500' />
-                  <span>Stream</span>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <AccessibleEmoji emoji='✅' label='Completed' className='text-green-500' />
-                  <span>Dota 2</span>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <AccessibleEmoji emoji='✅' label='Completed' className='text-green-500' />
-                  <span>OBS</span>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <AccessibleEmoji emoji='⏳' label='In Progress' className='text-yellow-500' />
-                  <span className='font-semibold'>Connect Steam</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {!isLive && (
-            <div className='flex flex-row items-center justify-center mb-6'>
-              <Alert
-                message='Your stream is offline'
-                description='Dotabod and Steam connection require your stream to be live.'
-                type='warning'
-                showIcon
-                className='max-w-2xl'
-              />
-            </div>
-          )}
-
-          <div className='flex flex-row items-center justify-center mb-6'>
-            <Alert
-              type='info'
-              showIcon
-              className='max-w-2xl'
-              message={
-                <span>
-                  <AccessibleEmoji emoji='⏳' label='Final Step' className='mr-2' />
-                  Final Step: Connect Your Steam Account
-                </span>
-              }
-              description={
-                <div>
-                  <div className='mb-2'>
-                    <strong>Stream Status:</strong>
-                    {isLive ? (
-                      <span className='ml-2 inline-flex items-center gap-1 text-green-500'>
-                        <AccessibleEmoji emoji='✅' label='Online' />
-                        Online - Ready to connect!
-                      </span>
-                    ) : (
-                      <span className='ml-2 inline-flex items-center gap-1 text-red-500'>
-                        <AccessibleEmoji emoji='❌' label='Offline' />
-                        Offline - Start streaming first
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    Play any match or demo a hero (while streaming) to connect your Steam account.
-                    This only needs to be done once!
-                  </div>
-                </div>
-              }
-            />
-          </div>
-
-          <div className='mb-6 text-center'>
-            <Title level={4}>
-              Technical setup finished!
-              <Image
-                className='inline ml-2'
-                alt='ok emote'
-                unoptimized
-                src='https://cdn.7tv.app/emote/61767e69ffc7244d797d22f4/1x.webp'
-                width={28}
-                height={28}
-              />
-            </Title>
-            <Paragraph>
-              Your Dotabod configuration is complete. Now connect your Steam account to start using
-              Dotabod.
-            </Paragraph>
-          </div>
-
-          <div className='mb-8'>
-            <Title level={4}>Complete Your Setup</Title>
-            <div className='flex flex-col md:flex-row gap-4 justify-center'>
-              <Card className='flex-1 hover:shadow-md transition-shadow'>
-                <Title level={5}>Connect Your Steam Account</Title>
-                <Paragraph>
-                  Play a match or demo a hero to connect your Steam account and complete your
-                  Dotabod setup.
-                </Paragraph>
-                {!isLive && (
-                  <Alert
-                    type='warning'
-                    showIcon
-                    message='Stream must be online to connect'
-                    className='mb-3'
-                  />
-                )}
-                <Link
-                  href='steam://run/570'
-                  onClick={() => {
-                    track('setup/launch_dota2_clicked')
-                    // Check if Steam protocol is supported, if not redirect to Steam store
-                    setTimeout(() => {
-                      const steamLaunched = document.hidden
-                      if (!steamLaunched) {
-                        window.open('https://store.steampowered.com/app/570/Dota_2/', '_blank')
-                      }
-                    }, 500)
-                  }}
-                >
-                  <Button type='primary' size='large' block>
-                    Launch Dota 2
-                  </Button>
-                </Link>
-              </Card>
-
-              <Card className='flex-1 hover:shadow-md transition-shadow'>
-                <Title level={5}>Verify Your Setup</Title>
-                <Paragraph>
-                  Check the live preview to confirm everything is working correctly. This will also
-                  connect your Steam account.
-                </Paragraph>
-                <Link href='/overlay'>
-                  <Button
-                    onClick={() => {
-                      track('setup/test_dotabod_clicked')
-                    }}
-                    size='large'
-                    block
-                  >
-                    Test Setup
-                  </Button>
-                </Link>
-              </Card>
-            </div>
-          </div>
-
-          <Collapse
-            onChange={() => {
-              track('setup/collapse_test_dotabod')
-            }}
-            accordion
-            defaultActiveKey={['1']}
-            items={[
-              {
-                key: '1',
-                label: 'How to connect your Steam account',
-                children: (
-                  <>
-                    {!isLive ? (
-                      <Alert
-                        type='error'
-                        showIcon
-                        className='mb-4'
-                        message='Your Twitch stream must be online to connect Steam'
-                        description='Steam accounts only connect when your stream is live. Start streaming first, then follow the steps below.'
-                      />
-                    ) : (
-                      <Alert
-                        type='success'
-                        showIcon
-                        className='mb-4'
-                        message='Your stream is online!'
-                        description="You're ready to connect your Steam account. Follow the steps below."
-                      />
-                    )}
-
-                    <Alert
-                      type='info'
-                      showIcon
-                      className='mb-4'
-                      message='Your Steam account connects automatically when you play.'
-                      description='After this first connection, all future matches and Steam accounts auto-connect - no setup needed!'
-                    />
-
-                    <div className='mb-4'>
-                      <strong>Choose one:</strong>
-                      <ol className='list-decimal list-inside mt-2 space-y-3'>
-                        <li>
-                          <strong>Quick 2-minute test:</strong> Demo any hero, type{' '}
-                          <Tag>!facet</Tag> in chat to confirm it works
-                        </li>
-                        <li>
-                          <strong>Skip testing:</strong> Just play your first match - your Steam
-                          account will connect automatically
-                        </li>
-                      </ol>
-                      {!isLive && (
-                        <div className='mt-3 text-yellow-500'>
-                          ⚠️ Remember: Your stream must be online for either option to work!
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='mb-4'>
-                      <strong>Verify it worked:</strong>
-                      <ol className='list-decimal list-inside mt-2 space-y-2'>
-                        <li>
-                          Visit the{' '}
-                          <Link
-                            href='/dashboard/features'
-                            className='text-blue-500 hover:underline'
-                          >
-                            Features page → MMR Tracker
-                          </Link>
-                        </li>
-                        <li>Your Steam account should appear with your avatar and MMR</li>
-                      </ol>
-                    </div>
-
-                    <Alert
-                      type='warning'
-                      showIcon
-                      className='mt-4'
-                      message="If your account doesn't appear after playing:"
-                      description={
-                        <div className='space-y-2'>
-                          <div className='flex items-center gap-2'>
-                            <AccessibleEmoji
-                              emoji='✅'
-                              label='Success'
-                              className='text-green-500'
-                            />
-                            <span>First, confirm your stream was online when you played</span>
-                          </div>
-                          <div className='flex items-center gap-2'>
-                            <AccessibleEmoji emoji='❌' label='Error' className='text-red-500' />
-                            <span>
-                              If yes and it still didn't work, the PowerShell script may have
-                              failed. Contact support with a screenshot of your PowerShell output.
-                            </span>
-                          </div>
-                          <div className='mt-2'>
-                            <Link href='/dashboard/help'>
-                              <Button size='small' type='primary'>
-                                Get Help
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      }
-                    />
-
-                    <div className='flex flex-col items-center justify-center mt-4'>
-                      <Image
-                        alt='crystal maiden demo hero'
-                        width={2384}
-                        height={1506}
-                        className='rounded-xl shadow-md'
-                        src='https://i.imgur.com/nJrBvdf.png'
-                      />
-                    </div>
-                  </>
-                ),
-              },
-            ]}
-          />
-
-          <div className='mt-8 text-center'>
-            <Title level={4}>Explore Dotabod Features</Title>
-            <Paragraph>
-              Discover all the powerful features Dotabod offers to enhance your streaming
-              experience.
-            </Paragraph>
-            <Link href='/dashboard/features'>
-              <Button size='large' type='primary'>
-                View All Features
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      ),
+      status: steamLinked ? ('finish' as const) : undefined,
+      content: <ConnectSteam isLive={isLive} />,
     },
   ]
 
@@ -673,7 +355,12 @@ const SetupPage = () => {
       />
 
       <div className='mb-4'>
-        <Progress percent={Math.round((active / (steps.length - 1)) * 100)} showInfo={false} />
+        <Progress
+          percent={Math.round(
+            (Math.min(active + (steamLinked ? 1 : 0), steps.length) / steps.length) * 100,
+          )}
+          showInfo={false}
+        />
       </div>
 
       <Steps

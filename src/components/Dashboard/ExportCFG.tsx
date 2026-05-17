@@ -1,16 +1,16 @@
 import { AppleOutlined, LinuxOutlined, WindowsOutlined } from '@ant-design/icons'
-import { Tabs } from 'antd'
+import { Alert, Button, Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import UnixInstaller from '@/components/Dashboard/UnixInstaller'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
-import { TierBadge } from './Features/TierBadge'
 import WindowsInstaller from './WindowsInstaller'
 
 function InstallPage() {
   const track = useTrack()
   const [activeKey, setActiveKey] = useState('windows')
+  const [autoRoutedToManual, setAutoRoutedToManual] = useState(false)
   const router = useRouter()
 
   const updateUrlWithGsiType = (newGsiType: 'windows' | 'manual') => {
@@ -50,12 +50,34 @@ function InstallPage() {
         updateUrlWithGsiType('windows')
       } else {
         updateUrlWithGsiType('manual')
+        setAutoRoutedToManual(true)
       }
     }
   }, [])
 
   return (
     <Card>
+      {autoRoutedToManual && activeKey === 'manual' && (
+        <Alert
+          type='info'
+          showIcon
+          className='mb-4 max-w-2xl'
+          message='Showing manual install for your operating system'
+          description={
+            <span>
+              The Automatic installer is Windows only. If you play Dota 2 on Windows,{' '}
+              <Button
+                type='link'
+                onClick={() => updateUrlWithGsiType('windows')}
+                className='p-0! h-auto! align-baseline!'
+              >
+                switch to the Automatic tab
+              </Button>{' '}
+              for a one-line install. Both options are free.
+            </span>
+          }
+        />
+      )}
       <Tabs
         onTabClick={(key) => {
           track('install_type/click', { label: key })
@@ -69,17 +91,13 @@ function InstallPage() {
         items={[
           {
             key: 'windows',
-            label: (
-              <span>
-                Automatic <TierBadge feature='autoInstaller' />
-              </span>
-            ),
+            label: 'Automatic (Windows)',
             children: <WindowsInstaller />,
             icon: <WindowsOutlined />,
           },
           {
             key: 'manual',
-            label: 'Manual',
+            label: 'Manual (Mac, Linux, or Windows fallback)',
             children: <UnixInstaller />,
             icon: (
               <>

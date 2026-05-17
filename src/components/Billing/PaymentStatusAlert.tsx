@@ -38,13 +38,13 @@ export const PaymentStatusAlert = () => {
 
       const response = await fetch(`/api/payment-status?invoiceId=${invoiceId}`)
       if (!response.ok) {
-        throw new Error('Failed to fetch payment status')
+        throw new Error("We couldn't reach the payment service.")
       }
 
       const data = await response.json()
       setPaymentStatus(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to check payment status')
+      setError(err instanceof Error ? err.message : "We couldn't check your payment status.")
     } finally {
       setLoading(false)
     }
@@ -82,11 +82,11 @@ export const PaymentStatusAlert = () => {
     return (
       <div className='mb-6'>
         <Alert
-          message='Checking payment status...'
+          message='Checking your payment…'
           description={
             <div className='flex items-center gap-2'>
               <Spin size='small' />
-              <span>Please wait while we verify your Bitcoin payment</span>
+              <span>Bitcoin payments usually confirm within a few minutes.</span>
             </div>
           }
           type='info'
@@ -100,13 +100,13 @@ export const PaymentStatusAlert = () => {
     return (
       <div className='mb-6'>
         <Alert
-          message='Unable to check payment status'
+          message="We couldn't check your payment"
           description={error}
           type='error'
           showIcon
           action={
             <Button size='small' onClick={() => fetchPaymentStatus(invoice as string)}>
-              Retry
+              Try again
             </Button>
           }
         />
@@ -164,12 +164,12 @@ export const PaymentStatusAlert = () => {
           <div className='flex gap-2'>
             {paymentStatus.statusInfo.canRetry && (
               <Button size='small' onClick={handleRetry}>
-                Get New Payment Link
+                Get a new payment link
               </Button>
             )}
             {paymentStatus.statusInfo.type === 'processing' && (
               <Button size='small' onClick={() => fetchPaymentStatus(paymentStatus.invoiceId)}>
-                Refresh Status
+                Refresh status
               </Button>
             )}
           </div>

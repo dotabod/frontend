@@ -11,8 +11,143 @@ import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { TierBadge } from './Features/TierBadge'
+import ObsProUpsell from './ObsProUpsell'
 import { ObsSetup } from './ObsSetup'
 import RegionalBlockingNote from './RegionalBlockingNote'
+
+const CopyInstructions = ({
+  copyURL,
+  track,
+}: {
+  copyURL: string
+  track: ReturnType<typeof useTrack>
+}) => (
+  <div className='flex flex-col items-center gap-4 md:flex-row'>
+    <CopyButton value={copyURL}>
+      {({ copied, copy }) => (
+        <Button
+          type='dashed'
+          className={clsx(copied && 'border-green-600! text-green-600!')}
+          onClick={() => {
+            copy()
+            track('overlay/copy_url')
+          }}
+        >
+          {copied ? 'Copied to clipboard!' : 'Copy your browser source URL'}
+        </Button>
+      )}
+    </CopyButton>
+    <div className='mt-4 gap-2 text-xs md:mt-0'>
+      <Tag color='red'>Warning</Tag>
+      <span>Do not share or show this URL on stream</span>
+    </div>
+  </div>
+)
+
+const ManualHeader = () => (
+  <>
+    <ObsProUpsell />
+    <div className='flex items-center gap-2'>
+      <Tag className='text-xs!'>Note</Tag>
+      <span>OBS and Streamlabs have the same instructions</span>
+    </div>
+  </>
+)
+
+const OBSVideo = ({ copyURL, track }: { copyURL: string; track: ReturnType<typeof useTrack> }) => (
+  <div className='space-y-2'>
+    <ManualHeader />
+    <CopyInstructions copyURL={copyURL} track={track} />
+    <p>Paste this into the URL field when making the browser source</p>
+    <div className='flex flex-col items-center space-y-4'>
+      <video
+        className='rounded-lg'
+        playsInline
+        width='630'
+        height='766'
+        controls
+        autoPlay
+        muted
+        loop
+      >
+        <source src='/images/setup/how-to-obs.mp4' type='video/mp4' />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+)
+
+const OBSText = ({ copyURL, track }: { copyURL: string; track: ReturnType<typeof useTrack> }) => (
+  <div className='space-y-2'>
+    <ManualHeader />
+    <p>
+      1. Let&apos;s see what our canvas resolution is set to. Open OBS Studio and go to File &gt;
+      Settings
+    </p>
+    <div className='flex flex-col items-center space-y-4'>
+      <Image
+        alt='dotabod browser source properties'
+        width={331}
+        unoptimized
+        height={292}
+        src='/images/setup/obs-step-1.png'
+      />
+    </div>
+
+    <p>
+      2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s usually 1920x1080 but you
+      could have a different one.
+    </p>
+    <div className='flex flex-col items-center space-y-4'>
+      <Image
+        alt='dotabod browser source properties'
+        width={544}
+        unoptimized
+        height={310}
+        src='/images/setup/obs-step-2.png'
+      />
+    </div>
+
+    <p>
+      3. Close the settings window. Now let&apos;s add the browser source. Under Sources click Add
+      &gt; Browser and press OK.
+    </p>
+
+    <div className='flex flex-col items-center space-y-4'>
+      <Image
+        alt='dotabod browser source properties'
+        width={572}
+        unoptimized
+        height={256}
+        src='/images/setup/obs-step-3.png'
+      />
+    </div>
+
+    <p>
+      4. Fill out the properties, entering your &quot;Base (Canvas) Resolution&quot; from Step 2
+      earlier. If you had 1920x1080, put 1920 for width, and 1080 for height.
+    </p>
+    <div className='ml-4 space-y-4'>
+      <p>
+        Copy and paste your personal URL into the URL field (1) for the browser source. Click OK to
+        save.
+      </p>
+
+      <CopyInstructions copyURL={copyURL} track={track} />
+    </div>
+
+    <div className='flex flex-col items-center space-y-4'>
+      <Image
+        alt='dotabod browser source properties'
+        unoptimized
+        width={635}
+        height={519}
+        src='/images/setup/obs-step-4.png'
+      />
+    </div>
+    <p>5. Right click the Dotabod browser source &gt; Transform &gt; Fit to screen.</p>
+  </div>
+)
 
 export default function OBSOverlay() {
   const user = useSession()?.data?.user
@@ -23,7 +158,6 @@ export default function OBSOverlay() {
   const router = useRouter()
 
   const updateUrlWithOverlayType = (newOverlayType: 'auto' | 'text' | 'video') => {
-    // Update the URL without adding a new history entry
     router.replace(
       {
         pathname: router.pathname,
@@ -31,7 +165,7 @@ export default function OBSOverlay() {
       },
       undefined,
       { shallow: true },
-    ) // `shallow: true` to not trigger data fetching methods again
+    )
   }
 
   useEffect(() => {
@@ -40,136 +174,6 @@ export default function OBSOverlay() {
       setActiveKey(parsedStep)
     }
   }, [router.query.overlayType])
-
-  const CopyInstructions = () => (
-    <div className='flex flex-col items-center gap-4 md:flex-row'>
-      <CopyButton value={copyURL}>
-        {({ copied, copy }) => (
-          <Button
-            type='dashed'
-            className={clsx(copied && 'border-green-600! text-green-600!')}
-            onClick={() => {
-              copy()
-              track('overlay/copy_url')
-            }}
-          >
-            {copied ? 'Copied to clipboard!' : 'Copy your browser source URL'}
-          </Button>
-        )}
-      </CopyButton>
-      <div className='mt-4 gap-2 text-xs md:mt-0'>
-        <Tag color='red'>Warning</Tag>
-        <span>Do not share or show this URL on stream</span>
-      </div>
-    </div>
-  )
-
-  const OBSVideo = () => (
-    <div className='space-y-2'>
-      <div className='flex items-center gap-2'>
-        <Tag className='text-xs!'>Note</Tag>
-        <span>OBS and Streamlabs have the same instructions</span>
-      </div>
-
-      <CopyInstructions />
-      <p>Paste this into the URL field when making the browser source</p>
-      <div className='flex flex-col items-center space-y-4'>
-        <video
-          className='rounded-lg'
-          playsInline
-          width='630'
-          height='766'
-          controls
-          autoPlay
-          muted
-          loop
-        >
-          <source src='/images/setup/how-to-obs.mp4' type='video/mp4' />
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    </div>
-  )
-
-  const OBSText = () => (
-    <div className='space-y-2'>
-      <div className='flex items-center gap-2'>
-        <Tag className='text-xs!'>Note</Tag>
-        <span>OBS and Streamlabs have the same instructions</span>
-      </div>
-
-      <p>
-        1. Let&apos;s see what our canvas resolution is set to. Open OBS Studio and go to File &gt;
-        Settings
-      </p>
-      <div className='flex flex-col items-center space-y-4'>
-        <Image
-          alt='dotabod browser source properties'
-          width={331}
-          unoptimized
-          height={292}
-          src='/images/setup/obs-step-1.png'
-        />
-      </div>
-
-      <p>
-        2. Remember your &quot;Base (Canvas) Resolution&quot;. It&apos;s usually 1920x1080 but you
-        could have a different one.
-      </p>
-      <div className='flex flex-col items-center space-y-4'>
-        <Image
-          alt='dotabod browser source properties'
-          width={544}
-          unoptimized
-          height={310}
-          src='/images/setup/obs-step-2.png'
-        />
-      </div>
-
-      <p>
-        3. Close the settings window. Now let&apos;s add the browser source. Under Sources click Add
-        &gt; Browser and press OK.
-      </p>
-
-      <div className='flex flex-col items-center space-y-4'>
-        <Image
-          alt='dotabod browser source properties'
-          width={572}
-          unoptimized
-          height={256}
-          src='/images/setup/obs-step-3.png'
-        />
-      </div>
-
-      <p>
-        4. Fill out the properties, entering your &quot;Base (Canvas) Resolution&quot; from Step 2
-        earlier. If you had 1920x1080, put 1920 for width, and 1080 for height.
-      </p>
-      <div className='ml-4 space-y-4'>
-        <p>
-          Copy and paste your personal URL into the URL field (1) for the browser source. Click OK
-          to save.
-        </p>
-
-        <CopyInstructions />
-
-        <div className='mt-4'>
-          <RegionalBlockingNote />
-        </div>
-      </div>
-
-      <div className='flex flex-col items-center space-y-4'>
-        <Image
-          alt='dotabod browser source properties'
-          unoptimized
-          width={635}
-          height={519}
-          src='/images/setup/obs-step-4.png'
-        />
-      </div>
-      <p>5. Right click the Dotabod browser source &gt; Transform &gt; Fit to screen.</p>
-    </div>
-  )
 
   return (
     <Card>
@@ -188,6 +192,7 @@ export default function OBSOverlay() {
         />
       </div>
       <div className='space-y-4 px-8 pb-8 text-sm text-gray-300'>
+        <RegionalBlockingNote />
         <Tabs
           defaultActiveKey={activeKey}
           activeKey={activeKey}
@@ -207,11 +212,15 @@ export default function OBSOverlay() {
               key: 'auto',
               children: <ObsSetup />,
             },
-            { label: 'Manual (text)', key: 'text', children: <OBSText /> },
+            {
+              label: 'Manual (text)',
+              key: 'text',
+              children: <OBSText copyURL={copyURL} track={track} />,
+            },
             {
               label: 'Manual (video)',
               key: 'video',
-              children: <OBSVideo />,
+              children: <OBSVideo copyURL={copyURL} track={track} />,
             },
           ]}
         />

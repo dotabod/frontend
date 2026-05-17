@@ -31,7 +31,7 @@ const DataPage = () => {
         body: JSON.stringify({ action: 'export' }),
       })
 
-      if (!response.ok) throw new Error('Failed to export data')
+      if (!response.ok) throw new Error("We couldn't export your data.")
 
       const data = await response.json()
 
@@ -46,9 +46,9 @@ const DataPage = () => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
 
-      message.success('Data exported successfully')
+      message.success('Your data export has been downloaded.')
     } catch (error) {
-      message.error('Failed to export data')
+      message.error("We couldn't export your data. Try again in a moment.")
       console.error(error)
     } finally {
       setLoading(null)
@@ -58,23 +58,24 @@ const DataPage = () => {
   const handleDeleteAccount = () => {
     track('delete_account')
     confirm({
-      title: 'Are you sure you want to delete your account?',
+      title: 'Delete your Dotabod account?',
       icon: <ExclamationCircleOutlined />,
       content: (
         <div>
-          <Paragraph>This action cannot be undone. This will:</Paragraph>
+          <Paragraph>This permanently:</Paragraph>
           <ul>
-            <li>Delete all your personal information</li>
-            <li>Remove all your settings and preferences</li>
-            <li>Cancel any active subscriptions</li>
-            <li>Delete your match history</li>
-            <li>Remove all connected accounts</li>
+            <li>Erases your profile, settings, and preferences</li>
+            <li>Cancels any active Dotabod subscription</li>
+            <li>Deletes your saved Dota 2 match history</li>
+            <li>Disconnects your Twitch and Steam accounts</li>
+            <li>Invalidates your overlay URL and Dota 2 token</li>
           </ul>
+          <Paragraph>You can't undo this.</Paragraph>
         </div>
       ),
-      okText: 'Yes, delete my account',
+      okText: 'Delete my account',
       okType: 'danger',
-      cancelText: 'No, keep my account',
+      cancelText: 'Keep my account',
       async onOk() {
         try {
           setLoading('delete')
@@ -84,12 +85,12 @@ const DataPage = () => {
             body: JSON.stringify({ action: 'delete' }),
           })
 
-          if (!response.ok) throw new Error('Failed to delete account')
+          if (!response.ok) throw new Error("We couldn't delete your account.")
 
-          message.success('Account deleted successfully', 0)
+          message.success('Your account has been deleted. Signing you out…', 0)
           signOut({ callbackUrl: '/', redirect: true })
         } catch (error) {
-          message.error('Failed to delete account')
+          message.error("We couldn't delete your account. Try again or contact support.")
           console.error(error)
         } finally {
           setLoading(null)
@@ -109,28 +110,24 @@ const DataPage = () => {
   return (
     <>
       <Head>
-        <title>Dotabod | Data Management</title>
+        <title>Dotabod | Your data</title>
       </Head>
       <Header
-        subtitle='You have the right to export or delete your personal data. Exporting data will
-                download all information we have about your account. Deleting your account will
-                permanently remove all your data from our servers.'
-        title='Data Management'
+        subtitle='Download a copy of everything we have about your account, or delete it for good. Both are one-click and you stay in control.'
+        title='Your data'
       />
 
       <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
-        <Card title={<span>Export Your Data</span>}>
+        <Card title={<span>Export your data</span>}>
           <Space direction='vertical' className='w-full' size='large'>
-            <Text>
-              Download a copy of all your personal data in JSON format. This includes your:
-            </Text>
+            <Text>You'll get a JSON file with:</Text>
             <ul className='list-disc pl-4 '>
-              <li>Account information</li>
-              <li>Preferences and settings</li>
+              <li>Account details</li>
+              <li>Settings and preferences</li>
               <li>Connected Twitch account</li>
               <li>Connected Steam accounts</li>
-              <li>Dota 2 match history</li>
-              <li>Approved managers</li>
+              <li>Saved Dota 2 match history</li>
+              <li>Approved team managers</li>
             </ul>
             <Button
               key='export'
@@ -139,28 +136,25 @@ const DataPage = () => {
               loading={loading === 'export'}
               block
             >
-              Export Data
+              Download my data
             </Button>
           </Space>
         </Card>
 
-        <Card title={<span>Delete Your Account</span>}>
+        <Card title={<span>Delete your account</span>}>
           <div className='subtitle'>
-            This action permanently removes all your data from our servers and cannot be undone.
+            Permanently removes everything we have about your account. You can't undo this.
           </div>
           <Space direction='vertical' className='w-full' size='large'>
-            <Text>This will delete your:</Text>
+            <Text>This will:</Text>
             <ul className='list-disc pl-4'>
-              <li>Personal information</li>
-              <li>Twitch connection</li>
-              <li>Settings</li>
-              <li>Stripe customer</li>
-              <li>Invalidate token for Dota 2 client</li>
-              <li>Invalidate overlay URL</li>
-              <li>Dota 2 match history</li>
-              <li>Approved managers</li>
-              <li>Steam accounts</li>
-              <li>Cancel active subscriptions</li>
+              <li>Erase your profile and settings</li>
+              <li>Disconnect Twitch and Steam</li>
+              <li>Cancel any active Dotabod subscription</li>
+              <li>Delete your saved Dota 2 match history</li>
+              <li>Remove approved team managers</li>
+              <li>Invalidate your overlay URL and Dota 2 token</li>
+              <li>Delete your Stripe customer record</li>
             </ul>
             <Button
               key='delete'
@@ -170,7 +164,7 @@ const DataPage = () => {
               loading={loading === 'delete'}
               block
             >
-              Delete Account
+              Delete my account
             </Button>
           </Space>
         </Card>
@@ -183,8 +177,8 @@ DataPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Data | Dotabod Dashboard',
-        description: 'View and manage the data associated with your Dotabod account.',
+        title: 'Your data | Dotabod Dashboard',
+        description: 'Export a copy of your Dotabod account data, or delete your account.',
         canonicalUrl: 'https://dotabod.com/dashboard/data',
         noindex: true,
       }}

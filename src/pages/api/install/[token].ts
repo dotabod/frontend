@@ -5,6 +5,7 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { buildGsiConfig } from '@/lib/gsiConfig'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -38,31 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const fileName = `gamestate_integration_dotabod-${response.name}.cfg`
-    const fileData = `"Dotabod Configuration"
-{
-  "uri" "${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}"
-  "timeout" "5.0"
-  "buffer" "0.5"
-  "throttle" "0.5"
-  "heartbeat" "30.0"
-  "data"
-  {
-    "abilities" "1"
-    "buildings" "1"
-    "events" "1"
-    "hero" "1"
-    "items" "1"
-    "map" "1"
-    "player" "1"
-    "provider" "1"
-    "wearables" "1"
-  }
-  "auth"
-  {
-    "token" "${userId}"
-  }
-}
-`
+    const fileData = buildGsiConfig(userId)
 
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`)
     res.setHeader('Content-Type', 'text/plain')

@@ -132,10 +132,10 @@ describe('Dashboard Billing Page', () => {
     render(<BillingPage />)
 
     expect(screen.getByRole('heading', { name: 'Billing' })).toBeInTheDocument()
-    expect(screen.getByText(/current subscription at a glance/i)).toBeInTheDocument()
+    expect(screen.getByText(/your current plan, renewal date/i)).toBeInTheDocument()
     expect(screen.getByTestId('billing-overview')).toBeInTheDocument()
     expect(screen.getByTestId('subscription-alerts')).toHaveTextContent('hideManageButton:true')
-    expect(screen.getByRole('heading', { name: 'Change plan' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Compare plans' })).toBeInTheDocument()
     expect(screen.getByTestId('billing-plans')).toBeInTheDocument()
   })
 

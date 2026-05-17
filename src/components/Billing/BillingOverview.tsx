@@ -54,7 +54,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
         <div className='space-y-4'>
           <div className='flex flex-wrap items-center gap-2'>
             <span className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
-              Current billing
+              Current plan
             </span>
             <span
               className={clsx(
@@ -80,7 +80,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
             onClick={onOpenPortal}
             disabled={isLoading}
           >
-            {isLoading ? 'Opening Stripe...' : summary.portalButtonLabel}
+            {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
           </Button>
         )}
       </div>
@@ -88,7 +88,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
       <div className='grid gap-4 border-t border-gray-800 pt-4 md:grid-cols-2'>
         <div className='space-y-1'>
           <div className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
-            What happens next
+            What's next
           </div>
           <div className='text-lg font-semibold text-gray-100'>{summary.nextStepValue}</div>
           <p className='text-sm text-gray-400'>{summary.nextStepLabel}</p>
@@ -96,7 +96,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
 
         <div className='space-y-1'>
           <div className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
-            Billing portal
+            Manage in Stripe
           </div>
           <div className='text-lg font-semibold text-gray-100'>{summary.portalSummaryLabel}</div>
           <p className='text-sm text-gray-400'>{summary.portalHelpText}</p>
@@ -109,7 +109,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
         </div>
       )}
 
-      <p className='text-sm text-gray-400'>Need a different plan? Compare the options below.</p>
+      <p className='text-sm text-gray-400'>Looking to change plans? Compare them below.</p>
     </Card>
   )
 }
