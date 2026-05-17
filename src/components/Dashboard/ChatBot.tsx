@@ -11,6 +11,7 @@ import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
+import { useSetupModStatus } from '@/lib/hooks/useSetupModStatus'
 import {
   STABLE_SWR_OPTIONS,
   useUpdateAccount,
@@ -109,11 +110,11 @@ export default function ChatBot() {
   const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`
   const track = useTrack()
   const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
-  const { error: makeDotabodModError, isLoading: makeDotabodModLoading } = useSWR(
-    hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null,
-    fetcher,
-    STABLE_SWR_OPTIONS,
-  )
+  // Pro: fire-and-forget the POST that adds dotabod as a moderator. We don't read its
+  // result anymore — current mod state comes from useSetupModStatus below — but the
+  // POST still needs to run so the auto-mod action happens for Pro users.
+  useSWR(hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null, fetcher, STABLE_SWR_OPTIONS)
+  const { data: modStatus } = useSetupModStatus()
   const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')
   const { error: updateEmoteSetError } = useSWR(
     hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,
@@ -218,7 +219,7 @@ export default function ChatBot() {
   const accountCount = accountData?.accounts?.length ?? 0
   const stepOneComplete =
     accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : !!mmr
-  const stepModComplete = !makeDotabodModLoading && !makeDotabodModError
+  const stepModComplete = Boolean(modStatus?.modded)
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor
   const stepFourComplete = user?.hasDotabodEmoteSet

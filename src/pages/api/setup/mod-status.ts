@@ -12,11 +12,10 @@ class HelixStatusError extends Error {
   }
 }
 
-// In-memory TTL cache so 1000 dashboard tabs polling at 15s don't multiply Twitch helix
-// traffic. Per-pod cache; fine as a soft rate-limiter. Verified state TTL is generous
-// because mod status rarely flips back during a session.
-const VERIFIED_TTL_MS = 5 * 60 * 1000
-const UNVERIFIED_TTL_MS = 60 * 1000
+// In-memory TTL cache so multiple dashboard tabs / rapid polling don't multiply Twitch
+// helix traffic. Per-pod cache; fine as a soft rate-limiter. 60s in either state keeps
+// the dashboard responsive to real mod / unmod events without hammering helix.
+const CACHE_TTL_MS = 60 * 1000
 const cache = new Map<string, { modded: boolean; expiresAt: number }>()
 
 async function isModerator(broadcasterId: string, accessToken: string): Promise<boolean> {
@@ -53,10 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json({ modded: false, reason: 'no_twitch_token' })
     }
     const modded = await isModerator(providerAccountId, accessToken)
-    cache.set(userId, {
-      modded,
-      expiresAt: Date.now() + (modded ? VERIFIED_TTL_MS : UNVERIFIED_TTL_MS),
-    })
+    cache.set(userId, { modded, expiresAt: Date.now() + CACHE_TTL_MS })
     return res.status(200).json({ modded })
   } catch (err) {
     // 401/403/404 from helix are expected user states (no scopes, deleted broadcaster) —

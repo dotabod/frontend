@@ -8,11 +8,13 @@ export type SetupModStatusResponse = {
 }
 
 const POLL_WHEN_UNVERIFIED_MS = 15000
+const POLL_WHEN_VERIFIED_MS = 60000
 
 export const useSetupModStatus = () =>
   useSWR<SetupModStatusResponse>('/api/setup/mod-status', fetcher, {
     ...SETTINGS_SWR_OPTIONS,
-    // Stop polling once verified — mod status rarely flips back mid-session, and a refresh
-    // picks up changes if it does. Saves a /min hit to Twitch helix per active dashboard.
-    refreshInterval: (latest) => (latest?.modded ? 0 : POLL_WHEN_UNVERIFIED_MS),
+    // Keep polling once verified so we catch unmod events; the backend has its own
+    // helix rate-limit cache so this stays cheap. Stopping entirely would leave the
+    // dashboard showing "verified" indefinitely after a real unmod.
+    refreshInterval: (latest) => (latest?.modded ? POLL_WHEN_VERIFIED_MS : POLL_WHEN_UNVERIFIED_MS),
   })
