@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { type ReactElement, useCallback, useEffect, useState } from 'react'
+import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 import ChatBot from '@/components/Dashboard/ChatBot'
 import ConnectSteam from '@/components/Dashboard/ConnectSteam'
@@ -15,9 +15,11 @@ import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
 import { fetcher } from '@/lib/fetcher'
+import { useSetupModStatus } from '@/lib/hooks/useSetupModStatus'
 import { useSteamLinkedAccount } from '@/lib/hooks/useSteamLinkedAccount'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { SETUP_SIGNAL_KEYS } from '@/lib/setupSignalKeys'
 import { useTrack } from '@/lib/track'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
 
@@ -70,14 +72,46 @@ const triggerCryptoConfetti = () => {
   frame()
 }
 
+type SettingsPayload = {
+  stream_online?: boolean
+  settings?: { key: string }[]
+}
+
 const SetupPage = () => {
   const session = useSession()
   const { notification } = App.useApp()
   const track = useTrack()
-  const { data } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
-  const isLive = data?.stream_online
   const { data: steamStatus } = useSteamLinkedAccount()
   const steamLinked = Boolean(steamStatus?.linked)
+  const { data: modStatus } = useSetupModStatus()
+  const modVerified = Boolean(modStatus?.modded)
+
+  // Folded into /api/settings to save one Vercel invocation per poll. The backend writes
+  // these rows on first GSI packet / first overlay socket; we only need their existence.
+  const { data } = useSWR<SettingsPayload>('/api/settings', fetcher, {
+    ...SETTINGS_SWR_OPTIONS,
+    refreshInterval: (latest) => {
+      const keys = latest?.settings
+      const gsi = keys?.some((s) => s.key === SETUP_SIGNAL_KEYS.gsi)
+      const overlay = keys?.some((s) => s.key === SETUP_SIGNAL_KEYS.overlay)
+      return gsi && overlay ? 0 : 10000
+    },
+  })
+  const isLive = Boolean(data?.stream_online)
+  const settingKeySet = useMemo(
+    () => new Set(data?.settings?.map((s) => s.key) ?? []),
+    [data?.settings],
+  )
+  const gsiVerified = settingKeySet.has(SETUP_SIGNAL_KEYS.gsi)
+  const overlayVerified = settingKeySet.has(SETUP_SIGNAL_KEYS.overlay)
+
+  const signals: { done: boolean; label: string }[] = [
+    { done: modVerified, label: 'Twitch mod' },
+    { done: gsiVerified, label: 'Game data' },
+    { done: overlayVerified, label: 'Overlay' },
+    { done: steamLinked, label: 'Steam' },
+  ]
+  const completedSignals = signals.filter((s) => s.done)
 
   const [active, setActive] = useState(0)
   const router = useRouter()
@@ -288,16 +322,19 @@ const SetupPage = () => {
       title: 'Stream',
       content: <ChatBot />,
       description: 'Connect your stream',
+      status: modVerified ? ('finish' as const) : undefined,
     },
     {
       title: 'Dota 2',
       content: <ExportCFG />,
       description: 'Configure game settings',
+      status: gsiVerified ? ('finish' as const) : undefined,
     },
     {
       title: 'OBS',
       content: <OBSOverlay />,
       description: 'Set up your overlay',
+      status: overlayVerified ? ('finish' as const) : undefined,
     },
     {
       title: 'Connect Steam',
@@ -356,11 +393,14 @@ const SetupPage = () => {
 
       <div className='mb-4'>
         <Progress
-          percent={Math.round(
-            (Math.min(active + (steamLinked ? 1 : 0), steps.length) / steps.length) * 100,
-          )}
+          percent={Math.round((completedSignals.length / signals.length) * 100)}
           showInfo={false}
         />
+        {completedSignals.length > 0 && (
+          <p className='text-xs text-gray-500 mt-1'>
+            {completedSignals.map((s) => `${s.label} verified`).join(', ')}
+          </p>
+        )}
       </div>
 
       <Steps
