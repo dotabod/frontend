@@ -339,8 +339,8 @@ const faqs = [
         steps={[
           <span key={0}>
             Chrome 142 and later asks for permission before connecting to your local network. When
-            Chrome prompts you to &quot;Look for and connect to any device on your local network&quot;,
-            click &quot;Allow&quot;.
+            Chrome prompts you to &quot;Look for and connect to any device on your local
+            network&quot;, click &quot;Allow&quot;.
           </span>,
           <span key={1}>
             Already denied the prompt? Re-enable it:
