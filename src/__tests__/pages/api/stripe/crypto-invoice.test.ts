@@ -197,6 +197,20 @@ describe('POST /api/stripe/crypto-invoice', () => {
     expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
   })
 
+  it('rejects a void Stripe invoice even when a reusable cached NOWPayments row exists', async () => {
+    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue({
+      hostedInvoiceUrl: 'https://nowpayments.io/payment/?iid=cached',
+      status: 'waiting',
+    })
+    mocks.stripe.invoices.retrieve.mockResolvedValue({ id: 'in_renew_1', status: 'void' })
+
+    const { req, res } = buildReq()
+    await handler(req, res)
+
+    expect(res._getStatusCode()).toBe(400)
+    expect(mocks.prisma.nowPaymentsInvoice.findUnique).not.toHaveBeenCalled()
+  })
+
   it('rejects impersonation', async () => {
     mocks.getServerSession.mockResolvedValue({
       user: { id: 'user_1', isImpersonating: true },

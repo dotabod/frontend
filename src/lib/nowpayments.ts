@@ -126,6 +126,9 @@ export function verifyNowPaymentsSignature(
   return crypto.timingSafeEqual(sigBuf, expBuf)
 }
 
+// Only 'finished' guarantees the funds are credited to our NOWPayments balance.
+// 'confirmed' (on-chain confirmed, not yet exchanged) and 'sending' (payout in
+// flight) are mid-flow and must NOT mark the Stripe invoice paid.
 export const NOWPAYMENTS_CONFIRMED_STATUSES = new Set<NowPaymentsStatus>(['finished'])
 export const NOWPAYMENTS_TERMINAL_STATUSES = new Set<NowPaymentsStatus>([
   'finished',

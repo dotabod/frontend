@@ -25,7 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const signature = req.headers['x-nowpayments-sig']
     const valid = verifyNowPaymentsSignature(body, signature)
     if (!valid) {
-      if (process.env.VERCEL_ENV === 'production') {
+      // Only local dev (NODE_ENV=development) may bypass for the simulator —
+      // Vercel preview deployments are publicly reachable and must reject.
+      if (process.env.NODE_ENV !== 'development') {
         console.error('NOWPayments invalid signature', { signature })
         res.status(400).json({ error: 'Invalid signature' })
         return
@@ -35,7 +37,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const payment = body as unknown as NowPaymentsPaymentStatus
     const stripeInvoiceId = payment.order_id
-    if (!stripeInvoiceId) {
+    const knownStatuses: ReadonlyArray<NowPaymentsPaymentStatus['payment_status']> = [
+      'waiting',
+      'confirming',
+      'confirmed',
+      'sending',
+      'partially_paid',
+      'finished',
+      'failed',
+      'refunded',
+      'expired',
+    ]
+    if (
+      typeof stripeInvoiceId !== 'string' ||
+      typeof payment.payment_id !== 'number' ||
+      !knownStatuses.includes(payment.payment_status)
+    ) {
+      console.warn('NOWPayments webhook missing required fields', {
+        hasOrderId: typeof stripeInvoiceId === 'string',
+        hasPaymentId: typeof payment.payment_id === 'number',
+        status: payment.payment_status,
+      })
       res.status(200).json({ message: 'OK' })
       return
     }

@@ -80,6 +80,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+      let invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+
+      if (invoice.status === 'void' || invoice.status === 'uncollectible') {
+        return res.status(400).json({
+          error: 'This invoice has been canceled. No payment is required.',
+        })
+      }
+
+      if (invoice.status !== 'draft' && invoice.status !== 'open') {
+        return res.status(400).json({
+          error: `Invoice is not in a payable state. Current status: ${invoice.status}`,
+        })
+      }
+
       const existing = await prisma.nowPaymentsInvoice.findUnique({
         where: { stripeInvoiceId: renewalInvoiceId },
       })
@@ -98,20 +112,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         await prisma.nowPaymentsInvoice.delete({
           where: { stripeInvoiceId: renewalInvoiceId },
-        })
-      }
-
-      let invoice = await stripe.invoices.retrieve(renewalInvoiceId)
-
-      if (invoice.status === 'void' || invoice.status === 'uncollectible') {
-        return res.status(400).json({
-          error: 'This invoice has been canceled. No payment is required.',
-        })
-      }
-
-      if (invoice.status !== 'draft' && invoice.status !== 'open') {
-        return res.status(400).json({
-          error: `Invoice is not in a payable state. Current status: ${invoice.status}`,
         })
       }
 

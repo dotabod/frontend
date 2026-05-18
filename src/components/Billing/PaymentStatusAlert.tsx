@@ -1,4 +1,4 @@
-import { Alert, Button, Spin } from 'antd'
+import { Alert, App, Button, Spin } from 'antd'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -26,6 +26,7 @@ interface PaymentStatus {
 
 export const PaymentStatusAlert = () => {
   const router = useRouter()
+  const { notification } = App.useApp()
   const { payment, crypto, invoice } = router.query
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null)
   const [loading, setLoading] = useState(false)
@@ -66,11 +67,21 @@ export const PaymentStatusAlert = () => {
   const handleRetry = async () => {
     try {
       const res = await fetch('/api/stripe/crypto-invoice', { method: 'POST' })
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({ error: res.statusText }))
+        throw new Error(errBody?.error || `Request failed: ${res.status}`)
+      }
       const { url } = await res.json()
-      if (url) window.location.href = url
+      if (!url) throw new Error('No payment URL returned')
+      window.location.href = url
     } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
       console.error('Failed to refresh crypto invoice URL', err)
+      notification.error({
+        message: 'Could not refresh payment link',
+        description: message,
+        placement: 'bottomRight',
+      })
     }
   }
 

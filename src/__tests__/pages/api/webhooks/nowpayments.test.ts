@@ -94,6 +94,24 @@ describe('POST /api/webhooks/nowpayments', () => {
     expect(res._getStatusCode()).toBe(400)
   })
 
+  it('rejects an invalid signature on Vercel preview deployments (not just production)', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('VERCEL_ENV', 'preview')
+    const { req, res } = buildReq(finishedBody, 'deadbeef')
+    await handler(req, res)
+    expect(res._getStatusCode()).toBe(400)
+    expect(mocks.processConfirmedNowPaymentsPayment).not.toHaveBeenCalled()
+  })
+
+  it('returns 200 OK for a signed but malformed payload missing required fields', async () => {
+    const bad = { foo: 'bar' }
+    const sig = sign(bad)
+    const { req, res } = buildReq(bad, sig)
+    await handler(req, res)
+    expect(res._getStatusCode()).toBe(200)
+    expect(mocks.prisma.nowPaymentsInvoice.findUnique).not.toHaveBeenCalled()
+  })
+
   it('returns 200 and ignores when the invoice is unknown', async () => {
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(null)
     const { req, res } = buildReq(finishedBody, sign(finishedBody))

@@ -99,9 +99,13 @@ describe('processConfirmedNowPaymentsPayment', () => {
       { idempotencyKey: 'nowpayments-np_inv_1' },
     )
     expect(mocks.handleInvoiceEvent).toHaveBeenCalledWith(paidInvoice, mocks.tx)
-    expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenLastCalledWith({
+    expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenCalledTimes(1)
+    expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenCalledWith({
       where: { nowPaymentsId: 'np_inv_1' },
-      data: {
+      data: expect.objectContaining({
+        status: 'finished',
+        paymentId: '9999',
+        payCurrency: 'usdttrc20',
         lastWebhookAt: expect.any(Date),
         metadata: expect.objectContaining({
           processedSuccessfully: true,
@@ -109,8 +113,22 @@ describe('processConfirmedNowPaymentsPayment', () => {
           nowPaymentsId: 'np_inv_1',
           paymentId: '9999',
         }),
-      },
+      }),
     })
+  })
+
+  it('does not flip status to finished when Stripe work fails', async () => {
+    mocks.stripe.invoices.retrieve.mockResolvedValue({ id: 'in_1', status: 'open' })
+    mocks.stripe.invoices.pay.mockResolvedValue({ id: 'in_1', status: 'paid' })
+    mocks.handleInvoiceEvent.mockResolvedValue(false)
+
+    await expect(processConfirmedNowPaymentsPayment(baseInvoice, basePayment)).rejects.toThrow()
+
+    // Failure update should NOT set status — it must only record metadata so the
+    // row remains at its prior status for the next webhook to retry against.
+    const failureCall = mocks.prisma.nowPaymentsInvoice.update.mock.calls.at(-1)?.[0]
+    expect(failureCall?.data?.status).toBeUndefined()
+    expect(failureCall?.data?.metadata).toMatchObject({ processedSuccessfully: false })
   })
 
   it('skips work that was already processed successfully', async () => {

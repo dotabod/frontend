@@ -50,17 +50,6 @@ export async function processConfirmedNowPaymentsPayment(
   let stripeInvoiceMarkedPaid = false
   let subscriptionCreated = false
 
-  await prisma.nowPaymentsInvoice.update({
-    where: { nowPaymentsId: invoice.nowPaymentsId },
-    data: {
-      status: payment.payment_status,
-      paymentId: String(payment.payment_id),
-      payCurrency: payment.pay_currency,
-      payAmount: payment.pay_amount,
-      actuallyPaid: payment.actually_paid,
-    },
-  })
-
   try {
     let stripeInvoice = await stripe.invoices.retrieve(invoice.stripeInvoiceId)
 
@@ -104,6 +93,11 @@ export async function processConfirmedNowPaymentsPayment(
     await prisma.nowPaymentsInvoice.update({
       where: { nowPaymentsId: invoice.nowPaymentsId },
       data: {
+        status: payment.payment_status,
+        paymentId: String(payment.payment_id),
+        payCurrency: payment.pay_currency,
+        payAmount: payment.pay_amount,
+        actuallyPaid: payment.actually_paid,
         lastWebhookAt: new Date(),
         metadata: {
           ...existingMetadata,
