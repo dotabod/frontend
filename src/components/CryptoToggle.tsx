@@ -96,8 +96,8 @@ const CryptoToggle = memo(
               <div className='max-w-xs'>
                 <p className='text-sm'>
                   {activePeriod === 'lifetime'
-                    ? 'Make a one-time payment with USDC stablecoin.'
-                    : "For recurring subscriptions, you'll receive invoices to pay with USDC stablecoin."}
+                    ? 'One-time payment in BTC, USDT, USDC, ETH, or 100+ other cryptocurrencies.'
+                    : "Each renewal, you'll receive an invoice to pay in BTC, USDT, USDC, ETH, or 100+ other cryptocurrencies."}
                 </p>
                 <p className='text-sm mt-2 text-amber-500'>
                   Note: Free trials are not available with crypto payments.

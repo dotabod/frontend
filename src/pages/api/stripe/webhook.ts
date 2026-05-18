@@ -28,7 +28,7 @@ const relevantEvents = new Set<Stripe.Event.Type>([
   'invoice.payment_failed',
   'invoice.marked_uncollectible',
   'invoice.overdue',
-  'invoice.paid', // Added for Boomfi crypto payments
+  'invoice.paid', // Fallback for invoices marked paid_out_of_band via crypto settlement
   'checkout.session.completed',
   'charge.succeeded',
   'charge.refunded',

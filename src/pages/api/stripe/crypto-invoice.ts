@@ -3,6 +3,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { featureFlags } from '@/lib/featureFlags'
+import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
 import { CRYPTO_PRICE_IDS } from '@/utils/subscription'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -79,10 +80,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      // Retrieve the invoice from Stripe
-      const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
+      let invoice = await stripe.invoices.retrieve(renewalInvoiceId)
 
-      // Check if the invoice is in a valid state for payment
       if (invoice.status === 'void' || invoice.status === 'uncollectible') {
         return res.status(400).json({
           error: 'This invoice has been canceled. No payment is required.',
@@ -95,26 +94,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       }
 
-      // If the invoice is a draft, finalize it first to generate the hosted invoice URL
-      if (invoice.status === 'draft') {
-        const finalizedInvoice = await stripe.invoices.finalizeInvoice(renewalInvoiceId)
-
-        // Check if we have a hosted invoice URL
-        if (!finalizedInvoice.hosted_invoice_url) {
-          throw new Error('No hosted invoice URL available after finalizing invoice')
+      const existing = await prisma.nowPaymentsInvoice.findUnique({
+        where: { stripeInvoiceId: renewalInvoiceId },
+      })
+      // Reuse only when the prior NOWPayments invoice is still payable.
+      // Terminal states (failed/refunded/expired) get a fresh URL.
+      const REUSABLE_STATUSES = new Set([
+        'waiting',
+        'confirming',
+        'confirmed',
+        'sending',
+        'partially_paid',
+      ])
+      if (existing) {
+        if (REUSABLE_STATUSES.has(existing.status)) {
+          return res.status(200).json({ url: existing.hostedInvoiceUrl })
         }
-
-        return res.status(200).json({ url: finalizedInvoice.hosted_invoice_url })
+        await prisma.nowPaymentsInvoice.delete({
+          where: { stripeInvoiceId: renewalInvoiceId },
+        })
       }
 
-      // If invoice is already open, use its existing hosted URL
-      if (!invoice.hosted_invoice_url) {
-        throw new Error('No hosted invoice URL available for this invoice')
+      if (invoice.status === 'draft') {
+        invoice = await stripe.invoices.finalizeInvoice(renewalInvoiceId)
       }
 
-      return res.status(200).json({ url: invoice.hosted_invoice_url })
+      const { url } = await createAndStoreCryptoInvoice({
+        stripeInvoice: invoice,
+        userId: session.user.id,
+        orderDescription: 'Dotabod subscription renewal',
+        metadata: { renewal: true },
+      })
+
+      return res.status(200).json({ url })
     } catch (error) {
-      console.error('Error processing invoice payment:', error)
+      console.error('Error processing crypto renewal invoice:', error)
       return res.status(500).json({ error: 'Failed to process invoice payment' })
     }
   } catch (error) {
