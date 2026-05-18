@@ -1,8 +1,11 @@
 pre-commit:
   commands:
     biome:
-      run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files} && git add {staged_files}
+      run: |
+        npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files} \
+          && git add {staged_files} \
+          && npx @biomejs/biome ci --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
 pre-push:
   commands:
     biome:
-      run: npx @biomejs/biome check --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {push_files}
+      run: npx @biomejs/biome ci --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {push_files}
