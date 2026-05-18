@@ -129,8 +129,8 @@ export default function ChatBot() {
   const router = useRouter()
 
   useEffect(() => {
-    const parsedMod = router.query.modType as string
-    const parsed7TV = router.query.sevenTvType as string
+    const parsedMod = router.query.modType
+    const parsed7TV = router.query.sevenTvType
 
     if (parsedMod === 'auto' || parsedMod === 'manual') {
       setActiveKeyMod(parsedMod)
@@ -236,8 +236,11 @@ export default function ChatBot() {
           onTabClick={(key) => {
             track('chatbot/change_mod_tab', { tab: key })
           }}
-          // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
-          onChange={(key: any) => updateUrlWithModType(key)}
+          onChange={(key) => {
+            if (key === 'auto' || key === 'manual') {
+              updateUrlWithModType(key)
+            }
+          }}
           items={[
             {
               label: (
@@ -380,8 +383,11 @@ export default function ChatBot() {
           onTabClick={(key) => {
             track('chatbot/change_7tv_tab', { tab: key })
           }}
-          // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
-          onChange={(key: any) => updateUrlWith7TVType(key)}
+          onChange={(key) => {
+            if (key === 'auto' || key === 'manual') {
+              updateUrlWith7TVType(key)
+            }
+          }}
           items={[
             {
               label: (

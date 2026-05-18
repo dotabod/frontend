@@ -27,9 +27,12 @@ export default function SceneSwitcher(): React.ReactNode {
 
   const loading = l0 || l1 || l2 || l3
 
-  const handleSceneName = useDebouncedCallback((value, updater) => {
-    updater(value)
-  }, 500)
+  const handleSceneName = useDebouncedCallback(
+    (value: string, updater: (newValue: string) => void) => {
+      updater(value)
+    },
+    500,
+  )
 
   const scenes = {
     [Settings['obs-minimap']]: {
@@ -100,8 +103,7 @@ export default function SceneSwitcher(): React.ReactNode {
                       placeholder={defaultSettings['obs-scene-switcher'][sceneKey]}
                       value={scene.value}
                       maxLength={200}
-                      // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
-                      onChange={(value: any) => handleSceneName(value, scene.update)}
+                      onChange={(value) => handleSceneName(value, scene.update)}
                       helpText={scene.helpText}
                     />
                   )}

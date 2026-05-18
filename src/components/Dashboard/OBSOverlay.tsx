@@ -169,7 +169,7 @@ export default function OBSOverlay() {
   }
 
   useEffect(() => {
-    const parsedStep = router.query.overlayType as string
+    const parsedStep = router.query.overlayType
     if (parsedStep === 'auto' || parsedStep === 'text' || parsedStep === 'video') {
       setActiveKey(parsedStep)
     }
@@ -200,8 +200,11 @@ export default function OBSOverlay() {
           onTabClick={(key) => {
             track('overlay/change_tab', { tab: key })
           }}
-          // biome-ignore lint/suspicious/noExplicitAny: Quick fix for type mismatch
-          onChange={(key: any) => updateUrlWithOverlayType(key)}
+          onChange={(key) => {
+            if (key === 'auto' || key === 'text' || key === 'video') {
+              updateUrlWithOverlayType(key)
+            }
+          }}
           items={[
             {
               label: (

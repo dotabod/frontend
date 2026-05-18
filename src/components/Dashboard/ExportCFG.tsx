@@ -26,7 +26,7 @@ function InstallPage() {
   }
 
   useEffect(() => {
-    const parsedStep = router.query.gsiType as string
+    const parsedStep = router.query.gsiType
     if (parsedStep === 'windows' || parsedStep === 'manual') {
       setActiveKey(parsedStep)
     }
@@ -86,7 +86,9 @@ function InstallPage() {
         defaultActiveKey={activeKey}
         activeKey={activeKey}
         onChange={(key) => {
-          updateUrlWithGsiType(key as 'windows' | 'manual')
+          if (key === 'windows' || key === 'manual') {
+            updateUrlWithGsiType(key)
+          }
         }}
         items={[
           {
