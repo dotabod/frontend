@@ -536,7 +536,10 @@ function Plan({
                   <ul className='list-disc pl-4 space-y-1'>
                     <li>You'll be charged for a new crypto-based {activePeriod} subscription</li>
                     <li>Your current regular subscription will be canceled</li>
-                    <li>Future payments will be made with cryptocurrency (USDC)</li>
+                    <li>
+                      Future payments can be made in BTC, USDT, USDC, ETH, or 100+ other
+                      cryptocurrencies
+                    </li>
                     <li>Your access to Pro features will continue uninterrupted</li>
                     <li className='text-amber-400'>
                       Crypto subscriptions do not auto-renew - you'll receive an invoice to pay

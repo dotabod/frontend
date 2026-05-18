@@ -63,10 +63,14 @@ export const PaymentStatusAlert = () => {
     }
   }, [payment, crypto, invoice, fetchPaymentStatus])
 
-  const handleRetry = () => {
-    if (paymentStatus?.invoice.id) {
-      // Redirect to the Stripe invoice page where they can get a new Bitcoin payment link
-      window.open(`https://invoice.stripe.com/${paymentStatus.invoice.id}`, '_blank')
+  const handleRetry = async () => {
+    try {
+      const res = await fetch('/api/stripe/crypto-invoice', { method: 'POST' })
+      if (!res.ok) throw new Error(await res.text())
+      const { url } = await res.json()
+      if (url) window.location.href = url
+    } catch (err) {
+      console.error('Failed to refresh crypto invoice URL', err)
     }
   }
 
@@ -86,7 +90,7 @@ export const PaymentStatusAlert = () => {
           description={
             <div className='flex items-center gap-2'>
               <Spin size='small' />
-              <span>Bitcoin payments usually confirm within a few minutes.</span>
+              <span>Crypto payments usually confirm within a few minutes.</span>
             </div>
           }
           type='info'

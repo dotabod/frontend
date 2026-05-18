@@ -5,7 +5,7 @@ import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { featureFlags } from '@/lib/featureFlags'
-import { generatePaylinkUrl } from '@/lib/paylink'
+import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 
@@ -208,9 +208,9 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     tx,
   } = params
 
-  // If this is a crypto payment, use the OpenNode flow with invoices
+  // If this is a crypto payment, use the NOWPayments hosted invoice flow
   if (isCryptoPayment) {
-    return await createOpenNodeInvoice({
+    return await createCryptoInvoice({
       customerId,
       priceId,
       isRecurring,
@@ -288,9 +288,10 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
 }
 
 /**
- * Creates an invoice with an OpenNode payment link for crypto payments
+ * Creates a Stripe invoice (for record-keeping) and a matching NOWPayments
+ * hosted invoice, then returns the NOWPayments-hosted checkout URL.
  */
-async function createOpenNodeInvoice(
+async function createCryptoInvoice(
   params: Omit<CheckoutSessionParams, 'isGift' | 'isCryptoPayment'>,
 ): Promise<string> {
   const {
@@ -343,7 +344,6 @@ async function createOpenNodeInvoice(
     }
   }
 
-  // Get subscription period and price details
   const { getCurrentPeriod } = await import('@/utils/subscription')
   const pricePeriod = getCurrentPeriod(priceId)
   const price = await stripe.prices.retrieve(priceId)
@@ -352,11 +352,9 @@ async function createOpenNodeInvoice(
     throw new Error('Price has no unit amount')
   }
 
-  // Set due date to 7 days from now
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 7)
 
-  // Create Stripe invoice
   const invoiceParams: Stripe.InvoiceCreateParams = {
     customer: customerId,
     collection_method: 'send_invoice',
@@ -369,28 +367,26 @@ async function createOpenNodeInvoice(
       locale,
       twitchId,
       isCryptoPayment: 'true',
-      paymentProvider: 'opennode',
-      stripePriceId: priceId, // Store the actual price ID for later retrieval
+      paymentProvider: 'nowpayments',
+      stripePriceId: priceId,
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       pricePeriod,
     },
     payment_settings: {
-      payment_method_types: [], // Disable Stripe payment methods
+      payment_method_types: [],
     },
   }
 
-  const invoice = await stripe.invoices.create(invoiceParams)
-
-  if (!invoice?.id) {
+  const stripeInvoice = await stripe.invoices.create(invoiceParams)
+  if (!stripeInvoice?.id) {
     throw new Error('Stripe invoice creation failed')
   }
 
-  // Add line item
   await stripe.invoiceItems.create({
     customer: customerId,
-    invoice: invoice.id,
+    invoice: stripeInvoice.id,
     price_data: {
       product: price.product as string,
       unit_amount: price.unit_amount,
@@ -398,30 +394,24 @@ async function createOpenNodeInvoice(
     },
   })
 
-  // Generate signed payment link (1 hour TTL)
-  const bitcoinPayLink = generatePaylinkUrl(invoice.id, 60)
-
-  // Update invoice with OpenNode payment link
-  await stripe.invoices.update(invoice.id, {
-    description: `Pay with Bitcoin: ${bitcoinPayLink}`,
-    footer: `Prefer Bitcoin? Click here: ${bitcoinPayLink}`,
-    custom_fields: [
-      {
-        name: 'Bitcoin Payment (OpenNode)',
-        value: bitcoinPayLink,
-      },
-    ],
-    metadata: {
-      ...invoiceParams.metadata,
-      bitcoin_pay_url: bitcoinPayLink,
-    },
-  })
-
-  // Finalize the invoice
-  await stripe.invoices.finalizeInvoice(invoice.id, {
+  const finalized = await stripe.invoices.finalizeInvoice(stripeInvoice.id, {
     auto_advance: false,
   })
 
-  // For crypto payments, finalize the invoice for record-keeping but return the bitcoin payment link directly
-  return bitcoinPayLink
+  const { url, nowPaymentsId } = await createAndStoreCryptoInvoice({
+    stripeInvoice: finalized,
+    userId,
+    orderDescription: `Dotabod ${pricePeriod} subscription`,
+    metadata: { pricePeriod, stripePriceId: priceId },
+  })
+
+  await stripe.invoices.update(stripeInvoice.id, {
+    metadata: {
+      ...invoiceParams.metadata,
+      nowpayments_invoice_id: nowPaymentsId,
+      nowpayments_invoice_url: url,
+    },
+  })
+
+  return url
 }
