@@ -5,14 +5,19 @@ import type { ICreateInvoice, ICreatePayment } from '@nowpaymentsio/nowpayments-
 
 const NOWPAYMENTS_BASE_URL = 'https://api.nowpayments.io/v1'
 
-if (!process.env.NOWPAYMENTS_API_KEY) {
-  throw new Error('NOWPAYMENTS_API_KEY is not set')
-}
-if (!process.env.NOWPAYMENTS_IPN_SECRET) {
-  throw new Error('NOWPAYMENTS_IPN_SECRET is not set')
+function getApiKey(): string {
+  const key = process.env.NOWPAYMENTS_API_KEY
+  if (!key) throw new Error('NOWPAYMENTS_API_KEY is not set')
+  return key
 }
 
-export type { ICreateInvoice, ICreatePayment, InvoiceReturn, GetPaymentStatusReturn }
+function getIpnSecret(): string {
+  const secret = process.env.NOWPAYMENTS_IPN_SECRET
+  if (!secret) throw new Error('NOWPAYMENTS_IPN_SECRET is not set')
+  return secret
+}
+
+export type { GetPaymentStatusReturn, ICreateInvoice, ICreatePayment, InvoiceReturn }
 
 export type CreateInvoiceParams = ICreateInvoice
 export type NowPaymentsInvoiceResponse = InvoiceReturn
@@ -47,7 +52,7 @@ async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown):
   const res = await fetch(`${NOWPAYMENTS_BASE_URL}${path}`, {
     method,
     headers: {
-      'x-api-key': process.env.NOWPAYMENTS_API_KEY as string,
+      'x-api-key': getApiKey(),
       'Content-Type': 'application/json',
     },
     body: body ? JSON.stringify(body) : undefined,
@@ -110,7 +115,7 @@ export function verifyNowPaymentsSignature(
   signature: string | string[] | undefined,
 ): boolean {
   if (!signature || Array.isArray(signature)) return false
-  const secret = process.env.NOWPAYMENTS_IPN_SECRET as string
+  const secret = getIpnSecret()
   const expected = crypto
     .createHmac('sha512', secret)
     .update(JSON.stringify(sortObject(body)))

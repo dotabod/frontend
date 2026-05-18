@@ -83,8 +83,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const existing = await prisma.nowPaymentsInvoice.findUnique({
         where: { stripeInvoiceId: renewalInvoiceId },
       })
+      // Reuse only when the prior NOWPayments invoice is still payable.
+      // Terminal states (failed/refunded/expired) get a fresh URL.
+      const REUSABLE_STATUSES = new Set([
+        'waiting',
+        'confirming',
+        'confirmed',
+        'sending',
+        'partially_paid',
+      ])
       if (existing) {
-        return res.status(200).json({ url: existing.hostedInvoiceUrl })
+        if (REUSABLE_STATUSES.has(existing.status)) {
+          return res.status(200).json({ url: existing.hostedInvoiceUrl })
+        }
+        await prisma.nowPaymentsInvoice.delete({
+          where: { stripeInvoiceId: renewalInvoiceId },
+        })
       }
 
       let invoice = await stripe.invoices.retrieve(renewalInvoiceId)

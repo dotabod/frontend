@@ -75,6 +75,12 @@ describe('POST /api/webhooks/nowpayments', () => {
     vi.stubEnv('VERCEL_ENV', 'production')
   })
 
+  it('rejects non-POST methods with 405', async () => {
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'GET' })
+    await handler(req, res)
+    expect(res._getStatusCode()).toBe(405)
+  })
+
   it('rejects an invalid signature in production', async () => {
     const { req, res } = buildReq(finishedBody, 'deadbeef')
     await handler(req, res)

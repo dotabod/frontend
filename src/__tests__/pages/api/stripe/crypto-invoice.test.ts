@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
     nowPaymentsInvoice: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      delete: vi.fn(),
     },
   },
   stripe: {
@@ -74,9 +75,10 @@ describe('POST /api/stripe/crypto-invoice', () => {
     mocks.prisma.subscription.findFirst.mockResolvedValue(cryptoSubscription)
   })
 
-  it('returns the cached NOWPayments invoice URL when one already exists', async () => {
+  it('returns the cached NOWPayments invoice URL when one already exists in a payable state', async () => {
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue({
       hostedInvoiceUrl: 'https://nowpayments.io/payment/?iid=existing',
+      status: 'waiting',
     })
     mocks.stripe.invoices.retrieve.mockResolvedValue({ id: 'in_renew_1', status: 'open' })
 
@@ -86,6 +88,34 @@ describe('POST /api/stripe/crypto-invoice', () => {
     expect(res._getStatusCode()).toBe(200)
     expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=existing')
     expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
+  })
+
+  it('discards a terminal-state cached invoice and creates a fresh one', async () => {
+    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue({
+      hostedInvoiceUrl: 'https://nowpayments.io/payment/?iid=stale',
+      status: 'expired',
+    })
+    mocks.prisma.nowPaymentsInvoice.delete.mockResolvedValue({})
+    mocks.stripe.invoices.retrieve.mockResolvedValue({
+      id: 'in_renew_1',
+      status: 'open',
+      customer: 'cus_1',
+      currency: 'usd',
+      amount_remaining: 1300,
+    })
+    mocks.createNowPaymentsInvoice.mockResolvedValue({
+      id: 6666,
+      invoice_url: 'https://nowpayments.io/payment/?iid=replacement',
+    })
+
+    const { req, res } = buildReq()
+    await handler(req, res)
+
+    expect(mocks.prisma.nowPaymentsInvoice.delete).toHaveBeenCalledWith({
+      where: { stripeInvoiceId: 'in_renew_1' },
+    })
+    expect(res._getStatusCode()).toBe(200)
+    expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=replacement')
   })
 
   it('creates a fresh NOWPayments invoice when none exists for this renewal', async () => {
@@ -102,6 +132,7 @@ describe('POST /api/stripe/crypto-invoice', () => {
       invoice_url: 'https://nowpayments.io/payment/?iid=fresh',
     })
     mocks.prisma.nowPaymentsInvoice.create.mockResolvedValue({})
+    mocks.prisma.nowPaymentsInvoice.delete.mockResolvedValue({})
 
     const { req, res } = buildReq()
     await handler(req, res)

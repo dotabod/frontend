@@ -10,6 +10,11 @@ import { processConfirmedNowPaymentsPayment } from '@/lib/nowpayments-payment'
 export const runtime = 'nodejs'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
   try {
     const body = req.body as Record<string, unknown>
     if (!body || typeof body !== 'object') {
