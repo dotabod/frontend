@@ -29,7 +29,9 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
 
   return (
     <fieldset className='flex flex-col sm:grid sm:grid-cols-3 rounded-lg'>
-      <legend className='sr-only'>Billing period</legend>
+      <legend className='contents'>
+        <span className='sr-only'>Billing period</span>
+      </legend>
       {periods.map((period) => (
         <div
           key={period}
