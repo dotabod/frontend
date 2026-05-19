@@ -734,6 +734,193 @@ const CommandDetail: Record<
       </div>
     ),
   },
+  commandGeo: {
+    key: 'commandGeo',
+    title: 'Player countries',
+    description: 'Shows the country flags of every player in the current match.',
+    cmd: '!geo',
+    alias: ['country', 'location'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!geo'
+        response='Playing with players from 🇰🇷 🇷🇺 🇪🇪 🇺🇸 🇱🇧 🇺🇸 🇨🇳 🇩🇪 🇧🇷 🇸🇪'
+      />
+    ),
+  },
+  commandLost: {
+    key: 'commandLost',
+    title: 'Manual loss resolution',
+    description:
+      'Manually resolve a bet as a loss when Dotabod disconnected before the match ended. Pass a match ID to resolve a specific past match (e.g. !lost 1234567).',
+    cmd: '!lost',
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!lost'
+        response='Match 7654321 manually resolved as LOST by @mod'
+      />
+    ),
+  },
+  commandWon: {
+    key: 'commandWon',
+    title: 'Manual win resolution',
+    description:
+      'Manually resolve a bet as a win when Dotabod disconnected before the match ended. Pass a match ID to resolve a specific past match (e.g. !won 1234567).',
+    cmd: '!won',
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!won'
+        response='Match 7654321 manually resolved as WON by @mod'
+      />
+    ),
+  },
+  commandToday: {
+    key: 'commandToday',
+    title: "Today's hero stats",
+    description: 'Shows wins and losses per hero played today.',
+    cmd: '!today',
+    alias: ['td'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!today'
+        response='Pudge 2-1 · Invoker 1-0 · Sniper 0-2 · 3W 3L (6 games)'
+      />
+    ),
+  },
+  commandRecent: {
+    key: 'commandWon',
+    title: 'Recent matches',
+    description:
+      'Lists the last 5 resolved matches from this stream with their match IDs, hero, and result. Shares the toggle with !won.',
+    cmd: '!recent',
+    alias: ['history', 'matches'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!recent'
+        response='Recent matches: 7654321 W (Pudge), 7654320 L (Invoker), 7654319 W (Sniper) 👌'
+      />
+    ),
+  },
+  commandUnresolved: {
+    key: 'commandWon',
+    title: 'Unresolved matches',
+    description:
+      'Lists matches from this stream that have no win/loss recorded yet. Use !won or !lost with the match ID to resolve. Shares the toggle with !won.',
+    cmd: '!unresolved',
+    alias: ['pending'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!unresolved'
+        response='2 unresolved match(es) 👌 Use !won or !lost with match ID: 7654321 (Pudge), 7654320 (Invoker)'
+      />
+    ),
+  },
+  commandStats: {
+    key: 'commandItems',
+    title: 'Live hero stats',
+    description:
+      'Shows live KDA, last hits, denies, gold, net worth, and level for a hero in the current match. Shares the toggle with !items.',
+    cmd: '!stats',
+    alias: ['stat', 'kda', 'lh', 'gold', 'networth', 'level'],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!stats marci'
+        response='(2m delay) Marci: KDA 8/2/14 · LH 142 · DN 11 · G 1,820 · NW 18,400 · LVL 21'
+      />
+    ),
+  },
+  commandMatch: {
+    title: 'Match ID',
+    description: 'Shows the match ID of the current game.',
+    cmd: '!match',
+    alias: ['matchid'],
+    allowed: 'all',
+    response: (props) => <TwitchChat {...props} command='!match' response='Match ID: 7654321' />,
+  },
+  commandSetdelay: {
+    title: 'Set stream delay',
+    description:
+      'Configures the Dotabod chat-delay buffer (in seconds). Use !setdelay 0 to remove the delay.',
+    cmd: '!setdelay 3',
+    alias: ['delay=', 'setstreamdelay', 'streamdelay='],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!setdelay 3'
+        response='Setting stream delay to: 3 seconds'
+      />
+    ),
+  },
+  commandFixdbl: {
+    title: 'Fix double down',
+    description:
+      'Toggles the doubledown status of the last match. Use this if Dotabod recorded a doubledown incorrectly.',
+    cmd: '!fixdbl',
+    alias: ['fixdd'],
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        modOnly
+        command='!fixdbl'
+        response='Changing this match to double down mmr: dotabuff.com/matches/7654321 Type !fixdd to undo'
+      />
+    ),
+  },
+  commandFriends: {
+    title: 'Friends (admin)',
+    description:
+      'Admin-only command that returns the current match ID. Not available to regular mods or chatters.',
+    cmd: '!friends',
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat {...props} modOnly command='!friends' response='Match ID: 7654321' />
+    ),
+  },
+  commandTest: {
+    title: 'Test (admin)',
+    description:
+      'Admin-only debug command used by Dotabod developers. Not available to regular mods or chatters.',
+    cmd: '!test',
+    allowed: 'mods',
+    response: (props) => (
+      <TwitchChat {...props} modOnly command='!test' response='cards! 7654321' />
+    ),
+  },
+  commandCount: {
+    title: 'Connection count',
+    description:
+      'Debug command showing how many streamers are connected to the Dotabod GSI and overlay servers.',
+    cmd: '!count',
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!count'
+        response='42 streamers connected to Dotabod GSI · 38 streamers using the overlay'
+      />
+    ),
+  },
 }
 
 export default CommandDetail

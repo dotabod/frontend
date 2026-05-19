@@ -161,6 +161,19 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   disableAutoClipping: SUBSCRIPTION_TIERS.FREE,
   autoCommandsOnMatchStart: SUBSCRIPTION_TIERS.PRO,
   discardZeroBets: SUBSCRIPTION_TIERS.PRO,
+  commandGeo: SUBSCRIPTION_TIERS.PRO,
+  commandLost: SUBSCRIPTION_TIERS.PRO,
+  commandWon: SUBSCRIPTION_TIERS.PRO,
+  commandToday: SUBSCRIPTION_TIERS.PRO,
+  commandRecent: SUBSCRIPTION_TIERS.PRO,
+  commandUnresolved: SUBSCRIPTION_TIERS.PRO,
+  commandStats: SUBSCRIPTION_TIERS.PRO,
+  commandMatch: SUBSCRIPTION_TIERS.FREE,
+  commandSetdelay: SUBSCRIPTION_TIERS.PRO,
+  commandFixdbl: SUBSCRIPTION_TIERS.FREE,
+  commandFriends: SUBSCRIPTION_TIERS.FREE,
+  commandTest: SUBSCRIPTION_TIERS.FREE,
+  commandCount: SUBSCRIPTION_TIERS.FREE,
 } as const
 
 export type FeatureTier = keyof typeof FEATURE_TIERS

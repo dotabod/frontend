@@ -43,6 +43,19 @@ export const commands = {
   commandMute: true,
   commandLastFm: false,
   commandOnly: false,
+  commandGeo: true,
+  commandLost: true,
+  commandWon: true,
+  commandToday: true,
+  commandRecent: true,
+  commandUnresolved: true,
+  commandStats: true,
+  commandMatch: true,
+  commandSetdelay: true,
+  commandFixdbl: true,
+  commandFriends: false,
+  commandTest: false,
+  commandCount: false,
 }
 export type CommandKeys = keyof typeof commands
 
