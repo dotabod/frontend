@@ -44,34 +44,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Check if user wants to pay with crypto and if feature is enabled
     const isCryptoPayment = paymentMethod === 'crypto' && featureFlags.enableCryptoPayments
 
-    // Handle customer and subscription logic in a transaction
-    const checkoutUrl = await prisma.$transaction(
+    // Keep this transaction narrow: production runs with connection_limit=1, so
+    // any external API call inside the callback holds the only pool connection
+    // and any nested non-tx prisma write deadlocks the pool.
+    const { customerId, subscriptionData } = await prisma.$transaction(
       async (tx) => {
         const customerId = await ensureCustomer(session.user, tx)
         const subscriptionData = await getSubscription(session.user.id, tx)
-        return await createCheckoutSession({
-          customerId,
-          priceId,
-          isRecurring,
-          isLifetime,
-          subscriptionData,
-          userId: session.user.id,
-          email: session.user.email ?? '',
-          name: session.user.name ?? '',
-          image: session.user.image ?? '',
-          locale: session.user.locale ?? '',
-          twitchId: session.user.twitchId ?? '',
-          referer: req.headers.referer,
-          isGift,
-          isCryptoPayment,
-          tx,
-        })
+        return { customerId, subscriptionData }
       },
       {
-        timeout: 30000, // Increase timeout to 30 seconds to handle gift subscription processing
+        timeout: 15000,
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
       },
     )
+
+    const checkoutUrl = await createCheckoutSession({
+      customerId,
+      priceId,
+      isRecurring,
+      isLifetime,
+      subscriptionData,
+      userId: session.user.id,
+      email: session.user.email ?? '',
+      name: session.user.name ?? '',
+      image: session.user.image ?? '',
+      locale: session.user.locale ?? '',
+      twitchId: session.user.twitchId ?? '',
+      referer: req.headers.referer,
+      isGift,
+      isCryptoPayment,
+    })
 
     return res.status(200).json({ url: checkoutUrl })
   } catch (error) {
@@ -186,7 +189,6 @@ interface CheckoutSessionParams {
   referer?: string
   isGift?: boolean
   isCryptoPayment: boolean
-  tx?: Prisma.TransactionClient
 }
 
 async function createCheckoutSession(params: CheckoutSessionParams): Promise<string> {
@@ -205,7 +207,6 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     referer,
     isGift,
     isCryptoPayment,
-    tx,
   } = params
 
   // If this is a crypto payment, use the NOWPayments hosted invoice flow
@@ -223,7 +224,6 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
       locale,
       twitchId,
       referer,
-      tx,
     })
   }
 
@@ -306,13 +306,12 @@ async function createCryptoInvoice(
     image,
     locale,
     twitchId,
-    tx,
   } = params
 
   // Cancel any pending crypto invoices if this is an upgrade
-  if (subscriptionData?.stripePriceId && tx) {
+  if (subscriptionData?.stripePriceId) {
     try {
-      const existingSubscription = await tx.subscription.findFirst({
+      const existingSubscription = await prisma.subscription.findFirst({
         where: {
           userId,
           stripeCustomerId: customerId,
