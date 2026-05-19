@@ -81,18 +81,13 @@ model User {
   NowPaymentsInvoice                NowPaymentsInvoice[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
-  @@index([id], map: "idx_users_on_id")
-  @@index([name], map: "idx_users_on_name")
   @@index([locale])
   @@index([stream_online])
   @@index([mmr(sort: Desc)], map: "idx_users_mmr_desc")
   @@index([stream_online, mmr(sort: Desc)], map: "idx_users_stream_online_mmr_desc")
   @@index([hideFromLeaderboard])
-  @@index([kickUsername])
   @@index([lastStreamCheck])
   @@index([streamPlatform])
-  @@index([twitchUsername])
-  @@index([youtubeChannelId])
   @@map("users")
 }
 
