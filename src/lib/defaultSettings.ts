@@ -42,7 +42,7 @@ export const commands = {
   commandDotabod: true,
   commandMute: true,
   commandLastFm: false,
-  commandOnly: false,
+  commandOnly: true,
   commandGeo: true,
   commandLost: true,
   commandWon: true,

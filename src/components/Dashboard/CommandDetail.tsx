@@ -27,7 +27,7 @@ const CommandDetail: Record<
         {...props}
         modOnly
         command='!toggle'
-        response='Will no longer watch game events nor respond to commands. Type !toggle again to enable.'
+        response='Dotabod is now disabled. Will no longer respond to commands nor watch game events. Type !toggle again to enable.'
       />
     ),
   },
@@ -35,7 +35,7 @@ const CommandDetail: Record<
     title: 'Online or offline status',
     description: 'Updates the status of your stream that Dotabod sees to online or offline.',
     cmd: '!online',
-    alias: ['offline', 'forceonline', 'forceoffline'],
+    alias: ['offline'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -74,8 +74,8 @@ const CommandDetail: Record<
         command='!fixparty'
         modOnly
         responses={[
-          'Changing this match to party mmr: dotabuff.com/matches/1234567.',
-          'Updated MMR to 3090, -10',
+          'Changing this match to party mmr: dotabuff.com/matches/1234567 Type !fixparty to undo',
+          'Updated MMR to 3090',
         ]}
       />
     ),
@@ -124,7 +124,7 @@ const CommandDetail: Record<
         {...props}
         modOnly
         command='!beta'
-        response='You are now a beta tester. Visit discord.dotabod.com to see the beta features. Type !beta to undo'
+        response='<channel> is now a beta tester. Visit discord.dotabod.com to see the beta features. Type !beta to undo'
       />
     ),
   },
@@ -146,7 +146,7 @@ const CommandDetail: Record<
     description:
       'Only allow mods to send messages in chat. Turns sub only mode on and deletes messages from subs.',
     cmd: '!modsonly',
-    alias: [],
+    alias: ['modsonlyoff', 'modsonlyon'],
     allowed: 'mods',
     response: (props) => (
       <TwitchChat
@@ -253,7 +253,9 @@ const CommandDetail: Record<
     cmd: '!xpm',
     alias: [],
     allowed: 'all',
-    response: (props) => <TwitchChat {...props} command='!xpm' response='Live XPM: 778' />,
+    response: (props) => (
+      <TwitchChat {...props} command='!xpm' response='Live XPM for Pudge: 778' />
+    ),
   },
   commandWL: {
     key: 'commandWL',
@@ -304,7 +306,7 @@ const CommandDetail: Record<
       <TwitchChat
         {...props}
         command='!gpm'
-        response='Live GPM: 660. 5270 from hero kills, 9295 from creep kills.'
+        response='Live GPM for Pudge: 660. 5270 from hero kills, 9295 from creep kills.'
       />
     ),
   },
@@ -315,7 +317,9 @@ const CommandDetail: Record<
     cmd: '!apm',
     alias: [],
     allowed: 'all',
-    response: (props) => <TwitchChat {...props} command='!apm' response='Live APM: 123' />,
+    response: (props) => (
+      <TwitchChat {...props} command='!apm' response='Live APM for Pudge: 123 Chatting' />
+    ),
   },
 
   commandNP: {
@@ -323,7 +327,7 @@ const CommandDetail: Record<
     title: 'Notable players',
     description: 'Find out if your match has any pros.',
     cmd: '!np',
-    alias: ['who', 'players'],
+    alias: [],
     allowed: 'all',
     response: (props, all = true) => (
       <div className='space-y-6'>
@@ -428,7 +432,7 @@ const CommandDetail: Record<
     alias: ['lastgame'],
     allowed: 'all',
     response: (props) => (
-      <TwitchChat {...props} command='!lg' response='Rubick played as Crystal Maiden' />
+      <TwitchChat {...props} command='!lg' response='Rubick was Crystal Maiden' />
     ),
   },
   commandPing: {
@@ -449,7 +453,7 @@ const CommandDetail: Record<
       <TwitchChat
         {...props}
         command='!dotabod'
-        response={`I'm an open source bot made by @techleed. More info: https://${window.location.host}/dotabod.com`}
+        response={`I'm an open source bot made by @techleed. Get Dotabod for your stream: https://${window.location.host}`}
       />
     ),
   },
@@ -464,7 +468,7 @@ const CommandDetail: Record<
       <TwitchChat
         {...props}
         command='!lgs'
-        response='Last game: won · 47m long · Ended 4m ago · dotabuff.com/matches/6945205'
+        response='Won last game · 6/3/12 on Pudge · 47m long · dotabuff.com/matches/6945205'
       />
     ),
   },
@@ -473,19 +477,19 @@ const CommandDetail: Record<
     title: 'Profile',
     description: 'Shows the profile link for the hero color you specify during a live match.',
     cmd: '!profile',
-    alias: ['stats', 'check'],
+    alias: [],
     allowed: 'all',
     response: (props) => (
       <>
         <TwitchChat
           {...props}
           command='!profile blue'
-          response="Here's blue: dotabuff.com/matches/1234567."
+          response="Here's blue: dotabuff.com/players/1234567"
         />
         <TwitchChat
           {...props}
           command='!profile ?'
-          response='Invalid hero color. Must be 1-10 or one of Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown'
+          response='Invalid hero color, slot, or name. Try 1-10, a partial hero name, or a color from Blue Teal Purple Yellow Orange Pink Olive Light Blue Green Brown'
         />
       </>
     ),
@@ -504,7 +508,7 @@ const CommandDetail: Record<
         <TwitchChat
           {...props}
           command='!hero'
-          response='Winrate: 53% as Pudge in 30d of 41 matches. '
+          response='Winrate is 53% on Pudge in 30d from 41 matches.'
         />
       </>
     ),
@@ -528,11 +532,11 @@ const CommandDetail: Record<
     key: 'commandDelay',
     title: 'Stream delay',
     description: 'Tells chat the Dotabod bot delay you configured from the features page.',
-    cmd: 'delay!',
+    cmd: '!delay',
     alias: ['streamdelay'],
     allowed: 'all',
     response: (props) => (
-      <TwitchChat {...props} command='delay!' response='Stream delay: 3 seconds' />
+      <TwitchChat {...props} command='!delay' response='Stream delay: 3 seconds' />
     ),
   },
   commandRosh: {
@@ -540,7 +544,7 @@ const CommandDetail: Record<
     title: 'Roshan and aegis',
     description: 'Tells chat the current roshan and aegis status.',
     cmd: '!rosh',
-    alias: ['aegis'],
+    alias: ['roshan', 'aegis'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat {...props} command='!rosh' response={chatterInfo.roshanKilled.message} />
@@ -619,7 +623,7 @@ const CommandDetail: Record<
     title: 'Win Probability',
     description: 'Shows the current win probability for the game.',
     cmd: '!wp',
-    alias: [],
+    alias: ['winprobability', 'win%'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -634,7 +638,7 @@ const CommandDetail: Record<
     title: 'Spectator Count',
     description: 'Displays the number of spectators currently watching the match live.',
     cmd: '!spectators',
-    alias: [],
+    alias: ['specs'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -694,7 +698,7 @@ const CommandDetail: Record<
     title: 'Last.fm Now Playing',
     description: 'Show what music you are currently listening to on Last.fm.',
     cmd: '!song',
-    alias: ['music'],
+    alias: ['lastfm', 'music', 'nowplaying'],
     allowed: 'all',
     response: (props) => (
       <TwitchChat
@@ -717,7 +721,7 @@ const CommandDetail: Record<
           {...props}
           modOnly
           command='!only immortal'
-          response='Verified mode is now enabled. Only Immortal or higher ranks can chat.'
+          response='Verified mode is now enabled. Only Immortal or higher ranks can chat. Visit dotabod.com/verified to become Dotabod verified.'
         />
         <TwitchChat
           {...props}
@@ -729,7 +733,7 @@ const CommandDetail: Record<
           {...props}
           modOnly
           command='!only status'
-          response='Verified mode is currently enabled. Only Immortal+ ranks can chat.'
+          response='Verified mode is currently enabled. Only Immortal+ ranks can chat. Visit dotabod.com/verified to become Dotabod verified.'
         />
       </div>
     ),
