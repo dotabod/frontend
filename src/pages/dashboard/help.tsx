@@ -1,7 +1,8 @@
-import { MessageOutlined } from '@ant-design/icons'
+import { MessageOutlined, SearchOutlined } from '@ant-design/icons'
 import {
   Alert,
   Button,
+  Collapse,
   Divider,
   Form,
   Input,
@@ -17,19 +18,19 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import type React from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import {
-  PowerShellFailureMessage,
+  CfgLocationNote,
+  LiveRequiredNote,
+  PowerShellFailureSteps,
   PowerShellSetupStep,
-  PowerShellTroubleshootingContent,
 } from '@/components/Dashboard/PowerShellTroubleshooting'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
-import { STEAM_CONNECTION_MESSAGES } from '@/lib/steamConnectionMessages'
 import { Card } from '@/ui/card'
 
 // Define form values interface
@@ -68,26 +69,33 @@ export const StepComponent: React.FC<{
   )
 }
 
-const faqs = [
+type FaqCategory = 'steam' | 'overlay' | 'chat' | 'setup' | 'concepts'
+
+interface Faq {
+  id: string
+  category: FaqCategory
+  question: string
+  keywords: string[]
+  answer: ReactNode
+}
+
+const categoryOrder: { id: FaqCategory; label: string }[] = [
+  { id: 'steam', label: 'Steam & MMR' },
+  { id: 'overlay', label: 'Overlay' },
+  { id: 'chat', label: 'Chat & testing' },
+  { id: 'setup', label: 'Setup & connection' },
+  { id: 'concepts', label: 'Good to know' },
+]
+
+const faqs: Faq[] = [
   {
-    question: 'How do I connect my Steam account?',
+    id: 'steam-connect',
+    category: 'steam',
+    question: "Steam won't connect",
+    keywords: ['steam', 'connect', 'mmr', 'account', 'facet', 'powershell', 'cfg', 'gsi'],
     answer: (
-      <div>
-        <Alert
-          type='warning'
-          showIcon
-          className='mb-3'
-          message='Your stream must be live for Steam to connect'
-          description="Steam only connects while you're streaming on Twitch."
-        />
-
-        <Alert
-          type='info'
-          showIcon
-          className='mb-3'
-          message='Steam connects automatically the next time you play.'
-        />
-
+      <div className='flex flex-col gap-3'>
+        <LiveRequiredNote />
         <StepComponent
           steps={[
             <span key={0}>
@@ -110,80 +118,103 @@ const faqs = [
                 should appear there with your avatar and MMR.
               </div>
             </span>,
-            <span key={3}>
-              <strong>All set</strong>
-              <div className='mt-1 text-sm'>{STEAM_CONNECTION_MESSAGES.autoConnectOffline}</div>
-            </span>,
           ]}
         />
-
         <Alert
           type='error'
           showIcon
-          className='mt-4'
-          message='Played while streaming, but your account still isn’t showing?'
-          description={<PowerShellTroubleshootingContent />}
+          message='Still not connecting after you played while live?'
+          description={
+            <StepComponent
+              hideTitle
+              steps={[
+                <PowerShellSetupStep key={0} />,
+                <span key={1}>
+                  <strong>Check the cfg file location</strong>
+                  <div className='mt-1 text-sm'>
+                    The cfg file may be in the wrong folder.{' '}
+                    <Link href='/dashboard?step=2'>Follow Step 2</Link> again. <CfgLocationNote />
+                  </div>
+                </span>,
+                <span key={2}>
+                  <strong>Check for an account conflict</strong>
+                  <div className='mt-1 text-sm'>
+                    Your Steam account may be linked to another Dotabod user. Only one user can link
+                    a Steam account at a time. Open{' '}
+                    <Link href='/dashboard/features'>the MMR tracker on the Features page</Link> to
+                    see who's currently using it. Ask them to remove the link, or use the support
+                    form below for help unlinking.
+                  </div>
+                </span>,
+                <span key={3}>
+                  <strong>Still not working?</strong>
+                  <div className='mt-1 text-sm'>
+                    <PowerShellFailureSteps />
+                  </div>
+                </span>,
+              ]}
+            />
+          }
         />
       </div>
     ),
   },
   {
-    question: 'How do I test that it works?',
+    id: 'steam-mmr',
+    category: 'steam',
+    question: 'MMR isn’t tracking',
+    keywords: ['mmr', 'rank', 'tracking', 'starting value'],
     answer: (
-      <StepComponent
-        steps={[
-          <span key={1}>
-            Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can type.
-          </span>,
-          <span key={2}>
-            Spectate a live pro match and type <Tag>!np</Tag> to confirm Dotabod responds with the
-            notable players.
-          </span>,
-        ]}
-      />
+      <span>
+        <Link href='/dashboard/features'>Enter your current MMR</Link> on the Features page so we
+        have a starting value.
+      </span>
     ),
   },
   {
-    question: "Overlay stuck, won't update?",
+    id: 'overlay',
+    category: 'overlay',
+    question: 'Overlay isn’t showing or won’t update',
+    keywords: [
+      'overlay',
+      'obs',
+      'browser source',
+      'blank',
+      'stuck',
+      'refresh',
+      'cloudflare',
+      'gsi',
+    ],
     answer: (
       <StepComponent
         steps={[
-          <span key={0}>In OBS, click Refresh on the Dotabod browser source.</span>,
-          'Restart OBS.',
+          'In OBS, click Refresh on the Dotabod browser source.',
           'Confirm your stream is live.',
-          'Try the steps under "Overlay not showing anything?"',
-        ]}
-      />
-    ),
-  },
-  {
-    question: 'Overlay not showing anything?',
-    answer: (
-      <StepComponent
-        steps={[
           'Remove the Dotabod browser source in OBS, then add it again.',
           'In OBS, right-click the Dotabod browser source, then choose Transform, then Fit to content.',
-          <span key={3}>
-            Check your OBS version. OBS 31 and later can show blank overlays due to a Chromium
-            change. If that's you:
+          "In OBS, move the Dotabod browser source above your other sources so they don't cover it.",
+          <span key={5}>
+            <strong>Using OBS 31 or later?</strong> A Chromium change in OBS 31+ can show blank
+            overlays. If that's you:
             <div className='mt-2'>
               <a
                 href='https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe'
                 target='_blank'
                 rel='noreferrer'
-                className='text-blue-500 hover:underline'
               >
                 Download OBS 30.2.3
               </a>{' '}
               and run the installer. You don't need to uninstall first.
             </div>
           </span>,
-          <span key={4}>
-            Check the cfg file location. It belongs in <Tag>/gamestate_integration/</Tag>, not{' '}
-            <Tag>/cfg/</Tag>.
+          <span key={6}>
+            <strong>Check the cfg file location.</strong>
+            <div className='mt-1 text-sm'>
+              <CfgLocationNote />
+            </div>
           </span>,
-          'Restart the Dota client and Steam.',
-          <span key={5}>
+          'Restart OBS, the Dota client, and Steam.',
+          <span key={8}>
             <strong>Regional blocking note</strong>
             <div className='mt-1 text-sm'>
               Some ISPs and networks block Cloudflare, which can hide the overlay. If that's you,
@@ -192,7 +223,6 @@ const faqs = [
                 href='https://github.com/Flowseal/zapret-discord-youtube'
                 target='_blank'
                 rel='noreferrer'
-                className='text-blue-500 hover:underline'
               >
                 zapret-discord-youtube
               </a>
@@ -203,20 +233,21 @@ const faqs = [
                 href='https://github.com/Flowseal/zapret-discord-youtube/releases/tag/1.9.0b'
                 target='_blank'
                 rel='noreferrer'
-                className='text-blue-500 hover:underline'
               >
                 v1.9.0b
               </a>
               .
             </div>
           </span>,
-          "In OBS, move the Dotabod browser source above your other sources so they don't cover it.",
         ]}
       />
     ),
   },
   {
-    question: "Dotabod won't talk in chat?",
+    id: 'chat-talk',
+    category: 'chat',
+    question: "Dotabod won't talk in chat",
+    keywords: ['chat', 'talk', 'ban', 'unban', 'ping', 'rejoin'],
     answer: (
       <StepComponent
         steps={[
@@ -232,108 +263,29 @@ const faqs = [
     ),
   },
   {
-    question: "Dotabod can't find my Steam ID after I played?",
+    id: 'chat-test',
+    category: 'chat',
+    question: 'How do I test that it works?',
+    keywords: ['test', 'ping', 'np', 'notable players', 'works'],
     answer: (
-      <div>
-        <Alert
-          type='warning'
-          showIcon
-          className='mb-3'
-          message='First, confirm your stream was live when you played'
-          description='Steam only connects while your Twitch stream is live. If you were offline, start streaming and play again.'
-        />
-        <StepComponent
-          steps={[
-            <PowerShellSetupStep key={0} />,
-            <span key={1}>
-              <strong>Check the cfg file location</strong>
-              <div className='mt-1 text-sm'>
-                The cfg file may be in the wrong folder.{' '}
-                <Link href='/dashboard?step=2'>Follow Step 2</Link> again. It belongs in{' '}
-                <Tag>/gamestate_integration/</Tag>, not <Tag>/cfg/</Tag>. Restart Dota after moving
-                the file.
-              </div>
-            </span>,
-            <span key={2}>
-              <strong>Check for an account conflict</strong>
-              <div className='mt-1 text-sm'>
-                Your Steam account may be linked to another Dotabod user. Only one user can link a
-                Steam account at a time. Open{' '}
-                <Link href='/dashboard/features'>the MMR tracker on the Features page</Link> to see
-                who's currently using it. Ask them to remove the link, or{' '}
-                <Link href='/dashboard/help'>contact support</Link> for help unlinking.
-              </div>
-            </span>,
-            <span key={3}>
-              <strong>Still not working?</strong>
-              <div className='mt-1 text-sm'>
-                <PowerShellFailureMessage />
-              </div>
-            </span>,
-          ]}
-        />
-      </div>
+      <StepComponent
+        steps={[
+          <span key={1}>
+            Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can type.
+          </span>,
+          <span key={2}>
+            Spectate a live pro match and type <Tag>!np</Tag> to confirm Dotabod responds with the
+            notable players.
+          </span>,
+        ]}
+      />
     ),
   },
   {
-    question: 'Why does my stream need to be live to connect Steam?',
-    answer: (
-      <div>
-        <p className='mb-3'>
-          Dotabod is a streaming tool, so it activates only when you're live on Twitch. That
-          includes detecting and connecting your Steam account.
-        </p>
-        <Alert
-          type='info'
-          showIcon
-          message='You only need to be streaming for the first connection.'
-          description="After Steam connects once while you're streaming, every future match works automatically, even offline or with a different Steam account."
-        />
-        <p className='mt-3'>
-          <strong>Typical flow:</strong>
-        </p>
-        <ol className='mt-2 list-inside list-decimal space-y-1'>
-          <li>Run the PowerShell script (can be done offline).</li>
-          <li>Start streaming on Twitch.</li>
-          <li>Play a match or demo a hero.</li>
-          <li>Steam connects and appears in your MMR tracker.</li>
-          <li>Future matches auto-connect, regardless of stream status.</li>
-        </ol>
-      </div>
-    ),
-  },
-  {
-    question: 'MMR not tracking?',
-    answer: (
-      <span>
-        <Link href='/dashboard/features'>Enter your current MMR</Link> on the Features page so we
-        have a starting value.
-      </span>
-    ),
-  },
-  {
-    question: "Why do bets open right when I pick? Can't I get counter-picked?",
-    answer:
-      "Bets open once your pick is visible to the enemy team in-game. By then, they can't counter-pick or counter-ban your hero anyway.",
-  },
-  {
-    question: 'Can I still use 9kmmrbot?',
-    answer: (
-      <div className='flex flex-col space-y-4'>
-        <div>
-          Running Dotabod and 9kmmrbot together works fine. Your chat might not love the double-bot
-          spam, though.
-        </div>
-        <div>
-          One thing to note: 9kmmrbot can no longer pull game data for accounts outside the high
-          immortal bracket (roughly the top 1000 players). Dotabod&apos;s integration works at every
-          rank.
-        </div>
-      </div>
-    ),
-  },
-  {
-    question: 'Chrome says "Local network access denied", or the installer or OBS won\'t connect?',
+    id: 'setup-chrome',
+    category: 'setup',
+    question: 'Chrome says "Local network access denied", or the installer or OBS won\'t connect',
+    keywords: ['chrome', 'local network', 'installer', 'obs', 'websocket', 'permission', 'denied'],
     answer: (
       <StepComponent
         steps={[
@@ -363,6 +315,61 @@ const faqs = [
       />
     ),
   },
+  {
+    id: 'concept-live',
+    category: 'concepts',
+    question: 'Why does my stream need to be live to connect Steam?',
+    keywords: ['live', 'stream', 'steam', 'connect', 'offline', 'why'],
+    answer: (
+      <div className='flex flex-col gap-3'>
+        <p>
+          Dotabod is a streaming tool, so it activates only when you're live on Twitch. That
+          includes detecting and connecting your Steam account.
+        </p>
+        <LiveRequiredNote />
+        <div>
+          <strong>First-time setup, in order:</strong>
+          <ol className='mt-2 list-inside list-decimal space-y-1'>
+            <li>Run the PowerShell script once during setup (offline is fine).</li>
+            <li>Start streaming on Twitch.</li>
+            <li>Play a match or demo a hero.</li>
+            <li>Steam connects and appears in your MMR tracker.</li>
+            <li>
+              You're done. Future matches auto-connect, regardless of stream status, and you never
+              need to run the script again.
+            </li>
+          </ol>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: 'concept-bets',
+    category: 'concepts',
+    question: "Why do bets open right when I pick? Can't I get counter-picked?",
+    keywords: ['bets', 'pick', 'counter', 'predictions'],
+    answer:
+      "Bets open once your pick is visible to the enemy team in-game. By then, they can't counter-pick or counter-ban your hero anyway.",
+  },
+  {
+    id: 'concept-9kmmrbot',
+    category: 'concepts',
+    question: 'Can I still use 9kmmrbot?',
+    keywords: ['9kmmrbot', 'bot', 'immortal', 'compatibility'],
+    answer: (
+      <div className='flex flex-col space-y-4'>
+        <div>
+          Running Dotabod and 9kmmrbot together works fine. Your chat might not love the double-bot
+          spam, though.
+        </div>
+        <div>
+          One thing to note: 9kmmrbot can no longer pull game data for accounts outside the high
+          immortal bracket (roughly the top 1000 players). Dotabod&apos;s integration works at every
+          rank.
+        </div>
+      </div>
+    ),
+  },
 ]
 
 const TroubleshootPage = () => {
@@ -372,6 +379,42 @@ const TroubleshootPage = () => {
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
   const [hubspotBlocked, setHubspotBlocked] = useState(false)
+  const [query, setQuery] = useState('')
+  const [openKeys, setOpenKeys] = useState<string[]>([])
+
+  const normalizedQuery = query.trim().toLowerCase()
+
+  const filteredFaqs = useMemo(() => {
+    if (!normalizedQuery) return faqs
+    return faqs.filter(
+      (faq) =>
+        faq.question.toLowerCase().includes(normalizedQuery) ||
+        faq.keywords.some((keyword) => keyword.includes(normalizedQuery)),
+    )
+  }, [normalizedQuery])
+
+  const handleSearch = (value: string) => {
+    setQuery(value)
+    const next = value.trim().toLowerCase()
+    if (next) {
+      setOpenKeys(
+        faqs
+          .filter(
+            (faq) =>
+              faq.question.toLowerCase().includes(next) ||
+              faq.keywords.some((keyword) => keyword.includes(next)),
+          )
+          .map((faq) => faq.id),
+      )
+    } else {
+      setOpenKeys([])
+    }
+  }
+
+  const handleCollapseChange = (categoryIds: string[]) => (keys: string | string[]) => {
+    const next = Array.isArray(keys) ? keys : [keys]
+    setOpenKeys((prev) => [...prev.filter((key) => !categoryIds.includes(key)), ...next])
+  }
 
   // Check if HubSpot is blocked
   useEffect(() => {
@@ -488,83 +531,108 @@ const TroubleshootPage = () => {
         <title>Dotabod | Troubleshooting</title>
       </Head>
       <Header
-        subtitle='Common fixes for setup, overlay, Steam, and chat issues. Still stuck? Send us a message below.'
+        subtitle='Common fixes for setup, overlay, Steam, and chat issues. Search for your problem, or send us a message at the bottom if you’re still stuck.'
         title='Troubleshooting'
       />
-      <div className='flex flex-col gap-4 justify-between items-start'>
-        <div className='max-w-2xl w-full'>
-          <Card className='gap-4 flex flex-col' title='Still stuck? Send us a message'>
-            {hubspotBlocked && (
-              <Alert
-                banner
-                message="Live chat couldn't load. Your browser's privacy settings or an extension may be blocking it."
-                type='warning'
-                showIcon
-              />
-            )}
 
-            <Form
-              form={form}
-              layout='vertical'
-              onFinish={handleSubmit}
-              className='gap-4 flex flex-col'
-            >
-              <Form.Item
-                name='message'
-                label='Message'
-                rules={[
-                  {
-                    required: true,
-                    message: 'Add a message so we can help.',
-                  },
-                  {
-                    min: 80,
-                    message: 'Add a bit more detail. We need at least 80 characters to help.',
-                  },
-                ]}
-              >
-                <Input.TextArea
-                  placeholder='What went wrong? Include what you tried and what happened.'
-                  rows={4}
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <div className='flex flex-wrap gap-3 items-center'>
-                  <Button type='primary' htmlType='submit' loading={submitting}>
-                    Send message
-                  </Button>
-                  <Divider type='vertical' />
-                  <Button icon={<MessageOutlined />} onClick={openChatWidget} type='default'>
-                    Open live chat
-                  </Button>
-                </div>
-              </Form.Item>
-            </Form>
-          </Card>
-        </div>
+      <div className='max-w-3xl space-y-8'>
         {!isLive && (
           <Alert
             message="Your stream is offline. Some features (like first-time Steam detection) only run while you're live."
             type='warning'
             showIcon
-            className='grow'
           />
         )}
-      </div>
 
-      <div className='lg:col-span-2'>
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
-          {faqs.map(
-            (faq) =>
-              faq.question && (
-                <Card key={faq.question}>
-                  <dt className='text-lg font-medium leading-6'>{faq.question}</dt>
-                  <dd className='mt-2 text-base text-gray-300'>{faq.answer}</dd>
-                </Card>
-              ),
+        <Input
+          allowClear
+          size='large'
+          prefix={<SearchOutlined className='text-gray-500' />}
+          placeholder='Search problems, e.g. overlay, steam, chat'
+          value={query}
+          onChange={(event) => handleSearch(event.target.value)}
+          aria-label='Search troubleshooting topics'
+        />
+
+        {filteredFaqs.length === 0 ? (
+          <p className='text-gray-400'>
+            No problems match “{query.trim()}”. Try a different word, or send us a message below.
+          </p>
+        ) : (
+          <div className='space-y-8'>
+            {categoryOrder.map((category) => {
+              const items = filteredFaqs.filter((faq) => faq.category === category.id)
+              if (items.length === 0) return null
+              const categoryIds = items.map((faq) => faq.id)
+              return (
+                <section key={category.id} className='space-y-3'>
+                  <h2 className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+                    {category.label}
+                  </h2>
+                  <Collapse
+                    activeKey={openKeys}
+                    onChange={handleCollapseChange(categoryIds)}
+                    items={items.map((faq) => ({
+                      key: faq.id,
+                      label: faq.question,
+                      children: <div className='text-gray-300'>{faq.answer}</div>,
+                    }))}
+                  />
+                </section>
+              )
+            })}
+          </div>
+        )}
+
+        <Card className='flex flex-col gap-4' title='Still stuck? Send us a message'>
+          {hubspotBlocked && (
+            <Alert
+              banner
+              message="Live chat couldn't load. Your browser's privacy settings or an extension may be blocking it."
+              type='warning'
+              showIcon
+            />
           )}
-        </div>
+
+          <Form
+            form={form}
+            layout='vertical'
+            onFinish={handleSubmit}
+            className='flex flex-col gap-4'
+          >
+            <Form.Item
+              name='message'
+              label='Message'
+              rules={[
+                {
+                  required: true,
+                  message: 'Add a message so we can help.',
+                },
+                {
+                  min: 80,
+                  message: 'Add a bit more detail. We need at least 80 characters to help.',
+                },
+              ]}
+            >
+              <Input.TextArea
+                placeholder='What went wrong? Include what you tried and what happened.'
+                rows={4}
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <div className='flex flex-wrap gap-3 items-center'>
+                <Button type='primary' htmlType='submit' loading={submitting}>
+                  Send message
+                </Button>
+                <Divider type='vertical' />
+                <Button icon={<MessageOutlined />} onClick={openChatWidget} type='default'>
+                  Open live chat
+                </Button>
+              </div>
+            </Form.Item>
+          </Form>
+        </Card>
       </div>
     </>
   )
