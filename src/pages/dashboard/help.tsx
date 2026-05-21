@@ -108,7 +108,8 @@ const faqs: Faq[] = [
               <strong>Play any Dota 2 match or demo a hero</strong>
               <div className='mt-1 text-sm'>
                 While you're live, Dotabod detects your Steam account automatically. Type{' '}
-                <Tag>!facet</Tag> in chat to confirm Dotabod can find you.
+                <Tag>!facet</Tag> in chat: if Dotabod replies with your hero's facet, it found your
+                Steam account.
               </div>
             </span>,
             <span key={2}>
@@ -271,7 +272,7 @@ const faqs: Faq[] = [
       <StepComponent
         steps={[
           <span key={1}>
-            Type <Tag>!ping</Tag> in your Twitch chat to make sure dotabod can type.
+            Type <Tag>!ping</Tag> in your Twitch chat to make sure Dotabod can type.
           </span>,
           <span key={2}>
             Spectate a live pro match and type <Tag>!np</Tag> to confirm Dotabod responds with the
@@ -363,9 +364,8 @@ const faqs: Faq[] = [
           spam, though.
         </div>
         <div>
-          One thing to note: 9kmmrbot can no longer pull game data for accounts outside the high
-          immortal bracket (roughly the top 1000 players). Dotabod&apos;s integration works at every
-          rank.
+          9kmmrbot can no longer pull game data for accounts outside the high immortal bracket
+          (roughly the top 1000 players). Dotabod&apos;s integration works at every rank.
         </div>
       </div>
     ),
@@ -588,7 +588,7 @@ const TroubleshootPage = () => {
           {hubspotBlocked && (
             <Alert
               banner
-              message="Live chat couldn't load. Your browser's privacy settings or an extension may be blocking it."
+              message="Live chat couldn't load. Your browser or an extension may be blocking it."
               type='warning'
               showIcon
             />
@@ -603,6 +603,7 @@ const TroubleshootPage = () => {
             <Form.Item
               name='message'
               label='Message'
+              extra='Tell us what you tried, what happened, and any error text you saw.'
               rules={[
                 {
                   required: true,
@@ -614,10 +615,7 @@ const TroubleshootPage = () => {
                 },
               ]}
             >
-              <Input.TextArea
-                placeholder='What went wrong? Include what you tried and what happened.'
-                rows={4}
-              />
+              <Input.TextArea placeholder='Describe the problem in your own words' rows={4} />
             </Form.Item>
 
             <Form.Item>
@@ -642,7 +640,7 @@ TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Troubleshoot | Dotabod Dashboard',
+        title: 'Troubleshooting | Dotabod Dashboard',
         description: 'Troubleshoot and resolve issues with your Dotabod setup.',
         canonicalUrl: 'https://dotabod.com/dashboard/help',
         noindex: true,
