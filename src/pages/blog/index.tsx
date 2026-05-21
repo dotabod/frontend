@@ -1,27 +1,16 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { Space, Typography } from 'antd'
-import matter from 'gray-matter'
 import type { GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { getAllPosts, type Post } from '@/lib/blog'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 import { formatDate } from '@/utils/formatDate'
 
 const { Title, Text, Paragraph } = Typography
-
-interface Post {
-  slug: string
-  title: string
-  description: string
-  date: string
-  author?: string
-  draft?: boolean
-}
 
 interface BlogIndexProps {
   posts: Post[]
@@ -124,39 +113,9 @@ BlogIndex.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const postsDirectory = path.join(process.cwd(), 'src/pages/blog')
-  const filenames = fs.readdirSync(postsDirectory)
-
-  const posts = filenames
-    .filter((filename) => filename.endsWith('.md'))
-    .map((filename) => {
-      const filePath = path.join(postsDirectory, filename)
-      const fileContents = fs.readFileSync(filePath, 'utf8')
-      const { data } = matter(fileContents)
-
-      // Ensure date is a string for serialization
-      const date = data.date
-        ? data.date instanceof Date
-          ? data.date.toISOString()
-          : String(data.date)
-        : new Date().toISOString()
-
-      return {
-        slug: filename.replace(/\.md$/, ''),
-        title: data.title || 'Untitled',
-        description: data.description || '',
-        date: date,
-        author: data.author || null,
-        draft: Boolean(data.draft),
-      }
-    })
-    // Filter out draft posts
-    .filter((post) => !post.draft)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
   return {
     props: {
-      posts,
+      posts: getAllPosts(),
     },
   }
 }
