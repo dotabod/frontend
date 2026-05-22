@@ -49,7 +49,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "^5.90.11",
     "@twurple/eventsub-base": "7.2.1",
-    "@vercel/analytics": "^1.6.1",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/edge-config": "^1.4.3",
     "@vercel/og": "^0.6.8",
     "antd": "^5.29.1",
