@@ -22,16 +22,19 @@ export type { GetPaymentStatusReturn, ICreateInvoice, ICreatePayment, InvoiceRet
 export type CreateInvoiceParams = ICreateInvoice
 export type NowPaymentsInvoiceResponse = InvoiceReturn
 
-export type NowPaymentsStatus =
-  | 'waiting'
-  | 'confirming'
-  | 'confirmed'
-  | 'sending'
-  | 'partially_paid'
-  | 'finished'
-  | 'failed'
-  | 'refunded'
-  | 'expired'
+export const NOWPAYMENTS_STATUS_VALUES = [
+  'waiting',
+  'confirming',
+  'confirmed',
+  'sending',
+  'partially_paid',
+  'finished',
+  'failed',
+  'refunded',
+  'expired',
+] as const
+
+export type NowPaymentsStatus = (typeof NOWPAYMENTS_STATUS_VALUES)[number]
 
 /**
  * Webhook (IPN) body. The SDK's `GetPaymentStatusReturn` covers the manual
@@ -88,20 +91,24 @@ export async function getNowPaymentsStatus(): Promise<{ message: string }> {
   return request<{ message: string }>('GET', '/status')
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 /**
  * Recursively sorts an object's keys alphabetically. Matches the canonicalization
  * NOWPayments uses to build the IPN signature.
  */
-function sortObject<T>(value: T): T {
+export function sortObject(value: unknown): unknown {
   if (Array.isArray(value)) {
-    return value.map((v) => sortObject(v)) as unknown as T
+    return value.map((v) => sortObject(v))
   }
-  if (value && typeof value === 'object') {
+  if (isRecord(value)) {
     const sorted: Record<string, unknown> = {}
-    for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-      sorted[key] = sortObject((value as Record<string, unknown>)[key])
+    for (const key of Object.keys(value).sort()) {
+      sorted[key] = sortObject(value[key])
     }
-    return sorted as unknown as T
+    return sorted
   }
   return value
 }
@@ -137,6 +144,22 @@ export const NOWPAYMENTS_TERMINAL_STATUSES = new Set<NowPaymentsStatus>([
   'expired',
 ])
 
+const NOWPAYMENTS_STATUSES = new Set<string>(NOWPAYMENTS_STATUS_VALUES)
+
+function isNowPaymentsStatus(value: unknown): value is NowPaymentsStatus {
+  return typeof value === 'string' && NOWPAYMENTS_STATUSES.has(value)
+}
+
 export function isNowPaymentsConfirmed(status: string | null | undefined): boolean {
-  return !!status && NOWPAYMENTS_CONFIRMED_STATUSES.has(status as NowPaymentsStatus)
+  return isNowPaymentsStatus(status) && NOWPAYMENTS_CONFIRMED_STATUSES.has(status)
+}
+
+// Intentionally a partial check: only the fields the handler reads, not a full schema.
+export function isNowPaymentsPaymentStatus(body: unknown): body is NowPaymentsPaymentStatus {
+  return (
+    isRecord(body) &&
+    typeof body.order_id === 'string' &&
+    typeof body.payment_id === 'number' &&
+    isNowPaymentsStatus(body.payment_status)
+  )
 }

@@ -23,7 +23,7 @@ const TwitchUser = ({
   image: string
   last: boolean
   name: string
-  onClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+  onClick?: () => void
 }) => {
   const session = useSession()
   const userName = last ? session?.data?.user?.name || name : name
@@ -59,7 +59,7 @@ const TwitchUser = ({
             type='button'
             className='flex w-full flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105 cursor-pointer'
             onClick={() => {
-              if (onClick) onClick({} as unknown as React.MouseEvent<HTMLAnchorElement, MouseEvent>)
+              onClick?.()
               setOpen(true)
             }}
           >

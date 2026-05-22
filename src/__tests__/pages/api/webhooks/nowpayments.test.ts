@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { sortObject } from '@/lib/nowpayments'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -27,18 +28,6 @@ let handler: typeof import('@/pages/api/webhooks/nowpayments/index').default
 beforeAll(async () => {
   ;({ default: handler } = await import('@/pages/api/webhooks/nowpayments/index'))
 })
-
-function sortObject<T>(value: T): T {
-  if (Array.isArray(value)) return value.map((v) => sortObject(v)) as unknown as T
-  if (value && typeof value === 'object') {
-    const sorted: Record<string, unknown> = {}
-    for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-      sorted[key] = sortObject((value as Record<string, unknown>)[key])
-    }
-    return sorted as unknown as T
-  }
-  return value
-}
 
 function sign(body: Record<string, unknown>): string {
   return crypto

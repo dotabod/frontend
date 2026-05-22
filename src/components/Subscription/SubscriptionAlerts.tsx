@@ -3,7 +3,7 @@ import { ClockIcon, GiftIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
-import type { GiftInfo, GiftSubInfo, StatusInfo, SubscriptionWithGiftDetails } from './types'
+import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
 
 // Reusable component for subscription alert messages
 function SubscriptionAlertMessage({
@@ -52,7 +52,9 @@ export function SubscriptionAlerts({
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
 
   const isVirtualGracePeriodSubscription =
-    (subscription as unknown as SubscriptionWithGiftDetails)?.isGracePeriodVirtual ||
+    (!!subscription &&
+      'isGracePeriodVirtual' in subscription &&
+      Boolean(subscription.isGracePeriodVirtual)) ||
     (inGracePeriod &&
       subscription?.status === 'TRIALING' &&
       !subscription?.stripeSubscriptionId &&

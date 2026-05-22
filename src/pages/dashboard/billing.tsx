@@ -1,5 +1,3 @@
-import type { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
-import type { JsonValue } from '@prisma/client/runtime/library'
 import { message, Typography } from 'antd'
 import Head from 'next/head'
 import { useSession } from 'next-auth/react'
@@ -19,28 +17,10 @@ const { Title } = Typography
 
 const PORTAL_FALLBACK_ERROR = "We couldn't open Stripe billing. Try again in a moment."
 
-// Define the subscription type with metadata for type safety
-interface SubscriptionWithMetadata {
-  id?: string
-  userId?: string
-  stripeCustomerId?: string | null
-  stripePriceId?: string | null
-  stripeSubscriptionId?: string | null
-  tier?: SubscriptionTier
-  status?: SubscriptionStatus | null
-  transactionType?: TransactionType | null
-  currentPeriodEnd?: Date | null
-  cancelAtPeriodEnd?: boolean
-  metadata?: JsonValue
-}
-
 const BillingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { data: session } = useSession()
-  const { subscription: rawSubscription } = useSubscriptionContext()
-
-  // Cast subscription to the type with metadata
-  const subscription = rawSubscription as unknown as SubscriptionWithMetadata
+  const { subscription } = useSubscriptionContext()
 
   const statusInfo = getSubscriptionStatusInfo(
     subscription?.status,

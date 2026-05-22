@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/db'
 import {
   isNowPaymentsConfirmed,
-  type NowPaymentsPaymentStatus,
+  isNowPaymentsPaymentStatus,
   verifyNowPaymentsSignature,
 } from '@/lib/nowpayments'
 import { processConfirmedNowPaymentsPayment } from '@/lib/nowpayments-payment'
@@ -35,32 +35,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.warn('NOWPayments signature verification failed in development - continuing')
     }
 
-    const payment = body as unknown as NowPaymentsPaymentStatus
-    const stripeInvoiceId = payment.order_id
-    const knownStatuses: ReadonlyArray<NowPaymentsPaymentStatus['payment_status']> = [
-      'waiting',
-      'confirming',
-      'confirmed',
-      'sending',
-      'partially_paid',
-      'finished',
-      'failed',
-      'refunded',
-      'expired',
-    ]
-    if (
-      typeof stripeInvoiceId !== 'string' ||
-      typeof payment.payment_id !== 'number' ||
-      !knownStatuses.includes(payment.payment_status)
-    ) {
+    if (!isNowPaymentsPaymentStatus(body)) {
       console.warn('NOWPayments webhook missing required fields', {
-        hasOrderId: typeof stripeInvoiceId === 'string',
-        hasPaymentId: typeof payment.payment_id === 'number',
-        status: payment.payment_status,
+        hasOrderId: typeof body.order_id === 'string',
+        hasPaymentId: typeof body.payment_id === 'number',
+        status: body.payment_status,
       })
       res.status(200).json({ message: 'OK' })
       return
     }
+
+    const payment = body
+    const stripeInvoiceId = payment.order_id
 
     const invoice = await prisma.nowPaymentsInvoice.findUnique({
       where: { stripeInvoiceId },

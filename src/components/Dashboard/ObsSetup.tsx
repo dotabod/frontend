@@ -258,7 +258,11 @@ const ObsSetup: React.FC = () => {
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
-      const scenes = sceneListResponse.scenes as unknown as Scene[]
+      const scenes: Scene[] = sceneListResponse.scenes.map((scene) => ({
+        sceneIndex: Number(scene.sceneIndex),
+        sceneUuid: String(scene.sceneUuid),
+        sceneName: String(scene.sceneName),
+      }))
       const sceneUuids = scenes.map((scene) => scene.sceneUuid)
       setScenes(scenes)
 
@@ -316,7 +320,9 @@ const ObsSetup: React.FC = () => {
         const sceneItemsResponse = await obs.call('GetSceneItemList', {
           sceneUuid: selectedScene,
         })
-        const sceneItems = sceneItemsResponse.sceneItems as unknown as SceneItem[]
+        const sceneItems: SceneItem[] = sceneItemsResponse.sceneItems.map((item) => ({
+          sourceName: String(item.sourceName),
+        }))
 
         // Check if the browser source already exists in the selected scene
         const existingSourceInScene = sceneItems.find(
@@ -330,7 +336,9 @@ const ObsSetup: React.FC = () => {
 
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
-        const inputs = inputListResponse.inputs as unknown as ObsInput[]
+        const inputs: ObsInput[] = inputListResponse.inputs.map((input) => ({
+          inputName: String(input.inputName),
+        }))
         const existingInput = inputs.find((input) => input.inputName === '[dotabod] main overlay')
 
         if (existingInput) {
@@ -402,7 +410,9 @@ const ObsSetup: React.FC = () => {
         const sceneItemsResponse = await obs.call('GetSceneItemList', {
           sceneUuid: scene,
         })
-        const sceneItems = sceneItemsResponse.sceneItems as unknown as SceneItem[]
+        const sceneItems: SceneItem[] = sceneItemsResponse.sceneItems.map((item) => ({
+          sourceName: String(item.sourceName),
+        }))
 
         const existingSourceInScene = sceneItems.find(
           (item) => item.sourceName === '[dotabod] main overlay',

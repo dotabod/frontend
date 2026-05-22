@@ -1,24 +1,21 @@
 import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 import { PrismaClient } from '@prisma/client'
 
-// Define globals for both clients
-type GlobalWithPrisma = typeof globalThis & {
-  prisma: PrismaClient
-  prismaMongo: PrismaMongo
+// Extend the global object for TypeScript so the singletons survive hot reloads
+declare global {
+  var prismaGlobal: PrismaClient | undefined
+  var prismaMongoGlobal: PrismaMongo | undefined
 }
 
-// Extend the global object for TypeScript
-const globalForPrisma = global as unknown as GlobalWithPrisma
-
 // Create singleton instances for both clients
-export const prisma = globalForPrisma.prisma || new PrismaClient()
-export const prismaMongo = globalForPrisma.prismaMongo || new PrismaMongo()
+export const prisma = globalThis.prismaGlobal || new PrismaClient()
+export const prismaMongo = globalThis.prismaMongoGlobal || new PrismaMongo()
 
 // Only store the instances on the global object in development to prevent
 // multiple instances during hot-reloading
 if (process.env.VERCEL_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
-  globalForPrisma.prismaMongo = prismaMongo
+  globalThis.prismaGlobal = prisma
+  globalThis.prismaMongoGlobal = prismaMongo
 }
 
 // Helper to check which database type we're dealing with

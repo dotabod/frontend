@@ -59,14 +59,16 @@ export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promis
  */
 export async function verifyOpenNodeWebhook(eventData: unknown): Promise<boolean> {
   try {
-    const webhookData = eventData as {
-      hashed_order: string
-      id?: string
-      description?: string
+    if (
+      typeof eventData !== 'object' ||
+      eventData === null ||
+      !('hashed_order' in eventData) ||
+      typeof eventData.hashed_order !== 'string'
+    ) {
+      return false
     }
-    const isValid = signatureIsValid(
-      webhookData as unknown as Parameters<typeof signatureIsValid>[0],
-    ) as boolean
+    const webhookData = eventData as Parameters<typeof signatureIsValid>[0]
+    const isValid = signatureIsValid(webhookData)
 
     // Add debugging info in development
     if (process.env.VERCEL_ENV !== 'production') {

@@ -100,11 +100,7 @@ export default function SceneSwitcher(): React.ReactNode {
                       hideTierBadge
                       settingKey={sceneKey as SettingKeys}
                       label={scene.label}
-                      placeholder={
-                        (
-                          defaultSettings['obs-scene-switcher'] as unknown as Record<string, string>
-                        )[sceneKey]
-                      }
+                      placeholder={defaultSettings[sceneKey]}
                       value={scene.value}
                       maxLength={200}
                       onChange={(value) => handleSceneName(value, scene.update)}

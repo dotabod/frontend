@@ -76,22 +76,6 @@ type MinimapStatusData = {
   // Add other properties as needed
 }
 
-type TwitchEventData = {
-  // Define the structure of your Twitch event data
-  id: string
-  title?: string
-  outcomes?: Array<{
-    id: string
-    title: string
-    color: string
-    users?: number
-    points?: number
-    // Add other properties as needed
-  }>
-  status?: string
-  // Add other properties as needed
-}
-
 export type ChatMessage = {
   message: string
   timestamp?: number
@@ -335,14 +319,14 @@ export const useSocket = ({
       mutate()
     })
 
-    socket.on('channelPollOrBet', (data: TwitchEventData, eventName: string) => {
+    socket.on('channelPollOrBet', (data: PollData | BetData, eventName: string) => {
       updateLastReceived()
       console.log('twitchEvent', { eventName, data })
       const isEnd = eventName.includes('End') || eventName.includes('Lock')
       if (eventName.includes('Poll')) {
-        setPollData(isEnd ? null : (data as unknown as PollData))
+        setPollData(isEnd || !('choices' in data) ? null : data)
       } else {
-        setBetData(isEnd ? null : (data as unknown as BetData))
+        setBetData(isEnd || !('outcomes' in data) ? null : data)
       }
     })
 

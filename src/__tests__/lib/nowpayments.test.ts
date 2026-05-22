@@ -6,29 +6,19 @@ vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 
 let verifyNowPaymentsSignature: typeof import('@/lib/nowpayments').verifyNowPaymentsSignature
 let isNowPaymentsConfirmed: typeof import('@/lib/nowpayments').isNowPaymentsConfirmed
+let sortObject: typeof import('@/lib/nowpayments').sortObject
 
 beforeAll(async () => {
   const mod = await import('@/lib/nowpayments')
   verifyNowPaymentsSignature = mod.verifyNowPaymentsSignature
   isNowPaymentsConfirmed = mod.isNowPaymentsConfirmed
+  sortObject = mod.sortObject
 })
 
 beforeEach(() => {
   vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
   vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 })
-
-function sortObject<T>(value: T): T {
-  if (Array.isArray(value)) return value.map((v) => sortObject(v)) as unknown as T
-  if (value && typeof value === 'object') {
-    const sorted: Record<string, unknown> = {}
-    for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-      sorted[key] = sortObject((value as Record<string, unknown>)[key])
-    }
-    return sorted as unknown as T
-  }
-  return value
-}
 
 function sign(body: Record<string, unknown>, secret = 'test-ipn-secret'): string {
   return crypto
