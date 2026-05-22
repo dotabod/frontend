@@ -80,27 +80,34 @@ function ensureContactProperties(token: string) {
 }
 
 // Best-effort: never throws, so it can't break the visitor-token response.
+// `subscription` is optional: when omitted (e.g. the tier lookup failed) we leave
+// the existing dotabod_subscription value untouched rather than overwriting it.
 export async function syncHubSpotContact(
   token: string,
-  { email, username, subscription }: { email: string; username: string; subscription: string },
+  { email, username, subscription }: { email: string; username: string; subscription?: string },
 ) {
   try {
     await ensureContactProperties(token)
-    const res = await fetch(
-      `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`,
-      {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          properties: {
-            twitch_username: username,
-            dotabod_subscription: subscription,
+    // Upsert by email so a brand-new contact (not yet indexed from the visitor
+    // identification call) is created rather than 404ing on a plain update.
+    const res = await fetch(`${CRM_BASE}/objects/contacts/batch/upsert`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        inputs: [
+          {
+            id: email,
+            idProperty: 'email',
+            properties: {
+              twitch_username: username,
+              ...(subscription ? { dotabod_subscription: subscription } : {}),
+            },
           },
-        }),
-      },
-    )
+        ],
+      }),
+    })
     if (!res.ok) {
-      throw new Error(`Failed to update HubSpot contact: ${res.status} ${res.statusText}`)
+      throw new Error(`Failed to upsert HubSpot contact: ${res.status} ${res.statusText}`)
     }
   } catch (error) {
     captureException(error instanceof Error ? error : new Error(String(error)))

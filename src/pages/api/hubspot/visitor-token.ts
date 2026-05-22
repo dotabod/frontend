@@ -10,6 +10,20 @@ import { getSubscription } from '@/utils/subscription'
 const HUBSPOT_VISITOR_TOKEN_URL =
   'https://api.hubapi.com/visitor-identification/2026-03/tokens/create'
 
+// Best-effort, fire-and-forget: enrich the HubSpot contact without blocking the
+// token response that gates the chat widget load.
+async function enrichContact(token: string, userId: string, email: string, username: string) {
+  let subscription: string | undefined
+  try {
+    subscription = subscriptionToValue(await getSubscription(userId))
+  } catch (error) {
+    // Leave subscription undefined so a transient DB error never overwrites the
+    // contact's real tier with "free".
+    captureException(error instanceof Error ? error : new Error(String(error)))
+  }
+  await syncHubSpotContact(token, { email, username, subscription })
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const email = session?.user?.email
@@ -28,6 +42,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const [firstName, ...rest] = (session.user.name ?? '').trim().split(' ')
   const lastName = rest.join(' ')
 
+  let visitorToken: string
   try {
     const response = await fetch(HUBSPOT_VISITOR_TOKEN_URL, {
       method: 'POST',
@@ -52,20 +67,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!data.token) {
       throw new Error('HubSpot visitor token response missing token')
     }
-
-    // Best-effort enrichment of the contact record so it shows in the inbox sidebar.
-    const subscription = await getSubscription(session.user.id).catch(() => null)
-    await syncHubSpotContact(token, {
-      email,
-      username: session.user.name ?? '',
-      subscription: subscriptionToValue(subscription),
-    })
-
-    return res.status(200).json({ email, token: data.token })
+    visitorToken = data.token
   } catch (error: unknown) {
-    const err = error instanceof Error ? error : new Error(String(error))
-    captureException(err)
+    captureException(error instanceof Error ? error : new Error(String(error)))
     return res.status(500).json({ message: 'Failed to create visitor token' })
+  }
+
+  // Respond immediately — the widget only needs the token to identify the visitor.
+  res.status(200).json({ email, token: visitorToken })
+
+  // Skip enrichment while impersonating: the session id is the admin's but the
+  // email/name are the impersonated user's, so writing would corrupt their contact.
+  if (!session.user.isImpersonating) {
+    void enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {
+      captureException(error instanceof Error ? error : new Error(String(error)))
+    })
   }
 }
 

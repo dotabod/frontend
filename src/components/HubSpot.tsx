@@ -17,17 +17,39 @@ const HubSpot = () => {
 
     window._hsq = window._hsq || []
     window.hsConversationsOnReady = window.hsConversationsOnReady || []
-    // Wait to load until identity (if any) is resolved, so identification is set first.
-    window.hsConversationsSettings = { loadImmediately: false }
+    // Keep the widget from auto-loading before identity resolves, but preserve any
+    // identification already set on a previous run so we don't transiently drop it.
+    window.hsConversationsSettings = {
+      ...window.hsConversationsSettings,
+      loadImmediately: false,
+    }
 
-    const loadWidget = () => {
+    // Each effect run owns its own `cancelled` flag; the cleanup flips it so any
+    // queued onReady callback from a superseded run becomes a no-op.
+    let cancelled = false
+
+    const loadWith = (identity?: { email: string; token: string }) => {
+      if (cancelled) return
+
+      window.hsConversationsSettings = identity
+        ? {
+            loadImmediately: false,
+            identificationEmail: identity.email,
+            identificationToken: identity.token,
+          }
+        : { loadImmediately: false }
+
       const run = () => {
+        if (cancelled) return
+        // Re-identifying (login/logout without a full reload) requires resetting
+        // the widget before it reloads with the new identity.
         if (loadedRef.current) {
           window.HubSpotConversations?.clear?.({ resetWidget: true })
         }
-        window.HubSpotConversations?.widget.load()
+        window.HubSpotConversations?.widget?.load()
         loadedRef.current = true
       }
+
       if (window.HubSpotConversations) {
         run()
       } else {
@@ -36,32 +58,32 @@ const HubSpot = () => {
     }
 
     if (status === 'authenticated' && data?.user?.email) {
-      let cancelled = false
       fetch('/api/hubspot/visitor-token')
-        .then((res) => (res.ok ? res.json() : null))
+        .then((res) => (res.ok && res.status !== 204 ? res.json() : null))
         .then((payload: { email?: string; token?: string } | null) => {
           if (cancelled) return
           if (payload?.email && payload?.token) {
-            window._hsq.push(['identify', { email: payload.email }])
-            window.hsConversationsSettings = {
-              ...window.hsConversationsSettings,
-              identificationEmail: payload.email,
-              identificationToken: payload.token,
-            }
+            window._hsq.push(['identify', { email: payload.email, name: data.user?.name }])
+            // identify is only transmitted to HubSpot on the next trackPageView.
+            window._hsq.push(['trackPageView'])
+            loadWith({ email: payload.email, token: payload.token })
+          } else if (!loadedRef.current) {
+            // No identity available and nothing loaded yet — still show the widget.
+            loadWith()
           }
-          loadWidget()
         })
         .catch(() => {
-          // Token failed — still load the widget so support chat works, just unidentified.
-          if (!cancelled) loadWidget()
+          // Don't downgrade an already-identified widget; only load if nothing has.
+          if (!cancelled && !loadedRef.current) loadWith()
         })
-      return () => {
-        cancelled = true
-      }
+    } else {
+      // Anonymous visitor: load the widget without identification.
+      loadWith()
     }
 
-    // Anonymous visitor: load the widget without identification.
-    loadWidget()
+    return () => {
+      cancelled = true
+    }
   }, [isOverlay, status, data?.user?.email])
 
   if (isOverlay) return null

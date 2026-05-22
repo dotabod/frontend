@@ -93,6 +93,9 @@ const ContactPage: React.FC = () => {
           widget.close()
           setIsChatWidgetOpen(false)
         } else {
+          // The widget loads lazily (loadImmediately: false), so load+open covers
+          // the not-yet-loaded case; open() handles the already-loaded case.
+          widget.load({ widgetOpen: true })
           widget.open()
           setIsChatWidgetOpen(true)
         }

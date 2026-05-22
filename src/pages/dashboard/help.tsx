@@ -462,6 +462,9 @@ const TroubleshootPage = () => {
   // Function to open HubSpot chat widget
   const openChatWidget = () => {
     if (window.HubSpotConversations) {
+      // The widget loads lazily (loadImmediately: false), so load+open covers the
+      // not-yet-loaded case; open() handles the already-loaded case.
+      window.HubSpotConversations.widget.load({ widgetOpen: true })
       window.HubSpotConversations.widget.open()
     } else {
       message.error('Live chat is blocked by your browser or an extension.')
