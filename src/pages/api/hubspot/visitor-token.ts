@@ -4,6 +4,8 @@ import fetch from 'node-fetch'
 import { getServerSession } from '@/lib/api/getServerSession'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
+import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
+import { getSubscription } from '@/utils/subscription'
 
 const HUBSPOT_VISITOR_TOKEN_URL =
   'https://api.hubapi.com/visitor-identification/2026-03/tokens/create'
@@ -50,6 +52,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!data.token) {
       throw new Error('HubSpot visitor token response missing token')
     }
+
+    // Best-effort enrichment of the contact record so it shows in the inbox sidebar.
+    const subscription = await getSubscription(session.user.id).catch(() => null)
+    await syncHubSpotContact(token, {
+      email,
+      username: session.user.name ?? '',
+      subscription: subscriptionToValue(subscription),
+    })
 
     return res.status(200).json({ email, token: data.token })
   } catch (error: unknown) {

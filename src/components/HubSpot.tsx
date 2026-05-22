@@ -1,14 +1,19 @@
+import { useRouter } from 'next/router'
 import Script from 'next/script'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
 
 const HubSpot = () => {
   const { data, status } = useSession()
+  const router = useRouter()
+  // Never load the support chat or sync contacts inside OBS overlay browser sources.
+  // /overlay still renders the dashboard UI; only /overlay/[userId] is the OBS source.
+  const isOverlay = router.pathname.startsWith('/overlay/[userId]')
   // Tracks whether widget.load() has already run, so a later login re-identifies.
   const loadedRef = useRef(false)
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (isOverlay || status === 'loading') return
 
     window._hsq = window._hsq || []
     window.hsConversationsOnReady = window.hsConversationsOnReady || []
@@ -57,7 +62,9 @@ const HubSpot = () => {
 
     // Anonymous visitor: load the widget without identification.
     loadWidget()
-  }, [status, data?.user?.email])
+  }, [isOverlay, status, data?.user?.email])
+
+  if (isOverlay) return null
 
   return (
     <Script id='hs-script' strategy='afterInteractive' src='//js-na1.hs-scripts.com/39771134.js' />
