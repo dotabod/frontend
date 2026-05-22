@@ -253,6 +253,22 @@ export function isSubscriptionActive(
   return false
 }
 
+// Single source of truth for "is this a PayPal-backed subscription". PayPal
+// sets both signals; check both so callers can never disagree.
+export function isPaypalSubscription(
+  subscription: { metadata?: unknown; stripeSubscriptionId?: string | null } | null | undefined,
+): boolean {
+  if (!subscription) return false
+  if (subscription.stripeSubscriptionId?.startsWith('paypal_')) return true
+  const metadata =
+    subscription.metadata &&
+    typeof subscription.metadata === 'object' &&
+    !Array.isArray(subscription.metadata)
+      ? (subscription.metadata as Record<string, unknown>)
+      : null
+  return metadata?.paymentProvider === 'paypal'
+}
+
 interface SubscriptionPriceId {
   tier: SubscriptionTier
   monthly: string

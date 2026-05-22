@@ -1,10 +1,13 @@
 import { App, Button } from 'antd'
 import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { BillingNotice } from './BillingNotice'
 
 const Spinner = () => <Loader2Icon size={16} className='animate-spin' />
+
+const TERMINAL_STATUSES = ['success', 'error', 'cancelled', 'expired']
+const isTerminalStatus = (type?: string) => !!type && TERMINAL_STATUSES.includes(type)
 
 interface PaymentStatus {
   invoiceId: string
@@ -35,36 +38,63 @@ export const PaymentStatusAlert = () => {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const mountedRef = useRef(true)
 
-  const fetchPaymentStatus = useCallback(async (invoiceId: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const response = await fetch(`/api/payment-status?invoiceId=${invoiceId}`)
-      if (!response.ok) {
-        throw new Error("We couldn't reach the payment service.")
-      }
-
-      const data = await response.json()
-      setPaymentStatus(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't check your payment status.")
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
     }
   }, [])
 
+  const fetchPaymentStatus = useCallback(
+    async (invoiceId: string): Promise<PaymentStatus | null> => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const response = await fetch(`/api/payment-status?invoiceId=${invoiceId}`)
+        if (!response.ok) {
+          throw new Error("We couldn't reach the payment service.")
+        }
+
+        const data = (await response.json()) as PaymentStatus
+        if (mountedRef.current) setPaymentStatus(data)
+        return data
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err instanceof Error ? err.message : "We couldn't check your payment status.")
+        }
+        return null
+      } finally {
+        if (mountedRef.current) setLoading(false)
+      }
+    },
+    [],
+  )
+
   useEffect(() => {
-    if (payment === 'processing' && crypto === 'true' && invoice && typeof invoice === 'string') {
-      fetchPaymentStatus(invoice)
+    if (
+      !(payment === 'processing' && crypto === 'true' && invoice && typeof invoice === 'string')
+    ) {
+      return
+    }
 
-      // Poll for status updates every 30 seconds for processing payments
-      const interval = setInterval(() => {
-        fetchPaymentStatus(invoice)
-      }, 30000)
+    let intervalId: ReturnType<typeof setInterval> | undefined
 
-      return () => clearInterval(interval)
+    const poll = async () => {
+      const data = await fetchPaymentStatus(invoice)
+      // Stop polling once the payment reaches a terminal state.
+      if (data && isTerminalStatus(data.statusInfo?.type) && intervalId) {
+        clearInterval(intervalId)
+      }
+    }
+
+    poll()
+    intervalId = setInterval(poll, 30000)
+
+    return () => {
+      if (intervalId) clearInterval(intervalId)
     }
   }, [payment, crypto, invoice, fetchPaymentStatus])
 

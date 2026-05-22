@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useId } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { plans } from '@/components/Billing/BillingPlans'
 import {
   calculateSavings,
@@ -23,12 +23,15 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
   const periods: PricePeriod[] = ['monthly', 'annual', 'lifetime']
   const reduce = useReducedMotion()
   const groupId = useId()
+  const didInitPeriod = useRef(false)
 
-  // Set initial period based on subscription
+  // Default the period to the active subscription's period, but only once, so a
+  // later context refresh never snaps back the user's manual selection.
   useEffect(() => {
+    if (didInitPeriod.current) return
     if (isSubscriptionActive({ status: subscription?.status })) {
-      const period = getCurrentPeriod(subscription?.stripePriceId)
-      onChange(period)
+      didInitPeriod.current = true
+      onChange(getCurrentPeriod(subscription?.stripePriceId))
     }
   }, [subscription, onChange])
 

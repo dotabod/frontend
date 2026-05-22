@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
-import { getBillingSummaryInfo } from '@/utils/subscription'
+import { getBillingSummaryInfo, isPaypalSubscription } from '@/utils/subscription'
 import { BillingNotice } from './BillingNotice'
 
 const chipClasses = {
@@ -43,7 +43,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
     formattedCreditBalance,
   })
 
-  const isPayPal = Boolean(subscription?.stripeSubscriptionId?.startsWith('paypal_'))
+  const isPayPal = isPaypalSubscription(subscription)
 
   if (isSubscriptionLoading) {
     return (

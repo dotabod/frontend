@@ -55,6 +55,17 @@ export function SubscriptionAlerts({
         },
       })
 
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        console.error('Failed to apply credits:', body?.error || response.statusText)
+        message.error({
+          content: 'There was an issue applying your credits. Please try again or contact support.',
+          key: 'applyCredits',
+          duration: 5,
+        })
+        return
+      }
+
       const result = await response.json()
 
       if (result.success) {

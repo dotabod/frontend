@@ -18,6 +18,7 @@ import {
   calculateSavings,
   getPriceId,
   gracePeriodPrettyDate,
+  isPaypalSubscription,
   isSubscriptionActive,
   type PricePeriod,
   SUBSCRIPTION_TIERS,
@@ -139,14 +140,8 @@ function Plan({
   // Detect whether the current subscription was paid with PayPal
   const isPaidWithPaypal = useMemo(() => {
     if (tier === SUBSCRIPTION_TIERS.FREE) return false
-    const metadata =
-      subscription?.metadata &&
-      typeof subscription.metadata === 'object' &&
-      !Array.isArray(subscription.metadata)
-        ? (subscription.metadata as Record<string, unknown>)
-        : null
-    return metadata?.paymentProvider === 'paypal'
-  }, [subscription?.metadata, tier])
+    return isPaypalSubscription(subscription)
+  }, [subscription, tier])
 
   // A single source of truth for the chosen payment method. Card is the
   // default; PayPal/Crypto are only pre-selected when the active subscription
@@ -458,7 +453,7 @@ function Plan({
 
           if (currentIsPeriod !== activePeriod && activePeriod !== 'lifetime') {
             modal.confirm({
-              title: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+              title: `Upgrade to ${activePeriod} plan`,
               content: (
                 <div className='space-y-2 mt-2'>
                   <p>
@@ -476,7 +471,7 @@ function Plan({
                   <p className='mt-4'>Would you like to proceed with the upgrade?</p>
                 </div>
               ),
-              okText: `Upgrade to ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+              okText: `Upgrade to ${activePeriod}`,
               cancelText: 'Cancel',
               onOk: async () => {
                 try {
@@ -524,7 +519,7 @@ function Plan({
 
           if (currentRegularPeriod !== activePeriod && currentRegularPeriod !== 'unknown') {
             modal.confirm({
-              title: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+              title: `Switch to crypto ${activePeriod} plan`,
               content: (
                 <div className='space-y-2 mt-2'>
                   <p>
@@ -547,7 +542,7 @@ function Plan({
                   <p className='mt-4'>Would you like to proceed with this change?</p>
                 </div>
               ),
-              okText: `Switch to Crypto ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+              okText: `Switch to crypto ${activePeriod}`,
               cancelText: 'Cancel',
               onOk: async () => {
                 try {
@@ -596,7 +591,7 @@ function Plan({
                 : 'unknown'
 
           modal.confirm({
-            title: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)} Plan`,
+            title: `Switch to regular ${activePeriod} plan`,
             content: (
               <div className='space-y-2 mt-2'>
                 <p>
@@ -615,7 +610,7 @@ function Plan({
                 <p className='mt-4'>Would you like to proceed with this change?</p>
               </div>
             ),
-            okText: `Switch to Regular ${activePeriod.charAt(0).toUpperCase() + activePeriod.slice(1)}`,
+            okText: `Switch to regular ${activePeriod}`,
             cancelText: 'Cancel',
             onOk: async () => {
               try {
@@ -656,7 +651,7 @@ function Plan({
         ) {
           // Show confirmation modal before proceeding
           modal.confirm({
-            title: 'Upgrade to Lifetime Access',
+            title: 'Upgrade to lifetime access',
             content: (
               <div className='space-y-2 mt-2'>
                 <p>You currently have an active subscription. Here's what will happen:</p>
@@ -674,7 +669,7 @@ function Plan({
                 <p className='mt-4'>Would you like to proceed with the upgrade?</p>
               </div>
             ),
-            okText: 'Upgrade to Lifetime',
+            okText: 'Upgrade to lifetime',
             cancelText: 'Cancel',
             onOk: async () => {
               try {
