@@ -1,7 +1,6 @@
 import { type PayPalOrder, SubscriptionStatus, TransactionType } from '@prisma/client'
 import prisma from '@/lib/db'
 import { getSubscription, type PayPalCaptureResult } from '@/lib/paypal'
-import { createLifetimePurchase } from '@/lib/stripe/utils/subscription-utils'
 
 function mapStatus(paypalStatus: string): SubscriptionStatus {
   switch (paypalStatus) {
@@ -122,13 +121,36 @@ export async function completeLifetimeOrder(
   const metadata = (order.metadata as Record<string, unknown>) || {}
   const stripePriceId = (metadata.stripePriceId as string) || null
 
-  await prisma.$transaction(async (tx) =>
-    createLifetimePurchase(order.userId, '', stripePriceId, tx, {
-      paymentProvider: 'paypal',
-      paypalOrderId: order.paypalOrderId,
-      paypalCaptureId: capture.captureId ?? '',
-    }),
-  )
+  // Skip if the user already has an active lifetime purchase (idempotency).
+  const existingLifetime = await prisma.subscription.findFirst({
+    where: {
+      userId: order.userId,
+      status: SubscriptionStatus.ACTIVE,
+      transactionType: TransactionType.LIFETIME,
+    },
+    select: { id: true },
+  })
+
+  if (!existingLifetime) {
+    const farFuture = new Date()
+    farFuture.setFullYear(farFuture.getFullYear() + 100)
+    await prisma.subscription.create({
+      data: {
+        userId: order.userId,
+        stripePriceId: stripePriceId || undefined,
+        status: SubscriptionStatus.ACTIVE,
+        tier: 'PRO',
+        transactionType: TransactionType.LIFETIME,
+        currentPeriodEnd: farFuture,
+        cancelAtPeriodEnd: false,
+        metadata: {
+          paymentProvider: 'paypal',
+          paypalOrderId: order.paypalOrderId,
+          paypalCaptureId: capture.captureId ?? '',
+        },
+      },
+    })
+  }
 
   await prisma.payPalOrder.update({
     where: { paypalOrderId: order.paypalOrderId },

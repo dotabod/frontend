@@ -6,7 +6,6 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { featureFlags } from '@/lib/featureFlags'
 import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
-import { createPaypalApproval } from '@/lib/paypal-checkout'
 import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 
@@ -36,17 +35,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { priceId, isGift, paymentMethod } = (await req.body) as CheckoutRequestBody
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID is required' })
-    }
-
-    // PayPal is fully decoupled from Stripe: PayPal owns billing and we sync the
-    // subscriptions table from PayPal webhooks. No Stripe price/customer needed.
-    if (paymentMethod === 'paypal' && featureFlags.enablePaypalPayments) {
-      const url = await createPaypalApproval({
-        priceId,
-        userId: session.user.id,
-        email: session.user.email ?? undefined,
-      })
-      return res.status(200).json({ url })
     }
 
     // Verify price and determine purchase type
