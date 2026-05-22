@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { Prisma } from '@prisma/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { processEventIdempotently } from '@/pages/api/stripe/utils/idempotency'
+import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 
 describe('processEventIdempotently', () => {
   const mockTx: Pick<Prisma.TransactionClient, 'webhookEvent'> = {

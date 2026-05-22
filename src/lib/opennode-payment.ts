@@ -1,7 +1,7 @@
 import type { OpenNodeCharge } from '@prisma/client'
 import prisma from '@/lib/db'
+import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 import { stripe } from '@/lib/stripe-server'
-import { handleInvoiceEvent } from '@/pages/api/stripe/handlers/invoice-events'
 
 export const OPENNODE_CONFIRMED_STATUSES = new Set(['paid', 'confirmed'])
 

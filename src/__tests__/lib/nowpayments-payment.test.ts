@@ -25,7 +25,7 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('@/lib/db', () => ({ default: mocks.prisma }))
 vi.mock('@/lib/stripe-server', () => ({ stripe: mocks.stripe }))
-vi.mock('@/pages/api/stripe/handlers/invoice-events', () => ({
+vi.mock('@/lib/stripe/handlers/invoice-events', () => ({
   handleInvoiceEvent: mocks.handleInvoiceEvent,
 }))
 

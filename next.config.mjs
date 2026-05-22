@@ -51,10 +51,10 @@ const nextConfig = {
   },
   experimental: {
     forceSwcTransforms: false,
-    turbo: {
-      resolveAlias: {
-        '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
-      },
+  },
+  turbopack: {
+    resolveAlias: {
+      '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
     },
   },
   // Fix for Prisma engine not found error
@@ -186,9 +186,12 @@ export default withSentryConfig(
       deleteSourcemapsAfterUpload: true,
     },
 
-    // Automatically annotate React components to show their full name in breadcrumbs and session replay
-    reactComponentAnnotation: {
-      enabled: true,
+    // Annotate React components in breadcrumbs and session replay.
+    // Turbopack equivalent of webpack.reactComponentAnnotation (Sentry >= 10.43.0).
+    _experimental: {
+      turbopackReactComponentAnnotation: {
+        enabled: true,
+      },
     },
 
     // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
@@ -197,13 +200,15 @@ export default withSentryConfig(
     // side errors will fail.
     // tunnelRoute: "/monitoring",
 
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
-    disableLogger: true,
-
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
+    // Webpack-only options; ignored under the default Turbopack build (Next 16),
+    // so they only take effect with `next build --webpack`.
+    webpack: {
+      // Tree-shake Sentry logger statements to reduce bundle size
+      treeshake: {
+        removeDebugLogging: true,
+      },
+      // Automatic instrumentation of Vercel Cron Monitors
+      automaticVercelMonitors: true,
+    },
   }),
 )

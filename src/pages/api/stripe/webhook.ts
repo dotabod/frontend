@@ -2,15 +2,18 @@ import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
+import { handleChargeRefunded, handleChargeSucceeded } from '@/lib/stripe/handlers/charge-events'
+import { handleCheckoutCompleted } from '@/lib/stripe/handlers/checkout-events'
+import { handleCustomerDeleted } from '@/lib/stripe/handlers/customer-events'
+import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
+import {
+  handleSubscriptionDeleted,
+  handleSubscriptionEvent,
+} from '@/lib/stripe/handlers/subscription-events'
+import { debugLog } from '@/lib/stripe/utils/debugLog'
+import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
+import { withTransaction } from '@/lib/stripe/utils/transaction'
 import { stripe } from '@/lib/stripe-server'
-import { handleChargeRefunded, handleChargeSucceeded } from './handlers/charge-events'
-import { handleCheckoutCompleted } from './handlers/checkout-events'
-import { handleCustomerDeleted } from './handlers/customer-events'
-import { handleInvoiceEvent } from './handlers/invoice-events'
-import { handleSubscriptionDeleted, handleSubscriptionEvent } from './handlers/subscription-events'
-import { debugLog } from './utils/debugLog'
-import { processEventIdempotently } from './utils/idempotency'
-import { withTransaction } from './utils/transaction'
 
 export const config = {
   api: {

@@ -3,11 +3,11 @@ import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { stripe } from '@/lib/stripe-server'
 import {
   createCryptoSubscription,
   findExistingCryptoSubscription,
-} from '@/pages/api/stripe/utils/subscription-utils'
+} from '@/lib/stripe/utils/subscription-utils'
+import { stripe } from '@/lib/stripe-server'
 import { CRYPTO_PRICE_IDS, getCurrentPeriod } from '@/utils/subscription'
 
 // Mock subscription utils

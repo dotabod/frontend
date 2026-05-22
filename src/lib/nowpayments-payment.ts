@@ -1,8 +1,8 @@
 import type { NowPaymentsInvoice } from '@prisma/client'
 import prisma from '@/lib/db'
 import { isNowPaymentsConfirmed, type NowPaymentsPaymentStatus } from '@/lib/nowpayments'
+import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 import { stripe } from '@/lib/stripe-server'
-import { handleInvoiceEvent } from '@/pages/api/stripe/handlers/invoice-events'
 
 export type NowPaymentsProcessResult = {
   processed: boolean
