@@ -112,7 +112,7 @@ export function getRankImage(rank: RankType) {
   return {
     rank: rank.mmr,
     image: rank.myRank?.image ?? '0.png',
-    leaderboard: rank.standing,
+    leaderboard: rank.standing ?? null,
   }
 }
 

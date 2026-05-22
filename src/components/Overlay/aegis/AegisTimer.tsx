@@ -1,7 +1,14 @@
 import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
+import type { TransformRes } from '@/lib/hooks/useTransformRes'
 
-export const AegisTimer = ({ minutes, seconds, res }) => (
+type AegisTimerProps = {
+  minutes: number
+  seconds: number
+  res: TransformRes
+}
+
+export const AegisTimer = ({ minutes, seconds, res }: AegisTimerProps) => (
   <div className='flex flex-col items-center' id='aegis-timer'>
     <Image
       className='animate-pulse rounded-full'

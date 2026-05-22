@@ -50,7 +50,11 @@ type NavigationItem = {
   children?: NavigationItem[]
 }
 
-function getItem(item: NavigationItem, collapsed = false, isChild = false) {
+function getItem(
+  item: NavigationItem,
+  collapsed = false,
+  isChild = false,
+): NonNullable<MenuProps['items']>[number] {
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden={true} /> : null
@@ -78,7 +82,7 @@ function getItem(item: NavigationItem, collapsed = false, isChild = false) {
     icon,
     label: label,
     children: item.children?.map((child) => getItem(child, collapsed, true)),
-  }
+  } as NonNullable<MenuProps['items']>[number]
 }
 
 // Create mapping dynamically from navigation structure

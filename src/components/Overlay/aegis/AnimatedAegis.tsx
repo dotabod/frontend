@@ -3,15 +3,13 @@ import { AegisTimer } from '@/components/Overlay/aegis/AegisTimer'
 import { PlayerTopbar } from '@/components/Overlay/PlayerTopbar'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
+import type { AegisState } from '@/lib/hooks/rosh'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 interface AnimatedAegisProps {
   block: blockType
-  aegis: {
-    expireS: number
-    playerId: number
-  }
+  aegis: AegisState
   paused: boolean
   onComplete: () => void
 }
@@ -24,7 +22,7 @@ export const AnimatedAegis = ({ aegis, paused, onComplete, block }: AnimatedAegi
   if (!isEnabled || block.type !== 'playing' || !aegis.expireS) return null
 
   return (
-    <PlayerTopbar position={aegis.playerId}>
+    <PlayerTopbar position={aegis.playerId ?? 0}>
       <CountdownCircleTimer
         isPlaying={!paused}
         duration={aegis.expireS}

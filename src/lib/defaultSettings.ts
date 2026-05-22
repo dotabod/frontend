@@ -179,7 +179,6 @@ export const defaultSettings = {
 }
 
 export type SettingKeys = keyof typeof defaultSettings
-export const Settings = {} as Record<SettingKeys, SettingKeys>
-for (const key of Object.keys(defaultSettings)) {
-  Settings[key as SettingKeys] = key as SettingKeys
-}
+export const Settings = Object.fromEntries(
+  Object.keys(defaultSettings).map((key) => [key, key]),
+) as { [K in SettingKeys]: K }

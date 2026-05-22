@@ -3,13 +3,13 @@ import { isDev } from '@/lib/devConsts'
 
 const devTotalTimer = 480000
 
-interface RoshanState {
+export interface RoshanState {
   minS: number
   maxS: number
   count: number
 }
 
-interface AegisState {
+export interface AegisState {
   expireS: number
   playerId: number | null
 }

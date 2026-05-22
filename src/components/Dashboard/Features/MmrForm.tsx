@@ -34,7 +34,12 @@ interface FormValues {
   }>
 }
 
-const SteamAvatar = ({ data: response, id }) => {
+type SteamAvatarProps = {
+  data?: { data?: { id: number | string; avatar?: string }[] }
+  id: number | string
+}
+
+const SteamAvatar = ({ data: response, id }: SteamAvatarProps) => {
   if (!response) return <p>Loading...</p>
   return (
     <Image

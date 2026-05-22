@@ -9,13 +9,16 @@ import {
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { type Dispatch, type SetStateAction, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import io, { type Socket } from 'socket.io-client'
+import type { NotablePlayer } from '@/components/Overlay/NotablePlayers'
+import type { PollData } from '@/components/Overlay/PollOverlay'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { fetcher } from '@/lib/fetcher'
 import { getMatchData, matchDataCache } from '@/lib/hooks/openDotaAPI'
+import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { getRankImage, type RankType } from '@/lib/ranks'
 import {
@@ -94,6 +97,34 @@ export type ChatMessage = {
   timestamp?: number
 }
 
+export type RankImageDetails = {
+  image: string | null
+  rank: number | null
+  leaderboard: number | null
+  notLoaded?: boolean
+}
+
+export type BetData = {
+  title: string
+  endDate: PollData['endDate']
+  outcomes: { title: string; totalVotes: number; channelPoints: number }[]
+}
+
+type UseSocketProps = {
+  setPollData: Dispatch<SetStateAction<PollData | null>>
+  setBetData: Dispatch<SetStateAction<BetData | null>>
+  setBlock: Dispatch<SetStateAction<blockType>>
+  setPaused: Dispatch<SetStateAction<boolean>>
+  setAegis: Dispatch<SetStateAction<AegisState>>
+  setNotablePlayers: Dispatch<SetStateAction<NotablePlayer[]>>
+  setRoshan: Dispatch<SetStateAction<RoshanState>>
+  setConnected: Dispatch<SetStateAction<boolean>>
+  setRankImageDetails: Dispatch<SetStateAction<RankImageDetails>>
+  setWL: Dispatch<SetStateAction<wlType>>
+  setRadiantWinChance: Dispatch<SetStateAction<WinChance | null>>
+  setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>
+}
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -107,7 +138,7 @@ export const useSocket = ({
   setWL,
   setRadiantWinChance,
   setChatMessages,
-}) => {
+}: UseSocketProps) => {
   const router = useRouter()
   const { userId } = router.query
   const dispatch = useDispatch()
@@ -307,9 +338,12 @@ export const useSocket = ({
     socket.on('channelPollOrBet', (data: TwitchEventData, eventName: string) => {
       updateLastReceived()
       console.log('twitchEvent', { eventName, data })
-      const func = eventName.includes('Poll') ? setPollData : setBetData
-      const newData = eventName.includes('End') || eventName.includes('Lock') ? null : data
-      func(newData)
+      const isEnd = eventName.includes('End') || eventName.includes('Lock')
+      if (eventName.includes('Poll')) {
+        setPollData(isEnd ? null : (data as unknown as PollData))
+      } else {
+        setBetData(isEnd ? null : (data as unknown as BetData))
+      }
     })
 
     socket.on('update-medal', (deets: RankType) => {
@@ -326,7 +360,7 @@ export const useSocket = ({
       updateLastReceived()
       // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
       if (!chanceDetails) {
-        return setRadiantWinChance((prev) => ({ ...prev, visible: false }))
+        return setRadiantWinChance((prev) => (prev ? { ...prev, visible: false } : null))
       }
       setRadiantWinChance({ ...chanceDetails, visible: true })
     })

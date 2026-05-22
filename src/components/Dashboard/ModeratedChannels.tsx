@@ -2,7 +2,7 @@ import { captureException } from '@sentry/nextjs'
 import { Button, Select, Spin, Tooltip } from 'antd'
 import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { useTrack } from '@/lib/track'
 
@@ -91,7 +91,7 @@ export default function ModeratedChannels() {
     track('selected_moderated_channel')
   }, [track])
 
-  const renderOptionLabel = (imageSrc, name) => (
+  const renderOptionLabel = (imageSrc?: string | null, name?: ReactNode) => (
     <div className='flex flex-row items-center gap-2'>
       {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
       <img
@@ -109,7 +109,7 @@ export default function ModeratedChannels() {
   )
 
   const handleOnChange = useCallback(
-    (value) => {
+    (value: string) => {
       if (value === user?.twitchId) {
         return
       }

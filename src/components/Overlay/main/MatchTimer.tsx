@@ -2,10 +2,11 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { zeroPad } from 'react-countdown'
 import { Settings } from '@/lib/defaultSettings'
+import type { TransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 
-export const MatchTimer = ({ res }) => {
+export const MatchTimer = ({ res }: { res: TransformRes }) => {
   const [duration, setDuration] = useState(0)
   const { data: findMatchText } = useUpdateSetting(Settings.queueBlockerFindMatchText)
 

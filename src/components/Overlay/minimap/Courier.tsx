@@ -1,4 +1,6 @@
-const Courier = ({ data, team }) => {
+import type { MinimapUnitProps } from '@/lib/redux/store'
+
+const Courier = ({ data, team }: MinimapUnitProps) => {
   const isEnemy = data.teamP !== team
   const hasIcon = data.image !== 'plaincircle'
   const isFlying = data.image.includes('flying')

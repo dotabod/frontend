@@ -1,15 +1,31 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit'
+import type { blockType } from '@/lib/devConsts'
+
+export type MinimapEntity = {
+  teamP: string
+  image: string
+  unitname: string
+  name: string
+  yaw: number
+  xposP: number
+  yposP: number
+}
+
+export type MinimapUnitProps = {
+  data: MinimapEntity
+  team: blockType['team']
+}
 
 const initialState = {
   isTest: false,
   isPreview: false,
   status: null as null | { active?: boolean; hero: string },
   settings: null as null | Record<string, unknown>,
-  heroes: null as null | Array<{ name: string }>,
-  hero_units: null as null | Array<{ unitname: string }>,
-  buildings: null as null | Array<Record<string, unknown>>,
-  creeps: null as null | Array<Record<string, unknown>>,
-  couriers: null as null | Array<Record<string, unknown>>,
+  heroes: null as null | MinimapEntity[],
+  hero_units: null as null | MinimapEntity[],
+  buildings: null as null | MinimapEntity[],
+  creeps: null as null | MinimapEntity[],
+  couriers: null as null | MinimapEntity[],
 }
 
 type AppState = typeof initialState

@@ -6,7 +6,7 @@ export function HeroBlocker({
   teamName,
   type,
 }: {
-  teamName: 'radiant' | 'dire'
+  teamName: blockType['team']
   type?: blockType['type']
 }) {
   const res = useTransformRes()

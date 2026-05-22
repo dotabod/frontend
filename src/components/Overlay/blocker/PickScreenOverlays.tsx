@@ -6,15 +6,27 @@ import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { RestrictFeature } from '@/components/RestrictFeature'
 import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
+import type { RankImageDetails, wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 
-export const PickScreenOverlays = ({ rankImageDetails, wl, block: { team, type } }) => {
+type PickScreenOverlaysProps = {
+  rankImageDetails: RankImageDetails
+  wl: wlType
+  block: blockType
+}
+
+export const PickScreenOverlays = ({
+  rankImageDetails,
+  wl,
+  block: { team, type },
+}: PickScreenOverlaysProps) => {
   const res = useTransformRes()
   const { data: shouldBlock } = useUpdateSetting(Settings['picks-blocker'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
-  const hasPickScreen = ['picks', 'strategy', 'strategy-2'].includes(type)
+  const hasPickScreen = ['picks', 'strategy', 'strategy-2'].includes(type ?? '')
 
   if (!hasPickScreen) return null
 

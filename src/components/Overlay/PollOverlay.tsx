@@ -1,7 +1,7 @@
 import { Center, Progress } from '@mantine/core'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import Countdown, { zeroPad } from 'react-countdown'
+import Countdown, { type CountdownRenderProps, zeroPad } from 'react-countdown'
 import TwitchFetcher from 'twitch-fetcher'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
@@ -26,7 +26,7 @@ const PollColors = [
   '#c46300',
   '#c60000',
 ]
-const PollTimer = ({ minutes, seconds, completed }) =>
+const PollTimer = ({ minutes, seconds, completed }: CountdownRenderProps) =>
   completed ? null : (
     <span className='font-outline-2 text-slate-50'>
       {zeroPad(minutes)}:{zeroPad(seconds)}
@@ -54,7 +54,7 @@ export const PollOverlay = ({
         bttv: true,
       })
       .then(setEmotes)
-      .catch((_e) => {
+      .catch((_e: unknown) => {
         // Don't need to report on users that don't have a 7tv or bttv account
       })
   }, [providerAccountId])

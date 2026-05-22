@@ -2,15 +2,23 @@ import { FindMatch } from '@/components/Overlay/main/FindMatch'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
+import type { RankImageDetails, wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { RestrictFeature } from '../RestrictFeature'
 
-export const MainScreenOverlays = ({ block, wl, rankImageDetails }) => {
+type MainScreenOverlaysProps = {
+  block: blockType
+  wl: wlType
+  rankImageDetails: RankImageDetails
+}
+
+export const MainScreenOverlays = ({ block, wl, rankImageDetails }: MainScreenOverlaysProps) => {
   const res = useTransformRes()
   const { data: showQueueBlocker } = useUpdateSetting(Settings.queueBlocker)
 
-  if (![null].includes(block.type)) return null
+  if (block.type !== null) return null
 
   return (
     <>

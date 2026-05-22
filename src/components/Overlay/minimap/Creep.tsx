@@ -1,4 +1,6 @@
-const Creep = ({ data, team }) => {
+import type { MinimapUnitProps } from '@/lib/redux/store'
+
+const Creep = ({ data, team }: MinimapUnitProps) => {
   const isEnemy = data.teamP !== team
 
   const position = {

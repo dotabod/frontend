@@ -1,17 +1,33 @@
 import { clsx } from 'clsx'
+import type { Dispatch, SetStateAction } from 'react'
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 import { InGameOutsideCenterV2, InGameV2 } from '@/components/Overlay/blocker/InGameV2'
-import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
+import { type NotablePlayer, NotablePlayers } from '@/components/Overlay/NotablePlayers'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
 import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
 import { RestrictFeature } from '@/components/RestrictFeature'
 import { Settings } from '@/lib/defaultSettings'
+import type { blockType } from '@/lib/devConsts'
+import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
+import type { RankImageDetails, wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { MinimapBlocker } from './blocker/MinimapBlocker'
+
+type InGameOverlaysProps = {
+  wl: wlType
+  block: blockType
+  rankImageDetails: RankImageDetails
+  paused: boolean
+  roshan: RoshanState
+  setRoshan: Dispatch<SetStateAction<RoshanState>>
+  setAegis: Dispatch<SetStateAction<AegisState>>
+  aegis: AegisState
+  notablePlayers: NotablePlayer[]
+}
 
 export const InGameOverlays = ({
   wl,
@@ -23,12 +39,12 @@ export const InGameOverlays = ({
   setAegis,
   aegis,
   notablePlayers,
-}) => {
+}: InGameOverlaysProps) => {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 
-  if (!['spectator', 'playing', 'arcade'].includes(block.type)) return null
+  if (!['spectator', 'playing', 'arcade'].includes(block.type ?? '')) return null
 
   return (
     <>

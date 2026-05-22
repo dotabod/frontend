@@ -90,7 +90,7 @@ export default function SceneSwitcher(): React.ReactNode {
           </li>
           <li>Must create the following scenes (case sensitive)</li>
           <ul className='ml-4 list-none space-y-6'>
-            {Object.keys(scenes).map((sceneKey: string) => {
+            {(Object.keys(scenes) as (keyof typeof scenes)[]).map((sceneKey) => {
               const scene = scenes[sceneKey]
               return (
                 <li key={sceneKey}>
@@ -100,7 +100,11 @@ export default function SceneSwitcher(): React.ReactNode {
                       hideTierBadge
                       settingKey={sceneKey as SettingKeys}
                       label={scene.label}
-                      placeholder={defaultSettings['obs-scene-switcher'][sceneKey]}
+                      placeholder={
+                        (
+                          defaultSettings['obs-scene-switcher'] as unknown as Record<string, string>
+                        )[sceneKey]
+                      }
                       value={scene.value}
                       maxLength={200}
                       onChange={(value) => handleSceneName(value, scene.update)}

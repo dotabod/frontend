@@ -33,7 +33,7 @@ export const NotablePlayers = ({
   return (
     <div id='notable-players'>
       {(players || []).map((player, i) => {
-        const flagKey = `${player.country_code?.toUpperCase()}Flag`
+        const flagKey = `${player.country_code?.toUpperCase()}Flag` as keyof typeof Flags
         // biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
         const FlagComp = player.country_code ? Flags[flagKey] : null
 

@@ -1,4 +1,6 @@
-export function QrCodeBorder(props) {
+import type { SVGProps } from 'react'
+
+export function QrCodeBorder(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox='0 0 96 96' fill='none' aria-hidden='true' {...props}>
       <path

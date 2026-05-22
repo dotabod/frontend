@@ -1,4 +1,6 @@
-const HeroUnit = ({ data, team }) => {
+import type { MinimapUnitProps } from '@/lib/redux/store'
+
+const HeroUnit = ({ data, team }: MinimapUnitProps) => {
   const isEnemy = data.teamP !== team
   const unitType = data.unitname
   const isBrewling = unitType.includes('brewmaster')
