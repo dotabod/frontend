@@ -118,7 +118,7 @@ export const PlanDescription = ({
 
           {messageType === 'trial' && (
             <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Includes 14-day free trial
+              Includes 14 day free trial
             </span>
           )}
         </div>

@@ -101,7 +101,7 @@ const PaymentMethodPicker = memo(
             })}
           </fieldset>
         </LayoutGroup>
-        <div className='mt-2 min-h-4 text-xs text-gray-400'>
+        <div aria-live='polite' className='mt-2 min-h-8 text-xs text-gray-400'>
           <AnimatePresence mode='wait' initial={false}>
             <motion.p
               key={`${value}-${activePeriod}`}

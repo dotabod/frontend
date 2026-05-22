@@ -1,5 +1,5 @@
 import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
-import { App, Button, notification, Tooltip } from 'antd'
+import { App, Button, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { Bitcoin, Wallet } from 'lucide-react'
 import Image from 'next/image'
@@ -77,7 +77,7 @@ function Plan({
     STABLE_SWR_OPTIONS,
   )
 
-  const { message, modal } = App.useApp()
+  const { message, modal, notification } = App.useApp()
   const { data: session } = useSession()
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false)
   const {
@@ -540,7 +540,7 @@ function Plan({
                     </li>
                     <li>Your access to Pro features will continue uninterrupted</li>
                     <li className='text-amber-400'>
-                      Crypto subscriptions do not auto-renew - you'll receive an invoice to pay
+                      Crypto subscriptions do not auto-renew, so you'll receive an invoice to pay
                       manually
                     </li>
                   </ul>
@@ -608,8 +608,8 @@ function Plan({
                   <li>Your current crypto subscription will remain active until its end date</li>
                   <li>Any pending crypto invoices will be automatically canceled</li>
                   <li>Future payments will be automatically charged to your card</li>
-                  <li className='text-green-400'>
-                    Your subscription will auto-renew - no need to manually pay invoices
+                  <li className='text-emerald-400'>
+                    Your subscription will auto-renew, so there is no need to pay invoices manually
                   </li>
                 </ul>
                 <p className='mt-4'>Would you like to proceed with this change?</p>
@@ -800,7 +800,7 @@ function Plan({
             : 'bg-gray-900/40 ring-1 ring-gray-800',
         )}
       >
-        <h3 className='flex flex-wrap items-center gap-y-2 text-sm font-semibold text-gray-100'>
+        <h3 className='flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-gray-100'>
           {logo ? (
             activePeriod === 'lifetime' && tier === SUBSCRIPTION_TIERS.PRO ? (
               <Image
@@ -816,9 +816,9 @@ function Plan({
           ) : (
             <Logomark className={clsx('h-6 w-6 flex-none', logomarkClassName)} />
           )}
-          <span className='ml-4'>{name}</span>
+          <span>{name}</span>
           {featured && !hasActivePlan && !inGracePeriod && (
-            <span className='ml-2 rounded-full border border-purple-500/40 bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-300'>
+            <span className='rounded-full border border-purple-500/40 bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-300'>
               Recommended
             </span>
           )}
@@ -826,17 +826,17 @@ function Plan({
             tier === SUBSCRIPTION_TIERS.PRO &&
             !hasActivePlan &&
             activePeriod !== 'lifetime' && (
-              <span className='ml-2 text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
+              <span className='text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
                 Free until {gracePeriodPrettyDate}
               </span>
             )}
           {hasActivePlan && isCurrentPlan && (
-            <span className='ml-2 text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300'>
+            <span className='text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300'>
               Your plan
             </span>
           )}
           {hasCreditBalance && tier === SUBSCRIPTION_TIERS.PRO && activePeriod !== 'lifetime' && (
-            <span className='ml-2 flex items-center gap-1 rounded-full border border-indigo-500/30 bg-indigo-500/15 px-2 py-0.5 text-xs text-indigo-300'>
+            <span className='flex items-center gap-1 rounded-full border border-indigo-500/30 bg-indigo-500/15 px-2 py-0.5 text-xs text-indigo-300'>
               <Wallet size={12} />
               Credit: {formattedCreditBalance}
             </span>
@@ -884,7 +884,7 @@ function Plan({
                   ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
                   : 'border border-gray-700 bg-transparent text-gray-200 hover:border-gray-600 hover:bg-gray-800',
               )}
-              aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+              aria-label={`${buttonText} (${name} plan)`}
             >
               {buttonText}
             </Button>
@@ -902,7 +902,7 @@ function Plan({
                 ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
                 : 'border border-gray-700 bg-transparent text-gray-200 hover:border-gray-600 hover:bg-gray-800',
             )}
-            aria-label={`Get started with the ${name} plan for ${price[activePeriod]}`}
+            aria-label={`${buttonText} (${name} plan)`}
           >
             {buttonText}
           </Button>
@@ -933,13 +933,13 @@ function Plan({
                   )}
                 >
                   <span className='break-words'>
-                    {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 1} interested)`}
+                    {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 0} interested)`}
                   </span>
                 </Button>
               ) : (
                 <div className='flex flex-col gap-1 items-center'>
                   <span className='text-xs break-words'>
-                    {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
+                    {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 0} interested)`}
                   </span>
                   <Button
                     type='link'

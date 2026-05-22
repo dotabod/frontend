@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { Card } from '@/ui/card'
 import { gracePeriodPrettyDate, type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 import Plan from '../Plan'
 import { SubscriptionStatus } from '../Subscription/SubscriptionStatus'
@@ -57,7 +56,7 @@ export const plans = [
       lifetime: '$99',
     },
     tier: SUBSCRIPTION_TIERS.PRO,
-    description: 'Everything in Free, plus auto-predictions, advanced overlays, and pro commands.',
+    description: 'Everything in Free, plus auto predictions, advanced overlays, and pro commands.',
     button: {
       label: 'Subscribe',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.PRO}`,
@@ -104,7 +103,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
     return null
   }
 
-  const Wrapper = showTitle ? 'div' : Card
+  const Wrapper = 'div'
 
   return (
     <div>

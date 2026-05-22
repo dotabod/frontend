@@ -32,6 +32,8 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
     }
   }, [subscription, onChange])
 
+  // Computed in render (not module scope) because `plans` is a circular import
+  // from BillingPlans and may be uninitialised at module-eval time.
   const maxSavings = Math.max(
     ...plans
       .filter((plan) => plan.price.monthly !== '$0')
@@ -39,10 +41,12 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
   )
 
   return (
-    <div className='inline-flex flex-col items-center'>
-      <span className='mb-2 text-xs text-gray-500'>Billing</span>
+    <div className='flex w-full max-w-sm flex-col items-center sm:w-auto sm:max-w-none'>
+      <span aria-hidden className='mb-2 text-xs text-gray-500'>
+        Billing
+      </span>
       <LayoutGroup id={groupId}>
-        <fieldset className='relative grid grid-cols-3 gap-1 rounded-lg border border-gray-800 bg-gray-900/60 p-1'>
+        <fieldset className='relative grid w-full grid-cols-3 gap-1 rounded-lg border border-gray-800 bg-gray-900/60 p-1 sm:w-auto'>
           <legend className='sr-only'>Billing</legend>
           {periods.map((period) => {
             const selected = activePeriod === period
@@ -67,7 +71,7 @@ export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodTog
                 )}
                 <span
                   className={clsx(
-                    'relative z-10 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm capitalize transition-colors md:px-6',
+                    'relative z-10 flex w-full cursor-pointer flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 rounded-md px-3 py-2 text-sm capitalize transition-colors sm:px-4 md:px-6',
                     'peer-focus-visible:outline-hidden peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900',
                     selected ? 'font-semibold text-gray-900' : 'text-gray-300 hover:text-gray-100',
                   )}

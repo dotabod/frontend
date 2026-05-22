@@ -43,7 +43,6 @@ export const PriceDisplay = ({
           className={clsx(
             'flex text-4xl font-bold tracking-tight',
             featured ? 'text-white' : 'text-gray-100',
-            payWithCrypto && 'crypto-price',
           )}
         >
           {price.monthly === price.annual ? (
@@ -90,11 +89,9 @@ export const PriceDisplay = ({
         </p>
       </div>
 
-      {activePeriod === 'annual' && !Number.isNaN(savings) && (
-        <p className={clsx('-mt-10 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-          Saving {savings}%
-        </p>
-      )}
+      <div className={clsx('mt-2 h-5 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+        {activePeriod === 'annual' && !Number.isNaN(savings) ? `Saving ${savings}%` : null}
+      </div>
       <div className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
         <PlanDescription
           tier={tier}
