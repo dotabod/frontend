@@ -12,6 +12,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { fetcher } from '@/lib/fetcher'
 import { STABLE_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { createPaypalCheckout } from '@/lib/paypal-client'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
   calculateSavings,
@@ -462,6 +463,16 @@ function Plan({
         // If free plan, redirect to dashboard
         if (tier === SUBSCRIPTION_TIERS.FREE) {
           window.location.href = '/dashboard'
+          return
+        }
+
+        // PayPal is decoupled from Stripe price IDs — it only needs the period.
+        if (usePayWithPaypal) {
+          const response = await createPaypalCheckout(activePeriod)
+          if (!response.url) {
+            throw new Error('Failed to create checkout session')
+          }
+          window.location.href = response.url
           return
         }
 

@@ -1,6 +1,15 @@
 import prisma from '@/lib/db'
 import { createOrder, createSubscription } from '@/lib/paypal'
-import { getCurrentPeriod } from '@/utils/subscription'
+import { getPriceId, SUBSCRIPTION_TIERS } from '@/utils/subscription'
+
+type Period = 'monthly' | 'annual' | 'lifetime'
+
+// Best-effort Stripe price ID purely as a display hint for the dashboard's
+// period detection. Empty when not configured (e.g. sandbox) — PayPal does not
+// need it; the period drives everything functional.
+function displayPriceId(period: Period): string | null {
+  return getPriceId(SUBSCRIPTION_TIERS.PRO, period, false) || null
+}
 
 function getPlanId(period: 'monthly' | 'annual'): string {
   const env =
@@ -23,14 +32,14 @@ function getLifetimeAmountCents(): number {
  * (PayPal owns billing); lifetime uses a one-time Order. No Stripe involved.
  */
 export async function createPaypalApproval(params: {
-  priceId: string
+  period: Period
   userId: string
   email?: string
 }): Promise<string> {
-  const { priceId, userId, email } = params
-  const period = getCurrentPeriod(priceId)
+  const { period, userId, email } = params
   const baseUrl = process.env.NEXTAUTH_URL || 'https://dotabod.com'
   const cancelUrl = `${baseUrl}/dashboard/billing?paid=false`
+  const stripePriceId = displayPriceId(period)
 
   if (period === 'lifetime') {
     const { orderId, approveUrl } = await createOrder({
@@ -49,14 +58,14 @@ export async function createPaypalApproval(params: {
         amount: getLifetimeAmountCents() / 100,
         currency: 'usd',
         status: 'CREATED',
-        metadata: { priceType: 'lifetime', stripePriceId: priceId },
+        metadata: { priceType: 'lifetime', stripePriceId },
       },
     })
 
     return approveUrl
   }
 
-  const planId = getPlanId(period === 'annual' ? 'annual' : 'monthly')
+  const planId = getPlanId(period)
   const { subscriptionId, approveUrl } = await createSubscription({
     planId,
     userId,
@@ -71,7 +80,7 @@ export async function createPaypalApproval(params: {
       userId,
       planId,
       status: 'APPROVAL_PENDING',
-      metadata: { priceType: period, stripePriceId: priceId },
+      metadata: { priceType: period, stripePriceId },
     },
   })
 

@@ -24,13 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
     }
 
-    const { priceId } = (await req.body) as { priceId?: string }
-    if (!priceId) {
-      return res.status(400).json({ error: 'Price ID is required' })
+    const { period } = (await req.body) as { period?: string }
+    if (period !== 'monthly' && period !== 'annual' && period !== 'lifetime') {
+      return res.status(400).json({ error: 'Valid period is required' })
     }
 
     const url = await createPaypalApproval({
-      priceId,
+      period,
       userId: session.user.id,
       email: session.user.email ?? undefined,
     })
