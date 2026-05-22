@@ -61,6 +61,7 @@ const OverlayPage = () => {
   const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)
   const isFirstLoad = useRef(true)
   const blockTypeChangeTimer = useRef<NodeJS.Timeout | null>(null)
+  const reportedErrorStatus = useRef<number | null>(null)
 
   const [block, setBlock] = useState<blockType>({
     matchId: null,
@@ -181,15 +182,21 @@ const OverlayPage = () => {
 
   useEffect(() => {
     if (error && !is404) {
-      Sentry.captureException(new Error('Error in overlay page fetching settings'), {
-        extra: {
-          errorFromHook: error,
-          status: (error as PotentialError)?.status,
-          message: (error as PotentialError)?.message,
-          is404Calculated: is404,
-          originalData: original,
-        },
-      })
+      const status = (error as PotentialError)?.status
+      // Skip transient network errors (no status -> SWR will retry) and 5xx
+      // (already captured server-side in /api/settings). Report each status once.
+      const isReportable = typeof status === 'number' && status < 500 && status !== 404
+      if (isReportable && reportedErrorStatus.current !== status) {
+        reportedErrorStatus.current = status
+        Sentry.captureException(new Error('Error in overlay page fetching settings'), {
+          extra: {
+            status,
+            message: (error as PotentialError)?.message,
+          },
+        })
+      }
+    } else {
+      reportedErrorStatus.current = null
     }
 
     if (is404) {
@@ -221,7 +228,7 @@ const OverlayPage = () => {
     } else {
       notification.destroy('auth-error')
     }
-  }, [error, notification, is404, original])
+  }, [error, notification, is404])
 
   useEffect(() => {
     if (!isDevMode) return
