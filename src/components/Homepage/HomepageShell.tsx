@@ -5,8 +5,7 @@ import CookieConsent from '@/components/CookieConsent'
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
-import HubSpotIdentification from '../HubSpotIdentification'
-import HubSpotScript from '../HubSpotScript'
+import HubSpot from '../HubSpot'
 
 interface SEOProps {
   title?: string
@@ -107,8 +106,7 @@ const HomepageShell = ({
 
       <Banner />
       <Header />
-      <HubSpotScript />
-      <HubSpotIdentification />
+      <HubSpot />
       <main
         className='bg-gray-800'
         style={{

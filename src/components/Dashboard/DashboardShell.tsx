@@ -14,8 +14,7 @@ import CookieConsent from '@/components/CookieConsent'
 import { CompactDisableToggle } from '@/components/Dashboard/CompactDisableToggle'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
-import HubSpotIdentification from '@/components/HubSpotIdentification'
-import HubSpotScript from '@/components/HubSpotScript'
+import HubSpot from '@/components/HubSpot'
 import { DarkLogo, Logomark } from '@/components/Logo'
 import GiftNotification from '@/components/Subscription/GiftNotification'
 import { UserAccountNav } from '@/components/UserAccountNav'
@@ -321,8 +320,7 @@ export default function DashboardShell({
         {seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
       </Head>
       <Banner />
-      <HubSpotScript />
-      <HubSpotIdentification />
+      <HubSpot />
       <Layout className='h-full bg-gray-800'>
         <Sider
           breakpoint='md'
