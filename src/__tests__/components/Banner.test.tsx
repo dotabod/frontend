@@ -1,6 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import useSWR from 'swr'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Banner from '@/components/Banner'
+
+vi.mock('swr', () => ({
+  default: vi.fn(),
+}))
 
 // Mock next/link
 vi.mock('next/link', () => ({
@@ -15,37 +20,78 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+const mockUseSWR = vi.mocked(useSWR)
+
+function mockPost(post: { slug: string; title: string; description: string; date: string } | null) {
+  mockUseSWR.mockReturnValue({
+    data: { post },
+    error: undefined,
+    isLoading: false,
+    isValidating: false,
+    mutate: vi.fn(),
+  } as unknown as ReturnType<typeof useSWR>)
+}
+
 describe('Banner', () => {
+  const freshPost = {
+    slug: 'crypto-payments-launch',
+    title: 'Pay with crypto',
+    description: 'NOWPayments support',
+    // 2 days before the mocked system time, so it is within the 14-day freshness window
+    date: '2025-10-02T12:00:00Z',
+  }
+
   beforeEach(() => {
-    // Mock the current date to be within the crypto announcement period (Oct 4, 2025 ± 7 days)
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2025-10-04T12:00:00Z'))
+
+    const store: Record<string, string> = {}
+    vi.stubGlobal('localStorage', {
+      getItem: vi.fn((key: string) => store[key] ?? null),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = value
+      }),
+      removeItem: vi.fn((key: string) => {
+        delete store[key]
+      }),
+      clear: vi.fn(() => {
+        for (const key of Object.keys(store)) delete store[key]
+      }),
+    })
   })
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
   })
 
-  it('renders the banner when date is within crypto announcement period', () => {
+  it('renders the banner when the latest post is fresh', () => {
+    mockPost(freshPost)
     render(<Banner />)
 
-    expect(screen.getByText('New! Pay for Dotabod Pro with cryptocurrency.')).toBeInTheDocument()
-    expect(screen.getByText('Learn More')).toBeInTheDocument()
-    expect(screen.getByText('Learn More').closest('a')).toHaveAttribute(
+    expect(screen.getByText(/Fresh on the blog/)).toBeInTheDocument()
+    expect(screen.getByText(/Pay with crypto/)).toBeInTheDocument()
+    expect(screen.getByText('Read it').closest('a')).toHaveAttribute(
       'href',
       '/blog/crypto-payments-launch',
     )
   })
 
-  it('does not render the banner when date is outside crypto announcement period', () => {
-    vi.setSystemTime(new Date('2025-11-01'))
-
+  it('does not render the banner when there is no post', () => {
+    mockPost(null)
     const { container } = render(<Banner />)
     expect(container.firstChild).toBeNull()
   })
 
-  it('hides the banner when dismiss button is clicked', () => {
+  it('does not render the banner when the post is stale', () => {
+    mockPost({ ...freshPost, date: '2025-09-01T12:00:00Z' })
+    const { container } = render(<Banner />)
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('hides the banner when the dismiss button is clicked', () => {
+    mockPost(freshPost)
     render(<Banner />)
 
     const dismissButton = screen.getByRole('button')
@@ -53,9 +99,10 @@ describe('Banner', () => {
 
     fireEvent.click(dismissButton)
 
-    // Banner should be hidden after clicking dismiss
-    expect(
-      screen.queryByText('New! Pay for Dotabod Pro with cryptocurrency.'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/Fresh on the blog/)).not.toBeInTheDocument()
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      'dotabod-banner-dismissed-slug',
+      'crypto-payments-launch',
+    )
   })
 })
