@@ -79,6 +79,8 @@ model User {
   subscription                      Subscription[]
   OpenNodeCharge                    OpenNodeCharge[]
   NowPaymentsInvoice                NowPaymentsInvoice[]
+  PayPalOrder                       PayPalOrder[]
+  PayPalSubscription                PayPalSubscription[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([locale])
@@ -425,6 +427,47 @@ model NowPaymentsInvoice {
   @@index([status])
   @@index([paymentId])
   @@map("nowpayments_invoices")
+}
+
+// Recurring PayPal subscription. PayPal owns the billing schedule and
+// auto-charges each cycle; we sync the subscriptions table from PayPal webhooks.
+model PayPalSubscription {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()"))
+  paypalSubscriptionId String    @unique @map("paypal_subscription_id")
+  userId               String    @map("user_id")
+  planId               String    @map("plan_id")
+  status               String
+  payerId              String?   @map("payer_id")
+  metadata             Json?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+  lastWebhookAt        DateTime? @map("last_webhook_at")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("paypal_subscriptions")
+}
+
+// One-time PayPal order, used only for lifetime purchases.
+model PayPalOrder {
+  id            String    @id @default(dbgenerated("gen_random_uuid()"))
+  paypalOrderId String    @unique @map("paypal_order_id")
+  captureId     String?   @map("capture_id")
+  userId        String    @map("user_id")
+  amount        Float
+  currency      String
+  status        String
+  payerId       String?   @map("payer_id")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+  lastWebhookAt DateTime? @map("last_webhook_at")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("paypal_orders")
 }
 
 enum SubscriptionStatus {

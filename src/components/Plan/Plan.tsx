@@ -25,6 +25,7 @@ import {
 import CryptoToggle from '../CryptoToggle'
 import ErrorBoundary from '../ErrorBoundary'
 import { Logomark } from '../Logo'
+import PayPalToggle from '../PayPalToggle'
 import { FeatureList } from './FeatureList'
 import { PriceDisplay } from './PriceDisplay'
 
@@ -172,12 +173,40 @@ function Plan({
 
   // Check if crypto payments feature is enabled
   const isCryptoPaymentsEnabled = isFeatureEnabled('enableCryptoPayments')
+  // Check if PayPal payments feature is enabled
+  const isPaypalPaymentsEnabled = isFeatureEnabled('enablePaypalPayments')
+
+  // Detect whether the current subscription was paid with PayPal
+  const isPaidWithPaypal = useMemo(() => {
+    if (tier === SUBSCRIPTION_TIERS.FREE) return false
+    const metadata =
+      subscription?.metadata &&
+      typeof subscription.metadata === 'object' &&
+      !Array.isArray(subscription.metadata)
+        ? (subscription.metadata as Record<string, unknown>)
+        : null
+    return metadata?.paymentProvider === 'paypal'
+  }, [subscription?.metadata, tier])
+
+  const [payWithPaypal, setPayWithPaypal] = useState(
+    () => isPaypalPaymentsEnabled && tier === SUBSCRIPTION_TIERS.PRO && isPaidWithPaypal,
+  )
 
   // Initialize payWithCrypto state based on subscription data and feature flag
   // Only enable for Pro tier and default to true if user already has a crypto subscription AND feature is enabled
   const [payWithCrypto, setPayWithCrypto] = useState(() => {
     return isCryptoPaymentsEnabled && tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto
   })
+
+  // Keep crypto and PayPal toggles mutually exclusive
+  const selectCrypto = useCallback((value: boolean) => {
+    setPayWithCrypto(value)
+    if (value) setPayWithPaypal(false)
+  }, [])
+  const selectPaypal = useCallback((value: boolean) => {
+    setPayWithPaypal(value)
+    if (value) setPayWithCrypto(false)
+  }, [])
 
   // Update payWithCrypto when subscription data changes or feature flag status changes
   useEffect(() => {
@@ -419,6 +448,8 @@ function Plan({
       // Use the override value if provided, otherwise use the state value
       const usePayWithCrypto =
         overrideCryptoPreference !== undefined ? overrideCryptoPreference : payWithCrypto
+      const usePayWithPaypal = payWithPaypal && !usePayWithCrypto
+      const selectedMethod = usePayWithCrypto ? 'crypto' : usePayWithPaypal ? 'paypal' : undefined
 
       try {
         if (!session) {
@@ -685,7 +716,7 @@ function Plan({
                 const response = await createCheckoutSession(
                   priceId,
                   session.user.id,
-                  usePayWithCrypto ? 'crypto' : undefined,
+                  selectedMethod,
                 )
 
                 if (!response.url) {
@@ -734,11 +765,7 @@ function Plan({
           activePeriod,
           usePayWithCrypto,
         )
-        const response = await createCheckoutSession(
-          priceId,
-          session.user.id,
-          usePayWithCrypto ? 'crypto' : undefined,
-        )
+        const response = await createCheckoutSession(priceId, session.user.id, selectedMethod)
 
         if (!response.url) {
           throw new Error('Failed to create checkout session')
@@ -766,6 +793,7 @@ function Plan({
       hasActivePlan,
       isCurrentPlan,
       isPaidWithCrypto,
+      payWithPaypal,
       redirectingToCheckout,
     ],
   )
@@ -927,20 +955,26 @@ function Plan({
           </Button>
         )}
 
-        {isCryptoPaymentsEnabled && tier !== SUBSCRIPTION_TIERS.FREE && (
-          <div className='mt-3 flex flex-col gap-2 text-center'>
-            {/* Payment method selection - only show for Pro tier and if feature is enabled */}
-            {tier === SUBSCRIPTION_TIERS.PRO && (
+        {(isCryptoPaymentsEnabled || isPaypalPaymentsEnabled) &&
+          tier === SUBSCRIPTION_TIERS.PRO && (
+            <div className='mt-3 flex flex-col gap-2 text-center'>
+              {/* Payment method selection - only show for Pro tier and if feature is enabled */}
               <CryptoToggle
                 payWithCrypto={payWithCrypto}
-                setPayWithCrypto={setPayWithCrypto}
+                setPayWithCrypto={selectCrypto}
                 activePeriod={activePeriod}
                 featured={featured}
                 isEnabled={isCryptoPaymentsEnabled}
               />
-            )}
-          </div>
-        )}
+              <PayPalToggle
+                payWithPaypal={payWithPaypal}
+                setPayWithPaypal={selectPaypal}
+                activePeriod={activePeriod}
+                featured={featured}
+                isEnabled={isPaypalPaymentsEnabled}
+              />
+            </div>
+          )}
 
         {/* Crypto interest button */}
         {!isCryptoPaymentsEnabled && tier !== SUBSCRIPTION_TIERS.FREE && (
