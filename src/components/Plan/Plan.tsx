@@ -154,16 +154,38 @@ function Plan({
   })
   const payWithCrypto = paymentMethod === 'crypto'
   const payWithPaypal = paymentMethod === 'paypal'
+  const didInitMethod = useRef(false)
 
-  // Re-sync the method once subscription data resolves, and fall back to card if
-  // a feature flag is turned off while its method is selected.
+  // Reflect the subscription's actual payment method ONCE, after it resolves
+  // (it is often undefined on first render). Only runs once so it never clobbers
+  // a deliberate selection the user makes in the picker afterward.
   useEffect(() => {
-    if (isCryptoPaymentsEnabled && tier === SUBSCRIPTION_TIERS.PRO && isPaidWithCrypto) {
+    if (didInitMethod.current) return
+    if (tier !== SUBSCRIPTION_TIERS.PRO || !subscription) return
+    didInitMethod.current = true
+    if (isPaypalPaymentsEnabled && isPaidWithPaypal) {
+      setPaymentMethod('paypal')
+    } else if (isCryptoPaymentsEnabled && isPaidWithCrypto) {
       setPaymentMethod('crypto')
-    } else if (!isCryptoPaymentsEnabled && payWithCrypto) {
+    }
+  }, [
+    tier,
+    subscription,
+    isPaidWithPaypal,
+    isPaidWithCrypto,
+    isPaypalPaymentsEnabled,
+    isCryptoPaymentsEnabled,
+  ])
+
+  // If the selected method's feature flag gets turned off, fall back to card so
+  // the user can't be stuck on a method the picker no longer offers.
+  useEffect(() => {
+    if (payWithCrypto && !isCryptoPaymentsEnabled) {
+      setPaymentMethod('card')
+    } else if (payWithPaypal && !isPaypalPaymentsEnabled) {
       setPaymentMethod('card')
     }
-  }, [tier, isPaidWithCrypto, isCryptoPaymentsEnabled, payWithCrypto])
+  }, [payWithCrypto, payWithPaypal, isCryptoPaymentsEnabled, isPaypalPaymentsEnabled])
 
   const savings = calculateSavings(price.monthly, price.annual)
 
@@ -393,20 +415,26 @@ function Plan({
   }
 
   const handleSubscribe = useCallback(
-    async (overrideCryptoPreference?: boolean) => {
+    async (overrideMethod?: PaymentMethod) => {
       if (redirectingToCheckout) return // Prevent multiple calls while redirecting
       setRedirectingToCheckout(true)
 
-      // Use the override value if provided, otherwise use the state value
-      const usePayWithCrypto =
-        overrideCryptoPreference !== undefined ? overrideCryptoPreference : payWithCrypto
-      const usePayWithPaypal = payWithPaypal && !usePayWithCrypto
+      // Use the override (e.g. restored from the post-login URL) if provided,
+      // otherwise the current picker selection. The enum is mutually exclusive.
+      const method = overrideMethod ?? paymentMethod
+      const usePayWithCrypto = method === 'crypto'
+      const usePayWithPaypal = method === 'paypal'
       const selectedMethod = usePayWithCrypto ? 'crypto' : usePayWithPaypal ? 'paypal' : undefined
 
       try {
         if (!session) {
+          const methodParam = usePayWithCrypto
+            ? '&crypto=true'
+            : usePayWithPaypal
+              ? '&paypal=true'
+              : ''
           await signIn('twitch', {
-            callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}${usePayWithCrypto ? '&crypto=true' : ''}`,
+            callbackUrl: `/dashboard/billing?plan=${tier}&period=${activePeriod}${methodParam}`,
           })
           return
         }
@@ -703,10 +731,13 @@ function Plan({
           return
         }
 
-        // If user has an active paid subscription, redirect to portal
+        // If user has an active Stripe-managed subscription, redirect to portal.
+        // PayPal subs carry a synthetic `paypal_` id that Stripe can't resolve,
+        // so they fall through to a fresh checkout for the chosen method instead.
         if (
           isSubscriptionActive({ status: subscription?.status }) &&
-          subscription?.stripeSubscriptionId
+          subscription?.stripeSubscriptionId &&
+          !isPaypalSubscription(subscription)
         ) {
           const response = await fetch('/api/stripe/portal', {
             method: 'POST',
@@ -751,18 +782,18 @@ function Plan({
       subscription,
       isLifetimePlan,
       modal,
-      payWithCrypto,
+      notification,
+      paymentMethod,
       hasActivePlan,
       isCurrentPlan,
       isPaidWithCrypto,
-      payWithPaypal,
       redirectingToCheckout,
     ],
   )
 
   // Add effect to handle auto-subscription based on URL parameters
   useEffect(() => {
-    const { plan, period, crypto } = router.query
+    const { plan, period, crypto, paypal } = router.query
 
     // Check if URL parameters match this plan's tier and period
     if (
@@ -780,8 +811,10 @@ function Plan({
       router.replace(pathname, undefined, { shallow: true })
       message.success('Redirecting to checkout...')
 
-      // Trigger subscription process with crypto preference from URL
-      handleSubscribe(crypto === 'true')
+      // Restore the payment method the user chose before signing in.
+      const restoredMethod: PaymentMethod | undefined =
+        crypto === 'true' ? 'crypto' : paypal === 'true' ? 'paypal' : undefined
+      handleSubscribe(restoredMethod)
     }
   }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 
@@ -934,7 +967,7 @@ function Plan({
               ) : (
                 <div className='flex flex-col gap-1 items-center'>
                   <span className='text-xs break-words'>
-                    {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 0} interested)`}
+                    {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
                   </span>
                   <Button
                     type='link'

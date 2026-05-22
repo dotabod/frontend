@@ -93,7 +93,9 @@ export const PlanDescription = ({
 
           {messageType === 'paypal' && (
             <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
-              Note: Free trial is not available with PayPal payments
+              {hasCreditBalance
+                ? `Note: PayPal checkout will not apply your ${formattedCreditBalance} account credit, and free trials are not available with PayPal.`
+                : 'Note: Free trial is not available with PayPal payments'}
             </span>
           )}
 

@@ -3,7 +3,11 @@ import clsx from 'clsx'
 import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
-import { getBillingSummaryInfo, isPaypalSubscription } from '@/utils/subscription'
+import {
+  getBillingSummaryInfo,
+  isPaypalSubscription,
+  isSubscriptionActive,
+} from '@/utils/subscription'
 import { BillingNotice } from './BillingNotice'
 
 const chipClasses = {
@@ -83,7 +87,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
           <div className='text-base font-medium text-gray-100'>{summary.nextStepValue}</div>
         </div>
 
-        {isPayPal ? (
+        {isPayPal && isSubscriptionActive({ status: subscription?.status }) ? (
           <div className='sm:text-right'>
             <Button
               type='primary'
@@ -99,21 +103,25 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
               PayPal account's automatic payments.
             </p>
           </div>
+        ) : summary.canManageInStripe ? (
+          <div className='sm:text-right'>
+            <Button
+              type='primary'
+              icon={<ExternalLinkIcon size={14} />}
+              onClick={onOpenPortal}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
+            </Button>
+            <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ml-auto'>
+              {summary.portalHelpText}
+            </p>
+          </div>
         ) : (
-          summary.canManageInStripe && (
-            <div className='sm:text-right'>
-              <Button
-                type='primary'
-                icon={<ExternalLinkIcon size={14} />}
-                onClick={onOpenPortal}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
-              </Button>
-              <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ml-auto'>
-                {summary.portalHelpText}
-              </p>
-            </div>
+          summary.portalHelpText && (
+            <p className='max-w-xs text-xs leading-5 text-gray-500 sm:text-right'>
+              {summary.portalHelpText}
+            </p>
           )
         )}
       </div>

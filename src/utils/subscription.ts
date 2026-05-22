@@ -253,13 +253,18 @@ export function isSubscriptionActive(
   return false
 }
 
-// Single source of truth for "is this a PayPal-backed subscription". PayPal
-// sets both signals; check both so callers can never disagree.
+// Single source of truth for "is this a PayPal-backed subscription". The
+// subscription id reflects the CURRENT provider (migrating to Stripe replaces
+// the `paypal_` id), so when an id is present it is authoritative and stale
+// `paymentProvider` metadata can't misclassify the row. Metadata is only a
+// fallback for records that have no subscription id yet.
 export function isPaypalSubscription(
   subscription: { metadata?: unknown; stripeSubscriptionId?: string | null } | null | undefined,
 ): boolean {
   if (!subscription) return false
-  if (subscription.stripeSubscriptionId?.startsWith('paypal_')) return true
+  if (subscription.stripeSubscriptionId) {
+    return subscription.stripeSubscriptionId.startsWith('paypal_')
+  }
   const metadata =
     subscription.metadata &&
     typeof subscription.metadata === 'object' &&

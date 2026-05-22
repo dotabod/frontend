@@ -16,7 +16,12 @@ function getStripe(): Stripe {
 }
 
 export const stripe = new Proxy({} as Stripe, {
-  get(_target, prop, receiver) {
-    return Reflect.get(getStripe(), prop, receiver)
+  get(_target, prop) {
+    const instance = getStripe()
+    // Resolve against the real instance (receiver = instance) so accessor
+    // getters bind to it, and bind methods so a call through this Proxy keeps
+    // `this` as the real Stripe instance (its resources use private # fields).
+    const value = Reflect.get(instance, prop, instance)
+    return typeof value === 'function' ? value.bind(instance) : value
   },
 })

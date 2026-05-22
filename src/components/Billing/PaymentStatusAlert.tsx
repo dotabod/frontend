@@ -6,7 +6,10 @@ import { BillingNotice } from './BillingNotice'
 
 const Spinner = () => <Loader2Icon size={16} className='animate-spin' />
 
-const TERMINAL_STATUSES = ['success', 'error', 'cancelled', 'expired']
+// Anything that will not resolve itself by polling again. Must mirror the
+// statusInfo.type values emitted by /api/payment-status (processing is the only
+// non-terminal state; warning = amount mismatch, unknown = unclassified).
+const TERMINAL_STATUSES = ['success', 'error', 'cancelled', 'expired', 'warning', 'unknown']
 const isTerminalStatus = (type?: string) => !!type && TERMINAL_STATUSES.includes(type)
 
 interface PaymentStatus {
@@ -201,7 +204,7 @@ export const PaymentStatusAlert = () => {
         <dd>{paymentStatus.invoice.number || paymentStatus.invoiceId}</dd>
         <dt>Amount</dt>
         <dd>
-          {paymentStatus.amount} {paymentStatus.currency.toUpperCase()}
+          {paymentStatus.amount} {(paymentStatus.currency ?? '').toUpperCase()}
         </dd>
         <dt>Charge ID</dt>
         <dd className='truncate'>{paymentStatus.chargeId}</dd>
