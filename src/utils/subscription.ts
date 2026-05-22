@@ -280,14 +280,9 @@ const PRICE_IDS: SubscriptionPriceId[] = [
   },
 ]
 
-export const CRYPTO_PRICE_IDS: SubscriptionPriceId[] = [
-  {
-    tier: SUBSCRIPTION_TIERS.PRO,
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
-    annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
-    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID || '',
-  },
-]
+// Crypto pays against the same Stripe prices as card payments, so this is an
+// alias of PRICE_IDS rather than a duplicated literal.
+export const CRYPTO_PRICE_IDS: SubscriptionPriceId[] = PRICE_IDS
 
 export function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
@@ -305,8 +300,8 @@ export function getPriceId(
 export function getCurrentPeriod(priceId?: string | null): PricePeriod {
   if (!priceId) return 'monthly'
 
-  // Check both regular and gift price IDs
-  const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS, ...CRYPTO_PRICE_IDS]
+  // Check both regular and gift price IDs (CRYPTO_PRICE_IDS aliases PRICE_IDS)
+  const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS]
 
   if (allPriceIds.some((price) => price.monthly === priceId)) return 'monthly'
   if (allPriceIds.some((price) => price.annual === priceId)) return 'annual'
