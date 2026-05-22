@@ -92,7 +92,7 @@ const faqs: Faq[] = [
     id: 'steam-connect',
     category: 'steam',
     question: "Steam won't connect",
-    keywords: ['steam', 'connect', 'mmr', 'account', 'facet', 'powershell', 'cfg', 'gsi'],
+    keywords: ['steam', 'connect', 'mmr', 'account', 'innate', 'powershell', 'cfg', 'gsi'],
     answer: (
       <div className='flex flex-col gap-3'>
         <LiveRequiredNote />
@@ -108,8 +108,8 @@ const faqs: Faq[] = [
               <strong>Play any Dota 2 match or demo a hero</strong>
               <div className='mt-1 text-sm'>
                 While you're live, Dotabod detects your Steam account automatically. Type{' '}
-                <Tag>!facet</Tag> in chat: if Dotabod replies with your hero's facet, it found your
-                Steam account.
+                <Tag>!innate</Tag> in chat: if Dotabod replies with your hero's innate, it found
+                your Steam account.
               </div>
             </span>,
             <span key={2}>

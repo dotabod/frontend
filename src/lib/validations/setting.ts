@@ -109,7 +109,6 @@ const settingsSchema = {
   queueBlockerFindMatch: z.boolean(),
   queueBlockerFindMatchText: z.string().max(45),
   commandSpectators: z.boolean(),
-  commandFacet: z.boolean(),
   commandInnate: z.boolean(),
   commandShard: z.boolean(),
   commandAghs: z.boolean(),

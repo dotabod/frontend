@@ -29,7 +29,6 @@ export const commands = {
   commandResetwl: true,
   commandLocale: true,
   commandSpectators: true,
-  commandFacet: true,
   commandInnate: true,
   commandShard: true,
   commandAghs: true,

@@ -603,21 +603,6 @@ const CommandDetail: Record<
       />
     ),
   },
-  commandFacet: {
-    key: 'commandFacet',
-    title: 'Facet Information',
-    description: 'Provides information about the selected facet of a hero.',
-    cmd: '!facet jug 2',
-    alias: [],
-    allowed: 'all',
-    response: (props) => (
-      <TwitchChat
-        {...props}
-        command='!facet'
-        response='Juggernaut facet 2: Healing Ward · Summons a Healing Ward that heals all nearby allies.'
-      />
-    ),
-  },
   commandWinProbability: {
     key: 'commandWinProbability',
     title: 'Win Probability',

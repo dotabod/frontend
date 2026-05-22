@@ -190,7 +190,7 @@ const TroubleshootingContent = ({ isLive }: { isLive: boolean }) => {
       <p>Two ways to trigger the first connection:</p>
       <ul className='list-disc ml-5 space-y-1 text-gray-400'>
         <li>
-          Quick check: demo any hero, then type <Tag>!facet</Tag> in chat to confirm Dotabod sees
+          Quick check: demo any hero, then type <Tag>!innate</Tag> in chat to confirm Dotabod sees
           the game.
         </li>
         <li>Skip testing: just play your first match, the link happens during the game.</li>

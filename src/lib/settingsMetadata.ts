@@ -740,14 +740,6 @@ export const settingsMetadata: SettingMetadata[] = [
     page: { path: '/dashboard/commands', section: 'commands' },
   },
   {
-    key: 'commandFacet',
-    label: '!facet Command',
-    description: 'Show hero facet information',
-    searchTerms: ['facet', 'hero', 'ability', 'skill', 'command'],
-    category: 'commands',
-    page: { path: '/dashboard/commands', section: 'commands' },
-  },
-  {
     key: 'commandWinProbability',
     label: '!wp Command',
     description: 'Show current win probability',
