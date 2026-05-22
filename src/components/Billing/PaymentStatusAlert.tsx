@@ -1,6 +1,10 @@
-import { Alert, App, Button, Spin } from 'antd'
+import { App, Button } from 'antd'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
+import { BillingNotice } from './BillingNotice'
+
+const Spinner = () => <Loader2Icon size={16} className='animate-spin' />
 
 interface PaymentStatus {
   invoiceId: string
@@ -95,37 +99,25 @@ export const PaymentStatusAlert = () => {
 
   if (loading && !paymentStatus) {
     return (
-      <div className='mb-6'>
-        <Alert
-          message='Checking your payment…'
-          description={
-            <div className='flex items-center gap-2'>
-              <Spin size='small' />
-              <span>Crypto payments usually confirm within a few minutes.</span>
-            </div>
-          }
-          type='info'
-          showIcon
-        />
-      </div>
+      <BillingNotice tone='info' icon={<Spinner />} title='Checking your payment'>
+        Crypto payments usually confirm within a few minutes.
+      </BillingNotice>
     )
   }
 
   if (error) {
     return (
-      <div className='mb-6'>
-        <Alert
-          message="We couldn't check your payment"
-          description={error}
-          type='error'
-          showIcon
-          action={
-            <Button size='small' onClick={() => fetchPaymentStatus(invoice as string)}>
-              Try again
-            </Button>
-          }
-        />
-      </div>
+      <BillingNotice
+        tone='error'
+        title="We couldn't check your payment"
+        action={
+          <Button size='small' onClick={() => fetchPaymentStatus(invoice as string)}>
+            Try again
+          </Button>
+        }
+      >
+        {error}
+      </BillingNotice>
     )
   }
 
@@ -151,45 +143,39 @@ export const PaymentStatusAlert = () => {
   }
 
   return (
-    <div className='mb-6'>
-      <Alert
-        message={
-          <div className='flex items-center justify-between'>
-            <span>{paymentStatus.statusInfo.message}</span>
-            {paymentStatus.statusInfo.type === 'processing' && <Spin size='small' />}
-          </div>
-        }
-        description={
-          <div className='space-y-2'>
-            <p>{paymentStatus.statusInfo.description}</p>
-            <div className='text-sm text-gray-400'>
-              <div>Invoice: {paymentStatus.invoice.number || paymentStatus.invoiceId}</div>
-              <div>
-                Amount: {paymentStatus.amount} {paymentStatus.currency.toUpperCase()}
-              </div>
-              <div>Charge ID: {paymentStatus.chargeId}</div>
-            </div>
-          </div>
-        }
-        type={getAlertType(paymentStatus.statusInfo.type)}
-        showIcon
-        closable
-        onClose={handleDismiss}
-        action={
-          <div className='flex gap-2'>
-            {paymentStatus.statusInfo.canRetry && (
-              <Button size='small' onClick={handleRetry}>
-                Get a new payment link
-              </Button>
-            )}
-            {paymentStatus.statusInfo.type === 'processing' && (
-              <Button size='small' onClick={() => fetchPaymentStatus(paymentStatus.invoiceId)}>
-                Refresh status
-              </Button>
-            )}
-          </div>
-        }
-      />
-    </div>
+    <BillingNotice
+      tone={getAlertType(paymentStatus.statusInfo.type)}
+      icon={paymentStatus.statusInfo.type === 'processing' ? <Spinner /> : undefined}
+      title={paymentStatus.statusInfo.message}
+      action={
+        <div className='flex flex-wrap gap-2'>
+          {paymentStatus.statusInfo.canRetry && (
+            <Button size='small' onClick={handleRetry}>
+              Get a new payment link
+            </Button>
+          )}
+          {paymentStatus.statusInfo.type === 'processing' && (
+            <Button size='small' onClick={() => fetchPaymentStatus(paymentStatus.invoiceId)}>
+              Refresh status
+            </Button>
+          )}
+          <Button size='small' type='text' onClick={handleDismiss}>
+            Dismiss
+          </Button>
+        </div>
+      }
+    >
+      <p>{paymentStatus.statusInfo.description}</p>
+      <dl className='mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs opacity-80'>
+        <dt>Invoice</dt>
+        <dd>{paymentStatus.invoice.number || paymentStatus.invoiceId}</dd>
+        <dt>Amount</dt>
+        <dd>
+          {paymentStatus.amount} {paymentStatus.currency.toUpperCase()}
+        </dd>
+        <dt>Charge ID</dt>
+        <dd className='truncate'>{paymentStatus.chargeId}</dd>
+      </dl>
+    </BillingNotice>
   )
 }

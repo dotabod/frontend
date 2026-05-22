@@ -1,16 +1,19 @@
 import { Button, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { ExternalLinkIcon } from 'lucide-react'
+import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
 import { getBillingSummaryInfo } from '@/utils/subscription'
+import { BillingNotice } from './BillingNotice'
 
-const toneClasses = {
+const chipClasses = {
   success: 'border-emerald-800 bg-emerald-950/40 text-emerald-200',
   info: 'border-indigo-800 bg-indigo-950/40 text-indigo-200',
   warning: 'border-amber-800 bg-amber-950/40 text-amber-200',
   error: 'border-red-800 bg-red-950/40 text-red-200',
 }
+
+const PAYPAL_AUTOPAY_URL = 'https://www.paypal.com/myaccount/autopay/'
 
 interface BillingOverviewProps {
   isLoading: boolean
@@ -40,6 +43,8 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
     formattedCreditBalance,
   })
 
+  const isPayPal = Boolean(subscription?.stripeSubscriptionId?.startsWith('paypal_'))
+
   if (isSubscriptionLoading) {
     return (
       <Card>
@@ -49,67 +54,83 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
   }
 
   return (
-    <Card className='space-y-6'>
-      <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
-        <div className='space-y-4'>
-          <div className='flex flex-wrap items-center gap-2'>
-            <span className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
-              Current plan
-            </span>
-            <span
-              className={clsx(
-                'rounded-full border px-3 py-1 text-xs font-medium',
-                toneClasses[summary.tone],
-              )}
-            >
-              {summary.planLabel}
-            </span>
-            <span className='text-sm text-gray-400'>{summary.statusLabel}</span>
-          </div>
+    <Card className='space-y-5'>
+      <div className='flex flex-wrap items-center gap-2'>
+        <span className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+          Current plan
+        </span>
+        <span
+          className={clsx(
+            'rounded-full border px-3 py-1 text-xs font-medium',
+            chipClasses[summary.tone],
+          )}
+        >
+          {summary.planLabel}
+        </span>
+        <span className='text-sm text-gray-400'>{summary.statusLabel}</span>
+      </div>
 
-          <div>
-            <h2 className='text-2xl font-semibold text-gray-100'>{summary.headline}</h2>
-            <p className='mt-2 max-w-3xl text-sm leading-6 text-gray-300'>{summary.description}</p>
+      <div>
+        <h2 className='text-2xl font-semibold text-gray-100'>{summary.headline}</h2>
+        <p className='mt-2 max-w-[68ch] text-sm leading-6 text-gray-300'>{summary.description}</p>
+      </div>
+
+      <div className='flex flex-col gap-4 border-t border-gray-800 pt-5 sm:flex-row sm:items-end sm:justify-between'>
+        <div className='space-y-1'>
+          <div className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+            {summary.nextStepLabel}
           </div>
+          <div className='text-base font-medium text-gray-100'>{summary.nextStepValue}</div>
         </div>
 
-        {summary.canManageInStripe && (
-          <Button
-            type='primary'
-            icon={<ExternalLinkIcon size={14} />}
-            onClick={onOpenPortal}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
-          </Button>
+        {isPayPal ? (
+          <div className='sm:text-right'>
+            <Button
+              type='primary'
+              icon={<ExternalLinkIcon size={14} />}
+              href={PAYPAL_AUTOPAY_URL}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              Manage PayPal subscription
+            </Button>
+            <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ml-auto'>
+              You subscribed with PayPal. Update your payment method or cancel renewal from your
+              PayPal account's automatic payments.
+            </p>
+          </div>
+        ) : (
+          summary.canManageInStripe && (
+            <div className='sm:text-right'>
+              <Button
+                type='primary'
+                icon={<ExternalLinkIcon size={14} />}
+                onClick={onOpenPortal}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
+              </Button>
+              <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ml-auto'>
+                {summary.portalHelpText}
+              </p>
+            </div>
+          )
         )}
       </div>
 
-      <div className='grid gap-4 border-t border-gray-800 pt-4 md:grid-cols-2'>
-        <div className='space-y-1'>
-          <div className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
-            What's next
-          </div>
-          <div className='text-lg font-semibold text-gray-100'>{summary.nextStepValue}</div>
-          <p className='text-sm text-gray-400'>{summary.nextStepLabel}</p>
-        </div>
-
-        <div className='space-y-1'>
-          <div className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
-            Manage in Stripe
-          </div>
-          <div className='text-lg font-semibold text-gray-100'>{summary.portalSummaryLabel}</div>
-          <p className='text-sm text-gray-400'>{summary.portalHelpText}</p>
-        </div>
-      </div>
-
       {summary.creditMessage && (
-        <div className='rounded-lg border border-indigo-900 bg-indigo-950/30 px-4 py-3 text-sm text-indigo-200'>
+        <BillingNotice tone='info' icon={<GiftIcon size={18} />} title='Account credit'>
           {summary.creditMessage}
-        </div>
+        </BillingNotice>
       )}
 
-      <p className='text-sm text-gray-400'>Looking to change plans? Compare them below.</p>
+      <p className='text-sm text-gray-400'>
+        Want a different tier or billing period?{' '}
+        <a href='#compare-plans' className='font-medium'>
+          Compare plans
+        </a>
+        .
+      </p>
     </Card>
   )
 }

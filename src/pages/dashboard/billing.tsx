@@ -1,4 +1,4 @@
-import { message, Typography } from 'antd'
+import { message } from 'antd'
 import Head from 'next/head'
 import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
@@ -12,8 +12,6 @@ import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
-
-const { Title } = Typography
 
 const PORTAL_FALLBACK_ERROR = "We couldn't open Stripe billing. Try again in a moment."
 
@@ -89,7 +87,7 @@ const BillingPage = () => {
         subtitle='Your current plan, renewal date, and a shortcut to Stripe for payment details and invoices.'
       />
 
-      <div className='space-y-6'>
+      <div className='space-y-4'>
         <PaymentStatusAlert />
         <BillingOverview isLoading={isLoading} onOpenPortal={handlePortalAccess} />
         <SubscriptionAlerts
@@ -101,12 +99,13 @@ const BillingPage = () => {
         />
       </div>
 
-      <div className='mt-6'>
-        <Title level={4} className='mb-4'>
-          Compare plans
-        </Title>
+      <section className='mt-12 scroll-mt-6' id='compare-plans'>
+        <h2 className='text-xl font-semibold text-gray-100'>Compare plans</h2>
+        <p className='mt-1 mb-4 text-sm text-gray-400'>
+          Switch tiers or billing period. Changes take effect at checkout.
+        </p>
         <BillingPlans showTitle={false} />
-      </div>
+      </section>
     </>
   )
 }

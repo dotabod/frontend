@@ -66,8 +66,8 @@ function SubscriptionStatusComponent() {
   })
 
   const subtitle = summary.creditMessage
-    ? `${summary.headline} — ${summary.creditMessage}`
-    : `${summary.headline} — ${summary.nextStepLabel}: ${summary.nextStepValue}`
+    ? `${summary.headline}. ${summary.creditMessage}`
+    : `${summary.headline}. ${summary.nextStepLabel}: ${summary.nextStepValue}`
 
   return (
     <div className='flex flex-col gap-4'>

@@ -13,6 +13,7 @@ interface PlanDescriptionProps {
   tier: string
   activePeriod: string
   payWithCrypto: boolean
+  payWithPaypal: boolean
   description: string
   hasCreditBalance: boolean
   formattedCreditBalance: string
@@ -23,6 +24,7 @@ export const PlanDescription = ({
   tier,
   activePeriod,
   payWithCrypto,
+  payWithPaypal,
   description,
   hasCreditBalance,
   formattedCreditBalance,
@@ -48,6 +50,8 @@ export const PlanDescription = ({
     if (showProContent) {
       if (payWithCrypto) {
         newMessageType = 'crypto'
+      } else if (payWithPaypal) {
+        newMessageType = 'paypal'
       } else if (hasCreditBalance && !hasActivePlan) {
         newMessageType = 'credit-checkout'
       } else if (hasActivePlan && hasCreditBalance) {
@@ -63,7 +67,16 @@ export const PlanDescription = ({
     }
 
     setMessageType(newMessageType)
-  }, [tier, activePeriod, payWithCrypto, hasCreditBalance, hasActivePlan, hasTrial, subscription])
+  }, [
+    tier,
+    activePeriod,
+    payWithCrypto,
+    payWithPaypal,
+    hasCreditBalance,
+    hasActivePlan,
+    hasTrial,
+    subscription,
+  ])
 
   return (
     <ErrorBoundary>
@@ -75,6 +88,12 @@ export const PlanDescription = ({
           {messageType === 'crypto' && (
             <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
               Note: Free trial is not available with crypto payments
+            </span>
+          )}
+
+          {messageType === 'paypal' && (
+            <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+              Note: Free trial is not available with PayPal payments
             </span>
           )}
 

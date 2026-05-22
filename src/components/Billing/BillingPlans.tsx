@@ -109,27 +109,44 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
   return (
     <div>
       {showTitle && (
-        <div className='mx-auto max-w-2xl text-center'>
-          <h2 className='text-3xl font-medium tracking-tight text-gray-100'>
-            Two plans. Free for the essentials, Pro for the rest.
+        <div className='mx-auto mb-12 max-w-3xl text-center'>
+          <h2
+            id='pricing-title'
+            className='text-balance text-4xl font-semibold leading-tight tracking-tight text-gray-100 sm:text-5xl'
+          >
+            Two plans. Free covers the basics, Pro covers the rest.
           </h2>
 
           {inGracePeriod && !hasActivePlan ? (
             <>
-              <p className='mt-2 text-lg text-yellow-400 font-medium'>
-                You have free access to all Pro features until {gracePeriodPrettyDate}.
+              <p className='mt-4 text-base font-medium text-amber-300'>
+                You have free access to every Pro feature until {gracePeriodPrettyDate}.
               </p>
-              <p className='mt-2 text-lg text-gray-400'>
-                Subscribe before then to keep Pro features after the trial ends.
+              <p className='mt-1 text-base text-gray-400'>
+                Subscribe before then to keep Pro once the free window closes.
               </p>
             </>
           ) : hasActivePlan ? (
-            <p className='mt-2 text-lg text-purple-400'>
+            <p className='mt-4 text-base text-purple-300'>
               <SubscriptionStatus />
             </p>
           ) : (
-            <p className='mt-2 text-lg text-gray-400'>Pick the plan that fits how you stream.</p>
+            <p className='mt-4 text-pretty text-base text-gray-400'>
+              Start on Free, no card needed. Move up to Pro when you want the full kit.
+            </p>
           )}
+
+          <ul className='mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm text-gray-500'>
+            <li>Free plan, no card needed</li>
+            <li aria-hidden className='text-gray-700'>
+              ·
+            </li>
+            <li>14 day free trial on Pro</li>
+            <li aria-hidden className='text-gray-700'>
+              ·
+            </li>
+            <li>Cancel anytime</li>
+          </ul>
         </div>
       )}
 
@@ -142,7 +159,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
           />
         </div>
 
-        <div className='mx-auto grid max-w-2xl grid-cols-1 items-start gap-x-8 gap-y-10 mt-8 lg:max-w-none lg:grid-cols-2'>
+        <div className='mx-auto mt-8 grid max-w-2xl grid-cols-1 items-start gap-6 lg:max-w-5xl lg:grid-cols-2 lg:gap-8'>
           {plans.map((plan) => (
             <Plan
               key={plan.name}

@@ -16,6 +16,7 @@ interface PriceDisplayProps {
   tier: SubscriptionTier
   featured: boolean
   payWithCrypto: boolean
+  payWithPaypal: boolean
   description: string
   hasCreditBalance: boolean
   formattedCreditBalance: string
@@ -29,6 +30,7 @@ export const PriceDisplay = ({
   tier,
   featured,
   payWithCrypto,
+  payWithPaypal,
   description,
   hasCreditBalance,
   formattedCreditBalance,
@@ -98,6 +100,7 @@ export const PriceDisplay = ({
           tier={tier}
           activePeriod={activePeriod}
           payWithCrypto={payWithCrypto}
+          payWithPaypal={payWithPaypal}
           description={description}
           hasCreditBalance={hasCreditBalance}
           formattedCreditBalance={formattedCreditBalance}
