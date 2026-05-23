@@ -17,30 +17,24 @@ const useMaybeSignout = (skip = false) => {
     STABLE_SWR_OPTIONS,
   )
 
+  const user = session?.user
+  const scope = user?.scope
+  const isImpersonating = user?.isImpersonating
+  const role = user?.role
+
   // Effect to sign out user if they lack the necessary scope or a refresh is required
   useEffect(() => {
-    if (session?.user?.isImpersonating) return
+    if (isImpersonating) return
+    if (role === 'chatter') return
 
-    if (session?.user?.role === 'chatter') {
-      return
-    }
-
-    const shouldSignOut =
-      status === 'authenticated' &&
-      ((session?.user?.scope?.length > 10 &&
-        !session?.user?.scope?.includes('moderator:read:followers')) ||
-        requiresRefresh)
+    const hasIncompleteScope =
+      (scope?.length ?? 0) > 10 && !scope?.includes('moderator:read:followers')
+    const shouldSignOut = status === 'authenticated' && (hasIncompleteScope || requiresRefresh)
 
     if (shouldSignOut) {
       signOut({ callbackUrl: '/login?setup-scopes', redirect: true })
     }
-  }, [
-    session?.user?.scope,
-    session?.user?.isImpersonating,
-    status,
-    requiresRefresh,
-    session?.user?.role,
-  ])
+  }, [scope, isImpersonating, role, status, requiresRefresh])
 }
 
 export default useMaybeSignout

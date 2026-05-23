@@ -59,8 +59,7 @@ const OverlayPage = () => {
   const [connected, setConnected] = useState(false)
   const [showDevImage, setShowDevImage] = useState(true)
   const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)
-  const isFirstLoad = useRef(true)
-  const blockTypeChangeTimer = useRef<NodeJS.Timeout | null>(null)
+  const [hasShownOnce, setHasShownOnce] = useState(false)
   const reportedErrorStatus = useRef<number | null>(null)
 
   const [block, setBlock] = useState<blockType>({
@@ -117,33 +116,20 @@ const OverlayPage = () => {
     setIsOldObs(isOldOBS)
   }, [])
 
-  // Handle logic for showing MainScreenOverlays with a delay on first load
+  // Wait 10s after the first connect before showing MainScreenOverlays;
+  // reconnects after that show immediately.
   useEffect(() => {
-    // Clear any existing timers on component unmount or when block type changes
-    if (blockTypeChangeTimer.current) {
-      clearTimeout(blockTypeChangeTimer.current)
-      blockTypeChangeTimer.current = null
-    }
-
-    if (isFirstLoad.current) {
-      // On first load, wait 10 seconds before showing MainScreenOverlays
-      if (connected) {
-        blockTypeChangeTimer.current = setTimeout(() => {
-          setShowMainScreenOverlay(true)
-          isFirstLoad.current = false // No longer first load
-        }, 10000)
-      }
-    } else {
-      // After first load, show immediately
+    if (!connected) return
+    if (hasShownOnce) {
       setShowMainScreenOverlay(true)
+      return
     }
-
-    return () => {
-      if (blockTypeChangeTimer.current) {
-        clearTimeout(blockTypeChangeTimer.current)
-      }
-    }
-  }, [connected])
+    const timer = setTimeout(() => {
+      setShowMainScreenOverlay(true)
+      setHasShownOnce(true)
+    }, 10000)
+    return () => clearTimeout(timer)
+  }, [connected, hasShownOnce])
 
   useEffect(() => {
     if (!original) return

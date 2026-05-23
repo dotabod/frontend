@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -78,8 +77,6 @@ export function useLastFm() {
   const [track, setTrack] = useState<LastFmTrackType | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
-  const { userId } = router.query
   const prevTrackRef = useRef<LastFmTrackType | null>(null)
 
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
@@ -156,7 +153,7 @@ export function useLastFm() {
       clearInterval(intervalId)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isEnabled, username, refreshRate, userId, fetchNowPlaying])
+  }, [isEnabled, username, refreshRate, fetchNowPlaying])
 
   return { track, loading, error }
 }
