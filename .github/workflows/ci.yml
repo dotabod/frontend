@@ -16,7 +16,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.minimumReleaseAge=0
       - name: Run vp check
         run: pnpm exec vp check
       - name: Run tests
