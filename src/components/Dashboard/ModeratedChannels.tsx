@@ -72,7 +72,7 @@ export default function ModeratedChannels() {
 
     fetchOptions(value).then((newOptions) => {
       if (fetchId !== fetchRef.current) {
-        // for fetch callback order
+        // For fetch callback order
         return
       }
 
@@ -93,7 +93,7 @@ export default function ModeratedChannels() {
 
   const renderOptionLabel = (imageSrc?: string | null, name?: ReactNode) => (
     <div className='flex flex-row items-center gap-2'>
-      {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
+      {/* Biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
       <img
         alt='User Profile'
         width={30}
@@ -117,8 +117,8 @@ export default function ModeratedChannels() {
       track('changed_moderated_channel')
 
       signIn('impersonate', {
-        channelToImpersonate: value,
         callbackUrl: '/dashboard/features',
+        channelToImpersonate: value,
       })
     },
     [user, track],
@@ -131,19 +131,19 @@ export default function ModeratedChannels() {
 
   const allOptions = [
     {
-      value: `${user?.twitchId}`,
       label: renderOptionLabel(user?.image, user?.name),
       name: user?.name,
+      value: `${user?.twitchId}`,
     },
     ...moderatedChannels.map((channel) => ({
+      label: renderOptionLabel(channel.image, channel.name),
       name: channel.name,
       value: channel.providerAccountId,
-      label: renderOptionLabel(channel.image, channel.name),
     })),
     ...options.map((option) => ({
-      value: option.value,
-      name: option.label,
       label: renderOptionLabel(option.image, option.label),
+      name: option.label,
+      value: option.value,
     })),
   ]
 

@@ -10,8 +10,8 @@ async function getTotalCryptoInterest() {
       where: {
         key: 'crypto_payment_interest',
         value: {
-          path: ['interested'],
           equals: true,
+          path: ['interested'],
         },
       },
     })

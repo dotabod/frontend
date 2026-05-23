@@ -61,8 +61,8 @@ export const StepComponent: React.FC<{
       onChange={onChange}
       direction='vertical'
       items={steps.map((step, index) => ({
-        title: hideTitle ? undefined : `Step ${index + 1}`,
         description: step,
+        title: hideTitle ? undefined : `Step ${index + 1}`,
         ...stepProps?.[index],
       }))}
     />
@@ -89,10 +89,6 @@ const categoryOrder: { id: FaqCategory; label: string }[] = [
 
 const faqs: Faq[] = [
   {
-    id: 'steam-connect',
-    category: 'steam',
-    question: "Steam won't connect",
-    keywords: ['steam', 'connect', 'mmr', 'account', 'innate', 'powershell', 'cfg', 'gsi'],
     answer: (
       <div className='flex flex-col gap-3'>
         <LiveRequiredNote />
@@ -159,33 +155,24 @@ const faqs: Faq[] = [
         />
       </div>
     ),
+    category: 'steam',
+    id: 'steam-connect',
+    keywords: ['steam', 'connect', 'mmr', 'account', 'innate', 'powershell', 'cfg', 'gsi'],
+    question: "Steam won't connect",
   },
   {
-    id: 'steam-mmr',
-    category: 'steam',
-    question: 'MMR isn’t tracking',
-    keywords: ['mmr', 'rank', 'tracking', 'starting value'],
     answer: (
       <span>
         <Link href='/dashboard/features'>Enter your current MMR</Link> on the Features page so we
         have a starting value.
       </span>
     ),
+    category: 'steam',
+    id: 'steam-mmr',
+    keywords: ['mmr', 'rank', 'tracking', 'starting value'],
+    question: 'MMR isn’t tracking',
   },
   {
-    id: 'overlay',
-    category: 'overlay',
-    question: 'Overlay isn’t showing or won’t update',
-    keywords: [
-      'overlay',
-      'obs',
-      'browser source',
-      'blank',
-      'stuck',
-      'refresh',
-      'cloudflare',
-      'gsi',
-    ],
     answer: (
       <StepComponent
         steps={[
@@ -243,12 +230,21 @@ const faqs: Faq[] = [
         ]}
       />
     ),
+    category: 'overlay',
+    id: 'overlay',
+    keywords: [
+      'overlay',
+      'obs',
+      'browser source',
+      'blank',
+      'stuck',
+      'refresh',
+      'cloudflare',
+      'gsi',
+    ],
+    question: 'Overlay isn’t showing or won’t update',
   },
   {
-    id: 'chat-talk',
-    category: 'chat',
-    question: "Dotabod won't talk in chat",
-    keywords: ['chat', 'talk', 'ban', 'unban', 'ping', 'rejoin'],
     answer: (
       <StepComponent
         steps={[
@@ -262,12 +258,12 @@ const faqs: Faq[] = [
         ]}
       />
     ),
+    category: 'chat',
+    id: 'chat-talk',
+    keywords: ['chat', 'talk', 'ban', 'unban', 'ping', 'rejoin'],
+    question: "Dotabod won't talk in chat",
   },
   {
-    id: 'chat-test',
-    category: 'chat',
-    question: 'How do I test that it works?',
-    keywords: ['test', 'ping', 'np', 'notable players', 'works'],
     answer: (
       <StepComponent
         steps={[
@@ -281,12 +277,12 @@ const faqs: Faq[] = [
         ]}
       />
     ),
+    category: 'chat',
+    id: 'chat-test',
+    keywords: ['test', 'ping', 'np', 'notable players', 'works'],
+    question: 'How do I test that it works?',
   },
   {
-    id: 'setup-chrome',
-    category: 'setup',
-    question: 'Chrome says "Local network access denied", or the installer or OBS won\'t connect',
-    keywords: ['chrome', 'local network', 'installer', 'obs', 'websocket', 'permission', 'denied'],
     answer: (
       <StepComponent
         steps={[
@@ -315,12 +311,12 @@ const faqs: Faq[] = [
         ]}
       />
     ),
+    category: 'setup',
+    id: 'setup-chrome',
+    keywords: ['chrome', 'local network', 'installer', 'obs', 'websocket', 'permission', 'denied'],
+    question: 'Chrome says "Local network access denied", or the installer or OBS won\'t connect',
   },
   {
-    id: 'concept-live',
-    category: 'concepts',
-    question: 'Why does my stream need to be live to connect Steam?',
-    keywords: ['live', 'stream', 'steam', 'connect', 'offline', 'why'],
     answer: (
       <div className='flex flex-col gap-3'>
         <p>
@@ -343,20 +339,20 @@ const faqs: Faq[] = [
         </div>
       </div>
     ),
+    category: 'concepts',
+    id: 'concept-live',
+    keywords: ['live', 'stream', 'steam', 'connect', 'offline', 'why'],
+    question: 'Why does my stream need to be live to connect Steam?',
   },
   {
-    id: 'concept-bets',
-    category: 'concepts',
-    question: "Why do bets open right when I pick? Can't I get counter-picked?",
-    keywords: ['bets', 'pick', 'counter', 'predictions'],
     answer:
       "Bets open once your pick is visible to the enemy team in-game. By then, they can't counter-pick or counter-ban your hero anyway.",
+    category: 'concepts',
+    id: 'concept-bets',
+    keywords: ['bets', 'pick', 'counter', 'predictions'],
+    question: "Why do bets open right when I pick? Can't I get counter-picked?",
   },
   {
-    id: 'concept-9kmmrbot',
-    category: 'concepts',
-    question: 'Can I still use 9kmmrbot?',
-    keywords: ['9kmmrbot', 'bot', 'immortal', 'compatibility'],
     answer: (
       <div className='flex flex-col space-y-4'>
         <div>
@@ -369,6 +365,10 @@ const faqs: Faq[] = [
         </div>
       </div>
     ),
+    category: 'concepts',
+    id: 'concept-9kmmrbot',
+    keywords: ['9kmmrbot', 'bot', 'immortal', 'compatibility'],
+    question: 'Can I still use 9kmmrbot?',
   },
 ]
 
@@ -385,7 +385,9 @@ const TroubleshootPage = () => {
   const normalizedQuery = query.trim().toLowerCase()
 
   const filteredFaqs = useMemo(() => {
-    if (!normalizedQuery) return faqs
+    if (!normalizedQuery) {
+      return faqs
+    }
     return faqs.filter(
       (faq) =>
         faq.question.toLowerCase().includes(normalizedQuery) ||
@@ -424,7 +426,7 @@ const TroubleshootPage = () => {
 
     const checkHubspotAvailability = () => {
       // Check if HubSpot script loaded properly
-      const hubspotLoaded = typeof window.HubSpotConversations !== 'undefined'
+      const hubspotLoaded = window.HubSpotConversations !== undefined
 
       if (hubspotLoaded) {
         // HubSpot is available, clear interval
@@ -463,7 +465,7 @@ const TroubleshootPage = () => {
   const openChatWidget = () => {
     if (window.HubSpotConversations) {
       // The widget loads lazily (loadImmediately: false), so load+open covers the
-      // not-yet-loaded case; open() handles the already-loaded case.
+      // Not-yet-loaded case; open() handles the already-loaded case.
       window.HubSpotConversations.widget.load({ widgetOpen: true })
       window.HubSpotConversations.widget.open()
     } else {
@@ -486,6 +488,10 @@ const TroubleshootPage = () => {
 
       // Prepare the data for HubSpot
       const data = {
+        context: {
+          pageName: 'Dotabod Troubleshooting',
+          pageUri: window.location.href,
+        },
         fields: [
           {
             name: 'email',
@@ -500,10 +506,6 @@ const TroubleshootPage = () => {
             value: values.message || '',
           },
         ],
-        context: {
-          pageUri: window.location.href,
-          pageName: 'Dotabod Troubleshooting',
-        },
       }
 
       // Submit to HubSpot
@@ -565,7 +567,9 @@ const TroubleshootPage = () => {
           <div className='space-y-8'>
             {categoryOrder.map((category) => {
               const items = filteredFaqs.filter((faq) => faq.category === category.id)
-              if (items.length === 0) return null
+              if (items.length === 0) {
+                return null
+              }
               const categoryIds = items.map((faq) => faq.id)
               return (
                 <section key={category.id} className='space-y-3'>
@@ -576,9 +580,9 @@ const TroubleshootPage = () => {
                     activeKey={openKeys}
                     onChange={handleCollapseChange(categoryIds)}
                     items={items.map((faq) => ({
+                      children: <div className='text-gray-300'>{faq.answer}</div>,
                       key: faq.id,
                       label: faq.question,
-                      children: <div className='text-gray-300'>{faq.answer}</div>,
                     }))}
                   />
                 </section>
@@ -609,12 +613,12 @@ const TroubleshootPage = () => {
               extra='Tell us what you tried, what happened, and any error text you saw.'
               rules={[
                 {
-                  required: true,
                   message: 'Add a message so we can help.',
+                  required: true,
                 },
                 {
-                  min: 80,
                   message: 'Add a bit more detail. We need at least 80 characters to help.',
+                  min: 80,
                 },
               ]}
             >
@@ -643,10 +647,10 @@ TroubleshootPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Troubleshooting | Dotabod Dashboard',
-        description: 'Troubleshoot and resolve issues with your Dotabod setup.',
         canonicalUrl: 'https://dotabod.com/dashboard/help',
+        description: 'Troubleshoot and resolve issues with your Dotabod setup.',
         noindex: true,
+        title: 'Troubleshooting | Dotabod Dashboard',
       }}
     >
       {page}

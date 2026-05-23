@@ -23,12 +23,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // Update the notification to mark it as acknowledged
       const result = await prisma.disableNotification.updateMany({
+        data: {
+          acknowledged: true,
+        },
         where: {
           id: notificationId,
           userId: session.user.id,
-        },
-        data: {
-          acknowledged: true,
         },
       })
 
@@ -40,8 +40,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     } catch (error) {
       captureException(error)
       return res.status(500).json({
-        message: 'Failed to acknowledge disable reason',
         error: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Failed to acknowledge disable reason',
       })
     }
   }

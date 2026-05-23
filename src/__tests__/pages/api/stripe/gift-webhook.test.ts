@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 /**
  * Tests for the Stripe webhook handler specifically for gift subscriptions
@@ -8,130 +8,124 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  */
 
 // Mock the webhook handler
-vi.mock('@/pages/api/stripe/webhook', () => {
-  return {
-    default: vi.fn((req, res) => {
-      if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' })
-      }
+vi.mock('@/pages/api/stripe/webhook', () => ({
+  config: {
+    api: {
+      bodyParser: false,
+    },
+  },
+  default: vi.fn((req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
 
-      if (!req.headers['stripe-signature']) {
-        return res.status(400).json({ error: 'Webhook configuration error' })
-      }
+    if (!req.headers['stripe-signature']) {
+      return res.status(400).json({ error: 'Webhook configuration error' })
+    }
 
-      if (!req.headers['stripe-webhook-secret']) {
-        return res.status(400).json({ error: 'Missing webhook secret' })
-      }
+    if (!req.headers['stripe-webhook-secret']) {
+      return res.status(400).json({ error: 'Missing webhook secret' })
+    }
 
-      if (req.headers['stripe-signature'] === 'invalid_signature') {
-        return res.status(400).json({ error: 'Webhook verification failed' })
-      }
+    if (req.headers['stripe-signature'] === 'invalid_signature') {
+      return res.status(400).json({ error: 'Webhook verification failed' })
+    }
 
-      // Test for gift subscription handling
-      if (req.headers['is-gift'] === 'true') {
-        // Handle gift subscription with existing subscriptions
-        if (req.headers['has-existing-subscription'] === 'true') {
-          return res.status(200).json({
-            received: true,
-            gift: true,
-            hasExistingSubscription: true,
-            endDate: '2025-04-15T15:22:58.000Z',
-          })
-        }
-
-        // Handle gift subscription with quantity adjustments
-        if (req.headers['adjusted-quantity'] === 'true') {
-          return res.status(200).json({
-            received: true,
-            gift: true,
-            quantityWasAdjusted: true,
-            originalQuantity: 1,
-            finalQuantity: 3,
-            endDate: '2025-06-15T15:22:58.000Z',
-          })
-        }
-
-        // Handle annual gift subscription
-        if (req.headers['gift-type'] === 'annual') {
-          return res.status(200).json({
-            received: true,
-            gift: true,
-            giftType: 'annual',
-            endDate: '2026-03-15T15:22:58.000Z',
-          })
-        }
-
-        // Handle lifetime gift subscription
-        if (req.headers['gift-type'] === 'lifetime') {
-          return res.status(200).json({
-            received: true,
-            gift: true,
-            giftType: 'lifetime',
-            endDate: '2099-12-31T23:59:59.999Z',
-          })
-        }
-
-        // Default gift subscription handling (monthly)
+    // Test for gift subscription handling
+    if (req.headers['is-gift'] === 'true') {
+      // Handle gift subscription with existing subscriptions
+      if (req.headers['has-existing-subscription'] === 'true') {
         return res.status(200).json({
-          received: true,
-          gift: true,
-          giftType: 'monthly',
           endDate: '2025-04-15T15:22:58.000Z',
+          gift: true,
+          hasExistingSubscription: true,
+          received: true,
         })
       }
 
-      return res.status(200).json({ received: true })
-    }),
-    config: {
-      api: {
-        bodyParser: false,
-      },
-    },
-  }
-})
+      // Handle gift subscription with quantity adjustments
+      if (req.headers['adjusted-quantity'] === 'true') {
+        return res.status(200).json({
+          endDate: '2025-06-15T15:22:58.000Z',
+          finalQuantity: 3,
+          gift: true,
+          originalQuantity: 1,
+          quantityWasAdjusted: true,
+          received: true,
+        })
+      }
+
+      // Handle annual gift subscription
+      if (req.headers['gift-type'] === 'annual') {
+        return res.status(200).json({
+          endDate: '2026-03-15T15:22:58.000Z',
+          gift: true,
+          giftType: 'annual',
+          received: true,
+        })
+      }
+
+      // Handle lifetime gift subscription
+      if (req.headers['gift-type'] === 'lifetime') {
+        return res.status(200).json({
+          endDate: '2099-12-31T23:59:59.999Z',
+          gift: true,
+          giftType: 'lifetime',
+          received: true,
+        })
+      }
+
+      // Default gift subscription handling (monthly)
+      return res.status(200).json({
+        endDate: '2025-04-15T15:22:58.000Z',
+        gift: true,
+        giftType: 'monthly',
+        received: true,
+      })
+    }
+
+    return res.status(200).json({ received: true })
+  }),
+}))
 
 // Import the mocked handler
 import handler, { config } from '@/pages/api/stripe/webhook'
 
 // Mock the database client
-vi.mock('@/lib/db', () => {
-  return {
-    default: {
-      subscription: {
-        findUnique: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-      },
-      user: {
-        findUnique: vi.fn(),
-      },
-      giftSubscription: {
-        create: vi.fn(),
-      },
-      notification: {
-        create: vi.fn(),
-      },
-      $transaction: vi.fn((callback) => callback()),
+vi.mock('@/lib/db', () => ({
+  default: {
+    $transaction: vi.fn((callback) => callback()),
+    giftSubscription: {
+      create: vi.fn(),
     },
-  }
-})
+    notification: {
+      create: vi.fn(),
+    },
+    subscription: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    user: {
+      findUnique: vi.fn(),
+    },
+  },
+}))
 
 // Mock the Stripe client
-vi.mock('@/lib/stripe-server', () => {
-  return {
-    stripe: {
-      checkout: {
-        sessions: {
-          retrieve: vi.fn(),
-          listLineItems: vi.fn(),
-        },
-      },
-      webhooks: {
-        constructEvent: vi.fn(),
+vi.mock('@/lib/stripe-server', () => ({
+  stripe: {
+    checkout: {
+      sessions: {
+        listLineItems: vi.fn(),
+        retrieve: vi.fn(),
       },
     },
-  }
-})
+    webhooks: {
+      constructEvent: vi.fn(),
+    },
+  },
+}))
 
 describe('Gift Subscription Webhook Handler', () => {
   beforeEach(() => {
@@ -152,112 +146,112 @@ describe('Gift Subscription Webhook Handler', () => {
 
   it('should process monthly gift subscriptions correctly', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
+        'is-gift': 'true',
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
-        'is-gift': 'true',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      received: true,
+      endDate: '2025-04-15T15:22:58.000Z',
       gift: true,
       giftType: 'monthly',
-      endDate: '2025-04-15T15:22:58.000Z',
+      received: true,
     })
   })
 
   it('should process annual gift subscriptions correctly', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
+        'gift-type': 'annual',
+        'is-gift': 'true',
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
-        'is-gift': 'true',
-        'gift-type': 'annual',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      received: true,
+      endDate: '2026-03-15T15:22:58.000Z',
       gift: true,
       giftType: 'annual',
-      endDate: '2026-03-15T15:22:58.000Z',
+      received: true,
     })
   })
 
   it('should process lifetime gift subscriptions correctly', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
+        'gift-type': 'lifetime',
+        'is-gift': 'true',
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
-        'is-gift': 'true',
-        'gift-type': 'lifetime',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      received: true,
+      endDate: '2099-12-31T23:59:59.999Z',
       gift: true,
       giftType: 'lifetime',
-      endDate: '2099-12-31T23:59:59.999Z',
+      received: true,
     })
   })
 
   it('should handle gift subscriptions with existing subscriptions', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
+        'has-existing-subscription': 'true',
+        'is-gift': 'true',
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
-        'is-gift': 'true',
-        'has-existing-subscription': 'true',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      received: true,
+      endDate: '2025-04-15T15:22:58.000Z',
       gift: true,
       hasExistingSubscription: true,
-      endDate: '2025-04-15T15:22:58.000Z',
+      received: true,
     })
   })
 
   it('should handle gift subscriptions with quantity adjustments', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
+        'adjusted-quantity': 'true',
+        'is-gift': 'true',
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
-        'is-gift': 'true',
-        'adjusted-quantity': 'true',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      received: true,
-      gift: true,
-      quantityWasAdjusted: true,
-      originalQuantity: 1,
-      finalQuantity: 3,
       endDate: '2025-06-15T15:22:58.000Z',
+      finalQuantity: 3,
+      gift: true,
+      originalQuantity: 1,
+      quantityWasAdjusted: true,
+      received: true,
     })
   })
 })

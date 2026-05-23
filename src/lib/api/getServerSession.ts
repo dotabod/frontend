@@ -4,7 +4,9 @@ import { decode } from 'next-auth/jwt'
 
 export const getServerSession = async (...args: [NextApiRequest, NextApiResponse, AuthOptions]) => {
   const session: Session | null = await getNextServerSession(...args)
-  if (!session) return null
+  if (!session) {
+    return null
+  }
 
   if (!process.env.NEXTAUTH_SECRET) {
     throw new Error('NEXTAUTH_SECRET is not set')
@@ -13,8 +15,8 @@ export const getServerSession = async (...args: [NextApiRequest, NextApiResponse
   let authenticatedUserId: string | null = session?.user?.id
   if (session?.user?.isImpersonating) {
     const decryptedId = await decode({
-      token: session?.user?.id,
       secret: process.env.NEXTAUTH_SECRET,
+      token: session?.user?.id,
     })
     authenticatedUserId = decryptedId?.id ?? null
   }

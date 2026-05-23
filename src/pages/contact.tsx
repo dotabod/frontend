@@ -39,6 +39,10 @@ const ContactPage: React.FC = () => {
       // Prepare the data for HubSpot
       // Note: HubSpot field names might be 'email', 'content' etc. Adjust as needed.
       const data = {
+        context: {
+          pageName: 'Dotabod Contact Us', // Or a more specific name if needed
+          pageUri: window.location.href,
+        },
         fields: [
           {
             name: 'email',
@@ -53,10 +57,6 @@ const ContactPage: React.FC = () => {
             value: values.message || '',
           },
         ],
-        context: {
-          pageUri: window.location.href,
-          pageName: 'Dotabod Contact Us', // Or a more specific name if needed
-        },
       }
 
       // Submit to HubSpot
@@ -94,13 +94,13 @@ const ContactPage: React.FC = () => {
           setIsChatWidgetOpen(false)
         } else {
           // The widget loads lazily (loadImmediately: false), so load+open covers
-          // the not-yet-loaded case; open() handles the already-loaded case.
+          // The not-yet-loaded case; open() handles the already-loaded case.
           widget.load({ widgetOpen: true })
           widget.open()
           setIsChatWidgetOpen(true)
         }
-      } catch (e) {
-        console.error('Error toggling HubSpot chat widget:', e)
+      } catch (error) {
+        console.error('Error toggling HubSpot chat widget:', error)
         // Attempt to open as a fallback if toggle fails
         try {
           widget.open()
@@ -124,10 +124,10 @@ const ContactPage: React.FC = () => {
   return (
     <HomepageShell
       seo={{
-        title: 'Contact Us | Dotabod',
-        description: 'Get in touch with the Dotabod team. Send us your questions or feedback.',
         canonicalUrl: 'https://dotabod.com/contact', // Assuming this is the canonical URL
+        description: 'Get in touch with the Dotabod team. Send us your questions or feedback.',
         noindex: false, // Make sure search engines can index this page if desired
+        title: 'Contact Us | Dotabod',
       }}
     >
       <div className='container mx-auto px-4 py-8 md:py-16'>
@@ -145,8 +145,8 @@ const ContactPage: React.FC = () => {
                 name='email'
                 label={<span className='text-gray-200'>Email</span>}
                 rules={[
-                  { required: true, message: 'Please enter your email address' },
-                  { type: 'email', message: 'Please enter a valid email address' },
+                  { message: 'Please enter your email address', required: true },
+                  { message: 'Please enter a valid email address', type: 'email' },
                 ]}
               >
                 <Input placeholder='your.email@example.com' type='email' size='large' />
@@ -156,13 +156,13 @@ const ContactPage: React.FC = () => {
                 label={<span className='text-gray-200'>Message</span>}
                 rules={[
                   {
-                    required: true,
                     message: 'Please enter your message - we need details to help you effectively',
+                    required: true,
                   },
                   {
-                    min: 80,
                     message:
                       'Please provide more details about your issue (at least 80 characters)',
+                    min: 80,
                   },
                   {
                     validator: (_, value) => {

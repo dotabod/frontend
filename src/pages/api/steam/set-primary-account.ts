@@ -28,8 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Verify that this account is linked to the user
     const steamAccount = await prisma.steamAccount.findFirst({
       where: {
-        steam32Id: parsedSteam32Id,
         OR: [{ userId: session.user.id }, { connectedUserIds: { has: session.user.id } }],
+        steam32Id: parsedSteam32Id,
       },
     })
 
@@ -39,19 +39,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Update the user record to set this account as primary
     await prisma.user.update({
-      where: {
-        id: session.user.id,
-      },
       data: {
         steam32Id: parsedSteam32Id,
         updatedAt: new Date(),
       },
+      where: {
+        id: session.user.id,
+      },
     })
 
     return res.status(200).json({
-      success: true,
       message: 'Primary Steam account updated successfully',
       steam32Id: parsedSteam32Id.toString(),
+      success: true,
     })
   } catch (error) {
     captureException(error)

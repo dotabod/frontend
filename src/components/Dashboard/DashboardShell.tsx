@@ -38,7 +38,7 @@ interface SEOProps {
   noindex?: boolean
 }
 
-type NavigationItem = {
+interface NavigationItem {
   name?: string
   key?: string
   href?: string
@@ -57,7 +57,9 @@ function getItem(
   const props = item.onClick ? { onClick: item.onClick } : {}
 
   let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden={true} /> : null
-  if (collapsed && isChild) icon = null
+  if (collapsed && isChild) {
+    icon = null
+  }
 
   const label = item.href ? (
     <Link
@@ -77,10 +79,10 @@ function getItem(
   )
 
   return {
-    key: item.href || item.key,
-    icon,
-    label: label,
     children: item.children?.map((child) => getItem(child, collapsed, true)),
+    icon,
+    key: item.href || item.key,
+    label,
   } as NonNullable<MenuProps['items']>[number]
 }
 
@@ -157,7 +159,9 @@ export default function DashboardShell({
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key)
-    if (broken) setCollapsed(true)
+    if (broken) {
+      setCollapsed(true)
+    }
   }
 
   // Handle submenu open/close
@@ -225,11 +229,11 @@ export default function DashboardShell({
       // Get the first unread notification
       const firstNotification = giftNotificationData.notifications[0]
       setGiftDetails({
+        giftMessage: firstNotification.giftMessage,
+        giftQuantity: firstNotification.giftQuantity || 1,
+        giftType: firstNotification.giftType,
         id: firstNotification.id,
         senderName: firstNotification.senderName,
-        giftMessage: firstNotification.giftMessage,
-        giftType: firstNotification.giftType,
-        giftQuantity: firstNotification.giftQuantity || 1,
       })
       setHasGiftNotification(true)
 
@@ -246,13 +250,13 @@ export default function DashboardShell({
       try {
         // Call API to mark notification as read
         const response = await fetch('/api/gift-notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({
             notificationId: giftDetails.id,
           }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
         })
 
         if (!response.ok) {
@@ -269,25 +273,35 @@ export default function DashboardShell({
     }
   }
 
-  if (status !== 'authenticated') return null
+  if (status !== 'authenticated') {
+    return null
+  }
 
   const isImpersonating = Boolean(data?.user?.isImpersonating)
 
   const filterNavigationItems = (items: NavigationItem[]): NavigationItem[] =>
     items
       .map((item): NavigationItem | null => {
-        if (!item.name) return item // Keep dividers
+        if (!item.name) {
+          return item
+        } // Keep dividers
 
-        if (isImpersonating && item.hideForImpersonator) return null
+        if (isImpersonating && item.hideForImpersonator) {
+          return null
+        }
 
-        if (data?.user?.role !== 'admin' && item.key === 'admin-menu') return null
+        if (data?.user?.role !== 'admin' && item.key === 'admin-menu') {
+          return null
+        }
 
         if (item.children) {
           const filteredChildren = item.children.filter(
             (child) => !(isImpersonating && child.hideForImpersonator),
           )
 
-          if (filteredChildren.length === 0) return null
+          if (filteredChildren.length === 0) {
+            return null
+          }
 
           return { ...item, children: filteredChildren }
         }
@@ -375,12 +389,13 @@ export default function DashboardShell({
                 }}
                 mode='inline'
                 items={filterNavigationItems(navigation).map((item, i: number) => {
-                  if (!item.name)
+                  if (!item.name) {
                     return {
+                      className: 'm-6! bg-gray-500!',
                       key: item?.href || i,
                       type: 'divider',
-                      className: 'm-6! bg-gray-500!',
                     }
+                  }
 
                   return getItem(item, collapsed)
                 })}

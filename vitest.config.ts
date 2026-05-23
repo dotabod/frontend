@@ -1,10 +1,15 @@
 import path from 'node:path'
 import react from '@vitejs/plugin-react'
-import { loadEnv } from 'vite'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, loadEnv } from 'vite-plus'
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '.prisma-mongo/client': path.resolve(__dirname, './node_modules/.prisma-mongo/client'),
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     environment: 'happy-dom',
     globals: true,
@@ -17,8 +22,6 @@ export default defineConfig({
     env: loadEnv('', process.cwd(), ''),
     exclude: ['.next/', 'node_modules/', '.api/', 'vitest.setup.ts', '**/*.d.ts', '**/*.config.*'],
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
       exclude: [
         '.next/',
         'node_modules/',
@@ -30,12 +33,8 @@ export default defineConfig({
         '**/__tests__/**',
       ],
       include: ['src/components/Overlay/GiftAlert/GiftSubscriptionAlert.tsx'],
-    },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '.prisma-mongo/client': path.resolve(__dirname, './node_modules/.prisma-mongo/client'),
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
     },
   },
 })

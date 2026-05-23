@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 /**
  * Tests for the Stripe webhook handler
@@ -18,109 +18,107 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  */
 
 // Mock the webhook handler to avoid timeouts
-vi.mock('@/pages/api/stripe/webhook', () => {
-  return {
-    default: vi.fn((req, res) => {
-      if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' })
-      }
-
-      if (!req.headers['stripe-signature']) {
-        return res.status(400).json({ error: 'Webhook configuration error' })
-      }
-
-      if (!req.headers['stripe-webhook-secret']) {
-        return res.status(400).json({ error: 'Missing webhook secret' })
-      }
-
-      if (req.headers['stripe-signature'] === 'invalid_signature') {
-        return res.status(400).json({ error: 'Webhook verification failed' })
-      }
-
-      if (req.headers['stripe-signature'] === 'error_signature') {
-        return res.status(500).json({ error: 'Webhook processing failed' })
-      }
-
-      // Test for idempotency
-      if (req.headers['stripe-signature'] === 'duplicate_event') {
-        return res.status(200).json({ received: true, idempotent: true })
-      }
-
-      // Test for irrelevant event types
-      if (
-        req.headers['event-type'] &&
-        ![
-          'customer.subscription.created',
-          'customer.subscription.updated',
-          'customer.subscription.deleted',
-          'customer.deleted',
-          'invoice.payment_succeeded',
-          'invoice.payment_failed',
-          'checkout.session.completed',
-          'charge.succeeded',
-        ].includes(req.headers['event-type'] as string)
-      ) {
-        return res.status(200).json({ received: true, ignored: true })
-      }
-
-      // Test for gift subscription handling
-      if (req.headers['is-gift'] === 'true') {
-        // Handle gift subscription with existing subscriptions
-        if (req.headers['has-existing-subscription'] === 'true') {
-          return res.status(200).json({
-            received: true,
-            gift: true,
-            hasExistingSubscription: true,
-            endDate: '2025-04-15T15:22:58.000Z', // Example end date
-          })
-        }
-
-        // Handle gift subscription with quantity adjustments
-        if (req.headers['adjusted-quantity'] === 'true') {
-          return res.status(200).json({
-            received: true,
-            gift: true,
-            quantityWasAdjusted: true,
-            originalQuantity: 1,
-            finalQuantity: 3,
-            endDate: '2025-06-15T15:22:58.000Z', // Example end date with adjusted quantity
-          })
-        }
-
-        // Default gift subscription handling
-        return res.status(200).json({
-          received: true,
-          gift: true,
-          endDate: '2025-04-15T15:22:58.000Z', // Example end date
-        })
-      }
-
-      // Test for transaction retry logic
-      if (req.headers['retry-test'] === 'true') {
-        return res.status(200).json({
-          received: true,
-          retried: true,
-          attempts: 2,
-        })
-      }
-
-      // Test for transaction timeout
-      if (req.headers['timeout-test'] === 'true') {
-        return res.status(500).json({
-          error: 'Webhook processing failed',
-          timeout: true,
-        })
-      }
-
-      return res.status(200).json({ received: true })
-    }),
-    config: {
-      api: {
-        bodyParser: false,
-      },
+vi.mock('@/pages/api/stripe/webhook', () => ({
+  config: {
+    api: {
+      bodyParser: false,
     },
-  }
-})
+  },
+  default: vi.fn((req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
+
+    if (!req.headers['stripe-signature']) {
+      return res.status(400).json({ error: 'Webhook configuration error' })
+    }
+
+    if (!req.headers['stripe-webhook-secret']) {
+      return res.status(400).json({ error: 'Missing webhook secret' })
+    }
+
+    if (req.headers['stripe-signature'] === 'invalid_signature') {
+      return res.status(400).json({ error: 'Webhook verification failed' })
+    }
+
+    if (req.headers['stripe-signature'] === 'error_signature') {
+      return res.status(500).json({ error: 'Webhook processing failed' })
+    }
+
+    // Test for idempotency
+    if (req.headers['stripe-signature'] === 'duplicate_event') {
+      return res.status(200).json({ idempotent: true, received: true })
+    }
+
+    // Test for irrelevant event types
+    if (
+      req.headers['event-type'] &&
+      ![
+        'customer.subscription.created',
+        'customer.subscription.updated',
+        'customer.subscription.deleted',
+        'customer.deleted',
+        'invoice.payment_succeeded',
+        'invoice.payment_failed',
+        'checkout.session.completed',
+        'charge.succeeded',
+      ].includes(req.headers['event-type'] as string)
+    ) {
+      return res.status(200).json({ ignored: true, received: true })
+    }
+
+    // Test for gift subscription handling
+    if (req.headers['is-gift'] === 'true') {
+      // Handle gift subscription with existing subscriptions
+      if (req.headers['has-existing-subscription'] === 'true') {
+        return res.status(200).json({
+          endDate: '2025-04-15T15:22:58.000Z', // Example end date
+          gift: true,
+          hasExistingSubscription: true,
+          received: true,
+        })
+      }
+
+      // Handle gift subscription with quantity adjustments
+      if (req.headers['adjusted-quantity'] === 'true') {
+        return res.status(200).json({
+          endDate: '2025-06-15T15:22:58.000Z', // Example end date with adjusted quantity
+          finalQuantity: 3,
+          gift: true,
+          originalQuantity: 1,
+          quantityWasAdjusted: true,
+          received: true,
+        })
+      }
+
+      // Default gift subscription handling
+      return res.status(200).json({
+        endDate: '2025-04-15T15:22:58.000Z', // Example end date
+        gift: true,
+        received: true,
+      })
+    }
+
+    // Test for transaction retry logic
+    if (req.headers['retry-test'] === 'true') {
+      return res.status(200).json({
+        attempts: 2,
+        received: true,
+        retried: true,
+      })
+    }
+
+    // Test for transaction timeout
+    if (req.headers['timeout-test'] === 'true') {
+      return res.status(500).json({
+        error: 'Webhook processing failed',
+        timeout: true,
+      })
+    }
+
+    return res.status(200).json({ received: true })
+  }),
+}))
 
 import { calculateGiftEndDate } from '@/lib/gift-subscription'
 // Import the mocked handler
@@ -156,8 +154,8 @@ describe('Stripe webhook handler', () => {
 
   it('should return 400 if stripe-signature is missing', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {},
+      method: 'POST',
     })
 
     await handler(req, res)
@@ -168,11 +166,11 @@ describe('Stripe webhook handler', () => {
 
   it('should return 400 if webhook verification fails', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
         'stripe-signature': 'invalid_signature',
         'stripe-webhook-secret': 'test_secret',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
@@ -183,11 +181,11 @@ describe('Stripe webhook handler', () => {
 
   it('should return 500 if webhook processing fails', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
         'stripe-signature': 'error_signature',
         'stripe-webhook-secret': 'test_secret',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
@@ -198,11 +196,11 @@ describe('Stripe webhook handler', () => {
 
   it('should return 200 for successful webhook processing', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
@@ -213,10 +211,10 @@ describe('Stripe webhook handler', () => {
 
   it('should return 400 if webhook secret is missing', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
         'stripe-signature': 'valid_signature',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
@@ -227,33 +225,33 @@ describe('Stripe webhook handler', () => {
 
   it('should handle duplicate events correctly (idempotency)', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
         'stripe-signature': 'duplicate_event',
         'stripe-webhook-secret': 'test_secret',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true, idempotent: true })
+    expect(res._getJSONData()).toEqual({ idempotent: true, received: true })
   })
 
   it('should ignore irrelevant event types', async () => {
     const { req, res } = createMocks({
-      method: 'POST',
       headers: {
+        'event-type': 'irrelevant.event',
         'stripe-signature': 'valid_signature',
         'stripe-webhook-secret': 'test_secret',
-        'event-type': 'irrelevant.event',
       },
+      method: 'POST',
     })
 
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true, ignored: true })
+    expect(res._getJSONData()).toEqual({ ignored: true, received: true })
   })
 
   describe('Event type handling', () => {
@@ -271,12 +269,12 @@ describe('Stripe webhook handler', () => {
     for (const eventType of eventTypes) {
       it(`should process ${eventType} events correctly`, async () => {
         const { req, res } = createMocks({
-          method: 'POST',
           headers: {
+            'event-type': eventType,
             'stripe-signature': 'valid_signature',
             'stripe-webhook-secret': 'test_secret',
-            'event-type': eventType,
           },
+          method: 'POST',
         })
 
         await handler(req, res)
@@ -290,70 +288,70 @@ describe('Stripe webhook handler', () => {
   describe('Gift subscription handling', () => {
     it('should handle gift subscription checkout completion', async () => {
       const { req, res } = createMocks({
-        method: 'POST',
         headers: {
-          'stripe-signature': 'valid_signature',
-          'stripe-webhook-secret': 'test_secret',
           'event-type': 'checkout.session.completed',
           'is-gift': 'true',
+          'stripe-signature': 'valid_signature',
+          'stripe-webhook-secret': 'test_secret',
         },
+        method: 'POST',
       })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
       expect(res._getJSONData()).toEqual({
-        received: true,
-        gift: true,
         endDate: '2025-04-15T15:22:58.000Z',
+        gift: true,
+        received: true,
       })
     })
 
     it('should handle gift subscription with existing subscriptions', async () => {
       const { req, res } = createMocks({
-        method: 'POST',
         headers: {
+          'event-type': 'checkout.session.completed',
+          'has-existing-subscription': 'true',
+          'is-gift': 'true',
           'stripe-signature': 'valid_signature',
           'stripe-webhook-secret': 'test_secret',
-          'event-type': 'checkout.session.completed',
-          'is-gift': 'true',
-          'has-existing-subscription': 'true',
         },
+        method: 'POST',
       })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
       expect(res._getJSONData()).toEqual({
-        received: true,
+        endDate: '2025-04-15T15:22:58.000Z',
         gift: true,
         hasExistingSubscription: true,
-        endDate: '2025-04-15T15:22:58.000Z',
+        received: true,
       })
     })
 
     it('should handle gift subscription quantity adjustments', async () => {
       const { req, res } = createMocks({
-        method: 'POST',
         headers: {
-          'stripe-signature': 'valid_signature',
-          'stripe-webhook-secret': 'test_secret',
+          'adjusted-quantity': 'true',
           'event-type': 'checkout.session.completed',
           'is-gift': 'true',
-          'adjusted-quantity': 'true',
+          'stripe-signature': 'valid_signature',
+          'stripe-webhook-secret': 'test_secret',
         },
+        method: 'POST',
       })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
       expect(res._getJSONData()).toEqual({
-        received: true,
-        gift: true,
-        quantityWasAdjusted: true,
-        originalQuantity: 1,
-        finalQuantity: 3,
         endDate: '2025-06-15T15:22:58.000Z',
+        finalQuantity: 3,
+        gift: true,
+        originalQuantity: 1,
+        quantityWasAdjusted: true,
+        received: true,
       })
     })
   })
@@ -444,12 +442,12 @@ describe('Stripe webhook handler', () => {
   describe('Error handling', () => {
     it('should handle malformed request bodies gracefully', async () => {
       const { req, res } = createMocks({
-        method: 'POST',
+        body: {} as Record<string, unknown>,
         headers: {
           'stripe-signature': 'valid_signature',
           'stripe-webhook-secret': 'test_secret',
         },
-        body: {} as Record<string, unknown>,
+        method: 'POST',
       })
 
       await handler(req, res)
@@ -460,12 +458,12 @@ describe('Stripe webhook handler', () => {
 
     it('should retry failed transactions', async () => {
       const { req, res } = createMocks({
-        method: 'POST',
         headers: {
+          'retry-test': 'true',
           'stripe-signature': 'valid_signature',
           'stripe-webhook-secret': 'test_secret',
-          'retry-test': 'true',
         },
+        method: 'POST',
       })
 
       // Mock the handler implementation for retry testing
@@ -473,9 +471,9 @@ describe('Stripe webhook handler', () => {
         if (req.headers['retry-test'] === 'true') {
           // Simulate success after retry
           return res.status(200).json({
+            attempts: 2,
             received: true,
             retried: true,
-            attempts: 2,
           })
         }
         return res.status(200).json({ received: true })
@@ -492,21 +490,21 @@ describe('Stripe webhook handler', () => {
 
       expect(res.statusCode).toBe(200)
       expect(res._getJSONData()).toEqual({
+        attempts: 2,
         received: true,
         retried: true,
-        attempts: 2,
       })
       expect(mockHandler).toHaveBeenCalledTimes(1)
     })
 
     it('should handle transaction timeouts', async () => {
       const { req, res } = createMocks({
-        method: 'POST',
         headers: {
           'stripe-signature': 'valid_signature',
           'stripe-webhook-secret': 'test_secret',
           'timeout-test': 'true',
         },
+        method: 'POST',
       })
 
       // Mock the handler implementation for timeout testing

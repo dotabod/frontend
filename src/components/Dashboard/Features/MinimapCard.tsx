@@ -26,24 +26,24 @@ export default function MinimapCard(): React.ReactNode {
 
   const switches = [
     {
-      settingKey: Settings['minimap-blocker'],
       label: 'Enable minimap blocker',
+      settingKey: Settings['minimap-blocker'],
     },
     {
-      settingKey: Settings['minimap-simple'],
       label: 'Simple minimap background',
+      settingKey: Settings['minimap-simple'],
     },
     {
-      settingKey: Settings['minimap-xl'],
       label: 'Extra large minimap',
+      settingKey: Settings['minimap-xl'],
     },
     {
-      settingKey: Settings.minimapRight,
       label: 'Right side minimap',
+      settingKey: Settings.minimapRight,
     },
     {
-      settingKey: Settings.battlepass,
       label: 'Battlepass hud',
+      settingKey: Settings.battlepass,
     },
   ]
 

@@ -51,19 +51,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (giftType === 'lifetime') {
       const existingLifetime = await prisma.subscription.findFirst({
         where: {
-          userId: userId,
-          status: 'ACTIVE',
           OR: [
             {
               transactionType: 'LIFETIME',
             },
             {
-              isGift: true,
               giftDetails: {
                 giftType: 'lifetime',
               },
+              isGift: true,
             },
           ],
+          status: 'ACTIVE',
+          userId,
         },
       })
 
@@ -92,46 +92,46 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Create a test subscription with isGift flag
     const subscription = await prisma.subscription.create({
       data: {
-        userId: userId,
+        cancelAtPeriodEnd: false,
+        currentPeriodEnd,
+        isGift: true,
         status: 'ACTIVE',
         tier: 'PRO',
         transactionType: 'RECURRING',
-        currentPeriodEnd: currentPeriodEnd,
-        cancelAtPeriodEnd: false,
-        isGift: true,
+        userId,
       },
     })
 
     // Create a gift subscription record
     const giftSubscription = await prisma.giftSubscription.create({
       data: {
-        subscriptionId: subscription.id,
-        senderName: 'Test Sender',
-        giftMessage: giftMessage,
-        giftType: giftType,
+        giftMessage,
         giftQuantity: finalGiftQuantity,
+        giftType,
+        senderName: 'Test Sender',
+        subscriptionId: subscription.id,
       },
     })
 
     // Create a notification for the gift
     const notification = await prisma.notification.create({
       data: {
-        userId: userId,
-        type: 'GIFT_SUBSCRIPTION',
-        isRead: false,
         giftSubscriptionId: giftSubscription.id,
+        isRead: false,
+        type: 'GIFT_SUBSCRIPTION',
+        userId,
       },
     })
 
     // Get total active gift subscriptions for this user
     const activeGiftSubscriptions = await prisma.subscription.findMany({
-      where: {
-        userId: userId,
-        status: 'ACTIVE',
-        isGift: true,
-      },
       include: {
         giftDetails: true,
+      },
+      where: {
+        isGift: true,
+        status: 'ACTIVE',
+        userId,
       },
     })
 
@@ -152,22 +152,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       } else if (sub.giftDetails?.giftType === 'monthly') {
         // Apply the gift quantity multiplier
         const quantity = sub.giftDetails.giftQuantity || 1
-        totalGiftedMonths += 1 * quantity
+        totalGiftedMonths += Number(quantity)
       }
     }
 
     return res.status(200).json({
-      success: true,
+      giftSubscription,
+      hasLifetime,
       message: 'Test gift notification created',
       notification,
-      giftSubscription,
       subscription,
+      success: true,
       totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,
-      hasLifetime,
     })
   } catch (error) {
     console.error('Error creating test gift notification:', error)
-    return res.status(500).json({ message: 'Internal server error', error: String(error) })
+    return res.status(500).json({ error: String(error), message: 'Internal server error' })
   }
 }
 

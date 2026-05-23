@@ -8,7 +8,7 @@ export function formatDate(dateString: string | Date) {
   return utcDate.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric',
     timeZone: 'UTC',
+    year: 'numeric',
   })
 }

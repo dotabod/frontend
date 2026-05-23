@@ -30,40 +30,42 @@ const triggerCryptoConfetti = () => {
   const colors = ['#8b5cf6', '#a78bfa', '#f59e0b', '#fbbf24']
 
   const frame = () => {
-    if (Date.now() > end) return
+    if (Date.now() > end) {
+      return
+    }
 
     // More particles for crypto
     confetti({
-      particleCount: 6,
       angle: 60,
+      colors,
+      origin: { x: 0, y: 0.5 },
+      particleCount: 6,
+      scalar: 1.2,
+      shapes: ['circle', 'square'],
       spread: 70,
       startVelocity: 75,
-      origin: { x: 0, y: 0.5 },
-      colors: colors,
-      shapes: ['circle', 'square'],
-      scalar: 1.2,
     })
     confetti({
-      particleCount: 6,
       angle: 120,
+      colors,
+      origin: { x: 1, y: 0.5 },
+      particleCount: 6,
+      scalar: 1.2,
+      shapes: ['circle', 'square'],
       spread: 70,
       startVelocity: 75,
-      origin: { x: 1, y: 0.5 },
-      colors: colors,
-      shapes: ['circle', 'square'],
-      scalar: 1.2,
     })
 
     // Add some "bitcoin" shaped confetti (smaller circles) in gold
     confetti({
-      particleCount: 4,
       angle: 90,
+      colors: ['#f59e0b', '#fbbf24'],
+      origin: { x: 0.5, y: 0.5 },
+      particleCount: 4,
+      scalar: 0.7,
+      shapes: ['circle'],
       spread: 360,
       startVelocity: 40,
-      origin: { x: 0.5, y: 0.5 },
-      colors: ['#f59e0b', '#fbbf24'],
-      shapes: ['circle'],
-      scalar: 0.7,
     })
 
     requestAnimationFrame(frame)
@@ -72,7 +74,7 @@ const triggerCryptoConfetti = () => {
   frame()
 }
 
-type SettingsPayload = {
+interface SettingsPayload {
   stream_online?: boolean
   settings?: { key: string }[]
 }
@@ -87,14 +89,14 @@ const SetupPage = () => {
   const modVerified = Boolean(modStatus?.modded)
 
   // Folded into /api/settings to save one Vercel invocation per poll. The backend writes
-  // these rows on first GSI packet / first overlay socket; we only need their existence.
+  // These rows on first GSI packet / first overlay socket; we only need their existence.
   const { data } = useSWR<SettingsPayload>('/api/settings', fetcher, {
     ...SETTINGS_SWR_OPTIONS,
     refreshInterval: (latest) => {
       const keys = latest?.settings
       const gsi = keys?.some((s) => s.key === SETUP_SIGNAL_KEYS.gsi)
       const overlay = keys?.some((s) => s.key === SETUP_SIGNAL_KEYS.overlay)
-      return gsi && overlay ? 0 : 10000
+      return gsi && overlay ? 0 : 10_000
     },
   })
   const isLive = Boolean(data?.stream_online)
@@ -122,7 +124,7 @@ const SetupPage = () => {
   const didJustPay = router.query.paid === 'true'
   // Check if payment was made with crypto
   const paidWithCrypto = router.query.crypto === 'true'
-  // isTrial comes from the checkout API's success URL: ?trial=${isRecurring && trialDays > 0}
+  // IsTrial comes from the checkout API's success URL: ?trial=${isRecurring && trialDays > 0}
   // It will be true for recurring subscriptions with a trial period (grace period or standard 14-day trial)
   // It will be false for lifetime purchases or subscriptions with no trial (like when a user already has a gift sub)
   const isTrial = router.query.trial === 'true'
@@ -185,23 +187,25 @@ const SetupPage = () => {
     const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
 
     const frame = () => {
-      if (Date.now() > end) return
+      if (Date.now() > end) {
+        return
+      }
 
       confetti({
-        particleCount: 3,
         angle: 60,
+        colors,
+        origin: { x: 0, y: 0.5 },
+        particleCount: 3,
         spread: 55,
         startVelocity: 60,
-        origin: { x: 0, y: 0.5 },
-        colors: colors,
       })
       confetti({
-        particleCount: 3,
         angle: 120,
+        colors,
+        origin: { x: 1, y: 0.5 },
+        particleCount: 3,
         spread: 55,
         startVelocity: 60,
-        origin: { x: 1, y: 0.5 },
-        colors: colors,
       })
 
       requestAnimationFrame(frame)
@@ -251,8 +255,7 @@ const SetupPage = () => {
       // Special notification styling for crypto payments
       if (paidWithCrypto) {
         notification.open({
-          key: 'paid',
-          message: '',
+          className: 'crypto-notification',
           description: (
             <CryptoSuccessContent
               message='Dotabod Pro Unlocked with Crypto'
@@ -260,25 +263,26 @@ const SetupPage = () => {
             />
           ),
           duration: 55,
-          className: 'crypto-notification',
+          key: 'paid',
+          message: '',
         })
 
         // Add body class for temporary crypto theme
         document.body.classList.add('crypto-payment-success')
         setTimeout(() => {
           document.body.classList.remove('crypto-payment-success')
-        }, 60000) // Remove after 1 minute
+        }, 60_000) // Remove after 1 minute
       } else {
         notification.success({
-          key: 'paid',
-          message: 'Dotabod Pro Unlocked',
           description,
           duration: 55,
+          key: 'paid',
+          message: 'Dotabod Pro Unlocked',
         })
       }
 
       // Clear the query params but preserve the step
-      const step = router.query.step
+      const { step } = router.query
       router.replace(
         {
           pathname: router.pathname,
@@ -307,28 +311,28 @@ const SetupPage = () => {
 
   const steps = [
     {
-      title: 'Stream',
       content: <ChatBot />,
       description: 'Connect your stream',
       status: modVerified ? ('finish' as const) : undefined,
+      title: 'Stream',
     },
     {
-      title: 'Dota 2',
       content: <ExportCFG />,
       description: 'Configure game settings',
       status: gsiVerified ? ('finish' as const) : undefined,
+      title: 'Dota 2',
     },
     {
-      title: 'OBS',
       content: <OBSOverlay />,
       description: 'Set up your overlay',
       status: overlayVerified ? ('finish' as const) : undefined,
+      title: 'OBS',
     },
     {
-      title: 'Connect Steam',
+      content: <ConnectSteam isLive={isLive} />,
       description: 'Auto-connects when you play',
       status: steamLinked ? ('finish' as const) : undefined,
-      content: <ConnectSteam isLive={isLive} />,
+      title: 'Connect Steam',
     },
   ]
 
@@ -414,11 +418,11 @@ SetupPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Dashboard | Dotabod',
+        canonicalUrl: 'https://dotabod.com/dashboard',
         description:
           'Manage your Dotabod settings and features to enhance your Dota 2 streaming experience.',
-        canonicalUrl: 'https://dotabod.com/dashboard',
         noindex: true,
+        title: 'Dashboard | Dotabod',
       }}
     >
       {page}

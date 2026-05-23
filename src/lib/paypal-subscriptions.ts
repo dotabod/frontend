@@ -4,15 +4,19 @@ import { getSubscription, type PayPalCaptureResult } from '@/lib/paypal'
 
 function mapStatus(paypalStatus: string): SubscriptionStatus {
   switch (paypalStatus) {
-    case 'ACTIVE':
+    case 'ACTIVE': {
       return SubscriptionStatus.ACTIVE
-    case 'SUSPENDED':
+    }
+    case 'SUSPENDED': {
       return SubscriptionStatus.PAST_DUE
+    }
     case 'CANCELLED':
-    case 'EXPIRED':
+    case 'EXPIRED': {
       return SubscriptionStatus.CANCELED
-    default:
+    }
+    default: {
       return SubscriptionStatus.INCOMPLETE
+    }
   }
 }
 
@@ -30,7 +34,7 @@ export async function syncPaypalSubscription(paypalSubscriptionId: string): Prom
   }
 
   const details = await getSubscription(paypalSubscriptionId)
-  const userId = record.userId
+  const { userId } = record
   const metadata = (record.metadata as Record<string, unknown>) || {}
   const priceType = (metadata.priceType as string) || 'monthly'
   const stripePriceId = (metadata.stripePriceId as string) || null
@@ -42,42 +46,42 @@ export async function syncPaypalSubscription(paypalSubscriptionId: string): Prom
     : computeFallbackPeriodEnd(priceType)
 
   await prisma.payPalSubscription.update({
-    where: { paypalSubscriptionId },
     data: {
-      status: details.status,
-      payerId: details.payerId ?? record.payerId,
       lastWebhookAt: new Date(),
+      payerId: details.payerId ?? record.payerId,
+      status: details.status,
     },
+    where: { paypalSubscriptionId },
   })
 
   await prisma.subscription.upsert({
-    where: { stripeSubscriptionId },
     create: {
-      userId,
-      stripeSubscriptionId,
-      stripePriceId,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd,
+      metadata: {
+        paymentProvider: 'paypal',
+        paypalSubscriptionId,
+        priceType,
+      },
       status,
+      stripePriceId,
+      stripeSubscriptionId,
       tier: 'PRO',
       transactionType: TransactionType.RECURRING,
-      currentPeriodEnd,
-      cancelAtPeriodEnd: false,
-      metadata: {
-        paymentProvider: 'paypal',
-        paypalSubscriptionId,
-        priceType,
-      },
+      userId,
     },
     update: {
-      status,
-      stripePriceId,
       currentPeriodEnd,
-      updatedAt: new Date(),
       metadata: {
         paymentProvider: 'paypal',
         paypalSubscriptionId,
         priceType,
       },
+      status,
+      stripePriceId,
+      updatedAt: new Date(),
     },
+    where: { stripeSubscriptionId },
   })
 
   return true
@@ -102,12 +106,12 @@ export async function markPaypalSubscriptionInactive(
   status: SubscriptionStatus,
 ): Promise<void> {
   await prisma.payPalSubscription.updateMany({
+    data: { lastWebhookAt: new Date(), status },
     where: { paypalSubscriptionId },
-    data: { status, lastWebhookAt: new Date() },
   })
   await prisma.subscription.updateMany({
-    where: { stripeSubscriptionId: `paypal_${paypalSubscriptionId}` },
     data: { status, updatedAt: new Date() },
+    where: { stripeSubscriptionId: `paypal_${paypalSubscriptionId}` },
   })
 }
 
@@ -123,12 +127,12 @@ export async function completeLifetimeOrder(
 
   // Skip if the user already has an active lifetime purchase (idempotency).
   const existingLifetime = await prisma.subscription.findFirst({
+    select: { id: true },
     where: {
-      userId: order.userId,
       status: SubscriptionStatus.ACTIVE,
       transactionType: TransactionType.LIFETIME,
+      userId: order.userId,
     },
-    select: { id: true },
   })
 
   if (!existingLifetime) {
@@ -136,30 +140,30 @@ export async function completeLifetimeOrder(
     farFuture.setFullYear(farFuture.getFullYear() + 100)
     await prisma.subscription.create({
       data: {
-        userId: order.userId,
-        stripePriceId: stripePriceId || undefined,
-        status: SubscriptionStatus.ACTIVE,
-        tier: 'PRO',
-        transactionType: TransactionType.LIFETIME,
-        currentPeriodEnd: farFuture,
         cancelAtPeriodEnd: false,
+        currentPeriodEnd: farFuture,
         metadata: {
           paymentProvider: 'paypal',
-          paypalOrderId: order.paypalOrderId,
           paypalCaptureId: capture.captureId ?? '',
+          paypalOrderId: order.paypalOrderId,
         },
+        status: SubscriptionStatus.ACTIVE,
+        stripePriceId: stripePriceId || undefined,
+        tier: 'PRO',
+        transactionType: TransactionType.LIFETIME,
+        userId: order.userId,
       },
     })
   }
 
   await prisma.payPalOrder.update({
-    where: { paypalOrderId: order.paypalOrderId },
     data: {
-      status: capture.status,
       captureId: capture.captureId ?? undefined,
-      payerId: capture.payerId ?? undefined,
       lastWebhookAt: new Date(),
       metadata: { ...metadata, processedSuccessfully: true },
+      payerId: capture.payerId ?? undefined,
+      status: capture.status,
     },
+    where: { paypalOrderId: order.paypalOrderId },
   })
 }

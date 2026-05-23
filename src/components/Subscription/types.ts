@@ -8,7 +8,7 @@ export interface GiftInfo {
   giftCount: number
   giftMessage: string
   hasLifetime: boolean
-  giftSubscriptions?: Array<{
+  giftSubscriptions?: {
     id: string
     endDate: Date | null
     senderName: string
@@ -16,7 +16,7 @@ export interface GiftInfo {
     giftQuantity: number
     giftMessage: string
     createdAt: Date
-  }>
+  }[]
 }
 
 // Shared status info type

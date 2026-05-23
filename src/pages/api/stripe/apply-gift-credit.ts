@@ -44,29 +44,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const activeSubscription = await getSubscription(userIdToUse)
 
     // If the user already has an active subscription (not a grace period one),
-    // there's no need to apply credits automatically
+    // There's no need to apply credits automatically
     if (
       activeSubscription &&
       !activeSubscription.isGift &&
       isSubscriptionActive(activeSubscription)
     ) {
       return res.status(200).json({
+        activeSubscription: true,
         message: 'User already has an active subscription',
         success: false,
-        activeSubscription: true,
       })
     }
 
     // Get the user's Stripe customer ID
     const user = await prisma.user.findUnique({
-      where: { id: userIdToUse },
       select: {
-        id: true,
         email: true,
-        name: true,
+        id: true,
         image: true,
         locale: true,
+        name: true,
       },
+      where: { id: userIdToUse },
     })
 
     if (!user) {
@@ -75,9 +75,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Find the user's Stripe customer ID
     const subscription = await prisma.subscription.findFirst({
-      where: { userId: userIdToUse },
-      select: { stripeCustomerId: true },
       orderBy: { createdAt: 'desc' },
+      select: { stripeCustomerId: true },
+      where: { userId: userIdToUse },
     })
 
     const stripeCustomerId = subscription?.stripeCustomerId
@@ -101,21 +101,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Safely access the balance after ensuring the customer is not deleted
-    const balance = customer.balance
+    const { balance } = customer
 
     // If balance is zero or positive, there are no credits to use
     if (balance >= 0) {
       return res.status(200).json({
+        balance,
         message: 'No credit balance available',
-        balance: balance,
         success: false,
       })
     }
 
     // Check for inactive subscriptions that can be reactivated
     const inactiveSubsription = await prisma.subscription.findFirst({
+      orderBy: { createdAt: 'desc' },
       where: {
-        userId: userIdToUse,
+        cancelAtPeriodEnd: true,
         status: {
           in: [
             SubscriptionStatus.CANCELED,
@@ -124,10 +125,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             SubscriptionStatus.UNPAID,
           ],
         },
-        cancelAtPeriodEnd: true,
         stripeSubscriptionId: { not: null },
+        userId: userIdToUse,
       },
-      orderBy: { createdAt: 'desc' },
     })
 
     // If stripe subscription exists, try to reactivate it
@@ -147,19 +147,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           customer: stripeCustomerId,
           items: [{ price: priceId }],
           metadata: {
-            userId: userIdToUse,
             email: user.email || '',
-            name: user.name || '',
             image: user.image || '',
-            locale: user.locale || '',
-            isUpgradeToLifetime: 'false',
-            isNewSubscription: 'true',
-            isGift: 'false',
-            isCryptoPayment: 'false',
             isAutoApplied: 'true', // Indicate this was auto-applied via gift credit
+            isCryptoPayment: 'false',
+            isGift: 'false',
+            isNewSubscription: 'true',
+            isUpgradeToLifetime: 'false',
+            locale: user.locale || '',
+            name: user.name || '',
+            userId: userIdToUse,
           },
           // Optional: Add trial days or other parameters if needed
-          // trial_period_days: 30, // Example: Give a 30-day trial
+          // Trial_period_days: 30, // Example: Give a 30-day trial
         })
 
         // Ensure the subscription was created successfully
@@ -168,7 +168,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // If the latest invoice exists and is paid (likely due to balance application),
-        // determine the correct currentPeriodEnd. Otherwise, estimate 30 days.
+        // Determine the correct currentPeriodEnd. Otherwise, estimate 30 days.
         let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Default: 30 days
         if (
           newStripeSubscription.latest_invoice &&
@@ -191,38 +191,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Create a new subscription record in Prisma
         await prisma.subscription.create({
           data: {
-            userId: userIdToUse,
-            status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
-            tier: 'PRO',
-            transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
-            stripeCustomerId: stripeCustomerId,
-            stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
-            stripePriceId: priceId as string,
-            currentPeriodEnd: currentPeriodEnd,
             cancelAtPeriodEnd: false,
+            currentPeriodEnd,
             isGift: false, // This subscription itself isn't a gift, it was paid for by gift *credit*
             metadata: {
-              autoApplied: 'true',
               appliedAt: new Date().toISOString(),
+              autoApplied: 'true',
               creditBalanceUsed: balance.toString(), // Record the balance *before* application
               source: 'gift-credit-auto-apply-reactivate-path',
             },
+            status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
+            stripeCustomerId,
+            stripePriceId: priceId as string,
+            stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
+            tier: 'PRO',
+            transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
+            userId: userIdToUse,
           },
         })
 
         return res.status(200).json({
-          message: 'Successfully applied gift credits to create a new subscription',
-          success: true,
-          priceId: priceId,
           creditApplied: Math.abs(balance) / 100, // Show the amount of credit potentially used
+          message: 'Successfully applied gift credits to create a new subscription',
+          priceId,
+          success: true,
         })
       } catch (error) {
         console.error('Error creating subscription from inactive path:', error)
         // Check for specific Stripe errors if needed
-        // if (error instanceof Stripe.errors.StripeCardError) { ... }
+        // If (error instanceof Stripe.errors.StripeCardError) { ... }
         return res.status(500).json({
-          error: 'Failed to create subscription using gift credits',
           details: error.message,
+          error: 'Failed to create subscription using gift credits',
           success: false,
         })
       }
@@ -242,19 +242,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           customer: stripeCustomerId,
           items: [{ price: priceId }],
           metadata: {
-            userId: userIdToUse,
             email: user.email || '',
-            name: user.name || '',
             image: user.image || '',
-            locale: user.locale || '',
-            isUpgradeToLifetime: 'false',
-            isNewSubscription: 'true',
-            isGift: 'false',
-            isCryptoPayment: 'false',
             isAutoApplied: 'true', // Indicate this was auto-applied via gift credit
+            isCryptoPayment: 'false',
+            isGift: 'false',
+            isNewSubscription: 'true',
+            isUpgradeToLifetime: 'false',
+            locale: user.locale || '',
+            name: user.name || '',
+            userId: userIdToUse,
           },
           // Optional: Add trial days or other parameters if needed
-          // trial_period_days: 30, // Example: Give a 30-day trial
+          // Trial_period_days: 30, // Example: Give a 30-day trial
         })
 
         // Ensure the subscription was created successfully
@@ -263,7 +263,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // If the latest invoice exists and is paid (likely due to balance application),
-        // determine the correct currentPeriodEnd. Otherwise, estimate 30 days.
+        // Determine the correct currentPeriodEnd. Otherwise, estimate 30 days.
         let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Default: 30 days
         if (
           newStripeSubscription.latest_invoice &&
@@ -286,38 +286,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Create a new subscription record in Prisma
         await prisma.subscription.create({
           data: {
-            userId: userIdToUse,
-            status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
-            tier: 'PRO',
-            transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
-            stripeCustomerId: stripeCustomerId,
-            stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
-            stripePriceId: priceId,
-            currentPeriodEnd: currentPeriodEnd,
             cancelAtPeriodEnd: false,
+            currentPeriodEnd,
             isGift: false, // This subscription itself isn't a gift, it was paid for by gift *credit*
             metadata: {
-              autoApplied: 'true',
               appliedAt: new Date().toISOString(),
+              autoApplied: 'true',
               creditBalanceUsed: balance.toString(), // Record the balance *before* application
               source: 'gift-credit-auto-apply-new-path',
             },
+            status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
+            stripeCustomerId,
+            stripePriceId: priceId,
+            stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
+            tier: 'PRO',
+            transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
+            userId: userIdToUse,
           },
         })
 
         return res.status(200).json({
-          message: 'Successfully applied gift credits to create a new subscription',
-          success: true,
-          priceId: priceId,
           creditApplied: Math.abs(balance) / 100, // Show the amount of credit potentially used
+          message: 'Successfully applied gift credits to create a new subscription',
+          priceId,
+          success: true,
         })
       } catch (error) {
         console.error('Error creating new subscription:', error)
         // Check for specific Stripe errors if needed
-        // if (error instanceof Stripe.errors.StripeCardError) { ... }
+        // If (error instanceof Stripe.errors.StripeCardError) { ... }
         return res.status(500).json({
-          error: 'Failed to create new subscription using gift credits',
           details: error.message,
+          error: 'Failed to create new subscription using gift credits',
           success: false,
         })
       }
@@ -325,8 +325,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     console.error('Error applying gift credit:', error)
     return res.status(500).json({
-      error: 'An unexpected error occurred',
       details: error.message,
+      error: 'An unexpected error occurred',
       success: false,
     })
   }

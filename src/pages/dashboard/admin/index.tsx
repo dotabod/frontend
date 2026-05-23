@@ -46,7 +46,9 @@ const AdminPage = () => {
   const [_submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (status === 'loading') {
+      return
+    }
 
     if (!session?.user?.role?.includes('admin')) {
       router.push('/404')
@@ -80,10 +82,10 @@ const AdminPage = () => {
       const isForAllUsers = !values.userId
 
       const payload = {
+        isForAllUsers,
         message: values.message,
         sendAt: values.scheduledDate ? values.scheduledDate.toISOString() : dayjs().toISOString(),
         userId: isForAllUsers ? undefined : values.userId,
-        isForAllUsers,
       }
 
       await axios.post('/api/admin/scheduled-messages', payload)
@@ -130,10 +132,10 @@ const AdminPage = () => {
       const isForAllUsers = !values.userId
 
       const payload = {
+        isForAllUsers,
         message: values.message,
         sendAt: values.scheduledDate ? values.scheduledDate.toISOString() : dayjs().toISOString(),
         userId: isForAllUsers ? undefined : values.userId,
-        isForAllUsers,
       }
 
       await axios.put(`/api/admin/scheduled-messages/${editingMessage?.id}`, payload)
@@ -150,7 +152,6 @@ const AdminPage = () => {
 
   const handleDelete = async (id: string) => {
     Modal.confirm({
-      title: 'Are you sure you want to delete this scheduled message?',
       onOk: async () => {
         try {
           await fetch(`/api/admin/scheduled-messages/${id}`, {
@@ -161,40 +162,40 @@ const AdminPage = () => {
           console.error('Error deleting scheduled message:', error)
         }
       },
+      title: 'Are you sure you want to delete this scheduled message?',
     })
   }
 
   const columns: ColumnsType<ScheduledMessage> = [
     {
-      title: 'ID',
       dataIndex: 'id',
+      ellipsis: true,
       key: 'id',
-      ellipsis: true,
+      title: 'ID',
     },
     {
-      title: 'Message',
       dataIndex: 'message',
-      key: 'message',
       ellipsis: true,
+      key: 'message',
+      title: 'Message',
     },
     {
-      title: 'Send At',
       dataIndex: 'sendAt',
       key: 'sendAt',
       render: (text) => (text ? dayjs(text).format('YYYY-MM-DD HH:mm:ss') : 'When online'),
+      title: 'Send At',
     },
     {
-      title: 'Recipient',
       key: 'recipient',
       render: (_, record) => (record.isForAllUsers ? 'All Users' : record.userId || 'Unknown'),
+      title: 'Recipient',
     },
     {
-      title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      title: 'Status',
     },
     {
-      title: 'Delivery Status',
       key: 'deliveryStats',
       render: (_, record) => {
         const stats = (
@@ -210,7 +211,9 @@ const AdminPage = () => {
             }
           }
         ).deliveryStats
-        if (!stats) return 'N/A'
+        if (!stats) {
+          return 'N/A'
+        }
 
         return (
           <Space direction='vertical' style={{ width: '100%' }}>
@@ -234,9 +237,9 @@ const AdminPage = () => {
           </Space>
         )
       },
+      title: 'Delivery Status',
     },
     {
-      title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
@@ -254,20 +257,19 @@ const AdminPage = () => {
           />
         </Space>
       ),
+      title: 'Actions',
     },
   ]
 
   const items: TabsProps['items'] = [
     {
-      key: 'create',
-      label: 'Create Message',
       children: (
         <Card>
           <Form form={form} layout='vertical' onFinish={handleSubmit}>
             <Form.Item
               name='message'
               label='Message'
-              rules={[{ required: true, message: 'Please enter a message' }]}
+              rules={[{ message: 'Please enter a message', required: true }]}
             >
               <Input.TextArea rows={4} placeholder='Enter your message' />
             </Form.Item>
@@ -300,10 +302,10 @@ const AdminPage = () => {
           </Form>
         </Card>
       ),
+      key: 'create',
+      label: 'Create Message',
     },
     {
-      key: 'history',
-      label: 'Message History',
       children: (
         <Card>
           <Table
@@ -341,7 +343,7 @@ const AdminPage = () => {
               <Form.Item
                 name='message'
                 label='Message'
-                rules={[{ required: true, message: 'Please enter a message' }]}
+                rules={[{ message: 'Please enter a message', required: true }]}
               >
                 <Input.TextArea rows={4} placeholder='Enter your message' />
               </Form.Item>
@@ -378,6 +380,8 @@ const AdminPage = () => {
           </Modal>
         </Card>
       ),
+      key: 'history',
+      label: 'Message History',
     },
   ]
 
@@ -386,7 +390,7 @@ const AdminPage = () => {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px' }}>
+    <div style={{ margin: '0 auto', maxWidth: 1200, padding: '24px' }}>
       <Title level={2} style={{ marginBottom: 24 }}>
         Admin Panel - Scheduled Messages
       </Title>
@@ -400,10 +404,10 @@ AdminPage.getLayout = function getLayout(page: React.ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Admin Panel | Dotabod Dashboard',
-        description: 'Manage scheduled messages for Dotabod users.',
         canonicalUrl: 'https://dotabod.com/dashboard/admin',
+        description: 'Manage scheduled messages for Dotabod users.',
         noindex: true,
+        title: 'Admin Panel | Dotabod Dashboard',
       }}
     >
       {page}

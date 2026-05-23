@@ -33,7 +33,9 @@ function InstallPage() {
   }, [router.query.gsiType])
 
   useEffect(() => {
-    if (!router.isReady || router.query.gsiType) return
+    if (!router.isReady || router.query.gsiType) {
+      return
+    }
 
     const platform =
       // @ts-expect-error userAgentData is not yet in the TS types
@@ -45,8 +47,8 @@ function InstallPage() {
       updateUrlWithGsiType('manual')
       setAutoRoutedToManual(true)
     }
-    // updateUrlWithGsiType is stable enough; depending on router.isReady ensures
-    // we only auto-route after Next.js has hydrated the query.
+    // UpdateUrlWithGsiType is stable enough; depending on router.isReady ensures
+    // We only auto-route after Next.js has hydrated the query.
   }, [router.isReady, router.query.gsiType])
 
   return (
@@ -86,14 +88,12 @@ function InstallPage() {
         }}
         items={[
           {
-            key: 'windows',
-            label: 'Automatic (Windows)',
             children: <WindowsInstaller />,
             icon: <WindowsOutlined />,
+            key: 'windows',
+            label: 'Automatic (Windows)',
           },
           {
-            key: 'manual',
-            label: 'Manual (Mac, Linux, or Windows fallback)',
             children: <UnixInstaller />,
             icon: (
               <>
@@ -101,6 +101,8 @@ function InstallPage() {
                 <LinuxOutlined />
               </>
             ),
+            key: 'manual',
+            label: 'Manual (Mac, Linux, or Windows fallback)',
           },
         ]}
       />

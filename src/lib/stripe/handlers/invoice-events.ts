@@ -56,13 +56,13 @@ export async function handleInvoiceEvent(
 
         // Update the subscription record with the latest status
         await tx.subscription.updateMany({
-          where: { stripeSubscriptionId: subscription.id },
           data: {
-            status,
-            currentPeriodEnd,
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            currentPeriodEnd,
+            status,
             updatedAt: new Date(),
           },
+          where: { stripeSubscriptionId: subscription.id },
         })
 
         return true
@@ -84,7 +84,7 @@ function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
     return firstLineItem.subscription as string
   }
 
-  const parent = firstLineItem.parent
+  const { parent } = firstLineItem
   if (
     parent &&
     parent.type === 'subscription_item_details' &&
@@ -113,9 +113,9 @@ async function handleCryptoInvoiceEvent(
   if (resolvedUser) {
     console.log(
       JSON.stringify({
+        customerId,
         event: 'crypto_user_resolution',
         invoiceId: invoice.id,
-        customerId,
         source: resolvedUser.source,
         userId,
       }),
@@ -133,18 +133,18 @@ async function handleCryptoInvoiceEvent(
         // Find the subscription that references this invoice
         const subscription = await tx.subscription.findFirst({
           where: {
-            stripeCustomerId: customerId,
             metadata: {
-              path: ['renewalInvoiceId'],
               equals: invoice.id,
+              path: ['renewalInvoiceId'],
             },
+            stripeCustomerId: customerId,
           },
         })
 
         if (!subscription) {
           console.log(`No subscription found with renewalInvoiceId: ${invoice.id}`)
           // If we have an overdue or uncollectible invoice but no subscription with this invoice ID,
-          // try to find by customer ID (for current period invoices)
+          // Try to find by customer ID (for current period invoices)
           if (
             invoice.status === 'uncollectible' ||
             invoice.status === 'void' ||
@@ -154,9 +154,9 @@ async function handleCryptoInvoiceEvent(
           ) {
             const activeSubscription = await tx.subscription.findFirst({
               where: {
-                stripeCustomerId: customerId,
-                userId: userId,
                 status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.PAST_DUE] },
+                stripeCustomerId: customerId,
+                userId,
               },
             })
 
@@ -171,18 +171,18 @@ async function handleCryptoInvoiceEvent(
                   : SubscriptionStatus.PAST_DUE
 
               await tx.subscription.update({
-                where: { id: activeSubscription.id },
                 data: {
-                  status: newStatus,
-                  updatedAt: new Date(),
                   metadata: {
                     ...(typeof activeSubscription.metadata === 'object'
                       ? activeSubscription.metadata
                       : {}),
-                    lastUnpaidInvoiceId: invoice.id,
                     lastInvoiceStatus: invoice.status,
+                    lastUnpaidInvoiceId: invoice.id,
                   },
+                  status: newStatus,
+                  updatedAt: new Date(),
                 },
+                where: { id: activeSubscription.id },
               })
 
               console.log(`Updated subscription ${activeSubscription.id} status to ${newStatus}`)
@@ -260,18 +260,18 @@ async function handleCryptoInvoiceEvent(
             // Create a new draft invoice for the next period
             // Use type assertion to fix customerId type issue
             const params: Stripe.InvoiceCreateParams = {
-              customer: customerId,
-              collection_method: 'send_invoice',
-              description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
-              automatically_finalizes_at: Math.floor(renewalDate.getTime() / 1000),
-              due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000), // Due date 7 days after finalization date
               auto_advance: true, // Enable automatic advancement so Stripe handles finalization
+              automatically_finalizes_at: Math.floor(renewalDate.getTime() / 1000),
+              collection_method: 'send_invoice',
+              customer: customerId,
+              description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
+              due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000), // Due date 7 days after finalization date
               metadata: {
-                userId,
                 isCryptoPayment: 'true',
                 isRenewalInvoice: 'true',
-                pricePeriod,
                 previousInvoiceId: invoice.id ?? '',
+                pricePeriod,
+                userId,
               },
             }
 
@@ -285,10 +285,10 @@ async function handleCryptoInvoiceEvent(
 
             // Add the line item for the price
             await stripe.invoiceItems.create({
-              customer: customerId,
               amount: price.unit_amount,
-              invoice: newInvoice.id,
+              customer: customerId,
               description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
+              invoice: newInvoice.id,
             })
 
             console.log(
@@ -297,20 +297,20 @@ async function handleCryptoInvoiceEvent(
 
             // Update the subscription with the new period end and invoice ID
             await tx.subscription.update({
-              where: { id: subscription.id },
               data: {
-                status: SubscriptionStatus.ACTIVE,
-                currentPeriodEnd: newPeriodEnd,
                 cancelAtPeriodEnd: true, // Will expire at the end of the period
+                currentPeriodEnd: newPeriodEnd,
                 metadata: {
                   ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
-                  priceType: pricePeriod,
                   previousRenewalInvoiceId: invoice.id ?? '',
-                  renewalInvoiceId: newInvoice.id,
+                  priceType: pricePeriod,
                   renewalDueDate: renewalDate.toISOString(),
+                  renewalInvoiceId: newInvoice.id,
                 },
+                status: SubscriptionStatus.ACTIVE,
                 updatedAt: new Date(),
               },
+              where: { id: subscription.id },
             })
 
             console.log(
@@ -323,17 +323,17 @@ async function handleCryptoInvoiceEvent(
 
             // Still update the subscription period
             await tx.subscription.update({
-              where: { id: subscription.id },
               data: {
-                status: SubscriptionStatus.ACTIVE,
-                currentPeriodEnd: newPeriodEnd,
                 cancelAtPeriodEnd: true,
+                currentPeriodEnd: newPeriodEnd,
                 metadata: {
                   ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
                   renewalError: 'true',
                 },
+                status: SubscriptionStatus.ACTIVE,
                 updatedAt: new Date(),
               },
+              where: { id: subscription.id },
             })
 
             return false
@@ -341,16 +341,16 @@ async function handleCryptoInvoiceEvent(
         } else if (invoice.status === 'uncollectible' || invoice.status === 'void') {
           // Mark the subscription as inactive if the invoice is void or uncollectible
           await tx.subscription.update({
-            where: { id: subscription.id },
             data: {
-              status: SubscriptionStatus.CANCELED,
-              updatedAt: new Date(),
               metadata: {
                 ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
-                lastUnpaidInvoiceId: invoice.id,
                 cancellationReason: 'invoice_uncollectible',
+                lastUnpaidInvoiceId: invoice.id,
               },
+              status: SubscriptionStatus.CANCELED,
+              updatedAt: new Date(),
             },
+            where: { id: subscription.id },
           })
 
           console.log(
@@ -364,15 +364,15 @@ async function handleCryptoInvoiceEvent(
         ) {
           // Invoice is overdue (open but past due date)
           await tx.subscription.update({
-            where: { id: subscription.id },
             data: {
-              status: SubscriptionStatus.PAST_DUE,
-              updatedAt: new Date(),
               metadata: {
                 ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
                 lastOverdueInvoiceId: invoice.id,
               },
+              status: SubscriptionStatus.PAST_DUE,
+              updatedAt: new Date(),
             },
+            where: { id: subscription.id },
           })
 
           console.log(`Marked subscription ${subscription.id} as PAST_DUE due to overdue invoice`)
@@ -394,22 +394,30 @@ async function handleCryptoInvoiceEvent(
  */
 function mapStripeStatus(status: string): SubscriptionStatus {
   switch (status) {
-    case 'active':
+    case 'active': {
       return SubscriptionStatus.ACTIVE
-    case 'trialing':
+    }
+    case 'trialing': {
       return SubscriptionStatus.TRIALING
-    case 'past_due':
+    }
+    case 'past_due': {
       return SubscriptionStatus.PAST_DUE
-    case 'canceled':
+    }
+    case 'canceled': {
       return SubscriptionStatus.CANCELED
-    case 'unpaid':
+    }
+    case 'unpaid': {
       return SubscriptionStatus.PAST_DUE
-    case 'incomplete':
+    }
+    case 'incomplete': {
       return SubscriptionStatus.PAST_DUE
-    case 'incomplete_expired':
+    }
+    case 'incomplete_expired': {
       return SubscriptionStatus.CANCELED
-    default:
+    }
+    default: {
       return SubscriptionStatus.CANCELED
+    }
   }
 }
 
@@ -424,7 +432,7 @@ async function resolveUserIdForCryptoInvoice(
   tx: Prisma.TransactionClient,
 ): Promise<{ userId: string; source: CryptoUserResolutionSource } | null> {
   if (invoice.metadata?.userId) {
-    return { userId: invoice.metadata.userId, source: 'invoice_metadata' }
+    return { source: 'invoice_metadata', userId: invoice.metadata.userId }
   }
 
   const customerId = typeof invoice.customer === 'string' ? invoice.customer : null
@@ -436,32 +444,32 @@ async function resolveUserIdForCryptoInvoice(
   try {
     const customer = await stripe.customers.retrieve(customerId)
     if (!customer.deleted && customer.metadata?.userId) {
-      return { userId: customer.metadata.userId, source: 'customer_metadata' }
+      return { source: 'customer_metadata', userId: customer.metadata.userId }
     }
   } catch (error) {
     console.error(`Failed to resolve userId from customer ${customerId}:`, error)
   }
 
   const openNodeCharge = await tx.openNodeCharge.findUnique({
-    where: { stripeInvoiceId: invoice.id },
     select: { userId: true },
+    where: { stripeInvoiceId: invoice.id },
   })
 
   if (openNodeCharge?.userId) {
-    return { userId: openNodeCharge.userId, source: 'opennode_charge' }
+    return { source: 'opennode_charge', userId: openNodeCharge.userId }
   }
 
   const existingSubscription = await tx.subscription.findFirst({
-    where: {
-      stripeCustomerId: customerId,
-      NOT: { status: SubscriptionStatus.CANCELED },
-    },
     orderBy: { updatedAt: 'desc' },
     select: { userId: true },
+    where: {
+      NOT: { status: SubscriptionStatus.CANCELED },
+      stripeCustomerId: customerId,
+    },
   })
 
   if (existingSubscription?.userId) {
-    return { userId: existingSubscription.userId, source: 'subscription_lookup' }
+    return { source: 'subscription_lookup', userId: existingSubscription.userId }
   }
 
   return null
@@ -484,9 +492,9 @@ async function handleOpenNodeInvoicePaid(
   if (resolvedUser) {
     console.log(
       JSON.stringify({
+        customerId,
         event: 'opennode_user_resolution',
         invoiceId: invoice.id,
-        customerId,
         source: resolvedUser.source,
         userId,
       }),
@@ -543,12 +551,12 @@ async function handleOpenNodeInvoicePaid(
           console.log(`OpenNode invoice ${invoice.id} is for a lifetime purchase`)
 
           const existingLifetimePurchase = await tx.subscription.findFirst({
+            select: { id: true },
             where: {
-              userId,
               status: SubscriptionStatus.ACTIVE,
               transactionType: TransactionType.LIFETIME,
+              userId,
             },
-            select: { id: true },
           })
 
           if (existingLifetimePurchase) {
@@ -561,9 +569,9 @@ async function handleOpenNodeInvoicePaid(
           // Find and cancel all active subscriptions
           const activeSubscriptions = await tx.subscription.findMany({
             where: {
-              userId,
               NOT: { status: SubscriptionStatus.CANCELED },
               transactionType: { not: TransactionType.LIFETIME },
+              userId,
             },
           })
 
@@ -619,95 +627,75 @@ async function handleOpenNodeInvoicePaid(
             }
 
             await tx.subscription.update({
-              where: { id: subscription.id },
               data: {
-                status: SubscriptionStatus.CANCELED,
                 cancelAtPeriodEnd: true,
-                updatedAt: new Date(),
                 metadata: {
                   ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
-                  upgradedToLifetime: 'true',
-                  upgradedAt: new Date().toISOString(),
                   openNodeInvoiceId: invoice.id ?? '',
+                  upgradedAt: new Date().toISOString(),
+                  upgradedToLifetime: 'true',
                 },
+                status: SubscriptionStatus.CANCELED,
+                updatedAt: new Date(),
               },
+              where: { id: subscription.id },
             })
           }
 
           // Create lifetime purchase
           await createLifetimePurchase(userId, customerId, priceId, tx, {
             isCryptoPayment: 'true',
-            paymentProvider: 'opennode',
             openNodeInvoiceId: invoice.id ?? '',
+            paymentProvider: 'opennode',
           })
           console.log(`Successfully created lifetime purchase for user ${userId}`)
           return true
-        } else {
-          // Handle recurring subscription - reuse existing crypto subscription logic
-          console.log(`OpenNode invoice ${invoice.id} is for a regular subscription`)
+        }
+        // Handle recurring subscription - reuse existing crypto subscription logic
+        console.log(`OpenNode invoice ${invoice.id} is for a regular subscription`)
 
-          // Find existing crypto subscription
-          const existingSubscription = await tx.subscription.findFirst({
-            where: {
-              userId,
-              stripeCustomerId: customerId,
-              metadata: { path: ['isCryptoPayment'], equals: 'true' },
-              NOT: { status: SubscriptionStatus.CANCELED },
-            },
-          })
+        // Find existing crypto subscription
+        const existingSubscription = await tx.subscription.findFirst({
+          where: {
+            NOT: { status: SubscriptionStatus.CANCELED },
+            metadata: { equals: 'true', path: ['isCryptoPayment'] },
+            stripeCustomerId: customerId,
+            userId,
+          },
+        })
 
-          const { getCurrentPeriod } = await import('@/utils/subscription')
-          const pricePeriod = getCurrentPeriod(priceId)
+        const { getCurrentPeriod } = await import('@/utils/subscription')
+        const pricePeriod = getCurrentPeriod(priceId)
 
-          if (existingSubscription) {
-            // Handle renewal/upgrade
-            const existingPriceId = existingSubscription.stripePriceId
-            const existingPeriod = existingPriceId ? getCurrentPeriod(existingPriceId) : 'unknown'
+        if (existingSubscription) {
+          // Handle renewal/upgrade
+          const existingPriceId = existingSubscription.stripePriceId
+          const existingPeriod = existingPriceId ? getCurrentPeriod(existingPriceId) : 'unknown'
 
-            if (existingPeriod !== pricePeriod) {
-              // This is an upgrade, cancel existing and create new
-              await tx.subscription.update({
-                where: { id: existingSubscription.id },
-                data: {
-                  status: SubscriptionStatus.CANCELED,
-                  cancelAtPeriodEnd: true,
-                  updatedAt: new Date(),
-                  metadata: {
-                    ...(typeof existingSubscription.metadata === 'object'
-                      ? existingSubscription.metadata
-                      : {}),
-                    upgradedTo: pricePeriod,
-                    upgradedAt: new Date().toISOString(),
-                    openNodeInvoiceId: invoice.id ?? '',
-                  },
+          if (existingPeriod !== pricePeriod) {
+            // This is an upgrade, cancel existing and create new
+            await tx.subscription.update({
+              data: {
+                cancelAtPeriodEnd: true,
+                metadata: {
+                  ...(typeof existingSubscription.metadata === 'object'
+                    ? existingSubscription.metadata
+                    : {}),
+                  openNodeInvoiceId: invoice.id ?? '',
+                  upgradedAt: new Date().toISOString(),
+                  upgradedTo: pricePeriod,
                 },
-              })
+                status: SubscriptionStatus.CANCELED,
+                updatedAt: new Date(),
+              },
+              where: { id: existingSubscription.id },
+            })
 
-              // Create fake session for createCryptoSubscription
-              const fakeSession: Partial<Stripe.Checkout.Session> = {
-                id: `opennode_${invoice.id}`,
-                customer: customerId,
-                metadata: { userId, isCryptoPayment: 'true', openNodeInvoiceId: invoice.id ?? '' },
-              }
-
-              return await createCryptoSubscription(
-                userId,
-                fakeSession as Stripe.Checkout.Session,
-                priceId,
-                customerId,
-                tx,
-                existingSubscription.currentPeriodEnd || new Date(),
-              )
-            } else {
-              // This is a renewal - extend existing subscription
-              return await handleCryptoRenewal(invoice, existingSubscription, tx, pricePeriod)
-            }
-          } else {
-            // New crypto subscription
+            // Create fake session for createCryptoSubscription
             const fakeSession: Partial<Stripe.Checkout.Session> = {
-              id: `opennode_${invoice.id}`,
               customer: customerId,
-              metadata: { userId, isCryptoPayment: 'true', openNodeInvoiceId: invoice.id ?? '' },
+              id: `opennode_${invoice.id}`,
+              metadata: { isCryptoPayment: 'true', openNodeInvoiceId: invoice.id ?? '', userId },
             }
 
             return await createCryptoSubscription(
@@ -716,9 +704,26 @@ async function handleOpenNodeInvoicePaid(
               priceId,
               customerId,
               tx,
+              existingSubscription.currentPeriodEnd || new Date(),
             )
           }
+          // This is a renewal - extend existing subscription
+          return await handleCryptoRenewal(invoice, existingSubscription, tx, pricePeriod)
         }
+        // New crypto subscription
+        const fakeSession: Partial<Stripe.Checkout.Session> = {
+          customer: customerId,
+          id: `opennode_${invoice.id}`,
+          metadata: { isCryptoPayment: 'true', openNodeInvoiceId: invoice.id ?? '', userId },
+        }
+
+        return await createCryptoSubscription(
+          userId,
+          fakeSession as Stripe.Checkout.Session,
+          priceId,
+          customerId,
+          tx,
+        )
       },
       `handleOpenNodeInvoicePaid(${invoice.id})`,
       userId || customerId,
@@ -750,18 +755,18 @@ async function handleCryptoRenewal(
 
   // Update subscription with new period end
   await tx.subscription.update({
-    where: { id: subscription.id },
     data: {
-      status: SubscriptionStatus.ACTIVE,
-      currentPeriodEnd: newPeriodEnd,
       cancelAtPeriodEnd: true,
+      currentPeriodEnd: newPeriodEnd,
       metadata: {
         ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
         lastRenewalInvoiceId: invoice.id ?? '',
         renewedAt: new Date().toISOString(),
       },
+      status: SubscriptionStatus.ACTIVE,
       updatedAt: new Date(),
     },
+    where: { id: subscription.id },
   })
 
   return true

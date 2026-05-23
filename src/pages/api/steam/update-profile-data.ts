@@ -56,31 +56,33 @@ type Region =
 
 function _estimateMMR(leaderboard_rank: number, region: Region): number {
   // Max leaderboard rank is 5000
-  if (leaderboard_rank <= 0 || leaderboard_rank > 5000) return 8500
+  if (leaderboard_rank <= 0 || leaderboard_rank > 5000) {
+    return 8500
+  }
 
   let baseMMR: number
   const x = leaderboard_rank
 
   if (region === 'EUROPE') {
-    baseMMR = 15300 - 8.2 * Math.log(x) * x ** 0.6
+    baseMMR = 15_300 - 8.2 * Math.log(x) * x ** 0.6
   } else if (region === 'US EAST') {
-    baseMMR = 14900 - 7.8 * Math.log(x) * x ** 0.6
+    baseMMR = 14_900 - 7.8 * Math.log(x) * x ** 0.6
   } else if (region === 'SINGAPORE') {
-    baseMMR = 14750 - 7.6 * Math.log(x) * x ** 0.58
+    baseMMR = 14_750 - 7.6 * Math.log(x) * x ** 0.58
   } else if (region === 'ARGENTINA') {
-    baseMMR = 14500 - 7.9 * Math.log(x) * x ** 0.6
+    baseMMR = 14_500 - 7.9 * Math.log(x) * x ** 0.6
   } else if (region === 'STOCKHOLM') {
-    baseMMR = 14650 - 7.5 * Math.log(x) * x ** 0.59
+    baseMMR = 14_650 - 7.5 * Math.log(x) * x ** 0.59
   } else if (region === 'AUSTRIA') {
-    baseMMR = 14400 - 7.7 * Math.log(x) * x ** 0.61
+    baseMMR = 14_400 - 7.7 * Math.log(x) * x ** 0.61
   } else if (region === 'DUBAI') {
-    baseMMR = 14200 - 7.3 * Math.log(x) * x ** 0.6
+    baseMMR = 14_200 - 7.3 * Math.log(x) * x ** 0.6
   } else if (region === 'PERU') {
-    baseMMR = 14300 - 7.6 * Math.log(x) * x ** 0.58
+    baseMMR = 14_300 - 7.6 * Math.log(x) * x ** 0.58
   } else if (region === 'BRAZIL') {
-    baseMMR = 14150 - 7.4 * Math.log(x) * x ** 0.57
+    baseMMR = 14_150 - 7.4 * Math.log(x) * x ** 0.57
   } else {
-    baseMMR = 14000 - 7.0 * Math.log(x) * x ** 0.6
+    baseMMR = 14_000 - 7 * Math.log(x) * x ** 0.6
   }
 
   return Math.round(baseMMR)
@@ -95,7 +97,7 @@ export function rankTierToMmr(rankTier: string | number) {
   // Just gonna guess an immortal without standing is 6k mmr
   if (intRankTier > 77) {
     // Get the highest MMR from the ranks array
-    const highestRankMMR = ranks[ranks.length - 1]?.range[1] || 5619
+    const highestRankMMR = ranks.at(-1)?.range[1] || 5619
     return highestRankMMR + 50
   }
 
@@ -128,8 +130,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Check if the steam32Id is associated with the user
     const steamAccount = await prisma.steamAccount.findFirst({
       where: {
-        steam32Id: Number.parseInt(steam32Id.toString(), 10),
         OR: [{ userId: session.user.id }, { connectedUserIds: { has: session.user.id } }],
+        steam32Id: Number.parseInt(steam32Id.toString(), 10),
       },
     })
 
@@ -152,24 +154,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Update the steam account with the new MMR and leaderboard rank
     const updatedAccount = await prisma.steamAccount.update({
+      data: {
+        leaderboard_rank: profile.leaderboard_rank || null,
+        mmr: estimatedMMR,
+        updatedAt: new Date(),
+      },
       where: {
         steam32Id: accountId,
-      },
-      data: {
-        mmr: estimatedMMR,
-        leaderboard_rank: profile.leaderboard_rank || null,
-        updatedAt: new Date(),
       },
     })
 
     return res.status(200).json({
-      success: true,
-      profile,
       data: {
-        steam32Id: updatedAccount.steam32Id,
-        mmr: updatedAccount.mmr,
         leaderboardRank: updatedAccount.leaderboard_rank,
+        mmr: updatedAccount.mmr,
+        steam32Id: updatedAccount.steam32Id,
       },
+      profile,
+      success: true,
     })
   } catch (error) {
     captureException(error)

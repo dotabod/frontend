@@ -43,18 +43,18 @@ const Login: NextPageWithLayout = () => {
   return (
     <Container>
       <div
-        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+        style={{ alignItems: 'center', display: 'flex', height: '100%', justifyContent: 'center' }}
       >
-        <div style={{ width: '100%', maxWidth: '32rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ maxWidth: '32rem', width: '100%' }}>
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
             <Typography.Title level={2}>Sign in as a chat bot</Typography.Title>
-            <Typography.Paragraph style={{ fontSize: '1.125rem', color: 'var(--color-dark-300)' }}>
+            <Typography.Paragraph style={{ color: 'var(--color-dark-300)', fontSize: '1.125rem' }}>
               You probably want to sign in as a streamer,{' '}
               <Link href='/login' prefetch={false}>
                 <strong>login here</strong>
               </Link>
             </Typography.Paragraph>
-            <Typography.Paragraph style={{ fontSize: '1rem', color: 'var(--color-dark-300)' }}>
+            <Typography.Paragraph style={{ color: 'var(--color-dark-300)', fontSize: '1rem' }}>
               Redirecting to the streamer login page in {countdown} seconds...
             </Typography.Paragraph>
           </div>
@@ -74,15 +74,15 @@ Login.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Sign In (chat bot)',
         subtitle:
           'Sign in to your Dotabod chat bot account to access your dashboard and manage your Dota 2 streaming tools.',
+        title: 'Sign In (chat bot)',
       }}
       seo={{
-        title: 'Sign In (chat bot) | Dotabod',
+        canonicalUrl: 'https://dotabod.com/login-as-bot',
         description:
           'Sign in to your Dotabod chat bot account to access your dashboard and manage your Dota 2 streaming tools.',
-        canonicalUrl: 'https://dotabod.com/login-as-bot',
+        title: 'Sign In (chat bot) | Dotabod',
       }}
     >
       {page}

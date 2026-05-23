@@ -9,8 +9,8 @@ export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 
 const replay = Sentry.replayIntegration({
-  maskAllText: false,
   blockAllMedia: false,
+  maskAllText: false,
 })
 
 function handleNavigation(url: URL) {

@@ -117,7 +117,7 @@ export const DevControls = ({
           prev.filter((msg) => msg.timestamp?.toString() !== messageId),
         )
         messageTimeoutsRef.current.delete(messageId)
-      }, 10000) // 10 seconds
+      }, 10_000) // 10 seconds
 
       // Store timeout ID for cleanup
       messageTimeoutsRef.current.set(messageId, timeoutId)
@@ -141,7 +141,7 @@ export const DevControls = ({
         prev.filter((msg) => msg.timestamp?.toString() !== messageId),
       )
       messageTimeoutsRef.current.delete(messageId)
-    }, 10000) // 10 seconds
+    }, 10_000) // 10 seconds
 
     // Store timeout ID for cleanup
     messageTimeoutsRef.current.set(messageId, timeoutId)
@@ -163,7 +163,9 @@ export const DevControls = ({
   }, [isDevMode])
 
   useEffect(() => {
-    if (!isDragging) return
+    if (!isDragging) {
+      return
+    }
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
     return () => {
@@ -182,20 +184,22 @@ export const DevControls = ({
     }
   }, [])
 
-  if (!isDevMode) return null
+  if (!isDevMode) {
+    return null
+  }
 
   return (
     <motion.div
       style={{
-        transform: `translate(${position.x}px, ${position.y}px)`,
+        left: '1rem',
         position: 'fixed',
         top: '1rem',
-        left: '1rem',
+        transform: `translate(${position.x}px, ${position.y}px)`,
         zIndex: 50,
       }}
       className='flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
     >
-      {/* biome-ignore lint/a11y/useSemanticElements: Draggable handle for window positioning */}
+      {/* Biome-ignore lint/a11y/useSemanticElements: Draggable handle for window positioning */}
       <div
         role='button'
         tabIndex={0}
@@ -216,9 +220,9 @@ export const DevControls = ({
             value={block.team}
             onChange={handleTeamChange}
             options={[
-              { value: 'radiant', label: 'Radiant' },
-              { value: 'dire', label: 'Dire' },
-              { value: null, label: 'None' },
+              { label: 'Radiant', value: 'radiant' },
+              { label: 'Dire', value: 'dire' },
+              { label: 'None', value: null },
             ]}
             style={{ width: 120 }}
             placeholder='Select team'
@@ -227,12 +231,12 @@ export const DevControls = ({
             value={block.type}
             onChange={handleTypeChange}
             options={[
-              { value: 'picks', label: 'Picks' },
-              { value: 'playing', label: 'Playing' },
-              { value: 'strategy', label: 'Strategy' },
-              { value: 'strategy-2', label: 'Strategy 2' },
-              { value: 'spectator', label: 'Spectator' },
-              { value: null, label: 'None' },
+              { label: 'Picks', value: 'picks' },
+              { label: 'Playing', value: 'playing' },
+              { label: 'Strategy', value: 'strategy' },
+              { label: 'Strategy 2', value: 'strategy-2' },
+              { label: 'Spectator', value: 'spectator' },
+              { label: 'None', value: null },
             ]}
             style={{ width: 120 }}
             placeholder='Select type'
@@ -328,8 +332,9 @@ export const DevModeToggle = () => {
   const router = useRouter()
   const isDevMode = useIsDevMode()
 
-  if (typeof process === 'undefined' || process.env.NODE_ENV !== 'development' || isDevMode)
+  if (typeof process === 'undefined' || process.env.NODE_ENV !== 'development' || isDevMode) {
     return null
+  }
 
   const enableDevMode = () => {
     const storage = window.localStorage
@@ -343,8 +348,8 @@ export const DevModeToggle = () => {
   return (
     <motion.div
       style={{
-        position: 'fixed',
         bottom: '1rem',
+        position: 'fixed',
         right: '1rem',
         zIndex: 50,
       }}

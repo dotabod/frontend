@@ -9,13 +9,13 @@ import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { getValueOrDefault } from '@/lib/settings'
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 
-const commandKeys = Object.keys(CommandDetail) as Array<keyof typeof CommandDetail>
+const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
 
 const CommandsPage = () => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
   const { data } = useUpdate({ path: '/api/settings' })
-  const settings = data?.settings as Array<{ key: string; value: unknown }> | undefined
+  const settings = data?.settings as { key: string; value: unknown }[] | undefined
 
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -42,7 +42,9 @@ const CommandsPage = () => {
       return true
     })
     .filter((command) => {
-      if (!searchTerm) return true
+      if (!searchTerm) {
+        return true
+      }
 
       const searchableKeys = ['alias', 'title', 'description', 'cmd']
       const commandDetail = CommandDetail[command]
@@ -96,7 +98,7 @@ const CommandsPage = () => {
           onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
         />
       </div>
-      {filteredCommands.length < 1 && (
+      {filteredCommands.length === 0 && (
         <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
       )}
 
@@ -113,10 +115,10 @@ CommandsPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Commands | Dotabod Dashboard',
-        description: 'Manage your Dotabod chat commands for your Dota 2 stream.',
         canonicalUrl: 'https://dotabod.com/dashboard/commands',
+        description: 'Manage your Dotabod chat commands for your Dota 2 stream.',
         noindex: true,
+        title: 'Commands | Dotabod Dashboard',
       }}
     >
       {page}

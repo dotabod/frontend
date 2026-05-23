@@ -13,11 +13,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Find the user by username
     const user = await prisma.user.findFirst({
-      where: {
-        name: username.toLowerCase(),
-      },
       select: {
         id: true,
+      },
+      where: {
+        name: username.toLowerCase(),
       },
     })
 
@@ -41,23 +41,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!subscription) {
       return res.status(200).json({
-        tier: SUBSCRIPTION_TIERS.FREE,
-        status: null,
-        isPro: false,
+        inGracePeriod,
         isGracePeriodPro: false,
         isLifetime: false,
-        inGracePeriod,
+        isPro: false,
+        status: null,
+        tier: SUBSCRIPTION_TIERS.FREE,
       })
     }
 
     // Return subscription information
     return res.status(200).json({
-      tier: subscription.tier as SubscriptionTier,
-      status: subscription.status,
-      isPro: subscription.tier === SUBSCRIPTION_TIERS.PRO,
+      inGracePeriod,
       isGracePeriodPro,
       isLifetime: subscription.transactionType === 'LIFETIME',
-      inGracePeriod,
+      isPro: subscription.tier === SUBSCRIPTION_TIERS.PRO,
+      status: subscription.status,
+      tier: subscription.tier as SubscriptionTier,
     })
   } catch (error) {
     console.error('Error in subscription by username route:', error)

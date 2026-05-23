@@ -9,7 +9,7 @@ interface PeriodToggleProps {
   onChange: (period: PricePeriod) => void
 }
 
-// ease-out-quint
+// Ease-out-quint
 const EASE = [0.22, 1, 0.36, 1] as const
 
 export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
@@ -18,7 +18,7 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
   const groupId = useId()
 
   // Computed in render (not module scope) because `plans` is a circular import
-  // from BillingPlans and may be uninitialised at module-eval time.
+  // From BillingPlans and may be uninitialised at module-eval time.
   const maxSavings = Math.max(
     ...plans
       .filter((plan) => plan.price.monthly !== '$0')

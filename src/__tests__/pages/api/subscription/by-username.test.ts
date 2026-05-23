@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/subscription/by-username'
 
 // Mock prisma
@@ -60,11 +60,11 @@ describe('subscription/by-username API', () => {
     await handler(req, res)
 
     expect(prisma.user.findFirst).toHaveBeenCalledWith({
-      where: {
-        name: 'nonexistentuser',
-      },
       select: {
         id: true,
+      },
+      where: {
+        name: 'nonexistentuser',
       },
     })
     expect(res.statusCode).toBe(404)
@@ -81,34 +81,34 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
-      id: 'user-123',
+      beta_tester: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '',
+      currentViewers: null,
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
-      stream_online: false,
-      stream_start_date: null,
-      beta_tester: false,
-      locale: '',
-      kick: null,
-      youtube: null,
-      proExpiration: null,
-      currentViewers: null,
+      followers: null,
       hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
-      twitchUsername: null,
+      id: 'user-123',
+      image: null,
+      kick: null,
       kickUsername: null,
+      lastStreamCheck: null,
+      locale: '',
+      mmr: 0,
+      name: '',
+      proExpiration: null,
+      steam32Id: null,
       streamCategory: null,
+      streamPlatform: null,
       streamStartedAt: null,
       streamTitle: null,
+      stream_delay: null,
+      stream_online: false,
+      stream_start_date: null,
+      twitchUsername: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
 
@@ -124,12 +124,12 @@ describe('subscription/by-username API', () => {
     expect(isInGracePeriod).toHaveBeenCalled()
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      tier: SUBSCRIPTION_TIERS.FREE,
-      status: null,
-      isPro: false,
+      inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: false,
-      inGracePeriod: false,
+      isPro: false,
+      status: null,
+      tier: SUBSCRIPTION_TIERS.FREE,
     })
   })
 
@@ -143,52 +143,52 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
-      id: 'user-456',
+      beta_tester: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '',
+      currentViewers: null,
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
-      stream_online: false,
-      stream_start_date: null,
-      beta_tester: false,
-      locale: '',
-      kick: null,
-      youtube: null,
-      proExpiration: null,
-      currentViewers: null,
+      followers: null,
       hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
-      twitchUsername: null,
+      id: 'user-456',
+      image: null,
+      kick: null,
       kickUsername: null,
+      lastStreamCheck: null,
+      locale: '',
+      mmr: 0,
+      name: '',
+      proExpiration: null,
+      steam32Id: null,
       streamCategory: null,
+      streamPlatform: null,
       streamStartedAt: null,
       streamTitle: null,
+      stream_delay: null,
+      stream_online: false,
+      stream_start_date: null,
+      twitchUsername: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
 
     // Mock active PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: 'ACTIVE',
-      id: 'sub_123',
-      stripeSubscriptionId: 'sub_123',
-      transactionType: 'RECURRING',
+      cancelAtPeriodEnd: false,
       createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
+      id: 'sub_123',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      giftDetails: null,
-      metadata: {},
-      isGift: false,
+      stripeSubscriptionId: 'sub_123',
+      tier: SUBSCRIPTION_TIERS.PRO,
+      transactionType: 'RECURRING',
     })
 
     // Mock not in grace period
@@ -199,12 +199,12 @@ describe('subscription/by-username API', () => {
     expect(getSubscription).toHaveBeenCalledWith('user-456')
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: 'ACTIVE',
-      isPro: true,
+      inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: false,
-      inGracePeriod: false,
+      isPro: true,
+      status: 'ACTIVE',
+      tier: SUBSCRIPTION_TIERS.PRO,
     })
   })
 
@@ -218,52 +218,52 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
-      id: 'user-789',
+      beta_tester: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '',
+      currentViewers: null,
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
-      stream_online: false,
-      stream_start_date: null,
-      beta_tester: false,
-      locale: '',
-      kick: null,
-      youtube: null,
-      proExpiration: null,
-      currentViewers: null,
+      followers: null,
       hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
-      twitchUsername: null,
+      id: 'user-789',
+      image: null,
+      kick: null,
       kickUsername: null,
+      lastStreamCheck: null,
+      locale: '',
+      mmr: 0,
+      name: '',
+      proExpiration: null,
+      steam32Id: null,
       streamCategory: null,
+      streamPlatform: null,
       streamStartedAt: null,
       streamTitle: null,
+      stream_delay: null,
+      stream_online: false,
+      stream_start_date: null,
+      twitchUsername: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
 
     // Mock lifetime PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
-      tier: SUBSCRIPTION_TIERS.PRO,
-      id: 'sub-123',
-      status: 'ACTIVE',
-      stripeSubscriptionId: null,
-      transactionType: 'LIFETIME',
+      cancelAtPeriodEnd: false,
       createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
+      id: 'sub-123',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      giftDetails: null,
-      metadata: {},
-      isGift: false,
+      stripeSubscriptionId: null,
+      tier: SUBSCRIPTION_TIERS.PRO,
+      transactionType: 'LIFETIME',
     })
 
     // Mock not in grace period
@@ -274,12 +274,12 @@ describe('subscription/by-username API', () => {
     expect(getSubscription).toHaveBeenCalledWith('user-789')
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: 'ACTIVE',
-      isPro: true,
+      inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: true,
-      inGracePeriod: false,
+      isPro: true,
+      status: 'ACTIVE',
+      tier: SUBSCRIPTION_TIERS.PRO,
     })
   })
 
@@ -293,56 +293,56 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
-      id: 'user-101',
+      beta_tester: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '',
+      currentViewers: null,
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
-      stream_online: false,
-      stream_start_date: null,
-      beta_tester: false,
-      locale: '',
-      kick: null,
-      youtube: null,
-      proExpiration: null,
-      currentViewers: null,
+      followers: null,
       hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
-      twitchUsername: null,
+      id: 'user-101',
+      image: null,
+      kick: null,
       kickUsername: null,
+      lastStreamCheck: null,
+      locale: '',
+      mmr: 0,
+      name: '',
+      proExpiration: null,
+      steam32Id: null,
       streamCategory: null,
+      streamPlatform: null,
       streamStartedAt: null,
       streamTitle: null,
+      stream_delay: null,
+      stream_online: false,
+      stream_start_date: null,
+      twitchUsername: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
     // Mock gift PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
-      id: 'sub_123',
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: 'ACTIVE',
-      stripeSubscriptionId: null,
-      transactionType: 'RECURRING',
+      cancelAtPeriodEnd: false,
       createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: {
+        giftMessage: null,
+        giftQuantity: 1,
+        giftType: 'subscription',
+        senderName: 'user-999',
+      },
+      id: 'sub_123',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      giftDetails: {
-        senderName: 'user-999',
-        giftMessage: null,
-        giftType: 'subscription',
-        giftQuantity: 1,
-      },
-      metadata: {},
-      isGift: false,
+      stripeSubscriptionId: null,
+      tier: SUBSCRIPTION_TIERS.PRO,
+      transactionType: 'RECURRING',
     })
 
     // Mock not in grace period
@@ -353,12 +353,12 @@ describe('subscription/by-username API', () => {
     expect(getSubscription).toHaveBeenCalledWith('user-101')
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: 'ACTIVE',
-      isPro: true,
+      inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: false,
-      inGracePeriod: false,
+      isPro: true,
+      status: 'ACTIVE',
+      tier: SUBSCRIPTION_TIERS.PRO,
     })
   })
 
@@ -372,51 +372,51 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
-      id: 'user-202',
+      beta_tester: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '',
+      currentViewers: null,
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
-      stream_online: false,
-      stream_start_date: null,
-      beta_tester: false,
-      locale: '',
-      kick: null,
-      youtube: null,
-      proExpiration: null,
-      currentViewers: null,
+      followers: null,
       hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
-      twitchUsername: null,
+      id: 'user-202',
+      image: null,
+      kick: null,
       kickUsername: null,
+      lastStreamCheck: null,
+      locale: '',
+      mmr: 0,
+      name: '',
+      proExpiration: null,
+      steam32Id: null,
       streamCategory: null,
+      streamPlatform: null,
       streamStartedAt: null,
       streamTitle: null,
+      stream_delay: null,
+      stream_online: false,
+      stream_start_date: null,
+      twitchUsername: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
     // Mock FREE tier subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
-      id: 'subscription-123',
-      tier: SUBSCRIPTION_TIERS.FREE,
-      status: null,
-      stripeSubscriptionId: null,
-      transactionType: 'RECURRING' as const,
-      stripeCustomerId: null,
-      stripePriceId: null,
-      currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
       createdAt: new Date(),
+      currentPeriodEnd: null,
       giftDetails: null,
-      metadata: {},
+      id: 'subscription-123',
       isGift: false,
+      metadata: {},
+      status: null,
+      stripeCustomerId: null,
+      stripePriceId: null,
+      stripeSubscriptionId: null,
+      tier: SUBSCRIPTION_TIERS.FREE,
+      transactionType: 'RECURRING' as const,
     })
 
     // Mock in grace period
@@ -427,12 +427,12 @@ describe('subscription/by-username API', () => {
     expect(getSubscription).toHaveBeenCalledWith('user-202')
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      tier: SUBSCRIPTION_TIERS.FREE,
-      status: null,
-      isPro: false,
+      inGracePeriod: true,
       isGracePeriodPro: true,
       isLifetime: false,
-      inGracePeriod: true,
+      isPro: false,
+      status: null,
+      tier: SUBSCRIPTION_TIERS.FREE,
     })
   })
 

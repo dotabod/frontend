@@ -1,18 +1,18 @@
 import { Prisma } from '@prisma/client'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 vi.stubEnv('NEXTAUTH_URL', 'https://dotabod.com')
 
 const mocks = vi.hoisted(() => ({
+  createNowPaymentsInvoice: vi.fn(),
   prisma: {
     nowPaymentsInvoice: {
       create: vi.fn(),
       findUnique: vi.fn(),
     },
   },
-  createNowPaymentsInvoice: vi.fn(),
 }))
 
 vi.mock('@/lib/db', () => ({ default: mocks.prisma }))
@@ -27,10 +27,10 @@ beforeAll(async () => {
 })
 
 const stripeInvoice = {
-  id: 'in_1',
-  customer: 'cus_1',
-  currency: 'usd',
   amount_remaining: 1300,
+  currency: 'usd',
+  customer: 'cus_1',
+  id: 'in_1',
 }
 
 describe('createAndStoreCryptoInvoice', () => {
@@ -48,22 +48,22 @@ describe('createAndStoreCryptoInvoice', () => {
     mocks.prisma.nowPaymentsInvoice.create.mockResolvedValue({})
 
     const result = await createAndStoreCryptoInvoice({
+      orderDescription: 'Dotabod monthly subscription',
       stripeInvoice,
       userId: 'user_1',
-      orderDescription: 'Dotabod monthly subscription',
     })
 
     expect(result).toEqual({
-      url: 'https://nowpayments.io/payment/?iid=fresh',
       nowPaymentsId: '7777',
+      url: 'https://nowpayments.io/payment/?iid=fresh',
     })
     expect(mocks.createNowPaymentsInvoice).toHaveBeenCalledWith(
       expect.objectContaining({
+        ipn_callback_url: 'https://dotabod.com/api/webhooks/nowpayments',
+        order_description: 'Dotabod monthly subscription',
+        order_id: 'in_1',
         price_amount: 13,
         price_currency: 'usd',
-        order_id: 'in_1',
-        order_description: 'Dotabod monthly subscription',
-        ipn_callback_url: 'https://dotabod.com/api/webhooks/nowpayments',
       }),
     )
   })
@@ -71,9 +71,9 @@ describe('createAndStoreCryptoInvoice', () => {
   it('throws when the Stripe invoice has no balance due', async () => {
     await expect(
       createAndStoreCryptoInvoice({
+        orderDescription: 'test',
         stripeInvoice: { ...stripeInvoice, amount_remaining: 0 },
         userId: 'user_1',
-        orderDescription: 'test',
       }),
     ).rejects.toThrow(/no balance due/)
     expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
@@ -85,8 +85,8 @@ describe('createAndStoreCryptoInvoice', () => {
       invoice_url: 'https://nowpayments.io/payment/?iid=loser',
     })
     const conflict = new Prisma.PrismaClientKnownRequestError('Unique violation', {
-      code: 'P2002',
       clientVersion: 'test',
+      code: 'P2002',
     })
     mocks.prisma.nowPaymentsInvoice.create.mockRejectedValue(conflict)
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue({
@@ -95,14 +95,14 @@ describe('createAndStoreCryptoInvoice', () => {
     })
 
     const result = await createAndStoreCryptoInvoice({
+      orderDescription: 'test',
       stripeInvoice,
       userId: 'user_1',
-      orderDescription: 'test',
     })
 
     expect(result).toEqual({
-      url: 'https://nowpayments.io/payment/?iid=winner',
       nowPaymentsId: '7777',
+      url: 'https://nowpayments.io/payment/?iid=winner',
     })
   })
 
@@ -115,9 +115,9 @@ describe('createAndStoreCryptoInvoice', () => {
 
     await expect(
       createAndStoreCryptoInvoice({
+        orderDescription: 'test',
         stripeInvoice,
         userId: 'user_1',
-        orderDescription: 'test',
       }),
     ).rejects.toThrow(/db down/)
   })

@@ -11,13 +11,17 @@ import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
 
 const extractCookieValue = (cookieHeader: string | string[] | undefined, name: string) => {
-  if (!cookieHeader) return ''
+  if (!cookieHeader) {
+    return ''
+  }
 
   const cookieStringFull = Array.isArray(cookieHeader)
     ? cookieHeader.find((header) => header.includes(name))
     : cookieHeader
 
-  if (!cookieStringFull) return ''
+  if (!cookieStringFull) {
+    return ''
+  }
 
   const match = cookieStringFull
     .split(';')
@@ -36,240 +40,12 @@ if (!process.env.NEXTAUTH_SECRET) {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: 'jwt',
-    maxAge: 3 * 24 * 60 * 60, // 3 days in seconds
-  },
-  pages: {
-    signIn: '/login',
-    error: '/error',
-  },
-  events: {
-    async signIn({ user }) {
-      if (user.id) {
-        try {
-          fetch(`${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}/resubscribe`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ token: user.id }),
-          }).catch((error) => {
-            console.error('Error calling resubscribe endpoint:', error)
-            captureException(error, {
-              extra: {
-                userId: user.id,
-              },
-            })
-          })
-        } catch (error) {
-          console.error('Error calling resubscribe endpoint:', error)
-          captureException(error, {
-            extra: {
-              userId: user.id,
-            },
-          })
-        }
-      }
-    },
-  },
-  providers: [
-    CredentialsProvider({
-      name: 'impersonate',
-      id: 'impersonate',
-      credentials: {
-        channelToImpersonate: {
-          label: 'Channel ID',
-          type: 'text',
-          placeholder: '1234',
-        },
-      },
-
-      async authorize(credentials, req) {
-        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0', 10)
-        if (!channelToImpersonate) {
-          captureException(new Error('Invalid channel ID'))
-          throw new Error('ACCESS_DENIED')
-        }
-
-        const headerCookies = req.headers?.cookie
-        let currentLoggedInUserId: string | undefined
-        let currentProviderId: string | undefined
-
-        try {
-          const secureCookie =
-            process.env.NEXTAUTH_URL?.startsWith('https://') ?? !!process.env.VERCEL
-          const cookieName = secureCookie
-            ? '__Secure-next-auth.session-token'
-            : 'next-auth.session-token'
-          const sessionToken = extractCookieValue(headerCookies, cookieName)
-          const actualToken = await decode({
-            secret: process.env.NEXTAUTH_SECRET ?? '',
-            token: sessionToken.replace(`${cookieName}=`, ''),
-          })
-          currentLoggedInUserId = actualToken?.id ?? undefined
-          currentProviderId = actualToken?.twitchId ?? undefined
-        } catch (e) {
-          console.error(e)
-          captureException(e, {
-            extra: {
-              userId: currentLoggedInUserId,
-              channelToImpersonate: credentials?.channelToImpersonate,
-            },
-          })
-        }
-
-        if (!currentLoggedInUserId) {
-          captureException(new Error('Invalid session token'), {
-            extra: {
-              userId: currentLoggedInUserId,
-            },
-          })
-          throw new Error('ACCESS_DENIED')
-        }
-
-        const { providerAccountId, accessToken, error } =
-          await getTwitchTokens(currentLoggedInUserId)
-        if (error) {
-          throw new Error('MODERATOR_ACCESS_DENIED')
-        }
-
-        const isAdmin = await prisma.user.findFirst({
-          where: {
-            id: currentLoggedInUserId,
-            admin: {
-              role: 'admin',
-            },
-          },
-        })
-
-        if (!isAdmin) {
-          // check to make sure they're still a moderator on twitch
-          const response = await getModeratedChannels(providerAccountId, accessToken)
-
-          if (
-            Array.isArray(response) &&
-            !response.find(
-              (channel) => Number.parseInt(channel.providerAccountId, 10) === channelToImpersonate,
-            )
-          ) {
-            captureException(new Error('You are not a moderator for this channel'), {
-              extra: {
-                userId: currentLoggedInUserId,
-                channelToImpersonate,
-              },
-            })
-            throw new Error('MODERATOR_ACCESS_DENIED')
-          }
-        }
-
-        const userToImpersonate = await prisma.account.findFirst({
-          select: {
-            userId: true,
-          },
-          where: {
-            providerAccountId: `${channelToImpersonate}`,
-          },
-        })
-
-        if (!userToImpersonate) {
-          captureException(new Error('Channel not found'), {
-            extra: {
-              userId: currentLoggedInUserId,
-              channelToImpersonate,
-            },
-          })
-          throw new Error('ACCESS_DENIED')
-        }
-
-        if (!isAdmin) {
-          // check to make sure they're an approved moderator for this user
-          const moderator = await prisma.approvedModerator.findFirst({
-            select: {
-              moderatorChannelId: true,
-              createdAt: true,
-            },
-            where: {
-              moderatorChannelId: Number.parseInt(currentProviderId ?? '0', 10),
-              userId: userToImpersonate.userId,
-            },
-          })
-
-          if (!moderator) {
-            captureException(new Error('NOT_APPROVED'), {
-              extra: {
-                userId: currentLoggedInUserId,
-                channelToImpersonate,
-              },
-            })
-            throw new Error('NOT_APPROVED')
-          }
-        }
-
-        const data = await prisma.account.findUnique({
-          select: {
-            user: true,
-          },
-          where: {
-            providerAccountId: `${channelToImpersonate}`,
-          },
-        })
-
-        if (!data) {
-          captureException(new Error('Channel not found'), {
-            extra: {
-              userId: currentLoggedInUserId,
-              channelToImpersonate,
-            },
-          })
-          throw new Error('ACCESS_DENIED')
-        }
-
-        return { ...data?.user, currentLoggedInUserId }
-      },
-    }),
-    TwitchProvider({
-      allowDangerousEmailAccountLinking: true,
-      clientId: process.env.TWITCH_CLIENT_ID,
-      clientSecret: process.env.TWITCH_CLIENT_SECRET,
-      authorization: {
-        params: {
-          scope: defaultScopes,
-        },
-      },
-    }),
-  ],
   callbacks: {
-    async session({ token, session }) {
-      if (token) {
-        const encryptedId = await encode({
-          token: {
-            image: token.picture ?? token.image ?? '',
-            name: '',
-            id: token.id,
-            isImpersonating: token.isImpersonating,
-            twitchId: '',
-            locale: '',
-            scope: '',
-          },
-          secret: process.env.NEXTAUTH_SECRET ?? '',
-        })
-        session.user.isImpersonating = token.isImpersonating
-        session.user.locale = token.locale
-        session.user.twitchId = token.twitchId
-        session.user.role = token.role
-        session.user.id = token?.isImpersonating ? encryptedId : token.id
-        session.user.name = token.name
-        session.user.email = token?.isImpersonating ? '' : token.email
-        session.user.image = token.picture ?? token.image ?? ''
-        session.user.scope = token.scope
-      }
-
-      return session
-    },
     async jwt({ token, account, user, profile }) {
       // Save a db lookup
-      if (token.id) return token
+      if (token.id) {
+        return token
+      }
 
       if (!user) {
         if (!token.sub) {
@@ -283,36 +59,36 @@ export const authOptions: NextAuthOptions = {
       const twitchUser = user as TwitchUser
 
       const newUser = {
-        email: twitchProfile?.email ?? twitchUser.email,
-        name: twitchProfile?.preferred_username ?? twitchUser.name ?? twitchUser.displayName ?? '',
         displayName:
           twitchProfile?.preferred_username ??
           twitchUser.displayName ??
           token.name ??
           twitchUser.name ??
           '',
+        email: twitchProfile?.email ?? twitchUser.email,
         image: twitchProfile?.picture ?? twitchUser.image,
+        name: twitchProfile?.preferred_username ?? twitchUser.name ?? twitchUser.displayName ?? '',
       }
 
       const provider = await prisma.user.findFirst({
-        where: {
-          id: token.id || user.id || profile?.sub,
-        },
         select: {
+          Account: {
+            select: {
+              providerAccountId: true,
+              requires_refresh: true,
+              scope: true,
+            },
+          },
           admin: {
             select: {
               role: true,
             },
           },
           displayName: true,
-          Account: {
-            select: {
-              scope: true,
-              requires_refresh: true,
-              providerAccountId: true,
-            },
-          },
           locale: true,
+        },
+        where: {
+          id: token.id || user.id || profile?.sub,
         },
       })
       const isImpersonating = account?.provider === 'impersonate'
@@ -348,7 +124,7 @@ export const authOptions: NextAuthOptions = {
           return 'bot'
         }
 
-        // even if they login as chatter, since they have streamer scopes, we should treat them as a user
+        // Even if they login as chatter, since they have streamer scopes, we should treat them as a user
         if (alreadyHasStreamerScopes) {
           return 'user'
         }
@@ -372,9 +148,9 @@ export const authOptions: NextAuthOptions = {
           : roleFromScopes === 'bot'
             ? chatBotScopes
             : alreadyHasStreamerScopes && isLoggingInAsChatter
-              ? // use old scopes
+              ? // Use old scopes
                 (provider?.Account?.scope ?? defaultScopes)
-              : // use new scopes
+              : // Use new scopes
                 (account?.scope ?? defaultScopes)
 
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
@@ -384,12 +160,12 @@ export const authOptions: NextAuthOptions = {
         provider.displayName !== newUser.displayName
       ) {
         await prisma.user.update({
+          data: {
+            displayName: newUser.displayName,
+            updatedAt: new Date(),
+          },
           where: {
             id: user.id,
-          },
-          data: {
-            updatedAt: new Date(),
-            displayName: newUser.displayName,
           },
         })
       }
@@ -416,36 +192,265 @@ export const authOptions: NextAuthOptions = {
         // Set requires_refresh to false if the user is logging in
         // Because this new token will be the fresh one we needed
         await prisma.account.update({
+          data: {
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            refresh_token: account.refresh_token,
+            requires_refresh: false,
+            scope: account.scope,
+            updatedAt: new Date(),
+          },
           where: {
             provider_providerAccountId: {
               provider: account.provider,
               providerAccountId: account.providerAccountId,
             },
           },
-          data: {
-            updatedAt: new Date(),
-            refresh_token: account.refresh_token,
-            access_token: account.access_token,
-            expires_at: account.expires_at,
-            scope: account.scope,
-            requires_refresh: false,
-          },
         })
       }
 
       const result = {
-        locale: provider?.locale,
-        twitchId: String(twitchId),
-        id: user.id,
-        name: newUser.displayName || newUser.name,
         email: newUser.email,
+        id: user.id,
         image: newUser.image || '',
         isImpersonating,
+        locale: provider?.locale,
+        name: newUser.displayName || newUser.name,
         role: roleFromScopes,
         scope: scopesToUpdate,
+        twitchId: String(twitchId),
       }
 
       return result as JWT
     },
+    async session({ token, session }) {
+      if (token) {
+        const encryptedId = await encode({
+          secret: process.env.NEXTAUTH_SECRET ?? '',
+          token: {
+            id: token.id,
+            image: token.picture ?? token.image ?? '',
+            isImpersonating: token.isImpersonating,
+            locale: '',
+            name: '',
+            scope: '',
+            twitchId: '',
+          },
+        })
+        session.user.isImpersonating = token.isImpersonating
+        session.user.locale = token.locale
+        session.user.twitchId = token.twitchId
+        session.user.role = token.role
+        session.user.id = token?.isImpersonating ? encryptedId : token.id
+        session.user.name = token.name
+        session.user.email = token?.isImpersonating ? '' : token.email
+        session.user.image = token.picture ?? token.image ?? ''
+        session.user.scope = token.scope
+      }
+
+      return session
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (user.id) {
+        try {
+          fetch(`${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}/resubscribe`, {
+            body: JSON.stringify({ token: user.id }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+          }).catch((error) => {
+            console.error('Error calling resubscribe endpoint:', error)
+            captureException(error, {
+              extra: {
+                userId: user.id,
+              },
+            })
+          })
+        } catch (error) {
+          console.error('Error calling resubscribe endpoint:', error)
+          captureException(error, {
+            extra: {
+              userId: user.id,
+            },
+          })
+        }
+      }
+    },
+  },
+  pages: {
+    error: '/error',
+    signIn: '/login',
+  },
+  providers: [
+    CredentialsProvider({
+      async authorize(credentials, req) {
+        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0', 10)
+        if (!channelToImpersonate) {
+          captureException(new Error('Invalid channel ID'))
+          throw new Error('ACCESS_DENIED')
+        }
+
+        const headerCookies = req.headers?.cookie
+        let currentLoggedInUserId: string | undefined
+        let currentProviderId: string | undefined
+
+        try {
+          const secureCookie =
+            process.env.NEXTAUTH_URL?.startsWith('https://') ?? Boolean(process.env.VERCEL)
+          const cookieName = secureCookie
+            ? '__Secure-next-auth.session-token'
+            : 'next-auth.session-token'
+          const sessionToken = extractCookieValue(headerCookies, cookieName)
+          const actualToken = await decode({
+            secret: process.env.NEXTAUTH_SECRET ?? '',
+            token: sessionToken.replace(`${cookieName}=`, ''),
+          })
+          currentLoggedInUserId = actualToken?.id ?? undefined
+          currentProviderId = actualToken?.twitchId ?? undefined
+        } catch (error) {
+          console.error(error)
+          captureException(error, {
+            extra: {
+              channelToImpersonate: credentials?.channelToImpersonate,
+              userId: currentLoggedInUserId,
+            },
+          })
+        }
+
+        if (!currentLoggedInUserId) {
+          captureException(new Error('Invalid session token'), {
+            extra: {
+              userId: currentLoggedInUserId,
+            },
+          })
+          throw new Error('ACCESS_DENIED')
+        }
+
+        const { providerAccountId, accessToken, error } =
+          await getTwitchTokens(currentLoggedInUserId)
+        if (error) {
+          throw new Error('MODERATOR_ACCESS_DENIED')
+        }
+
+        const isAdmin = await prisma.user.findFirst({
+          where: {
+            admin: {
+              role: 'admin',
+            },
+            id: currentLoggedInUserId,
+          },
+        })
+
+        if (!isAdmin) {
+          // Check to make sure they're still a moderator on twitch
+          const response = await getModeratedChannels(providerAccountId, accessToken)
+
+          if (
+            Array.isArray(response) &&
+            !response.find(
+              (channel) => Number.parseInt(channel.providerAccountId, 10) === channelToImpersonate,
+            )
+          ) {
+            captureException(new Error('You are not a moderator for this channel'), {
+              extra: {
+                channelToImpersonate,
+                userId: currentLoggedInUserId,
+              },
+            })
+            throw new Error('MODERATOR_ACCESS_DENIED')
+          }
+        }
+
+        const userToImpersonate = await prisma.account.findFirst({
+          select: {
+            userId: true,
+          },
+          where: {
+            providerAccountId: `${channelToImpersonate}`,
+          },
+        })
+
+        if (!userToImpersonate) {
+          captureException(new Error('Channel not found'), {
+            extra: {
+              channelToImpersonate,
+              userId: currentLoggedInUserId,
+            },
+          })
+          throw new Error('ACCESS_DENIED')
+        }
+
+        if (!isAdmin) {
+          // Check to make sure they're an approved moderator for this user
+          const moderator = await prisma.approvedModerator.findFirst({
+            select: {
+              createdAt: true,
+              moderatorChannelId: true,
+            },
+            where: {
+              moderatorChannelId: Number.parseInt(currentProviderId ?? '0', 10),
+              userId: userToImpersonate.userId,
+            },
+          })
+
+          if (!moderator) {
+            captureException(new Error('NOT_APPROVED'), {
+              extra: {
+                channelToImpersonate,
+                userId: currentLoggedInUserId,
+              },
+            })
+            throw new Error('NOT_APPROVED')
+          }
+        }
+
+        const data = await prisma.account.findUnique({
+          select: {
+            user: true,
+          },
+          where: {
+            providerAccountId: `${channelToImpersonate}`,
+          },
+        })
+
+        if (!data) {
+          captureException(new Error('Channel not found'), {
+            extra: {
+              channelToImpersonate,
+              userId: currentLoggedInUserId,
+            },
+          })
+          throw new Error('ACCESS_DENIED')
+        }
+
+        return { ...data?.user, currentLoggedInUserId }
+      },
+      credentials: {
+        channelToImpersonate: {
+          label: 'Channel ID',
+          placeholder: '1234',
+          type: 'text',
+        },
+      },
+      id: 'impersonate',
+      name: 'impersonate',
+    }),
+    TwitchProvider({
+      allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          scope: defaultScopes,
+        },
+      },
+      clientId: process.env.TWITCH_CLIENT_ID,
+      clientSecret: process.env.TWITCH_CLIENT_SECRET,
+    }),
+  ],
+  session: {
+    maxAge: 3 * 24 * 60 * 60, // 3 days in seconds
+    strategy: 'jwt',
   },
 }

@@ -16,7 +16,7 @@ const Courier = ({ data, team }: MinimapUnitProps) => {
       className={`container-courier ${isEnemy ? 'enemy' : ''}`}
       style={{ bottom: data.yposP, left: data.xposP }}
     >
-      {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
+      {/* Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
       {hasIcon && <img className={`icon ${isFlying ? 'flying' : ''}`} src={icon} alt='courier' />}
     </div>
   )

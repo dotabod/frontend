@@ -15,27 +15,30 @@ interface PaymentMethodPickerProps {
 }
 
 const META: Record<PaymentMethod, { label: string; Icon: typeof CreditCard }> = {
-  card: { label: 'Card', Icon: CreditCard },
-  paypal: { label: 'PayPal', Icon: Wallet },
-  crypto: { label: 'Crypto', Icon: Bitcoin },
+  card: { Icon: CreditCard, label: 'Card' },
+  crypto: { Icon: Bitcoin, label: 'Crypto' },
+  paypal: { Icon: Wallet, label: 'PayPal' },
 }
 
-// ease-out-quint: confident deceleration, no overshoot
+// Ease-out-quint: confident deceleration, no overshoot
 const EASE = [0.22, 1, 0.36, 1] as const
 
 function noteFor(method: PaymentMethod, period: PricePeriod): string {
   const isLifetime = period === 'lifetime'
   switch (method) {
-    case 'paypal':
+    case 'paypal': {
       return isLifetime
         ? 'One-time payment through your PayPal account.'
         : 'Renews automatically through your PayPal account.'
-    case 'crypto':
+    }
+    case 'crypto': {
       return isLifetime
         ? 'One-time payment in BTC, USDT, ETH, and 100+ other coins.'
         : "You'll get an invoice each period to pay in BTC, USDT, ETH, and 100+ other coins."
-    default:
+    }
+    default: {
       return isLifetime ? 'One-time card payment.' : 'Renews automatically. Cancel anytime.'
+    }
   }
 }
 
@@ -45,11 +48,17 @@ const PaymentMethodPicker = memo(
     const groupId = useId()
 
     const options: PaymentMethod[] = ['card']
-    if (paypalEnabled) options.push('paypal')
-    if (cryptoEnabled) options.push('crypto')
+    if (paypalEnabled) {
+      options.push('paypal')
+    }
+    if (cryptoEnabled) {
+      options.push('crypto')
+    }
 
     // With only the card option there is nothing to choose between.
-    if (options.length < 2) return null
+    if (options.length < 2) {
+      return null
+    }
 
     return (
       <div className='mt-6'>

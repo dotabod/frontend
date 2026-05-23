@@ -8,7 +8,7 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { RestrictFeature } from '../RestrictFeature'
 
-type MainScreenOverlaysProps = {
+interface MainScreenOverlaysProps {
   block: blockType
   wl: wlType
   rankImageDetails: RankImageDetails
@@ -18,7 +18,9 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }: MainScreenOv
   const res = useTransformRes()
   const { data: showQueueBlocker } = useUpdateSetting(Settings.queueBlocker)
 
-  if (block.type !== null) return null
+  if (block.type !== null) {
+    return null
+  }
 
   return (
     <>
@@ -30,8 +32,8 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }: MainScreenOv
       <div
         style={{
           height: res({ h: 61 }),
-          width: '100%',
           top: 0,
+          width: '100%',
         }}
         id='main-screen-overlay'
         className='absolute'
@@ -40,8 +42,8 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }: MainScreenOv
           id='main-screen-wl-mmr-card'
           className='absolute flex h-full items-center justify-center space-x-2 '
           style={{
-            width: res({ w: 299 }),
             right: res({ w: 416 }),
+            width: res({ w: 299 }),
           }}
         >
           <RestrictFeature feature='commandWL'>

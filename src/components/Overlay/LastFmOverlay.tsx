@@ -14,10 +14,10 @@ export default function LastFmOverlay() {
   const [inputValue, setInputValue] = useState('')
   const initializedRef = useRef(false)
   const sampleTrack = {
-    artist: 'Artist Name',
-    title: 'Track Title',
     album: 'Album Name',
     albumArt: 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif',
+    artist: 'Artist Name',
+    title: 'Track Title',
   }
 
   // Set input value only once when username is first loaded

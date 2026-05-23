@@ -10,14 +10,14 @@ import { prismaMongo } from '@/lib/db'
 
 // Define validation schema for updating a notable player
 const updateNotablePlayerSchema = z.object({
+  account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
+  country_code: z.string().max(3).optional(),
   name: z
     .string()
     .min(1)
     .refine((name) => !name || !detect(name), {
       message: 'Name contains inappropriate language. Please revise it.',
     }),
-  country_code: z.string().max(3).optional(),
-  account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -36,14 +36,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Find the player, ensuring it belongs to the user's channel
     const player = await prismaMongo.notablePlayers.findFirst({
       select: {
-        name: true,
-        country_code: true,
         addedBy: true,
+        country_code: true,
         createdAt: true,
+        name: true,
       },
       where: {
-        id,
         channel: `${session.user.twitchId}`,
+        id,
       },
     })
 
@@ -61,8 +61,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const validatedData = updateNotablePlayerSchema.parse(req.body)
 
       const updatedPlayer = await prismaMongo.notablePlayers.update({
-        where: { id },
         data: validatedData,
+        where: { id },
       })
 
       return res.status(200).json(updatedPlayer)

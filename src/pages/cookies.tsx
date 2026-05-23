@@ -17,7 +17,9 @@ const ManageCookiePreferences = () => {
     setIsClient(true)
   }, [])
 
-  if (!isClient) return null
+  if (!isClient) {
+    return null
+  }
 
   return (
     <div className='border border-gray-200 rounded-lg p-6 my-6 text-center'>
@@ -118,7 +120,6 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
                 dataSource={category.cookies}
                 columns={[
                   {
-                    title: 'Name',
                     dataIndex: 'name',
                     key: 'name',
                     render: (text, record) => (
@@ -127,22 +128,23 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
                         {'pattern' in record && record.pattern && <Tag color='blue'>Pattern</Tag>}
                       </span>
                     ),
+                    title: 'Name',
                   },
                   {
-                    title: 'Domain',
                     dataIndex: 'domain',
                     key: 'domain',
                     render: (text) => (text === 'current' ? 'This website' : text),
+                    title: 'Domain',
                   },
                   {
-                    title: 'Description',
                     dataIndex: 'description',
                     key: 'description',
+                    title: 'Description',
                   },
                   {
-                    title: 'Expiry',
                     dataIndex: 'expiry',
                     key: 'expiry',
+                    title: 'Expiry',
                   },
                 ]}
                 pagination={false}
@@ -160,7 +162,6 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
           dataSource={allCookies}
           columns={[
             {
-              title: 'Name',
               dataIndex: 'name',
               key: 'name',
               render: (text: React.ReactNode, record: { pattern?: boolean }) => (
@@ -168,33 +169,34 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
                   {text} {record.pattern && <Tag color='blue'>Pattern</Tag>}
                 </span>
               ),
+              title: 'Name',
             },
             {
-              title: 'Category',
               dataIndex: 'category',
-              key: 'category',
-              filters: Array.from(new Set(allCookies.map((c) => c.category))).map((cat) => ({
+              filters: [...new Set(allCookies.map((c) => c.category))].map((cat) => ({
                 text: cat,
                 value: cat,
               })),
+              key: 'category',
               onFilter: (value, record) =>
                 (record as { category: string }).category === String(value),
+              title: 'Category',
             },
             {
-              title: 'Domain',
               dataIndex: 'domain',
               key: 'domain',
               render: (text) => (text === 'current' ? 'This website' : text),
+              title: 'Domain',
             },
             {
-              title: 'Description',
               dataIndex: 'description',
               key: 'description',
+              title: 'Description',
             },
             {
-              title: 'Expiry',
               dataIndex: 'expiry',
               key: 'expiry',
+              title: 'Expiry',
             },
           ]}
           pagination={{ pageSize: 10 }}
@@ -261,23 +263,21 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
   )
 }
 
-const CookiePolicyPage: NextPageWithLayout = () => {
-  return <CookiePolicy />
-}
+const CookiePolicyPage: NextPageWithLayout = () => <CookiePolicy />
 
 CookiePolicyPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Cookie Policy',
         subtitle:
           'Learn about how Dotabod uses cookies and other tracking technologies to enhance your experience on our website.',
+        title: 'Cookie Policy',
       }}
       seo={{
-        title: 'Cookie Policy | Dotabod',
+        canonicalUrl: 'https://dotabod.com/cookies',
         description:
           'Learn about how Dotabod uses cookies and other tracking technologies to enhance your experience on our website.',
-        canonicalUrl: 'https://dotabod.com/cookies',
+        title: 'Cookie Policy | Dotabod',
       }}
     >
       {page}

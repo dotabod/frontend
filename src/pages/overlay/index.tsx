@@ -14,7 +14,9 @@ const OverlayPage = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (isMaintenanceMode) return
+    if (isMaintenanceMode) {
+      return
+    }
 
     const resizeListener = () => {
       const headerHeight = 309
@@ -58,9 +60,9 @@ const OverlayPage = () => {
       <Spin size='large' tip='Loading overlay...' spinning={isLoading}>
         <div
           style={{
-            width: `${scaledWidth}px`,
             height: `${scaledHeight}px`,
             overflow: 'hidden',
+            width: `${scaledWidth}px`,
           }}
         >
           <iframe
@@ -69,10 +71,10 @@ const OverlayPage = () => {
             className='rounded-lg border border-gray-400'
             src={`/overlay/${data?.user?.id}`}
             style={{
+              height: 1080,
               transform: `scale(${scale})`,
               transformOrigin: 'top left',
               width: 1920,
-              height: 1080,
             }}
           />
         </div>

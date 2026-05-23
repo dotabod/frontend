@@ -71,7 +71,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     try {
       // Add to the channel's active set. Creating and assigning a separate set changes the
-      // streamer's visible 7TV emotes.
+      // Streamer's visible 7TV emotes.
       const activeEmoteSetId = stvResponse.emote_set?.id
 
       if (!activeEmoteSetId) {
@@ -88,9 +88,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         throw new Error('Emote set not found')
       }
 
-      const existingEmoteNames = userEmoteSet.emoteSet.emotes.map((e) => e.name)
+      const existingEmoteNames = new Set(userEmoteSet.emoteSet.emotes.map((e) => e.name))
       const emotesAlreadyInSet = emotesRequired.every((emote) =>
-        existingEmoteNames.includes(emote.label),
+        existingEmoteNames.has(emote.label),
       )
 
       if (emotesAlreadyInSet) {
@@ -98,21 +98,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       console.log('Adding emotes to emote set...')
-      const failedEmotes: Array<{ name: string; error: unknown }> = []
+      const failedEmotes: { name: string; error: unknown }[] = []
       await Promise.all(
         emotesRequired.map(async (emote, _index) => {
           try {
             console.log(`Adding emote ${emote.label}...`)
             await client.request(CHANGE_EMOTE_IN_SET, {
-              id: activeEmoteSetId,
               action: 'ADD',
-              name: emote.label,
               emote_id: emote.id,
+              id: activeEmoteSetId,
+              name: emote.label,
             })
             console.log(`Successfully added emote ${emote.label}`)
           } catch (error) {
             console.error(`Error adding emote ${emote.label}:`, error)
-            failedEmotes.push({ name: emote.label, error })
+            failedEmotes.push({ error, name: emote.label })
           }
         }),
       )
@@ -138,12 +138,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         console.error('Failed to add emotes:', missingEmotes)
         console.error('Failed emote details:', failedEmotes)
         return res.status(500).json({
+          failedEmotes: failedEmotes.map((f) => ({
+            error: String(f.error),
+            name: f.name,
+          })),
           message: 'Failed to add some emotes',
           missingEmotes,
-          failedEmotes: failedEmotes.map((f) => ({
-            name: f.name,
-            error: String(f.error),
-          })),
         })
       }
 
@@ -161,8 +161,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     const errorStack = error instanceof Error ? error.stack : undefined
     return res.status(500).json({
-      message: 'Internal server error',
       error: errorMessage,
+      message: 'Internal server error',
       stack: process.env.VERCEL_ENV !== 'production' ? errorStack : undefined,
     })
   }

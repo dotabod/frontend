@@ -38,14 +38,14 @@ const SeparatorImg = ({
 const FillRadiant = ({ width }: { width: number }) => (
   <div
     className='rounded-l bg-linear-to-r from-green-500 to-lime-500 text-right'
-    style={{ width: `${width}%`, transition: 'width 1.5s ease-in-out' }}
+    style={{ transition: 'width 1.5s ease-in-out', width: `${width}%` }}
   />
 )
 
 const FillDire = ({ width }: { width: number }) => (
   <div
     className='rounded-r bg-linear-to-r from-red-600 to-red-500'
-    style={{ width: `${width}%`, transition: 'width 1.5s ease-in-out' }}
+    style={{ transition: 'width 1.5s ease-in-out', width: `${width}%` }}
   />
 )
 

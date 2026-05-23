@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         break
       }
       // Lifetime order approved — backup capture in case the buyer closed the
-      // tab before the return route ran. Skipped if already processed there.
+      // Tab before the return route ran. Skipped if already processed there.
       case 'CHECKOUT.ORDER.APPROVED': {
         const orderId = resource.id
         if (orderId) {
@@ -95,8 +95,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         break
       }
-      default:
+      default: {
         break
+      }
     }
 
     return res.status(200).json({ message: 'OK' })

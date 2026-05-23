@@ -16,8 +16,8 @@ export async function handleSubscriptionEvent(
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
   debugLog('Entering handleSubscriptionEvent', {
-    subscriptionId: subscription.id,
     status: subscription.status,
+    subscriptionId: subscription.id,
   })
   const customerId = subscription.customer as string
   let customer: Stripe.Customer | Stripe.DeletedCustomer | null = null
@@ -38,26 +38,26 @@ export async function handleSubscriptionEvent(
     return false
   }
 
-  const userId = customer.metadata.userId
+  const { userId } = customer.metadata
   if (!userId) {
     debugLog('No userId found in customer metadata, exiting handleSubscriptionEvent', {
       customerId,
     })
     return false
   }
-  debugLog('Found userId in metadata', { userId, customerId })
+  debugLog('Found userId in metadata', { customerId, userId })
 
   const result = await withErrorHandling(
     async () => {
       debugLog('Inside withErrorHandling for handleSubscriptionEvent', {
-        userId,
         subscriptionId: subscription.id,
+        userId,
       })
       // Get the price ID from the subscription
       const priceId = subscription.items.data[0]?.price.id ?? null
       debugLog('Extracted priceId', { priceId, subscriptionId: subscription.id })
       const mappedStatus = mapStripeStatus(subscription.status)
-      debugLog('Mapped Stripe status', { stripeStatus: subscription.status, mappedStatus })
+      debugLog('Mapped Stripe status', { mappedStatus, stripeStatus: subscription.status })
 
       // Find or create the subscription record
       debugLog('Finding existing subscription record', { stripeSubscriptionId: subscription.id })
@@ -74,49 +74,49 @@ export async function handleSubscriptionEvent(
         })
         // Update the existing subscription
         await tx.subscription.update({
-          where: {
-            id: existingSubscription.id,
-          },
           data: {
-            status: mappedStatus,
-            tier: getSubscriptionTier(priceId, mappedStatus),
-            stripePriceId: priceId || '',
-            currentPeriodEnd: new Date(subscription.items.data[0]?.current_period_end * 1000),
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            currentPeriodEnd: new Date(subscription.items.data[0]?.current_period_end * 1000),
             metadata: {
               ...subscription.metadata,
               // Store collection method to know this is a crypto invoice-based subscription
               collectionMethod: subscription.collection_method,
               isCryptoPayment: subscription.metadata?.isCryptoPayment || 'false',
             },
+            status: mappedStatus,
+            stripePriceId: priceId || '',
+            tier: getSubscriptionTier(priceId, mappedStatus),
             updatedAt: new Date(),
+          },
+          where: {
+            id: existingSubscription.id,
           },
         })
 
         debugLog(`Updated subscription ${existingSubscription.id} status to ${mappedStatus}`)
       } else {
         debugLog('No existing subscription found, creating new record...', {
-          userId,
           stripeSubscriptionId: subscription.id,
+          userId,
         })
         // Create a new subscription record
         const newSubscription = await tx.subscription.create({
           data: {
-            userId,
-            status: mappedStatus,
-            tier: getSubscriptionTier(priceId, mappedStatus),
-            stripePriceId: priceId || '',
-            stripeCustomerId: customerId,
-            transactionType: TransactionType.RECURRING,
-            currentPeriodEnd: new Date(subscription.items.data[0]?.current_period_end * 1000),
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            stripeSubscriptionId: subscription.id,
+            currentPeriodEnd: new Date(subscription.items.data[0]?.current_period_end * 1000),
             metadata: {
               ...subscription.metadata,
               // Store collection method to know this is a crypto invoice-based subscription
               collectionMethod: subscription.collection_method,
               isCryptoPayment: subscription.metadata?.isCryptoPayment || 'false',
             },
+            status: mappedStatus,
+            stripeCustomerId: customerId,
+            stripePriceId: priceId || '',
+            stripeSubscriptionId: subscription.id,
+            tier: getSubscriptionTier(priceId, mappedStatus),
+            transactionType: TransactionType.RECURRING,
+            userId,
           },
         })
 
@@ -126,8 +126,8 @@ export async function handleSubscriptionEvent(
       }
 
       debugLog('Finished processing inside withErrorHandling for handleSubscriptionEvent', {
-        userId,
         subscriptionId: subscription.id,
+        userId,
       })
       return true
     },
@@ -136,7 +136,7 @@ export async function handleSubscriptionEvent(
   )
 
   const finalResult = result !== null
-  debugLog('Exiting handleSubscriptionEvent', { subscriptionId: subscription.id, finalResult })
+  debugLog('Exiting handleSubscriptionEvent', { finalResult, subscriptionId: subscription.id })
   return finalResult
 }
 
@@ -172,17 +172,17 @@ export async function handleSubscriptionDeleted(
       })
       // Update the subscription status to canceled
       await tx.subscription.update({
-        where: {
-          id: existingSubscription.id,
-        },
         data: {
-          status: SubscriptionStatus.CANCELED,
           cancelAtPeriodEnd: true,
           metadata: {
             ...(existingSubscription.metadata as Record<string, unknown>),
             canceledAt: new Date().toISOString(),
           },
+          status: SubscriptionStatus.CANCELED,
           updatedAt: new Date(),
+        },
+        where: {
+          id: existingSubscription.id,
         },
       })
 
@@ -200,7 +200,7 @@ export async function handleSubscriptionDeleted(
   }, `handleSubscriptionDeleted(${subscription.id})`)
 
   const finalResult = result !== null
-  debugLog('Exiting handleSubscriptionDeleted', { subscriptionId: subscription.id, finalResult })
+  debugLog('Exiting handleSubscriptionDeleted', { finalResult, subscriptionId: subscription.id })
   return finalResult
 }
 
@@ -213,25 +213,30 @@ function mapStripeStatus(status: string): SubscriptionStatus {
   debugLog('Mapping Stripe status', { status })
   let mappedStatus: SubscriptionStatus
   switch (status) {
-    case 'active':
+    case 'active': {
       mappedStatus = SubscriptionStatus.ACTIVE
       break
-    case 'trialing':
+    }
+    case 'trialing': {
       mappedStatus = SubscriptionStatus.TRIALING
       break
-    case 'canceled':
+    }
+    case 'canceled': {
       mappedStatus = SubscriptionStatus.CANCELED
       break
+    }
     case 'incomplete':
     case 'incomplete_expired':
     case 'past_due':
-    case 'unpaid':
+    case 'unpaid': {
       mappedStatus = SubscriptionStatus.PAST_DUE
       break
-    default:
+    }
+    default: {
       mappedStatus = SubscriptionStatus.CANCELED
       break
+    }
   }
-  debugLog('Finished mapping Stripe status', { status, mappedStatus })
+  debugLog('Finished mapping Stripe status', { mappedStatus, status })
   return mappedStatus
 }

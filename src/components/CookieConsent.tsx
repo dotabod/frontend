@@ -22,7 +22,7 @@ declare global {
   interface Window {
     _ga_enabled?: boolean
     _hubspot_enabled?: boolean
-    gtag?: (command: string, ...args: Array<unknown>) => void
+    gtag?: (command: string, ...args: unknown[]) => void
     HubSpotConsentConfig?: {
       setTrackingCookiesAllowed: (allowed: boolean) => void
     }
@@ -31,96 +31,96 @@ declare global {
 
 // Define cookie categories and their descriptions
 const cookieCategories = {
-  necessary: {
-    title: 'Necessary',
-    description:
-      'These cookies are required for the website to function properly and cannot be disabled.',
+  analytics: {
     cookies: [
       {
-        name: 'cookie_preferences',
-        domain: 'current',
-        description: 'Stores your cookie consent preferences',
-        expiry: '1 year',
-        type: 'necessary',
+        description: 'Google Analytics cookie used to distinguish users',
+        domain: '.dotabod.com',
+        expiry: '2 years',
+        name: '_ga',
+        type: 'analytics',
       },
       {
-        name: 'next-auth.session-token',
-        domain: 'current',
-        description: 'Authentication session token',
-        expiry: 'Session',
-        type: 'necessary',
+        description: 'Google Analytics cookie used to persist session state',
+        domain: '.dotabod.com',
+        expiry: '2 years',
+        name: '_ga_*',
+        pattern: true,
+        type: 'analytics',
       },
     ],
-  },
-  analytics: {
-    title: 'Analytics',
     description:
       'These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.',
-    cookies: [
-      {
-        name: '_ga',
-        domain: '.dotabod.com',
-        description: 'Google Analytics cookie used to distinguish users',
-        expiry: '2 years',
-        type: 'analytics',
-      },
-      {
-        name: '_ga_*',
-        domain: '.dotabod.com',
-        description: 'Google Analytics cookie used to persist session state',
-        expiry: '2 years',
-        type: 'analytics',
-        pattern: true,
-      },
-    ],
+    title: 'Analytics',
   },
   marketing: {
-    title: 'Marketing',
-    description:
-      'These cookies are used to track visitors across websites to display relevant advertisements.',
     cookies: [
       {
-        name: 'hubspotutk',
-        domain: '.dotabod.com',
         description: 'HubSpot cookie used to track visitors across HubSpot sites',
+        domain: '.dotabod.com',
         expiry: '13 months',
+        name: 'hubspotutk',
         type: 'marketing',
       },
       {
-        name: '__hssc',
-        domain: '.dotabod.com',
         description: 'HubSpot cookie for session tracking',
+        domain: '.dotabod.com',
         expiry: '30 minutes',
+        name: '__hssc',
         type: 'marketing',
       },
       {
-        name: '__hssrc',
-        domain: '.dotabod.com',
         description: 'HubSpot cookie to determine if the user has restarted their browser',
+        domain: '.dotabod.com',
         expiry: 'Session',
+        name: '__hssrc',
         type: 'marketing',
       },
       {
-        name: '__hstc',
-        domain: '.dotabod.com',
         description: 'HubSpot main cookie for tracking visitors',
+        domain: '.dotabod.com',
         expiry: '13 months',
+        name: '__hstc',
         type: 'marketing',
       },
     ],
+    description:
+      'These cookies are used to track visitors across websites to display relevant advertisements.',
+    title: 'Marketing',
   },
-  preferences: {
-    title: 'Preferences',
-    description: 'These cookies enable personalized features and functionality on our website.',
+  necessary: {
     cookies: [
       {
-        name: 'theme',
+        description: 'Stores your cookie consent preferences',
         domain: 'current',
-        description: 'Stores your theme preference (light/dark)',
         expiry: '1 year',
+        name: 'cookie_preferences',
+        type: 'necessary',
+      },
+      {
+        description: 'Authentication session token',
+        domain: 'current',
+        expiry: 'Session',
+        name: 'next-auth.session-token',
+        type: 'necessary',
+      },
+    ],
+    description:
+      'These cookies are required for the website to function properly and cannot be disabled.',
+    title: 'Necessary',
+  },
+  preferences: {
+    cookies: [
+      {
+        description: 'Stores your theme preference (light/dark)',
+        domain: 'current',
+        expiry: '1 year',
+        name: 'theme',
         type: 'preferences',
       },
     ],
+    description: 'These cookies enable personalized features and functionality on our website.',
+    title: 'Preferences',
   },
 }
 
@@ -155,9 +155,9 @@ const CookieConsent = () => {
 
   const handleAcceptAll = () => {
     const allAccepted = {
-      necessary: true,
       analytics: true,
       marketing: true,
+      necessary: true,
       preferences: true,
     }
     updatePreferences(allAccepted)
@@ -173,9 +173,9 @@ const CookieConsent = () => {
 
   const handleRejectAll = () => {
     const allRejected = {
-      necessary: true, // Necessary cookies are always accepted
       analytics: false,
       marketing: false,
+      necessary: true, // Necessary cookies are always accepted
       preferences: false,
     }
     updatePreferences(allRejected)
@@ -184,7 +184,9 @@ const CookieConsent = () => {
   }
 
   const handlePreferenceChange = (key: keyof CookiePreferences) => (e: CheckboxChangeEvent) => {
-    if (key === 'necessary') return // Cannot change necessary cookies
+    if (key === 'necessary') {
+      return
+    } // Cannot change necessary cookies
     updatePreferences({ ...preferences, [key]: e.target.checked })
   }
 
@@ -221,14 +223,14 @@ const CookieConsent = () => {
           }
           showIcon
           style={{
-            position: 'fixed',
+            borderRadius: 8,
             bottom: 16,
             left: 16,
-            zIndex: 1001,
-            width: 'min(420px, calc(100vw - 32px))',
             margin: 0,
             padding: 12,
-            borderRadius: 8,
+            position: 'fixed',
+            width: 'min(420px, calc(100vw - 32px))',
+            zIndex: 1001,
           }}
           closable={false}
         />
@@ -243,15 +245,15 @@ const CookieConsent = () => {
         width='100%'
         style={{ maxWidth: '100%' }}
         styles={{
+          body: {
+            paddingTop: '20px',
+          },
           header: {
+            flexWrap: 'wrap',
+            gap: '20px',
             position: 'sticky',
             top: 0,
             zIndex: 10,
-            flexWrap: 'wrap',
-            gap: '20px',
-          },
-          body: {
-            paddingTop: '20px',
           },
         }}
         extra={
@@ -264,7 +266,7 @@ const CookieConsent = () => {
           </Space>
         }
       >
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ margin: '0 auto', maxWidth: '1000px' }}>
           <Paragraph>
             Cookies are small data files that are placed on your computer or mobile device when you
             visit a website. Cookies are widely used by website owners to make their websites work,
@@ -280,7 +282,7 @@ const CookieConsent = () => {
           <div>
             {Object.entries(cookieCategories).map(([key, category]) => (
               <div key={key} style={{ marginBottom: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ alignItems: 'center', display: 'flex', marginBottom: '8px' }}>
                   <Checkbox
                     checked={preferences[key as keyof CookiePreferences]}
                     onChange={handlePreferenceChange(key as keyof CookiePreferences)}
@@ -294,17 +296,14 @@ const CookieConsent = () => {
 
                 {/* Cookie details collapsible panel */}
                 <Collapse
-                  style={{ marginLeft: '24px', marginBottom: '16px' }}
+                  style={{ marginBottom: '16px', marginLeft: '24px' }}
                   items={[
                     {
-                      key: `${key}-cookies`,
-                      label: `View ${category.cookies.length} cookie${category.cookies.length !== 1 ? 's' : ''}`,
                       children: (
                         <Table
                           dataSource={category.cookies}
                           columns={[
                             {
-                              title: 'Name',
                               dataIndex: 'name',
                               key: 'name',
                               render: (text, record) => (
@@ -315,28 +314,31 @@ const CookieConsent = () => {
                                   )}
                                 </span>
                               ),
+                              title: 'Name',
                             },
                             {
-                              title: 'Domain',
                               dataIndex: 'domain',
                               key: 'domain',
                               render: (text) => (text === 'current' ? 'This website' : text),
+                              title: 'Domain',
                             },
                             {
-                              title: 'Description',
                               dataIndex: 'description',
                               key: 'description',
+                              title: 'Description',
                             },
                             {
-                              title: 'Expiry',
                               dataIndex: 'expiry',
                               key: 'expiry',
+                              title: 'Expiry',
                             },
                           ]}
                           pagination={false}
                           size='small'
                         />
                       ),
+                      key: `${key}-cookies`,
+                      label: `View ${category.cookies.length} cookie${category.cookies.length !== 1 ? 's' : ''}`,
                     },
                   ]}
                 />

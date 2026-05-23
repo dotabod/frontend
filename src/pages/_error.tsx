@@ -20,21 +20,17 @@ import * as Sentry from '@sentry/nextjs'
 import type { NextPageContext } from 'next'
 import NextErrorComponent from 'next/error'
 
-type ErrorProps = {
+interface ErrorProps {
   statusCode?: number
 }
 
-const CustomErrorComponent = (props: ErrorProps) => {
-  // If you're using a Nextjs version prior to 12.2.1, uncomment this to
-  // compensate for https://github.com/vercel/next.js/issues/8592
-  // Sentry.captureUnderscoreErrorException(props);
-
-  return <NextErrorComponent statusCode={props.statusCode || 500} />
-}
+const CustomErrorComponent = (props: ErrorProps) => (
+  <NextErrorComponent statusCode={props.statusCode || 500} />
+)
 
 CustomErrorComponent.getInitialProps = async (contextData: NextPageContext) => {
   // In case this is running in a serverless function, await this in order to give Sentry
-  // time to send the error before the lambda exits
+  // Time to send the error before the lambda exits
   await Sentry.captureUnderscoreErrorException(contextData)
 
   // Guard against undefined NextErrorComponent or missing getInitialProps

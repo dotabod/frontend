@@ -35,75 +35,73 @@ export const PriceDisplay = ({
   hasCreditBalance,
   formattedCreditBalance,
   hasTrial,
-}: PriceDisplayProps) => {
-  return (
-    <>
-      <div className='relative mt-5'>
-        <p
-          className={clsx(
-            'flex text-4xl font-bold tracking-tight',
-            featured ? 'text-white' : 'text-gray-100',
-          )}
-        >
-          {price.monthly === price.annual ? (
-            price.monthly
-          ) : (
-            <>
-              <span
-                aria-hidden={activePeriod === 'annual' || activePeriod === 'lifetime'}
-                className={clsx(
-                  'transition duration-300',
-                  (activePeriod === 'annual' || activePeriod === 'lifetime') &&
-                    'pointer-events-none translate-x-6 opacity-0 select-none',
-                )}
-              >
-                {price.monthly}
-                <span className='text-sm'> / month</span>
-              </span>
-              <span
-                aria-hidden={activePeriod !== 'annual'}
-                className={clsx(
-                  'absolute top-0 left-0 transition duration-300',
-                  activePeriod === 'annual'
-                    ? 'translate-x-0 opacity-100'
-                    : 'pointer-events-none -translate-x-6 opacity-0 select-none',
-                )}
-              >
-                {price.annual}
-                <span className='text-sm'> / year</span>
-              </span>
-              <span
-                aria-hidden={activePeriod !== 'lifetime'}
-                className={clsx(
-                  'absolute top-0 left-0 transition duration-300',
-                  activePeriod === 'lifetime'
-                    ? 'translate-x-0 opacity-100'
-                    : 'pointer-events-none -translate-x-6 opacity-0 select-none',
-                )}
-              >
-                {price.lifetime}
-                <span className='text-sm'> one-time</span>
-              </span>
-            </>
-          )}
-        </p>
-      </div>
+}: PriceDisplayProps) => (
+  <>
+    <div className='relative mt-5'>
+      <p
+        className={clsx(
+          'flex text-4xl font-bold tracking-tight',
+          featured ? 'text-white' : 'text-gray-100',
+        )}
+      >
+        {price.monthly === price.annual ? (
+          price.monthly
+        ) : (
+          <>
+            <span
+              aria-hidden={activePeriod === 'annual' || activePeriod === 'lifetime'}
+              className={clsx(
+                'transition duration-300',
+                (activePeriod === 'annual' || activePeriod === 'lifetime') &&
+                  'pointer-events-none translate-x-6 opacity-0 select-none',
+              )}
+            >
+              {price.monthly}
+              <span className='text-sm'> / month</span>
+            </span>
+            <span
+              aria-hidden={activePeriod !== 'annual'}
+              className={clsx(
+                'absolute top-0 left-0 transition duration-300',
+                activePeriod === 'annual'
+                  ? 'translate-x-0 opacity-100'
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+              )}
+            >
+              {price.annual}
+              <span className='text-sm'> / year</span>
+            </span>
+            <span
+              aria-hidden={activePeriod !== 'lifetime'}
+              className={clsx(
+                'absolute top-0 left-0 transition duration-300',
+                activePeriod === 'lifetime'
+                  ? 'translate-x-0 opacity-100'
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+              )}
+            >
+              {price.lifetime}
+              <span className='text-sm'> one-time</span>
+            </span>
+          </>
+        )}
+      </p>
+    </div>
 
-      <div className={clsx('mt-2 h-5 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-        {activePeriod === 'annual' && !Number.isNaN(savings) ? `Saving ${savings}%` : null}
-      </div>
-      <div className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
-        <PlanDescription
-          tier={tier}
-          activePeriod={activePeriod}
-          payWithCrypto={payWithCrypto}
-          payWithPaypal={payWithPaypal}
-          description={description}
-          hasCreditBalance={hasCreditBalance}
-          formattedCreditBalance={formattedCreditBalance}
-          hasTrial={hasTrial}
-        />
-      </div>
-    </>
-  )
-}
+    <div className={clsx('mt-2 h-5 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+      {activePeriod === 'annual' && !Number.isNaN(savings) ? `Saving ${savings}%` : null}
+    </div>
+    <div className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+      <PlanDescription
+        tier={tier}
+        activePeriod={activePeriod}
+        payWithCrypto={payWithCrypto}
+        payWithPaypal={payWithPaypal}
+        description={description}
+        hasCreditBalance={hasCreditBalance}
+        formattedCreditBalance={formattedCreditBalance}
+        hasTrial={hasTrial}
+      />
+    </div>
+  </>
+)

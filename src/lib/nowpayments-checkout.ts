@@ -16,37 +16,41 @@ export async function createAndStoreCryptoInvoice({
   orderDescription,
   metadata,
 }: Params): Promise<{ url: string; nowPaymentsId: string }> {
-  if (!stripeInvoice.id) throw new Error('Stripe invoice has no id')
+  if (!stripeInvoice.id) {
+    throw new Error('Stripe invoice has no id')
+  }
 
   const amountRemaining = stripeInvoice.amount_remaining ?? 0
-  if (amountRemaining <= 0) throw new Error('Stripe invoice has no balance due')
+  if (amountRemaining <= 0) {
+    throw new Error('Stripe invoice has no balance due')
+  }
 
   const priceAmount = amountRemaining / 100
   const priceCurrency = (stripeInvoice.currency || 'usd').toLowerCase()
   const baseUrl = process.env.NEXTAUTH_URL || 'https://dotabod.com'
 
   const npInvoice = await createNowPaymentsInvoice({
+    cancel_url: `${baseUrl}/dashboard/billing?paid=false`,
+    ipn_callback_url: `${baseUrl}/api/webhooks/nowpayments`,
+    order_description: orderDescription,
+    order_id: stripeInvoice.id,
     price_amount: priceAmount,
     price_currency: priceCurrency,
-    ipn_callback_url: `${baseUrl}/api/webhooks/nowpayments`,
-    order_id: stripeInvoice.id,
-    order_description: orderDescription,
     success_url: `${baseUrl}/dashboard/billing?payment=processing&crypto=true&invoice=${stripeInvoice.id}`,
-    cancel_url: `${baseUrl}/dashboard/billing?paid=false`,
   })
 
   try {
     await prisma.nowPaymentsInvoice.create({
       data: {
+        hostedInvoiceUrl: npInvoice.invoice_url,
+        metadata: (metadata ?? null) as Prisma.InputJsonValue,
         nowPaymentsId: String(npInvoice.id),
-        stripeInvoiceId: stripeInvoice.id,
-        stripeCustomerId: stripeInvoice.customer as string,
-        userId,
         priceAmount,
         priceCurrency,
         status: 'waiting',
-        hostedInvoiceUrl: npInvoice.invoice_url,
-        metadata: (metadata ?? null) as Prisma.InputJsonValue,
+        stripeCustomerId: stripeInvoice.customer as string,
+        stripeInvoiceId: stripeInvoice.id,
+        userId,
       },
     })
   } catch (error) {
@@ -55,11 +59,11 @@ export async function createAndStoreCryptoInvoice({
         where: { stripeInvoiceId: stripeInvoice.id },
       })
       if (existing) {
-        return { url: existing.hostedInvoiceUrl, nowPaymentsId: existing.nowPaymentsId }
+        return { nowPaymentsId: existing.nowPaymentsId, url: existing.hostedInvoiceUrl }
       }
     }
     throw error
   }
 
-  return { url: npInvoice.invoice_url, nowPaymentsId: String(npInvoice.id) }
+  return { nowPaymentsId: String(npInvoice.id), url: npInvoice.invoice_url }
 }

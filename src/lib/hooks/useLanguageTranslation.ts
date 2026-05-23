@@ -22,7 +22,7 @@ interface Project {
   inContextPseudoLanguage: Language
   isSuspended: boolean
   qaCheckIsActive: boolean
-  qaCheckCategories: { [key: string]: boolean }
+  qaCheckCategories: Record<string, boolean>
   languageMapping: LanguageMapping
   notificationSettings: NotificationSettings
   id: number

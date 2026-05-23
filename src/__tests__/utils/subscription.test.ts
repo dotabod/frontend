@@ -4,7 +4,7 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 // We need to mock the module before importing it
 vi.mock('@/utils/subscription', async () => {
@@ -18,11 +18,11 @@ vi.mock('@/utils/subscription', async () => {
 // Mock prisma
 vi.mock('@/lib/db', () => ({
   default: {
-    user: {
-      findUnique: vi.fn(),
-    },
     subscription: {
       findMany: vi.fn(),
+    },
+    user: {
+      findUnique: vi.fn(),
     },
   },
 }))
@@ -35,70 +35,70 @@ describe('Subscription priority logic', () => {
   it('should prioritize non-gift active subscription over gift subscription', async () => {
     // Setup test data
     const giftSubscription: Partial<Subscription> = {
-      id: '3c8bc61e-5cc6-42a1-b380-1f4f9037e2be',
-      tier: SubscriptionTier.PRO,
-      status: SubscriptionStatus.ACTIVE,
-      transactionType: TransactionType.RECURRING,
-      isGift: true,
-      stripeSubscriptionId: null,
+      cancelAtPeriodEnd: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: 'test-user-id',
+      currentPeriodEnd: null,
+      id: '3c8bc61e-5cc6-42a1-b380-1f4f9037e2be',
+      isGift: true,
+      metadata: null,
+      status: SubscriptionStatus.ACTIVE,
       stripeCustomerId: '',
       stripePriceId: '',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      metadata: null,
+      stripeSubscriptionId: null,
+      tier: SubscriptionTier.PRO,
+      transactionType: TransactionType.RECURRING,
+      updatedAt: new Date(),
+      userId: 'test-user-id',
     }
 
     const selfSubscription: Partial<Subscription> = {
-      id: 'dcd97b94-7a25-4c12-af4d-99156621fb4b',
-      tier: SubscriptionTier.PRO,
-      status: SubscriptionStatus.TRIALING,
-      transactionType: TransactionType.RECURRING,
-      isGift: false,
-      stripeSubscriptionId: 'sub_1R35HBATtc1xLdxvToG0W0pT',
+      cancelAtPeriodEnd: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: 'test-user-id',
+      currentPeriodEnd: null,
+      id: 'dcd97b94-7a25-4c12-af4d-99156621fb4b',
+      isGift: false,
+      metadata: null,
+      status: SubscriptionStatus.TRIALING,
       stripeCustomerId: '',
       stripePriceId: '',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      metadata: null,
+      stripeSubscriptionId: 'sub_1R35HBATtc1xLdxvToG0W0pT',
+      tier: SubscriptionTier.PRO,
+      transactionType: TransactionType.RECURRING,
+      updatedAt: new Date(),
+      userId: 'test-user-id',
     }
 
     // Mock the database calls with proper types
     // Set proExpiration to null to avoid the virtual gift subscription
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
-      id: 'test-user-id',
+      beta_tester: false,
+      createdAt: new Date(),
+      currentViewers: null,
       displayName: 'Test User',
       email: 'test@example.com',
-      image: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      proExpiration: null, // Set to null to avoid virtual gift subscription
-      locale: 'en',
       emailVerified: null,
+      followers: null,
+      hideFromLeaderboard: false,
+      id: 'test-user-id',
+      image: null,
+      kick: null,
+      kickUsername: null,
+      lastStreamCheck: null,
+      locale: 'en',
+      mmr: 0,
       name: '',
+      proExpiration: null, // Set to null to avoid virtual gift subscription
+      steam32Id: null,
+      streamCategory: null,
+      streamPlatform: null,
+      streamStartedAt: null,
+      streamTitle: null,
       stream_delay: null,
       stream_online: false,
       stream_start_date: null,
-      beta_tester: false,
-      kick: null,
-      youtube: null,
-      currentViewers: null,
-      hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
       twitchUsername: null,
-      kickUsername: null,
-      streamCategory: null,
-      streamStartedAt: null,
-      streamTitle: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
 
@@ -121,34 +121,34 @@ describe('Subscription priority logic', () => {
   it('returns null when no subscriptions exist and grace period check fails', async () => {
     // Mock the database calls
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
-      id: 'test-user-id',
+      beta_tester: false,
+      createdAt: new Date(),
+      currentViewers: null,
       displayName: 'Test User',
       email: 'test@example.com',
-      image: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      proExpiration: null,
-      locale: 'en',
       emailVerified: null,
+      followers: null,
+      hideFromLeaderboard: false,
+      id: 'test-user-id',
+      image: null,
+      kick: null,
+      kickUsername: null,
+      lastStreamCheck: null,
+      locale: 'en',
+      mmr: 0,
       name: '',
+      proExpiration: null,
+      steam32Id: null,
+      streamCategory: null,
+      streamPlatform: null,
+      streamStartedAt: null,
+      streamTitle: null,
       stream_delay: null,
       stream_online: false,
       stream_start_date: null,
-      beta_tester: false,
-      kick: null,
-      youtube: null,
-      currentViewers: null,
-      hideFromLeaderboard: false,
-      lastStreamCheck: null,
-      streamPlatform: null,
       twitchUsername: null,
-      kickUsername: null,
-      streamCategory: null,
-      streamStartedAt: null,
-      streamTitle: null,
+      updatedAt: new Date(),
+      youtube: null,
       youtubeChannelId: null,
     })
 
@@ -159,7 +159,7 @@ describe('Subscription priority logic', () => {
     const result = await getSubscription('test-user-id')
 
     // The actual behavior is that result is null when there are no subscriptions
-    // and we're not in the grace period
+    // And we're not in the grace period
     expect(result).toBeNull()
   })
 })
@@ -167,17 +167,17 @@ describe('Subscription priority logic', () => {
 describe('getBillingSummaryInfo', () => {
   it('summarizes an active paid subscription with Stripe management', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.ACTIVE,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-04-20T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: 'sub_123',
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.ACTIVE,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: 'sub_123',
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.headline).toBe('Your Pro plan is active')
@@ -189,17 +189,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes a payment issue with the right urgency', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.PAST_DUE,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-04-20T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: 'sub_123',
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.PAST_DUE,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: 'sub_123',
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.tone).toBe('error')
@@ -209,17 +209,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes complimentary access when grace-period access exists without Stripe', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.TRIALING,
       cancelAtPeriodEnd: true,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2025-04-30T23:59:59.999Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: null,
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: true,
+      status: SubscriptionStatus.TRIALING,
       stripeCustomerId: null,
       stripePriceId: null,
+      stripeSubscriptionId: null,
       tier: SubscriptionTier.PRO,
-      inGracePeriod: true,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.statusLabel).toBe('Complimentary access')
@@ -229,17 +229,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes lifetime access without a Stripe portal dependency', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.ACTIVE,
       cancelAtPeriodEnd: false,
+      creditBalance: 2500,
       currentPeriodEnd: new Date('2099-01-01T00:00:00.000Z'),
-      transactionType: TransactionType.LIFETIME,
-      stripeSubscriptionId: null,
+      formattedCreditBalance: '$25.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.ACTIVE,
       stripeCustomerId: null,
       stripePriceId: null,
+      stripeSubscriptionId: null,
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 2500,
-      formattedCreditBalance: '$25.00',
+      transactionType: TransactionType.LIFETIME,
     })
 
     expect(summary.headline).toBe('You have lifetime access to Dotabod Pro')
@@ -249,17 +249,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes a canceled subscription — does not fall through to Free plan copy', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.CANCELED,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-03-01T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: null,
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.CANCELED,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: null,
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.headline).toBe('Your subscription has been canceled')
@@ -270,17 +270,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes an incomplete subscription with warning tone', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.INCOMPLETE,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: 'sub_123',
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.INCOMPLETE,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: 'sub_123',
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.headline).toBe('Your payment is incomplete')
@@ -292,17 +292,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes an incomplete-expired subscription with error tone', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.INCOMPLETE_EXPIRED,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-03-01T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: null,
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.INCOMPLETE_EXPIRED,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: null,
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.headline).toBe('Your subscription setup expired')
@@ -312,17 +312,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes an unpaid subscription with error tone and pay-invoice CTA', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.UNPAID,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: 'sub_123',
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.UNPAID,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: 'sub_123',
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.headline).toBe('Your invoice is unpaid')
@@ -334,17 +334,17 @@ describe('getBillingSummaryInfo', () => {
 
   it('summarizes a paused subscription with warning tone', () => {
     const summary = getBillingSummaryInfo({
-      status: SubscriptionStatus.PAUSED,
       cancelAtPeriodEnd: false,
+      creditBalance: 0,
       currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
-      transactionType: TransactionType.RECURRING,
-      stripeSubscriptionId: 'sub_123',
+      formattedCreditBalance: '$0.00',
+      inGracePeriod: false,
+      status: SubscriptionStatus.PAUSED,
       stripeCustomerId: 'cus_123',
       stripePriceId: 'price_123',
+      stripeSubscriptionId: 'sub_123',
       tier: SubscriptionTier.PRO,
-      inGracePeriod: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
+      transactionType: TransactionType.RECURRING,
     })
 
     expect(summary.headline).toBe('Your subscription is paused')

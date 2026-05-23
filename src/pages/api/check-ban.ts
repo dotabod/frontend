@@ -17,7 +17,7 @@ async function checkBan(broadcasterId: string | undefined, accessToken: string) 
   }
 
   try {
-    const checkResponse = await fetch(checkUrl, { method: 'GET', headers })
+    const checkResponse = await fetch(checkUrl, { headers, method: 'GET' })
     if (!checkResponse.ok) {
       throw new Error(`Failed to get banned info: ${checkResponse.statusText}`)
     }
@@ -28,7 +28,7 @@ async function checkBan(broadcasterId: string | undefined, accessToken: string) 
     return { banned: false }
   } catch (error) {
     captureException(error)
-    return { message: 'Error', error: error.message }
+    return { error: error.message, message: 'Error' }
   }
 }
 
@@ -55,30 +55,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Also check for disable reasons related to bot bans
     const commandDisableSetting = await prisma.setting.findFirst({
-      where: {
-        userId: session.user.id,
-        key: 'commandDisable',
-      },
       select: {
-        value: true,
-        disableReason: true,
         autoDisabledAt: true,
         disableMetadata: true,
+        disableReason: true,
+        value: true,
+      },
+      where: {
+        key: 'commandDisable',
+        userId: session.user.id,
       },
     })
 
     const response = {
       ...banResponse,
-      disabled: commandDisableSetting?.value === true,
-      disableReason: commandDisableSetting?.disableReason,
-      disabledAt: commandDisableSetting?.autoDisabledAt,
       disableMetadata: commandDisableSetting?.disableMetadata,
+      disableReason: commandDisableSetting?.disableReason,
+      disabled: commandDisableSetting?.value === true,
+      disabledAt: commandDisableSetting?.autoDisabledAt,
     }
 
     return res.status(200).json(response)
   } catch (error) {
     captureException(error)
-    return res.status(500).json({ message: 'Failed to get ban info', error: error.message })
+    return res.status(500).json({ error: error.message, message: 'Failed to get ban info' })
   }
 }
 

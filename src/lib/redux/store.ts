@@ -1,7 +1,7 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit'
 import type { blockType } from '@/lib/devConsts'
 
-type MinimapEntity = {
+interface MinimapEntity {
   teamP: string
   image: string
   unitname: string
@@ -11,55 +11,55 @@ type MinimapEntity = {
   yposP: number
 }
 
-export type MinimapUnitProps = {
+export interface MinimapUnitProps {
   data: MinimapEntity
   team: blockType['team']
 }
 
 const initialState = {
-  isTest: false,
-  isPreview: false,
-  status: null as null | { active?: boolean; hero: string },
-  settings: null as null | Record<string, unknown>,
-  heroes: null as null | MinimapEntity[],
-  hero_units: null as null | MinimapEntity[],
   buildings: null as null | MinimapEntity[],
-  creeps: null as null | MinimapEntity[],
   couriers: null as null | MinimapEntity[],
+  creeps: null as null | MinimapEntity[],
+  hero_units: null as null | MinimapEntity[],
+  heroes: null as null | MinimapEntity[],
+  isPreview: false,
+  isTest: false,
+  settings: null as null | Record<string, unknown>,
+  status: null as null | { active?: boolean; hero: string },
 }
 
 type AppState = typeof initialState
 
 const appSlice = createSlice({
+  initialState,
   name: 'app',
-  initialState: initialState,
   reducers: {
-    setTest: (state, action) => {
-      state.isTest = action.payload
-    },
-    setPreview: (state, action) => {
-      state.isPreview = action.payload
-    },
-    setMinimapStatus: (state, action) => {
-      state.status = action.payload
-    },
-    setMinimapSettings: (state, action) => {
-      state.settings = action.payload
-    },
-    setMinimapDataHeroes: (state, action) => {
-      state.heroes = action.payload
-    },
-    setMinimapDataHeroUnits: (state, action) => {
-      state.hero_units = action.payload
-    },
     setMinimapDataBuildings: (state, action) => {
       state.buildings = action.payload
+    },
+    setMinimapDataCouriers: (state, action) => {
+      state.couriers = action.payload
     },
     setMinimapDataCreeps: (state, action) => {
       state.creeps = action.payload
     },
-    setMinimapDataCouriers: (state, action) => {
-      state.couriers = action.payload
+    setMinimapDataHeroUnits: (state, action) => {
+      state.hero_units = action.payload
+    },
+    setMinimapDataHeroes: (state, action) => {
+      state.heroes = action.payload
+    },
+    setMinimapSettings: (state, action) => {
+      state.settings = action.payload
+    },
+    setMinimapStatus: (state, action) => {
+      state.status = action.payload
+    },
+    setPreview: (state, action) => {
+      state.isPreview = action.payload
+    },
+    setTest: (state, action) => {
+      state.isTest = action.payload
     },
   },
 })

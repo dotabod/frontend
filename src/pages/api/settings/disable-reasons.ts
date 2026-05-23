@@ -17,41 +17,41 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       // Get all unresolved disable reasons for the user
       const disableReasons = await prisma.disableNotification.findMany({
-        where: {
-          userId: session.user.id,
-          resolvedAt: null,
-        },
         orderBy: {
           createdAt: 'desc',
+        },
+        where: {
+          resolvedAt: null,
+          userId: session.user.id,
         },
       })
 
       // Also get settings with disable reasons
       const disabledSettings = await prisma.setting.findMany({
-        where: {
-          userId: session.user.id,
-          disableReason: {
-            not: null,
-          },
-        },
         select: {
-          key: true,
-          disableReason: true,
           autoDisabledAt: true,
           autoDisabledBy: true,
           disableMetadata: true,
+          disableReason: true,
+          key: true,
+        },
+        where: {
+          disableReason: {
+            not: null,
+          },
+          userId: session.user.id,
         },
       })
 
       return res.status(200).json({
-        notifications: disableReasons,
         disabledSettings,
+        notifications: disableReasons,
       })
     } catch (error) {
       captureException(error)
       return res.status(500).json({
-        message: 'Failed to get disable reasons',
         error: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Failed to get disable reasons',
       })
     }
   }

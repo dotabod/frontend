@@ -63,13 +63,14 @@ export function TierSlider({
   }
 
   // Clean up timeout on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (debounceTimeout) {
         clearTimeout(debounceTimeout)
       }
-    }
-  }, [debounceTimeout])
+    },
+    [debounceTimeout],
+  )
 
   const sliderId = `slider-${settingKey}`
 

@@ -28,9 +28,9 @@ function WidgetPage() {
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const [wl, setWL] = useState([
     {
-      win: 0,
       lose: 0,
       type: 'U',
+      win: 0,
     },
   ])
   const [rankImageDetails, setRankImageDetails] = useState<{
@@ -40,14 +40,18 @@ function WidgetPage() {
     notLoaded?: boolean
   }>({
     image: '0.png',
-    rank: 0,
     leaderboard: 0,
     notLoaded: true,
+    rank: 0,
   })
 
   useEffect(() => {
-    if (isMaintenanceMode) return
-    if (!userId) return
+    if (isMaintenanceMode) {
+      return
+    }
+    if (!userId) {
+      return
+    }
 
     console.log('Connecting to socket init...')
 
@@ -56,7 +60,9 @@ function WidgetPage() {
     })
 
     socket.on('update-wl', (records: wlType) => {
-      if (isDev()) return
+      if (isDev()) {
+        return
+      }
       setWL(records)
     })
 
@@ -65,19 +71,23 @@ function WidgetPage() {
     })
 
     socket.on('update-medal', (deets: RankType) => {
-      if (isDev()) return
+      if (isDev()) {
+        return
+      }
       const rankDetails = getRankImage(deets)
       setRankImageDetails({
         image: rankDetails.image,
-        rank: rankDetails.rank,
         leaderboard: rankDetails.leaderboard,
         notLoaded: false,
+        rank: rankDetails.rank,
       })
     })
   }, [userId])
 
   useEffect(() => {
-    if (isMaintenanceMode) return
+    if (isMaintenanceMode) {
+      return
+    }
 
     return () => {
       socket?.off('update-wl')
@@ -87,8 +97,12 @@ function WidgetPage() {
   }, [])
 
   useEffect(() => {
-    if (isMaintenanceMode) return
-    if (!original) return
+    if (isMaintenanceMode) {
+      return
+    }
+    if (!original) {
+      return
+    }
 
     const steamAccount = original.SteamAccount?.[0]
     const rank = getRankDetail(
@@ -96,7 +110,9 @@ function WidgetPage() {
       steamAccount?.leaderboard_rank ?? null,
     )
 
-    if (!rank) return
+    if (!rank) {
+      return
+    }
 
     const leaderboard =
       'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? null)
@@ -108,9 +124,9 @@ function WidgetPage() {
       notLoaded: boolean
     } = {
       image: rank.myRank?.image ?? '0.png',
-      rank: rank.mmr,
       leaderboard,
       notLoaded: false,
+      rank: rank.mmr,
     }
 
     setRankImageDetails(rankDetails)
@@ -127,8 +143,8 @@ function WidgetPage() {
         id='ingame-wl-mmr-card'
         style={{
           ...wlPosition,
-          width: res({ w: 215 }),
           left: wlPosition.left ?? undefined,
+          width: res({ w: 215 }),
         }}
       >
         <RestrictFeature feature='commandWL'>

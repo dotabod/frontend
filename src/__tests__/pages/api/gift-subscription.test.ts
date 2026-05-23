@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 import { isInGracePeriod } from '@/utils/subscription'
 
@@ -106,7 +106,7 @@ describe('Gift Subscription Functions', () => {
       expect(aprEnd.getFullYear()).toBe(2023)
 
       // For CI, we'll adjust our test to accept either month 3 (April) or month 4 (May)
-      // as JavaScript date handling differs across environments
+      // As JavaScript date handling differs across environments
       expect([3, 4]).toContain(aprEnd.getMonth())
 
       // The date should be 30 in April, or possibly 1 in May (if overflow happens)

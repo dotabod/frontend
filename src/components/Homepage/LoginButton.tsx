@@ -30,16 +30,16 @@ export function LoginButton({ className, ...props }: LoginButtonProps) {
         setLoading(true)
         return !user
           ? signIn('twitch', {
-              redirect: false,
               callbackUrl:
                 searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
+              redirect: false,
             })
               .then((e) => {
                 console.log(e)
               })
-              .catch((e) => {
-                Sentry.captureException(e)
-                console.log(e)
+              .catch((error) => {
+                Sentry.captureException(error)
+                console.log(error)
               })
               .finally(() => setLoading(false))
           : router.push('/dashboard')

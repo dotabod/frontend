@@ -207,23 +207,23 @@ export default function OBSOverlay() {
           }}
           items={[
             {
+              children: <ObsSetup />,
+              key: 'auto',
               label: (
                 <span>
                   Automatic (OBS) <TierBadge feature='autoOBS' />
                 </span>
               ),
-              key: 'auto',
-              children: <ObsSetup />,
             },
             {
-              label: 'Manual (text)',
-              key: 'text',
               children: <OBSText copyURL={copyURL} track={track} />,
+              key: 'text',
+              label: 'Manual (text)',
             },
             {
-              label: 'Manual (video)',
-              key: 'video',
               children: <OBSVideo copyURL={copyURL} track={track} />,
+              key: 'video',
+              label: 'Manual (video)',
             },
           ]}
         />

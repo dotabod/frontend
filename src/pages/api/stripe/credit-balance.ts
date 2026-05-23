@@ -40,11 +40,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // If no customer ID from subscription, check if user has any previous subscriptions with a customer ID
     if (!customerId) {
       const subscriptionWithCustomerId = await prisma.subscription.findFirst({
-        where: {
-          userId: session.user.id,
-          stripeCustomerId: { not: null },
-        },
         select: { stripeCustomerId: true },
+        where: {
+          stripeCustomerId: { not: null },
+          userId: session.user.id,
+        },
       })
 
       customerId = subscriptionWithCustomerId?.stripeCustomerId || null

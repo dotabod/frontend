@@ -22,13 +22,17 @@ const Numbers: React.FC<NumbersProps> = ({
 
   // Helper function to render leaderboard position
   const renderLeaderboard = () => {
-    if (!leaderboardPosition) return null
+    if (!leaderboardPosition) {
+      return null
+    }
     return <span>{`#${leaderboardPosition}`}</span>
   }
 
   // Helper function to render rank
   const renderRank = () => {
-    if (!playerRank && !leaderboardPosition) return null
+    if (!playerRank && !leaderboardPosition) {
+      return null
+    }
 
     if (playerRank && (leaderboardPosition || !hasImage || playerRank)) {
       return (
@@ -60,7 +64,7 @@ export const MMRBadge = ({
   rank,
   mainScreen = false,
   className = '',
-  notLoaded: _notLoaded = undefined,
+  notLoaded: _notLoaded,
   style,
   ...props
 }: {
@@ -73,7 +77,9 @@ export const MMRBadge = ({
   style?: React.CSSProperties
 }) => {
   const res = useTransformRes()
-  if (!image && !leaderboard && !rank) return null
+  if (!image && !leaderboard && !rank) {
+    return null
+  }
 
   if (mainScreen) {
     return (
@@ -91,7 +97,7 @@ export const MMRBadge = ({
             marginTop: res({ h: 20 }),
           }}
         />
-        <Numbers hasImage={!!image} playerRank={rank} leaderboardPosition={leaderboard} />
+        <Numbers hasImage={Boolean(image)} playerRank={rank} leaderboardPosition={leaderboard} />
       </div>
     )
   }
@@ -106,7 +112,7 @@ export const MMRBadge = ({
         id='rank-badge'
       />
       <Numbers
-        hasImage={!!image}
+        hasImage={Boolean(image)}
         playerRank={rank}
         leaderboardPosition={leaderboard}
         className={clsx(

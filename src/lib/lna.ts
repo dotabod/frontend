@@ -26,7 +26,9 @@ export interface LocalFetchOptions extends RequestInit {
  * Check if we're running in a secure context
  */
 function isSecureContext(): boolean {
-  if (typeof window === 'undefined') return false
+  if (typeof window === 'undefined') {
+    return false
+  }
   return window.isSecureContext ?? false
 }
 
@@ -34,7 +36,9 @@ function isSecureContext(): boolean {
  * Detect if we're running in Chrome (or Chromium-based browsers)
  */
 function isChrome(): boolean {
-  if (typeof navigator === 'undefined') return false
+  if (typeof navigator === 'undefined') {
+    return false
+  }
   const ua = navigator.userAgent
   return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua)
 }
@@ -44,11 +48,15 @@ function isChrome(): boolean {
  * Returns null if not Chrome or version cannot be determined
  */
 function getChromeVersion(): number | null {
-  if (!isChrome() || typeof navigator === 'undefined') return null
+  if (!isChrome() || typeof navigator === 'undefined') {
+    return null
+  }
 
   const ua = navigator.userAgent
   const match = ua.match(/Chrome\/(\d+)/)
-  if (!match) return null
+  if (!match) {
+    return null
+  }
 
   const version = Number.parseInt(match[1], 10)
   return Number.isNaN(version) ? null : version
@@ -108,7 +116,7 @@ export function buildLocalFetchOptions(
   // In practice, we'll add it and let the browser handle it
   if (typeof Request !== 'undefined') {
     // Add targetAddressSpace - browsers that support it will use it,
-    // others will ignore unknown properties
+    // Others will ignore unknown properties
     options.targetAddressSpace = addressSpace
   }
 

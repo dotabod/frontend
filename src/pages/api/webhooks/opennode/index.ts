@@ -27,13 +27,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (process.env.VERCEL_ENV === 'production') {
         res.status(400).json({ error: 'Invalid signature' })
         return
-      } else {
-        console.warn('Signature verification failed in development - continuing processing')
       }
+      console.warn('Signature verification failed in development - continuing processing')
     }
 
     const charge = event || {}
-    const status: string = charge.status
+    const { status } = charge
     const chargeId: string = charge.id
     // @ts-expect-error OpenNode charge metadata is not typed
     const invoiceId: string | undefined = charge.metadata?.stripe_invoice_id
@@ -83,11 +82,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       // For non-payment statuses, just update lastWebhookAt
       await prisma.openNodeCharge.updateMany({
-        where: { openNodeChargeId: chargeId },
         data: {
-          status,
           lastWebhookAt: new Date(),
+          status,
         },
+        where: { openNodeChargeId: chargeId },
       })
     }
 

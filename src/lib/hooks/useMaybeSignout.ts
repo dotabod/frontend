@@ -24,8 +24,12 @@ const useMaybeSignout = (skip = false) => {
 
   // Effect to sign out user if they lack the necessary scope or a refresh is required
   useEffect(() => {
-    if (isImpersonating) return
-    if (role === 'chatter') return
+    if (isImpersonating) {
+      return
+    }
+    if (role === 'chatter') {
+      return
+    }
 
     const hasIncompleteScope =
       (scope?.length ?? 0) > 10 && !scope?.includes('moderator:read:followers')

@@ -29,16 +29,16 @@ export function getAllPosts(): Post[] {
         : new Date().toISOString()
 
       return {
+        author: data.author || null,
+        date,
+        description: data.description || '',
+        draft: Boolean(data.draft),
         slug: filename.replace(/\.md$/, ''),
         title: data.title || 'Untitled',
-        description: data.description || '',
-        date,
-        author: data.author || null,
-        draft: Boolean(data.draft),
       }
     })
     .filter((post) => !post.draft)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
 export function getLatestPost(): Post | null {

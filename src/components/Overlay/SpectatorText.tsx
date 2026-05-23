@@ -17,7 +17,9 @@ export const SpectatorText = ({ block }: { block: blockType }) => {
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 
-  if (block?.type !== 'spectator') return null
+  if (block?.type !== 'spectator') {
+    return null
+  }
 
   const styles: Position = {
     bottom: isXL

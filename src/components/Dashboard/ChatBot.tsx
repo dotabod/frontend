@@ -25,32 +25,32 @@ import MmrForm from './Features/MmrForm'
 const SevenTVBaseEmoteURL = (id: string) => `https://cdn.7tv.app/emote/${id}/2x.webp`
 
 export const emotesRequired = [
-  { label: 'HECANT', id: '01G4FZG870000487MWX9F93YF7' },
-  { label: 'Okayeg', id: '01EZPFKAH8000FNWX000ADZW5H' },
-  { label: 'Happi', id: '01H07F15D00002ETD2HQRT8J3Z' },
-  { label: 'Madge', id: '01F6ASPNM00009TPCEMWQTT4XX' },
-  { label: 'POGGIES', id: '01F6P05NWG0003BH8AEY96655D' },
-  { label: 'PepeLaugh', id: '01F010F9GR0007E4VV006YKSKN' },
-  { label: 'ICANT', id: '01FSF14EM00007E5TN8YT2AJCS' },
-  { label: 'BASED', id: '01F031CCA80001TJB3006SVBHS' },
-  { label: 'Chatting', id: '01FAK9C8MR0004HKF2ZK1YPQ5A' },
-  { label: 'massivePIDAS', id: '01G0KP1N5R000167A5H0K2MX85' },
-  { label: 'Sadge', id: '01FHNBZRW8000C3ZWT2Z63JS92' },
-  { label: 'EZ', id: '01F9FS6EEG0006XXD6DX0K9Y04' },
-  { label: 'Clap', id: '01F6NE9AER000CKKT9BSDYGT0J' },
-  { label: 'peepoGamble', id: '01F96A83PG0007ECJ7AZB0NR4S' },
-  { label: 'PauseChamp', id: '01F6QWHR20000EB9BSAR8G1DKZ' },
+  { id: '01G4FZG870000487MWX9F93YF7', label: 'HECANT' },
+  { id: '01EZPFKAH8000FNWX000ADZW5H', label: 'Okayeg' },
+  { id: '01H07F15D00002ETD2HQRT8J3Z', label: 'Happi' },
+  { id: '01F6ASPNM00009TPCEMWQTT4XX', label: 'Madge' },
+  { id: '01F6P05NWG0003BH8AEY96655D', label: 'POGGIES' },
+  { id: '01F010F9GR0007E4VV006YKSKN', label: 'PepeLaugh' },
+  { id: '01FSF14EM00007E5TN8YT2AJCS', label: 'ICANT' },
+  { id: '01F031CCA80001TJB3006SVBHS', label: 'BASED' },
+  { id: '01FAK9C8MR0004HKF2ZK1YPQ5A', label: 'Chatting' },
+  { id: '01G0KP1N5R000167A5H0K2MX85', label: 'massivePIDAS' },
+  { id: '01FHNBZRW8000C3ZWT2Z63JS92', label: 'Sadge' },
+  { id: '01F9FS6EEG0006XXD6DX0K9Y04', label: 'EZ' },
+  { id: '01F6NE9AER000CKKT9BSDYGT0J', label: 'Clap' },
+  { id: '01F96A83PG0007ECJ7AZB0NR4S', label: 'peepoGamble' },
+  { id: '01F6QWHR20000EB9BSAR8G1DKZ', label: 'PauseChamp' },
 ]
 
 // Add type at the top
-type User = {
+interface User {
   id?: string
   personalSet?: string
   hasDotabodEditor: boolean
   hasDotabodEmoteSet: boolean
 }
 
-type Emote = {
+interface Emote {
   name: string
   id: string
 }
@@ -61,17 +61,21 @@ const EmoteList: React.FC<{
 }> = ({ emotes, user }) => (
   <List
     grid={{
-      xs: 3,
-      sm: 4,
-      md: 5,
       lg: 6,
+      md: 5,
+      sm: 4,
       xl: 8,
+      xs: 3,
       xxl: 10,
     }}
-    dataSource={emotesRequired.sort((a, b) => {
-      // if it's found in emotes, put it at the bottom
-      if (emotes.find((e) => e?.name === a.label)) return 1
-      if (emotes.find((e) => e?.name === b.label)) return -1
+    dataSource={emotesRequired.toSorted((a, b) => {
+      // If it's found in emotes, put it at the bottom
+      if (emotes.find((e) => e?.name === a.label)) {
+        return 1
+      }
+      if (emotes.find((e) => e?.name === b.label)) {
+        return -1
+      }
       return 0
     })}
     renderItem={({ id, label }) => {
@@ -111,7 +115,7 @@ export default function ChatBot() {
   const track = useTrack()
   const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
   // Pro: fire-and-forget the POST that adds dotabod as a moderator. We don't read its
-  // result anymore — current mod state comes from useSetupModStatus below — but the
+  // Result anymore — current mod state comes from useSetupModStatus below — but the
   // POST still needs to run so the auto-mod action happens for Pro users.
   useSWR(hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null, fetcher, STABLE_SWR_OPTIONS)
   const { data: modStatus } = useSetupModStatus()
@@ -168,19 +172,23 @@ export default function ChatBot() {
         const response = await fetch(`${stvUrl}?cacheBust=${Date.now()}`)
         const data = await response.json()
         const user = {
-          id: data?.user?.id,
-          personalSet: data?.emote_set?.id,
           hasDotabodEditor:
             Array.isArray(data.user?.editors) &&
-            !!data.user?.editors?.find(
-              (editor: { id: string }) =>
-                editor.id?.toLowerCase() === '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase(),
+            Boolean(
+              data.user?.editors?.find(
+                (editor: { id: string }) =>
+                  editor.id?.toLowerCase() === '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase(),
+              ),
             ),
-          hasDotabodEmoteSet: !!emotesRequired.every(
-            (emote) =>
-              Array.isArray(data.emote_set?.emotes) &&
-              data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),
+          hasDotabodEmoteSet: Boolean(
+            emotesRequired.every(
+              (emote) =>
+                Array.isArray(data.emote_set?.emotes) &&
+                data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),
+            ),
           ),
+          id: data?.user?.id,
+          personalSet: data?.emote_set?.id,
         }
 
         if (updateEmoteSetError) {
@@ -214,11 +222,11 @@ export default function ChatBot() {
   }, [stvUrl, updateEmoteSetError])
 
   const { data: mmr } = useUpdateSetting(Settings.mmr)
-  const accountsWithMmr = accountData?.accounts as Array<{ mmr: number }> | undefined
+  const accountsWithMmr = accountData?.accounts as { mmr: number }[] | undefined
 
   const accountCount = accountData?.accounts?.length ?? 0
   const stepOneComplete =
-    accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : !!mmr
+    accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : Boolean(mmr)
   const stepModComplete = Boolean(modStatus?.modded)
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor
@@ -243,12 +251,6 @@ export default function ChatBot() {
           }}
           items={[
             {
-              label: (
-                <span>
-                  Automatic <TierBadge feature='autoModerator' />
-                </span>
-              ),
-              key: 'auto',
               children: (
                 <>
                   <StepComponent
@@ -305,10 +307,14 @@ export default function ChatBot() {
                   />
                 </>
               ),
+              key: 'auto',
+              label: (
+                <span>
+                  Automatic <TierBadge feature='autoModerator' />
+                </span>
+              ),
             },
             {
-              label: 'Manual',
-              key: 'manual',
               children: (
                 <StepComponent
                   stepProps={[
@@ -367,6 +373,8 @@ export default function ChatBot() {
                   ]}
                 />
               ),
+              key: 'manual',
+              label: 'Manual',
             },
           ]}
         />
@@ -390,12 +398,6 @@ export default function ChatBot() {
           }}
           items={[
             {
-              label: (
-                <span>
-                  Automatic <TierBadge feature='auto7TV' />
-                </span>
-              ),
-              key: 'auto',
               children: (
                 <StepComponent
                   initialStep={initialStep}
@@ -536,10 +538,14 @@ export default function ChatBot() {
                   ]}
                 />
               ),
+              key: 'auto',
+              label: (
+                <span>
+                  Automatic <TierBadge feature='auto7TV' />
+                </span>
+              ),
             },
             {
-              label: 'Manual',
-              key: 'manual',
               children: (
                 <div>
                   <p>To manually add the required emotes:</p>
@@ -563,6 +569,8 @@ export default function ChatBot() {
                   <EmoteList emotes={emotes} user={user} />
                 </div>
               ),
+              key: 'manual',
+              label: 'Manual',
             },
           ]}
         />

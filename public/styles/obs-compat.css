@@ -200,7 +200,7 @@
 
 /* Additional classes for specific component */
 .font-\[RadianceM\] {
-  font-family: "RadianceM", sans-serif;
+  font-family: 'RadianceM', sans-serif;
 }
 .bg-black\/60 {
   background-color: rgba(0, 0, 0, 0.6);

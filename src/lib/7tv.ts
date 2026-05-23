@@ -1,18 +1,18 @@
 import { GraphQLClient } from 'graphql-request'
 
-export type EmoteSetResponse = {
+export interface EmoteSetResponse {
   emoteSet: {
     emote_count: number
     capacity: number
     flags: number
     name: string
     owner?: {
-      connections?: Array<{
+      connections?: {
         id: string
         name: string
-      }>
+      }[]
     }
-    emotes: Array<{
+    emotes: {
       id: string
       name: string
       data: {
@@ -20,17 +20,17 @@ export type EmoteSetResponse = {
         name: string
         host: {
           url: string
-          files: Array<{
+          files: {
             name: string
             format: string
-          }>
+          }[]
         }
       }
-    }>
+    }[]
   }
 }
 
-export type SevenTVUserResponse = {
+export interface SevenTVUserResponse {
   user?: {
     id: string
   }

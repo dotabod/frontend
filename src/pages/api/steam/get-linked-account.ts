@@ -15,11 +15,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Find the user's primary linked Steam account
     const user = await prisma.user.findUnique({
-      where: {
-        id: session.user.id,
-      },
       select: {
         steam32Id: true,
+      },
+      where: {
+        id: session.user.id,
       },
     })
 
@@ -28,13 +28,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Get all Steam accounts linked to this user
     // This includes both primary and secondary accounts
     const steamAccounts = await prisma.steamAccount.findMany({
+      select: {
+        name: true,
+        steam32Id: true,
+        userId: true,
+      },
       where: {
         OR: [{ userId: session.user.id }, { connectedUserIds: { has: session.user.id } }],
-      },
-      select: {
-        steam32Id: true,
-        name: true,
-        userId: true,
       },
     })
 
@@ -44,21 +44,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Format the accounts data
     const linkedAccounts = steamAccounts.map((account) => ({
-      steam32Id: account.steam32Id.toString(),
-      name: account.name,
       isPrimary: account.steam32Id === primarySteam32Id,
+      name: account.name,
+      steam32Id: account.steam32Id.toString(),
     }))
 
     return res.status(200).json({
-      linked: true,
       accounts: linkedAccounts,
+      linked: true,
       primaryAccount: primarySteam32Id
         ? {
-            steam32Id: primarySteam32Id.toString(),
             profileData: {
-              name: steamAccounts.find((a) => a.steam32Id === primarySteam32Id)?.name || 'Unknown',
               id: primarySteam32Id.toString(),
+              name: steamAccounts.find((a) => a.steam32Id === primarySteam32Id)?.name || 'Unknown',
             },
+            steam32Id: primarySteam32Id.toString(),
           }
         : null,
     })

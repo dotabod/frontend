@@ -15,15 +15,15 @@ class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      hasError: false,
       error: null,
+      hasError: false,
     }
   }
 
   static getDerivedStateFromError(error: Error): State {
     return {
-      hasError: true,
       error,
+      hasError: true,
     }
   }
 

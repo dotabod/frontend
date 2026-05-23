@@ -2,132 +2,132 @@
 name: Dotabod
 description: Dashboard for Dota 2 streamers on Twitch
 colors:
-  twitch-purple: "oklch(0.627 0.265 303.9)"
-  twitch-purple-soft: "oklch(0.827 0.119 306.383)"
-  twitch-purple-deep: "oklch(0.295 0.113 309)"
-  surface-base: "oklch(0.205 0 0)"
-  surface-raised: "oklch(0.269 0 0)"
-  surface-hover: "oklch(0.371 0 0)"
-  ink-primary: "oklch(0.922 0 0)"
-  ink-secondary: "oklch(0.87 0 0)"
-  ink-tertiary: "oklch(0.708 0 0)"
-  ink-quiet: "oklch(0.556 0 0)"
-  hairline: "oklch(0.371 0 0)"
-  hairline-hover: "oklch(0.439 0 0)"
-  state-success: "oklch(0.432 0.095 166.913)"
-  state-info: "oklch(0.398 0.195 277)"
-  state-warning: "oklch(0.476 0.114 70)"
-  state-error: "oklch(0.444 0.177 26)"
+  twitch-purple: 'oklch(0.627 0.265 303.9)'
+  twitch-purple-soft: 'oklch(0.827 0.119 306.383)'
+  twitch-purple-deep: 'oklch(0.295 0.113 309)'
+  surface-base: 'oklch(0.205 0 0)'
+  surface-raised: 'oklch(0.269 0 0)'
+  surface-hover: 'oklch(0.371 0 0)'
+  ink-primary: 'oklch(0.922 0 0)'
+  ink-secondary: 'oklch(0.87 0 0)'
+  ink-tertiary: 'oklch(0.708 0 0)'
+  ink-quiet: 'oklch(0.556 0 0)'
+  hairline: 'oklch(0.371 0 0)'
+  hairline-hover: 'oklch(0.439 0 0)'
+  state-success: 'oklch(0.432 0.095 166.913)'
+  state-info: 'oklch(0.398 0.195 277)'
+  state-warning: 'oklch(0.476 0.114 70)'
+  state-error: 'oklch(0.444 0.177 26)'
 typography:
   display:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "3rem"
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+    fontSize: '3rem'
     fontWeight: 500
-    lineHeight: "1"
-    letterSpacing: "normal"
+    lineHeight: '1'
+    letterSpacing: 'normal'
   headline:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.5rem"
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+    fontSize: '1.5rem'
     fontWeight: 600
-    lineHeight: "2rem"
-    letterSpacing: "normal"
+    lineHeight: '2rem'
+    letterSpacing: 'normal'
   title:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.125rem"
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+    fontSize: '1.125rem'
     fontWeight: 500
-    lineHeight: "1.5rem"
-    letterSpacing: "normal"
+    lineHeight: '1.5rem'
+    letterSpacing: 'normal'
   body:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.875rem"
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+    fontSize: '0.875rem'
     fontWeight: 400
-    lineHeight: "1.5rem"
-    letterSpacing: "normal"
+    lineHeight: '1.5rem'
+    letterSpacing: 'normal'
   body-small:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+    fontSize: '0.75rem'
     fontWeight: 400
-    lineHeight: "1rem"
-    letterSpacing: "normal"
+    lineHeight: '1rem'
+    letterSpacing: 'normal'
   label:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+    fontSize: '0.75rem'
     fontWeight: 500
-    lineHeight: "1rem"
-    letterSpacing: "0.2em"
+    lineHeight: '1rem'
+    letterSpacing: '0.2em'
 rounded:
-  sm: "0.125rem"
-  md: "0.375rem"
-  lg: "0.5rem"
-  xl: "0.75rem"
-  full: "9999px"
+  sm: '0.125rem'
+  md: '0.375rem'
+  lg: '0.5rem'
+  xl: '0.75rem'
+  full: '9999px'
 spacing:
-  xs: "0.5rem"
-  sm: "0.75rem"
-  md: "1rem"
-  lg: "1.25rem"
-  xl: "1.5rem"
-  2xl: "2rem"
+  xs: '0.5rem'
+  sm: '0.75rem'
+  md: '1rem'
+  lg: '1.25rem'
+  xl: '1.5rem'
+  2xl: '2rem'
 components:
   button-primary:
-    backgroundColor: "{colors.twitch-purple-deep}"
-    textColor: "{colors.ink-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.md}"
-    padding: "0.375rem 1rem"
+    backgroundColor: '{colors.twitch-purple-deep}'
+    textColor: '{colors.ink-primary}'
+    typography: '{typography.body}'
+    rounded: '{rounded.md}'
+    padding: '0.375rem 1rem'
   button-primary-hover:
-    backgroundColor: "{colors.twitch-purple-soft}"
-    textColor: "{colors.ink-primary}"
+    backgroundColor: '{colors.twitch-purple-soft}'
+    textColor: '{colors.ink-primary}'
   button-default:
-    backgroundColor: "{colors.surface-raised}"
-    textColor: "{colors.ink-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.md}"
-    padding: "0.375rem 1rem"
+    backgroundColor: '{colors.surface-raised}'
+    textColor: '{colors.ink-primary}'
+    typography: '{typography.body}'
+    rounded: '{rounded.md}'
+    padding: '0.375rem 1rem'
   button-default-hover:
-    backgroundColor: "{colors.surface-hover}"
-    textColor: "{colors.twitch-purple-soft}"
+    backgroundColor: '{colors.surface-hover}'
+    textColor: '{colors.twitch-purple-soft}'
   button-danger:
-    backgroundColor: "{colors.state-error}"
-    textColor: "{colors.ink-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.md}"
-    padding: "0.375rem 1rem"
+    backgroundColor: '{colors.state-error}'
+    textColor: '{colors.ink-primary}'
+    typography: '{typography.body}'
+    rounded: '{rounded.md}'
+    padding: '0.375rem 1rem'
   card:
-    backgroundColor: "{colors.surface-base}"
-    textColor: "{colors.ink-secondary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.lg}"
-    padding: "1.25rem"
+    backgroundColor: '{colors.surface-base}'
+    textColor: '{colors.ink-secondary}'
+    typography: '{typography.body}'
+    rounded: '{rounded.lg}'
+    padding: '1.25rem'
   card-hover:
-    backgroundColor: "{colors.surface-base}"
-    textColor: "{colors.ink-secondary}"
+    backgroundColor: '{colors.surface-base}'
+    textColor: '{colors.ink-secondary}'
   input:
-    backgroundColor: "{colors.surface-raised}"
-    textColor: "{colors.ink-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.md}"
-    padding: "0.375rem 0.75rem"
+    backgroundColor: '{colors.surface-raised}'
+    textColor: '{colors.ink-primary}'
+    typography: '{typography.body}'
+    rounded: '{rounded.md}'
+    padding: '0.375rem 0.75rem'
   nav-item:
-    backgroundColor: "{colors.surface-raised}"
-    textColor: "{colors.ink-secondary}"
-    typography: "{typography.body}"
-    padding: "0.5rem 1rem"
+    backgroundColor: '{colors.surface-raised}'
+    textColor: '{colors.ink-secondary}'
+    typography: '{typography.body}'
+    padding: '0.5rem 1rem'
   nav-item-hover:
-    backgroundColor: "{colors.surface-hover}"
-    textColor: "{colors.ink-secondary}"
+    backgroundColor: '{colors.surface-hover}'
+    textColor: '{colors.ink-secondary}'
   nav-item-active:
-    backgroundColor: "{colors.hairline-hover}"
-    textColor: "{colors.ink-primary}"
+    backgroundColor: '{colors.hairline-hover}'
+    textColor: '{colors.ink-primary}'
   chip:
-    backgroundColor: "{colors.surface-raised}"
-    textColor: "{colors.ink-secondary}"
-    typography: "{typography.label}"
-    rounded: "{rounded.full}"
-    padding: "0.25rem 0.75rem"
+    backgroundColor: '{colors.surface-raised}'
+    textColor: '{colors.ink-secondary}'
+    typography: '{typography.label}'
+    rounded: '{rounded.full}'
+    padding: '0.25rem 0.75rem'
   label-eyebrow:
-    textColor: "{colors.ink-quiet}"
-    typography: "{typography.label}"
+    textColor: '{colors.ink-quiet}'
+    typography: '{typography.label}'
 ---
 
 # Design System: Dotabod
@@ -143,6 +143,7 @@ The system rejects the StreamElements/Streamlabs lineage — no neon accents, no
 Density is moderate. Whitespace is generous in section gaps, tight inside controls. Type sits in a single sans-serif voice (Inter); the optional Radiance fonts in the codebase belong to the OBS overlay, not the dashboard, and must not bleed in.
 
 **Key Characteristics:**
+
 - Dark by default, single-theme (AntD `darkAlgorithm`); no light variant.
 - Achromatic grays carry 90%+ of the surface; purple appears as signal, not decoration.
 - Cards rest flat; hover is the only thing that ever lifts.

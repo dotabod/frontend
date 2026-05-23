@@ -1,13 +1,13 @@
 // @ts-nocheck
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import BillingPage from '@/pages/dashboard/billing'
 
 const { messageMock } = vi.hoisted(() => ({
   messageMock: {
-    info: vi.fn(),
     error: vi.fn(),
+    info: vi.fn(),
   },
 }))
 
@@ -22,9 +22,9 @@ vi.mock('next/head', () => ({
 
 vi.mock('@/utils/subscription', () => ({
   getSubscriptionStatusInfo: vi.fn().mockReturnValue({
+    badge: 'gold',
     message: 'Renews on April 20, 2026',
     type: 'success',
-    badge: 'gold',
   }),
 }))
 
@@ -69,37 +69,35 @@ vi.mock('@/components/Dashboard/DashboardShell', () => ({
   default: ({ children }) => <div data-testid='dashboard-shell'>{children}</div>,
 }))
 
-vi.mock('antd', () => {
-  return {
-    message: messageMock,
-    Typography: {
-      Title: ({ children }) => <h1>{children}</h1>,
-    },
-  }
-})
+vi.mock('antd', () => ({
+  Typography: {
+    Title: ({ children }) => <h1>{children}</h1>,
+  },
+  message: messageMock,
+}))
 
 vi.mock('@/contexts/SubscriptionContext', () => ({
   useSubscriptionContext: () => ({
+    creditBalance: 0,
+    formattedCreditBalance: '$0.00',
+    hasActivePlan: true,
+    inGracePeriod: false,
+    isLifetimePlan: false,
+    isLoading: false,
     subscription: {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      currentPeriodEnd: new Date(),
+      currentPeriodStart: new Date(),
       id: 'sub-123',
-      userId: 'user-123',
+      isGift: false,
+      status: 'ACTIVE',
       stripeCustomerId: 'cus-123',
       stripePriceId: 'price-123',
       stripeSubscriptionId: 'sub-123',
       tier: 'PRO',
-      status: 'ACTIVE',
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: new Date(),
-      cancelAtPeriodEnd: false,
-      canceledAt: null,
-      isGift: false,
+      userId: 'user-123',
     },
-    isLoading: false,
-    isLifetimePlan: false,
-    inGracePeriod: false,
-    hasActivePlan: true,
-    creditBalance: 0,
-    formattedCreditBalance: '$0.00',
   }),
 }))
 
@@ -110,18 +108,18 @@ describe('Dashboard Billing Page', () => {
 
     vi.mocked(useSession).mockReturnValue({
       data: {
+        expires: '1',
         user: {
-          name: 'Test User',
           email: 'test@example.com',
           id: 'user-123',
           image: 'https://example.com/avatar.png',
           isImpersonating: false,
-          twitchId: '',
-          role: 'user',
           locale: 'en',
+          name: 'Test User',
+          role: 'user',
           scope: '',
+          twitchId: '',
         },
-        expires: '1',
       },
       status: 'authenticated',
       update: vi.fn(),
@@ -141,11 +139,11 @@ describe('Dashboard Billing Page', () => {
 
   it('shows inline guidance toast when no Stripe customer portal can be opened', async () => {
     vi.mocked(global.fetch).mockResolvedValue({
-      ok: false,
       json: async () => ({
         code: 'NO_STRIPE_CUSTOMER',
         guidance: 'No active Stripe billing profile found.',
       }),
+      ok: false,
     } as Response)
 
     render(<BillingPage />)

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/update-followers'
 
 // Mock the middleware
@@ -100,16 +100,16 @@ describe('update-followers API', () => {
 
     // Mock getSession to return a user who is impersonating
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: '',
       user: {
         id: 'user-123',
-        isImpersonating: true,
-        name: '',
         image: '',
-        twitchId: '',
+        isImpersonating: true,
         locale: '',
+        name: '',
         scope: '',
+        twitchId: '',
       },
-      expires: '',
     })
 
     await handler(req, res)
@@ -125,33 +125,33 @@ describe('update-followers API', () => {
 
     // Mock getSession to return a user
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: '',
       user: {
         id: 'user-123',
-        isImpersonating: false,
-        name: '',
         image: '',
-        twitchId: '',
+        isImpersonating: false,
         locale: '',
+        name: '',
         scope: '',
+        twitchId: '',
       },
-      expires: '',
     })
     // Mock getTwitchTokens to return tokens
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
-      providerAccountId: '12345',
       accessToken: 'mock-access-token',
+      providerAccountId: '12345',
     })
 
     // Mock fetch response for follower count
     vi.mocked(global.fetch).mockResolvedValueOnce({
-      ok: true,
       json: () => Promise.resolve({ total: 100 }),
+      ok: true,
     } as unknown as Response)
 
     // Mock prisma.user.update
     vi.mocked(prisma.user.update).mockResolvedValueOnce({
-      id: 'user-123',
       followers: 100,
+      id: 'user-123',
     } as unknown as User)
 
     await handler(req, res)
@@ -183,21 +183,21 @@ describe('update-followers API', () => {
 
     // Mock getSession to return a user
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: '',
       user: {
         id: 'user-123',
-        isImpersonating: false,
-        name: '',
         image: '',
-        twitchId: '',
+        isImpersonating: false,
         locale: '',
+        name: '',
         scope: '',
+        twitchId: '',
       },
-      expires: '',
     })
     // Mock getTwitchTokens to return tokens
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
-      providerAccountId: '12345',
       accessToken: 'mock-access-token',
+      providerAccountId: '12345',
     })
 
     // Mock fetch response with error
@@ -223,21 +223,21 @@ describe('update-followers API', () => {
 
     // Mock getSession to return a user
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: '',
       user: {
         id: 'user-123',
-        isImpersonating: false,
-        name: '',
         image: '',
-        twitchId: '',
+        isImpersonating: false,
         locale: '',
+        name: '',
         scope: '',
+        twitchId: '',
       },
-      expires: '',
     })
     // Mock getTwitchTokens to return an error
     vi.mocked(getTwitchTokens).mockResolvedValueOnce({
-      message: 'Failed to get Twitch tokens',
       error: 'Twitch token error',
+      message: 'Failed to get Twitch tokens',
     })
 
     await handler(req, res)
@@ -260,16 +260,16 @@ describe('update-followers API', () => {
 
     // Mock getServerSession to return a user
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: '',
       user: {
         id: 'user-123',
-        isImpersonating: false,
-        name: '',
         image: '',
-        twitchId: '',
+        isImpersonating: false,
         locale: '',
+        name: '',
         scope: '',
+        twitchId: '',
       },
-      expires: '',
     })
 
     // Mock getTwitchTokens to throw an error

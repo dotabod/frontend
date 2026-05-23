@@ -58,7 +58,9 @@ export const MinimapBlocker = ({ block }: { block: blockType }) => {
   const status = useSelector(selectStatus)?.active
 
   const shouldBlockMap = isEnabled && block.type === 'playing'
-  if (!shouldBlockMap) return null
+  if (!shouldBlockMap) {
+    return null
+  }
 
   return (
     <motion.div

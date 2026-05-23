@@ -7,11 +7,11 @@ import prisma from '@/lib/db'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
 const token = process.env.CROWDIN_TOKEN
-const projectId = 564471
+const projectId = 564_471
 
 async function getTotalUsersForLanguage(languageId: string) {
   try {
-    // return a percentage of total users to users using this language
+    // Return a percentage of total users to users using this language
     const total = await prisma.user.count()
     const locales = await prisma.user.count({
       where: {
@@ -79,10 +79,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { total, percentage } = await getTotalUsersForLanguage(languageId as string)
 
     res.status(200).json({
-      total: languageId !== 'en' ? total : undefined,
-      percentage,
       languageProgress,
+      percentage,
       project,
+      total: languageId !== 'en' ? total : undefined,
     })
   } catch (error) {
     captureException(error)

@@ -31,19 +31,19 @@ const GiftSuccessPage: NextPageWithLayout = () => {
 
       const frame = () => {
         confetti({
-          particleCount: 2,
           angle: 60,
-          spread: 55,
-          origin: { x: 0 },
           colors: ['#5D5FEF', '#3F83F8', '#10B981'],
+          origin: { x: 0 },
+          particleCount: 2,
+          spread: 55,
         })
 
         confetti({
-          particleCount: 2,
           angle: 120,
-          spread: 55,
-          origin: { x: 1 },
           colors: ['#5D5FEF', '#3F83F8', '#10B981'],
+          origin: { x: 1 },
+          particleCount: 2,
+          spread: 55,
         })
 
         if (Date.now() < end) {
@@ -237,14 +237,14 @@ GiftSuccessPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Gift Sent Successfully',
         subtitle: 'Your gift has been sent successfully.',
+        title: 'Gift Sent Successfully',
       }}
       seo={{
-        title: 'Gift Sent Successfully | Dotabod',
-        description: 'Your gift has been sent successfully.',
         canonicalUrl: 'https://dotabod.com/gift-success',
+        description: 'Your gift has been sent successfully.',
         noindex: true,
+        title: 'Gift Sent Successfully | Dotabod',
       }}
     >
       {page}

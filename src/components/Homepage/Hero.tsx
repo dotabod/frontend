@@ -112,7 +112,7 @@ const TwitchUser = ({
 
 export function Hero() {
   const session = useSession()
-  // get users from api/featured-users
+  // Get users from api/featured-users
   const { data: users, isLoading } = useSWR<{
     topLive: { name: string; image: string }[]
   }>('/api/featured-users', fetcher)
@@ -193,7 +193,7 @@ export function Hero() {
                 <div className='flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left'>
                   <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
                   <span>
-                    Trusted by Over {new Intl.NumberFormat('en-US').format(30000)} Twitch Streamers
+                    Trusted by Over {new Intl.NumberFormat('en-US').format(30_000)} Twitch Streamers
                     Including:
                   </span>
                   <LiveIcon />

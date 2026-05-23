@@ -10,6 +10,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const topLive = await prisma.user.findMany({
+      orderBy: {
+        followers: 'desc',
+      },
+      select: {
+        image: true,
+        name: true,
+      },
       take: 10,
       where: {
         followers: {
@@ -23,13 +30,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         },
         stream_online: true,
-      },
-      orderBy: {
-        followers: 'desc',
-      },
-      select: {
-        name: true,
-        image: true,
       },
     })
 

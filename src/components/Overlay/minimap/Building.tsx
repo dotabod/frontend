@@ -8,7 +8,9 @@ const Building = ({ data, team }: MinimapUnitProps) => {
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const isEnemy = data.teamP !== team
 
-  if (!data.image || imageError) return null
+  if (!data.image || imageError) {
+    return null
+  }
 
   const handleImageError = () => {
     setImageError(true)
@@ -30,16 +32,18 @@ const Building = ({ data, team }: MinimapUnitProps) => {
       .replace('_', '')
   }
 
-  if (!data.image) return null
+  if (!data.image) {
+    return null
+  }
 
-  const image = data.image.replace(/sword|shield/g, 'miscbuilding')
+  const image = data.image.replaceAll(/sword|shield/g, 'miscbuilding')
 
   return (
     <div
       className={`container-building ${isXL ? 'xl' : ''}`}
       style={{ bottom: data.yposP, left: data.xposP }}
     >
-      {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
+      {/* Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
       <img
         className={`icon ${buildingType()}`}
         src={`/images/overlay/minimap/blocker/icons/buildings/${

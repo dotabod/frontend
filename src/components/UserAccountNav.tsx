@@ -54,7 +54,9 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     errorRetryCount: 3,
     onErrorRetry: (_error, _key, _config, revalidate, { retryCount }) => {
       // Only retry up to 3 times
-      if (retryCount >= 3) return
+      if (retryCount >= 3) {
+        return
+      }
 
       // Retry after 5 seconds
       setTimeout(() => revalidate({ retryCount }), 5000)
@@ -64,7 +66,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
   // Force image to load even if notifications fail
   useEffect(() => {
     // If there's an error with notifications or it's taking too long,
-    // ensure the image is shown after a timeout
+    // Ensure the image is shown after a timeout
     const timer = setTimeout(() => {
       if (!imageLoaded) {
         setImageLoaded(true)
@@ -86,14 +88,20 @@ const UserButton = ({ user, className }: UserButtonProps) => {
 
   // Filter notifications based on active tab
   const filteredNotifications = notifications.filter((notification) => {
-    if (activeTab === 'all') return true
-    if (activeTab === 'unread') return !notification.read
-    if (activeTab === 'read') return notification.read
+    if (activeTab === 'all') {
+      return true
+    }
+    if (activeTab === 'unread') {
+      return !notification.read
+    }
+    if (activeTab === 'read') {
+      return notification.read
+    }
     return true
   })
 
   // Sort notifications - unread first
-  const sortedNotifications = [...filteredNotifications].sort((a, b) => {
+  const sortedNotifications = [...filteredNotifications].toSorted((a, b) => {
     // First sort by read status (unread first)
     if (a.read !== b.read) {
       return a.read ? 1 : -1
@@ -110,13 +118,13 @@ const UserButton = ({ user, className }: UserButtonProps) => {
   const dismissNotification = async (notificationId: string) => {
     try {
       await fetch('/api/gift-notifications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           notificationId,
         }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
       })
 
       // Refresh notifications after dismissal
@@ -130,26 +138,34 @@ const UserButton = ({ user, className }: UserButtonProps) => {
   const formatGiftType = (type: string, quantity = 1) => {
     if (quantity <= 1) {
       switch (type) {
-        case 'monthly':
+        case 'monthly': {
           return 'a month of Dotabod Pro'
-        case 'annual':
+        }
+        case 'annual': {
           return 'a year of Dotabod Pro'
-        case 'lifetime':
+        }
+        case 'lifetime': {
           return 'Dotabod Pro Lifetime'
-        default:
+        }
+        default: {
           return 'Dotabod Pro'
+        }
       }
     }
 
     switch (type) {
-      case 'monthly':
+      case 'monthly': {
         return `${quantity} months of Dotabod Pro`
-      case 'annual':
+      }
+      case 'annual': {
         return `${quantity} years of Dotabod Pro`
-      case 'lifetime':
+      }
+      case 'lifetime': {
         return 'Dotabod Pro Lifetime'
-      default:
+      }
+      default: {
         return 'Dotabod Pro'
+      }
     }
   }
 
@@ -278,7 +294,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
       >
         <div className='cursor-pointer mr-4'>
           <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
-            <BellOutlined style={{ fontSize: '20px', color: '#fff' }} />
+            <BellOutlined style={{ color: '#fff', fontSize: '20px' }} />
           </Badge>
         </div>
       </Popover>
@@ -288,16 +304,16 @@ const UserButton = ({ user, className }: UserButtonProps) => {
         menu={{
           items: [
             {
+              key: 'dashboard',
               label: (
                 <Link href='/dashboard' prefetch={false}>
                   Dashboard
                 </Link>
               ),
-              key: 'dashboard',
             },
             {
-              label: 'Logout',
               key: 'logout',
+              label: 'Logout',
               onClick: () => {
                 signOut({
                   callbackUrl: window.location.origin,
@@ -340,9 +356,9 @@ const UserButton = ({ user, className }: UserButtonProps) => {
             <div className='ml-3 flex flex-col'>
               {isSettingsLoading ? (
                 <>
-                  <Skeleton.Input active size='small' style={{ width: 100, height: 16 }} />
+                  <Skeleton.Input active size='small' style={{ height: 16, width: 100 }} />
                   <div className='mt-1'>
-                    <Skeleton.Input active size='small' style={{ width: 80, height: 14 }} />
+                    <Skeleton.Input active size='small' style={{ height: 14, width: 80 }} />
                   </div>
                 </>
               ) : (
@@ -374,7 +390,9 @@ interface UserAccountNavProps {
 export function UserAccountNav({ className }: UserAccountNavProps) {
   const user = useSession()?.data?.user
 
-  if (!user) return null
+  if (!user) {
+    return null
+  }
 
   return <UserButton user={user} className={className} />
 }

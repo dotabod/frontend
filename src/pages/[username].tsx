@@ -17,7 +17,7 @@ import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
 
-const commandKeys = Object.keys(CommandDetail) as Array<keyof typeof CommandDetail>
+const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
 
 const FEATURED_COMMAND_KEYS = [
   'commandMmr',
@@ -38,10 +38,10 @@ interface PageContentProps {
     image: string | null
     createdAt: string
     mmr?: number
-    settings: Array<{
+    settings: {
       key: string
       value: unknown
-    }>
+    }[]
   } | null
   subscriptionInfo?: {
     isPro: boolean
@@ -74,10 +74,10 @@ const PageContent = ({
   }>(shouldFetchSub ? `/api/subscription/by-username?username=${username}` : null, fetcher)
 
   const subscriptionInfo = {
-    isPro: ssrSubscriptionInfo?.isPro ?? subData?.isPro ?? false,
-    isLifetime: ssrSubscriptionInfo?.isLifetime ?? subData?.isLifetime ?? false,
-    isGracePeriodPro: ssrSubscriptionInfo?.isGracePeriodPro ?? subData?.isGracePeriodPro ?? false,
     inGracePeriod: ssrSubscriptionInfo?.inGracePeriod ?? subData?.inGracePeriod ?? false,
+    isGracePeriodPro: ssrSubscriptionInfo?.isGracePeriodPro ?? subData?.isGracePeriodPro ?? false,
+    isLifetime: ssrSubscriptionInfo?.isLifetime ?? subData?.isLifetime ?? false,
+    isPro: ssrSubscriptionInfo?.isPro ?? subData?.isPro ?? false,
     loading: shouldFetchSub ? subLoading : false,
   }
 
@@ -91,7 +91,7 @@ const PageContent = ({
     image?: string | null
     createdAt?: string
     mmr?: number
-    settings?: Array<{ key: string; value: unknown }>
+    settings?: { key: string; value: unknown }[]
     error?: unknown
   }
 
@@ -113,7 +113,7 @@ const PageContent = ({
                 <Skeleton.Button active size='large' shape='round' />
                 <Skeleton.Button active size='small' shape='round' style={{ width: 60 }} />
               </div>
-              <Skeleton.Input active size='small' style={{ width: 200, marginTop: 8 }} />
+              <Skeleton.Input active size='small' style={{ marginTop: 8, width: 200 }} />
             </div>
             <div>
               <div className='flex space-x-2'>
@@ -146,7 +146,7 @@ const PageContent = ({
     ? commandKeys.map((command) => {
         const commandDetail = CommandDetail[command]
         const isEnabled = getValueOrDefault(commandDetail.key, profile.settings)
-        return { command, isEnabled: !!isEnabled }
+        return { command, isEnabled: Boolean(isEnabled) }
       })
     : []
 
@@ -154,14 +154,22 @@ const PageContent = ({
     .filter((command) => {
       const commandDetail = CommandDetail[command]
       const isEnabled = getValueOrDefault(commandDetail.key, profile.settings)
-      if (enabled === 'Enabled') return isEnabled === true
-      if (enabled === 'Disabled') return isEnabled === false
+      if (enabled === 'Enabled') {
+        return isEnabled === true
+      }
+      if (enabled === 'Disabled') {
+        return isEnabled === false
+      }
       return true
     })
     .filter((command) => {
       const commandDetail = CommandDetail[command]
-      if (permission === 'Mods') return commandDetail.allowed === 'mods'
-      if (permission === 'Viewers') return commandDetail.allowed === 'all'
+      if (permission === 'Mods') {
+        return commandDetail.allowed === 'mods'
+      }
+      if (permission === 'Viewers') {
+        return commandDetail.allowed === 'all'
+      }
       return true
     })
     .filter((command) => {
@@ -186,7 +194,9 @@ const PageContent = ({
 
   // Determine what subscription badge to show
   const getSubscriptionBadge = () => {
-    if (subscriptionInfo.loading) return null
+    if (subscriptionInfo.loading) {
+      return null
+    }
     if (subscriptionInfo.isPro) {
       if (subscriptionInfo.isGracePeriodPro) {
         return (
@@ -251,7 +261,7 @@ const PageContent = ({
                   profile?.stream_online ? 'animate-pulse bg-red-500/30' : 'bg-gray-600/10'
                 }`}
               />
-              {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
+              {/* Biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
               <img
                 onError={(e) => {
                   e.currentTarget.src = '/images/hero/default.png'
@@ -397,7 +407,7 @@ const PageContent = ({
           )}
         </div>
 
-        {filteredCommands.length < 1 && (
+        {filteredCommands.length === 0 && (
           <Empty
             description={
               enabled === 'Enabled'
@@ -452,10 +462,10 @@ interface UserProfileProps {
     image: string | null
     createdAt: string
     mmr?: number
-    settings: Array<{
+    settings: {
       key: string
       value: unknown
-    }>
+    }[]
   } | null
   subscriptionInfo: {
     isPro: boolean
@@ -519,8 +529,8 @@ const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps
       <HomepageShell
         dontUseTitle
         ogImage={{
-          title: userData.displayName || userData.name,
           subtitle: 'Commands and settings available for this streamer.',
+          title: userData.displayName || userData.name,
         }}
       >
         <PageContent userData={userData} subscriptionInfo={subscriptionInfo} username={username} />
@@ -532,22 +542,22 @@ const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps
 export const getStaticPaths: GetStaticPaths = async () => {
   if (isMaintenanceModeEnabled()) {
     return {
-      paths: [],
       fallback: 'blocking',
+      paths: [],
     }
   }
 
   // Pre-build only the most popular users for fastest loading
   const topUsers = await prisma.user.findMany({
+    orderBy: { followers: 'desc' },
+    select: { name: true },
+    take: 500, // Pre-build only top 500 most popular active users
     where: {
       AND: [
         { followers: { gte: 500 } }, // Higher threshold for pre-building
         { stream_online: true }, // Focus on currently active streamers
       ],
     },
-    select: { name: true },
-    orderBy: { followers: 'desc' },
-    take: 500, // Pre-build only top 500 most popular active users
   })
 
   const paths = topUsers.map((user) => ({
@@ -555,8 +565,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }))
 
   return {
-    paths,
     fallback: 'blocking', // Generate other 29,950+ pages on-demand with ISR
+    paths,
   }
 }
 
@@ -580,13 +590,12 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
     // Fetch user data
     const userData = await prisma.user.findFirst({
       select: {
-        id: true,
-        displayName: true,
-        name: true,
-        stream_online: true,
-        image: true,
         createdAt: true,
+        displayName: true,
+        id: true,
+        image: true,
         mmr: true,
+        name: true,
         settings: {
           select: {
             key: true,
@@ -598,6 +607,7 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
             },
           },
         },
+        stream_online: true,
       },
       where: {
         name: username.toLowerCase(),
@@ -611,24 +621,24 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
     // Fetch subscription info
     const subscription = await getSubscription(userData.id)
     const subscriptionInfo = {
-      isPro: subscription?.tier === 'PRO',
-      isLifetime: subscription?.transactionType === 'LIFETIME',
-      isGracePeriodPro: false,
       inGracePeriod: false,
+      isGracePeriodPro: false,
+      isLifetime: subscription?.transactionType === 'LIFETIME',
+      isPro: subscription?.tier === 'PRO',
     }
 
     return {
       props: {
-        userData: {
-          displayName: userData.displayName,
-          name: userData.name,
-          stream_online: userData.stream_online,
-          image: userData.image,
-          createdAt: userData.createdAt.toISOString(),
-          mmr: userData.mmr,
-          settings: userData.settings,
-        },
         subscriptionInfo,
+        userData: {
+          createdAt: userData.createdAt.toISOString(),
+          displayName: userData.displayName,
+          image: userData.image,
+          mmr: userData.mmr,
+          name: userData.name,
+          settings: userData.settings,
+          stream_online: userData.stream_online,
+        },
         username: username.toLowerCase(),
       },
       revalidate: 600, // Revalidate every 10 minutes

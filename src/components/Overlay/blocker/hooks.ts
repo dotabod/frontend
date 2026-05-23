@@ -17,12 +17,14 @@ export const useDynamicResizing = (ref: RefObject<HTMLDivElement | null>) => {
 
   const resizeHandler = useCallback(() => {
     const content = ref.current
-    if (!content) return
+    if (!content) {
+      return
+    }
 
     setUiRescale(
       Math.min(window.innerWidth / content.offsetWidth, window.innerHeight / content.offsetHeight),
     )
   }, [ref])
 
-  return { uiRescale, resizeHandler }
+  return { resizeHandler, uiRescale }
 }

@@ -7,14 +7,17 @@ const Users4Sitemap = () => null
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     const USERS_PER_SITEMAP = 5000
-    const offset = 15000 // Page 4 (15000-19999)
+    const offset = 15_000 // Page 4 (15000-19999)
 
     // Fetch users for this page
     const users = await prisma.user.findMany({
+      orderBy: [{ followers: 'desc' }, { updatedAt: 'desc' }],
       select: {
         name: true,
         updatedAt: true,
       },
+      skip: offset,
+      take: USERS_PER_SITEMAP,
       where: {
         name: {
           not: '',
@@ -26,9 +29,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
           { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } }, // Created within last year
         ],
       },
-      orderBy: [{ followers: 'desc' }, { updatedAt: 'desc' }],
-      take: USERS_PER_SITEMAP,
-      skip: offset,
     })
 
     // If no users found, return empty sitemap

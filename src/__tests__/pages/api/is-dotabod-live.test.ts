@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { NextApiHandler } from 'next'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/is-dotabod-live'
 
 // Mock the prisma client

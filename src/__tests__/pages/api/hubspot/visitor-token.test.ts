@@ -1,11 +1,11 @@
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.mock('@/lib/api/getServerSession', () => ({ getServerSession: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
 vi.mock('@/lib/hubspot', () => ({
-  syncHubSpotContact: vi.fn().mockResolvedValue(undefined),
   subscriptionToValue: vi.fn(() => 'pro'),
+  syncHubSpotContact: vi.fn().mockResolvedValue(),
 }))
 vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))
 vi.mock('node-fetch', () => ({ default: vi.fn() }))
@@ -17,19 +17,19 @@ import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import handler from '@/pages/api/hubspot/visitor-token'
 import { getSubscription } from '@/utils/subscription'
 
-// biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
+// Biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
 const anyVal = (v: unknown) => v as any
 
 const tokenOk = () =>
-  anyVal({ ok: true, status: 200, statusText: 'OK', json: async () => ({ token: 'vtok' }) })
+  anyVal({ json: async () => ({ token: 'vtok' }), ok: true, status: 200, statusText: 'OK' })
 
 const session = (over: Record<string, unknown> = {}) =>
   anyVal({
     user: {
-      id: 'user-1',
       email: 'gamer@example.com',
-      name: 'Cool Gamer',
+      id: 'user-1',
       isImpersonating: false,
+      name: 'Cool Gamer',
       ...over,
     },
   })
@@ -37,9 +37,9 @@ const session = (over: Record<string, unknown> = {}) =>
 describe('GET /api/hubspot/visitor-token', () => {
   beforeEach(() => {
     vi.stubEnv('HUBSPOT_PRIVATE_APP_TOKEN', 'test-token')
-    vi.mocked(getSubscription).mockResolvedValue(anyVal({ tier: 'PRO', status: 'ACTIVE' }))
+    vi.mocked(getSubscription).mockResolvedValue(anyVal({ status: 'ACTIVE', tier: 'PRO' }))
     vi.mocked(fetch).mockResolvedValue(tokenOk())
-    vi.mocked(syncHubSpotContact).mockResolvedValue(undefined)
+    vi.mocked(syncHubSpotContact).mockResolvedValue()
     vi.mocked(subscriptionToValue).mockReturnValue('pro')
   })
 
@@ -76,15 +76,15 @@ describe('GET /api/hubspot/visitor-token', () => {
     await vi.waitFor(() => expect(syncHubSpotContact).toHaveBeenCalled())
     expect(syncHubSpotContact).toHaveBeenCalledWith('test-token', {
       email: 'gamer@example.com',
-      username: 'Cool Gamer',
       subscription: 'pro',
+      username: 'Cool Gamer',
     })
   })
 
   it('returns 500 and does not enrich when the token request fails', async () => {
     vi.mocked(getServerSession).mockResolvedValue(session())
     vi.mocked(fetch).mockResolvedValue(
-      anyVal({ ok: false, status: 403, statusText: 'Forbidden', json: async () => ({}) }),
+      anyVal({ json: async () => ({}), ok: false, status: 403, statusText: 'Forbidden' }),
     )
     const { req, res } = createMocks({ method: 'GET' })
     await handler(anyVal(req), anyVal(res))
@@ -114,8 +114,8 @@ describe('GET /api/hubspot/visitor-token', () => {
     await vi.waitFor(() => expect(syncHubSpotContact).toHaveBeenCalled())
     expect(syncHubSpotContact).toHaveBeenCalledWith('test-token', {
       email: 'gamer@example.com',
-      username: 'Cool Gamer',
       subscription: undefined,
+      username: 'Cool Gamer',
     })
     expect(subscriptionToValue).not.toHaveBeenCalled()
   })

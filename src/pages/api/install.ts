@@ -11,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let updatedScriptContent = scriptContent
 
     if (req.headers.host) {
-      updatedScriptContent = updatedScriptContent.replace(/\/dotabod\.com/g, `/${req.headers.host}`)
+      updatedScriptContent = updatedScriptContent.replaceAll('/dotabod.com', `/${req.headers.host}`)
     }
 
     // Set appropriate headers for PowerShell script

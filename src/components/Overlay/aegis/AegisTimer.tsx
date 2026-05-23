@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
 import type { TransformRes } from '@/lib/hooks/useTransformRes'
 
-type AegisTimerProps = {
+interface AegisTimerProps {
   minutes: number
   seconds: number
   res: TransformRes
@@ -20,8 +20,8 @@ export const AegisTimer = ({ minutes, seconds, res }: AegisTimerProps) => (
     <span
       className='font-outline-2 z-10 text-white/90'
       style={{
-        marginTop: res({ h: -13 }),
         fontSize: res({ h: 14 }),
+        marginTop: res({ h: -13 }),
       }}
     >
       {minutes}:{zeroPad(seconds)}

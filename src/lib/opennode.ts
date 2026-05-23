@@ -74,9 +74,9 @@ export async function verifyOpenNodeWebhook(eventData: unknown): Promise<boolean
     if (process.env.VERCEL_ENV !== 'production') {
       console.log('OpenNode signature verification:', {
         chargeId: webhookData.id,
+        description: webhookData.description,
         hashedOrder: webhookData.hashed_order,
         isValid,
-        description: webhookData.description,
       })
     }
 
@@ -115,8 +115,12 @@ export function buildCheckoutUrl(chargeId: string, hostedUrl?: string): string {
       : `https://checkout.dev.opennode.com/${chargeId}`)
 
   const params: string[] = []
-  if (process.env.OPENNODE_CHECKOUT_DEFAULT_LN === 'true') params.push('ln=1')
-  if (process.env.OPENNODE_CHECKOUT_HIDE_FIAT === 'true') params.push('hf=1')
+  if (process.env.OPENNODE_CHECKOUT_DEFAULT_LN === 'true') {
+    params.push('ln=1')
+  }
+  if (process.env.OPENNODE_CHECKOUT_HIDE_FIAT === 'true') {
+    params.push('hf=1')
+  }
 
-  return params.length ? `${baseUrl}?${params.join('&')}` : baseUrl
+  return params.length > 0 ? `${baseUrl}?${params.join('&')}` : baseUrl
 }

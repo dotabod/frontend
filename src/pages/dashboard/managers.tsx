@@ -62,13 +62,13 @@ const ModeratorsPage = () => {
 
     try {
       const data = await fetch('/api/approve-moderator', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           moderatorChannelIds: selectedModerators,
         }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
       })
       const body = await data.json()
       if (body?.error) {
@@ -77,15 +77,15 @@ const ModeratorsPage = () => {
       // Re-fetch approved moderators
       mutate()
       notification.success({
-        message: 'Success',
         description: 'Managers updated successfully!',
+        message: 'Success',
       })
       track('approve_moderators_success')
     } catch (error) {
       console.error('Failed to approve moderators:', error)
       notification.error({
-        message: 'Error',
         description: 'Failed to approve moderators.',
+        message: 'Error',
       })
       track('approve_moderators_failure', {
         error: error instanceof Error ? error.message : String(error),
@@ -192,9 +192,9 @@ const ModeratorsPage = () => {
               options={
                 Array.isArray(moderatorList)
                   ? moderatorList.map((moderator) => ({
+                      disabled: moderator.user_id === '843245458',
                       label: moderator.user_name,
                       value: moderator.user_id,
-                      disabled: moderator.user_id === '843245458',
                     }))
                   : []
               }
@@ -243,10 +243,10 @@ ModeratorsPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Managers | Dotabod Dashboard',
-        description: 'Manage moderators and channel managers for your Dotabod account.',
         canonicalUrl: 'https://dotabod.com/dashboard/managers',
+        description: 'Manage moderators and channel managers for your Dotabod account.',
         noindex: true,
+        title: 'Managers | Dotabod Dashboard',
       }}
     >
       {page}

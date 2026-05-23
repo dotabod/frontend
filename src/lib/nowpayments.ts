@@ -7,13 +7,17 @@ const NOWPAYMENTS_BASE_URL = 'https://api.nowpayments.io/v1'
 
 function getApiKey(): string {
   const key = process.env.NOWPAYMENTS_API_KEY
-  if (!key) throw new Error('NOWPAYMENTS_API_KEY is not set')
+  if (!key) {
+    throw new Error('NOWPAYMENTS_API_KEY is not set')
+  }
   return key
 }
 
 function getIpnSecret(): string {
   const secret = process.env.NOWPAYMENTS_IPN_SECRET
-  if (!secret) throw new Error('NOWPAYMENTS_IPN_SECRET is not set')
+  if (!secret) {
+    throw new Error('NOWPAYMENTS_IPN_SECRET is not set')
+  }
   return secret
 }
 
@@ -51,13 +55,15 @@ export interface NowPaymentsPaymentStatus extends Omit<GetPaymentStatusReturn, '
 
 async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
   const options: RequestInit = {
-    method,
     headers: {
-      'x-api-key': getApiKey(),
       'Content-Type': 'application/json',
+      'x-api-key': getApiKey(),
     },
+    method,
   }
-  if (body !== undefined) options.body = JSON.stringify(body)
+  if (body !== undefined) {
+    options.body = JSON.stringify(body)
+  }
   const res = await fetch(`${NOWPAYMENTS_BASE_URL}${path}`, options)
   const text = await res.text()
   let parsed: unknown
@@ -94,7 +100,7 @@ export function sortObject(value: unknown): unknown {
   }
   if (isRecord(value)) {
     const sorted: Record<string, unknown> = {}
-    for (const key of Object.keys(value).sort()) {
+    for (const key of Object.keys(value).toSorted()) {
       sorted[key] = sortObject(value[key])
     }
     return sorted
@@ -110,7 +116,9 @@ export function verifyNowPaymentsSignature(
   body: Record<string, unknown>,
   signature: string | string[] | undefined,
 ): boolean {
-  if (!signature || Array.isArray(signature)) return false
+  if (!signature || Array.isArray(signature)) {
+    return false
+  }
   const secret = getIpnSecret()
   const expected = crypto
     .createHmac('sha512', secret)
@@ -118,13 +126,15 @@ export function verifyNowPaymentsSignature(
     .digest('hex')
   const sigBuf = Buffer.from(signature)
   const expBuf = Buffer.from(expected)
-  if (sigBuf.length !== expBuf.length) return false
+  if (sigBuf.length !== expBuf.length) {
+    return false
+  }
   return crypto.timingSafeEqual(sigBuf, expBuf)
 }
 
 // Only 'finished' guarantees the funds are credited to our NOWPayments balance.
 // 'confirmed' (on-chain confirmed, not yet exchanged) and 'sending' (payout in
-// flight) are mid-flow and must NOT mark the Stripe invoice paid.
+// Flight) are mid-flow and must NOT mark the Stripe invoice paid.
 const NOWPAYMENTS_CONFIRMED_STATUSES = new Set<NowPaymentsStatus>(['finished'])
 
 const NOWPAYMENTS_STATUSES = new Set<string>(NOWPAYMENTS_STATUS_VALUES)

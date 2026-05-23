@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { isDev } from '@/lib/devConsts'
 
-const devTotalTimer = 480000
+const devTotalTimer = 480_000
 
 export interface RoshanState {
   minS: number
@@ -16,18 +16,20 @@ export interface AegisState {
 
 export const useRoshan = () => {
   const [roshan, setRoshan] = useState<RoshanState>({
-    minS: 0,
-    maxS: 0,
     count: 0,
+    maxS: 0,
+    minS: 0,
   })
 
   useEffect(() => {
-    if (!isDev()) return
+    if (!isDev()) {
+      return
+    }
 
     setRoshan({
-      minS: devTotalTimer / 1000,
-      maxS: devTotalTimer / 1000,
       count: 1,
+      maxS: devTotalTimer / 1000,
+      minS: devTotalTimer / 1000,
     })
   }, [])
 
@@ -47,7 +49,9 @@ export const useAegis = () => {
   })
 
   useEffect(() => {
-    if (!isDev()) return
+    if (!isDev()) {
+      return
+    }
 
     setAegis({
       expireS: 300,

@@ -4,7 +4,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
-type WLType = {
+interface WLType {
   mainScreen?: boolean
   wl: { win: number; lose: number; type: string }[]
   className?: string
@@ -13,7 +13,9 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
   const { data: isEnabled } = useUpdateSetting(Settings.commandWL)
   const res = useTransformRes()
 
-  if (!isEnabled) return null
+  if (!isEnabled) {
+    return null
+  }
   const fontSize = res({ h: 18 })
 
   return (

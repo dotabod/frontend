@@ -30,27 +30,35 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
   const getGiftTypeDisplay = (type: 'monthly' | 'annual' | 'lifetime', quantity: number) => {
     if (quantity <= 1) {
       switch (type) {
-        case 'monthly':
+        case 'monthly': {
           return 'a month of Dotabod Pro'
-        case 'annual':
+        }
+        case 'annual': {
           return 'a year of Dotabod Pro'
-        case 'lifetime':
+        }
+        case 'lifetime': {
           return 'Dotabod Pro Lifetime'
-        default:
+        }
+        default: {
           return 'Dotabod Pro'
+        }
       }
     }
 
     // For quantity > 1
     switch (type) {
-      case 'monthly':
+      case 'monthly': {
         return `${quantity} months of Dotabod Pro`
-      case 'annual':
+      }
+      case 'annual': {
         return `${quantity} years of Dotabod Pro`
-      case 'lifetime':
+      }
+      case 'lifetime': {
         return 'Dotabod Pro Lifetime'
-      default:
+      }
+      default: {
         return 'Dotabod Pro'
+      }
     }
   }
 
@@ -61,7 +69,7 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
     const key = `gift-notification-${Date.now()}`
 
     notification.success({
-      message: "You've received a gift!",
+      className: 'gift-notification',
       description: (
         <Space direction='vertical' size='small'>
           <Text>
@@ -73,12 +81,12 @@ const GiftNotification: React.FC<GiftNotificationProps> = ({
           )}
         </Space>
       ),
-      icon: <GiftOutlined style={{ color: '#52c41a' }} />,
       duration: 0, // Don't auto-close
+      icon: <GiftOutlined style={{ color: '#52c41a' }} />,
       key,
+      message: "You've received a gift!",
       onClose: onDismiss,
       placement: 'bottomLeft',
-      className: 'gift-notification',
     })
 
     // Clean up notification when component unmounts

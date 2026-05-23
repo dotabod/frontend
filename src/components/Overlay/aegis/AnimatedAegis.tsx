@@ -18,8 +18,12 @@ export const AnimatedAegis = ({ aegis, paused, onComplete, block }: AnimatedAegi
   const res = useTransformRes()
   const { data: isEnabled } = useUpdateSetting(Settings.aegis)
 
-  if (!aegis || !block) return null
-  if (!isEnabled || block.type !== 'playing' || !aegis.expireS) return null
+  if (!aegis || !block) {
+    return null
+  }
+  if (!isEnabled || block.type !== 'playing' || !aegis.expireS) {
+    return null
+  }
 
   return (
     <PlayerTopbar position={aegis.playerId ?? 0}>
@@ -38,7 +42,7 @@ export const AnimatedAegis = ({ aegis, paused, onComplete, block }: AnimatedAegi
       >
         {(props) => {
           const totalSeconds = props.remainingTime
-          // convert totalSeconds into minutes and seconds
+          // Convert totalSeconds into minutes and seconds
           const minutes = Math.floor(totalSeconds / 60)
           const seconds = totalSeconds - minutes * 60
 

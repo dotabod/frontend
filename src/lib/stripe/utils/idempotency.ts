@@ -42,7 +42,7 @@ export async function processEventIdempotently(
         `Event ${eventId} (${eventType}) already processed, skipping. Recorded at: ${existingEvent.processedAt}`,
       )
       // Return a special value to indicate "already processed" (not an error but also didn't process now)
-      return { skipped: true, processedAt: existingEvent.processedAt }
+      return { processedAt: existingEvent.processedAt, skipped: true }
     }
     debugLog(`No existing record found for event ${eventId}. Proceeding to record.`)
 
@@ -51,9 +51,9 @@ export async function processEventIdempotently(
       debugLog(`Attempting to create webhookEvent record for event ${eventId}`)
       await tx.webhookEvent.create({
         data: {
-          stripeEventId: eventId,
-          eventType: eventType,
+          eventType,
           processedAt: new Date(),
+          stripeEventId: eventId,
         },
       })
       eventRecordCreated = true
@@ -61,7 +61,7 @@ export async function processEventIdempotently(
     } catch (error) {
       debugLog(`Error creating webhookEvent record for event ${eventId}`, { error })
       // If the error is a unique constraint violation, it means another concurrent
-      // process has already recorded this event, so we can safely skip processing
+      // Process has already recorded this event, so we can safely skip processing
       if (error.code === 'P2002' && error.meta?.target?.includes('stripeEventId')) {
         // Try to fetch the existing record to get its processedAt
         const existingEventRetry = await tx.webhookEvent.findUnique({
@@ -74,13 +74,13 @@ export async function processEventIdempotently(
           debugLog(
             `Event ${eventId} (${eventType}) already being processed by another request. Recorded at: ${existingEventRetry.processedAt}`,
           )
-          return { skipped: true, processedAt: existingEventRetry.processedAt }
+          return { processedAt: existingEventRetry.processedAt, skipped: true }
         }
 
         debugLog(
           `Event ${eventId} (${eventType}) already being processed by another request (unique constraint violation), skipping`,
         )
-        return { skipped: true, processedAt: new Date() }
+        return { processedAt: new Date(), skipped: true }
       }
       throw error // Re-throw other errors
     }

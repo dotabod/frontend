@@ -9,10 +9,10 @@ import prisma from '@/lib/db'
 
 const accountUpdateSchema = z.array(
   z.object({
-    steam32Id: z.number().min(0),
+    delete: z.boolean().optional(),
     mmr: z.number().min(0).max(30_000),
     name: z.string().max(500).optional(),
-    delete: z.boolean().optional(),
+    steam32Id: z.number().min(0),
   }),
 )
 
@@ -20,6 +20,8 @@ async function getAccounts(userId: string) {
   try {
     const accounts = await prisma.steamAccount.findMany({
       select: {
+        connectedUserIds: true,
+        leaderboard_rank: true,
         mmr: true,
         name: true,
         steam32Id: true,
@@ -29,12 +31,10 @@ async function getAccounts(userId: string) {
             name: true,
           },
         },
-        leaderboard_rank: true,
-        connectedUserIds: true,
       },
       where: {
         OR: [
-          { userId: userId },
+          { userId },
           {
             connectedUserIds: {
               has: userId,
@@ -100,9 +100,9 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
         } else {
           if (accounts.some((account) => account.steam32Id === update.steam32Id)) {
             return prisma.steamAccount.update({
-              data: { steam32Id: update.steam32Id, mmr: update.mmr, updatedAt: new Date() },
+              data: { mmr: update.mmr, steam32Id: update.steam32Id, updatedAt: new Date() },
+              select: { mmr: true, name: true, steam32Id: true },
               where: { steam32Id: update.steam32Id },
-              select: { steam32Id: true, mmr: true, name: true },
             })
           }
         }

@@ -68,14 +68,14 @@ const TestGiftPage: NextPageWithLayout = () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/test-gift-notification?giftType=${giftType}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           giftMessage,
           giftQuantity,
         }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
       })
 
       const data = await response.json()
@@ -98,16 +98,16 @@ const TestGiftPage: NextPageWithLayout = () => {
   const getSubscriptionStatusMessage = () => {
     if (hasLifetime) {
       return {
-        type: 'info',
         message:
           'You already have a Lifetime subscription. In a real scenario, users would not be able to gift you additional subscriptions.',
+        type: 'info',
       }
     }
 
     if (typeof totalGiftedMonths === 'number' && totalGiftedMonths > 0) {
       return {
-        type: 'info',
         message: `You currently have ${totalGiftedMonths} month${totalGiftedMonths > 1 ? 's' : ''} of gifted Dotabod Pro.`,
+        type: 'info',
       }
     }
 
@@ -123,7 +123,7 @@ const TestGiftPage: NextPageWithLayout = () => {
         <title>Test Gift Notification | Dotabod</title>
       </Head>
       <Layout>
-        <Content style={{ padding: '50px', maxWidth: '800px', margin: '0 auto' }}>
+        <Content style={{ margin: '0 auto', maxWidth: '800px', padding: '50px' }}>
           <Card>
             <Title level={2}>Test Gift Notification</Title>
 
@@ -201,10 +201,10 @@ TestGiftPage.getLayout = function getLayout(page: React.ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Test Gift Notification | Dotabod',
-        description: 'Test gift notification for Dotabod',
         canonicalUrl: 'https://dotabod.com/dashboard/admin/test-gift',
+        description: 'Test gift notification for Dotabod',
         noindex: true,
+        title: 'Test Gift Notification | Dotabod',
       }}
     >
       {page}

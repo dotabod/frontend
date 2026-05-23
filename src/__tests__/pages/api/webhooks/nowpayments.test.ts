@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { sortObject } from '@/lib/nowpayments'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
@@ -38,23 +38,23 @@ function sign(body: Record<string, unknown>): string {
 
 function buildReq(body: Record<string, unknown>, signature?: string) {
   return createMocks<NextApiRequest, NextApiResponse>({
-    method: 'POST',
-    headers: signature ? { 'x-nowpayments-sig': signature } : {},
     body,
+    headers: signature ? { 'x-nowpayments-sig': signature } : {},
+    method: 'POST',
   })
 }
 
 const finishedBody = {
-  payment_id: 9999,
+  actually_paid: 13.05,
   invoice_id: 4242,
-  payment_status: 'finished',
+  order_id: 'in_1',
   pay_address: 'TXYZ',
+  pay_amount: 13.05,
+  pay_currency: 'usdttrc20',
+  payment_id: 9999,
+  payment_status: 'finished',
   price_amount: 13,
   price_currency: 'usd',
-  pay_amount: 13.05,
-  actually_paid: 13.05,
-  pay_currency: 'usdttrc20',
-  order_id: 'in_1',
 }
 
 describe('POST /api/webhooks/nowpayments', () => {
@@ -110,7 +110,7 @@ describe('POST /api/webhooks/nowpayments', () => {
   })
 
   it('processes a finished payment', async () => {
-    const invoice = { nowPaymentsId: 'np_inv_1', stripeInvoiceId: 'in_1', status: 'waiting' }
+    const invoice = { nowPaymentsId: 'np_inv_1', status: 'waiting', stripeInvoiceId: 'in_1' }
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
     mocks.processConfirmedNowPaymentsPayment.mockResolvedValue({ reason: 'processed' })
 
@@ -120,17 +120,17 @@ describe('POST /api/webhooks/nowpayments', () => {
     expect(res._getStatusCode()).toBe(200)
     expect(mocks.processConfirmedNowPaymentsPayment).toHaveBeenCalledWith(
       invoice,
-      expect.objectContaining({ payment_status: 'finished', payment_id: 9999 }),
+      expect.objectContaining({ payment_id: 9999, payment_status: 'finished' }),
     )
   })
 
   it('updates status only for non-terminal events like confirming', async () => {
     const confirmingBody = { ...finishedBody, payment_status: 'confirming' }
     const invoice = {
-      nowPaymentsId: 'np_inv_1',
-      stripeInvoiceId: 'in_1',
-      status: 'waiting',
       lastWebhookAt: null,
+      nowPaymentsId: 'np_inv_1',
+      status: 'waiting',
+      stripeInvoiceId: 'in_1',
     }
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
 
@@ -140,18 +140,18 @@ describe('POST /api/webhooks/nowpayments', () => {
     expect(res._getStatusCode()).toBe(200)
     expect(mocks.processConfirmedNowPaymentsPayment).not.toHaveBeenCalled()
     expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenCalledWith({
-      where: { nowPaymentsId: 'np_inv_1' },
       data: expect.objectContaining({ status: 'confirming' }),
+      where: { nowPaymentsId: 'np_inv_1' },
     })
   })
 
   it('skips a duplicate non-confirmed webhook (same status, already seen)', async () => {
     const confirmingBody = { ...finishedBody, payment_status: 'confirming' }
     const invoice = {
-      nowPaymentsId: 'np_inv_1',
-      stripeInvoiceId: 'in_1',
-      status: 'confirming',
       lastWebhookAt: new Date('2026-05-18T00:00:00.000Z'),
+      nowPaymentsId: 'np_inv_1',
+      status: 'confirming',
+      stripeInvoiceId: 'in_1',
     }
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
 
@@ -163,7 +163,7 @@ describe('POST /api/webhooks/nowpayments', () => {
   })
 
   it('returns 500 when payment processing throws so NOWPayments retries', async () => {
-    const invoice = { nowPaymentsId: 'np_inv_1', stripeInvoiceId: 'in_1', status: 'waiting' }
+    const invoice = { nowPaymentsId: 'np_inv_1', status: 'waiting', stripeInvoiceId: 'in_1' }
     mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
     mocks.processConfirmedNowPaymentsPayment.mockRejectedValue(new Error('boom'))
 

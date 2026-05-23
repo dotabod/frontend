@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 
 const useSubscriptionContextMock = vi.fn()
@@ -41,35 +41,35 @@ vi.mock('antd', () => ({
     Input: () => <div data-testid='skeleton' />,
   },
   message: {
+    error: vi.fn(),
     loading: vi.fn(),
     success: vi.fn(),
-    error: vi.fn(),
   },
 }))
 
 describe('SubscriptionAlerts', () => {
   const giftInfo = {
-    hasGifts: false,
     giftCount: 0,
     giftMessage: '',
+    hasGifts: false,
     hasLifetime: false,
   }
 
   it('shows credit guidance when a member has credit and no active plan', () => {
     useSubscriptionContextMock.mockReturnValue({
+      creditBalance: 5000,
+      formattedCreditBalance: '$50.00',
+      hasActivePlan: false,
+      inGracePeriod: false,
+      isLifetimePlan: false,
+      isLoading: false,
       subscription: {
+        cancelAtPeriodEnd: false,
+        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
         status: 'CANCELED',
         stripeCustomerId: null,
         stripeSubscriptionId: null,
-        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
-        cancelAtPeriodEnd: false,
       },
-      isLifetimePlan: false,
-      inGracePeriod: false,
-      hasActivePlan: false,
-      creditBalance: 5000,
-      formattedCreditBalance: '$50.00',
-      isLoading: false,
     })
 
     render(
@@ -87,28 +87,28 @@ describe('SubscriptionAlerts', () => {
 
   it('shows Update Payment action for PAST_DUE with Stripe customer and no stripeSubscriptionId', () => {
     useSubscriptionContextMock.mockReturnValue({
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+      hasActivePlan: false,
+      inGracePeriod: false,
+      isLifetimePlan: false,
+      isLoading: false,
       subscription: {
+        cancelAtPeriodEnd: false,
+        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
         status: 'PAST_DUE',
         stripeCustomerId: 'cus_123',
         stripeSubscriptionId: null,
-        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
-        cancelAtPeriodEnd: false,
       },
-      isLifetimePlan: false,
-      inGracePeriod: false,
-      hasActivePlan: false,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
-      isLoading: false,
     })
 
     render(
       <SubscriptionAlerts
         giftInfo={giftInfo}
         statusInfo={{
+          badge: 'red',
           message: 'Payment failed - update payment method to avoid cancellation',
           type: 'error',
-          badge: 'red',
         }}
         handlePortalAccess={vi.fn()}
         isLoading={false}
@@ -120,29 +120,29 @@ describe('SubscriptionAlerts', () => {
 
   it('shows Renew Now when a subscription is ending soon and actions are enabled', () => {
     useSubscriptionContextMock.mockReturnValue({
+      creditBalance: 0,
+      formattedCreditBalance: '$0.00',
+      hasActivePlan: true,
+      inGracePeriod: false,
+      isLifetimePlan: false,
+      isLoading: false,
       subscription: {
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
+        isGift: false,
         status: 'ACTIVE',
         stripeCustomerId: 'cus_123',
         stripeSubscriptionId: 'sub_123',
-        currentPeriodEnd: new Date('2026-04-01T00:00:00.000Z'),
-        cancelAtPeriodEnd: true,
-        isGift: false,
       },
-      isLifetimePlan: false,
-      inGracePeriod: false,
-      hasActivePlan: true,
-      creditBalance: 0,
-      formattedCreditBalance: '$0.00',
-      isLoading: false,
     })
 
     render(
       <SubscriptionAlerts
         giftInfo={giftInfo}
         statusInfo={{
+          badge: 'red',
           message: 'Ending in 4 days',
           type: 'warning',
-          badge: 'red',
         }}
         handlePortalAccess={vi.fn()}
         isLoading={false}

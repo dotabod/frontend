@@ -47,13 +47,13 @@ async function updateFollows(userId: string) {
 
   if (totalFollowerCount !== null) {
     await prisma.user.update({
-      where: { id: userId },
       data: { followers: totalFollowerCount, updatedAt: new Date() },
+      where: { id: userId },
     })
     console.log(`Updated followers for user ${userId} to ${totalFollowerCount}`)
   } else {
-    // console.log(`Failed to update followers for user ${user.name}`)
-    // do nothing
+    // Console.log(`Failed to update followers for user ${user.name}`)
+    // Do nothing
   }
 }
 

@@ -35,7 +35,7 @@ export function SubscriptionAlerts({
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
 
   const isVirtualGracePeriodSubscription =
-    (!!subscription &&
+    (Boolean(subscription) &&
       'isGracePeriodVirtual' in subscription &&
       Boolean(subscription.isGracePeriodVirtual)) ||
     (inGracePeriod &&
@@ -49,10 +49,10 @@ export function SubscriptionAlerts({
     message.loading({ content: 'Applying credits...', key: 'applyCredits' })
     try {
       const response = await fetch('/api/stripe/apply-gift-credit', {
-        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        method: 'POST',
       })
 
       if (!response.ok) {
@@ -60,8 +60,8 @@ export function SubscriptionAlerts({
         console.error('Failed to apply credits:', body?.error || response.statusText)
         message.error({
           content: 'There was an issue applying your credits. Please try again or contact support.',
-          key: 'applyCredits',
           duration: 5,
+          key: 'applyCredits',
         })
         return
       }
@@ -71,24 +71,24 @@ export function SubscriptionAlerts({
       if (result.success) {
         message.success({
           content: 'Credits applied successfully!',
-          key: 'applyCredits',
           duration: 2,
+          key: 'applyCredits',
         })
         window.location.reload()
       } else {
         console.error('Failed to apply credits:', result.error || result.message)
         message.error({
           content: 'There was an issue applying your credits. Please try again or contact support.',
-          key: 'applyCredits',
           duration: 5,
+          key: 'applyCredits',
         })
       }
     } catch (error) {
       console.error('Error applying credits:', error)
       message.error({
         content: 'There was an issue applying your credits. Please try again or contact support.',
-        key: 'applyCredits',
         duration: 5,
+        key: 'applyCredits',
       })
     } finally {
       setIsApplyingCredits(false)
@@ -96,8 +96,12 @@ export function SubscriptionAlerts({
   }
 
   const createCreditAlert = () => {
-    if (isInGracePeriod()) return null
-    if (creditBalance <= 0) return null
+    if (isInGracePeriod()) {
+      return null
+    }
+    if (creditBalance <= 0) {
+      return null
+    }
 
     return (
       <BillingNotice

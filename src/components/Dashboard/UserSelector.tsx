@@ -57,7 +57,7 @@ const UserSelector = ({
 
     fetchOptions(searchValue).then((newOptions) => {
       if (fetchId !== fetchRef.current) {
-        // for fetch callback order
+        // For fetch callback order
         return
       }
 
@@ -70,7 +70,7 @@ const UserSelector = ({
 
   const renderOptionLabel = (imageSrc: string, name: string) => (
     <div className='flex flex-row items-center gap-2'>
-      {/* biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
+      {/* Biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
       <img
         alt='User Profile'
         width={30}
@@ -86,9 +86,9 @@ const UserSelector = ({
   )
 
   const fullOptions = options.map((option) => ({
-    value: option.value,
-    name: option.label,
     label: renderOptionLabel(option.image, option.label),
+    name: option.label,
+    value: option.value,
   }))
 
   return (

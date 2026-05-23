@@ -11,7 +11,9 @@ export function HeroBlocker({
 }) {
   const res = useTransformRes()
 
-  if (!type) return null
+  if (!type) {
+    return null
+  }
 
   return (
     <Image

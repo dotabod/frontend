@@ -28,7 +28,9 @@ const GiftSubscriptionAlert = ({
 
   // Format the gift type for display
   const formatGiftType = () => {
-    if (giftType === 'lifetime') return 'Lifetime'
+    if (giftType === 'lifetime') {
+      return 'Lifetime'
+    }
 
     const duration =
       giftQuantity > 1
@@ -43,14 +45,16 @@ const GiftSubscriptionAlert = ({
   // Hide the alert after 10 seconds
   useEffect(() => {
     // Skip the timeout in preview mode
-    if (preview) return
+    if (preview) {
+      return
+    }
 
     const timer = setTimeout(() => {
       setVisible(false)
       setTimeout(() => {
         onComplete?.()
       }, 500) // Allow time for exit animation
-    }, 10000)
+    }, 10_000)
 
     return () => clearTimeout(timer)
   }, [onComplete, preview])

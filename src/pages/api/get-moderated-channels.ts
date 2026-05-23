@@ -35,11 +35,11 @@ export async function getModeratedChannels(userId: string | undefined, accessTok
       }
 
       const response = await fetch(url.toString(), {
-        method: 'GET',
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Client-Id': process.env.TWITCH_CLIENT_ID || '',
         },
+        method: 'GET',
       })
 
       if (!response.ok) {
@@ -57,26 +57,26 @@ export async function getModeratedChannels(userId: string | undefined, accessTok
     const broadcasterIds = moderatedChannels.map((channel) => channel.broadcaster_id)
 
     const userModeratedChannels = await prisma.account.findMany({
+      select: {
+        providerAccountId: true,
+        user: {
+          select: {
+            image: true,
+            name: true,
+          },
+        },
+      },
       where: {
         providerAccountId: {
           in: broadcasterIds,
         },
       },
-      select: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-          },
-        },
-        providerAccountId: true,
-      },
     })
 
     const flattenedResponse = userModeratedChannels.map((account) => ({
-      providerAccountId: account.providerAccountId,
-      name: account.user.name,
       image: account.user.image,
+      name: account.user.name,
+      providerAccountId: account.providerAccountId,
     }))
 
     return flattenedResponse
@@ -84,7 +84,7 @@ export async function getModeratedChannels(userId: string | undefined, accessTok
     const err = error instanceof Error ? error : new Error(String(error))
     captureException(err)
     console.error('Failed to get moderated channels:', err)
-    return { message: 'Failed to get moderated channels', error: err.message }
+    return { error: err.message, message: 'Failed to get moderated channels' }
   }
 }
 
@@ -119,19 +119,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         },
       },
+      take: 10,
       where: {
         OR: [
           { providerAccountId: { contains: search.toLowerCase().trim() } },
           { user: { name: { contains: search.toLowerCase().trim() } } },
         ],
       },
-      take: 10,
     })
     return res.status(200).json(
       users.map((user) => ({
-        value: user.providerAccountId,
-        label: user.user.name,
         image: user.user.image,
+        label: user.user.name,
+        value: user.providerAccountId,
       })),
     )
   }
@@ -154,20 +154,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!isInGracePeriod()) {
     // Get channels that have the required tier
     const eligibleChannels = await prisma.account.findMany({
+      select: {
+        providerAccountId: true,
+      },
       where: {
         user: {
           subscription: {
             some: {
-              tier: GENERIC_FEATURE_TIERS.managers,
               status: {
                 in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
               },
+              tier: GENERIC_FEATURE_TIERS.managers,
             },
           },
         },
-      },
-      select: {
-        providerAccountId: true,
       },
     })
 

@@ -15,139 +15,7 @@ enum CATEGORIES {
   Event = 'Events',
 }
 export const chatterInfo = {
-  midas: {
-    tooltip: 'If your midas is ready and unused for 10s',
-    category: CATEGORIES.Item,
-    message: (
-      <>
-        <div className='space-x-2'>
-          <Image
-            width={22}
-            height={22}
-            alt='massivePIDAS'
-            className='inline align-middle'
-            src='/images/emotes/massivePIDAS.webp'
-          />
-          <span>Use your midas</span>
-        </div>
-        <div className='space-x-2'>
-          <span>Midas was finally used, 64 seconds late</span>
-          <Image
-            width={22}
-            height={22}
-            alt='massivePIDAS'
-            className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/6350aa989bb828a9f0d42863/1x'
-          />
-        </div>
-      </>
-    ),
-  },
-  pause: {
-    tooltip: 'As soon as anyone presses F9',
-    category: CATEGORIES.Item,
-    message: (
-      <span className='inline space-x-2'>
-        <Image
-          width={22}
-          height={22}
-          alt='pauseChamp'
-          className='inline align-middle'
-          src='/images/emotes/pauseChamp.webp'
-        />
-        <span>Who paused the game?</span>
-      </span>
-    ),
-  },
-  smoke: {
-    tooltip: 'Whenever your hero has smoke debuff',
-    category: CATEGORIES.Hero,
-    message: (
-      <span className='inline space-x-2'>
-        <Image
-          width={22}
-          height={22}
-          alt='Shush'
-          className='inline align-middle'
-          src='/images/emotes/Shush.png'
-        />
-        <span>Pudge is smoked!</span>
-      </span>
-    ),
-  },
-  passiveDeath: {
-    tooltip: 'Whenever you die with passive stick / faerie / etc',
-    category: CATEGORIES.Item,
-    message: (
-      <span className='inline space-x-2'>
-        <span>Pudge died with passive faerie fire</span>
-        <Image
-          width={22}
-          height={22}
-          alt='ICANT'
-          className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
-        />
-      </span>
-    ),
-  },
-  roshPickup: {
-    tooltip: '',
-    category: CATEGORIES.Event,
-    message: 'Pudge picked up the aegis!',
-  },
-  roshDeny: {
-    tooltip: '',
-    category: CATEGORIES.Event,
-    message: (
-      <span className='inline space-x-2'>
-        <span>Pudge denied the aegis</span>
-        <Image
-          width={22}
-          height={22}
-          alt='ICANT'
-          className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
-        />
-      </span>
-    ),
-  },
-  roshanKilled: {
-    tooltip: '',
-    category: CATEGORIES.Event,
-    message:
-      "Roshan killed! Next roshan between 30:27 and 33:27 · Rosh deaths: 1 · Next drop: agh's shard. · Invoker picked up the aegis!",
-  },
-  tip: {
-    tooltip: '',
-    category: CATEGORIES.Event,
-    message: (
-      <>
-        <div className='space-x-2'>
-          <span>The tip from Spectre</span>
-          <Image
-            width={22}
-            height={22}
-            alt='ICANT'
-            className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
-          />
-        </div>
-        <div className='space-x-2'>
-          <span>We tipping Crystal Maiden</span>
-          <Image
-            width={22}
-            height={22}
-            alt='ICANT'
-            className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
-          />
-        </div>
-      </>
-    ),
-  },
   bounties: {
-    tooltip: '',
     category: CATEGORIES.Event,
     message: (
       <div className='space-x-2'>
@@ -176,14 +44,52 @@ export const chatterInfo = {
         />
       </div>
     ),
-  },
-  powerTreads: {
     tooltip: '',
-    category: CATEGORIES.Item,
-    message: 'We toggled treads 6 time to save a total 284 mana this match.',
+  },
+  commandsReady: {
+    category: CATEGORIES.Event,
+    message: (
+      <span>Match data found !np · !smurfs · !gm · !lg · !avg · !items commands activated.</span>
+    ),
+    tooltip:
+      'At the beginning of every match, once !np etc are ready. Usually when you first spawn in fountain.',
+  },
+  dotapatch: {
+    category: CATEGORIES.Event,
+    message: (
+      <span className='inline space-x-2'>
+        <Image
+          width={22}
+          height={22}
+          alt='PogChamp'
+          className='inline align-middle'
+          src='https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/dark/2.0'
+        />
+        <span>
+          A new Dota 2 patch has been released: 7.41. Check out the patch notes at
+          https://www.dota2.com/patches
+        </span>
+      </span>
+    ),
+    tooltip: 'When a new Dota 2 patch is available',
+  },
+  firstBloodDeath: {
+    category: CATEGORIES.Hero,
+    message: (
+      <div className='space-x-2'>
+        <span>Pudge giving up first blood</span>
+        <Image
+          width={22}
+          height={22}
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x'
+        />
+      </div>
+    ),
+    tooltip: '',
   },
   killstreak: {
-    tooltip: '',
     category: CATEGORIES.Hero,
     message: (
       <>
@@ -209,53 +115,9 @@ export const chatterInfo = {
         </div>
       </>
     ),
-  },
-  firstBloodDeath: {
     tooltip: '',
-    category: CATEGORIES.Hero,
-    message: (
-      <div className='space-x-2'>
-        <span>Pudge giving up first blood</span>
-        <Image
-          width={22}
-          height={22}
-          alt='ICANT'
-          className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x'
-        />
-      </div>
-    ),
-  },
-  noTp: {
-    tooltip: 'If you dont have a tp within 30 seconds, you get a message',
-    category: CATEGORIES.Item,
-    message: (
-      <>
-        <div className='space-x-2'>
-          <span>@techleed where&apos;s your tp</span>
-          <Image
-            width={22}
-            height={22}
-            alt='ICANT'
-            className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp'
-          />
-        </div>
-        <div className='space-x-2'>
-          <span>@techleed nice job getting a tp finally after 322 seconds</span>
-          <Image
-            width={22}
-            height={22}
-            alt='ICANT'
-            className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/60ec91f58ed8b373e4221742/1x.webp'
-          />
-        </div>
-      </>
-    ),
   },
   matchOutcome: {
-    tooltip: 'At the end of every match',
     category: CATEGORIES.Event,
     message: (
       <>
@@ -285,18 +147,37 @@ export const chatterInfo = {
         </div>
       </>
     ),
+    tooltip: 'At the end of every match',
   },
-  commandsReady: {
-    tooltip:
-      'At the beginning of every match, once !np etc are ready. Usually when you first spawn in fountain.',
-    category: CATEGORIES.Event,
+  midas: {
+    category: CATEGORIES.Item,
     message: (
-      <span>Match data found !np · !smurfs · !gm · !lg · !avg · !items commands activated.</span>
+      <>
+        <div className='space-x-2'>
+          <Image
+            width={22}
+            height={22}
+            alt='massivePIDAS'
+            className='inline align-middle'
+            src='/images/emotes/massivePIDAS.webp'
+          />
+          <span>Use your midas</span>
+        </div>
+        <div className='space-x-2'>
+          <span>Midas was finally used, 64 seconds late</span>
+          <Image
+            width={22}
+            height={22}
+            alt='massivePIDAS'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/6350aa989bb828a9f0d42863/1x'
+          />
+        </div>
+      </>
     ),
+    tooltip: 'If your midas is ready and unused for 10s',
   },
   neutralItems: {
-    tooltip:
-      "Depending on whether you're playing turbo or normal, neutral items will be available at different times.",
     category: CATEGORIES.Event,
     message: (
       <span className='inline space-x-2'>
@@ -310,25 +191,144 @@ export const chatterInfo = {
         />
       </span>
     ),
+    tooltip:
+      "Depending on whether you're playing turbo or normal, neutral items will be available at different times.",
   },
-  dotapatch: {
-    tooltip: 'When a new Dota 2 patch is available',
-    category: CATEGORIES.Event,
+  noTp: {
+    category: CATEGORIES.Item,
+    message: (
+      <>
+        <div className='space-x-2'>
+          <span>@techleed where&apos;s your tp</span>
+          <Image
+            width={22}
+            height={22}
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp'
+          />
+        </div>
+        <div className='space-x-2'>
+          <span>@techleed nice job getting a tp finally after 322 seconds</span>
+          <Image
+            width={22}
+            height={22}
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/60ec91f58ed8b373e4221742/1x.webp'
+          />
+        </div>
+      </>
+    ),
+    tooltip: 'If you dont have a tp within 30 seconds, you get a message',
+  },
+  passiveDeath: {
+    category: CATEGORIES.Item,
+    message: (
+      <span className='inline space-x-2'>
+        <span>Pudge died with passive faerie fire</span>
+        <Image
+          width={22}
+          height={22}
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
+        />
+      </span>
+    ),
+    tooltip: 'Whenever you die with passive stick / faerie / etc',
+  },
+  pause: {
+    category: CATEGORIES.Item,
     message: (
       <span className='inline space-x-2'>
         <Image
           width={22}
           height={22}
-          alt='PogChamp'
+          alt='pauseChamp'
           className='inline align-middle'
-          src='https://static-cdn.jtvnw.net/emoticons/v2/305954156/default/dark/2.0'
+          src='/images/emotes/pauseChamp.webp'
         />
-        <span>
-          A new Dota 2 patch has been released: 7.41. Check out the patch notes at
-          https://www.dota2.com/patches
-        </span>
+        <span>Who paused the game?</span>
       </span>
     ),
+    tooltip: 'As soon as anyone presses F9',
+  },
+  powerTreads: {
+    category: CATEGORIES.Item,
+    message: 'We toggled treads 6 time to save a total 284 mana this match.',
+    tooltip: '',
+  },
+  roshDeny: {
+    category: CATEGORIES.Event,
+    message: (
+      <span className='inline space-x-2'>
+        <span>Pudge denied the aegis</span>
+        <Image
+          width={22}
+          height={22}
+          alt='ICANT'
+          className='inline align-middle'
+          src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
+        />
+      </span>
+    ),
+    tooltip: '',
+  },
+  roshPickup: {
+    category: CATEGORIES.Event,
+    message: 'Pudge picked up the aegis!',
+    tooltip: '',
+  },
+  roshanKilled: {
+    category: CATEGORIES.Event,
+    message:
+      "Roshan killed! Next roshan between 30:27 and 33:27 · Rosh deaths: 1 · Next drop: agh's shard. · Invoker picked up the aegis!",
+    tooltip: '',
+  },
+  smoke: {
+    category: CATEGORIES.Hero,
+    message: (
+      <span className='inline space-x-2'>
+        <Image
+          width={22}
+          height={22}
+          alt='Shush'
+          className='inline align-middle'
+          src='/images/emotes/Shush.png'
+        />
+        <span>Pudge is smoked!</span>
+      </span>
+    ),
+    tooltip: 'Whenever your hero has smoke debuff',
+  },
+  tip: {
+    category: CATEGORIES.Event,
+    message: (
+      <>
+        <div className='space-x-2'>
+          <span>The tip from Spectre</span>
+          <Image
+            width={22}
+            height={22}
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
+          />
+        </div>
+        <div className='space-x-2'>
+          <span>We tipping Crystal Maiden</span>
+          <Image
+            width={22}
+            height={22}
+            alt='ICANT'
+            className='inline align-middle'
+            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
+          />
+        </div>
+      </>
+    ),
+    tooltip: '',
   },
 }
 
@@ -343,7 +343,7 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce(
   },
   {} as Record<
     string,
-    Array<{ id: string; tooltip: string; category: CATEGORIES; message: React.ReactNode }>
+    { id: string; tooltip: string; category: CATEGORIES; message: React.ReactNode }[]
   >,
 )
 
@@ -374,36 +374,34 @@ export default function ChatterCard() {
         )}
       >
         <DotabodChatter />
-        {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => {
-          return (
-            <Card key={categoryName} title={categoryName}>
-              <div className='ml-4 flex flex-col space-y-3'>
-                {(groupedChatterInfo[categoryName] || []).map((value: GroupedChatterItem) => (
-                  <div key={value.id}>
-                    <Tooltip title={value?.tooltip} placement='left'>
-                      <div className='flex items-center space-x-3'>
-                        <TierSwitch
-                          settingKey={`chatters.${value.id}` as ChatterSettingKeys}
-                          disabled={!isEnabled}
-                          checked={dbChatters[value.id]?.enabled}
-                          onChange={(checked) => {
-                            updateChatters({
-                              ...dbChatters,
-                              [value.id]: {
-                                enabled: checked,
-                              },
-                            })
-                          }}
-                        />
-                        <span>{value.message}</span>
-                      </div>
-                    </Tooltip>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )
-        })}
+        {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => (
+          <Card key={categoryName} title={categoryName}>
+            <div className='ml-4 flex flex-col space-y-3'>
+              {(groupedChatterInfo[categoryName] || []).map((value: GroupedChatterItem) => (
+                <div key={value.id}>
+                  <Tooltip title={value?.tooltip} placement='left'>
+                    <div className='flex items-center space-x-3'>
+                      <TierSwitch
+                        settingKey={`chatters.${value.id}` as ChatterSettingKeys}
+                        disabled={!isEnabled}
+                        checked={dbChatters[value.id]?.enabled}
+                        onChange={(checked) => {
+                          updateChatters({
+                            ...dbChatters,
+                            [value.id]: {
+                              enabled: checked,
+                            },
+                          })
+                        }}
+                      />
+                      <span>{value.message}</span>
+                    </div>
+                  </Tooltip>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ))}
       </div>
     </>
   )

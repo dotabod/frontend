@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import useSWR from 'swr'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import Banner from '@/components/Banner'
 
 vi.mock('swr', () => ({
@@ -47,15 +47,17 @@ describe('Banner', () => {
 
     const store: Record<string, string> = {}
     vi.stubGlobal('localStorage', {
-      getItem: vi.fn((key: string) => store[key] ?? null),
-      setItem: vi.fn((key: string, value: string) => {
-        store[key] = value
+      clear: vi.fn(() => {
+        for (const key of Object.keys(store)) {
+          delete store[key]
+        }
       }),
+      getItem: vi.fn((key: string) => store[key] ?? null),
       removeItem: vi.fn((key: string) => {
         delete store[key]
       }),
-      clear: vi.fn(() => {
-        for (const key of Object.keys(store)) delete store[key]
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = value
       }),
     })
   })

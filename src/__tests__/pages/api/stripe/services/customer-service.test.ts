@@ -1,15 +1,15 @@
 // @ts-nocheck
 import type { Prisma } from '@prisma/client'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { CustomerService } from '@/lib/stripe/services/customer-service'
 import { stripe } from '@/lib/stripe-server'
 
 vi.mock('@/lib/stripe-server', () => ({
   stripe: {
     customers: {
-      retrieve: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
+      list: vi.fn(),
+      retrieve: vi.fn(),
     },
   },
 }))
@@ -37,8 +37,8 @@ describe('CustomerService.ensureCustomer', () => {
     const service = new CustomerService(mockTx)
 
     const customerId = await service.ensureCustomer({
-      id: 'user-1',
       email: null,
+      id: 'user-1',
       name: 'No Email User',
     })
 
@@ -47,11 +47,11 @@ describe('CustomerService.ensureCustomer', () => {
     expect(stripe.customers.create).toHaveBeenCalledWith({
       email: undefined,
       metadata: {
-        userId: 'user-1',
         email: '',
-        name: 'No Email User',
         image: '',
         locale: '',
+        name: 'No Email User',
+        userId: 'user-1',
       },
     })
   })

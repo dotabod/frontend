@@ -12,7 +12,7 @@ const prisma = globalThis.prismaGlobal || new PrismaClient()
 export const prismaMongo = globalThis.prismaMongoGlobal || new PrismaMongo()
 
 // Only store the instances on the global object in development to prevent
-// multiple instances during hot-reloading
+// Multiple instances during hot-reloading
 if (process.env.VERCEL_ENV !== 'production') {
   globalThis.prismaGlobal = prisma
   globalThis.prismaMongoGlobal = prismaMongo

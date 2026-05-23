@@ -1,33 +1,33 @@
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const mocks = vi.hoisted(() => {
   const openNodeCharge = {
-    id: 'row_1',
-    openNodeChargeId: 'charge_1',
-    stripeInvoiceId: 'in_1',
-    stripeCustomerId: 'cus_1',
-    userId: 'user_1',
-    amount: 131136,
-    currency: 'USD',
-    status: 'processing',
-    hostedCheckoutUrl: null,
-    metadata: {},
+    amount: 131_136,
     createdAt: new Date('2026-04-29T20:00:00.000Z'),
-    updatedAt: new Date('2026-04-29T20:00:00.000Z'),
+    currency: 'USD',
+    hostedCheckoutUrl: null,
+    id: 'row_1',
     lastWebhookAt: null,
+    metadata: {},
+    openNodeChargeId: 'charge_1',
+    status: 'processing',
+    stripeCustomerId: 'cus_1',
+    stripeInvoiceId: 'in_1',
+    updatedAt: new Date('2026-04-29T20:00:00.000Z'),
+    userId: 'user_1',
   }
 
   return {
-    openNodeCharge,
+    getOpenNodeChargeStatus: vi.fn(),
     getServerSession: vi.fn(),
+    openNodeCharge,
     prisma: {
       openNodeCharge: {
         findUnique: vi.fn(),
         update: vi.fn(),
       },
     },
-    getOpenNodeChargeStatus: vi.fn(),
     processConfirmedOpenNodePayment: vi.fn(),
     stripe: {
       invoices: {
@@ -65,15 +65,15 @@ vi.mock('@/lib/stripe-server', () => ({
 import handler from '@/pages/api/payment-status'
 
 const invoice = {
-  id: 'in_1',
-  number: 'F3F91300-0012',
-  customer: 'cus_1',
-  customer_email: 'user@example.com',
-  metadata: { userId: 'user_1' },
-  status: 'open',
-  total: 9900,
   amount_due: 9900,
   currency: 'usd',
+  customer: 'cus_1',
+  customer_email: 'user@example.com',
+  id: 'in_1',
+  metadata: { userId: 'user_1' },
+  number: 'F3F91300-0012',
+  status: 'open',
+  total: 9900,
 }
 
 describe('payment-status API', () => {
@@ -107,11 +107,11 @@ describe('payment-status API', () => {
 
     expect(res.statusCode).toBe(200)
     expect(mocks.prisma.openNodeCharge.update).toHaveBeenCalledWith({
-      where: { id: 'row_1' },
       data: {
         status: 'paid',
         updatedAt: expect.any(Date),
       },
+      where: { id: 'row_1' },
     })
     expect(mocks.processConfirmedOpenNodePayment).toHaveBeenCalledWith(
       {
@@ -121,15 +121,15 @@ describe('payment-status API', () => {
       'paid',
     )
     expect(res._getJSONData()).toMatchObject({
-      invoiceId: 'in_1',
-      chargeId: 'charge_1',
-      status: 'paid',
       amount: 99,
+      chargeId: 'charge_1',
       currency: 'usd',
       invoice: {
         id: 'in_1',
         status: 'paid',
       },
+      invoiceId: 'in_1',
+      status: 'paid',
     })
   })
 })

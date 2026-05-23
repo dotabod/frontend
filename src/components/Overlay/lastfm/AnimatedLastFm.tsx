@@ -30,32 +30,32 @@ export const AnimatedLastFm = ({
     }
   > = {
     picks: {
-      width: res({ w: 379 }),
-      height: res({ h: 85 }),
       bottom: res({ h: 125 }),
+      height: res({ h: 85 }),
       right: res({ w: 199 }),
-    },
-    strategy: {
       width: res({ w: 379 }),
-      height: res({ h: 85 }),
-      bottom: res({ h: 125 }),
-      right: res({ w: 199 }),
-    },
-    'strategy-2': {
-      width: res({ w: 381 }),
-      height: res({ h: 85 }),
-      bottom: res({ h: 125 }),
-      right: res({ w: 0 }),
     },
     playing: {
+      height: res({ h: 65 }),
       right: res({ w: 175 }),
       width: res({ w: 368 }),
-      height: res({ h: 65 }),
     },
     spectator: {
+      height: res({ h: 65 }),
       right: res({ w: 175 }),
       width: res({ w: 368 }),
-      height: res({ h: 65 }),
+    },
+    strategy: {
+      bottom: res({ h: 125 }),
+      height: res({ h: 85 }),
+      right: res({ w: 199 }),
+      width: res({ w: 379 }),
+    },
+    'strategy-2': {
+      bottom: res({ h: 125 }),
+      height: res({ h: 85 }),
+      right: res({ w: 0 }),
+      width: res({ w: 381 }),
     },
   }
 
@@ -70,25 +70,27 @@ export const AnimatedLastFm = ({
 
   if (mainScreen || !styles?.width) {
     styles = {
-      right: res({ w: 0 }),
-      left: undefined,
-      width: res({ w: 305 }),
       height: res({ h: 59 }),
+      left: undefined,
+      right: res({ w: 0 }),
+      width: res({ w: 305 }),
     }
   }
 
-  if (!isEnabled || !track) return null
+  if (!isEnabled || !track) {
+    return null
+  }
 
   return (
     <div
       id='main-screen-lastfm'
       className='absolute flex h-full items-center justify-center space-x-2'
       style={{
-        right: styles.right,
-        left: styles.left,
-        width: styles.width,
-        height: styles.height,
         bottom: styles.bottom,
+        height: styles.height,
+        left: styles.left,
+        right: styles.right,
+        width: styles.width,
         zIndex: 40,
       }}
     >

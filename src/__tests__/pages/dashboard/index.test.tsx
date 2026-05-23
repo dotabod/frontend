@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { createMockRouter, createMockSession, createMockSWR } from '@/__tests__/utils/mockFactories'
 import SetupPage from '@/pages/dashboard/index'
 
@@ -34,27 +34,26 @@ vi.mock('@/lib/server/dashboardAccess', () => ({
 // Mock environment variables
 vi.mock('@/utils/env', () => ({
   env: {
-    NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID: 'price_monthly_123',
     NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID: 'price_annual_123',
     NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID: 'price_lifetime_123',
+    NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID: 'price_monthly_123',
     STRIPE_WEBHOOK_SECRET: 'whsec_test_secret',
   },
 }))
 vi.mock('@/utils/subscription', () => ({
-  isInGracePeriod: vi.fn().mockReturnValue(false),
   GRACE_PERIOD_END: new Date(),
   PRICE_IDS: [
     {
-      tier: 'FREE',
-      monthly: 'price_free_monthly',
       annual: 'price_free_annual',
+      monthly: 'price_free_monthly',
       name: 'Free',
+      tier: 'FREE',
     },
     {
-      tier: 'PRO',
-      monthly: 'price_pro_monthly',
       annual: 'price_pro_annual',
+      monthly: 'price_pro_monthly',
       name: 'Pro',
+      tier: 'PRO',
     },
   ],
   SUBSCRIPTION_TIERS: {
@@ -62,29 +61,30 @@ vi.mock('@/utils/subscription', () => ({
     PRO: 'PRO',
   },
   getRequiredTier: vi.fn().mockReturnValue('FREE'),
+  isInGracePeriod: vi.fn().mockReturnValue(false),
 }))
 
 vi.mock('@/hooks/useSubscription', () => ({
+  useFeatureAccess: () => ({
+    hasAccess: true,
+    requiredTier: 'FREE',
+  }),
   useSubscription: vi.fn().mockReturnValue({
+    isLoading: false,
     subscription: {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      currentPeriodEnd: new Date(),
+      currentPeriodStart: new Date(),
       id: 'sub-123',
-      userId: 'user-123',
+      isGift: false,
+      status: 'ACTIVE',
       stripeCustomerId: 'cus-123',
       stripePriceId: 'price-123',
       stripeSubscriptionId: 'sub-123',
       tier: 'PRO',
-      status: 'ACTIVE',
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: new Date(),
-      cancelAtPeriodEnd: false,
-      canceledAt: null,
-      isGift: false,
+      userId: 'user-123',
     },
-    isLoading: false,
-  }),
-  useFeatureAccess: () => ({
-    requiredTier: 'FREE',
-    hasAccess: true,
   }),
 }))
 
@@ -110,33 +110,31 @@ vi.mock('@/components/Dashboard/Header', () => ({
 }))
 
 // Mock App from antd
-vi.mock('antd', () => {
-  return {
-    App: {
-      useApp: () => ({
-        message: {
-          success: vi.fn(),
-          error: vi.fn(),
-        },
-        notification: {
-          success: vi.fn(),
-          error: vi.fn(),
-        },
-      }),
-    },
-    Alert: ({ children }) => <div>{children}</div>,
-    Button: ({ children }) => <button type='button'>{children}</button>,
-    Collapse: ({ children }) => <div>{children}</div>,
-    Steps: ({ children }) => <div>{children}</div>,
-    Typography: {
-      Title: ({ children }) => <h1>{children}</h1>,
-      Text: ({ children }) => <span>{children}</span>,
-      Paragraph: ({ children }) => <p>{children}</p>,
-    },
-    Progress: () => <div>Progress</div>,
-    Tag: ({ children, ...props }) => <span {...props}>{children}</span>,
-  }
-})
+vi.mock('antd', () => ({
+  Alert: ({ children }) => <div>{children}</div>,
+  App: {
+    useApp: () => ({
+      message: {
+        error: vi.fn(),
+        success: vi.fn(),
+      },
+      notification: {
+        error: vi.fn(),
+        success: vi.fn(),
+      },
+    }),
+  },
+  Button: ({ children }) => <button type='button'>{children}</button>,
+  Collapse: ({ children }) => <div>{children}</div>,
+  Progress: () => <div>Progress</div>,
+  Steps: ({ children }) => <div>{children}</div>,
+  Tag: ({ children, ...props }) => <span {...props}>{children}</span>,
+  Typography: {
+    Paragraph: ({ children }) => <p>{children}</p>,
+    Text: ({ children }) => <span>{children}</span>,
+    Title: ({ children }) => <h1>{children}</h1>,
+  },
+}))
 
 // Mock canvas-confetti
 vi.mock('canvas-confetti', () => ({
@@ -146,21 +144,21 @@ vi.mock('canvas-confetti', () => ({
 // Mock contexts
 vi.mock('@/contexts/SubscriptionContext', () => ({
   useSubscriptionContext: () => ({
+    isLoading: false,
     subscription: {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      currentPeriodEnd: new Date(),
+      currentPeriodStart: new Date(),
       id: 'sub-123',
-      userId: 'user-123',
+      isGift: false,
+      status: 'ACTIVE',
       stripeCustomerId: 'cus-123',
       stripePriceId: 'price-123',
       stripeSubscriptionId: 'sub-123',
       tier: 'PRO',
-      status: 'ACTIVE',
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: new Date(),
-      cancelAtPeriodEnd: false,
-      canceledAt: null,
-      isGift: false,
+      userId: 'user-123',
     },
-    isLoading: false,
   }),
 }))
 

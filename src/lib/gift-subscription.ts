@@ -11,11 +11,11 @@ export async function createGiftCheckoutSession(
   params: GiftCheckoutParams,
 ): Promise<{ url: string } | { error: string } | { message: string }> {
   const response = await fetch('/api/stripe/create-gift-checkout', {
-    method: 'POST',
+    body: JSON.stringify(params),
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(params),
+    method: 'POST',
   })
 
   const data = await response.json()
@@ -41,7 +41,7 @@ export function calculateGiftEndDate(
   startDate: Date = new Date(),
 ): Date {
   // Create a new date for safer manipulation
-  const endDate = new Date(startDate.getTime())
+  const endDate = new Date(startDate)
   const originalDay = startDate.getUTCDate()
 
   // Lifetime subscription (add 100 years)

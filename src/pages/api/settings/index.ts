@@ -18,43 +18,43 @@ import {
 } from '@/utils/subscription'
 
 const subscriptionRelationQuery = {
+  orderBy: [{ status: 'asc' }, { transactionType: 'desc' }, { createdAt: 'desc' }],
+  select: {
+    cancelAtPeriodEnd: true,
+    createdAt: true,
+    currentPeriodEnd: true,
+    giftDetails: {
+      select: {
+        giftMessage: true,
+        giftQuantity: true,
+        giftType: true,
+        senderName: true,
+      },
+    },
+    id: true,
+    isGift: true,
+    metadata: true,
+    status: true,
+    stripeCustomerId: true,
+    stripePriceId: true,
+    stripeSubscriptionId: true,
+    tier: true,
+    transactionType: true,
+  },
   where: {
     OR: [
       {
+        isGift: false,
         status: {
           in: ['ACTIVE', 'TRIALING', 'PAST_DUE'],
         },
-        isGift: false,
       },
       {
-        transactionType: 'LIFETIME',
         status: { in: ['ACTIVE'] },
+        transactionType: 'LIFETIME',
       },
     ],
   },
-  select: {
-    id: true,
-    tier: true,
-    status: true,
-    transactionType: true,
-    currentPeriodEnd: true,
-    cancelAtPeriodEnd: true,
-    stripePriceId: true,
-    stripeCustomerId: true,
-    createdAt: true,
-    stripeSubscriptionId: true,
-    metadata: true,
-    isGift: true,
-    giftDetails: {
-      select: {
-        senderName: true,
-        giftType: true,
-        giftQuantity: true,
-        giftMessage: true,
-      },
-    },
-  },
-  orderBy: [{ status: 'asc' }, { transactionType: 'desc' }, { createdAt: 'desc' }],
 } satisfies Prisma.SubscriptionFindManyArgs
 
 type SettingsSubscriptionRow = Prisma.SubscriptionGetPayload<{
@@ -70,27 +70,27 @@ function getSettingsSubscription(subscriptions: SettingsSubscriptionRow[]) {
 
   if (!subscription && isInGracePeriod()) {
     return {
-      tier: SUBSCRIPTION_TIERS.PRO,
-      status: 'TRIALING' as const,
-      transactionType: 'RECURRING' as const,
-      currentPeriodEnd: GRACE_PERIOD_END,
       cancelAtPeriodEnd: true,
-      stripePriceId: '',
-      stripeCustomerId: '',
       createdAt: new Date(),
-      stripeSubscriptionId: null,
-      isGift: false,
+      currentPeriodEnd: GRACE_PERIOD_END,
       giftDetails: null,
-      isVirtual: true,
+      isGift: false,
       isGracePeriodVirtual: true,
+      isVirtual: true,
+      status: 'TRIALING' as const,
+      stripeCustomerId: '',
+      stripePriceId: '',
+      stripeSubscriptionId: null,
+      tier: SUBSCRIPTION_TIERS.PRO,
+      transactionType: 'RECURRING' as const,
     }
   }
 
   if (!subscription || !isSubscriptionActive(subscription)) {
     return {
-      tier: SUBSCRIPTION_TIERS.FREE,
       status: null,
       stripePriceId: '',
+      tier: SUBSCRIPTION_TIERS.FREE,
     }
   }
 
@@ -114,11 +114,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         // Use findFirst instead of findFirstOrThrow to handle not found cases gracefully
         const data = await prisma.user.findFirst({
           select: {
-            displayName: true,
-            name: true,
-            stream_online: true,
-            image: true,
             createdAt: true,
+            displayName: true,
+            image: true,
+            name: true,
             settings: {
               select: {
                 key: true,
@@ -130,6 +129,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 },
               },
             },
+            stream_online: true,
             subscription: {
               ...subscriptionRelationQuery,
             },
@@ -181,14 +181,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const data = await prisma.user.findFirst({
         select: {
-          stream_online: true,
-          settings: {
-            select: {
-              key: true,
-              value: true,
-            },
-          },
-          beta_tester: true,
           Account: {
             select: {
               providerAccountId: true,
@@ -196,16 +188,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
           SteamAccount: {
             select: {
-              mmr: true,
               leaderboard_rank: true,
+              mmr: true,
               steam32Id: true,
             },
           },
+          beta_tester: true,
+          mmr: true,
+          settings: {
+            select: {
+              key: true,
+              value: true,
+            },
+          },
+          steam32Id: true,
+          stream_online: true,
           subscription: {
             ...subscriptionRelationQuery,
           },
-          mmr: true,
-          steam32Id: true,
         },
         where: {
           id: resolvedUserId,
@@ -268,8 +268,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         const post = await prisma.setting.create({
           data: {
             key: validatedBody.key,
-            value: validatedBody.value,
             userId: session.user.id,
+            value: validatedBody.value,
           },
           select: {
             id: true,

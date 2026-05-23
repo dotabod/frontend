@@ -3,7 +3,7 @@ import type { UseRouterResult } from 'next/router'
 import type { Session } from 'next-auth'
 import type { SWRResponse } from 'swr'
 
-type MockSessionData = {
+interface MockSessionData {
   user: {
     name: string
     email: string
@@ -15,7 +15,7 @@ type MockSessionData = {
   update: ReturnType<typeof vi.fn>
 }
 
-type MockRouterData = {
+interface MockRouterData {
   query: Record<string, string>
   pathname: string
   replace: ReturnType<typeof vi.fn>
@@ -39,7 +39,7 @@ type MockRouterData = {
   forward: ReturnType<typeof vi.fn>
 }
 
-type MockSWRData<T = unknown> = {
+interface MockSWRData<T = unknown> {
   data: T
   error: unknown
   isLoading: boolean
@@ -52,15 +52,15 @@ export function createMockSession(
 ): Session & { status: 'authenticated'; update: ReturnType<typeof vi.fn> } {
   return {
     data: {
-      user: {
-        name: 'Test User',
-        email: 'test@example.com',
-        id: 'user-123',
-        image: 'https://example.com/avatar.png',
-      },
       expires: '1',
       status: 'authenticated',
       update: vi.fn(),
+      user: {
+        email: 'test@example.com',
+        id: 'user-123',
+        image: 'https://example.com/avatar.png',
+        name: 'Test User',
+      },
       ...overrides,
     },
   } as unknown as Session & { status: 'authenticated'; update: ReturnType<typeof vi.fn> }
@@ -68,27 +68,27 @@ export function createMockSession(
 
 export function createMockRouter(overrides?: Partial<MockRouterData>): UseRouterResult {
   return {
-    query: {},
-    pathname: '/dashboard',
-    replace: vi.fn(),
-    push: vi.fn(),
-    reload: vi.fn(),
+    asPath: '',
     back: vi.fn(),
-    prefetch: vi.fn(),
+    basePath: '',
     beforePopState: vi.fn(),
     events: {
-      on: vi.fn(),
-      off: vi.fn(),
       emit: vi.fn(),
+      off: vi.fn(),
+      on: vi.fn(),
     },
-    isFallback: false,
-    isReady: true,
-    isPreview: false,
-    asPath: '',
-    basePath: '',
-    isLocaleDomain: false,
-    route: '',
     forward: vi.fn(),
+    isFallback: false,
+    isLocaleDomain: false,
+    isPreview: false,
+    isReady: true,
+    pathname: '/dashboard',
+    prefetch: vi.fn(),
+    push: vi.fn(),
+    query: {},
+    reload: vi.fn(),
+    replace: vi.fn(),
+    route: '',
     ...overrides,
   } as unknown as UseRouterResult
 }

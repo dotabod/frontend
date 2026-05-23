@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
@@ -9,8 +9,8 @@ async function load() {
   const sentry = await import('@sentry/nextjs')
   const mod = await import('@/lib/hubspot')
   return {
-    fetchMock: vi.mocked(fetchMod.default),
     captureException: vi.mocked(sentry.captureException),
+    fetchMock: vi.mocked(fetchMod.default),
     ...mod,
   }
 }
@@ -21,11 +21,11 @@ const res = (body: unknown = {}, status = 200) =>
     status,
     statusText: 'OK',
     json: async () => body,
-    // biome-ignore lint/suspicious/noExplicitAny: minimal fetch Response stub for tests
+    // Biome-ignore lint/suspicious/noExplicitAny: minimal fetch Response stub for tests
   }) as any
 
 const isUrl = (call: unknown[], suffix: string) => String(call[0]).endsWith(suffix)
-// biome-ignore lint/suspicious/noExplicitAny: reading the stringified request body
+// Biome-ignore lint/suspicious/noExplicitAny: reading the stringified request body
 const bodyOf = (call: unknown[]) => JSON.parse((call[1] as any).body)
 
 describe('lib/hubspot', () => {
@@ -40,11 +40,11 @@ describe('lib/hubspot', () => {
       expect(subscriptionToValue({ tier: 'FREE' })).toBe('free')
       expect(subscriptionToValue({})).toBe('free')
       expect(
-        subscriptionToValue({ tier: 'PRO', transactionType: 'LIFETIME', status: 'ACTIVE' }),
+        subscriptionToValue({ status: 'ACTIVE', tier: 'PRO', transactionType: 'LIFETIME' }),
       ).toBe('pro_lifetime')
-      expect(subscriptionToValue({ tier: 'PRO', status: 'TRIALING' })).toBe('pro_trial')
-      expect(subscriptionToValue({ tier: 'PRO', status: 'PAST_DUE' })).toBe('pro_past_due')
-      expect(subscriptionToValue({ tier: 'PRO', status: 'ACTIVE' })).toBe('pro')
+      expect(subscriptionToValue({ status: 'TRIALING', tier: 'PRO' })).toBe('pro_trial')
+      expect(subscriptionToValue({ status: 'PAST_DUE', tier: 'PRO' })).toBe('pro_past_due')
+      expect(subscriptionToValue({ status: 'ACTIVE', tier: 'PRO' })).toBe('pro')
     })
   })
 
@@ -53,7 +53,7 @@ describe('lib/hubspot', () => {
       const { fetchMock, syncHubSpotContact } = await load()
       fetchMock.mockResolvedValue(res())
 
-      await syncHubSpotContact('tok', { email: 'a@b.com', username: 'gamer', subscription: 'pro' })
+      await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'gamer' })
 
       const propertyCalls = fetchMock.mock.calls.filter((c) => isUrl(c, '/properties/contacts'))
       expect(propertyCalls).toHaveLength(2)
@@ -63,7 +63,7 @@ describe('lib/hubspot', () => {
       expect(bodyOf(upsert as unknown[]).inputs[0]).toMatchObject({
         id: 'a@b.com',
         idProperty: 'email',
-        properties: { twitch_username: 'gamer', dotabod_subscription: 'pro' },
+        properties: { dotabod_subscription: 'pro', twitch_username: 'gamer' },
       })
     })
 
@@ -74,7 +74,9 @@ describe('lib/hubspot', () => {
       await syncHubSpotContact('tok', { email: 'a@b.com', username: 'gamer' })
 
       const upsert = fetchMock.mock.calls.find((c) => isUrl(c, '/contacts/batch/upsert'))
-      expect(bodyOf(upsert as unknown[]).inputs[0].properties).toEqual({ twitch_username: 'gamer' })
+      expect(bodyOf(upsert as unknown[]).inputs[0].properties).toEqual({
+        twitch_username: 'gamer',
+      })
     })
 
     it('treats a 409 on property creation as success and still upserts', async () => {
@@ -83,7 +85,7 @@ describe('lib/hubspot', () => {
         String(url).endsWith('/properties/contacts') ? res({}, 409) : res(),
       )
 
-      await syncHubSpotContact('tok', { email: 'a@b.com', username: 'g', subscription: 'pro' })
+      await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' })
 
       expect(fetchMock.mock.calls.some((c) => isUrl(c, '/contacts/batch/upsert'))).toBe(true)
     })
@@ -95,7 +97,7 @@ describe('lib/hubspot', () => {
       )
 
       await expect(
-        syncHubSpotContact('tok', { email: 'a@b.com', username: 'g', subscription: 'pro' }),
+        syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
       ).resolves.toBeUndefined()
       expect(captureException).toHaveBeenCalled()
     })
@@ -107,7 +109,7 @@ describe('lib/hubspot', () => {
       )
 
       await expect(
-        syncHubSpotContact('tok', { email: 'a@b.com', username: 'g', subscription: 'pro' }),
+        syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
       ).resolves.toBeUndefined()
       expect(captureException).toHaveBeenCalled()
       expect(fetchMock.mock.calls.some((c) => isUrl(c, '/contacts/batch/upsert'))).toBe(false)

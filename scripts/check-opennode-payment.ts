@@ -43,8 +43,8 @@ interface ChargeWithStatus {
 async function discoverProblematicCharges(): Promise<ChargeWithStatus[]> {
   // Find all paid/confirmed charges
   const paidCharges = await prisma.openNodeCharge.findMany({
-    where: { status: { in: ['paid', 'confirmed'] } },
     orderBy: { createdAt: 'desc' },
+    where: { status: { in: ['paid', 'confirmed'] } },
   })
 
   const results: ChargeWithStatus[] = []
@@ -53,13 +53,13 @@ async function discoverProblematicCharges(): Promise<ChargeWithStatus[]> {
     // Check if user has active LIFETIME subscription
     const lifetimeSubscription = await prisma.subscription.findFirst({
       where: {
-        userId: charge.userId,
-        transactionType: TransactionType.LIFETIME,
         status: SubscriptionStatus.ACTIVE,
+        transactionType: TransactionType.LIFETIME,
+        userId: charge.userId,
       },
     })
 
-    const hasLifetime = !!lifetimeSubscription
+    const hasLifetime = Boolean(lifetimeSubscription)
     const missingWebhook = !charge.lastWebhookAt
     const needsFix = !hasLifetime || missingWebhook
 
@@ -263,11 +263,11 @@ async function checkSingleCharge(): Promise<void> {
   console.log('-'.repeat(80))
 
   const subscriptions = await prisma.subscription.findMany({
-    where: {
-      userId: charge.userId,
-    },
     orderBy: {
       createdAt: 'desc',
+    },
+    where: {
+      userId: charge.userId,
     },
   })
 
@@ -380,8 +380,9 @@ async function checkSingleCharge(): Promise<void> {
     console.log()
     console.log('  # Dry run (safe, no changes):')
     console.log(
-      '  doppler run -- bun run scripts/fix-opennode-payment.ts --dry-run ' +
-        charge.stripeInvoiceId,
+      `  doppler run -- bun run scripts/fix-opennode-payment.ts --dry-run ${
+        charge.stripeInvoiceId
+      }`,
     )
     console.log()
     console.log('  # Actual fix:')

@@ -1,20 +1,20 @@
 import '@testing-library/jest-dom'
 import React from 'react'
-import { vi } from 'vitest'
+import { vi } from 'vite-plus/test'
 
 // Mock the framer-motion
 vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }: React.PropsWithChildren) => children,
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
       React.createElement('div', props, children),
   },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => children,
 }))
 
 // Mock the Prisma Mongo client
 vi.mock('.prisma-mongo/client', () => {
   function MockPrismaMongoClient(this: Record<string, unknown>) {
-    this.$disconnect = vi.fn().mockResolvedValue(undefined)
+    this.$disconnect = vi.fn().mockResolvedValue()
     this.cards = {
       findUnique: vi.fn().mockResolvedValue({ id: 'mock-card-id' }),
     }
@@ -41,27 +41,25 @@ interface MockFetchOptions {
 }
 
 // Helper function to create fetch responses
-global.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) => {
-  return {
-    ok: options.status ? options.status >= 200 && options.status < 300 : true,
-    status: options.status || 200,
-    statusText: options.statusText || 'OK',
-    headers: new Headers(options.headers || { 'Content-Type': 'application/json' }),
-    json: () => Promise.resolve(data),
-    text: () => Promise.resolve(JSON.stringify(data)),
-    redirected: false,
-    type: 'basic',
-    url: '',
-    clone: function () {
-      return this
-    },
-    body: null,
-    bodyUsed: false,
-    arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-    blob: () => Promise.resolve(new Blob([])),
-    formData: () => Promise.resolve(new FormData()),
-  } as Response
-}
+global.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) => ({
+  arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+  blob: () => Promise.resolve(new Blob([])),
+  body: null,
+  bodyUsed: false,
+  clone() {
+    return this
+  },
+  formData: () => Promise.resolve(new FormData()),
+  headers: new Headers(options.headers || { 'Content-Type': 'application/json' }),
+  json: () => Promise.resolve(data),
+  ok: options.status ? options.status >= 200 && options.status < 300 : true,
+  redirected: false,
+  status: options.status || 200,
+  statusText: options.statusText || 'OK',
+  text: () => Promise.resolve(JSON.stringify(data)),
+  type: 'basic',
+  url: '',
+})
 
 // Add global fetch mock helper
 global.mockFetch = (response: unknown, options: MockFetchOptions = {}) => {

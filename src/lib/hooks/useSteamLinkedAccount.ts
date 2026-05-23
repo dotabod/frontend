@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
-export type SteamLinkedAccountResponse = {
+export interface SteamLinkedAccountResponse {
   linked: boolean
   primaryAccount?: {
     steam32Id: string
@@ -10,7 +10,7 @@ export type SteamLinkedAccountResponse = {
   } | null
 }
 
-const POLL_INTERVAL_MS = 10000
+const POLL_INTERVAL_MS = 10_000
 
 export const useSteamLinkedAccount = () =>
   useSWR<SteamLinkedAccountResponse>('/api/steam/get-linked-account', fetcher, {

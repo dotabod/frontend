@@ -1,10 +1,10 @@
 // Client helper for starting a PayPal checkout. PayPal is decoupled from Stripe
-// and only needs the billing period — no Stripe price ID involved.
+// And only needs the billing period — no Stripe price ID involved.
 export async function createPaypalCheckout(period: string): Promise<{ url: string }> {
   const response = await fetch('/api/paypal/create-checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ period }),
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
   })
 
   if (!response.ok) {

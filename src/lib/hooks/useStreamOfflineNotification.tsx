@@ -20,12 +20,12 @@ export const useStreamOfflineNotification = (
   useEffect(() => {
     if (streamOnline === false) {
       notification.open({
-        key: 'stream-offline',
-        type: 'error',
-        duration: 0,
-        placement: 'bottomLeft',
-        message: 'Twitch stream is offline',
         description: <StreamOfflineMessage />,
+        duration: 0,
+        key: 'stream-offline',
+        message: 'Twitch stream is offline',
+        placement: 'bottomLeft',
+        type: 'error',
       })
     } else {
       notification.destroy('stream-offline')

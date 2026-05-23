@@ -19,7 +19,9 @@ export const AnimateRosh = ({ onComplete, paused, block, roshan }: AnimateRoshPr
   const isDevMode = useIsDevMode()
   const { data: isEnabled } = useUpdateSetting(Settings.rosh)
 
-  if (!roshan) return null
+  if (!roshan) {
+    return null
+  }
 
   const props = {
     color: roshan.minS ? 'red' : 'yellow',

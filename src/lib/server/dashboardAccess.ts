@@ -6,10 +6,9 @@ interface DashboardAccessOptions {
   requireAdmin?: boolean
 }
 
-export const requireDashboardAccess = (
-  options: DashboardAccessOptions = {},
-): GetServerSideProps => {
-  return async (context: GetServerSidePropsContext) => {
+export const requireDashboardAccess =
+  (options: DashboardAccessOptions = {}): GetServerSideProps =>
+  async (context: GetServerSidePropsContext) => {
     const session = await getServerSession(context.req, context.res, authOptions)
 
     if (!session) {
@@ -41,4 +40,3 @@ export const requireDashboardAccess = (
 
     return { props: {} }
   }
-}

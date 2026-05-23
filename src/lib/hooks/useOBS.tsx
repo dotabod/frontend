@@ -28,13 +28,17 @@ export const useOBS = ({ connected, block }: { connected: boolean; block: blockT
     console.log('Connected to socket! Running OBS scene switchers')
 
     // Only run in OBS browser source
-    if (typeof window !== 'object' || !window?.obsstudio) return
+    if (typeof window !== 'object' || !window?.obsstudio) {
+      return
+    }
 
     window.obsstudio.getCurrentScene((scene) => {
       const myScenes = [minimapName, picksName, dcName]
 
       // Some people don't enable the permissions
-      if (typeof window.obsstudio.setCurrentScene !== 'function') return
+      if (typeof window.obsstudio.setCurrentScene !== 'function') {
+        return
+      }
 
       if (block.type === 'playing') {
         window.obsstudio.setCurrentScene(minimapName)
@@ -47,7 +51,7 @@ export const useOBS = ({ connected, block }: { connected: boolean; block: blockT
 
       // Streamer has a custom scene, lets not override it
       // This allows streamers to make a scene for playing other games, and having
-      // dota in the background wont switch scenes on them
+      // Dota in the background wont switch scenes on them
       if (myScenes.includes(scene?.name)) {
         window.obsstudio.setCurrentScene(dcName)
         return

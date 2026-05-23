@@ -10,31 +10,31 @@ Dotabod is a platform designed to enhance the experience of Dota 2 streamers and
 
 1. Clone the repository & copy the example environment file
 
-  ```bash
-  git clone https://github.com/dotabod/frontend.git
-  cd frontend
+```bash
+git clone https://github.com/dotabod/frontend.git
+cd frontend
 
-  # Fill out the values in .env with your own
-  cp .env.example .env
-  ```
+# Fill out the values in .env with your own
+cp .env.example .env
+```
 
 1. Install dependencies
 
-  ```bash
-  bun install
-  ```
+```bash
+bun install
+```
 
 1. Setup your postgres database
 
-  ```bash
-  bun prisma db push
-  ```
+```bash
+bun prisma db push
+```
 
 1. Start the development server
 
-  ```bash
-  bun run dev
-  ```
+```bash
+bun run dev
+```
 
 1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

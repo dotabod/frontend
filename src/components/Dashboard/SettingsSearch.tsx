@@ -28,7 +28,9 @@ export function SettingsSearch() {
 
   // Simple fuzzy search implementation
   const searchResults = useMemo(() => {
-    if (!query.trim()) return []
+    if (!query.trim()) {
+      return []
+    }
 
     const searchQuery = query.toLowerCase()
     const results: SearchResult[] = []
@@ -72,7 +74,7 @@ export function SettingsSearch() {
       }
 
       // Fuzzy match - check if all characters appear in order within reasonable distance
-      const chars = searchQuery.split('')
+      const chars = [...searchQuery]
       let charIndex = 0
       let firstFoundIndex = -1
       let lastFoundIndex = -1
@@ -124,7 +126,7 @@ export function SettingsSearch() {
     }
 
     // Sort by score descending
-    return results.sort((a, b) => b.score - a.score).slice(0, 10)
+    return results.toSorted((a, b) => b.score - a.score).slice(0, 10)
   }, [query])
 
   // Handle navigation to setting
@@ -137,7 +139,9 @@ export function SettingsSearch() {
       // After navigation, scroll to the section if specified
       if (result.page.section) {
         setTimeout(() => {
-          if (!result.page.section) return
+          if (!result.page.section) {
+            return
+          }
           const element = document.getElementById(result.page.section)
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -153,10 +157,12 @@ export function SettingsSearch() {
   }
 
   const handleInputKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (!isOpen) return
+    if (!isOpen) {
+      return
+    }
 
     switch (e.key) {
-      case 'ArrowDown':
+      case 'ArrowDown': {
         e.preventDefault()
         isKeyboardNavigationRef.current = true
         setSelectedIndex((prev) =>
@@ -166,7 +172,8 @@ export function SettingsSearch() {
           isKeyboardNavigationRef.current = false
         }, 100)
         break
-      case 'ArrowUp':
+      }
+      case 'ArrowUp': {
         e.preventDefault()
         isKeyboardNavigationRef.current = true
         setSelectedIndex((prev) =>
@@ -176,17 +183,20 @@ export function SettingsSearch() {
           isKeyboardNavigationRef.current = false
         }, 100)
         break
-      case 'Enter':
+      }
+      case 'Enter': {
         e.preventDefault()
         if (searchResults[selectedIndex]) {
           navigateToSetting(searchResults[selectedIndex])
         }
         break
-      case 'Escape':
+      }
+      case 'Escape': {
         e.preventDefault()
         setIsOpen(false)
         searchInputRef.current?.blur()
         break
+      }
     }
   }
 
@@ -239,21 +249,23 @@ export function SettingsSearch() {
 
   const getCategoryLabel = (category: SettingMetadata['category']) => {
     const labels = {
-      obs: 'OBS',
-      overlay: 'Overlay',
-      chat: 'Chat',
-      stream: 'Stream',
-      mmr: 'MMR',
+      advanced: 'Advanced',
       bets: 'Bets',
+      chat: 'Chat',
       commands: 'Commands',
       display: 'Display',
-      advanced: 'Advanced',
+      mmr: 'MMR',
+      obs: 'OBS',
+      overlay: 'Overlay',
+      stream: 'Stream',
     }
     return labels[category] || category
   }
 
   const searchResultsContent = useMemo(() => {
-    if (!isOpen) return null
+    if (!isOpen) {
+      return null
+    }
 
     if (query && searchResults.length === 0) {
       return (
@@ -273,7 +285,7 @@ export function SettingsSearch() {
 
     if (searchResults.length > 0) {
       return (
-        <div ref={listContainerRef} style={{ width: 400, maxHeight: 384, overflow: 'auto' }}>
+        <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>
           <Typography.Text className='text-xs font-medium text-gray-400 px-3 py-1 block'>
             Search Results
           </Typography.Text>
@@ -292,8 +304,8 @@ export function SettingsSearch() {
                 onMouseEnter={() => setSelectedIndex(index)}
                 style={{
                   backgroundColor: selectedIndex === index ? '#374151' : 'transparent',
-                  padding: '8px 12px',
                   margin: '0 8px',
+                  padding: '8px 12px',
                 }}
               >
                 <List.Item.Meta

@@ -10,7 +10,9 @@ export const useTrack = () => {
   const track = useCallback(
     (event: string, properties?: Record<string, unknown>) => {
       // Only track if analytics is enabled
-      if (!preferences.analytics) return
+      if (!preferences.analytics) {
+        return
+      }
 
       const user = session?.data?.user
       sendGTMEvent({

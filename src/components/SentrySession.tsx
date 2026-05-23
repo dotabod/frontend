@@ -12,12 +12,12 @@ const SentrySession = () => {
     if (process.env.NEXT_PUBLIC_SENTRY_DSN && status === 'authenticated' && loaded) {
       if (preferences.analytics) {
         Sentry.setUser({
-          id: data?.user?.id,
-          username: data?.user?.name,
           email: data?.user?.email ?? undefined,
-          twitchId: data?.user?.twitchId,
-          locale: data?.user?.locale,
+          id: data?.user?.id,
           isImpersonating: data?.user?.isImpersonating,
+          locale: data?.user?.locale,
+          twitchId: data?.user?.twitchId,
+          username: data?.user?.name,
         })
       } else {
         // Clear user data if analytics is disabled

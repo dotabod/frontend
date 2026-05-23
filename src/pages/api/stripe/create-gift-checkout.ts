@@ -9,25 +9,29 @@ import { GIFT_PRICE_IDS } from '@/utils/subscription'
 
 // Function to check for profanity in text
 const checkForProfanity = (text: string | undefined): boolean => {
-  if (!text) return false
+  if (!text) {
+    return false
+  }
   return detect(text)
 }
 
 // Function to sanitize input
 const sanitizeInput = (text: string | undefined): string => {
-  if (!text) return ''
+  if (!text) {
+    return ''
+  }
   // Basic sanitization - remove any HTML tags and limit length
-  return text.replace(/<[^>]*>?/gm, '').substring(0, 200)
+  return text.replaceAll(/<[^>]*>?/gm, '').slice(0, 200)
 }
 
 // Define the request schema for validation
 const giftCheckoutSchema = z.object({
-  recipientUsername: z.string().min(1, 'Recipient username is required'),
-  priceId: z.string().min(1, 'Price ID is required'),
   giftMessage: z.string().optional(),
-  giftSenderName: z.string().optional(),
   giftSenderEmail: z.string().email().optional(),
+  giftSenderName: z.string().optional(),
+  priceId: z.string().min(1, 'Price ID is required'),
   quantity: z.number().int().min(1).default(1),
+  recipientUsername: z.string().min(1, 'Recipient username is required'),
 })
 
 export type GiftCheckoutRequest = z.infer<typeof giftCheckoutSchema>
@@ -49,8 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const errors = validationResult.error.format()
 
       return res.status(400).json({
-        error: 'Invalid request data',
         details: errors,
+        error: 'Invalid request data',
       })
     }
 
@@ -85,12 +89,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Check if the recipient already has a lifetime subscription
     const recipientSubscriptions = await prisma.subscription.findMany({
-      where: {
-        userId: recipientUser.id,
-        status: 'ACTIVE',
-      },
       include: {
         giftDetails: true,
+      },
+      where: {
+        status: 'ACTIVE',
+        userId: recipientUser.id,
       },
     })
 
@@ -136,8 +140,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // Allow customers to adjust quantity during checkout
           adjustable_quantity: {
             enabled: true,
-            minimum: 1,
             maximum: 100,
+            minimum: 1,
           },
         },
       ],
@@ -174,8 +178,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error('Gift checkout creation failed:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return res.status(500).json({
-      error: 'Failed to create gift checkout session',
       details: errorMessage,
+      error: 'Failed to create gift checkout session',
     })
   }
 }

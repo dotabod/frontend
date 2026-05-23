@@ -19,12 +19,12 @@ export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }: RoshTim
       <div
         className='absolute z-40 flex items-center justify-center rounded-full border border-slate-500 bg-black/60 font-[RadianceM] text-white/90 shadow-sm'
         style={{
-          height: res({ h: 20 }),
-          width: res({ w: 20 }),
-          top: res({ h: -2 }),
-          left: res({ w: 0 }),
           fontSize: res({ h: 15 }),
           fontWeight: 500,
+          height: res({ h: 20 }),
+          left: res({ w: 0 }),
+          top: res({ h: -2 }),
+          width: res({ w: 20 }),
         }}
       >
         {roshanCount}
@@ -35,11 +35,11 @@ export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }: RoshTim
       height={res({ h: 95 })}
       width={res({ w: 95 })}
       style={{
-        left: res({ w: 0 }),
-        top: res({ h: 0 }),
         height: res({ h: 70 }),
-        width: res({ w: 70 }),
+        left: res({ w: 0 }),
         maxWidth: res({ w: 70 }),
+        top: res({ h: 0 }),
+        width: res({ w: 70 }),
       }}
       alt='main bg'
       className='absolute z-0'
@@ -59,8 +59,8 @@ export const RoshTimer = ({ color, roshanCount, res, minutes, seconds }: RoshTim
       alt='roshan icon'
       className='absolute z-20'
       style={{
-        top: res({ h: 8 }),
         left: res({ h: 13 }),
+        top: res({ h: 8 }),
       }}
     />
     <span

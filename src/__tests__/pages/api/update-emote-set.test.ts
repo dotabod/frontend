@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/update-emote-set'
 
 const mockChatBotModule = vi.hoisted(() => ({
@@ -58,12 +58,12 @@ vi.mock('@/lib/api/getServerSession', () => ({
 
 // Mock subscription utils
 vi.mock('@/utils/subscription', () => ({
-  getSubscription: vi.fn(),
-  canAccessFeature: vi.fn(),
   SubscriptionTier: {
     FREE: 'FREE',
     PRO: 'PRO',
   },
+  canAccessFeature: vi.fn(),
+  getSubscription: vi.fn(),
 }))
 
 // Mock ChatBot emotes
@@ -75,13 +75,13 @@ vi.mock('@/components/Dashboard/ChatBot', () => ({
 
 // Mock getTwitchTokens to avoid environment variable issues
 vi.mock('@/lib/getTwitchTokens', () => ({
-  default: vi.fn().mockResolvedValue({
-    access_token: 'mock-access-token',
-    expires_in: 14400,
-    token_type: 'bearer',
-  }),
   CLIENT_ID: 'mock-client-id',
   CLIENT_SECRET: 'mock-client-secret',
+  default: vi.fn().mockResolvedValue({
+    access_token: 'mock-access-token',
+    expires_in: 14_400,
+    token_type: 'bearer',
+  }),
 }))
 
 import { GraphQLClient } from 'graphql-request'
@@ -119,17 +119,17 @@ describe('update-emote-set API', () => {
 
   it('returns 403 when user is impersonating', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        isImpersonating: true,
-        name: 'Test User',
         image: 'image-url',
-        twitchId: 'twitch-123',
-        role: 'user',
+        isImpersonating: true,
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     const { req, res } = createMocks({
@@ -157,33 +157,33 @@ describe('update-emote-set API', () => {
 
   it('returns 403 when user does not have access to auto7TV feature', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'FREE',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'FREE',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -203,33 +203,33 @@ describe('update-emote-set API', () => {
 
   it('returns 400 when Twitch ID is missing', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        twitchId: '',
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: '',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -249,33 +249,33 @@ describe('update-emote-set API', () => {
 
   it('returns 400 when emotesRequired is not defined', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -297,33 +297,33 @@ describe('update-emote-set API', () => {
 
   it('returns 500 when SEVENTV_AUTH is not set', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -346,33 +346,33 @@ describe('update-emote-set API', () => {
 
   it('returns 404 when 7TV user is not found', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -394,33 +394,33 @@ describe('update-emote-set API', () => {
 
   it('returns 400 when the 7TV user has no active emote set', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -444,33 +444,33 @@ describe('update-emote-set API', () => {
 
   it('returns 200 when emotes are already in set', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -479,8 +479,8 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'stvuser-123' },
       emote_set: { id: 'active-set-123' },
+      user: { id: 'stvuser-123' },
     })
 
     // Mock GraphQL client
@@ -512,33 +512,33 @@ describe('update-emote-set API', () => {
 
   it('successfully updates emote set', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -547,8 +547,8 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'stvuser-123' },
       emote_set: { id: 'active-set-123' },
+      user: { id: 'stvuser-123' },
     })
 
     // Mock GraphQL client
@@ -595,33 +595,33 @@ describe('update-emote-set API', () => {
 
   it('handles errors when adding emotes', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: 'user-123',
-        twitchId: 'twitch-123',
-        name: 'Test User',
         image: 'image-url',
         isImpersonating: false,
-        role: 'user',
         locale: 'en-US',
+        name: 'Test User',
+        role: 'user',
         scope: 'test-scope',
+        twitchId: 'twitch-123',
       },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     })
 
     vi.mocked(getSubscription).mockResolvedValueOnce({
+      cancelAtPeriodEnd: false,
+      createdAt: new Date(),
+      currentPeriodEnd: null,
+      giftDetails: null,
       id: 'subscription-123',
-      tier: 'PRO',
+      isGift: false,
+      metadata: {},
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      status: 'ACTIVE',
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      isGift: false,
+      tier: 'PRO',
       transactionType: 'RECURRING',
-      createdAt: new Date(),
-      giftDetails: null,
-      metadata: {},
     })
 
     vi.mocked(canAccessFeature).mockReturnValueOnce({
@@ -630,8 +630,8 @@ describe('update-emote-set API', () => {
     })
 
     vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'stvuser-123' },
       emote_set: { id: 'active-set-123' },
+      user: { id: 'stvuser-123' },
     })
 
     // Mock GraphQL client

@@ -29,50 +29,48 @@ interface BlogPostProps {
   }
 }
 
-const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => {
-  return (
-    <Container className='pb-16'>
-      <div className='max-w-3xl mx-auto'>
-        <div className='mb-8'>
-          <Button
-            type='text'
-            icon={
-              <svg
-                viewBox='0 0 16 16'
-                fill='none'
-                aria-hidden='true'
-                className='h-4 w-4 stroke-current'
-              >
-                <path
-                  d='M7.25 11.25 3.75 8m0 0 3.5-3.25M3.75 8h8.5'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            }
-          >
-            <Link href='/blog'>Back to blog</Link>
-          </Button>
-        </div>
-
-        <article>
-          <Space direction='vertical' size='small' className='mb-4'>
-            <Text type='secondary'>{formatDate(meta.date)}</Text>
-            {meta.author && <Text type='secondary'>By {meta.author}</Text>}
-          </Space>
-
-          <Title level={1} className='mb-8'>
-            {meta.title}
-          </Title>
-          <div className='max-w-none prose prose-invert prose-headings:font-bold prose-headings:text-gray-300 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-500 prose-li:text-gray-300 prose-ul:ml-5 prose-ol:ml-5 prose-li:pl-0 prose-code:bg-gray-800 prose-code:text-gray-200 prose-pre:bg-gray-800 prose-pre:text-gray-200 prose-blockquote:text-gray-400 prose-blockquote:border-gray-600'>
-            <MDXRemote {...source} />
-          </div>
-        </article>
+const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => (
+  <Container className='pb-16'>
+    <div className='max-w-3xl mx-auto'>
+      <div className='mb-8'>
+        <Button
+          type='text'
+          icon={
+            <svg
+              viewBox='0 0 16 16'
+              fill='none'
+              aria-hidden='true'
+              className='h-4 w-4 stroke-current'
+            >
+              <path
+                d='M7.25 11.25 3.75 8m0 0 3.5-3.25M3.75 8h8.5'
+                strokeWidth='1.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+          }
+        >
+          <Link href='/blog'>Back to blog</Link>
+        </Button>
       </div>
-    </Container>
-  )
-}
+
+      <article>
+        <Space direction='vertical' size='small' className='mb-4'>
+          <Text type='secondary'>{formatDate(meta.date)}</Text>
+          {meta.author && <Text type='secondary'>By {meta.author}</Text>}
+        </Space>
+
+        <Title level={1} className='mb-8'>
+          {meta.title}
+        </Title>
+        <div className='max-w-none prose prose-invert prose-headings:font-bold prose-headings:text-gray-300 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-500 prose-li:text-gray-300 prose-ul:ml-5 prose-ol:ml-5 prose-li:pl-0 prose-code:bg-gray-800 prose-code:text-gray-200 prose-pre:bg-gray-800 prose-pre:text-gray-200 prose-blockquote:text-gray-400 prose-blockquote:border-gray-600'>
+          <MDXRemote {...source} />
+        </div>
+      </article>
+    </div>
+  </Container>
+)
 
 BlogPost.getLayout = function getLayout(page: ReactElement) {
   const { meta } = page.props as BlogPostProps
@@ -82,14 +80,14 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: meta.title,
         subtitle: meta.description,
+        title: meta.title,
       }}
       seo={{
-        title: pageTitle,
+        canonicalUrl,
         description: meta.description,
-        canonicalUrl: canonicalUrl,
         ogType: 'article',
+        title: pageTitle,
       }}
     >
       {page}
@@ -117,8 +115,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }))
 
   return {
-    paths,
     fallback: false,
+    paths,
   }
 }
 
@@ -155,8 +153,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const mdxSource = await serialize(content, {
     mdxOptions: {
-      remarkPlugins: [remarkGfm],
       rehypePlugins: [rehypeSlug, rehypeHighlight],
+      remarkPlugins: [remarkGfm],
     },
     scope: processedData, // Use the processed data
   })
@@ -169,15 +167,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: {
-      source: mdxSource,
       meta: {
-        title: processedData.title || 'Untitled',
-        description: processedData.description || '',
-        date: dateString,
         author: processedData.author || null,
+        date: dateString,
+        description: processedData.description || '',
         image: processedData.image || null,
         slug, // Add slug to meta for canonical URL
+        title: processedData.title || 'Untitled',
       },
+      source: mdxSource,
     },
   }
 }

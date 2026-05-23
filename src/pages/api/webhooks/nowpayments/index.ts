@@ -75,15 +75,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     } else {
       await prisma.nowPaymentsInvoice.update({
-        where: { nowPaymentsId: invoice.nowPaymentsId },
         data: {
-          status: payment.payment_status,
-          paymentId: String(payment.payment_id),
-          payCurrency: payment.pay_currency,
-          payAmount: payment.pay_amount,
           actuallyPaid: payment.actually_paid,
           lastWebhookAt: new Date(),
+          payAmount: payment.pay_amount,
+          payCurrency: payment.pay_currency,
+          paymentId: String(payment.payment_id),
+          status: payment.payment_status,
         },
+        where: { nowPaymentsId: invoice.nowPaymentsId },
       })
     }
 

@@ -16,11 +16,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     // Caught error
     const locale = await prisma.user.findFirst({
-      where: {
-        id: session.user.id,
-      },
       select: {
         locale: true,
+      },
+      where: {
+        id: session.user.id,
       },
     })
 

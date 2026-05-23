@@ -12,14 +12,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     const scheduledMessages = await prisma.scheduledMessage.findMany({
       include: {
+        deliveries: true,
         user: {
           select: {
+            email: true,
             id: true,
             name: true,
-            email: true,
           },
         },
-        deliveries: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -33,19 +33,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const messagesWithStats = await Promise.all(
       scheduledMessages.map(async (message) => {
         const deliveryStats = await prisma.messageDelivery.groupBy({
+          _count: {
+            status: true,
+          },
           by: ['status'],
           where: {
             scheduledMessageId: message.id,
           },
-          _count: {
-            status: true,
-          },
         })
 
         const stats = {
+          cancelled: 0,
           delivered: 0,
           pending: 0,
-          cancelled: 0,
         }
 
         for (const stat of deliveryStats) {
@@ -58,10 +58,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ...message,
           deliveryStats: {
             ...stats,
-            totalTargetUsers: targetUserCount,
+            cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
             deliveredPercent: Math.round((stats.delivered / targetUserCount) * 100),
             pendingPercent: Math.round((stats.pending / targetUserCount) * 100),
-            cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
+            totalTargetUsers: targetUserCount,
           },
         }
       }),
@@ -82,17 +82,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // If we have a userId and it's not for all users, we need to find the actual user ID
-    // from the accounts table using the provider account ID
+    // From the accounts table using the provider account ID
     let actualUserId: string | null = null
     if (!isForAllUsers && userId) {
       try {
         // Find the user associated with this provider account ID (from Twitch)
         const account = await prisma.account.findFirst({
-          where: {
-            providerAccountId: userId,
-          },
           select: {
             userId: true,
+          },
+          where: {
+            providerAccountId: userId,
           },
         })
 
@@ -111,10 +111,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const createdMessage = await prisma.scheduledMessage.create({
         data: {
-          message,
-          userId: actualUserId,
           isForAllUsers,
+          message,
           sendAt: new Date(sendAt),
+          userId: actualUserId,
         },
       })
 

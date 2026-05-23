@@ -9,6 +9,8 @@ export function RestrictFeature({
   children: React.ReactNode
 }) {
   const { hasAccess } = useFeatureAccess(feature)
-  if (!hasAccess) return null
+  if (!hasAccess) {
+    return null
+  }
   return children
 }

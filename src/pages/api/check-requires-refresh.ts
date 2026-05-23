@@ -22,13 +22,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const response = await prisma.account.findFirst({
       select: {
+        requires_refresh: true,
         user: {
           select: {
-            name: true,
             displayName: true,
+            name: true,
           },
         },
-        requires_refresh: true,
       },
       where: {
         userId: session.user.id,
@@ -55,7 +55,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(requiresRefresh)
   } catch (error) {
     captureException(error)
-    return res.status(500).json({ message: 'Failed to get info', error: error.message })
+    return res.status(500).json({ error: error.message, message: 'Failed to get info' })
   }
 }
 

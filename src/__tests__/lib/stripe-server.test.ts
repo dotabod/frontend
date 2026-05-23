@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const ctorSpy = vi.fn()
 
@@ -48,8 +48,8 @@ describe('lib/stripe-server', () => {
 
     expect(ctorSpy).toHaveBeenCalledTimes(1)
     expect(ctorSpy).toHaveBeenCalledWith('sk_test_123', {
-      typescript: true,
       apiVersion: '2025-03-31.basil',
+      typescript: true,
     })
   })
 })

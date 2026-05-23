@@ -29,12 +29,14 @@ export default function CommandsCard({
       className='bg-transparent'
       activeKey={isOpen ? [id] : undefined}
       onChange={(keys) => {
-        if (isOpen && !keys.includes(id)) onClose?.()
+        if (isOpen && !keys.includes(id)) {
+          onClose?.()
+        }
       }}
     >
       <Collapse.Panel
         className={`rounded-lg! border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-xs hover:shadow-gray-500${
-          readonly && (typeof publicIsEnabled !== 'undefined' ? !publicIsEnabled : !isEnabled)
+          readonly && (publicIsEnabled !== undefined ? !publicIsEnabled : !isEnabled)
             ? ' opacity-50'
             : ''
         }`}
@@ -57,12 +59,12 @@ export default function CommandsCard({
               (readonly ? (
                 <span
                   className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    (typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled)
+                    (publicIsEnabled !== undefined ? publicIsEnabled : isEnabled)
                       ? 'bg-green-950 text-green-400 ring-1 ring-green-800'
                       : 'bg-gray-800 text-gray-600'
                   }`}
                 >
-                  {(typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled)
+                  {(publicIsEnabled !== undefined ? publicIsEnabled : isEnabled)
                     ? 'Enabled'
                     : 'Disabled'}
                 </span>
@@ -70,7 +72,7 @@ export default function CommandsCard({
                 <TierSwitch
                   settingKey={command.key}
                   disabled={!hasAccess}
-                  checked={typeof publicIsEnabled !== 'undefined' ? publicIsEnabled : isEnabled}
+                  checked={publicIsEnabled !== undefined ? publicIsEnabled : isEnabled}
                   onChange={hasAccess ? updateSetting : undefined}
                 />
               ))}

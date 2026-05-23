@@ -1,6 +1,6 @@
 import { act, render } from '@testing-library/react'
 import useSWR from 'swr'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 
 const mutateMock = vi.hoisted(() => vi.fn())
@@ -50,11 +50,11 @@ describe('useUpdate', () => {
 
     function TestComponent() {
       const { updateSetting } = useUpdate<Record<string, unknown>, { value: boolean }>({
-        path: '/api/settings',
         dataTransform: (data, newValue) => ({
           ...data,
           settings: [{ key: 'showRankImage', value: newValue.value }],
         }),
+        path: '/api/settings',
       })
       updateRef.current = updateSetting
       return null
@@ -67,8 +67,8 @@ describe('useUpdate', () => {
     })
 
     expect(global.fetch).toHaveBeenCalledWith('/api/settings/showRankImage', {
-      method: 'PATCH',
       body: JSON.stringify({ value: false }),
+      method: 'PATCH',
     })
     expect(mutateMock).toHaveBeenCalledWith(
       '/api/settings',

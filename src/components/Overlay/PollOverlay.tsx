@@ -8,7 +8,7 @@ import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 import { TextWithEmotes } from './TextWithEmotes'
 
-export type PollData = {
+export interface PollData {
   title: string
   endDate: number | string | Date
   choices: { title: string; totalVotes?: number }[]
@@ -45,7 +45,9 @@ export const PollOverlay = ({
   const providerAccountId = data?.Account?.providerAccountId
 
   useEffect(() => {
-    if (!providerAccountId) return
+    if (!providerAccountId) {
+      return
+    }
 
     const emoteFetcher = new TwitchFetcher()
     emoteFetcher

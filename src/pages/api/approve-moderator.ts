@@ -13,8 +13,8 @@ async function approveModerators(userId: string, newModeratorChannelIds: number[
   try {
     // Fetch the current list of approved moderator channel IDs
     const currentModerators = await prisma.approvedModerator.findMany({
-      where: { userId },
       select: { moderatorChannelId: true },
+      where: { userId },
     })
     const currentModeratorChannelIds = currentModerators.map((mod) => mod.moderatorChannelId)
 
@@ -30,8 +30,8 @@ async function approveModerators(userId: string, newModeratorChannelIds: number[
     if (moderatorsToRemove.length > 0) {
       await prisma.approvedModerator.deleteMany({
         where: {
-          userId,
           moderatorChannelId: { in: moderatorsToRemove },
+          userId,
         },
       })
     }
@@ -40,13 +40,13 @@ async function approveModerators(userId: string, newModeratorChannelIds: number[
     if (moderatorsToAdd.length > 0) {
       await prisma.approvedModerator.createMany({
         data: moderatorsToAdd.map((moderatorChannelId) => ({
-          userId,
           moderatorChannelId,
+          userId,
         })),
       })
     }
   } catch (error) {
-    throw new Error(`Failed to approve managers: ${error.message}`)
+    throw new Error(`Failed to approve managers: ${error.message}`, { cause: error })
   }
 }
 
@@ -85,8 +85,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const parseResult = approvedModeratorSchema.safeParse(parsedModeratorChannelIds)
     if (!parseResult.success) {
       return res.status(400).json({
-        message: 'Invalid moderatorChannelIds',
         errors: parseResult.error.errors,
+        message: 'Invalid moderatorChannelIds',
       })
     }
 
@@ -95,7 +95,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json({ message: 'Managers approved successfully' })
     } catch (error) {
       console.error('Failed to approve managers:', error)
-      return res.status(500).json({ message: 'Error approving managers', error })
+      return res.status(500).json({ error, message: 'Error approving managers' })
     }
   } else {
     res.setHeader('Allow', ['POST'])

@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/languages'
 
 // Mock fetch
@@ -35,8 +35,8 @@ describe('languages API', () => {
       data: [
         {
           data: {
-            translationProgress: 75,
             approvalProgress: 50,
+            translationProgress: 75,
           },
         },
       ],
@@ -44,15 +44,15 @@ describe('languages API', () => {
 
     // Mock successful fetch response
     global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
       json: () => Promise.resolve(mockResponse),
+      ok: true,
     })
 
     const { req, res } = createMocks({
       method: 'GET',
       query: {
-        projectId: 'test-project',
         languageId: 'test-language',
+        projectId: 'test-project',
       },
     })
 
@@ -71,8 +71,8 @@ describe('languages API', () => {
     // Verify response
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      translationProgress: 75,
       approvalProgress: 50,
+      translationProgress: 75,
     })
   })
 
@@ -85,8 +85,8 @@ describe('languages API', () => {
     const { req, res } = createMocks({
       method: 'GET',
       query: {
-        projectId: 'test-project',
         languageId: 'test-language',
+        projectId: 'test-project',
       },
     })
 
@@ -108,8 +108,8 @@ describe('languages API', () => {
     const { req, res } = createMocks({
       method: 'GET',
       query: {
-        projectId: 'test-project',
         languageId: 'test-language',
+        projectId: 'test-project',
       },
     })
 

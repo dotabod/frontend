@@ -11,10 +11,10 @@ import {
 import { BillingNotice } from './BillingNotice'
 
 const chipClasses = {
-  success: 'border-emerald-800 bg-emerald-950/40 text-emerald-200',
-  info: 'border-indigo-800 bg-indigo-950/40 text-indigo-200',
-  warning: 'border-amber-800 bg-amber-950/40 text-amber-200',
   error: 'border-red-800 bg-red-950/40 text-red-200',
+  info: 'border-indigo-800 bg-indigo-950/40 text-indigo-200',
+  success: 'border-emerald-800 bg-emerald-950/40 text-emerald-200',
+  warning: 'border-amber-800 bg-amber-950/40 text-amber-200',
 }
 
 const PAYPAL_AUTOPAY_URL = 'https://www.paypal.com/myaccount/autopay/'
@@ -34,17 +34,17 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
   } = useSubscriptionContext()
 
   const summary = getBillingSummaryInfo({
-    status: subscription?.status,
     cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd,
+    creditBalance,
     currentPeriodEnd: subscription?.currentPeriodEnd,
-    transactionType: subscription?.transactionType,
-    stripeSubscriptionId: subscription?.stripeSubscriptionId,
+    formattedCreditBalance,
+    inGracePeriod,
+    status: subscription?.status,
     stripeCustomerId: subscription?.stripeCustomerId,
     stripePriceId: subscription?.stripePriceId,
+    stripeSubscriptionId: subscription?.stripeSubscriptionId,
     tier: subscription?.tier,
-    inGracePeriod,
-    creditBalance,
-    formattedCreditBalance,
+    transactionType: subscription?.transactionType,
   })
 
   const isPayPal = isPaypalSubscription(subscription)

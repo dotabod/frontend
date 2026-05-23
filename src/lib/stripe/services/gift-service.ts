@@ -22,7 +22,9 @@ export class GiftService {
    */
   async processGiftCheckout(session: Stripe.Checkout.Session): Promise<boolean> {
     const recipientUserId = session.metadata?.recipientUserId
-    if (!recipientUserId) return false
+    if (!recipientUserId) {
+      return false
+    }
 
     return (
       (await withErrorHandling(
@@ -35,10 +37,12 @@ export class GiftService {
           let giftQuantity = Number.parseInt(session.metadata?.giftQuantity || '1', 10)
 
           // For gift credits, get the actual quantity from the line items
-          // in case the customer adjusted it during checkout
+          // In case the customer adjusted it during checkout
           try {
             // Retrieve the line items to get the final quantity
-            const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 })
+            const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+              limit: 1,
+            })
             if (lineItems.data.length > 0) {
               const actualQuantity = lineItems.data[0].quantity || 1
               if (actualQuantity !== giftQuantity) {
@@ -56,14 +60,14 @@ export class GiftService {
 
           // Find the recipient user
           const recipientUser = await this.tx.user.findUnique({
-            where: { id: recipientUserId },
             select: {
-              id: true,
               email: true,
-              name: true,
+              id: true,
               image: true,
               locale: true,
+              name: true,
             },
+            where: { id: recipientUserId },
           })
 
           if (!recipientUser) {
@@ -79,12 +83,12 @@ export class GiftService {
 
           // Add the credit to the customer's balance
           await this.addCustomerBalanceCredit(recipientCustomerId, creditAmount, {
-            giftType,
-            giftQuantity: giftQuantity.toString(),
-            giftSenderName,
-            giftMessage,
-            giftSenderEmail: session.metadata?.giftSenderEmail || '',
             checkoutSessionId: session.id,
+            giftMessage,
+            giftQuantity: giftQuantity.toString(),
+            giftSenderEmail: session.metadata?.giftSenderEmail || '',
+            giftSenderName,
+            giftType,
             gifterId: session.metadata?.gifterId || '',
             recipientId: recipientUserId,
           })
@@ -100,11 +104,11 @@ export class GiftService {
               currency: session.currency || 'usd',
               stripeSessionId: session.id,
               metadata: {
-                giftSenderName,
-                giftMessage,
-                giftSenderEmail: session.metadata?.giftSenderEmail || '',
                 checkoutSessionId: session.id,
                 creditAmount: creditAmount.toString(),
+                giftMessage,
+                giftSenderEmail: session.metadata?.giftSenderEmail || '',
+                giftSenderName,
               },
               // Create a relation to a placeholder gift subscription
               giftSubscription: {
@@ -116,21 +120,21 @@ export class GiftService {
                   // Create a placeholder subscription for the gift
                   subscription: {
                     create: {
-                      userId: recipientUserId,
-                      stripeCustomerId: recipientCustomerId,
+                      isGift: true,
+                      metadata: {
+                        checkoutSessionId: session.id,
+                        creditAmount: creditAmount.toString(),
+                        giftQuantity: giftQuantity.toString(),
+                        giftType,
+                      },
                       status: SubscriptionStatus.ACTIVE,
+                      stripeCustomerId: recipientCustomerId,
                       tier: getSubscriptionTier(null, SubscriptionStatus.ACTIVE),
                       transactionType:
                         giftType === 'lifetime'
                           ? TransactionType.LIFETIME
                           : TransactionType.RECURRING,
-                      isGift: true,
-                      metadata: {
-                        giftType,
-                        giftQuantity: giftQuantity.toString(),
-                        creditAmount: creditAmount.toString(),
-                        checkoutSessionId: session.id,
-                      },
+                      userId: recipientUserId,
                     },
                   },
                 },
@@ -141,10 +145,10 @@ export class GiftService {
           // Create a notification for the recipient
           await this.tx.notification.create({
             data: {
-              userId: recipientUserId,
-              type: 'GIFT_SUBSCRIPTION',
-              isRead: false,
               giftSubscriptionId: giftTransaction.giftSubscriptionId,
+              isRead: false,
+              type: 'GIFT_SUBSCRIPTION',
+              userId: recipientUserId,
             },
           })
 
@@ -152,9 +156,9 @@ export class GiftService {
           // We do this by checking if the user has an active subscription
           const existingSubscription = await this.tx.subscription.findFirst({
             where: {
-              userId: recipientUserId,
-              status: { in: ['ACTIVE', 'TRIALING'] },
               isGift: false,
+              status: { in: ['ACTIVE', 'TRIALING'] },
+              userId: recipientUserId,
             },
           })
 
@@ -168,13 +172,13 @@ export class GiftService {
                 const autoApplyResponse = await fetch(
                   `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
                   {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
                     body: JSON.stringify({
                       userId: recipientUserId,
                     }),
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    method: 'POST',
                   },
                 )
 
@@ -209,17 +213,21 @@ export class GiftService {
     let creditAmount = 0
 
     switch (giftType) {
-      case 'monthly':
+      case 'monthly': {
         creditAmount = monthlyPrice * giftQuantity
         break
-      case 'annual':
+      }
+      case 'annual': {
         creditAmount = annualPrice * giftQuantity
         break
-      case 'lifetime':
+      }
+      case 'lifetime': {
         creditAmount = lifetimePrice
         break
-      default:
+      }
+      default: {
         creditAmount = monthlyPrice * giftQuantity
+      }
     }
 
     // Return negative amount (credit to reduce what customer owes)
@@ -240,7 +248,7 @@ export class GiftService {
   ): Promise<Stripe.CustomerBalanceTransaction> {
     try {
       const balanceTransaction = await stripe.customers.createBalanceTransaction(customerId, {
-        amount, // negative amount to credit the customer
+        amount, // Negative amount to credit the customer
         currency: 'usd',
         description: `Gift subscription credit: ${metadata.giftType} x ${metadata.giftQuantity}`,
         metadata,

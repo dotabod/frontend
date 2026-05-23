@@ -1,14 +1,14 @@
 // @ts-nocheck
 import type { Prisma } from '@prisma/client'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 
 describe('processEventIdempotently', () => {
   const mockTx: Pick<Prisma.TransactionClient, 'webhookEvent'> = {
     webhookEvent: {
-      findUnique: vi.fn(),
       create: vi.fn(),
       delete: vi.fn(),
+      findUnique: vi.fn(),
     },
   }
 
@@ -34,9 +34,9 @@ describe('processEventIdempotently', () => {
     expect(result).toBe(false)
     expect(mockTx.webhookEvent.create).toHaveBeenCalledWith({
       data: {
-        stripeEventId: 'evt_1',
         eventType: 'checkout.session.completed',
         processedAt: expect.any(Date),
+        stripeEventId: 'evt_1',
       },
     })
     expect(mockTx.webhookEvent.delete).toHaveBeenCalledWith({

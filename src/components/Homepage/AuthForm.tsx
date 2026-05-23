@@ -20,16 +20,16 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         onClick={() => {
           setIsLoading(true)
           signIn('twitch', {
-            redirect: false,
             callbackUrl:
               searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
+            redirect: false,
           })
             .then((e) => {
               console.log(e)
             })
-            .catch((e) => {
-              captureException(e)
-              console.log(e)
+            .catch((error) => {
+              captureException(error)
+              console.log(error)
             })
             .finally(() => setIsLoading(false))
         }}

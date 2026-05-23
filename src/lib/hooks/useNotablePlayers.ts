@@ -4,51 +4,51 @@ import { isDev } from '@/lib/devConsts'
 
 const devPlayers: NotablePlayer[] = [
   {
+    account_id: 103_910_993,
     country_code: 'se',
-    account_id: 103910993,
-    position: 0,
     heroId: 5,
     heroName: 'Lich',
-    isMe: false,
     image:
       'https://static-cdn.jtvnw.net/jtv_user_pictures/gorgc-profile_image-469e05d25a1e8594-70x70.jpeg',
+    isMe: false,
     name: 'Gorgc',
+    position: 0,
   },
   {
+    account_id: 48_594_480,
     country_code: 'ae',
-    account_id: 48594480,
-    position: 1,
     heroId: 5,
     heroName: 'Lich',
     isMe: true,
     name: 'lil pleb',
+    position: 1,
   },
   {
-    country_code: 'ua',
     account_id: 39,
-    position: 4,
+    country_code: 'ua',
     heroId: 5,
     heroName: 'Lich',
     isMe: false,
     name: 'Yatoro',
+    position: 4,
   },
   {
-    country_code: 'rs',
     account_id: 39,
-    position: 8,
+    country_code: 'rs',
     heroId: 5,
     heroName: 'Lich',
     isMe: false,
     name: 'BoraNija ',
+    position: 8,
   },
   {
-    country_code: 'us',
     account_id: 39,
-    position: 9,
+    country_code: 'us',
     heroId: 5,
     heroName: 'Lich',
     isMe: false,
     name: 'Gunnar ',
+    position: 9,
   },
 ]
 
@@ -56,7 +56,9 @@ export const useNotablePlayers = () => {
   const [notablePlayers, setNotablePlayers] = useState<NotablePlayer[]>([])
 
   useEffect(() => {
-    if (!isDev()) return
+    if (!isDev()) {
+      return
+    }
 
     setNotablePlayers(devPlayers)
   }, [])

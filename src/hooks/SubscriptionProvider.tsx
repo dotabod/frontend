@@ -39,7 +39,9 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
 
   // Transform data to add proper Date objects for currentPeriodEnd
   const subscription = useMemo<SubscriptionRow | null>(() => {
-    if (!data?.subscription) return null
+    if (!data?.subscription) {
+      return null
+    }
 
     const rawSubscription = data.subscription
     return {
@@ -53,9 +55,9 @@ export function SubscriptionProviderMain({ children }: { children: React.ReactNo
   return (
     <SubscriptionContext.Provider
       value={{
-        subscription,
         isLoading,
         isSubscribed: isSubscriptionActive({ status: subscription?.status }),
+        subscription,
       }}
     >
       {children}

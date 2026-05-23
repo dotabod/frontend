@@ -47,8 +47,8 @@ async function handleGetRequest(
   try {
     const setting = await prisma.setting.findFirst({
       where: {
-        userId: userId,
         key: settingKey,
+        userId,
       },
     })
 
@@ -107,21 +107,21 @@ async function handlePatchRequest(
     }
 
     await prisma.setting.upsert({
+      create: {
+        key: validatedBody.key,
+        updatedAt: new Date(),
+        userId,
+        value: validatedBody.value,
+      },
+      update: {
+        updatedAt: new Date(),
+        value: validatedBody.value,
+      },
       where: {
         key_userId: {
           key: validatedBody.key,
-          userId: userId,
+          userId,
         },
-      },
-      update: {
-        value: validatedBody.value,
-        updatedAt: new Date(),
-      },
-      create: {
-        key: validatedBody.key,
-        value: validatedBody.value,
-        userId: userId,
-        updatedAt: new Date(),
       },
     })
 

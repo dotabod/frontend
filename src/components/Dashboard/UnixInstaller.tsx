@@ -12,7 +12,9 @@ export default function UnixInstaller() {
   const [url, setUrl] = useState('')
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!user?.id) {
+      return
+    }
     const blob = new Blob([buildGsiConfig(user.id)], { type: 'text/plain' })
     const objectUrl = URL.createObjectURL(blob)
     setUrl(objectUrl)

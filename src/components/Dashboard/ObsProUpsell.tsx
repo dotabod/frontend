@@ -10,7 +10,9 @@ const ObsProUpsell = () => {
   const track = useTrack()
 
   // Don't flash the upsell at Pro users while their subscription is still resolving.
-  if (isLoading || hasAccess) return null
+  if (isLoading || hasAccess) {
+    return null
+  }
 
   return (
     <div className='rounded-md border border-yellow-700/40 bg-yellow-950/15 px-4 py-3 mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>

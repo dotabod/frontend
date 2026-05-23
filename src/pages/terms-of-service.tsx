@@ -1033,13 +1033,13 @@ TermsOfService.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Terms of Service',
         subtitle: 'Read the terms and conditions that govern your use of Dotabod services.',
+        title: 'Terms of Service',
       }}
       seo={{
-        title: 'Terms of Service | Dotabod',
-        description: 'Read the terms and conditions that govern your use of Dotabod services.',
         canonicalUrl: 'https://dotabod.com/terms-of-service',
+        description: 'Read the terms and conditions that govern your use of Dotabod services.',
+        title: 'Terms of Service | Dotabod',
       }}
     >
       {page}

@@ -1,41 +1,41 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 vi.stubEnv('NEXTAUTH_URL', 'https://dotabod.com')
 
 const mocks = vi.hoisted(() => ({
+  createNowPaymentsInvoice: vi.fn(),
+  featureFlags: { enableCryptoPayments: true },
+  getServerSession: vi.fn(),
+  getSubscription: vi.fn(),
   prisma: {
     $transaction: vi.fn(),
-    subscription: {
-      findFirst: vi.fn(),
-      updateMany: vi.fn(),
-    },
     nowPaymentsInvoice: {
       create: vi.fn(),
       findUnique: vi.fn(),
     },
+    subscription: {
+      findFirst: vi.fn(),
+      updateMany: vi.fn(),
+    },
   },
   stripe: {
-    prices: { retrieve: vi.fn() },
-    customers: { retrieve: vi.fn(), list: vi.fn(), create: vi.fn() },
+    checkout: { sessions: { create: vi.fn() } },
+    customers: { create: vi.fn(), list: vi.fn(), retrieve: vi.fn() },
+    invoiceItems: { create: vi.fn() },
     invoices: {
       create: vi.fn(),
       finalizeInvoice: vi.fn(),
+      markUncollectible: vi.fn(),
+      retrieve: vi.fn(),
       update: vi.fn(),
       voidInvoice: vi.fn(),
-      retrieve: vi.fn(),
-      markUncollectible: vi.fn(),
     },
-    invoiceItems: { create: vi.fn() },
-    checkout: { sessions: { create: vi.fn() } },
+    prices: { retrieve: vi.fn() },
   },
-  getServerSession: vi.fn(),
-  getSubscription: vi.fn(),
-  createNowPaymentsInvoice: vi.fn(),
-  featureFlags: { enableCryptoPayments: true },
 }))
 
 vi.mock('@/lib/db', () => ({ default: mocks.prisma }))
@@ -47,10 +47,10 @@ vi.mock('@/lib/nowpayments', () => ({
   createNowPaymentsInvoice: mocks.createNowPaymentsInvoice,
 }))
 vi.mock('@/utils/subscription', () => ({
-  getSubscription: mocks.getSubscription,
-  isInGracePeriod: () => false,
   GRACE_PERIOD_END: new Date('2099-01-01'),
   getCurrentPeriod: () => 'monthly',
+  getSubscription: mocks.getSubscription,
+  isInGracePeriod: () => false,
 }))
 
 let handler: typeof import('@/pages/api/stripe/create-checkout').default
@@ -61,21 +61,21 @@ beforeAll(async () => {
 
 const session = {
   user: {
-    id: 'user_1',
     email: 'user@example.com',
-    name: 'Test User',
+    id: 'user_1',
     image: '',
-    locale: 'en',
-    twitchId: 'twitch_1',
     isImpersonating: false,
+    locale: 'en',
+    name: 'Test User',
+    twitchId: 'twitch_1',
   },
 }
 
 function buildReq(body: Record<string, unknown> = { priceId: 'price_mo' }) {
   return createMocks<NextApiRequest, NextApiResponse>({
-    method: 'POST',
     body,
     headers: { referer: 'https://dotabod.com/dashboard/billing' },
+    method: 'POST',
   })
 }
 
@@ -103,18 +103,18 @@ describe('POST /api/stripe/create-checkout', () => {
     mocks.getSubscription.mockResolvedValue(null)
     mocks.stripe.customers.retrieve.mockResolvedValue({ id: 'cus_1' })
     mocks.stripe.prices.retrieve.mockResolvedValue({
-      type: 'recurring',
-      unit_amount: 1300,
       currency: 'usd',
       product: 'prod_1',
+      type: 'recurring',
+      unit_amount: 1300,
     })
   })
 
   describe('connection pool deadlock regression', () => {
     // Production runs with connection_limit=1. If the crypto flow's
-    // prisma.nowPaymentsInvoice.create() runs inside the outer $transaction it
-    // tries to grab a second pool connection while the tx still holds the only
-    // one → P2024/P2028 deadlock. These tests pin the transaction boundary.
+    // Prisma.nowPaymentsInvoice.create() runs inside the outer $transaction it
+    // Tries to grab a second pool connection while the tx still holds the only
+    // One → P2024/P2028 deadlock. These tests pin the transaction boundary.
 
     it('runs prisma.nowPaymentsInvoice.create after the outer $transaction has closed', async () => {
       const timeline: string[] = []
@@ -123,10 +123,10 @@ describe('POST /api/stripe/create-checkout', () => {
       mocks.stripe.invoices.create.mockResolvedValue({ id: 'in_1' })
       mocks.stripe.invoiceItems.create.mockResolvedValue({})
       mocks.stripe.invoices.finalizeInvoice.mockResolvedValue({
-        id: 'in_1',
-        customer: 'cus_1',
-        currency: 'usd',
         amount_remaining: 1300,
+        currency: 'usd',
+        customer: 'cus_1',
+        id: 'in_1',
       })
       mocks.stripe.invoices.update.mockResolvedValue({})
       mocks.createNowPaymentsInvoice.mockResolvedValue({
@@ -138,7 +138,7 @@ describe('POST /api/stripe/create-checkout', () => {
         return {}
       })
 
-      const { req, res } = buildReq({ priceId: 'price_mo', paymentMethod: 'crypto' })
+      const { req, res } = buildReq({ paymentMethod: 'crypto', priceId: 'price_mo' })
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
@@ -158,10 +158,10 @@ describe('POST /api/stripe/create-checkout', () => {
       })
       mocks.stripe.invoiceItems.create.mockResolvedValue({})
       mocks.stripe.invoices.finalizeInvoice.mockResolvedValue({
-        id: 'in_1',
-        customer: 'cus_1',
-        currency: 'usd',
         amount_remaining: 1300,
+        currency: 'usd',
+        customer: 'cus_1',
+        id: 'in_1',
       })
       mocks.stripe.invoices.update.mockResolvedValue({})
       mocks.createNowPaymentsInvoice.mockImplementation(async () => {
@@ -170,7 +170,7 @@ describe('POST /api/stripe/create-checkout', () => {
       })
       mocks.prisma.nowPaymentsInvoice.create.mockResolvedValue({})
 
-      const { req, res } = buildReq({ priceId: 'price_mo', paymentMethod: 'crypto' })
+      const { req, res } = buildReq({ paymentMethod: 'crypto', priceId: 'price_mo' })
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
@@ -203,10 +203,10 @@ describe('POST /api/stripe/create-checkout', () => {
       mocks.stripe.invoices.create.mockResolvedValue({ id: 'in_2' })
       mocks.stripe.invoiceItems.create.mockResolvedValue({})
       mocks.stripe.invoices.finalizeInvoice.mockResolvedValue({
-        id: 'in_2',
-        customer: 'cus_1',
-        currency: 'usd',
         amount_remaining: 1300,
+        currency: 'usd',
+        customer: 'cus_1',
+        id: 'in_2',
       })
       mocks.stripe.invoices.update.mockResolvedValue({})
       mocks.createNowPaymentsInvoice.mockResolvedValue({
@@ -215,7 +215,7 @@ describe('POST /api/stripe/create-checkout', () => {
       })
       mocks.prisma.nowPaymentsInvoice.create.mockResolvedValue({})
 
-      const { req, res } = buildReq({ priceId: 'price_mo', paymentMethod: 'crypto' })
+      const { req, res } = buildReq({ paymentMethod: 'crypto', priceId: 'price_mo' })
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
@@ -251,7 +251,7 @@ describe('POST /api/stripe/create-checkout', () => {
         url: 'https://checkout.stripe.com/no-crypto',
       })
 
-      const { req, res } = buildReq({ priceId: 'price_mo', paymentMethod: 'crypto' })
+      const { req, res } = buildReq({ paymentMethod: 'crypto', priceId: 'price_mo' })
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)

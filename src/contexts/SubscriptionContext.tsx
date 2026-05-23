@@ -51,15 +51,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   return (
     <SubscriptionContext.Provider
       value={{
-        subscription,
-        isLoading,
-        inGracePeriod,
-        hasActivePlan,
-        isLifetimePlan,
-        isPro,
-        isFree,
         creditBalance,
         formattedCreditBalance,
+        hasActivePlan,
+        inGracePeriod,
+        isFree,
+        isLifetimePlan,
+        isLoading,
+        isPro,
+        subscription,
       }}
     >
       {children}

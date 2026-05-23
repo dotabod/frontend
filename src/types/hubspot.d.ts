@@ -19,7 +19,7 @@ interface HubSpotConversationsSettings {
 
 interface Window {
   _hsq: unknown[]
-  hsConversationsOnReady?: Array<() => void>
+  hsConversationsOnReady?: (() => void)[]
   hsConversationsSettings?: HubSpotConversationsSettings
   HubSpotConversations?: HubSpotConversations
 }

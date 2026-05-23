@@ -41,22 +41,22 @@ export async function findExistingCryptoSubscription(
 ) {
   return await tx.subscription.findFirst({
     where: {
-      userId,
       OR: [
         // Check for recurring subscriptions
         {
+          metadata: {
+            equals: 'true',
+            path: ['isCryptoPayment'],
+          },
           stripeCustomerId: customerId,
           transactionType: 'RECURRING',
-          metadata: {
-            path: ['isCryptoPayment'],
-            equals: 'true',
-          },
         },
         // Also check for one-time crypto payments with our special ID format
         {
           stripeSubscriptionId: `crypto_${sessionId}`,
         },
       ],
+      userId,
     },
   })
 }
@@ -77,13 +77,13 @@ export async function createLifetimePurchase(
   metadata?: Prisma.InputJsonObject,
 ): Promise<{ id: string }> {
   const existingLifetimePurchase = await tx.subscription.findFirst({
-    where: {
-      userId,
-      status: SubscriptionStatus.ACTIVE,
-      transactionType: TransactionType.LIFETIME,
-    },
     select: {
       id: true,
+    },
+    where: {
+      status: SubscriptionStatus.ACTIVE,
+      transactionType: TransactionType.LIFETIME,
+      userId,
     },
   })
 
@@ -104,14 +104,14 @@ export async function createLifetimePurchase(
 
   return await tx.subscription.create({
     data: {
-      userId,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: farFutureDate,
+      status: SubscriptionStatus.ACTIVE,
       stripeCustomerId: customerId,
       stripePriceId: priceId || undefined,
-      status: SubscriptionStatus.ACTIVE,
       tier: 'PRO',
       transactionType: TransactionType.LIFETIME,
-      currentPeriodEnd: farFutureDate,
-      cancelAtPeriodEnd: false,
+      userId,
       ...(metadata ? { metadata } : {}),
     },
     select: {
@@ -179,20 +179,20 @@ export async function createCryptoSubscription(
 
   try {
     // For crypto payments, we create a draft invoice instead of a subscription
-    // since crypto payments are one-time and not recurring
+    // Since crypto payments are one-time and not recurring
     const invoice = await stripe.invoices.create({
+      auto_advance: true, // Enable automatic advancement so Stripe handles finalization
+      automatically_finalizes_at: Math.floor(renewalDate.getTime() / 1000),
+      collection_method: 'send_invoice',
       customer: customerId,
       description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
-      collection_method: 'send_invoice',
-      automatically_finalizes_at: Math.floor(renewalDate.getTime() / 1000),
       due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000), // Due date 7 days after finalization date
-      auto_advance: true, // Enable automatic advancement so Stripe handles finalization
       metadata: {
-        userId,
         isCryptoPayment: 'true',
-        originalCheckoutSession: session.id,
         isRenewalInvoice: 'true',
+        originalCheckoutSession: session.id,
         pricePeriod,
+        userId,
       },
     })
 
@@ -204,9 +204,9 @@ export async function createCryptoSubscription(
 
     // Add the line item for the price
     await stripe.invoiceItems.create({
-      description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
-      customer: customerId,
       amount: price.unit_amount,
+      customer: customerId,
+      description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
       invoice: invoice.id,
     })
 
@@ -220,23 +220,23 @@ export async function createCryptoSubscription(
     // Create a subscription record with auto-expiry at period end
     await tx.subscription.create({
       data: {
-        userId,
-        stripeCustomerId: customerId,
-        stripePriceId: priceId,
-        status: SubscriptionStatus.ACTIVE,
-        tier: 'PRO',
-        transactionType: TransactionType.RECURRING,
-        currentPeriodEnd: periodEnd,
         cancelAtPeriodEnd: true, // Will expire at the end of the period
-        stripeSubscriptionId: `crypto_${session.id}`, // Use a prefix to identify crypto payments
+        currentPeriodEnd: periodEnd,
         metadata: {
-          isCryptoPayment: 'true',
           checkoutSessionId: session.id,
+          isCryptoPayment: 'true',
           paymentIntentId: (session.payment_intent as string) || undefined,
           priceType: pricePeriod,
-          renewalInvoiceId: renewalInvoiceId, // Store reference to the draft invoice
           renewalDueDate: renewalDate.toISOString(),
+          renewalInvoiceId, // Store reference to the draft invoice,
         },
+        status: SubscriptionStatus.ACTIVE,
+        stripeCustomerId: customerId,
+        stripePriceId: priceId,
+        stripeSubscriptionId: `crypto_${session.id}`, // Use a prefix to identify crypto payments
+        tier: 'PRO',
+        transactionType: TransactionType.RECURRING,
+        userId,
       },
     })
 
@@ -250,22 +250,22 @@ export async function createCryptoSubscription(
     // Still create the subscription but without renewal info
     await tx.subscription.create({
       data: {
-        userId,
-        stripeCustomerId: customerId,
-        stripePriceId: priceId,
-        status: SubscriptionStatus.ACTIVE,
-        tier: 'PRO',
-        transactionType: TransactionType.RECURRING,
-        currentPeriodEnd: periodEnd,
         cancelAtPeriodEnd: true,
-        stripeSubscriptionId: `crypto_${session.id}`,
+        currentPeriodEnd: periodEnd,
         metadata: {
-          isCryptoPayment: 'true',
           checkoutSessionId: session.id,
+          isCryptoPayment: 'true',
           paymentIntentId: (session.payment_intent as string) || undefined,
           priceType: pricePeriod,
           renewalError: 'true',
         },
+        status: SubscriptionStatus.ACTIVE,
+        stripeCustomerId: customerId,
+        stripePriceId: priceId,
+        stripeSubscriptionId: `crypto_${session.id}`,
+        tier: 'PRO',
+        transactionType: TransactionType.RECURRING,
+        userId,
       },
     })
 

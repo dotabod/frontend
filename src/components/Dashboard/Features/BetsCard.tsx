@@ -99,7 +99,7 @@ export default function BetsCard() {
                   htmlType='submit'
                   disabled={
                     !form.isFieldsTouched() ||
-                    !!form.getFieldsError().filter(({ errors }) => errors.length).length
+                    form.getFieldsError().filter(({ errors }) => errors.length).length > 0
                   }
                 >
                   Save

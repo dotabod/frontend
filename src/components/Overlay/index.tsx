@@ -45,7 +45,7 @@ interface PotentialError {
 
 // Check before the component even renders - this check is now primarily for _app.tsx
 // OverlayPage will rely on the determination made in _app.tsx, passed via props or context if necessary,
-// or _app.tsx will render InvalidOverlayPage directly.
+// Or _app.tsx will render InvalidOverlayPage directly.
 // For now, we keep a local check as a fallback or if this page is accessed directly not through _app standard flow.
 const isInvalidLocalCheck = checkForInvalidOverlay(
   typeof window !== 'undefined' ? window.location.pathname : '',
@@ -79,9 +79,9 @@ const OverlayPage = () => {
   const { notablePlayers, setNotablePlayers } = useNotablePlayers()
   const [wl, setWL] = useState([
     {
-      win: 0,
       lose: 0,
       type: 'U',
+      win: 0,
     },
   ])
   const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)
@@ -95,9 +95,9 @@ const OverlayPage = () => {
     notLoaded?: boolean
   }>({
     image: '0.png',
-    rank: 0,
     leaderboard: 0,
     notLoaded: true,
+    rank: 0,
   })
 
   const [isInIframe, setIsInIframe] = useState(false)
@@ -117,9 +117,11 @@ const OverlayPage = () => {
   }, [])
 
   // Wait 10s after the first connect before showing MainScreenOverlays;
-  // reconnects after that show immediately.
+  // Reconnects after that show immediately.
   useEffect(() => {
-    if (!connected) return
+    if (!connected) {
+      return
+    }
     if (hasShownOnce) {
       setShowMainScreenOverlay(true)
       return
@@ -127,12 +129,14 @@ const OverlayPage = () => {
     const timer = setTimeout(() => {
       setShowMainScreenOverlay(true)
       setHasShownOnce(true)
-    }, 10000)
+    }, 10_000)
     return () => clearTimeout(timer)
   }, [connected, hasShownOnce])
 
   useEffect(() => {
-    if (!original) return
+    if (!original) {
+      return
+    }
 
     const steamAccount = original.SteamAccount?.[0]
     const rank = getRankDetail(
@@ -140,7 +144,9 @@ const OverlayPage = () => {
       steamAccount?.leaderboard_rank ?? null,
     )
 
-    if (!rank) return
+    if (!rank) {
+      return
+    }
 
     const leaderboard =
       'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? null)
@@ -152,9 +158,9 @@ const OverlayPage = () => {
       notLoaded: boolean
     } = {
       image: rank.myRank?.image ?? '0.png',
-      rank: rank.mmr,
       leaderboard,
       notLoaded: false,
+      rank: rank.mmr,
     }
 
     setRankImageDetails(rankDetails)
@@ -176,8 +182,8 @@ const OverlayPage = () => {
         reportedErrorStatus.current = status
         Sentry.captureException(new Error('Error in overlay page fetching settings'), {
           extra: {
-            status,
             message: (error as PotentialError)?.message,
+            status,
           },
         })
       }
@@ -194,8 +200,8 @@ const OverlayPage = () => {
           localStorage.setItem(
             pathKey,
             JSON.stringify({
-              timestamp: Date.now(),
               status: 404,
+              timestamp: Date.now(),
             }),
           )
         } catch {
@@ -204,12 +210,12 @@ const OverlayPage = () => {
       }
 
       notification.open({
-        key: 'auth-error',
-        type: 'error',
-        duration: 0,
-        placement: 'bottomLeft',
-        message: 'Authentication failed',
         description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+        duration: 0,
+        key: 'auth-error',
+        message: 'Authentication failed',
+        placement: 'bottomLeft',
+        type: 'error',
       })
     } else {
       notification.destroy('auth-error')
@@ -217,7 +223,9 @@ const OverlayPage = () => {
   }, [error, notification, is404])
 
   useEffect(() => {
-    if (!isDevMode) return
+    if (!isDevMode) {
+      return
+    }
     setWL(devWL)
     setPollData(devPoll)
     setBlock(devBlockTypes)
@@ -227,17 +235,17 @@ const OverlayPage = () => {
 
   useSocket({
     setAegis,
+    setBetData,
     setBlock,
+    setChatMessages,
     setConnected,
+    setNotablePlayers,
     setPaused,
+    setPollData,
+    setRadiantWinChance,
     setRankImageDetails,
     setRoshan,
-    setPollData,
-    setBetData,
-    setNotablePlayers,
     setWL,
-    setRadiantWinChance,
-    setChatMessages,
   })
 
   useOBS({ block, connected })

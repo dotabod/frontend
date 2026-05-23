@@ -21,7 +21,7 @@ export default function WinLossOverlay() {
       </div>
 
       <div className='my-6 flex justify-center space-x-4'>
-        <WinLossCard wl={[{ win: 10, lose: 5, type: '10-5' }]} />
+        <WinLossCard wl={[{ lose: 5, type: '10-5', win: 10 }]} />
       </div>
     </Card>
   )

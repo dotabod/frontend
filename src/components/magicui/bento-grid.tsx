@@ -2,15 +2,13 @@ import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { MagicCard } from './magic-card'
 
-const BentoGrid = ({ children, className }: { children: ReactNode; className?: string }) => {
-  return (
-    <div className={clsx('grid w-full auto-rows-[22rem] grid-cols-3 gap-4', className)}>
-      {children}
-    </div>
-  )
-}
+const BentoGrid = ({ children, className }: { children: ReactNode; className?: string }) => (
+  <div className={clsx('grid w-full auto-rows-[22rem] grid-cols-3 gap-4', className)}>
+    {children}
+  </div>
+)
 
-type BentoGridItemProps = {
+interface BentoGridItemProps {
   name: ReactNode
   className: string
   background?: ReactNode
@@ -63,8 +61,8 @@ const BentoCard = ({
           className={clsx(
             'absolute bottom-0 flex w-full transform-gpu flex-row items-center p-4 transition-all duration-300',
             {
-              'translate-y-10 opacity-0': !disableHover,
               'group-hover:translate-y-0 group-hover:opacity-100': !disableHover,
+              'translate-y-10 opacity-0': !disableHover,
             },
           )}
         >

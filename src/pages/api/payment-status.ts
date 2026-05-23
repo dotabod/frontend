@@ -50,11 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Update local status if different
     if (chargeStatus && chargeStatus.status !== openNodeCharge.status) {
       await prisma.openNodeCharge.update({
-        where: { id: openNodeCharge.id },
         data: {
           status: chargeStatus.status,
           updatedAt: new Date(),
         },
+        where: { id: openNodeCharge.id },
       })
     }
 
@@ -80,20 +80,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Return user-friendly status information
     res.status(200).json({
-      invoiceId,
-      chargeId: openNodeCharge.openNodeChargeId,
-      status: currentStatus,
       amount: invoiceAmount || openNodeCharge.amount,
-      currency: invoice.currency || openNodeCharge.currency,
+      chargeId: openNodeCharge.openNodeChargeId,
       createdAt: openNodeCharge.createdAt,
-      statusInfo: getStatusInfo(currentStatus),
+      currency: invoice.currency || openNodeCharge.currency,
       invoice: {
-        id: invoice.id,
-        number: invoice.number,
         amount: invoice.amount_due ? invoice.amount_due / 100 : 0,
         currency: invoice.currency,
+        id: invoice.id,
+        number: invoice.number,
         status: invoice.status,
       },
+      invoiceId,
+      status: currentStatus,
+      statusInfo: getStatusInfo(currentStatus),
     })
   } catch (error) {
     console.error('Payment status check failed:', error)
@@ -104,57 +104,64 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 function getStatusInfo(status: string) {
   switch (status) {
-    case 'processing':
+    case 'processing': {
       return {
-        message: 'Payment is processing on the blockchain',
-        type: 'processing',
+        canRetry: false,
         description:
           'Your Bitcoin payment has been received and is being confirmed on the blockchain. This usually takes 10-30 minutes.',
-        canRetry: false,
+        message: 'Payment is processing on the blockchain',
+        type: 'processing',
       }
+    }
     case 'paid':
-    case 'confirmed':
+    case 'confirmed': {
       return {
+        canRetry: false,
+        description: 'Your Bitcoin payment has been confirmed and your subscription is now active.',
         message: 'Payment completed successfully',
         type: 'success',
-        description: 'Your Bitcoin payment has been confirmed and your subscription is now active.',
-        canRetry: false,
       }
-    case 'expired':
+    }
+    case 'expired': {
       return {
+        canRetry: true,
+        description: 'The payment window has expired. You can request a new payment link.',
         message: 'Payment link has expired',
         type: 'expired',
-        description: 'The payment window has expired. You can request a new payment link.',
-        canRetry: true,
       }
-    case 'cancelled':
+    }
+    case 'cancelled': {
       return {
+        canRetry: true,
+        description: 'The payment was cancelled before completion.',
         message: 'Payment was cancelled',
         type: 'cancelled',
-        description: 'The payment was cancelled before completion.',
-        canRetry: true,
       }
-    case 'underpaid':
+    }
+    case 'underpaid': {
       return {
+        canRetry: false,
+        description: 'The payment amount was less than required. Please contact support.',
         message: 'Payment amount insufficient',
         type: 'error',
-        description: 'The payment amount was less than required. Please contact support.',
-        canRetry: false,
       }
-    case 'overpaid':
+    }
+    case 'overpaid': {
       return {
-        message: 'Payment amount exceeded',
-        type: 'warning',
+        canRetry: false,
         description:
           'You paid more than required. Your subscription is active and we will process the refund.',
-        canRetry: false,
+        message: 'Payment amount exceeded',
+        type: 'warning',
       }
-    default:
+    }
+    default: {
       return {
+        canRetry: false,
+        description: 'Unable to determine payment status. Please contact support if this persists.',
         message: 'Payment status unknown',
         type: 'unknown',
-        description: 'Unable to determine payment status. Please contact support if this persists.',
-        canRetry: false,
       }
+    }
   }
 }

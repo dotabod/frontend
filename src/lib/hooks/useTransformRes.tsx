@@ -5,9 +5,7 @@ export const useTransformRes = ({
 }: {
   returnInput?: boolean
 } = {}): TransformRes => {
-  const res: TransformRes = ({ h = 0, w = 0 }) => {
-    return h || w
-  }
+  const res: TransformRes = ({ h = 0, w = 0 }) => h || w
 
   return res
 }

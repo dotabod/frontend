@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { GiftSubscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/test-gift-notification'
 
 // Mock dependencies
@@ -23,16 +23,16 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/lib/db', () => ({
   default: {
-    subscription: {
-      findFirst: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-    },
     giftSubscription: {
       create: vi.fn(),
     },
     notification: {
       create: vi.fn(),
+    },
+    subscription: {
+      create: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }))
@@ -54,42 +54,42 @@ describe('test-gift-notification API', () => {
 
     const mockDate = new Date()
     vi.mocked(prisma.subscription.create).mockResolvedValue({
+      cancelAtPeriodEnd: false,
+      createdAt: mockDate,
+      currentPeriodEnd: mockDate,
       id: 'sub-123',
-      userId: 'user-123',
+      isGift: true,
+      metadata: null,
+      status: 'ACTIVE' as SubscriptionStatus,
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
       tier: 'PRO' as SubscriptionTier,
-      status: 'ACTIVE' as SubscriptionStatus,
       transactionType: 'RECURRING',
-      currentPeriodEnd: mockDate,
-      cancelAtPeriodEnd: false,
-      createdAt: mockDate,
       updatedAt: mockDate,
-      isGift: true,
-      metadata: null,
+      userId: 'user-123',
     })
 
     vi.mocked(prisma.giftSubscription.create).mockResolvedValue({
-      id: 'gift-123',
-      subscriptionId: 'sub-123',
-      senderName: 'Test Sender',
-      giftMessage: 'This is a test gift message. Enjoy your subscription!',
-      giftType: 'monthly',
-      giftQuantity: 1,
       createdAt: mockDate,
-      updatedAt: mockDate,
+      giftMessage: 'This is a test gift message. Enjoy your subscription!',
+      giftQuantity: 1,
+      giftType: 'monthly',
       gifterId: null,
+      id: 'gift-123',
+      senderName: 'Test Sender',
+      subscriptionId: 'sub-123',
+      updatedAt: mockDate,
     })
 
     vi.mocked(prisma.notification.create).mockResolvedValue({
-      id: 'notification-123',
-      userId: 'user-123',
-      type: 'GIFT_SUBSCRIPTION',
-      isRead: false,
-      giftSubscriptionId: 'gift-123',
       createdAt: mockDate,
+      giftSubscriptionId: 'gift-123',
+      id: 'notification-123',
+      isRead: false,
+      type: 'GIFT_SUBSCRIPTION',
       updatedAt: mockDate,
+      userId: 'user-123',
     })
   })
 
@@ -123,18 +123,18 @@ describe('test-gift-notification API', () => {
 
   it('returns 401 when user is not an admin', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'user',
         locale: 'en',
+        name: 'Test User',
+        role: 'user',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     const { req, res } = createMocks({
@@ -149,18 +149,18 @@ describe('test-gift-notification API', () => {
 
   it('returns 400 for invalid gift type', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'admin',
         locale: 'en',
+        name: 'Test User',
+        role: 'admin',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     const { req, res } = createMocks({
@@ -180,27 +180,27 @@ describe('test-gift-notification API', () => {
 
   it('returns 400 for invalid gift quantity', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'admin',
         locale: 'en',
+        name: 'Test User',
+        role: 'admin',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     const { req, res } = createMocks({
+      body: {
+        giftQuantity: '-1',
+      },
       method: 'POST',
       query: {
         giftType: 'monthly',
-      },
-      body: {
-        giftQuantity: '-1',
       },
     })
 
@@ -214,41 +214,41 @@ describe('test-gift-notification API', () => {
 
   it('successfully creates a monthly gift notification', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'admin',
         locale: 'en',
+        name: 'Test User',
+        role: 'admin',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     const mockDate = new Date()
     vi.mocked(prisma.giftSubscription.create).mockResolvedValue({
-      id: 'gift-123',
-      subscriptionId: 'sub-123',
-      senderName: 'Test Sender',
-      giftMessage: 'This is a test gift message. Enjoy your subscription!',
-      giftType: 'monthly',
-      giftQuantity: 2,
       createdAt: mockDate,
-      updatedAt: mockDate,
+      giftMessage: 'This is a test gift message. Enjoy your subscription!',
+      giftQuantity: 2,
+      giftType: 'monthly',
       gifterId: null,
+      id: 'gift-123',
+      senderName: 'Test Sender',
+      subscriptionId: 'sub-123',
+      updatedAt: mockDate,
     })
 
     const { req, res } = createMocks({
+      body: {
+        giftMessage: 'This is a test gift message. Enjoy your subscription!',
+        giftQuantity: '2',
+      },
       method: 'POST',
       query: {
         giftType: 'monthly',
-      },
-      body: {
-        giftQuantity: '2',
-        giftMessage: 'This is a test gift message. Enjoy your subscription!',
       },
     })
 
@@ -267,67 +267,67 @@ describe('test-gift-notification API', () => {
 
   it('successfully creates a lifetime gift notification', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'admin',
         locale: 'en',
+        name: 'Test User',
+        role: 'admin',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     const mockDate = new Date()
     vi.mocked(prisma.giftSubscription.create).mockResolvedValue({
-      id: 'gift-123',
-      subscriptionId: 'sub-123',
-      senderName: 'Test Sender',
-      giftMessage: 'This is a test gift message. Enjoy your subscription!',
-      giftType: 'lifetime',
-      giftQuantity: 1,
       createdAt: mockDate,
-      updatedAt: mockDate,
+      giftMessage: 'This is a test gift message. Enjoy your subscription!',
+      giftQuantity: 1,
+      giftType: 'lifetime',
       gifterId: null,
+      id: 'gift-123',
+      senderName: 'Test Sender',
+      subscriptionId: 'sub-123',
+      updatedAt: mockDate,
     })
     vi.mocked(prisma.subscription.findMany).mockResolvedValue([
       {
-        id: 'sub-1234',
-        userId: 'user-123',
-        status: 'ACTIVE',
-        isGift: true,
+        cancelAtPeriodEnd: false,
         createdAt: mockDate,
-        updatedAt: mockDate,
+        currentPeriodEnd: mockDate,
+        giftDetails: {
+          createdAt: mockDate,
+          giftMessage: 'This is a test gift message',
+          giftQuantity: 1,
+          giftType: 'lifetime',
+          id: 'gift-details-123',
+          senderName: 'Test Sender',
+          subscriptionId: 'sub-1234',
+          updatedAt: mockDate,
+        } as GiftSubscription,
+        id: 'sub-1234',
+        isGift: true,
+        status: 'ACTIVE',
         stripeCustomerId: null,
         stripePriceId: null,
         stripeSubscriptionId: null,
         tier: 'PRO',
         transactionType: 'LIFETIME',
-        currentPeriodEnd: mockDate,
-        cancelAtPeriodEnd: false,
-        giftDetails: {
-          id: 'gift-details-123',
-          subscriptionId: 'sub-1234',
-          senderName: 'Test Sender',
-          giftMessage: 'This is a test gift message',
-          giftType: 'lifetime',
-          giftQuantity: 1,
-          createdAt: mockDate,
-          updatedAt: mockDate,
-        } as GiftSubscription,
+        updatedAt: mockDate,
+        userId: 'user-123',
       },
     ])
 
     const { req, res } = createMocks({
+      body: {
+        giftMessage: 'This is a test gift message. Enjoy your subscription!',
+      },
       method: 'POST',
       query: {
         giftType: 'lifetime',
-      },
-      body: {
-        giftMessage: 'This is a test gift message. Enjoy your subscription!',
       },
     })
 
@@ -346,18 +346,18 @@ describe('test-gift-notification API', () => {
 
   it('handles existing lifetime subscription', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'admin',
         locale: 'en',
+        name: 'Test User',
+        role: 'admin',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     // Mock console.warn
@@ -366,32 +366,32 @@ describe('test-gift-notification API', () => {
     const mockDate = new Date()
     // Mock existing lifetime subscription
     vi.mocked(prisma.subscription.findFirst).mockResolvedValue({
+      cancelAtPeriodEnd: false,
+      createdAt: mockDate,
+      currentPeriodEnd: mockDate,
       id: 'existing-sub-123',
-      userId: 'user-123',
+      isGift: true,
+      metadata: null,
+      status: 'ACTIVE' as SubscriptionStatus,
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
       tier: 'PRO' as SubscriptionTier,
-      status: 'ACTIVE' as SubscriptionStatus,
       transactionType: 'LIFETIME',
-      currentPeriodEnd: mockDate,
-      cancelAtPeriodEnd: false,
-      createdAt: mockDate,
       updatedAt: mockDate,
-      isGift: true,
-      metadata: null,
+      userId: 'user-123',
     })
 
     vi.mocked(prisma.giftSubscription.create).mockResolvedValue({
-      id: 'gift-123',
-      subscriptionId: 'sub-123',
-      senderName: 'Test Sender',
-      giftMessage: 'This is a test gift message. Enjoy your subscription!',
-      giftType: 'lifetime',
-      giftQuantity: 1,
       createdAt: mockDate,
-      updatedAt: mockDate,
+      giftMessage: 'This is a test gift message. Enjoy your subscription!',
+      giftQuantity: 1,
+      giftType: 'lifetime',
       gifterId: null,
+      id: 'gift-123',
+      senderName: 'Test Sender',
+      subscriptionId: 'sub-123',
+      updatedAt: mockDate,
     })
 
     const { req, res } = createMocks({
@@ -411,18 +411,18 @@ describe('test-gift-notification API', () => {
 
   it('handles server error', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
+      expires: '',
       user: {
-        id: 'user-123',
-        name: 'Test User',
         email: 'test@example.com',
+        id: 'user-123',
         image: 'https://example.com/avatar.png',
         isImpersonating: false,
-        twitchId: 'twitch-123',
-        role: 'admin',
         locale: 'en',
+        name: 'Test User',
+        role: 'admin',
         scope: 'user',
+        twitchId: 'twitch-123',
       },
-      expires: '',
     })
 
     // Mock console.error

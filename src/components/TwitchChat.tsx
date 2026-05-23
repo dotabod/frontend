@@ -14,7 +14,9 @@ export default function TwitchChat({
   responses?: React.ReactNode[]
   response?: React.ReactNode
 }) {
-  if (response) responses.push(response)
+  if (response) {
+    responses.push(response)
+  }
   return (
     <div
       className={clsx(className, 'mt-2 max-w-xs rounded-sm border p-2 text-sm', 'border-gray-700')}

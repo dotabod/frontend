@@ -11,12 +11,12 @@ export function withAuthentication(handler: NextApiHandler) {
 
     if (process.env.NEXT_PUBLIC_SENTRY_DSN && session?.user?.id) {
       Sentry.setUser({
-        id: session?.user?.id,
-        username: session?.user?.name,
         email: session?.user?.email ?? undefined,
-        twitchId: session?.user?.twitchId,
-        locale: session?.user?.locale,
+        id: session?.user?.id,
         isImpersonating: session?.user?.isImpersonating,
+        locale: session?.user?.locale,
+        twitchId: session?.user?.twitchId,
+        username: session?.user?.name,
       })
     }
 

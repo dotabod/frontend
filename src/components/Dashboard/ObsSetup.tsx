@@ -125,16 +125,18 @@ const ObsSetup: React.FC = () => {
   }, [obsPort, obsPassword, form, obs])
 
   useEffect(() => {
-    if (!obs || !hasAccess) return
+    if (!obs || !hasAccess) {
+      return
+    }
 
     const handleConnectionClosed = (error?: Error) => {
       console.log('OBS connection closed', error)
       setConnected(false)
       setError({
-        code: 'CONNECTION_CLOSED',
-        message: 'Connection to OBS lost',
-        details: error?.message || 'Unknown error',
         actionable: true,
+        code: 'CONNECTION_CLOSED',
+        details: error?.message || 'Unknown error',
+        message: 'Connection to OBS lost',
       })
       track('obs/connection_closed', { error: error?.message || 'No error details' })
     }
@@ -143,10 +145,10 @@ const ObsSetup: React.FC = () => {
       console.log('OBS connection error:', error)
       setConnected(false)
       setError({
-        code: 'CONNECTION_ERROR',
-        message: 'Connection error',
-        details: error.message || 'Unknown error',
         actionable: true,
+        code: 'CONNECTION_ERROR',
+        details: error.message || 'Unknown error',
+        message: 'Connection error',
       })
       track('obs/connection_error', { error: error.message })
     }
@@ -160,11 +162,11 @@ const ObsSetup: React.FC = () => {
       // Note: Currently WebSockets are not yet gated by LNA, but we prepare for it
       if (shouldCheckLna() && lnaChecked && lnaPermissionState === 'denied') {
         setError({
+          actionable: true,
           code: 'CONNECTION_ERROR',
-          message: 'Local network access denied',
           details:
             'Your browser has denied permission to connect to OBS. Please allow local network access in your browser settings.',
-          actionable: true,
+          message: 'Local network access denied',
         })
         track('obs/lna_denied_blocked')
         return
@@ -176,7 +178,7 @@ const ObsSetup: React.FC = () => {
         const obsPasswordValue = form.getFieldValue('password') || ''
 
         await obs.connect(`ws://${obsHost}:${obsPortValue}`, obsPasswordValue, {
-          eventSubscriptions: 0b1111111111111111,
+          eventSubscriptions: 0b1111_1111_1111_1111,
         })
         setConnected(true)
         setError(null) // Clear any previous connection errors
@@ -184,7 +186,7 @@ const ObsSetup: React.FC = () => {
         track('obs/connect_success', { port: obsPortValue })
 
         const getVersion = await obs.call('GetVersion')
-        const obsVersion = getVersion.obsVersion
+        const { obsVersion } = getVersion
 
         const [major, minor, patch] = obsVersion.split('.').map(Number)
         if (
@@ -193,9 +195,9 @@ const ObsSetup: React.FC = () => {
           (major === 30 && minor === 2 && patch < 3)
         ) {
           setError({
+            actionable: true,
             code: 'VERSION_TOO_OLD',
             message: 'OBS version 30.2.3 or above is required',
-            actionable: true,
           })
           console.log('Error: OBS version 30.2.3 or above is required')
           track('obs/version_error', { version: obsVersion })
@@ -205,10 +207,10 @@ const ObsSetup: React.FC = () => {
         // Check if version is too new (31.0 or above)
         if (major >= 31) {
           setError({
+            actionable: false,
             code: 'VERSION_TOO_NEW',
             message:
               'OBS version 31 or above may cause blank overlay issues. If your overlay loads correctly, you can ignore this warning',
-            actionable: false,
           })
           console.log('Warning: OBS version 31 or above may cause blank overlay issues')
           track('obs/version_warning', { version: obsVersion })
@@ -221,13 +223,13 @@ const ObsSetup: React.FC = () => {
         setBaseHeight(fetchedBaseHeight)
 
         await fetchScenes(fetchedBaseWidth, fetchedBaseHeight)
-      } catch (err: unknown) {
-        const errorObj = err as Error
+      } catch (error: unknown) {
+        const errorObj = error as Error
         setError({
-          code: 'CONNECTION_ERROR',
-          message: 'Error connecting to OBS',
-          details: errorObj.message,
           actionable: true,
+          code: 'CONNECTION_ERROR',
+          details: errorObj.message,
+          message: 'Error connecting to OBS',
         })
         console.log('Error:', errorObj)
         track('obs/connection_error', { error: errorObj.message })
@@ -243,8 +245,8 @@ const ObsSetup: React.FC = () => {
 
       try {
         obs.disconnect()
-      } catch (err) {
-        console.log('Error disconnecting from OBS:', err)
+      } catch (error) {
+        console.log('Error disconnecting from OBS:', error)
       }
 
       setConnected(false)
@@ -253,15 +255,17 @@ const ObsSetup: React.FC = () => {
 
   // Modify fetchScenes to accept baseWidth and baseHeight
   const fetchScenes = async (currentBaseWidth: number, currentBaseHeight: number) => {
-    if (!obs || !hasAccess) return
+    if (!obs || !hasAccess) {
+      return
+    }
 
     try {
       // Fetch the list of scenes
       const sceneListResponse = await obs.call('GetSceneList')
       const scenes: Scene[] = sceneListResponse.scenes.map((scene) => ({
         sceneIndex: Number(scene.sceneIndex),
-        sceneUuid: String(scene.sceneUuid),
         sceneName: String(scene.sceneName),
+        sceneUuid: String(scene.sceneUuid),
       }))
       const sceneUuids = scenes.map((scene) => scene.sceneUuid)
       setScenes(scenes)
@@ -286,13 +290,13 @@ const ObsSetup: React.FC = () => {
       if (error?.actionable) {
         setError(null)
       }
-    } catch (err: unknown) {
-      const errorObj = err as Error
+    } catch (error: unknown) {
+      const errorObj = error as Error
       setError({
-        code: 'FETCH_SCENES_ERROR',
-        message: 'Error fetching scenes',
-        details: errorObj.message,
         actionable: true,
+        code: 'FETCH_SCENES_ERROR',
+        details: errorObj.message,
+        message: 'Error fetching scenes',
       })
       console.log('Error:', errorObj)
       Sentry.captureException(errorObj)
@@ -306,7 +310,9 @@ const ObsSetup: React.FC = () => {
     currentBaseWidth: number,
     currentBaseHeight: number,
   ) => {
-    if (!obs || scenesToAdd.length === 0 || !hasAccess) return
+    if (!obs || scenesToAdd.length === 0 || !hasAccess) {
+      return
+    }
 
     track('obs/add_to_scene')
 
@@ -344,46 +350,46 @@ const ObsSetup: React.FC = () => {
         if (existingInput) {
           // If the input exists globally, add it to the selected scene
           const createSceneItemResponse = await obs.call('CreateSceneItem', {
+            sceneItemEnabled: true, // Enable the item by default
             sceneUuid: selectedScene,
             sourceName: '[dotabod] main overlay',
-            sceneItemEnabled: true, // Enable the item by default
           })
           await obs.call('SetSceneItemLocked', {
-            sceneUuid: selectedScene,
             sceneItemId: createSceneItemResponse.sceneItemId,
             sceneItemLocked: true,
+            sceneUuid: selectedScene,
           })
           addedScenes++
           message.success(`Existing source added to scene: ${selectedScene}`)
         } else {
           // If the input doesn't exist, create a new browser source using CreateInput
           const createInputResponse = await obs.call('CreateInput', {
-            sceneUuid: selectedScene,
-            inputName: '[dotabod] main overlay',
             inputKind: 'browser_source',
+            inputName: '[dotabod] main overlay',
             inputSettings: {
               css: '',
-              url: overlayUrl,
-              width: currentBaseWidth,
               height: currentBaseHeight,
+              url: overlayUrl,
               webpage_control_level: 4, // Allow OBS to control the webpage
+              width: currentBaseWidth,
             },
+            sceneUuid: selectedScene,
           })
           await obs.call('SetSceneItemLocked', {
-            sceneUuid: selectedScene,
             sceneItemId: createInputResponse.sceneItemId,
             sceneItemLocked: true,
+            sceneUuid: selectedScene,
           })
           addedScenes++
           message.success(`New browser source created and added to scene: ${selectedScene}`)
         }
-      } catch (err: unknown) {
-        const errorObj = err as Error
+      } catch (error: unknown) {
+        const errorObj = error as Error
         setError({
-          code: 'ADD_TO_SCENE_ERROR',
-          message: 'Error adding browser source to scene',
-          details: errorObj.message,
           actionable: true,
+          code: 'ADD_TO_SCENE_ERROR',
+          details: errorObj.message,
+          message: 'Error adding browser source to scene',
         })
         console.log('Error:', errorObj)
         Sentry.captureException(errorObj)
@@ -400,7 +406,9 @@ const ObsSetup: React.FC = () => {
   }
 
   const checkScenesForSource = async (sceneUuids: string[]): Promise<string[]> => {
-    if (!obs) return []
+    if (!obs) {
+      return []
+    }
 
     const scenesWithOverlay: string[] = []
 
@@ -421,8 +429,8 @@ const ObsSetup: React.FC = () => {
         if (existingSourceInScene) {
           scenesWithOverlay.push(scene)
         }
-      } catch (err: unknown) {
-        const errorObj = err as Error
+      } catch (error: unknown) {
+        const errorObj = error as Error
         console.log(`Error checking scene "${scene}":`, errorObj)
         Sentry.captureException(errorObj)
         // Continue checking other scenes even if one fails
@@ -453,24 +461,28 @@ const ObsSetup: React.FC = () => {
 
   // Helper function to render error action buttons based on error code
   const renderErrorAction = () => {
-    if (!error) return null
+    if (!error) {
+      return null
+    }
 
     switch (error.code) {
       case 'CONNECTION_ERROR':
       case 'CONNECTION_CLOSED':
       case 'FETCH_SCENES_ERROR':
       case 'ADD_TO_SCENE_ERROR':
-      case 'UNKNOWN_ERROR':
+      case 'UNKNOWN_ERROR': {
         return <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
+      }
 
-      case 'VERSION_TOO_OLD':
+      case 'VERSION_TOO_OLD': {
         return (
           <Button type='primary' href='https://obsproject.com/download' target='_blank'>
             Update OBS
           </Button>
         )
+      }
 
-      case 'VERSION_TOO_NEW':
+      case 'VERSION_TOO_NEW': {
         return (
           <Button
             type='primary'
@@ -480,37 +492,46 @@ const ObsSetup: React.FC = () => {
             Download OBS 30.2.3
           </Button>
         )
+      }
 
-      default:
+      default: {
         return null
+      }
     }
   }
 
   // Helper function to get the alert type based on error code
   const getAlertType = () => {
-    if (!error) return 'info'
+    if (!error) {
+      return 'info'
+    }
 
     switch (error.code) {
-      case 'VERSION_TOO_NEW':
+      case 'VERSION_TOO_NEW': {
         return 'warning'
+      }
       case 'VERSION_TOO_OLD':
       case 'CONNECTION_ERROR':
       case 'CONNECTION_CLOSED':
       case 'FETCH_SCENES_ERROR':
       case 'ADD_TO_SCENE_ERROR':
-      case 'UNKNOWN_ERROR':
+      case 'UNKNOWN_ERROR': {
         return 'error'
-      default:
+      }
+      default: {
         return 'info'
+      }
     }
   }
 
   // Helper to render additional info based on error code
   const renderAdditionalInfo = () => {
-    if (!error) return null
+    if (!error) {
+      return null
+    }
 
     switch (error.code) {
-      case 'VERSION_TOO_NEW':
+      case 'VERSION_TOO_NEW': {
         return (
           <Alert
             message='Some users experience completely blank overlays in OBS v31+ due to Chromium changes. If your overlay appears correctly, you can continue using your current version. Otherwise, download v30.2.3 and run the installer to downgrade - no need to uninstall first.'
@@ -518,19 +539,21 @@ const ObsSetup: React.FC = () => {
             showIcon
           />
         )
-      default:
+      }
+      default: {
         return null
+      }
     }
   }
 
   return (
     <FeatureWrapper feature='autoOBS'>
       <Form
-        initialValues={{ port: obsPort, password: obsPassword }}
+        initialValues={{ password: obsPassword, port: obsPort }}
         form={form}
         onFinish={handleFormSubmit}
         layout='vertical'
-        style={{ maxWidth: 600, margin: '0 auto' }}
+        style={{ margin: '0 auto', maxWidth: 600 }}
         className='space-y-2'
       >
         <Space direction='vertical' size='middle' className='mb-4'>
@@ -623,8 +646,8 @@ const ObsSetup: React.FC = () => {
                 label='OBS WebSocket Password'
                 rules={[
                   {
-                    required: true,
                     message: 'Please enter the OBS WebSocket password!',
+                    required: true,
                   },
                   {
                     max: 45,
@@ -645,8 +668,8 @@ const ObsSetup: React.FC = () => {
                 label='Port'
                 rules={[
                   {
-                    required: true,
                     message: 'Please enter the OBS WebSocket port!',
+                    required: true,
                   },
                 ]}
               >
@@ -655,7 +678,7 @@ const ObsSetup: React.FC = () => {
                   placeholder='4455'
                   type='number'
                   min={1}
-                  max={65535}
+                  max={65_535}
                   onChange={debouncedFormSubmit}
                   onPressEnter={() => form.submit()}
                 />
@@ -701,13 +724,13 @@ const ObsSetup: React.FC = () => {
                     setSelectedScenes(value)
                   }}
                   options={scenes.map((scene) => ({
+                    disabled: scenesWithSource.includes(scene.sceneUuid),
                     label: (
                       <span translate='no' className='notranslate'>
                         {scene.sceneName}
                       </span>
                     ),
                     value: scene.sceneUuid,
-                    disabled: scenesWithSource.includes(scene.sceneUuid),
                   }))}
                 />
                 {!error?.actionable && connected && scenes.length > 1 && (

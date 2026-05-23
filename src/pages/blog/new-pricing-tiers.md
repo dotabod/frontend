@@ -5,7 +5,6 @@ date: 2025-03-01
 author: Dotabod Team
 ---
 
-
 Since Dotabod launched, we've proudly provided everything free for over 22,000 passionate Dota 2 streamers. Watching this community flourish has been amazing—but to level up and sustain growth, we're introducing new pricing tiers starting **April 30, 2025**.
 
 ### Here’s what the new plans look like

@@ -31,14 +31,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Get the user's subscription
     const subscription = await prisma.subscription.findFirst({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
-        userId: session.user.id,
         NOT: {
           status: 'CANCELED',
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
+        userId: session.user.id,
       },
     })
 
@@ -120,10 +120,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const { url } = await createAndStoreCryptoInvoice({
+        metadata: { renewal: true },
+        orderDescription: 'Dotabod subscription renewal',
         stripeInvoice: invoice,
         userId: session.user.id,
-        orderDescription: 'Dotabod subscription renewal',
-        metadata: { renewal: true },
       })
 
       return res.status(200).json({ url })

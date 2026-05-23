@@ -5,7 +5,7 @@ import { stripe } from '@/lib/stripe-server'
 
 const OPENNODE_CONFIRMED_STATUSES = new Set(['paid', 'confirmed'])
 
-export type OpenNodePaymentProcessResult = {
+export interface OpenNodePaymentProcessResult {
   processed: boolean
   reason: 'not_confirmed' | 'already_processed' | 'processed'
   stripeInvoiceMarkedPaid: boolean
@@ -13,7 +13,7 @@ export type OpenNodePaymentProcessResult = {
 }
 
 export function isOpenNodePaymentConfirmed(status: string | null | undefined): boolean {
-  return !!status && OPENNODE_CONFIRMED_STATUSES.has(status)
+  return Boolean(status) && OPENNODE_CONFIRMED_STATUSES.has(status)
 }
 
 function getMetadata(charge: OpenNodeCharge): Record<string, unknown> {
@@ -54,8 +54,8 @@ export async function processConfirmedOpenNodePayment(
   let subscriptionCreated = false
 
   await prisma.openNodeCharge.update({
-    where: { openNodeChargeId: charge.openNodeChargeId },
     data: { status },
+    where: { openNodeChargeId: charge.openNodeChargeId },
   })
 
   try {
@@ -88,30 +88,32 @@ export async function processConfirmedOpenNodePayment(
       throw new Error(`Invoice handler returned false for ${charge.stripeInvoiceId}`)
     }
 
-    subscriptionCreated = !!(await prisma.subscription.findFirst({
-      where: {
-        userId: charge.userId,
-        stripeCustomerId: charge.stripeCustomerId,
-        NOT: { status: 'CANCELED' },
-      },
-      orderBy: { createdAt: 'desc' },
-      select: { id: true },
-    }))
+    subscriptionCreated = Boolean(
+      await prisma.subscription.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+        where: {
+          NOT: { status: 'CANCELED' },
+          stripeCustomerId: charge.stripeCustomerId,
+          userId: charge.userId,
+        },
+      }),
+    )
 
     await prisma.openNodeCharge.update({
-      where: { openNodeChargeId: charge.openNodeChargeId },
       data: {
         lastWebhookAt: new Date(),
         metadata: {
           ...existingMetadata,
+          chargeId: charge.openNodeChargeId,
+          invoiceId: charge.stripeInvoiceId,
+          processedAt: new Date().toISOString(),
           processedSuccessfully: true,
           stripeInvoiceMarkedPaid,
           subscriptionCreated,
-          invoiceId: charge.stripeInvoiceId,
-          chargeId: charge.openNodeChargeId,
-          processedAt: new Date().toISOString(),
         },
       },
+      where: { openNodeChargeId: charge.openNodeChargeId },
     })
 
     return {
@@ -122,20 +124,20 @@ export async function processConfirmedOpenNodePayment(
     }
   } catch (error) {
     await prisma.openNodeCharge.update({
-      where: { openNodeChargeId: charge.openNodeChargeId },
       data: {
         metadata: {
           ...existingMetadata,
-          processedSuccessfully: false,
-          lastError: error instanceof Error ? error.message : String(error),
+          chargeId: charge.openNodeChargeId,
           errorStack: error instanceof Error ? error.stack : undefined,
+          failedAt: new Date().toISOString(),
+          invoiceId: charge.stripeInvoiceId,
+          lastError: error instanceof Error ? error.message : String(error),
+          processedSuccessfully: false,
           stripeInvoiceMarkedPaid,
           subscriptionCreated,
-          invoiceId: charge.stripeInvoiceId,
-          chargeId: charge.openNodeChargeId,
-          failedAt: new Date().toISOString(),
         },
       },
+      where: { openNodeChargeId: charge.openNodeChargeId },
     })
 
     throw error

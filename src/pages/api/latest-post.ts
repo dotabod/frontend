@@ -8,10 +8,10 @@ async function handler(_req: NextApiRequest, res: NextApiResponse) {
     const latest = getLatestPost()
     const post = latest
       ? {
+          date: latest.date,
+          description: latest.description,
           slug: latest.slug,
           title: latest.title,
-          description: latest.description,
-          date: latest.date,
         }
       : null
 

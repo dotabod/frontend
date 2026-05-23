@@ -20,7 +20,9 @@ export const ChatMessagesOverlay = ({ chatMessages }: { chatMessages: ChatMessag
   const { data: isEnabled } = useUpdateSetting(Settings.autoTranslate)
 
   // Show messages if autoTranslate is enabled OR if we're in dev mode (for testing)
-  if (chatMessages.length === 0 || (!isEnabled && !isDevMode)) return null
+  if (chatMessages.length === 0 || (!isEnabled && !isDevMode)) {
+    return null
+  }
 
   const styles: Position = {
     bottom: res({

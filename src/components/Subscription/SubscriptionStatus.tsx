@@ -25,7 +25,9 @@ function SubscriptionStatusComponent() {
 
   // Fetch credit balance information when the component mounts
   useEffect(() => {
-    if (!session?.user?.id) return
+    if (!session?.user?.id) {
+      return
+    }
 
     const fetchCreditBalance = async () => {
       try {
@@ -49,20 +51,20 @@ function SubscriptionStatusComponent() {
   }, [session?.user?.id, subscription?.metadata])
 
   const summary = getBillingSummaryInfo({
-    status: subscription?.status,
     cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd,
-    currentPeriodEnd: subscription?.currentPeriodEnd,
-    transactionType: subscription?.transactionType,
-    stripeSubscriptionId: subscription?.stripeSubscriptionId,
-    stripeCustomerId: subscription?.stripeCustomerId,
-    stripePriceId: subscription?.stripePriceId,
-    tier: subscription?.tier,
-    inGracePeriod,
     creditBalance: contextCreditBalance ?? creditBalance.amount,
+    currentPeriodEnd: subscription?.currentPeriodEnd,
     formattedCreditBalance:
       formattedCreditBalance && formattedCreditBalance !== '$0.00'
         ? formattedCreditBalance
         : creditBalance.formattedAmount,
+    inGracePeriod,
+    status: subscription?.status,
+    stripeCustomerId: subscription?.stripeCustomerId,
+    stripePriceId: subscription?.stripePriceId,
+    stripeSubscriptionId: subscription?.stripeSubscriptionId,
+    tier: subscription?.tier,
+    transactionType: subscription?.transactionType,
   })
 
   const subtitle = summary.creditMessage

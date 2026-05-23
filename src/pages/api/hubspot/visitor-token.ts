@@ -11,17 +11,17 @@ const HUBSPOT_VISITOR_TOKEN_URL =
   'https://api.hubapi.com/visitor-identification/2026-03/tokens/create'
 
 // Best-effort, fire-and-forget: enrich the HubSpot contact without blocking the
-// token response that gates the chat widget load.
+// Token response that gates the chat widget load.
 async function enrichContact(token: string, userId: string, email: string, username: string) {
   let subscription: string | undefined
   try {
     subscription = subscriptionToValue(await getSubscription(userId))
   } catch (error) {
     // Leave subscription undefined so a transient DB error never overwrites the
-    // contact's real tier with "free".
+    // Contact's real tier with "free".
     captureException(error instanceof Error ? error : new Error(String(error)))
   }
-  await syncHubSpotContact(token, { email, username, subscription })
+  await syncHubSpotContact(token, { email, subscription, username })
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -45,16 +45,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   let visitorToken: string
   try {
     const response = await fetch(HUBSPOT_VISITOR_TOKEN_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
         email,
         firstName: firstName || undefined,
         lastName: lastName || undefined,
       }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
     })
 
     if (!response.ok) {
@@ -77,7 +77,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json({ email, token: visitorToken })
 
   // Skip enrichment while impersonating: the session id is the admin's but the
-  // email/name are the impersonated user's, so writing would corrupt their contact.
+  // Email/name are the impersonated user's, so writing would corrupt their contact.
   if (!session.user.isImpersonating) {
     void enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {
       captureException(error instanceof Error ? error : new Error(String(error)))

@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -10,9 +10,7 @@ let sortObject: typeof import('@/lib/nowpayments').sortObject
 
 beforeAll(async () => {
   const mod = await import('@/lib/nowpayments')
-  verifyNowPaymentsSignature = mod.verifyNowPaymentsSignature
-  isNowPaymentsConfirmed = mod.isNowPaymentsConfirmed
-  sortObject = mod.sortObject
+  ;({ verifyNowPaymentsSignature, isNowPaymentsConfirmed, sortObject } = mod)
 })
 
 beforeEach(() => {
@@ -30,11 +28,11 @@ function sign(body: Record<string, unknown>, secret = 'test-ipn-secret'): string
 describe('verifyNowPaymentsSignature', () => {
   it('accepts a valid signature', () => {
     const body = {
-      payment_id: 123,
-      payment_status: 'finished',
       order_id: 'in_test_1',
       pay_amount: 12.5,
       pay_currency: 'usdttrc20',
+      payment_id: 123,
+      payment_status: 'finished',
     }
     const sig = sign(body)
     expect(verifyNowPaymentsSignature(body, sig)).toBe(true)
@@ -42,9 +40,9 @@ describe('verifyNowPaymentsSignature', () => {
 
   it('rejects a tampered body', () => {
     const body = {
+      order_id: 'in_test_1',
       payment_id: 123,
       payment_status: 'finished',
-      order_id: 'in_test_1',
     }
     const sig = sign(body)
     const tampered = { ...body, payment_status: 'failed' }
@@ -52,7 +50,7 @@ describe('verifyNowPaymentsSignature', () => {
   })
 
   it('rejects a missing signature header', () => {
-    expect(verifyNowPaymentsSignature({ payment_id: 1 }, undefined)).toBe(false)
+    expect(verifyNowPaymentsSignature({ payment_id: 1 })).toBe(false)
   })
 
   it('rejects an array signature header', () => {
@@ -67,7 +65,7 @@ describe('verifyNowPaymentsSignature', () => {
 
   it('is order-independent within nested objects', () => {
     const a = { fee: { currency: 'btc', depositFee: 0.1 }, payment_id: 1 }
-    const b = { payment_id: 1, fee: { depositFee: 0.1, currency: 'btc' } }
+    const b = { fee: { currency: 'btc', depositFee: 0.1 }, payment_id: 1 }
     const sig = sign(a)
     expect(verifyNowPaymentsSignature(b, sig)).toBe(true)
   })
@@ -81,6 +79,6 @@ describe('isNowPaymentsConfirmed', () => {
     expect(isNowPaymentsConfirmed('partially_paid')).toBe(false)
     expect(isNowPaymentsConfirmed('failed')).toBe(false)
     expect(isNowPaymentsConfirmed(null)).toBe(false)
-    expect(isNowPaymentsConfirmed(undefined)).toBe(false)
+    expect(isNowPaymentsConfirmed()).toBe(false)
   })
 })

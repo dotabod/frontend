@@ -1,6 +1,6 @@
 import type { GiftSubscription, Subscription, User } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/user/gift-subscriptions'
 
 // Mock prisma
@@ -91,25 +91,25 @@ describe('gift-subscriptions API', () => {
 
     expect(getServerSession).toHaveBeenCalled()
     expect(prisma.subscription.findMany).toHaveBeenCalledWith({
-      where: {
-        userId: 'user-123',
-        isGift: true,
-        status: 'ACTIVE',
+      include: {
+        giftDetails: true,
       },
       orderBy: {
         createdAt: 'desc',
       },
-      include: {
-        giftDetails: true,
+      where: {
+        isGift: true,
+        status: 'ACTIVE',
+        userId: 'user-123',
       },
     })
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({
-      hasGifts: false,
       giftCount: 0,
-      hasLifetime: false,
       giftMessage: '',
       giftSubscriptions: [],
+      hasGifts: false,
+      hasLifetime: false,
     })
   })
 
@@ -128,54 +128,54 @@ describe('gift-subscriptions API', () => {
     // Mock single subscription
     vi.mocked(prisma.subscription.findMany).mockResolvedValueOnce([
       {
+        cancelAtPeriodEnd: false,
+        createdAt: new Date(),
+        currentPeriodEnd: endDate,
+        giftDetails: {
+          createdAt: new Date(),
+          giftMessage: '',
+          giftQuantity: 1,
+          giftType: 'monthly',
+          id: 'gift-123',
+          senderName: 'John Doe',
+          subscriptionId: 'sub-123',
+          updatedAt: new Date(),
+        } as GiftSubscription,
         id: 'sub-123',
-        userId: 'user-123',
+        isGift: true,
+        metadata: {},
+        status: 'ACTIVE',
         stripeCustomerId: null,
         stripePriceId: null,
         stripeSubscriptionId: null,
         tier: 'PRO',
-        status: 'ACTIVE',
         transactionType: 'RECURRING',
-        currentPeriodEnd: endDate,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
         updatedAt: new Date(),
-        isGift: true,
-        metadata: {},
-        giftDetails: {
-          id: 'gift-123',
-          subscriptionId: 'sub-123',
-          senderName: 'John Doe',
-          giftType: 'monthly',
-          giftQuantity: 1,
-          giftMessage: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as GiftSubscription,
+        userId: 'user-123',
       } as Subscription,
     ])
 
     // Mock user lookup
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
-      id: 'user-123',
-      name: 'Test User',
+      beta_tester: false,
+      createdAt: new Date(),
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
+      followers: null,
+      id: 'user-123',
+      image: null,
+      kick: null,
+      locale: 'en',
+      mmr: 0,
+      name: 'Test User',
+      proExpiration: endDate,
+      steam32Id: null,
+      stream_delay: null,
       stream_online: false,
       stream_start_date: null,
-      beta_tester: false,
-      locale: 'en',
-      kick: null,
-      youtube: null,
-      createdAt: new Date(),
       updatedAt: new Date(),
-      proExpiration: endDate,
+      youtube: null,
     } as User)
 
     await handler(req, res)
@@ -184,21 +184,21 @@ describe('gift-subscriptions API', () => {
 
     const responseData = res._getJSONData()
     expect(responseData).toEqual({
-      hasGifts: true,
       giftCount: 1,
-      hasLifetime: false,
       giftMessage: `Your Pro subscription is active until ${endDate.toLocaleDateString()}`,
       giftSubscriptions: [
         {
-          id: 'sub-123',
-          endDate: endDate.toISOString(),
-          senderName: 'John Doe',
-          giftType: 'monthly',
-          giftQuantity: 1,
-          giftMessage: '',
           createdAt: expect.any(String),
+          endDate: endDate.toISOString(),
+          giftMessage: '',
+          giftQuantity: 1,
+          giftType: 'monthly',
+          id: 'sub-123',
+          senderName: 'John Doe',
         },
       ],
+      hasGifts: true,
+      hasLifetime: false,
     })
   })
 
@@ -218,80 +218,80 @@ describe('gift-subscriptions API', () => {
     // Mock multiple subscriptions
     vi.mocked(prisma.subscription.findMany).mockResolvedValueOnce([
       {
+        cancelAtPeriodEnd: false,
+        createdAt: new Date(),
+        currentPeriodEnd: endDate1,
+        giftDetails: {
+          createdAt: new Date(),
+          giftMessage: '',
+          giftQuantity: 1,
+          giftType: 'monthly',
+          id: 'gift-123',
+          senderName: 'John Doe',
+          subscriptionId: 'sub-123',
+          updatedAt: new Date(),
+        } as GiftSubscription,
         id: 'sub-123',
-        userId: 'user-123',
+        isGift: true,
+        metadata: {},
+        status: 'ACTIVE',
         stripeCustomerId: null,
         stripePriceId: null,
         stripeSubscriptionId: null,
         tier: 'PRO',
-        status: 'ACTIVE',
         transactionType: 'RECURRING',
-        currentPeriodEnd: endDate1,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
         updatedAt: new Date(),
-        isGift: true,
-        metadata: {},
-        giftDetails: {
-          id: 'gift-123',
-          subscriptionId: 'sub-123',
-          senderName: 'John Doe',
-          giftType: 'monthly',
-          giftQuantity: 1,
-          giftMessage: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as GiftSubscription,
+        userId: 'user-123',
       } as Subscription,
       {
+        cancelAtPeriodEnd: false,
+        createdAt: new Date(),
+        currentPeriodEnd: endDate2,
+        giftDetails: {
+          createdAt: new Date(),
+          giftMessage: '',
+          giftQuantity: 1,
+          giftType: 'monthly',
+          id: 'gift-456',
+          senderName: 'Jane Smith',
+          subscriptionId: 'sub-456',
+          updatedAt: new Date(),
+        } as GiftSubscription,
         id: 'sub-456',
-        userId: 'user-123',
+        isGift: true,
+        metadata: {},
+        status: 'ACTIVE',
         stripeCustomerId: null,
         stripePriceId: null,
         stripeSubscriptionId: null,
         tier: 'PRO',
-        status: 'ACTIVE',
         transactionType: 'RECURRING',
-        currentPeriodEnd: endDate2,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
         updatedAt: new Date(),
-        isGift: true,
-        metadata: {},
-        giftDetails: {
-          id: 'gift-456',
-          subscriptionId: 'sub-456',
-          senderName: 'Jane Smith',
-          giftType: 'monthly',
-          giftQuantity: 1,
-          giftMessage: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as GiftSubscription,
+        userId: 'user-123',
       } as Subscription,
     ])
 
     // Mock user lookup
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
-      id: 'user-123',
-      name: 'Test User',
+      beta_tester: false,
+      createdAt: new Date(),
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
+      followers: null,
+      id: 'user-123',
+      image: null,
+      kick: null,
+      locale: 'en',
+      mmr: 0,
+      name: 'Test User',
+      proExpiration: endDate1,
+      steam32Id: null,
+      stream_delay: null,
       stream_online: false,
       stream_start_date: null,
-      beta_tester: false,
-      locale: 'en',
-      kick: null,
-      youtube: null,
-      createdAt: new Date(),
       updatedAt: new Date(),
-      proExpiration: endDate1,
+      youtube: null,
     } as User)
 
     await handler(req, res)
@@ -300,30 +300,30 @@ describe('gift-subscriptions API', () => {
 
     const responseData = res._getJSONData()
     expect(responseData).toEqual({
-      hasGifts: true,
       giftCount: 2,
-      hasLifetime: false,
       giftMessage: `Your Pro subscription is active until ${endDate1.toLocaleDateString()}`,
       giftSubscriptions: [
         {
-          id: 'sub-123',
-          endDate: endDate1.toISOString(),
-          senderName: 'John Doe',
-          giftType: 'monthly',
-          giftQuantity: 1,
-          giftMessage: '',
           createdAt: expect.any(String),
+          endDate: endDate1.toISOString(),
+          giftMessage: '',
+          giftQuantity: 1,
+          giftType: 'monthly',
+          id: 'sub-123',
+          senderName: 'John Doe',
         },
         {
-          id: 'sub-456',
-          endDate: endDate2.toISOString(),
-          senderName: 'Jane Smith',
-          giftType: 'monthly',
-          giftQuantity: 1,
-          giftMessage: '',
           createdAt: expect.any(String),
+          endDate: endDate2.toISOString(),
+          giftMessage: '',
+          giftQuantity: 1,
+          giftType: 'monthly',
+          id: 'sub-456',
+          senderName: 'Jane Smith',
         },
       ],
+      hasGifts: true,
+      hasLifetime: false,
     })
   })
 
@@ -342,45 +342,45 @@ describe('gift-subscriptions API', () => {
     // Mock subscription with no sender name
     vi.mocked(prisma.subscription.findMany).mockResolvedValueOnce([
       {
+        cancelAtPeriodEnd: false,
+        createdAt: new Date(),
+        currentPeriodEnd: endDate,
+        giftDetails: null,
         id: 'sub-123',
-        userId: 'user-123',
+        isGift: true,
+        metadata: {},
+        status: 'ACTIVE',
         stripeCustomerId: null,
         stripePriceId: null,
         stripeSubscriptionId: null,
         tier: 'PRO',
-        status: 'ACTIVE',
         transactionType: 'RECURRING',
-        currentPeriodEnd: endDate,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
         updatedAt: new Date(),
-        isGift: true,
-        metadata: {},
-        giftDetails: null,
+        userId: 'user-123',
       } as Subscription,
     ])
 
     // Mock user lookup
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
-      id: 'user-123',
-      name: 'Test User',
+      beta_tester: false,
+      createdAt: new Date(),
       displayName: null,
       email: null,
-      image: null,
-      mmr: 0,
-      steam32Id: null,
-      followers: null,
-      stream_delay: null,
       emailVerified: null,
+      followers: null,
+      id: 'user-123',
+      image: null,
+      kick: null,
+      locale: 'en',
+      mmr: 0,
+      name: 'Test User',
+      proExpiration: endDate,
+      steam32Id: null,
+      stream_delay: null,
       stream_online: false,
       stream_start_date: null,
-      beta_tester: false,
-      locale: 'en',
-      kick: null,
-      youtube: null,
-      createdAt: new Date(),
       updatedAt: new Date(),
-      proExpiration: endDate,
+      youtube: null,
     } as User)
 
     await handler(req, res)

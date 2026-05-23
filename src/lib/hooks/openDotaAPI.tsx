@@ -38,18 +38,20 @@ export async function getMatchData(matchId: string, heroId: number) {
         return getMatchData(matchId, heroId)
       } catch (error) {
         console.error(`[MMR] Failed to parse match ${matchId}:`, error)
-        throw new Error(`Match ${matchId} not available or not ready to be parsed`)
+        throw new Error(`Match ${matchId} not available or not ready to be parsed`, {
+          cause: error,
+        })
       }
     }
 
     let radiantWin = null
     let lobbyType = null
     const moreData = {
-      radiantScore: 0,
+      assists: 0,
+      deaths: 0,
       direScore: 0,
       kills: 0,
-      deaths: 0,
-      assists: 0,
+      radiantScore: 0,
     }
 
     if (Array.isArray(opendotaMatch.data?.players)) {
@@ -75,13 +77,13 @@ export async function getMatchData(matchId: string, heroId: number) {
         lobbyType = opendotaMatch?.data?.lobby_type
       }
     } else {
-      throw new Error('Match data is incomplete')
+      throw new TypeError('Match data is incomplete')
     }
 
     const result = {
+      lobbyType,
       matchId,
       radiantWin,
-      lobbyType,
       ...moreData,
     }
 
@@ -91,7 +93,7 @@ export async function getMatchData(matchId: string, heroId: number) {
     return result
   } catch (error) {
     console.error(`[MMR] Error fetching match ${matchId}:`, error)
-    throw new Error(`Failed to fetch match data for ${matchId}`)
+    throw new Error(`Failed to fetch match data for ${matchId}`, { cause: error })
   }
 }
 
@@ -108,10 +110,10 @@ async function createJob(matchId: string): Promise<number> {
 
   // Set up the retry operation
   const operation = retry.operation({
-    retries: 8, // Number of retries
     factor: 3, // Exponential backoff factor
-    minTimeout: 1 * 1000, // Minimum retry timeout (1 second)
     maxTimeout: 60 * 1000, // Maximum retry timeout (60 seconds)
+    minTimeout: 1 * 1000, // Minimum retry timeout (1 second)
+    retries: 8, // Number of retries
   })
 
   const jobPromise = new Promise<number>((resolve, reject) => {
@@ -133,15 +135,15 @@ async function createJob(matchId: string): Promise<number> {
 
         // Continue once parsing is complete
         resolve(jobId)
-      } catch (e) {
-        // all this because opendota responds with e400 if not ready
+      } catch (error) {
+        // All this because opendota responds with e400 if not ready
         if (operation.retry(new Error('Match not ready to be parsed'))) {
           return
         }
 
         // Remove from cache if failed
         jobRequestCache.delete(matchId)
-        reject(e)
+        reject(error)
       }
     })
   })
@@ -176,10 +178,10 @@ async function getJobStatus(jobId: number): Promise<boolean> {
 
   // Set up the retry operation
   const operation = retry.operation({
-    retries: 8, // Number of retries
     factor: 3, // Exponential backoff factor
-    minTimeout: 1 * 2000, // Minimum retry timeout (2 seconds)
     maxTimeout: 60 * 1000, // Maximum retry timeout (60 seconds)
+    minTimeout: 1 * 2000, // Minimum retry timeout (2 seconds)
+    retries: 8, // Number of retries
   })
 
   const statusPromise = new Promise<boolean>((resolve, reject) => {
@@ -203,14 +205,14 @@ async function getJobStatus(jobId: number): Promise<boolean> {
         // Remove from cache if failed or unknown status
         jobStatusCache.delete(jobId)
         reject(new Error(`Job not finished or has unexpected status: ${jobStatus?.data?.status}`))
-      } catch (e) {
+      } catch (error) {
         if (operation.retry(new Error('Error checking job status'))) {
           return
         }
 
         // Remove from cache if failed
         jobStatusCache.delete(jobId)
-        reject(e)
+        reject(error)
       }
     })
   })

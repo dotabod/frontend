@@ -23,9 +23,6 @@ const Login: NextPageWithLayout = () => {
     })
 
     notification.error({
-      key: 'login-error',
-      duration: 50000,
-      message: 'Login error',
       description: (
         <span>
           We couldn't log you in. First, try to login with{' '}
@@ -45,6 +42,9 @@ const Login: NextPageWithLayout = () => {
           <Link href='/contact'>contact page</Link>.
         </span>
       ),
+      duration: 50_000,
+      key: 'login-error',
+      message: 'Login error',
     })
   }, [notification])
 
@@ -59,36 +59,38 @@ const Login: NextPageWithLayout = () => {
       showError()
     } else if (status !== 'authenticated' && router.asPath.toLowerCase().includes('setup-scopes')) {
       notification.info({
-        key: 'scope-setup',
-        duration: 50000,
-        message: 'Relink account',
         description: (
           <span>
             You've been logged out. Please login again to relink your account to Twitch. Reach out
             to us through our <Link href='/contact'>contact page</Link> for more help.
           </span>
         ),
+        duration: 50_000,
+        key: 'scope-setup',
+        message: 'Relink account',
       })
     }
   }, [router.asPath, status, notification, showError])
 
-  if (status === 'authenticated') return null
+  if (status === 'authenticated') {
+    return null
+  }
 
   return (
     <Container>
       <div
-        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+        style={{ alignItems: 'center', display: 'flex', height: '100%', justifyContent: 'center' }}
       >
-        <div style={{ width: '100%', maxWidth: '32rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ maxWidth: '32rem', width: '100%' }}>
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
             <Typography.Title level={2}>Sign in</Typography.Title>
-            <Typography.Paragraph style={{ fontSize: '1.125rem', color: 'var(--color-dark-300)' }}>
+            <Typography.Paragraph style={{ color: 'var(--color-dark-300)', fontSize: '1.125rem' }}>
               You can begin using Dotabod right away!
             </Typography.Paragraph>
           </div>
           <div>
             <UserAuthForm />
-            <Typography.Paragraph style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <Typography.Paragraph style={{ marginTop: '1rem', textAlign: 'center' }}>
               Not a streamer? If you just want to become Dotabod Verified to show your rank in chat,{' '}
               <Link href='/verify' prefetch={false}>
                 login here
@@ -105,15 +107,15 @@ Login.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Sign In',
         subtitle:
           'Sign in to your Dotabod account to access your dashboard and manage your Dota 2 streaming tools.',
+        title: 'Sign In',
       }}
       seo={{
-        title: 'Sign In | Dotabod',
+        canonicalUrl: 'https://dotabod.com/login',
         description:
           'Sign in to your Dotabod account to access your dashboard and manage your Dota 2 streaming tools.',
-        canonicalUrl: 'https://dotabod.com/login',
+        title: 'Sign In | Dotabod',
       }}
     >
       {page}

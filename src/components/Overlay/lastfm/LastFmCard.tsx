@@ -8,7 +8,7 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 const { Text } = Typography
 
-type LastFmTrackType = {
+interface LastFmTrackType {
   artist: string
   title: string
   album?: string
@@ -16,7 +16,7 @@ type LastFmTrackType = {
   url?: string
 }
 
-type LastFmCardProps = {
+interface LastFmCardProps {
   mainScreen?: boolean
   track: LastFmTrackType | null
   className?: string
@@ -49,34 +49,44 @@ const ScrollingText = ({ text, className }: { text: string; className?: string }
     let animationCancelled = false
 
     const startAnimation = async () => {
-      if (!isOverflowing || !textRef.current || !containerRef.current) return
+      if (!isOverflowing || !textRef.current || !containerRef.current) {
+        return
+      }
 
       const textElement = textRef.current
       const containerElement = containerRef.current
       const animateDuration = textElement.scrollWidth * 0.015 // Slightly faster animation
 
       const animate = async () => {
-        if (animationCancelled) return
+        if (animationCancelled) {
+          return
+        }
 
         // Pause at start
         await new Promise((resolve) => setTimeout(resolve, 2000))
-        if (animationCancelled) return
+        if (animationCancelled) {
+          return
+        }
 
         // Scroll to end
         await controls.start({
-          x: containerElement.clientWidth - textElement.scrollWidth,
           transition: { duration: animateDuration, ease: 'easeInOut' },
+          x: containerElement.clientWidth - textElement.scrollWidth,
         })
-        if (animationCancelled) return
+        if (animationCancelled) {
+          return
+        }
 
         // Pause at end
         await new Promise((resolve) => setTimeout(resolve, 1500))
-        if (animationCancelled) return
+        if (animationCancelled) {
+          return
+        }
 
         // Scroll back to start
         await controls.start({
-          x: 0,
           transition: { duration: animateDuration, ease: 'easeInOut' },
+          x: 0,
         })
 
         if (!animationCancelled) {
@@ -123,7 +133,7 @@ const AlbumArtImage = ({
   const src = imageError || !isValidImageUrl(albumArt) ? FALLBACK_IMAGE : albumArt
 
   return (
-    // biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
+    // Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
     <motion.img
       src={src}
       alt={`${album || 'Album'} cover`}
@@ -154,7 +164,9 @@ const LastFmCard = ({
   const fontSize = res({ h: 14 })
   const imageSize = res({ h: 54 })
 
-  if (!isEnabled || !track) return null
+  if (!isEnabled || !track) {
+    return null
+  }
 
   return (
     <div
@@ -175,12 +187,12 @@ const LastFmCard = ({
             className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{
+              marginRight: track.albumArt ? undefined : 0,
               opacity: 1,
               scale: 1,
               width: track.albumArt ? imageSize : 0,
-              marginRight: track.albumArt ? undefined : 0,
             }}
-            exit={{ opacity: 0, scale: 0.8, width: 0, marginRight: 0 }}
+            exit={{ marginRight: 0, opacity: 0, scale: 0.8, width: 0 }}
             transition={{
               duration: 0.4,
               ease: [0.4, 0, 0.2, 1],

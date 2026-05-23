@@ -8,7 +8,7 @@
 /**
  * Type definition for all feature flags
  */
-export type FeatureFlags = {
+export interface FeatureFlags {
   enableCryptoPayments: boolean
   enablePaypalPayments: boolean
 }

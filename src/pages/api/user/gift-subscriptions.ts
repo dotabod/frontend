@@ -19,16 +19,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Find all active gift subscriptions for the user
     const giftSubscriptions = await prisma.subscription.findMany({
-      where: {
-        userId,
-        isGift: true,
-        status: 'ACTIVE',
-      },
       include: {
         giftDetails: true,
       },
       orderBy: {
         createdAt: 'desc',
+      },
+      where: {
+        isGift: true,
+        status: 'ACTIVE',
+        userId,
       },
     })
 
@@ -45,20 +45,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Format gift subscriptions for the response
     const formattedGifts = giftSubscriptions.map((sub) => ({
-      id: sub.id,
-      endDate: sub.currentPeriodEnd,
-      senderName: sub.giftDetails?.senderName || 'Anonymous',
-      giftType: sub.giftDetails?.giftType || 'monthly',
-      giftQuantity: sub.giftDetails?.giftQuantity || 1,
-      giftMessage: sub.giftDetails?.giftMessage || '',
       createdAt: sub.createdAt,
+      endDate: sub.currentPeriodEnd,
+      giftMessage: sub.giftDetails?.giftMessage || '',
+      giftQuantity: sub.giftDetails?.giftQuantity || 1,
+      giftType: sub.giftDetails?.giftType || 'monthly',
+      id: sub.id,
+      senderName: sub.giftDetails?.senderName || 'Anonymous',
     }))
 
     // Find the latest gift expiration date
     const latestGift = giftSubscriptions.reduce(
       (latest, current) => {
-        if (!latest.currentPeriodEnd) return current
-        if (!current.currentPeriodEnd) return latest
+        if (!latest.currentPeriodEnd) {
+          return current
+        }
+        if (!current.currentPeriodEnd) {
+          return latest
+        }
         return current.currentPeriodEnd > latest.currentPeriodEnd ? current : latest
       },
       { currentPeriodEnd: null } as (typeof giftSubscriptions)[0],
@@ -76,11 +80,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.status(200).json({
-      hasGifts,
       giftCount,
-      hasLifetime,
       giftMessage,
       giftSubscriptions: formattedGifts,
+      hasGifts,
+      hasLifetime,
     })
   } catch (error) {
     console.error('Error fetching gift subscriptions:', error)

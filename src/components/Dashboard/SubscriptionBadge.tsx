@@ -15,7 +15,9 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
 
   // Check if a credit balance exists
   const creditBalance = useMemo(() => {
-    if (!subscription?.metadata || typeof subscription.metadata !== 'object') return 0
+    if (!subscription?.metadata || typeof subscription.metadata !== 'object') {
+      return 0
+    }
     return Number((subscription.metadata as Record<string, unknown>).creditBalance || 0)
   }, [subscription?.metadata])
 
@@ -33,22 +35,28 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
 
   const commonClasses = 'flex items-center gap-2'
   const tooltipProps = {
-    title: statusInfo?.message || 'Manage your subscription',
     placement: collapsed ? ('right' as const) : undefined,
+    title: statusInfo?.message || 'Manage your subscription',
   }
 
   // Determine badge status
   const getBadgeStatus = () => {
-    if (!statusInfo) return 'default'
+    if (!statusInfo) {
+      return 'default'
+    }
     switch (statusInfo.type) {
-      case 'success':
+      case 'success': {
         return 'success'
-      case 'warning':
+      }
+      case 'warning': {
         return 'warning'
-      case 'error':
+      }
+      case 'error': {
         return 'error'
-      default:
+      }
+      default: {
         return 'processing'
+      }
     }
   }
 
@@ -57,9 +65,9 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     // Priority order: Lifetime > Gift > Pro > Grace Period
     if (subscription?.transactionType === 'LIFETIME') {
       return {
+        color: 'black',
         icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
         text: 'Lifetime Pro',
-        color: 'black',
         tooltip: 'Lifetime Pro Subscriber',
       }
     }
@@ -67,6 +75,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     // If user has a regular subscription and credit balance
     if (hasActivePlan && creditBalance > 0) {
       return {
+        color: 'gold',
         icon: (
           <div className='relative'>
             <CrownIcon size={14} className='inline-block flex-shrink-0' />
@@ -74,34 +83,33 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
           </div>
         ),
         text: 'Pro + Credit',
-        color: 'gold',
         tooltip: 'Pro Subscriber with Credit Balance',
       }
     }
 
     if (hasActivePlan) {
       return {
+        color: 'gold',
         icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
         text: 'Pro',
-        color: 'gold',
         tooltip: 'Pro Subscriber',
       }
     }
 
     if (creditBalance > 0) {
       return {
+        color: 'green',
         icon: <Wallet size={14} className='inline-block flex-shrink-0' />,
         text: 'Credit Balance',
-        color: 'green',
         tooltip: 'Credit balance available - subscribe to use it',
       }
     }
 
     if (inGracePeriod) {
       return {
+        color: 'blue',
         icon: <CrownIcon size={14} className='inline-block flex-shrink-0' />,
         text: 'Free Trial',
-        color: 'blue',
         tooltip: 'Using Pro features during free trial period',
       }
     }
@@ -112,8 +120,8 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   // Get the badge details
   const badgeDetails = getSubscriptionBadge()
 
-  // logo for lifetime is https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp
-  // otherwise its the current plan logo
+  // Logo for lifetime is https://cdn.betterttv.net/emote/609431bc39b5010444d0cbdc/3x.webp
+  // Otherwise its the current plan logo
   const logo =
     currentPlan?.tier === 'PRO' && subscription?.transactionType === 'LIFETIME' ? (
       <Image

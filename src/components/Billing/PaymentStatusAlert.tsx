@@ -7,10 +7,17 @@ import { BillingNotice } from './BillingNotice'
 const Spinner = () => <Loader2Icon size={16} className='animate-spin' />
 
 // Anything that will not resolve itself by polling again. Must mirror the
-// statusInfo.type values emitted by /api/payment-status (processing is the only
-// non-terminal state; warning = amount mismatch, unknown = unclassified).
-const TERMINAL_STATUSES = ['success', 'error', 'cancelled', 'expired', 'warning', 'unknown']
-const isTerminalStatus = (type?: string) => !!type && TERMINAL_STATUSES.includes(type)
+// StatusInfo.type values emitted by /api/payment-status (processing is the only
+// Non-terminal state; warning = amount mismatch, unknown = unclassified).
+const TERMINAL_STATUSES = new Set([
+  'success',
+  'error',
+  'cancelled',
+  'expired',
+  'warning',
+  'unknown',
+])
+const isTerminalStatus = (type?: string) => Boolean(type) && TERMINAL_STATUSES.has(type)
 
 interface PaymentStatus {
   invoiceId: string
@@ -62,15 +69,21 @@ export const PaymentStatusAlert = () => {
         }
 
         const data = (await response.json()) as PaymentStatus
-        if (mountedRef.current) setPaymentStatus(data)
-        return data
-      } catch (err) {
         if (mountedRef.current) {
-          setError(err instanceof Error ? err.message : "We couldn't check your payment status.")
+          setPaymentStatus(data)
+        }
+        return data
+      } catch (error) {
+        if (mountedRef.current) {
+          setError(
+            error instanceof Error ? error.message : "We couldn't check your payment status.",
+          )
         }
         return null
       } finally {
-        if (mountedRef.current) setLoading(false)
+        if (mountedRef.current) {
+          setLoading(false)
+        }
       }
     },
     [],
@@ -94,10 +107,12 @@ export const PaymentStatusAlert = () => {
     }
 
     poll()
-    intervalId = setInterval(poll, 30000)
+    intervalId = setInterval(poll, 30_000)
 
     return () => {
-      if (intervalId) clearInterval(intervalId)
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
     }
   }, [payment, crypto, invoice, fetchPaymentStatus])
 
@@ -109,14 +124,16 @@ export const PaymentStatusAlert = () => {
         throw new Error(errBody?.error || `Request failed: ${res.status}`)
       }
       const { url } = await res.json()
-      if (!url) throw new Error('No payment URL returned')
+      if (!url) {
+        throw new Error('No payment URL returned')
+      }
       window.location.href = url
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      console.error('Failed to refresh crypto invoice URL', err)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      console.error('Failed to refresh crypto invoice URL', error)
       notification.error({
-        message: 'Could not refresh payment link',
         description: message,
+        message: 'Could not refresh payment link',
         placement: 'bottomRight',
       })
     }
@@ -160,18 +177,23 @@ export const PaymentStatusAlert = () => {
 
   const getAlertType = (statusType: string) => {
     switch (statusType) {
-      case 'processing':
+      case 'processing': {
         return 'info' as const
-      case 'success':
+      }
+      case 'success': {
         return 'success' as const
+      }
       case 'error':
-      case 'cancelled':
+      case 'cancelled': {
         return 'error' as const
+      }
       case 'warning':
-      case 'expired':
+      case 'expired': {
         return 'warning' as const
-      default:
+      }
+      default: {
         return 'info' as const
+      }
     }
   }
 

@@ -8,8 +8,8 @@ import { TierSwitch } from './TierSwitch'
 
 // Convert locale schema to options for the Select component
 const LANGUAGE_OPTIONS = localePatchSchema.options.map((locale) => ({
-  value: locale,
   label: new Intl.DisplayNames(['en'], { type: 'language' }).of(locale.split('-')[0]) || locale,
+  value: locale,
 }))
 
 /**

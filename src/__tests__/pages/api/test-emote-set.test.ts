@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { captureException, withScope } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import handler from '@/pages/api/test-emote-set'
 
@@ -27,31 +27,31 @@ vi.mock('@/lib/gql', () => ({
 
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
-  withScope: vi.fn((callback) => callback({ setTag: vi.fn(), setContext: vi.fn() })),
+  withScope: vi.fn((callback) => callback({ setContext: vi.fn(), setTag: vi.fn() })),
 }))
 
 const TEST_EMOTE_NAME = 'DOTABOD_TEST'
 const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
 
-function mockEmoteSet(emotes: Array<{ name: string }> = []) {
+function mockEmoteSet(emotes: { name: string }[] = []) {
   return {
     emoteSet: {
-      emote_count: emotes.length,
       capacity: 100,
-      flags: 0,
-      name: 'ActiveEmoteSet',
+      emote_count: emotes.length,
       emotes: emotes.map((emote) => ({
-        id: 'test-emote-id',
-        name: emote.name,
         data: {
+          host: {
+            files: [{ format: 'WEBP', name: '1x.webp' }],
+            url: 'https://example.com',
+          },
           id: TEST_EMOTE_ID,
           name: emote.name,
-          host: {
-            url: 'https://example.com',
-            files: [{ name: '1x.webp', format: 'WEBP' }],
-          },
         },
+        id: 'test-emote-id',
+        name: emote.name,
       })),
+      flags: 0,
+      name: 'ActiveEmoteSet',
     },
   }
 }
@@ -89,10 +89,10 @@ describe('test-emote-set API', () => {
     vi.stubEnv('VERCEL_ENV', 'production')
 
     const { req, res } = createMocks({
-      method: 'GET',
       headers: {
         authorization: 'Bearer invalid-secret',
       },
+      method: 'GET',
     })
 
     await handler(req, res)
@@ -113,7 +113,7 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 403 when CRON_TWITCH_ID is missing', async () => {
-    vi.stubEnv('CRON_TWITCH_ID', undefined)
+    vi.stubEnv('CRON_TWITCH_ID')
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -126,7 +126,7 @@ describe('test-emote-set API', () => {
   })
 
   it('returns 500 when SEVENTV_AUTH is missing', async () => {
-    vi.stubEnv('SEVENTV_AUTH', undefined)
+    vi.stubEnv('SEVENTV_AUTH')
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -155,8 +155,8 @@ describe('test-emote-set API', () => {
 
     expect(res.statusCode).toBe(500)
     expect(res._getJSONData()).toEqual({
-      message: 'Internal server error',
       error: 'No active 7TV emote set found',
+      message: 'Internal server error',
     })
     expect(mockClient.request).not.toHaveBeenCalled()
   })
@@ -175,8 +175,8 @@ describe('test-emote-set API', () => {
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
     vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'test-user-id' },
       emote_set: { id: 'active-emote-set-id' },
+      user: { id: 'test-user-id' },
     })
 
     const { req, res } = createMocks({
@@ -190,16 +190,16 @@ describe('test-emote-set API', () => {
     expect(get7TVUser).toHaveBeenCalledWith('test-twitch-id')
     expect(create7TVClient).toHaveBeenCalledWith('test-auth-token')
     expect(mockClient.request).toHaveBeenCalledWith('mock-change-emote-query', {
-      id: 'active-emote-set-id',
       action: 'ADD',
-      name: TEST_EMOTE_NAME,
       emote_id: TEST_EMOTE_ID,
+      id: 'active-emote-set-id',
+      name: TEST_EMOTE_NAME,
     })
     expect(mockClient.request).toHaveBeenCalledWith('mock-change-emote-query', {
-      id: 'active-emote-set-id',
       action: 'REMOVE',
-      name: TEST_EMOTE_NAME,
       emote_id: TEST_EMOTE_ID,
+      id: 'active-emote-set-id',
+      name: TEST_EMOTE_NAME,
     })
   })
 
@@ -218,8 +218,8 @@ describe('test-emote-set API', () => {
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
     vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'test-user-id' },
       emote_set: { id: 'active-emote-set-id' },
+      user: { id: 'test-user-id' },
     })
 
     const { req, res } = createMocks({
@@ -253,8 +253,8 @@ describe('test-emote-set API', () => {
       mockClient as unknown as ReturnType<typeof create7TVClient>,
     )
     vi.mocked(get7TVUser).mockResolvedValueOnce({
-      user: { id: 'test-user-id' },
       emote_set: { id: 'active-emote-set-id' },
+      user: { id: 'test-user-id' },
     })
 
     const { req, res } = createMocks({
@@ -265,14 +265,14 @@ describe('test-emote-set API', () => {
 
     expect(res.statusCode).toBe(500)
     expect(res._getJSONData()).toEqual({
-      message: 'Internal server error',
       error: 'Verification failed',
+      message: 'Internal server error',
     })
     expect(mockClient.request).toHaveBeenLastCalledWith('mock-change-emote-query', {
-      id: 'active-emote-set-id',
       action: 'REMOVE',
-      name: TEST_EMOTE_NAME,
       emote_id: TEST_EMOTE_ID,
+      id: 'active-emote-set-id',
+      name: TEST_EMOTE_NAME,
     })
   })
 
@@ -291,8 +291,8 @@ describe('test-emote-set API', () => {
 
     expect(res.statusCode).toBe(500)
     expect(res._getJSONData()).toEqual({
-      message: 'Internal server error',
       error: 'Test error',
+      message: 'Internal server error',
     })
     expect(captureException).toHaveBeenCalled()
     expect(withScope).toHaveBeenCalled()

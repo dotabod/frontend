@@ -45,8 +45,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isCryptoPayment = paymentMethod === 'crypto' && featureFlags.enableCryptoPayments
 
     // Keep this transaction narrow: production runs with connection_limit=1, so
-    // any external API call inside the callback holds the only pool connection
-    // and any nested non-tx prisma write deadlocks the pool.
+    // Any external API call inside the callback holds the only pool connection
+    // And any nested non-tx prisma write deadlocks the pool.
     const { customerId, subscriptionData } = await prisma.$transaction(
       async (tx) => {
         const customerId = await ensureCustomer(session.user, tx)
@@ -54,26 +54,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return { customerId, subscriptionData }
       },
       {
-        timeout: 15000,
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        timeout: 15_000,
       },
     )
 
     const checkoutUrl = await createCheckoutSession({
       customerId,
-      priceId,
-      isRecurring,
-      isLifetime,
-      subscriptionData,
-      userId: session.user.id,
       email: session.user.email ?? '',
-      name: session.user.name ?? '',
       image: session.user.image ?? '',
-      locale: session.user.locale ?? '',
-      twitchId: session.user.twitchId ?? '',
-      referer: req.headers.referer,
-      isGift,
       isCryptoPayment,
+      isGift,
+      isLifetime,
+      isRecurring,
+      locale: session.user.locale ?? '',
+      name: session.user.name ?? '',
+      priceId,
+      referer: req.headers.referer,
+      subscriptionData,
+      twitchId: session.user.twitchId ?? '',
+      userId: session.user.id,
     })
 
     return res.status(200).json({ url: checkoutUrl })
@@ -96,9 +96,9 @@ async function ensureCustomer(
 ): Promise<string> {
   // Look for any existing subscription to get a customer ID
   const subscription = await tx.subscription.findFirst({
-    where: { userId: user.id },
-    select: { stripeCustomerId: true },
     orderBy: { createdAt: 'desc' }, // Use the most recent subscription
+    select: { stripeCustomerId: true },
+    where: { userId: user.id },
   })
 
   let customerId = subscription?.stripeCustomerId
@@ -134,8 +134,8 @@ async function ensureCustomer(
     if (!subscription?.stripeCustomerId) {
       // Update existing subscriptions with no customer ID
       await tx.subscription.updateMany({
-        where: { userId: user.id, stripeCustomerId: null },
         data: { stripeCustomerId: customerId, updatedAt: new Date() },
+        where: { stripeCustomerId: null, userId: user.id },
       })
     }
   }
@@ -158,12 +158,12 @@ async function createStripeCustomer(user: {
   return stripe.customers.create({
     email: user.email ?? undefined,
     metadata: {
-      userId: user.id,
       email: user.email ?? '',
-      name: user.name ?? '',
       image: user.image ?? '',
       locale: user.locale ?? '',
+      name: user.name ?? '',
       twitchId: user.twitchId ?? '',
+      userId: user.id,
     },
   })
 }
@@ -213,17 +213,17 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
   if (isCryptoPayment) {
     return await createCryptoInvoice({
       customerId,
-      priceId,
-      isRecurring,
-      isLifetime,
-      subscriptionData,
-      userId,
       email,
-      name,
       image,
+      isLifetime,
+      isRecurring,
       locale,
-      twitchId,
+      name,
+      priceId,
       referer,
+      subscriptionData,
+      twitchId,
+      userId,
     })
   }
 
@@ -255,11 +255,24 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
     : `${baseUrl || 'https://dotabod.com'}/?paid=false`
 
   const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    mode: isRecurring ? 'subscription' : 'payment',
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: successUrl,
+    allow_promotion_codes: true,
     cancel_url: cancelUrl,
+    customer: customerId,
+    line_items: [{ price: priceId, quantity: 1 }],
+    metadata: {
+      email,
+      image,
+      isCryptoPayment: 'false',
+      isGift: isGift ? 'true' : 'false',
+      isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      locale,
+      name,
+      previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
+      twitchId,
+      userId,
+    },
+    mode: isRecurring ? 'subscription' : 'payment',
     subscription_data: isRecurring
       ? {
           ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
@@ -268,20 +281,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
           },
         }
       : undefined,
-    allow_promotion_codes: true,
-    metadata: {
-      userId,
-      email,
-      name,
-      image,
-      locale,
-      twitchId,
-      isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
-      previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
-      isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
-      isGift: isGift ? 'true' : 'false',
-      isCryptoPayment: 'false',
-    },
+    success_url: successUrl,
   })
 
   return session.url ?? ''
@@ -312,12 +312,12 @@ async function createCryptoInvoice(
   if (subscriptionData?.stripePriceId) {
     try {
       const existingSubscription = await prisma.subscription.findFirst({
-        where: {
-          userId,
-          stripeCustomerId: customerId,
-          NOT: { status: 'CANCELED' },
-        },
         select: { metadata: true },
+        where: {
+          NOT: { status: 'CANCELED' },
+          stripeCustomerId: customerId,
+          userId,
+        },
       })
 
       const metadata = (existingSubscription?.metadata as Record<string, unknown>) || {}
@@ -355,23 +355,23 @@ async function createCryptoInvoice(
   dueDate.setDate(dueDate.getDate() + 7)
 
   const invoiceParams: Stripe.InvoiceCreateParams = {
-    customer: customerId,
     collection_method: 'send_invoice',
+    customer: customerId,
     due_date: Math.floor(dueDate.getTime() / 1000),
     metadata: {
-      userId,
       email,
-      name,
       image,
-      locale,
-      twitchId,
       isCryptoPayment: 'true',
-      paymentProvider: 'nowpayments',
-      stripePriceId: priceId,
-      isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
-      previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
+      locale,
+      name,
+      paymentProvider: 'nowpayments',
+      previousSubscriptionId: subscriptionData?.stripeSubscriptionId ?? '',
       pricePeriod,
+      stripePriceId: priceId,
+      twitchId,
+      userId,
     },
     payment_settings: {
       payment_method_types: [],
@@ -387,9 +387,9 @@ async function createCryptoInvoice(
     customer: customerId,
     invoice: stripeInvoice.id,
     price_data: {
+      currency: price.currency,
       product: price.product as string,
       unit_amount: price.unit_amount,
-      currency: price.currency,
     },
   })
 
@@ -398,10 +398,10 @@ async function createCryptoInvoice(
   })
 
   const { url, nowPaymentsId } = await createAndStoreCryptoInvoice({
+    metadata: { pricePeriod, stripePriceId: priceId },
+    orderDescription: `Dotabod ${pricePeriod} subscription`,
     stripeInvoice: finalized,
     userId,
-    orderDescription: `Dotabod ${pricePeriod} subscription`,
-    metadata: { pricePeriod, stripePriceId: priceId },
   })
 
   await stripe.invoices.update(stripeInvoice.id, {

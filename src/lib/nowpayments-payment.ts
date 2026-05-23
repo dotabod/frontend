@@ -4,7 +4,7 @@ import { isNowPaymentsConfirmed, type NowPaymentsPaymentStatus } from '@/lib/now
 import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 import { stripe } from '@/lib/stripe-server'
 
-export type NowPaymentsProcessResult = {
+export interface NowPaymentsProcessResult {
   processed: boolean
   reason: 'not_confirmed' | 'already_processed' | 'processed'
   stripeInvoiceMarkedPaid: boolean
@@ -80,36 +80,38 @@ export async function processConfirmedNowPaymentsPayment(
       throw new Error(`Invoice handler returned false for ${invoice.stripeInvoiceId}`)
     }
 
-    subscriptionCreated = !!(await prisma.subscription.findFirst({
-      where: {
-        userId: invoice.userId,
-        stripeCustomerId: invoice.stripeCustomerId,
-        NOT: { status: 'CANCELED' },
-      },
-      orderBy: { createdAt: 'desc' },
-      select: { id: true },
-    }))
+    subscriptionCreated = Boolean(
+      await prisma.subscription.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+        where: {
+          NOT: { status: 'CANCELED' },
+          stripeCustomerId: invoice.stripeCustomerId,
+          userId: invoice.userId,
+        },
+      }),
+    )
 
     await prisma.nowPaymentsInvoice.update({
-      where: { nowPaymentsId: invoice.nowPaymentsId },
       data: {
-        status: payment.payment_status,
-        paymentId: String(payment.payment_id),
-        payCurrency: payment.pay_currency,
-        payAmount: payment.pay_amount,
         actuallyPaid: payment.actually_paid,
         lastWebhookAt: new Date(),
         metadata: {
           ...existingMetadata,
-          processedSuccessfully: true,
-          stripeInvoiceMarkedPaid,
-          subscriptionCreated,
           invoiceId: invoice.stripeInvoiceId,
           nowPaymentsId: invoice.nowPaymentsId,
           paymentId: String(payment.payment_id),
           processedAt: new Date().toISOString(),
+          processedSuccessfully: true,
+          stripeInvoiceMarkedPaid,
+          subscriptionCreated,
         },
+        payAmount: payment.pay_amount,
+        payCurrency: payment.pay_currency,
+        paymentId: String(payment.payment_id),
+        status: payment.payment_status,
       },
+      where: { nowPaymentsId: invoice.nowPaymentsId },
     })
 
     return {
@@ -120,21 +122,21 @@ export async function processConfirmedNowPaymentsPayment(
     }
   } catch (error) {
     await prisma.nowPaymentsInvoice.update({
-      where: { nowPaymentsId: invoice.nowPaymentsId },
       data: {
         metadata: {
           ...existingMetadata,
-          processedSuccessfully: false,
-          lastError: error instanceof Error ? error.message : String(error),
           errorStack: error instanceof Error ? error.stack : undefined,
-          stripeInvoiceMarkedPaid,
-          subscriptionCreated,
+          failedAt: new Date().toISOString(),
           invoiceId: invoice.stripeInvoiceId,
+          lastError: error instanceof Error ? error.message : String(error),
           nowPaymentsId: invoice.nowPaymentsId,
           paymentId: String(payment.payment_id),
-          failedAt: new Date().toISOString(),
+          processedSuccessfully: false,
+          stripeInvoiceMarkedPaid,
+          subscriptionCreated,
         },
       },
+      where: { nowPaymentsId: invoice.nowPaymentsId },
     })
 
     throw error

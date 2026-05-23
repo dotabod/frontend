@@ -49,7 +49,7 @@ export const RoshCounter = ({ color, count, duration, onComplete, paused }: Rosh
         >
           {(props) => {
             const totalSeconds = props.remainingTime
-            // convert totalSeconds into minutes and seconds
+            // Convert totalSeconds into minutes and seconds
             const minutes = Math.floor(totalSeconds / 60)
             const seconds = totalSeconds - minutes * 60
 

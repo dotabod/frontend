@@ -26,9 +26,9 @@ export class CustomerService {
       async () => {
         // Look for any existing subscription to get a customer ID
         const subscription = await this.tx.subscription.findFirst({
-          where: { userId: user.id },
-          select: { stripeCustomerId: true },
           orderBy: { createdAt: 'desc' }, // Use the most recent subscription
+          select: { stripeCustomerId: true },
+          where: { userId: user.id },
         })
 
         let customerId = subscription?.stripeCustomerId
@@ -64,8 +64,8 @@ export class CustomerService {
           if (!subscription?.stripeCustomerId) {
             // Update existing subscriptions with no customer ID
             await this.tx.subscription.updateMany({
-              where: { userId: user.id, stripeCustomerId: null },
               data: { stripeCustomerId: customerId, updatedAt: new Date() },
+              where: { stripeCustomerId: null, userId: user.id },
             })
           }
         }
@@ -102,11 +102,11 @@ export class CustomerService {
     return await stripe.customers.create({
       email: user.email ?? undefined,
       metadata: {
-        userId: user.id,
         email: user.email ?? '',
-        name: user.name ?? '',
         image: user.image ?? '',
         locale: user.locale ?? '',
+        name: user.name ?? '',
+        userId: user.id,
       },
     })
   }
@@ -123,16 +123,16 @@ export class CustomerService {
       debugLog('No userId found in customer metadata, exiting.', { customerId: customer.id })
       return false
     }
-    debugLog('Found userId in metadata', { userId, customerId: customer.id })
+    debugLog('Found userId in metadata', { customerId: customer.id, userId })
 
     const result = await withErrorHandling(
       async () => {
         debugLog('Inside withErrorHandling for handleCustomerDeleted', {
-          userId,
           customerId: customer.id,
+          userId,
         })
         // Delete subscriptions associated with this customer
-        debugLog('Deleting subscriptions for customer', { userId, customerId: customer.id })
+        debugLog('Deleting subscriptions for customer', { customerId: customer.id, userId })
         const deleteResult = await this.tx.subscription.deleteMany({
           where: {
             OR: [{ userId }, { stripeCustomerId: customer.id }],
@@ -140,18 +140,21 @@ export class CustomerService {
         })
         debugLog('Deleted subscriptions', {
           count: deleteResult.count,
-          userId,
           customerId: customer.id,
+          userId,
         })
 
         // Check if there are any remaining active subscriptions (e.g., gift subscriptions)
-        // that aren't associated with this customer
-        debugLog('Checking for remaining active subscriptions', { userId, customerId: customer.id })
+        // That aren't associated with this customer
+        debugLog('Checking for remaining active subscriptions', {
+          customerId: customer.id,
+          userId,
+        })
         const remainingSubscriptions = await this.tx.subscription.findMany({
           where: {
-            userId,
             status: { in: ['ACTIVE', 'TRIALING'] },
             stripeCustomerId: { not: customer.id },
+            userId,
           },
         })
 
@@ -165,12 +168,12 @@ export class CustomerService {
       userId,
     )
 
-    debugLog('Result from withErrorHandling', { result, userId, customerId: customer.id })
+    debugLog('Result from withErrorHandling', { customerId: customer.id, result, userId })
     const finalResult = result !== null
     debugLog('Exiting CustomerService.handleCustomerDeleted', {
+      customerId: customer.id,
       finalResult,
       userId,
-      customerId: customer.id,
     })
     return finalResult
   }

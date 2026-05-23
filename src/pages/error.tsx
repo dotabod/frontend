@@ -11,7 +11,9 @@ const AuthErrorPage: NextPageWithLayout = () => {
   const track = useTrack()
 
   useEffect(() => {
-    if (errorMessage) track('auth_error', { error: errorMessage })
+    if (errorMessage) {
+      track('auth_error', { error: errorMessage })
+    }
   }, [track, errorMessage])
 
   useEffect(() => {
@@ -68,13 +70,13 @@ AuthErrorPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Error',
         subtitle: 'An error occurred while processing your request.',
+        title: 'Error',
       }}
       seo={{
-        title: 'Error | Dotabod',
-        description: 'An error occurred while processing your request.',
         canonicalUrl: 'https://dotabod.com/error',
+        description: 'An error occurred while processing your request.',
+        title: 'Error | Dotabod',
       }}
     >
       {page}

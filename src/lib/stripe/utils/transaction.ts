@@ -20,8 +20,8 @@ export async function withTransaction<T>(
     try {
       debugLog(`Attempting transaction, try ${retryCount + 1}/${maxRetries}`)
       const result = await prisma.$transaction(operation, {
-        timeout: 30000, // Increase from 10000 to 30000 (30 seconds)
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, // Ensure consistent reads
+        timeout: 30_000, // Increase from 10000 to 30000 (30 seconds)
       })
       debugLog(`Transaction attempt ${retryCount + 1} successful`)
       return result

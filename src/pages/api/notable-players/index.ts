@@ -10,14 +10,14 @@ import { prismaMongo } from '@/lib/db'
 
 // Define validation schema for creating a notable player
 const createNotablePlayerSchema = z.object({
+  account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
+  country_code: z.string().max(3).optional(),
   name: z
     .string()
     .min(1)
     .refine((name) => !name || !detect(name), {
       message: 'Name contains inappropriate language. Please revise it.',
     }),
-  account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
-  country_code: z.string().max(3).optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -34,11 +34,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // GET - List notable players for the user's channel
     if (req.method === 'GET') {
       const notablePlayers = await prismaMongo.notablePlayers.findMany({
-        where: {
-          channel,
-        },
         orderBy: {
           name: 'asc',
+        },
+        where: {
+          channel,
         },
       })
 
@@ -67,8 +67,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const newPlayer = await prismaMongo.notablePlayers.create({
         data: {
           ...validatedData,
-          channel,
           addedBy: session.user.name,
+          channel,
           createdAt: new Date(),
         },
       })

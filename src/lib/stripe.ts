@@ -4,11 +4,11 @@ export async function createCheckoutSession(
   paymentMethod?: string,
 ): Promise<{ url: string }> {
   const response = await fetch('/api/stripe/create-checkout', {
-    method: 'POST',
+    body: JSON.stringify({ paymentMethod, priceId, userId }),
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ priceId, userId, paymentMethod }),
+    method: 'POST',
   })
 
   if (!response.ok) {

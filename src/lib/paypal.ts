@@ -2,37 +2,45 @@ const LIVE_BASE_URL = 'https://api-m.paypal.com'
 const SANDBOX_BASE_URL = 'https://api-m.sandbox.paypal.com'
 
 function getBaseUrl(): string {
-  if (process.env.PAYPAL_API_BASE) return process.env.PAYPAL_API_BASE
+  if (process.env.PAYPAL_API_BASE) {
+    return process.env.PAYPAL_API_BASE
+  }
   return process.env.NODE_ENV === 'production' ? LIVE_BASE_URL : SANDBOX_BASE_URL
 }
 
 function getClientId(): string {
   const id = process.env.PAYPAL_CLIENT_ID
-  if (!id) throw new Error('PAYPAL_CLIENT_ID is not set')
+  if (!id) {
+    throw new Error('PAYPAL_CLIENT_ID is not set')
+  }
   return id
 }
 
 function getClientSecret(): string {
   const secret = process.env.PAYPAL_CLIENT_SECRET
-  if (!secret) throw new Error('PAYPAL_CLIENT_SECRET is not set')
+  if (!secret) {
+    throw new Error('PAYPAL_CLIENT_SECRET is not set')
+  }
   return secret
 }
 
 function getWebhookId(): string {
   const id = process.env.PAYPAL_WEBHOOK_ID
-  if (!id) throw new Error('PAYPAL_WEBHOOK_ID is not set')
+  if (!id) {
+    throw new Error('PAYPAL_WEBHOOK_ID is not set')
+  }
   return id
 }
 
 async function getAccessToken(): Promise<string> {
   const auth = Buffer.from(`${getClientId()}:${getClientSecret()}`).toString('base64')
   const res = await fetch(`${getBaseUrl()}/v1/oauth2/token`, {
-    method: 'POST',
+    body: 'grant_type=client_credentials',
     headers: {
       Authorization: `Basic ${auth}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: 'grant_type=client_credentials',
+    method: 'POST',
   })
   const data = (await res.json()) as { access_token?: string; error_description?: string }
   if (!res.ok || !data.access_token) {
@@ -49,14 +57,16 @@ async function authedRequest<T>(
 ): Promise<T> {
   const token = await getAccessToken()
   const options: RequestInit = {
-    method,
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
       ...extraHeaders,
     },
+    method,
   }
-  if (body !== undefined) options.body = JSON.stringify(body)
+  if (body !== undefined) {
+    options.body = JSON.stringify(body)
+  }
   const res = await fetch(`${getBaseUrl()}${path}`, options)
   const text = await res.text()
   let parsed: unknown
@@ -117,39 +127,39 @@ export async function createOrder(params: {
 }): Promise<{ orderId: string; approveUrl: string }> {
   const order = await authedRequest<PayPalOrderResponse>('POST', '/v2/checkout/orders', {
     intent: 'CAPTURE',
+    payment_source: {
+      paypal: {
+        experience_context: {
+          cancel_url: params.cancelUrl,
+          return_url: params.returnUrl,
+          shipping_preference: 'NO_SHIPPING',
+          user_action: 'PAY_NOW',
+        },
+      },
+    },
     purchase_units: [
       {
-        custom_id: params.userId,
-        description: params.description,
         amount: {
           currency_code: params.currency.toUpperCase(),
           value: formatAmount(params.amountCents),
         },
+        custom_id: params.userId,
+        description: params.description,
       },
     ],
-    payment_source: {
-      paypal: {
-        experience_context: {
-          return_url: params.returnUrl,
-          cancel_url: params.cancelUrl,
-          user_action: 'PAY_NOW',
-          shipping_preference: 'NO_SHIPPING',
-        },
-      },
-    },
   })
-  return { orderId: order.id, approveUrl: findApproveLink(order.links) }
+  return { approveUrl: findApproveLink(order.links), orderId: order.id }
 }
 
 interface PayPalCaptureApiResponse {
   id: string
   status: string
   payer?: { payer_id?: string }
-  purchase_units?: Array<{
+  purchase_units?: {
     payments?: {
-      captures?: Array<{ id: string; status: string }>
+      captures?: { id: string; status: string }[]
     }
-  }>
+  }[]
 }
 
 export async function captureOrder(orderId: string): Promise<PayPalCaptureResult> {
@@ -161,10 +171,10 @@ export async function captureOrder(orderId: string): Promise<PayPalCaptureResult
   )
   const capture = res.purchase_units?.[0]?.payments?.captures?.[0]
   return {
-    orderId: res.id,
-    status: res.status,
     captureId: capture?.id ?? null,
+    orderId: res.id,
     payerId: res.payer?.payer_id ?? null,
+    status: res.status,
   }
 }
 
@@ -193,13 +203,13 @@ export async function createSubscription(params: {
     custom_id: params.userId,
     ...(params.email ? { subscriber: { email_address: params.email } } : {}),
     application_context: {
-      return_url: params.returnUrl,
       cancel_url: params.cancelUrl,
-      user_action: 'SUBSCRIBE_NOW',
+      return_url: params.returnUrl,
       shipping_preference: 'NO_SHIPPING',
+      user_action: 'SUBSCRIBE_NOW',
     },
   })
-  return { subscriptionId: sub.id, approveUrl: findApproveLink(sub.links) }
+  return { approveUrl: findApproveLink(sub.links), subscriptionId: sub.id }
 }
 
 export interface PayPalSubscriptionDetails {
@@ -217,12 +227,12 @@ export async function getSubscription(subscriptionId: string): Promise<PayPalSub
     `/v1/billing/subscriptions/${subscriptionId}`,
   )
   return {
-    id: sub.id,
-    status: sub.status,
-    planId: sub.plan_id ?? null,
-    payerId: sub.subscriber?.payer_id ?? null,
-    nextBillingTime: sub.billing_info?.next_billing_time ?? null,
     customId: sub.custom_id ?? null,
+    id: sub.id,
+    nextBillingTime: sub.billing_info?.next_billing_time ?? null,
+    payerId: sub.subscriber?.payer_id ?? null,
+    planId: sub.plan_id ?? null,
+    status: sub.status,
   }
 }
 
@@ -245,8 +255,8 @@ export async function verifyWebhookSignature(
     transmission_id: get('paypal-transmission-id'),
     transmission_sig: get('paypal-transmission-sig'),
     transmission_time: get('paypal-transmission-time'),
-    webhook_id: getWebhookId(),
     webhook_event: JSON.parse(rawBody),
+    webhook_id: getWebhookId(),
   }
 
   const res = await authedRequest<VerifyWebhookResponse>(

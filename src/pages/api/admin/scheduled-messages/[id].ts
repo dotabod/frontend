@@ -18,16 +18,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // GET a single scheduled message with delivery stats
   if (req.method === 'GET') {
     const scheduledMessage = await prisma.scheduledMessage.findUnique({
-      where: { id },
       include: {
         user: {
           select: {
+            email: true,
             id: true,
             name: true,
-            email: true,
           },
         },
       },
+      where: { id },
     })
 
     if (!scheduledMessage) {
@@ -36,19 +36,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Get delivery stats
     const deliveryStats = await prisma.messageDelivery.groupBy({
+      _count: {
+        status: true,
+      },
       by: ['status'],
       where: {
         scheduledMessageId: id,
       },
-      _count: {
-        status: true,
-      },
     })
 
     const stats = {
+      cancelled: 0,
       delivered: 0,
       pending: 0,
-      cancelled: 0,
     }
 
     for (const stat of deliveryStats) {
@@ -63,10 +63,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ...scheduledMessage,
       deliveryStats: {
         ...stats,
-        totalTargetUsers: targetUserCount,
+        cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
         deliveredPercent: Math.round((stats.delivered / targetUserCount) * 100),
         pendingPercent: Math.round((stats.pending / targetUserCount) * 100),
-        cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
+        totalTargetUsers: targetUserCount,
       },
     })
   }
@@ -93,8 +93,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const updateData: Record<string, unknown> = {}
-    if (message) updateData.message = message
-    if (sendAt) updateData.sendAt = new Date(sendAt)
+    if (message) {
+      updateData.message = message
+    }
+    if (sendAt) {
+      updateData.sendAt = new Date(sendAt)
+    }
 
     // Handle the isForAllUsers and userId logic
     if (isForAllUsers !== undefined) {
@@ -112,8 +116,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     updateData.updatedAt = new Date()
 
     const updatedMessage = await prisma.scheduledMessage.update({
-      where: { id },
       data: updateData,
+      where: { id },
     })
 
     return res.status(200).json(updatedMessage)
@@ -137,17 +141,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       // If the message is already being processed, mark it as cancelled
       await prisma.scheduledMessage.update({
-        where: { id },
         data: { status: 'CANCELLED', updatedAt: new Date() },
+        where: { id },
       })
 
       // Also mark all pending deliveries as cancelled
       await prisma.messageDelivery.updateMany({
+        data: { status: 'CANCELLED', updatedAt: new Date() },
         where: {
           scheduledMessageId: id,
           status: 'PENDING',
         },
-        data: { status: 'CANCELLED', updatedAt: new Date() },
       })
     }
 

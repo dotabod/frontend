@@ -1,5 +1,5 @@
 import { act, cleanup, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import GiftSubscriptionAlert from '../../../../components/Overlay/GiftAlert/GiftSubscriptionAlert'
 
 describe('GiftSubscriptionAlert', () => {
@@ -66,7 +66,7 @@ describe('GiftSubscriptionAlert', () => {
 
     // Fast-forward time
     act(() => {
-      vi.advanceTimersByTime(10000)
+      vi.advanceTimersByTime(10_000)
     })
 
     // Should not be called immediately (waiting for exit animation)

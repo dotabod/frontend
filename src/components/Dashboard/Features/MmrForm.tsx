@@ -24,23 +24,25 @@ import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
 
 // Add type for form values
 interface FormValues {
-  accounts: Array<{
+  accounts: {
     steam32Id: number
     mmr: number
     name: string | null
     leaderboard_rank: number | null
     connectedUserIds: string[]
     delete?: boolean
-  }>
+  }[]
 }
 
-type SteamAvatarProps = {
+interface SteamAvatarProps {
   data?: { data?: { id: number | string; avatar?: string }[] }
   id: number | string
 }
 
 const SteamAvatar = ({ data: response, id }: SteamAvatarProps) => {
-  if (!response) return <p>Loading...</p>
+  if (!response) {
+    return <p>Loading...</p>
+  }
   return (
     <Image
       width={45}
@@ -134,7 +136,7 @@ const MmrForm = ({ hideText = false }) => {
 
   const steamIds = accounts.map((a) => a.steam32Id)
   const path = `/api/steam/${steamIds.join('/')}`
-  const { data: steamData } = useSWR(steamIds.length ? path : null, fetcher, STABLE_SWR_OPTIONS)
+  const { data: steamData } = useSWR(steamIds.length > 0 ? path : null, fetcher, STABLE_SWR_OPTIONS)
 
   useEffect(() => {
     if (data?.accounts) {
@@ -254,7 +256,7 @@ const MmrForm = ({ hideText = false }) => {
                             placeholder='9000'
                             type='number'
                             min={0}
-                            max={30000}
+                            max={30_000}
                             className='w-[120px]!'
                             {...form.getInputProps(`accounts.${index}.mmr`)}
                           />
@@ -299,7 +301,7 @@ const MmrForm = ({ hideText = false }) => {
                       <span>
                         Confirm remove {form.values.accounts.filter((a) => a.delete).length}
                       </span>
-                    ) : accounts.length ? (
+                    ) : accounts.length > 0 ? (
                       <span>Save</span>
                     ) : null}
                     <span>
@@ -343,7 +345,7 @@ const MmrForm = ({ hideText = false }) => {
                   name='mmr'
                   type='number'
                   min={0}
-                  max={30000}
+                  max={30_000}
                   defaultValue={mmr}
                   onChange={debouncedMmr}
                 />

@@ -5,7 +5,7 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 
 function convertSteam32To64(steam32Id: string | number) {
-  return BigInt(steam32Id) + BigInt(76561197960265728)
+  return BigInt(steam32Id) + 76_561_197_960_265_728n
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -32,15 +32,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     )
 
     const json = await response.json()
-    // return an array of avatars for each steam id from the input
+    // Return an array of avatars for each steam id from the input
 
     return res.status(200).json({
       data:
         json?.response?.players.map(
           (player: { avatarfull: string; personaname: string; steamid: string }) => ({
             avatar: player.avatarfull,
+            id: `${BigInt(player.steamid) - 76_561_197_960_265_728n}`,
             name: player.personaname,
-            id: `${BigInt(player.steamid) - BigInt(76561197960265728)}`,
           }),
         ) || [],
     })
@@ -48,7 +48,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     captureException(error)
     console.error(error)
 
-    // return the error message
+    // Return the error message
     return res.status(500).end()
   }
 }

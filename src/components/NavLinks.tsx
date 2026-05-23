@@ -19,7 +19,7 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
     setIsMounted(true)
   }, [])
 
-  const additional: Array<[string, string, string?]> = []
+  const additional: [string, string, string?][] = []
   if (bottom) {
     additional.push(['Privacy Policy', '/privacy-policy'])
     additional.push(['Terms of Service', '/terms-of-service'])
@@ -35,7 +35,7 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
     ...additional,
   ].map(([label, href, tooltip], index) => {
     const isGiftLink = label === 'Gift Pro'
-    const uniqueKey = `navlink-${label.replace(/\s+/g, '-').toLowerCase()}`
+    const uniqueKey = `navlink-${label.replaceAll(/\s+/g, '-').toLowerCase()}`
 
     return (
       <Tooltip key={uniqueKey} title={tooltip} placement='top'>
@@ -57,7 +57,7 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
                   animate={{ opacity: 1, transition: { duration: 0.15 } }}
                   exit={{
                     opacity: 0,
-                    transition: { duration: 0.15, delay: 0.2 },
+                    transition: { delay: 0.2, duration: 0.15 },
                   }}
                 />
               )}

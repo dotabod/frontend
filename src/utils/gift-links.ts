@@ -8,7 +8,9 @@
  * @returns The URL for the gift page
  */
 export function createGiftLink(username: string): string {
-  if (!username) return '/gift'
+  if (!username) {
+    return '/gift'
+  }
 
   // Ensure the username is properly formatted
   const formattedUsername = username.trim().toLowerCase()

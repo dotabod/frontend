@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "ignoreDeprecations": "5.0",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "*": ["./*"]
     },
-    "target": "es5",
+    "target": "es2022",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -33,15 +33,9 @@
     "types/**/*.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
+    "scripts/**/*.ts",
+    "scripts/**/*.mjs",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "src/__tests__/**",
-    "scripts/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
-  ]
+  "exclude": ["node_modules"]
 }

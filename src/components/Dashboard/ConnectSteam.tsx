@@ -6,7 +6,7 @@ import { useSteamLinkedAccount } from '@/lib/hooks/useSteamLinkedAccount'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 
-type Props = {
+interface Props {
   isLive: boolean
 }
 
@@ -19,7 +19,7 @@ const ConnectSteam = ({ isLive }: Props) => {
   const linked = Boolean(data?.linked)
   const accountName = data?.primaryAccount?.profileData?.name
   // Only surface the error after the first load attempt has completed, so a transient
-  // first-paint blip doesn't show an alarming banner to a user whose page is fine.
+  // First-paint blip doesn't show an alarming banner to a user whose page is fine.
   const showFetchError = Boolean(error) && !isLoading && !data
 
   const launchDota = () => {
@@ -100,11 +100,11 @@ const ConnectSteam = ({ isLive }: Props) => {
           onChange={() => track('setup/collapse_test_dotabod')}
           items={[
             {
+              children: <TroubleshootingContent isLive={isLive} />,
               key: 'help',
               label: linked
                 ? 'Something off with your Steam account?'
                 : 'Account not appearing after playing?',
-              children: <TroubleshootingContent isLive={isLive} />,
             },
           ]}
         />
@@ -147,7 +147,7 @@ const StatusPanel = ({
   )
 }
 
-const TONE_COLOR = { good: 'success', warn: 'warning', neutral: 'default' } as const
+const TONE_COLOR = { good: 'success', neutral: 'default', warn: 'warning' } as const
 
 const StatusRow = ({
   label,
@@ -159,51 +159,47 @@ const StatusRow = ({
   value: string
   tone: 'good' | 'warn' | 'neutral'
   hint?: string
-}) => {
-  return (
-    <div>
-      <div className='flex items-center justify-between'>
-        <span className='text-sm text-gray-400'>{label}</span>
-        <Tag
-          color={TONE_COLOR[tone]}
-          icon={tone === 'good' ? <CheckCircleFilled /> : null}
-          className='m-0'
-        >
-          {value}
-        </Tag>
-      </div>
-      {hint && <p className='text-xs text-gray-500 mt-1'>{hint}</p>}
+}) => (
+  <div>
+    <div className='flex items-center justify-between'>
+      <span className='text-sm text-gray-400'>{label}</span>
+      <Tag
+        color={TONE_COLOR[tone]}
+        icon={tone === 'good' ? <CheckCircleFilled /> : null}
+        className='m-0'
+      >
+        {value}
+      </Tag>
     </div>
-  )
-}
+    {hint && <p className='text-xs text-gray-500 mt-1'>{hint}</p>}
+  </div>
+)
 
-const TroubleshootingContent = ({ isLive }: { isLive: boolean }) => {
-  return (
-    <div className='space-y-3 text-sm'>
-      {!isLive && (
-        <Alert
-          type='warning'
-          showIcon
-          message='Your stream needs to be online for the link to happen.'
-        />
-      )}
-      <p>Two ways to trigger the first connection:</p>
-      <ul className='list-disc ml-5 space-y-1 text-gray-400'>
-        <li>
-          Quick check: demo any hero, then type <Tag>!innate</Tag> in chat to confirm Dotabod sees
-          the game.
-        </li>
-        <li>Skip testing: just play your first match, the link happens during the game.</li>
-      </ul>
-      <p className='mt-3'>
-        Still nothing after a match?{' '}
-        <Link href='/dashboard/help' className='underline'>
-          Tell us what you saw
-        </Link>{' '}
-        and we&apos;ll help. The most common cause is the PowerShell installer didn&apos;t complete.
-      </p>
-    </div>
-  )
-}
+const TroubleshootingContent = ({ isLive }: { isLive: boolean }) => (
+  <div className='space-y-3 text-sm'>
+    {!isLive && (
+      <Alert
+        type='warning'
+        showIcon
+        message='Your stream needs to be online for the link to happen.'
+      />
+    )}
+    <p>Two ways to trigger the first connection:</p>
+    <ul className='list-disc ml-5 space-y-1 text-gray-400'>
+      <li>
+        Quick check: demo any hero, then type <Tag>!innate</Tag> in chat to confirm Dotabod sees the
+        game.
+      </li>
+      <li>Skip testing: just play your first match, the link happens during the game.</li>
+    </ul>
+    <p className='mt-3'>
+      Still nothing after a match?{' '}
+      <Link href='/dashboard/help' className='underline'>
+        Tell us what you saw
+      </Link>{' '}
+      and we&apos;ll help. The most common cause is the PowerShell installer didn&apos;t complete.
+    </p>
+  </div>
+)
 
 export default ConnectSteam

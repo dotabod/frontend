@@ -32,8 +32,8 @@ const { Text } = Typography
 // Form schema for creating/updating a notable player
 const notablePlayerSchema = z.object({
   account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
-  name: z.string().min(1, { message: 'Name is required' }),
   country_code: z.string().max(3).optional(),
+  name: z.string().min(1, { message: 'Name is required' }),
 })
 
 type NotablePlayerFormValues = z.infer<typeof notablePlayerSchema>
@@ -58,7 +58,9 @@ const NotablePlayersPage: NextPageWithLayout = () => {
     try {
       setIsLoading(true)
       const response = await fetch('/api/notable-players')
-      if (!response.ok) throw new Error('Failed to fetch notable players')
+      if (!response.ok) {
+        throw new Error('Failed to fetch notable players')
+      }
 
       const data = await response.json()
       setNotablePlayers(data)
@@ -80,8 +82,8 @@ const NotablePlayersPage: NextPageWithLayout = () => {
   const handleOpenEditModal = (player: NotablePlayer) => {
     form.setFieldsValue({
       account_id: player.account_id,
-      name: player.name,
       country_code: player.country_code || '',
+      name: player.name,
     })
     setIsEditMode(true)
     setCurrentPlayerId(player.id)
@@ -98,19 +100,21 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       if (isEditMode && currentPlayerId) {
         // Update existing player
         const response = await fetch(`/api/notable-players/${currentPlayerId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(validatedData),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'PUT',
         })
 
-        if (!response.ok) throw new Error('Failed to update notable player')
+        if (!response.ok) {
+          throw new Error('Failed to update notable player')
+        }
         messageApi.success('Player updated successfully')
       } else {
         // Create new player
         const response = await fetch('/api/notable-players', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(validatedData),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
         })
 
         if (!response.ok) {
@@ -148,7 +152,9 @@ const NotablePlayersPage: NextPageWithLayout = () => {
         method: 'DELETE',
       })
 
-      if (!response.ok) throw new Error('Failed to delete notable player')
+      if (!response.ok) {
+        throw new Error('Failed to delete notable player')
+      }
 
       messageApi.success('Player deleted successfully')
       fetchNotablePlayers()
@@ -162,44 +168,45 @@ const NotablePlayersPage: NextPageWithLayout = () => {
 
   const columns: ColumnsType<NotablePlayer> = [
     {
-      title: 'Name',
       dataIndex: 'name',
       key: 'name',
       render: (text) => <Text strong>{text}</Text>,
+      title: 'Name',
     },
     {
-      title: 'Account ID',
       dataIndex: 'account_id',
       key: 'account_id',
+      title: 'Account ID',
     },
     {
-      title: 'Country',
       dataIndex: 'country_code',
       key: 'country_code',
       render: (text) => {
-        // biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
+        // Biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
         const FlagComp = text ? Flags[`${text.toUpperCase()}Flag` as keyof typeof Flags] : null
         return FlagComp ? <FlagComp w={30} radius={2} /> : '-'
       },
+      title: 'Country',
     },
     {
-      title: 'Added By',
       dataIndex: 'addedBy',
       key: 'addedBy',
       render: (text) => {
         const name = text || session?.user?.name || '-'
-        if (name === '-') return name
+        if (name === '-') {
+          return name
+        }
         return (
           <a href={`https://twitch.tv/${name}`} target='_blank' rel='noopener noreferrer'>
             {name}
           </a>
         )
       },
+      title: 'Added By',
     },
     {
-      title: 'Actions',
-      key: 'actions',
       align: 'right',
+      key: 'actions',
       render: (_, record) => (
         <Space size='small'>
           <Tooltip title='Edit player'>
@@ -226,6 +233,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           </Popconfirm>
         </Space>
       ),
+      title: 'Actions',
     },
   ]
 
@@ -255,7 +263,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           </Button>
         </div>
 
-        {isLoading && !notablePlayers.length ? (
+        {isLoading && notablePlayers.length === 0 ? (
           <div className='flex justify-center items-center py-12'>
             <Spin size='large' />
           </div>
@@ -264,11 +272,11 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             columns={columns}
             dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
             pagination={{
-              pageSize,
-              onShowSizeChange: (_current, size) => setPageSize(size),
-              showSizeChanger: true,
               hideOnSinglePage: true,
+              onShowSizeChange: (_current, size) => setPageSize(size),
+              pageSize,
               position: ['bottomCenter'],
+              showSizeChanger: true,
             }}
             bordered
             locale={{
@@ -308,7 +316,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           <Form.Item
             name='account_id'
             label='Account ID*'
-            rules={[{ required: true, message: 'Account ID is required' }]}
+            rules={[{ message: 'Account ID is required', required: true }]}
           >
             <Input type='number' placeholder='Enter Dota 2 account ID' disabled={isEditMode} />
           </Form.Item>
@@ -316,7 +324,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           <Form.Item
             name='name'
             label='Player Name*'
-            rules={[{ required: true, message: 'Player name is required' }]}
+            rules={[{ message: 'Player name is required', required: true }]}
           >
             <Input placeholder='Enter player name' />
           </Form.Item>
@@ -360,10 +368,10 @@ NotablePlayersPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Notable Players | Dotabod Dashboard',
-        description: 'Manage notable players for your Dota 2 streams.',
         canonicalUrl: 'https://dotabod.com/dashboard/notable-players',
+        description: 'Manage notable players for your Dota 2 streams.',
         noindex: true,
+        title: 'Notable Players | Dotabod Dashboard',
       }}
     >
       {page}

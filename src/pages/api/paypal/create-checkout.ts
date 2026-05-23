@@ -5,7 +5,7 @@ import { featureFlags } from '@/lib/featureFlags'
 import { createPaypalApproval } from '@/lib/paypal-checkout'
 
 // Dedicated PayPal checkout endpoint. Intentionally does NOT import stripe-server
-// so PayPal works without Stripe credentials (fully decoupled).
+// So PayPal works without Stripe credentials (fully decoupled).
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -30,9 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const url = await createPaypalApproval({
+      email: session.user.email ?? undefined,
       period,
       userId: session.user.id,
-      email: session.user.email ?? undefined,
     })
 
     return res.status(200).json({ url })

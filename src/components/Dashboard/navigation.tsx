@@ -13,10 +13,10 @@ import Discord from '@/images/logos/Discord'
 
 // Add a const for parent keys
 const PARENT_KEYS = {
-  ADMIN: 'admin-menu',
-  FEATURES: 'features-menu',
-  BOT_SETTINGS: 'bot-settings-menu',
   ACCOUNT: 'account-menu',
+  ADMIN: 'admin-menu',
+  BOT_SETTINGS: 'bot-settings-menu',
+  FEATURES: 'features-menu',
   HELP: 'help-menu',
   LEGAL: 'legal-menu',
 } as const
@@ -24,150 +24,150 @@ const PARENT_KEYS = {
 export const navigation = [
   // Admin only
   {
-    name: 'Admin',
-    key: PARENT_KEYS.ADMIN,
-    icon: ShieldCheck,
-    hideForImpersonator: true,
     children: [
-      { name: 'Scheduled Messages', href: '/dashboard/admin' },
-      { name: 'Manage Channel', href: '/dashboard/admin/manage-channel' },
-      { name: 'Test Gift', href: '/dashboard/admin/test-gift' },
+      { href: '/dashboard/admin', name: 'Scheduled Messages' },
+      { href: '/dashboard/admin/manage-channel', name: 'Manage Channel' },
+      { href: '/dashboard/admin/test-gift', name: 'Test Gift' },
     ],
+    hideForImpersonator: true,
+    icon: ShieldCheck,
+    key: PARENT_KEYS.ADMIN,
+    name: 'Admin',
   },
 
   // Main features
   {
-    name: 'Setup',
+    hideForImpersonator: true,
     href: '/dashboard',
     icon: BeakerIcon,
-    hideForImpersonator: true,
+    name: 'Setup',
   },
   {
-    name: 'Features',
-    key: PARENT_KEYS.FEATURES,
-    icon: SparklesIcon,
     children: [
       {
-        name: 'Overview',
         href: '/dashboard/features',
+        name: 'Overview',
       },
       {
-        name: 'Stream overlay',
         href: '/dashboard/features/overlay',
+        name: 'Stream overlay',
       },
       {
-        name: 'Chat features',
         href: '/dashboard/features/chat',
+        name: 'Chat features',
       },
       {
-        name: 'Notable players',
         href: '/dashboard/notable-players',
+        name: 'Notable players',
       },
       {
-        name: 'Advanced',
         href: '/dashboard/features/advanced',
+        name: 'Advanced',
       },
     ],
+    icon: SparklesIcon,
+    key: PARENT_KEYS.FEATURES,
+    name: 'Features',
   },
   {
-    name: 'Bot & team',
-    key: PARENT_KEYS.BOT_SETTINGS,
-    icon: SparklesIcon,
     children: [
       {
-        name: 'Chat commands',
         href: '/dashboard/commands',
+        name: 'Chat commands',
       },
       {
-        name: 'Team access',
-        href: '/dashboard/managers',
         hideForImpersonator: true,
+        href: '/dashboard/managers',
+        name: 'Team access',
       },
     ],
+    icon: SparklesIcon,
+    key: PARENT_KEYS.BOT_SETTINGS,
+    name: 'Bot & team',
   },
 
   // Account & Support
   {
-    name: 'Account',
-    key: PARENT_KEYS.ACCOUNT,
-    icon: ShieldCheck,
-    hideForImpersonator: true,
     children: [
       {
-        name: 'Billing',
+        hideForImpersonator: true,
         href: '/dashboard/billing',
         icon: DollarSignIcon,
-        hideForImpersonator: true,
+        name: 'Billing',
       },
       {
-        name: 'Gift a subscription',
         href: '/gift',
         icon: Gift,
+        name: 'Gift a subscription',
       },
       {
-        name: 'Your data',
+        hideForImpersonator: true,
         href: '/dashboard/data',
         icon: HardDriveIcon,
-        hideForImpersonator: true,
+        name: 'Your data',
       },
     ],
+    hideForImpersonator: true,
+    icon: ShieldCheck,
+    key: PARENT_KEYS.ACCOUNT,
+    name: 'Account',
   },
 
   // Help & Resources
   {
-    name: 'Help',
-    key: PARENT_KEYS.HELP,
-    icon: QuestionMarkCircleIcon,
     children: [
       {
-        name: 'Help center',
         href: '/dashboard/help',
         icon: QuestionMarkCircleIcon,
+        name: 'Help center',
       },
       {
-        name: 'Discord community',
         href: 'https://discord.dotabod.com',
         icon: Discord,
+        name: 'Discord community',
       },
       {
-        name: 'GitHub',
         href: 'https://github.com/dotabod/',
         icon: Github,
+        name: 'GitHub',
       },
       {
-        name: 'Blog',
         href: '/blog',
         icon: NewspaperIcon,
+        name: 'Blog',
       },
       {
-        name: 'Service status',
         href: 'https://status.dotabod.com',
         icon: Info,
+        name: 'Service status',
       },
     ],
+    icon: QuestionMarkCircleIcon,
+    key: PARENT_KEYS.HELP,
+    name: 'Help',
   },
 
   // Legal
   {
-    name: 'Legal',
-    key: PARENT_KEYS.LEGAL,
-    icon: ShieldCheck,
     children: [
       {
-        name: 'Privacy Policy',
         href: '/privacy-policy',
         icon: ShieldCheck,
+        name: 'Privacy Policy',
       },
       {
-        name: 'Terms of Service',
         href: '/terms-of-service',
         icon: ShieldCheck,
+        name: 'Terms of Service',
       },
       {
-        name: 'Cookie Policy',
         href: '/cookies',
         icon: Cookie,
+        name: 'Cookie Policy',
       },
     ],
+    icon: ShieldCheck,
+    key: PARENT_KEYS.LEGAL,
+    name: 'Legal',
   },
 ]

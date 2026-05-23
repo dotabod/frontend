@@ -42,7 +42,7 @@ export default function MmrOverlay() {
         <MMRBadge
           leaderboard={showRankLeader ? 1 : undefined}
           image={showRankImage ? '92.png' : null}
-          rank={showRankMmr ? 13150 : undefined}
+          rank={showRankMmr ? 13_150 : undefined}
         />
       </div>
 

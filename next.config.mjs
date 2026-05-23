@@ -1,7 +1,7 @@
 // @ts-check
 
 // This file sets a custom webpack configuration to use your Next.js app
-// with Sentry.
+// With Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
@@ -20,22 +20,22 @@ const nextConfig = {
   async redirects() {
     const redirects = [
       {
-        source: '/install',
         destination: '/api/install',
         permanent: false,
+        source: '/install',
       },
       {
-        source: '/dashboard/troubleshoot',
         destination: '/dashboard/help',
         permanent: false,
+        source: '/dashboard/troubleshoot',
       },
     ]
 
     if (process.env.IS_IN_MAINTENANCE_MODE === 'true') {
       redirects.push(
-        { source: '/', destination: '/maintenance', permanent: false },
-        { source: '/login', destination: '/maintenance', permanent: false },
-        { source: '/verify', destination: '/maintenance', permanent: false },
+        { destination: '/maintenance', permanent: false, source: '/' },
+        { destination: '/maintenance', permanent: false, source: '/login' },
+        { destination: '/maintenance', permanent: false, source: '/verify' },
       )
     }
 
@@ -44,8 +44,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/lastfm-proxy/:path*',
         destination: 'https://ws.audioscrobbler.com/:path*',
+        source: '/lastfm-proxy/:path*',
       },
     ]
   },
@@ -117,40 +117,40 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
         hostname: 'avatars.steamstatic.com',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'static-cdn.jtvnw.net',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'i.imgur.com',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'cdn.7tv.app',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'lastfm.freetls.fastly.net',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'cdn.frankerfacez.com',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'cdn.betterttv.net',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'avatars.akamai.steamstatic.com',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'avatars.cloudflare.steamstatic.com',
+        protocol: 'https',
       },
     ],
   },
@@ -178,7 +178,7 @@ export default withSentryConfig(
     widenClientFileUpload: true,
 
     // Comment out the property that's causing the linter error
-    // transpileClientSDK: true,
+    // TranspileClientSDK: true,
 
     // Hides source maps from generated client bundles
     sourcemaps: {
@@ -197,11 +197,11 @@ export default withSentryConfig(
     // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
     // This can increase your server load as well as your hosting bill.
     // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-    // side errors will fail.
-    // tunnelRoute: "/monitoring",
+    // Side errors will fail.
+    // TunnelRoute: "/monitoring",
 
     // Webpack-only options; ignored under the default Turbopack build (Next 16),
-    // so they only take effect with `next build --webpack`.
+    // So they only take effect with `next build --webpack`.
     webpack: {
       // Tree-shake Sentry logger statements to reduce bundle size
       treeshake: {

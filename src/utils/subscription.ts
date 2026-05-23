@@ -39,9 +39,9 @@ const TIER_LEVELS: Record<SubscriptionTier, number> = {
 }
 
 const PRICE_PERIODS = {
-  MONTHLY: 'monthly',
   ANNUAL: 'annual',
   LIFETIME: 'lifetime',
+  MONTHLY: 'monthly',
 } as const
 
 export type PricePeriod = (typeof PRICE_PERIODS)[keyof typeof PRICE_PERIODS]
@@ -182,17 +182,19 @@ export type FeatureTier = keyof typeof FEATURE_TIERS
 
 // Add new mapping for generic features
 export const GENERIC_FEATURE_TIERS = {
-  managers: SUBSCRIPTION_TIERS.PRO,
-  autoOBS: SUBSCRIPTION_TIERS.PRO,
+  auto7TV: SUBSCRIPTION_TIERS.PRO,
   autoInstaller: SUBSCRIPTION_TIERS.FREE,
   autoModerator: SUBSCRIPTION_TIERS.PRO,
-  auto7TV: SUBSCRIPTION_TIERS.PRO,
+  autoOBS: SUBSCRIPTION_TIERS.PRO,
+  managers: SUBSCRIPTION_TIERS.PRO,
 } as const
 
 export type GenericFeature = keyof typeof GENERIC_FEATURE_TIERS
 
 export function getRequiredTier(feature?: FeatureTier | GenericFeature): SubscriptionTier {
-  if (!feature) return SUBSCRIPTION_TIERS.PRO
+  if (!feature) {
+    return SUBSCRIPTION_TIERS.PRO
+  }
 
   return (
     FEATURE_TIERS[feature as FeatureTier] ||
@@ -250,21 +252,29 @@ export function canAccessFeature(
 export function isSubscriptionActive(
   subscription: { status: SubscriptionStatus | null | undefined } | null,
 ): boolean {
-  if (!subscription?.status) return false
-  if (subscription.status === SubscriptionStatus.TRIALING) return true
-  if (subscription.status === SubscriptionStatus.ACTIVE) return true
+  if (!subscription?.status) {
+    return false
+  }
+  if (subscription.status === SubscriptionStatus.TRIALING) {
+    return true
+  }
+  if (subscription.status === SubscriptionStatus.ACTIVE) {
+    return true
+  }
   return false
 }
 
 // Single source of truth for "is this a PayPal-backed subscription". The
-// subscription id reflects the CURRENT provider (migrating to Stripe replaces
-// the `paypal_` id), so when an id is present it is authoritative and stale
+// Subscription id reflects the CURRENT provider (migrating to Stripe replaces
+// The `paypal_` id), so when an id is present it is authoritative and stale
 // `paymentProvider` metadata can't misclassify the row. Metadata is only a
-// fallback for records that have no subscription id yet.
+// Fallback for records that have no subscription id yet.
 export function isPaypalSubscription(
   subscription: { metadata?: unknown; stripeSubscriptionId?: string | null } | null | undefined,
 ): boolean {
-  if (!subscription) return false
+  if (!subscription) {
+    return false
+  }
   if (subscription.stripeSubscriptionId) {
     return subscription.stripeSubscriptionId.startsWith('paypal_')
   }
@@ -297,15 +307,15 @@ export const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
 
 const PRICE_IDS: SubscriptionPriceId[] = [
   {
-    tier: SUBSCRIPTION_TIERS.PRO,
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
     annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
     lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID || '',
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
+    tier: SUBSCRIPTION_TIERS.PRO,
   },
 ]
 
 // Crypto pays against the same Stripe prices as card payments, so this is an
-// alias of PRICE_IDS rather than a duplicated literal.
+// Alias of PRICE_IDS rather than a duplicated literal.
 export const CRYPTO_PRICE_IDS: SubscriptionPriceId[] = PRICE_IDS
 
 export function getPriceId(
@@ -315,21 +325,35 @@ export function getPriceId(
 ): string {
   const priceList = payWithCrypto ? CRYPTO_PRICE_IDS : PRICE_IDS
   const price = priceList.find((p) => p.tier === tier)
-  if (!price) throw new Error(`No price found for tier ${tier}`)
-  if (period === 'monthly') return price.monthly
-  if (period === 'annual') return price.annual
+  if (!price) {
+    throw new Error(`No price found for tier ${tier}`)
+  }
+  if (period === 'monthly') {
+    return price.monthly
+  }
+  if (period === 'annual') {
+    return price.annual
+  }
   return price.lifetime
 }
 
 export function getCurrentPeriod(priceId?: string | null): PricePeriod {
-  if (!priceId) return 'monthly'
+  if (!priceId) {
+    return 'monthly'
+  }
 
   // Check both regular and gift price IDs (CRYPTO_PRICE_IDS aliases PRICE_IDS)
   const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS]
 
-  if (allPriceIds.some((price) => price.monthly === priceId)) return 'monthly'
-  if (allPriceIds.some((price) => price.annual === priceId)) return 'annual'
-  if (allPriceIds.some((price) => price.lifetime === priceId)) return 'lifetime'
+  if (allPriceIds.some((price) => price.monthly === priceId)) {
+    return 'monthly'
+  }
+  if (allPriceIds.some((price) => price.annual === priceId)) {
+    return 'annual'
+  }
+  if (allPriceIds.some((price) => price.lifetime === priceId)) {
+    return 'lifetime'
+  }
 
   return 'monthly' // Default to monthly if no match found
 }
@@ -353,8 +377,8 @@ function getPlanLabel(
 }
 
 // Validation
-// if (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
-//   throw new Error(
+// If (PRICE_IDS.some((price) => !price.monthly || !price.annual || !price.lifetime)) {
+//   Throw new Error(
 //     `Missing required Stripe price IDs in environment variables, found: ${PRICE_IDS.filter(
 //       (price) => !price.monthly || !price.annual || !price.lifetime,
 //     )}`,
@@ -366,49 +390,6 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
 
   // Find all active subscriptions for the user
   const subscriptions = await db.subscription.findMany({
-    where: {
-      userId,
-      OR: [
-        // Active or trialing subscriptions - exclude gift markers
-        {
-          status: {
-            in: [
-              SubscriptionStatus.ACTIVE,
-              SubscriptionStatus.TRIALING,
-              SubscriptionStatus.PAST_DUE,
-            ],
-          },
-          isGift: false,
-        },
-        // Include lifetime subscriptions that are not canceled
-        {
-          transactionType: 'LIFETIME',
-          status: { in: [SubscriptionStatus.ACTIVE] },
-        },
-      ],
-    },
-    select: {
-      id: true,
-      tier: true,
-      status: true,
-      transactionType: true,
-      currentPeriodEnd: true,
-      cancelAtPeriodEnd: true,
-      stripePriceId: true,
-      stripeCustomerId: true,
-      createdAt: true,
-      stripeSubscriptionId: true,
-      metadata: true,
-      isGift: true,
-      giftDetails: {
-        select: {
-          senderName: true,
-          giftType: true,
-          giftQuantity: true,
-          giftMessage: true,
-        },
-      },
-    },
     orderBy: [
       // Prioritize active status first
       { status: 'asc' },
@@ -417,6 +398,49 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
       // Then most recent
       { createdAt: 'desc' },
     ],
+    select: {
+      cancelAtPeriodEnd: true,
+      createdAt: true,
+      currentPeriodEnd: true,
+      giftDetails: {
+        select: {
+          giftMessage: true,
+          giftQuantity: true,
+          giftType: true,
+          senderName: true,
+        },
+      },
+      id: true,
+      isGift: true,
+      metadata: true,
+      status: true,
+      stripeCustomerId: true,
+      stripePriceId: true,
+      stripeSubscriptionId: true,
+      tier: true,
+      transactionType: true,
+    },
+    where: {
+      OR: [
+        // Active or trialing subscriptions - exclude gift markers
+        {
+          isGift: false,
+          status: {
+            in: [
+              SubscriptionStatus.ACTIVE,
+              SubscriptionStatus.TRIALING,
+              SubscriptionStatus.PAST_DUE,
+            ],
+          },
+        },
+        // Include lifetime subscriptions that are not canceled
+        {
+          status: { in: [SubscriptionStatus.ACTIVE] },
+          transactionType: 'LIFETIME',
+        },
+      ],
+      userId,
+    },
   })
 
   // Prioritize active or trialing subscriptions
@@ -436,19 +460,19 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
     // Handle grace period
     if (isInGracePeriod()) {
       return {
-        tier: SUBSCRIPTION_TIERS.PRO,
-        status: SubscriptionStatus.TRIALING,
-        transactionType: TransactionType.RECURRING,
-        currentPeriodEnd: GRACE_PERIOD_END,
         cancelAtPeriodEnd: true,
-        stripePriceId: '',
-        stripeCustomerId: '',
         createdAt: new Date(),
-        stripeSubscriptionId: null,
-        isGift: false,
+        currentPeriodEnd: GRACE_PERIOD_END,
         giftDetails: null,
-        isVirtual: true, // Mark as virtual subscription for grace period
+        isGift: false,
         isGracePeriodVirtual: true, // Specifically mark as grace period virtual subscription
+        isVirtual: true, // Mark as virtual subscription for grace period
+        status: SubscriptionStatus.TRIALING,
+        stripeCustomerId: '',
+        stripePriceId: '',
+        stripeSubscriptionId: null,
+        tier: SUBSCRIPTION_TIERS.PRO,
+        transactionType: TransactionType.RECURRING,
       }
     }
 
@@ -491,9 +515,9 @@ export function getSubscriptionStatusInfo(
       currentPeriodEnd.getFullYear() > 2090)
   ) {
     return {
+      badge: 'default',
       message: 'Lifetime access',
       type: 'success',
-      badge: 'default',
     }
   }
 
@@ -511,13 +535,15 @@ export function getSubscriptionStatusInfo(
     (isInGracePeriod() && !(transactionType === 'LIFETIME' || stripeSubscriptionId))
   ) {
     return {
+      badge: 'gold',
       message: `Free Pro access until ${gracePeriodPrettyDate}`,
       type: 'info',
-      badge: 'gold',
     }
   }
 
-  if (!status) return null
+  if (!status) {
+    return null
+  }
 
   // Calculate days remaining for better messaging
   const daysRemaining = currentPeriodEnd
@@ -531,14 +557,16 @@ export function getSubscriptionStatusInfo(
   const endDate = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'unknown'
 
   switch (status) {
-    case SubscriptionStatus.TRIALING:
+    case SubscriptionStatus.TRIALING: {
       return {
+        badge: 'gold',
         message: cancelAtPeriodEnd ? `Trial ends on ${endDate}` : `Trial access until ${endDate}`,
         type: 'info',
-        badge: 'gold',
       }
-    case SubscriptionStatus.ACTIVE:
+    }
+    case SubscriptionStatus.ACTIVE: {
       return {
+        badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
         message: cancelAtPeriodEnd
           ? isEndingSoon
             ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
@@ -547,46 +575,53 @@ export function getSubscriptionStatusInfo(
             ? `Renews on ${endDate}`
             : 'Active subscription',
         type: cancelAtPeriodEnd ? (isEndingSoon ? 'warning' : 'info') : 'success',
-        badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
       }
-    case SubscriptionStatus.PAST_DUE:
+    }
+    case SubscriptionStatus.PAST_DUE: {
       return {
+        badge: 'red',
         message: 'Payment failed - update payment method to avoid cancellation',
         type: 'error',
-        badge: 'red',
       }
-    case SubscriptionStatus.INCOMPLETE:
+    }
+    case SubscriptionStatus.INCOMPLETE: {
       return {
+        badge: 'red',
         message: 'Payment incomplete',
         type: 'warning',
-        badge: 'red',
       }
-    case SubscriptionStatus.INCOMPLETE_EXPIRED:
+    }
+    case SubscriptionStatus.INCOMPLETE_EXPIRED: {
       return {
+        badge: 'red',
         message: 'Payment expired',
         type: 'error',
-        badge: 'red',
       }
-    case SubscriptionStatus.CANCELED:
+    }
+    case SubscriptionStatus.CANCELED: {
       return {
+        badge: 'default',
         message: 'Subscription canceled',
         type: 'info',
-        badge: 'default',
       }
-    case SubscriptionStatus.UNPAID:
+    }
+    case SubscriptionStatus.UNPAID: {
       return {
+        badge: 'red',
         message: 'Payment required',
         type: 'error',
-        badge: 'red',
       }
-    case SubscriptionStatus.PAUSED:
+    }
+    case SubscriptionStatus.PAUSED: {
       return {
+        badge: 'default',
         message: 'Subscription paused',
         type: 'warning',
-        badge: 'default',
       }
-    default:
+    }
+    default: {
       return null
+    }
   }
 }
 
@@ -633,261 +668,261 @@ export function getBillingSummaryInfo({
 
   if (transactionType === TransactionType.LIFETIME) {
     return {
-      headline: 'You have lifetime access to Dotabod Pro',
+      canManageInStripe: false,
+      creditMessage,
       description:
         'Your account is fully unlocked with no renewals, invoices, or cancellation steps to worry about.',
-      planLabel,
-      statusLabel: 'Lifetime',
+      headline: 'You have lifetime access to Dotabod Pro',
       nextStepLabel: 'Access',
       nextStepValue: 'Never expires',
-      tone: 'success',
-      canManageInStripe: false,
+      planLabel,
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: 'No portal needed',
       portalHelpText: 'Lifetime purchases do not need ongoing billing management.',
-      creditMessage,
+      portalSummaryLabel: 'No portal needed',
+      statusLabel: 'Lifetime',
+      tone: 'success',
     }
   }
 
   if (status === SubscriptionStatus.PAST_DUE) {
     return {
-      headline: 'Your payment needs attention',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'Update your payment method to keep access to Pro features and avoid cancellation.',
-      planLabel,
-      statusLabel: 'Payment issue',
+      headline: 'Your payment needs attention',
       nextStepLabel: 'Next step',
       nextStepValue: hasStripeCustomer ? 'Update your payment method in Stripe' : 'Contact support',
-      tone: 'error',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Update payment method',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to update your payment method, review invoices, or restart renewal.'
         : 'There is no Stripe billing profile attached to this access yet.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Payment issue',
+      tone: 'error',
     }
   }
 
   if (status === SubscriptionStatus.TRIALING && stripeSubscriptionId) {
     return {
-      headline: 'You are on a Pro trial',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description: cancelAtPeriodEnd
         ? 'Your access stays on until the trial ends. Open Stripe if you need to update payment details before billing starts.'
         : 'Your trial is active and your subscription will continue automatically unless you change it in Stripe.',
-      planLabel,
-      statusLabel: 'Trial',
+      headline: 'You are on a Pro trial',
       nextStepLabel: 'Trial ends',
       nextStepValue: endDate,
-      tone: 'info',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to update your payment method, download invoices, or cancel before renewal.'
         : 'You do not have a Stripe billing profile yet.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Trial',
+      tone: 'info',
     }
   }
 
   if (inGracePeriod && !stripeSubscriptionId) {
     return {
-      headline: `You have complimentary Pro access until ${gracePeriodPrettyDate}`,
+      canManageInStripe: false,
+      creditMessage,
       description:
         'You can use Pro features right now. Subscribe before the free access window ends if you want Pro to continue afterward.',
-      planLabel: 'Pro Access',
-      statusLabel: 'Complimentary access',
+      headline: `You have complimentary Pro access until ${gracePeriodPrettyDate}`,
       nextStepLabel: 'Free access ends',
       nextStepValue: gracePeriodPrettyDate,
-      tone: 'info',
-      canManageInStripe: false,
+      planLabel: 'Pro Access',
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: 'No Stripe billing profile yet',
       portalHelpText: 'You will get a Stripe billing profile when you start a paid subscription.',
-      creditMessage,
+      portalSummaryLabel: 'No Stripe billing profile yet',
+      statusLabel: 'Complimentary access',
+      tone: 'info',
     }
   }
 
   if (status === SubscriptionStatus.ACTIVE && cancelAtPeriodEnd) {
     return {
-      headline: 'Your Pro plan is scheduled to end',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'You still have full access for the rest of the current billing period. Renew in Stripe if you want it to continue.',
-      planLabel,
-      statusLabel: 'Ending',
+      headline: 'Your Pro plan is scheduled to end',
       nextStepLabel: 'Access ends',
       nextStepValue: endDate,
-      tone: statusInfo?.type || 'warning',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to renew, update payment details, or review invoices.'
         : 'There is no Stripe billing profile attached to this access.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Ending',
+      tone: statusInfo?.type || 'warning',
     }
   }
 
   if (status === SubscriptionStatus.ACTIVE) {
     return {
-      headline: 'Your Pro plan is active',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'Everything is in good shape. If you need invoices, payment details, or cancellation options, Stripe handles that for you.',
-      planLabel,
-      statusLabel: 'Active',
+      headline: 'Your Pro plan is active',
       nextStepLabel: 'Renews',
       nextStepValue: endDate,
-      tone: 'success',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to update payment methods, download invoices, or cancel renewal.'
         : 'There is no Stripe billing profile attached to this access.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Active',
+      tone: 'success',
     }
   }
 
   if (status === SubscriptionStatus.CANCELED) {
     return {
-      headline: 'Your subscription has been canceled',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'Your access has ended. If you want Pro features back, choose a plan below to resubscribe.',
-      planLabel,
-      statusLabel: 'Canceled',
+      headline: 'Your subscription has been canceled',
       nextStepLabel: 'Next step',
       nextStepValue: hasCreditBalance
         ? 'Use your available credit on a new Pro plan'
         : 'Choose a Pro plan below',
-      tone: 'info',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Stripe still has your invoices and previous payment details on file.'
         : 'There is no Stripe billing profile attached to this account.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Canceled',
+      tone: 'info',
     }
   }
 
   if (status === SubscriptionStatus.INCOMPLETE) {
     return {
-      headline: 'Your payment is incomplete',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'Your subscription was not fully set up because the initial payment did not go through. Update your payment method to activate it.',
-      planLabel,
-      statusLabel: 'Incomplete',
+      headline: 'Your payment is incomplete',
       nextStepLabel: 'Next step',
       nextStepValue: hasStripeCustomer ? 'Update your payment method in Stripe' : 'Contact support',
-      tone: 'warning',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Update payment method',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to update your payment method and complete the subscription setup.'
         : 'There is no Stripe billing profile attached to this account.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Incomplete',
+      tone: 'warning',
     }
   }
 
   if (status === SubscriptionStatus.INCOMPLETE_EXPIRED) {
     return {
-      headline: 'Your subscription setup expired',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'The initial payment window passed without a successful charge and the subscription was closed. Start a new subscription below.',
-      planLabel,
-      statusLabel: 'Expired',
+      headline: 'Your subscription setup expired',
       nextStepLabel: 'Next step',
       nextStepValue: 'Choose a Pro plan below',
-      tone: 'error',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Open billing portal',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Stripe still has your previous payment details on file.'
         : 'There is no Stripe billing profile attached to this account.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Expired',
+      tone: 'error',
     }
   }
 
   if (status === SubscriptionStatus.UNPAID) {
     return {
-      headline: 'Your invoice is unpaid',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'An outstanding invoice needs to be settled to restore Pro access. Update your payment method in Stripe.',
-      planLabel,
-      statusLabel: 'Unpaid',
+      headline: 'Your invoice is unpaid',
       nextStepLabel: 'Next step',
       nextStepValue: hasStripeCustomer ? 'Pay outstanding invoice in Stripe' : 'Contact support',
-      tone: 'error',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Pay invoice',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to pay the outstanding invoice or update your payment method.'
         : 'There is no Stripe billing profile attached to this account.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Unpaid',
+      tone: 'error',
     }
   }
 
   if (status === SubscriptionStatus.PAUSED) {
     return {
-      headline: 'Your subscription is paused',
+      canManageInStripe: hasStripeCustomer,
+      creditMessage,
       description:
         'Pro features are not active while your subscription is paused. Resume your subscription in Stripe when you are ready.',
-      planLabel,
-      statusLabel: 'Paused',
+      headline: 'Your subscription is paused',
       nextStepLabel: 'Next step',
       nextStepValue: hasStripeCustomer ? 'Resume subscription in Stripe' : 'Contact support',
-      tone: 'warning',
-      canManageInStripe: hasStripeCustomer,
+      planLabel,
       portalButtonLabel: 'Resume subscription',
-      portalSummaryLabel: hasStripeCustomer
-        ? 'Manage billing in Stripe'
-        : 'No Stripe billing profile',
       portalHelpText: hasStripeCustomer
         ? 'Use Stripe to resume your subscription or update your billing details.'
         : 'There is no Stripe billing profile attached to this account.',
-      creditMessage,
+      portalSummaryLabel: hasStripeCustomer
+        ? 'Manage billing in Stripe'
+        : 'No Stripe billing profile',
+      statusLabel: 'Paused',
+      tone: 'warning',
     }
   }
 
   return {
-    headline: 'You are on the Free plan',
+    canManageInStripe: hasStripeCustomer,
+    creditMessage,
     description:
       'Upgrade when you are ready. The available plans below are where you can start, change, or resume a paid subscription.',
-    planLabel,
-    statusLabel: 'Free',
+    headline: 'You are on the Free plan',
     nextStepLabel: 'Next step',
     nextStepValue: hasCreditBalance
       ? 'Use your available credit on a Pro plan'
       : 'Choose a Pro plan below',
-    tone: 'info',
-    canManageInStripe: hasStripeCustomer,
+    planLabel,
     portalButtonLabel: 'Open billing portal',
-    portalSummaryLabel: hasStripeCustomer
-      ? 'Manage billing in Stripe'
-      : 'No Stripe billing profile yet',
     portalHelpText: hasStripeCustomer
       ? 'If you had a previous subscription, Stripe still has your invoices and payment details.'
       : 'You will get a Stripe billing profile when you start a paid subscription.',
-    creditMessage,
+    portalSummaryLabel: hasStripeCustomer
+      ? 'Manage billing in Stripe'
+      : 'No Stripe billing profile yet',
+    statusLabel: 'Free',
+    tone: 'info',
   }
 }
 
@@ -912,13 +947,19 @@ export function getSubscriptionTier(
 
 // Update the hasPaidSubscription check
 export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): boolean {
-  if (!subscription) return false
+  if (!subscription) {
+    return false
+  }
 
   // Check for lifetime subscription
-  if (subscription.transactionType === 'LIFETIME') return true
+  if (subscription.transactionType === 'LIFETIME') {
+    return true
+  }
 
   // Check for recurring subscription with Stripe ID
-  if (subscription.stripeSubscriptionId) return true
+  if (subscription.stripeSubscriptionId) {
+    return true
+  }
 
   return false
 }

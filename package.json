@@ -13,8 +13,8 @@
     "build": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
     "build-local": "doppler run -- npm run build",
     "start": "next start",
-    "lint": "oxlint && biome check",
-    "lint:fix": "oxlint --fix && biome check --write",
+    "lint": "vp lint && biome check",
+    "lint:fix": "vp lint --fix && biome check --write",
     "typecheck": "tsc --noEmit",
     "parse": "i18next -c ./i18next-parser.config.mjs",
     "postinstall": "npm run generate:all && lefthook install || true",
@@ -22,7 +22,7 @@
     "test": "npm run vitest",
     "test:watch": "npm run vitest watch",
     "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' npm run vitest run --coverage",
-    "vitest": "vitest run",
+    "vitest": "vp test run",
     "generate:postgres": "npx prisma generate",
     "generate:mongo": "npx prisma generate --schema=./prisma-mongo/schema.prisma",
     "generate:all": "npm run generate:postgres && npm run generate:mongo",
@@ -30,7 +30,6 @@
     "mongo:push": "doppler run -- npx prisma db push --schema=./prisma-mongo/schema.prisma",
     "mongo:studio": "doppler run -- npx prisma studio --schema=./prisma-mongo/schema.prisma"
   },
-  "browserslist": "defaults, not ie <= 11",
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",
     "@ant-design/icons": "^6.1.0",
@@ -103,12 +102,20 @@
     "knip": "^6.14.2",
     "lefthook": "^2.1.6",
     "node-mocks-http": "^1.17.2",
-    "oxlint": "^1.66.0",
     "postcss": "^8.5.6",
     "prisma": "^6.19.0",
     "ts-morph": "^28.0.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.7"
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "browserslist": "defaults, not ie <= 11",
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    }
   },
   "trustedDependencies": [
     "@biomejs/biome",
@@ -118,6 +125,5 @@
     "esbuild",
     "prisma",
     "sharp"
-  ],
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  ]
 }

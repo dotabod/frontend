@@ -44,11 +44,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // Validate the response by sending a verification request to Steam
       const verifyParams = new URLSearchParams({
-        'openid.ns': params['openid.ns'],
+        'openid.assoc_handle': params['openid.assoc_handle'] || '',
         'openid.mode': 'check_authentication',
+        'openid.ns': params['openid.ns'],
         'openid.sig': params['openid.sig'],
         'openid.signed': params['openid.signed'],
-        'openid.assoc_handle': params['openid.assoc_handle'] || '',
       })
 
       // Add all signed parameters to the verification request
@@ -62,11 +62,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // Send verification request to Steam
       const verifyResponse = await fetch(STEAM_OPENID_URL, {
-        method: 'POST',
+        body: verifyParams.toString(),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: verifyParams.toString(),
+        method: 'POST',
       })
 
       const verifyText = await verifyResponse.text()
@@ -78,7 +78,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       // Convert Steam64 to Steam32 ID
-      const steam32Id = (BigInt(steamId64) - BigInt('76561197960265728')).toString()
+      const steam32Id = (BigInt(steamId64) - 76_561_197_960_265_728n).toString()
 
       // Fetch Steam profile data
       const profileResponse = await fetch(
@@ -102,8 +102,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         const player = profileJson.response.players[0]
         profileData = {
           avatar: player.avatarfull,
-          name: player.personaname,
           id: steam32Id,
+          name: player.personaname,
         }
       }
 
@@ -123,14 +123,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             !existingSteamAccount.connectedUserIds.includes(session.user.id)
           ) {
             await prisma.steamAccount.update({
-              where: {
-                steam32Id: Number.parseInt(steam32Id, 10),
-              },
               data: {
                 connectedUserIds: {
                   push: session.user.id,
                 },
                 updatedAt: new Date(),
+              },
+              where: {
+                steam32Id: Number.parseInt(steam32Id, 10),
               },
             })
           }
@@ -138,8 +138,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           // Create a new steam account entry
           await prisma.steamAccount.create({
             data: {
-              steam32Id: Number.parseInt(steam32Id, 10),
               name: profileData?.name || null,
+              steam32Id: Number.parseInt(steam32Id, 10),
               userId: session.user.id,
             },
           })
@@ -147,22 +147,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         // If user doesn't have a primary account yet, set this one as primary
         const user = await prisma.user.findUnique({
-          where: {
-            id: session.user.id,
-          },
           select: {
             steam32Id: true,
+          },
+          where: {
+            id: session.user.id,
           },
         })
 
         if (!user?.steam32Id) {
           await prisma.user.update({
-            where: {
-              id: session.user.id,
-            },
             data: {
               steam32Id: Number.parseInt(steam32Id, 10),
               updatedAt: new Date(),
+            },
+            where: {
+              id: session.user.id,
             },
           })
         }
@@ -174,8 +174,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.status(200).json({
         message: 'Steam authentication validated successfully',
-        steam32Id,
         profileData,
+        steam32Id,
       })
     } catch (error) {
       captureException(error)

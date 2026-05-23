@@ -7,8 +7,8 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 const steamVerifySchema = z.object({
-  steam32Id: z.string().transform((val) => Number.parseInt(val, 10)),
   name: z.string().optional(),
+  steam32Id: z.string().transform((val) => Number.parseInt(val, 10)),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -33,21 +33,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         // If it exists but belongs to a different user, link it to the current user as well
         if (existingSteamAccount.userId !== session.user.id) {
           await prisma.steamAccount.update({
-            where: {
-              steam32Id: body.steam32Id,
-            },
             data: {
               connectedUserIds: {
                 push: session.user.id,
               },
               updatedAt: new Date(),
             },
+            where: {
+              steam32Id: body.steam32Id,
+            },
           })
         }
 
         return res.status(200).json({
-          message: 'Steam account already linked to your profile',
           existingAccount: true,
+          message: 'Steam account already linked to your profile',
           steam32Id: body.steam32Id,
         })
       }
@@ -55,26 +55,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // Create a new steam account entry
       const steamAccount = await prisma.steamAccount.create({
         data: {
-          steam32Id: body.steam32Id,
           name: body.name,
+          steam32Id: body.steam32Id,
           userId: session.user.id,
         },
       })
 
       // Update the user record with the steam32Id
       await prisma.user.update({
-        where: {
-          id: session.user.id,
-        },
         data: {
           steam32Id: body.steam32Id,
           updatedAt: new Date(),
         },
+        where: {
+          id: session.user.id,
+        },
       })
 
       return res.status(200).json({
-        message: 'Steam account linked successfully',
         existingAccount: false,
+        message: 'Steam account linked successfully',
         steamAccount,
       })
     } catch (error) {
@@ -82,7 +82,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.error('Error saving Steam ID:', error)
 
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid request data', errors: error.errors })
+        return res.status(400).json({ errors: error.errors, message: 'Invalid request data' })
       }
 
       return res.status(500).json({ message: 'Internal server error' })

@@ -18,8 +18,7 @@ export function SecondaryFeatures() {
           {CommandDetail[Settings.commandWL].response({}, false)}
         </div>
       ),
-      name: 'Real-Time Win/Loss Overlay',
-      disableHover: false,
+      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2',
       cta: (
         <Popover
           className='self-end'
@@ -40,11 +39,25 @@ export function SecondaryFeatures() {
       ),
       description:
         'Instantly display your ranked or unranked win-loss record, current MMR, and progress to next rank on stream with one simple command.',
-      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2',
+      disableHover: false,
+      name: 'Real-Time Win/Loss Overlay',
     },
     {
-      name: 'MMR badge and tracking',
-      disableHover: false,
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          {CommandDetail[Settings.commandMmr].response()}
+          <div className='mt-6 flex justify-center space-x-4'>
+            <MMRBadge image='55.png' rank={3860} className='self-center rounded-md!' />
+            <MMRBadge
+              image='92.png'
+              className='self-center rounded-md!'
+              leaderboard={1}
+              rank={13_150}
+            />
+          </div>
+        </div>
+      ),
+      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-2 lg:col-end-3',
       cta: (
         <Popover
           content={
@@ -62,37 +75,22 @@ export function SecondaryFeatures() {
           </button>
         </Popover>
       ),
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          {CommandDetail[Settings.commandMmr].response()}
-          <div className='mt-6 flex justify-center space-x-4'>
-            <MMRBadge image='55.png' rank={3860} className='self-center rounded-md!' />
-            <MMRBadge
-              image='92.png'
-              className='self-center rounded-md!'
-              leaderboard={1}
-              rank={13150}
-            />
-          </div>
-        </div>
-      ),
       description: 'Show off your current rank, or leaderboard standing on stream.',
-      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-2 lg:col-end-3',
+      disableHover: false,
+      name: 'MMR badge and tracking',
     },
     {
-      name: 'Instant Smurf Detection',
-      description:
-        'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
       background: (
         <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandSmurfs].response()}
         </div>
       ),
       className: 'lg:row-start-1 lg:row-end-2 lg:col-start-3 lg:col-end-4',
+      description:
+        'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
+      name: 'Instant Smurf Detection',
     },
     {
-      name: 'Dotabod has things to say',
-      description: 'But only when the game conditions meet the correct parameters.',
       background: (
         <div className='flex flex-col items-center justify-center'>
           <TwitchChat
@@ -106,9 +104,25 @@ export function SecondaryFeatures() {
         </div>
       ),
       className: 'lg:row-start-2 lg:row-end-3 lg:col-start-3 lg:col-end-4',
+      description: 'But only when the game conditions meet the correct parameters.',
+      name: 'Dotabod has things to say',
     },
     {
-      name: 'Roshan & Aegis Timers',
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          <TwitchChat
+            responses={[
+              <React.Fragment key={1}>
+                <span>{chatterInfo.roshanKilled.message}</span>
+              </React.Fragment>,
+              <React.Fragment key={2}>
+                <span>{chatterInfo.roshPickup.message}</span>
+              </React.Fragment>,
+            ]}
+          />
+        </div>
+      ),
+      className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
       cta: (
         <Popover
           content={
@@ -136,33 +150,19 @@ export function SecondaryFeatures() {
           </button>
         </Popover>
       ),
-      disableHover: false,
       description: 'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
-      className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
-      background: (
-        <div className='flex flex-col items-center justify-center'>
-          <TwitchChat
-            responses={[
-              <React.Fragment key={1}>
-                <span>{chatterInfo.roshanKilled.message}</span>
-              </React.Fragment>,
-              <React.Fragment key={2}>
-                <span>{chatterInfo.roshPickup.message}</span>
-              </React.Fragment>,
-            ]}
-          />
-        </div>
-      ),
+      disableHover: false,
+      name: 'Roshan & Aegis Timers',
     },
     {
-      name: 'In-Game Medal Tracking',
-      description: CommandDetail[Settings.commandGM].description,
       background: (
         <div className='flex flex-col items-center justify-center'>
           {CommandDetail[Settings.commandGM].response()}
         </div>
       ),
       className: 'lg:row-start-3 lg:row-end-4 lg:col-start-3 lg:col-end-4',
+      description: CommandDetail[Settings.commandGM].description,
+      name: 'In-Game Medal Tracking',
     },
   ]
 

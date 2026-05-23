@@ -45,7 +45,9 @@ export const GiftSubscriptionForm = ({
 
   // Function to check for profanity in text
   const checkForProfanity = (text: string | undefined): boolean => {
-    if (!text) return false
+    if (!text) {
+      return false
+    }
     return detect(text)
   }
 
@@ -91,8 +93,8 @@ export const GiftSubscriptionForm = ({
       if (checkForProfanity(submittedValues.giftMessage)) {
         form.setFields([
           {
-            name: 'giftMessage',
             errors: ['Your message contains inappropriate language. Please revise it.'],
+            name: 'giftMessage',
           },
         ])
         setFormError('Please remove inappropriate language from your message.')
@@ -103,8 +105,8 @@ export const GiftSubscriptionForm = ({
       if (checkForProfanity(submittedValues.giftSenderName)) {
         form.setFields([
           {
-            name: 'giftSenderName',
             errors: ['Your name contains inappropriate language. Please revise it.'],
+            name: 'giftSenderName',
           },
         ])
         setFormError('Please remove inappropriate language from your name.')
@@ -115,11 +117,11 @@ export const GiftSubscriptionForm = ({
       const priceId = process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID as string
 
       const result = await createGiftCheckoutSession({
-        recipientUsername: submittedValues.recipientUsername,
-        priceId,
         giftMessage: submittedValues.giftMessage,
         giftSenderName: submittedValues.giftSenderName,
+        priceId,
         quantity: submittedValues.quantity,
+        recipientUsername: submittedValues.recipientUsername,
       })
 
       // Check if the result contains an error or message
@@ -141,8 +143,8 @@ export const GiftSubscriptionForm = ({
           // Update the form field with error
           form.setFields([
             {
-              name: 'recipientUsername',
               errors: [errorText],
+              name: 'recipientUsername',
             },
           ])
         } else {
@@ -178,7 +180,7 @@ export const GiftSubscriptionForm = ({
     const basePrice = plans.find((p) => p.tier === selectedTier)?.price[activePeriod] || '$0'
 
     // Extract the numeric value from the price string (e.g., "$5" -> 5)
-    const numericPrice = Number.parseFloat(basePrice.replace(/[^0-9.]/g, ''))
+    const numericPrice = Number.parseFloat(basePrice.replaceAll(/[^0-9.]/g, ''))
     const total = numericPrice * quantity
 
     // Format the total price with the same currency symbol
@@ -259,14 +261,14 @@ export const GiftSubscriptionForm = ({
             <Form.Item
               name='recipientUsername'
               label="Recipient's Username"
-              rules={[{ required: true, message: "Please enter the recipient's username" }]}
+              rules={[{ message: "Please enter the recipient's username", required: true }]}
               tooltip='Enter the Twitch username of the streamer you want to gift to'
               validateStatus={usernameError ? 'error' : undefined}
               help={usernameError}
             >
               <Input
                 placeholder='Enter Twitch username'
-                disabled={!!recipientUsername}
+                disabled={Boolean(recipientUsername)}
                 onChange={handleUsernameChange}
                 className='w-full'
               />

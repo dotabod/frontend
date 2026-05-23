@@ -15,14 +15,14 @@ export const usePlayerPositions = () => {
   const initialSize = 62
   const gapSize = 513
 
-  // there are 5 on left, 5 on right
-  const firstFive = Array.from({ length: 5 }, (_, i) => i).map((i) => {
-    return initialSize * (i + 1) + spaceFromLeft
-  })
-  // repeat(5, 111px) 356px repeat(5, 111px)
+  // There are 5 on left, 5 on right
+  const firstFive = Array.from({ length: 5 }, (_, i) => i).map(
+    (i) => initialSize * (i + 1) + spaceFromLeft,
+  )
+  // Repeat(5, 111px) 356px repeat(5, 111px)
   const playerPositions = [
-    ...firstFive, // left
-    ...firstFive.map((w, _i) => w + gapSize), // right
+    ...firstFive, // Left
+    ...firstFive.map((w, _i) => w + gapSize), // Right
   ].map((w) => res({ w }))
 
   return { playerPositions }
@@ -38,14 +38,14 @@ export const useOverlayPositions = () => {
 
   const wlPosition: Position & { fontSize: number } = {
     bottom: 0,
-    right: res({ w: 311 }),
-    left: null,
     fontSize: res({ w: 18 }),
+    left: null,
+    right: res({ w: 311 }),
   }
 
   const roshPosition: Position = {
-    left: isXL ? res({ w: isSimple ? 280 : 285 }) : res({ w: isSimple ? 243 : 250 }),
     bottom: res({ h: 100 }),
+    left: isXL ? res({ w: isSimple ? 280 : 285 }) : res({ w: isSimple ? 243 : 250 }),
     right: null,
   }
 
@@ -81,20 +81,20 @@ export const useOverlayPositions = () => {
     }
   }
   return {
-    wlPosition: {
-      ...wlPosition,
-      left: wlPosition.left ?? undefined,
-      right: wlPosition.right ?? undefined,
+    minimapPosition: {
+      ...minimapPosition,
+      left: minimapPosition.left ?? undefined,
+      right: minimapPosition.right ?? undefined,
     },
     roshPosition: {
       ...roshPosition,
       left: roshPosition.left ?? undefined,
       right: roshPosition.right ?? undefined,
     },
-    minimapPosition: {
-      ...minimapPosition,
-      left: minimapPosition.left ?? undefined,
-      right: minimapPosition.right ?? undefined,
+    wlPosition: {
+      ...wlPosition,
+      left: wlPosition.left ?? undefined,
+      right: wlPosition.right ?? undefined,
     },
   }
 }

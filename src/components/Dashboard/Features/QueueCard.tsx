@@ -61,7 +61,7 @@ export default function QueueCard() {
                 htmlType='submit'
                 disabled={
                   !form.isFieldsTouched() ||
-                  !!form.getFieldsError().filter(({ errors }) => errors.length).length
+                  form.getFieldsError().filter(({ errors }) => errors.length).length > 0
                 }
               >
                 Save

@@ -36,23 +36,23 @@ export default function SceneSwitcher(): React.ReactNode {
 
   const scenes = {
     [Settings['obs-minimap']]: {
-      value: obsMini,
-      update: updateMini,
-      label: 'Minimap blocker',
       helpText: 'Whenever the minimap is first shown, switch to this scene',
+      label: 'Minimap blocker',
+      update: updateMini,
+      value: obsMini,
     },
     [Settings['obs-picks']]: {
-      value: obsPick,
-      update: updatePicks,
-      label: 'Picks blocker',
       helpText:
         'As soon as picks are shown and heroes are able to be selected, switch to this scene',
+      label: 'Picks blocker',
+      update: updatePicks,
+      value: obsPick,
     },
     [Settings['obs-dc']]: {
-      value: obsDc,
-      update: updateDc,
-      label: 'Game disconnected',
       helpText: 'Switch to this scene when you disconnect and leave a Dota game',
+      label: 'Game disconnected',
+      update: updateDc,
+      value: obsDc,
     },
   }
 

@@ -6,12 +6,12 @@ export const InvalidOverlayPage = () => {
   const { notification } = App.useApp()
 
   notification.open({
-    key: 'auth-error',
-    type: 'error',
-    duration: 0,
-    placement: 'bottomLeft',
-    message: 'Authentication failed',
     description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
+    duration: 0,
+    key: 'auth-error',
+    message: 'Authentication failed',
+    placement: 'bottomLeft',
+    type: 'error',
   })
 
   return (
@@ -34,8 +34,12 @@ export const InvalidOverlayPage = () => {
 
 // Check for invalid overlay URLs in localStorage
 export const checkForInvalidOverlay = (pathname: string): boolean => {
-  if (typeof window === 'undefined' || !window.localStorage) return false
-  if (!pathname.includes('overlay/')) return false
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return false
+  }
+  if (!pathname.includes('overlay/')) {
+    return false
+  }
 
   try {
     const pathKey = `invalid_overlay_${pathname}`
@@ -43,11 +47,11 @@ export const checkForInvalidOverlay = (pathname: string): boolean => {
 
     if (cachedData) {
       const data = JSON.parse(cachedData)
-      const timestamp = data.timestamp
+      const { timestamp } = data
       const now = Date.now()
 
       // If the cached 404 is less than 1 day old, consider it valid
-      if (timestamp && now - timestamp < 86400000) {
+      if (timestamp && now - timestamp < 86_400_000) {
         return true
       }
 

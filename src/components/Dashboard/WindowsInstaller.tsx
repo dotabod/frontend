@@ -21,7 +21,7 @@ import CodeBlock from './CodeBlock'
 
 const { Step } = Steps
 
-type InstallationStepsProps = {
+interface InstallationStepsProps {
   success: boolean
   currentStep: number
   errorWithoutSuccess: string | boolean | null
@@ -34,7 +34,6 @@ const InstallationSteps = ({
 }: InstallationStepsProps) => {
   const steps = [
     {
-      title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',
       description: errorWithoutSuccess ? (
         <span>
           Please try again or reach out from the <Link href='/dashboard/help'>help page</Link> for
@@ -58,14 +57,15 @@ const InstallationSteps = ({
           )}
         </div>
       ),
+      title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',
     },
     {
-      title: 'Process Token',
       description: 'Processing the provided token...',
+      title: 'Process Token',
     },
     {
-      title: 'Install Dotabod',
       description: 'Running the installer script',
+      title: 'Install Dotabod',
     },
   ]
 
@@ -121,7 +121,7 @@ const WindowsInstaller = () => {
 
     channel.addEventListener('message', handleMessage)
     // Post a message as soon as the component mounts,
-    // indicating that an instance has been opened.
+    // Indicating that an instance has been opened.
     channel.postMessage('instance-opened')
 
     return () => {
@@ -166,7 +166,9 @@ const WindowsInstaller = () => {
     let interval: NodeJS.Timeout
 
     const checkStatus = async () => {
-      if (!hasAccess || success || error || !sanitizedPort) return
+      if (!hasAccess || success || error || !sanitizedPort) {
+        return
+      }
 
       // Don't proceed if LNA permission was denied
       if (lnaPermissionState === 'denied') {
@@ -178,8 +180,8 @@ const WindowsInstaller = () => {
           `http://localhost:${sanitizedPort}/status`,
           buildLocalFetchOptions(
             {
-              method: 'GET',
               headers: { 'Content-Type': 'application/json' },
+              method: 'GET',
             },
             'loopback',
           ),
@@ -197,13 +199,15 @@ const WindowsInstaller = () => {
     }
 
     const fetchToken = async () => {
-      if (!session?.data?.user?.id) return
+      if (!session?.data?.user?.id) {
+        return
+      }
 
       try {
         const response = await fetch(
           `http://localhost:${sanitizedPort}/token?token=${encodeURIComponent(session.data.user.id)}`,
           buildLocalFetchOptions(
-            { method: 'GET', headers: { 'Content-Type': 'application/json' } },
+            { headers: { 'Content-Type': 'application/json' }, method: 'GET' },
             'loopback',
           ),
         )

@@ -5,7 +5,7 @@ function JustButton({
   data,
   user,
   extension = 'cfg',
-  onClick = undefined,
+  onClick,
 }: {
   url: string
   data?: { beta_tester?: boolean }

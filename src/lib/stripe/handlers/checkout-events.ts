@@ -31,7 +31,9 @@ export async function handleCheckoutCompleted(
 
   // Handle regular (non-gift) subscriptions
   const userId = session.metadata?.userId
-  if (!userId) return false
+  if (!userId) {
+    return false
+  }
 
   const cancelInvoiceIfPending = async (invoiceId: string, context: string) => {
     try {
@@ -154,8 +156,14 @@ export async function handleCheckoutCompleted(
             console.log(`Detected crypto subscription period: ${cryptoPeriod}`)
 
             // Check if the user has any active regular (non-crypto) subscriptions in Stripe
-            // that need to be canceled when switching to crypto
+            // That need to be canceled when switching to crypto
             const activeRegularSubscriptions = await tx.subscription.findMany({
+              select: {
+                id: true,
+                metadata: true,
+                stripePriceId: true,
+                stripeSubscriptionId: true,
+              },
               where: {
                 userId,
                 NOT: {
@@ -166,12 +174,6 @@ export async function handleCheckoutCompleted(
                   not: null,
                 },
                 // We'll check for crypto payment flag in the code
-              },
-              select: {
-                id: true,
-                stripeSubscriptionId: true,
-                stripePriceId: true,
-                metadata: true,
               },
             })
 
@@ -221,21 +223,21 @@ export async function handleCheckoutCompleted(
 
                     // Update in database
                     await tx.subscription.update({
-                      where: { id: regularSubscription.id },
                       data: {
-                        status: SubscriptionStatus.CANCELED,
                         cancelAtPeriodEnd: true,
-                        updatedAt: new Date(),
                         metadata: {
                           ...(typeof regularSubscription.metadata === 'object'
                             ? regularSubscription.metadata
                             : {}),
-                          switchedToCrypto: 'true',
-                          switchedAt: new Date().toISOString(),
-                          previousPriceId: regularSubscription.stripePriceId,
                           newCryptoPeriod: cryptoPeriod,
+                          previousPriceId: regularSubscription.stripePriceId,
+                          switchedAt: new Date().toISOString(),
+                          switchedToCrypto: 'true',
                         },
+                        status: SubscriptionStatus.CANCELED,
+                        updatedAt: new Date(),
                       },
+                      where: { id: regularSubscription.id },
                     })
 
                     console.log(
@@ -270,11 +272,11 @@ export async function handleCheckoutCompleted(
               // Find and cancel ALL active subscriptions for this user
               const activeSubscriptions = await tx.subscription.findMany({
                 where: {
-                  userId,
                   NOT: {
                     status: SubscriptionStatus.CANCELED,
                   },
                   transactionType: { not: TransactionType.LIFETIME },
+                  userId,
                 },
               })
 
@@ -329,17 +331,17 @@ export async function handleCheckoutCompleted(
 
                 // Update subscription status in our database
                 await tx.subscription.update({
-                  where: { id: subscription.id },
                   data: {
-                    status: SubscriptionStatus.CANCELED,
                     cancelAtPeriodEnd: true,
-                    updatedAt: new Date(),
                     metadata: {
                       ...baseMetadata,
-                      upgradedToLifetime: 'true',
                       upgradedAt: new Date().toISOString(),
+                      upgradedToLifetime: 'true',
                     },
+                    status: SubscriptionStatus.CANCELED,
+                    updatedAt: new Date(),
                   },
+                  where: { id: subscription.id },
                 })
 
                 console.log(
@@ -400,18 +402,18 @@ export async function handleCheckoutCompleted(
 
                   // Cancel the existing subscription
                   await tx.subscription.update({
-                    where: { id: existingSubscription.id },
                     data: {
-                      status: SubscriptionStatus.CANCELED,
                       cancelAtPeriodEnd: true,
-                      updatedAt: new Date(),
                       metadata: {
                         ...sanitizedMetadata,
-                        upgradedTo: newPeriod,
-                        upgradedAt: new Date().toISOString(),
                         previousPriceId: existingPriceId,
+                        upgradedAt: new Date().toISOString(),
+                        upgradedTo: newPeriod,
                       },
+                      status: SubscriptionStatus.CANCELED,
+                      updatedAt: new Date(),
                     },
+                    where: { id: existingSubscription.id },
                   })
 
                   // Create a new subscription with the new period
@@ -465,11 +467,11 @@ export async function handleCheckoutCompleted(
             // Find and cancel ALL active subscriptions for this user
             const activeSubscriptions = await tx.subscription.findMany({
               where: {
-                userId,
                 NOT: {
                   status: SubscriptionStatus.CANCELED,
                 },
                 transactionType: { not: TransactionType.LIFETIME },
+                userId,
               },
             })
 
@@ -522,17 +524,17 @@ export async function handleCheckoutCompleted(
 
               // Update subscription status in our database
               await tx.subscription.update({
-                where: { id: subscription.id },
                 data: {
-                  status: SubscriptionStatus.CANCELED,
                   cancelAtPeriodEnd: true,
-                  updatedAt: new Date(),
                   metadata: {
                     ...baseMetadata,
-                    upgradedToLifetime: 'true',
                     upgradedAt: new Date().toISOString(),
+                    upgradedToLifetime: 'true',
                   },
+                  status: SubscriptionStatus.CANCELED,
+                  updatedAt: new Date(),
                 },
+                where: { id: subscription.id },
               })
 
               console.log(

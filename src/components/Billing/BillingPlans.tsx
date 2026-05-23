@@ -20,15 +20,12 @@ interface BillingPlansProps {
 
 export const plans = [
   {
-    name: 'Free',
-    featured: false,
-    price: { monthly: '$0', annual: '$0', lifetime: '$0' },
-    description: 'The core overlay, MMR tracking, and basic chat commands. No card required.',
     button: {
-      label: 'Get started for free',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.FREE}`,
+      label: 'Get started for free',
     },
-    tier: SUBSCRIPTION_TIERS.FREE,
+    description: 'The core overlay, MMR tracking, and basic chat commands. No card required.',
+    featured: false,
     features: [
       'Automated setup (Dota 2)',
       'Multi-language support',
@@ -51,22 +48,17 @@ export const plans = [
       />
     ),
     logomarkClassName: 'fill-gray-300',
+    name: 'Free',
+    price: { annual: '$0', lifetime: '$0', monthly: '$0' },
+    tier: SUBSCRIPTION_TIERS.FREE,
   },
   {
-    name: 'Pro',
-    featured: true,
-    hasTrial: true,
-    price: {
-      monthly: '$6',
-      annual: '$57',
-      lifetime: '$99',
-    },
-    tier: SUBSCRIPTION_TIERS.PRO,
-    description: 'Everything in Free, plus auto predictions, advanced overlays, and pro commands.',
     button: {
-      label: 'Subscribe',
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.PRO}`,
+      label: 'Subscribe',
     },
+    description: 'Everything in Free, plus auto predictions, advanced overlays, and pro commands.',
+    featured: true,
     features: [
       'All Free features',
       'Automated setup (OBS, 7TV, Twitch)',
@@ -87,6 +79,7 @@ export const plans = [
       </span>,
       'And more! Browse the full list of features in the dashboard',
     ],
+    hasTrial: true,
     logo: (
       <Image
         src='https://cdn.betterttv.net/emote/5ff1bbbf9d7d952e405a2edc/3x.webp'
@@ -97,6 +90,13 @@ export const plans = [
       />
     ),
     logomarkClassName: 'fill-purple-500',
+    name: 'Pro',
+    price: {
+      annual: '$57',
+      lifetime: '$99',
+      monthly: '$6',
+    },
+    tier: SUBSCRIPTION_TIERS.PRO,
   },
 ]
 
@@ -107,9 +107,11 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
   const didInitPeriod = useRef(false)
 
   // Default the period to the active subscription's period, but only once, so a
-  // later context refresh never snaps back the user's manual selection.
+  // Later context refresh never snaps back the user's manual selection.
   useEffect(() => {
-    if (didInitPeriod.current) return
+    if (didInitPeriod.current) {
+      return
+    }
     if (isSubscriptionActive({ status: subscription?.status })) {
       didInitPeriod.current = true
       setActivePeriod(getCurrentPeriod(subscription?.stripePriceId))

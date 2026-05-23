@@ -26,12 +26,14 @@ const DataPage = () => {
       track('export_data')
       setLoading('export')
       const response = await fetch('/api/manage-data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'export' }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
       })
 
-      if (!response.ok) throw new Error("We couldn't export your data.")
+      if (!response.ok) {
+        throw new Error("We couldn't export your data.")
+      }
 
       const data = await response.json()
 
@@ -41,7 +43,7 @@ const DataPage = () => {
       const a = document.createElement('a')
       a.href = url
       a.download = 'dotabod-data.json'
-      document.body.appendChild(a)
+      document.body.append(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
@@ -58,8 +60,7 @@ const DataPage = () => {
   const handleDeleteAccount = () => {
     track('delete_account')
     confirm({
-      title: 'Delete your Dotabod account?',
-      icon: <ExclamationCircleOutlined />,
+      cancelText: 'Keep my account',
       content: (
         <div>
           <Paragraph>This permanently:</Paragraph>
@@ -73,19 +74,21 @@ const DataPage = () => {
           <Paragraph>You can't undo this.</Paragraph>
         </div>
       ),
+      icon: <ExclamationCircleOutlined />,
       okText: 'Delete my account',
       okType: 'danger',
-      cancelText: 'Keep my account',
       async onOk() {
         try {
           setLoading('delete')
           const response = await fetch('/api/manage-data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'delete' }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
           })
 
-          if (!response.ok) throw new Error("We couldn't delete your account.")
+          if (!response.ok) {
+            throw new Error("We couldn't delete your account.")
+          }
 
           message.success('Your account has been deleted. Signing you out…', 0)
           signOut({ callbackUrl: '/', redirect: true })
@@ -96,6 +99,7 @@ const DataPage = () => {
           setLoading(null)
         }
       },
+      title: 'Delete your Dotabod account?',
     })
   }
 
@@ -177,10 +181,10 @@ DataPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Your data | Dotabod Dashboard',
-        description: 'Export a copy of your Dotabod account data, or delete your account.',
         canonicalUrl: 'https://dotabod.com/dashboard/data',
+        description: 'Export a copy of your Dotabod account data, or delete your account.',
         noindex: true,
+        title: 'Your data | Dotabod Dashboard',
       }}
     >
       {page}

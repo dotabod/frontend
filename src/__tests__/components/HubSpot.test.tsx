@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.mock('next/script', () => ({
   default: ({ src, id }: { src?: string; id?: string }) => (
@@ -13,17 +13,17 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import HubSpot from '@/components/HubSpot'
 
-// biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
+// Biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
 const anyVal = (v: unknown) => v as any
 
 const widget = {
+  close: vi.fn(),
   load: vi.fn(),
   open: vi.fn(),
-  close: vi.fn(),
   refresh: vi.fn(),
   remove: vi.fn(),
 }
-const conversations = { widget, clear: vi.fn() }
+const conversations = { clear: vi.fn(), widget }
 
 describe('HubSpot component', () => {
   beforeEach(() => {
@@ -66,9 +66,9 @@ describe('HubSpot component', () => {
     )
     global.fetch = vi.fn().mockResolvedValue(
       anyVal({
+        json: async () => ({ email: 'gamer@example.com', token: 'vtok' }),
         ok: true,
         status: 200,
-        json: async () => ({ email: 'gamer@example.com', token: 'vtok' }),
       }),
     )
 
@@ -76,9 +76,9 @@ describe('HubSpot component', () => {
 
     await waitFor(() => expect(widget.load).toHaveBeenCalled())
     expect(window.hsConversationsSettings).toEqual({
-      loadImmediately: false,
       identificationEmail: 'gamer@example.com',
       identificationToken: 'vtok',
+      loadImmediately: false,
     })
     expect(window._hsq).toContainEqual([
       'identify',
@@ -95,7 +95,7 @@ describe('HubSpot component', () => {
       }),
     )
     const json = vi.fn()
-    global.fetch = vi.fn().mockResolvedValue(anyVal({ ok: true, status: 204, json }))
+    global.fetch = vi.fn().mockResolvedValue(anyVal({ json, ok: true, status: 204 }))
 
     render(<HubSpot />)
 

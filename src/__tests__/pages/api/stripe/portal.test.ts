@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const getServerSessionMock = vi.fn()
 const getSubscriptionMock = vi.fn()
@@ -90,12 +90,12 @@ describe('/api/stripe/portal', () => {
     await handler(req, res)
 
     expect(historicalSubscriptionFindFirstMock).toHaveBeenCalledWith({
-      where: {
-        userId: 'user_123',
-        stripeCustomerId: { not: null },
-      },
-      select: { stripeCustomerId: true },
       orderBy: { updatedAt: 'desc' },
+      select: { stripeCustomerId: true },
+      where: {
+        stripeCustomerId: { not: null },
+        userId: 'user_123',
+      },
     })
     expect(portalCreateMock).toHaveBeenCalledWith({
       customer: 'cus_hist_123',
@@ -115,8 +115,8 @@ describe('/api/stripe/portal', () => {
 
     expect(res.statusCode).toBe(400)
     expect(res._getJSONData()).toEqual({
-      error: 'No Stripe customer found',
       code: 'NO_STRIPE_CUSTOMER',
+      error: 'No Stripe customer found',
       guidance: 'No active Stripe billing profile found. If you need help, contact support.',
     })
   })

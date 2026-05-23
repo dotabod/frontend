@@ -32,7 +32,7 @@ import {
 
 let socket: Socket | null = null
 
-export type WinChance = {
+export interface WinChance {
   value: number
   time: number
   visible: boolean
@@ -45,7 +45,7 @@ export type wlType = {
 }[]
 
 // Add these type definitions
-type CourierData = {
+interface CourierData {
   // Define courier data structure based on your application
   id: number
   position: [number, number]
@@ -53,7 +53,7 @@ type CourierData = {
   // Add other properties as needed
 }
 
-type CreepData = {
+interface CreepData {
   // Define creep data structure based on your application
   id: number
   position: [number, number]
@@ -61,7 +61,7 @@ type CreepData = {
   // Add other properties as needed
 }
 
-type HeroUnitData = {
+interface HeroUnitData {
   // Define hero unit data structure based on your application
   id: number
   position: [number, number]
@@ -69,32 +69,32 @@ type HeroUnitData = {
   // Add other properties as needed
 }
 
-type MinimapStatusData = {
+interface MinimapStatusData {
   // Define status data structure based on your application
   gameState: string
   matchId?: string
   // Add other properties as needed
 }
 
-export type ChatMessage = {
+export interface ChatMessage {
   message: string
   timestamp?: number
 }
 
-export type RankImageDetails = {
+export interface RankImageDetails {
   image: string | null
   rank: number | null
   leaderboard: number | null
   notLoaded?: boolean
 }
 
-export type BetData = {
+export interface BetData {
   title: string
   endDate: PollData['endDate']
   outcomes: { title: string; totalVotes: number; channelPoints: number }[]
 }
 
-type UseSocketProps = {
+interface UseSocketProps {
   setPollData: Dispatch<SetStateAction<PollData | null>>
   setBetData: Dispatch<SetStateAction<BetData | null>>
   setBlock: Dispatch<SetStateAction<blockType>>
@@ -127,14 +127,16 @@ export const useSocket = ({
   const { userId } = router.query
   const dispatch = useDispatch()
 
-  // can pass any key here, we just want mutate() function on `api/settings`
+  // Can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
 
   // Ref to store timeout IDs for chat message cleanup
   const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      return
+    }
 
     let lastReceivedTime = Date.now()
 
@@ -148,10 +150,10 @@ export const useSocket = ({
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        timeout: 20000,
+        timeout: 20_000,
       })
 
-      console.log('Socket instance created:', !!socket)
+      console.log('Socket instance created:', Boolean(socket))
     }
 
     // Use socket.io's built-in ping event to track connection health
@@ -161,13 +163,13 @@ export const useSocket = ({
 
     // Monitor for stale connections
     const connectionMonitor = setInterval(() => {
-      if (Date.now() - lastReceivedTime > 45000) {
+      if (Date.now() - lastReceivedTime > 45_000) {
         // 45s = 3 missed pings
         console.log('Connection appears stale, reconnecting...')
         socket?.disconnect()
         socket?.connect()
       }
-    }, 15000)
+    }, 15_000)
 
     // Update lastReceivedTime whenever we get any data
     const updateLastReceived = () => {
@@ -205,7 +207,7 @@ export const useSocket = ({
 
     socket.on('requestHeroData', async ({ allTime, heroId, steam32Id }, cb) => {
       updateLastReceived()
-      const wl = { win: 0, lose: 0 }
+      const wl = { lose: 0, win: 0 }
       const response = await fetcher(
         `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${
           allTime ? '' : '&date=30'
@@ -223,8 +225,8 @@ export const useSocket = ({
     socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
       updateLastReceived()
       console.log('[MMR] requestMatchData event received', {
-        matchId,
         heroSlot,
+        matchId,
       })
       try {
         // First check if we already have the match data cached
@@ -239,9 +241,9 @@ export const useSocket = ({
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
         cb(data)
-      } catch (e) {
-        captureException(e)
-        console.log('[MMR] Error fetching match data', { e })
+      } catch (error) {
+        captureException(error)
+        console.log('[MMR] Error fetching match data', { error })
         cb(null)
       }
     })
@@ -285,7 +287,7 @@ export const useSocket = ({
           prev.filter((msg) => msg.timestamp?.toString() !== messageId),
         )
         messageTimeoutsRef.current.delete(messageId)
-      }, 10000) // 10 seconds
+      }, 10_000) // 10 seconds
 
       // Store timeout ID for cleanup
       messageTimeoutsRef.current.set(messageId, timeoutId)
@@ -320,7 +322,7 @@ export const useSocket = ({
 
     socket.on('channelPollOrBet', (data: PollData | BetData, eventName: string) => {
       updateLastReceived()
-      console.log('twitchEvent', { eventName, data })
+      console.log('twitchEvent', { data, eventName })
       const isEnd = eventName.includes('End') || eventName.includes('Lock')
       if (eventName.includes('Poll')) {
         setPollData(isEnd || !('choices' in data) ? null : data)
@@ -393,11 +395,11 @@ export const useSocket = ({
 }
 
 const _events = {
-  subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
-  subscribeToChannelPredictionProgressEvents: EventSubChannelPredictionProgressEvent,
-  subscribeToChannelPredictionLockEvents: EventSubChannelPredictionLockEvent,
-  subscribeToChannelPredictionEndEvents: EventSubChannelPredictionEndEvent,
   subscribeToChannelPollBeginEvents: EventSubChannelPollBeginEvent,
-  subscribeToChannelPollProgressEvents: EventSubChannelPollProgressEvent,
   subscribeToChannelPollEndEvents: EventSubChannelPollEndEvent,
+  subscribeToChannelPollProgressEvents: EventSubChannelPollProgressEvent,
+  subscribeToChannelPredictionBeginEvents: EventSubChannelPredictionBeginEvent,
+  subscribeToChannelPredictionEndEvents: EventSubChannelPredictionEndEvent,
+  subscribeToChannelPredictionLockEvents: EventSubChannelPredictionLockEvent,
+  subscribeToChannelPredictionProgressEvents: EventSubChannelPredictionProgressEvent,
 }

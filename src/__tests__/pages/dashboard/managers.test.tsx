@@ -2,7 +2,7 @@
 import { render } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { createMockSession } from '@/__tests__/utils/mockFactories'
 import { canAccessFeature } from '@/utils/subscription'
 
@@ -28,52 +28,52 @@ vi.mock('@/lib/track', () => ({
 }))
 
 vi.mock('@/hooks/useSubscription', () => ({
+  useFeatureAccess: () => ({
+    hasAccess: true,
+    requiredTier: 'FREE',
+  }),
   useSubscription: vi.fn().mockReturnValue({
+    isLoading: false,
     subscription: {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      currentPeriodEnd: new Date(),
+      currentPeriodStart: new Date(),
       id: 'sub-123',
-      userId: 'user-123',
+      isGift: false,
+      status: 'ACTIVE',
       stripeCustomerId: 'cus-123',
       stripePriceId: 'price-123',
       stripeSubscriptionId: 'sub-123',
       tier: 'PRO',
-      status: 'ACTIVE',
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: new Date(),
-      cancelAtPeriodEnd: false,
-      canceledAt: null,
-      isGift: false,
+      userId: 'user-123',
     },
-    isLoading: false,
-  }),
-  useFeatureAccess: () => ({
-    requiredTier: 'FREE',
-    hasAccess: true,
   }),
 }))
 
 vi.mock('@/utils/subscription', () => ({
-  canAccessFeature: vi.fn(),
-  isInGracePeriod: vi.fn().mockReturnValue(false),
   GRACE_PERIOD_END: new Date(),
   PRICE_IDS: [
     {
-      tier: 'FREE',
-      monthly: 'price_free_monthly',
       annual: 'price_free_annual',
+      monthly: 'price_free_monthly',
       name: 'Free',
+      tier: 'FREE',
     },
     {
-      tier: 'PRO',
-      monthly: 'price_pro_monthly',
       annual: 'price_pro_annual',
+      monthly: 'price_pro_monthly',
       name: 'Pro',
+      tier: 'PRO',
     },
   ],
   SUBSCRIPTION_TIERS: {
     FREE: 'FREE',
     PRO: 'PRO',
   },
+  canAccessFeature: vi.fn(),
   getRequiredTier: vi.fn().mockReturnValue('FREE'),
+  isInGracePeriod: vi.fn().mockReturnValue(false),
 }))
 
 vi.mock('@/components/Dashboard/DashboardShell', () => ({
@@ -89,40 +89,38 @@ vi.mock('@/components/Dashboard/Header', () => ({
 }))
 
 // Mock App from antd
-vi.mock('antd', () => {
-  return {
-    notification: {
-      success: vi.fn(),
-      error: vi.fn(),
-    },
-    Select: ({ children, ...props }) => <select {...props}>{children}</select>,
-    Tag: ({ children }) => <span>{children}</span>,
-    Button: ({ children, ...props }) => (
-      <button type='button' {...props}>
-        {children}
-      </button>
-    ),
-  }
-})
+vi.mock('antd', () => ({
+  Button: ({ children, ...props }) => (
+    <button type='button' {...props}>
+      {children}
+    </button>
+  ),
+  Select: ({ children, ...props }) => <select {...props}>{children}</select>,
+  Tag: ({ children }) => <span>{children}</span>,
+  notification: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}))
 
 // Mock contexts
 vi.mock('@/contexts/SubscriptionContext', () => ({
   useSubscriptionContext: () => ({
+    isLoading: false,
     subscription: {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      currentPeriodEnd: new Date(),
+      currentPeriodStart: new Date(),
       id: 'sub-123',
-      userId: 'user-123',
+      isGift: false,
+      status: 'ACTIVE',
       stripeCustomerId: 'cus-123',
       stripePriceId: 'price-123',
       stripeSubscriptionId: 'sub-123',
       tier: 'PRO',
-      status: 'ACTIVE',
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: new Date(),
-      cancelAtPeriodEnd: false,
-      canceledAt: null,
-      isGift: false,
+      userId: 'user-123',
     },
-    isLoading: false,
   }),
 }))
 

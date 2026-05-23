@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 
 vi.mock('@/components/Overlay/PollOverlay', () => ({
@@ -28,9 +28,9 @@ describe('PollOverlays', () => {
       <PollOverlays
         pollData={null}
         betData={{
-          title: 'Prediction',
           endDate,
-          outcomes: [{ title: 'Radiant', totalVotes: 1, channelPoints: 10 }],
+          outcomes: [{ channelPoints: 10, title: 'Radiant', totalVotes: 1 }],
+          title: 'Prediction',
         }}
         radiantWinChance={null}
         setPollData={vi.fn()}

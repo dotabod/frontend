@@ -27,9 +27,9 @@ export const MatchTimer = ({ res }: { res: TransformRes }) => {
       {...motionProps}
       style={{
         bottom: res({ h: 72 }),
+        height: res({ h: 24 }),
         right: res({ w: 15 }),
         width: res({ w: 469 }),
-        height: res({ h: 24 }),
       }}
       id='match-timer'
       className='match-timer absolute flex space-x-4'

@@ -14,30 +14,30 @@ interface UpdateProps {
   dataTransform?: (data: unknown, newValue: unknown) => unknown
 }
 
-type SettingEntry = {
+interface SettingEntry {
   key: string
   value: unknown
 }
 
-type SettingsData = {
+interface SettingsData {
   settings?: SettingEntry[]
   mmr?: number | null
   rankOnly?: RankOnlyInfo
   Account?: {
     providerAccountId?: string
   }
-  SteamAccount?: Array<{
+  SteamAccount?: {
     steam32Id: number
     mmr: number
     leaderboard_rank: number | null
-  }>
+  }[]
   stream_online?: boolean
   beta_tester?: boolean
   error?: unknown
   [key: string]: unknown
 }
 
-type UserProfileData = {
+interface UserProfileData {
   displayName: string | null
   name: string
   stream_online: boolean
@@ -48,7 +48,7 @@ type UserProfileData = {
   error?: unknown
 }
 
-type MutationValue = {
+interface MutationValue {
   value: unknown
 }
 
@@ -60,13 +60,13 @@ type AccountMutationValue = Pick<
 }
 
 export const SETTINGS_SWR_OPTIONS = {
+  dedupingInterval: 60_000,
+  errorRetryCount: 1,
+  errorRetryInterval: 30_000,
+  focusThrottleInterval: 120_000,
   revalidateIfStale: false,
   revalidateOnFocus: false,
   revalidateOnReconnect: false,
-  dedupingInterval: 60000,
-  focusThrottleInterval: 120000,
-  errorRetryInterval: 30000,
-  errorRetryCount: 1,
 } as const
 
 export const STABLE_SWR_OPTIONS = SETTINGS_SWR_OPTIONS
@@ -101,32 +101,38 @@ export const useUpdate = <
   const updateSetting = (newValue: TNewValue, customPath = '') => {
     const targetPath = customPath || path
     const cachePath = path || targetPath
-    if (!targetPath) return
+    if (!targetPath) {
+      return
+    }
 
     const options: MutatorOptions = {
       optimisticData: dataTransform(data, newValue),
-      rollbackOnError: true,
       revalidate,
+      rollbackOnError: true,
     }
 
     const maybeEnabled = newValue as { enabled?: boolean } | undefined
     let isNow: string | number =
       typeof newValue === 'string' || typeof newValue === 'number' ? newValue : 'updated'
-    if (newValue === true || maybeEnabled?.enabled === true) isNow = 'enabled'
-    if (newValue === false || maybeEnabled?.enabled === false) isNow = 'disabled'
+    if (newValue === true || maybeEnabled?.enabled === true) {
+      isNow = 'enabled'
+    }
+    if (newValue === false || maybeEnabled?.enabled === false) {
+      isNow = 'disabled'
+    }
 
     const updateFn = async (currentData: TData | undefined) => {
       const response = await fetch(targetPath, {
-        method: 'PATCH',
         body: JSON.stringify(newValue),
+        method: 'PATCH',
       })
       message.open({
-        type: response.ok ? 'success' : 'error',
         content: response.ok
           ? `Success! Setting is now ${
               ['string', 'number'].includes(typeof isNow) ? isNow : 'updated'
             }`
           : 'Could not save your settings',
+        type: response.ok ? 'success' : 'error',
       })
 
       return dataTransform(currentData, newValue)
@@ -135,19 +141,19 @@ export const useUpdate = <
     mutate(cachePath, updateFn(data), options)
   }
 
-  return { data, loading, updateSetting, mutate, error }
+  return { data, error, loading, mutate, updateSetting }
 }
 
 export function useUpdateAccount() {
   const { data, loading, updateSetting } = useUpdate<
     { accounts?: SteamAccount[] },
-    Array<AccountMutationValue>
+    AccountMutationValue[]
   >({
-    path: '/api/settings/accounts',
     dataTransform: (data, newValue) => ({
       accounts:
         (newValue?.filter((a) => !a.delete) as SteamAccount[] | undefined) || data?.accounts,
     }),
+    path: '/api/settings/accounts',
   })
 
   return { data, loading, update: updateSetting }
@@ -155,8 +161,8 @@ export function useUpdateAccount() {
 
 export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
   const { data, loading, updateSetting } = useUpdate<{ locale?: string }, string>({
-    path: '/api/settings/locale',
     dataTransform: (data, newValue) => ({ locale: newValue || data?.locale }),
+    path: '/api/settings/locale',
     ...props,
   })
 
@@ -164,7 +170,7 @@ export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
 }
 
 // Define type for rankOnly settings
-type RankOnlyInfo = {
+interface RankOnlyInfo {
   enabled: boolean
   minimumRank: string
   minimumRankTier: number
@@ -207,9 +213,10 @@ export function useUpdateSetting<T = boolean>(
     error,
     updateSetting: update,
   } = useUpdate<SettingsData, MutationValue>({
-    path: url,
     dataTransform: (data, newValue) => {
-      if (!data) return {}
+      if (!data) {
+        return {}
+      }
 
       if (key === Settings.mmr) {
         return { ...data, mmr: newValue.value }
@@ -261,10 +268,13 @@ export function useUpdateSetting<T = boolean>(
 
       return { ...data, settings: newData }
     },
+    path: url,
   })
 
   let value = getValueOrDefault(key, data?.settings)
-  if (key === Settings.mmr) value = data?.mmr || 0
+  if (key === Settings.mmr) {
+    value = data?.mmr || 0
+  }
   if (key?.startsWith('chatters.')) {
     const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
     const chatterKey = key.split('.')[1]
@@ -274,8 +284,12 @@ export function useUpdateSetting<T = boolean>(
   const tierAccess = canAccessFeature(key as FeatureTier, subscription)
 
   const updateSetting = (newValue: unknown) => {
-    if (!tierAccess.hasAccess) return
-    if (!url) return
+    if (!tierAccess.hasAccess) {
+      return
+    }
+    if (!url) {
+      return
+    }
 
     if (key?.startsWith('chatters.')) {
       const chatterKey = key.split('.')[1]
@@ -306,12 +320,12 @@ export function useUpdateSetting<T = boolean>(
 
   return {
     data: value as T,
-    original: (data || {}) as SettingsData,
     error,
     loading,
-    updateSetting,
-    tierAccess,
     mutate: () => url && mutate(url),
+    original: (data || {}) as SettingsData,
+    tierAccess,
+    updateSetting,
   }
 }
 
@@ -335,8 +349,8 @@ export function useGetSettingsByUsername() {
   // Return error information to make it easier to handle in the component
   return {
     data,
-    loading,
     error,
+    loading,
     notFound: error && (error as { status?: number })?.status === 404,
   }
 }

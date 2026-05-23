@@ -17,7 +17,7 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { MinimapBlocker } from './blocker/MinimapBlocker'
 
-type InGameOverlaysProps = {
+interface InGameOverlaysProps {
   wl: wlType
   block: blockType
   rankImageDetails: RankImageDetails
@@ -44,7 +44,9 @@ export const InGameOverlays = ({
   const { wlPosition } = useOverlayPositions()
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
 
-  if (!['spectator', 'playing', 'arcade'].includes(block.type ?? '')) return null
+  if (!['spectator', 'playing', 'arcade'].includes(block.type ?? '')) {
+    return null
+  }
 
   return (
     <>
@@ -63,7 +65,7 @@ export const InGameOverlays = ({
               if (roshan?.minS) {
                 setRoshan({ ...roshan, minS: 0 })
               } else {
-                setRoshan({ ...roshan, minS: 0, maxS: 0 })
+                setRoshan({ ...roshan, maxS: 0, minS: 0 })
               }
             }}
           />

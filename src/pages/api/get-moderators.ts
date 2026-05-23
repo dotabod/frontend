@@ -33,11 +33,11 @@ export async function getModerators(userId: string | undefined, accessToken: str
       }
 
       const response = await fetch(url.toString(), {
-        method: 'GET',
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Client-Id': process.env.TWITCH_CLIENT_ID || '',
         },
+        method: 'GET',
       })
 
       if (!response.ok) {
@@ -57,7 +57,7 @@ export async function getModerators(userId: string | undefined, accessToken: str
     const err = error instanceof Error ? error : new Error(String(error))
     captureException(err)
     console.error('Failed to get moderated channels:', err)
-    return { message: 'Failed to get moderated channels', error: err.message }
+    return { error: err.message, message: 'Failed to get moderated channels' }
   }
 }
 

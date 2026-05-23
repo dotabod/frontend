@@ -24,12 +24,12 @@ GiftSubscriptionPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Gift Dotabod Pro',
         subtitle: 'Gift Dotabod Pro to your favorite streamer',
+        title: 'Gift Dotabod Pro',
       }}
       seo={{
-        title: 'Gift Dotabod Pro',
         description: 'Gift Dotabod Pro to your favorite streamer',
+        title: 'Gift Dotabod Pro',
       }}
     >
       {page}

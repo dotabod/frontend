@@ -12,7 +12,7 @@ import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
 
-type PickScreenOverlaysProps = {
+interface PickScreenOverlaysProps {
   rankImageDetails: RankImageDetails
   wl: wlType
   block: blockType
@@ -28,7 +28,9 @@ export const PickScreenOverlays = ({
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
   const hasPickScreen = ['picks', 'strategy', 'strategy-2'].includes(type ?? '')
 
-  if (!hasPickScreen) return null
+  if (!hasPickScreen) {
+    return null
+  }
 
   const styles: {
     width: number
@@ -38,11 +40,11 @@ export const PickScreenOverlays = ({
     left: number | undefined
     zIndex: number
   } = {
-    width: res({ w: 381 }),
-    height: res({ h: 200 }),
     bottom: res({ h: 16 }),
-    right: type === 'strategy-2' ? 0 : res({ w: 199 }),
+    height: res({ h: 200 }),
     left: undefined,
+    right: type === 'strategy-2' ? 0 : res({ w: 199 }),
+    width: res({ w: 381 }),
     zIndex: 40,
   }
 
@@ -90,9 +92,9 @@ export const PickScreenOverlays = ({
             {...motionProps}
             style={{
               height: '100%',
-              width: '100%',
-              overflow: 'hidden',
               margin: 0,
+              overflow: 'hidden',
+              width: '100%',
             }}
             className='absolute'
           >

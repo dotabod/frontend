@@ -57,7 +57,7 @@ const NotFound: NextPageWithLayout = () => {
                 animate={{ opacity: 1, transition: { duration: 0.15 } }}
                 exit={{
                   opacity: 0,
-                  transition: { duration: 0.15, delay: 0.2 },
+                  transition: { delay: 0.2, duration: 0.15 },
                 }}
               />
             )}
@@ -122,7 +122,7 @@ const NotFound: NextPageWithLayout = () => {
       </main>
       <div className='hidden lg:relative lg:col-start-2 lg:row-start-1 lg:row-end-4 lg:block'>
         <div className='absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10' />
-        {/* biome-ignore lint/performance/noImgElement: Static 404 page image, next/image optimization unnecessary */}
+        {/* Biome-ignore lint/performance/noImgElement: Static 404 page image, next/image optimization unnecessary */}
         <img
           src='/images/404.webp'
           alt='Lost in space illustration'
@@ -137,13 +137,13 @@ NotFound.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Page Not Found',
         subtitle: 'The page you are looking for could not be found.',
+        title: 'Page Not Found',
       }}
       seo={{
-        title: 'Page Not Found | Dotabod',
-        description: 'The page you are looking for could not be found.',
         canonicalUrl: 'https://dotabod.com/404',
+        description: 'The page you are looking for could not be found.',
+        title: 'Page Not Found | Dotabod',
       }}
     >
       {page}

@@ -67,11 +67,11 @@ interface LinkedAccount {
 async function updatePlayerProfile(steam32Id: string | number): Promise<OpenDotaProfile | null> {
   try {
     const response = await fetch('/api/steam/update-profile-data', {
-      method: 'POST',
+      body: JSON.stringify({ steam32Id }),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ steam32Id }),
+      method: 'POST',
     })
 
     if (!response.ok) {
@@ -96,7 +96,7 @@ const VerifyPage: NextPageWithLayout = () => {
   const [unlinkModalVisible, setUnlinkModalVisible] = useState(false)
   const { notification } = App.useApp()
   const track = useTrack()
-  const [actionLoading, setActionLoading] = useState<{ [key: string]: boolean }>({})
+  const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   const handleStreamerLogin = useCallback(() => {
@@ -107,9 +107,6 @@ const VerifyPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (router.asPath.toLowerCase().includes('error=chatter')) {
       notification.error({
-        key: 'chatter-error',
-        duration: 0,
-        message: 'Login error',
         description: (
           <span>
             You don't have access to the Streamer dashboard.{' '}
@@ -119,6 +116,9 @@ const VerifyPage: NextPageWithLayout = () => {
             if you want to login as a streamer.
           </span>
         ),
+        duration: 0,
+        key: 'chatter-error',
+        message: 'Login error',
       })
     }
   }, [router.asPath, isSigningOut, notification, handleStreamerLogin])
@@ -132,15 +132,15 @@ const VerifyPage: NextPageWithLayout = () => {
       signIn(
         'twitch',
         {
-          redirect: false,
           callbackUrl: '/verify',
+          redirect: false,
         },
         {
           scope: chatVerifyScopes,
         },
-      ).catch((e) => {
-        captureException(e)
-        console.error(e)
+      ).catch((error) => {
+        captureException(error)
+        console.error(error)
       })
     }
   }, [status])
@@ -193,11 +193,11 @@ const VerifyPage: NextPageWithLayout = () => {
 
           // Verify the Steam authentication server-side
           const response = await fetch('/api/steam/validate-auth', {
-            method: 'POST',
+            body: JSON.stringify(openIdParams),
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(openIdParams),
+            method: 'POST',
           })
 
           if (!response.ok) {
@@ -210,9 +210,9 @@ const VerifyPage: NextPageWithLayout = () => {
           if (steam32Id) {
             // Show success notification
             notification.success({
-              message: 'Dotabod Verified!',
               description:
                 'Your Steam account has been successfully verified and linked to your profile',
+              message: 'Dotabod Verified!',
             })
 
             // Track successful verification
@@ -248,8 +248,8 @@ const VerifyPage: NextPageWithLayout = () => {
           captureException(error)
           console.error('Error processing Steam authentication:', error)
           notification.error({
-            message: 'Steam Verification Failed',
             description: 'There was an error verifying your Steam account. Please try again.',
+            message: 'Steam Verification Failed',
           })
           track('steam_verification_error')
           router.replace('/verify', undefined, { shallow: true })
@@ -264,7 +264,9 @@ const VerifyPage: NextPageWithLayout = () => {
 
   // Fetch player profile from OpenDota API through our backend
   const fetchPlayerProfile = async (accountId: number) => {
-    if (!accountId) return
+    if (!accountId) {
+      return
+    }
 
     // Update loading state for this account
     setLinkedAccounts((prevAccounts) =>
@@ -281,15 +283,15 @@ const VerifyPage: NextPageWithLayout = () => {
       setLinkedAccounts((prevAccounts) =>
         prevAccounts.map((account) =>
           account.steam32Id === accountId.toString()
-            ? { ...account, profile, loading: false }
+            ? { ...account, loading: false, profile }
             : account,
         ),
       )
 
       if (profile) {
         track('player_profile_fetched', {
+          has_leaderboard_rank: Boolean(profile.leaderboard_rank),
           rank_tier: profile.rank_tier,
-          has_leaderboard_rank: !!profile.leaderboard_rank,
         })
       }
     } catch (error) {
@@ -303,9 +305,9 @@ const VerifyPage: NextPageWithLayout = () => {
       )
 
       notification.warning({
-        message: 'Profile Data Incomplete',
         description:
           "We couldn't retrieve complete Dota 2 profile data for one of your accounts. Some information may be missing.",
+        message: 'Profile Data Incomplete',
       })
     }
   }
@@ -317,11 +319,11 @@ const VerifyPage: NextPageWithLayout = () => {
       setActionLoading((prev) => ({ ...prev, [`setPrimary_${steam32Id}`]: true }))
 
       const response = await fetch('/api/steam/set-primary-account', {
-        method: 'POST',
+        body: JSON.stringify({ steam32Id }),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ steam32Id }),
+        method: 'POST',
       })
 
       if (!response.ok) {
@@ -337,14 +339,14 @@ const VerifyPage: NextPageWithLayout = () => {
       )
 
       notification.success({
-        message: 'Primary Account Updated',
         description: 'Your primary Steam account has been updated successfully.',
+        message: 'Primary Account Updated',
       })
     } catch (error) {
       console.error('Error setting primary account:', error)
       notification.error({
-        message: 'Update Failed',
         description: 'Failed to update your primary Steam account. Please try again.',
+        message: 'Update Failed',
       })
     } finally {
       // Clear loading state
@@ -355,7 +357,9 @@ const VerifyPage: NextPageWithLayout = () => {
   // Show unlink confirmation modal
   const showUnlinkConfirmation = (steam32Id: string) => {
     const account = linkedAccounts.find((a) => a.steam32Id === steam32Id)
-    if (!account) return
+    if (!account) {
+      return
+    }
 
     setAccountToUnlink(steam32Id)
     setUnlinkModalVisible(true)
@@ -363,7 +367,9 @@ const VerifyPage: NextPageWithLayout = () => {
 
   // Handle unlink confirmation
   const handleUnlinkConfirm = async () => {
-    if (!accountToUnlink) return
+    if (!accountToUnlink) {
+      return
+    }
 
     try {
       // Set loading state for unlink modal buttons
@@ -387,11 +393,11 @@ const VerifyPage: NextPageWithLayout = () => {
       }
 
       const response = await fetch('/api/steam/unlink-account', {
-        method: 'POST',
+        body: JSON.stringify({ steam32Id }),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ steam32Id }),
+        method: 'POST',
       })
 
       if (!response.ok) {
@@ -416,11 +422,11 @@ const VerifyPage: NextPageWithLayout = () => {
 
         // Also update on the server
         await fetch('/api/steam/set-primary-account', {
-          method: 'POST',
+          body: JSON.stringify({ steam32Id: newPrimaryId }),
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ steam32Id: newPrimaryId }),
+          method: 'POST',
         })
       } else {
         // Just remove the account from the list
@@ -428,14 +434,14 @@ const VerifyPage: NextPageWithLayout = () => {
       }
 
       notification.success({
-        message: 'Account Unlinked',
         description: 'Your Steam account has been successfully unlinked.',
+        message: 'Account Unlinked',
       })
     } catch (error) {
       console.error('Error unlinking account:', error)
       notification.error({
-        message: 'Unlink Failed',
         description: 'Failed to unlink your Steam account. Please try again.',
+        message: 'Unlink Failed',
       })
     } finally {
       // Clear loading state if not handled by modal
@@ -454,12 +460,12 @@ const VerifyPage: NextPageWithLayout = () => {
 
     // Build Steam OpenID parameters
     const params = new URLSearchParams({
-      'openid.ns': 'http://specs.openid.net/auth/2.0',
-      'openid.mode': 'checkid_setup',
-      'openid.return_to': `${window.location.origin}/verify`,
-      'openid.realm': window.location.origin,
-      'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
       'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
+      'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
+      'openid.mode': 'checkid_setup',
+      'openid.ns': 'http://specs.openid.net/auth/2.0',
+      'openid.realm': window.location.origin,
+      'openid.return_to': `${window.location.origin}/verify`,
     })
 
     // Redirect to Steam authentication
@@ -474,7 +480,9 @@ const VerifyPage: NextPageWithLayout = () => {
 
   // Get rank image URL
   const getRankImageUrl = (rankTier: number) => {
-    if (!rankTier) return '/images/ranks/0.png'
+    if (!rankTier) {
+      return '/images/ranks/0.png'
+    }
 
     // Extract the medal and stars from rank tier
     const medal = Math.floor(rankTier / 10)
@@ -494,7 +502,7 @@ const VerifyPage: NextPageWithLayout = () => {
       <Container>
         <div className='flex flex-col min-h-[60vh]'>
           <Skeleton.Avatar active size={80} shape='circle' />
-          <Skeleton.Input active style={{ width: 200, marginTop: 16 }} />
+          <Skeleton.Input active style={{ marginTop: 16, width: 200 }} />
         </div>
       </Container>
     )
@@ -591,8 +599,8 @@ const VerifyPage: NextPageWithLayout = () => {
                           type='text'
                           icon={<StarOutlined />}
                           onClick={() => setPrimaryAccount(account.steam32Id)}
-                          loading={!!actionLoading[`setPrimary_${account.steam32Id}`]}
-                          disabled={!!actionLoading[`setPrimary_${account.steam32Id}`]}
+                          loading={Boolean(actionLoading[`setPrimary_${account.steam32Id}`])}
+                          disabled={Boolean(actionLoading[`setPrimary_${account.steam32Id}`])}
                           title='Set as primary account'
                         >
                           Set as Primary
@@ -604,8 +612,8 @@ const VerifyPage: NextPageWithLayout = () => {
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => showUnlinkConfirmation(account.steam32Id)}
-                        loading={!!actionLoading[`unlink_${account.steam32Id}`]}
-                        disabled={!!actionLoading[`unlink_${account.steam32Id}`]}
+                        loading={Boolean(actionLoading[`unlink_${account.steam32Id}`])}
+                        disabled={Boolean(actionLoading[`unlink_${account.steam32Id}`])}
                         title='Unlink this account'
                       >
                         Unlink
@@ -749,8 +757,8 @@ const VerifyPage: NextPageWithLayout = () => {
           cancelText='Cancel'
           okButtonProps={{
             danger: true,
-            loading: actionLoading.unlinkModal,
             disabled: actionLoading.unlinkModal,
+            loading: actionLoading.unlinkModal,
           }}
           cancelButtonProps={{
             disabled: actionLoading.unlinkModal,
@@ -776,14 +784,14 @@ VerifyPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       seo={{
-        title: 'Get verified | Dotabod',
+        canonicalUrl: 'https://dotabod.com/verify',
         description:
           'Verify your Twitch and Steam accounts to become Dotabod Verified and share your rank in chat!',
-        canonicalUrl: 'https://dotabod.com/verify',
+        title: 'Get verified | Dotabod',
       }}
       ogImage={{
-        title: 'Get Dotabod Verified',
         subtitle: 'Link your Steam account to become Dotabod Verified',
+        title: 'Get Dotabod Verified',
       }}
     >
       {page}

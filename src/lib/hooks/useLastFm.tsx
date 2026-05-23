@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
-type LastFmTrackType = {
+interface LastFmTrackType {
   artist: string
   title: string
   album?: string
@@ -13,49 +13,55 @@ type LastFmTrackType = {
 const LASTFM_API_KEY = process.env.NEXT_PUBLIC_LASTFM_API_KEY
 const LASTFM_PLACEHOLDER_HASH = '2a96cbd8b46e442fc41c2b86b821562f'
 
-type LastFmImage = {
+interface LastFmImage {
   size: string
   '#text': string
 }
 
 // Last.fm's JSON API returns track/artist/album names with HTML-encoded
-// entities (e.g. "&#39;" for "'"). JSX renders strings as textContent, so
-// without decoding the overlay would show the literal "Everybody&#39;s".
+// Entities (e.g. "&#39;" for "'"). JSX renders strings as textContent, so
+// Without decoding the overlay would show the literal "Everybody&#39;s".
 const decodeHtmlEntities = (s: string): string =>
   s
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
+    .replaceAll(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replaceAll(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
       String.fromCodePoint(Number.parseInt(hex, 16)),
     )
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&apos;', "'")
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&amp;', '&')
 
-type LastFmResponse = {
+interface LastFmResponse {
   error?: number
   recenttracks?: {
-    track: Array<{
+    track: {
       '@attr'?: { nowplaying: string }
       artist: { '#text': string }
       name: string
       album: { '#text': string }
       image?: LastFmImage[]
       url?: string
-    }>
+    }[]
   }
 }
 
 export function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | null {
-  if (data?.error) return null
+  if (data?.error) {
+    return null
+  }
 
   const tracks = data?.recenttracks?.track
-  if (!tracks?.length) return null
+  if (!tracks?.length) {
+    return null
+  }
 
   const recentTrack = tracks[0]
   const isNowPlaying = recentTrack['@attr']?.nowplaying === 'true'
-  if (!isNowPlaying) return null
+  if (!isNowPlaying) {
+    return null
+  }
 
   const albumArtUrl =
     recentTrack.image?.find((img: LastFmImage) => img.size === 'medium')?.['#text'] ||
@@ -65,10 +71,10 @@ export function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | nul
   const albumArt = albumArtUrl?.includes(LASTFM_PLACEHOLDER_HASH) ? null : albumArtUrl
 
   return {
-    artist: decodeHtmlEntities(recentTrack.artist['#text']),
-    title: decodeHtmlEntities(recentTrack.name),
     album: decodeHtmlEntities(recentTrack.album['#text']),
     albumArt,
+    artist: decodeHtmlEntities(recentTrack.artist['#text']),
+    title: decodeHtmlEntities(recentTrack.name),
     url: recentTrack.url,
   }
 }
@@ -84,7 +90,9 @@ export function useLastFm() {
   const { data: refreshRate } = useUpdateSetting(Settings.lastFmRefreshRate)
 
   const fetchNowPlaying = useCallback(async () => {
-    if (!username || !LASTFM_API_KEY) return
+    if (!username || !LASTFM_API_KEY) {
+      return
+    }
 
     try {
       setLoading(true)
@@ -122,8 +130,8 @@ export function useLastFm() {
         prevTrackRef.current = parsed
         setTrack(parsed)
       }
-    } catch (err) {
-      console.error('Error fetching Last.fm data:', err)
+    } catch (error) {
+      console.error('Error fetching Last.fm data:', error)
       setError('Failed to fetch Last.fm data')
       setTrack(null)
     } finally {
@@ -132,7 +140,9 @@ export function useLastFm() {
   }, [username])
 
   useEffect(() => {
-    if (!isEnabled || !username) return
+    if (!isEnabled || !username) {
+      return
+    }
 
     // Initial fetch
     fetchNowPlaying()
@@ -155,5 +165,5 @@ export function useLastFm() {
     }
   }, [isEnabled, username, refreshRate, fetchNowPlaying])
 
-  return { track, loading, error }
+  return { error, loading, track }
 }

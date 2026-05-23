@@ -71,8 +71,8 @@ async function prompt(question: string): Promise<string> {
 async function discoverChargesToFix(): Promise<ChargeToFix[]> {
   // Find all paid/confirmed charges
   const paidCharges = await prisma.openNodeCharge.findMany({
-    where: { status: { in: ['paid', 'confirmed'] } },
     orderBy: { createdAt: 'desc' },
+    where: { status: { in: ['paid', 'confirmed'] } },
   })
 
   const results: ChargeToFix[] = []
@@ -81,13 +81,13 @@ async function discoverChargesToFix(): Promise<ChargeToFix[]> {
     // Check if user has active LIFETIME subscription
     const lifetimeSubscription = await prisma.subscription.findFirst({
       where: {
-        userId: charge.userId,
-        transactionType: TransactionType.LIFETIME,
         status: SubscriptionStatus.ACTIVE,
+        transactionType: TransactionType.LIFETIME,
+        userId: charge.userId,
       },
     })
 
-    const hasLifetime = !!lifetimeSubscription
+    const hasLifetime = Boolean(lifetimeSubscription)
     const missingWebhook = !charge.lastWebhookAt
     const needsFix = !hasLifetime || missingWebhook
 
@@ -115,8 +115,8 @@ async function discoverChargesToFix(): Promise<ChargeToFix[]> {
 async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
   const result: FixResult = {
     charge,
-    success: false,
     skipped: false,
+    success: false,
   }
 
   try {
@@ -129,9 +129,9 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
     // Step 2: Check for existing lifetime subscription
     const existingSubscription = await prisma.subscription.findFirst({
       where: {
-        userId: charge.userId,
-        transactionType: TransactionType.LIFETIME,
         status: SubscriptionStatus.ACTIVE,
+        transactionType: TransactionType.LIFETIME,
+        userId: charge.userId,
       },
     })
 
@@ -139,16 +139,16 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
       // Update lastWebhookAt if it's NULL
       if (!charge.lastWebhookAt) {
         await prisma.openNodeCharge.update({
-          where: { openNodeChargeId: charge.openNodeChargeId },
           data: {
             lastWebhookAt: new Date(),
             metadata: {
               ...(charge.metadata as Record<string, unknown>),
+              recoveryNote: 'Subscription already existed, just updated lastWebhookAt',
               recoveryScriptRan: true,
               recoveryScriptRunAt: new Date().toISOString(),
-              recoveryNote: 'Subscription already existed, just updated lastWebhookAt',
             },
           },
+          where: { openNodeChargeId: charge.openNodeChargeId },
         })
       }
       result.success = true
@@ -202,9 +202,9 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
     // Step 6: Verify subscription was created
     const subscription = await prisma.subscription.findFirst({
       where: {
-        userId: charge.userId,
-        transactionType: TransactionType.LIFETIME,
         status: SubscriptionStatus.ACTIVE,
+        transactionType: TransactionType.LIFETIME,
+        userId: charge.userId,
       },
     })
 
@@ -215,17 +215,17 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
 
     // Step 7: Update OpenNode charge record
     await prisma.openNodeCharge.update({
-      where: { openNodeChargeId: charge.openNodeChargeId },
       data: {
         lastWebhookAt: new Date(),
         metadata: {
           ...(charge.metadata as Record<string, unknown>),
+          processedSuccessfully: true,
           recoveryScriptRan: true,
           recoveryScriptRunAt: new Date().toISOString(),
           subscriptionId: subscription.id,
-          processedSuccessfully: true,
         },
       },
+      where: { openNodeChargeId: charge.openNodeChargeId },
     })
 
     result.success = true
@@ -317,7 +317,7 @@ async function runDiscoveryMode(): Promise<void> {
 
     if (answer !== 'y') {
       console.log('Skipped')
-      results.push({ charge, success: false, skipped: true })
+      results.push({ charge, skipped: true, success: false })
       console.log()
       continue
     }
@@ -423,9 +423,9 @@ async function runSingleChargeMode(): Promise<void> {
   console.log('Step 3: Checking for existing subscription...')
   const existingSubscription = await prisma.subscription.findFirst({
     where: {
-      userId: charge.userId,
-      transactionType: TransactionType.LIFETIME,
       status: SubscriptionStatus.ACTIVE,
+      transactionType: TransactionType.LIFETIME,
+      userId: charge.userId,
     },
   })
 
@@ -441,16 +441,16 @@ async function runSingleChargeMode(): Promise<void> {
     if (!charge.lastWebhookAt && !dryRun) {
       console.log('Updating OpenNode charge lastWebhookAt...')
       await prisma.openNodeCharge.update({
-        where: { openNodeChargeId: charge.openNodeChargeId },
         data: {
           lastWebhookAt: new Date(),
           metadata: {
             ...(charge.metadata as Record<string, unknown>),
+            recoveryNote: 'Subscription already existed, just updated lastWebhookAt',
             recoveryScriptRan: true,
             recoveryScriptRunAt: new Date().toISOString(),
-            recoveryNote: 'Subscription already existed, just updated lastWebhookAt',
           },
         },
+        where: { openNodeChargeId: charge.openNodeChargeId },
       })
       console.log('✅ Updated OpenNode charge record')
     }
@@ -559,9 +559,9 @@ async function runSingleChargeMode(): Promise<void> {
   console.log('Step 8: Verifying subscription creation...')
   const subscription = await prisma.subscription.findFirst({
     where: {
-      userId: charge.userId,
-      transactionType: TransactionType.LIFETIME,
       status: SubscriptionStatus.ACTIVE,
+      transactionType: TransactionType.LIFETIME,
+      userId: charge.userId,
     },
   })
 
@@ -583,17 +583,17 @@ async function runSingleChargeMode(): Promise<void> {
   // Step 9: Update OpenNode charge record
   console.log('Step 9: Updating OpenNode charge record...')
   await prisma.openNodeCharge.update({
-    where: { openNodeChargeId: charge.openNodeChargeId },
     data: {
       lastWebhookAt: new Date(),
       metadata: {
         ...(charge.metadata as Record<string, unknown>),
+        processedSuccessfully: true,
         recoveryScriptRan: true,
         recoveryScriptRunAt: new Date().toISOString(),
         subscriptionId: subscription.id,
-        processedSuccessfully: true,
       },
     },
+    where: { openNodeChargeId: charge.openNodeChargeId },
   })
   console.log('✅ Updated OpenNode charge record with lastWebhookAt')
   console.log()

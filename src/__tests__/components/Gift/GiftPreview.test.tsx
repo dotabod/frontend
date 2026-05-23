@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 import { GiftPreview } from '@/components/Gift/GiftSubscriptionForm/GiftPreview'
 
 vi.mock('@/components/Overlay/GiftAlert/GiftSubscriptionAlert', () => ({

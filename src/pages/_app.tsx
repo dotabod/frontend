@@ -134,7 +134,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
   if (isInvalidLocalCheck) {
     // If it's a known invalid overlay, render the InvalidOverlayPage directly
-    // and bypass the main layout and providers that might make API calls.
+    // And bypass the main layout and providers that might make API calls.
     // We also ensure it is mounted to avoid hydration issues with this conditional rendering path.
     return (
       <StyleProvider cache={clientCache} hashPriority='high'>

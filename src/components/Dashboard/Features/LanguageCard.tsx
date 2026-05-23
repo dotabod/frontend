@@ -69,28 +69,28 @@ export default function LanguageCard() {
 
     if (!fullLanguage) {
       return {
-        value: 'en',
         id: 'en-US',
         label: 'English',
+        value: 'en',
       }
     }
 
     return {
-      value: fullLanguage.locale,
       id: fullLanguage.id,
       label: data?.project?.targetLanguages ? fullLanguage.name : 'Unknown',
+      value: fullLanguage.locale,
     }
   })
 
   arr.push({
-    value: 'en',
     id: 'en-US',
     label: 'English',
+    value: 'en',
   })
 
   arr.sort((a, b) => {
-    const nameA = a.label.toUpperCase() // ignore upper and lowercase
-    const nameB = b.label.toUpperCase() // ignore upper and lowercase
+    const nameA = a.label.toUpperCase() // Ignore upper and lowercase
+    const nameB = b.label.toUpperCase() // Ignore upper and lowercase
     if (nameA < nameB) {
       return -1
     }
@@ -168,7 +168,6 @@ export default function LanguageCard() {
           placeholder='Language selector'
           className='w-full transition-all'
           options={arr.map((x) => ({
-            value: x.value,
             label: (
               <SelectItem
                 label={x.label}
@@ -182,6 +181,7 @@ export default function LanguageCard() {
                 )}
               />
             ),
+            value: x.value,
           }))}
           value={localeOption?.locale}
           onChange={(value) => updateLocale(value)}

@@ -13,7 +13,9 @@ export const Badge = ({
 }: BadgeProps & Omit<React.ComponentProps<typeof Image>, 'src' | 'alt'>) => {
   const res = useTransformRes()
 
-  if (!image) return null
+  if (!image) {
+    return null
+  }
 
   return (
     <Image

@@ -62,17 +62,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (action === 'export') {
       // Get all user data
       const userData = await prisma.user.findUnique({
-        where: { id: session.user.id },
         include: {
-          settings: true,
           SteamAccount: true,
-          matches: true,
-          streams: true,
-          subscription: true,
           approvedModerators: true,
+          matches: true,
           mods_mods_mod_user_idTousers: true,
           mods_mods_streamer_user_idTousers: true,
+          settings: true,
+          streams: true,
+          subscription: true,
         },
+        where: { id: session.user.id },
       })
 
       // Transform BigInt values before sending response

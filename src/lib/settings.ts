@@ -2,7 +2,7 @@ import type { ChatterSettingKeys } from '@/utils/subscription'
 import type { SettingKeys } from './defaultSettings'
 import { defaultSettings } from './defaultSettings'
 
-type Setting = {
+interface Setting {
   key: string
   value: unknown
 }
@@ -13,7 +13,9 @@ export function getValueOrDefault(
   key: SettingKeys | ChatterSettingKeys | undefined,
   settings?: Setting[],
 ): unknown {
-  if (!key) return undefined
+  if (!key) {
+    return undefined
+  }
 
   // Handle chatter settings
   if (key.startsWith('chatters.')) {

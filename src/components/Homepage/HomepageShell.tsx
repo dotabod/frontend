@@ -49,8 +49,12 @@ const HomepageShell = ({
   // If ogImage props are provided, build a custom OG image URL
   if (ogImage) {
     const params = new URLSearchParams()
-    if (ogImage.title) params.append('title', ogImage.title)
-    if (ogImage.subtitle) params.append('subtitle', ogImage.subtitle)
+    if (ogImage.title) {
+      params.append('title', ogImage.title)
+    }
+    if (ogImage.subtitle) {
+      params.append('subtitle', ogImage.subtitle)
+    }
 
     defaultOgImage = `/api/og-image?${params.toString()}`
   }
@@ -98,7 +102,9 @@ const HomepageShell = ({
 
         {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
         <style global jsx>{`
-          html,#__next,body {
+          html,
+          #__next,
+          body {
             background-color: #1f2937; /* bg-gray-800 */
           }
         `}</style>

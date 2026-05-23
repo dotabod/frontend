@@ -49,12 +49,12 @@ export function DisableToggle() {
       notification.destroy('stream-offline')
     } else {
       notification.open({
-        key: 'stream-offline',
-        type: 'warning',
-        duration: 0,
-        placement: 'bottomLeft',
-        message: 'Your stream is offline',
         description: 'Dotabod and Steam connection require your stream to be live.',
+        duration: 0,
+        key: 'stream-offline',
+        message: 'Your stream is offline',
+        placement: 'bottomLeft',
+        type: 'warning',
       })
     }
   }, [isLive, notification])
@@ -93,12 +93,12 @@ export function DisableToggle() {
       }
 
       notification.open({
-        key: 'dotabod-disabled',
-        type: 'warning',
-        duration: 0,
-        placement: 'bottomLeft',
-        message,
         description,
+        duration: 0,
+        key: 'dotabod-disabled',
+        message,
+        placement: 'bottomLeft',
+        type: 'warning',
       })
     } else {
       notification.destroy('dotabod-disabled')
@@ -116,11 +116,6 @@ export function DisableToggle() {
   useEffect(() => {
     if (data?.banned) {
       notification.open({
-        key: 'dotabod-banned',
-        placement: 'bottomLeft',
-        type: 'error',
-        duration: 0,
-        message: 'Dotabod is disabled because you banned it from the channel.',
         description: user?.name && (
           <span>
             <Button
@@ -139,6 +134,11 @@ export function DisableToggle() {
             <span>to unban Dotabod</span>
           </span>
         ),
+        duration: 0,
+        key: 'dotabod-banned',
+        message: 'Dotabod is disabled because you banned it from the channel.',
+        placement: 'bottomLeft',
+        type: 'error',
       })
     } else {
       notification.destroy('dotabod-banned')

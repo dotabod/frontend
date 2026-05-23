@@ -17,9 +17,9 @@ export const FindMatch = () => {
           style={{
             fontSize: res({ w: 14 }),
             height: res({ h: 24 }),
-            width: res({ w: 120 }),
-            top: res({ h: 144 }),
             left: res({ w: 108 }),
+            top: res({ h: 144 }),
+            width: res({ w: 120 }),
           }}
           className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
         >
@@ -31,9 +31,9 @@ export const FindMatch = () => {
           style={{
             fontSize: res({ w: 14 }),
             height: res({ h: 24 }),
-            width: res({ w: 120 }),
-            top: res({ h: 144 }),
             left: res({ w: 108 }),
+            top: res({ h: 144 }),
+            width: res({ w: 120 }),
           }}
           className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
         >
@@ -47,9 +47,9 @@ export const FindMatch = () => {
           style={{
             fontSize: res({ w: 14 }),
             height: res({ h: 24 }),
-            width: res({ w: 131 }),
-            top: res({ h: 224 }),
             left: res({ w: 411 }),
+            top: res({ h: 224 }),
+            width: res({ w: 131 }),
           }}
           className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
         >
@@ -61,9 +61,9 @@ export const FindMatch = () => {
           style={{
             fontSize: res({ w: 14 }),
             height: res({ h: 24 }),
-            width: res({ w: 131 }),
-            top: res({ h: 224 }),
             left: res({ w: 411 }),
+            top: res({ h: 224 }),
+            width: res({ w: 131 }),
           }}
           className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
         >
@@ -76,14 +76,14 @@ export const FindMatch = () => {
         {...motionProps}
         id='find-match-queue-blocker-main'
         style={{
-          bottom: res({ h: 0 }), // correct is n
-          right: res({ w: 0 }), // correct is 50
+          bottom: res({ h: 0 }), // Correct is n
+          right: res({ w: 0 }), // Correct is 50
         }}
         className='absolute'
       >
         {isFindingMatchEnabled && <MatchTimer res={res} />}
 
-        {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
+        {/* Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
         <img
           id='find-match-queue-blocker-bg'
           width={res({ w: 840 })}

@@ -2,7 +2,7 @@
 import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import {
   createCryptoSubscription,
   findExistingCryptoSubscription,
@@ -12,22 +12,22 @@ import { CRYPTO_PRICE_IDS, getCurrentPeriod } from '@/utils/subscription'
 
 // Mock subscription utils
 vi.mock('@/utils/subscription', () => ({
-  getCurrentPeriod: vi.fn(),
   CRYPTO_PRICE_IDS: ['crypto_monthly', 'crypto_annual', 'crypto_lifetime'],
+  getCurrentPeriod: vi.fn(),
 }))
 
 // Mock Prisma
 vi.mock('@/lib/db', () => ({
   default: {
     subscription: {
+      create: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
-      create: vi.fn(),
       update: vi.fn(),
     },
     transaction: {
-      findFirst: vi.fn(),
       create: vi.fn(),
+      findFirst: vi.fn(),
     },
   },
 }))
@@ -35,6 +35,9 @@ vi.mock('@/lib/db', () => ({
 // Mock Stripe
 vi.mock('@/lib/stripe-server', () => ({
   stripe: {
+    invoiceItems: {
+      create: vi.fn(),
+    },
     invoices: {
       create: vi.fn(),
       update: vi.fn(),
@@ -42,29 +45,26 @@ vi.mock('@/lib/stripe-server', () => ({
     prices: {
       retrieve: vi.fn(),
     },
-    invoiceItems: {
-      create: vi.fn(),
-    },
   },
 }))
 
 describe('Crypto Subscription Utilities', () => {
   const mockTx: Pick<Prisma.TransactionClient, 'subscription' | 'transaction'> = {
     subscription: {
+      create: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
-      create: vi.fn(),
       update: vi.fn(),
     },
     transaction: {
-      findFirst: vi.fn(),
       create: vi.fn(),
+      findFirst: vi.fn(),
     },
   }
 
   const mockSession = {
-    id: 'cs_test_123',
     customer: 'cus_test_123',
+    id: 'cs_test_123',
   } as Stripe.Checkout.Session
 
   beforeEach(() => {
@@ -82,9 +82,9 @@ describe('Crypto Subscription Utilities', () => {
     it('should find existing crypto subscription by customer ID', async () => {
       const mockSubscription = {
         id: 'sub_123',
-        userId: 'user_123',
         stripeCustomerId: 'cus_test_123',
         transactionType: 'RECURRING',
+        userId: 'user_123',
       }
 
       mockTx.subscription.findFirst.mockResolvedValue(mockSubscription)
@@ -99,20 +99,20 @@ describe('Crypto Subscription Utilities', () => {
       expect(result).toEqual(mockSubscription)
       expect(mockTx.subscription.findFirst).toHaveBeenCalledWith({
         where: {
-          userId: 'user_123',
           OR: [
             {
+              metadata: {
+                equals: 'true',
+                path: ['isCryptoPayment'],
+              },
               stripeCustomerId: 'cus_test_123',
               transactionType: 'RECURRING',
-              metadata: {
-                path: ['isCryptoPayment'],
-                equals: 'true',
-              },
             },
             {
               stripeSubscriptionId: 'crypto_cs_test_123',
             },
           ],
+          userId: 'user_123',
         },
       })
     })
@@ -153,8 +153,8 @@ describe('Crypto Subscription Utilities', () => {
 
       const mockSubscription = {
         id: 'sub_123',
-        stripeSubscriptionId: 'crypto_cs_test_123',
         status: 'ACTIVE',
+        stripeSubscriptionId: 'crypto_cs_test_123',
       }
 
       // Mock Stripe invoice creation
@@ -174,19 +174,19 @@ describe('Crypto Subscription Utilities', () => {
 
       expect(result).toBe(true)
       expect(stripe.invoices.create).toHaveBeenCalledWith({
+        auto_advance: true,
+        automatically_finalizes_at: expect.any(Number),
+        collection_method: 'send_invoice',
         customer: mockCustomerId,
         description: 'Crypto Dotabod Pro Monthly subscription',
+        due_date: expect.any(Number),
         metadata: {
-          userId: mockUserId,
           isCryptoPayment: 'true',
           isRenewalInvoice: 'true',
           originalCheckoutSession: 'cs_test_123',
           pricePeriod: 'monthly',
+          userId: mockUserId,
         },
-        auto_advance: true,
-        collection_method: 'send_invoice',
-        due_date: expect.any(Number),
-        automatically_finalizes_at: expect.any(Number),
       })
     })
 
@@ -200,8 +200,8 @@ describe('Crypto Subscription Utilities', () => {
 
       const mockSubscription = {
         id: 'sub_123',
-        stripeSubscriptionId: 'crypto_cs_test_123',
         status: 'ACTIVE',
+        stripeSubscriptionId: 'crypto_cs_test_123',
       }
 
       vi.mocked(stripe.invoices.create).mockResolvedValue(mockInvoice as Stripe.Invoice)
@@ -218,19 +218,19 @@ describe('Crypto Subscription Utilities', () => {
 
       expect(result).toBe(true)
       expect(stripe.invoices.create).toHaveBeenCalledWith({
+        auto_advance: true,
+        automatically_finalizes_at: expect.any(Number),
+        collection_method: 'send_invoice',
         customer: mockCustomerId,
         description: 'Crypto Dotabod Pro Annual subscription',
+        due_date: expect.any(Number),
         metadata: {
-          userId: mockUserId,
           isCryptoPayment: 'true',
           isRenewalInvoice: 'true',
           originalCheckoutSession: 'cs_test_123',
           pricePeriod: 'annual',
+          userId: mockUserId,
         },
-        auto_advance: true,
-        collection_method: 'send_invoice',
-        due_date: expect.any(Number),
-        automatically_finalizes_at: expect.any(Number),
       })
     })
 
@@ -239,8 +239,8 @@ describe('Crypto Subscription Utilities', () => {
 
       const mockSubscription = {
         id: 'sub_123',
-        stripeSubscriptionId: 'crypto_cs_test_123',
         status: 'ACTIVE',
+        stripeSubscriptionId: 'crypto_cs_test_123',
       }
 
       mockTx.subscription.create.mockResolvedValue(mockSubscription)
@@ -256,14 +256,14 @@ describe('Crypto Subscription Utilities', () => {
       expect(result).toBe(true)
       expect(mockTx.subscription.create).toHaveBeenCalledWith({
         data: {
-          userId: mockUserId,
-          stripeCustomerId: mockCustomerId,
-          stripePriceId: 'crypto_lifetime',
-          status: 'ACTIVE',
-          transactionType: 'LIFETIME',
-          tier: 'PRO',
           cancelAtPeriodEnd: false,
           currentPeriodEnd: expect.any(Date),
+          status: 'ACTIVE',
+          stripeCustomerId: mockCustomerId,
+          stripePriceId: 'crypto_lifetime',
+          tier: 'PRO',
+          transactionType: 'LIFETIME',
+          userId: mockUserId,
         },
         select: {
           id: true,
@@ -289,13 +289,13 @@ describe('Crypto Subscription Utilities', () => {
       expect(result).toBe(true)
       expect(mockTx.subscription.create).not.toHaveBeenCalled()
       expect(mockTx.subscription.findFirst).toHaveBeenCalledWith({
-        where: {
-          userId: mockUserId,
-          status: 'ACTIVE',
-          transactionType: 'LIFETIME',
-        },
         select: {
           id: true,
+        },
+        where: {
+          status: 'ACTIVE',
+          transactionType: 'LIFETIME',
+          userId: mockUserId,
         },
       })
     })
@@ -348,16 +348,16 @@ describe('Crypto Subscription Utilities', () => {
     it('should allow valid upgrade from monthly to annual crypto subscription', async () => {
       // Mock existing monthly subscription
       const existingSubscription = {
-        id: 'sub_existing',
-        userId: 'user_123',
-        stripeCustomerId: 'cus_test_123',
-        stripePriceId: 'crypto_monthly',
-        status: 'ACTIVE',
         currentPeriodEnd: new Date('2025-11-04T15:59:27.229Z'),
+        id: 'sub_existing',
         metadata: {
           isCryptoPayment: 'true',
           renewalInvoiceId: 'in_renewal_123',
         },
+        status: 'ACTIVE',
+        stripeCustomerId: 'cus_test_123',
+        stripePriceId: 'crypto_monthly',
+        userId: 'user_123',
       }
 
       // Mock finding existing subscription
@@ -366,8 +366,12 @@ describe('Crypto Subscription Utilities', () => {
 
       // Mock new annual subscription creation
       vi.mocked(getCurrentPeriod).mockImplementation((priceId: string) => {
-        if (priceId === 'crypto_monthly') return 'monthly'
-        if (priceId === 'crypto_annual') return 'annual'
+        if (priceId === 'crypto_monthly') {
+          return 'monthly'
+        }
+        if (priceId === 'crypto_annual') {
+          return 'annual'
+        }
         return 'monthly'
       })
 
@@ -381,18 +385,18 @@ describe('Crypto Subscription Utilities', () => {
       // This would be called from checkout-events.ts upgrade logic
       // First, cancel the existing subscription
       await mockTx.subscription.update({
-        where: { id: existingSubscription.id },
         data: {
-          status: SubscriptionStatus.CANCELED,
           cancelAtPeriodEnd: true,
-          updatedAt: new Date(),
           metadata: {
             ...existingSubscription.metadata,
-            upgradedTo: 'annual',
-            upgradedAt: new Date().toISOString(),
             previousPriceId: 'crypto_monthly',
+            upgradedAt: new Date().toISOString(),
+            upgradedTo: 'annual',
           },
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: new Date(),
         },
+        where: { id: existingSubscription.id },
       })
 
       // Then create new subscription starting from existing end date
@@ -407,42 +411,46 @@ describe('Crypto Subscription Utilities', () => {
 
       expect(result).toBe(true)
       expect(mockTx.subscription.update).toHaveBeenCalledWith({
-        where: { id: existingSubscription.id },
         data: {
-          status: SubscriptionStatus.CANCELED,
           cancelAtPeriodEnd: true,
-          updatedAt: expect.any(Date),
           metadata: {
             ...existingSubscription.metadata,
-            upgradedTo: 'annual',
-            upgradedAt: expect.any(String),
             previousPriceId: 'crypto_monthly',
+            upgradedAt: expect.any(String),
+            upgradedTo: 'annual',
           },
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: expect.any(Date),
         },
+        where: { id: existingSubscription.id },
       })
     })
 
     it('should allow valid upgrade from annual to monthly crypto subscription', async () => {
       // Mock existing annual subscription
       const existingSubscription = {
-        id: 'sub_existing',
-        userId: 'user_123',
-        stripeCustomerId: 'cus_test_123',
-        stripePriceId: 'crypto_annual',
-        status: 'ACTIVE',
         currentPeriodEnd: new Date('2026-10-04T14:59:27.233Z'),
+        id: 'sub_existing',
         metadata: {
           isCryptoPayment: 'true',
           renewalInvoiceId: 'in_renewal_456',
         },
+        status: 'ACTIVE',
+        stripeCustomerId: 'cus_test_123',
+        stripePriceId: 'crypto_annual',
+        userId: 'user_123',
       }
 
       mockTx.subscription.findFirst.mockResolvedValue(existingSubscription)
       mockTx.subscription.update.mockResolvedValue({ ...existingSubscription, status: 'CANCELED' })
 
       vi.mocked(getCurrentPeriod).mockImplementation((priceId: string) => {
-        if (priceId === 'crypto_annual') return 'annual'
-        if (priceId === 'crypto_monthly') return 'monthly'
+        if (priceId === 'crypto_annual') {
+          return 'annual'
+        }
+        if (priceId === 'crypto_monthly') {
+          return 'monthly'
+        }
         return 'monthly'
       })
 
@@ -455,18 +463,18 @@ describe('Crypto Subscription Utilities', () => {
 
       // Cancel existing subscription
       await mockTx.subscription.update({
-        where: { id: existingSubscription.id },
         data: {
-          status: SubscriptionStatus.CANCELED,
           cancelAtPeriodEnd: true,
-          updatedAt: new Date(),
           metadata: {
             ...existingSubscription.metadata,
-            upgradedTo: 'monthly',
-            upgradedAt: new Date().toISOString(),
             previousPriceId: 'crypto_annual',
+            upgradedAt: new Date().toISOString(),
+            upgradedTo: 'monthly',
           },
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: new Date(),
         },
+        where: { id: existingSubscription.id },
       })
 
       // Create new monthly subscription
@@ -481,18 +489,18 @@ describe('Crypto Subscription Utilities', () => {
 
       expect(result).toBe(true)
       expect(mockTx.subscription.update).toHaveBeenCalledWith({
-        where: { id: existingSubscription.id },
         data: {
-          status: SubscriptionStatus.CANCELED,
           cancelAtPeriodEnd: true,
-          updatedAt: expect.any(Date),
           metadata: {
             ...existingSubscription.metadata,
-            upgradedTo: 'monthly',
-            upgradedAt: expect.any(String),
             previousPriceId: 'crypto_annual',
+            upgradedAt: expect.any(String),
+            upgradedTo: 'monthly',
           },
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: expect.any(Date),
         },
+        where: { id: existingSubscription.id },
       })
     })
 
@@ -500,21 +508,25 @@ describe('Crypto Subscription Utilities', () => {
       // Mock existing lifetime subscription
       const existingSubscription = {
         id: 'sub_existing',
-        userId: 'user_123',
-        stripeCustomerId: 'cus_test_123',
-        stripePriceId: 'crypto_lifetime',
-        status: 'ACTIVE',
-        transactionType: 'LIFETIME',
         metadata: {
           isCryptoPayment: 'true',
         },
+        status: 'ACTIVE',
+        stripeCustomerId: 'cus_test_123',
+        stripePriceId: 'crypto_lifetime',
+        transactionType: 'LIFETIME',
+        userId: 'user_123',
       }
 
       mockTx.subscription.findFirst.mockResolvedValue(existingSubscription)
 
       vi.mocked(getCurrentPeriod).mockImplementation((priceId: string) => {
-        if (priceId === 'crypto_lifetime') return 'lifetime'
-        if (priceId === 'crypto_monthly') return 'monthly'
+        if (priceId === 'crypto_lifetime') {
+          return 'lifetime'
+        }
+        if (priceId === 'crypto_monthly') {
+          return 'monthly'
+        }
         return 'monthly'
       })
 
@@ -535,13 +547,13 @@ describe('Crypto Subscription Utilities', () => {
       // Mock existing monthly subscription trying to "upgrade" to same monthly
       const existingSubscription = {
         id: 'sub_existing',
-        userId: 'user_123',
-        stripeCustomerId: 'cus_test_123',
-        stripePriceId: 'crypto_monthly',
-        status: 'ACTIVE',
         metadata: {
           isCryptoPayment: 'true',
         },
+        status: 'ACTIVE',
+        stripeCustomerId: 'cus_test_123',
+        stripePriceId: 'crypto_monthly',
+        userId: 'user_123',
       }
 
       mockTx.subscription.findFirst.mockResolvedValue(existingSubscription)

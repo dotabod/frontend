@@ -20,29 +20,29 @@ async function addModerator(broadcasterId: string | undefined, accessToken: stri
 
   try {
     // Check if the user is already a moderator
-    const checkResponse = await fetch(checkUrl, { method: 'GET', headers })
+    const checkResponse = await fetch(checkUrl, { headers, method: 'GET' })
     if (!checkResponse.ok) {
       throw new Error(`Failed to get moderators: ${checkResponse.statusText}`)
     }
     const checkData = await checkResponse.json()
     if (checkData.data && checkData.data.length > 0) {
       // The user is already a moderator
-      return { status: 'OK', message: 'User is already a moderator' }
+      return { message: 'User is already a moderator', status: 'OK' }
     }
 
     // If the user is not a moderator, add them as a moderator
     const url = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${broadcasterId}&user_id=${process.env.TWITCH_BOT_PROVIDERID}`
-    const response = await fetch(url, { method: 'POST', headers })
+    const response = await fetch(url, { headers, method: 'POST' })
     if (!response.ok) {
       throw new Error(`Failed to add moderator: ${response.statusText}`)
     }
     if (response.status === 204) {
-      return { status: 'OK', message: 'Added Dotabod as moderator' }
+      return { message: 'Added Dotabod as moderator', status: 'OK' }
     }
   } catch (error) {
     captureException(error)
     console.error(error)
-    return { status: 'ERROR', message: 'Error', error: error.message } // Handle error gracefully
+    return { error: error.message, message: 'Error', status: 'ERROR' } // Handle error gracefully
   }
 }
 
@@ -72,7 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   } catch (error) {
     captureException(error)
     console.error('Failed to update mod:', error)
-    return res.status(500).json({ message: 'Failed to update mod', error: error.message })
+    return res.status(500).json({ error: error.message, message: 'Failed to update mod' })
   }
 }
 

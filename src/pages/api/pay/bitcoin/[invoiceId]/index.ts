@@ -48,37 +48,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const opendodtacharge = {
       amount,
-      currency,
-      description: `Invoice ${invoice.number || invoice.id}`,
-      customer_email: invoice.customer_email || undefined,
-      notif_email: invoice.customer_email || undefined,
-      callback_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/webhooks/opennode`,
-      success_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
       auto_settle: false, // Configure based on treasury policy
-      ttl: 60, // 1 hour expiration
+      callback_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/webhooks/opennode`,
+      currency,
+      customer_email: invoice.customer_email || undefined,
+      description: `Invoice ${invoice.number || invoice.id}`,
       metadata: {
-        stripe_invoice_id: invoice.id,
         customer_id: invoice.customer,
+        stripe_invoice_id: invoice.id,
         user_id: invoice.metadata?.userId,
       },
+      notif_email: invoice.customer_email || undefined,
+      success_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
+      ttl: 60, // 1 hour expiration,
     }
     const charge = await createOpenNodeCharge(opendodtacharge)
 
     // Store charge mapping
     const opennodeData = {
-      openNodeChargeId: charge.id,
-      stripeInvoiceId: invoice.id || '',
-      stripeCustomerId: invoice.customer as string,
-      userId: invoice.metadata?.userId || '',
       amount,
       currency,
-      status: charge.status,
       hostedCheckoutUrl: charge.hosted_checkout_url,
       metadata: {
         ...charge.metadata,
         openNodeAmount: charge.amount,
         openNodeCurrency: charge.currency,
       },
+      openNodeChargeId: charge.id,
+      status: charge.status,
+      stripeCustomerId: invoice.customer as string,
+      stripeInvoiceId: invoice.id || '',
+      userId: invoice.metadata?.userId || '',
     }
 
     await prisma.openNodeCharge.create({

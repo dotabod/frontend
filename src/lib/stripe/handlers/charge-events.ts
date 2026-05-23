@@ -43,10 +43,10 @@ export async function handleChargeSucceeded(
           console.log(`Processing crypto payment for charge ${charge.id}`)
 
           // For crypto payments, we need to check if this is a recurring subscription payment
-          // by looking up the checkout session that initiated this payment
+          // By looking up the checkout session that initiated this payment
           const sessions = await stripe.checkout.sessions.list({
-            payment_intent: charge.payment_intent as string,
             limit: 1,
+            payment_intent: charge.payment_intent as string,
           })
 
           if (sessions.data.length > 0) {
@@ -118,11 +118,11 @@ export async function handleChargeSucceeded(
         }
 
         // For non-crypto payments, we still need to verify this is a lifetime payment
-        // by checking the associated checkout session and price ID
+        // By checking the associated checkout session and price ID
         if (charge.payment_intent) {
           const sessions = await stripe.checkout.sessions.list({
-            payment_intent: charge.payment_intent as string,
             limit: 1,
+            payment_intent: charge.payment_intent as string,
           })
 
           if (sessions.data.length > 0) {
@@ -248,11 +248,13 @@ export async function handleChargeRefunded(
 async function isGiftPayment(paymentIntentId: string): Promise<boolean> {
   try {
     const sessions = await stripe.checkout.sessions.list({
-      payment_intent: paymentIntentId,
       limit: 1,
+      payment_intent: paymentIntentId,
     })
 
-    if (sessions.data.length === 0) return false
+    if (sessions.data.length === 0) {
+      return false
+    }
 
     return sessions.data[0].metadata?.isGift === 'true'
   } catch (error) {
@@ -286,8 +288,8 @@ async function handleGiftCreditRefund(
 
   console.log(`Looking up checkout session for payment intent ${paymentIntent}`)
   const sessions = await stripe.checkout.sessions.list({
-    payment_intent: paymentIntent,
     limit: 1,
+    payment_intent: paymentIntent,
   })
 
   if (sessions.data.length === 0) {
@@ -312,16 +314,16 @@ async function handleGiftCreditRefund(
 
   // Find the recipient's customer ID
   const user = await tx.user.findUnique({
-    where: { id: recipientUserId },
     include: {
       subscription: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
         where: {
           stripeCustomerId: { not: null },
         },
-        orderBy: { createdAt: 'desc' },
-        take: 1,
       },
     },
+    where: { id: recipientUserId },
   })
 
   const customerId = user?.subscription[0]?.stripeCustomerId
@@ -336,15 +338,15 @@ async function handleGiftCreditRefund(
 
   // Look for the gift transaction record in our database
   const giftTransaction = await tx.giftTransaction.findFirst({
-    where: {
-      OR: [
-        { metadata: { path: ['checkoutSessionId'], equals: session.id } },
-        { metadata: { path: ['paymentIntentId'], equals: paymentIntent } },
-        { stripeSessionId: session.id },
-      ],
-    },
     include: {
       giftSubscription: true,
+    },
+    where: {
+      OR: [
+        { metadata: { equals: session.id, path: ['checkoutSessionId'] } },
+        { metadata: { equals: paymentIntent, path: ['paymentIntentId'] } },
+        { stripeSessionId: session.id },
+      ],
     },
   })
 
@@ -364,17 +366,17 @@ async function handleGiftCreditRefund(
     try {
       // Record the refund in our gift transaction
       await tx.giftTransaction.update({
-        where: { id: giftTransaction.id },
         data: {
-          updatedAt: new Date(),
           metadata: {
             ...(giftTransaction.metadata as Record<string, unknown>),
-            refundedAt: new Date().toISOString(),
             refundAmount: refundAmount.toString(),
-            refundProportion: refundProportion.toString(),
             refundId: charge.refunds?.data?.[0]?.id || null,
+            refundProportion: refundProportion.toString(),
+            refundedAt: new Date().toISOString(),
           },
+          updatedAt: new Date(),
         },
+        where: { id: giftTransaction.id },
       })
 
       // For customer balance credits, create a positive balance transaction to offset the credit
@@ -384,10 +386,10 @@ async function handleGiftCreditRefund(
         currency: giftTransaction.currency,
         description: `Refund of gift credit from ${giftTransaction.giftSubscription?.senderName || 'Anonymous'}`,
         metadata: {
+          isRefund: 'true',
           originalTransactionId: giftTransaction.id,
           refundId: charge.refunds?.data?.[0]?.id || null,
           refundedAt: new Date().toISOString(),
-          isRefund: 'true',
         },
       })
 
@@ -398,17 +400,17 @@ async function handleGiftCreditRefund(
       // If this was a full refund, also mark the gift subscription record as canceled
       if (charge.refunded && giftTransaction.giftSubscriptionId) {
         await tx.subscription.updateMany({
+          data: {
+            metadata: {
+              refundId: charge.refunds?.data?.[0]?.id || null,
+              refundedAt: new Date().toISOString(),
+            },
+            status: SubscriptionStatus.CANCELED,
+            updatedAt: new Date(),
+          },
           where: {
             giftDetails: {
               id: giftTransaction.giftSubscriptionId,
-            },
-          },
-          data: {
-            status: SubscriptionStatus.CANCELED,
-            updatedAt: new Date(),
-            metadata: {
-              refundedAt: new Date().toISOString(),
-              refundId: charge.refunds?.data?.[0]?.id || null,
             },
           },
         })
@@ -427,19 +429,19 @@ async function handleGiftCreditRefund(
     // Create a basic reversal based on session metadata
     if (customerId && session.metadata?.giftType && session.metadata?.giftQuantity) {
       try {
-        const giftType = session.metadata.giftType
+        const { giftType } = session.metadata
         const giftQuantity = Number.parseInt(session.metadata.giftQuantity, 10) || 1
 
         // Calculate an approximate refund amount based on standard pricing
         const priceMap = {
-          monthly:
-            Number.parseInt(process.env.MONTHLY_SUBSCRIPTION_PRICE_CENTS || '500', 10) *
-            giftQuantity,
           annual:
             Number.parseInt(process.env.ANNUAL_SUBSCRIPTION_PRICE_CENTS || '4800', 10) *
             giftQuantity,
           lifetime:
             Number.parseInt(process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS || '30000', 10) *
+            giftQuantity,
+          monthly:
+            Number.parseInt(process.env.MONTHLY_SUBSCRIPTION_PRICE_CENTS || '500', 10) *
             giftQuantity,
         }
 
@@ -456,11 +458,11 @@ async function handleGiftCreditRefund(
             description: `Refund of estimated gift credit from ${session.metadata.giftSenderName || 'Anonymous'}`,
             metadata: {
               checkoutSessionId: session.id,
+              isEstimated: 'true',
+              isRefund: 'true',
               paymentIntentId: paymentIntent,
               refundId: charge.refunds?.data?.[0]?.id || null,
               refundedAt: new Date().toISOString(),
-              isRefund: 'true',
-              isEstimated: 'true',
             },
           })
 
@@ -503,10 +505,10 @@ async function getUserIdFromPaymentIntent(
 
       // Look up the subscription with this customer ID
       const subscription = await tx.subscription.findFirst({
+        orderBy: { createdAt: 'desc' },
         where: {
           stripeCustomerId: customerId,
         },
-        orderBy: { createdAt: 'desc' },
       })
 
       if (subscription?.userId) {
@@ -516,8 +518,8 @@ async function getUserIdFromPaymentIntent(
 
     // If we still don't have a userId, try to find it from checkout sessions
     const sessions = await stripe.checkout.sessions.list({
-      payment_intent: paymentIntentId,
       limit: 1,
+      payment_intent: paymentIntentId,
     })
 
     if (sessions.data.length > 0) {
@@ -555,8 +557,8 @@ async function processSubscriptionRefund(
   // Get all active subscriptions for this user/customer
   const subscriptions = await tx.subscription.findMany({
     where: {
-      userId,
       stripeCustomerId: charge.customer as string,
+      userId,
     },
   })
 
@@ -575,17 +577,17 @@ async function processSubscriptionRefund(
       // If fully refunded, mark the purchase as canceled
       if (charge.refunded) {
         await tx.subscription.update({
-          where: { id: subscription.id },
           data: {
-            status: SubscriptionStatus.CANCELED,
-            updatedAt: new Date(),
             metadata: {
               ...(subscription.metadata as Record<string, unknown>),
-              refundedAt: new Date().toISOString(),
               refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
               refundId: charge.refunds?.data?.[0]?.id || null,
+              refundedAt: new Date().toISOString(),
             },
+            status: SubscriptionStatus.CANCELED,
+            updatedAt: new Date(),
           },
+          where: { id: subscription.id },
         })
         console.log(
           `Marked ${subscription.transactionType} subscription ${subscription.id} as canceled due to full refund`,
@@ -594,16 +596,16 @@ async function processSubscriptionRefund(
       // If partially refunded, update the metadata
       else if (charge.amount_refunded > 0) {
         await tx.subscription.update({
-          where: { id: subscription.id },
           data: {
-            updatedAt: new Date(),
             metadata: {
               ...(subscription.metadata as Record<string, unknown>),
               partiallyRefundedAt: new Date().toISOString(),
               refundAmount: charge.amount_refunded.toString(),
               refundId: charge.refunds?.data?.[0]?.id || null,
             },
+            updatedAt: new Date(),
           },
+          where: { id: subscription.id },
         })
         console.log(
           `Updated ${subscription.transactionType} subscription ${subscription.id} metadata for partial refund`,
@@ -616,18 +618,18 @@ async function processSubscriptionRefund(
       charge.refunded
     ) {
       await tx.subscription.update({
-        where: { id: subscription.id },
         data: {
-          status: SubscriptionStatus.CANCELED,
-          updatedAt: new Date(),
           metadata: {
             ...(subscription.metadata as Record<string, unknown>),
-            refundedAt: new Date().toISOString(),
+            fullyRefunded: 'true',
             refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
             refundId: charge.refunds?.data?.[0]?.id || null,
-            fullyRefunded: 'true',
+            refundedAt: new Date().toISOString(),
           },
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: new Date(),
         },
+        where: { id: subscription.id },
       })
       console.log(`Manually canceled crypto subscription ${subscription.id} due to refund`)
     }
@@ -635,17 +637,17 @@ async function processSubscriptionRefund(
     // The actual subscription status changes will come from Stripe subscription webhooks
     else if (subscription.status !== SubscriptionStatus.CANCELED) {
       await tx.subscription.update({
-        where: { id: subscription.id },
         data: {
-          updatedAt: new Date(),
           metadata: {
             ...(subscription.metadata as Record<string, unknown>),
-            refundRecorded: new Date().toISOString(),
+            fullyRefunded: charge.refunded ? 'true' : 'false',
             refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
             refundId: charge.refunds?.data?.[0]?.id || null,
-            fullyRefunded: charge.refunded ? 'true' : 'false',
+            refundRecorded: new Date().toISOString(),
           },
+          updatedAt: new Date(),
         },
+        where: { id: subscription.id },
       })
       console.log(`Updated recurring subscription ${subscription.id} metadata for refund`)
     }

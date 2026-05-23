@@ -24,15 +24,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let customerId = subscription?.stripeCustomerId
 
     // Fallback to historical records in case the user no longer has
-    // an active/trialing row but still has a Stripe customer account
+    // An active/trialing row but still has a Stripe customer account
     if (!customerId) {
       const historicalSubscription = await prisma.subscription.findFirst({
-        where: {
-          userId: session.user.id,
-          stripeCustomerId: { not: null },
-        },
-        select: { stripeCustomerId: true },
         orderBy: { updatedAt: 'desc' },
+        select: { stripeCustomerId: true },
+        where: {
+          stripeCustomerId: { not: null },
+          userId: session.user.id,
+        },
       })
 
       customerId = historicalSubscription?.stripeCustomerId || null
@@ -40,8 +40,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!customerId) {
       return res.status(400).json({
-        error: 'No Stripe customer found',
         code: 'NO_STRIPE_CUSTOMER',
+        error: 'No Stripe customer found',
         guidance: 'No active Stripe billing profile found. If you need help, contact support.',
       })
     }
@@ -60,8 +60,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     console.error('Error creating portal session:', error)
     return res.status(500).json({
-      error: 'Failed to create Stripe portal session',
       code: 'PORTAL_SESSION_FAILED',
+      error: 'Failed to create Stripe portal session',
       guidance: 'Please try again in a moment. If this keeps happening, contact support.',
     })
   }

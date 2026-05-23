@@ -39,13 +39,15 @@ export const PollOverlays = ({
         setIsVisible(false)
         setPollData(null)
         setBetData(null)
-      }, 30000) // 30 seconds
+      }, 30_000) // 30 seconds
 
       return () => clearTimeout(timer)
     }
   }, [pollData, betData, setPollData, setBetData])
 
-  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled) || !isVisible) return null
+  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled) || !isVisible) {
+    return null
+  }
 
   return (
     <div

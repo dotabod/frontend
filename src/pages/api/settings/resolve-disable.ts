@@ -26,29 +26,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       await prisma.$transaction(async (tx) => {
         // Clear disable reason from setting
         await tx.setting.updateMany({
-          where: {
-            userId: session.user.id,
-            key: settingKey,
-          },
           data: {
-            disableReason: null,
             autoDisabledAt: null,
             autoDisabledBy: null,
             disableMetadata: undefined,
+            disableReason: null,
             updatedAt: now,
+          },
+          where: {
+            key: settingKey,
+            userId: session.user.id,
           },
         })
 
         // Mark notifications as resolved
         await tx.disableNotification.updateMany({
-          where: {
-            userId: session.user.id,
-            settingKey,
-            resolvedAt: null,
-          },
           data: {
-            resolvedAt: now,
             autoResolved,
+            resolvedAt: now,
+          },
+          where: {
+            resolvedAt: null,
+            settingKey,
+            userId: session.user.id,
           },
         })
       })
@@ -57,8 +57,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     } catch (error) {
       captureException(error)
       return res.status(500).json({
-        message: 'Failed to resolve disable reason',
         error: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Failed to resolve disable reason',
       })
     }
   }

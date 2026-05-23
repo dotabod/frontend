@@ -38,11 +38,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Check if this is the primary account for the user
     const user = await prisma.user.findUnique({
-      where: {
-        id: session.user.id,
-      },
       select: {
         steam32Id: true,
+      },
+      where: {
+        id: session.user.id,
       },
     })
 
@@ -52,7 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const otherAccount = await prisma.steamAccount.findFirst({
         where: {
           OR: [
-            { userId: session.user.id, steam32Id: { not: parsedSteam32Id } },
+            { steam32Id: { not: parsedSteam32Id }, userId: session.user.id },
             { connectedUserIds: { has: session.user.id }, steam32Id: { not: parsedSteam32Id } },
           ],
         },
@@ -61,23 +61,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (otherAccount) {
         // Update the user's primary account
         await prisma.user.update({
-          where: {
-            id: session.user.id,
-          },
           data: {
             steam32Id: otherAccount.steam32Id,
             updatedAt: new Date(),
+          },
+          where: {
+            id: session.user.id,
           },
         })
       } else {
         // Clear the user's primary account
         await prisma.user.update({
-          where: {
-            id: session.user.id,
-          },
           data: {
             steam32Id: null,
             updatedAt: new Date(),
+          },
+          where: {
+            id: session.user.id,
           },
         })
       }
@@ -92,13 +92,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         const remainingUsers = steamAccount.connectedUserIds.filter((id) => id !== newOwnerId)
 
         await prisma.steamAccount.update({
-          where: {
-            steam32Id: parsedSteam32Id,
-          },
           data: {
-            userId: newOwnerId,
             connectedUserIds: remainingUsers,
             updatedAt: new Date(),
+            userId: newOwnerId,
+          },
+          where: {
+            steam32Id: parsedSteam32Id,
           },
         })
       } else {
@@ -112,21 +112,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     } else {
       // This user is in the connected users list, remove them
       await prisma.steamAccount.update({
-        where: {
-          steam32Id: parsedSteam32Id,
-        },
         data: {
           connectedUserIds: {
             set: steamAccount.connectedUserIds.filter((id) => id !== session.user.id),
           },
           updatedAt: new Date(),
         },
+        where: {
+          steam32Id: parsedSteam32Id,
+        },
       })
     }
 
     return res.status(200).json({
-      success: true,
       message: 'Steam account unlinked successfully',
+      success: true,
     })
   } catch (error) {
     captureException(error)

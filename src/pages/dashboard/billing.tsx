@@ -70,9 +70,9 @@ const BillingPage = () => {
 
   // Empty gift info to pass to SubscriptionAlerts (to maintain compatibility)
   const emptyGiftInfo = {
-    hasGifts: false,
     giftCount: 0,
     giftMessage: '',
+    hasGifts: false,
     hasLifetime: false,
   }
 
@@ -114,10 +114,10 @@ BillingPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <DashboardShell
       seo={{
-        title: 'Billing | Dotabod Dashboard',
-        description: 'Manage your Dotabod subscription and billing information.',
         canonicalUrl: 'https://dotabod.com/dashboard/billing',
+        description: 'Manage your Dotabod subscription and billing information.',
         noindex: true,
+        title: 'Billing | Dotabod Dashboard',
       }}
     >
       {page}

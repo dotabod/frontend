@@ -18,11 +18,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           name: 'dotabod',
         },
       })
-      .then((data) => {
-        return res.json(data?.stream_online || false)
-      })
-      .catch((e) => {
-        captureException(e)
+      .then((data) => res.json(data?.stream_online || false))
+      .catch((error) => {
+        captureException(error)
         return res.status(500).end()
       })
   } catch (error) {

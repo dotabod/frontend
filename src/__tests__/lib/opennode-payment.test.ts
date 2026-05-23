@@ -1,27 +1,27 @@
 import type { OpenNodeCharge } from '@prisma/client'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const mocks = vi.hoisted(() => {
   const tx = {}
 
   return {
-    tx,
+    handleInvoiceEvent: vi.fn(),
     prisma: {
+      $transaction: vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback(tx)),
       openNodeCharge: {
         update: vi.fn(),
       },
       subscription: {
         findFirst: vi.fn(),
       },
-      $transaction: vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback(tx)),
     },
     stripe: {
       invoices: {
-        retrieve: vi.fn(),
         pay: vi.fn(),
+        retrieve: vi.fn(),
       },
     },
-    handleInvoiceEvent: vi.fn(),
+    tx,
   }
 })
 
@@ -40,19 +40,19 @@ vi.mock('@/lib/stripe/handlers/invoice-events', () => ({
 import { processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 
 const baseCharge: OpenNodeCharge = {
-  id: 'row_1',
-  openNodeChargeId: 'charge_1',
-  stripeInvoiceId: 'in_1',
-  stripeCustomerId: 'cus_1',
-  userId: 'user_1',
   amount: 99,
-  currency: 'USD',
-  status: 'processing',
-  hostedCheckoutUrl: null,
-  metadata: {},
   createdAt: new Date('2026-04-29T20:00:00.000Z'),
-  updatedAt: new Date('2026-04-29T20:00:00.000Z'),
+  currency: 'USD',
+  hostedCheckoutUrl: null,
+  id: 'row_1',
   lastWebhookAt: null,
+  metadata: {},
+  openNodeChargeId: 'charge_1',
+  status: 'processing',
+  stripeCustomerId: 'cus_1',
+  stripeInvoiceId: 'in_1',
+  updatedAt: new Date('2026-04-29T20:00:00.000Z'),
+  userId: 'user_1',
 }
 
 describe('processConfirmedOpenNodePayment', () => {
@@ -65,14 +65,14 @@ describe('processConfirmedOpenNodePayment', () => {
 
   it('marks an open Stripe invoice paid and runs the invoice handler', async () => {
     const paidInvoice = {
-      id: 'in_1',
-      status: 'paid',
       customer: 'cus_1',
+      id: 'in_1',
       metadata: {
         isCryptoPayment: 'true',
         paymentProvider: 'opennode',
         userId: 'user_1',
       },
+      status: 'paid',
     }
 
     mocks.stripe.invoices.retrieve.mockResolvedValue({
@@ -91,24 +91,24 @@ describe('processConfirmedOpenNodePayment', () => {
     )
     expect(mocks.handleInvoiceEvent).toHaveBeenCalledWith(paidInvoice, mocks.tx)
     expect(mocks.prisma.openNodeCharge.update).toHaveBeenLastCalledWith({
-      where: { openNodeChargeId: 'charge_1' },
       data: {
         lastWebhookAt: expect.any(Date),
         metadata: expect.objectContaining({
-          processedSuccessfully: true,
-          invoiceId: 'in_1',
           chargeId: 'charge_1',
+          invoiceId: 'in_1',
+          processedSuccessfully: true,
         }),
       },
+      where: { openNodeChargeId: 'charge_1' },
     })
   })
 
   it('skips work that was already processed successfully', async () => {
     const processedCharge: OpenNodeCharge = {
       ...baseCharge,
-      status: 'paid',
       lastWebhookAt: new Date('2026-04-29T20:01:00.000Z'),
       metadata: { processedSuccessfully: true },
+      status: 'paid',
     }
 
     const result = await processConfirmedOpenNodePayment(processedCharge, 'paid')
@@ -121,14 +121,14 @@ describe('processConfirmedOpenNodePayment', () => {
 
   it('handles an invoice that Stripe already marked paid', async () => {
     const paidInvoice = {
-      id: 'in_1',
-      status: 'paid',
       customer: 'cus_1',
+      id: 'in_1',
       metadata: {
         isCryptoPayment: 'true',
         paymentProvider: 'opennode',
         userId: 'user_1',
       },
+      status: 'paid',
     }
 
     mocks.stripe.invoices.retrieve.mockResolvedValue(paidInvoice)

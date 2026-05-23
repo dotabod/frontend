@@ -8,28 +8,28 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     // Static pages
     const staticPages = [
       {
-        url: 'https://dotabod.com',
-        lastmod: new Date().toISOString(),
         changefreq: 'daily',
+        lastmod: new Date().toISOString(),
         priority: '1.0',
+        url: 'https://dotabod.com',
       },
       {
-        url: 'https://dotabod.com/contact',
-        lastmod: new Date().toISOString(),
         changefreq: 'monthly',
+        lastmod: new Date().toISOString(),
         priority: '0.7',
+        url: 'https://dotabod.com/contact',
       },
       {
+        changefreq: 'yearly',
+        lastmod: new Date().toISOString(),
+        priority: '0.5',
         url: 'https://dotabod.com/privacy-policy',
-        lastmod: new Date().toISOString(),
-        changefreq: 'yearly',
-        priority: '0.5',
       },
       {
-        url: 'https://dotabod.com/terms-of-service',
-        lastmod: new Date().toISOString(),
         changefreq: 'yearly',
+        lastmod: new Date().toISOString(),
         priority: '0.5',
+        url: 'https://dotabod.com/terms-of-service',
       },
     ]
 

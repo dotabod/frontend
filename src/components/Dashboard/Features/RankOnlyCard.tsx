@@ -8,24 +8,24 @@ import { TierSwitch } from './TierSwitch'
 
 // Rank mapping used to determine minimumRankTier from selected rank
 const rankToTier = {
-  Herald: 10,
-  Guardian: 20,
-  Crusader: 30,
-  Archon: 40,
-  Legend: 50,
   Ancient: 60,
+  Archon: 40,
+  Crusader: 30,
   Divine: 70,
+  Guardian: 20,
+  Herald: 10,
   Immortal: 80,
+  Legend: 50,
 }
 
-type RankTierInfo = {
+interface RankTierInfo {
   enabled: boolean
   minimumRank: keyof typeof rankToTier
   minimumRankTier: number
 }
 
 // Type for the form values which may be partial during submission
-type FormValues = {
+interface FormValues {
   minimumRank?: keyof typeof rankToTier
 }
 
@@ -61,7 +61,7 @@ export const RankOnlyCard = () => {
     })
   }
 
-  const ranks = Object.keys(rankToTier) as Array<keyof typeof rankToTier>
+  const ranks = Object.keys(rankToTier) as (keyof typeof rankToTier)[]
 
   return (
     <Card title='Rank Only' feature='rankOnly'>
@@ -119,7 +119,7 @@ export const RankOnlyCard = () => {
                   disabled={
                     !isEnabled ||
                     !form.isFieldsTouched() ||
-                    !!form.getFieldsError().filter(({ errors }) => errors.length).length
+                    form.getFieldsError().filter(({ errors }) => errors.length).length > 0
                   }
                 >
                   Save

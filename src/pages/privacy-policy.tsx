@@ -1099,14 +1099,14 @@ PrivacyPolicy.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Privacy Policy',
         subtitle: 'Learn about how Dotabod collects, uses, and protects your personal information.',
+        title: 'Privacy Policy',
       }}
       seo={{
-        title: 'Privacy Policy | Dotabod',
+        canonicalUrl: 'https://dotabod.com/privacy-policy',
         description:
           'Learn about how Dotabod collects, uses, and protects your personal information.',
-        canonicalUrl: 'https://dotabod.com/privacy-policy',
+        title: 'Privacy Policy | Dotabod',
       }}
     >
       {page}

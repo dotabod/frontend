@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 // Cookie preferences type
-export type CookiePreferences = {
+export interface CookiePreferences {
   necessary: boolean
   analytics: boolean
   marketing: boolean
@@ -24,8 +24,8 @@ const getDomain = (): string => {
       const url = process.env.NEXTAUTH_URL ?? 'dotabod.com'
       const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`)
       return urlObj.hostname
-    } catch (e) {
-      console.error('Error extracting domain:', e)
+    } catch (error) {
+      console.error('Error extracting domain:', error)
       return 'dotabod.com'
     }
   }
@@ -38,7 +38,9 @@ const setCookie = (
   value: string,
   options: { expires?: number; path?: string } = {},
 ): void => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') {
+    return
+  }
 
   const { expires = 365, path = '/' } = options
 
@@ -46,12 +48,14 @@ const setCookie = (
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + expires)
 
-  // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
+  // Biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
   document.cookie = `${name}=${encodeURIComponent(value)};expires=${expiryDate.toUTCString()};path=${path};`
 }
 
 const getCookie = (name: string): string | undefined => {
-  if (typeof window === 'undefined') return undefined
+  if (typeof window === 'undefined') {
+    return undefined
+  }
 
   const cookies = document.cookie.split(';')
   for (const cookie of cookies) {
@@ -64,7 +68,9 @@ const getCookie = (name: string): string | undefined => {
 }
 
 const getAllCookies = (): Record<string, string> => {
-  if (typeof window === 'undefined') return {}
+  if (typeof window === 'undefined') {
+    return {}
+  }
 
   const result: Record<string, string> = {}
   const cookies = document.cookie.split(';')
@@ -80,36 +86,40 @@ const getAllCookies = (): Record<string, string> => {
 }
 
 const removeCookie = (name: string, path = '/', domain?: string): void => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') {
+    return
+  }
 
   // Try different combinations of paths and domains to ensure the cookie is removed
   const expires = 'expires=Thu, 01 Jan 1970 00:00:00 GMT'
 
   if (domain) {
-    // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
+    // Biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
     document.cookie = `${name}=; ${expires}; path=${path}; domain=${domain};`
   } else {
-    // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
+    // Biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
     document.cookie = `${name}=; ${expires}; path=${path};`
 
     const currentDomain = window.location.hostname
-    // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
+    // Biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
     document.cookie = `${name}=; ${expires}; path=${path}; domain=${currentDomain};`
 
     if (currentDomain.split('.').length > 2) {
       const rootDomain = currentDomain.split('.').slice(-2).join('.')
-      // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
+      // Biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
       document.cookie = `${name}=; ${expires}; path=${path}; domain=.${rootDomain};`
     }
   }
 
-  // biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
+  // Biome-ignore lint/suspicious/noDocumentCookie: Cookie manager utility requires direct cookie access
   document.cookie = `${name}=; ${expires}; path=/;`
 }
 
 // Initialize third-party scripts based on cookie preferences
 const initializeThirdPartyScripts = (prefs: CookiePreferences): void => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') {
+    return
+  }
 
   // Only initialize scripts if we have explicit consent
   // First, save the preferences to cookie and localStorage
@@ -122,8 +132,8 @@ const initializeThirdPartyScripts = (prefs: CookiePreferences): void => {
   // Set Google Analytics consent mode
   if (window.gtag) {
     window.gtag('consent', 'update', {
-      analytics_storage: prefs.analytics ? 'granted' : 'denied',
       ad_storage: prefs.marketing ? 'granted' : 'denied',
+      analytics_storage: prefs.analytics ? 'granted' : 'denied',
       functionality_storage: prefs.necessary ? 'granted' : 'denied',
       personalization_storage: prefs.preferences ? 'granted' : 'denied',
     })
@@ -140,9 +150,9 @@ const initializeThirdPartyScripts = (prefs: CookiePreferences): void => {
 // Hook for accessing and updating cookie preferences
 export const useCookiePreferences = () => {
   const [preferences, setPreferences] = useState<CookiePreferences>({
-    necessary: true,
     analytics: false,
     marketing: false,
+    necessary: true,
     preferences: false,
   })
 
@@ -163,8 +173,8 @@ export const useCookiePreferences = () => {
         if (!localStorage.getItem('cookie_preferences_updated')) {
           localStorage.setItem('cookie_preferences_updated', Date.now().toString())
         }
-      } catch (e) {
-        console.error('Error parsing saved cookie preferences', e)
+      } catch (error) {
+        console.error('Error parsing saved cookie preferences', error)
       }
     }
 
@@ -181,16 +191,18 @@ export const useCookiePreferences = () => {
   }, [])
 
   return {
+    hasConsented,
+    loaded,
     preferences,
     updatePreferences,
-    loaded,
-    hasConsented,
   }
 }
 
 // Apply cookie preferences by removing disallowed cookies
 const applyPreferences = (prefs: CookiePreferences): void => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') {
+    return
+  }
 
   // First, initialize third-party scripts with the current preferences
   initializeThirdPartyScripts(prefs)
@@ -243,7 +255,7 @@ declare global {
   interface Window {
     _ga_enabled?: boolean
     _hubspot_enabled?: boolean
-    gtag?: (command: string, ...args: Array<unknown>) => void
+    gtag?: (command: string, ...args: unknown[]) => void
     HubSpotConsentConfig?: {
       setTrackingCookiesAllowed: (allowed: boolean) => void
     }

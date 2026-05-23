@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 
 describe('Gift Subscription Utilities', () => {

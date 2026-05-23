@@ -14,7 +14,6 @@ const MotionAppScreenBody = motion(AppScreen.Body)
 
 const features = [
   {
-    name: 'Twitch predictions creator',
     description: (
       <span>
         Let viewers use channel points to predict game outcomes. Dotabod handles opening and closing
@@ -31,10 +30,10 @@ const features = [
         src='/images/emotes/peepogamba.webp'
       />
     ),
+    name: 'Twitch predictions creator',
     screen: BetsScreen,
   },
   {
-    name: 'Active chatting',
     description:
       'Dotabod sends timely, context-aware chat messages to engage your audience with insights relevant to your gameplay—never spammy, always helpful.',
     icon: (props?: { className?: string }) => (
@@ -46,10 +45,10 @@ const features = [
         src='https://cdn.betterttv.net/emote/618c77311f8ff7628e6d5b8f/3x'
       />
     ),
+    name: 'Active chatting',
     screen: OBSScreen,
   },
   {
-    name: 'Minimap and hero picks blocker',
     description: (
       <span>
         Stop stream snipers and protect your strategy with auto-activated minimap and hero selection
@@ -65,54 +64,55 @@ const features = [
         src='/images/emotes/ttours.png'
       />
     ),
+    name: 'Minimap and hero picks blocker',
     screen: BlockScreen,
   },
 ]
 
 const headerAnimation = {
-  initial: { opacity: 0, transition: { duration: 0.3 } },
-  animate: { opacity: 1, transition: { duration: 0.3, delay: 0.3 } },
+  animate: { opacity: 1, transition: { delay: 0.3, duration: 0.3 } },
   exit: { opacity: 0, transition: { duration: 0.3 } },
+  initial: { opacity: 0, transition: { duration: 0.3 } },
 }
 
-const maxZIndex = 2147483647
+const maxZIndex = 2_147_483_647
 
-type ScreenAnimationCustom = {
+interface ScreenAnimationCustom {
   isForwards: boolean
   changeCount: number
 }
 
 const bodyVariantBackwards = {
+  filter: 'blur(4px)',
   opacity: 0.4,
   scale: 0.8,
-  filter: 'blur(4px)',
-  zIndex: 0,
   transition: { duration: 0.4 },
+  zIndex: 0,
 }
 
 const bodyVariantForwards = (custom: ScreenAnimationCustom) => ({
+  transition: { duration: 0.4 },
   y: '100%',
   zIndex: maxZIndex - custom.changeCount,
-  transition: { duration: 0.4 },
 })
 
 const bodyAnimation = {
-  initial: 'initial',
   animate: 'animate',
   exit: 'exit',
+  initial: 'initial',
   variants: {
-    initial: (custom: ScreenAnimationCustom) =>
-      custom.isForwards ? bodyVariantForwards(custom) : bodyVariantBackwards,
     animate: (custom: ScreenAnimationCustom) => ({
-      y: '0%',
+      filter: 'blur(0px)',
       opacity: 1,
       scale: 1,
-      zIndex: maxZIndex / 2 - custom.changeCount,
-      filter: 'blur(0px)',
       transition: { duration: 0.4 },
+      y: '0%',
+      zIndex: maxZIndex / 2 - custom.changeCount,
     }),
     exit: (custom: ScreenAnimationCustom) =>
       custom.isForwards ? bodyVariantBackwards : bodyVariantForwards(custom),
+    initial: (custom: ScreenAnimationCustom) =>
+      custom.isForwards ? bodyVariantForwards(custom) : bodyVariantBackwards,
   },
 }
 
@@ -298,7 +298,7 @@ function FeaturesDesktop() {
                   key={feature.name + changeCount}
                   className='col-start-1 row-start-1 flex focus:outline-offset-[32px] not-focus-visible:focus:outline-hidden'
                 >
-                  <feature.screen animated custom={{ isForwards, changeCount }} />
+                  <feature.screen animated custom={{ changeCount, isForwards }} />
                 </TabPanel>
               ) : null,
             )}

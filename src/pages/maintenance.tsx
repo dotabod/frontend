@@ -19,14 +19,14 @@ Maintenance.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Maintenance',
         subtitle: 'Dotabod is currently undergoing scheduled maintenance. Please check back later.',
+        title: 'Maintenance',
       }}
       seo={{
-        title: 'Maintenance | Dotabod',
+        canonicalUrl: 'https://dotabod.com/maintenance',
         description:
           'Dotabod is currently undergoing scheduled maintenance. Please check back later.',
-        canonicalUrl: 'https://dotabod.com/maintenance',
+        title: 'Maintenance | Dotabod',
       }}
     >
       {page}

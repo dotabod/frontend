@@ -13,7 +13,7 @@ export default function NumberTicker({
   value: number
   direction?: 'up' | 'down'
   className?: string
-  delay?: number // delay in s
+  delay?: number // Delay in s
 }) {
   const ref = useRef<HTMLSpanElement>(null)
   const motionValue = useMotionValue(direction === 'down' ? value : 0)
@@ -21,13 +21,14 @@ export default function NumberTicker({
     damping: 60,
     stiffness: 100,
   })
-  const isInView = useInView(ref, { once: true, margin: '0px' })
+  const isInView = useInView(ref, { margin: '0px', once: true })
 
   useEffect(() => {
-    if (isInView)
+    if (isInView) {
       setTimeout(() => {
         motionValue.set(direction === 'down' ? 0 : value)
       }, delay * 1000)
+    }
   }, [motionValue, isInView, delay, value, direction])
 
   useEffect(

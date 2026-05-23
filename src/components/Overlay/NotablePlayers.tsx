@@ -5,7 +5,7 @@ import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
-export type NotablePlayer = {
+export interface NotablePlayer {
   heroId: number
   account_id: number
   position: number
@@ -34,7 +34,7 @@ export const NotablePlayers = ({
     <div id='notable-players'>
       {(players || []).map((player, i) => {
         const flagKey = `${player.country_code?.toUpperCase()}Flag` as keyof typeof Flags
-        // biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
+        // Biome-ignore lint/performance/noDynamicNamespaceImportAccess: Flag components are dynamically selected by country code
         const FlagComp = player.country_code ? Flags[flagKey] : null
 
         return (

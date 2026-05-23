@@ -32,7 +32,12 @@ export const GET_EMOTE_SET_FOR_CARD = gql`
 `
 
 export const CHANGE_EMOTE_IN_SET = gql`
-  mutation ChangeEmoteInSet($id: ObjectID!, $action: ListItemAction!, $emote_id: ObjectID!, $name: String) {
+  mutation ChangeEmoteInSet(
+    $id: ObjectID!
+    $action: ListItemAction!
+    $emote_id: ObjectID!
+    $name: String
+  ) {
     emoteSet(id: $id) {
       id
       emotes(id: $emote_id, action: $action, name: $name) {

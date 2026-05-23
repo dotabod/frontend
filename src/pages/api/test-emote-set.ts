@@ -28,10 +28,10 @@ async function removeTestEmoteIfPresent(client: GraphQLClient, emoteSetId: strin
   }
 
   await client.request(CHANGE_EMOTE_IN_SET, {
-    id: emoteSetId,
     action: 'REMOVE',
-    name: TEST_EMOTE_NAME,
     emote_id: TEST_EMOTE_ID,
+    id: emoteSetId,
+    name: TEST_EMOTE_NAME,
   })
 }
 
@@ -82,10 +82,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     console.log('Adding test emote to active emote set...')
     await client.request(CHANGE_EMOTE_IN_SET, {
-      id: stvResponse.emote_set.id,
       action: 'ADD',
-      name: TEST_EMOTE_NAME,
       emote_id: TEST_EMOTE_ID,
+      id: stvResponse.emote_set.id,
+      name: TEST_EMOTE_NAME,
     })
     addedTestEmote = true
 
@@ -107,14 +107,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     Sentry.withScope((scope) => {
       scope.setTag('test-related', 'true')
       scope.setContext('testDetails', {
+        emoteSetId: activeEmoteSetId,
         twitchId,
         userId,
-        emoteSetId: activeEmoteSetId,
       })
       Sentry.captureException(error)
     })
     const errorMessage = error instanceof Error ? error.message : String(error)
-    res.status(500).json({ message: 'Internal server error', error: errorMessage })
+    res.status(500).json({ error: errorMessage, message: 'Internal server error' })
   } finally {
     if (addedTestEmote && activeEmoteSetId !== 'N/A') {
       try {

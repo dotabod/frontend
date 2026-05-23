@@ -56,7 +56,7 @@ function Plan({
     label: string
     href: string
   }
-  features: Array<React.ReactNode>
+  features: React.ReactNode[]
   activePeriod: PricePeriod
   logomarkClassName?: string
   featured?: boolean
@@ -92,9 +92,11 @@ function Plan({
 
   // Check if the current subscription was paid with crypto.
   // Prefer explicit subscription metadata and only fall back to price IDs when
-  // crypto price IDs are distinct from regular price IDs.
+  // Crypto price IDs are distinct from regular price IDs.
   const isPaidWithCrypto = useMemo(() => {
-    if (tier === SUBSCRIPTION_TIERS.FREE) return false
+    if (tier === SUBSCRIPTION_TIERS.FREE) {
+      return false
+    }
 
     const metadata =
       subscription?.metadata &&
@@ -107,9 +109,13 @@ function Plan({
     const isCryptoFromMetadata =
       metadata?.isCryptoPayment === true || metadata?.isCryptoPayment === 'true'
 
-    if (isCryptoFromMetadata) return true
+    if (isCryptoFromMetadata) {
+      return true
+    }
 
-    if (!subscription?.stripePriceId) return false
+    if (!subscription?.stripePriceId) {
+      return false
+    }
 
     const regularPriceIds = [
       getPriceId(SUBSCRIPTION_TIERS.PRO, 'monthly', false),
@@ -124,7 +130,7 @@ function Plan({
     ]
 
     // If crypto IDs overlap with regular IDs in config, treat price ID matching
-    // as ambiguous and avoid forcing crypto state in the UI.
+    // As ambiguous and avoid forcing crypto state in the UI.
     const hasDistinctCryptoPrice =
       cryptoPriceIds.includes(subscription.stripePriceId) &&
       !regularPriceIds.includes(subscription.stripePriceId)
@@ -139,23 +145,37 @@ function Plan({
 
   // Detect whether the current subscription was paid with PayPal
   const isPaidWithPaypal = useMemo(() => {
-    if (tier === SUBSCRIPTION_TIERS.FREE) return false
+    if (tier === SUBSCRIPTION_TIERS.FREE) {
+      return false
+    }
     return isPaypalSubscription(subscription)
   }, [subscription, tier])
 
   // Tracks the user's deliberate pick in the picker. When null, paymentMethod
-  // derives from the active subscription so it reflects reality even when
+  // Derives from the active subscription so it reflects reality even when
   // `subscription` arrives async after first render.
   const [userPickedMethod, setUserPickedMethod] = useState<PaymentMethod | null>(null)
 
   const paymentMethod: PaymentMethod = (() => {
-    if (tier !== SUBSCRIPTION_TIERS.PRO) return 'card'
-    if (userPickedMethod === 'paypal' && isPaypalPaymentsEnabled) return 'paypal'
-    if (userPickedMethod === 'crypto' && isCryptoPaymentsEnabled) return 'crypto'
-    if (userPickedMethod === 'card') return 'card'
+    if (tier !== SUBSCRIPTION_TIERS.PRO) {
+      return 'card'
+    }
+    if (userPickedMethod === 'paypal' && isPaypalPaymentsEnabled) {
+      return 'paypal'
+    }
+    if (userPickedMethod === 'crypto' && isCryptoPaymentsEnabled) {
+      return 'crypto'
+    }
+    if (userPickedMethod === 'card') {
+      return 'card'
+    }
     // No user pick (or user's pick is no longer enabled) — derive from subscription
-    if (isPaypalPaymentsEnabled && isPaidWithPaypal) return 'paypal'
-    if (isCryptoPaymentsEnabled && isPaidWithCrypto) return 'crypto'
+    if (isPaypalPaymentsEnabled && isPaidWithPaypal) {
+      return 'paypal'
+    }
+    if (isCryptoPaymentsEnabled && isPaidWithCrypto) {
+      return 'crypto'
+    }
     return 'card'
   })()
   const payWithCrypto = paymentMethod === 'crypto'
@@ -196,7 +216,7 @@ function Plan({
       // Call the update function without chaining .then()
       updateCryptoInterest({
         interested: true,
-        tier: tier,
+        tier,
         transactionType:
           activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
       })
@@ -214,8 +234,8 @@ function Plan({
     } catch (error) {
       console.error('Error registering crypto interest:', error)
       notification.error({
-        message: 'Error',
         description: 'Failed to register your interest. Please try again later.',
+        message: 'Error',
       })
     }
   }
@@ -231,7 +251,7 @@ function Plan({
       // Call the update function to set interested to false
       updateCryptoInterest({
         interested: false,
-        tier: tier,
+        tier,
         transactionType:
           activePeriod === 'lifetime' ? TransactionType.LIFETIME : TransactionType.RECURRING,
       })
@@ -249,8 +269,8 @@ function Plan({
     } catch (error) {
       console.error('Error removing crypto interest:', error)
       notification.error({
-        message: 'Error',
         description: 'Failed to update your interest status. Please try again later.',
+        message: 'Error',
       })
     }
   }
@@ -380,21 +400,27 @@ function Plan({
   // Determine if button should be disabled
   const isButtonDisabled = () => {
     // Always enable Free tier button
-    if (tier === SUBSCRIPTION_TIERS.FREE) return false
+    if (tier === SUBSCRIPTION_TIERS.FREE) {
+      return false
+    }
 
     // Disable if user already has lifetime access
-    if (isLifetimePlan) return true
+    if (isLifetimePlan) {
+      return true
+    }
 
     return false
   }
 
   const handleSubscribe = useCallback(
     async (overrideMethod?: PaymentMethod) => {
-      if (redirectingToCheckout) return // Prevent multiple calls while redirecting
+      if (redirectingToCheckout) {
+        return
+      } // Prevent multiple calls while redirecting
       setRedirectingToCheckout(true)
 
       // Use the override (e.g. restored from the post-login URL) if provided,
-      // otherwise the current picker selection. The enum is mutually exclusive.
+      // Otherwise the current picker selection. The enum is mutually exclusive.
       const method = overrideMethod ?? paymentMethod
       const usePayWithCrypto = method === 'crypto'
       const usePayWithPaypal = method === 'paypal'
@@ -455,7 +481,8 @@ function Plan({
 
           if (currentIsPeriod !== activePeriod && activePeriod !== 'lifetime') {
             modal.confirm({
-              title: `Upgrade to ${activePeriod} plan`,
+              cancelText: 'Cancel',
+              className: 'text-base',
               content: (
                 <div className='space-y-2 mt-2'>
                   <p>
@@ -474,7 +501,6 @@ function Plan({
                 </div>
               ),
               okText: `Upgrade to ${activePeriod}`,
-              cancelText: 'Cancel',
               onOk: async () => {
                 try {
                   const priceId = getPriceId(SUBSCRIPTION_TIERS.PRO, activePeriod, true)
@@ -488,13 +514,13 @@ function Plan({
                 } catch (error) {
                   console.error('Checkout session creation error:', error)
                   notification.error({
-                    message: 'Checkout Error',
                     description: 'Failed to create checkout session. Please try again later.',
+                    message: 'Checkout Error',
                     placement: 'bottomRight',
                   })
                 }
               },
-              className: 'text-base',
+              title: `Upgrade to ${activePeriod} plan`,
               width: 500,
             })
             setRedirectingToCheckout(false)
@@ -521,7 +547,8 @@ function Plan({
 
           if (currentRegularPeriod !== activePeriod && currentRegularPeriod !== 'unknown') {
             modal.confirm({
-              title: `Switch to crypto ${activePeriod} plan`,
+              cancelText: 'Cancel',
+              className: 'text-base',
               content: (
                 <div className='space-y-2 mt-2'>
                   <p>
@@ -545,7 +572,6 @@ function Plan({
                 </div>
               ),
               okText: `Switch to crypto ${activePeriod}`,
-              cancelText: 'Cancel',
               onOk: async () => {
                 try {
                   // Get the correct price ID for crypto payment
@@ -562,13 +588,13 @@ function Plan({
                 } catch (error) {
                   console.error('Checkout session creation error:', error)
                   notification.error({
-                    message: 'Checkout Error',
                     description: 'Failed to create checkout session. Please try again later.',
+                    message: 'Checkout Error',
                     placement: 'bottomRight',
                   })
                 }
               },
-              className: 'text-base',
+              title: `Switch to crypto ${activePeriod} plan`,
               width: 550,
             })
             setRedirectingToCheckout(false)
@@ -593,7 +619,8 @@ function Plan({
                 : 'unknown'
 
           modal.confirm({
-            title: `Switch to regular ${activePeriod} plan`,
+            cancelText: 'Cancel',
+            className: 'text-base',
             content: (
               <div className='space-y-2 mt-2'>
                 <p>
@@ -613,7 +640,6 @@ function Plan({
               </div>
             ),
             okText: `Switch to regular ${activePeriod}`,
-            cancelText: 'Cancel',
             onOk: async () => {
               try {
                 // Get the correct price ID for regular payment
@@ -630,13 +656,13 @@ function Plan({
               } catch (error) {
                 console.error('Checkout session creation error:', error)
                 notification.error({
-                  message: 'Checkout Error',
                   description: 'Failed to create checkout session. Please try again later.',
+                  message: 'Checkout Error',
                   placement: 'bottomRight',
                 })
               }
             },
-            className: 'text-base',
+            title: `Switch to regular ${activePeriod} plan`,
             width: 550,
           })
           setRedirectingToCheckout(false)
@@ -653,7 +679,8 @@ function Plan({
         ) {
           // Show confirmation modal before proceeding
           modal.confirm({
-            title: 'Upgrade to lifetime access',
+            cancelText: 'Cancel',
+            className: 'text-base',
             content: (
               <div className='space-y-2 mt-2'>
                 <p>You currently have an active subscription. Here's what will happen:</p>
@@ -672,7 +699,6 @@ function Plan({
               </div>
             ),
             okText: 'Upgrade to lifetime',
-            cancelText: 'Cancel',
             onOk: async () => {
               try {
                 // Create new checkout session for lifetime upgrade
@@ -691,14 +717,14 @@ function Plan({
               } catch (error) {
                 console.error('Checkout session creation error:', error)
                 notification.error({
-                  message: 'Checkout Error',
                   description: 'Failed to create checkout session. Please try again later.',
+                  message: 'Checkout Error',
                   placement: 'bottomRight',
                 })
                 setRedirectingToCheckout(false)
               }
             },
-            className: 'text-base',
+            title: 'Upgrade to lifetime access',
             width: 500,
           })
           setRedirectingToCheckout(false)
@@ -707,7 +733,7 @@ function Plan({
 
         // If user has an active Stripe-managed subscription, redirect to portal.
         // PayPal subs carry a synthetic `paypal_` id that Stripe can't resolve,
-        // so they fall through to a fresh checkout for the chosen method instead.
+        // So they fall through to a fresh checkout for the chosen method instead.
         if (
           isSubscriptionActive({ status: subscription?.status }) &&
           subscription?.stripeSubscriptionId &&
@@ -742,8 +768,8 @@ function Plan({
       } catch (error) {
         console.error('Subscription error:', error)
         notification.error({
-          message: 'Subscription Error',
           description: 'Failed to process subscription request. Please try again later.',
+          message: 'Subscription Error',
           placement: 'bottomRight',
         })
         setRedirectingToCheckout(false) // Reset redirecting state on error

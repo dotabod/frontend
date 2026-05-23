@@ -47,7 +47,7 @@ function Minimap({ block }: { block: blockType }) {
           isPreview ? preview : '',
         ].join(' ')}
       >
-        <div className={fog} style={{ ['--minimap-opacity' as string]: fogOpacity }} />
+        <div className={fog} style={{ '--minimap-opacity': fogOpacity }} />
 
         {buildings.map((building, index) => (
           <Building team={block?.team} data={building} key={`minimap-building-${index}`} />

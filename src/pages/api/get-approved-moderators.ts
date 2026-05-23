@@ -29,8 +29,8 @@ async function getApprovedModerators(req: NextApiRequest, res: NextApiResponse) 
   try {
     const moderators = await prisma.approvedModerator.findMany({
       select: {
-        moderatorChannelId: true,
         createdAt: true,
+        moderatorChannelId: true,
       },
       where: {
         userId: {

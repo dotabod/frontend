@@ -46,8 +46,8 @@ async function findUserByCustomerId(
 ): Promise<{ id: string } | null> {
   // Find a subscription with this customer ID
   const subscription = await tx.subscription.findFirst({
-    where: { stripeCustomerId: customerId },
     select: { userId: true },
+    where: { stripeCustomerId: customerId },
   })
 
   if (subscription) {
@@ -82,9 +82,9 @@ async function verifyWebhook(
     debugLog('Webhook event constructed successfully', { eventId: event.id })
     debugLog('Exiting verifyWebhook successfully')
     return { event }
-  } catch (err) {
-    console.error('Webhook verification failed:', err)
-    debugLog('Webhook verification failed', { error: err })
+  } catch (error) {
+    console.error('Webhook verification failed:', error)
+    debugLog('Webhook verification failed', { error })
     debugLog('Exiting verifyWebhook with error')
     return { error: 'Webhook verification failed' }
   }
@@ -137,14 +137,14 @@ async function processWebhookEvent(
           debugLog(`Checking active crypto subscriptions for user ${user.id}`)
           const activeCryptoSubscriptions = await tx.subscription.findMany({
             where: {
-              userId: user.id,
               NOT: {
                 status: SubscriptionStatus.CANCELED,
               },
               metadata: {
-                path: ['isCryptoPayment'],
                 equals: 'true',
+                path: ['isCryptoPayment'],
               },
+              userId: user.id,
             },
           })
           debugLog(`Found ${activeCryptoSubscriptions.length} active crypto subscriptions`)
@@ -177,17 +177,17 @@ async function processWebhookEvent(
             // Mark the subscription as canceled
             debugLog(`Updating subscription ${cryptoSub.id} status to CANCELED`)
             await tx.subscription.update({
-              where: { id: cryptoSub.id },
               data: {
-                status: SubscriptionStatus.CANCELED,
                 cancelAtPeriodEnd: true,
-                updatedAt: new Date(),
                 metadata: {
                   ...(typeof cryptoSub.metadata === 'object' ? cryptoSub.metadata : {}),
-                  switchedToRegular: 'true',
                   switchedAt: new Date().toISOString(),
+                  switchedToRegular: 'true',
                 },
+                status: SubscriptionStatus.CANCELED,
+                updatedAt: new Date(),
               },
+              where: { id: cryptoSub.id },
             })
             debugLog(`Successfully marked crypto subscription ${cryptoSub.id} as canceled`)
           }
@@ -277,7 +277,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   debugLog('Verifying webhook signature...')
   const { event, error } = await verifyWebhook(req)
-  debugLog('Webhook verification completed.', { eventId: event?.id, error })
+  debugLog('Webhook verification completed.', { error, eventId: event?.id })
 
   if (error) {
     debugLog('Webhook verification failed:', error)
@@ -324,15 +324,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         `Event ${event.id} (${event.type}) was already processed at ${result.processedAt}. Responding 200 OK.`,
       )
       return res.status(200).json({
-        received: true,
         processed: true,
-        skipped: true,
         processedAt: result.processedAt,
+        received: true,
+        skipped: true,
       })
     }
 
     debugLog(`Successfully processed event ${event.id} (${event.type}). Responding 200 OK.`)
-    return res.status(200).json({ received: true, processed: true })
+    return res.status(200).json({ processed: true, received: true })
   } catch (error) {
     console.error(
       `Unhandled error in webhook handler for event ${event.id} (${event.type}):`,
@@ -341,6 +341,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Return 200 to prevent Stripe from retrying, as this might be a persistent error
     // We'll handle the failure through our own monitoring and recovery process
     debugLog(`Responding 200 OK after unhandled error for event ${event.id} (${event.type})`)
-    return res.status(200).json({ received: true, processed: false })
+    return res.status(200).json({ processed: false, received: true })
   }
 }

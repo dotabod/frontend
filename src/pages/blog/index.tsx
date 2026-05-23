@@ -97,14 +97,14 @@ BlogIndex.getLayout = function getLayout(page: ReactElement) {
   return (
     <HomepageShell
       ogImage={{
-        title: 'Blog',
         subtitle: 'Latest news, updates, and insights from the Dotabod team',
+        title: 'Blog',
       }}
       seo={{
-        title: pageTitle,
+        canonicalUrl,
         description: pageDescription,
-        canonicalUrl: canonicalUrl,
         ogType: 'website',
+        title: pageTitle,
       }}
     >
       {page}
@@ -112,12 +112,10 @@ BlogIndex.getLayout = function getLayout(page: ReactElement) {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {
-      posts: getAllPosts(),
-    },
-  }
-}
+export const getStaticProps: GetStaticProps = async () => ({
+  props: {
+    posts: getAllPosts(),
+  },
+})
 
 export default BlogIndex
