@@ -151,7 +151,7 @@ const WindowsInstaller = () => {
         } else if (state === 'prompt') {
           track('lna/status_prompt_shown')
         }
-      } catch (_err) {
+      } catch {
         // If permission query fails, treat as unsupported
         setLnaPermissionState('unsupported')
         setLnaChecked(true)
@@ -191,7 +191,7 @@ const WindowsInstaller = () => {
           setError(null)
           clearInterval(interval)
         }
-      } catch (_err) {
+      } catch {
         // Silent fail - we'll retry
       }
     }
@@ -218,7 +218,7 @@ const WindowsInstaller = () => {
           setCurrentStep(3)
           track('setup/installer_success')
         }, 3000)
-      } catch (_err) {
+      } catch {
         // Silent fail - we'll retry
       }
     }

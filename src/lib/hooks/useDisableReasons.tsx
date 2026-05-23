@@ -16,7 +16,7 @@ export interface DisableNotification {
   autoResolved: boolean
 }
 
-export interface DisabledSetting {
+interface DisabledSetting {
   key: string
   disableReason: string
   autoDisabledAt: string

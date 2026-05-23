@@ -334,7 +334,7 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
   return 'monthly' // Default to monthly if no match found
 }
 
-export function getPlanLabel(
+function getPlanLabel(
   tier?: SubscriptionTier | null,
   stripePriceId?: string | null,
   transactionType?: TransactionType | string | null,
@@ -474,11 +474,6 @@ export function isInGracePeriod(): boolean {
 export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
 
 // Get the day after grace period ends (for consistent messaging with subscription dates)
-export const gracePeriodEndNextDay = (() => {
-  const nextDay = new Date(GRACE_PERIOD_END)
-  nextDay.setDate(nextDay.getDate() + 1)
-  return formatDate(nextDay)
-})()
 
 // Update the getSubscriptionStatusInfo function
 export function getSubscriptionStatusInfo(

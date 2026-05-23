@@ -29,44 +29,6 @@ export async function createGiftCheckoutSession(
 }
 
 /**
- * Fetches gift subscription information for the current user
- * @returns Gift subscription information
- */
-export async function fetchGiftSubscriptions(): Promise<{
-  hasGifts: boolean
-  giftCount: number
-  hasLifetime: boolean
-  giftMessage: string
-  giftSubscriptions?: Array<{
-    id: string
-    endDate: Date | null
-    senderName: string
-    giftType: string
-    giftQuantity: number
-    giftMessage: string
-    createdAt: Date
-  }>
-}> {
-  try {
-    const response = await fetch('/api/user/gift-subscriptions')
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch gift subscriptions')
-    }
-
-    return response.json()
-  } catch (error) {
-    console.error('Error fetching gift subscriptions:', error)
-    return {
-      hasGifts: false,
-      giftCount: 0,
-      hasLifetime: false,
-      giftMessage: '',
-    }
-  }
-}
-
-/**
  * Calculates the end date for a gift subscription based on type and quantity
  * @param giftType The type of gift (monthly, annual, lifetime)
  * @param quantity The number of periods to add

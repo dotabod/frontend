@@ -59,7 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let stvResponse: SevenTVUserResponse | null = null
     try {
       stvResponse = await get7TVUser(twitchId)
-    } catch (_error) {
+    } catch {
       return res.status(404).json({ message: '7TV user not found' })
     }
 

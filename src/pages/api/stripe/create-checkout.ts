@@ -327,7 +327,7 @@ async function createCryptoInvoice(
         console.log(`Canceling pending invoice ${renewalInvoiceId} for user ${userId}`)
         try {
           await stripe.invoices.voidInvoice(renewalInvoiceId)
-        } catch (_invoiceError) {
+        } catch {
           try {
             const invoice = await stripe.invoices.retrieve(renewalInvoiceId)
             if (invoice.status === 'open') {

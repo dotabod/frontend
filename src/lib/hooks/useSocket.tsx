@@ -137,7 +137,6 @@ export const useSocket = ({
     if (!userId) return
 
     let lastReceivedTime = Date.now()
-    let reconnectTimeout: NodeJS.Timeout | undefined
 
     console.log('Connecting to socket init...', { userId })
 
@@ -357,8 +356,6 @@ export const useSocket = ({
     // Clean up
     return () => {
       clearInterval(connectionMonitor)
-      clearTimeout(reconnectTimeout)
-
       // Clear all message timeouts
       messageTimeoutsRef.current.forEach((timeoutId) => {
         clearTimeout(timeoutId)

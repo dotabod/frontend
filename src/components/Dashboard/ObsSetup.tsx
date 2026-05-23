@@ -103,7 +103,7 @@ const ObsSetup: React.FC = () => {
         } else if (state === 'prompt') {
           track('lna/obs_status_prompt_shown')
         }
-      } catch (_err) {
+      } catch {
         // If permission query fails, treat as unsupported
         setLnaPermissionState('unsupported')
         setLnaChecked(true)
@@ -722,7 +722,6 @@ const ObsSetup: React.FC = () => {
                     }}
                     disabled={
                       !connected ||
-                      selectedScenes.length === 0 ||
                       selectedScenes.every((scene) => scenesWithSource.includes(scene))
                     }
                   >

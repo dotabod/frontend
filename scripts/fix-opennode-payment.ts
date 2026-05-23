@@ -143,7 +143,7 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
           data: {
             lastWebhookAt: new Date(),
             metadata: {
-              ...((charge.metadata as Record<string, unknown>) || {}),
+              ...(charge.metadata as Record<string, unknown>),
               recoveryScriptRan: true,
               recoveryScriptRunAt: new Date().toISOString(),
               recoveryNote: 'Subscription already existed, just updated lastWebhookAt',
@@ -219,7 +219,7 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
       data: {
         lastWebhookAt: new Date(),
         metadata: {
-          ...((charge.metadata as Record<string, unknown>) || {}),
+          ...(charge.metadata as Record<string, unknown>),
           recoveryScriptRan: true,
           recoveryScriptRunAt: new Date().toISOString(),
           subscriptionId: subscription.id,
@@ -445,7 +445,7 @@ async function runSingleChargeMode(): Promise<void> {
         data: {
           lastWebhookAt: new Date(),
           metadata: {
-            ...((charge.metadata as Record<string, unknown>) || {}),
+            ...(charge.metadata as Record<string, unknown>),
             recoveryScriptRan: true,
             recoveryScriptRunAt: new Date().toISOString(),
             recoveryNote: 'Subscription already existed, just updated lastWebhookAt',
@@ -587,7 +587,7 @@ async function runSingleChargeMode(): Promise<void> {
     data: {
       lastWebhookAt: new Date(),
       metadata: {
-        ...((charge.metadata as Record<string, unknown>) || {}),
+        ...(charge.metadata as Record<string, unknown>),
         recoveryScriptRan: true,
         recoveryScriptRunAt: new Date().toISOString(),
         subscriptionId: subscription.id,

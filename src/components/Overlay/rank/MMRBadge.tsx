@@ -60,7 +60,7 @@ export const MMRBadge = ({
   rank,
   mainScreen = false,
   className = '',
-  notLoaded = undefined,
+  notLoaded: _notLoaded = undefined,
   style,
   ...props
 }: {

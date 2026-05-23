@@ -7,7 +7,12 @@ interface PhoneFrameProps extends HTMLAttributes<HTMLDivElement> {
   priority?: boolean
 }
 
-export function PhoneFrame({ className, children, priority = false, ...props }: PhoneFrameProps) {
+export function PhoneFrame({
+  className,
+  children,
+  priority: _priority = false,
+  ...props
+}: PhoneFrameProps) {
   return (
     <div className={clsx('relative aspect-366/729', className)} {...props}>
       {children}

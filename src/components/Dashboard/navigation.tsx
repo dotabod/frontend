@@ -12,7 +12,7 @@ import {
 import Discord from '@/images/logos/Discord'
 
 // Add a const for parent keys
-export const PARENT_KEYS = {
+const PARENT_KEYS = {
   ADMIN: 'admin-menu',
   FEATURES: 'features-menu',
   BOT_SETTINGS: 'bot-settings-menu',

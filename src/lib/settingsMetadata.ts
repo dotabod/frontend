@@ -841,16 +841,5 @@ export function getSearchableText(setting: SettingMetadata): string {
 }
 
 // Helper function to get setting by key
-export function getSettingByKey(key: string): SettingMetadata | undefined {
-  return settingsMetadata.find((s) => s.key === key)
-}
-
 // Helper function to get settings by category
-export function getSettingsByCategory(category: SettingMetadata['category']): SettingMetadata[] {
-  return settingsMetadata.filter((s) => s.category === category)
-}
-
 // Helper function to get settings by page
-export function getSettingsByPage(path: string): SettingMetadata[] {
-  return settingsMetadata.filter((s) => s.page.path === path)
-}

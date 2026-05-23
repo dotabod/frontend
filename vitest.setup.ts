@@ -81,12 +81,8 @@ global.mockFetchNetworkError = () => {
 
 // Add type definitions for the global helpers
 declare global {
-  // eslint-disable-next-line no-var
   var createFetchResponse: (data: unknown, options?: MockFetchOptions) => Response
-  // eslint-disable-next-line no-var
   var mockFetch: (response: unknown, options?: MockFetchOptions) => void
-  // eslint-disable-next-line no-var
   var mockFetchError: (errorMessage: string) => void
-  // eslint-disable-next-line no-var
   var mockFetchNetworkError: () => void
 }

@@ -212,7 +212,7 @@ const OverlayPage = () => {
               status: 404,
             }),
           )
-        } catch (_e) {
+        } catch {
           // Ignore storage errors
         }
       }

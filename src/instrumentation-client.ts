@@ -20,7 +20,7 @@ function handleNavigation(url: URL) {
     } else {
       replay.start()
     }
-  } catch (_e) {
+  } catch {
     // Sentry.captureException(e)
   }
 }

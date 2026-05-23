@@ -1,6 +1,6 @@
-import type { SubscriptionStatus, TransactionType } from '@prisma/client'
-import type { JsonValue } from '@prisma/client/runtime/library'
-import type { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import type {} from '@prisma/client'
+import type {} from '@prisma/client/runtime/library'
+import type {} from '@/utils/subscription'
 
 // Shared gift subscription info type
 export interface GiftInfo {
@@ -36,24 +36,3 @@ export interface GiftSubInfo {
 }
 
 // Shared subscription with gift details type
-export interface SubscriptionWithGiftDetails {
-  id?: string
-  userId?: string
-  stripeCustomerId?: string | null
-  stripePriceId?: string | null
-  stripeSubscriptionId?: string | null
-  tier?: (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS]
-  status?: SubscriptionStatus | null
-  transactionType?: TransactionType | null
-  currentPeriodEnd?: Date | null
-  cancelAtPeriodEnd?: boolean
-  metadata?: JsonValue
-  giftDetails?: {
-    senderName?: string | null
-    giftType?: string | null
-    giftQuantity?: number | null
-    giftMessage?: string | null
-  } | null
-  isVirtual?: boolean
-  isGracePeriodVirtual?: boolean
-}

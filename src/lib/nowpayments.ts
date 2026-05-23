@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import type { InvoiceReturn } from '@nowpaymentsio/nowpayments-api-js/src/actions/create-invoice'
 import type { GetPaymentStatusReturn } from '@nowpaymentsio/nowpayments-api-js/src/actions/get-payment-status'
-import type { ICreateInvoice, ICreatePayment } from '@nowpaymentsio/nowpayments-api-js/src/types'
+import type { ICreateInvoice } from '@nowpaymentsio/nowpayments-api-js/src/types'
 
 const NOWPAYMENTS_BASE_URL = 'https://api.nowpayments.io/v1'
 
@@ -17,12 +17,10 @@ function getIpnSecret(): string {
   return secret
 }
 
-export type { GetPaymentStatusReturn, ICreateInvoice, ICreatePayment, InvoiceReturn }
-
 export type CreateInvoiceParams = ICreateInvoice
 export type NowPaymentsInvoiceResponse = InvoiceReturn
 
-export const NOWPAYMENTS_STATUS_VALUES = [
+const NOWPAYMENTS_STATUS_VALUES = [
   'waiting',
   'confirming',
   'confirmed',
@@ -34,7 +32,7 @@ export const NOWPAYMENTS_STATUS_VALUES = [
   'expired',
 ] as const
 
-export type NowPaymentsStatus = (typeof NOWPAYMENTS_STATUS_VALUES)[number]
+type NowPaymentsStatus = (typeof NOWPAYMENTS_STATUS_VALUES)[number]
 
 /**
  * Webhook (IPN) body. The SDK's `GetPaymentStatusReturn` covers the manual
@@ -52,14 +50,15 @@ export interface NowPaymentsPaymentStatus extends Omit<GetPaymentStatusReturn, '
 }
 
 async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`${NOWPAYMENTS_BASE_URL}${path}`, {
+  const options: RequestInit = {
     method,
     headers: {
       'x-api-key': getApiKey(),
       'Content-Type': 'application/json',
     },
-    body: body ? JSON.stringify(body) : undefined,
-  })
+  }
+  if (body !== undefined) options.body = JSON.stringify(body)
+  const res = await fetch(`${NOWPAYMENTS_BASE_URL}${path}`, options)
   const text = await res.text()
   let parsed: unknown
   try {
@@ -79,16 +78,6 @@ export async function createNowPaymentsInvoice(
   params: CreateInvoiceParams,
 ): Promise<NowPaymentsInvoiceResponse> {
   return request<NowPaymentsInvoiceResponse>('POST', '/invoice', params)
-}
-
-export async function getNowPaymentsPaymentStatus(
-  paymentId: string | number,
-): Promise<NowPaymentsPaymentStatus> {
-  return request<NowPaymentsPaymentStatus>('GET', `/payment/${paymentId}`)
-}
-
-export async function getNowPaymentsStatus(): Promise<{ message: string }> {
-  return request<{ message: string }>('GET', '/status')
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -136,13 +125,7 @@ export function verifyNowPaymentsSignature(
 // Only 'finished' guarantees the funds are credited to our NOWPayments balance.
 // 'confirmed' (on-chain confirmed, not yet exchanged) and 'sending' (payout in
 // flight) are mid-flow and must NOT mark the Stripe invoice paid.
-export const NOWPAYMENTS_CONFIRMED_STATUSES = new Set<NowPaymentsStatus>(['finished'])
-export const NOWPAYMENTS_TERMINAL_STATUSES = new Set<NowPaymentsStatus>([
-  'finished',
-  'failed',
-  'refunded',
-  'expired',
-])
+const NOWPAYMENTS_CONFIRMED_STATUSES = new Set<NowPaymentsStatus>(['finished'])
 
 const NOWPAYMENTS_STATUSES = new Set<string>(NOWPAYMENTS_STATUS_VALUES)
 

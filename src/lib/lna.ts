@@ -25,7 +25,7 @@ export interface LocalFetchOptions extends RequestInit {
 /**
  * Check if we're running in a secure context
  */
-export function isSecureContext(): boolean {
+function isSecureContext(): boolean {
   if (typeof window === 'undefined') return false
   return window.isSecureContext ?? false
 }
@@ -33,7 +33,7 @@ export function isSecureContext(): boolean {
 /**
  * Detect if we're running in Chrome (or Chromium-based browsers)
  */
-export function isChrome(): boolean {
+function isChrome(): boolean {
   if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent
   return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua)
@@ -43,7 +43,7 @@ export function isChrome(): boolean {
  * Get Chrome major version number
  * Returns null if not Chrome or version cannot be determined
  */
-export function getChromeVersion(): number | null {
+function getChromeVersion(): number | null {
   if (!isChrome() || typeof navigator === 'undefined') return null
 
   const ua = navigator.userAgent
@@ -57,7 +57,7 @@ export function getChromeVersion(): number | null {
 /**
  * Check if Chrome version supports LNA (>=142)
  */
-export function isChromeLnaEnabled(): boolean {
+function isChromeLnaEnabled(): boolean {
   const version = getChromeVersion()
   return version !== null && version >= 142
 }
@@ -83,7 +83,7 @@ export async function queryLnaPermission(): Promise<LnaPermissionState> {
       name: 'local-network-access' as PermissionName,
     })
     return result.state as LnaPermissionState
-  } catch (_error) {
+  } catch {
     // Permission name not recognized or other error
     return 'unsupported'
   }

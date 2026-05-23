@@ -179,7 +179,7 @@ export async function handleSubscriptionDeleted(
           status: SubscriptionStatus.CANCELED,
           cancelAtPeriodEnd: true,
           metadata: {
-            ...((existingSubscription.metadata as Record<string, unknown>) || {}),
+            ...(existingSubscription.metadata as Record<string, unknown>),
             canceledAt: new Date().toISOString(),
           },
           updatedAt: new Date(),

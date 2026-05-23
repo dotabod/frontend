@@ -16,7 +16,7 @@ export type FeatureFlags = {
 /**
  * Default feature flags configuration
  */
-export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
+const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
   enableCryptoPayments: true,
   enablePaypalPayments: true,
 }
@@ -31,18 +31,4 @@ export const featureFlags: FeatureFlags = { ...DEFAULT_FEATURE_FLAGS }
  */
 export function isFeatureEnabled(flagName: keyof FeatureFlags): boolean {
   return featureFlags[flagName]
-}
-
-/**
- * Enable a feature
- */
-export function enableFeature(flagName: keyof FeatureFlags): void {
-  featureFlags[flagName] = true
-}
-
-/**
- * Disable a feature
- */
-export function disableFeature(flagName: keyof FeatureFlags): void {
-  featureFlags[flagName] = false
 }

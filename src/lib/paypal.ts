@@ -24,7 +24,7 @@ function getWebhookId(): string {
   return id
 }
 
-export async function getAccessToken(): Promise<string> {
+async function getAccessToken(): Promise<string> {
   const auth = Buffer.from(`${getClientId()}:${getClientSecret()}`).toString('base64')
   const res = await fetch(`${getBaseUrl()}/v1/oauth2/token`, {
     method: 'POST',
@@ -48,15 +48,16 @@ async function authedRequest<T>(
   extraHeaders?: Record<string, string>,
 ): Promise<T> {
   const token = await getAccessToken()
-  const res = await fetch(`${getBaseUrl()}${path}`, {
+  const options: RequestInit = {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
       ...extraHeaders,
     },
-    body: body ? JSON.stringify(body) : undefined,
-  })
+  }
+  if (body !== undefined) options.body = JSON.stringify(body)
+  const res = await fetch(`${getBaseUrl()}${path}`, options)
   const text = await res.text()
   let parsed: unknown
   try {
@@ -72,13 +73,13 @@ async function authedRequest<T>(
   return parsed as T
 }
 
-export interface PayPalLink {
+interface PayPalLink {
   href: string
   rel: string
   method?: string
 }
 
-export interface PayPalOrderResponse {
+interface PayPalOrderResponse {
   id: string
   status: string
   links?: PayPalLink[]
@@ -223,10 +224,6 @@ export async function getSubscription(subscriptionId: string): Promise<PayPalSub
     nextBillingTime: sub.billing_info?.next_billing_time ?? null,
     customId: sub.custom_id ?? null,
   }
-}
-
-export async function cancelSubscription(subscriptionId: string, reason: string): Promise<void> {
-  await authedRequest('POST', `/v1/billing/subscriptions/${subscriptionId}/cancel`, { reason })
 }
 
 interface VerifyWebhookResponse {

@@ -17,7 +17,7 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
 }
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ code, translation, label, ...others }: ItemProps, ref) => (
+  ({ code: _code, translation, label, ...others }: ItemProps, ref) => (
     <div
       ref={ref}
       className='flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-2'

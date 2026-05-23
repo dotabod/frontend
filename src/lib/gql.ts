@@ -1,14 +1,5 @@
 import { gql } from 'graphql-request'
 
-export const DELETE_EMOTE_SET = gql`
-  mutation DeleteEmoteSet($id: ObjectID!) {
-    emoteSet(id: $id) {
-      delete
-      __typename
-    }
-  }
-`
-
 export const GET_EMOTE_SET_FOR_CARD = gql`
   query GetEmoteSetForCard($id: ObjectID!, $limit: Int) {
     emoteSet(id: $id) {

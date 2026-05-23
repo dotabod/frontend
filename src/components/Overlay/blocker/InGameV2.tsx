@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useDynamicResizing, useWindowResize } from './hooks'
-export const TopHud = styled.div`
+
+const TopHud = styled.div`
   position: absolute;
   top: 0;
   left: 0;
@@ -16,12 +17,12 @@ export const TopHud = styled.div`
   z-index: 4;
 `
 
-export const TeamContainer = styled.div`
+const TeamContainer = styled.div`
   display: flex;
   gap: 1px;
 `
 
-export const TopHudHero = styled.div<{ $isRadiant: boolean; $isDevMode: boolean }>`
+const TopHudHero = styled.div<{ $isRadiant: boolean; $isDevMode: boolean }>`
   ${({ $isDevMode }) => ($isDevMode ? 'border: 1px solid red;' : '')}
   cursor: pointer;
   height: 40px;
@@ -59,7 +60,7 @@ const UltrawideContentWrap = styled.div`
   overflow: visible;
 `
 
-export const Clock = styled.div<{ $isDevMode: boolean }>`
+const Clock = styled.div<{ $isDevMode: boolean }>`
   ${({ $isDevMode }) => ($isDevMode ? 'border: 1px solid red;' : '')}
   width: 205px;
 `

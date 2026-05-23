@@ -1,7 +1,7 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit'
 import type { blockType } from '@/lib/devConsts'
 
-export type MinimapEntity = {
+type MinimapEntity = {
   teamP: string
   image: string
   unitname: string

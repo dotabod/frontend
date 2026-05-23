@@ -5,5 +5,3 @@ export const SETUP_SIGNAL_KEYS = {
   gsi: 'gsi_first_seen_at',
   overlay: 'overlay_first_seen_at',
 } as const
-
-export type SetupSignalKey = (typeof SETUP_SIGNAL_KEYS)[keyof typeof SETUP_SIGNAL_KEYS]

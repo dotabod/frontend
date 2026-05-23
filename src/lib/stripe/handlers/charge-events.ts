@@ -368,7 +368,7 @@ async function handleGiftCreditRefund(
         data: {
           updatedAt: new Date(),
           metadata: {
-            ...((giftTransaction.metadata as Record<string, unknown>) || {}),
+            ...(giftTransaction.metadata as Record<string, unknown>),
             refundedAt: new Date().toISOString(),
             refundAmount: refundAmount.toString(),
             refundProportion: refundProportion.toString(),
@@ -580,7 +580,7 @@ async function processSubscriptionRefund(
             status: SubscriptionStatus.CANCELED,
             updatedAt: new Date(),
             metadata: {
-              ...((subscription.metadata as Record<string, unknown>) || {}),
+              ...(subscription.metadata as Record<string, unknown>),
               refundedAt: new Date().toISOString(),
               refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
               refundId: charge.refunds?.data?.[0]?.id || null,
@@ -598,7 +598,7 @@ async function processSubscriptionRefund(
           data: {
             updatedAt: new Date(),
             metadata: {
-              ...((subscription.metadata as Record<string, unknown>) || {}),
+              ...(subscription.metadata as Record<string, unknown>),
               partiallyRefundedAt: new Date().toISOString(),
               refundAmount: charge.amount_refunded.toString(),
               refundId: charge.refunds?.data?.[0]?.id || null,
@@ -621,7 +621,7 @@ async function processSubscriptionRefund(
           status: SubscriptionStatus.CANCELED,
           updatedAt: new Date(),
           metadata: {
-            ...((subscription.metadata as Record<string, unknown>) || {}),
+            ...(subscription.metadata as Record<string, unknown>),
             refundedAt: new Date().toISOString(),
             refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
             refundId: charge.refunds?.data?.[0]?.id || null,
@@ -639,7 +639,7 @@ async function processSubscriptionRefund(
         data: {
           updatedAt: new Date(),
           metadata: {
-            ...((subscription.metadata as Record<string, unknown>) || {}),
+            ...(subscription.metadata as Record<string, unknown>),
             refundRecorded: new Date().toISOString(),
             refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
             refundId: charge.refunds?.data?.[0]?.id || null,

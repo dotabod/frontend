@@ -54,33 +54,9 @@ export const checkForInvalidOverlay = (pathname: string): boolean => {
       // Cached data is too old, remove it
       localStorage.removeItem(pathKey)
     }
-  } catch (_e) {
+  } catch {
     // Ignore storage errors
   }
 
   return false
-}
-
-/**
- * Applies global styles for the invalid overlay page.
- * This should be called from _app.tsx when an overlay is determined to be invalid.
- */
-export const applyInvalidOverlayGlobalStyles = () => {
-  if (typeof document !== 'undefined') {
-    document.documentElement.style.overflow = 'hidden'
-    document.body.style.overflow = 'hidden'
-    document.body.style.backgroundColor = 'transparent'
-  }
-}
-
-/**
- * Resets global styles that might have been applied for the invalid overlay page.
- * This should be called from _app.tsx when an overlay is determined to be valid again or on other pages.
- */
-export const resetInvalidOverlayGlobalStyles = () => {
-  if (typeof document !== 'undefined') {
-    document.documentElement.style.overflow = ''
-    document.body.style.overflow = ''
-    document.body.style.backgroundColor = '' // Or your default background
-  }
 }
