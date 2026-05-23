@@ -6,11 +6,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      # vp check internally re-runs `pnpm install` to verify deps status;
-      # without this, fresh Dependabot bumps trip pnpm's minimumReleaseAge
-      # supply-chain policy on the second invocation.
-      PNPM_CONFIG_MINIMUM_RELEASE_AGE: 0
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

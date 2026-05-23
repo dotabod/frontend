@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    # Wait past pnpm's minimumReleaseAge (default 1d) before bumping, so the
+    # lockfile Dependabot commits doesn't trip the supply-chain policy in CI
+    # or Vercel. Bigger window for majors out of general caution.
+    cooldown:
+      default-days: 2
+      semver-major-days: 7
