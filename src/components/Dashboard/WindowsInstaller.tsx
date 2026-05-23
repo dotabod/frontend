@@ -115,7 +115,7 @@ const WindowsInstaller = () => {
     const channel = new BroadcastChannel('single-instance-check')
     const handleMessage = (event: MessageEvent) => {
       if (event.data === 'instance-opened') {
-        router.replace('/404')
+        void router.replace('/404')
       }
     }
 
@@ -158,7 +158,7 @@ const WindowsInstaller = () => {
       }
     }
 
-    checkLnaPermission()
+    void checkLnaPermission()
   }, [track])
 
   // Status check effect

@@ -70,7 +70,7 @@ export default function ModeratedChannels() {
       return
     }
 
-    fetchOptions(value).then((newOptions) => {
+    void fetchOptions(value).then((newOptions) => {
       if (fetchId !== fetchRef.current) {
         // For fetch callback order
         return
@@ -84,7 +84,7 @@ export default function ModeratedChannels() {
   }, 300)
 
   useEffect(() => {
-    fetchModeratedChannels()
+    void fetchModeratedChannels()
   }, [fetchModeratedChannels])
 
   const handleOnClick = useCallback(() => {
@@ -116,7 +116,7 @@ export default function ModeratedChannels() {
       setLoading(true)
       track('changed_moderated_channel')
 
-      signIn('impersonate', {
+      void signIn('impersonate', {
         callbackUrl: '/dashboard/features',
         channelToImpersonate: value,
       })
@@ -126,7 +126,7 @@ export default function ModeratedChannels() {
 
   const handleSignOut = useCallback(() => {
     setIsSigningOut(true)
-    signOut()
+    void signOut()
   }, [])
 
   const allOptions = [

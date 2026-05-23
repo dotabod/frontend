@@ -47,7 +47,7 @@ function SubscriptionStatusComponent() {
       }
     }
 
-    fetchCreditBalance()
+    void fetchCreditBalance()
   }, [session?.user?.id, subscription?.metadata])
 
   const summary = getBillingSummaryInfo({

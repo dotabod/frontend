@@ -75,7 +75,7 @@ const ModeratorsPage = () => {
         throw new Error(body?.message)
       }
       // Re-fetch approved moderators
-      mutate()
+      void mutate()
       notification.success({
         description: 'Managers updated successfully!',
         message: 'Success',

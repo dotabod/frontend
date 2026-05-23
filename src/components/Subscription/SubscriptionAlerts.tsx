@@ -35,7 +35,7 @@ export function SubscriptionAlerts({
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
 
   const isVirtualGracePeriodSubscription =
-    (Boolean(subscription) &&
+    (subscription != null &&
       'isGracePeriodVirtual' in subscription &&
       Boolean(subscription.isGracePeriodVirtual)) ||
     (inGracePeriod &&

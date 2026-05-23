@@ -226,8 +226,10 @@ export async function handleCheckoutCompleted(
                       data: {
                         cancelAtPeriodEnd: true,
                         metadata: {
-                          ...(typeof regularSubscription.metadata === 'object'
-                            ? regularSubscription.metadata
+                          ...(regularSubscription.metadata &&
+                          typeof regularSubscription.metadata === 'object' &&
+                          !Array.isArray(regularSubscription.metadata)
+                            ? (regularSubscription.metadata as Record<string, unknown>)
                             : {}),
                           newCryptoPeriod: cryptoPeriod,
                           previousPriceId: regularSubscription.stripePriceId,

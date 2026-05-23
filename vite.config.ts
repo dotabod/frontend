@@ -46,5 +46,25 @@ export default defineConfig({
       ],
       'vite-plus/prefer-vite-plus-imports': 'error',
     },
+    overrides: [
+      {
+        files: ['src/__tests__/**', '**/*.test.ts', '**/*.test.tsx'],
+        rules: {
+          'typescript/unbound-method': 'off',
+          'typescript/no-floating-promises': 'off',
+          'typescript/no-base-to-string': 'off',
+          'typescript/restrict-template-expressions': 'off',
+          'typescript/no-misused-spread': 'off',
+        },
+      },
+      {
+        files: ['scripts/**'],
+        rules: {
+          'typescript/no-floating-promises': 'off',
+          'typescript/restrict-template-expressions': 'off',
+          'typescript/no-base-to-string': 'off',
+        },
+      },
+    ],
   },
 })

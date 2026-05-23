@@ -30,7 +30,7 @@ const GiftSuccessPage: NextPageWithLayout = () => {
       const end = Date.now() + duration
 
       const frame = () => {
-        confetti({
+        void confetti({
           angle: 60,
           colors: ['#5D5FEF', '#3F83F8', '#10B981'],
           origin: { x: 0 },
@@ -38,7 +38,7 @@ const GiftSuccessPage: NextPageWithLayout = () => {
           spread: 55,
         })
 
-        confetti({
+        void confetti({
           angle: 120,
           colors: ['#5D5FEF', '#3F83F8', '#10B981'],
           origin: { x: 1 },

@@ -152,7 +152,7 @@ async function createJob(matchId: string): Promise<number> {
   jobRequestCache.set(matchId, jobPromise)
 
   // Clean up cache after promise resolves or rejects
-  jobPromise.finally(() => {
+  void jobPromise.finally(() => {
     // Keep successful results in cache for a while, but eventually clean them up
     setTimeout(
       () => {
@@ -221,7 +221,7 @@ async function getJobStatus(jobId: number): Promise<boolean> {
   jobStatusCache.set(jobId, statusPromise)
 
   // Clean up cache after promise resolves or rejects
-  statusPromise.finally(() => {
+  void statusPromise.finally(() => {
     // Keep successful results in cache for a while, but eventually clean them up
     setTimeout(
       () => {

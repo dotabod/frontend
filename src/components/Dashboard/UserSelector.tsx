@@ -55,7 +55,7 @@ const UserSelector = ({
       return
     }
 
-    fetchOptions(searchValue).then((newOptions) => {
+    void fetchOptions(searchValue).then((newOptions) => {
       if (fetchId !== fetchRef.current) {
         // For fetch callback order
         return

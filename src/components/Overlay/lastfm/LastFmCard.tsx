@@ -90,14 +90,14 @@ const ScrollingText = ({ text, className }: { text: string; className?: string }
         })
 
         if (!animationCancelled) {
-          animate() // Repeat animation
+          void animate() // Repeat animation
         }
       }
 
-      animate()
+      void animate()
     }
 
-    startAnimation()
+    void startAnimation()
 
     return () => {
       animationCancelled = true

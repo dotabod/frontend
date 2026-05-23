@@ -101,7 +101,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
   const handleStreamerLogin = useCallback(() => {
     setIsSigningOut(true)
-    signIn('twitch', { callbackUrl: '/dashboard', redirect: true })
+    void signIn('twitch', { callbackUrl: '/dashboard', redirect: true })
   }, [])
 
   useEffect(() => {
@@ -167,7 +167,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
               // Fetch player profiles for all accounts
               for (const account of data.accounts) {
-                fetchPlayerProfile(Number.parseInt(account.steam32Id, 10))
+                void fetchPlayerProfile(Number.parseInt(account.steam32Id, 10))
               }
             }
           }
@@ -179,7 +179,7 @@ const VerifyPage: NextPageWithLayout = () => {
       }
     }
 
-    checkLinkedAccounts()
+    void checkLinkedAccounts()
   }, [status, router.query])
 
   // Step 3: Check for Steam authentication callback
@@ -234,13 +234,13 @@ const VerifyPage: NextPageWithLayout = () => {
 
                 // Fetch player profiles for all accounts
                 for (const account of data.accounts) {
-                  fetchPlayerProfile(Number.parseInt(account.steam32Id, 10))
+                  void fetchPlayerProfile(Number.parseInt(account.steam32Id, 10))
                 }
               }
             }
 
             // Clear query parameters from URL
-            router.replace('/verify', undefined, { shallow: true })
+            void router.replace('/verify', undefined, { shallow: true })
           } else {
             throw new Error('Invalid Steam authentication response')
           }
@@ -252,14 +252,14 @@ const VerifyPage: NextPageWithLayout = () => {
             message: 'Steam Verification Failed',
           })
           track('steam_verification_error')
-          router.replace('/verify', undefined, { shallow: true })
+          void router.replace('/verify', undefined, { shallow: true })
         } finally {
           setLoading(false)
         }
       }
     }
 
-    handleSteamCallback()
+    void handleSteamCallback()
   }, [router.query, status, router, notification, track])
 
   // Fetch player profile from OpenDota API through our backend

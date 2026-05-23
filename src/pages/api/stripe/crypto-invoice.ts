@@ -67,8 +67,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Check if this subscription was upgraded to a different plan
     if (metadata.upgradedTo) {
+      const upgradedTo = typeof metadata.upgradedTo === 'string' ? metadata.upgradedTo : 'newer'
       return res.status(400).json({
-        error: `This subscription has been upgraded to a ${metadata.upgradedTo} plan. Please use the newer subscription for payments.`,
+        error: `This subscription has been upgraded to a ${upgradedTo} plan. Please use the newer subscription for payments.`,
       })
     }
 

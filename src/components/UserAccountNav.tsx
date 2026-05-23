@@ -128,7 +128,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
       })
 
       // Refresh notifications after dismissal
-      refreshGiftNotifications()
+      void refreshGiftNotifications()
     } catch (error) {
       console.error('Failed to dismiss notification:', error)
     }
@@ -315,7 +315,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
               key: 'logout',
               label: 'Logout',
               onClick: () => {
-                signOut({
+                void signOut({
                   callbackUrl: window.location.origin,
                   redirect: true,
                 })

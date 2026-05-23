@@ -13,7 +13,7 @@ export interface OpenNodePaymentProcessResult {
 }
 
 export function isOpenNodePaymentConfirmed(status: string | null | undefined): boolean {
-  return Boolean(status) && OPENNODE_CONFIRMED_STATUSES.has(status)
+  return status != null && OPENNODE_CONFIRMED_STATUSES.has(status)
 }
 
 function getMetadata(charge: OpenNodeCharge): Record<string, unknown> {

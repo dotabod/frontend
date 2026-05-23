@@ -17,7 +17,7 @@ const TERMINAL_STATUSES = new Set([
   'warning',
   'unknown',
 ])
-const isTerminalStatus = (type?: string) => Boolean(type) && TERMINAL_STATUSES.has(type)
+const isTerminalStatus = (type?: string) => type != null && TERMINAL_STATUSES.has(type)
 
 interface PaymentStatus {
   invoiceId: string
@@ -106,7 +106,7 @@ export const PaymentStatusAlert = () => {
       }
     }
 
-    poll()
+    void poll()
     intervalId = setInterval(poll, 30_000)
 
     return () => {
@@ -140,7 +140,7 @@ export const PaymentStatusAlert = () => {
   }
 
   const handleDismiss = () => {
-    router.replace('/dashboard/billing', undefined, { shallow: true })
+    void router.replace('/dashboard/billing', undefined, { shallow: true })
   }
 
   if (!payment || payment !== 'processing' || crypto !== 'true' || !invoice) {

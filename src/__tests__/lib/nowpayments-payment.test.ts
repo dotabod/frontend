@@ -56,7 +56,7 @@ const baseInvoice: NowPaymentsInvoice = {
   userId: 'user_1',
 }
 
-const basePayment: NowPaymentsPaymentStatus = {
+const basePayment = {
   actually_paid: 13.05,
   invoice_id: 1234,
   order_id: 'in_1',
@@ -67,7 +67,7 @@ const basePayment: NowPaymentsPaymentStatus = {
   payment_status: 'finished',
   price_amount: 13,
   price_currency: 'usd',
-}
+} as NowPaymentsPaymentStatus
 
 describe('processConfirmedNowPaymentsPayment', () => {
   beforeEach(() => {

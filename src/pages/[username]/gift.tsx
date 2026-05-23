@@ -10,14 +10,15 @@ import { Card } from '@/ui/card'
 
 const GiftSubscriptionPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { username, canceled } = router.query
+  const { username: rawUsername, canceled } = router.query
+  const username = typeof rawUsername === 'string' ? rawUsername : ''
   const { data, loading, error, notFound } = useGetSettingsByUsername()
   const profile = data as { displayName?: string }
 
   // Redirect to 404 if user not found
   useEffect(() => {
     if (username && !loading && (notFound || error)) {
-      router.push('/404')
+      void router.push('/404')
     }
   }, [loading, router, notFound, error, username])
 
@@ -45,12 +46,10 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
           name='description'
           content={`Support ${!loading && profile?.displayName ? profile.displayName : username} by gifting them Dotabod Pro!`}
         />
-        {username && typeof username === 'string' && (
-          <link rel='canonical' href={`https://dotabod.com/${username}/gift`} />
-        )}
+        {username && <link rel='canonical' href={`https://dotabod.com/${username}/gift`} />}
       </Head>
       <GiftSubscriptionForm
-        recipientUsername={typeof username === 'string' ? username : undefined}
+        recipientUsername={username || undefined}
         recipientDisplayName={profile?.displayName}
         canceled={canceled === 'true'}
         loading={loading}
@@ -61,7 +60,8 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
 
 GiftSubscriptionPage.getLayout = function getLayout(page: ReactElement) {
   const router = useRouter()
-  const { username } = router.query
+  const { username: rawUsername } = router.query
+  const username = typeof rawUsername === 'string' ? rawUsername : ''
 
   return (
     <HomepageShell

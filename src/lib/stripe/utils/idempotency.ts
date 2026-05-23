@@ -39,7 +39,7 @@ export async function processEventIdempotently(
 
     if (existingEvent) {
       debugLog(
-        `Event ${eventId} (${eventType}) already processed, skipping. Recorded at: ${existingEvent.processedAt}`,
+        `Event ${eventId} (${eventType}) already processed, skipping. Recorded at: ${existingEvent.processedAt.toISOString()}`,
       )
       // Return a special value to indicate "already processed" (not an error but also didn't process now)
       return { processedAt: existingEvent.processedAt, skipped: true }
@@ -72,7 +72,7 @@ export async function processEventIdempotently(
 
         if (existingEventRetry) {
           debugLog(
-            `Event ${eventId} (${eventType}) already being processed by another request. Recorded at: ${existingEventRetry.processedAt}`,
+            `Event ${eventId} (${eventType}) already being processed by another request. Recorded at: ${existingEventRetry.processedAt.toISOString()}`,
           )
           return { processedAt: existingEventRetry.processedAt, skipped: true }
         }

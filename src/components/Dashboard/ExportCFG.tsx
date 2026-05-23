@@ -15,7 +15,7 @@ function InstallPage() {
 
   const updateUrlWithGsiType = (newGsiType: 'windows' | 'manual') => {
     // Update the URL without adding a new history entry
-    router.replace(
+    void router.replace(
       {
         pathname: router.pathname,
         query: { ...router.query, gsiType: newGsiType },

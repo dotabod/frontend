@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
@@ -47,7 +48,7 @@ function Minimap({ block }: { block: blockType }) {
           isPreview ? preview : '',
         ].join(' ')}
       >
-        <div className={fog} style={{ '--minimap-opacity': fogOpacity }} />
+        <div className={fog} style={{ '--minimap-opacity': fogOpacity } as CSSProperties} />
 
         {buildings.map((building, index) => (
           <Building team={block?.team} data={building} key={`minimap-building-${index}`} />

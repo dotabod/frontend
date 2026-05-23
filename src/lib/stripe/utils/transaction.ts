@@ -14,7 +14,7 @@ export async function withTransaction<T>(
 ): Promise<T | null> {
   debugLog('Entering withTransaction')
   let retryCount = 0
-  let lastError: Error | unknown = null
+  let lastError: unknown = null
 
   while (retryCount < maxRetries) {
     try {

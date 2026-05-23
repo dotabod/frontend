@@ -108,7 +108,7 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
         }
         return null
       })
-      .filter(Boolean)
+      .filter((p): p is NonNullable<typeof p> => p !== null)
 
     const updatedAccounts = await Promise.all(updatePromises)
     return res.json({ accounts: updatedAccounts })

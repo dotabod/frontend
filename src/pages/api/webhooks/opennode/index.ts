@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       (status !== 'paid' && status !== 'confirmed' ? true : alreadyProcessedSuccessfully)
     ) {
       console.log(
-        `Charge ${chargeId} already processed at ${existingCharge.lastWebhookAt} with status ${status}`,
+        `Charge ${chargeId} already processed at ${existingCharge.lastWebhookAt.toISOString()} with status ${status}`,
       )
       res.status(200).json({ message: 'Already processed' })
       return

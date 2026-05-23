@@ -8,6 +8,13 @@ import {
   isLifetimePrice,
 } from '../utils/subscription-utils'
 
+function toMetadataObject(value: unknown): Record<string, unknown> {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return value as Record<string, unknown>
+  }
+  return {}
+}
+
 /**
  * Handles an invoice event from Stripe (payment succeeded or failed)
  * @param invoice The Stripe invoice object
@@ -173,9 +180,7 @@ async function handleCryptoInvoiceEvent(
               await tx.subscription.update({
                 data: {
                   metadata: {
-                    ...(typeof activeSubscription.metadata === 'object'
-                      ? activeSubscription.metadata
-                      : {}),
+                    ...toMetadataObject(activeSubscription.metadata),
                     lastInvoiceStatus: invoice.status,
                     lastUnpaidInvoiceId: invoice.id,
                   },
@@ -301,7 +306,7 @@ async function handleCryptoInvoiceEvent(
                 cancelAtPeriodEnd: true, // Will expire at the end of the period
                 currentPeriodEnd: newPeriodEnd,
                 metadata: {
-                  ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                  ...toMetadataObject(subscription.metadata),
                   previousRenewalInvoiceId: invoice.id ?? '',
                   priceType: pricePeriod,
                   renewalDueDate: renewalDate.toISOString(),
@@ -327,7 +332,7 @@ async function handleCryptoInvoiceEvent(
                 cancelAtPeriodEnd: true,
                 currentPeriodEnd: newPeriodEnd,
                 metadata: {
-                  ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                  ...toMetadataObject(subscription.metadata),
                   renewalError: 'true',
                 },
                 status: SubscriptionStatus.ACTIVE,
@@ -343,7 +348,7 @@ async function handleCryptoInvoiceEvent(
           await tx.subscription.update({
             data: {
               metadata: {
-                ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                ...toMetadataObject(subscription.metadata),
                 cancellationReason: 'invoice_uncollectible',
                 lastUnpaidInvoiceId: invoice.id,
               },
@@ -366,7 +371,7 @@ async function handleCryptoInvoiceEvent(
           await tx.subscription.update({
             data: {
               metadata: {
-                ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                ...toMetadataObject(subscription.metadata),
                 lastOverdueInvoiceId: invoice.id,
               },
               status: SubscriptionStatus.PAST_DUE,
@@ -630,7 +635,7 @@ async function handleOpenNodeInvoicePaid(
               data: {
                 cancelAtPeriodEnd: true,
                 metadata: {
-                  ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+                  ...toMetadataObject(subscription.metadata),
                   openNodeInvoiceId: invoice.id ?? '',
                   upgradedAt: new Date().toISOString(),
                   upgradedToLifetime: 'true',
@@ -678,9 +683,7 @@ async function handleOpenNodeInvoicePaid(
               data: {
                 cancelAtPeriodEnd: true,
                 metadata: {
-                  ...(typeof existingSubscription.metadata === 'object'
-                    ? existingSubscription.metadata
-                    : {}),
+                  ...toMetadataObject(existingSubscription.metadata),
                   openNodeInvoiceId: invoice.id ?? '',
                   upgradedAt: new Date().toISOString(),
                   upgradedTo: pricePeriod,
@@ -759,7 +762,7 @@ async function handleCryptoRenewal(
       cancelAtPeriodEnd: true,
       currentPeriodEnd: newPeriodEnd,
       metadata: {
-        ...(typeof subscription.metadata === 'object' ? subscription.metadata : {}),
+        ...toMetadataObject(subscription.metadata),
         lastRenewalInvoiceId: invoice.id ?? '',
         renewedAt: new Date().toISOString(),
       },

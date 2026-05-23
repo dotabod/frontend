@@ -50,7 +50,7 @@ describe('verifyNowPaymentsSignature', () => {
   })
 
   it('rejects a missing signature header', () => {
-    expect(verifyNowPaymentsSignature({ payment_id: 1 })).toBe(false)
+    expect(verifyNowPaymentsSignature({ payment_id: 1 }, undefined)).toBe(false)
   })
 
   it('rejects an array signature header', () => {
@@ -79,6 +79,6 @@ describe('isNowPaymentsConfirmed', () => {
     expect(isNowPaymentsConfirmed('partially_paid')).toBe(false)
     expect(isNowPaymentsConfirmed('failed')).toBe(false)
     expect(isNowPaymentsConfirmed(null)).toBe(false)
-    expect(isNowPaymentsConfirmed()).toBe(false)
+    expect(isNowPaymentsConfirmed(undefined)).toBe(false)
   })
 })

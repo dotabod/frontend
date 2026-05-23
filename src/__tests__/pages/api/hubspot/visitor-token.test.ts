@@ -5,7 +5,7 @@ vi.mock('@/lib/api/getServerSession', () => ({ getServerSession: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
 vi.mock('@/lib/hubspot', () => ({
   subscriptionToValue: vi.fn(() => 'pro'),
-  syncHubSpotContact: vi.fn().mockResolvedValue(),
+  syncHubSpotContact: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))
 vi.mock('node-fetch', () => ({ default: vi.fn() }))
@@ -17,7 +17,7 @@ import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import handler from '@/pages/api/hubspot/visitor-token'
 import { getSubscription } from '@/utils/subscription'
 
-// Biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
+// biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
 const anyVal = (v: unknown) => v as any
 
 const tokenOk = () =>

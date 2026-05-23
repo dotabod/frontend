@@ -3,7 +3,7 @@ import type { defaultSettings } from '@/lib/defaultSettings'
 type Settings = typeof defaultSettings
 
 export interface SettingMetadata {
-  key: keyof Settings | string
+  key: string
   label: string
   description: string
   searchTerms: string[]

@@ -110,7 +110,7 @@ const ObsSetup: React.FC = () => {
       }
     }
 
-    checkLnaPermission()
+    void checkLnaPermission()
   }, [track])
 
   useEffect(() => {
@@ -236,7 +236,7 @@ const ObsSetup: React.FC = () => {
       }
     }
 
-    connectObs()
+    void connectObs()
 
     return () => {
       // Clean up all event listeners
@@ -244,7 +244,7 @@ const ObsSetup: React.FC = () => {
       obs.off('ConnectionError', handleConnectionError)
 
       try {
-        obs.disconnect()
+        void obs.disconnect()
       } catch (error) {
         console.log('Error disconnecting from OBS:', error)
       }
@@ -264,8 +264,8 @@ const ObsSetup: React.FC = () => {
       const sceneListResponse = await obs.call('GetSceneList')
       const scenes: Scene[] = sceneListResponse.scenes.map((scene) => ({
         sceneIndex: Number(scene.sceneIndex),
-        sceneName: String(scene.sceneName),
-        sceneUuid: String(scene.sceneUuid),
+        sceneName: typeof scene.sceneName === 'string' ? scene.sceneName : '',
+        sceneUuid: typeof scene.sceneUuid === 'string' ? scene.sceneUuid : '',
       }))
       const sceneUuids = scenes.map((scene) => scene.sceneUuid)
       setScenes(scenes)
@@ -327,7 +327,7 @@ const ObsSetup: React.FC = () => {
           sceneUuid: selectedScene,
         })
         const sceneItems: SceneItem[] = sceneItemsResponse.sceneItems.map((item) => ({
-          sourceName: String(item.sourceName),
+          sourceName: typeof item.sourceName === 'string' ? item.sourceName : '',
         }))
 
         // Check if the browser source already exists in the selected scene
@@ -343,7 +343,7 @@ const ObsSetup: React.FC = () => {
         // If the source doesn't exist, create the browser source
         const inputListResponse = await obs.call('GetInputList')
         const inputs: ObsInput[] = inputListResponse.inputs.map((input) => ({
-          inputName: String(input.inputName),
+          inputName: typeof input.inputName === 'string' ? input.inputName : '',
         }))
         const existingInput = inputs.find((input) => input.inputName === '[dotabod] main overlay')
 
@@ -419,7 +419,7 @@ const ObsSetup: React.FC = () => {
           sceneUuid: scene,
         })
         const sceneItems: SceneItem[] = sceneItemsResponse.sceneItems.map((item) => ({
-          sourceName: String(item.sourceName),
+          sourceName: typeof item.sourceName === 'string' ? item.sourceName : '',
         }))
 
         const existingSourceInScene = sceneItems.find(

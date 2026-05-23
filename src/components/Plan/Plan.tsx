@@ -223,7 +223,7 @@ function Plan({
 
       // Optimistically update the UI
       if (cryptoInterestData) {
-        mutateCryptoInterestData(
+        void mutateCryptoInterestData(
           {
             ...cryptoInterestData,
             userCount: cryptoInterestData.userCount + 1,
@@ -258,7 +258,7 @@ function Plan({
 
       // Optimistically update the UI
       if (cryptoInterestData && cryptoInterestData.userCount > 0) {
-        mutateCryptoInterestData(
+        void mutateCryptoInterestData(
           {
             ...cryptoInterestData,
             userCount: cryptoInterestData.userCount - 1,
@@ -808,13 +808,13 @@ function Plan({
 
       // Remove the query parameters to prevent repeated subscription attempts
       const { pathname } = router
-      router.replace(pathname, undefined, { shallow: true })
+      void router.replace(pathname, undefined, { shallow: true })
       message.success('Redirecting to checkout...')
 
       // Restore the payment method the user chose before signing in.
       const restoredMethod: PaymentMethod | undefined =
         crypto === 'true' ? 'crypto' : paypal === 'true' ? 'paypal' : undefined
-      handleSubscribe(restoredMethod)
+      void handleSubscribe(restoredMethod)
     }
   }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 

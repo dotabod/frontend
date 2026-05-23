@@ -36,7 +36,7 @@ const useMaybeSignout = (skip = false) => {
     const shouldSignOut = status === 'authenticated' && (hasIncompleteScope || requiresRefresh)
 
     if (shouldSignOut) {
-      signOut({ callbackUrl: '/login?setup-scopes', redirect: true })
+      void signOut({ callbackUrl: '/login?setup-scopes', redirect: true })
     }
   }, [scope, isImpersonating, role, status, requiresRefresh])
 }

@@ -51,7 +51,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
 
   // Fetch notable players on component mount
   useEffect(() => {
-    fetchNotablePlayers()
+    void fetchNotablePlayers()
   }, [])
 
   const fetchNotablePlayers = async () => {
@@ -129,7 +129,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       }
 
       setIsModalOpen(false)
-      fetchNotablePlayers()
+      void fetchNotablePlayers()
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Handle Zod validation errors
@@ -157,7 +157,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       }
 
       messageApi.success('Player deleted successfully')
-      fetchNotablePlayers()
+      void fetchNotablePlayers()
     } catch (error) {
       console.error('Error deleting notable player:', error)
       messageApi.error('Failed to delete notable player')

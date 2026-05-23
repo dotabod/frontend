@@ -180,7 +180,11 @@ async function processWebhookEvent(
               data: {
                 cancelAtPeriodEnd: true,
                 metadata: {
-                  ...(typeof cryptoSub.metadata === 'object' ? cryptoSub.metadata : {}),
+                  ...(cryptoSub.metadata &&
+                  typeof cryptoSub.metadata === 'object' &&
+                  !Array.isArray(cryptoSub.metadata)
+                    ? (cryptoSub.metadata as Record<string, unknown>)
+                    : {}),
                   switchedAt: new Date().toISOString(),
                   switchedToRegular: 'true',
                 },
@@ -321,7 +325,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Handle the case where the event was already processed
     if (result && typeof result === 'object' && result.skipped) {
       debugLog(
-        `Event ${event.id} (${event.type}) was already processed at ${result.processedAt}. Responding 200 OK.`,
+        `Event ${event.id} (${event.type}) was already processed at ${result.processedAt instanceof Date ? result.processedAt.toISOString() : String(result.processedAt)}. Responding 200 OK.`,
       )
       return res.status(200).json({
         processed: true,

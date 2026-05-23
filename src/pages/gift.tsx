@@ -13,7 +13,7 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
   useEffect(() => {
     const { username } = router.query
     if (username && typeof username === 'string' && router.pathname === '/gift') {
-      router.push(createGiftLink(username))
+      void router.push(createGiftLink(username))
     }
   }, [router])
 

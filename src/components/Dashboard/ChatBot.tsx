@@ -145,7 +145,7 @@ export default function ChatBot() {
   }, [router.query.modType, router.query.sevenTvType])
 
   const updateUrlWithModType = (newType: 'auto' | 'manual') => {
-    router.replace(
+    void router.replace(
       {
         pathname: router.pathname,
         query: { ...router.query, modType: newType },
@@ -156,7 +156,7 @@ export default function ChatBot() {
   }
 
   const updateUrlWith7TVType = (newType: 'auto' | 'manual') => {
-    router.replace(
+    void router.replace(
       {
         pathname: router.pathname,
         query: { ...router.query, sevenTvType: newType },
@@ -213,7 +213,7 @@ export default function ChatBot() {
     }
 
     // On load
-    fetchUserData()
+    void fetchUserData()
 
     // Every 5 seconds
     const intervalId = setInterval(fetchUserData, 5000)

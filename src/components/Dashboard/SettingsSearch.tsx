@@ -74,7 +74,7 @@ export function SettingsSearch() {
       }
 
       // Fuzzy match - check if all characters appear in order within reasonable distance
-      const chars = [...searchQuery]
+      const chars = Array.from(searchQuery)
       let charIndex = 0
       let firstFoundIndex = -1
       let lastFoundIndex = -1
@@ -135,7 +135,7 @@ export function SettingsSearch() {
     setQuery('')
 
     // Navigate to the page
-    router.push(result.page.path).then(() => {
+    void router.push(result.page.path).then(() => {
       // After navigation, scroll to the section if specified
       if (result.page.section) {
         setTimeout(() => {

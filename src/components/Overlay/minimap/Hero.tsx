@@ -9,7 +9,8 @@ import {
 function Hero({ data, team }: MinimapUnitProps) {
   const heroUnits = useSelector(selectHeroUnits)
   // Default, custom, or icon
-  const displayType = useSelector(selectSettings)?.hero_display || 'icon'
+  const rawDisplayType = useSelector(selectSettings)?.hero_display
+  const displayType: string = typeof rawDisplayType === 'string' ? rawDisplayType : 'icon'
   const mainHero = useSelector(selectMainHero)
 
   const position = {
@@ -46,7 +47,7 @@ function Hero({ data, team }: MinimapUnitProps) {
   }
 
   return (
-    <div className={['container-hero', displayType].join(' ')} style={position}>
+    <div className={`container-hero ${displayType}`} style={position}>
       {!(isBrewmaster && hasBrewlings) && (
         <>
           {displayType === 'custom' && (

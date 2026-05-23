@@ -361,7 +361,7 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
 function getPlanLabel(
   tier?: SubscriptionTier | null,
   stripePriceId?: string | null,
-  transactionType?: TransactionType | string | null,
+  transactionType?: string | null,
 ): string {
   if (transactionType === TransactionType.LIFETIME) {
     return 'Pro Lifetime'
@@ -641,7 +641,7 @@ export function getBillingSummaryInfo({
   status: SubscriptionStatus | null | undefined
   cancelAtPeriodEnd?: boolean
   currentPeriodEnd?: Date | null
-  transactionType?: TransactionType | string | null
+  transactionType?: string | null
   stripeSubscriptionId?: string | null
   stripeCustomerId?: string | null
   stripePriceId?: string | null

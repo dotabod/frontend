@@ -51,11 +51,11 @@ const AdminPage = () => {
     }
 
     if (!session?.user?.role?.includes('admin')) {
-      router.push('/404')
+      void router.push('/404')
       return
     }
 
-    fetchMessages()
+    void fetchMessages()
   }, [session?.user?.role, status, router.push])
 
   if (!session?.user?.role?.includes('admin')) {
@@ -91,7 +91,7 @@ const AdminPage = () => {
       await axios.post('/api/admin/scheduled-messages', payload)
       message.success('Message scheduled successfully')
       form.resetFields()
-      fetchMessages()
+      void fetchMessages()
     } catch (error) {
       console.error(error)
       message.error('Failed to schedule message')
@@ -141,7 +141,7 @@ const AdminPage = () => {
       await axios.put(`/api/admin/scheduled-messages/${editingMessage?.id}`, payload)
       message.success('Message updated successfully')
       setOpenDialog(false)
-      fetchMessages()
+      void fetchMessages()
     } catch (error) {
       console.error(error)
       message.error('Failed to update message')
@@ -157,7 +157,7 @@ const AdminPage = () => {
           await fetch(`/api/admin/scheduled-messages/${id}`, {
             method: 'DELETE',
           })
-          fetchMessages()
+          void fetchMessages()
         } catch (error) {
           console.error('Error deleting scheduled message:', error)
         }

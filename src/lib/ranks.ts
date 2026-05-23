@@ -84,7 +84,8 @@ export function getRankDetail(mmr: string | number, standing: number | null) {
   }
 
   // Higher than max mmr? Lets check leaderboards
-  if (mmrNum > ranks.at(-1).range[1]) {
+  const maxRank = ranks.at(-1)
+  if (maxRank && mmrNum > maxRank.range[1]) {
     return lookupLeaderRank({ mmr: mmrNum, standing })
   }
 

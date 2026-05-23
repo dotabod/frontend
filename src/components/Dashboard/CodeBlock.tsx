@@ -11,7 +11,7 @@ const CodeBlock = () => {
   const handleCopy = () => {
     track('install/copy_windows_installer')
 
-    navigator.clipboard
+    void navigator.clipboard
       .writeText(`powershell -c "irm https://${window.location.host}/install | iex"`)
       .then(() => {
         setCopied(true)

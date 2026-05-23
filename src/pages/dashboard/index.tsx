@@ -35,7 +35,7 @@ const triggerCryptoConfetti = () => {
     }
 
     // More particles for crypto
-    confetti({
+    void confetti({
       angle: 60,
       colors,
       origin: { x: 0, y: 0.5 },
@@ -45,7 +45,7 @@ const triggerCryptoConfetti = () => {
       spread: 70,
       startVelocity: 75,
     })
-    confetti({
+    void confetti({
       angle: 120,
       colors,
       origin: { x: 1, y: 0.5 },
@@ -57,7 +57,7 @@ const triggerCryptoConfetti = () => {
     })
 
     // Add some "bitcoin" shaped confetti (smaller circles) in gold
-    confetti({
+    void confetti({
       angle: 90,
       colors: ['#f59e0b', '#fbbf24'],
       origin: { x: 0.5, y: 0.5 },
@@ -157,7 +157,7 @@ const SetupPage = () => {
   const updateStepInUrl = useCallback(
     (newActiveStep: number) => {
       // Update the URL without adding a new history entry
-      router.replace(
+      void router.replace(
         {
           pathname: router.pathname,
           query: { ...router.query, step: newActiveStep + 1 }, // +1 to make it 1-indexed for the URL
@@ -191,7 +191,7 @@ const SetupPage = () => {
         return
       }
 
-      confetti({
+      void confetti({
         angle: 60,
         colors,
         origin: { x: 0, y: 0.5 },
@@ -199,7 +199,7 @@ const SetupPage = () => {
         spread: 55,
         startVelocity: 60,
       })
-      confetti({
+      void confetti({
         angle: 120,
         colors,
         origin: { x: 1, y: 0.5 },
@@ -283,7 +283,7 @@ const SetupPage = () => {
 
       // Clear the query params but preserve the step
       const { step } = router.query
-      router.replace(
+      void router.replace(
         {
           pathname: router.pathname,
           query: step ? { step } : {},

@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 import React from 'react'
 import { vi } from 'vite-plus/test'
 
@@ -14,7 +14,7 @@ vi.mock('framer-motion', () => ({
 // Mock the Prisma Mongo client
 vi.mock('.prisma-mongo/client', () => {
   function MockPrismaMongoClient(this: Record<string, unknown>) {
-    this.$disconnect = vi.fn().mockResolvedValue()
+    this.$disconnect = vi.fn().mockResolvedValue(undefined)
     this.cards = {
       findUnique: vi.fn().mockResolvedValue({ id: 'mock-card-id' }),
     }
@@ -41,25 +41,26 @@ interface MockFetchOptions {
 }
 
 // Helper function to create fetch responses
-global.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) => ({
-  arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-  blob: () => Promise.resolve(new Blob([])),
-  body: null,
-  bodyUsed: false,
-  clone() {
-    return this
-  },
-  formData: () => Promise.resolve(new FormData()),
-  headers: new Headers(options.headers || { 'Content-Type': 'application/json' }),
-  json: () => Promise.resolve(data),
-  ok: options.status ? options.status >= 200 && options.status < 300 : true,
-  redirected: false,
-  status: options.status || 200,
-  statusText: options.statusText || 'OK',
-  text: () => Promise.resolve(JSON.stringify(data)),
-  type: 'basic',
-  url: '',
-})
+global.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) =>
+  ({
+    arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+    blob: () => Promise.resolve(new Blob([])),
+    body: null,
+    bodyUsed: false,
+    clone() {
+      return this
+    },
+    formData: () => Promise.resolve(new FormData()),
+    headers: new Headers(options.headers || { 'Content-Type': 'application/json' }),
+    json: () => Promise.resolve(data),
+    ok: options.status ? options.status >= 200 && options.status < 300 : true,
+    redirected: false,
+    status: options.status || 200,
+    statusText: options.statusText || 'OK',
+    text: () => Promise.resolve(JSON.stringify(data)),
+    type: 'basic',
+    url: '',
+  }) as unknown as Response
 
 // Add global fetch mock helper
 global.mockFetch = (response: unknown, options: MockFetchOptions = {}) => {

@@ -16,7 +16,7 @@ const replay = Sentry.replayIntegration({
 function handleNavigation(url: URL) {
   try {
     if (url.pathname.startsWith('/overlay')) {
-      replay.stop()
+      void replay.stop()
     } else {
       replay.start()
     }

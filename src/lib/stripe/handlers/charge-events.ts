@@ -210,7 +210,11 @@ export async function handleChargeRefunded(
 
   // Handle cases where metadata is missing but we have a payment intent
   if (charge.payment_intent) {
-    console.log(`No userId in metadata, but found payment_intent ${charge.payment_intent}`)
+    const piId =
+      typeof charge.payment_intent === 'string'
+        ? charge.payment_intent
+        : (charge.payment_intent?.id ?? 'null')
+    console.log(`No userId in metadata, but found payment_intent ${piId}`)
     return (
       (await withErrorHandling(
         async () => {
@@ -229,7 +233,11 @@ export async function handleChargeRefunded(
             return true
           }
 
-          console.log(`Unable to find userId for payment intent ${charge.payment_intent}`)
+          const piIdLookup =
+            typeof charge.payment_intent === 'string'
+              ? charge.payment_intent
+              : (charge.payment_intent?.id ?? 'null')
+          console.log(`Unable to find userId for payment intent ${piIdLookup}`)
           return true
         },
         `handleChargeRefunded(${charge.id})`,
@@ -563,7 +571,9 @@ async function processSubscriptionRefund(
   })
 
   if (subscriptions.length === 0) {
-    console.log(`No subscriptions found for user ${userId} with customer ${charge.customer}`)
+    const customerId =
+      typeof charge.customer === 'string' ? charge.customer : (charge.customer?.id ?? 'null')
+    console.log(`No subscriptions found for user ${userId} with customer ${customerId}`)
     return
   }
 

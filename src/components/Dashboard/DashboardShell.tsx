@@ -266,7 +266,7 @@ export default function DashboardShell({
         }
 
         // Refresh notifications after marking as read
-        refreshGiftNotifications()
+        void refreshGiftNotifications()
       } catch (error) {
         console.error('Failed to mark notification as read:', error)
       }

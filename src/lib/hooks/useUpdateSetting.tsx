@@ -46,6 +46,7 @@ interface UserProfileData {
   mmr?: number | null
   settings: SettingEntry[]
   error?: unknown
+  [key: string]: unknown
 }
 
 interface MutationValue {
@@ -138,7 +139,7 @@ export const useUpdate = <
       return dataTransform(currentData, newValue)
     }
 
-    mutate(cachePath, updateFn(data), options)
+    void mutate(cachePath, updateFn(data), options)
   }
 
   return { data, error, loading, mutate, updateSetting }
@@ -333,7 +334,7 @@ export function useGetSettings() {
   const router = useRouter()
 
   // This is only used to get user settings from the OBS overlay
-  const { userId } = router.query
+  const userId = typeof router.query.userId === 'string' ? router.query.userId : ''
   const url = `/api/settings${userId ? `?id=${userId}` : ''}`
   const { data, loading } = useUpdate<SettingsData>({ path: url })
   return { data, loading }
@@ -342,7 +343,7 @@ export function useGetSettings() {
 export function useGetSettingsByUsername() {
   const router = useRouter()
 
-  const { username } = router.query
+  const username = typeof router.query.username === 'string' ? router.query.username : ''
   const url = `/api/settings${username ? `?username=${username}` : ''}`
   const { data, loading, error } = useUpdate<UserProfileData>({ path: url })
 

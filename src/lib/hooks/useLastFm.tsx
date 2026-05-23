@@ -145,7 +145,7 @@ export function useLastFm() {
     }
 
     // Initial fetch
-    fetchNowPlaying()
+    void fetchNowPlaying()
 
     // Set up interval to fetch periodically
     const configuredInterval = typeof refreshRate === 'number' ? refreshRate : 30
@@ -154,7 +154,7 @@ export function useLastFm() {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        fetchNowPlaying()
+        void fetchNowPlaying()
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)

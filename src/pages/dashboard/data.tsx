@@ -91,7 +91,7 @@ const DataPage = () => {
           }
 
           message.success('Your account has been deleted. Signing you out…', 0)
-          signOut({ callbackUrl: '/', redirect: true })
+          void signOut({ callbackUrl: '/', redirect: true })
         } catch (error) {
           message.error("We couldn't delete your account. Try again or contact support.")
           console.error(error)

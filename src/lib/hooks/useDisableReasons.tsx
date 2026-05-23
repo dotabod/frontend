@@ -53,7 +53,7 @@ export function useDisableReasons() {
 
         // Optimistically update the data
         if (data) {
-          mutate(
+          void mutate(
             {
               ...data,
               notifications: data.notifications.map((notification) =>
@@ -93,7 +93,7 @@ export function useDisableReasons() {
         // Optimistically update the data
         if (data) {
           const now = new Date().toISOString()
-          mutate(
+          void mutate(
             {
               disabledSettings: data.disabledSettings.filter(
                 (setting) => setting.key !== settingKey,
@@ -118,7 +118,7 @@ export function useDisableReasons() {
   )
 
   const getDisableReasonExplanation = useCallback(
-    (reason: DisableReason, metadata?: Record<string, unknown>) => {
+    (reason: DisableReason, metadata?: Record<string, string | undefined>) => {
       switch (reason) {
         case 'TOKEN_REVOKED': {
           return {

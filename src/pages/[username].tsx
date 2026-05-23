@@ -98,7 +98,7 @@ const PageContent = ({
   useEffect(() => {
     // Only redirect to 404 if username exists in query and we've finished loading (for client-side only)
     if (!ssrUserData && username && !finalLoading && (notFound || profile?.error || error)) {
-      router.push('/404')
+      void router.push('/404')
     }
   }, [finalLoading, profile, router, notFound, error, username, ssrUserData])
 

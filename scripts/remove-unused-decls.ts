@@ -74,7 +74,7 @@ for (const [filename, diags] of byFile) {
     }
 
     try {
-      ;(toRemove as { remove: () => void }).remove()
+      ;(toRemove as unknown as { remove: () => void }).remove()
       removed++
     } catch (error) {
       console.warn(

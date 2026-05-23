@@ -158,7 +158,7 @@ export default function OBSOverlay() {
   const router = useRouter()
 
   const updateUrlWithOverlayType = (newOverlayType: 'auto' | 'text' | 'video') => {
-    router.replace(
+    void router.replace(
       {
         pathname: router.pathname,
         query: { ...router.query, overlayType: newOverlayType },
