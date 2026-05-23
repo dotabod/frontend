@@ -7,6 +7,7 @@ export default defineConfig({
     semi: false,
     singleQuote: true,
     trailingComma: 'all',
+    useTabs: false,
   },
   lint: {
     categories: {
