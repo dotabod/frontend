@@ -2,6 +2,7 @@ pre-commit:
   piped: true
   commands:
     fmt:
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css}'
       run: |
         npx vp fmt {staged_files} \
           && git add {staged_files}
