@@ -260,6 +260,7 @@ const OverlayPage = () => {
     // This helps when users mistype URLs or accounts are deleted
     return (
       <>
+        {/* oxlint-disable-next-line nextjs/no-duplicate-head -- conditional render path, only one Head per render */}
         <Head>
           <title>Dotabod | Invalid Overlay URL</title>
           <meta name='robots' content='noindex' />
@@ -302,6 +303,7 @@ const OverlayPage = () => {
     <>
       <Head>
         <title>Dotabod | Stream overlays</title>
+        {/* oxlint-disable-next-line nextjs/no-css-tags -- OBS legacy compatibility stylesheet */}
         {isOldObs && <link rel='stylesheet' href='/styles/obs-compat.css' />}
       </Head>
       <style global jsx>{`

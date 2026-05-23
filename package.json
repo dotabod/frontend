@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "format": "biome format --write",
+    "format": "vp fmt",
     "dev": "doppler run -- next dev",
     "pull": "doppler run -- npx prisma db pull",
     "push": "doppler run -- npx prisma db push",
@@ -13,8 +13,8 @@
     "build": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && next build",
     "build-local": "doppler run -- npm run build",
     "start": "next start",
-    "lint": "vp lint && biome check",
-    "lint:fix": "vp lint --fix && biome check --write",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
     "typecheck": "tsc --noEmit",
     "parse": "i18next -c ./i18next-parser.config.mjs",
     "postinstall": "npm run generate:all && lefthook install || true",
@@ -87,7 +87,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/canvas-confetti": "^1.9.0",
@@ -118,7 +117,6 @@
     }
   },
   "trustedDependencies": [
-    "@biomejs/biome",
     "@prisma/client",
     "@prisma/engines",
     "@sentry/cli",

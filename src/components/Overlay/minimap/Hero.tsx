@@ -51,7 +51,6 @@ function Hero({ data, team }: MinimapUnitProps) {
       {!(isBrewmaster && hasBrewlings) && (
         <>
           {displayType === 'custom' && (
-            // Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
             <img
               title={data.name}
               alt='hero icon'
@@ -62,7 +61,6 @@ function Hero({ data, team }: MinimapUnitProps) {
               src={pointerIcon}
             />
           )}
-          {/* Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
           <img
             title={data.name}
             alt='hero icon'

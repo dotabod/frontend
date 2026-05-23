@@ -199,7 +199,6 @@ export const DevControls = ({
       }}
       className='flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
     >
-      {/* Biome-ignore lint/a11y/useSemanticElements: Draggable handle for window positioning */}
       <div
         role='button'
         tabIndex={0}

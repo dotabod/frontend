@@ -133,7 +133,6 @@ const AlbumArtImage = ({
   const src = imageError || !isValidImageUrl(albumArt) ? FALLBACK_IMAGE : albumArt
 
   return (
-    // Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
     <motion.img
       src={src}
       alt={`${album || 'Album'} cover`}

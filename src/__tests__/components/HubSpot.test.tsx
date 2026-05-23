@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 vi.mock('next/script', () => ({
   default: ({ src, id }: { src?: string; id?: string }) => (
+    // oxlint-disable-next-line nextjs/no-sync-scripts -- mocking next/script for tests
     <script data-testid='hs-script' id={id} src={src} />
   ),
 }))
@@ -13,7 +14,6 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import HubSpot from '@/components/HubSpot'
 
-// Biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
 const anyVal = (v: unknown) => v as any
 
 const widget = {

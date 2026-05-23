@@ -27,7 +27,6 @@ export default class MyDocument extends Document {
       styles: (
         <>
           {initialProps.styles}
-          {/* Biome-ignore lint/security/noDangerouslySetInnerHtml: required for antd cssinjs */}
           <style data-type='antd-cssinjs' dangerouslySetInnerHTML={{ __html: style }} />
         </>
       ),

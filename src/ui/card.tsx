@@ -21,7 +21,6 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
   const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
   return (
-    // Biome-ignore lint/a11y/useSemanticElements: Container with hover/focus behavior for locked feature overlay
     <div
       role='button'
       tabIndex={0}

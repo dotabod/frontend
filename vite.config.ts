@@ -3,18 +3,14 @@ import { defineConfig } from 'vite-plus'
 export default defineConfig({
   fmt: {
     jsxSingleQuote: true,
+    printWidth: 100,
     semi: false,
     singleQuote: true,
+    trailingComma: 'all',
   },
   lint: {
     categories: {
       correctness: 'error',
-      // nursery: 'warn',
-      // pedantic: 'warn',
-      // perf: 'warn',
-      // restriction: 'warn',
-      // style: 'warn',
-      // suspicious: 'warn',
     },
     env: {
       builtin: true,
@@ -33,7 +29,7 @@ export default defineConfig({
       respectEslintDisableDirectives: true,
       reportUnusedDisableDirectives: 'error',
     },
-    plugins: ['typescript', 'unicorn', 'oxc'],
+    plugins: ['typescript', 'unicorn', 'oxc', 'react', 'jsx-a11y', 'react-perf', 'nextjs'],
     rules: {
       'no-unused-vars': [
         'error',
@@ -44,6 +40,10 @@ export default defineConfig({
           varsIgnorePattern: '^_',
         },
       ],
+      'jsx-a11y/prefer-tag-over-role': 'off',
+      'nextjs/no-img-element': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'typescript/no-explicit-any': 'error',
       'vite-plus/prefer-vite-plus-imports': 'error',
     },
     overrides: [
@@ -55,6 +55,7 @@ export default defineConfig({
           'typescript/no-base-to-string': 'off',
           'typescript/restrict-template-expressions': 'off',
           'typescript/no-misused-spread': 'off',
+          'typescript/no-explicit-any': 'off',
         },
       },
       {

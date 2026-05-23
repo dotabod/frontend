@@ -21,11 +21,9 @@ const res = (body: unknown = {}, status = 200) =>
     status,
     statusText: 'OK',
     json: async () => body,
-    // Biome-ignore lint/suspicious/noExplicitAny: minimal fetch Response stub for tests
   }) as any
 
 const isUrl = (call: unknown[], suffix: string) => String(call[0]).endsWith(suffix)
-// Biome-ignore lint/suspicious/noExplicitAny: reading the stringified request body
 const bodyOf = (call: unknown[]) => JSON.parse((call[1] as any).body)
 
 describe('lib/hubspot', () => {

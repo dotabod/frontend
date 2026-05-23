@@ -17,7 +17,6 @@ import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import handler from '@/pages/api/hubspot/visitor-token'
 import { getSubscription } from '@/utils/subscription'
 
-// biome-ignore lint/suspicious/noExplicitAny: minimal stubs for test doubles
 const anyVal = (v: unknown) => v as any
 
 const tokenOk = () =>

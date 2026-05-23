@@ -235,6 +235,7 @@ const PageContent = ({
 
   return (
     <>
+      {/* oxlint-disable-next-line nextjs/no-duplicate-head -- conditional render path, only one Head per render */}
       <Head>
         <title>{`${finalLoading || !profile?.displayName ? '...' : profile.displayName}'s Dota 2 Commands — Dotabod`}</title>
         <meta
@@ -261,7 +262,6 @@ const PageContent = ({
                   profile?.stream_online ? 'animate-pulse bg-red-500/30' : 'bg-gray-600/10'
                 }`}
               />
-              {/* Biome-ignore lint/performance/noImgElement: Dynamic image with onError fallback, not compatible with next/image */}
               <img
                 onError={(e) => {
                   e.currentTarget.src = '/images/hero/default.png'

@@ -83,7 +83,6 @@ export const FindMatch = () => {
       >
         {isFindingMatchEnabled && <MatchTimer res={res} />}
 
-        {/* Biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
         <img
           id='find-match-queue-blocker-bg'
           width={res({ w: 840 })}
