@@ -93,34 +93,45 @@ function ensureContactProperties(token: string) {
 
 // Best-effort: never throws, so it can't break the visitor-token response.
 // `subscription` is optional: when omitted (e.g. the tier lookup failed) we leave
-// The existing dotabod_subscription value untouched rather than overwriting it.
+// the existing dotabod_subscription value untouched rather than overwriting it.
 export async function syncHubSpotContact(
   token: string,
   { email, username, subscription }: { email: string; username: string; subscription?: string },
 ) {
   try {
     await ensureContactProperties(token)
-    // Upsert by email so a brand-new contact (not yet indexed from the visitor
-    // Identification call) is created rather than 404ing on a plain update.
-    const res = await fetch(`${CRM_BASE}/objects/contacts/batch/upsert`, {
-      body: JSON.stringify({
-        inputs: [
-          {
-            id: email,
-            idProperty: 'email',
-            properties: {
-              twitch_username: username,
-              ...(subscription ? { dotabod_subscription: subscription } : {}),
-            },
-          },
-        ],
-      }),
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      method: 'POST',
-    })
-    if (!res.ok) {
-      throw new Error(`Failed to upsert HubSpot contact: ${res.status} ${res.statusText}`)
+    const properties = {
+      twitch_username: username,
+      ...(subscription ? { dotabod_subscription: subscription } : {}),
     }
+    // PATCH by email supports partial updates; batch/upsert with idProperty=email
+    // does not and returns 409 for any existing contact.
+    const patchRes = await fetch(
+      `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`,
+      {
+        body: JSON.stringify({ properties }),
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        method: 'PATCH',
+      },
+    )
+    if (patchRes.ok) {
+      return
+    }
+    // Contact doesn't exist yet (visitor-identification didn't create one) — create it.
+    if (patchRes.status === 404) {
+      const createRes = await fetch(`${CRM_BASE}/objects/contacts`, {
+        body: JSON.stringify({ properties: { email, ...properties } }),
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      if (!createRes.ok) {
+        throw new Error(
+          `Failed to create HubSpot contact: ${createRes.status} ${createRes.statusText}`,
+        )
+      }
+      return
+    }
+    throw new Error(`Failed to update HubSpot contact: ${patchRes.status} ${patchRes.statusText}`)
   } catch (error) {
     captureException(error instanceof Error ? error : new Error(String(error)))
   }
