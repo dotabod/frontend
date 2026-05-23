@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion'
-import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import { type PollData, PollOverlay } from '@/components/Overlay/PollOverlay'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
@@ -28,24 +28,10 @@ export const PollOverlays = ({
   setBetData,
 }: PollOverlaysProps) => {
   const res = useTransformRes()
-  const [isVisible, setIsVisible] = useState(true)
   const { data: isEnabled } = useUpdateSetting(Settings.livePolls)
   const { data: isWinProbEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
 
-  useEffect(() => {
-    if (pollData || betData) {
-      setIsVisible(true)
-      const timer = setTimeout(() => {
-        setIsVisible(false)
-        setPollData(null)
-        setBetData(null)
-      }, 30_000) // 30 seconds
-
-      return () => clearTimeout(timer)
-    }
-  }, [pollData, betData, setPollData, setBetData])
-
-  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled) || !isVisible) {
+  if (!isEnabled || (!pollData && !betData && !isWinProbEnabled)) {
     return null
   }
 
