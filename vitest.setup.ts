@@ -13,19 +13,18 @@ vi.mock('framer-motion', () => ({
 
 // Mock the Prisma Mongo client
 vi.mock('.prisma-mongo/client', () => {
-  const mockPrismaMongoClient = vi.fn(() => ({
-    $disconnect: vi.fn().mockResolvedValue(undefined),
-    cards: {
+  function MockPrismaMongoClient(this: Record<string, unknown>) {
+    this.$disconnect = vi.fn().mockResolvedValue(undefined)
+    this.cards = {
       findUnique: vi.fn().mockResolvedValue({ id: 'mock-card-id' }),
-    },
-    notablePlayers: {
+    }
+    this.notablePlayers = {
       findUnique: vi.fn().mockResolvedValue({ id: 'mock-player-id' }),
-    },
-    // Add other methods as needed
-  }))
+    }
+  }
 
   return {
-    PrismaClient: mockPrismaMongoClient,
+    PrismaClient: MockPrismaMongoClient,
   }
 })
 

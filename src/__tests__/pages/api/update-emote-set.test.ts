@@ -42,10 +42,11 @@ vi.mock('@/lib/7tv', () => ({
 // Mock GraphQL client and gql
 vi.mock('graphql-request', () => {
   const mockRequest = vi.fn()
+  function MockGraphQLClient(this: { request: typeof mockRequest }) {
+    this.request = mockRequest
+  }
   return {
-    GraphQLClient: vi.fn().mockImplementation(() => ({
-      request: mockRequest,
-    })),
+    GraphQLClient: vi.fn(MockGraphQLClient),
     gql: (query) => query,
   }
 })
@@ -106,12 +107,9 @@ describe('update-emote-set API', () => {
 
     // Reset the mock request function
     mockRequest = vi.fn()
-    vi.mocked(GraphQLClient).mockImplementation(
-      () =>
-        ({
-          request: mockRequest,
-        }) as unknown as GraphQLClient,
-    )
+    vi.mocked(GraphQLClient).mockImplementation(function (this: { request: typeof mockRequest }) {
+      this.request = mockRequest
+    } as unknown as new () => GraphQLClient)
   })
 
   afterEach(() => {
