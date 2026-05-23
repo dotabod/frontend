@@ -34,6 +34,20 @@ export default function NotablePlayersCard() {
               label='Show country flags in !np twitch chat command'
             />
           </div>
+          <div className='flex items-center'>
+            <TierSwitch
+              hideTierBadge
+              settingKey={Settings.streamersNpSuffix}
+              label='Append count of other Dotabod streamers to !np (anonymized, no names)'
+            />
+          </div>
+          <div className='flex items-center'>
+            <TierSwitch
+              hideTierBadge
+              settingKey={Settings.streamersAnnounce}
+              label='Announce the count of other Dotabod streamers in chat at match start'
+            />
+          </div>
         </div>
       </div>
       <div

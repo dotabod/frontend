@@ -443,6 +443,22 @@ const CommandDetail: Record<
     allowed: 'all',
     response: (props) => <TwitchChat {...props} command='!ping' response='Pong EZ Clap' />,
   },
+  commandStreamers: {
+    key: 'commandStreamers',
+    title: 'Streamers in match',
+    description:
+      'Anonymously tells chat how many other Dotabod streamers are in your current match. No names are shown to avoid cross-chat drama.',
+    cmd: '!streamers',
+    alias: [],
+    allowed: 'all',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!streamers'
+        response='Playing with 2 other Dotabod streamers Okayge'
+      />
+    ),
+  },
   commandDotabod: {
     title: 'About',
     description: "Tell everyone about the new bot you're using!",

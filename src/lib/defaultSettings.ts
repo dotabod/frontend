@@ -55,6 +55,7 @@ export const commands = {
   commandFriends: false,
   commandTest: false,
   commandCount: false,
+  commandStreamers: true,
 }
 export type CommandKeys = keyof typeof commands
 
@@ -148,6 +149,8 @@ export const defaultSettings = {
   notablePlayersOverlay: true,
   notablePlayersOverlayFlags: true,
   notablePlayersOverlayFlagsCmd: true,
+  streamersNpSuffix: false,
+  streamersAnnounce: false,
   winProbabilityOverlay: false,
   winProbabilityOverlayIntervalMinutes: 5,
   tellChatNewMMR: true,
