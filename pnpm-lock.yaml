@@ -4,10 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
-
 importers:
 
   .:
@@ -111,6 +107,9 @@ importers:
       next-mdx-remote:
         specifier: ^6.0.0
         version: 6.0.0(@types/react@19.2.15)(react@19.1.0)
+      node-fetch:
+        specifier: ^2.7.0
+        version: 2.7.0
       obs-websocket-js:
         specifier: ^5.0.7
         version: 5.0.8
@@ -4570,7 +4569,7 @@ packages:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   twitch-fetcher@https://codeload.github.com/dotabod/twitch-fetcher/tar.gz/bbb25d2c185390f3343679bc928cba24bcf0394c:
-    resolution: {tarball: https://codeload.github.com/dotabod/twitch-fetcher/tar.gz/bbb25d2c185390f3343679bc928cba24bcf0394c}
+    resolution: {gitHosted: true, integrity: sha512-0NnCpKmOca4/hSJSMp1nGAqbQ3j45nx7RYbQkNX5aL0x3+cXwvPfxOq2lwX8CATCLIv/rZe0W6TmRr3pN0ON4g==, tarball: https://codeload.github.com/dotabod/twitch-fetcher/tar.gz/bbb25d2c185390f3343679bc928cba24bcf0394c}
     version: 1.2.1
 
   type-fest@0.7.1:

@@ -64,6 +64,7 @@
     "next": "^16.2.6",
     "next-auth": "4.24.14",
     "next-mdx-remote": "^6.0.0",
+    "node-fetch": "^2.7.0",
     "obs-websocket-js": "^5.0.7",
     "opennode": "^1.5.0",
     "postcss-focus-visible": "^10.0.1",
@@ -109,19 +110,9 @@
     "vite-plus": "latest",
     "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
   },
-  "browserslist": "defaults, not ie <= 11",
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
-    }
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
   },
-  "trustedDependencies": [
-    "@prisma/client",
-    "@prisma/engines",
-    "@sentry/cli",
-    "esbuild",
-    "prisma",
-    "sharp"
-  ]
+  "browserslist": "defaults, not ie <= 11"
 }
