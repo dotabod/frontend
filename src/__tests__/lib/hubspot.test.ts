@@ -47,7 +47,10 @@ describe('lib/hubspot', () => {
   })
 
   describe('syncHubSpotContact', () => {
-    it('creates both properties and upserts the contact by email with the subscription', async () => {
+    const PATCH_SUFFIX = `/objects/contacts/${encodeURIComponent('a@b.com')}?idProperty=email`
+    const isPatch = (call: unknown[]) => isUrl(call, PATCH_SUFFIX)
+
+    it('creates both properties and patches the contact by email with the subscription', async () => {
       const { fetchMock, syncHubSpotContact } = await load()
       fetchMock.mockResolvedValue(res())
 
@@ -56,11 +59,10 @@ describe('lib/hubspot', () => {
       const propertyCalls = fetchMock.mock.calls.filter((c) => isUrl(c, '/properties/contacts'))
       expect(propertyCalls).toHaveLength(2)
 
-      const upsert = fetchMock.mock.calls.find((c) => isUrl(c, '/contacts/batch/upsert'))
-      expect(upsert).toBeDefined()
-      expect(bodyOf(upsert as unknown[]).inputs[0]).toMatchObject({
-        id: 'a@b.com',
-        idProperty: 'email',
+      const patch = fetchMock.mock.calls.find(isPatch)
+      expect(patch).toBeDefined()
+      expect((patch as unknown[])[1]).toMatchObject({ method: 'PATCH' })
+      expect(bodyOf(patch as unknown[])).toEqual({
         properties: { dotabod_subscription: 'pro', twitch_username: 'gamer' },
       })
     })
@@ -71,13 +73,13 @@ describe('lib/hubspot', () => {
 
       await syncHubSpotContact('tok', { email: 'a@b.com', username: 'gamer' })
 
-      const upsert = fetchMock.mock.calls.find((c) => isUrl(c, '/contacts/batch/upsert'))
-      expect(bodyOf(upsert as unknown[]).inputs[0].properties).toEqual({
+      const patch = fetchMock.mock.calls.find(isPatch)
+      expect(bodyOf(patch as unknown[]).properties).toEqual({
         twitch_username: 'gamer',
       })
     })
 
-    it('treats a 409 on property creation as success and still upserts', async () => {
+    it('treats a 409 on property creation as success and still patches', async () => {
       const { fetchMock, syncHubSpotContact } = await load()
       fetchMock.mockImplementation(async (url: unknown) =>
         String(url).endsWith('/properties/contacts') ? res({}, 409) : res(),
@@ -85,13 +87,32 @@ describe('lib/hubspot', () => {
 
       await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' })
 
-      expect(fetchMock.mock.calls.some((c) => isUrl(c, '/contacts/batch/upsert'))).toBe(true)
+      expect(fetchMock.mock.calls.some(isPatch)).toBe(true)
     })
 
-    it('never throws and reports to Sentry when the upsert fails', async () => {
+    it('falls back to creating the contact when PATCH returns 404', async () => {
+      const { fetchMock, syncHubSpotContact } = await load()
+      fetchMock.mockImplementation(async (url: unknown) =>
+        String(url).endsWith(PATCH_SUFFIX) ? res({}, 404) : res(),
+      )
+
+      await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'gamer' })
+
+      const create = fetchMock.mock.calls.find(
+        (c) => isUrl(c, '/objects/contacts') && (c[1] as { method?: string }).method === 'POST',
+      )
+      expect(create).toBeDefined()
+      expect(bodyOf(create as unknown[]).properties).toMatchObject({
+        email: 'a@b.com',
+        dotabod_subscription: 'pro',
+        twitch_username: 'gamer',
+      })
+    })
+
+    it('never throws and reports to Sentry when the patch fails', async () => {
       const { fetchMock, captureException, syncHubSpotContact } = await load()
       fetchMock.mockImplementation(async (url: unknown) =>
-        String(url).endsWith('/contacts/batch/upsert') ? res({}, 500) : res(),
+        String(url).endsWith(PATCH_SUFFIX) ? res({}, 500) : res(),
       )
 
       await expect(

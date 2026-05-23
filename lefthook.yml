@@ -1,17 +1,16 @@
 pre-commit:
+  piped: true
   commands:
     fmt:
       run: |
         npx vp fmt {staged_files} \
           && git add {staged_files}
-    lint:
+    lint-fix:
       glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
       run: |
         npx vp lint --fix {staged_files} \
-          && git add {staged_files} \
-          && npx vp lint {staged_files}
-pre-push:
-  commands:
-    lint:
-      glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
-      run: npx vp lint {push_files}
+          && git add {staged_files}
+    check:
+      run: npx vp check
+    test:
+      run: npx vp test run
