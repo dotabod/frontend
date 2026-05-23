@@ -19,6 +19,21 @@ type LastFmImage = {
   '#text': string
 }
 
+// Last.fm's JSON API returns track/artist/album names with HTML-encoded
+// entities (e.g. "&#39;" for "'"). JSX renders strings as textContent, so
+// without decoding the overlay would show the literal "Everybody&#39;s".
+const decodeHtmlEntities = (s: string): string =>
+  s
+    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+
 type LastFmResponse = {
   error?: number
   recenttracks?: {
@@ -51,9 +66,9 @@ export function parseLastFmResponse(data: LastFmResponse): LastFmTrackType | nul
   const albumArt = albumArtUrl?.includes(LASTFM_PLACEHOLDER_HASH) ? null : albumArtUrl
 
   return {
-    artist: recentTrack.artist['#text'],
-    title: recentTrack.name,
-    album: recentTrack.album['#text'],
+    artist: decodeHtmlEntities(recentTrack.artist['#text']),
+    title: decodeHtmlEntities(recentTrack.name),
+    album: decodeHtmlEntities(recentTrack.album['#text']),
     albumArt,
     url: recentTrack.url,
   }
