@@ -28,7 +28,7 @@ export const useOBS = ({ connected, block }: { connected: boolean; block: blockT
     console.log('Connected to socket! Running OBS scene switchers')
 
     // Only run in OBS browser source
-    if (!hasSceneSwitcher || typeof window !== 'object' || !window?.obsstudio) return
+    if (typeof window !== 'object' || !window?.obsstudio) return
 
     window.obsstudio.getCurrentScene((scene) => {
       const myScenes = [minimapName, picksName, dcName]
@@ -53,5 +53,5 @@ export const useOBS = ({ connected, block }: { connected: boolean; block: blockT
         return
       }
     })
-  }, [connected, block.type])
+  }, [connected, block.type, userId, hasSceneSwitcher, minimapName, picksName, dcName])
 }

@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": ["public/styles/obs-compat.css"],
-  "ignoreBinaries": ["doppler"]
+  "ignoreBinaries": ["doppler"],
+  "entry": ["scripts/**/*.{ts,mjs}"]
 }

@@ -33,27 +33,21 @@ function InstallPage() {
   }, [router.query.gsiType])
 
   useEffect(() => {
-    const determinePlatform = () => {
+    if (!router.isReady || router.query.gsiType) return
+
+    const platform =
       // @ts-expect-error userAgentData is not yet in the TS types
-      if (navigator.userAgentData?.platform) {
-        // @ts-expect-error userAgentData is not yet in the TS types
-        return navigator.userAgentData.platform.toLowerCase()
-      }
+      navigator.userAgentData?.platform?.toLowerCase() ?? navigator.userAgent.toLowerCase()
 
-      // Fallback to userAgent if userAgentData is not available
-      return navigator.userAgent.toLowerCase()
+    if (platform.includes('win')) {
+      updateUrlWithGsiType('windows')
+    } else {
+      updateUrlWithGsiType('manual')
+      setAutoRoutedToManual(true)
     }
-
-    if (!router.query.gsiType) {
-      const platform = determinePlatform()
-      if (platform.includes('win')) {
-        updateUrlWithGsiType('windows')
-      } else {
-        updateUrlWithGsiType('manual')
-        setAutoRoutedToManual(true)
-      }
-    }
-  }, [])
+    // updateUrlWithGsiType is stable enough; depending on router.isReady ensures
+    // we only auto-route after Next.js has hydrated the query.
+  }, [router.isReady, router.query.gsiType])
 
   return (
     <Card>

@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
-export interface DisableNotification {
+interface DisableNotification {
   id: string
   userId: string
   settingKey: string

@@ -1,7 +1,7 @@
 import { Typography } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -104,6 +104,45 @@ const ScrollingText = ({ text, className }: { text: string; className?: string }
   )
 }
 
+const FALLBACK_IMAGE = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
+
+const isValidImageUrl = (url?: string | null) =>
+  Boolean(url) && (url?.startsWith('http://') || url?.startsWith('https://'))
+
+const AlbumArtImage = ({
+  albumArt,
+  album,
+  imageSize,
+}: {
+  albumArt: string
+  album?: string
+  imageSize: number
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
+  const src = imageError || !isValidImageUrl(albumArt) ? FALLBACK_IMAGE : albumArt
+
+  return (
+    // biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image
+    <motion.img
+      src={src}
+      alt={`${album || 'Album'} cover`}
+      width={imageSize}
+      height={imageSize}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: imageLoaded ? 1 : 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className='rounded object-cover rounded-sm'
+      onError={() => {
+        setImageError(true)
+        setImageLoaded(true)
+      }}
+      onLoad={() => setImageLoaded(true)}
+    />
+  )
+}
+
 const LastFmCard = ({
   mainScreen = false,
   track,
@@ -112,37 +151,8 @@ const LastFmCard = ({
 }: LastFmCardProps) => {
   const { data: isEnabled } = useUpdateSetting(Settings.lastFmOverlay)
   const res = useTransformRes()
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
   const fontSize = res({ h: 14 })
   const imageSize = res({ h: 54 })
-  const fallbackImage = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
-  const prevAlbumArtRef = useRef<string | null>('')
-
-  // Function to verify if the URL is valid
-  const isValidImageUrl = useCallback((url?: string | null) => {
-    if (!url) return false
-    return url.startsWith('http://') || url.startsWith('https://')
-  }, [])
-
-  // Function to decide what image src to use
-  const getImageSrc = useCallback(() => {
-    const src: string =
-      imageError || !isValidImageUrl(track?.albumArt ?? null)
-        ? fallbackImage
-        : (track?.albumArt ?? fallbackImage)
-    console.log('Calculated image src:', src)
-    return src
-  }, [imageError, isValidImageUrl, track?.albumArt])
-
-  useEffect(() => {
-    // Reset image states when album art changes
-    if (track?.albumArt !== prevAlbumArtRef.current) {
-      prevAlbumArtRef.current = track?.albumArt ?? null
-      setImageLoaded(false)
-      setImageError(false)
-    }
-  }, [track])
 
   if (!isEnabled || !track) return null
 
@@ -182,22 +192,11 @@ const LastFmCard = ({
           >
             {track.albumArt && (
               <div className='relative'>
-                {/* biome-ignore lint/performance/noImgElement: Overlay rendered in OBS browser source, not optimizable by next/image */}
-                <motion.img
-                  src={getImageSrc()}
-                  alt={`${track.album || 'Album'} cover`}
-                  width={imageSize}
-                  height={imageSize}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: imageLoaded ? 1 : 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className='rounded object-cover rounded-sm'
-                  onError={() => {
-                    setImageError(true)
-                    setImageLoaded(true)
-                  }}
-                  onLoad={() => setImageLoaded(true)}
+                <AlbumArtImage
+                  key={track.albumArt}
+                  albumArt={track.albumArt}
+                  album={track.album}
+                  imageSize={imageSize}
                 />
               </div>
             )}

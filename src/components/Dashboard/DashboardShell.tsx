@@ -187,7 +187,7 @@ export default function DashboardShell({
         })
       }
     }
-  }, [])
+  }, [hasAutoModeratorAccess])
 
   // Update selected menu item and open parent menu when route changes
   useEffect(() => {
