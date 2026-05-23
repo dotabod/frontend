@@ -21,19 +21,19 @@ cp .env.example .env
 1. Install dependencies
 
 ```bash
-bun install
+pnpm install
 ```
 
 1. Setup your postgres database
 
 ```bash
-bun prisma db push
+pnpm prisma db push
 ```
 
 1. Start the development server
 
 ```bash
-bun run dev
+pnpm dev
 ```
 
 1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

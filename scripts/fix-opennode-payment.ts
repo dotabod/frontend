@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S pnpm dlx tsx
 
 /**
  * Recovery script for failed OpenNode crypto payments
@@ -8,10 +8,10 @@
  * errors in the webhook handler.
  *
  * Usage:
- *   doppler run -- bun run scripts/fix-opennode-payment.ts                      # Auto-discover and fix interactively
- *   doppler run -- bun run scripts/fix-opennode-payment.ts <invoice_id>         # Fix specific invoice
- *   doppler run -- bun run scripts/fix-opennode-payment.ts --charge-id <id>     # Fix specific charge
- *   doppler run -- bun run scripts/fix-opennode-payment.ts --dry-run            # Show what would be fixed
+ *   doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts                      # Auto-discover and fix interactively
+ *   doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts <invoice_id>         # Fix specific invoice
+ *   doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts --charge-id <id>     # Fix specific charge
+ *   doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts --dry-run            # Show what would be fixed
  */
 
 import * as readline from 'node:readline'
@@ -279,7 +279,7 @@ async function runDiscoveryMode(): Promise<void> {
     console.log('='.repeat(80))
     console.log()
     console.log('To fix these charges, run without --dry-run:')
-    console.log('  doppler run -- bun run scripts/fix-opennode-payment.ts')
+    console.log('  doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts')
     console.log()
     return
   }

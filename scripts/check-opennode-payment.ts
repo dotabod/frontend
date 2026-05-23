@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S pnpm dlx tsx
 
 /**
  * Diagnostic script for OpenNode crypto payments
@@ -7,9 +7,9 @@
  * Use it to diagnose payment issues and see what needs to be done.
  *
  * Usage:
- *   doppler run -- bun run scripts/check-opennode-payment.ts                      # Auto-discover all problematic charges
- *   doppler run -- bun run scripts/check-opennode-payment.ts <invoice_id>         # Check specific invoice
- *   doppler run -- bun run scripts/check-opennode-payment.ts --charge-id <id>     # Check specific charge
+ *   doppler run -- pnpm dlx tsx scripts/check-opennode-payment.ts                      # Auto-discover all problematic charges
+ *   doppler run -- pnpm dlx tsx scripts/check-opennode-payment.ts <invoice_id>         # Check specific invoice
+ *   doppler run -- pnpm dlx tsx scripts/check-opennode-payment.ts --charge-id <id>     # Check specific charge
  */
 
 import type { OpenNodeCharge } from '@prisma/client'
@@ -133,16 +133,16 @@ async function showDiscoverySummary(): Promise<void> {
   console.log('='.repeat(80))
   console.log()
   console.log('To fix all charges interactively:')
-  console.log('  doppler run -- bun run scripts/fix-opennode-payment.ts')
+  console.log('  doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts')
   console.log()
   console.log('To fix a specific charge:')
   console.log(
-    `  doppler run -- bun run scripts/fix-opennode-payment.ts ${chargesToFix[0].charge.stripeInvoiceId}`,
+    `  doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts ${chargesToFix[0].charge.stripeInvoiceId}`,
   )
   console.log()
   console.log('To check a specific charge in detail:')
   console.log(
-    `  doppler run -- bun run scripts/check-opennode-payment.ts ${chargesToFix[0].charge.stripeInvoiceId}`,
+    `  doppler run -- pnpm dlx tsx scripts/check-opennode-payment.ts ${chargesToFix[0].charge.stripeInvoiceId}`,
   )
   console.log()
 }
@@ -380,14 +380,14 @@ async function checkSingleCharge(): Promise<void> {
     console.log()
     console.log('  # Dry run (safe, no changes):')
     console.log(
-      `  doppler run -- bun run scripts/fix-opennode-payment.ts --dry-run ${
+      `  doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts --dry-run ${
         charge.stripeInvoiceId
       }`,
     )
     console.log()
     console.log('  # Actual fix:')
     console.log(
-      `  doppler run -- bun run scripts/fix-opennode-payment.ts ${charge.stripeInvoiceId}`,
+      `  doppler run -- pnpm dlx tsx scripts/fix-opennode-payment.ts ${charge.stripeInvoiceId}`,
     )
     console.log()
   }

@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 
-- Dev server: `doppler run -- next dev` or `bun run dev`
-- Build: `bun run build-local`
-- Lint: `bun run lint`
-- Run all tests: `bun run test`
-- Run specific test: `bun run vitest run <test file or pattern>`
-- Watch tests: `bun run test:watch`
-- Test coverage: `bun run test:coverage`
+- Dev server: `doppler run -- next dev` or `pnpm dev`
+- Build: `pnpm build-local`
+- Lint: `pnpm lint`
+- Run all tests: `pnpm test`
+- Run specific test: `pnpm exec vitest run <test file or pattern>`
+- Watch tests: `pnpm test:watch`
+- Test coverage: `pnpm test:coverage`
 
 ## Code Style
 
 - TypeScript for all code with strict typing
-- Follow Biome formatting rules: 2-space indentation, single quotes, avoid semicolons
+- Formatting/linting via Vite+ (oxfmt + oxlint): 2-space indentation, single quotes, avoid semicolons. Run `pnpm exec vp check` (or `vp check --fix`).
 - Use React functional components with hooks
 - Use `@/` imports with paths configured in tsconfig.json
 - Follow mobile-first responsive design with Tailwind CSS
