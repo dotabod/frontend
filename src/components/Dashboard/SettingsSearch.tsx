@@ -4,7 +4,13 @@ import { Empty, Input, type InputRef, List, Popover, Typography } from 'antd'
 import clsx from 'clsx'
 import { ChevronRight, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  type KeyboardEvent as ReactKeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { getSearchableText, type SettingMetadata, settingsMetadata } from '@/lib/settingsMetadata'
 
 interface SearchResult extends SettingMetadata {
@@ -146,47 +152,43 @@ export function SettingsSearch() {
     })
   }
 
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return
+  const handleInputKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen) return
 
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault()
-          isKeyboardNavigationRef.current = true
-          setSelectedIndex((prev) => (prev + 1) % searchResults.length)
-          // Clear the flag after a short delay to allow scroll to complete
-          setTimeout(() => {
-            isKeyboardNavigationRef.current = false
-          }, 100)
-          break
-        case 'ArrowUp':
-          e.preventDefault()
-          isKeyboardNavigationRef.current = true
-          setSelectedIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length)
-          // Clear the flag after a short delay to allow scroll to complete
-          setTimeout(() => {
-            isKeyboardNavigationRef.current = false
-          }, 100)
-          break
-        case 'Enter':
-          e.preventDefault()
-          if (searchResults[selectedIndex]) {
-            navigateToSetting(searchResults[selectedIndex])
-          }
-          break
-        case 'Escape':
-          e.preventDefault()
-          setIsOpen(false)
-          searchInputRef.current?.blur()
-          break
-      }
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        isKeyboardNavigationRef.current = true
+        setSelectedIndex((prev) =>
+          searchResults.length === 0 ? 0 : (prev + 1) % searchResults.length,
+        )
+        setTimeout(() => {
+          isKeyboardNavigationRef.current = false
+        }, 100)
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        isKeyboardNavigationRef.current = true
+        setSelectedIndex((prev) =>
+          searchResults.length === 0 ? 0 : (prev - 1 + searchResults.length) % searchResults.length,
+        )
+        setTimeout(() => {
+          isKeyboardNavigationRef.current = false
+        }, 100)
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (searchResults[selectedIndex]) {
+          navigateToSetting(searchResults[selectedIndex])
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        setIsOpen(false)
+        searchInputRef.current?.blur()
+        break
     }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, searchResults, selectedIndex])
+  }
 
   // Handle click outside - simplified since Popover handles this
   useEffect(() => {
@@ -200,11 +202,6 @@ export function SettingsSearch() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen, query])
-
-  // Reset selected index when results change
-  useEffect(() => {
-    setSelectedIndex(0)
-  }, [searchResults])
 
   // Scroll selected item into view when selectedIndex changes
   useEffect(() => {
@@ -342,9 +339,11 @@ export function SettingsSearch() {
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
+            setSelectedIndex(0)
             setIsOpen(true)
           }}
           onFocus={() => setIsOpen(true)}
+          onKeyDown={handleInputKeyDown}
           placeholder='Search settings... (⌘K)'
           size='large'
           style={{

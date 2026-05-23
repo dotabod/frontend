@@ -1,9 +1,15 @@
 import { StarOutlined } from '@ant-design/icons'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
-import { gracePeriodPrettyDate, type PricePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
+import {
+  getCurrentPeriod,
+  gracePeriodPrettyDate,
+  isSubscriptionActive,
+  type PricePeriod,
+  SUBSCRIPTION_TIERS,
+} from '@/utils/subscription'
 import Plan from '../Plan'
 import { SubscriptionStatus } from '../Subscription/SubscriptionStatus'
 import { PeriodToggle } from './PeriodToggle'
@@ -98,6 +104,17 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
   const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const { data: session } = useSession()
   const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()
+  const didInitPeriod = useRef(false)
+
+  // Default the period to the active subscription's period, but only once, so a
+  // later context refresh never snaps back the user's manual selection.
+  useEffect(() => {
+    if (didInitPeriod.current) return
+    if (isSubscriptionActive({ status: subscription?.status })) {
+      didInitPeriod.current = true
+      setActivePeriod(getCurrentPeriod(subscription?.stripePriceId))
+    }
+  }, [subscription])
 
   if (session?.user?.isImpersonating) {
     return null
@@ -151,11 +168,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
 
       <Wrapper>
         <div className='mt-8 flex justify-center'>
-          <PeriodToggle
-            activePeriod={activePeriod}
-            onChange={setActivePeriod}
-            subscription={subscription}
-          />
+          <PeriodToggle activePeriod={activePeriod} onChange={setActivePeriod} />
         </div>
 
         <div className='mx-auto mt-8 grid max-w-2xl grid-cols-1 items-start gap-6 lg:max-w-5xl lg:grid-cols-2 lg:gap-8'>

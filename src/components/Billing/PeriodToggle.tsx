@@ -1,39 +1,21 @@
 import clsx from 'clsx'
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useId, useRef } from 'react'
+import { useId } from 'react'
 import { plans } from '@/components/Billing/BillingPlans'
-import {
-  calculateSavings,
-  getCurrentPeriod,
-  isSubscriptionActive,
-  type PricePeriod,
-  type SubscriptionRow,
-} from '@/utils/subscription'
+import { calculateSavings, type PricePeriod } from '@/utils/subscription'
 
 interface PeriodToggleProps {
   activePeriod: PricePeriod
   onChange: (period: PricePeriod) => void
-  subscription: SubscriptionRow | null
 }
 
 // ease-out-quint
 const EASE = [0.22, 1, 0.36, 1] as const
 
-export function PeriodToggle({ activePeriod, onChange, subscription }: PeriodToggleProps) {
+export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
   const periods: PricePeriod[] = ['monthly', 'annual', 'lifetime']
   const reduce = useReducedMotion()
   const groupId = useId()
-  const didInitPeriod = useRef(false)
-
-  // Default the period to the active subscription's period, but only once, so a
-  // later context refresh never snaps back the user's manual selection.
-  useEffect(() => {
-    if (didInitPeriod.current) return
-    if (isSubscriptionActive({ status: subscription?.status })) {
-      didInitPeriod.current = true
-      onChange(getCurrentPeriod(subscription?.stripePriceId))
-    }
-  }, [subscription, onChange])
 
   // Computed in render (not module scope) because `plans` is a circular import
   // from BillingPlans and may be uninitialised at module-eval time.

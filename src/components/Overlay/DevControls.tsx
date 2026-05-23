@@ -163,22 +163,24 @@ export const DevControls = ({
   }, [isDevMode])
 
   useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-    }
-
+    if (!isDragging) return
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
-
-      // Clear all message timeouts on unmount
-      messageTimeoutsRef.current.forEach((timeoutId) => {
-        clearTimeout(timeoutId)
-      })
-      messageTimeoutsRef.current.clear()
     }
   }, [isDragging, handleMouseMove, handleMouseUp])
+
+  useEffect(() => {
+    const timeouts = messageTimeoutsRef.current
+    return () => {
+      timeouts.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      timeouts.clear()
+    }
+  }, [])
 
   if (!isDevMode) return null
 

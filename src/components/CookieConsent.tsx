@@ -128,21 +128,15 @@ const cookieCategories = {
 export const getCookieCategories = () => cookieCategories
 
 const CookieConsent = () => {
-  const [visible, setVisible] = useState(false)
+  const [forceShow, setForceShow] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const { preferences, updatePreferences, loaded, hasConsented } = useCookiePreferences()
-
-  useEffect(() => {
-    // Show banner if user hasn't explicitly consented yet
-    if (loaded) {
-      setVisible(!hasConsented)
-    }
-  }, [loaded, hasConsented])
+  const visible = forceShow || (loaded && !hasConsented)
 
   // Listen for global events
   useEffect(() => {
     const handleShowBanner = () => {
-      setVisible(true)
+      setForceShow(true)
       setShowSettings(false)
     }
 
@@ -150,11 +144,9 @@ const CookieConsent = () => {
       setShowSettings(true)
     }
 
-    // Add event listeners
     window.addEventListener(COOKIE_EVENTS.SHOW_BANNER, handleShowBanner)
     window.addEventListener(COOKIE_EVENTS.SHOW_SETTINGS, handleShowSettings)
 
-    // Clean up
     return () => {
       window.removeEventListener(COOKIE_EVENTS.SHOW_BANNER, handleShowBanner)
       window.removeEventListener(COOKIE_EVENTS.SHOW_SETTINGS, handleShowSettings)
@@ -169,13 +161,13 @@ const CookieConsent = () => {
       preferences: true,
     }
     updatePreferences(allAccepted)
-    setVisible(false)
+    setForceShow(false)
     setShowSettings(false)
   }
 
   const handleSavePreferences = () => {
     updatePreferences(preferences)
-    setVisible(false)
+    setForceShow(false)
     setShowSettings(false)
   }
 
@@ -187,7 +179,7 @@ const CookieConsent = () => {
       preferences: false,
     }
     updatePreferences(allRejected)
-    setVisible(false)
+    setForceShow(false)
     setShowSettings(false)
   }
 
