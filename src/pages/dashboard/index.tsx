@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
+import { type ReactElement, useCallback, useEffect, useMemo } from 'react'
 import useSWR from 'swr'
 import ChatBot from '@/components/Dashboard/ChatBot'
 import ConnectSteam from '@/components/Dashboard/ConnectSteam'
@@ -113,8 +113,12 @@ const SetupPage = () => {
   ]
   const completedSignals = signals.filter((s) => s.done)
 
-  const [active, setActive] = useState(0)
   const router = useRouter()
+  const maxStepIndex = 3
+  const active = useMemo(() => {
+    const parsedStep = Number.parseInt(router.query.step as string, 10)
+    return !Number.isNaN(parsedStep) && parsedStep > 0 ? Math.min(parsedStep - 1, maxStepIndex) : 0
+  }, [router.query.step])
   const didJustPay = router.query.paid === 'true'
   // Check if payment was made with crypto
   const paidWithCrypto = router.query.crypto === 'true'
@@ -164,32 +168,16 @@ const SetupPage = () => {
   )
 
   const nextStep = useCallback(() => {
-    setActive((current) => {
-      const nextStep = current < 3 ? current + 1 : current
-      updateStepInUrl(nextStep)
-      track('setup/next_step', { from: current, to: nextStep })
-      return nextStep
-    })
-  }, [updateStepInUrl, track])
+    const next = active < maxStepIndex ? active + 1 : active
+    updateStepInUrl(next)
+    track('setup/next_step', { from: active, to: next })
+  }, [active, updateStepInUrl, track])
 
   const prevStep = useCallback(() => {
-    setActive((current) => {
-      const prevStep = current > 0 ? current - 1 : current
-      updateStepInUrl(prevStep)
-      track('setup/prev_step', { from: current, to: prevStep })
-      return prevStep
-    })
-  }, [updateStepInUrl, track])
-
-  const maxStepIndex = 3
-
-  useEffect(() => {
-    const parsedStep = Number.parseInt(router.query.step as string, 10)
-
-    setActive(
-      !Number.isNaN(parsedStep) && parsedStep > 0 ? Math.min(parsedStep - 1, maxStepIndex) : 0,
-    )
-  }, [router.query.step])
+    const prev = active > 0 ? active - 1 : active
+    updateStepInUrl(prev)
+    track('setup/prev_step', { from: active, to: prev })
+  }, [active, updateStepInUrl, track])
 
   // Standard confetti animation
   const triggerConfetti = useCallback(() => {
@@ -406,7 +394,6 @@ const SetupPage = () => {
       <Steps
         current={active}
         onChange={(newActiveStep) => {
-          setActive(newActiveStep)
           updateStepInUrl(newActiveStep)
           track('setup/change_step', { step: newActiveStep })
         }}

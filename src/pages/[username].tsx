@@ -5,11 +5,13 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import { Container } from '@/components/Container'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import prisma from '@/lib/db'
+import { fetcher } from '@/lib/fetcher'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
@@ -59,22 +61,25 @@ const PageContent = ({
   const [enabled, setEnabled] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [openCardKey, setOpenCardKey] = useState<string | null>(null)
-  const [subscriptionInfo, setSubscriptionInfo] = useState<{
-    isPro: boolean
-    isLifetime: boolean
-    isGracePeriodPro: boolean
-    inGracePeriod: boolean
-    loading: boolean
-  }>({
-    isPro: ssrSubscriptionInfo?.isPro || false,
-    isLifetime: ssrSubscriptionInfo?.isLifetime || false,
-    isGracePeriodPro: ssrSubscriptionInfo?.isGracePeriodPro || false,
-    inGracePeriod: ssrSubscriptionInfo?.inGracePeriod || false,
-    loading: !ssrSubscriptionInfo,
-  })
   const router = useRouter()
   const { username } = router.query
   const { data, loading, error, notFound } = useGetSettingsByUsername()
+
+  const shouldFetchSub = !ssrSubscriptionInfo && typeof username === 'string' && Boolean(username)
+  const { data: subData, isLoading: subLoading } = useSWR<{
+    isPro?: boolean
+    isLifetime?: boolean
+    isGracePeriodPro?: boolean
+    inGracePeriod?: boolean
+  }>(shouldFetchSub ? `/api/subscription/by-username?username=${username}` : null, fetcher)
+
+  const subscriptionInfo = {
+    isPro: ssrSubscriptionInfo?.isPro ?? subData?.isPro ?? false,
+    isLifetime: ssrSubscriptionInfo?.isLifetime ?? subData?.isLifetime ?? false,
+    isGracePeriodPro: ssrSubscriptionInfo?.isGracePeriodPro ?? subData?.isGracePeriodPro ?? false,
+    inGracePeriod: ssrSubscriptionInfo?.inGracePeriod ?? subData?.inGracePeriod ?? false,
+    loading: shouldFetchSub ? subLoading : false,
+  }
 
   // Use SSR data if available, otherwise fall back to client-side data
   const finalUserData = ssrUserData || data
@@ -89,32 +94,6 @@ const PageContent = ({
     settings?: Array<{ key: string; value: unknown }>
     error?: unknown
   }
-
-  // Fetch subscription information only if we don't have SSR data
-  useEffect(() => {
-    if (!ssrSubscriptionInfo && username && typeof username === 'string') {
-      fetch(`/api/subscription/by-username?username=${username}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setSubscriptionInfo({
-            isPro: data.isPro || false,
-            isLifetime: data.isLifetime || false,
-            isGracePeriodPro: data.isGracePeriodPro || false,
-            inGracePeriod: data.inGracePeriod || false,
-            loading: false,
-          })
-        })
-        .catch(() => {
-          setSubscriptionInfo({
-            isPro: false,
-            isLifetime: false,
-            isGracePeriodPro: false,
-            inGracePeriod: false,
-            loading: false,
-          })
-        })
-    }
-  }, [username, ssrSubscriptionInfo])
 
   useEffect(() => {
     // Only redirect to 404 if username exists in query and we've finished loading (for client-side only)

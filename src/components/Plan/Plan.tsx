@@ -143,49 +143,23 @@ function Plan({
     return isPaypalSubscription(subscription)
   }, [subscription, tier])
 
-  // A single source of truth for the chosen payment method. Card is the
-  // default; PayPal/Crypto are only pre-selected when the active subscription
-  // already uses them and the feature is enabled.
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(() => {
+  // Tracks the user's deliberate pick in the picker. When null, paymentMethod
+  // derives from the active subscription so it reflects reality even when
+  // `subscription` arrives async after first render.
+  const [userPickedMethod, setUserPickedMethod] = useState<PaymentMethod | null>(null)
+
+  const paymentMethod: PaymentMethod = (() => {
     if (tier !== SUBSCRIPTION_TIERS.PRO) return 'card'
+    if (userPickedMethod === 'paypal' && isPaypalPaymentsEnabled) return 'paypal'
+    if (userPickedMethod === 'crypto' && isCryptoPaymentsEnabled) return 'crypto'
+    if (userPickedMethod === 'card') return 'card'
+    // No user pick (or user's pick is no longer enabled) — derive from subscription
     if (isPaypalPaymentsEnabled && isPaidWithPaypal) return 'paypal'
     if (isCryptoPaymentsEnabled && isPaidWithCrypto) return 'crypto'
     return 'card'
-  })
+  })()
   const payWithCrypto = paymentMethod === 'crypto'
   const payWithPaypal = paymentMethod === 'paypal'
-  const didInitMethod = useRef(false)
-
-  // Reflect the subscription's actual payment method ONCE, after it resolves
-  // (it is often undefined on first render). Only runs once so it never clobbers
-  // a deliberate selection the user makes in the picker afterward.
-  useEffect(() => {
-    if (didInitMethod.current) return
-    if (tier !== SUBSCRIPTION_TIERS.PRO || !subscription) return
-    didInitMethod.current = true
-    if (isPaypalPaymentsEnabled && isPaidWithPaypal) {
-      setPaymentMethod('paypal')
-    } else if (isCryptoPaymentsEnabled && isPaidWithCrypto) {
-      setPaymentMethod('crypto')
-    }
-  }, [
-    tier,
-    subscription,
-    isPaidWithPaypal,
-    isPaidWithCrypto,
-    isPaypalPaymentsEnabled,
-    isCryptoPaymentsEnabled,
-  ])
-
-  // If the selected method's feature flag gets turned off, fall back to card so
-  // the user can't be stuck on a method the picker no longer offers.
-  useEffect(() => {
-    if (payWithCrypto && !isCryptoPaymentsEnabled) {
-      setPaymentMethod('card')
-    } else if (payWithPaypal && !isPaypalPaymentsEnabled) {
-      setPaymentMethod('card')
-    }
-  }, [payWithCrypto, payWithPaypal, isCryptoPaymentsEnabled, isPaypalPaymentsEnabled])
 
   const savings = calculateSavings(price.monthly, price.annual)
 
@@ -891,7 +865,7 @@ function Plan({
           (isCryptoPaymentsEnabled || isPaypalPaymentsEnabled) && (
             <PaymentMethodPicker
               value={paymentMethod}
-              onChange={setPaymentMethod}
+              onChange={setUserPickedMethod}
               activePeriod={activePeriod}
               cryptoEnabled={isCryptoPaymentsEnabled}
               paypalEnabled={isPaypalPaymentsEnabled}
