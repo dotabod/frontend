@@ -84,8 +84,8 @@ async function main() {
       where: { userId: target.id, status: { in: ['paid', 'confirmed'] } },
     }),
     prisma.nowPaymentsInvoice.findMany({
-      select: { id: true, paymentStatus: true },
-      where: { userId: target.id },
+      select: { id: true, status: true },
+      where: { userId: target.id, status: { in: ['finished', 'partially_paid', 'confirmed'] } },
     }),
     prisma.payPalSubscription.findMany({
       select: { id: true, status: true },
