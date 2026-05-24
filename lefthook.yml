@@ -13,5 +13,12 @@ pre-commit:
           && git add {staged_files}
     check:
       run: npx vp check
+    # Full project tsc — catches Prisma/generated-type errors that oxlint
+    # (`vp check`) doesn't analyze. Vercel's `next build` runs the real
+    # TypeScript compiler too; this hook surfaces the same class of error
+    # locally before it red-lights the deploy. tsc is incremental
+    # (tsconfig.json sets `incremental: true`), so warm runs are fast.
+    typecheck:
+      run: npm run typecheck
     test:
       run: npx vp test run
