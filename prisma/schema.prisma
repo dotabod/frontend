@@ -63,6 +63,9 @@ model User {
   streamStartedAt                   DateTime?
   streamTitle                       String?
   youtubeChannelId                  String?               @unique
+  bannedAt                          DateTime?             @map("banned_at") @db.Timestamptz(6)
+  bannedReason                      String?               @map("banned_reason")
+  bannedBy                          String?               @map("banned_by") @db.Uuid
   MessageDelivery                   MessageDelivery[]
   scheduledMessages                 ScheduledMessage[]
   Account                           Account?
@@ -90,6 +93,7 @@ model User {
   @@index([hideFromLeaderboard])
   @@index([lastStreamCheck])
   @@index([streamPlatform])
+  @@index([bannedAt], map: "idx_users_banned_at")
   @@map("users")
 }
 
@@ -403,24 +407,24 @@ model OpenNodeCharge {
 }
 
 model NowPaymentsInvoice {
-  id                  String    @id @default(dbgenerated("gen_random_uuid()"))
-  nowPaymentsId       String    @unique @map("nowpayments_id")
-  stripeInvoiceId     String    @unique @map("stripe_invoice_id")
-  stripeCustomerId    String    @map("stripe_customer_id")
-  userId              String    @map("user_id")
-  priceAmount         Float     @map("price_amount")
-  priceCurrency       String    @map("price_currency")
-  payCurrency         String?   @map("pay_currency")
-  payAmount           Float?    @map("pay_amount")
-  actuallyPaid        Float?    @map("actually_paid")
-  paymentId           String?   @map("payment_id")
-  status              String
-  hostedInvoiceUrl    String    @map("hosted_invoice_url")
-  metadata            Json?
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at")
-  lastWebhookAt       DateTime? @map("last_webhook_at")
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String    @id @default(dbgenerated("gen_random_uuid()"))
+  nowPaymentsId    String    @unique @map("nowpayments_id")
+  stripeInvoiceId  String    @unique @map("stripe_invoice_id")
+  stripeCustomerId String    @map("stripe_customer_id")
+  userId           String    @map("user_id")
+  priceAmount      Float     @map("price_amount")
+  priceCurrency    String    @map("price_currency")
+  payCurrency      String?   @map("pay_currency")
+  payAmount        Float?    @map("pay_amount")
+  actuallyPaid     Float?    @map("actually_paid")
+  paymentId        String?   @map("payment_id")
+  status           String
+  hostedInvoiceUrl String    @map("hosted_invoice_url")
+  metadata         Json?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+  lastWebhookAt    DateTime? @map("last_webhook_at")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([stripeInvoiceId])
   @@index([userId])

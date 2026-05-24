@@ -278,6 +278,9 @@ describe('install/[token] API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
 
     await handler(req, res)
@@ -393,6 +396,9 @@ describe('install/[token] API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
 
     await handler(req, res)

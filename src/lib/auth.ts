@@ -96,6 +96,7 @@ export const authOptions: NextAuthOptions = {
               role: true,
             },
           },
+          bannedAt: true,
           displayName: true,
           locale: true,
         },
@@ -103,6 +104,14 @@ export const authOptions: NextAuthOptions = {
           id: token.id || user.id || profile?.sub,
         },
       })
+
+      // Hard gate: a banned user cannot acquire a JWT. NextAuth surfaces a
+      // thrown error to /error?error=<message>; the error page maps
+      // ACCOUNT_BANNED to a "you're banned, contact support" copy.
+      if (provider?.bannedAt) {
+        throw new Error('ACCOUNT_BANNED')
+      }
+
       const isImpersonating = account?.provider === 'impersonate'
 
       // Check if user is logging in as a chatter by comparing scopes

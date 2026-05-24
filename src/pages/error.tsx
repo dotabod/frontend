@@ -23,6 +23,12 @@ const AuthErrorPage: NextPageWithLayout = () => {
         : router.query.error
       const decodedError = decodeURIComponent(errorParam)
 
+      if (decodedError === 'ACCOUNT_BANNED') {
+        setErrorMessage(
+          'Your Dotabod account has been suspended. If you believe this is a mistake, contact support.',
+        )
+        return
+      }
       if (decodedError === 'ACCESS_DENIED') {
         setErrorMessage('Something went wrong. You do not have permission to view this page.')
         return

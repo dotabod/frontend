@@ -110,6 +110,9 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
 
     // Mock no subscription found
@@ -172,6 +175,9 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
 
     // Mock active PRO subscription
@@ -247,6 +253,9 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
 
     // Mock lifetime PRO subscription
@@ -322,6 +331,9 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
     // Mock gift PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
@@ -401,6 +413,9 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
+      bannedAt: null,
+      bannedReason: null,
+      bannedBy: null,
     })
     // Mock FREE tier subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
