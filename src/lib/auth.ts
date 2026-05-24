@@ -6,6 +6,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
 import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
@@ -58,16 +59,26 @@ export const authOptions: NextAuthOptions = {
       const twitchProfile = profile as TwitchProfile | undefined
       const twitchUser = user as TwitchUser
 
+      // displayName MUST prefer the fresh OIDC `preferred_username` over
+      // `twitchUser.displayName` — on returning sign-ins, `twitchUser` is the
+      // existing DB row (set by NextAuth from getUserByAccount), so using it
+      // first would mask a Twitch-side rename. `preferred_username` is always
+      // the current rendered display name from this sign-in's id_token.
+      //
+      // `name` is the inverse: `preferred_username` is the *display* name
+      // (uppercase/Unicode), not the lowercase login chat/Helix require. On
+      // NEW sign-ins the TwitchProvider.profile() override fills
+      // `twitchUser.name` with the Helix `login`. On RETURNING sign-ins it's
+      // the (potentially stale) DB value — when displayName change is
+      // detected below, the prisma.user.update triggers the backend's
+      // UPDATE:users watcher, which calls /helix/users itself and reconciles
+      // both fields.
       const newUser = {
         displayName:
-          twitchProfile?.preferred_username ??
-          twitchUser.displayName ??
-          token.name ??
-          twitchUser.name ??
-          '',
+          twitchProfile?.preferred_username ?? twitchUser.displayName ?? token.name ?? '',
         email: twitchProfile?.email ?? twitchUser.email,
         image: twitchProfile?.picture ?? twitchUser.image,
-        name: twitchProfile?.preferred_username ?? twitchUser.name ?? twitchUser.displayName ?? '',
+        name: twitchUser.name ?? twitchProfile?.preferred_username?.toLowerCase() ?? '',
       }
 
       const provider = await prisma.user.findFirst({
@@ -251,35 +262,14 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  events: {
-    async signIn({ user }) {
-      if (user.id) {
-        try {
-          fetch(`${process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL}/resubscribe`, {
-            body: JSON.stringify({ token: user.id }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            method: 'POST',
-          }).catch((error) => {
-            console.error('Error calling resubscribe endpoint:', error)
-            captureException(error, {
-              extra: {
-                userId: user.id,
-              },
-            })
-          })
-        } catch (error) {
-          console.error('Error calling resubscribe endpoint:', error)
-          captureException(error, {
-            extra: {
-              userId: user.id,
-            },
-          })
-        }
-      }
-    },
-  },
+  // No `events.signIn` resubscribe hook here. The jwt() callback above writes
+  // `accounts.requires_refresh = false` on every sign-in (line ~191); when
+  // that flips from true → false the backend twitch-events watcher fires
+  // `handleNewUser`, which re-registers any missing EventSub subscriptions.
+  // The previous `fetch(.../resubscribe)` fire-and-forget HTTP call duplicated
+  // that work for the common case and was a no-op for the edge case
+  // (requires_refresh already false) because the backend's 5-min
+  // runSubscriptionHealthCheck reconciles missing subs anyway.
   pages: {
     error: '/error',
     signIn: '/login',
@@ -447,6 +437,15 @@ export const authOptions: NextAuthOptions = {
       },
       clientId: process.env.TWITCH_CLIENT_ID,
       clientSecret: process.env.TWITCH_CLIENT_SECRET,
+      // Twitch OIDC's `preferred_username` is the *display* name (uppercase,
+      // may be Unicode). The lowercase login that chat/Helix require is only
+      // available via /helix/users. Fetching it here means the User row is
+      // created with the correct `name` and `displayName` from the first
+      // INSERT — eliminating the window where the backend's twitch-events
+      // watcher had to retroactively fix the row.
+      async profile(profile, tokens) {
+        return twitchHelixProfile(profile, tokens.access_token ?? '')
+      },
     }),
   ],
   session: {
