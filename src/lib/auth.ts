@@ -6,6 +6,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { reconcileTwitchProfile } from '@/lib/reconcileTwitchProfile'
 import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
 import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
@@ -262,14 +263,30 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  // No `events.signIn` resubscribe hook here. The jwt() callback above writes
-  // `accounts.requires_refresh = false` on every sign-in (line ~191); when
-  // that flips from true → false the backend twitch-events watcher fires
-  // `handleNewUser`, which re-registers any missing EventSub subscriptions.
-  // The previous `fetch(.../resubscribe)` fire-and-forget HTTP call duplicated
-  // that work for the common case and was a no-op for the edge case
-  // (requires_refresh already false) because the backend's 5-min
-  // runSubscriptionHealthCheck reconciles missing subs anyway.
+  events: {
+    // Reconcile users.name + users.displayName against /helix/users on every
+    // sign-in. Covers the edge case the jwt() rename check misses: a user
+    // changing their Twitch login WITHOUT changing display name (OIDC's
+    // preferred_username = display name, so a login-only rename is invisible
+    // to the callback). Fire-and-forget — failures get logged + Sentry'd,
+    // but never block sign-in.
+    //
+    // (The previous events.signIn POST to /resubscribe is gone — the jwt()
+    // callback's `accounts.requires_refresh = false` write already triggers
+    // the backend twitch-events watcher when the value transitions from
+    // true, and the 5-min runSubscriptionHealthCheck reconciles missing
+    // subs for the no-transition edge case.)
+    signIn({ user, account }) {
+      if (!user.id || !account || account.provider !== 'twitch' || !account.access_token) return
+      const userId = user.id
+      reconcileTwitchProfile({ prisma, userId, accessToken: account.access_token }).catch(
+        (error) => {
+          console.error('Error reconciling twitch profile:', error)
+          captureException(error, { extra: { userId } })
+        },
+      )
+    },
+  },
   pages: {
     error: '/error',
     signIn: '/login',
