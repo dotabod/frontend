@@ -1,4 +1,5 @@
 import { captureException } from '@sentry/nextjs'
+import { waitUntil } from '@vercel/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
 import { getServerSession } from '@/lib/api/getServerSession'
@@ -79,9 +80,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Skip enrichment while impersonating: the session id is the admin's but the
   // Email/name are the impersonated user's, so writing would corrupt their contact.
   if (!session.user.isImpersonating) {
-    void enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {
-      captureException(error instanceof Error ? error : new Error(String(error)))
-    })
+    waitUntil(
+      enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {
+        captureException(error instanceof Error ? error : new Error(String(error)))
+      }),
+    )
   }
 }
 
