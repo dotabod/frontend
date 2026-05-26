@@ -15,6 +15,8 @@
 // preferred_username so signin never blocks on this — the backend will still
 // reconcile on the INSERT:accounts realtime event.
 
+import { addBreadcrumb } from '@sentry/nextjs'
+
 interface OidcProfile {
   sub?: string
   preferred_username?: string
@@ -36,6 +38,14 @@ export interface TwitchProfileUser {
   image?: string
 }
 
+function noteFallback(reason: string, extra?: Record<string, unknown>) {
+  addBreadcrumb({
+    category: 'auth',
+    message: 'twitchHelixProfile fallback',
+    data: { reason, ...extra },
+  })
+}
+
 async function fetchHelixUser(accessToken: string): Promise<HelixUser | null> {
   try {
     const res = await fetch('https://api.twitch.tv/helix/users', {
@@ -44,10 +54,19 @@ async function fetchHelixUser(accessToken: string): Promise<HelixUser | null> {
         'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
       },
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      noteFallback('helix_non_ok', { status: res.status })
+      return null
+    }
     const body = (await res.json()) as { data?: HelixUser[] }
-    return body.data?.[0] ?? null
-  } catch {
+    const user = body.data?.[0]
+    if (!user) {
+      noteFallback('helix_empty_data')
+      return null
+    }
+    return user
+  } catch (err) {
+    noteFallback('fetch_throw', { error: (err as Error)?.message })
     return null
   }
 }

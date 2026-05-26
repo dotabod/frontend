@@ -1,5 +1,5 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { captureException } from '@sentry/nextjs'
+import { captureException, captureMessage } from '@sentry/nextjs'
 import type { NextAuthOptions } from 'next-auth'
 import { decode, encode, type JWT } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
@@ -295,6 +295,28 @@ export const authOptions: NextAuthOptions = {
         },
       )
     },
+  },
+  // Forward NextAuth's internal logger to Sentry so the root cause of an
+  // OAuthCallback (token-exchange status, profile-fetch response, state-cookie
+  // mismatch, etc.) is captured server-side. Without this, the only signal we
+  // get is the bare `?error=OAuthCallback` redirect on the login page.
+  logger: {
+    error(code, metadata) {
+      const maybeError =
+        metadata instanceof Error ? metadata : (metadata as { error?: unknown } | undefined)?.error
+      const error = maybeError instanceof Error ? maybeError : new Error(code)
+      captureException(error, {
+        tags: { source: 'next-auth', code },
+        extra: metadata instanceof Error ? undefined : (metadata as Record<string, unknown>),
+      })
+    },
+    warn(code) {
+      captureMessage(`next-auth warning: ${code}`, {
+        level: 'warning',
+        tags: { source: 'next-auth', code },
+      })
+    },
+    debug() {},
   },
   pages: {
     error: '/error',

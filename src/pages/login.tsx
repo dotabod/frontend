@@ -15,38 +15,52 @@ const Login: NextPageWithLayout = () => {
   const router = useRouter()
   const { notification } = App.useApp()
 
-  const showError = useCallback(() => {
-    Sentry.captureMessage('Login error', {
-      tags: {
-        page: 'login',
-      },
-    })
+  const showError = useCallback(
+    (code: string) => {
+      // NextAuth-defined codes (https://next-auth.js.org/configuration/pages#error-codes).
+      // Tagging by code lets Sentry split this issue into actual root causes
+      // instead of collapsing every failure into one bucket.
+      if (code !== 'AccessDenied') {
+        Sentry.captureMessage(`Login error: ${code}`, {
+          level: code === 'Verification' ? 'info' : 'warning',
+          tags: { page: 'login', oauthError: code },
+        })
+      }
 
-    notification.error({
-      description: (
-        <span>
-          We couldn't log you in. First, try to login with{' '}
-          <a
-            href='https://support.google.com/chrome/answer/95464?hl=en&co=GENIE.Platform%3DDesktop'
-            target='_blank'
-            rel='noreferrer'
-          >
-            Incognito mode in Chrome
-          </a>
-          . If that doesn't work, maybe you already have an account on Dotabod with this email. Try
-          to update your email on{' '}
-          <a href='https://www.twitch.tv/settings/security' target='_blank' rel='noreferrer'>
-            Twitch
-          </a>{' '}
-          to a new one and then try again. If you need more help, reach out to us through our{' '}
-          <Link href='/contact'>contact page</Link>.
-        </span>
-      ),
-      duration: 50_000,
-      key: 'login-error',
-      message: 'Login error',
-    })
-  }, [notification])
+      const description =
+        code === 'AccessDenied' ? (
+          <span>You denied access on Twitch. Try again and approve the requested permissions.</span>
+        ) : code === 'Verification' ? (
+          <span>This sign-in link is no longer valid. Please request a new one.</span>
+        ) : (
+          <span>
+            We couldn't log you in. First, try to login with{' '}
+            <a
+              href='https://support.google.com/chrome/answer/95464?hl=en&co=GENIE.Platform%3DDesktop'
+              target='_blank'
+              rel='noreferrer'
+            >
+              Incognito mode in Chrome
+            </a>
+            . If that doesn't work, maybe you already have an account on Dotabod with this email.
+            Try to update your email on{' '}
+            <a href='https://www.twitch.tv/settings/security' target='_blank' rel='noreferrer'>
+              Twitch
+            </a>{' '}
+            to a new one and then try again. If you need more help, reach out to us through our{' '}
+            <Link href='/contact'>contact page</Link>.
+          </span>
+        )
+
+      notification.error({
+        description,
+        duration: 50_000,
+        key: 'login-error',
+        message: 'Login error',
+      })
+    },
+    [notification],
+  )
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -55,9 +69,11 @@ const Login: NextPageWithLayout = () => {
   }, [router.push, status])
 
   useEffect(() => {
-    if (status !== 'authenticated' && router.asPath.toLowerCase().includes('error')) {
-      showError()
-    } else if (status !== 'authenticated' && router.asPath.toLowerCase().includes('setup-scopes')) {
+    if (status === 'authenticated') return
+    const errorCode = typeof router.query.error === 'string' ? router.query.error : undefined
+    if (errorCode) {
+      showError(errorCode)
+    } else if (router.asPath.toLowerCase().includes('setup-scopes')) {
       notification.info({
         description: (
           <span>
@@ -70,7 +86,7 @@ const Login: NextPageWithLayout = () => {
         message: 'Relink account',
       })
     }
-  }, [router.asPath, status, notification, showError])
+  }, [router.asPath, router.query.error, status, notification, showError])
 
   if (status === 'authenticated') {
     return null
