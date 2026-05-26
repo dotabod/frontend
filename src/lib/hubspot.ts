@@ -106,14 +106,14 @@ export async function syncHubSpotContact(
     }
     // PATCH by email supports partial updates; batch/upsert with idProperty=email
     // does not and returns 409 for any existing contact.
-    const patchRes = await fetch(
-      `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`,
-      {
+    const patchUrl = `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`
+    const patch = () =>
+      fetch(patchUrl, {
         body: JSON.stringify({ properties }),
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         method: 'PATCH',
-      },
-    )
+      })
+    const patchRes = await patch()
     if (patchRes.ok) {
       return
     }
@@ -124,12 +124,24 @@ export async function syncHubSpotContact(
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         method: 'POST',
       })
-      if (!createRes.ok) {
+      if (createRes.ok) {
+        return
+      }
+      // 409 means the contact was created between our PATCH (404) and POST — either
+      // visitor-identification finished provisioning it, or a concurrent request won
+      // the race. Retry the PATCH so our property updates still apply.
+      if (createRes.status === 409) {
+        const retryRes = await patch()
+        if (retryRes.ok) {
+          return
+        }
         throw new Error(
-          `Failed to create HubSpot contact: ${createRes.status} ${createRes.statusText}`,
+          `Failed to update HubSpot contact after create-409: ${retryRes.status} ${retryRes.statusText}`,
         )
       }
-      return
+      throw new Error(
+        `Failed to create HubSpot contact: ${createRes.status} ${createRes.statusText}`,
+      )
     }
     throw new Error(`Failed to update HubSpot contact: ${patchRes.status} ${patchRes.statusText}`)
   } catch (error) {

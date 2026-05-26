@@ -109,6 +109,50 @@ describe('lib/hubspot', () => {
       })
     })
 
+    it('retries the PATCH when create-POST returns 409 (race) and does not report', async () => {
+      const { fetchMock, captureException, syncHubSpotContact } = await load()
+      let patchCalls = 0
+      fetchMock.mockImplementation(async (url: unknown, init?: unknown) => {
+        const u = String(url)
+        if (u.endsWith(PATCH_SUFFIX)) {
+          patchCalls += 1
+          // First PATCH: contact missing. Retry PATCH after 409: now exists.
+          return patchCalls === 1 ? res({}, 404) : res()
+        }
+        if (u.endsWith('/objects/contacts') && (init as any)?.method === 'POST') {
+          return res({}, 409)
+        }
+        return res()
+      })
+
+      await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' })
+
+      expect(patchCalls).toBe(2)
+      expect(captureException).not.toHaveBeenCalled()
+    })
+
+    it('reports to Sentry when the create-409 retry PATCH also fails', async () => {
+      const { fetchMock, captureException, syncHubSpotContact } = await load()
+      let patchCalls = 0
+      fetchMock.mockImplementation(async (url: unknown, init?: unknown) => {
+        const u = String(url)
+        if (u.endsWith(PATCH_SUFFIX)) {
+          patchCalls += 1
+          return patchCalls === 1 ? res({}, 404) : res({}, 500)
+        }
+        if (u.endsWith('/objects/contacts') && (init as any)?.method === 'POST') {
+          return res({}, 409)
+        }
+        return res()
+      })
+
+      await expect(
+        syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
+      ).resolves.toBeUndefined()
+      expect(patchCalls).toBe(2)
+      expect(captureException).toHaveBeenCalled()
+    })
+
     it('never throws and reports to Sentry when the patch fails', async () => {
       const { fetchMock, captureException, syncHubSpotContact } = await load()
       fetchMock.mockImplementation(async (url: unknown) =>
