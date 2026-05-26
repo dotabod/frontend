@@ -139,19 +139,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { id },
       })
     } else {
-      // If the message is already being processed, mark it as cancelled
-      await prisma.scheduledMessage.update({
-        data: { status: 'CANCELLED', updatedAt: new Date() },
-        where: { id },
-      })
+      // If the message is already being processed, mark it and its pending
+      // deliveries as cancelled atomically.
+      await prisma.$transaction(async (tx) => {
+        await tx.scheduledMessage.update({
+          data: { status: 'CANCELLED', updatedAt: new Date() },
+          where: { id },
+        })
 
-      // Also mark all pending deliveries as cancelled
-      await prisma.messageDelivery.updateMany({
-        data: { status: 'CANCELLED', updatedAt: new Date() },
-        where: {
-          scheduledMessageId: id,
-          status: 'PENDING',
-        },
+        await tx.messageDelivery.updateMany({
+          data: { status: 'CANCELLED', updatedAt: new Date() },
+          where: {
+            scheduledMessageId: id,
+            status: 'PENDING',
+          },
+        })
       })
     }
 

@@ -30,42 +30,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get total user count for percentage calculations
     const totalUsers = await prisma.user.count()
 
-    const messagesWithStats = await Promise.all(
-      scheduledMessages.map(async (message) => {
-        const deliveryStats = await prisma.messageDelivery.groupBy({
-          _count: {
-            status: true,
-          },
-          by: ['status'],
-          where: {
-            scheduledMessageId: message.id,
-          },
-        })
+    // Deliveries are already loaded via `include` above; count in-memory instead
+    // of issuing one groupBy per message (N+1 against connection_limit).
+    const messagesWithStats = scheduledMessages.map((message) => {
+      const stats = {
+        cancelled: 0,
+        delivered: 0,
+        pending: 0,
+      }
 
-        const stats = {
-          cancelled: 0,
-          delivered: 0,
-          pending: 0,
+      for (const delivery of message.deliveries) {
+        const key = delivery.status as keyof typeof stats
+        if (key in stats) {
+          stats[key]++
         }
+      }
 
-        for (const stat of deliveryStats) {
-          stats[stat.status as keyof typeof stats] = Number(stat._count.status)
-        }
+      const targetUserCount = message.isForAllUsers ? totalUsers : 1
 
-        const targetUserCount = message.isForAllUsers ? totalUsers : 1
-
-        return {
-          ...message,
-          deliveryStats: {
-            ...stats,
-            cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
-            deliveredPercent: Math.round((stats.delivered / targetUserCount) * 100),
-            pendingPercent: Math.round((stats.pending / targetUserCount) * 100),
-            totalTargetUsers: targetUserCount,
-          },
-        }
-      }),
-    )
+      return {
+        ...message,
+        deliveryStats: {
+          ...stats,
+          cancelledPercent: Math.round((stats.cancelled / targetUserCount) * 100),
+          deliveredPercent: Math.round((stats.delivered / targetUserCount) * 100),
+          pendingPercent: Math.round((stats.pending / targetUserCount) * 100),
+          totalTargetUsers: targetUserCount,
+        },
+      }
+    })
 
     return res.status(200).json(messagesWithStats)
   }

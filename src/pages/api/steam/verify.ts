@@ -52,24 +52,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
-      // Create a new steam account entry
-      const steamAccount = await prisma.steamAccount.create({
-        data: {
-          name: body.name,
-          steam32Id: body.steam32Id,
-          userId: session.user.id,
-        },
-      })
+      const steamAccount = await prisma.$transaction(async (tx) => {
+        const created = await tx.steamAccount.create({
+          data: {
+            name: body.name,
+            steam32Id: body.steam32Id,
+            userId: session.user.id,
+          },
+        })
 
-      // Update the user record with the steam32Id
-      await prisma.user.update({
-        data: {
-          steam32Id: body.steam32Id,
-          updatedAt: new Date(),
-        },
-        where: {
-          id: session.user.id,
-        },
+        await tx.user.update({
+          data: {
+            steam32Id: body.steam32Id,
+            updatedAt: new Date(),
+          },
+          where: {
+            id: session.user.id,
+          },
+        })
+
+        return created
       })
 
       return res.status(200).json({

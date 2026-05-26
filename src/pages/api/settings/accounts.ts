@@ -110,7 +110,7 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
       })
       .filter((p): p is NonNullable<typeof p> => p !== null)
 
-    const updatedAccounts = await Promise.all(updatePromises)
+    const updatedAccounts = await prisma.$transaction(updatePromises)
     return res.json({ accounts: updatedAccounts })
   } catch (error) {
     captureException(error)

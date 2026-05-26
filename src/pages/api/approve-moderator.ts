@@ -26,25 +26,25 @@ async function approveModerators(userId: string, newModeratorChannelIds: number[
       (id) => !newModeratorChannelIds.includes(id),
     )
 
-    // Remove moderators
-    if (moderatorsToRemove.length > 0) {
-      await prisma.approvedModerator.deleteMany({
-        where: {
-          moderatorChannelId: { in: moderatorsToRemove },
-          userId,
-        },
-      })
-    }
+    await prisma.$transaction(async (tx) => {
+      if (moderatorsToRemove.length > 0) {
+        await tx.approvedModerator.deleteMany({
+          where: {
+            moderatorChannelId: { in: moderatorsToRemove },
+            userId,
+          },
+        })
+      }
 
-    // Add new moderators
-    if (moderatorsToAdd.length > 0) {
-      await prisma.approvedModerator.createMany({
-        data: moderatorsToAdd.map((moderatorChannelId) => ({
-          moderatorChannelId,
-          userId,
-        })),
-      })
-    }
+      if (moderatorsToAdd.length > 0) {
+        await tx.approvedModerator.createMany({
+          data: moderatorsToAdd.map((moderatorChannelId) => ({
+            moderatorChannelId,
+            userId,
+          })),
+        })
+      }
+    })
   } catch (error) {
     throw new Error(`Failed to approve managers: ${error.message}`, { cause: error })
   }

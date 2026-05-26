@@ -109,63 +109,64 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // Save the Steam ID to the user's account
       try {
-        // Check if a SteamAccount with this steam32Id already exists
-        const existingSteamAccount = await prisma.steamAccount.findUnique({
-          where: {
-            steam32Id: Number.parseInt(steam32Id, 10),
-          },
-        })
+        const steam32IdInt = Number.parseInt(steam32Id, 10)
 
-        if (existingSteamAccount) {
-          // If it exists but doesn't include this user yet, add them to connectedUserIds
-          if (
-            existingSteamAccount.userId !== session.user.id &&
-            !existingSteamAccount.connectedUserIds.includes(session.user.id)
-          ) {
-            await prisma.steamAccount.update({
-              data: {
-                connectedUserIds: {
-                  push: session.user.id,
+        await prisma.$transaction(async (tx) => {
+          const existingSteamAccount = await tx.steamAccount.findUnique({
+            where: {
+              steam32Id: steam32IdInt,
+            },
+          })
+
+          if (existingSteamAccount) {
+            if (
+              existingSteamAccount.userId !== session.user.id &&
+              !existingSteamAccount.connectedUserIds.includes(session.user.id)
+            ) {
+              await tx.steamAccount.update({
+                data: {
+                  connectedUserIds: {
+                    push: session.user.id,
+                  },
+                  updatedAt: new Date(),
                 },
-                updatedAt: new Date(),
-              },
-              where: {
-                steam32Id: Number.parseInt(steam32Id, 10),
+                where: {
+                  steam32Id: steam32IdInt,
+                },
+              })
+            }
+          } else {
+            await tx.steamAccount.create({
+              data: {
+                name: profileData?.name || null,
+                steam32Id: steam32IdInt,
+                userId: session.user.id,
               },
             })
           }
-        } else {
-          // Create a new steam account entry
-          await prisma.steamAccount.create({
-            data: {
-              name: profileData?.name || null,
-              steam32Id: Number.parseInt(steam32Id, 10),
-              userId: session.user.id,
-            },
-          })
-        }
 
-        // If user doesn't have a primary account yet, set this one as primary
-        const user = await prisma.user.findUnique({
-          select: {
-            steam32Id: true,
-          },
-          where: {
-            id: session.user.id,
-          },
-        })
-
-        if (!user?.steam32Id) {
-          await prisma.user.update({
-            data: {
-              steam32Id: Number.parseInt(steam32Id, 10),
-              updatedAt: new Date(),
+          // If user doesn't have a primary account yet, set this one as primary
+          const user = await tx.user.findUnique({
+            select: {
+              steam32Id: true,
             },
             where: {
               id: session.user.id,
             },
           })
-        }
+
+          if (!user?.steam32Id) {
+            await tx.user.update({
+              data: {
+                steam32Id: steam32IdInt,
+                updatedAt: new Date(),
+              },
+              where: {
+                id: session.user.id,
+              },
+            })
+          }
+        })
       } catch (saveError) {
         captureException(saveError)
         console.error('Error saving Steam ID:', saveError)
