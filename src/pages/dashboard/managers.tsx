@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import { useSubscription } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
@@ -134,107 +135,113 @@ const ModeratorsPage = () => {
 
       {/* Show the mod card for mods who haven't selected a streamer yet */}
       {!session?.data?.user?.isImpersonating && (
-        <Card
-          title={
-            <div className='flex items-center gap-2'>
-              Manage a streamer <Tag color='green'>For Mods</Tag>
-            </div>
-          }
-        >
-          <p>
-            Select a streamer to manage. Only streamers with an active Dotabod subscription can be
-            managed.
-          </p>
-          <ModeratedChannels />
-        </Card>
+        <ErrorBoundary>
+          <Card
+            title={
+              <div className='flex items-center gap-2'>
+                Manage a streamer <Tag color='green'>For Mods</Tag>
+              </div>
+            }
+          >
+            <p>
+              Select a streamer to manage. Only streamers with an active Dotabod subscription can be
+              managed.
+            </p>
+            <ModeratedChannels />
+          </Card>
+        </ErrorBoundary>
       )}
 
       {/* Only show the approve managers card for streamers */}
       {!session?.data?.user?.isImpersonating && (
-        <Card
-          title={
-            <div className='flex items-center gap-2'>
-              Approve Managers <Tag color='red'>For Streamer</Tag>
+        <ErrorBoundary>
+          <Card
+            title={
+              <div className='flex items-center gap-2'>
+                Approve Managers <Tag color='red'>For Streamer</Tag>
+              </div>
+            }
+            feature='managers'
+          >
+            <div className='subtitle'>
+              <p>
+                By approving a user, you're allowing them to access and modify your Dotabod
+                dashboard. Approved managers can manage features, toggle commands, and update
+                settings on your behalf.
+              </p>
+              <p>
+                Note: They will not have access to your setup page, downloading the GSI cfg, nor
+                overlay URL.
+              </p>
             </div>
-          }
-          feature='managers'
-        >
-          <div className='subtitle'>
-            <p>
-              By approving a user, you're allowing them to access and modify your Dotabod dashboard.
-              Approved managers can manage features, toggle commands, and update settings on your
-              behalf.
-            </p>
-            <p>
-              Note: They will not have access to your setup page, downloading the GSI cfg, nor
-              overlay URL.
-            </p>
-          </div>
 
-          <div className='max-w-sm flex flex-col gap-4'>
-            <Select
-              disabled={!tierAccess.hasAccess}
-              optionFilterProp='label'
-              loading={loadingModList || loadingApprovedMods}
-              mode='multiple'
-              style={{ width: '100%' }}
-              placeholder='Select moderators'
-              value={selectedModerators}
-              defaultValue={
-                Array.isArray(approvedMods) &&
-                approvedMods.map((mod) => `${mod.moderatorChannelId}`)
-              }
-              onChange={(value: string[] | false) => {
-                if (Array.isArray(value)) {
-                  setSelectedModerators(value)
+            <div className='max-w-sm flex flex-col gap-4'>
+              <Select
+                disabled={!tierAccess.hasAccess}
+                optionFilterProp='label'
+                loading={loadingModList || loadingApprovedMods}
+                mode='multiple'
+                style={{ width: '100%' }}
+                placeholder='Select moderators'
+                value={selectedModerators}
+                defaultValue={
+                  Array.isArray(approvedMods) &&
+                  approvedMods.map((mod) => `${mod.moderatorChannelId}`)
                 }
-              }}
-              options={
-                Array.isArray(moderatorList)
-                  ? moderatorList.map((moderator) => ({
-                      disabled: moderator.user_id === '843245458',
-                      label: moderator.user_name,
-                      value: moderator.user_id,
-                    }))
-                  : []
-              }
-            />
-            <Button
-              type='primary'
-              onClick={handleApprove}
-              loading={loading}
-              disabled={!tierAccess.hasAccess}
-            >
-              Submit
-            </Button>
-          </div>
-        </Card>
+                onChange={(value: string[] | false) => {
+                  if (Array.isArray(value)) {
+                    setSelectedModerators(value)
+                  }
+                }}
+                options={
+                  Array.isArray(moderatorList)
+                    ? moderatorList.map((moderator) => ({
+                        disabled: moderator.user_id === '843245458',
+                        label: moderator.user_name,
+                        value: moderator.user_id,
+                      }))
+                    : []
+                }
+              />
+              <Button
+                type='primary'
+                onClick={handleApprove}
+                loading={loading}
+                disabled={!tierAccess.hasAccess}
+              >
+                Submit
+              </Button>
+            </div>
+          </Card>
+        </ErrorBoundary>
       )}
 
-      <Card>
-        <div className='title'>
-          <h3>What is this?</h3>
-        </div>
-        <div className=''>
-          <p className='mb-4'>
-            <Tag color='red'>For Streamer</Tag> Once you approve a user, they will login to
-            dotabod.com and be able to access your dashboard by using the selectbox at the top of
-            this page. Approved managers can view and modify your settings, commands, and other
-            dashboard features. This is useful for streamers who want to delegate some of their
-            Dotabod management to trusted moderators or team members. You can revoke access at any
-            time by removing them from the approved list above.
-          </p>
-          <p className='mb-4'>
-            <Tag color='blue'>For Mods</Tag> As a mod, you can manage streamers who have approved
-            you. Use the selector above to choose which streamer's dashboard you want to manage.
-          </p>
-          <p>
-            <Tag color='green'>For Managing Mods</Tag> When managing a streamer's account, you'll
-            see a badge indicating you're accessing the streamer's account, and any changes you make
-            will be applied to the streamer's Dotabod configuration.
-          </p>
-        </div>
-      </Card>
+      <ErrorBoundary>
+        <Card>
+          <div className='title'>
+            <h3>What is this?</h3>
+          </div>
+          <div className=''>
+            <p className='mb-4'>
+              <Tag color='red'>For Streamer</Tag> Once you approve a user, they will login to
+              dotabod.com and be able to access your dashboard by using the selectbox at the top of
+              this page. Approved managers can view and modify your settings, commands, and other
+              dashboard features. This is useful for streamers who want to delegate some of their
+              Dotabod management to trusted moderators or team members. You can revoke access at any
+              time by removing them from the approved list above.
+            </p>
+            <p className='mb-4'>
+              <Tag color='blue'>For Mods</Tag> As a mod, you can manage streamers who have approved
+              you. Use the selector above to choose which streamer's dashboard you want to manage.
+            </p>
+            <p>
+              <Tag color='green'>For Managing Mods</Tag> When managing a streamer's account, you'll
+              see a badge indicating you're accessing the streamer's account, and any changes you
+              make will be applied to the streamer's Dotabod configuration.
+            </p>
+          </div>
+        </Card>
+      </ErrorBoundary>
     </>
   )
 }

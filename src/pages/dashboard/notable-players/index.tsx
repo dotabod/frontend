@@ -22,6 +22,7 @@ import { z } from 'zod'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import type { NotablePlayer } from '@/lib/db'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import type { NextPageWithLayout } from '@/pages/_app'
@@ -32,8 +33,12 @@ const { Text } = Typography
 // Form schema for creating/updating a notable player
 const notablePlayerSchema = z.object({
   account_id: z.coerce.number().int().positive({ message: 'Account ID must be a positive number' }),
-  country_code: z.string().max(3).optional(),
-  name: z.string().min(1, { message: 'Name is required' }),
+  country_code: z
+    .string()
+    .length(2, { message: 'Use the 2-letter ISO country code' })
+    .optional()
+    .or(z.literal('')),
+  name: z.string().min(1, { message: 'Name is required' }).max(50),
 })
 
 type NotablePlayerFormValues = z.infer<typeof notablePlayerSchema>
@@ -170,7 +175,13 @@ const NotablePlayersPage: NextPageWithLayout = () => {
     {
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <Text strong>{text}</Text>,
+      width: 240,
+      ellipsis: { showTitle: false },
+      render: (text: string) => (
+        <Text strong ellipsis={{ tooltip: text }}>
+          {text}
+        </Text>
+      ),
       title: 'Name',
     },
     {
@@ -250,50 +261,55 @@ const NotablePlayersPage: NextPageWithLayout = () => {
 
       <p className='mb-6'>{CommandDetail.commandNP.response(null, false)}</p>
 
-      <Card title='Your Notable Players' className='mb-6'>
-        <div className='flex justify-between items-center mb-6'>
-          <Button
-            type='primary'
-            icon={<Plus className='h-4 w-4' />}
-            onClick={handleOpenAddModal}
-            loading={isLoading}
-          >
-            Add Player
-          </Button>
-        </div>
-
-        {isLoading && notablePlayers.length === 0 ? (
-          <div className='flex justify-center items-center py-12'>
-            <Spin size='large' />
+      <ErrorBoundary>
+        <Card title='Your Notable Players' className='mb-6'>
+          <div className='flex justify-between items-center mb-6'>
+            <Button
+              type='primary'
+              icon={<Plus className='h-4 w-4' />}
+              onClick={handleOpenAddModal}
+              loading={isLoading}
+            >
+              Add Player
+            </Button>
           </div>
-        ) : (
-          <Table
-            columns={columns}
-            dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
-            pagination={{
-              hideOnSinglePage: true,
-              onShowSizeChange: (_current, size) => setPageSize(size),
-              pageSize,
-              position: ['bottomCenter'],
-              showSizeChanger: true,
-            }}
-            bordered
-            locale={{
-              emptyText: (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No notable players found'>
-                  <Button
-                    type='primary'
-                    onClick={handleOpenAddModal}
-                    icon={<Plus className='h-4 w-4' />}
+
+          {isLoading && notablePlayers.length === 0 ? (
+            <div className='flex justify-center items-center py-12'>
+              <Spin size='large' />
+            </div>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
+              pagination={{
+                hideOnSinglePage: true,
+                onShowSizeChange: (_current, size) => setPageSize(size),
+                pageSize,
+                position: ['bottomCenter'],
+                showSizeChanger: true,
+              }}
+              bordered
+              locale={{
+                emptyText: (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description='No notable players found'
                   >
-                    Add Your First Player
-                  </Button>
-                </Empty>
-              ),
-            }}
-          />
-        )}
-      </Card>
+                    <Button
+                      type='primary'
+                      onClick={handleOpenAddModal}
+                      icon={<Plus className='h-4 w-4' />}
+                    >
+                      Add Your First Player
+                    </Button>
+                  </Empty>
+                ),
+              }}
+            />
+          )}
+        </Card>
+      </ErrorBoundary>
 
       <Modal
         title={isEditMode ? 'Edit Notable Player' : 'Add Notable Player'}
@@ -325,7 +341,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             label='Player Name*'
             rules={[{ message: 'Player name is required', required: true }]}
           >
-            <Input placeholder='Enter player name' />
+            <Input placeholder='Enter player name' maxLength={50} showCount />
           </Form.Item>
 
           <Form.Item
@@ -348,7 +364,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
               </div>
             }
           >
-            <Input placeholder='e.g. us, ru, cn' />
+            <Input placeholder='e.g. us, ru, cn' maxLength={2} />
           </Form.Item>
 
           <div className='flex justify-end gap-4 pt-4'>

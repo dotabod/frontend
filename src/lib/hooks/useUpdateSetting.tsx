@@ -1,12 +1,23 @@
 import type { SteamAccount, SubscriptionTier } from '@prisma/client'
+import * as Sentry from '@sentry/nextjs'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
 import { useSubscription } from '@/hooks/useSubscription'
 import { type SettingKeys, Settings } from '@/lib/defaultSettings'
 import { type ChatterSettingKeys, canAccessFeature, type FeatureTier } from '@/utils/subscription'
 import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
+
+function describeMutationFailure(status?: number): string {
+  if (status === 403) return "You don't have permission to change this setting."
+  if (status === 401) return "Couldn't save. Sign in again."
+  if (status === 400 || status === 422) return "That setting can't be set to this value."
+  if (status === 429) return "You're changing settings too quickly. Try again in a moment."
+  if (status === undefined) return "Couldn't reach the server. Check your connection."
+  return "Couldn't save. Try again in a moment."
+}
 
 interface UpdateProps {
   path?: string | null
@@ -95,9 +106,23 @@ export const useUpdate = <
   const { mutate } = useSWRConfig()
   const { message } = App.useApp()
 
+  const [pendingCount, setPendingCount] = useState(0)
+  const abortControllersRef = useRef<Set<AbortController>>(new Set())
+
+  useEffect(() => {
+    const controllers = abortControllersRef.current
+    return () => {
+      for (const controller of controllers) {
+        controller.abort()
+      }
+      controllers.clear()
+    }
+  }, [])
+
   // Update loading logic to consider both data and error
   // This ensures loading becomes false when we get an error response
   const loading = data === undefined && !error
+  const isSaving = pendingCount > 0
 
   const updateSetting = (newValue: TNewValue, customPath = '') => {
     const targetPath = customPath || path
@@ -122,31 +147,60 @@ export const useUpdate = <
       isNow = 'disabled'
     }
 
-    const updateFn = async (currentData: TData | undefined) => {
-      const response = await fetch(targetPath, {
-        body: JSON.stringify(newValue),
-        method: 'PATCH',
-      })
-      message.open({
-        content: response.ok
-          ? `Success! Setting is now ${
-              ['string', 'number'].includes(typeof isNow) ? isNow : 'updated'
-            }`
-          : 'Could not save your settings',
-        type: response.ok ? 'success' : 'error',
-      })
+    const controller = new AbortController()
+    abortControllersRef.current.add(controller)
+    setPendingCount((n) => n + 1)
 
-      return dataTransform(currentData, newValue)
+    const updateFn = async (currentData: TData | undefined) => {
+      let response: Response | undefined
+      try {
+        response = await fetch(targetPath, {
+          body: JSON.stringify(newValue),
+          method: 'PATCH',
+          signal: controller.signal,
+        })
+        if (!response.ok) {
+          throw new Error(`Settings PATCH ${response.status}`)
+        }
+        message.open({
+          content: `Success! Setting is now ${
+            ['string', 'number'].includes(typeof isNow) ? isNow : 'updated'
+          }`,
+          type: 'success',
+        })
+        return dataTransform(currentData, newValue)
+      } catch (err) {
+        if (controller.signal.aborted) {
+          // The request may have reached the server before unmount; keep the
+          // optimistic value so SWR doesn't roll it back on the user.
+          return dataTransform(currentData, newValue)
+        }
+        Sentry.captureException(err, {
+          tags: { feature: 'settings-mutation' },
+          extra: { path: targetPath, status: response?.status },
+        })
+        message.open({
+          content: describeMutationFailure(response?.status),
+          type: 'error',
+        })
+        throw err
+      } finally {
+        abortControllersRef.current.delete(controller)
+        setPendingCount((n) => n - 1)
+      }
     }
 
-    void mutate(cachePath, updateFn(data), options)
+    mutate(cachePath, updateFn(data), options).catch(() => {
+      // Failures are reported via Sentry + toast inside updateFn; swallow the
+      // re-thrown rejection here so it doesn't surface as an unhandled rejection.
+    })
   }
 
-  return { data, error, loading, mutate, updateSetting }
+  return { data, error, loading, isSaving, mutate, updateSetting }
 }
 
 export function useUpdateAccount() {
-  const { data, loading, updateSetting } = useUpdate<
+  const { data, loading, isSaving, updateSetting } = useUpdate<
     { accounts?: SteamAccount[] },
     AccountMutationValue[]
   >({
@@ -157,17 +211,17 @@ export function useUpdateAccount() {
     path: '/api/settings/accounts',
   })
 
-  return { data, loading, update: updateSetting }
+  return { data, loading, isSaving, update: updateSetting }
 }
 
 export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
-  const { data, loading, updateSetting } = useUpdate<{ locale?: string }, string>({
+  const { data, loading, isSaving, updateSetting } = useUpdate<{ locale?: string }, string>({
     dataTransform: (data, newValue) => ({ locale: newValue || data?.locale }),
     path: '/api/settings/locale',
     ...props,
   })
 
-  return { data, loading, update: updateSetting }
+  return { data, loading, isSaving, update: updateSetting }
 }
 
 // Define type for rankOnly settings
@@ -182,6 +236,7 @@ interface UpdateSettingResult<T = boolean> {
   original: SettingsData
   error: unknown
   loading: boolean
+  isSaving: boolean
   updateSetting: (newValue: T) => void
   mutate: () => void
   tierAccess: {
@@ -211,6 +266,7 @@ export function useUpdateSetting<T = boolean>(
     data,
     mutate,
     loading,
+    isSaving,
     error,
     updateSetting: update,
   } = useUpdate<SettingsData, MutationValue>({
@@ -323,6 +379,7 @@ export function useUpdateSetting<T = boolean>(
     data: value as T,
     error,
     loading,
+    isSaving,
     mutate: () => url && mutate(url),
     original: (data || {}) as SettingsData,
     tierAccess,

@@ -1,4 +1,6 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react'
+import * as Sentry from '@sentry/nextjs'
+import { Button } from 'antd'
+import { Component, type ErrorInfo, Fragment, type ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
@@ -9,6 +11,7 @@ interface Props {
 interface State {
   hasError: boolean
   error: Error | null
+  resetKey: number
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -17,10 +20,11 @@ class ErrorBoundary extends Component<Props, State> {
     this.state = {
       error: null,
       hasError: false,
+      resetKey: 0,
     }
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return {
       error,
       hasError: true,
@@ -29,28 +33,39 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('Error caught by ErrorBoundary:', error, errorInfo)
+    Sentry.captureException(error, {
+      contexts: { react: { componentStack: errorInfo.componentStack } },
+      tags: { feature: 'error-boundary' },
+    })
     this.props.onError?.(error, errorInfo)
+  }
+
+  reset = (): void => {
+    // Bump resetKey so the subtree remounts; otherwise a deterministic crash
+    // re-throws against the same stale state/props on the next render.
+    this.setState((s) => ({ error: null, hasError: false, resetKey: s.resetKey + 1 }))
   }
 
   render(): ReactNode {
     if (this.state.hasError) {
-      // You can render a fallback UI
       if (this.props.fallback) {
         return this.props.fallback
       }
 
-      // Default fallback UI
       return (
-        <div className='p-4 rounded-md bg-gray-800/50 backdrop-blur-xl shadow-lg'>
-          <h3 className='text-red-400 font-medium'>Something went wrong</h3>
-          <p className='text-gray-300 text-sm mt-2'>
-            The component encountered an error but the rest of the page is still functional.
+        <div className='rounded-lg border border-red-800 bg-red-950/40 p-5 text-sm text-red-200 shadow-lg'>
+          <h3 className='font-medium text-red-200'>Something went wrong</h3>
+          <p className='mt-2 text-red-200/80'>
+            This section couldn't load. The rest of the page should still work.
           </p>
+          <Button onClick={this.reset} size='small' className='mt-3'>
+            Try again
+          </Button>
         </div>
       )
     }
 
-    return this.props.children
+    return <Fragment key={this.state.resetKey}>{this.props.children}</Fragment>
   }
 }
 

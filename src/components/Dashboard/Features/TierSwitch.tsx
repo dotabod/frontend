@@ -23,15 +23,24 @@ export function TierSwitch({
   onChange: externalOnChange,
   hideTierBadge,
 }: TierSwitchProps) {
-  const { data: enabled, updateSetting, tierAccess } = useUpdateSetting(settingKey)
+  const { data: enabled, updateSetting, tierAccess, isSaving } = useUpdateSetting(settingKey)
 
-  const isDisabled = externalDisabled || !tierAccess.hasAccess
+  // isSaving only reflects mutations driven by the internal updateSetting. When
+  // the parent owns the change handler, the parent also owns the saving signal.
+  const usingInternalMutation = !externalOnChange
+  const reflectSaving = usingInternalMutation && isSaving
+  const isDisabled = externalDisabled || !tierAccess.hasAccess || reflectSaving
   const isChecked = externalChecked ?? enabled
   const handleChange = externalOnChange ?? updateSetting
   return (
     <div className={`flex items-center gap-2 ${className || ''}`}>
       <div className='flex items-center gap-2 flex-nowrap'>
-        <Switch checked={isChecked} onChange={handleChange} disabled={isDisabled} />
+        <Switch
+          checked={isChecked}
+          onChange={handleChange}
+          disabled={isDisabled}
+          loading={reflectSaving}
+        />
         {!hideTierBadge && <TierBadge requiredTier={tierAccess.requiredTier} />}
         {label && <span className='flex-1'>{label}</span>}
       </div>

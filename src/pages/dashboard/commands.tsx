@@ -4,6 +4,7 @@ import { type ReactElement, useState } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import Header from '@/components/Dashboard/Header'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { getValueOrDefault } from '@/lib/settings'
@@ -102,11 +103,13 @@ const CommandsPage = () => {
         <Empty description='Could not find any matching commands.' imageStyle={{ height: 60 }} />
       )}
 
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3'>
-        {filteredCommands.map((key) => (
-          <CommandsCard key={key} id={key} command={CommandDetail[key]} />
-        ))}
-      </div>
+      <ErrorBoundary>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3'>
+          {filteredCommands.map((key) => (
+            <CommandsCard key={key} id={key} command={CommandDetail[key]} />
+          ))}
+        </div>
+      </ErrorBoundary>
     </>
   )
 }

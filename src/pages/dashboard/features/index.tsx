@@ -8,6 +8,7 @@ import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
 import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import Header from '@/components/Dashboard/Header'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import type { NextPageWithLayout } from '@/pages/_app'
 
@@ -21,21 +22,33 @@ const FeaturesPage: NextPageWithLayout = () => (
 
     <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
       <div id='language'>
-        <LanguageCard />
+        <ErrorBoundary>
+          <LanguageCard />
+        </ErrorBoundary>
       </div>
       <div id='stream-delay'>
-        <StreamDelayCard />
+        <ErrorBoundary>
+          <StreamDelayCard />
+        </ErrorBoundary>
       </div>
       <div id='mmr-tracker'>
-        <MmrTrackerCard />
+        <ErrorBoundary>
+          <MmrTrackerCard />
+        </ErrorBoundary>
       </div>
       <div id='bets'>
-        <BetsCard />
+        <ErrorBoundary>
+          <BetsCard />
+        </ErrorBoundary>
       </div>
       <div id='rank-only'>
-        <RankOnlyCard />
+        <ErrorBoundary>
+          <RankOnlyCard />
+        </ErrorBoundary>
       </div>
-      <IdeaCard />
+      <ErrorBoundary>
+        <IdeaCard />
+      </ErrorBoundary>
     </div>
   </>
 )

@@ -3,6 +3,7 @@ import type { ReactElement } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
 import Header from '@/components/Dashboard/Header'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import type { NextPageWithLayout } from '@/pages/_app'
 
@@ -18,7 +19,9 @@ const FeaturesPage: NextPageWithLayout = () => (
     />
 
     <div id='chatter'>
-      <ChatterCard />
+      <ErrorBoundary>
+        <ChatterCard />
+      </ErrorBoundary>
     </div>
   </>
 )

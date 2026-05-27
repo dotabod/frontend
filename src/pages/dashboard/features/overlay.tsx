@@ -8,6 +8,7 @@ import PicksCard from '@/components/Dashboard/Features/PicksCard'
 import QueueCard from '@/components/Dashboard/Features/QueueCard'
 import RoshCard from '@/components/Dashboard/Features/RoshCard'
 import Header from '@/components/Dashboard/Header'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import BetsOverlay from '@/components/Overlay/BetsOverlay'
 import LastFmOverlay from '@/components/Overlay/LastFmOverlay'
 import MmrOverlay from '@/components/Overlay/MmrOverlay'
@@ -26,37 +27,59 @@ const FeaturesPage: NextPageWithLayout = () => (
 
     <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
       <div id='minimap'>
-        <MinimapCard />
+        <ErrorBoundary>
+          <MinimapCard />
+        </ErrorBoundary>
       </div>
       <div id='picks'>
-        <PicksCard />
+        <ErrorBoundary>
+          <PicksCard />
+        </ErrorBoundary>
       </div>
       <div id='wl'>
-        <WinLossOverlay />
+        <ErrorBoundary>
+          <WinLossOverlay />
+        </ErrorBoundary>
       </div>
       <div id='win-probability'>
-        <WinProbabilityOverlay />
+        <ErrorBoundary>
+          <WinProbabilityOverlay />
+        </ErrorBoundary>
       </div>
       <div id='mmr-overlay'>
-        <MmrOverlay />
+        <ErrorBoundary>
+          <MmrOverlay />
+        </ErrorBoundary>
       </div>
       <div id='bets-overlay'>
-        <BetsOverlay />
+        <ErrorBoundary>
+          <BetsOverlay />
+        </ErrorBoundary>
       </div>
       <div id='rosh'>
-        <RoshCard />
+        <ErrorBoundary>
+          <RoshCard />
+        </ErrorBoundary>
       </div>
       <div id='queue-blocker'>
-        <QueueCard />
+        <ErrorBoundary>
+          <QueueCard />
+        </ErrorBoundary>
       </div>
       <div id='notable-players'>
-        <NotablePlayersCard />
+        <ErrorBoundary>
+          <NotablePlayersCard />
+        </ErrorBoundary>
       </div>
       <div id='lastfm'>
-        <LastFmOverlay />
+        <ErrorBoundary>
+          <LastFmOverlay />
+        </ErrorBoundary>
       </div>
       <div id='auto-translate'>
-        <AutoTranslateCard />
+        <ErrorBoundary>
+          <AutoTranslateCard />
+        </ErrorBoundary>
       </div>
     </div>
   </>
