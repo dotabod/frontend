@@ -66,7 +66,9 @@ async function fetchHelixUser(accessToken: string): Promise<HelixUser | null> {
     }
     return user
   } catch (err) {
-    noteFallback('fetch_throw', { error: (err as Error)?.message })
+    noteFallback('fetch_throw', {
+      error: err instanceof Error ? err.message : String(err),
+    })
     return null
   }
 }

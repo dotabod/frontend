@@ -9,6 +9,25 @@ import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
 
+// Closed set of NextAuth error codes — anything outside this is treated as
+// `Unknown` so a crafted URL like `/login?error=<random>` can't generate
+// unbounded distinct Sentry issues. https://next-auth.js.org/configuration/pages#error-codes
+const KNOWN_AUTH_ERRORS = new Set([
+  'Configuration',
+  'AccessDenied',
+  'Verification',
+  'Default',
+  'OAuthSignin',
+  'OAuthCallback',
+  'OAuthCreateAccount',
+  'EmailCreateAccount',
+  'Callback',
+  'OAuthAccountNotLinked',
+  'EmailSignin',
+  'CredentialsSignin',
+  'SessionRequired',
+])
+
 const Login: NextPageWithLayout = () => {
   const { status } = useSession()
   App.useApp()
@@ -17,13 +36,19 @@ const Login: NextPageWithLayout = () => {
 
   const showError = useCallback(
     (code: string) => {
-      // NextAuth-defined codes (https://next-auth.js.org/configuration/pages#error-codes).
-      // Tagging by code lets Sentry split this issue into actual root causes
-      // instead of collapsing every failure into one bucket.
-      if (code !== 'AccessDenied') {
-        Sentry.captureMessage(`Login error: ${code}`, {
-          level: code === 'Verification' ? 'info' : 'warning',
-          tags: { page: 'login', oauthError: code },
+      const known = KNOWN_AUTH_ERRORS.has(code) ? code : 'Unknown'
+      // Skip Sentry for user-initiated denial. Note: NextAuth's Twitch flow
+      // currently maps Twitch's `?error=access_denied` to `OAuthCallback`,
+      // not `AccessDenied` — this branch is defensive for a future custom
+      // signIn callback returning false.
+      if (known !== 'AccessDenied') {
+        Sentry.captureMessage('Login error', {
+          level: 'info',
+          // Fingerprint is bounded by KNOWN_AUTH_ERRORS so unknown codes
+          // can't create unbounded Sentry issues.
+          fingerprint: ['login-error', known],
+          tags: { page: 'login', oauthError: known },
+          extra: known === 'Unknown' ? { rawCode: code.slice(0, 100) } : undefined,
         })
       }
 
@@ -70,7 +95,8 @@ const Login: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (status === 'authenticated') return
-    const errorCode = typeof router.query.error === 'string' ? router.query.error : undefined
+    const rawError = router.query.error
+    const errorCode = Array.isArray(rawError) ? rawError[0] : rawError
     if (errorCode) {
       showError(errorCode)
     } else if (router.asPath.toLowerCase().includes('setup-scopes')) {

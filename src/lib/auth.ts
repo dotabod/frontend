@@ -40,6 +40,44 @@ if (!process.env.NEXTAUTH_SECRET) {
   throw new Error('NEXTAUTH_SECRET is not set')
 }
 
+// Closed sets bound the fingerprint cardinality on captured events. The
+// `/api/auth/_log` endpoint forwards `code` from `req.body`, so an unbounded
+// fingerprint would let any client create unbounded Sentry issues.
+const KNOWN_NEXTAUTH_ERROR_CODES = new Set([
+  'OAUTH_CALLBACK_ERROR',
+  'OAUTH_CALLBACK_HANDLER_ERROR',
+  'OAUTH_V1_GET_ACCESS_TOKEN_ERROR',
+  'OAUTH_PARSE_PROFILE_ERROR',
+  'SIGNIN_OAUTH_ERROR',
+  'CALLBACK_OAUTH_ERROR',
+  'SIGNIN_EMAIL_ERROR',
+  'CALLBACK_EMAIL_ERROR',
+  'SIGNIN_CREDENTIALS_ERROR',
+  'CALLBACK_CREDENTIALS_JWT_ERROR',
+  'SESSION_ERROR',
+  'JWT_SESSION_ERROR',
+  'SIGNOUT_ERROR',
+  'LOGGER_ERROR',
+  'EVENTS_ERROR',
+  'ADAPTER_ERROR_CREATE_USER',
+  'ADAPTER_ERROR_GET_USER_BY_EMAIL',
+  'ADAPTER_ERROR_GET_USER_BY_ACCOUNT',
+  'ADAPTER_ERROR_UPDATE_USER',
+  'ADAPTER_ERROR_LINK_ACCOUNT',
+  'ADAPTER_ERROR_CREATE_SESSION',
+  'ADAPTER_ERROR_GET_SESSION_AND_USER',
+  'ADAPTER_ERROR_UPDATE_SESSION',
+  'ADAPTER_ERROR_DELETE_SESSION',
+  'ADAPTER_ERROR_USE_VERIFICATION_TOKEN',
+])
+const KNOWN_NEXTAUTH_WARN_CODES = new Set([
+  'JWT_AUTO_GENERATED_SIGNING_KEY',
+  'NEXTAUTH_URL',
+  'EMAIL_FROM',
+  'EXPERIMENTAL_API',
+  'DEBUG_ENABLED',
+])
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   callbacks: {
@@ -299,21 +337,47 @@ export const authOptions: NextAuthOptions = {
   // Forward NextAuth's internal logger to Sentry so the root cause of an
   // OAuthCallback (token-exchange status, profile-fetch response, state-cookie
   // mismatch, etc.) is captured server-side. Without this, the only signal we
-  // get is the bare `?error=OAuthCallback` redirect on the login page.
+  // get is the bare `?error=OAuthCallback` redirect on the login page. We
+  // still mirror to console so Vercel function logs keep their familiar
+  // `[next-auth]` markers for grep-based triage.
   logger: {
     error(code, metadata) {
+      // `code` is typed string by NextAuth, but the `/api/auth/_log` POST path
+      // unpacks it from `req.body` so a crafted client can send a non-string.
+      if (typeof code !== 'string') return
+      // `CLIENT_*` codes come from the browser via /api/auth/_log when
+      // next-auth/react's fetch to /api/auth/session blips (ad-blockers, tab
+      // closed mid-request, mobile network). They drown out actionable
+      // server-side codes like OAUTH_CALLBACK_ERROR.
+      if (code.startsWith('CLIENT_')) return
+      console.error(`[next-auth][error][${code}]`, metadata)
       const maybeError =
         metadata instanceof Error ? metadata : (metadata as { error?: unknown } | undefined)?.error
       const error = maybeError instanceof Error ? maybeError : new Error(code)
+      const known = KNOWN_NEXTAUTH_ERROR_CODES.has(code) ? code : 'unknown'
       captureException(error, {
-        tags: { source: 'next-auth', code },
+        // Explicit fingerprint by code, otherwise the `new Error(code)`
+        // fallback path collapses every distinct code into one issue
+        // (same stacktrace top-frame) — defeats the whole point.
+        fingerprint: ['next-auth-error', known],
+        tags: {
+          source: 'next-auth',
+          code: known === 'unknown' ? code.slice(0, 60) : code,
+        },
         extra: metadata instanceof Error ? undefined : (metadata as Record<string, unknown>),
       })
     },
     warn(code) {
-      captureMessage(`next-auth warning: ${code}`, {
+      if (typeof code !== 'string') return
+      console.warn(`[next-auth][warn][${code}]`)
+      const known = KNOWN_NEXTAUTH_WARN_CODES.has(code) ? code : 'unknown'
+      captureMessage('next-auth warning', {
         level: 'warning',
-        tags: { source: 'next-auth', code },
+        fingerprint: ['next-auth-warn', known],
+        tags: {
+          source: 'next-auth',
+          code: known === 'unknown' ? code.slice(0, 60) : code,
+        },
       })
     },
     debug() {},
