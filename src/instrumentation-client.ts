@@ -46,6 +46,15 @@ if (SENTRY_DSN) {
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 1,
     integrations: [replay],
+
+    // Auto-installer polls http://localhost:<port>/status until the local
+    // helper is running. Failures are expected and handled at the call site
+    // (WindowsInstaller.tsx), but extensions that wrap window.fetch can
+    // surface them as global unhandled rejections.
+    ignoreErrors: [
+      /Failed to fetch \(localhost:/i,
+      /NetworkError when attempting to fetch resource\.? \(localhost:/i,
+    ],
   })
 
   if (typeof window !== 'undefined') {
