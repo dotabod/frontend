@@ -21,6 +21,7 @@ const res = (body: unknown = {}, status = 200) =>
     status,
     statusText: 'OK',
     json: async () => body,
+    text: async () => (typeof body === 'string' ? body : JSON.stringify(body)),
   }) as any
 
 const isUrl = (call: unknown[], suffix: string) => String(call[0]).endsWith(suffix)

@@ -57,6 +57,10 @@ export function subscriptionToValue(
 // Memoized per server instance so we only attempt property creation once.
 let propertiesEnsured: Promise<void> | null = null
 
+async function readBody(res: { text(): Promise<string> }): Promise<string> {
+  return res.text().catch(() => '')
+}
+
 async function createProperty(token: string, prop: PropertyDef) {
   const res = await fetch(`${CRM_BASE}/properties/contacts`, {
     body: JSON.stringify({
@@ -72,8 +76,9 @@ async function createProperty(token: string, prop: PropertyDef) {
   })
   // 409 means the property already exists, which is the expected steady state.
   if (!res.ok && res.status !== 409) {
+    const detail = await readBody(res)
     throw new Error(
-      `Failed to create HubSpot property ${prop.name}: ${res.status} ${res.statusText}`,
+      `Failed to create HubSpot property ${prop.name}: ${res.status} ${res.statusText} ${detail}`,
     )
   }
 }
@@ -135,15 +140,20 @@ export async function syncHubSpotContact(
         if (retryRes.ok) {
           return
         }
+        const retryDetail = await readBody(retryRes)
         throw new Error(
-          `Failed to update HubSpot contact after create-409: ${retryRes.status} ${retryRes.statusText}`,
+          `Failed to update HubSpot contact after create-409: ${retryRes.status} ${retryRes.statusText} ${retryDetail}`,
         )
       }
+      const createDetail = await readBody(createRes)
       throw new Error(
-        `Failed to create HubSpot contact: ${createRes.status} ${createRes.statusText}`,
+        `Failed to create HubSpot contact: ${createRes.status} ${createRes.statusText} ${createDetail}`,
       )
     }
-    throw new Error(`Failed to update HubSpot contact: ${patchRes.status} ${patchRes.statusText}`)
+    const patchDetail = await readBody(patchRes)
+    throw new Error(
+      `Failed to update HubSpot contact: ${patchRes.status} ${patchRes.statusText} ${patchDetail}`,
+    )
   } catch (error) {
     captureException(error instanceof Error ? error : new Error(String(error)))
   }
