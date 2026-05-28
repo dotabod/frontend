@@ -15,6 +15,8 @@ interface ReconcileArgs {
   prisma: Pick<PrismaClient, 'user'>
   userId: string
   accessToken: string
+  currentName: string | null
+  currentDisplayName: string | null
 }
 
 interface HelixUser {
@@ -45,17 +47,13 @@ export async function reconcileTwitchProfile({
   prisma,
   userId,
   accessToken,
+  currentName,
+  currentDisplayName,
 }: ReconcileArgs): Promise<ReconcileResult> {
   const helix = await fetchHelix(accessToken)
   if (!helix) return 'helix-unavailable'
 
-  const current = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { name: true, displayName: true },
-  })
-  if (!current) return 'no-change'
-
-  if (current.name === helix.login && current.displayName === helix.display_name) {
+  if (currentName === helix.login && currentDisplayName === helix.display_name) {
     return 'no-change'
   }
 

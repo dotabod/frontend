@@ -326,12 +326,17 @@ export const authOptions: NextAuthOptions = {
     signIn({ user, account }) {
       if (!user.id || !account || account.provider !== 'twitch' || !account.access_token) return
       const userId = user.id
-      reconcileTwitchProfile({ prisma, userId, accessToken: account.access_token }).catch(
-        (error) => {
-          console.error('Error reconciling twitch profile:', error)
-          captureException(error, { extra: { userId } })
-        },
-      )
+      const twitchUser = user as TwitchUser
+      reconcileTwitchProfile({
+        prisma,
+        userId,
+        accessToken: account.access_token,
+        currentName: twitchUser.name ?? null,
+        currentDisplayName: twitchUser.displayName ?? null,
+      }).catch((error) => {
+        console.error('Error reconciling twitch profile:', error)
+        captureException(error, { extra: { userId } })
+      })
     },
   },
   // Forward NextAuth's internal logger to Sentry so the root cause of an

@@ -21,15 +21,14 @@ function mockHelix(data: Array<{ id: string; login: string; display_name: string
   })) as unknown as typeof fetch
 }
 
-function makePrisma(initial: { name: string; displayName: string | null }) {
+function makePrisma() {
   const calls: Array<{ where: unknown; data: unknown }> = []
   return {
     calls,
     user: {
-      findUnique: async () => initial,
       update: async (args: { where: unknown; data: unknown }) => {
         calls.push(args)
-        return initial
+        return {}
       },
     },
   }
@@ -42,12 +41,14 @@ describe('reconcileTwitchProfile', () => {
     // preferred_username (= display name), which is unchanged, so it misses
     // the rename. This reconciler is the safety net.
     mockHelix([{ id: '32474777', login: 'jamesleed', display_name: 'TECHLEED' }])
-    const prisma = makePrisma({ name: 'techleed', displayName: 'TECHLEED' })
+    const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
       prisma: prisma as never,
       userId: 'u-1',
       accessToken: 'tok',
+      currentName: 'techleed',
+      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('updated')
@@ -60,9 +61,15 @@ describe('reconcileTwitchProfile', () => {
 
   it('updates when displayName changed (the typical rename)', async () => {
     mockHelix([{ id: '32474777', login: 'jamesleed', display_name: 'JAMESLEED' }])
-    const prisma = makePrisma({ name: 'techleed', displayName: 'TECHLEED' })
+    const prisma = makePrisma()
 
-    await reconcileTwitchProfile({ prisma: prisma as never, userId: 'u-1', accessToken: 'tok' })
+    await reconcileTwitchProfile({
+      prisma: prisma as never,
+      userId: 'u-1',
+      accessToken: 'tok',
+      currentName: 'techleed',
+      currentDisplayName: 'TECHLEED',
+    })
 
     expect(prisma.calls[0].data).toMatchObject({
       name: 'jamesleed',
@@ -72,12 +79,14 @@ describe('reconcileTwitchProfile', () => {
 
   it('skips the prisma.update when nothing changed (idempotent)', async () => {
     mockHelix([{ id: '32474777', login: 'techleed', display_name: 'TECHLEED' }])
-    const prisma = makePrisma({ name: 'techleed', displayName: 'TECHLEED' })
+    const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
       prisma: prisma as never,
       userId: 'u-1',
       accessToken: 'tok',
+      currentName: 'techleed',
+      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('no-change')
@@ -88,12 +97,14 @@ describe('reconcileTwitchProfile', () => {
     // Legacy users created before the TwitchProvider.profile() override may
     // have displayName=NULL. Their next sign-in should populate it.
     mockHelix([{ id: '32474777', login: 'techleed', display_name: 'TECHLEED' }])
-    const prisma = makePrisma({ name: 'techleed', displayName: null })
+    const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
       prisma: prisma as never,
       userId: 'u-1',
       accessToken: 'tok',
+      currentName: 'techleed',
+      currentDisplayName: null,
     })
 
     expect(result).toBe('updated')
@@ -107,12 +118,14 @@ describe('reconcileTwitchProfile', () => {
     globalThis.fetch = vi.fn(async () => {
       throw new Error('ECONNRESET')
     }) as unknown as typeof fetch
-    const prisma = makePrisma({ name: 'techleed', displayName: 'TECHLEED' })
+    const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
       prisma: prisma as never,
       userId: 'u-1',
       accessToken: 'tok',
+      currentName: 'techleed',
+      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('helix-unavailable')
@@ -121,12 +134,14 @@ describe('reconcileTwitchProfile', () => {
 
   it('returns "helix-unavailable" when /helix/users returns empty data', async () => {
     mockHelix([])
-    const prisma = makePrisma({ name: 'techleed', displayName: 'TECHLEED' })
+    const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
       prisma: prisma as never,
       userId: 'u-1',
       accessToken: 'tok',
+      currentName: 'techleed',
+      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('helix-unavailable')
