@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "sentry-code-review": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-code-review/SKILL.md",
+      "computedHash": "3f2134bdeffc92ac7cd1d8561f056006cd1908ea87590182cefefdab441ed472"
+    },
+    "sentry-create-alert": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-create-alert/SKILL.md",
+      "computedHash": "05f78a17a70f3e38d283fef4f97b013024a01093ef436b96df12d51e2f1a7b00"
+    },
+    "sentry-feature-setup": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-feature-setup/SKILL.md",
+      "computedHash": "ae104e1c1f9df97f765f2ec87f7efbc3767d9675e185dea637494e7d891aefd9"
+    },
+    "sentry-fix-issues": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-fix-issues/SKILL.md",
+      "computedHash": "0ef2103f20d698acc56d856a07a372a0a68cb02bad654d0dacb4e2ffe87e98b5"
+    },
+    "sentry-nextjs-sdk": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-nextjs-sdk/SKILL.md",
+      "computedHash": "7a144b78fa9d3df2b7fa1d4376d800297bbcbc981c4e7ea6e0409c13fb07050e"
+    },
+    "sentry-pr-code-review": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-pr-code-review/SKILL.md",
+      "computedHash": "50d60bad66edd86ebda5302b67fb2980396b942fb125f70858f103c5a7692eb7"
+    },
+    "sentry-setup-ai-monitoring": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-setup-ai-monitoring/SKILL.md",
+      "computedHash": "12995e57245f0f98bdad2a279ed8483ccbfa283eeb3195598b861a587514c6e6"
+    },
+    "sentry-workflow": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills/sentry-workflow/SKILL.md",
+      "computedHash": "00a62d74aa26a9007d74532ab405b16684386e59c4121a5496f0059206683c6e"
+    }
+  }
+}
