@@ -40,7 +40,7 @@
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
     "@mantine/core": "^7.17.8",
-    "@mantine/form": "^7.17.8",
+    "@mantine/form": "^9.2.1",
     "@mantine/hooks": "^7.17.8",
     "@next-auth/prisma-adapter": "^1.0.7",
     "@next/third-parties": "^16.2.6",
