@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs'
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 const isProduction = process.env.NODE_ENV === 'production'
-const defaultServerTraceSampleRate = isProduction ? 0.02 : 1
+const defaultServerTraceSampleRate = isProduction ? 0.5 : 1
 
 if (SENTRY_DSN) {
   Sentry.init({

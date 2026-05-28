@@ -30,7 +30,7 @@ if (SENTRY_DSN) {
     dsn: SENTRY_DSN,
 
     // Use tracesSampler for more granular control over sampling
-    tracesSampleRate: 0.1,
+    tracesSampleRate: 0.5,
     // Capture errors based on environment
     release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 
