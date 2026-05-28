@@ -47,7 +47,7 @@
     "@nowpaymentsio/nowpayments-api-js": "^1.0.5",
     "@prisma/client": "^6.19.0",
     "@reduxjs/toolkit": "^2.11.0",
-    "@sentry/nextjs": "^10.53.1",
+    "@sentry/nextjs": "^10.54.0",
     "@tailwindcss/postcss": "^4.1.17",
     "@tailwindcss/typography": "^0.5.19",
     "@twurple/eventsub-base": "7.2.1",
