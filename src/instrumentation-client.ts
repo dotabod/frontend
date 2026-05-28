@@ -55,6 +55,24 @@ if (SENTRY_DSN) {
       /Failed to fetch \(localhost:/i,
       /NetworkError when attempting to fetch resource\.? \(localhost:/i,
     ],
+    // Some Yandex Browser extensions / AV products monkey-patch
+    // Object.getOwnPropertyDescriptor with a wrapper that recurses into
+    // itself. The resulting RangeError has zero application frames — just
+    // the wrapper looping until V8 runs out of stack. Drop only that exact
+    // shape so genuine stack-overflow bugs in our own code still surface.
+    beforeSend(event, hint) {
+      const error = hint?.originalException
+      if (!(error instanceof RangeError)) return event
+      if (!/Maximum call stack size exceeded/i.test(error.message)) return event
+
+      const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? []
+      if (frames.length === 0) return event
+
+      const allExtensionFrames = frames.every(
+        (f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,
+      )
+      return allExtensionFrames ? null : event
+    },
   })
 
   if (typeof window !== 'undefined') {
