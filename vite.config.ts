@@ -2,6 +2,8 @@ import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   fmt: {
+    // supabase/functions are Deno (npm: imports, Deno globals) — not part of the Next app.
+    ignorePatterns: ['supabase/**'],
     jsxSingleQuote: true,
     printWidth: 100,
     semi: false,
@@ -10,6 +12,7 @@ export default defineConfig({
     useTabs: false,
   },
   lint: {
+    ignorePatterns: ['supabase/**'],
     categories: {
       correctness: 'error',
     },
