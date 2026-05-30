@@ -1,12 +1,13 @@
 import confetti from 'canvas-confetti'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRightIcon, CheckIcon, ClockIcon, GiftIcon } from 'lucide-react'
+import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import TwitchChat from '@/components/TwitchChat'
+import { stripe } from '@/lib/stripe-server'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 
@@ -16,16 +17,21 @@ const NEXT_STEPS = [
   'Already a Pro subscriber? Your credits stack onto their account and extend how long they keep Pro.',
 ]
 
-const GiftSuccessPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { recipient, senderName, quantity, giftMessage } = router.query
+interface GiftSuccessProps {
+  recipient: string
+  senderName: string
+  quantity: number
+  giftMessage: string
+}
+
+const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
+  recipient,
+  senderName: formattedSenderName,
+  quantity: parsedQuantity,
+  giftMessage: formattedGiftMessage,
+}) => {
   const [hasCelebrated, setHasCelebrated] = useState(false)
   const reduceMotion = useReducedMotion()
-
-  // Parse quantity to a number (default to 1 if undefined or invalid)
-  const parsedQuantity = Number.parseInt(quantity as string, 10) || 1
-  const formattedSenderName = (senderName as string) || 'Anonymous'
-  const formattedGiftMessage = (giftMessage as string) || ''
 
   const fadeUp = (delay: number) => ({
     initial: reduceMotion ? false : { opacity: 0, y: 14 },
@@ -205,6 +211,48 @@ GiftSuccessPage.getLayout = function getLayout(page: ReactElement) {
       {page}
     </HomepageShell>
   )
+}
+
+export const getServerSideProps: GetServerSideProps<GiftSuccessProps> = async ({ query }) => {
+  const fallback: GiftSuccessProps = {
+    recipient: '',
+    senderName: 'Anonymous',
+    quantity: 1,
+    giftMessage: '',
+  }
+
+  const sessionId = typeof query.session_id === 'string' ? query.session_id : null
+  if (!sessionId) {
+    return { props: fallback }
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items'],
+    })
+
+    if (session.metadata?.isGift !== 'true') {
+      return { props: fallback }
+    }
+
+    // Prefer the real purchased quantity from the line item, since Stripe's
+    // adjustable quantity lets the buyer change it during checkout.
+    const lineQuantity = session.line_items?.data?.[0]?.quantity ?? undefined
+    const metaQuantity = Number.parseInt(session.metadata?.giftQuantity ?? '', 10)
+    const quantity = lineQuantity || (Number.isNaN(metaQuantity) ? 1 : metaQuantity) || 1
+
+    return {
+      props: {
+        recipient:
+          session.metadata?.recipientDisplayName || session.metadata?.recipientUsername || '',
+        senderName: session.metadata?.giftSenderName || 'Anonymous',
+        quantity,
+        giftMessage: session.metadata?.giftMessage || '',
+      },
+    }
+  } catch {
+    return { props: fallback }
+  }
 }
 
 export default GiftSuccessPage
