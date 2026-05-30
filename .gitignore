@@ -49,3 +49,8 @@ public/install.ps1
 !src/lib/private/install.ps1
 
 **/.claude/settings.local.json
+
+# Local agent skill installs and browser-automation output
+.claude/skills/
+.agents/skills/
+.playwright-mcp/
