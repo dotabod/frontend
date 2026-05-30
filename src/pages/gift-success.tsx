@@ -1,59 +1,58 @@
 import confetti from 'canvas-confetti'
-import { ArrowRightIcon, CakeIcon, ClockIcon, GiftIcon } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRightIcon, CheckIcon, ClockIcon, GiftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import HomepageShell from '@/components/Homepage/HomepageShell'
-import GiftSubscriptionAlert from '@/components/Overlay/GiftAlert/GiftSubscriptionAlert'
 import TwitchChat from '@/components/TwitchChat'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 
+const NEXT_STEPS = [
+  'The recipient gets a notification in their Twitch chat.',
+  "New to Pro? They set up a subscription and your credits cover the gifted months, so they aren't charged until those run out.",
+  'Already a Pro subscriber? Your credits stack onto their account and extend how long they keep Pro.',
+]
+
 const GiftSuccessPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { recipient, senderName, quantity, giftMessage } = router.query
-  const [showConfetti, setShowConfetti] = useState(false)
+  const [hasCelebrated, setHasCelebrated] = useState(false)
+  const reduceMotion = useReducedMotion()
 
   // Parse quantity to a number (default to 1 if undefined or invalid)
   const parsedQuantity = Number.parseInt(quantity as string, 10) || 1
   const formattedSenderName = (senderName as string) || 'Anonymous'
   const formattedGiftMessage = (giftMessage as string) || ''
 
-  // Trigger confetti effect when the page loads
+  const fadeUp = (delay: number) => ({
+    initial: reduceMotion ? false : { opacity: 0, y: 14 },
+    animate: { opacity: 1, y: 0 },
+    transition: { delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  })
+
+  // Trigger confetti when the page loads, unless the user prefers reduced motion.
   useEffect(() => {
-    if (typeof window !== 'undefined' && !showConfetti) {
-      setShowConfetti(true)
-
-      // Create a confetti effect
-      const duration = 3 * 1000
-      const end = Date.now() + duration
-
-      const frame = () => {
-        void confetti({
-          angle: 60,
-          colors: ['#5D5FEF', '#3F83F8', '#10B981'],
-          origin: { x: 0 },
-          particleCount: 2,
-          spread: 55,
-        })
-
-        void confetti({
-          angle: 120,
-          colors: ['#5D5FEF', '#3F83F8', '#10B981'],
-          origin: { x: 1 },
-          particleCount: 2,
-          spread: 55,
-        })
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame)
-        }
-      }
-
-      frame()
+    if (typeof window === 'undefined' || reduceMotion || hasCelebrated) {
+      return
     }
-  }, [showConfetti])
+    setHasCelebrated(true)
+
+    const duration = 3 * 1000
+    const end = Date.now() + duration
+    const colors = ['#a855f7', '#c084fc', '#7c3aed']
+
+    const frame = () => {
+      void confetti({ angle: 60, colors, origin: { x: 0 }, particleCount: 2, spread: 55 })
+      void confetti({ angle: 120, colors, origin: { x: 1 }, particleCount: 2, spread: 55 })
+      if (Date.now() < end) {
+        requestAnimationFrame(frame)
+      }
+    }
+    frame()
+  }, [hasCelebrated, reduceMotion])
 
   // Create gift message preview for Twitch chat
   const giftChatMessage = (
@@ -63,172 +62,128 @@ const GiftSuccessPage: NextPageWithLayout = () => {
       ) : (
         <span>
           A gift sub for Dotabod Pro was just gifted by{' '}
-          <span className='text-purple-400 font-semibold'>{formattedSenderName}</span>!
+          <span className='font-semibold text-purple-400'>{formattedSenderName}</span>!
         </span>
       )}
     </>
   )
 
   return (
-    <div className='container mx-auto flex max-w-3xl flex-col items-center py-16 text-center'>
-      <div className='mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-purple-100'>
-        <GiftIcon className='h-10 w-10 text-purple-600' />
-      </div>
+    <div className='mx-auto w-full max-w-3xl px-4 pb-20 md:px-6'>
+      <motion.header {...fadeUp(0)} className='pt-16 text-center'>
+        <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/15 ring-1 ring-purple-500/30'>
+          <CheckIcon className='h-8 w-8 text-purple-300' aria-hidden />
+        </div>
+        <h1 className='mt-6 text-balance text-4xl font-semibold tracking-tight text-gray-100 sm:text-5xl'>
+          Your gift is on its way
+        </h1>
+        <p className='mx-auto mt-4 max-w-lg text-pretty text-lg text-gray-400'>
+          {recipient ? (
+            <>
+              You gifted <span className='font-medium text-gray-200'>{parsedQuantity}</span>{' '}
+              {parsedQuantity === 1 ? 'month' : 'months'} of Dotabod Pro to{' '}
+              <span className='font-medium text-gray-200'>{recipient}</span>. They'll be notified
+              shortly.
+            </>
+          ) : (
+            <>
+              You gifted {parsedQuantity} {parsedQuantity === 1 ? 'month' : 'months'} of Dotabod
+              Pro. The recipient will be notified shortly.
+            </>
+          )}
+        </p>
+      </motion.header>
 
-      <h1 className='mb-3 text-3xl font-bold'>Gift Sent Successfully!</h1>
-
-      <p className='mb-8 max-w-lg text-muted-foreground'>
-        {recipient ? (
-          <>
-            Your gift subscription to{' '}
-            <span className='font-medium text-foreground'>{recipient}</span> has been sent
-            successfully. They'll be notified about your generous gift!
-          </>
-        ) : (
-          <>
-            Your gift subscription has been sent successfully. The recipient will be notified about
-            your generous gift!
-          </>
-        )}
-      </p>
-
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8'>
-        <Card className='p-6'>
-          <div className='flex items-center gap-3 mb-4'>
-            <GiftIcon className='h-5 w-5 text-primary' />
-            <h2 className='text-lg font-medium'>Gift Details</h2>
+      <motion.div {...fadeUp(0.08)} className='mt-10 grid grid-cols-1 gap-6 md:grid-cols-2'>
+        <Card>
+          <div className='flex items-center gap-2'>
+            <GiftIcon className='h-5 w-5 text-purple-300' aria-hidden />
+            <h2 className='text-lg font-medium text-gray-100'>Gift details</h2>
           </div>
-
-          <div className='space-y-4 text-left'>
-            <div className='flex items-start gap-2'>
-              <span className='font-medium min-w-28'>Recipient:</span>
-              <span>{recipient || 'Not specified'}</span>
+          <dl className='mt-4 space-y-3 text-sm'>
+            <div className='flex justify-between gap-3'>
+              <dt className='text-gray-500'>Recipient</dt>
+              <dd className='text-gray-200'>{recipient || 'Not specified'}</dd>
             </div>
-
-            <div className='flex items-start gap-2'>
-              <span className='font-medium min-w-28'>From:</span>
-              <span>{formattedSenderName}</span>
+            <div className='flex justify-between gap-3'>
+              <dt className='text-gray-500'>From</dt>
+              <dd className='text-gray-200'>{formattedSenderName}</dd>
             </div>
-
-            <div className='flex items-start gap-2'>
-              <span className='font-medium min-w-28'>Duration:</span>
-              <span>
-                {parsedQuantity} {parsedQuantity === 1 ? 'month' : 'months'} of Dotabod Pro
-              </span>
+            <div className='flex justify-between gap-3'>
+              <dt className='text-gray-500'>Duration</dt>
+              <dd className='text-gray-200'>
+                {parsedQuantity} {parsedQuantity === 1 ? 'month' : 'months'} of Pro
+              </dd>
             </div>
-
             {formattedGiftMessage && (
-              <div className='flex items-start gap-2'>
-                <span className='font-medium min-w-28'>Message:</span>
-                <span className='italic'>"{formattedGiftMessage}"</span>
+              <div className='flex justify-between gap-3'>
+                <dt className='text-gray-500'>Message</dt>
+                <dd className='text-right italic text-gray-300'>"{formattedGiftMessage}"</dd>
               </div>
             )}
-          </div>
+          </dl>
         </Card>
 
-        <Card className='p-6'>
-          <div className='flex items-center gap-3 mb-4'>
-            <ClockIcon className='h-5 w-5 text-amber-500' />
-            <h2 className='text-lg font-medium'>Important Note</h2>
+        <Card>
+          <div className='flex items-center gap-2'>
+            <ClockIcon className='h-5 w-5 text-amber-300' aria-hidden />
+            <h2 className='text-lg font-medium text-gray-100'>Good to know</h2>
           </div>
-
-          <div className='space-y-4 text-left'>
+          <div className='mt-4 space-y-3 text-sm text-gray-400'>
             <p>
-              The gift notification may take <span className='font-medium'>1-3 minutes</span> to
-              appear on the recipient's stream overlay and in their Twitch chat.
+              The notification can take{' '}
+              <span className='font-medium text-gray-200'>1 to 3 minutes</span> to reach the
+              recipient's Twitch chat.
             </p>
-            <p>If the recipient is streaming right now, they'll see your gift shortly!</p>
+            <p>If they're live right now, your gift will show up on stream shortly.</p>
           </div>
         </Card>
-      </div>
+      </motion.div>
 
-      <div className='mb-8 w-full'>
-        <Card className='p-6'>
-          <div className='flex items-center gap-3 mb-4'>
-            <CakeIcon className='h-5 w-5 text-purple-500' />
-            <h2 className='text-lg font-medium'>Gift Preview</h2>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <div>
-              <h3 className='text-left text-base font-medium mb-2'>Twitch Chat</h3>
-              <TwitchChat responses={[giftChatMessage]} />
-            </div>
-
-            <div>
-              <h3 className='text-left text-base font-medium mb-2'>Stream Overlay</h3>
-              <div className='rounded-md bg-gray-800 p-4 flex items-center justify-center'>
-                <div className='relative h-48 overflow-hidden flex items-center justify-center'>
-                  <GiftSubscriptionAlert
-                    senderName={formattedSenderName}
-                    giftType='monthly'
-                    giftQuantity={parsedQuantity}
-                    giftMessage={formattedGiftMessage}
-                    preview={true}
-                    className='scale-75'
-                  />
-                </div>
-              </div>
-            </div>
+      <motion.div {...fadeUp(0.16)} className='mt-6'>
+        <Card>
+          <h2 className='text-lg font-medium text-gray-100'>How it'll appear</h2>
+          <div className='mt-4'>
+            <span className='mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+              Twitch chat
+            </span>
+            <TwitchChat responses={[giftChatMessage]} />
           </div>
         </Card>
-      </div>
+      </motion.div>
 
-      <Card className='mb-8'>
-        <div className='flex items-center gap-3'>
-          <GiftIcon className='h-5 w-5 text-primary' />
-          <h2 className='text-lg font-medium'>What happens next?</h2>
-        </div>
+      <motion.div {...fadeUp(0.24)} className='mt-6'>
+        <Card>
+          <h2 className='text-lg font-medium text-gray-100'>What happens next</h2>
+          <ol className='mt-4 space-y-3'>
+            {NEXT_STEPS.map((step, index) => (
+              <li key={step} className='flex items-start gap-3 text-sm text-gray-300'>
+                <span className='mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple-500/15 text-xs font-semibold text-purple-200'>
+                  {index + 1}
+                </span>
+                <span className='text-gray-400'>{step}</span>
+              </li>
+            ))}
+          </ol>
+        </Card>
+      </motion.div>
 
-        <ul className='mt-4 space-y-3 text-left'>
-          <li className='flex items-start gap-3'>
-            <div className='mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary'>
-              1
-            </div>
-            <span>
-              The recipient will receive a notification about your gift in their Twitch chat and
-              stream overlay.
-            </span>
-          </li>
-          <li className='flex items-start gap-3'>
-            <div className='mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary'>
-              2
-            </div>
-            <span>
-              If the recipient has never subscribed to Dotabod Pro, they will need to set up a
-              subscription after receiving your gift. The credits will be automatically applied, so
-              they won't be charged for the duration of your gift.
-            </span>
-          </li>
-          <li className='flex items-start gap-3'>
-            <div className='mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary'>
-              3
-            </div>
-            <span>
-              If the recipient is already a Pro subscriber, the gift credits will automatically be
-              applied to their account and used when their subscription renews.
-            </span>
-          </li>
-        </ul>
-      </Card>
-
-      <div className='flex flex-col gap-4 sm:flex-row'>
+      <motion.div {...fadeUp(0.32)} className='mt-8 flex flex-col justify-center gap-3 sm:flex-row'>
         <Link
           href='/gift'
-          className='inline-flex items-center justify-center gap-2 rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent'
+          className='inline-flex items-center justify-center gap-2 rounded-md border border-gray-700 bg-gray-800 px-4 py-2 text-sm font-medium text-gray-200 transition-colors duration-200 hover:border-gray-600 hover:text-purple-300'
         >
-          <GiftIcon className='h-4 w-4' />
-          Send Another Gift
+          <GiftIcon className='h-4 w-4' aria-hidden />
+          Send another gift
         </Link>
-
         <Link
           href='/'
-          className='inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+          className='inline-flex items-center justify-center gap-2 rounded-md bg-purple-900 px-4 py-2 text-sm font-medium text-gray-100 transition-colors duration-200 hover:bg-purple-800'
         >
-          Return to Dashboard
-          <ArrowRightIcon className='h-4 w-4' />
+          Back to Dotabod
+          <ArrowRightIcon className='h-4 w-4' aria-hidden />
         </Link>
-      </div>
+      </motion.div>
     </div>
   )
 }
