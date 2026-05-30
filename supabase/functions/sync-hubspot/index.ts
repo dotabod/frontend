@@ -45,10 +45,33 @@ function hsHeaders(token: string) {
   return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 }
 
+// HubSpot private apps cap at ~100 requests / 10s (TEN_SECONDLY_ROLLING). Space
+// every call ~120ms apart (~83/10s, comfortably under) and retry 429s honoring
+// Retry-After. All HubSpot calls (across the concurrent workers) funnel through
+// this single limiter, so concurrency controls DB/processing overlap, not request rate.
+const MIN_INTERVAL_MS = 120
+let nextSlot = 0
+
+async function hsFetch(url: string, init: RequestInit, retries = 5): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const now = Date.now()
+    const wait = Math.max(0, nextSlot - now)
+    nextSlot = Math.max(now, nextSlot) + MIN_INTERVAL_MS
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait))
+
+    const res = await fetch(url, init)
+    if (res.status !== 429 || attempt >= retries) return res
+    const retryAfter = Number(res.headers.get('Retry-After'))
+    const backoff = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1000 * (attempt + 1)
+    await res.body?.cancel()
+    await new Promise((r) => setTimeout(r, backoff))
+  }
+}
+
 async function ensureContactProperties(token: string) {
   await Promise.all(
     CONTACT_PROPERTIES.map(async (prop) => {
-      const res = await fetch(`${CRM_BASE}/properties/contacts`, {
+      const res = await hsFetch(`${CRM_BASE}/properties/contacts`, {
         body: JSON.stringify({ groupName: 'contactinformation', ...prop }),
         headers: hsHeaders(token),
         method: 'POST',
@@ -73,7 +96,7 @@ async function syncContact(token: string, { email, username, subscription }: Con
   const properties = { dotabod_subscription: subscription, twitch_username: username }
   const patchUrl = `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`
   const patch = () =>
-    fetch(patchUrl, {
+    hsFetch(patchUrl, {
       body: JSON.stringify({ properties }),
       headers: hsHeaders(token),
       method: 'PATCH',
@@ -82,7 +105,7 @@ async function syncContact(token: string, { email, username, subscription }: Con
   const patchRes = await patch()
   if (patchRes.ok) return
   if (patchRes.status === 404) {
-    const createRes = await fetch(`${CRM_BASE}/objects/contacts`, {
+    const createRes = await hsFetch(`${CRM_BASE}/objects/contacts`, {
       body: JSON.stringify({ properties: { email, ...properties } }),
       headers: hsHeaders(token),
       method: 'POST',
@@ -159,6 +182,60 @@ async function fetchChanged(sql: ReturnType<typeof postgres>, hours: number): Pr
   return rows as unknown as Contact[]
 }
 
+// Targeted reheal: sync an explicit list of emails (e.g. contacts that failed an
+// earlier run and may never change again, so the updated_at window won't catch them).
+async function fetchByEmails(
+  sql: ReturnType<typeof postgres>,
+  emails: string[],
+): Promise<Contact[]> {
+  const rows = await sql`
+    with picked as (
+      select distinct on (s."userId") s."userId",
+        case
+          when s.tier::text = 'FREE' then 'free'
+          when s."transactionType"::text = 'LIFETIME' then 'pro_lifetime'
+          when s.status::text = 'TRIALING' then 'pro_trial'
+          when s.status::text = 'PAST_DUE' then 'pro_past_due'
+          else 'pro'
+        end as sub_value
+      from subscriptions s
+      order by s."userId",
+        (case when s.status::text in ('ACTIVE', 'TRIALING') then 0 else 1 end),
+        (case when s."transactionType"::text = 'LIFETIME' then 0 else 1 end),
+        s.created_at desc
+    )
+    select u.email as email,
+           coalesce(u."displayName", '') as username,
+           coalesce(p.sub_value, 'free') as subscription
+    from users u
+    left join picked p on p."userId" = u.id
+    where u.email = any(${emails})
+  `
+  return rows as unknown as Contact[]
+}
+
+// Bounded-concurrency sync of a contact list. Request rate is governed by the
+// throttle inside hsFetch, so concurrency only controls processing overlap.
+async function runSync(token: string, contacts: Contact[]) {
+  let synced = 0
+  let failed = 0
+  let cursor = 0
+  const worker = async () => {
+    while (cursor < contacts.length) {
+      const c = contacts[cursor++]
+      try {
+        await syncContact(token, c)
+        synced++
+      } catch (err) {
+        failed++
+        console.error('sync failed for', c.email, String(err))
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, contacts.length) }, worker))
+  return { considered: contacts.length, failed, synced }
+}
+
 Deno.serve(async (req) => {
   const sql = dbClient()
   try {
@@ -172,31 +249,27 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Optional ?hours= override for manual runs (e.g. wider catch-up); default 2h.
-    const hoursParam = Number(new URL(req.url).searchParams.get('hours'))
-    const lookback = Number.isFinite(hoursParam) && hoursParam > 0 ? hoursParam : LOOKBACK_HOURS
+    // Two modes:
+    //  - POST { emails: [...] } → targeted reheal of exactly those contacts.
+    //  - otherwise → users/subs changed in the last ?hours= (default 2h).
+    const body = await req.json().catch(() => ({}))
+    const emails: string[] = Array.isArray(body?.emails)
+      ? body.emails.filter((e: unknown): e is string => typeof e === 'string' && e.length > 0)
+      : []
 
     await ensureContactProperties(token)
-    const contacts = await fetchChanged(sql, lookback)
 
-    let synced = 0
-    let failed = 0
-    let cursor = 0
-    const worker = async () => {
-      while (cursor < contacts.length) {
-        const c = contacts[cursor++]
-        try {
-          await syncContact(token, c)
-          synced++
-        } catch (err) {
-          failed++
-          console.error('sync failed for', c.email, String(err))
-        }
-      }
+    let contacts: Contact[]
+    if (emails.length > 0) {
+      contacts = await fetchByEmails(sql, emails)
+    } else {
+      const hoursParam = Number(new URL(req.url).searchParams.get('hours'))
+      const lookback = Number.isFinite(hoursParam) && hoursParam > 0 ? hoursParam : LOOKBACK_HOURS
+      contacts = await fetchChanged(sql, lookback)
     }
-    await Promise.all(Array.from({ length: Math.min(CONCURRENCY, contacts.length) }, worker))
 
-    return new Response(JSON.stringify({ considered: contacts.length, failed, synced }), {
+    const result = await runSync(token, contacts)
+    return new Response(JSON.stringify({ mode: emails.length > 0 ? 'emails' : 'window', ...result }), {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (err) {
