@@ -112,13 +112,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    // Create a checkout session for the gift
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
-    const successUrl = `${baseUrl}/gift-success?recipient=${encodeURIComponent(recipientUser.name || recipientUser.displayName || '')}`
-    const cancelUrl = `${baseUrl}/gift?canceled=true`
-
     // Always use one-time payment mode for gift credits
     const finalQuantity = quantity
+
+    // Create a checkout session for the gift
+    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
+    // Pass only the Stripe session id. The success page reads the gift
+    // details from the session metadata server-side, so the recipient's
+    // name and the buyer's personal message never land in the URL, browser
+    // history, or request logs.
+    const successUrl = `${baseUrl}/gift-success?session_id={CHECKOUT_SESSION_ID}`
+    const cancelUrl = `${baseUrl}/gift?canceled=true`
 
     // Get gift duration from price ID using GIFT_PRICE_IDS
     // Determine gift duration based on which price ID field matches
@@ -156,6 +160,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         isGift: 'true',
         recipientUserId: recipientUser.id,
         recipientUsername,
+        // Friendly name for the success page (prefers display name over login).
+        recipientDisplayName: recipientUser.displayName || recipientUser.name || '',
         giftDuration,
         giftMessage: sanitizeInput(giftMessage),
         giftSenderName: sanitizeInput(giftSenderName) || 'Anonymous',
