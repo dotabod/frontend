@@ -112,13 +112,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    // Create a checkout session for the gift
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
-    const successUrl = `${baseUrl}/gift-success?recipient=${encodeURIComponent(recipientUser.name || recipientUser.displayName || '')}`
-    const cancelUrl = `${baseUrl}/gift?canceled=true`
-
     // Always use one-time payment mode for gift credits
     const finalQuantity = quantity
+
+    // Create a checkout session for the gift
+    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
+    // Pass the gift details through so the success page can show what was
+    // purchased. Quantity reflects the selection at checkout; a buyer who
+    // adjusts it inside Stripe may see a slightly different number here.
+    const successParams = new URLSearchParams({
+      recipient: recipientUser.name || recipientUser.displayName || '',
+      senderName: sanitizeInput(giftSenderName) || 'Anonymous',
+      quantity: finalQuantity.toString(),
+    })
+    const sanitizedGiftMessage = sanitizeInput(giftMessage)
+    if (sanitizedGiftMessage) {
+      successParams.set('giftMessage', sanitizedGiftMessage)
+    }
+    const successUrl = `${baseUrl}/gift-success?${successParams.toString()}`
+    const cancelUrl = `${baseUrl}/gift?canceled=true`
 
     // Get gift duration from price ID using GIFT_PRICE_IDS
     // Determine gift duration based on which price ID field matches

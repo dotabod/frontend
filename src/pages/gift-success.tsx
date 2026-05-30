@@ -135,7 +135,7 @@ const GiftSuccessPage: NextPageWithLayout = () => {
               <span className='font-medium text-gray-200'>1 to 3 minutes</span> to reach the
               recipient's Twitch chat.
             </p>
-            <p>If they're live right now, your gift will show up on stream shortly.</p>
+            <p>If they're live right now, it'll appear in their Twitch chat shortly.</p>
           </div>
         </Card>
       </motion.div>
