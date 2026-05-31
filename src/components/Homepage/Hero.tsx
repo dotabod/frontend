@@ -250,6 +250,15 @@ export function Hero() {
                 ) : (
                   <p className='text-center text-gray-300'>No top streamers found</p>
                 )}
+                <div className='mt-4 text-center lg:text-left'>
+                  <Link
+                    href='/streamers'
+                    onClick={() => track('homepage - browse all streamers')}
+                    className='text-sm font-medium text-purple-300 transition-colors hover:text-purple-200'
+                  >
+                    Browse all live streamers →
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

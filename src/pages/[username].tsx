@@ -448,6 +448,14 @@ const PageContent = ({
               Set up Dotabod for free
             </Button>
           </Link>
+          <p className='mt-4 text-sm'>
+            <Link
+              href='/streamers'
+              className='font-medium text-purple-300 transition-colors hover:text-purple-200'
+            >
+              Browse more Dota 2 streamers →
+            </Link>
+          </p>
         </div>
       </Container>
     </>
@@ -511,6 +519,18 @@ const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps
   const pageTitle = `${userData.displayName || userData.name} - ${userData.mmr || 0} MMR | Dotabod`
   const pageDescription = `View ${userData.displayName || userData.name}'s Dota 2 commands and stream stats on Dotabod. ${userData.stream_online ? 'Currently live streaming!' : 'Stream offline.'}`
 
+  const profileJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    url: `https://dotabod.com/${username}`,
+    mainEntity: {
+      '@type': 'Person',
+      name: userData.displayName || userData.name,
+      url: `https://twitch.tv/${userData.name}`,
+      ...(userData.image ? { image: userData.image } : {}),
+    },
+  }
+
   return (
     <>
       <Head>
@@ -525,6 +545,10 @@ const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps
         <meta property='twitter:description' content={pageDescription} />
         <meta property='twitter:image' content={userData.image || '/images/hero/default.png'} />
         <link rel='canonical' href={`https://dotabod.com/${username}`} />
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(profileJsonLd) }}
+        />
       </Head>
       <HomepageShell
         dontUseTitle
