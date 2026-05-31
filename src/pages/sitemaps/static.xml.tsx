@@ -14,6 +14,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         url: 'https://dotabod.com',
       },
       {
+        changefreq: 'daily',
+        lastmod: new Date().toISOString(),
+        priority: '0.8',
+        url: 'https://dotabod.com/streamers',
+      },
+      {
         changefreq: 'monthly',
         lastmod: new Date().toISOString(),
         priority: '0.7',
