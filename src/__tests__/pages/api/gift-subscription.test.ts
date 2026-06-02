@@ -195,10 +195,12 @@ describe('Gift Subscription Functions', () => {
       }
 
       return webhook().then((newExpiration) => {
-        // Should add 3 months to grace period end
-        expect(newExpiration.getFullYear()).toBe(2025)
-        expect(newExpiration.getMonth()).toBe(6) // July (0-indexed) after adding 3 months to April 30
-        expect(newExpiration.getDate()).toBe(30)
+        // Should add 3 months to grace period end. Use UTC accessors (like the
+        // sibling tests): the result is 2025-07-30T23:59:59.999Z, which rolls to
+        // the 31st under local time in any timezone ahead of UTC.
+        expect(newExpiration.getUTCFullYear()).toBe(2025)
+        expect(newExpiration.getUTCMonth()).toBe(6) // July (0-indexed) after adding 3 months to April 30
+        expect(newExpiration.getUTCDate()).toBe(30)
       })
     })
   })

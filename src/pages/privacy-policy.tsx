@@ -51,7 +51,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
               using our{' '}
             </em>
           </strong>
-          <a href='#toc'>
+          <a href='#toc' aria-label='table of contents'>
             <strong>
               <em>table of contents</em>
             </strong>
@@ -882,7 +882,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
             </tr>
             <tr>
               <td>L. Sensitive personal Information</td>
-              <td />
+              <td aria-label='No examples' />
               <td style={{ textAlign: 'center' }}>NO</td>
             </tr>
           </tbody>

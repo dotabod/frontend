@@ -40,6 +40,7 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
               <label key={period} className='relative block'>
                 <input
                   type='radio'
+                  aria-label={period}
                   name={`billing-period-${groupId}`}
                   value={period}
                   checked={selected}

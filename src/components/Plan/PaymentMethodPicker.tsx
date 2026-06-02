@@ -81,6 +81,7 @@ const PaymentMethodPicker = memo(
                 >
                   <input
                     type='radio'
+                    aria-label={label}
                     name={`payment-method-${groupId}`}
                     value={method}
                     checked={selected}
