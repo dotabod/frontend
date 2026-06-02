@@ -7,6 +7,15 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { Container } from '@/components/Container'
+import {
+  bestRarity,
+  type CosmeticItem,
+  hexA,
+  RARITY_META,
+  RarityChip,
+  rarityRank,
+  STEAM_CDN,
+} from '@/components/CosmeticSet'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -18,6 +27,79 @@ import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
 
 const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
+
+interface CollectionSummary {
+  count: number
+  // A few of the rarest heroes, for the fanned hand.
+  cards: Array<{ heroId: number; heroName: string; heroImg: string | null; bestRarity?: string }>
+  // Trophy rarities across the whole collection, rarest first.
+  tally: Array<{ rarity: string; count: number }>
+}
+
+// The discovery hook on the main page: a held hand of the streamer's rarest hero cards
+// that spreads on hover. One link into the collection (no nested anchors), so the cards
+// stay purely presentational here.
+function FannedHand({ username, collection }: { username: string; collection: CollectionSummary }) {
+  const cards = collection.cards.slice(0, 5)
+  const mid = (cards.length - 1) / 2
+  return (
+    <Link
+      href={`/${username}/set`}
+      aria-label={`${collection.count} heroes collected, open collection`}
+      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none'
+    >
+      <div className='relative mx-auto h-36 w-[260px] [--k:1] group-hover/fan:[--k:1.32]'>
+        {cards.map((c, i) => {
+          const offset = i - mid
+          const accent = (c.bestRarity && RARITY_META[c.bestRarity]?.color) || '#9146ff'
+          return (
+            <div
+              key={c.heroId}
+              className='absolute left-1/2 top-1 h-32 w-[88px] overflow-hidden rounded-xl border bg-gray-900 shadow-lg transition-transform duration-300 ease-out'
+              style={{
+                borderColor: hexA(accent, 0.55),
+                zIndex: i,
+                transform: `translateX(calc(-50% + ${offset * 26}px * var(--k))) rotate(calc(${offset * 7}deg * var(--k)))`,
+              }}
+            >
+              {c.heroImg && (
+                <img
+                  src={c.heroImg}
+                  alt=''
+                  aria-hidden
+                  className='h-full w-full object-cover object-center'
+                />
+              )}
+              <span
+                aria-hidden
+                className='absolute inset-0'
+                style={{
+                  background: `linear-gradient(180deg, transparent 45%, rgba(8,10,14,0.85))`,
+                  boxShadow: `inset 0 0 0 1px ${hexA(accent, 0.35)}`,
+                }}
+              />
+            </div>
+          )
+        })}
+      </div>
+      <div className='mt-4 text-center'>
+        <p className='text-sm font-semibold text-white'>
+          {collection.count} {collection.count === 1 ? 'hero' : 'heroes'} collected
+        </p>
+        {collection.tally.length > 0 && (
+          <div className='mt-2 flex flex-wrap justify-center gap-1.5'>
+            {collection.tally.map((t) => (
+              <RarityChip key={t.rarity} rarity={t.rarity} count={t.count} />
+            ))}
+          </div>
+        )}
+        <span className='mt-2 inline-block text-sm font-medium text-purple-300 transition-colors group-hover/fan:text-purple-200'>
+          Open collection →
+        </span>
+      </div>
+    </Link>
+  )
+}
 
 const FEATURED_COMMAND_KEYS = [
   'commandMmr',
@@ -50,12 +132,14 @@ interface PageContentProps {
     inGracePeriod: boolean
   }
   username?: string
+  collection?: CollectionSummary | null
 }
 
 const PageContent = ({
   userData: ssrUserData,
   subscriptionInfo: ssrSubscriptionInfo,
   username: ssrUsername,
+  collection,
 }: PageContentProps = {}) => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
@@ -342,6 +426,13 @@ const PageContent = ({
                 </Link>
               </div>
             </div>
+
+            {collection && collection.count > 0 && (
+              <FannedHand
+                username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
+                collection={collection}
+              />
+            )}
           </div>
         </Container>
       </div>
@@ -482,6 +573,7 @@ interface UserProfileProps {
     inGracePeriod: boolean
   }
   username: string
+  collection: CollectionSummary | null
 }
 
 function isMaintenanceModeEnabled() {
@@ -491,7 +583,50 @@ function isMaintenanceModeEnabled() {
   )
 }
 
-const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps) => {
+// Shape the streamer's loadouts into the fanned-hand summary: rarest few heroes plus a
+// trophy tally. Heroes.json is imported here (server-only) so it stays out of the bundle.
+async function buildCollectionSummary(
+  loadouts: Array<{ heroId: number; heroName: string; items: unknown }>,
+): Promise<CollectionSummary | null> {
+  if (!loadouts.length) return null
+
+  const heroes = (await import('dotaconstants/build/heroes.json')).default as Record<
+    string,
+    { img?: string }
+  >
+
+  const cards = loadouts
+    .map((l) => {
+      const items = l.items as unknown as CosmeticItem[]
+      const img = heroes[String(l.heroId)]?.img
+      return {
+        heroId: l.heroId,
+        heroName: l.heroName,
+        heroImg: img ? `${STEAM_CDN}${img}` : null,
+        bestRarity: bestRarity(items),
+      }
+    })
+    .sort(
+      (a, b) =>
+        (b.bestRarity ? (RARITY_META[b.bestRarity]?.rank ?? -1) : -1) -
+        (a.bestRarity ? (RARITY_META[a.bestRarity]?.rank ?? -1) : -1),
+    )
+    .slice(0, 5)
+
+  const tallyCounts = new Map<string, number>()
+  for (const l of loadouts)
+    for (const item of l.items as unknown as CosmeticItem[])
+      if (rarityRank(item) >= 4)
+        tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
+  const tally = [...tallyCounts.entries()]
+    .map(([rarity, count]) => ({ rarity, count }))
+    .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
+    .slice(0, 3)
+
+  return { count: loadouts.length, cards, tally }
+}
+
+const CommandsPage = ({ userData, subscriptionInfo, username, collection }: UserProfileProps) => {
   const router = useRouter()
 
   // If we're in fallback mode, show loading
@@ -557,7 +692,12 @@ const CommandsPage = ({ userData, subscriptionInfo, username }: UserProfileProps
           title: userData.displayName || userData.name,
         }}
       >
-        <PageContent userData={userData} subscriptionInfo={subscriptionInfo} username={username} />
+        <PageContent
+          userData={userData}
+          subscriptionInfo={subscriptionInfo}
+          username={username}
+          collection={collection}
+        />
       </HomepageShell>
     </>
   )
@@ -632,6 +772,9 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
           },
         },
         stream_online: true,
+        cosmeticLoadouts: {
+          select: { heroId: true, heroName: true, items: true, updatedAt: true },
+        },
       },
       where: {
         name: username.toLowerCase(),
@@ -641,6 +784,8 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
     if (!userData) {
       return { notFound: true }
     }
+
+    const collection = await buildCollectionSummary(userData.cosmeticLoadouts)
 
     // Fetch subscription info
     const subscription = await getSubscription(userData.id)
@@ -664,6 +809,7 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
           stream_online: userData.stream_online,
         },
         username: username.toLowerCase(),
+        collection,
       },
       revalidate: 600, // Revalidate every 10 minutes
     }

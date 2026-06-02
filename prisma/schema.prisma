@@ -64,26 +64,27 @@ model User {
   streamTitle                       String?
   youtubeChannelId                  String?               @unique
   bannedAt                          DateTime?             @map("banned_at") @db.Timestamptz(6)
-  bannedReason                      String?               @map("banned_reason")
   bannedBy                          String?               @map("banned_by") @db.Uuid
+  bannedReason                      String?               @map("banned_reason")
   MessageDelivery                   MessageDelivery[]
   scheduledMessages                 ScheduledMessage[]
   Account                           Account?
   admin                             admin?
   approvedModerators                ApprovedModerator[]   @relation("UserApprovedModerators")
+  cosmeticLoadouts                  CosmeticLoadout[]
   disableNotifications              DisableNotification[] @relation("UserDisableNotifications")
   matches                           matches[]
   mods_mods_mod_user_idTousers      mods[]                @relation("mods_mod_user_idTousers")
   mods_mods_streamer_user_idTousers mods[]                @relation("mods_streamer_user_idTousers")
   notifications                     Notification[]
+  NowPaymentsInvoice                NowPaymentsInvoice[]
+  OpenNodeCharge                    OpenNodeCharge[]
+  PayPalOrder                       PayPalOrder[]
+  PayPalSubscription                PayPalSubscription[]
   settings                          Setting[]
   SteamAccount                      SteamAccount[]
   streams                           streams?
   subscription                      Subscription[]
-  OpenNodeCharge                    OpenNodeCharge[]
-  NowPaymentsInvoice                NowPaymentsInvoice[]
-  PayPalOrder                       PayPalOrder[]
-  PayPalSubscription                PayPalSubscription[]
 
   @@index([followers(sort: Desc)], map: "idx_users_followers_desc")
   @@index([locale])
@@ -144,6 +145,19 @@ model SteamAccount {
 
   @@index([userId])
   @@map("steam_accounts")
+}
+
+model CosmeticLoadout {
+  userId    String
+  matchId   String
+  heroId    Int
+  heroName  String
+  items     Json
+  updatedAt DateTime @default(now()) @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, heroId])
+  @@map("cosmetic_loadouts")
 }
 
 model mods {
@@ -433,8 +447,6 @@ model NowPaymentsInvoice {
   @@map("nowpayments_invoices")
 }
 
-// Recurring PayPal subscription. PayPal owns the billing schedule and
-// auto-charges each cycle; we sync the subscriptions table from PayPal webhooks.
 model PayPalSubscription {
   id                   String    @id @default(dbgenerated("gen_random_uuid()"))
   paypalSubscriptionId String    @unique @map("paypal_subscription_id")
@@ -453,7 +465,6 @@ model PayPalSubscription {
   @@map("paypal_subscriptions")
 }
 
-// One-time PayPal order, used only for lifetime purchases.
 model PayPalOrder {
   id            String    @id @default(dbgenerated("gen_random_uuid()"))
   paypalOrderId String    @unique @map("paypal_order_id")
