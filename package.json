@@ -59,6 +59,7 @@
     "clsx": "^2.1.1",
     "curse-filter": "^6.0.0",
     "dayjs": "^1.11.19",
+    "dotaconstants": "github:dotabod/dotaconstants#70fffb95a5951dae2ea80b183c8c1170a52da6f1",
     "focus-visible": "^5.2.1",
     "framer-motion": "^12.23.25",
     "graphql-request": "^7.3.5",
