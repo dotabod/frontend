@@ -31,7 +31,13 @@ const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
 interface CollectionSummary {
   count: number
   // A few of the rarest heroes, for the fanned hand.
-  cards: Array<{ heroId: number; heroName: string; heroImg: string | null; bestRarity?: string }>
+  cards: Array<{
+    heroId: number
+    heroName: string
+    heroImg: string | null
+    // null (not undefined): undefined is unserializable from getStaticProps.
+    bestRarity: string | null
+  }>
   // Trophy rarities across the whole collection, rarest first.
   tally: Array<{ rarity: string; count: number }>
 }
@@ -656,7 +662,7 @@ async function buildCollectionSummary(
           heroId: l.heroId,
           heroName: l.heroName,
           heroImg: img ? `${STEAM_CDN}${img}` : null,
-          bestRarity: bestRarity(itemsOf(l.items)),
+          bestRarity: bestRarity(itemsOf(l.items)) ?? null,
         }
       })
       .sort(
