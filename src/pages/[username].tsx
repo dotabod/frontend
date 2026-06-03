@@ -1,5 +1,5 @@
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
-import { CrownIcon, ExternalLinkIcon, GiftIcon } from 'lucide-react'
+import { CrownIcon, ExternalLinkIcon, GiftIcon, SparklesIcon } from 'lucide-react'
 import type { GetStaticPaths, GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -95,6 +95,46 @@ function FannedHand({ username, collection }: { username: string; collection: Co
         )}
         <span className='mt-2 inline-block text-sm font-medium text-purple-300 transition-colors group-hover/fan:text-purple-200'>
           Open collection →
+        </span>
+      </div>
+    </Link>
+  )
+}
+
+// The zero-state counterpart to FannedHand: faint ghost slots, an explicit "0 heroes
+// collected", and a line on how the binder fills up. Keeps the feature discoverable for
+// streamers who have not collected anything yet, and links into the (empty) collection.
+function CollectionTeaser({ username, name }: { username: string; name: string }) {
+  return (
+    <Link
+      href={`/${username}/set`}
+      aria-label='0 heroes collected, learn how the collection works'
+      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none'
+    >
+      <div className='relative mx-auto h-36 w-[260px]'>
+        {[0, 1, 2].map((i) => {
+          const offset = i - 1
+          return (
+            <div
+              key={i}
+              className='absolute left-1/2 top-1 flex h-32 w-[88px] items-center justify-center rounded-xl border border-dashed border-gray-700 bg-gray-900/40 transition-transform duration-300 ease-out group-hover/fan:[--k:1.15] [--k:1]'
+              style={{
+                zIndex: i,
+                transform: `translateX(calc(-50% + ${offset * 26}px * var(--k))) rotate(calc(${offset * 7}deg * var(--k)))`,
+              }}
+            >
+              <SparklesIcon size={20} className='text-gray-700' aria-hidden />
+            </div>
+          )
+        })}
+      </div>
+      <div className='mt-4 text-center'>
+        <p className='text-sm font-semibold text-white'>0 heroes collected</p>
+        <p className='mx-auto mt-1 max-w-[240px] text-xs leading-5 text-gray-400'>
+          Heroes {name} plays on stream show up here.
+        </p>
+        <span className='mt-2 inline-block text-sm font-medium text-purple-300 transition-colors group-hover/fan:text-purple-200'>
+          See how it works →
         </span>
       </div>
     </Link>
@@ -427,10 +467,15 @@ const PageContent = ({
               </div>
             </div>
 
-            {collection && collection.count > 0 && (
+            {collection && collection.count > 0 ? (
               <FannedHand
                 username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
                 collection={collection}
+              />
+            ) : (
+              <CollectionTeaser
+                username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
+                name={profile?.displayName || profile?.name || 'this streamer'}
               />
             )}
           </div>
@@ -587,43 +632,56 @@ function isMaintenanceModeEnabled() {
 // trophy tally. Heroes.json is imported here (server-only) so it stays out of the bundle.
 async function buildCollectionSummary(
   loadouts: Array<{ heroId: number; heroName: string; items: unknown }>,
-): Promise<CollectionSummary | null> {
-  if (!loadouts.length) return null
+): Promise<CollectionSummary> {
+  // The count only needs the row count, so it stays reliable even if a row's items
+  // JSON is malformed. The decorative cards/tally are best-effort below.
+  const count = loadouts.length
+  if (!count) return { count: 0, cards: [], tally: [] }
 
-  const heroes = (await import('dotaconstants/build/heroes.json')).default as Record<
-    string,
-    { img?: string }
-  >
+  // A row's items can be null or a non-array shape from an older/partial capture;
+  // coerce so a bad row can never throw and 404 the whole profile page.
+  const itemsOf = (items: unknown): CosmeticItem[] =>
+    Array.isArray(items) ? (items as CosmeticItem[]) : []
 
-  const cards = loadouts
-    .map((l) => {
-      const items = l.items as unknown as CosmeticItem[]
-      const img = heroes[String(l.heroId)]?.img
-      return {
-        heroId: l.heroId,
-        heroName: l.heroName,
-        heroImg: img ? `${STEAM_CDN}${img}` : null,
-        bestRarity: bestRarity(items),
-      }
-    })
-    .sort(
-      (a, b) =>
-        (b.bestRarity ? (RARITY_META[b.bestRarity]?.rank ?? -1) : -1) -
-        (a.bestRarity ? (RARITY_META[a.bestRarity]?.rank ?? -1) : -1),
-    )
-    .slice(0, 5)
+  try {
+    const heroes = (await import('dotaconstants/build/heroes.json')).default as Record<
+      string,
+      { img?: string }
+    >
 
-  const tallyCounts = new Map<string, number>()
-  for (const l of loadouts)
-    for (const item of l.items as unknown as CosmeticItem[])
-      if (rarityRank(item) >= 4)
-        tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
-  const tally = [...tallyCounts.entries()]
-    .map(([rarity, count]) => ({ rarity, count }))
-    .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
-    .slice(0, 3)
+    const cards = loadouts
+      .map((l) => {
+        const img = heroes[String(l.heroId)]?.img
+        return {
+          heroId: l.heroId,
+          heroName: l.heroName,
+          heroImg: img ? `${STEAM_CDN}${img}` : null,
+          bestRarity: bestRarity(itemsOf(l.items)),
+        }
+      })
+      .sort(
+        (a, b) =>
+          (b.bestRarity ? (RARITY_META[b.bestRarity]?.rank ?? -1) : -1) -
+          (a.bestRarity ? (RARITY_META[a.bestRarity]?.rank ?? -1) : -1),
+      )
+      .slice(0, 5)
 
-  return { count: loadouts.length, cards, tally }
+    const tallyCounts = new Map<string, number>()
+    for (const l of loadouts)
+      for (const item of itemsOf(l.items))
+        if (rarityRank(item) >= 4)
+          tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
+    const tally = [...tallyCounts.entries()]
+      .map(([rarity, count]) => ({ rarity, count }))
+      .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
+      .slice(0, 3)
+
+    return { count, cards, tally }
+  } catch (error) {
+    // Never let cosmetic shaping break the page — fall back to the bare count.
+    console.error('Error building collection summary:', error)
+    return { count, cards: [], tally: [] }
+  }
 }
 
 const CommandsPage = ({ userData, subscriptionInfo, username, collection }: UserProfileProps) => {

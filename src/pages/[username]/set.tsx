@@ -284,7 +284,7 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
 
   const cards: Card[] = loadouts
     .map((l) => {
-      const items = l.items as unknown as CosmeticItem[]
+      const items = Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : []
       const heroImg = heroes[String(l.heroId)]?.img
       return {
         heroId: l.heroId,
@@ -309,7 +309,7 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
   // Trophy tally: count individual items of legendary rarity and up across every hero.
   const tallyCounts = new Map<string, number>()
   for (const l of loadouts)
-    for (const item of l.items as unknown as CosmeticItem[])
+    for (const item of Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : [])
       if (rarityRank(item) >= 4)
         tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
   const tally = [...tallyCounts.entries()]
