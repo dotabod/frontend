@@ -1,6 +1,6 @@
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
 import { CrownIcon, ExternalLinkIcon, GiftIcon, SparklesIcon } from 'lucide-react'
-import type { GetStaticPaths, GetStaticProps } from 'next'
+import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -691,19 +691,6 @@ async function buildCollectionSummary(
 }
 
 const CommandsPage = ({ userData, subscriptionInfo, username, collection }: UserProfileProps) => {
-  const router = useRouter()
-
-  // If we're in fallback mode, show loading
-  if (router.isFallback) {
-    return (
-      <HomepageShell>
-        <div className='p-6'>
-          <Skeleton active />
-        </div>
-      </HomepageShell>
-    )
-  }
-
   // If no user data, show 404
   if (!userData) {
     return (
@@ -767,38 +754,11 @@ const CommandsPage = ({ userData, subscriptionInfo, username, collection }: User
   )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  if (isMaintenanceModeEnabled()) {
-    return {
-      fallback: 'blocking',
-      paths: [],
-    }
-  }
+export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({ params, res }) => {
+  // Cache at the edge instead of ISR: with ~30k profile pages swept mostly by crawlers,
+  // ISR writes cost more than they save. Stale-while-revalidate keeps repeat hits warm.
+  res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=86400')
 
-  // Pre-build only the most popular users for fastest loading
-  const topUsers = await prisma.user.findMany({
-    orderBy: { followers: 'desc' },
-    select: { name: true },
-    take: 500, // Pre-build only top 500 most popular active users
-    where: {
-      AND: [
-        { followers: { gte: 500 } }, // Higher threshold for pre-building
-        { stream_online: true }, // Focus on currently active streamers
-      ],
-    },
-  })
-
-  const paths = topUsers.map((user) => ({
-    params: { username: user.name },
-  }))
-
-  return {
-    fallback: 'blocking', // Generate other 29,950+ pages on-demand with ISR
-    paths,
-  }
-}
-
-export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params }) => {
   const username = params?.username as string
 
   if (isMaintenanceModeEnabled()) {
@@ -875,7 +835,6 @@ export const getStaticProps: GetStaticProps<UserProfileProps> = async ({ params 
         username: username.toLowerCase(),
         collection,
       },
-      revalidate: 600, // Revalidate every 10 minutes
     }
   } catch (error) {
     console.error('Error fetching user data:', error)
