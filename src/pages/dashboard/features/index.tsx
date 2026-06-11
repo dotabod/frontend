@@ -5,6 +5,7 @@ import BetsCard from '@/components/Dashboard/Features/BetsCard'
 import IdeaCard from '@/components/Dashboard/Features/IdeaCard'
 import LanguageCard from '@/components/Dashboard/Features/LanguageCard'
 import MmrTrackerCard from '@/components/Dashboard/Features/MmrTrackerCard'
+import NewFeaturesCard from '@/components/Dashboard/Features/NewFeaturesCard'
 import { RankOnlyCard } from '@/components/Dashboard/Features/RankOnlyCard'
 import StreamDelayCard from '@/components/Dashboard/Features/StreamDelay'
 import Header from '@/components/Dashboard/Header'
@@ -44,6 +45,11 @@ const FeaturesPage: NextPageWithLayout = () => (
       <div id='rank-only'>
         <ErrorBoundary>
           <RankOnlyCard />
+        </ErrorBoundary>
+      </div>
+      <div id='new-features'>
+        <ErrorBoundary>
+          <NewFeaturesCard />
         </ErrorBoundary>
       </div>
       <ErrorBoundary>

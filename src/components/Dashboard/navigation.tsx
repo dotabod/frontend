@@ -45,6 +45,10 @@ export const navigation = [
   {
     children: [
       {
+        href: '/dashboard/whats-new',
+        name: "What's New",
+      },
+      {
         href: '/dashboard/features',
         name: 'Overview',
       },

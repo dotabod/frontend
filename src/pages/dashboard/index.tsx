@@ -14,6 +14,7 @@ import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ExportCFG from '@/components/Dashboard/ExportCFG'
 import Header from '@/components/Dashboard/Header'
 import OBSOverlay from '@/components/Dashboard/OBSOverlay'
+import WhatsNewTeaser from '@/components/Dashboard/WhatsNewTeaser'
 import { fetcher } from '@/lib/fetcher'
 import { useSetupModStatus } from '@/lib/hooks/useSetupModStatus'
 import { useSteamLinkedAccount } from '@/lib/hooks/useSteamLinkedAccount'
@@ -382,6 +383,8 @@ const SetupPage = () => {
         }
         title='Setup'
       />
+
+      <WhatsNewTeaser />
 
       <div className='mb-4'>
         <Progress

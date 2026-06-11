@@ -205,9 +205,9 @@ export default function DashboardShell({
     }
   }, [router.pathname, router.asPath])
 
-  // Fetch gift notifications from the API
+  // Fetch notifications from the API (gift toast filters to gift type below)
   const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
-    status === 'authenticated' ? '/api/gift-notifications' : null,
+    status === 'authenticated' ? '/api/notifications' : null,
     fetcher,
     STABLE_SWR_OPTIONS,
   )
@@ -225,31 +225,34 @@ export default function DashboardShell({
 
   // Update notification state when data changes
   useEffect(() => {
-    if (giftNotificationData?.hasNotification && giftNotificationData.notifications?.length > 0) {
-      // Get the first unread notification
-      const firstNotification = giftNotificationData.notifications[0]
+    // This toast is gift-specific; the notifications endpoint now returns other types
+    // too (e.g. new-feature), so pick the first unread GIFT_SUBSCRIPTION only.
+    const giftNotification = (giftNotificationData?.notifications || []).find(
+      (n) => n?.type === 'GIFT_SUBSCRIPTION' && !n?.read,
+    )
+    if (giftNotification) {
       setGiftDetails({
-        giftMessage: firstNotification.giftMessage,
-        giftQuantity: firstNotification.giftQuantity || 1,
-        giftType: firstNotification.giftType,
-        id: firstNotification.id,
-        senderName: firstNotification.senderName,
+        giftMessage: giftNotification.giftMessage,
+        giftQuantity: giftNotification.giftQuantity || 1,
+        giftType: giftNotification.giftType,
+        id: giftNotification.id,
+        senderName: giftNotification.senderName,
       })
       setHasGiftNotification(true)
-
-      setHasLifetime(giftNotificationData.hasLifetime || false)
-      setTotalNotifications(giftNotificationData.totalNotifications || 0)
     } else {
       setHasGiftNotification(false)
       setGiftDetails(null)
     }
+
+    setHasLifetime(giftNotificationData?.hasLifetime || false)
+    setTotalNotifications(giftNotificationData?.totalNotifications || 0)
   }, [giftNotificationData])
 
   const dismissGiftNotification = async () => {
     if (giftDetails?.id) {
       try {
         // Call API to mark notification as read
-        const response = await fetch('/api/gift-notifications', {
+        const response = await fetch('/api/notifications', {
           body: JSON.stringify({
             notificationId: giftDetails.id,
           }),

@@ -21,6 +21,8 @@ const settingsSchema = {
     yes: z.string().max(25),
   }),
   chatter: z.boolean(),
+  autoOptInNewFeatures: z.boolean(),
+  cosmeticsAnnounce: z.boolean(),
   chatters: z
     .object({
       bounties: z.object({ enabled: z.boolean() }),

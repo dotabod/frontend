@@ -101,6 +101,8 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   'chatters.neutralItems': SUBSCRIPTION_TIERS.PRO,
   'chatters.dotapatch': SUBSCRIPTION_TIERS.FREE,
   aegis: SUBSCRIPTION_TIERS.PRO,
+  autoOptInNewFeatures: SUBSCRIPTION_TIERS.FREE,
+  cosmeticsAnnounce: SUBSCRIPTION_TIERS.FREE,
   betsInfo: SUBSCRIPTION_TIERS.PRO,
   customMmr: SUBSCRIPTION_TIERS.PRO,
   tellChatNewMMR: SUBSCRIPTION_TIERS.FREE,
