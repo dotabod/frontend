@@ -2,8 +2,9 @@
 
 import { Empty, Input, type InputRef, List, Popover, Typography } from 'antd'
 import clsx from 'clsx'
-import { ChevronRight, Settings } from 'lucide-react'
+import { ChevronRight, CornerDownRight, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
 import {
   type KeyboardEvent as ReactKeyboardEvent,
   useEffect,
@@ -11,20 +12,76 @@ import {
   useRef,
   useState,
 } from 'react'
-import { getSearchableText, type SettingMetadata, settingsMetadata } from '@/lib/settingsMetadata'
+import {
+  filterNav,
+  isExternalNavItem,
+  type NavIcon,
+  navConfig,
+} from '@/components/Dashboard/navigation'
+import { type SettingMetadata, settingsMetadata } from '@/lib/settingsMetadata'
 
-interface SearchResult extends SettingMetadata {
-  score: number
+// A synthesized "go to page" entry, shaped like SettingMetadata so the existing
+// scorer can rank it right alongside real settings.
+interface NavSearchItem {
+  key: string
+  label: string
+  description: string
+  searchTerms: string[]
+  category: 'navigation'
+  page: { path: string; section?: string }
+  icon?: NavIcon
+  external: boolean
+  isNavigation: true
 }
+
+type SearchableItem = SettingMetadata | NavSearchItem
+
+type SearchResult = SearchableItem & { score: number }
+
+const isNavResult = (item: SearchableItem): item is NavSearchItem => 'isNavigation' in item
+
+// Searchable text for either kind of entry (mirrors lib/settingsMetadata's helper).
+const getSearchableText = (item: SearchableItem): string =>
+  [item.label, item.description, ...item.searchTerms, item.key].join(' ').toLowerCase()
 
 export function SettingsSearch() {
   const router = useRouter()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === 'admin'
+  const isImpersonating = Boolean(session?.user?.isImpersonating)
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const searchInputRef = useRef<InputRef>(null)
   const listContainerRef = useRef<HTMLDivElement>(null)
   const isKeyboardNavigationRef = useRef(false)
+
+  // Page-navigation entries derived from the nav config — the ⌘K "safety net"
+  // that keeps every relocated destination one keystroke away. Respects the same
+  // admin/impersonator gating as the sidebar so it never offers an unreachable page.
+  const navSearchItems = useMemo<NavSearchItem[]>(() => {
+    const opts = { isAdmin, isImpersonating }
+    const items = [
+      ...filterNav(navConfig.primary, opts),
+      ...filterNav(navConfig.bottom, opts).flatMap((item) => item.children ?? [item]),
+      ...filterNav(navConfig.account, opts),
+      ...filterNav(navConfig.help, opts),
+    ]
+
+    return items
+      .filter((item) => item.href)
+      .map((item) => ({
+        category: 'navigation' as const,
+        description: '',
+        external: isExternalNavItem(item),
+        icon: item.icon,
+        isNavigation: true as const,
+        key: item.href as string,
+        label: item.name,
+        page: { path: item.href as string },
+        searchTerms: [item.name.toLowerCase()],
+      }))
+  }, [isAdmin, isImpersonating])
 
   // Simple fuzzy search implementation
   const searchResults = useMemo(() => {
@@ -36,7 +93,7 @@ export function SettingsSearch() {
     const results: SearchResult[] = []
     const seenKeys = new Set<string>()
 
-    for (const setting of settingsMetadata) {
+    for (const setting of [...navSearchItems, ...settingsMetadata]) {
       // Skip if we've already seen this setting
       if (seenKeys.has(setting.key)) {
         continue
@@ -127,12 +184,23 @@ export function SettingsSearch() {
 
     // Sort by score descending
     return results.toSorted((a, b) => b.score - a.score).slice(0, 10)
-  }, [query])
+  }, [query, navSearchItems])
 
-  // Handle navigation to setting
-  const navigateToSetting = (result: SettingMetadata) => {
+  // Page jumps surface first, then settings — a single index space for keyboard nav.
+  const navResults = searchResults.filter(isNavResult)
+  const settingResults = searchResults.filter((result) => !isNavResult(result))
+  const orderedResults = [...navResults, ...settingResults]
+
+  // Handle navigation to a result (settings page section, internal page, or external link)
+  const navigateToSetting = (result: SearchResult) => {
     setIsOpen(false)
     setQuery('')
+
+    // External resources (Discord, GitHub, status) open in a new tab.
+    if (isNavResult(result) && result.external) {
+      window.open(result.page.path, '_blank', 'noopener,noreferrer')
+      return
+    }
 
     // Navigate to the page
     void router.push(result.page.path).then(() => {
@@ -166,7 +234,7 @@ export function SettingsSearch() {
         e.preventDefault()
         isKeyboardNavigationRef.current = true
         setSelectedIndex((prev) =>
-          searchResults.length === 0 ? 0 : (prev + 1) % searchResults.length,
+          orderedResults.length === 0 ? 0 : (prev + 1) % orderedResults.length,
         )
         setTimeout(() => {
           isKeyboardNavigationRef.current = false
@@ -177,7 +245,9 @@ export function SettingsSearch() {
         e.preventDefault()
         isKeyboardNavigationRef.current = true
         setSelectedIndex((prev) =>
-          searchResults.length === 0 ? 0 : (prev - 1 + searchResults.length) % searchResults.length,
+          orderedResults.length === 0
+            ? 0
+            : (prev - 1 + orderedResults.length) % orderedResults.length,
         )
         setTimeout(() => {
           isKeyboardNavigationRef.current = false
@@ -186,8 +256,8 @@ export function SettingsSearch() {
       }
       case 'Enter': {
         e.preventDefault()
-        if (searchResults[selectedIndex]) {
-          navigateToSetting(searchResults[selectedIndex])
+        if (orderedResults[selectedIndex]) {
+          navigateToSetting(orderedResults[selectedIndex])
         }
         break
       }
@@ -217,7 +287,7 @@ export function SettingsSearch() {
   useEffect(() => {
     if (
       isOpen &&
-      searchResults.length > 0 &&
+      orderedResults.length > 0 &&
       listContainerRef.current &&
       isKeyboardNavigationRef.current
     ) {
@@ -231,7 +301,7 @@ export function SettingsSearch() {
         })
       }
     }
-  }, [selectedIndex, isOpen, searchResults.length])
+  }, [selectedIndex, isOpen, orderedResults.length])
 
   // Global keyboard shortcut (Ctrl/Cmd + K)
   useEffect(() => {
@@ -274,7 +344,7 @@ export function SettingsSearch() {
             image={<Settings className='mx-auto h-8 w-8 text-gray-400' />}
             description={
               <div className='text-center'>
-                <p className='text-sm text-gray-300'>No settings found for "{query}"</p>
+                <p className='text-sm text-gray-300'>No results found for "{query}"</p>
                 <p className='text-xs text-gray-400 mt-1'>Try searching with different keywords</p>
               </div>
             }
@@ -283,54 +353,80 @@ export function SettingsSearch() {
       )
     }
 
-    if (searchResults.length > 0) {
+    if (searchResults.length === 0) {
+      return null
+    }
+
+    // data-index spans both sections so it stays in sync with keyboard selection
+    // (navResults/settingResults are the same split orderedResults uses).
+    const renderRow = (result: SearchResult, index: number) => {
+      const Icon: NavIcon = isNavResult(result) ? (result.icon ?? CornerDownRight) : Settings
+      const categoryLabel = isNavResult(result) ? null : getCategoryLabel(result.category)
+      const description = isNavResult(result) ? null : result.description
+
       return (
-        <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>
-          <Typography.Text className='text-xs font-medium text-gray-400 px-3 py-1 block'>
-            Search Results
-          </Typography.Text>
-          <List
-            size='small'
-            dataSource={searchResults}
-            renderItem={(result, index) => (
-              <List.Item
-                key={result.key}
-                data-index={index}
-                className={clsx(
-                  'cursor-pointer rounded-md mx-2 transition-colors',
-                  selectedIndex === index && 'bg-gray-700',
-                )}
-                onClick={() => navigateToSetting(result)}
-                onMouseEnter={() => setSelectedIndex(index)}
-                style={{
-                  backgroundColor: selectedIndex === index ? '#374151' : 'transparent',
-                  margin: '0 8px',
-                  padding: '8px 12px',
-                }}
-              >
-                <List.Item.Meta
-                  avatar={<Settings className='h-4 w-4 text-gray-400' />}
-                  title={
-                    <div className='flex items-center justify-between'>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-sm text-gray-100'>{result.label}</span>
-                        <span className='text-xs text-gray-400'>
-                          {getCategoryLabel(result.category)}
-                        </span>
-                      </div>
-                      <ChevronRight className='h-4 w-4 text-gray-400' />
-                    </div>
-                  }
-                  description={<span className='text-xs text-gray-300'>{result.description}</span>}
-                />
-              </List.Item>
-            )}
+        <List.Item
+          key={result.key}
+          data-index={index}
+          className={clsx(
+            'cursor-pointer rounded-md mx-2 transition-colors',
+            selectedIndex === index && 'bg-gray-700',
+          )}
+          onClick={() => navigateToSetting(result)}
+          onMouseEnter={() => setSelectedIndex(index)}
+          style={{
+            backgroundColor: selectedIndex === index ? '#374151' : 'transparent',
+            margin: '0 8px',
+            padding: '8px 12px',
+          }}
+        >
+          <List.Item.Meta
+            avatar={<Icon className='h-4 w-4 text-gray-400' />}
+            title={
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-sm text-gray-100'>{result.label}</span>
+                  {categoryLabel && <span className='text-xs text-gray-400'>{categoryLabel}</span>}
+                </div>
+                <ChevronRight className='h-4 w-4 text-gray-400' />
+              </div>
+            }
+            description={
+              description ? <span className='text-xs text-gray-300'>{description}</span> : null
+            }
           />
-        </div>
+        </List.Item>
       )
     }
 
-    return null
+    return (
+      <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>
+        {navResults.length > 0 && (
+          <>
+            <Typography.Text className='text-xs font-medium text-gray-400 px-3 py-1 block'>
+              Go to…
+            </Typography.Text>
+            <List
+              size='small'
+              dataSource={navResults}
+              renderItem={(result, index) => renderRow(result, index)}
+            />
+          </>
+        )}
+        {settingResults.length > 0 && (
+          <>
+            <Typography.Text className='text-xs font-medium text-gray-400 px-3 py-1 block'>
+              Search Results
+            </Typography.Text>
+            <List
+              size='small'
+              dataSource={settingResults}
+              renderItem={(result, index) => renderRow(result, navResults.length + index)}
+            />
+          </>
+        )}
+      </div>
+    )
   }, [isOpen, query, searchResults, selectedIndex])
 
   return (
@@ -356,7 +452,7 @@ export function SettingsSearch() {
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleInputKeyDown}
-          placeholder='Search settings... (⌘K)'
+          placeholder='Search or jump to… (⌘K)'
           size='large'
           style={{
             backgroundColor: '#1f2937',

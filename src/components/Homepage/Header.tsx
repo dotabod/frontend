@@ -6,7 +6,7 @@ import type { FC } from 'react'
 
 import { Container } from 'src/components/Container'
 import { Logo } from 'src/components/Logo'
-import { NavLinks } from 'src/components/NavLinks'
+import { NavLinks, primaryNavLinks } from 'src/components/NavLinks'
 import { ChevronUpIcon } from '../ChevronUpIcon'
 import { LoginButton } from './LoginButton'
 import { MenuIcon } from './MenuIcon'
@@ -59,28 +59,24 @@ export const Header: FC = () => (
                         }}
                         className='absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-800 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20'
                       >
+                        {/* Derived from the same primaryNavLinks the desktop nav uses
+                            so the two never drift. Legal + GitHub/Discord live in the footer. */}
                         <div className='space-y-4'>
-                          <MobileNavLink href='/streamers'>Streamers</MobileNavLink>
-                          <MobileNavLink href='/#features'>Features</MobileNavLink>
-                          <MobileNavLink href='/#pricing'>Pricing</MobileNavLink>
-                          <MobileNavLink href='/gift'>
-                            <span className='flex items-center gap-2'>
-                              <GiftIcon className='h-4 w-4' />
-                              Gift Pro
-                            </span>
-                          </MobileNavLink>
-                          <MobileNavLink href='/#faqs'>FAQs</MobileNavLink>
-                          <MobileNavLink href='/contact'>Contact Us</MobileNavLink>
-                          <MobileNavLink href='/blog'>Blog</MobileNavLink>
-                          <MobileNavLink href='/whats-new'>What&apos;s New</MobileNavLink>
-                          <MobileNavLink href='/privacy-policy'>Privacy Policy</MobileNavLink>
-                          <MobileNavLink href='/terms-of-service'>Terms of Service</MobileNavLink>
-                          <MobileNavLink href='/cookies'>Cookie Policy</MobileNavLink>
+                          {primaryNavLinks.map(([label, href]) => (
+                            <MobileNavLink key={href} href={href}>
+                              {label === 'Gift Pro' ? (
+                                <span className='flex items-center gap-2'>
+                                  <GiftIcon className='h-4 w-4' />
+                                  {label}
+                                </span>
+                              ) : (
+                                label
+                              )}
+                            </MobileNavLink>
+                          ))}
                           <MobileNavLink href='/dashboard' prefetch={false}>
                             Dashboard
                           </MobileNavLink>
-                          <MobileNavLink href='https://github.com/dotabod'>Github</MobileNavLink>
-                          <MobileNavLink href='https://discord.dotabod.com'>Discord</MobileNavLink>
                         </div>
                         <div className='mt-8 flex flex-col gap-4'>
                           <LoginButton />
