@@ -48,7 +48,7 @@ export default function WhatsNewFeatureCard({
 
         <p className='text-sm text-gray-300'>{entry.description}</p>
 
-        {entry.demo && (
+        {entry.demo && (entry.demo.chat || entry.demo.exampleUrl) && (
           <div className='rounded-md border border-gray-700/60 bg-gray-800/50 p-3'>
             <div className='mb-1.5 text-xs font-medium text-gray-500'>Example</div>
             {entry.demo.chat && (
@@ -61,7 +61,7 @@ export default function WhatsNewFeatureCard({
                 rel='noreferrer'
                 className='mt-2 inline-block text-xs font-medium text-purple-400 hover:text-purple-300'
               >
-                {entry.demo.exampleLabel ?? 'See a live example →'}
+                {entry.demo.exampleLabel ?? 'See a live example'}
               </a>
             )}
           </div>
@@ -70,12 +70,17 @@ export default function WhatsNewFeatureCard({
         {entry.details && entry.details.length > 0 && (
           <details className='group rounded-md border border-gray-700/60 bg-gray-800/30 px-3 py-2'>
             <summary className='flex cursor-pointer list-none select-none items-center gap-1 text-xs font-medium text-purple-400 hover:text-purple-300 [&::-webkit-details-marker]:hidden'>
-              <span className='inline-block transition-transform group-open:rotate-90'>›</span>
+              <span
+                aria-hidden='true'
+                className='inline-block transition-transform group-open:rotate-90'
+              >
+                ›
+              </span>
               How it works
             </summary>
             <div className='mt-2 space-y-2 text-sm text-gray-300'>
-              {entry.details.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
+              {entry.details.map((paragraph, i) => (
+                <p key={`${entry.id}-${i}`}>{paragraph}</p>
               ))}
             </div>
           </details>
@@ -96,7 +101,7 @@ export default function WhatsNewFeatureCard({
                 href={`${entry.deepLink.path}${entry.deepLink.section ? `#${entry.deepLink.section}` : ''}`}
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                {deepLinkLabel(entry.deepLink)} →
+                {deepLinkLabel(entry.deepLink)}
               </Link>
             )}
             {entry.blogSlug && (
@@ -104,7 +109,7 @@ export default function WhatsNewFeatureCard({
                 href={`/blog/${entry.blogSlug}`}
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                Read more →
+                Read more
               </Link>
             )}
             {entry.docsUrl && (
@@ -114,7 +119,7 @@ export default function WhatsNewFeatureCard({
                 rel='noreferrer'
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                Read more →
+                Read more
               </a>
             )}
           </div>

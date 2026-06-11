@@ -11,7 +11,7 @@ const { Title, Paragraph } = Typography
 
 const pageTitle = "What's New | Dotabod"
 const pageDescription =
-  'The latest Dotabod features, commands, and pages — follow along as they ship.'
+  'The latest Dotabod features, commands, and pages. Follow along as they ship.'
 const canonicalUrl = 'https://dotabod.com/whats-new'
 
 // Public, indexable changelog so anyone (logged in or not) can follow new releases. Same
@@ -28,7 +28,7 @@ const WhatsNewPublic: NextPageWithLayout = () => {
         <Paragraph className='mb-8 text-lg'>
           The latest Dotabod features, commands, and pages.{' '}
           <Link href='/dashboard/whats-new' className='text-purple-400 hover:text-purple-300'>
-            Manage them in your dashboard →
+            Manage them in your dashboard
           </Link>
         </Paragraph>
 

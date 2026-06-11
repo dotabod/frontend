@@ -22,7 +22,7 @@ export default function NewFeaturesCard() {
           href='/dashboard/whats-new'
           className='text-sm font-medium text-purple-400 hover:text-purple-300'
         >
-          See what&apos;s new →
+          See what&apos;s new
         </Link>
       </div>
     </Card>
