@@ -1,13 +1,11 @@
 import { Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import { whatsNew } from '@/lib/whatsNew'
+import { whatsNewSorted } from '@/lib/whatsNew'
 
 // Compact, unmissable pointer to the What's New page (the bell gets ignored). Shows the
 // titles of the newest entries and links to the full list.
 export default function WhatsNewTeaser() {
-  const latest = [...whatsNew]
-    .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
-    .slice(0, 2)
+  const latest = whatsNewSorted.slice(0, 2)
   if (!latest.length) return null
 
   return (

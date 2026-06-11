@@ -226,10 +226,11 @@ export default function DashboardShell({
   // Update notification state when data changes
   useEffect(() => {
     // This toast is gift-specific; the notifications endpoint now returns other types
-    // too (e.g. new-feature), so pick the first unread GIFT_SUBSCRIPTION only.
-    const giftNotification = (giftNotificationData?.notifications || []).find(
+    // too (e.g. new-feature), so consider only unread GIFT_SUBSCRIPTION rows.
+    const unreadGifts = (giftNotificationData?.notifications || []).filter(
       (n) => n?.type === 'GIFT_SUBSCRIPTION' && !n?.read,
     )
+    const giftNotification = unreadGifts[0]
     if (giftNotification) {
       setGiftDetails({
         giftMessage: giftNotification.giftMessage,
@@ -245,7 +246,8 @@ export default function DashboardShell({
     }
 
     setHasLifetime(giftNotificationData?.hasLifetime || false)
-    setTotalNotifications(giftNotificationData?.totalNotifications || 0)
+    // Gift-only count for the toast copy; the endpoint's totalNotifications mixes types.
+    setTotalNotifications(unreadGifts.length)
   }, [giftNotificationData])
 
   const dismissGiftNotification = async () => {

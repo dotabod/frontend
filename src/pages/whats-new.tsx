@@ -5,7 +5,7 @@ import type { ReactElement } from 'react'
 import { Container } from '@/components/Container'
 import WhatsNewFeatureCard from '@/components/Dashboard/Features/WhatsNewFeatureCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
-import { whatsNew } from '@/lib/whatsNew'
+import { whatsNewSorted } from '@/lib/whatsNew'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const { Title, Paragraph } = Typography
@@ -18,9 +18,7 @@ const canonicalUrl = 'https://dotabod.com/whats-new'
 // Public, indexable changelog so anyone (logged in or not) can follow new releases. Same
 // registry + cards as the dashboard page, rendered read-only (no toggles).
 const WhatsNewPublic: NextPageWithLayout = () => {
-  const entries = [...whatsNew].sort(
-    (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
-  )
+  const entries = whatsNewSorted
 
   return (
     <>

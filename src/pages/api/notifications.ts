@@ -88,7 +88,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         return res.status(200).json({
           hasLifetime,
-          hasNotification: notifications.some((n) => n !== null && !n.read),
           notifications,
           totalNotifications: notifications.length,
         })

@@ -33,6 +33,11 @@ export const whatsNew: WhatsNewEntry[] = [
   },
 ]
 
+// Newest-first ordering, reused by the dashboard page, public page, and home teaser.
+export const whatsNewSorted = [...whatsNew].sort(
+  (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
+)
+
 // Effective toggle state for a What's New entry: new-feature toggles follow the master
 // (autoOptInNewFeatures) until explicitly set; everything else uses its own stored value.
 export function entryToggleChecked(

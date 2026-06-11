@@ -8,15 +8,13 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
-import { whatsNew } from '@/lib/whatsNew'
+import { whatsNewSorted } from '@/lib/whatsNew'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 
 const WhatsNewPage: NextPageWithLayout = () => {
   const { data: master } = useUpdateSetting<boolean>(Settings.autoOptInNewFeatures)
-  const entries = [...whatsNew].sort(
-    (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
-  )
+  const entries = whatsNewSorted
 
   return (
     <>
