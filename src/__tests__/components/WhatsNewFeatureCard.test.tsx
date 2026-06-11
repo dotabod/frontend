@@ -33,6 +33,11 @@ const entry: WhatsNewEntry = {
   command: '!demo',
   blogSlug: 'hello-world',
   deepLink: { path: '/dashboard/x', section: 'y' },
+  demo: {
+    chat: 'Pudge set captured! 3 cosmetics → dotabod.com/streamer/set',
+    exampleUrl: 'https://dotabod.com/streamer/set',
+    exampleLabel: "See streamer's set page →",
+  },
 }
 
 describe('WhatsNewFeatureCard', () => {
@@ -51,6 +56,12 @@ describe('WhatsNewFeatureCard', () => {
     expect(screen.getByRole('link', { name: /Read more/ })).toHaveAttribute(
       'href',
       '/blog/hello-world',
+    )
+    // demo: sample chat + live example link
+    expect(screen.getByText(/Pudge set captured! 3 cosmetics/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /See streamer's set page/ })).toHaveAttribute(
+      'href',
+      'https://dotabod.com/streamer/set',
     )
   })
 

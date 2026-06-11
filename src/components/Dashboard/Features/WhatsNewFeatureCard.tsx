@@ -48,6 +48,25 @@ export default function WhatsNewFeatureCard({
 
         <p className='text-sm text-gray-300'>{entry.description}</p>
 
+        {entry.demo && (
+          <div className='rounded-md border border-gray-700/60 bg-gray-800/50 p-3'>
+            <div className='mb-1.5 text-xs font-medium text-gray-500'>Example</div>
+            {entry.demo.chat && (
+              <p className='font-mono text-xs text-gray-300'>{entry.demo.chat}</p>
+            )}
+            {entry.demo.exampleUrl && (
+              <a
+                href={entry.demo.exampleUrl}
+                target='_blank'
+                rel='noreferrer'
+                className='mt-2 inline-block text-xs font-medium text-purple-400 hover:text-purple-300'
+              >
+                {entry.demo.exampleLabel ?? 'See a live example →'}
+              </a>
+            )}
+          </div>
+        )}
+
         {hasFooter && (
           <div className='flex flex-wrap items-center gap-4 border-t border-gray-700 pt-3'>
             {!readOnly && entry.settingKey && (

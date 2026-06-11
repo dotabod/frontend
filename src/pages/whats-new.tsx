@@ -26,7 +26,7 @@ const WhatsNewPublic: NextPageWithLayout = () => {
       <div className='mx-auto max-w-3xl'>
         <Title level={1}>What&apos;s new</Title>
         <Paragraph className='mb-8 text-lg'>
-          The latest Dotabod features, commands, and pages — newest first.{' '}
+          The latest Dotabod features, commands, and pages.{' '}
           <Link href='/dashboard/whats-new' className='text-purple-400 hover:text-purple-300'>
             Manage them in your dashboard →
           </Link>

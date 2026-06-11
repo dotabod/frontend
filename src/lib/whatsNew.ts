@@ -16,6 +16,9 @@ export interface WhatsNewEntry {
   blogSlug?: string // links to /blog/<slug>
   docsUrl?: string // external "read more"
   tier?: 'FREE' | 'PRO'
+  // A live demo so people see what the feature actually does: a sample of what it posts
+  // and/or a link to a real example page.
+  demo?: { chat?: string; exampleUrl?: string; exampleLabel?: string }
 }
 
 export const whatsNew: WhatsNewEntry[] = [
@@ -30,6 +33,11 @@ export const whatsNew: WhatsNewEntry[] = [
     followsNewFeatureMaster: true,
     command: '!set',
     tier: 'FREE',
+    demo: {
+      chat: 'Invoker set captured! 4 cosmetics → dotabod.com/arteezy/set',
+      exampleUrl: 'https://dotabod.com/arteezy/set',
+      exampleLabel: "See arteezy's set page →",
+    },
   },
 ]
 

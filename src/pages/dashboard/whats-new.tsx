@@ -23,7 +23,7 @@ const WhatsNewPage: NextPageWithLayout = () => {
       </Head>
       <Header
         title="What's new"
-        subtitle='The latest Dotabod features, commands, and pages — newest first. Flip any of them on or off right here.'
+        subtitle='The latest Dotabod features, commands, and pages. Flip any of them on or off right here.'
       />
 
       <Card className='mb-6'>
