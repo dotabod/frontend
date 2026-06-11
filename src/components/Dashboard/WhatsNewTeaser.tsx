@@ -20,7 +20,7 @@ export default function WhatsNewTeaser() {
           <div className='text-sm text-gray-400'>{latest.map((e) => e.title).join(' · ')}</div>
         </div>
       </div>
-      <span className='shrink-0 text-sm font-medium text-purple-400'>See all →</span>
+      <span className='shrink-0 text-sm font-medium text-purple-400'>See all</span>
     </Link>
   )
 }

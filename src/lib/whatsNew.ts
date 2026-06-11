@@ -39,10 +39,10 @@ export const whatsNew: WhatsNewEntry[] = [
     demo: {
       chat: 'Invoker set captured! 4 cosmetics → dotabod.com/arteezy/set',
       exampleUrl: 'https://dotabod.com/arteezy/set',
-      exampleLabel: "See arteezy's set page →",
+      exampleLabel: "See arteezy's set page",
     },
     details: [
-      "Every hero pick or mid-game swap (while you're live) snapshots your equipped wearables to your collection — one entry per hero, refreshed each time you replay it. No need for chat to run !set.",
+      "Every hero pick or mid-game swap (while you're live) snapshots your equipped wearables to your collection, one entry per hero, refreshed each time you replay it. No need for chat to run !set.",
       "It posts in chat at most once per match per hero, and !set re-snapshots your current hero on demand. Your public page at dotabod.com/<name>/set shows every hero you've captured.",
     ],
   },
@@ -50,22 +50,22 @@ export const whatsNew: WhatsNewEntry[] = [
     id: 'cosmetic-set-pages',
     title: 'Hero cosmetic set pages',
     description:
-      "Browse any streamer's equipped cosmetics hero-by-hero — with rarity, a completion meter, and a trophy tally — on their public set page.",
+      "Browse any streamer's equipped cosmetics hero by hero on their public set page, with rarity, a completion meter, and a trophy tally.",
     releaseDate: '2026-06-02',
     category: 'pages',
     demo: {
       exampleUrl: 'https://dotabod.com/arteezy/set',
-      exampleLabel: "Browse arteezy's collection →",
+      exampleLabel: "Browse arteezy's collection",
     },
     details: [
-      'The page reads your captured loadouts and groups them by hero, with rarity, a completion meter, and a trophy tally. It fills in automatically as you play (or run !set) — the more heroes you pick on stream, the more complete it gets.',
+      'The page reads your captured loadouts and groups them by hero, with rarity, a completion meter, and a trophy tally. It fills in as you play or run !set, so the more heroes you pick on stream, the more complete it gets.',
     ],
   },
   {
     id: 'paypal',
     title: 'PayPal for Dotabod Pro',
     description:
-      'You can now subscribe to — or gift — Dotabod Pro with PayPal (monthly, annual, or lifetime), right alongside card and crypto.',
+      'You can now subscribe to (or gift) Dotabod Pro with PayPal, monthly, annual, or lifetime, alongside card and crypto.',
     releaseDate: '2026-05-28',
     category: 'advanced',
     blogSlug: 'paypal-payments',
@@ -80,22 +80,22 @@ export const whatsNew: WhatsNewEntry[] = [
     category: 'pages',
     demo: {
       exampleUrl: 'https://dotabod.com/streamers',
-      exampleLabel: 'Browse the directory →',
+      exampleLabel: 'Browse the directory',
     },
     details: [
-      'Lists Dotabod streamers publicly, filterable by rank and sortable by follower count — a way for viewers to discover others using Dotabod, and for the network to show up in search.',
+      'Lists Dotabod streamers publicly, filterable by rank and sortable by follower count. Viewers can find others using Dotabod, and the network shows up in search.',
     ],
   },
   {
     id: 'gift-redesign',
     title: 'Redesigned gifting',
     description:
-      'Gifting Pro got a cleaner flow: a live chat preview, preset durations, and a running price summary before checkout.',
+      'Gifting Pro has a cleaner flow, with a live chat preview, preset durations, and a running price summary before checkout.',
     releaseDate: '2026-05-30',
     category: 'pages',
     demo: {
       exampleUrl: 'https://dotabod.com/arteezy/gift',
-      exampleLabel: "See arteezy's gift page →",
+      exampleLabel: "See arteezy's gift page",
     },
   },
   {
@@ -124,15 +124,15 @@ export const whatsNew: WhatsNewEntry[] = [
     deepLink: { path: '/dashboard/commands' },
     demo: { chat: 'Playing with 2 other Dotabod streamers Okayge' },
     details: [
-      'Counts other Dotabod-registered users in your match from two sources — live broadcasters sending GSI for that match, plus the SourceTV roster — and never shows names, to avoid cross-chat drama.',
-      'Pro adds two extras: a " · N other streamer(s)" suffix on !np, and an automatic heads-up in chat about other streamers ~90 seconds after the match starts.',
+      'Counts other Dotabod-registered users in your match (live broadcasters sending GSI, plus the SourceTV roster) and never shows names, to avoid cross-chat drama.',
+      'Pro adds a " · N other streamer(s)" suffix on !np, plus an automatic heads-up in chat about other streamers ~90 seconds after the match starts.',
     ],
   },
   {
     id: 'mod-resolution',
     title: 'Easier bet resolution',
     description:
-      '!unresolved now lists pending matches with KDA, length, and match IDs, and a bare !won or !lost flips your most recent match — no match ID needed.',
+      '!unresolved now lists pending matches with KDA, length, and match IDs, and a bare !won or !lost flips your most recent match, no match ID needed.',
     releaseDate: '2026-05-22',
     category: 'commands',
     command: '!unresolved',
@@ -142,7 +142,7 @@ export const whatsNew: WhatsNewEntry[] = [
       chat: '2 unresolved match(es) 👌 Use !won or !lost with match ID: 7654321 (Pudge), 7654320 (Invoker)',
     },
     details: [
-      'A bare !won or !lost (no match ID) resolves the most recent finished match of your current stream session — handy when Dotabod disconnected before the match ended. Re-resolving a match doubles the MMR change to undo the old result and apply the new one.',
+      'A bare !won or !lost (no match ID) resolves the most recent finished match of your current stream session, handy when Dotabod disconnected before the match ended. Re-resolving a match doubles the MMR change to undo the old result and apply the new one.',
       "!unresolved lists this session's matches with no recorded result, newest first (up to 10), each with hero, K/D/A, score, length, and the match ID to pass to !won or !lost.",
     ],
   },
@@ -160,7 +160,7 @@ export const whatsNew: WhatsNewEntry[] = [
     },
     details: [
       'Kicks in for Immortal / 8500+ MMR games, where Valve hides the public draft. Dotabod auto-captures short overlay clips at draft (~46s), the strategy phase (~50s), and ~60s into the game.',
-      'Its Vision service reads the in-game hero bar — the row of ~60px portraits — and returns up to 10 heroes with a per-slot confidence score, falling back to draft player names until heroes load. Vision-detected heroes take priority when building the !np roster.',
+      'Its Vision service reads the in-game hero bar (the row of ~60px portraits) and returns up to 10 heroes with a per-slot confidence score, falling back to draft player names until heroes load. Vision-detected heroes take priority when building the !np roster.',
     ],
   },
   {
@@ -190,7 +190,7 @@ export const whatsNew: WhatsNewEntry[] = [
     id: 'crypto-nowpayments',
     title: 'Crypto payments, improved',
     description:
-      'Crypto checkout moved to NOWPayments — more supported coins and a smoother payment flow.',
+      'Crypto checkout moved to NOWPayments, with more supported coins and a smoother payment flow.',
     releaseDate: '2026-05-20',
     category: 'advanced',
     blogSlug: 'crypto-payments-nowpayments',
@@ -290,9 +290,7 @@ export function entryToggleChecked(
   return entry.followsNewFeatureMaster ? (value ?? master) : Boolean(value)
 }
 
-// Button label for a deep-link, named for its destination rather than a generic "settings".
-// Real entries are all covered by the map below (enforced in whatsNew.test.ts); the fallback
-// humanizes the last path segment so a brand-new destination is never mislabeled as "settings".
+// Human label for a deep-link's destination, used by the card's "Open …" button.
 const DEEP_LINK_LABELS: Record<string, string> = {
   '/dashboard': 'Open dashboard',
   '/dashboard/billing': 'Open billing',

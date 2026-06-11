@@ -61,7 +61,7 @@ export default function WhatsNewFeatureCard({
                 rel='noreferrer'
                 className='mt-2 inline-block text-xs font-medium text-purple-400 hover:text-purple-300'
               >
-                {entry.demo.exampleLabel ?? 'See a live example →'}
+                {entry.demo.exampleLabel ?? 'See a live example'}
               </a>
             )}
           </div>
@@ -96,7 +96,7 @@ export default function WhatsNewFeatureCard({
                 href={`${entry.deepLink.path}${entry.deepLink.section ? `#${entry.deepLink.section}` : ''}`}
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                {deepLinkLabel(entry.deepLink)} →
+                {deepLinkLabel(entry.deepLink)}
               </Link>
             )}
             {entry.blogSlug && (
@@ -104,7 +104,7 @@ export default function WhatsNewFeatureCard({
                 href={`/blog/${entry.blogSlug}`}
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                Read more →
+                Read more
               </Link>
             )}
             {entry.docsUrl && (
@@ -114,7 +114,7 @@ export default function WhatsNewFeatureCard({
                 rel='noreferrer'
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                Read more →
+                Read more
               </a>
             )}
           </div>
