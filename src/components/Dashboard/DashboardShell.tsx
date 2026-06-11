@@ -110,12 +110,16 @@ export default function DashboardShell({
     }
   }, [hasAutoModeratorAccess])
 
-  // Update selected menu item (and open the Admin accordion) when the route changes
+  // Update selected menu item (and open the Admin accordion) when the route changes.
+  // Also close the mobile drawer here: tapping a drawer link navigates via the nested
+  // <Link>, and relying on Menu.onClick bubbling to close it is unreliable on touch —
+  // closing on the route change itself guarantees the new page isn't left hidden behind it.
   useEffect(() => {
     const { pathname } = router
     const { key, parentKey } = findBestMatchingMenuItem(pathname)
 
     setCurrent(key)
+    setDrawerOpen(false)
 
     if (parentKey && !adminOpenKeys.includes(parentKey)) {
       setAdminOpenKeys((prev) => [...prev, parentKey])
