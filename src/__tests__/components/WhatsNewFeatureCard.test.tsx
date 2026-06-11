@@ -32,7 +32,7 @@ const entry: WhatsNewEntry = {
   followsNewFeatureMaster: true,
   command: '!demo',
   blogSlug: 'hello-world',
-  deepLink: { path: '/dashboard/x', section: 'y' },
+  deepLink: { path: '/dashboard/commands', section: 'y' },
   demo: {
     chat: 'Pudge set captured! 3 cosmetics → dotabod.com/streamer/set',
     exampleUrl: 'https://dotabod.com/streamer/set',
@@ -50,9 +50,9 @@ describe('WhatsNewFeatureCard', () => {
     expect(screen.getByText('Latest')).toBeInTheDocument()
     // tri-state with no explicit value follows master (true)
     expect(screen.getByText('Enabled')).toHaveAttribute('data-checked', 'true')
-    expect(screen.getByRole('link', { name: /Open settings/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Open commands/ })).toHaveAttribute(
       'href',
-      '/dashboard/x#y',
+      '/dashboard/commands#y',
     )
     expect(screen.getByRole('link', { name: /Read more/ })).toHaveAttribute(
       'href',

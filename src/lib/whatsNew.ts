@@ -289,3 +289,21 @@ export function entryToggleChecked(
 ): boolean | undefined {
   return entry.followsNewFeatureMaster ? (value ?? master) : Boolean(value)
 }
+
+// Button label for a deep-link, named for its destination rather than a generic "settings".
+// Real entries are all covered by the map below (enforced in whatsNew.test.ts); the fallback
+// humanizes the last path segment so a brand-new destination is never mislabeled as "settings".
+const DEEP_LINK_LABELS: Record<string, string> = {
+  '/dashboard': 'Open dashboard',
+  '/dashboard/billing': 'Open billing',
+  '/dashboard/commands': 'Open commands',
+  '/dashboard/features/overlay': 'Open overlay settings',
+  '/dashboard/help': 'Open help center',
+}
+
+export function deepLinkLabel(deepLink: { path: string }): string {
+  return (
+    DEEP_LINK_LABELS[deepLink.path] ??
+    `Open ${deepLink.path.split('/').filter(Boolean).pop() ?? 'page'}`
+  )
+}

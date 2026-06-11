@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { entryToggleChecked, type WhatsNewEntry, whatsNew } from '@/lib/whatsNew'
+import { deepLinkLabel, entryToggleChecked, type WhatsNewEntry, whatsNew } from '@/lib/whatsNew'
 
 const CATEGORIES = ['chat', 'overlay', 'commands', 'pages', 'advanced', 'bets', 'mmr', 'stream']
 
@@ -51,5 +51,33 @@ describe('entryToggleChecked', () => {
   it('non-tri-state uses its own value', () => {
     expect(entryToggleChecked(plain, true, false)).toBe(true)
     expect(entryToggleChecked(plain, null, true)).toBe(false)
+  })
+})
+
+const KNOWN_DEEP_LINK_PATHS = [
+  '/dashboard',
+  '/dashboard/billing',
+  '/dashboard/commands',
+  '/dashboard/features/overlay',
+  '/dashboard/help',
+]
+
+describe('deepLinkLabel', () => {
+  it('names each known destination', () => {
+    expect(deepLinkLabel({ path: '/dashboard' })).toBe('Open dashboard')
+    expect(deepLinkLabel({ path: '/dashboard/billing' })).toBe('Open billing')
+    expect(deepLinkLabel({ path: '/dashboard/commands' })).toBe('Open commands')
+    expect(deepLinkLabel({ path: '/dashboard/features/overlay' })).toBe('Open overlay settings')
+    expect(deepLinkLabel({ path: '/dashboard/help' })).toBe('Open help center')
+  })
+
+  it('humanizes the last path segment for an unknown destination', () => {
+    expect(deepLinkLabel({ path: '/dashboard/something' })).toBe('Open something')
+  })
+
+  it('every real deep-link points at a known, explicitly-labeled destination', () => {
+    for (const e of whatsNew) {
+      if (e.deepLink) expect(KNOWN_DEEP_LINK_PATHS).toContain(e.deepLink.path)
+    }
   })
 })

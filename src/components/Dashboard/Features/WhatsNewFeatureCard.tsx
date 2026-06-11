@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { entryToggleChecked, type WhatsNewEntry } from '@/lib/whatsNew'
+import { deepLinkLabel, entryToggleChecked, type WhatsNewEntry } from '@/lib/whatsNew'
 import { Card } from '@/ui/card'
 import { formatDate } from '@/utils/formatDate'
 import { TierSwitch } from './TierSwitch'
@@ -96,7 +96,7 @@ export default function WhatsNewFeatureCard({
                 href={`${entry.deepLink.path}${entry.deepLink.section ? `#${entry.deepLink.section}` : ''}`}
                 className='text-sm font-medium text-purple-400 hover:text-purple-300'
               >
-                Open settings →
+                {deepLinkLabel(entry.deepLink)} →
               </Link>
             )}
             {entry.blogSlug && (
