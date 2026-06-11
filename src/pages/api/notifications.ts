@@ -5,7 +5,10 @@ import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
-// Schema for marking a notification as read
+// Single notifications endpoint for the dashboard. Returns every notification type the
+// user has (gift subscriptions + new-feature heads-ups, …), each mapped to a
+// type-discriminated shape consumers switch on, plus the gift `hasLifetime` aggregate.
+// The bell renders all types; the gift toast in DashboardShell filters to GIFT_SUBSCRIPTION.
 const markAsReadSchema = z.object({
   notificationId: z.string(),
 })
@@ -14,23 +17,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) {
-      console.log('Unauthorized access attempt to gift notifications')
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
     const userId = session.user.id
 
-    // GET: Fetch gift notifications and subscription status
     if (req.method === 'GET') {
       try {
         res.setHeader('Cache-Control', 'private, max-age=15, stale-while-revalidate=30')
-
-        // Check if we should include read notifications
         const includeRead = req.query.includeRead === 'true'
 
-        // Find notifications of type GIFT_SUBSCRIPTION
-        // Only filter by isRead if includeRead is false
-        const notifications = await prisma.notification.findMany({
+        const rows = await prisma.notification.findMany({
           include: {
             giftSubscription: true,
           },
@@ -38,13 +35,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             createdAt: 'desc',
           },
           where: {
-            type: 'GIFT_SUBSCRIPTION',
+            type: { in: ['GIFT_SUBSCRIPTION', 'NEW_FEATURE'] },
             userId,
             ...(includeRead ? {} : { isRead: false }),
           },
         })
 
-        // Get active subscriptions to check if user has lifetime
+        // Gift aggregate still surfaced here (consumed by the gift toast + admin page).
         const activeSubscriptions = await prisma.subscription.findMany({
           include: {
             giftDetails: true,
@@ -54,49 +51,54 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             userId,
           },
         })
-
-        // Check if user has a lifetime subscription
         const hasLifetime = activeSubscriptions.some(
           (sub) =>
             sub.giftDetails?.giftType === 'lifetime' ||
             (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),
         )
 
-        // Format notifications for frontend
-        const formattedNotifications = notifications
-          .map((notification) => {
-            if (!notification.giftSubscription) {
+        const notifications = rows
+          .map((n) => {
+            if (n.type === 'NEW_FEATURE') {
+              return {
+                createdAt: n.createdAt,
+                id: n.id,
+                read: n.isRead,
+                type: 'NEW_FEATURE' as const,
+              }
+            }
+
+            // GIFT_SUBSCRIPTION — drop orphaned rows whose gift was deleted.
+            if (!n.giftSubscription) {
               return null
             }
 
             return {
-              createdAt: notification.createdAt,
-              giftMessage: notification.giftSubscription.giftMessage,
-              giftQuantity: notification.giftSubscription.giftQuantity || 1,
-              giftType: notification.giftSubscription.giftType,
-              id: notification.id,
-              read: notification.isRead, // Include read status in the response
-              senderName: notification.giftSubscription.senderName,
+              createdAt: n.createdAt,
+              giftMessage: n.giftSubscription.giftMessage,
+              giftQuantity: n.giftSubscription.giftQuantity || 1,
+              giftType: n.giftSubscription.giftType,
+              id: n.id,
+              read: n.isRead,
+              senderName: n.giftSubscription.senderName,
+              type: 'GIFT_SUBSCRIPTION' as const,
             }
           })
           .filter(Boolean)
 
         return res.status(200).json({
           hasLifetime,
-          hasNotification: formattedNotifications.some((n) => n !== null && !n.read), // Check for null before accessing read property
-          notifications: formattedNotifications,
-          totalNotifications: formattedNotifications.length,
+          notifications,
+          totalNotifications: notifications.length,
         })
       } catch (error) {
-        console.error('Error fetching gift notifications:', error)
+        console.error('Error fetching notifications:', error)
         return res.status(500).json({ error: String(error), message: 'Internal server error' })
       }
     }
 
-    // POST: Mark a notification as read
     if (req.method === 'POST') {
       try {
-        // Validate request body
         const validationResult = markAsReadSchema.safeParse(req.body)
         if (!validationResult.success) {
           return res
@@ -106,7 +108,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         const { notificationId } = validationResult.data
 
-        // Find the notification and ensure it belongs to the user
+        // Scope the update to the caller's own notifications.
         const notification = await prisma.notification.findFirst({
           where: {
             id: notificationId,
@@ -118,7 +120,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           return res.status(404).json({ message: 'Notification not found' })
         }
 
-        // Mark notification as read
         await prisma.notification.update({
           data: {
             isRead: true,
@@ -138,7 +139,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(405).json({ message: 'Method not allowed' })
   } catch (error) {
-    console.error('Unexpected error in gift notifications API:', error)
+    console.error('Unexpected error in notifications API:', error)
     return res.status(500).json({ error: String(error), message: 'Internal server error' })
   }
 }

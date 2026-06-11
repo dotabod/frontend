@@ -334,6 +334,24 @@ export const settingsMetadata: SettingMetadata[] = [
     searchTerms: ['roshan', 'killed', 'rosh', 'chat'],
   },
   {
+    category: 'advanced',
+    description:
+      'Automatically enable new dotabod features (chat, overlay, and more) as they launch',
+    key: 'autoOptInNewFeatures',
+    label: 'Auto-enable new features',
+    page: { path: '/dashboard/features', section: 'new-features' },
+    searchTerms: ['new', 'features', 'auto', 'opt in', 'updates', 'beta'],
+  },
+  {
+    category: 'chat',
+    description:
+      "Announce your hero's captured cosmetic set in chat with a link to your collection",
+    key: 'cosmeticsAnnounce',
+    label: 'Cosmetic Set Announcements',
+    page: { path: '/dashboard/whats-new', section: 'cosmetics' },
+    searchTerms: ['cosmetic', 'set', 'loadout', 'items', 'hero', 'chat', 'new features'],
+  },
+  {
     category: 'chat',
     description: 'Announce deaths with passive items unused',
     isNested: true,

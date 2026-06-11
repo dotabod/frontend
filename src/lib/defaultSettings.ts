@@ -40,6 +40,7 @@ export const commands = {
   commandRefresh: true,
   commandResetwl: true,
   commandRosh: true,
+  commandSet: true,
   commandSetdelay: true,
   commandSetmmr: true,
   commandShard: true,
@@ -176,6 +177,13 @@ export const defaultSettings = {
     minimumRankTier: 0,
   },
   discardZeroBets: false,
+  // Master switch: when on (default), features released after a streamer's last
+  // visit are enabled by default. Per-feature toggles (e.g. cosmeticsAnnounce)
+  // override this once explicitly set.
+  autoOptInNewFeatures: true,
+  // New-feature toggle for cosmetic-set announcements. null = follow
+  // autoOptInNewFeatures; true/false = explicit streamer choice (always wins).
+  cosmeticsAnnounce: null as boolean | null,
   ...commands,
   autoCommandsOnMatchStart: [],
 }

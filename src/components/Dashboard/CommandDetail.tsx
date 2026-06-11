@@ -691,6 +691,22 @@ const CommandDetail: Record<
     ),
     title: 'Roshan and aegis',
   },
+  commandSet: {
+    alias: ['cosmetics', 'loadout'],
+    allowed: 'all',
+    cmd: '!set',
+    description:
+      "Shows your current hero's equipped cosmetics with a link to your public collection page. Loadouts are captured automatically as you pick heroes on stream.",
+    key: 'commandSet',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!set'
+        response='Pudge has 5 equipped cosmetics → dotabod.com/<streamername>/set'
+      />
+    ),
+    title: 'Cosmetic set',
+  },
   commandSetdelay: {
     alias: ['delay=', 'setstreamdelay', 'streamdelay='],
     allowed: 'mods',

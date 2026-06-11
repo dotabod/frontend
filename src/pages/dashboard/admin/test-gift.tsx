@@ -37,7 +37,7 @@ const TestGiftPage: NextPageWithLayout = () => {
 
   // Fetch subscription status to check if user has lifetime
   const { data: giftNotificationData } = useSWR(
-    status === 'authenticated' ? '/api/gift-notifications' : null,
+    status === 'authenticated' ? '/api/notifications' : null,
     fetcher,
     STABLE_SWR_OPTIONS,
   )

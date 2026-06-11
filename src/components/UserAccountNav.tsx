@@ -12,16 +12,23 @@ import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS, STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
-// Define the notification type
-interface GiftNotification {
+// Notifications shown in the dashboard bell, discriminated by `type`.
+interface BaseNotification {
   id: string
+  createdAt: string
+  read?: boolean
+}
+interface GiftNotification extends BaseNotification {
+  type?: 'GIFT_SUBSCRIPTION'
   senderName: string
   giftMessage?: string
   giftType: 'monthly' | 'annual' | 'lifetime'
   giftQuantity?: number
-  createdAt: string
-  read?: boolean
 }
+interface NewFeatureNotification extends BaseNotification {
+  type: 'NEW_FEATURE'
+}
+type AppNotification = GiftNotification | NewFeatureNotification
 
 interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   user: Session['user']
@@ -45,7 +52,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     data: giftNotificationData,
     error: notificationError,
     mutate: refreshGiftNotifications,
-  } = useSWR('/api/gift-notifications?includeRead=true', fetcher, {
+  } = useSWR('/api/notifications?includeRead=true', fetcher, {
     ...STABLE_SWR_OPTIONS,
     // Configuration to fetch only once on mount
     // Keep error handling
@@ -76,7 +83,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     return () => clearTimeout(timer)
   }, [imageLoaded])
 
-  const notifications = (giftNotificationData?.notifications || []) as GiftNotification[]
+  const notifications = (giftNotificationData?.notifications || []) as AppNotification[]
   const totalUnreadNotifications = notifications.filter((n) => !n.read).length
 
   // Pagination state
@@ -117,7 +124,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
   // Handle notification dismissal
   const dismissNotification = async (notificationId: string) => {
     try {
-      await fetch('/api/gift-notifications', {
+      await fetch('/api/notifications', {
         body: JSON.stringify({
           notificationId,
         }),
@@ -215,37 +222,77 @@ const UserButton = ({ user, className }: UserButtonProps) => {
               <div className='max-h-80 overflow-y-auto'>
                 {sortedNotifications
                   .slice((currentPage - 1) * pageSize, currentPage * pageSize)
-                  .map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={clsx(
-                        'relative rounded-lg p-4 mb-2',
-                        notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
-                      )}
-                    >
-                      <div className='flex justify-between items-start'>
-                        <div className='font-semibold text-white'>Gift Subscription</div>
-                        <div className='text-xs text-gray-400'>
-                          {new Date(notification.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      <p className='mt-1 text-gray-300'>
-                        {`${notification.senderName || 'Someone'} has gifted you ${formatGiftType(notification.giftType, notification.giftQuantity)}!`}
-                      </p>
-                      {notification.giftMessage && (
-                        <p className='mt-2 italic text-gray-400'>"{notification.giftMessage}"</p>
-                      )}
-                      {!notification.read && (
-                        <Button
-                          onClick={() => dismissNotification(notification.id)}
-                          className='mt-2'
-                          size='small'
+                  .map((notification) => {
+                    if (notification.type === 'NEW_FEATURE') {
+                      return (
+                        <div
+                          key={notification.id}
+                          className={clsx(
+                            'relative rounded-lg p-4 mb-2',
+                            notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
+                          )}
                         >
-                          Dismiss
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+                          <div className='flex justify-between items-start'>
+                            <div className='font-semibold text-white'>New features</div>
+                            <div className='text-xs text-gray-400'>
+                              {new Date(notification.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <p className='mt-1 text-gray-300'>
+                            Dotabod now turns on new features automatically. Don&apos;t want new
+                            stuff on by default? You can opt out anytime.
+                          </p>
+                          <div className='mt-2 flex gap-2'>
+                            <Link href='/dashboard/whats-new'>
+                              <Button type='primary' size='small'>
+                                See what&apos;s new
+                              </Button>
+                            </Link>
+                            {!notification.read && (
+                              <Button
+                                onClick={() => dismissNotification(notification.id)}
+                                size='small'
+                              >
+                                Dismiss
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <div
+                        key={notification.id}
+                        className={clsx(
+                          'relative rounded-lg p-4 mb-2',
+                          notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
+                        )}
+                      >
+                        <div className='flex justify-between items-start'>
+                          <div className='font-semibold text-white'>Gift Subscription</div>
+                          <div className='text-xs text-gray-400'>
+                            {new Date(notification.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <p className='mt-1 text-gray-300'>
+                          {`${notification.senderName || 'Someone'} has gifted you ${formatGiftType(notification.giftType, notification.giftQuantity)}!`}
+                        </p>
+                        {notification.giftMessage && (
+                          <p className='mt-2 italic text-gray-400'>"{notification.giftMessage}"</p>
+                        )}
+                        {!notification.read && (
+                          <Button
+                            onClick={() => dismissNotification(notification.id)}
+                            className='mt-2'
+                            size='small'
+                          >
+                            Dismiss
+                          </Button>
+                        )}
+                      </div>
+                    )
+                  })}
 
                 {totalFilteredNotifications > pageSize && (
                   <div className='flex justify-between items-center mt-4'>

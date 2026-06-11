@@ -31,6 +31,7 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
     ['Streamers', '/streamers', 'Browse Dota 2 streamers live right now'],
     ['Pricing', '/#pricing'],
     ['Blog', '/blog'],
+    ["What's New", '/whats-new', 'Follow the latest Dotabod features and releases'],
     ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
     ['Contact Us', '/contact'],
     ...additional,
