@@ -15,6 +15,10 @@ describe('whatsNew registry', () => {
       if (e.tier) expect(['FREE', 'PRO']).toContain(e.tier)
       // A tri-state toggle must declare which setting it controls.
       if (e.followsNewFeatureMaster) expect(e.settingKey).toBeTruthy()
+      // Release dates are real and not in the future (catches typos like a wrong year).
+      expect(new Date(e.releaseDate).getTime()).toBeLessThanOrEqual(Date.now() + 86_400_000)
+      // Every entry must give the reader somewhere to go / something to see.
+      expect(Boolean(e.demo || e.deepLink || e.blogSlug || e.command || e.settingKey)).toBe(true)
     }
   })
 
