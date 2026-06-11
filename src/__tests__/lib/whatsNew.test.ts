@@ -18,7 +18,9 @@ describe('whatsNew registry', () => {
       // Release dates are real and not in the future (catches typos like a wrong year).
       expect(new Date(e.releaseDate).getTime()).toBeLessThanOrEqual(Date.now() + 86_400_000)
       // Every entry must give the reader somewhere to go / something to see.
-      expect(Boolean(e.demo || e.deepLink || e.blogSlug || e.command || e.settingKey)).toBe(true)
+      expect(
+        Boolean(e.demo || e.demoCommand || e.deepLink || e.blogSlug || e.command || e.settingKey),
+      ).toBe(true)
       // `details` (the "how it works" expander) must be non-empty paragraphs when present.
       if (e.details) {
         expect(e.details.length).toBeGreaterThan(0)
