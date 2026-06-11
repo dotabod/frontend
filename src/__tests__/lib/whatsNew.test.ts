@@ -23,6 +23,8 @@ describe('whatsNew registry', () => {
       if (e.details) {
         expect(e.details.length).toBeGreaterThan(0)
         for (const paragraph of e.details) expect(paragraph.trim().length).toBeGreaterThan(0)
+        // paragraphs must be unique (catches copy-paste; keeps the card's per-paragraph keys stable)
+        expect(new Set(e.details).size).toBe(e.details.length)
       }
     }
   })
