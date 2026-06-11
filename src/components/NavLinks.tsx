@@ -9,6 +9,28 @@ interface NavLinksProps {
   bottom?: boolean
 }
 
+export type NavLink = [label: string, href: string, tooltip?: string]
+
+// Single source of truth for marketing links so the desktop header, the mobile
+// menu (Header.tsx), and the footer all stay in sync instead of drifting apart.
+export const primaryNavLinks: NavLink[] = [
+  ['Streamers', '/streamers', 'Browse Dota 2 streamers live right now'],
+  ['Pricing', '/#pricing'],
+  ['Blog', '/blog'],
+  ["What's New", '/whats-new', 'Follow the latest Dotabod features and releases'],
+  ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
+  ['Contact Us', '/contact'],
+]
+
+// Footer-only links (legal + community). The footer renders primary + these.
+export const bottomNavLinks: NavLink[] = [
+  ['Privacy Policy', '/privacy-policy'],
+  ['Terms of Service', '/terms-of-service'],
+  ['Cookie Policy', '/cookies'],
+  ['GitHub', 'https://github.com/dotabod'],
+  ['Discord', 'https://discord.dotabod.com'],
+]
+
 export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
   // Only track hover state on client-side
   const [isMounted, setIsMounted] = useState(false)
@@ -19,23 +41,9 @@ export const NavLinks: FC<NavLinksProps> = ({ bottom = false }) => {
     setIsMounted(true)
   }, [])
 
-  const additional: [string, string, string?][] = []
-  if (bottom) {
-    additional.push(['Privacy Policy', '/privacy-policy'])
-    additional.push(['Terms of Service', '/terms-of-service'])
-    additional.push(['Cookie Policy', '/cookies'])
-    additional.push(['Discord', 'https://discord.dotabod.com'])
-  }
+  const links: NavLink[] = bottom ? [...primaryNavLinks, ...bottomNavLinks] : primaryNavLinks
 
-  return [
-    ['Streamers', '/streamers', 'Browse Dota 2 streamers live right now'],
-    ['Pricing', '/#pricing'],
-    ['Blog', '/blog'],
-    ["What's New", '/whats-new', 'Follow the latest Dotabod features and releases'],
-    ['Gift Pro', '/gift', 'Gift Dotabod Pro to your favorite streamer'],
-    ['Contact Us', '/contact'],
-    ...additional,
-  ].map(([label, href, tooltip], index) => {
+  return links.map(([label, href, tooltip], index) => {
     const isGiftLink = label === 'Gift Pro'
     const uniqueKey = `navlink-${label.replaceAll(/\s+/g, '-').toLowerCase()}`
 

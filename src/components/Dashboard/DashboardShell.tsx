@@ -1,6 +1,7 @@
+import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CopyButton } from '@mantine/core'
 import { captureException } from '@sentry/nextjs'
-import { Button, Layout, Menu, type MenuProps, Tag, theme } from 'antd'
+import { Button, Drawer, Layout, Menu, type MenuProps, theme } from 'antd'
 import clsx from 'clsx'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -11,11 +12,10 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
-import { CompactDisableToggle } from '@/components/Dashboard/CompactDisableToggle'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
 import { SubscriptionBadge } from '@/components/Dashboard/SubscriptionBadge'
 import HubSpot from '@/components/HubSpot'
-import { DarkLogo, Logomark } from '@/components/Logo'
+import { DarkLogo } from '@/components/Logo'
 import GiftNotification from '@/components/Subscription/GiftNotification'
 import { UserAccountNav } from '@/components/UserAccountNav'
 import { useFeatureAccess } from '@/hooks/useSubscription'
@@ -23,7 +23,8 @@ import { fetcher } from '@/lib/fetcher'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
 import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
-import { navigation } from './navigation'
+import { HelpMenu } from './HelpMenu'
+import { filterNav, findBestMatchingMenuItem, navConfig, navItemToMenuItem } from './navigation'
 import { SettingsSearch } from './SettingsSearch'
 
 const { Header, Sider, Content } = Layout
@@ -38,89 +39,6 @@ interface SEOProps {
   noindex?: boolean
 }
 
-interface NavigationItem {
-  name?: string
-  key?: string
-  href?: string
-  new?: boolean
-  icon?: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
-  onClick?: () => void
-  hideForImpersonator?: boolean
-  children?: NavigationItem[]
-}
-
-function getItem(
-  item: NavigationItem,
-  collapsed = false,
-  isChild = false,
-): NonNullable<MenuProps['items']>[number] {
-  const props = item.onClick ? { onClick: item.onClick } : {}
-
-  let icon = item.icon ? <item.icon className={clsx('h-4 w-4')} aria-hidden={true} /> : null
-  if (collapsed && isChild) {
-    icon = null
-  }
-
-  const label = item.href ? (
-    <Link
-      {...props}
-      href={item.href}
-      className='text-gray-200! flex flex-row gap-2 items-center'
-      target={item.href.startsWith('http') ? '_blank' : '_self'}
-    >
-      {item.name}
-      {item.new && <Tag color='green'>New</Tag>}
-    </Link>
-  ) : (
-    <div className='flex flex-row gap-2 items-center'>
-      {item.name}
-      {item.new && <Tag color='green'>New</Tag>}
-    </div>
-  )
-
-  return {
-    children: item.children?.map((child) => getItem(child, collapsed, true)),
-    icon,
-    key: item.href || item.key,
-    label,
-  } as NonNullable<MenuProps['items']>[number]
-}
-
-// Create mapping dynamically from navigation structure
-const PATH_TO_PARENT_KEY: Record<string, string> = {}
-for (const item of navigation) {
-  if (item.children) {
-    // For each parent with children, map all child hrefs to parent key
-    for (const child of item.children) {
-      if (child.href) {
-        PATH_TO_PARENT_KEY[child.href] = item.key || ''
-      }
-    }
-  }
-}
-
-// Helper function to find the best matching menu item for a given path
-const findBestMatchingMenuItem = (pathname: string) => {
-  // First try exact match
-  if (PATH_TO_PARENT_KEY[pathname]) {
-    return { key: pathname, parentKey: PATH_TO_PARENT_KEY[pathname] }
-  }
-
-  // For nested routes like /dashboard/features/something
-  // Try to find the closest parent path
-  const pathParts = pathname.split('/')
-  while (pathParts.length > 1) {
-    pathParts.pop()
-    const parentPath = pathParts.join('/')
-    if (PATH_TO_PARENT_KEY[parentPath]) {
-      return { key: parentPath, parentKey: PATH_TO_PARENT_KEY[parentPath] }
-    }
-  }
-
-  // Default to dashboard if no match found
-  return { key: '/dashboard', parentKey: '' }
-}
-
 export default function DashboardShell({
   children,
   seo,
@@ -130,14 +48,20 @@ export default function DashboardShell({
 }) {
   const { status, data } = useSession()
   const router = useRouter()
-  const [collapsed, setCollapsed] = useState(false)
+  // `broken` (set by the Sider breakpoint) is our single "is mobile" signal.
   const [broken, setBroken] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const copyOverlayUrl = useBaseUrl(`overlay/${data?.user?.id ?? ''}`)
   const {
     token: { colorBgLayout },
   } = theme.useToken()
-  const [current, setCurrent] = useState('/dashboard')
-  const [openKeys, setOpenKeys] = useState<string[]>([])
+  // Seed selection from the initial route so off-sidebar pages (billing/data/help)
+  // don't briefly false-highlight Setup before the route effect runs.
+  const [current, setCurrent] = useState(() => findBestMatchingMenuItem(router.pathname).key)
+  const [adminOpenKeys, setAdminOpenKeys] = useState<string[]>(() => {
+    const { parentKey } = findBestMatchingMenuItem(router.pathname)
+    return parentKey ? [parentKey] : []
+  })
 
   // Default SEO values
   const defaultTitle = 'Dashboard | Dotabod'
@@ -157,16 +81,9 @@ export default function DashboardShell({
   const pageType = seo?.ogType || 'website'
   const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
 
-  const onClick: MenuProps['onClick'] = (e) => {
-    setCurrent(e.key)
-    if (broken) {
-      setCollapsed(true)
-    }
-  }
-
-  // Handle submenu open/close
-  const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
-    setOpenKeys(keys)
+  // Handle Admin accordion open/close
+  const onAdminOpenChange: MenuProps['onOpenChange'] = (keys) => {
+    setAdminOpenKeys(keys)
   }
 
   useMaybeSignout()
@@ -193,17 +110,28 @@ export default function DashboardShell({
     }
   }, [hasAutoModeratorAccess])
 
-  // Update selected menu item and open parent menu when route changes
+  // Update selected menu item (and open the Admin accordion) when the route changes.
+  // Also close the mobile drawer here: tapping a drawer link navigates via the nested
+  // <Link>, and relying on Menu.onClick bubbling to close it is unreliable on touch —
+  // closing on the route change itself guarantees the new page isn't left hidden behind it.
   useEffect(() => {
     const { pathname } = router
     const { key, parentKey } = findBestMatchingMenuItem(pathname)
 
     setCurrent(key)
+    setDrawerOpen(false)
 
-    if (parentKey && !openKeys.includes(parentKey)) {
-      setOpenKeys((prev) => [...prev, parentKey])
+    if (parentKey && !adminOpenKeys.includes(parentKey)) {
+      setAdminOpenKeys((prev) => [...prev, parentKey])
     }
   }, [router.pathname, router.asPath])
+
+  // Close the mobile drawer once we're back on a desktop layout
+  useEffect(() => {
+    if (!broken) {
+      setDrawerOpen(false)
+    }
+  }, [broken])
 
   // Fetch notifications from the API (gift toast filters to gift type below)
   const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
@@ -283,37 +211,77 @@ export default function DashboardShell({
   }
 
   const isImpersonating = Boolean(data?.user?.isImpersonating)
+  const isAdmin = data?.user?.role === 'admin'
+  const navOpts = { isAdmin, isImpersonating }
 
-  const filterNavigationItems = (items: NavigationItem[]): NavigationItem[] =>
-    items
-      .map((item): NavigationItem | null => {
-        if (!item.name) {
-          return item
-        } // Keep dividers
+  // Region item lists, filtered once for the current viewer.
+  const primaryItems = filterNav(navConfig.primary, navOpts)
+  const bottomItems = filterNav(navConfig.bottom, navOpts)
+  const utilityItems = bottomItems.filter((item) => !item.adminOnly)
+  const adminItems = bottomItems.filter((item) => item.adminOnly)
 
-        if (isImpersonating && item.hideForImpersonator) {
-          return null
-        }
+  // The flat primary rail + bottom-pinned utilities. Rendered (with full labels) in
+  // both the desktop Sider and the mobile Drawer so the two never drift apart.
+  const renderNav = ({ onNavigate }: { onNavigate?: () => void }) => {
+    const onMenuClick: MenuProps['onClick'] = (e) => {
+      setCurrent(e.key)
+      onNavigate?.()
+    }
 
-        if (data?.user?.role !== 'admin' && item.key === 'admin-menu') {
-          return null
-        }
+    const menuStyle = { background: colorBgLayout, borderInlineEnd: 'none' as const }
 
-        if (item.children) {
-          const filteredChildren = item.children.filter(
-            (child) => !(isImpersonating && child.hideForImpersonator),
-          )
+    return (
+      <div className='flex h-full flex-col'>
+        <div>
+          <div className='m-auto mb-4 flex h-12 w-full justify-center gap-2 px-4 pt-4'>
+            <Link href='/'>
+              <DarkLogo className='h-full w-auto' />
+            </Link>
+          </div>
 
-          if (filteredChildren.length === 0) {
-            return null
-          }
+          <SubscriptionBadge collapsed={false} />
 
-          return { ...item, children: filteredChildren }
-        }
+          <div className='flex justify-center py-2'>
+            <DisableToggle />
+          </div>
 
-        return item
-      })
-      .filter((item): item is NavigationItem => Boolean(item))
+          <Menu
+            onClick={onMenuClick}
+            selectedKeys={[current]}
+            style={menuStyle}
+            mode='inline'
+            items={primaryItems.map((item) => navItemToMenuItem(item))}
+          />
+        </div>
+
+        {(utilityItems.length > 0 || adminItems.length > 0) && (
+          <div className='mt-auto border-t border-gray-700 pt-2'>
+            {utilityItems.length > 0 && (
+              <Menu
+                onClick={onMenuClick}
+                selectedKeys={[current]}
+                style={menuStyle}
+                mode='inline'
+                items={utilityItems.map((item) => navItemToMenuItem(item))}
+              />
+            )}
+
+            {adminItems.length > 0 && (
+              <Menu
+                onClick={onMenuClick}
+                selectedKeys={[current]}
+                openKeys={adminOpenKeys}
+                onOpenChange={onAdminOpenChange}
+                style={menuStyle}
+                mode='inline'
+                items={adminItems.map((item) => navItemToMenuItem(item))}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <>
@@ -343,96 +311,65 @@ export default function DashboardShell({
       <Layout className='h-full bg-gray-800'>
         <Sider
           breakpoint='md'
-          onBreakpoint={(broken) => {
-            setCollapsed(broken)
-            setBroken(broken)
-          }}
+          collapsedWidth={0}
+          onBreakpoint={setBroken}
           style={{
             background: colorBgLayout,
           }}
           width={250}
-          className={clsx('border-r-transparent', collapsed && 'min-w-11! max-w-11!')}
+          className='border-r-transparent'
           trigger={null}
           collapsible
-          collapsed={collapsed}
+          collapsed={broken}
         >
-          <div className='logo' />
-
-          <div className='flex flex-col items-end'>
-            <div className='w-full'>
-              <div className='m-auto mb-4 flex h-12 w-full px-4 pt-4 justify-center gap-2'>
-                {!collapsed ? (
-                  <Link href='/'>
-                    <DarkLogo className='h-full w-auto' />
-                  </Link>
-                ) : (
-                  <Link href='/'>
-                    <Logomark className='h-full w-auto' aria-hidden='true' />
-                  </Link>
-                )}
-              </div>
-              <SubscriptionBadge collapsed={collapsed} />
-
-              {!collapsed ? (
-                <div className='flex justify-center py-2'>
-                  <DisableToggle />
-                </div>
-              ) : (
-                <div className='flex justify-center py-2'>
-                  <CompactDisableToggle />
-                </div>
-              )}
-
-              <Menu
-                onClick={onClick}
-                selectedKeys={[current]}
-                openKeys={openKeys}
-                onOpenChange={onOpenChange}
-                style={{
-                  background: colorBgLayout,
-                  borderInlineEnd: 'none',
-                }}
-                mode='inline'
-                items={filterNavigationItems(navigation).map((item, i: number) => {
-                  if (!item.name) {
-                    return {
-                      className: 'm-6! bg-gray-500!',
-                      key: item?.href || i,
-                      type: 'divider',
-                    }
-                  }
-
-                  return getItem(item, collapsed)
-                })}
-              />
-            </div>
-          </div>
+          {/* On mobile the Sider collapses to 0 width; skip its content so it can't
+              leak past the zero-width container — the Drawer handles mobile nav. */}
+          {!broken && renderNav({})}
         </Sider>
-        <Layout className={clsx('bg-gray-800!', broken && !collapsed && 'hidden!')}>
-          <Header
-            className={clsx(
-              'bg-gray-900!',
-              broken && !collapsed && 'hidden!',
-              'flex w-full items-center justify-between gap-4 p-8!',
-            )}
-          >
-            <div className='w-full max-w-lg'>
-              <SettingsSearch />
+
+        <Drawer
+          placement='left'
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          width={250}
+          closable={false}
+          rootClassName='md:hidden'
+          styles={{ body: { background: colorBgLayout, padding: 0 } }}
+        >
+          {renderNav({ onNavigate: () => setDrawerOpen(false) })}
+        </Drawer>
+
+        <Layout className='bg-gray-800!'>
+          <Header className='flex w-full items-center justify-between gap-4 bg-gray-900! p-4! md:p-8!'>
+            <div className='flex flex-1 items-center gap-3'>
+              <Button
+                type='text'
+                aria-label='Open navigation menu'
+                className='flex items-center md:hidden!'
+                icon={<Bars3Icon className='h-6 w-6 text-gray-200' />}
+                onClick={() => setDrawerOpen(true)}
+              />
+              <div className='w-full max-w-lg'>
+                <SettingsSearch />
+              </div>
             </div>
 
             <div className='flex w-fit items-center gap-3 py-2'>
-              <CopyButton value={copyOverlayUrl}>
-                {({ copied, copy }) => (
-                  <Button
-                    type='dashed'
-                    size='small'
-                    className={clsx(copied && 'border-green-600! text-green-600!')}
-                    onClick={copy}
-                  >
-                    {copied ? 'Overlay URL copied' : 'Copy Overlay URL'}
-                  </Button>
-                )}
-              </CopyButton>
+              <div className='hidden md:block'>
+                <CopyButton value={copyOverlayUrl}>
+                  {({ copied, copy }) => (
+                    <Button
+                      type='dashed'
+                      size='small'
+                      className={clsx(copied && 'border-green-600! text-green-600!')}
+                      onClick={copy}
+                    >
+                      {copied ? 'Overlay URL copied' : 'Copy Overlay URL'}
+                    </Button>
+                  )}
+                </CopyButton>
+              </div>
+              <HelpMenu />
               <UserAccountNav />
             </div>
           </Header>

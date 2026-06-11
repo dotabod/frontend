@@ -1,6 +1,16 @@
 import { BellOutlined } from '@ant-design/icons'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { Badge, Button, Dropdown, Empty, Popover, Skeleton, Space, Tabs } from 'antd'
+import {
+  Badge,
+  Button,
+  Dropdown,
+  Empty,
+  type MenuProps,
+  Popover,
+  Skeleton,
+  Space,
+  Tabs,
+} from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,6 +19,7 @@ import type { Session } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { filterNav, navConfig, navItemToMenuItem } from '@/components/Dashboard/navigation'
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS, STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
@@ -175,6 +186,36 @@ const UserButton = ({ user, className }: UserButtonProps) => {
       }
     }
   }
+
+  // Account entries (Billing/Gift/Your data) live in this dropdown now. filterNav
+  // drops Billing + Your data for impersonators — gating the old dropdown lacked.
+  const accountItems = filterNav(navConfig.account, {
+    isImpersonating: Boolean(user?.isImpersonating),
+  }).map((item) => navItemToMenuItem(item))
+
+  const accountMenuItems: MenuProps['items'] = [
+    {
+      key: 'dashboard',
+      label: (
+        <Link href='/dashboard' prefetch={false}>
+          Dashboard
+        </Link>
+      ),
+    },
+    { type: 'divider' },
+    ...accountItems,
+    { type: 'divider' },
+    {
+      key: 'logout',
+      label: 'Logout',
+      onClick: () => {
+        void signOut({
+          callbackUrl: window.location.origin,
+          redirect: true,
+        })
+      },
+    },
+  ]
 
   return (
     <div className={clsx('flex items-center', className)}>
@@ -347,30 +388,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
       </Popover>
 
       {/* User Profile with loading skeleton */}
-      <Dropdown
-        menu={{
-          items: [
-            {
-              key: 'dashboard',
-              label: (
-                <Link href='/dashboard' prefetch={false}>
-                  Dashboard
-                </Link>
-              ),
-            },
-            {
-              key: 'logout',
-              label: 'Logout',
-              onClick: () => {
-                void signOut({
-                  callbackUrl: window.location.origin,
-                  redirect: true,
-                })
-              },
-            },
-          ],
-        }}
-      >
+      <Dropdown menu={{ items: accountMenuItems }}>
         <Link href='/dashboard' prefetch={false}>
           <div className='flex items-center cursor-pointer'>
             <div className='relative'>
@@ -400,7 +418,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
               </div>
             </div>
 
-            <div className='ml-3 flex flex-col'>
+            <div className='ml-3 hidden flex-col sm:flex'>
               {isSettingsLoading ? (
                 <>
                   <Skeleton.Input active size='small' style={{ height: 16, width: 100 }} />
