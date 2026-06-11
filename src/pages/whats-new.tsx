@@ -1,5 +1,4 @@
 import { Typography } from 'antd'
-import Head from 'next/head'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { Container } from '@/components/Container'
@@ -20,43 +19,28 @@ const canonicalUrl = 'https://dotabod.com/whats-new'
 const WhatsNewPublic: NextPageWithLayout = () => {
   const entries = whatsNewSorted
 
+  // SEO (title/description/canonical/OG/Twitter) is rendered by HomepageShell from the
+  // `seo` prop in getLayout below — no inline <Head> needed.
   return (
-    <>
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name='description' content={pageDescription} />
-        <link rel='canonical' href={canonicalUrl} />
+    <Container className='pb-16'>
+      <div className='mx-auto max-w-3xl'>
+        <Title level={1}>What&apos;s new</Title>
+        <Paragraph className='mb-8 text-lg'>
+          The latest Dotabod features, commands, and pages — newest first.{' '}
+          <Link href='/dashboard/whats-new' className='text-purple-400 hover:text-purple-300'>
+            Manage them in your dashboard →
+          </Link>
+        </Paragraph>
 
-        <meta property='og:type' content='website' />
-        <meta property='og:url' content={canonicalUrl} />
-        <meta property='og:title' content={pageTitle} />
-        <meta property='og:description' content={pageDescription} />
-
-        <meta property='twitter:card' content='summary_large_image' />
-        <meta property='twitter:url' content={canonicalUrl} />
-        <meta property='twitter:title' content={pageTitle} />
-        <meta property='twitter:description' content={pageDescription} />
-      </Head>
-      <Container className='pb-16'>
-        <div className='mx-auto max-w-3xl'>
-          <Title level={1}>What&apos;s new</Title>
-          <Paragraph className='mb-8 text-lg'>
-            The latest Dotabod features, commands, and pages — newest first.{' '}
-            <Link href='/dashboard/whats-new' className='text-purple-400 hover:text-purple-300'>
-              Manage them in your dashboard →
-            </Link>
-          </Paragraph>
-
-          <div className='grid grid-cols-1 gap-6'>
-            {entries.map((entry, i) => (
-              <div id={entry.id} key={entry.id}>
-                <WhatsNewFeatureCard entry={entry} latest={i === 0} readOnly />
-              </div>
-            ))}
-          </div>
+        <div className='grid grid-cols-1 gap-6'>
+          {entries.map((entry, i) => (
+            <div id={entry.id} key={entry.id}>
+              <WhatsNewFeatureCard entry={entry} latest={i === 0} readOnly />
+            </div>
+          ))}
         </div>
-      </Container>
-    </>
+      </div>
+    </Container>
   )
 }
 

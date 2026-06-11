@@ -22,6 +22,9 @@ const settingsSchema = {
   }),
   chatter: z.boolean(),
   autoOptInNewFeatures: z.boolean(),
+  // Tri-state: the null "follow autoOptInNewFeatures" state is the ABSENCE of a settings row
+  // (the default), not a persisted value. The UI only ever PATCHes true/false, and Prisma Json
+  // columns can't store raw null, so the write schema is boolean.
   cosmeticsAnnounce: z.boolean(),
   chatters: z
     .object({
