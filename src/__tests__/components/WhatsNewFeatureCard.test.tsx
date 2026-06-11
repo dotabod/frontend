@@ -38,6 +38,7 @@ const entry: WhatsNewEntry = {
     exampleUrl: 'https://dotabod.com/streamer/set',
     exampleLabel: "See streamer's set page →",
   },
+  details: ['First how-it-works paragraph.', 'Second how-it-works paragraph.'],
 }
 
 describe('WhatsNewFeatureCard', () => {
@@ -63,6 +64,10 @@ describe('WhatsNewFeatureCard', () => {
       'href',
       'https://dotabod.com/streamer/set',
     )
+    // collapsible "How it works" details (content is in the DOM even while collapsed)
+    expect(screen.getByText(/How it works/, { selector: 'summary' })).toBeInTheDocument()
+    expect(screen.getByText('First how-it-works paragraph.')).toBeInTheDocument()
+    expect(screen.getByText('Second how-it-works paragraph.')).toBeInTheDocument()
   })
 
   it('omits the toggle when the feature has no setting', () => {
@@ -80,5 +85,7 @@ describe('WhatsNewFeatureCard', () => {
     expect(screen.getByText('Demo feature')).toBeInTheDocument()
     expect(screen.queryByText('Enabled')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Read more/ })).toBeInTheDocument()
+    // details render in read-only mode too (they're not gated on the toggle)
+    expect(screen.getByText('First how-it-works paragraph.')).toBeInTheDocument()
   })
 })

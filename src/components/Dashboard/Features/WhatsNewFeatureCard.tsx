@@ -67,6 +67,20 @@ export default function WhatsNewFeatureCard({
           </div>
         )}
 
+        {entry.details && entry.details.length > 0 && (
+          <details className='group rounded-md border border-gray-700/60 bg-gray-800/30 px-3 py-2'>
+            <summary className='flex cursor-pointer list-none select-none items-center gap-1 text-xs font-medium text-purple-400 hover:text-purple-300 [&::-webkit-details-marker]:hidden'>
+              <span className='inline-block transition-transform group-open:rotate-90'>›</span>
+              How it works
+            </summary>
+            <div className='mt-2 space-y-2 text-sm text-gray-300'>
+              {entry.details.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </details>
+        )}
+
         {hasFooter && (
           <div className='flex flex-wrap items-center gap-4 border-t border-gray-700 pt-3'>
             {!readOnly && entry.settingKey && (

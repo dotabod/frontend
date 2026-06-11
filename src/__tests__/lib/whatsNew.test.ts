@@ -19,6 +19,11 @@ describe('whatsNew registry', () => {
       expect(new Date(e.releaseDate).getTime()).toBeLessThanOrEqual(Date.now() + 86_400_000)
       // Every entry must give the reader somewhere to go / something to see.
       expect(Boolean(e.demo || e.deepLink || e.blogSlug || e.command || e.settingKey)).toBe(true)
+      // `details` (the "how it works" expander) must be non-empty paragraphs when present.
+      if (e.details) {
+        expect(e.details.length).toBeGreaterThan(0)
+        for (const paragraph of e.details) expect(paragraph.trim().length).toBeGreaterThan(0)
+      }
     }
   })
 

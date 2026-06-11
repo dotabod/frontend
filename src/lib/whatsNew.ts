@@ -19,6 +19,9 @@ export interface WhatsNewEntry {
   // A live demo so people see what the feature actually does: a sample of what it posts
   // and/or a link to a real example page.
   demo?: { chat?: string; exampleUrl?: string; exampleLabel?: string }
+  // Deeper "how it works" detail (how/when/limits), shown in a collapsible section under the
+  // excerpt. Each string is rendered as its own paragraph.
+  details?: string[]
 }
 
 export const whatsNew: WhatsNewEntry[] = [
@@ -38,6 +41,10 @@ export const whatsNew: WhatsNewEntry[] = [
       exampleUrl: 'https://dotabod.com/arteezy/set',
       exampleLabel: "See arteezy's set page →",
     },
+    details: [
+      "Every hero pick or mid-game swap (while you're live) snapshots your equipped wearables to your collection — one entry per hero, refreshed each time you replay it. No need for chat to run !set.",
+      "It posts in chat at most once per match per hero, and !set re-snapshots your current hero on demand. Your public page at dotabod.com/<name>/set shows every hero you've captured.",
+    ],
   },
   {
     id: 'cosmetic-set-pages',
@@ -50,6 +57,9 @@ export const whatsNew: WhatsNewEntry[] = [
       exampleUrl: 'https://dotabod.com/arteezy/set',
       exampleLabel: "Browse arteezy's collection →",
     },
+    details: [
+      'The page reads your captured loadouts and groups them by hero, with rarity, a completion meter, and a trophy tally. It fills in automatically as you play (or run !set) — the more heroes you pick on stream, the more complete it gets.',
+    ],
   },
   {
     id: 'paypal',
@@ -72,6 +82,9 @@ export const whatsNew: WhatsNewEntry[] = [
       exampleUrl: 'https://dotabod.com/streamers',
       exampleLabel: 'Browse the directory →',
     },
+    details: [
+      'Lists Dotabod streamers publicly, filterable by rank and sortable by follower count — a way for viewers to discover others using Dotabod, and for the network to show up in search.',
+    ],
   },
   {
     id: 'gift-redesign',
@@ -93,6 +106,11 @@ export const whatsNew: WhatsNewEntry[] = [
     releaseDate: '2026-05-25',
     category: 'chat',
     deepLink: { path: '/dashboard/commands' },
+    demo: { chat: '3311 · Legend☆2 - Average rank this game · Try !smurfs' },
+    details: [
+      'Commands are grouped into related clusters (like !np, !gm, !avg, !smurfs, !ranked). About every 4th time one runs, Dotabod tacks a one-line hint for a sibling command onto its first reply.',
+      "It won't repeat the same suggestion in your channel within 30 minutes, won't suggest the command just used, and only suggests commands you have enabled. Turn it off with the toggle on the commands page.",
+    ],
   },
   {
     id: 'streamers-command',
@@ -105,6 +123,10 @@ export const whatsNew: WhatsNewEntry[] = [
     settingKey: 'commandStreamers',
     deepLink: { path: '/dashboard/commands' },
     demo: { chat: 'Playing with 2 other Dotabod streamers Okayge' },
+    details: [
+      'Counts other Dotabod-registered users in your match from two sources — live broadcasters sending GSI for that match, plus the SourceTV roster — and never shows names, to avoid cross-chat drama.',
+      'Pro adds two extras: a " · N other streamer(s)" suffix on !np, and an automatic heads-up in chat about other streamers ~90 seconds after the match starts.',
+    ],
   },
   {
     id: 'mod-resolution',
@@ -119,6 +141,10 @@ export const whatsNew: WhatsNewEntry[] = [
     demo: {
       chat: '2 unresolved match(es) 👌 Use !won or !lost with match ID: 7654321 (Pudge), 7654320 (Invoker)',
     },
+    details: [
+      'A bare !won or !lost (no match ID) resolves the most recent finished match of your current stream session — handy when Dotabod disconnected before the match ended. Re-resolving a match doubles the MMR change to undo the old result and apply the new one.',
+      "!unresolved lists this session's matches with no recorded result, newest first (up to 10), each with hero, K/D/A, score, length, and the match ID to pass to !won or !lost.",
+    ],
   },
   {
     id: 'vision-roster',
@@ -129,6 +155,13 @@ export const whatsNew: WhatsNewEntry[] = [
     category: 'overlay',
     command: '!np',
     deepLink: { path: '/dashboard/commands' },
+    demo: {
+      chat: 'All Pick: DuBu (Shadow Shaman) · Collapse (Magnus) · Puppy (Chen) · PPD (Tusk) · Rajjix (Timbersaw)',
+    },
+    details: [
+      'Kicks in for Immortal / 8500+ MMR games, where Valve hides the public draft. Dotabod auto-captures short overlay clips at draft (~46s), the strategy phase (~50s), and ~60s into the game.',
+      'Its Vision service reads the in-game hero bar — the row of ~60px portraits — and returns up to 10 heroes with a per-slot confidence score, falling back to draft player names until heroes load. Vision-detected heroes take priority when building the !np roster.',
+    ],
   },
   {
     id: 'lastfm-fix',
@@ -139,6 +172,10 @@ export const whatsNew: WhatsNewEntry[] = [
     category: 'overlay',
     settingKey: 'lastFmOverlay',
     deepLink: { path: '/dashboard/features/overlay' },
+    demo: { chat: "Now playing: Guns N' Roses - Sweet Child O' Mine (Appetite for Destruction)" },
+    details: [
+      "Last.fm's API returns names with HTML entities (like &#39; for an apostrophe). Dotabod now decodes those on the way in and stops re-escaping them on the way out to Twitch, so apostrophes and ampersands show as real characters instead of &#39; / &amp;.",
+    ],
   },
   {
     id: 'help-redesign',
@@ -179,6 +216,9 @@ export const whatsNew: WhatsNewEntry[] = [
     releaseDate: '2026-05-19',
     category: 'commands',
     deepLink: { path: '/dashboard/commands' },
+    details: [
+      'Commands like !geo, !stats, !match, !friends, !count, and !fixdbl each got their own on/off switch in the dashboard, so you can tailor exactly which ones your chat can use.',
+    ],
   },
   {
     id: 'steam-connector',
@@ -188,6 +228,9 @@ export const whatsNew: WhatsNewEntry[] = [
     releaseDate: '2026-05-17',
     category: 'stream',
     deepLink: { path: '/dashboard' },
+    details: [
+      "The connector polls for your active Steam account while you stream and links it automatically, with status feedback and built-in troubleshooting if it doesn't appear.",
+    ],
   },
   {
     id: 'billing-status',
@@ -215,6 +258,9 @@ export const whatsNew: WhatsNewEntry[] = [
     releaseDate: '2026-01-20',
     category: 'chat',
     deepLink: { path: '/dashboard/commands' },
+    details: [
+      "Twitch's Lead Moderator is a separate badge from a regular mod. Dotabod now grants Lead Moderators mod-level access to mod-only commands like !won, !toggle, and !modsonly.",
+    ],
   },
   {
     id: 'today-command',
