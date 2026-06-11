@@ -40,6 +40,7 @@ export const commands = {
   commandRefresh: true,
   commandResetwl: true,
   commandRosh: true,
+  commandSet: true,
   commandSetdelay: true,
   commandSetmmr: true,
   commandShard: true,

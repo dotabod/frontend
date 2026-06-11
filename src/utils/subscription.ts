@@ -130,6 +130,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandAPM: SUBSCRIPTION_TIERS.FREE,
   commandAvg: SUBSCRIPTION_TIERS.FREE,
   commandDotabuff: SUBSCRIPTION_TIERS.FREE,
+  commandSet: SUBSCRIPTION_TIERS.FREE,
   commandGM: SUBSCRIPTION_TIERS.PRO,
   commandGPM: SUBSCRIPTION_TIERS.FREE,
   commandHero: SUBSCRIPTION_TIERS.PRO,

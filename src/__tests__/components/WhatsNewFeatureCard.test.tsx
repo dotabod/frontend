@@ -18,6 +18,14 @@ vi.mock('@/components/Dashboard/Features/TierSwitch', () => ({
 vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   useUpdateSetting: vi.fn(() => ({ data: null, updateSetting: vi.fn() })),
 }))
+// The real CommandDetail pulls in next/image + chat components; stub the one key we exercise.
+vi.mock('@/components/Dashboard/CommandDetail', () => ({
+  default: {
+    commandNP: {
+      response: () => <div data-testid='command-demo'>!np with flag images</div>,
+    },
+  },
+}))
 
 import WhatsNewFeatureCard from '@/components/Dashboard/Features/WhatsNewFeatureCard'
 import type { WhatsNewEntry } from '@/lib/whatsNew'
@@ -68,6 +76,18 @@ describe('WhatsNewFeatureCard', () => {
     expect(screen.getByText(/How it works/, { selector: 'summary' })).toBeInTheDocument()
     expect(screen.getByText('First how-it-works paragraph.')).toBeInTheDocument()
     expect(screen.getByText('Second how-it-works paragraph.')).toBeInTheDocument()
+  })
+
+  it('renders the live command sample (with flag/emoji images) when demoCommand is set', () => {
+    render(
+      <WhatsNewFeatureCard
+        entry={{ ...entry, demoCommand: 'commandNP', demo: undefined }}
+        master
+      />,
+    )
+    expect(screen.getByTestId('command-demo')).toBeInTheDocument()
+    // the hand-copied demo.chat fallback is not used when a demoCommand is present
+    expect(screen.queryByText(/Pudge set captured/)).not.toBeInTheDocument()
   })
 
   it('omits the toggle when the feature has no setting', () => {

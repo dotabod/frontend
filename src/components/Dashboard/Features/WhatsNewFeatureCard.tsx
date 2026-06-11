@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { deepLinkLabel, entryToggleChecked, type WhatsNewEntry } from '@/lib/whatsNew'
 import { Card } from '@/ui/card'
@@ -48,13 +49,18 @@ export default function WhatsNewFeatureCard({
 
         <p className='text-sm text-gray-300'>{entry.description}</p>
 
-        {entry.demo && (entry.demo.chat || entry.demo.exampleUrl) && (
+        {(entry.demoCommand || entry.demo?.chat || entry.demo?.exampleUrl) && (
           <div className='rounded-md border border-gray-700/60 bg-gray-800/50 p-3'>
             <div className='mb-1.5 text-xs font-medium text-gray-500'>Example</div>
-            {entry.demo.chat && (
+            {entry.demoCommand ? (
+              // Reuse the real command's <TwitchChat> sample so flags, emotes, and emoji
+              // images render exactly as on the commands page. `all=false` keeps it to the
+              // single headline line (no extra "!np add"/usage examples).
+              CommandDetail[entry.demoCommand].response(null, false)
+            ) : entry.demo?.chat ? (
               <p className='font-mono text-xs text-gray-300'>{entry.demo.chat}</p>
-            )}
-            {entry.demo.exampleUrl && (
+            ) : null}
+            {entry.demo?.exampleUrl && (
               <a
                 href={entry.demo.exampleUrl}
                 target='_blank'

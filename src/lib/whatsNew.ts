@@ -1,4 +1,4 @@
-import type { SettingKeys } from '@/lib/defaultSettings'
+import type { CommandKeys, SettingKeys } from '@/lib/defaultSettings'
 
 // One released feature/command/page shown on the "What's New" dashboard surface. `id` is
 // shared by convention with the backend FEATURE_ANNOUNCEMENTS registry (the two repos have no
@@ -19,6 +19,10 @@ export interface WhatsNewEntry {
   // A live demo so people see what the feature actually does: a sample of what it posts
   // and/or a link to a real example page.
   demo?: { chat?: string; exampleUrl?: string; exampleLabel?: string }
+  // For command features, point at the real command in CommandDetail so the example renders
+  // the same <TwitchChat> sample the commands page uses, keeping its flag/emote/emoji images
+  // instead of a hand-copied text line. Takes precedence over demo.chat.
+  demoCommand?: CommandKeys
   // Deeper "how it works" detail (how/when/limits), shown in a collapsible section under the
   // excerpt. Each string is rendered as its own paragraph.
   details?: string[]
@@ -36,8 +40,8 @@ export const whatsNew: WhatsNewEntry[] = [
     followsNewFeatureMaster: true,
     command: '!set',
     tier: 'FREE',
+    demoCommand: 'commandSet',
     demo: {
-      chat: 'Invoker set captured! 4 cosmetics → dotabod.com/arteezy/set',
       exampleUrl: 'https://dotabod.com/arteezy/set',
       exampleLabel: "See arteezy's set page",
     },
@@ -122,7 +126,7 @@ export const whatsNew: WhatsNewEntry[] = [
     command: '!streamers',
     settingKey: 'commandStreamers',
     deepLink: { path: '/dashboard/commands' },
-    demo: { chat: 'Playing with 2 other Dotabod streamers Okayge' },
+    demoCommand: 'commandStreamers',
     details: [
       'Counts other Dotabod-registered users in your match (live broadcasters sending GSI, plus the SourceTV roster) and never shows names, to avoid cross-chat drama.',
       'Pro adds a " · N other streamer(s)" suffix on !np, plus an automatic heads-up in chat about other streamers ~90 seconds after the match starts.',
@@ -138,9 +142,7 @@ export const whatsNew: WhatsNewEntry[] = [
     command: '!unresolved',
     settingKey: 'commandWon',
     deepLink: { path: '/dashboard/commands' },
-    demo: {
-      chat: '2 unresolved match(es) 👌 Use !won or !lost with match ID: 7654321 (Pudge), 7654320 (Invoker)',
-    },
+    demoCommand: 'commandUnresolved',
     details: [
       'A bare !won or !lost (no match ID) resolves the most recent finished match of your current stream session, handy when Dotabod disconnected before the match ended. Re-resolving a match doubles the MMR change to undo the old result and apply the new one.',
       "!unresolved lists this session's matches with no recorded result, newest first (up to 10), each with hero, K/D/A, score, length, and the match ID to pass to !won or !lost.",
@@ -155,9 +157,7 @@ export const whatsNew: WhatsNewEntry[] = [
     category: 'overlay',
     command: '!np',
     deepLink: { path: '/dashboard/commands' },
-    demo: {
-      chat: 'All Pick: DuBu (Shadow Shaman) · Collapse (Magnus) · Puppy (Chen) · PPD (Tusk) · Rajjix (Timbersaw)',
-    },
+    demoCommand: 'commandNP',
     details: [
       'Kicks in for Immortal / 8500+ MMR games, where Valve hides the public draft. Dotabod auto-captures short overlay clips at draft (~46s), the strategy phase (~50s), and ~60s into the game.',
       'Its Vision service reads the in-game hero bar (the row of ~60px portraits) and returns up to 10 heroes with a per-slot confidence score, falling back to draft player names until heroes load. Vision-detected heroes take priority when building the !np roster.',
@@ -206,7 +206,7 @@ export const whatsNew: WhatsNewEntry[] = [
     command: '!recent',
     settingKey: 'commandWon',
     deepLink: { path: '/dashboard/commands' },
-    demo: { chat: 'Recent matches: 7654321 W (Pudge), 7654320 L (Invoker), 7654319 W (Sniper) 👌' },
+    demoCommand: 'commandRecent',
   },
   {
     id: 'command-toggles',
@@ -271,7 +271,7 @@ export const whatsNew: WhatsNewEntry[] = [
     command: '!today',
     settingKey: 'commandToday',
     deepLink: { path: '/dashboard/commands' },
-    demo: { chat: 'Pudge 2-1 · Invoker 1-0 · Sniper 0-2 · 3W 3L (6 games)' },
+    demoCommand: 'commandToday',
   },
 ]
 
