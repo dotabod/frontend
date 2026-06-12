@@ -62,6 +62,7 @@ const KNOWN_DEEP_LINK_PATHS = [
   '/dashboard',
   '/dashboard/billing',
   '/dashboard/commands',
+  '/dashboard/features/chat',
   '/dashboard/features/overlay',
   '/dashboard/help',
 ]
@@ -71,6 +72,7 @@ describe('deepLinkLabel', () => {
     expect(deepLinkLabel({ path: '/dashboard' })).toBe('Open dashboard')
     expect(deepLinkLabel({ path: '/dashboard/billing' })).toBe('Open billing')
     expect(deepLinkLabel({ path: '/dashboard/commands' })).toBe('Open commands')
+    expect(deepLinkLabel({ path: '/dashboard/features/chat' })).toBe('Open chat settings')
     expect(deepLinkLabel({ path: '/dashboard/features/overlay' })).toBe('Open overlay settings')
     expect(deepLinkLabel({ path: '/dashboard/help' })).toBe('Open help center')
   })

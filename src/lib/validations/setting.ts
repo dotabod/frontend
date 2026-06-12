@@ -44,6 +44,7 @@ const settingsSchema = {
       roshPickup: z.object({ enabled: z.boolean() }),
       roshanKilled: z.object({ enabled: z.boolean() }),
       smoke: z.object({ enabled: z.boolean() }),
+      smokeActivated: z.object({ enabled: z.boolean() }),
       tip: z.object({ enabled: z.boolean() }),
     })
     .partial(),
