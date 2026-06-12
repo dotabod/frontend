@@ -302,6 +302,22 @@ export const chatterInfo = {
     ),
     tooltip: 'Whenever your hero has smoke debuff',
   },
+  smokeActivated: {
+    category: CATEGORIES.Event,
+    message: (
+      <span className='inline space-x-2'>
+        <Image
+          width={22}
+          height={22}
+          alt='Shush'
+          className='inline align-middle'
+          src='/images/emotes/Shush.png'
+        />
+        <span>Pudge activated Smoke of Deceit!</span>
+      </span>
+    ),
+    tooltip: "When your team smokes — and calls you out if you weren't in it",
+  },
   tip: {
     category: CATEGORIES.Event,
     message: (

@@ -122,6 +122,9 @@ export const defaultSettings = {
     smoke: {
       enabled: true,
     },
+    smokeActivated: {
+      enabled: true,
+    },
     tip: {
       enabled: true,
     },
