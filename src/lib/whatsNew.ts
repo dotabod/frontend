@@ -64,7 +64,7 @@ export const whatsNew: WhatsNewEntry[] = [
     },
     details: [
       "Every hero pick or mid-game swap (while you're live) snapshots your equipped wearables to your collection, one entry per hero, refreshed each time you replay it. No need for chat to run !set.",
-      "It posts in chat at most once per match per hero, and !set re-snapshots your current hero on demand. Your public page at dotabod.com/<name>/set shows every hero you've captured.",
+      "It holds the chat post until everyone's locked in (strategy phase) so it never tips your pick to stream snipers, and posts at most once per match per hero. !set re-snapshots your current hero on demand, and your public page at dotabod.com/<name>/set shows every hero you've captured.",
     ],
   },
   {

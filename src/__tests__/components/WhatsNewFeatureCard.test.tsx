@@ -42,7 +42,7 @@ const entry: WhatsNewEntry = {
   blogSlug: 'hello-world',
   deepLink: { path: '/dashboard/commands', section: 'y' },
   demo: {
-    chat: 'Pudge set captured! 3 cosmetics → dotabod.com/streamer/set',
+    chat: 'Playing Pudge Pog new card unlocked, 3 cosmetics saved → dotabod.com/streamer/set',
     exampleUrl: 'https://dotabod.com/streamer/set',
     exampleLabel: "See streamer's set page →",
   },
@@ -67,7 +67,7 @@ describe('WhatsNewFeatureCard', () => {
       '/blog/hello-world',
     )
     // demo: sample chat + live example link
-    expect(screen.getByText(/Pudge set captured! 3 cosmetics/)).toBeInTheDocument()
+    expect(screen.getByText(/Playing Pudge Pog new card unlocked/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /See streamer's set page/ })).toHaveAttribute(
       'href',
       'https://dotabod.com/streamer/set',
@@ -87,7 +87,7 @@ describe('WhatsNewFeatureCard', () => {
     )
     expect(screen.getByTestId('command-demo')).toBeInTheDocument()
     // the hand-copied demo.chat fallback is not used when a demoCommand is present
-    expect(screen.queryByText(/Pudge set captured/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/new card unlocked/)).not.toBeInTheDocument()
   })
 
   it('omits the toggle when the feature has no setting', () => {
