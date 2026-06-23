@@ -23,24 +23,24 @@ export const chatterInfo = {
         <Image
           width={22}
           height={22}
-          alt='ICANT'
+          alt='EZ'
           className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/600ae212df6a0665f274c9df/1x'
+          src='https://cdn.7tv.app/emote/01F9FS6EEG0006XXD6DX0K9Y04/2x.webp'
         />
         <Image
           width={22}
           height={22}
-          alt='ICANT'
+          alt='Clap'
           className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/62b103336ef7a5f0b7df90c4/1x'
+          src='https://cdn.7tv.app/emote/01F6NE9AER000CKKT9BSDYGT0J/2x.webp'
         />
         <span>Thanks Pink, Yellow</span>
         <Image
           width={22}
           height={22}
-          alt='ICANT'
+          alt='SeemsGood'
           className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/60936f4a39b5010444d0c752/1x'
+          src='https://cdn.7tv.app/emote/01GTD2AQWG0004J62EZBADK0F5/2x.webp'
         />
       </div>
     ),
@@ -81,9 +81,9 @@ export const chatterInfo = {
         <Image
           width={22}
           height={22}
-          alt='ICANT'
+          alt='PepeLaugh'
           className='inline align-middle'
-          src='https://cdn.betterttv.net/emote/61fe1b9406fd6a9f5be370fd/1x'
+          src='https://cdn.7tv.app/emote/01F6Q76NN80005589X3BDK9CN1/2x.webp'
         />
       </div>
     ),
@@ -98,9 +98,9 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
-            alt='ICANT'
+            alt='POGGIES'
             className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/62aafeef6ef7a5f0b7df3d98/1x'
+            src='https://cdn.7tv.app/emote/01F6P05NWG0003BH8AEY96655D/2x.webp'
           />
         </div>
         <div className='space-x-2'>
@@ -108,9 +108,9 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
-            alt='ICANT'
+            alt='BibleThump'
             className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/61a5e69b371b825d3f6dd0b2/1x'
+            src='https://cdn.7tv.app/emote/01J8NMZ2HG0005G1FWF2H9Y615/2x.webp'
           />
         </div>
       </>
@@ -168,9 +168,9 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
-            alt='massivePIDAS'
+            alt='Madge'
             className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/6350aa989bb828a9f0d42863/1x'
+            src='https://cdn.7tv.app/emote/01F6ASPNM00009TPCEMWQTT4XX/2x.webp'
           />
         </div>
       </>
@@ -203,9 +203,9 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
-            alt='ICANT'
+            alt='HECANT'
             className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/628f6c913c6f14b68848c078/1x.webp'
+            src='https://cdn.7tv.app/emote/01G4FZG870000487MWX9F93YF7/2x.webp'
           />
         </div>
         <div className='space-x-2'>
@@ -213,10 +213,11 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
-            alt='ICANT'
+            alt='Okayeg'
             className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/60ec91f58ed8b373e4221742/1x.webp'
+            src='https://cdn.7tv.app/emote/01EZPFKAH8000FNWX000ADZW5H/2x.webp'
           />
+          <span>👍</span>
         </div>
       </>
     ),
@@ -304,7 +305,18 @@ export const chatterInfo = {
   },
   smokeActivated: {
     category: CATEGORIES.Event,
-    message: <span>team smoking without you HAH</span>,
+    message: (
+      <span className='inline space-x-2'>
+        <span>team smoking without you</span>
+        <Image
+          width={22}
+          height={22}
+          alt='HAH'
+          className='inline align-middle'
+          src='https://cdn.7tv.app/emote/01H1F4W6P80005BD0YVPMCDXGT/2x.webp'
+        />
+      </span>
+    ),
     tooltip: 'When a teammate pops smoke but you got left behind',
   },
   tip: {
@@ -326,9 +338,9 @@ export const chatterInfo = {
           <Image
             width={22}
             height={22}
-            alt='ICANT'
+            alt='PepeLaugh'
             className='inline align-middle'
-            src='https://cdn.betterttv.net/emote/61e4254a06fd6a9f5be0ea96/1x'
+            src='https://cdn.7tv.app/emote/01F6Q76NN80005589X3BDK9CN1/2x.webp'
           />
         </div>
       </>
