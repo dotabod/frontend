@@ -55,8 +55,11 @@ export function HelpMenu({ collapsed = false, onNavigate }: HelpMenuProps) {
       <Button
         type='text'
         aria-label='Help and resources'
+        className='text-gray-200!'
         icon={<QuestionMarkCircleIcon className='h-5 w-5 text-gray-200' />}
-      />
+      >
+        {!collapsed && 'Help'}
+      </Button>
     </Popover>
   )
 }

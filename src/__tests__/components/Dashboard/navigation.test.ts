@@ -37,12 +37,18 @@ describe('navConfig regions', () => {
     expect(hidden).toEqual(['Setup'])
   })
 
-  it('bottom region holds Team access and the admin-only Admin accordion', () => {
-    const [teamAccess, admin] = navConfig.bottom
+  it('bottom region holds Team access, Help center, and the admin-only Admin accordion', () => {
+    const [teamAccess, helpCenter, admin] = navConfig.bottom
 
     expect(teamAccess.href).toBe('/dashboard/managers')
     expect(teamAccess.hideForImpersonator).toBe(true)
     expect(teamAccess.children).toBeUndefined()
+
+    // Help center is pinned in the rail and visible to everyone (no impersonator gate).
+    expect(helpCenter.href).toBe('/dashboard/help')
+    expect(helpCenter.name).toBe('Help center')
+    expect(helpCenter.hideForImpersonator).toBeUndefined()
+    expect(helpCenter.adminOnly).toBeUndefined()
 
     expect(admin.name).toBe('Admin')
     expect(admin.adminOnly).toBe(true)
@@ -80,19 +86,20 @@ describe('navConfig regions', () => {
 describe('filterNav', () => {
   it('drops the Admin accordion for non-admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: false, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual(['Team access'])
+    expect(result.map((i) => i.name)).toEqual(['Team access', 'Help center'])
   })
 
   it('keeps the Admin accordion for admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: true, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual(['Team access', 'Admin'])
+    expect(result.map((i) => i.name)).toEqual(['Team access', 'Help center', 'Admin'])
   })
 
   it('hides Setup / Team access / Billing / Your data for impersonators everywhere', () => {
     const opts = { isAdmin: true, isImpersonating: true }
 
     expect(filterNav(navConfig.primary, opts).some((i) => i.name === 'Setup')).toBe(false)
-    expect(filterNav(navConfig.bottom, opts)).toEqual([]) // Team access + Admin both drop
+    // Team access + Admin both drop; Help center stays (universal, no impersonator gate).
+    expect(filterNav(navConfig.bottom, opts).map((i) => i.name)).toEqual(['Help center'])
     expect(filterNav(navConfig.account, opts).map((i) => i.name)).toEqual(['Gift Pro'])
   })
 })
@@ -111,8 +118,9 @@ describe('findBestMatchingMenuItem', () => {
     // Routes outside the sidebar must highlight nothing (not Setup).
     ['/dashboard/billing', { key: '', parentKey: '' }],
     ['/dashboard/data', { key: '', parentKey: '' }],
-    ['/dashboard/help', { key: '', parentKey: '' }],
     ['/dashboard/unknown', { key: '', parentKey: '' }],
+    // Help center now lives in the sidebar, so its route highlights it.
+    ['/dashboard/help', { key: '/dashboard/help', parentKey: '' }],
     // Unknown deep route walks up to the nearest registered prefix.
     ['/dashboard/features/overlay/extra', { key: '/dashboard/features/overlay', parentKey: '' }],
     ['/dashboard/commands/new', { key: '/dashboard/commands', parentKey: '' }],

@@ -52,6 +52,14 @@ export interface NavConfig {
   help: NavItem[]
 }
 
+// Shared so Help center lives in BOTH the sidebar bottom rail and the "?" popover
+// without the href/label/icon drifting apart. (The ⌘K palette dedupes by href.)
+const HELP_CENTER: NavItem = {
+  href: '/dashboard/help',
+  icon: QuestionMarkCircleIcon,
+  name: 'Help center',
+}
+
 // Single source of truth feeding the sidebar, avatar menu, "?" menu and ⌘K palette.
 export const navConfig: NavConfig = {
   primary: [
@@ -65,6 +73,8 @@ export const navConfig: NavConfig = {
   ],
   bottom: [
     { hideForImpersonator: true, href: '/dashboard/managers', icon: Users, name: 'Team access' },
+    // Pinned at the bottom of the rail, visible to everyone (incl. impersonators).
+    HELP_CENTER,
     {
       adminOnly: true,
       children: [
@@ -89,7 +99,7 @@ export const navConfig: NavConfig = {
     { hideForImpersonator: true, href: '/dashboard/data', icon: HardDriveIcon, name: 'Your data' },
   ],
   help: [
-    { href: '/dashboard/help', icon: QuestionMarkCircleIcon, name: 'Help center' },
+    HELP_CENTER,
     { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
     { href: 'https://discord.dotabod.com', icon: Discord, name: 'Discord' },
     { href: 'https://github.com/dotabod/', icon: Github, name: 'GitHub' },
@@ -186,7 +196,7 @@ export function filterNav(
 }
 
 // Dashboard root is matched exactly only — it's the ancestor of every dashboard
-// route, so prefix-matching it would false-highlight Setup for billing/data/help.
+// route, so prefix-matching it would false-highlight Setup for billing/data.
 const ROOT_PATH = '/dashboard'
 
 // Flat map of every sidebar-selectable href -> its parent menu key ('' for top level).
@@ -206,7 +216,7 @@ for (const item of [...navConfig.primary, ...navConfig.bottom]) {
  * Resolve the sidebar item to highlight for a pathname.
  * Exact match wins (so /dashboard/features/overlay beats /dashboard/features),
  * then the nearest registered prefix — except the dashboard root, which is
- * exact-only so routes outside the sidebar (billing/data/help) highlight nothing.
+ * exact-only so routes outside the sidebar (billing/data) highlight nothing.
  */
 export const findBestMatchingMenuItem = (pathname: string): { key: string; parentKey: string } => {
   if (pathname in NAV_HREF_TO_PARENT) {
