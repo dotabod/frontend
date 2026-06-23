@@ -2,13 +2,13 @@ import { act, render, waitFor } from '@testing-library/react'
 import * as Sentry from '@sentry/nextjs'
 import useSWR from 'swr'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
-import { useUpdate } from '@/lib/hooks/useUpdateSetting'
+import { useUpdate, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 const mutateMock = vi.hoisted(() => vi.fn())
 const messageOpenMock = vi.hoisted(() => vi.fn())
 
 vi.mock('next/router', () => ({
-  useRouter: () => ({ isReady: true }),
+  useRouter: () => ({ isReady: true, pathname: '/dashboard', query: {} }),
 }))
 
 vi.mock('antd', () => ({
@@ -30,6 +30,12 @@ vi.mock('swr', () => ({
 
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
+}))
+
+// useUpdateSetting gates writes on tier access via useSubscription; stub it. smokeActivated is
+// a FREE chatter, so access is granted regardless of the value returned here.
+vi.mock('@/hooks/useSubscription', () => ({
+  useSubscription: () => ({ subscription: null }),
 }))
 
 describe('useUpdate', () => {
@@ -206,6 +212,78 @@ describe('useUpdate', () => {
       expect.objectContaining({
         type: 'error',
         content: expect.stringContaining('permission'),
+      }),
+    )
+  })
+})
+
+describe('useUpdateSetting (chatters)', () => {
+  beforeEach(() => {
+    mutateMock.mockResolvedValue(undefined)
+    global.fetch = vi.fn().mockResolvedValue({ ok: true } as Response)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    mutateMock.mockReset()
+    messageOpenMock.mockReset()
+  })
+
+  it('optimistically flips the toggled chatter so the switch reflects the new state', () => {
+    const refs: { updateSetting?: (value: boolean | null) => void; value?: unknown } = {}
+
+    vi.mocked(useSWR).mockReturnValue({
+      data: {
+        settings: [
+          {
+            key: 'chatters',
+            value: { smoke: { enabled: true }, smokeActivated: { enabled: false } },
+          },
+        ],
+      },
+      error: undefined,
+    } as ReturnType<typeof useSWR>)
+
+    function TestComponent() {
+      const { data, updateSetting } = useUpdateSetting<boolean | null>('chatters.smokeActivated')
+      refs.updateSetting = updateSetting
+      refs.value = data
+      return null
+    }
+
+    render(<TestComponent />)
+
+    // Sanity: the switch starts in the stored (disabled) state.
+    expect(refs.value).toBe(false)
+
+    act(() => {
+      refs.updateSetting?.(true)
+    })
+
+    // The PATCH targets the parent `chatters` key with the nested {enabled} shape.
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/settings/chatters',
+      expect.objectContaining({
+        body: JSON.stringify({ value: { smokeActivated: { enabled: true } } }),
+        method: 'PATCH',
+      }),
+    )
+
+    // Regression: with revalidate off, the optimistic cache update is the only thing the UI
+    // reads, so it must flip smokeActivated to enabled (leaving other chatters intact) rather
+    // than stashing the payload under a stray `value` key.
+    expect(mutateMock).toHaveBeenCalledWith(
+      '/api/settings',
+      expect.any(Promise),
+      expect.objectContaining({
+        optimisticData: {
+          settings: [
+            {
+              key: 'chatters',
+              value: { smoke: { enabled: true }, smokeActivated: { enabled: true } },
+            },
+          ],
+        },
       }),
     )
   })

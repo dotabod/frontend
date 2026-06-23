@@ -299,9 +299,12 @@ export function useUpdateSetting<T = boolean>(
             if (setting.key === Settings.chatters) {
               return {
                 ...setting,
+                // `newValue` is the MutationValue wrapper ({ value: { [chatterKey]: {enabled} } });
+                // merge its inner payload, not the wrapper, so the toggled chatter actually
+                // updates instead of landing under a stray `value` key.
                 value: {
                   ...chattersData?.value,
-                  ...newValue,
+                  ...(newValue.value as Record<string, unknown>),
                 },
               }
             }
