@@ -1,16 +1,6 @@
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Collapse,
-  Divider,
-  Drawer,
-  Space,
-  Table,
-  Tag,
-  Typography,
-} from 'antd'
+import { Button, Checkbox, Collapse, Divider, Drawer, Space, Table, Tag, Typography } from 'antd'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { Cookie } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { COOKIE_EVENTS, type CookiePreferences, useCookiePreferences } from '@/lib/cookieManager'
@@ -199,41 +189,40 @@ const CookieConsent = () => {
   return (
     <>
       {visible && !showSettings && (
-        <Alert
-          message='Cookie preferences'
-          description={
-            <div>
-              <Paragraph>
-                We use necessary cookies by default. You can choose whether to allow analytics,
-                marketing, and preference cookies. Learn more in our{' '}
-                <Link href='/cookies'>Cookie Policy</Link>.
-              </Paragraph>
-              <Space size='small' wrap>
-                <Button size='small' type='primary' onClick={handleAcceptAll}>
-                  Accept all
-                </Button>
-                <Button size='small' onClick={handleRejectAll}>
-                  Reject non-essential
-                </Button>
-                <Button size='small' type='link' onClick={handleManagePreferences}>
-                  Customize
-                </Button>
-              </Space>
+        <div
+          role='region'
+          aria-label='Cookie consent'
+          className='animate-fade-in fixed bottom-4 left-4 z-[1001] w-[min(420px,calc(100vw-2rem))] rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-xl'
+        >
+          <div className='flex items-start gap-2.5'>
+            <Cookie aria-hidden className='mt-0.5 h-4 w-4 shrink-0 text-gray-400' />
+            <div className='min-w-0'>
+              <p className='text-sm font-medium text-gray-100'>Cookie preferences</p>
+              <p className='mt-1 text-sm leading-snug text-gray-300'>
+                We use necessary cookies to run the site, and optional analytics and marketing
+                cookies if you allow them. See our{' '}
+                <Link
+                  href='/cookies'
+                  className='text-purple-300 underline underline-offset-2 hover:text-purple-200'
+                >
+                  Cookie Policy
+                </Link>
+                .
+              </p>
             </div>
-          }
-          showIcon
-          style={{
-            borderRadius: 8,
-            bottom: 16,
-            left: 16,
-            margin: 0,
-            padding: 12,
-            position: 'fixed',
-            width: 'min(420px, calc(100vw - 32px))',
-            zIndex: 1001,
-          }}
-          closable={false}
-        />
+          </div>
+          <div className='mt-3 flex flex-wrap gap-2'>
+            <Button size='small' type='primary' onClick={handleAcceptAll}>
+              Accept all
+            </Button>
+            <Button size='small' onClick={handleRejectAll}>
+              Reject non-essential
+            </Button>
+            <Button size='small' type='text' onClick={handleManagePreferences}>
+              Customize
+            </Button>
+          </div>
+        </div>
       )}
 
       <Drawer
