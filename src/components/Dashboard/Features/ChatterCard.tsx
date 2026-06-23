@@ -304,19 +304,8 @@ export const chatterInfo = {
   },
   smokeActivated: {
     category: CATEGORIES.Event,
-    message: (
-      <span className='inline space-x-2'>
-        <Image
-          width={22}
-          height={22}
-          alt='Shush'
-          className='inline align-middle'
-          src='/images/emotes/Shush.png'
-        />
-        <span>Pudge activated Smoke of Deceit!</span>
-      </span>
-    ),
-    tooltip: "When your team smokes — and calls you out if you weren't in it",
+    message: <span>team smoking without you HAH</span>,
+    tooltip: 'When a teammate pops smoke but you got left behind',
   },
   tip: {
     category: CATEGORIES.Event,

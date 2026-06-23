@@ -1,4 +1,5 @@
 import type { CommandKeys, SettingKeys } from '@/lib/defaultSettings'
+import type { ChatterSettingKeys } from '@/utils/subscription'
 
 // One released feature/command/page shown on the "What's New" dashboard surface. `id` is
 // shared by convention with the backend FEATURE_ANNOUNCEMENTS registry (the two repos have no
@@ -9,7 +10,7 @@ export interface WhatsNewEntry {
   description: string
   releaseDate: string // ISO (yyyy-mm-dd)
   category: 'chat' | 'overlay' | 'commands' | 'pages' | 'advanced' | 'bets' | 'mmr' | 'stream'
-  settingKey?: SettingKeys // renders an inline toggle
+  settingKey?: SettingKeys | ChatterSettingKeys // renders an inline toggle
   followsNewFeatureMaster?: boolean // tri-state: checked = value ?? autoOptInNewFeatures
   deepLink?: { path: string; section?: string } // for settings that live on another page
   command?: string // e.g. '!set'
@@ -33,15 +34,16 @@ export const whatsNew: WhatsNewEntry[] = [
     id: 'smoke-activated',
     title: 'Team smoke alerts',
     description:
-      'When your team pops Smoke of Deceit, Dotabod posts a single line a few seconds later — naming the hero who smoked if you grouped up, or ribbing you if you got left behind.',
+      'When your team pops Smoke of Deceit without you, Dotabod ribs you in chat a few seconds later for getting left behind.',
     releaseDate: '2026-06-12',
     category: 'chat',
+    settingKey: 'chatters.smokeActivated',
     tier: 'FREE',
     deepLink: { path: '/dashboard/features/chat', section: 'chatters' },
     demo: { chat: 'team smoking without you HAH' },
     details: [
-      "It triggers on the in-game smoke-activated event, which Dota only sends for your own team, so it never reveals an enemy smoke — and it's separate from the existing Smoke alert, which only fires when your own hero gets the smoke debuff.",
-      "A few seconds after a teammate smokes, Dotabod checks whether your hero actually caught the buff and posts one line: if you grouped up it names the hero who popped it (or a generic line for 8500+ games where heroes are hidden); if you got left behind, it lets chat know you weren't with the team.",
+      "It triggers on the in-game smoke-activated event, which Dota only sends for your own team, so it never reveals an enemy smoke — and it's separate from the existing Smoke alert, which fires whenever your own hero gets the smoke debuff.",
+      'A few seconds after a teammate smokes, Dotabod checks whether your hero actually caught the buff. If you got left behind it posts a single line ribbing you; if you were in the smoke it stays quiet and lets the Smoke alert announce that your hero is smoked.',
     ],
   },
   {

@@ -255,7 +255,7 @@ export const settingsMetadata: SettingMetadata[] = [
   },
   {
     category: 'chat',
-    description: 'Announce when your team activates Smoke of Deceit, and rib you if you missed it',
+    description: 'Rib you in chat when your team pops Smoke of Deceit without you',
     isNested: true,
     key: 'chatters.smokeActivated',
     label: 'Smoke Activated Alert',
