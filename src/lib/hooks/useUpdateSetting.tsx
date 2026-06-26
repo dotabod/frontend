@@ -335,11 +335,9 @@ export function useUpdateSetting<T = boolean>(
   if (key === Settings.mmr) {
     value = data?.mmr || 0
   }
-  if (key?.startsWith('chatters.')) {
-    const chattersData = data?.settings?.find((s) => s.key === Settings.chatters)
-    const chatterKey = key.split('.')[1]
-    value = chattersData?.value?.[chatterKey]?.enabled ?? false
-  }
+  // Chatter keys (`chatters.x`) are resolved by getValueOrDefault above, which falls back to
+  // the real per-chatter default (on/off). Don't re-derive here with `?? false` — that showed
+  // default-on chatters as off in dotted-key consumers (e.g. the What's New card).
 
   const tierAccess = canAccessFeature(key as FeatureTier, subscription)
 

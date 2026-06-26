@@ -303,22 +303,6 @@ export const chatterInfo = {
     ),
     tooltip: 'Whenever your hero has smoke debuff',
   },
-  smokeActivated: {
-    category: CATEGORIES.Event,
-    message: (
-      <span className='inline space-x-2'>
-        <span>team smoking without you</span>
-        <Image
-          width={22}
-          height={22}
-          alt='HAH'
-          className='inline align-middle'
-          src='https://cdn.7tv.app/emote/01H1F4W6P80005BD0YVPMCDXGT/2x.webp'
-        />
-      </span>
-    ),
-    tooltip: 'When a teammate pops smoke but you got left behind',
-  },
   tip: {
     category: CATEGORIES.Event,
     message: (

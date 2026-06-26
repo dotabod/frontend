@@ -1,6 +1,8 @@
 import { Typography } from 'antd'
 import Link from 'next/link'
-import type { ReactElement } from 'react'
+import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
+import { type ReactElement, useEffect } from 'react'
 import { Container } from '@/components/Container'
 import WhatsNewFeatureCard from '@/components/Dashboard/Features/WhatsNewFeatureCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -18,6 +20,17 @@ const canonicalUrl = 'https://dotabod.com/whats-new'
 // registry + cards as the dashboard page, rendered read-only (no toggles).
 const WhatsNewPublic: NextPageWithLayout = () => {
   const entries = whatsNewSorted
+
+  // Logged-in streamers get bounced to the interactive dashboard version (where each entry has
+  // its toggle). Done client-side so the public page stays statically generated/indexable for
+  // guests and crawlers (which are never authenticated).
+  const { status } = useSession()
+  const router = useRouter()
+  useEffect(() => {
+    if (status === 'authenticated') {
+      void router.replace('/dashboard/whats-new')
+    }
+  }, [status, router])
 
   // SEO (title/description/canonical/OG/Twitter) is rendered by HomepageShell from the
   // `seo` prop in getLayout below — no inline <Head> needed.

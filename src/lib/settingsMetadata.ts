@@ -256,12 +256,10 @@ export const settingsMetadata: SettingMetadata[] = [
   {
     category: 'chat',
     description: 'Rib you in chat when your team pops Smoke of Deceit without you',
-    isNested: true,
-    key: 'chatters.smokeActivated',
-    label: 'Smoke Activated Alert',
-    page: { path: '/dashboard/features/chat', section: 'chatters' },
-    parentKey: 'chatters',
-    searchTerms: ['smoke', 'gank', 'deceit', 'activated', 'team'],
+    key: 'smokeActivated',
+    label: 'Team Smoke Alert',
+    page: { path: '/dashboard/features/chat', section: 'new-features' },
+    searchTerms: ['smoke', 'gank', 'deceit', 'activated', 'team', 'new features'],
   },
   {
     category: 'chat',
@@ -358,7 +356,7 @@ export const settingsMetadata: SettingMetadata[] = [
       "Announce your hero's captured cosmetic set in chat with a link to your collection",
     key: 'cosmeticsAnnounce',
     label: 'Cosmetic Set Announcements',
-    page: { path: '/dashboard/whats-new', section: 'cosmetics' },
+    page: { path: '/dashboard/features/chat', section: 'new-features' },
     searchTerms: ['cosmetic', 'set', 'loadout', 'items', 'hero', 'chat', 'new features'],
   },
   {

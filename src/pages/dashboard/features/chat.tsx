@@ -2,6 +2,7 @@ import Head from 'next/head'
 import type { ReactElement } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
+import NewFeatureChatToggles from '@/components/Dashboard/Features/NewFeatureChatToggles'
 import Header from '@/components/Dashboard/Header'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
@@ -17,6 +18,12 @@ const FeaturesPage: NextPageWithLayout = () => (
       subtitle='The bot reacts with chat messages to your game events as you play your match.'
       title='Chatter'
     />
+
+    <div id='new-features' className='mb-6'>
+      <ErrorBoundary>
+        <NewFeatureChatToggles />
+      </ErrorBoundary>
+    </div>
 
     <div id='chatter'>
       <ErrorBoundary>

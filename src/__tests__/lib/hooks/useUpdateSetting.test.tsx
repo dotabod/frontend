@@ -32,7 +32,7 @@ vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }))
 
-// useUpdateSetting gates writes on tier access via useSubscription; stub it. smokeActivated is
+// useUpdateSetting gates writes on tier access via useSubscription; stub it. tip is
 // a FREE chatter, so access is granted regardless of the value returned here.
 vi.mock('@/hooks/useSubscription', () => ({
   useSubscription: () => ({ subscription: null }),
@@ -237,7 +237,7 @@ describe('useUpdateSetting (chatters)', () => {
         settings: [
           {
             key: 'chatters',
-            value: { smoke: { enabled: true }, smokeActivated: { enabled: false } },
+            value: { smoke: { enabled: true }, tip: { enabled: false } },
           },
         ],
       },
@@ -245,7 +245,7 @@ describe('useUpdateSetting (chatters)', () => {
     } as ReturnType<typeof useSWR>)
 
     function TestComponent() {
-      const { data, updateSetting } = useUpdateSetting<boolean | null>('chatters.smokeActivated')
+      const { data, updateSetting } = useUpdateSetting<boolean | null>('chatters.tip')
       refs.updateSetting = updateSetting
       refs.value = data
       return null
@@ -264,13 +264,13 @@ describe('useUpdateSetting (chatters)', () => {
     expect(global.fetch).toHaveBeenCalledWith(
       '/api/settings/chatters',
       expect.objectContaining({
-        body: JSON.stringify({ value: { smokeActivated: { enabled: true } } }),
+        body: JSON.stringify({ value: { tip: { enabled: true } } }),
         method: 'PATCH',
       }),
     )
 
     // Regression: with revalidate off, the optimistic cache update is the only thing the UI
-    // reads, so it must flip smokeActivated to enabled (leaving other chatters intact) rather
+    // reads, so it must flip tip to enabled (leaving other chatters intact) rather
     // than stashing the payload under a stray `value` key.
     expect(mutateMock).toHaveBeenCalledWith(
       '/api/settings',
@@ -280,7 +280,7 @@ describe('useUpdateSetting (chatters)', () => {
           settings: [
             {
               key: 'chatters',
-              value: { smoke: { enabled: true }, smokeActivated: { enabled: true } },
+              value: { smoke: { enabled: true }, tip: { enabled: true } },
             },
           ],
         },

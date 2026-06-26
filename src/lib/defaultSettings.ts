@@ -49,6 +49,7 @@ export const commands = {
   commandStats: true,
   commandSteam: true,
   commandStreamers: true,
+  commandSuggestions: true,
   commandTest: false,
   commandToday: true,
   commandUnresolved: true,
@@ -122,9 +123,6 @@ export const defaultSettings = {
     smoke: {
       enabled: true,
     },
-    smokeActivated: {
-      enabled: true,
-    },
     tip: {
       enabled: true,
     },
@@ -187,6 +185,9 @@ export const defaultSettings = {
   // New-feature toggle for cosmetic-set announcements. null = follow
   // autoOptInNewFeatures; true/false = explicit streamer choice (always wins).
   cosmeticsAnnounce: null as boolean | null,
+  // New-feature toggle for the "team smoked without you" FOMO roast. Same tri-state
+  // as cosmeticsAnnounce: null = follow autoOptInNewFeatures; true/false = explicit choice.
+  smokeActivated: null as boolean | null,
   ...commands,
   autoCommandsOnMatchStart: [],
 }

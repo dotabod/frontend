@@ -13,7 +13,7 @@ vi.mock('antd', () => ({ Tag: () => null }))
 vi.mock('next/link', () => ({ default: () => null }))
 
 describe('navConfig regions', () => {
-  it('exposes a flat 7-item primary rail in IA order, each with name + href + icon', () => {
+  it('exposes a flat 8-item primary rail in IA order, each with name + href + icon', () => {
     expect(navConfig.primary.map((item) => item.href)).toEqual([
       '/dashboard',
       '/dashboard/features',
@@ -22,6 +22,7 @@ describe('navConfig regions', () => {
       '/dashboard/commands',
       '/dashboard/notable-players',
       '/dashboard/features/advanced',
+      '/dashboard/whats-new',
     ])
 
     for (const item of navConfig.primary) {
@@ -71,7 +72,6 @@ describe('navConfig regions', () => {
   it('help region lists resources and flags external links', () => {
     expect(navConfig.help.map((i) => i.name)).toEqual([
       'Help center',
-      "What's New",
       'Discord',
       'GitHub',
       'Service status',

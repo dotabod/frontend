@@ -82,14 +82,16 @@ export default function CommandsCard({
       >
         <div className='subtitle'>{command.description}</div>
         {command.response && <command.response dark />}
-        <div className='py-1'>
-          <p className='ml-1'>Command</p>
-          <div className='flex flex-wrap'>
-            <div className='mb-2 mr-2'>
-              <Tag>{command.cmd}</Tag>
+        {command.cmd && (
+          <div className='py-1'>
+            <p className='ml-1'>Command</p>
+            <div className='flex flex-wrap'>
+              <div className='mb-2 mr-2'>
+                <Tag>{command.cmd}</Tag>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         {command.alias?.length ? (
           <div className='py-1'>
             <p className='ml-1'>Alias</p>

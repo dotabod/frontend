@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { commands } from '@/lib/defaultSettings'
 import { canAccessFeature, type SubscriptionRow } from '@/utils/subscription'
 
 // Define schemas for each specific setting
@@ -26,6 +27,8 @@ const settingsSchema = {
   // (the default), not a persisted value. The UI only ever PATCHes true/false, and Prisma Json
   // columns can't store raw null, so the write schema is boolean.
   cosmeticsAnnounce: z.boolean(),
+  // Same tri-state new-feature toggle as cosmeticsAnnounce (the "team smoked without you" roast).
+  smokeActivated: z.boolean(),
   chatters: z
     .object({
       bounties: z.object({ enabled: z.boolean() }),
@@ -44,46 +47,17 @@ const settingsSchema = {
       roshPickup: z.object({ enabled: z.boolean() }),
       roshanKilled: z.object({ enabled: z.boolean() }),
       smoke: z.object({ enabled: z.boolean() }),
-      smokeActivated: z.object({ enabled: z.boolean() }),
       tip: z.object({ enabled: z.boolean() }),
     })
     .partial(),
-  commandAPM: z.boolean(),
-  commandAghs: z.boolean(),
-  commandAvg: z.boolean(),
-  commandBuilds: z.boolean(),
-  commandCommands: z.boolean(),
-  commandDelay: z.boolean(),
-  commandDisable: z.boolean(),
-  commandDotabuff: z.boolean(),
-  commandGM: z.boolean(),
-  commandGPM: z.boolean(),
-  commandHero: z.boolean(),
-  commandInnate: z.boolean(),
-  commandItems: z.boolean(),
-  commandLG: z.boolean(),
-  commandLGS: z.boolean(),
-  commandLastFm: z.boolean(),
-  commandLocale: z.boolean(),
-  commandMmr: z.boolean(),
-  commandModsonly: z.boolean(),
-  commandNP: z.boolean(),
-  commandOnline: z.boolean(),
-  commandOnly: z.boolean(),
-  commandOpendota: z.boolean(),
-  commandPleb: z.boolean(),
-  commandProfile: z.boolean(),
-  commandRanked: z.boolean(),
-  commandResetwl: z.boolean(),
-  commandRosh: z.boolean(),
-  commandShard: z.boolean(),
-  commandSmurfs: z.boolean(),
-  commandSpectators: z.boolean(),
-  commandSteam: z.boolean(),
-  commandVersion: z.boolean(),
-  commandWL: z.boolean(),
-  commandWinProbability: z.boolean(),
-  commandXPM: z.boolean(),
+  // Command on/off toggles are derived from the single source of truth (`commands` in
+  // defaultSettings) so this allowlist can never drift from the dashboard toggles again.
+  // Previously these were hand-listed and had silently dropped keys like `commandSet`,
+  // making the API reject them with "Invalid setting key". Every command setting is a boolean.
+  ...(Object.fromEntries(Object.keys(commands).map((key) => [key, z.boolean()])) as Record<
+    keyof typeof commands,
+    z.ZodBoolean
+  >),
   crypto_payment_interest: z.object({
     interested: z.boolean(),
     tier: z.enum(['FREE', 'PRO']),

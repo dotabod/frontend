@@ -37,9 +37,10 @@ export const whatsNew: WhatsNewEntry[] = [
       'When your team pops Smoke of Deceit without you, Dotabod ribs you in chat a few seconds later for getting left behind.',
     releaseDate: '2026-06-12',
     category: 'chat',
-    settingKey: 'chatters.smokeActivated',
+    settingKey: 'smokeActivated',
+    followsNewFeatureMaster: true,
     tier: 'FREE',
-    deepLink: { path: '/dashboard/features/chat', section: 'chatters' },
+    deepLink: { path: '/dashboard/features/chat', section: 'new-features' },
     demo: { chat: 'team smoking without you HAH' },
     details: [
       "It triggers on the in-game smoke-activated event, which Dota only sends for your own team, so it never reveals an enemy smoke — and it's separate from the existing Smoke alert, which fires whenever your own hero gets the smoke debuff.",
@@ -57,6 +58,7 @@ export const whatsNew: WhatsNewEntry[] = [
     followsNewFeatureMaster: true,
     command: '!set',
     tier: 'FREE',
+    deepLink: { path: '/dashboard/features/chat', section: 'new-features' },
     demoCommand: 'commandSet',
     demo: {
       exampleUrl: 'https://dotabod.com/arteezy/set',
@@ -126,6 +128,7 @@ export const whatsNew: WhatsNewEntry[] = [
       'Dotabod can append a related command hint to its first reply, so your chat discovers more of what it can do.',
     releaseDate: '2026-05-25',
     category: 'chat',
+    settingKey: 'commandSuggestions',
     deepLink: { path: '/dashboard/commands' },
     demo: { chat: '3311 · Legend☆2 - Average rank this game · Try !smurfs' },
     details: [

@@ -696,7 +696,7 @@ const CommandDetail: Record<
     allowed: 'all',
     cmd: '!set',
     description:
-      "Shows your current hero's equipped cosmetics with a link to your public collection page. Loadouts are captured automatically as you pick heroes on stream.",
+      "Shows your current hero's equipped cosmetics with a link to your public collection page, on demand. This is separate from the automatic hero-pick announcement — turn that on or off under Chat features → New features (the “Cosmetic set announcements” toggle).",
     key: 'commandSet',
     response: (props) => (
       <TwitchChat
@@ -820,6 +820,24 @@ const CommandDetail: Record<
       />
     ),
     title: 'Streamers in match',
+  },
+  // Not a chat command — a behavior toggle for the suffix Dotabod appends to its own replies.
+  // `cmd: ''` hides the "Command" tag in CommandsCard; the example shows the suffix in action.
+  commandSuggestions: {
+    alias: [],
+    allowed: 'all',
+    cmd: '',
+    description:
+      "Appends a related command hint to Dotabod's first reply (e.g. “· Try !smurfs”) so chat discovers more commands. Fires on about every 4th reply, never repeats the same hint within 30 minutes, and only suggests commands you have enabled.",
+    key: 'commandSuggestions',
+    response: (props) => (
+      <TwitchChat
+        {...props}
+        command='!avg'
+        response='3311 · Legend☆2 - Average rank this game · Try !smurfs'
+      />
+    ),
+    title: 'Command suggestions',
   },
   commandTest: {
     allowed: 'mods',

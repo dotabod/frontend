@@ -70,6 +70,7 @@ export const navConfig: NavConfig = {
     { href: '/dashboard/commands', icon: SquareTerminal, name: 'Chat commands' },
     { href: '/dashboard/notable-players', icon: Star, name: 'Notable players' },
     { href: '/dashboard/features/advanced', icon: SlidersHorizontal, name: 'Advanced' },
+    { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
   ],
   bottom: [
     { hideForImpersonator: true, href: '/dashboard/managers', icon: Users, name: 'Team access' },
@@ -100,7 +101,6 @@ export const navConfig: NavConfig = {
   ],
   help: [
     HELP_CENTER,
-    { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
     { href: 'https://discord.dotabod.com', icon: Discord, name: 'Discord' },
     { href: 'https://github.com/dotabod/', icon: Github, name: 'GitHub' },
     { href: 'https://status.dotabod.com', icon: Info, name: 'Service status' },
