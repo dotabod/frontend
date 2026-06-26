@@ -57,8 +57,12 @@ const nextConfig = {
       '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
     },
   },
-  // Fix for Prisma engine not found error
-  output: 'standalone',
+  // `standalone` bundles a `node server.js` for self-hosting and is only for that. On Vercel
+  // (Next 16) it breaks the build: `onBuildComplete` chmods `.next/output/static/404.html`,
+  // which standalone relocates, so the deploy fails with ENOENT. Vercel already traces the
+  // Prisma engines via outputFileTracingIncludes below, so standalone isn't needed there —
+  // only emit it off-Vercel (this repo has no Docker self-host today, but keep it safe).
+  output: process.env.VERCEL ? undefined : 'standalone',
   // Tell Next.js to copy the Prisma engines to the standalone output
   outputFileTracingExcludes: {
     '*': [
