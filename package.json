@@ -71,7 +71,7 @@
     "next-mdx-remote": "^6.0.0",
     "node-fetch": "^2.7.0",
     "obs-websocket-js": "^5.0.7",
-    "opennode": "^1.5.0",
+    "opennode": "^2.0.1",
     "postcss-focus-visible": "^10.0.1",
     "react": "19.1.0",
     "react-countdown": "^2.3.6",
