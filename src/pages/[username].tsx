@@ -52,7 +52,7 @@ function FannedHand({ username, collection }: { username: string; collection: Co
     <Link
       href={`/${username}/set`}
       aria-label={`${collection.count} heroes collected, open collection`}
-      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none'
+      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none sm:basis-full lg:basis-auto'
     >
       <div className='relative mx-auto h-36 w-[260px] [--k:1] group-hover/fan:[--k:1.32]'>
         {cards.map((c, i) => {
@@ -115,7 +115,7 @@ function CollectionTeaser({ username, name }: { username: string; name: string }
     <Link
       href={`/${username}/set`}
       aria-label='0 heroes collected, learn how the collection works'
-      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none'
+      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none sm:basis-full lg:basis-auto'
     >
       <div className='relative mx-auto h-36 w-[260px]'>
         {[0, 1, 2].map((i) => {
@@ -384,7 +384,7 @@ const PageContent = ({
       {/* Full-width hero */}
       <div className='relative border-b border-gray-700/50 bg-gradient-to-br from-gray-950 to-gray-800'>
         <Container className='py-10 sm:py-14'>
-          <div className='flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10'>
+          <div className='flex flex-col gap-6 sm:flex-row sm:flex-wrap sm:items-start sm:gap-10 lg:flex-nowrap'>
             {/* Avatar with live ring */}
             <div className='relative flex-shrink-0 self-start'>
               <div

@@ -88,7 +88,7 @@ export const Header: FC = () => (
               </>
             )}
           </Popover>
-          <LoginButton className='hidden lg:flex' />
+          <LoginButton className='hidden! lg:flex!' />
         </div>
       </Container>
     </nav>

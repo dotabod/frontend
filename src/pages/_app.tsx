@@ -124,7 +124,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
       <MantineProvider>
         <Provider store={store}>
-          <AntProvider>
+          <AntProvider className='min-w-0'>
             <ErrorBoundary>{getLayout(<Component {...pageProps} />)}</ErrorBoundary>
           </AntProvider>
         </Provider>

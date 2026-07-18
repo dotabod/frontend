@@ -191,8 +191,13 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
                   <h2 className='mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500'>
                     {featured.justPlayed ? 'Newest pull' : 'Latest hero'}
                   </h2>
-                  <div className='grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,260px)_1fr] sm:items-end'>
-                    <HeroCard username={username} card={featured} size='lg' />
+                  <div className='grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,235px)_1fr] sm:items-end'>
+                    <HeroCard
+                      username={username}
+                      card={featured}
+                      size='lg'
+                      className='mx-auto w-full max-w-[235px] sm:mx-0'
+                    />
                     <div className='pb-1'>
                       <p className='text-2xl font-bold text-white'>{featured.heroName}</p>
                       <p className='mt-1 text-sm text-gray-400'>
@@ -286,10 +291,11 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
     .map((l) => {
       const items = Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : []
       const heroImg = heroes[String(l.heroId)]?.img
+      const heroCardImg = heroImg?.replace('/heroes/', '/heroes/crops/').replace(/\?$/, '')
       return {
         heroId: l.heroId,
         heroName: l.heroName,
-        heroImg: heroImg ? `${STEAM_CDN}${heroImg}` : null,
+        heroImg: heroCardImg ? `${STEAM_CDN}${heroCardImg}` : null,
         itemCount: items.length,
         bestRarity: bestRarity(items),
         updatedIso: l.updatedAt.toISOString(),

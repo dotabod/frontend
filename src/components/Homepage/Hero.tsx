@@ -190,13 +190,21 @@ export function Hero() {
 
             <div key='twitch-streamer-list'>
               <div className='relative lg:col-span-7 xl:col-span-6'>
-                <div className='flex items-center space-x-2 text-center text-sm font-semibold text-gray-300 lg:text-left'>
-                  <Image src={TwitchSvg} width={18} height={18} alt='twitch logo' />
+                <div className='relative flex min-h-12 items-center justify-center px-10 text-center text-sm font-semibold text-gray-300 lg:min-h-0 lg:justify-start lg:gap-2 lg:px-0 lg:text-left'>
+                  <Image
+                    src={TwitchSvg}
+                    width={18}
+                    height={18}
+                    alt='twitch logo'
+                    className='absolute left-0 lg:static'
+                  />
                   <span>
                     Trusted by Over {new Intl.NumberFormat('en-US').format(30_000)} Twitch Streamers
                     Including:
                   </span>
-                  <LiveIcon />
+                  <span className='absolute right-0 lg:static'>
+                    <LiveIcon />
+                  </span>
                 </div>
               </div>
 
