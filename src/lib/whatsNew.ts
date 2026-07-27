@@ -31,6 +31,23 @@ export interface WhatsNewEntry {
 
 export const whatsNew: WhatsNewEntry[] = [
   {
+    id: 'vision-roster-accuracy',
+    title: '!np names real players more often',
+    description:
+      'All Pick games now get real player names instead of "Player 1, Player 2", !np drops fewer rosters entirely, and it no longer names a hero you never picked.',
+    releaseDate: '2026-07-27',
+    category: 'commands',
+    command: '!np',
+    deepLink: { path: '/dashboard/commands' },
+    demoCommand: 'commandNP',
+    details: [
+      'Dota has two different draft screens and Dotabod was only reading one of them. On the All Pick pick screen the names sit in the top bar, not on the mid-screen cards, so it was reading the hero grid instead and finding nothing — which is why those games fell back to "Player 1, Player 2". It now reads both layouts and keeps whichever actually returns names, taking readable rosters from 82% to 90% across the clips we tested.',
+      "The roster screen with names, ranks, and heroes is only up for about 30 seconds, and Dotabod's clip was landing in the last few of them — so any small drift missed it. The capture now aims for the middle of that window, roughly tripling the room for error before a game comes back empty.",
+      'A failed draft read could also mark a match "done" and throw away the good roster clip that came later, so some games lost data they had already captured. That no longer happens.',
+      "When the hero bar is partly hidden behind your own HUD, Dotabod could misread a portrait and confidently name the wrong hero. It now cross-checks against the hero Dota reports you're actually playing and corrects that slot instead of guessing.",
+    ],
+  },
+  {
     id: 'smoke-activated',
     title: 'Team smoke alerts',
     description:
