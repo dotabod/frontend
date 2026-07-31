@@ -5,8 +5,33 @@ import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { TierSwitch } from './TierSwitch'
 
+const EXPLICIT_NOTE_COMMANDS = [
+  { cmd: '!np', desc: 'Notable players' },
+  { cmd: '!gm', desc: 'Game medals / ranks' },
+  { cmd: '!avg', desc: 'Average rank' },
+]
+
+const SILENT_COMMANDS = [
+  { cmd: '!smurfs', desc: 'Smurf check' },
+  { cmd: '!lg', desc: 'Last game' },
+  { cmd: '!geo', desc: 'Player locations' },
+]
+
+const LOOKUP_COMMANDS = [
+  '!hero',
+  '!items',
+  '!d2pt',
+  '!gpm',
+  '!xpm',
+  '!innate',
+  '!shard',
+  '!aghs',
+  '!profile',
+]
+
 /**
- * ClippingCard component controls automatic clip creation for high MMR players.
+ * ClippingCard component controls the vision fallback that gives Dotabod match
+ * rosters once Valve's live API stops returning them (8500+ MMR / Immortal).
  *
  * Backend Integration:
  * The backend should check the `disableAutoClipping` setting from the user's settings
@@ -23,32 +48,64 @@ import { TierSwitch } from './TierSwitch'
  * ```
  */
 export default function ClippingCard(): React.ReactNode {
-  const { data: isDisabled } = useUpdateSetting(Settings.disableAutoClipping)
+  const { data: isDisabled, updateSetting } = useUpdateSetting(Settings.disableAutoClipping)
 
   return (
-    <Card title='Automatic Clipping' feature='disableAutoClipping'>
+    <Card title='High-MMR Match Detection' feature='disableAutoClipping'>
       <div className='subtitle'>
-        Control automatic clip creation for high MMR players (8500+ or Immortal rank).
+        Dotabod's only way to see who's in your match once your tracked MMR hits 8500+ or Immortal —
+        Valve's live API stops sending roster data at that bracket.
       </div>
 
-      <div className='mb-4'>
-        <p className='text-sm text-gray-300 mb-4'>
-          When enabled, Dotabod automatically creates clips during strategy time to capture player
-          ranks and heroes for the <code className='bg-gray-800 px-1 py-0.5 rounded'>!np</code> and{' '}
-          <code className='bg-gray-800 px-1 py-0.5 rounded'>!gm</code> commands. This is required
-          for players with 8500+ MMR due to Valve API restrictions.
-        </p>
-      </div>
-
-      <div className='flex items-center space-x-2 mb-4'>
+      <div className='flex items-center space-x-2 my-4'>
         <TierSwitch
           hideTierBadge
           settingKey={Settings.disableAutoClipping}
-          label='Disable automatic clipping'
+          checked={!isDisabled}
+          onChange={(checked) => updateSetting(!checked)}
+          label='High-MMR match detection'
         />
         <Tag color={isDisabled ? 'red' : 'green'}>
-          {isDisabled ? 'Clipping Disabled' : 'Clipping Enabled'}
+          {isDisabled ? 'Detection Off' : 'Detection Active'}
         </Tag>
+      </div>
+
+      <div className='mb-4'>
+        <p className='text-sm font-medium text-gray-300 mb-2'>Powers these commands:</p>
+        <div className='space-y-3'>
+          <div>
+            <p className='text-xs text-gray-400 mb-1'>Shows a "no data" message when off:</p>
+            <div className='flex flex-wrap gap-2'>
+              {EXPLICIT_NOTE_COMMANDS.map(({ cmd, desc }) => (
+                <span key={cmd} className='bg-gray-800 px-2 py-0.5 rounded text-xs'>
+                  <code>{cmd}</code> <span className='text-gray-400'>· {desc}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className='text-xs text-gray-400 mb-1'>Roster silently comes back empty:</p>
+            <div className='flex flex-wrap gap-2'>
+              {SILENT_COMMANDS.map(({ cmd, desc }) => (
+                <span key={cmd} className='bg-gray-800 px-2 py-0.5 rounded text-xs'>
+                  <code>{cmd}</code> <span className='text-gray-400'>· {desc}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className='text-xs text-gray-400 mb-1'>
+              Only when asked about a teammate or opponent (asking about yourself always works):
+            </p>
+            <div className='flex flex-wrap gap-2'>
+              {LOOKUP_COMMANDS.map((cmd) => (
+                <code key={cmd} className='bg-gray-800 px-2 py-0.5 rounded text-xs'>
+                  {cmd}
+                </code>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {isDisabled && (
@@ -57,22 +114,19 @@ export default function ClippingCard(): React.ReactNode {
           description={
             <div>
               <p className='mb-2'>
-                With automatic clipping disabled, the following commands will not work for players
-                with 8500+ MMR:
+                With detection off, these commands lose match data for players with 8500+ MMR:
               </p>
               <ul className='list-disc ml-5'>
-                <li>
-                  <code className='bg-gray-800 px-1 py-0.5 rounded'>!np</code> - Notable players
-                  (list of player names)
-                </li>
-                <li>
-                  <code className='bg-gray-800 px-1 py-0.5 rounded'>!gm</code> - Game medals (list
-                  of player ranks)
-                </li>
+                {[...EXPLICIT_NOTE_COMMANDS, ...SILENT_COMMANDS].map(({ cmd, desc }) => (
+                  <li key={cmd}>
+                    <code className='bg-gray-800 px-1 py-0.5 rounded'>{cmd}</code> - {desc}
+                  </li>
+                ))}
+                <li>Teammate/opponent lookups: {LOOKUP_COMMANDS.join(', ')}</li>
               </ul>
               <p className='mt-2 text-xs'>
-                These commands will still work for players below 8500 MMR who don't require
-                clipping.
+                Games below 8500 MMR are unaffected — Valve's API already gives Dotabod full roster
+                data for those.
               </p>
             </div>
           }
@@ -85,9 +139,9 @@ export default function ClippingCard(): React.ReactNode {
 
       <div className='mt-4 p-3 bg-gray-800 rounded-md'>
         <p className='text-xs text-gray-400'>
-          <strong>How it works:</strong> Dotabod creates a 5-second clip 50 seconds after strategy
-          time begins, then uses vision AI to extract player information. The clip is created from
-          your account and will show up in your clips on Twitch.
+          <strong>How it works:</strong> since Valve won't hand over the data directly, Dotabod
+          grabs a 5-second Twitch clip of the draft/hero bar and reads it with vision AI. The clip
+          is created from your account and will show up in your Twitch clips as a side effect.
         </p>
       </div>
     </Card>
