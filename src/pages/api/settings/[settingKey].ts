@@ -8,6 +8,7 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
+import { whatsNew } from '@/lib/whatsNew'
 import { getSubscription } from '@/utils/subscription'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -124,6 +125,32 @@ async function handlePatchRequest(
         },
       },
     })
+
+    // Turning the master off shouldn't retroactively disable features the streamer already
+    // had. Freeze every currently-registered follow-master feature to its enabled state,
+    // unless the streamer already made an explicit choice for it. Anything added to the
+    // registry after this point has no row yet, so it correctly falls through to the
+    // (now-off) master.
+    if (settingKey === Settings.autoOptInNewFeatures && validatedBody.value === false) {
+      const followMasterKeys = whatsNew
+        .filter((entry): entry is typeof entry & { settingKey: string } =>
+          Boolean(entry.followsNewFeatureMaster && entry.settingKey),
+        )
+        .map((entry) => entry.settingKey)
+
+      const existing = await prisma.setting.findMany({
+        where: { key: { in: followMasterKeys }, userId },
+        select: { key: true },
+      })
+      const alreadySet = new Set(existing.map((row) => row.key))
+      const toFreeze = followMasterKeys.filter((key) => !alreadySet.has(key))
+
+      if (toFreeze.length > 0) {
+        await prisma.$transaction(
+          toFreeze.map((key) => prisma.setting.create({ data: { key, userId, value: true } })),
+        )
+      }
+    }
 
     return res.status(200).json({ status: 'ok' })
   } catch (error) {
