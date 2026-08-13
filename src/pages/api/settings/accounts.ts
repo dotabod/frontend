@@ -2,7 +2,6 @@ import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
 import { getServerSession } from '@/lib/api/getServerSession'
-import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -52,18 +51,19 @@ async function getAccounts(userId: string) {
       const { user, connectedUserIds, ...accountData } = account
 
       if (user?.id === userId) {
-        return accountData
+        return { ...accountData, canEdit: true }
       }
 
       const filteredConnections = connectedUserIds?.filter((id) => id === userId)
       if (filteredConnections?.length) {
         return {
           ...accountData,
+          canEdit: false,
           connectedUserIds: user?.name ? [user.name] : [],
         }
       }
 
-      return accountData
+      return { ...accountData, canEdit: false }
     })
   } catch (error) {
     captureException(error)
@@ -81,34 +81,36 @@ async function handleGetRequest(res: NextApiResponse, userId: string) {
 }
 
 async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, userId: string) {
-  const accounts = await getAccounts(userId)
-  if (!accounts) {
-    return res.status(403).end()
-  }
-
   try {
     const accountUpdates = accountUpdateSchema.parse(JSON.parse(req.body))
+    const requestedAccountIds = [...new Set(accountUpdates.map(({ steam32Id }) => steam32Id))]
+    const ownedAccounts = requestedAccountIds.length
+      ? await prisma.steamAccount.findMany({
+          select: { steam32Id: true },
+          where: {
+            steam32Id: { in: requestedAccountIds },
+            userId,
+          },
+        })
+      : []
 
-    const updatePromises = accountUpdates
-      .map((update) => {
-        if (update.delete) {
-          if (accounts.some((account) => account.steam32Id === update.steam32Id)) {
-            return prisma.steamAccount.delete({
-              where: { steam32Id: update.steam32Id },
-            })
-          }
-        } else {
-          if (accounts.some((account) => account.steam32Id === update.steam32Id)) {
-            return prisma.steamAccount.update({
-              data: { mmr: update.mmr, steam32Id: update.steam32Id, updatedAt: new Date() },
-              select: { mmr: true, name: true, steam32Id: true },
-              where: { steam32Id: update.steam32Id },
-            })
-          }
-        }
-        return null
+    const ownedAccountIds = new Set(ownedAccounts.map(({ steam32Id }) => steam32Id))
+    if (requestedAccountIds.some((steam32Id) => !ownedAccountIds.has(steam32Id))) {
+      return res.status(403).end()
+    }
+
+    const updatePromises = accountUpdates.map((update) => {
+      if (update.delete) {
+        return prisma.steamAccount.delete({
+          where: { steam32Id: update.steam32Id },
+        })
+      }
+      return prisma.steamAccount.update({
+        data: { mmr: update.mmr, steam32Id: update.steam32Id, updatedAt: new Date() },
+        select: { mmr: true, name: true, steam32Id: true },
+        where: { steam32Id: update.steam32Id },
       })
-      .filter((p): p is NonNullable<typeof p> => p !== null)
+    })
 
     const updatedAccounts = await prisma.$transaction(updatePromises)
     return res.json({ accounts: updatedAccounts })
@@ -124,10 +126,10 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  const userId = session?.user?.id || (req.query.id as string)
+  const userId = session?.user?.id
 
   if (!userId) {
-    return res.status(403).end()
+    return res.status(401).json({ message: 'Unauthorized' })
   }
 
   if (req.method === 'GET') {
@@ -141,4 +143,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(405).end() // Method Not Allowed
 }
 
-export default withMethods(['GET', 'PATCH'], withAuthentication(handler))
+export default withMethods(['GET', 'PATCH'], handler)

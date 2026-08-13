@@ -1,6 +1,5 @@
 import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { useForm } from '@mantine/form'
-import type { SteamAccount } from '@prisma/client'
 import { Alert, Button, Form, InputNumber } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
@@ -16,6 +15,7 @@ import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import {
   SETTINGS_SWR_OPTIONS,
+  type SettingsSteamAccount,
   STABLE_SWR_OPTIONS,
   useUpdateAccount,
   useUpdateSetting,
@@ -30,6 +30,7 @@ interface FormValues {
     name: string | null
     leaderboard_rank: number | null
     connectedUserIds: string[]
+    canEdit: boolean
     delete?: boolean
   }[]
 }
@@ -127,7 +128,7 @@ const EmptyAccountsState = ({ hideText }: { hideText: boolean }) => {
 
 const MmrForm = ({ hideText = false }) => {
   const { data, loading: loadingAccounts, update } = useUpdateAccount()
-  const [accounts, setAccounts] = useState<SteamAccount[]>([])
+  const [accounts, setAccounts] = useState<SettingsSteamAccount[]>([])
   const form = useForm<FormValues>({
     initialValues: {
       accounts: [],
@@ -168,10 +169,12 @@ const MmrForm = ({ hideText = false }) => {
           <form
             onSubmit={form.onSubmit((values) => {
               update(
-                values.accounts.map((act) => ({
-                  ...act,
-                  mmr: Number(act.mmr) || 0,
-                })),
+                values.accounts
+                  .filter((account) => account.canEdit)
+                  .map((act) => ({
+                    ...act,
+                    mmr: Number(act.mmr) || 0,
+                  })),
               )
               form.resetDirty()
             })}
@@ -222,7 +225,7 @@ const MmrForm = ({ hideText = false }) => {
                       <div
                         className={clsx(
                           'flex flex-col items-center sm:flex-row sm:items-start sm:justify-start sm:gap-2',
-                          (removed || multiUsedBy) && 'opacity-40',
+                          (removed || !account.canEdit) && 'opacity-40',
                         )}
                       >
                         <div className='h-12! w-12!'>
@@ -251,7 +254,7 @@ const MmrForm = ({ hideText = false }) => {
                           }
                         >
                           <InputNumber
-                            disabled={Boolean(removed || multiUsedBy)}
+                            disabled={Boolean(removed || !account.canEdit)}
                             id={`${account.steam32Id}-mmr`}
                             placeholder='9000'
                             type='number'
@@ -263,7 +266,7 @@ const MmrForm = ({ hideText = false }) => {
                         </Form.Item>
 
                         <Button
-                          disabled={Boolean(removed || multiUsedBy)}
+                          disabled={Boolean(removed || !account.canEdit)}
                           danger
                           onClick={() => {
                             form.setValues({

@@ -64,10 +64,14 @@ interface MutationValue {
   value: unknown
 }
 
-type AccountMutationValue = Pick<
+export type SettingsSteamAccount = Pick<
   SteamAccount,
   'steam32Id' | 'mmr' | 'name' | 'leaderboard_rank' | 'connectedUserIds'
 > & {
+  canEdit: boolean
+}
+
+type AccountMutationValue = SettingsSteamAccount & {
   delete?: boolean
 }
 
@@ -201,13 +205,38 @@ export const useUpdate = <
 
 export function useUpdateAccount() {
   const { data, loading, isSaving, updateSetting } = useUpdate<
-    { accounts?: SteamAccount[] },
+    { accounts?: SettingsSteamAccount[] },
     AccountMutationValue[]
   >({
-    dataTransform: (data, newValue) => ({
-      accounts:
-        (newValue?.filter((a) => !a.delete) as SteamAccount[] | undefined) || data?.accounts,
-    }),
+    dataTransform: (data, newValue) => {
+      const updatesById = new Map<number, AccountMutationValue>(
+        newValue.map((account) => [account.steam32Id, account]),
+      )
+      const existingAccounts = data?.accounts ?? []
+      const existingAccountIds = new Set(existingAccounts.map(({ steam32Id }) => steam32Id))
+
+      return {
+        accounts: [
+          ...existingAccounts.flatMap((account) => {
+            if (!account.canEdit) {
+              return [account]
+            }
+
+            const update = updatesById.get(account.steam32Id)
+            if (!update) {
+              return [account]
+            }
+            if (update.delete) {
+              return []
+            }
+            return [{ ...account, ...update }]
+          }),
+          ...newValue.filter(
+            (account) => !account.delete && !existingAccountIds.has(account.steam32Id),
+          ),
+        ],
+      }
+    },
     path: '/api/settings/accounts',
   })
 

@@ -216,7 +216,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(404).json({ message: 'User not found' })
       }
 
-      if (session?.user?.isImpersonating) {
+      if (isPublicOverlayRequest || session?.user?.isImpersonating) {
         // Filter out obsServerPassword
         data.settings = data.settings.filter(
           (setting) => setting.key !== Settings.obsServerPassword,

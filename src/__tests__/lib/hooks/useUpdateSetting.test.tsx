@@ -2,7 +2,7 @@ import { act, render, waitFor } from '@testing-library/react'
 import * as Sentry from '@sentry/nextjs'
 import useSWR from 'swr'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
-import { useUpdate, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useUpdate, useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 const mutateMock = vi.hoisted(() => vi.fn())
 const messageOpenMock = vi.hoisted(() => vi.fn())
@@ -212,6 +212,65 @@ describe('useUpdate', () => {
       expect.objectContaining({
         type: 'error',
         content: expect.stringContaining('permission'),
+      }),
+    )
+  })
+})
+
+describe('useUpdateAccount', () => {
+  beforeEach(() => {
+    mutateMock.mockResolvedValue(undefined)
+    global.fetch = vi.fn().mockResolvedValue({ ok: true } as Response)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    mutateMock.mockReset()
+    messageOpenMock.mockReset()
+  })
+
+  it('retains read-only accounts during an optimistic update', () => {
+    const refs: { update?: ReturnType<typeof useUpdateAccount>['update'] } = {}
+    const ownedAccount = {
+      canEdit: true,
+      connectedUserIds: [],
+      leaderboard_rank: null,
+      mmr: 5000,
+      name: 'Owned account',
+      steam32Id: 111,
+    }
+    const linkedAccount = {
+      canEdit: false,
+      connectedUserIds: ['owner-name'],
+      leaderboard_rank: null,
+      mmr: 4000,
+      name: 'Linked account',
+      steam32Id: 222,
+    }
+
+    vi.mocked(useSWR).mockReturnValue({
+      data: { accounts: [ownedAccount, linkedAccount] },
+      error: undefined,
+    } as ReturnType<typeof useSWR>)
+
+    function TestComponent() {
+      refs.update = useUpdateAccount().update
+      return null
+    }
+
+    render(<TestComponent />)
+
+    act(() => {
+      refs.update?.([{ ...ownedAccount, mmr: 6000 }])
+    })
+
+    expect(mutateMock).toHaveBeenCalledWith(
+      '/api/settings/accounts',
+      expect.any(Promise),
+      expect.objectContaining({
+        optimisticData: {
+          accounts: [{ ...ownedAccount, mmr: 6000 }, linkedAccount],
+        },
       }),
     )
   })
