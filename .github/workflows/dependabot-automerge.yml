@@ -121,7 +121,8 @@ jobs:
               exit 0
             fi
 
-            base_sha=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.base.sha')
+            base_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/master" \
+              --jq '.object.sha')
             git fetch --no-tags origin "$base_sha" "$TESTED_HEAD_SHA"
             merge_tree=$(git merge-tree --write-tree "$base_sha" "$TESTED_HEAD_SHA")
             merge_message=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" \
