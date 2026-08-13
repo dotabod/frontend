@@ -150,6 +150,13 @@ jobs:
               -f target_url="$vercel_url" >/dev/null
 
             git push "$ssh_remote" "$merge_sha:refs/heads/master"
+            for _ in $(seq 1 10); do
+              if [ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" \
+                --jq '.state')" = 'closed' ]; then
+                exit 0
+              fi
+              sleep 2
+            done
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" \
               -f state=closed >/dev/null
             exit 0
