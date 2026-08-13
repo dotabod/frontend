@@ -20,6 +20,7 @@ jobs:
       - name: Queue tested Dependabot PR for squash merge
         env:
           GH_TOKEN: ${{ secrets.GHA_PAT }}
+          ACTIONS_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
           TESTED_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
@@ -63,5 +64,21 @@ jobs:
 
           # Branch protection is the final gate: GitHub waits for both the CI
           # test job and the Vercel deployment status before merging.
-          gh pr merge "$PR_NUMBER" -R "$GITHUB_REPOSITORY" --auto --squash \
-            --match-head-commit "$TESTED_HEAD_SHA"
+          merge_error=$(mktemp)
+          if gh pr merge "$PR_NUMBER" -R "$GITHUB_REPOSITORY" --auto --squash \
+            --match-head-commit "$TESTED_HEAD_SHA" 2> >(tee "$merge_error" >&2); then
+            exit 0
+          fi
+
+          # OAuth tokens need the special `workflow` scope to merge a PR that
+          # changes .github/workflows. The trusted workflow token has that repo
+          # permission, so use it only for this exact rejection. Its merge does
+          # not trigger follow-on workflows; workflow-file updates are therefore
+          # still validated before merging, but skip redundant post-merge CI.
+          if grep -q 'without.*workflow.*scope' "$merge_error"; then
+            GH_TOKEN="$ACTIONS_TOKEN" gh pr merge "$PR_NUMBER" -R "$GITHUB_REPOSITORY" \
+              --auto --squash --match-head-commit "$TESTED_HEAD_SHA"
+            exit 0
+          fi
+
+          exit 1
