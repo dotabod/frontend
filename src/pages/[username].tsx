@@ -1,5 +1,5 @@
 import { Button, Empty, Input, Segmented, Skeleton, Tag, Tooltip } from 'antd'
-import { CrownIcon, ExternalLinkIcon, GiftIcon, SparklesIcon } from 'lucide-react'
+import { BarChart3Icon, CrownIcon, ExternalLinkIcon, GiftIcon, SparklesIcon } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -19,9 +19,18 @@ import {
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { ProfileMatchOverview } from '@/components/ProfileMatchOverview'
 import prisma from '@/lib/db'
 import { fetcher } from '@/lib/fetcher'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
+import {
+  buildHeroPerformance,
+  formatQueueLabel,
+  formatStreamerScore,
+  type HeroPerformance,
+  type MatchHistoryRow,
+  readKda,
+} from '@/lib/matchHistory'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
@@ -179,6 +188,8 @@ interface PageContentProps {
   }
   username?: string
   collection?: CollectionSummary | null
+  heroPerformance?: HeroPerformance[]
+  recentMatches?: MatchHistoryRow[]
 }
 
 const PageContent = ({
@@ -186,6 +197,8 @@ const PageContent = ({
   subscriptionInfo: ssrSubscriptionInfo,
   username: ssrUsername,
   collection,
+  heroPerformance = [],
+  recentMatches = [],
 }: PageContentProps = {}) => {
   const [permission, setPermission] = useState('All')
   const [enabled, setEnabled] = useState('All')
@@ -470,6 +483,18 @@ const PageContent = ({
                     Gift Subscription
                   </Button>
                 </Link>
+                <Link
+                  href={`/${ssrUsername || (typeof username === 'string' ? username : '')}/matches`}
+                  passHref
+                >
+                  <Button
+                    size='large'
+                    icon={<BarChart3Icon size={16} />}
+                    className='flex items-center'
+                  >
+                    Match history
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -490,6 +515,12 @@ const PageContent = ({
 
       {/* Page content */}
       <Container className='py-8'>
+        <ProfileMatchOverview
+          heroPerformance={heroPerformance}
+          recentMatches={recentMatches}
+          username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
+        />
+
         {/* Featured commands strip */}
         {!finalLoading && enabledFeaturedCommands.length > 0 && (
           <div className='mb-10'>
@@ -625,6 +656,8 @@ interface UserProfileProps {
   }
   username: string
   collection: CollectionSummary | null
+  heroPerformance: HeroPerformance[]
+  recentMatches: MatchHistoryRow[]
 }
 
 function isMaintenanceModeEnabled() {
@@ -690,7 +723,14 @@ async function buildCollectionSummary(
   }
 }
 
-const CommandsPage = ({ userData, subscriptionInfo, username, collection }: UserProfileProps) => {
+const CommandsPage = ({
+  userData,
+  subscriptionInfo,
+  username,
+  collection,
+  heroPerformance,
+  recentMatches,
+}: UserProfileProps) => {
   // If no user data, show 404
   if (!userData) {
     return (
@@ -748,6 +788,8 @@ const CommandsPage = ({ userData, subscriptionInfo, username, collection }: User
           subscriptionInfo={subscriptionInfo}
           username={username}
           collection={collection}
+          heroPerformance={heroPerformance}
+          recentMatches={recentMatches}
         />
       </HomepageShell>
     </>
@@ -809,10 +851,82 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
       return { notFound: true }
     }
 
-    const collection = await buildCollectionSummary(userData.cosmeticLoadouts)
+    const [collection, subscription, groups, recentMatchRows, heroesModule] = await Promise.all([
+      buildCollectionSummary(userData.cosmeticLoadouts),
+      getSubscription(userData.id),
+      prisma.matches.groupBy({
+        by: ['hero_name', 'won'],
+        where: { userId: userData.id, won: { not: null } },
+        _count: { _all: true },
+      }),
+      prisma.matches.findMany({
+        where: { userId: userData.id, won: { not: null } },
+        orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+        take: 5,
+        select: {
+          created_at: true,
+          dire_score: true,
+          game_mode: true,
+          hero_name: true,
+          is_doubledown: true,
+          is_party: true,
+          kda: true,
+          lobby_type: true,
+          matchId: true,
+          myTeam: true,
+          radiant_score: true,
+          won: true,
+        },
+      }),
+      import('dotaconstants/build/heroes.json'),
+    ])
 
-    // Fetch subscription info
-    const subscription = await getSubscription(userData.id)
+    const resultGroups = groups.map((group) => ({
+      count: group._count._all,
+      heroName: group.hero_name,
+      won: group.won,
+    }))
+    const heroes = heroesModule.default as Record<
+      string,
+      { icon?: string; localized_name?: string; name?: string }
+    >
+    const heroPerformance = buildHeroPerformance(resultGroups, heroes)
+    const heroPresentation = new Map(
+      heroPerformance.map((hero) => [
+        hero.heroKey,
+        { heroImage: hero.heroImage, heroName: hero.heroName },
+      ]),
+    )
+    const matchDate = new Intl.DateTimeFormat('en-US', {
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+      year: 'numeric',
+    })
+    const recentMatches = recentMatchRows.map((match) => {
+      const hero = match.hero_name ? heroPresentation.get(match.hero_name) : null
+      return {
+        createdAt: match.created_at.toISOString(),
+        dateLabel: matchDate.format(match.created_at),
+        heroImage: hero?.heroImage ?? null,
+        heroName: hero?.heroName ?? 'Unknown hero',
+        isDoubleDown: match.is_doubledown,
+        kda: readKda(match.kda),
+        matchId: match.matchId,
+        queueLabel: formatQueueLabel({
+          gameMode: match.game_mode,
+          isParty: match.is_party,
+          lobbyType: match.lobby_type,
+        }),
+        score: formatStreamerScore({
+          direScore: match.dire_score,
+          myTeam: match.myTeam,
+          radiantScore: match.radiant_score,
+        }),
+        won: match.won === true,
+      }
+    })
+
     const subscriptionInfo = {
       inGracePeriod: false,
       isGracePeriodPro: false,
@@ -834,6 +948,8 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
         },
         username: username.toLowerCase(),
         collection,
+        heroPerformance,
+        recentMatches,
       },
     }
   } catch (error) {

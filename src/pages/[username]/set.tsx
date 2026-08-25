@@ -15,6 +15,7 @@ import {
   STEAM_CDN,
 } from '@/components/CosmeticSet'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { ProfileSectionNav } from '@/components/ProfileSectionNav'
 import prisma from '@/lib/db'
 
 type Card = HeroCardData & { updatedIso: string }
@@ -180,6 +181,8 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
             )}
           </Container>
         </header>
+
+        <ProfileSectionNav current='collection' username={username} />
 
         <Container className='py-10'>
           {!hasCards ? (

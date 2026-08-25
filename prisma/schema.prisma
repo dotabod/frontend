@@ -396,6 +396,7 @@ model matches {
   @@unique([matchId, userId], map: "bets_matchId_userId_key")
   @@index([updated_at], map: "bets_updated_at_idx")
   @@index([won, lobby_type, created_at, id], map: "idx_bets_on_won_lobbytype_createdat_id")
+  @@index([userId, hero_name, won], map: "matches_user_hero_result_idx")
 }
 
 model OpenNodeCharge {

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Dotabod Profile Navigation'
+  short_description: 'Verify public profile navigation end to end'
+  default_prompt: 'Use $dotabod-profile-nav-workflow to implement and verify profile-section navigation across Dotabod public profile pages.'

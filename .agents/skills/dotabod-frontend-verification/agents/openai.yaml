@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Dotabod Frontend Verification'
+  short_description: 'Run deterministic production browser verification'
+  default_prompt: 'Use $dotabod-frontend-verification to build and browser-verify this Dotabod frontend change in an isolated local environment.'

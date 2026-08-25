@@ -17,6 +17,7 @@ import {
   STEAM_CDN,
 } from '@/components/CosmeticSet'
 import HomepageShell from '@/components/Homepage/HomepageShell'
+import { ProfileSectionNav } from '@/components/ProfileSectionNav'
 import prisma from '@/lib/db'
 
 interface Sibling {
@@ -154,6 +155,8 @@ const DetailPage = ({
             </div>
           </Container>
         </header>
+
+        <ProfileSectionNav current='collection' username={username} />
 
         {/* Binder navigation: flip to the adjacent hero in the collection. */}
         <div className='border-b border-gray-800 bg-gray-900/40'>
