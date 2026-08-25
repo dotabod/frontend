@@ -306,7 +306,7 @@ export default function DashboardShell({
         {/* Dashboard pages should generally not be indexed by search engines */}
         {seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
       </Head>
-      <Banner />
+      <Banner whatsNewPath='/dashboard/whats-new' />
       <HubSpot />
       <Layout className='h-full bg-gray-800'>
         <Sider

@@ -17,7 +17,7 @@ export function ProfileSectionNav({ current, username }: ProfileSectionNavProps)
   return (
     <div className='border-b border-gray-800 bg-gray-950 font-sans'>
       <Container>
-        <nav aria-label='Profile sections' className='flex overflow-x-auto'>
+        <nav aria-label='Profile sections' className='flex overflow-x-auto overflow-y-hidden'>
           {sections.map((item) => {
             const active = item.section === current
             return (

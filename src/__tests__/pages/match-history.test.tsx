@@ -1,6 +1,24 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
-import MatchHistoryPage from '@/pages/[username]/matches'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import MatchHistoryPage, { getServerSideProps } from '@/pages/[username]/matches'
+
+const prismaMocks = vi.hoisted(() => ({
+  groupBy: vi.fn(),
+  matchesFindFirst: vi.fn(),
+  matchesFindMany: vi.fn(),
+  userFindFirst: vi.fn(),
+}))
+
+vi.mock('@/lib/db', () => ({
+  default: {
+    matches: {
+      findFirst: prismaMocks.matchesFindFirst,
+      findMany: prismaMocks.matchesFindMany,
+      groupBy: prismaMocks.groupBy,
+    },
+    user: { findFirst: prismaMocks.userFindFirst },
+  },
+}))
 
 vi.mock('@/components/Homepage/HomepageShell', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -42,7 +60,97 @@ const baseProps = {
   view: 'matches' as const,
 }
 
+function databaseMatch(index: number) {
+  return {
+    created_at: new Date(Date.UTC(2026, 7, 25 - index, 12)),
+    dire_score: 33,
+    game_mode: 22,
+    hero_name: 'npc_dota_hero_axe',
+    id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+    is_doubledown: false,
+    is_party: false,
+    kda: { assists: 12, deaths: 3, kills: 8 },
+    lobby_type: 7,
+    matchId: String(8_964_010_929n - BigInt(index)),
+    myTeam: 'radiant',
+    radiant_score: 64,
+    won: true,
+  }
+}
+
+beforeEach(() => {
+  prismaMocks.groupBy.mockReset()
+  prismaMocks.matchesFindFirst.mockReset()
+  prismaMocks.matchesFindMany.mockReset()
+  prismaMocks.userFindFirst.mockReset()
+
+  prismaMocks.groupBy.mockResolvedValue([
+    { _count: { _all: 21 }, hero_name: 'npc_dota_hero_axe', won: true },
+  ])
+  prismaMocks.matchesFindFirst.mockResolvedValue({
+    created_at: new Date('2026-08-05T12:00:00.000Z'),
+  })
+  prismaMocks.userFindFirst.mockResolvedValue({
+    displayName: 'Streamer',
+    id: 'user-1',
+    image: null,
+    name: 'streamer',
+  })
+})
+
 describe('public match history page', () => {
+  it('bounds the initial match query and exposes only the first page', async () => {
+    prismaMocks.matchesFindMany.mockResolvedValue(
+      Array.from({ length: 21 }, (_, index) => databaseMatch(index)),
+    )
+
+    const result = await getServerSideProps({
+      params: { username: 'Streamer' },
+      query: {},
+      res: { setHeader: vi.fn() },
+    } as never)
+
+    expect(prismaMocks.matchesFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+        take: 21,
+      }),
+    )
+    expect(result).toMatchObject({
+      props: {
+        matches: expect.arrayContaining([
+          expect.objectContaining({ matchId: '8964010929' }),
+          expect.objectContaining({ matchId: '8964010910' }),
+        ]),
+        nextCursor: expect.any(String),
+      },
+    })
+    if (!('props' in result)) throw new Error('Expected match-history props')
+    expect((await result.props).matches).toHaveLength(20)
+  })
+
+  it('links to the next cursor page while preserving the selected period', () => {
+    render(<MatchHistoryPage {...baseProps} nextCursor='next-page' period='30d' />)
+
+    expect(screen.getByRole('link', { name: 'View older matches' })).toHaveAttribute(
+      'href',
+      '/streamer/matches?cursor=next-page&period=30d',
+    )
+  })
+
+  it('does not load a page of match rows for the hero win-rate view', async () => {
+    prismaMocks.matchesFindMany.mockResolvedValue([])
+
+    const result = await getServerSideProps({
+      params: { username: 'Streamer' },
+      query: { view: 'heroes' },
+      res: { setHeader: vi.fn() },
+    } as never)
+
+    expect(prismaMocks.matchesFindMany).not.toHaveBeenCalled()
+    expect(result).toMatchObject({ props: { matches: [], nextCursor: null, view: 'heroes' } })
+  })
+
   it('renders a concise record summary and removes implementation copy', () => {
     render(<MatchHistoryPage {...baseProps} />)
 
@@ -198,5 +306,13 @@ describe('public match history page', () => {
     expect(
       within(profileSections).getByRole('link', { name: 'Cosmetic collection' }),
     ).not.toHaveAttribute('aria-current')
+  })
+
+  it('keeps the profile tab rail from scrolling vertically', () => {
+    render(<MatchHistoryPage {...baseProps} />)
+
+    expect(screen.getByRole('navigation', { name: 'Profile sections' })).toHaveClass(
+      'overflow-y-hidden',
+    )
   })
 })

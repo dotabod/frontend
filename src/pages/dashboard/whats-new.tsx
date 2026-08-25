@@ -8,13 +8,15 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
-import { whatsNewSorted } from '@/lib/whatsNew'
+import { groupWhatsNewByDate, whatsNewSorted } from '@/lib/whatsNew'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
+import { formatDate } from '@/utils/formatDate'
 
 const WhatsNewPage: NextPageWithLayout = () => {
   const { data: master } = useUpdateSetting<boolean>(Settings.autoOptInNewFeatures)
   const entries = whatsNewSorted
+  const groups = groupWhatsNewByDate(entries)
 
   return (
     <>
@@ -33,13 +35,34 @@ const WhatsNewPage: NextPageWithLayout = () => {
         />
       </Card>
 
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        {entries.map((entry, i) => (
-          <div id={entry.id} key={entry.id}>
-            <ErrorBoundary>
-              <WhatsNewFeatureCard entry={entry} master={master} latest={i === 0} />
-            </ErrorBoundary>
-          </div>
+      <div className='space-y-10'>
+        {groups.map((group) => (
+          <section key={group.releaseDate} aria-labelledby={`release-${group.releaseDate}`}>
+            <div className='mb-4 flex items-center gap-3'>
+              <h2
+                id={`release-${group.releaseDate}`}
+                className='m-0! text-sm font-semibold text-gray-200'
+              >
+                <time dateTime={group.releaseDate}>{formatDate(group.releaseDate)}</time>
+              </h2>
+              <div className='h-px flex-1 bg-gray-700' aria-hidden='true' />
+            </div>
+
+            <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+              {group.entries.map((entry) => (
+                <div id={entry.id} key={entry.id} className='scroll-mt-6'>
+                  <ErrorBoundary>
+                    <WhatsNewFeatureCard
+                      entry={entry}
+                      master={master}
+                      latest={entry.id === entries[0]?.id}
+                      showDate={false}
+                    />
+                  </ErrorBoundary>
+                </div>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </>

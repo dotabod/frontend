@@ -1,9 +1,45 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { deepLinkLabel, entryToggleChecked, type WhatsNewEntry, whatsNew } from '@/lib/whatsNew'
+import {
+  deepLinkLabel,
+  entryToggleChecked,
+  groupWhatsNewByDate,
+  type WhatsNewEntry,
+  whatsNew,
+  whatsNewSorted,
+} from '@/lib/whatsNew'
 
 const CATEGORIES = ['chat', 'overlay', 'commands', 'pages', 'advanced', 'bets', 'mmr', 'stream']
 
 describe('whatsNew registry', () => {
+  it('starts with the newest public-facing release', () => {
+    expect(whatsNewSorted[0]).toMatchObject({
+      demo: {
+        exampleLabel: "See dendi's match history",
+        exampleUrl: 'https://dotabod.com/dendi/matches',
+      },
+      id: 'public-match-history',
+      releaseDate: '2026-08-25',
+    })
+  })
+
+  it('includes the July settings improvements as one release entry', () => {
+    expect(whatsNew).toContainEqual(
+      expect.objectContaining({
+        id: 'clearer-match-start-settings',
+        releaseDate: '2026-07-31',
+      }),
+    )
+  })
+
+  it('includes the August account-security fixes as one release entry', () => {
+    expect(whatsNew).toContainEqual(
+      expect.objectContaining({
+        id: 'safer-account-settings',
+        releaseDate: '2026-08-13',
+      }),
+    )
+  })
+
   it('every entry has the required fields and a valid shape', () => {
     for (const e of whatsNew) {
       expect(e.id).toBeTruthy()
@@ -35,6 +71,19 @@ describe('whatsNew registry', () => {
     const ids = whatsNew.map((e) => e.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
+
+  it('groups releases by date without changing newest-first order', () => {
+    const entries = [
+      { id: 'new-a', releaseDate: '2026-08-25' },
+      { id: 'new-b', releaseDate: '2026-08-25' },
+      { id: 'old', releaseDate: '2026-07-31' },
+    ] as WhatsNewEntry[]
+
+    expect(groupWhatsNewByDate(entries)).toEqual([
+      { releaseDate: '2026-08-25', entries: [entries[0], entries[1]] },
+      { releaseDate: '2026-07-31', entries: [entries[2]] },
+    ])
+  })
 })
 
 describe('entryToggleChecked', () => {
@@ -63,6 +112,7 @@ const KNOWN_DEEP_LINK_PATHS = [
   '/dashboard/billing',
   '/dashboard/commands',
   '/dashboard/features/chat',
+  '/dashboard/features/advanced',
   '/dashboard/features/overlay',
   '/dashboard/help',
 ]
@@ -73,6 +123,7 @@ describe('deepLinkLabel', () => {
     expect(deepLinkLabel({ path: '/dashboard/billing' })).toBe('Open billing')
     expect(deepLinkLabel({ path: '/dashboard/commands' })).toBe('Open commands')
     expect(deepLinkLabel({ path: '/dashboard/features/chat' })).toBe('Open chat settings')
+    expect(deepLinkLabel({ path: '/dashboard/features/advanced' })).toBe('Open advanced settings')
     expect(deepLinkLabel({ path: '/dashboard/features/overlay' })).toBe('Open overlay settings')
     expect(deepLinkLabel({ path: '/dashboard/help' })).toBe('Open help center')
   })

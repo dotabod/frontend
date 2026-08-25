@@ -89,4 +89,12 @@ describe('cosmetic collection profile navigation', () => {
     )
     expect(screen.getByRole('link', { name: 'Bane' })).toHaveAttribute('href', '/streamer/set/3')
   })
+
+  it('keeps the shared profile tab rail from scrolling vertically', () => {
+    render(<SetPage {...setProps} />)
+
+    expect(screen.getByRole('navigation', { name: 'Profile sections' })).toHaveClass(
+      'overflow-y-hidden',
+    )
+  })
 })

@@ -347,7 +347,10 @@ for (const route of routes) {
         overflow: {
           document: document.documentElement.scrollWidth,
           navClient: nav.clientWidth,
+          navClientHeight: nav.clientHeight,
           navScroll: nav.scrollWidth,
+          navScrollHeight: nav.scrollHeight,
+          navVertical: getComputedStyle(nav).overflowY,
           viewport: window.innerWidth,
         },
         periods: [...document.querySelectorAll('nav[aria-label="Match history period"] a')]
@@ -365,6 +368,9 @@ for (const route of routes) {
         })(),
         hasHeroWinRates: Boolean(document.querySelector('#hero-win-rates-heading')),
         hasRecentMatches: Boolean(document.querySelector('table[aria-label="Recent matches"]')),
+        hasOlderMatchesLink: [...document.querySelectorAll('a')]
+          .some((link) => link.textContent.trim() === 'View older matches'),
+        recentMatchRows: document.querySelectorAll('table[aria-label="Recent matches"] tbody tr').length,
         railHeight: nav.getBoundingClientRect().height,
         siblingLinks: ${
           route.name === 'hero-detail'
@@ -465,6 +471,11 @@ for (const route of routes) {
       failures,
     )
     assert(
+      dom.overflow.navVertical === 'hidden',
+      `${route.path} ${viewport.name}: profile rail allows vertical scrolling ${JSON.stringify(dom.overflow)}`,
+      failures,
+    )
+    assert(
       dom.railHeight <= 56,
       `${route.path} ${viewport.name}: profile rail is taller than 56px`,
       failures,
@@ -508,6 +519,16 @@ for (const route of routes) {
         failures,
       )
       assert(dom.hasRecentMatches, `${route.path} ${viewport.name}: match table missing`, failures)
+      assert(
+        dom.recentMatchRows === 20,
+        `${route.path} ${viewport.name}: expected 20 initial match rows, found ${dom.recentMatchRows}`,
+        failures,
+      )
+      assert(
+        dom.hasOlderMatchesLink,
+        `${route.path} ${viewport.name}: older matches pagination link missing`,
+        failures,
+      )
       assert(
         !dom.hasHeroWinRates,
         `${route.path} ${viewport.name}: hero win rates rendered in matches view`,

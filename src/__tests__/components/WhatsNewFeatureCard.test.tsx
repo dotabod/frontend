@@ -108,4 +108,10 @@ describe('WhatsNewFeatureCard', () => {
     // details render in read-only mode too (they're not gated on the toggle)
     expect(screen.getByText('First how-it-works paragraph.')).toBeInTheDocument()
   })
+
+  it('can omit the repeated release date inside a dated group', () => {
+    render(<WhatsNewFeatureCard entry={entry} showDate={false} />)
+
+    expect(screen.queryByText('June 10, 2026')).not.toBeInTheDocument()
+  })
 })

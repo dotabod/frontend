@@ -31,6 +31,48 @@ export interface WhatsNewEntry {
 
 export const whatsNew: WhatsNewEntry[] = [
   {
+    id: 'public-match-history',
+    title: 'Public match history',
+    description:
+      'Streamer profiles now show recent results and most-played heroes. The full history adds hero win rates, KDA, scores, and 7-day, 30-day, or all-time filters.',
+    releaseDate: '2026-08-25',
+    category: 'pages',
+    demo: {
+      exampleUrl: 'https://dotabod.com/dendi/matches',
+      exampleLabel: "See dendi's match history",
+    },
+    details: [
+      "Each public profile shows the streamer's five most-played heroes and five latest tracked matches, including result, queue, KDA, score, and a link to OpenDota.",
+      'Open Match history to switch between individual matches and hero win rates, then filter the record to 7 days, 30 days, or all time.',
+    ],
+  },
+  {
+    id: 'safer-account-settings',
+    title: 'Safer account settings',
+    description:
+      'Linked Steam accounts are now read-only, account edits always use the signed-in streamer, and public overlay data no longer includes OBS server passwords.',
+    releaseDate: '2026-08-13',
+    category: 'advanced',
+    deepLink: { path: '/dashboard' },
+    details: [
+      'You can still see MMR and rank details for a Steam account linked from another streamer, but only its owner can change or remove it.',
+      'Dashboard requests now ignore account IDs supplied in the URL and authorize every change against your signed-in Dotabod account.',
+    ],
+  },
+  {
+    id: 'clearer-match-start-settings',
+    title: 'Clearer match-start settings',
+    description:
+      'Auto commands now preview each selected reply and explain when they run. High-MMR match detection now names every command that depends on its Twitch clips.',
+    releaseDate: '2026-07-31',
+    category: 'advanced',
+    deepLink: { path: '/dashboard/features/advanced' },
+    details: [
+      'Open Auto Commands on Match Start to choose !np, !smurfs, !gm, !lg, or !avg. Each row now includes the command description and sample reply, and Dotabod warns you when the feature is on but nothing is selected.',
+      'High-MMR Match Detection now explains why Dotabod creates short Twitch clips at 8500+ MMR, which commands lose roster data when detection is off, and which games remain unaffected.',
+    ],
+  },
+  {
     id: 'vision-roster-accuracy',
     title: '!np names real players more often',
     description:
@@ -317,6 +359,23 @@ export const whatsNewSorted = [...whatsNew].sort(
   (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
 )
 
+export interface WhatsNewDateGroup {
+  releaseDate: string
+  entries: WhatsNewEntry[]
+}
+
+export function groupWhatsNewByDate(entries: WhatsNewEntry[]): WhatsNewDateGroup[] {
+  return entries.reduce<WhatsNewDateGroup[]>((groups, entry) => {
+    const current = groups.at(-1)
+    if (current?.releaseDate === entry.releaseDate) {
+      current.entries.push(entry)
+    } else {
+      groups.push({ releaseDate: entry.releaseDate, entries: [entry] })
+    }
+    return groups
+  }, [])
+}
+
 // Effective toggle state for a What's New entry: new-feature toggles follow the master
 // (autoOptInNewFeatures) until explicitly set; everything else uses its own stored value.
 export function entryToggleChecked(
@@ -332,6 +391,7 @@ const DEEP_LINK_LABELS: Record<string, string> = {
   '/dashboard': 'Open dashboard',
   '/dashboard/billing': 'Open billing',
   '/dashboard/commands': 'Open commands',
+  '/dashboard/features/advanced': 'Open advanced settings',
   '/dashboard/features/chat': 'Open chat settings',
   '/dashboard/features/overlay': 'Open overlay settings',
   '/dashboard/help': 'Open help center',

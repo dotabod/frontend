@@ -43,7 +43,7 @@ describe('Banner', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
-    vi.setSystemTime(new Date('2025-10-04T12:00:00Z'))
+    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'))
 
     const store: Record<string, string> = {}
     vi.stubGlobal('localStorage', {
@@ -68,8 +68,31 @@ describe('Banner', () => {
     vi.restoreAllMocks()
   })
 
-  it('renders the banner when the latest post is fresh', () => {
-    mockPost(freshPost)
+  it("promotes the newest What's New entry when there is no fresher blog post", () => {
+    mockPost(null)
+    render(<Banner whatsNewPath='/dashboard/whats-new' />)
+
+    expect(screen.getByText(/New in Dotabod/)).toBeInTheDocument()
+    expect(screen.getByText(/Public match history/)).toBeInTheDocument()
+    expect(screen.getByRole('complementary', { name: 'Latest Dotabod update' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /See what's new/ })).toHaveAttribute(
+      'href',
+      '/dashboard/whats-new#public-match-history',
+    )
+  })
+
+  it('uses the public changelog path outside the dashboard', () => {
+    mockPost(null)
+    render(<Banner />)
+
+    expect(screen.getByRole('link', { name: /See what's new/ })).toHaveAttribute(
+      'href',
+      '/whats-new#public-match-history',
+    )
+  })
+
+  it('keeps a newer fresh blog post as the announcement', () => {
+    mockPost({ ...freshPost, date: '2026-08-25T08:00:00Z' })
     render(<Banner />)
 
     expect(screen.getByText(/Fresh on the blog/)).toBeInTheDocument()
@@ -80,20 +103,8 @@ describe('Banner', () => {
     )
   })
 
-  it('does not render the banner when there is no post', () => {
-    mockPost(null)
-    const { container } = render(<Banner />)
-    expect(container.firstChild).toBeNull()
-  })
-
-  it('does not render the banner when the post is stale', () => {
-    mockPost({ ...freshPost, date: '2025-09-01T12:00:00Z' })
-    const { container } = render(<Banner />)
-    expect(container.firstChild).toBeNull()
-  })
-
   it('hides the banner when the dismiss button is clicked', () => {
-    mockPost(freshPost)
+    mockPost(null)
     render(<Banner />)
 
     const dismissButton = screen.getByRole('button')
@@ -101,10 +112,10 @@ describe('Banner', () => {
 
     fireEvent.click(dismissButton)
 
-    expect(screen.queryByText(/Fresh on the blog/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/New in Dotabod/)).not.toBeInTheDocument()
     expect(localStorage.setItem).toHaveBeenCalledWith(
       'dotabod-banner-dismissed-slug',
-      'crypto-payments-launch',
+      'whats-new:public-match-history',
     )
   })
 })

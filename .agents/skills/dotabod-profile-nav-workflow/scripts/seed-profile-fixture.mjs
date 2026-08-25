@@ -82,7 +82,10 @@ try {
   }
 
   const heroKeys = Object.fromEntries(Object.values(heroes).map((hero) => [hero.id, hero.name]))
-  const matchCards = collection.cards.slice(0, 10)
+  const matchCards = Array.from(
+    { length: 25 },
+    (_, index) => collection.cards[index % collection.cards.length],
+  )
   const now = Date.now()
 
   for (const [index, card] of matchCards.entries()) {

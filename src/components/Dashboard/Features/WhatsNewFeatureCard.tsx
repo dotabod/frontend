@@ -13,11 +13,13 @@ export default function WhatsNewFeatureCard({
   master,
   latest,
   readOnly,
+  showDate = true,
 }: {
   entry: WhatsNewEntry
   master?: boolean
   latest?: boolean
   readOnly?: boolean
+  showDate?: boolean
 }) {
   // Always call the hook (rules of hooks); it no-ops when there's no settingKey.
   const { data: value, updateSetting } = useUpdateSetting<boolean | null>(entry.settingKey)
@@ -29,23 +31,26 @@ export default function WhatsNewFeatureCard({
     Boolean(entry.deepLink) ||
     Boolean(entry.blogSlug) ||
     Boolean(entry.docsUrl)
+  const hasMetadata = showDate || latest || Boolean(entry.command)
 
   return (
     <Card title={entry.title}>
       <div className='space-y-3'>
-        <div className='flex flex-wrap items-center gap-2 text-xs text-gray-400'>
-          <span>{formatDate(entry.releaseDate)}</span>
-          {latest && (
-            <span className='rounded bg-purple-600 px-1.5 py-0.5 font-medium text-white'>
-              Latest
-            </span>
-          )}
-          {entry.command && (
-            <span className='rounded bg-gray-700 px-1.5 py-0.5 font-mono text-gray-200'>
-              {entry.command}
-            </span>
-          )}
-        </div>
+        {hasMetadata && (
+          <div className='flex flex-wrap items-center gap-2 text-xs text-gray-400'>
+            {showDate && <span>{formatDate(entry.releaseDate)}</span>}
+            {latest && (
+              <span className='rounded bg-purple-600 px-1.5 py-0.5 font-medium text-white'>
+                Latest
+              </span>
+            )}
+            {entry.command && (
+              <span className='rounded bg-gray-700 px-1.5 py-0.5 font-mono text-gray-200'>
+                {entry.command}
+              </span>
+            )}
+          </div>
+        )}
 
         <p className='text-sm text-gray-300'>{entry.description}</p>
 

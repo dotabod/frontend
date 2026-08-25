@@ -6,8 +6,9 @@ import { type ReactElement, useEffect } from 'react'
 import { Container } from '@/components/Container'
 import WhatsNewFeatureCard from '@/components/Dashboard/Features/WhatsNewFeatureCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
-import { whatsNewSorted } from '@/lib/whatsNew'
+import { groupWhatsNewByDate, whatsNewSorted } from '@/lib/whatsNew'
 import type { NextPageWithLayout } from '@/pages/_app'
+import { formatDate } from '@/utils/formatDate'
 
 const { Title, Paragraph } = Typography
 
@@ -20,6 +21,7 @@ const canonicalUrl = 'https://dotabod.com/whats-new'
 // registry + cards as the dashboard page, rendered read-only (no toggles).
 const WhatsNewPublic: NextPageWithLayout = () => {
   const entries = whatsNewSorted
+  const groups = groupWhatsNewByDate(entries)
 
   // Logged-in streamers get bounced to the interactive dashboard version (where each entry has
   // its toggle). Done client-side so the public page stays statically generated/indexable for
@@ -45,11 +47,32 @@ const WhatsNewPublic: NextPageWithLayout = () => {
           </Link>
         </Paragraph>
 
-        <div className='grid grid-cols-1 gap-6'>
-          {entries.map((entry, i) => (
-            <div id={entry.id} key={entry.id}>
-              <WhatsNewFeatureCard entry={entry} latest={i === 0} readOnly />
-            </div>
+        <div className='space-y-10'>
+          {groups.map((group) => (
+            <section key={group.releaseDate} aria-labelledby={`release-${group.releaseDate}`}>
+              <div className='mb-4 flex items-center gap-3'>
+                <h2
+                  id={`release-${group.releaseDate}`}
+                  className='m-0! text-sm font-semibold text-gray-200'
+                >
+                  <time dateTime={group.releaseDate}>{formatDate(group.releaseDate)}</time>
+                </h2>
+                <div className='h-px flex-1 bg-gray-700' aria-hidden='true' />
+              </div>
+
+              <div className='grid grid-cols-1 gap-6'>
+                {group.entries.map((entry) => (
+                  <div id={entry.id} key={entry.id} className='scroll-mt-6'>
+                    <WhatsNewFeatureCard
+                      entry={entry}
+                      latest={entry.id === entries[0]?.id}
+                      readOnly
+                      showDate={false}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </div>

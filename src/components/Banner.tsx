@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
+import { whatsNewSorted } from '@/lib/whatsNew'
 
 const BANNER_FRESHNESS_DAYS = 14
 const DISMISSED_KEY = 'dotabod-banner-dismissed-slug'
@@ -14,13 +15,17 @@ interface LatestPost {
   date: string
 }
 
+interface BannerProps {
+  whatsNewPath?: '/whats-new' | '/dashboard/whats-new'
+}
+
 function isFresh(date: string): boolean {
   const daysSince = (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
   return daysSince >= 0 && daysSince <= BANNER_FRESHNESS_DAYS
 }
 
-export default function Banner() {
-  const { data } = useSWR<{ post: LatestPost | null }>('/api/latest-post', fetcher)
+export default function Banner({ whatsNewPath = '/whats-new' }: BannerProps) {
+  const { data, isLoading } = useSWR<{ post: LatestPost | null }>('/api/latest-post', fetcher)
   const [dismissedSlug, setDismissedSlug] = useState<string | null>(null)
 
   useEffect(() => {
@@ -28,48 +33,54 @@ export default function Banner() {
   }, [])
 
   const post = data?.post
-  if (!post || !isFresh(post.date) || dismissedSlug === post.slug) {
+  const latestRelease = whatsNewSorted[0]
+  const freshPost = post && isFresh(post.date) ? post : null
+  const freshRelease = latestRelease && isFresh(latestRelease.releaseDate) ? latestRelease : null
+  const showBlog =
+    freshPost &&
+    (!freshRelease ||
+      new Date(freshPost.date).getTime() >= new Date(freshRelease.releaseDate).getTime())
+  const announcement = showBlog
+    ? {
+        href: `/blog/${freshPost.slug}`,
+        id: freshPost.slug,
+        label: 'Read it',
+        prefix: 'Fresh on the blog',
+        title: freshPost.title,
+      }
+    : freshRelease
+      ? {
+          href: `${whatsNewPath}#${freshRelease.id}`,
+          id: `whats-new:${freshRelease.id}`,
+          label: "See what's new",
+          prefix: 'New in Dotabod',
+          title: freshRelease.title,
+        }
+      : null
+
+  if (isLoading || !announcement || dismissedSlug === announcement.id) {
     return null
   }
 
   const dismiss = () => {
-    localStorage.setItem(DISMISSED_KEY, post.slug)
-    setDismissedSlug(post.slug)
+    localStorage.setItem(DISMISSED_KEY, announcement.id)
+    setDismissedSlug(announcement.id)
   }
 
   return (
-    <div className='relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-800 px-6 sm:before:flex-1'>
-      <div
-        aria-hidden='true'
-        className='absolute top-1/2 left-[max(-7rem,calc(50%-52rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl'
-      >
-        <div
-          style={{
-            clipPath:
-              'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
-          }}
-          className='aspect-577/310 w-[36.0625rem] bg-gradient-to-r from-blue-600 to-teal-500 opacity-40'
-        />
-      </div>
-      <div
-        aria-hidden='true'
-        className='absolute top-1/2 left-[max(45rem,calc(50%+8rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl'
-      >
-        <div
-          style={{
-            clipPath:
-              'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
-          }}
-          className='aspect-577/310 w-[36.0625rem] bg-gradient-to-r from-blue-600 to-teal-500 opacity-40'
-        />
-      </div>
-      <p className='text-sm/6 text-gray-100 my-0!'>
-        Fresh on the blog: {post.title}.{' '}
+    <aside
+      aria-label='Latest Dotabod update'
+      className='relative isolate flex min-h-11 items-center gap-x-4 border-y border-purple-900/70 bg-gray-900 px-4 py-2.5 sm:px-6 sm:before:flex-1'
+    >
+      <span aria-hidden='true' className='size-1.5 flex-none rounded-full bg-purple-400' />
+      <p className='my-0! text-sm/6 text-gray-200'>
+        {announcement.prefix}:{' '}
+        <span className='font-medium text-gray-100'>{announcement.title}</span>.{' '}
         <Link
-          href={`/blog/${post.slug}`}
-          className='font-semibold whitespace-nowrap text-teal-300 hover:text-teal-200'
+          href={announcement.href}
+          className='whitespace-nowrap font-semibold text-purple-300 hover:text-purple-200'
         >
-          Read it&nbsp;<span aria-hidden='true'>&rarr;</span>
+          {announcement.label}&nbsp;<span aria-hidden='true'>&rarr;</span>
         </Link>
       </p>
       <div className='flex flex-1 justify-end'>
@@ -80,11 +91,11 @@ export default function Banner() {
             e.preventDefault()
             dismiss()
           }}
+          aria-label={`Dismiss ${announcement.prefix.toLowerCase()} announcement`}
         >
-          <span className='sr-only'>Dismiss</span>
           <XMarkIcon aria-hidden='true' className='size-5 text-gray-200' />
         </button>
       </div>
-    </div>
+    </aside>
   )
 }
