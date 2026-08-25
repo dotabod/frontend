@@ -50,19 +50,20 @@ const entry: WhatsNewEntry = {
 }
 
 describe('WhatsNewFeatureCard', () => {
-  it('renders title, command, latest badge, toggle (following master) and links', () => {
+  it('renders a labeled release article with its category, state, and actions', () => {
     render(<WhatsNewFeatureCard entry={entry} master latest />)
 
-    expect(screen.getByText('Demo feature')).toBeInTheDocument()
+    expect(screen.getByRole('article', { name: 'Demo feature' })).toBeInTheDocument()
+    expect(screen.getByText('Chat')).toBeInTheDocument()
     expect(screen.getByText('!demo')).toBeInTheDocument()
-    expect(screen.getByText('Latest')).toBeInTheDocument()
+    expect(screen.getByText('Latest release')).toBeInTheDocument()
     // tri-state with no explicit value follows master (true)
-    expect(screen.getByText('Enabled')).toHaveAttribute('data-checked', 'true')
+    expect(screen.getByText('Use Demo feature')).toHaveAttribute('data-checked', 'true')
     expect(screen.getByRole('link', { name: /Open commands/ })).toHaveAttribute(
       'href',
       '/dashboard/commands#y',
     )
-    expect(screen.getByRole('link', { name: /Read more/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Read announcement/ })).toHaveAttribute(
       'href',
       '/blog/hello-world',
     )
@@ -73,7 +74,7 @@ describe('WhatsNewFeatureCard', () => {
       'https://dotabod.com/streamer/set',
     )
     // collapsible "How it works" details (content is in the DOM even while collapsed)
-    expect(screen.getByText(/How it works/, { selector: 'summary' })).toBeInTheDocument()
+    expect(screen.getByText(/Release details/, { selector: 'summary' })).toBeInTheDocument()
     expect(screen.getByText('First how-it-works paragraph.')).toBeInTheDocument()
     expect(screen.getByText('Second how-it-works paragraph.')).toBeInTheDocument()
   })
@@ -104,7 +105,7 @@ describe('WhatsNewFeatureCard', () => {
     render(<WhatsNewFeatureCard entry={entry} master readOnly />)
     expect(screen.getByText('Demo feature')).toBeInTheDocument()
     expect(screen.queryByText('Enabled')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Read more/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Read announcement/ })).toBeInTheDocument()
     // details render in read-only mode too (they're not gated on the toggle)
     expect(screen.getByText('First how-it-works paragraph.')).toBeInTheDocument()
   })

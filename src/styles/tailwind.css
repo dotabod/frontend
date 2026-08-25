@@ -605,6 +605,16 @@ a:not(.ant-btn) {
   @apply text-purple-400;
 }
 
+/* The real Twitch chat samples use channel colors that are tuned for the commands page.
+   Lift those two speaker colors only inside the darker What's New demo surface. */
+.whats-new-command-demo [class*='text-[#8a2be2]'] {
+  color: oklch(0.827 0.119 306.383);
+}
+
+.whats-new-command-demo [class*='text-[#c90909]'] {
+  color: oklch(0.808 0.114 19.571);
+}
+
 .command-line::before {
   content: '> ';
   color: white;

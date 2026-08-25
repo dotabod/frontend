@@ -72,13 +72,16 @@ describe('Banner', () => {
     mockPost(null)
     render(<Banner whatsNewPath='/dashboard/whats-new' />)
 
+    const banner = screen.getByRole('complementary', { name: 'Latest Dotabod update' })
     expect(screen.getByText(/New in Dotabod/)).toBeInTheDocument()
     expect(screen.getByText(/Public match history/)).toBeInTheDocument()
-    expect(screen.getByRole('complementary', { name: 'Latest Dotabod update' })).toBeInTheDocument()
+    expect(banner).toHaveClass('overflow-hidden', 'bg-gray-800', 'px-6')
+    expect(banner.querySelectorAll('.blur-2xl')).toHaveLength(2)
     expect(screen.getByRole('link', { name: /See what's new/ })).toHaveAttribute(
       'href',
       '/dashboard/whats-new#public-match-history',
     )
+    expect(screen.getByRole('link', { name: /See what's new/ })).toHaveClass('text-teal-300')
   })
 
   it('uses the public changelog path outside the dashboard', () => {

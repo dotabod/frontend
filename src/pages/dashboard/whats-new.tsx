@@ -2,21 +2,16 @@ import Head from 'next/head'
 import type { ReactElement } from 'react'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { TierSwitch } from '@/components/Dashboard/Features/TierSwitch'
-import WhatsNewFeatureCard from '@/components/Dashboard/Features/WhatsNewFeatureCard'
+import WhatsNewFeed from '@/components/Dashboard/Features/WhatsNewFeed'
 import Header from '@/components/Dashboard/Header'
-import ErrorBoundary from '@/components/ErrorBoundary'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
-import { groupWhatsNewByDate, whatsNewSorted } from '@/lib/whatsNew'
+import { whatsNewSorted } from '@/lib/whatsNew'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { Card } from '@/ui/card'
-import { formatDate } from '@/utils/formatDate'
 
 const WhatsNewPage: NextPageWithLayout = () => {
   const { data: master } = useUpdateSetting<boolean>(Settings.autoOptInNewFeatures)
-  const entries = whatsNewSorted
-  const groups = groupWhatsNewByDate(entries)
 
   return (
     <>
@@ -25,46 +20,30 @@ const WhatsNewPage: NextPageWithLayout = () => {
       </Head>
       <Header
         title="What's new"
-        subtitle='The latest Dotabod features, commands, and pages. Flip any of them on or off right here.'
+        subtitle='See what changed, try real examples, and choose which optional features run on your stream.'
       />
 
-      <Card className='mb-6'>
+      <section
+        aria-labelledby='new-feature-defaults'
+        className='mb-10 rounded-lg border border-gray-700 bg-gray-900 p-5 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-6'
+      >
+        <div className='max-w-2xl'>
+          <h2 id='new-feature-defaults' className='m-0! text-base font-semibold text-gray-100'>
+            New feature defaults
+          </h2>
+          <p className='mt-1 mb-0! text-sm leading-6 text-gray-400'>
+            Choose what happens when Dotabod releases an optional feature. A switch on an individual
+            update always overrides this default.
+          </p>
+        </div>
         <TierSwitch
+          className='mt-4 shrink-0 sm:mt-0'
           settingKey={Settings.autoOptInNewFeatures}
-          label='Automatically enable new features as they launch'
+          label='Turn on new features automatically'
         />
-      </Card>
+      </section>
 
-      <div className='space-y-10'>
-        {groups.map((group) => (
-          <section key={group.releaseDate} aria-labelledby={`release-${group.releaseDate}`}>
-            <div className='mb-4 flex items-center gap-3'>
-              <h2
-                id={`release-${group.releaseDate}`}
-                className='m-0! text-sm font-semibold text-gray-200'
-              >
-                <time dateTime={group.releaseDate}>{formatDate(group.releaseDate)}</time>
-              </h2>
-              <div className='h-px flex-1 bg-gray-700' aria-hidden='true' />
-            </div>
-
-            <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-              {group.entries.map((entry) => (
-                <div id={entry.id} key={entry.id} className='scroll-mt-6'>
-                  <ErrorBoundary>
-                    <WhatsNewFeatureCard
-                      entry={entry}
-                      master={master}
-                      latest={entry.id === entries[0]?.id}
-                      showDate={false}
-                    />
-                  </ErrorBoundary>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+      <WhatsNewFeed entries={whatsNewSorted} master={master} />
     </>
   )
 }
@@ -74,7 +53,7 @@ WhatsNewPage.getLayout = function getLayout(page: ReactElement) {
     <DashboardShell
       seo={{
         canonicalUrl: 'https://dotabod.com/dashboard/whats-new',
-        description: 'The latest Dotabod features, commands, and pages.',
+        description: 'Recent Dotabod releases, examples, and optional feature controls.',
         noindex: true,
         title: "What's New | Dotabod",
       }}

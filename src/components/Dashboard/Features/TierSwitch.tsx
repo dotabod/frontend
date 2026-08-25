@@ -1,4 +1,5 @@
 import { Switch } from 'antd'
+import { useId } from 'react'
 import type { SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import type { ChatterSettingKeys } from '@/utils/subscription'
@@ -23,6 +24,7 @@ export function TierSwitch({
   onChange: externalOnChange,
   hideTierBadge,
 }: TierSwitchProps) {
+  const labelId = useId()
   const { data: enabled, updateSetting, tierAccess, isSaving } = useUpdateSetting(settingKey)
 
   // isSaving only reflects mutations driven by the internal updateSetting. When
@@ -36,13 +38,18 @@ export function TierSwitch({
     <div className={`flex items-center gap-2 ${className || ''}`}>
       <div className='flex items-center gap-2 flex-nowrap'>
         <Switch
+          aria-labelledby={label ? labelId : undefined}
           checked={isChecked}
           onChange={handleChange}
           disabled={isDisabled}
           loading={reflectSaving}
         />
         {!hideTierBadge && <TierBadge requiredTier={tierAccess.requiredTier} />}
-        {label && <span className='flex-1'>{label}</span>}
+        {label && (
+          <span id={labelId} className='flex-1'>
+            {label}
+          </span>
+        )}
       </div>
     </div>
   )
