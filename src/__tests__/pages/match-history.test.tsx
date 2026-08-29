@@ -155,11 +155,12 @@ describe('public match history page', () => {
     render(<MatchHistoryPage {...baseProps} />)
 
     expect(screen.getByRole('heading', { name: 'Match history' })).toBeInTheDocument()
-    expect(screen.getByText('6 wins')).toBeInTheDocument()
-    expect(screen.getByText('4 losses')).toBeInTheDocument()
-    expect(screen.getByText('60% win rate')).toBeInTheDocument()
-    expect(screen.getByText('10 matches')).toBeInTheDocument()
-    expect(screen.getByText('2 heroes')).toBeInTheDocument()
+    const record = screen.getByRole('region', { name: 'Match record' })
+    expect(within(record).getByText('6 wins')).toBeInTheDocument()
+    expect(within(record).getByText('4 losses')).toBeInTheDocument()
+    expect(within(record).getByText('60% win rate')).toBeInTheDocument()
+    expect(within(record).getByText('10 matches')).toBeInTheDocument()
+    expect(within(record).getByText('2 heroes')).toBeInTheDocument()
     expect(screen.queryByText(/Results include matches/i)).not.toBeInTheDocument()
     expect(screen.getByTestId('match-history-page')).toHaveClass('font-sans')
   })
@@ -180,6 +181,7 @@ describe('public match history page', () => {
       'href',
       'https://www.opendota.com/matches/8964010929',
     )
+    expect(screen.getByRole('link', { name: /8964010929/i })).toHaveTextContent('OpenDota')
   })
 
   it('switches to hero win rates while preserving the period filter', () => {
@@ -282,8 +284,11 @@ describe('public match history page', () => {
     render(<MatchHistoryPage {...baseProps} matches={[olderMatch, newerMatch]} />)
 
     expect(
-      screen.getAllByRole('link', { name: /Open match/ }).map((link) => link.textContent),
-    ).toEqual(['8964010930', '8964010928'])
+      screen.getAllByRole('link', { name: /Open match/ }).map((link) => link.getAttribute('href')),
+    ).toEqual([
+      'https://www.opendota.com/matches/8964010930',
+      'https://www.opendota.com/matches/8964010928',
+    ])
   })
 
   it('links match history to the cosmetic collection', () => {
