@@ -231,8 +231,8 @@ export default function DashboardShell({
     const menuStyle = { background: colorBgLayout, borderInlineEnd: 'none' as const }
 
     return (
-      <div className='flex h-full flex-col'>
-        <div>
+      <nav aria-label='Dashboard' className='flex h-full min-h-0 flex-col overflow-hidden'>
+        <div className='shrink-0'>
           <div className='m-auto mb-4 flex h-12 w-full justify-center gap-2 px-4 pt-4'>
             <Link href='/'>
               <DarkLogo className='h-full w-auto' />
@@ -244,7 +244,12 @@ export default function DashboardShell({
           <div className='flex justify-center py-2'>
             <DisableToggle />
           </div>
+        </div>
 
+        <div
+          data-testid='dashboard-primary-navigation'
+          className='min-h-0 flex-1 overflow-y-auto overscroll-contain'
+        >
           <Menu
             onClick={onMenuClick}
             selectedKeys={[current]}
@@ -255,7 +260,10 @@ export default function DashboardShell({
         </div>
 
         {(utilityItems.length > 0 || adminItems.length > 0) && (
-          <div className='mt-auto border-t border-gray-700 pt-2'>
+          <div
+            data-testid='dashboard-utility-navigation'
+            className='shrink-0 border-t border-gray-700 pt-2 pb-[env(safe-area-inset-bottom)]'
+          >
             {utilityItems.length > 0 && (
               <Menu
                 onClick={onMenuClick}
@@ -279,7 +287,7 @@ export default function DashboardShell({
             )}
           </div>
         )}
-      </div>
+      </nav>
     )
   }
 
@@ -306,96 +314,116 @@ export default function DashboardShell({
         {/* Dashboard pages should generally not be indexed by search engines */}
         {seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
       </Head>
-      <Banner whatsNewPath='/dashboard/whats-new' />
       <HubSpot />
-      <Layout className='h-full bg-gray-800'>
-        <Sider
-          breakpoint='md'
-          collapsedWidth={0}
-          onBreakpoint={setBroken}
-          style={{
-            background: colorBgLayout,
-          }}
-          width={250}
-          className='border-r-transparent'
-          trigger={null}
-          collapsible
-          collapsed={broken}
-        >
-          {/* On mobile the Sider collapses to 0 width; skip its content so it can't
-              leak past the zero-width container — the Drawer handles mobile nav. */}
-          {!broken && renderNav({})}
-        </Sider>
+      <div data-testid='dashboard-viewport' className='h-dvh overflow-hidden bg-gray-800'>
+        <Layout className='h-full min-h-0 bg-gray-800'>
+          <Sider
+            breakpoint='md'
+            collapsedWidth={0}
+            onBreakpoint={setBroken}
+            style={{
+              background: colorBgLayout,
+            }}
+            width={250}
+            className='h-dvh shrink-0 overflow-hidden border-r-transparent'
+            trigger={null}
+            collapsible
+            collapsed={broken}
+          >
+            {/* On mobile the Sider collapses to 0 width; skip its content so it can't
+                leak past the zero-width container — the Drawer handles mobile nav. */}
+            {!broken && renderNav({})}
+          </Sider>
 
-        <Drawer
-          placement='left'
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          width={250}
-          closable={false}
-          rootClassName='md:hidden'
-          styles={{ body: { background: colorBgLayout, padding: 0 } }}
-        >
-          {renderNav({ onNavigate: () => setDrawerOpen(false) })}
-        </Drawer>
+          <Drawer
+            placement='left'
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            width={250}
+            closable={false}
+            rootClassName='md:hidden'
+            styles={{
+              body: {
+                background: colorBgLayout,
+                height: '100%',
+                overflow: 'hidden',
+                padding: 0,
+              },
+            }}
+          >
+            {renderNav({ onNavigate: () => setDrawerOpen(false) })}
+          </Drawer>
 
-        <Layout className='bg-gray-800!'>
-          <Header className='flex w-full items-center justify-between gap-4 bg-gray-900! p-4! md:p-8!'>
-            <div className='flex flex-1 items-center gap-3'>
-              <Button
-                type='text'
-                aria-label='Open navigation menu'
-                className='flex items-center md:hidden!'
-                icon={<Bars3Icon className='h-6 w-6 text-gray-200' />}
-                onClick={() => setDrawerOpen(true)}
+          <Layout className='min-h-0 min-w-0 overflow-hidden bg-gray-800!'>
+            <div className='shrink-0'>
+              <Banner whatsNewPath='/dashboard/whats-new' />
+            </div>
+
+            <Header className='flex h-auto! shrink-0 items-center justify-between gap-3 bg-gray-900! p-4! leading-normal! md:gap-4 md:p-8!'>
+              <div className='flex min-w-0 flex-1 items-center gap-2 md:gap-3'>
+                <Button
+                  type='text'
+                  aria-label='Open navigation menu'
+                  className='flex shrink-0 items-center md:hidden!'
+                  icon={<Bars3Icon className='h-6 w-6 text-gray-200' />}
+                  onClick={() => setDrawerOpen(true)}
+                />
+                <div className='min-w-0 w-full max-w-lg'>
+                  <SettingsSearch />
+                </div>
+              </div>
+
+              <div className='flex w-fit shrink-0 items-center gap-2 py-1 md:gap-3 md:py-2'>
+                <div className='hidden md:block'>
+                  <CopyButton value={copyOverlayUrl}>
+                    {({ copied, copy }) => (
+                      <Button
+                        type='dashed'
+                        size='small'
+                        className={clsx(copied && 'border-green-600! text-green-600!')}
+                        onClick={copy}
+                      >
+                        {copied ? 'Overlay URL copied' : 'Copy Overlay URL'}
+                      </Button>
+                    )}
+                  </CopyButton>
+                </div>
+                <HelpMenu />
+                <UserAccountNav />
+              </div>
+            </Header>
+            {hasGiftNotification && giftDetails && (
+              <GiftNotification
+                senderName={giftDetails.senderName}
+                giftMessage={giftDetails.giftMessage}
+                giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
+                giftQuantity={giftDetails.giftQuantity}
+                onDismiss={dismissGiftNotification}
+                hasLifetime={hasLifetime}
+                totalNotifications={totalNotifications}
               />
-              <div className='w-full max-w-lg'>
-                <SettingsSearch />
-              </div>
-            </div>
+            )}
 
-            <div className='flex w-fit items-center gap-3 py-2'>
-              <div className='hidden md:block'>
-                <CopyButton value={copyOverlayUrl}>
-                  {({ copied, copy }) => (
-                    <Button
-                      type='dashed'
-                      size='small'
-                      className={clsx(copied && 'border-green-600! text-green-600!')}
-                      onClick={copy}
-                    >
-                      {copied ? 'Overlay URL copied' : 'Copy Overlay URL'}
-                    </Button>
-                  )}
-                </CopyButton>
+            <div
+              data-testid='dashboard-content-scroll'
+              className='min-h-0 flex-1 overflow-y-auto overscroll-contain'
+            >
+              <div className='flex min-h-full flex-col'>
+                <Content className='w-full flex-1 space-y-6 bg-gray-800 p-4 transition-all md:p-8'>
+                  {children}
+                </Content>
+                <footer className='shrink-0 border-t border-gray-700 bg-gray-900 px-4 pt-4 pb-1 text-center text-xs text-gray-400'>
+                  <p>
+                    Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This
+                    site is not affiliated with Valve Corporation.
+                  </p>
+                </footer>
               </div>
-              <HelpMenu />
-              <UserAccountNav />
             </div>
-          </Header>
-          {hasGiftNotification && giftDetails && (
-            <GiftNotification
-              senderName={giftDetails.senderName}
-              giftMessage={giftDetails.giftMessage}
-              giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
-              giftQuantity={giftDetails.giftQuantity}
-              onDismiss={dismissGiftNotification}
-              hasLifetime={hasLifetime}
-              totalNotifications={totalNotifications}
-            />
-          )}
-          <Content className='min-h-full w-full space-y-6 bg-gray-800 p-8 transition-all'>
-            {children}
-          </Content>
+          </Layout>
         </Layout>
-      </Layout>
-      <CookieConsent />
-      <div className='pt-4 pb-1 text-center text-xs text-gray-400 bg-gray-900 border-t border-gray-700'>
-        <p>
-          Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This site is
-          not affiliated with Valve Corporation.
-        </p>
       </div>
+      <CookieConsent />
     </>
   )
 }
