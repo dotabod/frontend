@@ -104,4 +104,127 @@ describe('useSocket', () => {
 
     expect(socketState.mutate).toHaveBeenCalledTimes(2)
   })
+
+  it('normalizes the legacy empty block state to the main-screen state', () => {
+    const setBlock = vi.fn()
+
+    const TestComponent = () => {
+      useSocket({
+        setAegis: vi.fn(),
+        setBetData: vi.fn(),
+        setBlock,
+        setChatMessages: vi.fn(),
+        setConnected: vi.fn(),
+        setNotablePlayers: vi.fn(),
+        setPaused: vi.fn(),
+        setPollData: vi.fn(),
+        setRadiantWinChance: vi.fn(),
+        setRankImageDetails: vi.fn(),
+        setRoshan: vi.fn(),
+        setWL: vi.fn(),
+      })
+
+      return null
+    }
+
+    render(<TestComponent />)
+
+    act(() => {
+      socketState.handlers.get('block')?.({
+        matchId: 8978976957,
+        state: 'DOTA_GAMERULES_STATE_POST_GAME',
+        team: 'radiant',
+        type: 'empty',
+      })
+    })
+
+    expect(setBlock).toHaveBeenCalledWith({
+      matchId: 8978976957,
+      state: 'DOTA_GAMERULES_STATE_POST_GAME',
+      team: 'radiant',
+      type: null,
+    })
+  })
+
+  it('normalizes a legacy main-menu init state after reconnecting', () => {
+    const setBlock = vi.fn()
+
+    const TestComponent = () => {
+      useSocket({
+        setAegis: vi.fn(),
+        setBetData: vi.fn(),
+        setBlock,
+        setChatMessages: vi.fn(),
+        setConnected: vi.fn(),
+        setNotablePlayers: vi.fn(),
+        setPaused: vi.fn(),
+        setPollData: vi.fn(),
+        setRadiantWinChance: vi.fn(),
+        setRankImageDetails: vi.fn(),
+        setRoshan: vi.fn(),
+        setWL: vi.fn(),
+      })
+
+      return null
+    }
+
+    render(<TestComponent />)
+
+    act(() => {
+      socketState.handlers.get('block')?.({
+        matchId: 8978976957,
+        state: 'DOTA_GAMERULES_STATE_INIT',
+        team: 'radiant',
+        type: 'empty',
+      })
+    })
+
+    expect(setBlock).toHaveBeenCalledWith({
+      matchId: 8978976957,
+      state: 'DOTA_GAMERULES_STATE_INIT',
+      team: 'radiant',
+      type: null,
+    })
+  })
+
+  it('preserves empty block states while a match is still loading', () => {
+    const setBlock = vi.fn()
+
+    const TestComponent = () => {
+      useSocket({
+        setAegis: vi.fn(),
+        setBetData: vi.fn(),
+        setBlock,
+        setChatMessages: vi.fn(),
+        setConnected: vi.fn(),
+        setNotablePlayers: vi.fn(),
+        setPaused: vi.fn(),
+        setPollData: vi.fn(),
+        setRadiantWinChance: vi.fn(),
+        setRankImageDetails: vi.fn(),
+        setRoshan: vi.fn(),
+        setWL: vi.fn(),
+      })
+
+      return null
+    }
+
+    render(<TestComponent />)
+
+    act(() => {
+      socketState.handlers.get('block')?.({
+        matchId: 8978976957,
+        state: 'DOTA_GAMERULES_STATE_STRATEGY_TIME',
+        team: 'radiant',
+        type: 'empty',
+      })
+    })
+
+    expect(setBlock).toHaveBeenCalledWith({
+      matchId: 8978976957,
+      state: 'DOTA_GAMERULES_STATE_STRATEGY_TIME',
+      team: 'radiant',
+      type: 'empty',
+    })
+  })
 })

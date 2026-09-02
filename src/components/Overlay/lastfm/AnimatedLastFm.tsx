@@ -20,14 +20,16 @@ export const AnimatedLastFm = ({
   const res = useTransformRes()
   const style = mainScreen ? { fontSize: res({ w: 18 }) } : {}
   const { track } = useLastFm()
-  const positions: Record<
-    NonNullable<blockType['type']>,
-    {
-      width: number
-      bottom?: number
-      right: number
-      height: number
-    }
+  const positions: Partial<
+    Record<
+      NonNullable<blockType['type']>,
+      {
+        width: number
+        bottom?: number
+        right: number
+        height: number
+      }
+    >
   > = {
     picks: {
       bottom: res({ h: 125 }),
@@ -59,6 +61,7 @@ export const AnimatedLastFm = ({
     },
   }
 
+  const position = block.type ? positions[block.type] : undefined
   let styles: {
     width?: number
     height?: number
@@ -66,7 +69,7 @@ export const AnimatedLastFm = ({
     right?: number
     left?: number
     zIndex?: number
-  } = block.type && positions[block.type] ? positions[block.type] : {}
+  } = position ?? {}
 
   if (mainScreen || !styles?.width) {
     styles = {

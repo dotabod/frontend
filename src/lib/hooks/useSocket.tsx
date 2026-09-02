@@ -109,6 +109,10 @@ interface UseSocketProps {
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>
 }
 
+type WireBlockType = blockType & {
+  state?: string
+}
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -248,14 +252,21 @@ export const useSocket = ({
       }
     })
 
-    socket.on('block', (data: blockType) => {
+    socket.on('block', (data: WireBlockType) => {
       updateLastReceived()
-      if (data?.type === 'playing') {
+      const isMainScreenState = [
+        'DOTA_GAMERULES_STATE_INIT',
+        'DOTA_GAMERULES_STATE_POST_GAME',
+      ].includes(data.state ?? '')
+      const normalizedData: blockType =
+        data.type === 'empty' && isMainScreenState ? { ...data, type: null } : data
+
+      if (normalizedData.type === 'playing') {
         setTimeout(() => {
-          setBlock(data)
+          setBlock(normalizedData)
         }, 5000)
       } else {
-        setBlock(data)
+        setBlock(normalizedData)
       }
     })
     socket.on('paused', (data) => {
