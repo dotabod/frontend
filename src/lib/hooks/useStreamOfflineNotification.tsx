@@ -1,5 +1,7 @@
 import type { App } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+
+const OFFLINE_SETTINGS_REFRESH_MS = 30_000
 
 const StreamOfflineMessage = () => (
   <div>
@@ -16,7 +18,14 @@ const StreamOfflineMessage = () => (
 export const useStreamOfflineNotification = (
   streamOnline: boolean | undefined,
   notification: ReturnType<typeof App.useApp>['notification'],
+  refreshSettings: () => void,
 ) => {
+  const refreshSettingsRef = useRef(refreshSettings)
+
+  useEffect(() => {
+    refreshSettingsRef.current = refreshSettings
+  }, [refreshSettings])
+
   useEffect(() => {
     if (streamOnline === false) {
       notification.open({
@@ -27,8 +36,14 @@ export const useStreamOfflineNotification = (
         placement: 'bottomLeft',
         type: 'error',
       })
-    } else {
-      notification.destroy('stream-offline')
+
+      const refreshTimer = window.setInterval(() => {
+        refreshSettingsRef.current()
+      }, OFFLINE_SETTINGS_REFRESH_MS)
+
+      return () => window.clearInterval(refreshTimer)
     }
+
+    notification.destroy('stream-offline')
   }, [streamOnline, notification])
 }

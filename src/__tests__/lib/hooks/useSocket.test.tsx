@@ -86,6 +86,11 @@ describe('useSocket', () => {
 
     render(<TestComponent />)
 
+    expect(socketState.ioMock).toHaveBeenCalledWith(
+      process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL,
+      expect.objectContaining({ reconnectionAttempts: Number.POSITIVE_INFINITY }),
+    )
+
     act(() => {
       socketState.handlers.get('connect')?.()
     })

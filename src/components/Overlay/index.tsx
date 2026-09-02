@@ -54,7 +54,7 @@ const isInvalidLocalCheck = checkForInvalidOverlay(
 const OverlayPage = () => {
   const { notification } = App.useApp()
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
-  const { original, error } = useUpdateSetting()
+  const { original, error, mutate: refreshSettings } = useUpdateSetting()
   const { height, width } = useWindowSize()
   const [connected, setConnected] = useState(false)
   const [showDevImage, setShowDevImage] = useState(true)
@@ -166,7 +166,7 @@ const OverlayPage = () => {
     setRankImageDetails(rankDetails)
   }, [original])
 
-  useStreamOfflineNotification(original?.stream_online, notification)
+  useStreamOfflineNotification(original?.stream_online, notification, refreshSettings)
 
   useEffect(() => {
     setIsInIframe(window.self !== window.top)

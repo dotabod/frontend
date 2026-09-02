@@ -8,13 +8,14 @@ type Notification = ReturnType<typeof App.useApp>['notification']
 function renderStreamOfflineNotification(
   streamOnline: boolean | undefined,
   notification: Notification,
+  refreshSettings = vi.fn(),
 ) {
   const TestComponent = () => {
-    useStreamOfflineNotification(streamOnline, notification)
+    useStreamOfflineNotification(streamOnline, notification, refreshSettings)
     return null
   }
 
-  return render(<TestComponent />)
+  return { ...render(<TestComponent />), refreshSettings }
 }
 
 describe('useStreamOfflineNotification', () => {
@@ -23,14 +24,14 @@ describe('useStreamOfflineNotification', () => {
     vi.restoreAllMocks()
   })
 
-  it('opens a persistent notification while the stream is offline without scheduling refreshes', () => {
+  it('opens a persistent notification and periodically refreshes settings while offline', () => {
     vi.useFakeTimers()
     const notification = {
       destroy: vi.fn(),
       open: vi.fn(),
     } as unknown as Notification
 
-    renderStreamOfflineNotification(false, notification)
+    const { refreshSettings } = renderStreamOfflineNotification(false, notification)
 
     expect(notification.open).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -41,23 +42,31 @@ describe('useStreamOfflineNotification', () => {
         type: 'error',
       }),
     )
-    expect(vi.getTimerCount()).toBe(0)
+    expect(vi.getTimerCount()).toBe(1)
+
+    vi.advanceTimersByTime(30_000)
+    expect(refreshSettings).toHaveBeenCalledOnce()
   })
 
-  it('destroys the offline notification when refreshed settings say the stream is online', () => {
+  it('stops refreshing and destroys the notification when settings say the stream is online', () => {
+    vi.useFakeTimers()
     const notification = {
       destroy: vi.fn(),
       open: vi.fn(),
     } as unknown as Notification
+    const refreshSettings = vi.fn()
 
-    const { rerender } = renderStreamOfflineNotification(false, notification)
+    const { rerender } = renderStreamOfflineNotification(false, notification, refreshSettings)
     const TestComponent = () => {
-      useStreamOfflineNotification(true, notification)
+      useStreamOfflineNotification(true, notification, refreshSettings)
       return null
     }
 
     rerender(<TestComponent />)
+    vi.advanceTimersByTime(60_000)
 
     expect(notification.destroy).toHaveBeenCalledWith('stream-offline')
+    expect(refreshSettings).not.toHaveBeenCalled()
+    expect(vi.getTimerCount()).toBe(0)
   })
 })

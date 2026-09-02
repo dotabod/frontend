@@ -173,11 +173,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       const isPublicOverlayRequest = Boolean(userId)
-      if (isPublicOverlayRequest) {
-        res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
-      } else {
-        res.setHeader('Cache-Control', 'private, no-store')
-      }
+      res.setHeader('Cache-Control', 'private, no-store')
 
       const data = await prisma.user.findFirst({
         select: {

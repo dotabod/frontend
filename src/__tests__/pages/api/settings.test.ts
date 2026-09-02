@@ -78,7 +78,7 @@ describe('settings API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res.getHeader('Cache-Control')).toBe('public, s-maxage=30, stale-while-revalidate=120')
+    expect(res.getHeader('Cache-Control')).toBe('private, no-store')
     expect(res._getJSONData().settings).toEqual([{ key: 'aegis', value: true }])
   })
 

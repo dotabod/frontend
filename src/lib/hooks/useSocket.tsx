@@ -147,7 +147,7 @@ export const useSocket = ({
       socket = io(process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL, {
         auth: { token: userId },
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: Number.POSITIVE_INFINITY,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         timeout: 20_000,
