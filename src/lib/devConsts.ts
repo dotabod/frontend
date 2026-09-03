@@ -22,7 +22,7 @@ export const isDev = () => {
 export interface blockType {
   matchId: number | null
   team: 'radiant' | 'dire' | null
-  type: 'empty' | 'picks' | 'playing' | 'strategy' | 'strategy-2' | 'spectator' | null
+  type: 'arcade' | 'empty' | 'picks' | 'playing' | 'strategy' | 'strategy-2' | 'spectator' | null
 }
 export const devBlockTypes: blockType = {
   matchId: 123_456_789,
