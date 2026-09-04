@@ -220,22 +220,37 @@ describe('WinLossOverlay', () => {
     })
   })
 
-  it('subtracts an unranked loss when that total is above zero', async () => {
-    socketState.control.records = [{ lose: 2, type: 'U', win: 1 }]
+  it('subtracts several unranked losses without crossing zero', async () => {
+    socketState.control.records = [{ lose: 5, type: 'U', win: 1 }]
     const fetchMock = vi.fn().mockResolvedValue({ ok: true })
     vi.stubGlobal('fetch', fetchMock)
     render(<WinLossOverlay />)
 
     fireEvent.click(screen.getByRole('radio', { name: 'Unranked' }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Correction amount' }), {
+      target: { value: '3' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Remove unranked loss' }))
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith('/api/win-loss-adjustments', {
-        body: JSON.stringify({ delta: -1, lobbyType: 0, won: false }),
+        body: JSON.stringify({ delta: -3, lobbyType: 0, won: false }),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       })
     })
+  })
+
+  it('disables a subtraction when its amount is larger than the selected total', () => {
+    socketState.control.records = [{ lose: 2, type: 'R', win: 5 }]
+    render(<WinLossOverlay />)
+
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Correction amount' }), {
+      target: { value: '3' },
+    })
+
+    expect(screen.getByRole('button', { name: 'Remove ranked win' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Remove ranked loss' })).toBeDisabled()
   })
 
   it('does not allow a subtraction that would take the selected total below zero', () => {

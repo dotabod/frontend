@@ -51,6 +51,18 @@ describe('win-loss adjustments API', () => {
     })
   })
 
+  it('stores a multi-game subtraction as one correction', async () => {
+    const { req, res } = postRequest({ delta: -3, lobbyType: 0, won: false })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(201)
+    expect(prisma.winLossAdjustment.create).toHaveBeenCalledWith({
+      data: { delta: -3, lobbyType: 0, userId: USER_ID, won: false },
+      select: { createdAt: true },
+    })
+  })
+
   it('rejects a correction from an unauthenticated request', async () => {
     vi.mocked(getServerSession).mockResolvedValue(null)
     const { req, res } = postRequest({ delta: 1, lobbyType: 7, won: true })
@@ -61,8 +73,26 @@ describe('win-loss adjustments API', () => {
     expect(prisma.winLossAdjustment.create).not.toHaveBeenCalled()
   })
 
-  it('rejects arbitrary deltas and lobby types', async () => {
-    const { req, res } = postRequest({ delta: 20, lobbyType: 3, won: true })
+  it('rejects a zero correction', async () => {
+    const { req, res } = postRequest({ delta: 0, lobbyType: 7, won: true })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(422)
+    expect(prisma.winLossAdjustment.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a correction larger than the dashboard limit', async () => {
+    const { req, res } = postRequest({ delta: -1001, lobbyType: 7, won: true })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(422)
+    expect(prisma.winLossAdjustment.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects an unsupported lobby type', async () => {
+    const { req, res } = postRequest({ delta: 1, lobbyType: 3, won: true })
 
     await handler(req, res)
 

@@ -35,6 +35,7 @@ export default function WinLossOverlay() {
     typeof statsStartDate === 'string' ? statsStartDate : null,
   )
   const [adjustmentLobbyType, setAdjustmentLobbyType] = useState<0 | 7>(7)
+  const [adjustmentAmount, setAdjustmentAmount] = useState<number | null>(1)
   const [adjustmentSaving, setAdjustmentSaving] = useState(false)
   const [adjustmentError, setAdjustmentError] = useState<string | null>(null)
   const {
@@ -77,13 +78,25 @@ export default function WinLossOverlay() {
     updateStatsDays(null)
   }
 
-  const adjustWinLoss = async (won: boolean, delta: -1 | 1) => {
+  const validAdjustmentAmount =
+    adjustmentAmount !== null &&
+    Number.isInteger(adjustmentAmount) &&
+    adjustmentAmount >= 1 &&
+    adjustmentAmount <= 1000
+
+  const adjustWinLoss = async (won: boolean, direction: -1 | 1) => {
+    if (!validAdjustmentAmount) return
+
     setAdjustmentSaving(true)
     setAdjustmentError(null)
 
     try {
       const response = await fetch('/api/win-loss-adjustments', {
-        body: JSON.stringify({ delta, lobbyType: adjustmentLobbyType, won }),
+        body: JSON.stringify({
+          delta: direction * adjustmentAmount,
+          lobbyType: adjustmentLobbyType,
+          won,
+        }),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       })
@@ -99,8 +112,8 @@ export default function WinLossOverlay() {
   const adjustmentTypeLabel = adjustmentLobbyType === 7 ? 'ranked' : 'unranked'
   const adjustmentRecordType = adjustmentLobbyType === 7 ? 'R' : 'U'
   const adjustmentRecord = wl?.records.find((record) => record.type === adjustmentRecordType)
-  const canRemoveWin = (adjustmentRecord?.win ?? 0) > 0
-  const canRemoveLoss = (adjustmentRecord?.lose ?? 0) > 0
+  const canRemoveWin = validAdjustmentAmount && adjustmentAmount <= (adjustmentRecord?.win ?? 0)
+  const canRemoveLoss = validAdjustmentAmount && adjustmentAmount <= (adjustmentRecord?.lose ?? 0)
 
   return (
     <Card title='Win/loss'>
@@ -181,10 +194,29 @@ export default function WinLossOverlay() {
           <Radio.Button value={7}>Ranked</Radio.Button>
           <Radio.Button value={0}>Unranked</Radio.Button>
         </Radio.Group>
+        <div className='mt-3 flex flex-wrap items-end gap-3'>
+          <div>
+            <label className='mb-1 block text-xs font-medium text-gray-400' htmlFor='wl-adjustment'>
+              Correction amount
+            </label>
+            <InputNumber
+              aria-label='Correction amount'
+              className='w-32!'
+              disabled={adjustmentSaving}
+              id='wl-adjustment'
+              max={1000}
+              min={1}
+              precision={0}
+              value={adjustmentAmount}
+              onChange={setAdjustmentAmount}
+            />
+          </div>
+          <span className='pb-1 text-xs text-gray-400'>Totals cannot go below zero.</span>
+        </div>
         <div className='mt-3 flex flex-wrap gap-2'>
           <Button
             aria-label={`Add ${adjustmentTypeLabel} win`}
-            disabled={adjustmentSaving}
+            disabled={adjustmentSaving || !validAdjustmentAmount}
             onClick={() => void adjustWinLoss(true, 1)}
           >
             + Win
@@ -198,7 +230,7 @@ export default function WinLossOverlay() {
           </Button>
           <Button
             aria-label={`Add ${adjustmentTypeLabel} loss`}
-            disabled={adjustmentSaving}
+            disabled={adjustmentSaving || !validAdjustmentAmount}
             onClick={() => void adjustWinLoss(false, 1)}
           >
             + Loss

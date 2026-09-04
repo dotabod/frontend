@@ -7,7 +7,12 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 const adjustmentSchema = z.object({
-  delta: z.union([z.literal(-1), z.literal(1)]),
+  delta: z
+    .number()
+    .int()
+    .min(-1000)
+    .max(1000)
+    .refine((value) => value !== 0),
   lobbyType: z.union([z.literal(0), z.literal(7)]),
   won: z.boolean(),
 })
