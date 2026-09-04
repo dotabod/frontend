@@ -4,7 +4,7 @@
 #
 # Two modes, auto-selected:
 #
-#   LOCAL  — when the supabase-db container runs on THIS host (i.e. the prod box itself).
+#   LOCAL  — when the exact production Supabase DB container runs on THIS host.
 #            Talks to its published 127.0.0.1:5432 directly, reading the password from the
 #            container. No SSH, no Doppler. This exists because on the prod host `ssh oracle`
 #            loops back and fails ("Permission denied (publickey)"), so the tunnel path below
@@ -16,7 +16,8 @@
 #            (the public pooler is only on :6543).
 #
 # Override the auto-detect with DB_TUNNEL_LOCAL=1 (force local) or DB_TUNNEL_LOCAL=0 (force
-# tunnel). In local mode the published port defaults to 5432, override with DB_LOCAL_PORT.
+# tunnel). Override the known production container with SUPABASE_DB_CONTAINER. In local mode the
+# published port defaults to 5432; override it with DB_LOCAL_PORT.
 #
 # Usage (note: no `doppler run --` prefix — tunnel mode wraps with doppler itself):
 #   scripts/db-tunnel.sh npx prisma db push
@@ -33,6 +34,7 @@ if [ "$#" -eq 0 ]; then
 fi
 
 LOCAL_MODE="${DB_TUNNEL_LOCAL:-auto}"
+PROD_SUPABASE_DB="${SUPABASE_DB_CONTAINER:-supabase-db-kk4wckkck0ogo0c8ookwsks0}"
 
 # Pick a docker invocation that works without prompting (`-n` never asks for a sudo password,
 # so dev laptops with no/locked-down docker just fall through to tunnel mode).
@@ -45,14 +47,25 @@ if [ "$LOCAL_MODE" != "0" ]; then
   fi
 fi
 
-# Find a running supabase-db container (the strong signal we're on the host that owns the DB).
+# Find the exact production Supabase container. A developer's unrelated local Supabase stack must
+# not switch this script into production-local mode.
 DB_CONTAINER=""
+LOCAL_PROD_HOST=0
 if [ -n "$DOCKER" ]; then
-  DB_CONTAINER=$($DOCKER ps --filter 'name=supabase-db' --format '{{.Names}}' 2>/dev/null | head -n1 || true)
+  DOCKER_NAMES=$($DOCKER ps --format '{{.Names}}' 2>/dev/null || true)
+  if grep -Fxq coolify <<< "$DOCKER_NAMES"; then
+    LOCAL_PROD_HOST=1
+  fi
+  DB_CONTAINER=$(grep -Fx "$PROD_SUPABASE_DB" <<< "$DOCKER_NAMES" || true)
 fi
 
 if [ "$LOCAL_MODE" = "1" ] && [ -z "$DB_CONTAINER" ]; then
-  echo "DB_TUNNEL_LOCAL=1 but no running 'supabase-db' container was found on this host." >&2
+  echo "DB_TUNNEL_LOCAL=1 but no running production Supabase DB container '$PROD_SUPABASE_DB' was found on this host." >&2
+  exit 1
+fi
+
+if [ "$LOCAL_PROD_HOST" -eq 1 ] && [ -z "$DB_CONTAINER" ]; then
+  echo "The production Coolify host is local, but Supabase DB container '$PROD_SUPABASE_DB' is not running; refusing to SSH back into oracle." >&2
   exit 1
 fi
 
