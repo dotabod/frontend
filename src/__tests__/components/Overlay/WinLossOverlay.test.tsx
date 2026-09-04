@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 
@@ -10,7 +10,10 @@ const socketState = vi.hoisted(() => {
     callback: (response: unknown) => void
     request: { statsDays?: number | null }
   }> = []
-  const control = { autoRespond: true }
+  const control: {
+    autoRespond: boolean
+    records: Array<{ lose: number; type: 'R' | 'U'; win: number }> | null
+  } = { autoRespond: true, records: null }
   const socket = {
     connected: true,
     disconnect: vi.fn(),
@@ -27,7 +30,7 @@ const socketState = vi.hoisted(() => {
         }
         const statsDays = request.statsDays ?? null
         callback({
-          records: [{ lose: 4, type: 'R', win: statsDays ?? 12 }],
+          records: control.records ?? [{ lose: 4, type: 'R', win: statsDays ?? 12 }],
           statsDays,
         })
       },
@@ -92,11 +95,13 @@ describe('WinLossOverlay', () => {
     socketState.handlers.clear()
     socketState.pendingResponses.length = 0
     socketState.control.autoRespond = true
+    socketState.control.records = null
     socketState.io.mockClear()
     socketState.socket.disconnect.mockClear()
     socketState.socket.emit.mockClear()
     socketState.socket.off.mockClear()
     socketState.socket.on.mockClear()
+    vi.unstubAllGlobals()
   })
 
   it("previews the user's current WL instead of a sample record", () => {
@@ -168,7 +173,6 @@ describe('WinLossOverlay', () => {
     expect(input).toHaveAttribute('placeholder', 'This stream')
     expect(input).toHaveAttribute('aria-valuemin', '1')
     expect(input).toHaveAttribute('aria-valuemax', '365')
-    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
     expect(screen.getByText(/This stream.*resets when a new stream starts/i)).toBeInTheDocument()
     expect(screen.getByText(/Leave blank for each stream.*enter 1.*365 days/i)).toBeInTheDocument()
     expect(screen.getByTestId('preview-window')).toHaveTextContent('12 W - 4 L · stream')
@@ -191,5 +195,56 @@ describe('WinLossOverlay', () => {
     })
 
     expect(updateStatsDays).toHaveBeenCalledTimes(1)
+  })
+
+  it('adds a ranked win correction and immediately reloads the shared WL total', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    vi.stubGlobal('fetch', fetchMock)
+    render(<WinLossOverlay />)
+    const initialRequests = socketState.socket.emit.mock.calls.filter(
+      ([event]) => event === 'request-wl',
+    ).length
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add ranked win' }))
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith('/api/win-loss-adjustments', {
+        body: JSON.stringify({ delta: 1, lobbyType: 7, won: true }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+    })
+    await waitFor(() => {
+      expect(
+        socketState.socket.emit.mock.calls.filter(([event]) => event === 'request-wl'),
+      ).toHaveLength(initialRequests + 1)
+    })
+  })
+
+  it('subtracts an unranked loss when that total is above zero', async () => {
+    socketState.control.records = [{ lose: 2, type: 'U', win: 1 }]
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    vi.stubGlobal('fetch', fetchMock)
+    render(<WinLossOverlay />)
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Unranked' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove unranked loss' }))
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith('/api/win-loss-adjustments', {
+        body: JSON.stringify({ delta: -1, lobbyType: 0, won: false }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+    })
+  })
+
+  it('does not allow a subtraction that would take the selected total below zero', () => {
+    socketState.control.records = [{ lose: 0, type: 'R', win: 0 }]
+    render(<WinLossOverlay />)
+
+    expect(screen.getByRole('button', { name: 'Remove ranked win' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Remove ranked loss' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Add ranked win' })).toBeEnabled()
   })
 })

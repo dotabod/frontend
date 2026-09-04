@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import io, { type Socket } from 'socket.io-client'
 import type { WLData, WLRecord } from './useSocket'
 
@@ -27,6 +27,7 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
   const statsDaysRef = useRef(statsDays)
   const lastRequestedWindowRef = useRef<string | null>(null)
   const requestIdRef = useRef(0)
+  const requestCurrentWLRef = useRef<((force?: boolean) => void) | null>(null)
   const isPreview = userId != null
 
   statsDaysRef.current = statsDays
@@ -72,6 +73,7 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
         },
       )
     }
+    requestCurrentWLRef.current = requestCurrentWL
 
     const handleConnect = () => {
       setConnected(true)
@@ -105,6 +107,7 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
       socket.disconnect()
       requestIdRef.current += 1
       socketRef.current = null
+      requestCurrentWLRef.current = null
       lastRequestedWindowRef.current = null
     }
   }, [isPreview, twitchId, userId])
@@ -134,5 +137,7 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
     )
   }, [isPreview, statsDays])
 
-  return { connected, error, loading, wl }
+  const refresh = useCallback(() => requestCurrentWLRef.current?.(true), [])
+
+  return { connected, error, loading, refresh, wl }
 }
