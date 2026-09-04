@@ -38,8 +38,11 @@ describe('navConfig regions', () => {
     expect(hidden).toEqual(['Setup'])
   })
 
-  it('bottom region holds Team access, Help center, and the admin-only Admin accordion', () => {
-    const [teamAccess, helpCenter, admin] = navConfig.bottom
+  it('bottom region holds diagnostics, Team access, Help center, and the Admin accordion', () => {
+    const [diagnostics, teamAccess, helpCenter, admin] = navConfig.bottom
+
+    expect(diagnostics.href).toBe('/dashboard/diagnostics')
+    expect(diagnostics.name).toBe('Connection diagnostics')
 
     expect(teamAccess.href).toBe('/dashboard/managers')
     expect(teamAccess.hideForImpersonator).toBe(true)
@@ -86,20 +89,32 @@ describe('navConfig regions', () => {
 describe('filterNav', () => {
   it('drops the Admin accordion for non-admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: false, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual(['Team access', 'Help center'])
+    expect(result.map((i) => i.name)).toEqual([
+      'Connection diagnostics',
+      'Team access',
+      'Help center',
+    ])
   })
 
   it('keeps the Admin accordion for admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: true, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual(['Team access', 'Help center', 'Admin'])
+    expect(result.map((i) => i.name)).toEqual([
+      'Connection diagnostics',
+      'Team access',
+      'Help center',
+      'Admin',
+    ])
   })
 
   it('hides Setup / Team access / Billing / Your data for impersonators everywhere', () => {
     const opts = { isAdmin: true, isImpersonating: true }
 
     expect(filterNav(navConfig.primary, opts).some((i) => i.name === 'Setup')).toBe(false)
-    // Team access + Admin both drop; Help center stays (universal, no impersonator gate).
-    expect(filterNav(navConfig.bottom, opts).map((i) => i.name)).toEqual(['Help center'])
+    // Team access + Admin both drop; diagnostics and Help center stay available.
+    expect(filterNav(navConfig.bottom, opts).map((i) => i.name)).toEqual([
+      'Connection diagnostics',
+      'Help center',
+    ])
     expect(filterNav(navConfig.account, opts).map((i) => i.name)).toEqual(['Gift Pro'])
   })
 })
@@ -111,6 +126,7 @@ describe('findBestMatchingMenuItem', () => {
     // Exact match beats the /dashboard/features prefix.
     ['/dashboard/features/overlay', { key: '/dashboard/features/overlay', parentKey: '' }],
     ['/dashboard/managers', { key: '/dashboard/managers', parentKey: '' }],
+    ['/dashboard/diagnostics', { key: '/dashboard/diagnostics', parentKey: '' }],
     [
       '/dashboard/admin/manage-channel',
       { key: '/dashboard/admin/manage-channel', parentKey: 'admin-menu' },

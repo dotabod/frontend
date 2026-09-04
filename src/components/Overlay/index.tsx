@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
 import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { ChatMessagesOverlay } from '@/components/Overlay/ChatMessagesOverlay'
@@ -52,6 +53,7 @@ const isInvalidLocalCheck = checkForInvalidOverlay(
 )
 
 const OverlayPage = () => {
+  const router = useRouter()
   const { notification } = App.useApp()
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { original, error, mutate: refreshSettings } = useUpdateSetting()
@@ -61,6 +63,24 @@ const OverlayPage = () => {
   const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)
   const [hasShownOnce, setHasShownOnce] = useState(false)
   const reportedErrorStatus = useRef<number | null>(null)
+
+  useEffect(() => {
+    const userId = typeof router.query.userId === 'string' ? router.query.userId : null
+    if (!userId || typeof window.obsstudio !== 'object') return
+
+    const reportPageLoaded = () => {
+      fetch('/api/diagnostics/overlay-page', {
+        body: JSON.stringify({ userId }),
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        method: 'POST',
+      }).catch(() => {})
+    }
+
+    reportPageLoaded()
+    const interval = window.setInterval(reportPageLoaded, 60_000)
+    return () => window.clearInterval(interval)
+  }, [router.query.userId])
 
   const [block, setBlock] = useState<blockType>({
     matchId: null,

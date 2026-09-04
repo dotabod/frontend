@@ -4,6 +4,10 @@ param (
 
 # Wrap the entire script in a function to ensure we can control the exit
 function Start-DotabodInstaller {
+  $gsiHost = "gsi.dotabod.com"
+  $gsiUrl = "https://$gsiHost"
+  $diagnosticPayloadBytes = 65536
+
   # Logging Functions
   function Write-Log {
     param (
@@ -132,7 +136,10 @@ function Start-DotabodInstaller {
         $response.Headers.Add("Access-Control-Allow-Origin", $origin)
       }
       else {
-        $response.Headers.Add("Access-Control-Allow-Origin", "https://dotabod.com") # default if no match
+        Write-Log "Rejected local callback from an unexpected origin." "DEBUG"
+        $response.StatusCode = 403
+        $response.OutputStream.Close()
+        continue
       }
 
       $response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS")
@@ -144,14 +151,15 @@ function Start-DotabodInstaller {
       }
       if ($request.HttpMethod -eq "GET" -and $request.Url.AbsolutePath -eq "/token") {
         Write-Log "Received token request." "DEBUG"
-        $token = $request.QueryString["token"].Trim()
-        if ($token -ne "") {
+        $rawToken = $request.QueryString["token"]
+        $token = if ($null -ne $rawToken) { $rawToken.Trim() } else { "" }
+        if (-not [string]::IsNullOrWhiteSpace($token)) {
           $responseString = "<html><body>Token received. You can close this window.</body></html>"
           $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseString)
           $response.ContentLength64 = $buffer.Length
           $response.OutputStream.Write($buffer, 0, $buffer.Length)
           $response.OutputStream.Close()
-          Write-Log "Token received: '$token'" "DEBUG"
+          Write-Log "Authentication token received." "DEBUG"
           $authenticated = $true
           return $token
         }
@@ -192,6 +200,100 @@ function Start-DotabodInstaller {
     }
   }
 
+  function Test-GsiConnectivity {
+    $result = [ordered]@{
+      DnsAddresses    = @()
+      Tcp443          = $false
+      HealthAttempts  = 0
+      HealthSuccesses = 0
+      PayloadBytes    = 0
+      PayloadComplete = $false
+      WarpDetected    = $false
+      WinHttpProxy    = "Unknown"
+      Error           = ""
+    }
+
+    Write-Log "Running Dotabod network diagnostics..." "INFO" Cyan
+
+    try {
+      $result.DnsAddresses = @(
+        [System.Net.Dns]::GetHostAddresses($gsiHost) |
+          ForEach-Object { $_.IPAddressToString } |
+          Select-Object -Unique
+      )
+    }
+    catch {
+      $result.Error = "DNS lookup failed: $($_.Exception.Message)"
+    }
+
+    try {
+      $tcp = Test-NetConnection -ComputerName $gsiHost -Port 443 -InformationLevel Quiet -WarningAction SilentlyContinue
+      $result.Tcp443 = [bool]$tcp
+    }
+    catch {
+      if (-not $result.Error) { $result.Error = "TCP test failed: $($_.Exception.Message)" }
+    }
+
+    # Multiple requests catch routes that work briefly and then time out.
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+      $result.HealthAttempts++
+      try {
+        $health = Invoke-WebRequest -Uri "$gsiUrl/" -TimeoutSec 10 -UseBasicParsing
+        if ($health.StatusCode -eq 200 -and $health.Content -match '"status"\s*:\s*"ok"') {
+          $result.HealthSuccesses++
+        }
+      }
+      catch {
+        Write-Log "GSI health attempt $attempt failed: $($_.Exception.Message)" "DEBUG"
+      }
+    }
+
+    try {
+      $handler = New-Object System.Net.Http.HttpClientHandler
+      $handler.AutomaticDecompression = [System.Net.DecompressionMethods]::None
+      $client = New-Object System.Net.Http.HttpClient($handler)
+      $client.Timeout = [TimeSpan]::FromSeconds(20)
+      $bytes = $client.GetByteArrayAsync("$gsiUrl/diagnostics/payload").GetAwaiter().GetResult()
+      $result.PayloadBytes = $bytes.Length
+      $result.PayloadComplete = $bytes.Length -eq $diagnosticPayloadBytes
+    }
+    catch {
+      if (-not $result.Error) { $result.Error = "Payload test failed: $($_.Exception.Message)" }
+    }
+    finally {
+      if ($null -ne $client) { $client.Dispose() }
+      if ($null -ne $handler) { $handler.Dispose() }
+    }
+
+    try {
+      $result.WarpDetected = [bool](Get-NetAdapter -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -match 'WARP' -or $_.InterfaceDescription -match 'Cloudflare|WARP'
+      } | Select-Object -First 1)
+    }
+    catch {
+      Write-Log "Could not inspect network adapters." "DEBUG"
+    }
+
+    try {
+      $proxyOutput = (& netsh winhttp show proxy 2>$null) -join " "
+      if ($proxyOutput) { $result.WinHttpProxy = ($proxyOutput -replace '\s+', ' ').Trim() }
+    }
+    catch {
+      Write-Log "Could not inspect the WinHTTP proxy." "DEBUG"
+    }
+
+    Write-Log "Diagnostic summary:" "INFO" Cyan
+    Write-Log "  DNS: $(if ($result.DnsAddresses.Count) { $result.DnsAddresses -join ', ' } else { 'FAILED' })"
+    Write-Log "  TCP port 443: $(if ($result.Tcp443) { 'OK' } else { 'FAILED' })"
+    Write-Log "  HTTPS health: $($result.HealthSuccesses)/$($result.HealthAttempts) successful"
+    Write-Log "  64 KB transfer: $($result.PayloadBytes)/$diagnosticPayloadBytes bytes"
+    Write-Log "  Cloudflare WARP adapter: $(if ($result.WarpDetected) { 'detected' } else { 'not detected' })"
+    Write-Log "  WinHTTP proxy: $($result.WinHttpProxy)" "DEBUG"
+    if ($result.Error) { Write-Log "  Last network error: $($result.Error)" "DEBUG" }
+
+    return [pscustomobject]$result
+  }
+
   function Get-BaseUri {
     $localHostUrl = "http://localhost:3000"
     $remoteHostUrl = "https://dotabod.com"
@@ -215,12 +317,19 @@ function Start-DotabodInstaller {
   # Main Logic
   Register-ObjectEvent -InputObject ([AppDomain]::CurrentDomain) -EventName "ProcessExit" -Action { Clear-ResourceAllocation } | Out-Null
 
-  # Check connectivity to Dotabod GSI link
-  $gsiUrl = "https://gsi.dotabod.com"
-  if (-not (Test-NetworkConnection -Url $gsiUrl)) {
-    Write-Log "Your PC can't access the Dotabod GSI server. This is likely due to a firewall issue or your internet service provider blocking it. In certain places like China or Kazakhstan, it is blocked. You may have to use a VPN like https://1.1.1.1 to use Dotabod." "ERROR"
-    # Don't return here, let the script continue to the finally block
+  # Test the same path Dota uses. A tiny health response alone can miss a connection
+  # that stalls after the first part of a response.
+  $networkDiagnostic = Test-GsiConnectivity
+  if (-not $networkDiagnostic.Tcp443 -or $networkDiagnostic.HealthSuccesses -eq 0 -or -not $networkDiagnostic.PayloadComplete) {
+    Write-Log "Your PC cannot reliably reach the Dotabod live server." "ERROR"
+    Write-Log "A browser-only VPN will not help Dota or OBS. Try zapret or system-wide Cloudflare WARP, then run this installer again." "INFO" DarkYellow
+    Write-Log "Open https://dotabod.com/dashboard/diagnostics for guided checks." "INFO" Cyan
+    Write-Log "CGNAT is normally not the cause because Dotabod uses outbound HTTPS connections." "INFO" DarkYellow
     return $false
+  }
+  elseif ($networkDiagnostic.HealthSuccesses -lt $networkDiagnostic.HealthAttempts) {
+    Write-Log "The server was reachable, but some attempts failed. Your ISP route may be intermittent." "INFO" DarkYellow
+    Write-Log "If the overlay stops updating, try zapret or system-wide Cloudflare WARP." "INFO" DarkYellow
   }
 
   try {
@@ -337,7 +446,7 @@ function Start-DotabodInstaller {
     Write-Log "Number of game folders found: $($matchesList.Count)" "DEBUG"
 
     # Initialize the variable to store the path containing app ID 570
-    $appPath = ""
+    $appPath = $null
 
     foreach ($match in $matchesList) {
       $path = $match.Groups[2].Value
@@ -354,7 +463,7 @@ function Start-DotabodInstaller {
     Write-Log "Detected Dota 2 installation path: $appPath" "DEBUG"
 
     # Assign Paths
-    $steamapps = if ($null -ne $appPath) {
+    $steamapps = if (-not [string]::IsNullOrWhiteSpace($appPath)) {
       Write-Log "Assigned Dota 2 library folder: $appPath" "DEBUG"
       Join-Path $appPath 'steamapps'
     }

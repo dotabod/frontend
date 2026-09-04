@@ -182,6 +182,10 @@ export const useSocket = ({
       }
     }, 15_000)
 
+    const diagnosticHeartbeat = setInterval(() => {
+      if (socket?.connected) socket.emit('diagnostic-heartbeat')
+    }, 60_000)
+
     // Update lastReceivedTime whenever we get any data
     const updateLastReceived = () => {
       lastReceivedTime = Date.now()
@@ -376,6 +380,7 @@ export const useSocket = ({
     // Clean up
     return () => {
       clearInterval(connectionMonitor)
+      clearInterval(diagnosticHeartbeat)
       // Clear all message timeouts
       messageTimeoutsRef.current.forEach((timeoutId) => {
         clearTimeout(timeoutId)

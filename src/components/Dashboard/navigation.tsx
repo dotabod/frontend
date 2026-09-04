@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   MessagesSquare,
   MonitorPlay,
+  Activity,
   NewspaperIcon,
   ShieldCheck,
   SlidersHorizontal,
@@ -73,6 +74,7 @@ export const navConfig: NavConfig = {
     { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
   ],
   bottom: [
+    { href: '/dashboard/diagnostics', icon: Activity, name: 'Connection diagnostics', new: true },
     { hideForImpersonator: true, href: '/dashboard/managers', icon: Users, name: 'Team access' },
     // Pinned at the bottom of the rail, visible to everyone (incl. impersonators).
     HELP_CENTER,
