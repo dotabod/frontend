@@ -22,7 +22,11 @@ Dotabod uses that choice in:
 
 The field is blank by default, so existing streamers keep the same online/offline reset behavior. Enter `30` for a 30-day challenge; the counter will continue when you end one stream and start the next. Clear the field whenever you want to return to per-stream stats.
 
+The settings card previews your own record while you change the window. You can try 7, 30, or any other supported value and see the count before leaving the page.
+
 The overlay shows a small `STREAM` or `30D` marker beside the record, so viewers know which range they are watching. `!wl` spells it out at the end of the response as `This stream` or `Last 30 days`.
+
+Your public Dotabod profile shows the same record and range. It updates when a match finishes, so viewers following a challenge do not need to reload the page.
 
 ## Reset a challenge without changing other stats
 

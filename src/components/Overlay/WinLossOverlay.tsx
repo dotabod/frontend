@@ -1,21 +1,34 @@
-import { Form, Input, InputNumber } from 'antd'
+import { Form, Input, InputNumber, Skeleton } from 'antd'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { useWinLoss } from '@/lib/hooks/useWinLoss'
 import { Card } from '@/ui/card'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import WinLossCard from './wl/WinLossCard'
 
 export default function WinLossOverlay() {
+  const userId = useSession().data?.user?.id
   const {
     data: statsDays,
     loading: statsDaysLoading,
     isSaving: statsDaysSaving,
     updateSetting: updateStatsDays,
   } = useUpdateSetting<number | null>(Settings.wlStatsDays)
-  const [draftStatsDays, setDraftStatsDays] = useState<number | null>(null)
+  const [draftStatsDays, setDraftStatsDays] = useState<number | null>(() =>
+    typeof statsDays === 'number' && Number.isFinite(statsDays) ? statsDays : null,
+  )
   const debouncedUpdateStatsDays = useDebouncedCallback(updateStatsDays, 500)
+  const {
+    error: previewError,
+    loading: previewLoading,
+    wl,
+  } = useWinLoss({
+    statsDays: draftStatsDays,
+    userId: statsDaysLoading ? null : userId,
+  })
 
   useEffect(() => {
     if (typeof statsDays === 'number' && Number.isFinite(statsDays)) {
@@ -90,13 +103,14 @@ export default function WinLossOverlay() {
         </Form.Item>
       </Form>
 
-      <div className='my-6 flex justify-center'>
-        <WinLossCard
-          wl={{
-            records: [{ lose: 5, type: 'U', win: 10 }],
-            statsDays: draftStatsDays,
-          }}
-        />
+      <div className='my-6 flex min-h-12 flex-col items-center justify-center gap-2'>
+        <span className='text-xs font-medium text-gray-500'>Your record</span>
+        {previewLoading || !wl ? (
+          <Skeleton.Input active size='small' style={{ height: 34, width: 132 }} />
+        ) : (
+          <WinLossCard wl={wl} />
+        )}
+        {previewError && <span className='text-xs text-gray-400'>Preview unavailable</span>}
       </div>
     </Card>
   )

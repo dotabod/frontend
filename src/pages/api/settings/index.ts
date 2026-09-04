@@ -114,6 +114,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         // Use findFirst instead of findFirstOrThrow to handle not found cases gracefully
         const data = await prisma.user.findFirst({
           select: {
+            Account: {
+              select: {
+                providerAccountId: true,
+              },
+            },
             createdAt: true,
             displayName: true,
             image: true,
@@ -145,11 +150,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         const subscription = getSettingsSubscription(data.subscription)
 
-        const { subscription: _subscriptionRows, ...userData } = data
+        const { Account, subscription: _subscriptionRows, ...userData } = data
 
         return res.json({
           ...userData,
           subscription,
+          twitchId: Account?.providerAccountId ?? null,
         })
       } catch (error) {
         captureException(error)

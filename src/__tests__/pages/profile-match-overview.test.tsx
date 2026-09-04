@@ -1,11 +1,37 @@
-import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { act, render, screen, within } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import ProfilePage, { getServerSideProps } from '@/pages/[username]'
 
 const prismaMocks = vi.hoisted(() => ({
   groupBy: vi.fn(),
   matchesFindMany: vi.fn(),
   userFindFirst: vi.fn(),
+}))
+
+const socketState = vi.hoisted(() => {
+  const handlers = new Map<string, (...args: unknown[]) => void>()
+  const socket = {
+    connected: true,
+    disconnect: vi.fn(),
+    emit: vi.fn((event: string, _request: unknown, callback: (response: unknown) => void) => {
+      if (event !== 'request-wl') return
+      callback({
+        records: [{ lose: 3, type: 'R', win: 8 }],
+        statsDays: 30,
+      })
+    }),
+    off: vi.fn(),
+    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
+      handlers.set(event, handler)
+      return socket
+    }),
+  }
+
+  return { handlers, io: vi.fn(() => socket), socket }
+})
+
+vi.mock('socket.io-client', () => ({
+  default: socketState.io,
 }))
 
 vi.mock('@/lib/db', () => ({
@@ -144,13 +170,24 @@ const baseProps = {
     name: 'streamer',
     settings: [],
     stream_online: false,
+    twitchId: 'channel-1',
   },
   username: 'streamer',
 }
 
+afterEach(() => {
+  socketState.handlers.clear()
+  socketState.io.mockClear()
+  socketState.socket.disconnect.mockClear()
+  socketState.socket.emit.mockClear()
+  socketState.socket.off.mockClear()
+  socketState.socket.on.mockClear()
+})
+
 describe('public profile match overview', () => {
   it('loads all-time hero performance and the five latest resolved matches', async () => {
     prismaMocks.userFindFirst.mockResolvedValue({
+      Account: { providerAccountId: 'channel-1' },
       cosmeticLoadouts: [],
       createdAt: new Date('2025-01-01T00:00:00.000Z'),
       displayName: 'Streamer',
@@ -212,8 +249,21 @@ describe('public profile match overview', () => {
             won: true,
           },
         ],
+        userData: { twitchId: 'channel-1' },
       },
     })
+  })
+
+  it('shows the configured WL window and updates the counter after a match', () => {
+    render(<ProfilePage {...baseProps} />)
+
+    expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL8 W - 3 LLast 30 days')
+
+    act(() => {
+      socketState.handlers.get('update-wl')?.([{ lose: 3, type: 'R', win: 9 }], 30)
+    })
+
+    expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL9 W - 3 LLast 30 days')
   })
 
   it('summarizes the most played heroes and links to all hero win rates', () => {

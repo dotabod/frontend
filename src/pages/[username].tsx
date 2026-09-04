@@ -20,6 +20,7 @@ import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { ProfileMatchOverview } from '@/components/ProfileMatchOverview'
+import { ProfileWinLossCounter } from '@/components/ProfileWinLossCounter'
 import prisma from '@/lib/db'
 import { fetcher } from '@/lib/fetcher'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
@@ -175,6 +176,7 @@ interface PageContentProps {
     image: string | null
     createdAt: string
     mmr?: number
+    twitchId: string | null
     settings: {
       key: string
       value: unknown
@@ -234,6 +236,7 @@ const PageContent = ({
     image?: string | null
     createdAt?: string
     mmr?: number
+    twitchId?: string | null
     settings?: { key: string; value: unknown }[]
     error?: unknown
   }
@@ -440,6 +443,7 @@ const PageContent = ({
                 {profile?.mmr != null && profile.mmr > 0 && (
                   <span>⚔ {profile.mmr.toLocaleString()} MMR</span>
                 )}
+                <ProfileWinLossCounter twitchId={profile?.twitchId} />
                 <span>
                   Using Dotabod since{' '}
                   {finalLoading || !profile?.createdAt
@@ -643,6 +647,7 @@ interface UserProfileProps {
     image: string | null
     createdAt: string
     mmr?: number
+    twitchId: string | null
     settings: {
       key: string
       value: unknown
@@ -820,6 +825,11 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
     // Fetch user data
     const userData = await prisma.user.findFirst({
       select: {
+        Account: {
+          select: {
+            providerAccountId: true,
+          },
+        },
         createdAt: true,
         displayName: true,
         id: true,
@@ -945,6 +955,7 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
           name: userData.name,
           settings: userData.settings,
           stream_online: userData.stream_online,
+          twitchId: userData.Account?.providerAccountId ?? null,
         },
         username: username.toLowerCase(),
         collection,

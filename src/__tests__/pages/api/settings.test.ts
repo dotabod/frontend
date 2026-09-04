@@ -88,6 +88,27 @@ describe('settings API', () => {
     expect(res._getJSONData().settings).toEqual([{ key: 'aegis', value: true }])
   })
 
+  it('returns the public Twitch channel id used by the live profile counter', async () => {
+    mockSession()
+    vi.mocked(prisma.user.findFirst).mockResolvedValue({
+      Account: { providerAccountId: 'twitch-id' },
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      displayName: 'Streamer',
+      image: null,
+      name: 'streamer',
+      settings: [],
+      stream_online: false,
+      subscription: [],
+    } as never)
+    const { req, res } = createMocks({ method: 'GET', query: { username: 'streamer' } })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData()).toMatchObject({ twitchId: 'twitch-id' })
+    expect(res._getJSONData()).not.toHaveProperty('Account')
+  })
+
   it('redacts the OBS password when an authenticated user requests a public overlay by id', async () => {
     mockSession({ id: OWNER_ID } as Session['user'])
     const { req, res } = createMocks({ method: 'GET', query: { id: PUBLIC_ID } })

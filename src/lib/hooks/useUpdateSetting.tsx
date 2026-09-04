@@ -56,6 +56,7 @@ interface UserProfileData {
   createdAt: string
   mmr?: number | null
   settings: SettingEntry[]
+  twitchId?: string | null
   error?: unknown
   [key: string]: unknown
 }

@@ -34,7 +34,7 @@ export const whatsNew: WhatsNewEntry[] = [
     id: 'custom-wl-stats-window',
     title: 'Keep your win/loss counter across streams',
     description:
-      "The overlay and !wl still reset each stream by default. Opt into a 1-365 day rolling window when you want a challenge record to continue across streams. !today still shows today's stats.",
+      "The overlay and !wl still reset each stream by default. Set a 1-365 day window for longer challenges, preview your current record, and show the live count on your public profile. !today still shows today's stats.",
     releaseDate: '2026-09-04',
     category: 'overlay',
     command: '!wl',
@@ -43,6 +43,7 @@ export const whatsNew: WhatsNewEntry[] = [
     demoCommand: 'commandWL',
     details: [
       'Leave Stats window blank to keep the familiar reset at every new stream, or enter 1 to 365 days for a challenge that continues across streams. The overlay shows STREAM or a compact 30D-style marker, and !wl states the range in plain language.',
+      'The settings card recalculates your record as you change the window. Your public profile shows the same range and updates after each tracked match.',
       '!resetwl starts the configured window from 0-0 without changing other stream-session commands. !today keeps its one-day hero breakdown.',
     ],
   },
