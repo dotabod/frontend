@@ -37,13 +37,12 @@ describe('Banner', () => {
     slug: 'crypto-payments-launch',
     title: 'Pay with crypto',
     description: 'NOWPayments support',
-    // 2 days before the mocked system time, so it is within the 14-day freshness window
     date: '2025-10-02T12:00:00Z',
   }
 
   beforeEach(() => {
     vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-08-25T12:00:00Z'))
+    vi.setSystemTime(new Date('2026-09-04T12:00:00Z'))
 
     const store: Record<string, string> = {}
     vi.stubGlobal('localStorage', {
@@ -74,12 +73,12 @@ describe('Banner', () => {
 
     const banner = screen.getByRole('complementary', { name: 'Latest Dotabod update' })
     expect(screen.getByText(/New in Dotabod/)).toBeInTheDocument()
-    expect(screen.getByText(/Public match history/)).toBeInTheDocument()
+    expect(screen.getByText(/Keep your win\/loss counter across streams/)).toBeInTheDocument()
     expect(banner).toHaveClass('overflow-hidden', 'bg-gray-800', 'px-6')
     expect(banner.querySelectorAll('.blur-2xl')).toHaveLength(2)
     expect(screen.getByRole('link', { name: /See what's new/ })).toHaveAttribute(
       'href',
-      '/dashboard/whats-new#public-match-history',
+      '/dashboard/whats-new#custom-wl-stats-window',
     )
     expect(screen.getByRole('link', { name: /See what's new/ })).toHaveClass('text-teal-300')
   })
@@ -90,12 +89,12 @@ describe('Banner', () => {
 
     expect(screen.getByRole('link', { name: /See what's new/ })).toHaveAttribute(
       'href',
-      '/whats-new#public-match-history',
+      '/whats-new#custom-wl-stats-window',
     )
   })
 
   it('keeps a newer fresh blog post as the announcement', () => {
-    mockPost({ ...freshPost, date: '2026-08-25T08:00:00Z' })
+    mockPost({ ...freshPost, date: '2026-09-04T08:00:00Z' })
     render(<Banner />)
 
     expect(screen.getByText(/Fresh on the blog/)).toBeInTheDocument()
@@ -118,7 +117,7 @@ describe('Banner', () => {
     expect(screen.queryByText(/New in Dotabod/)).not.toBeInTheDocument()
     expect(localStorage.setItem).toHaveBeenCalledWith(
       'dotabod-banner-dismissed-slug',
-      'whats-new:public-match-history',
+      'whats-new:custom-wl-stats-window',
     )
   })
 })

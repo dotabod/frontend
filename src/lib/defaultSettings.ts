@@ -132,6 +132,8 @@ export const defaultSettings = {
   minimapRight: false,
   mmr: null,
   'mmr-tracker': true,
+  // null keeps the original per-stream counter. A number opts into a rolling window.
+  wlStatsDays: null as number | null,
   'obs-scene-switcher': true,
   'obs-dc': '[dotabod] game disconnected',
   'obs-minimap': '[dotabod] blocking minimap',

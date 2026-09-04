@@ -48,13 +48,16 @@ export const devRank = {
   leaderboard: 0,
   rank: 5500,
 }
-export const devWL = [
-  {
-    lose: 1,
-    type: 'U',
-    win: 5,
-  },
-]
+export const devWL = {
+  records: [
+    {
+      lose: 1,
+      type: 'U',
+      win: 5,
+    },
+  ],
+  statsDays: 30,
+}
 
 export const devRadiantWinChance = {
   time: 256,

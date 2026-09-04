@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -261,11 +261,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         }
 
+        const settingValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
+          validatedBody.key === Settings.wlStatsDays && validatedBody.value === null
+            ? Prisma.JsonNull
+            : (validatedBody.value as Prisma.InputJsonValue)
+
         const post = await prisma.setting.create({
           data: {
             key: validatedBody.key,
             userId: session.user.id,
-            value: validatedBody.value,
+            value: settingValue,
           },
           select: {
             id: true,

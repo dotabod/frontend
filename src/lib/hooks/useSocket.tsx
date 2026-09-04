@@ -38,11 +38,18 @@ export interface WinChance {
   visible: boolean
 }
 
-export type wlType = {
+export interface WLRecord {
   win: number
   lose: number
   type: string
-}[]
+}
+
+export interface WLData {
+  records: WLRecord[]
+  statsDays: number | null
+}
+
+export type wlType = WLData
 
 // Add these type definitions
 interface CourierData {
@@ -347,9 +354,9 @@ export const useSocket = ({
       setRankImageDetails(getRankImage(deets))
     })
 
-    socket.on('update-wl', (records: wlType) => {
+    socket.on('update-wl', (records: WLRecord[], statsDays: number | null = null) => {
       updateLastReceived()
-      setWL(records)
+      setWL({ records, statsDays })
     })
 
     socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {

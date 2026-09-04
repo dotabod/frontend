@@ -9,7 +9,7 @@ import { RestrictFeature } from '@/components/RestrictFeature'
 import { Settings } from '@/lib/defaultSettings'
 import { isDev } from '@/lib/devConsts'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
-import type { wlType } from '@/lib/hooks/useSocket'
+import type { WLRecord, wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
@@ -26,13 +26,10 @@ function WidgetPage() {
   const res = useTransformRes()
   const { wlPosition } = useOverlayPositions()
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
-  const [wl, setWL] = useState([
-    {
-      lose: 0,
-      type: 'U',
-      win: 0,
-    },
-  ])
+  const [wl, setWL] = useState<wlType>({
+    records: [{ lose: 0, type: 'U', win: 0 }],
+    statsDays: null,
+  })
   const [rankImageDetails, setRankImageDetails] = useState<{
     image: string | null
     rank: number | null
@@ -59,11 +56,11 @@ function WidgetPage() {
       auth: { token: userId },
     })
 
-    socket.on('update-wl', (records: wlType) => {
+    socket.on('update-wl', (records: WLRecord[], statsDays: number | null = null) => {
       if (isDev()) {
         return
       }
-      setWL(records)
+      setWL({ records, statsDays })
     })
 
     socket.on('refresh-settings', () => {

@@ -1,27 +1,102 @@
-import clsx from 'clsx'
+import { Form, Input, InputNumber } from 'antd'
+import { useEffect, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
+import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import WinLossCard from './wl/WinLossCard'
 
 export default function WinLossOverlay() {
+  const {
+    data: statsDays,
+    loading: statsDaysLoading,
+    isSaving: statsDaysSaving,
+    updateSetting: updateStatsDays,
+  } = useUpdateSetting<number | null>(Settings.wlStatsDays)
+  const [draftStatsDays, setDraftStatsDays] = useState<number | null>(null)
+  const debouncedUpdateStatsDays = useDebouncedCallback(updateStatsDays, 500)
+
+  useEffect(() => {
+    if (typeof statsDays === 'number' && Number.isFinite(statsDays)) {
+      setDraftStatsDays(statsDays)
+      return
+    }
+
+    setDraftStatsDays(null)
+  }, [statsDays])
+
+  useEffect(() => () => debouncedUpdateStatsDays.cancel(), [debouncedUpdateStatsDays])
+
+  const handleStatsDaysChange = (value: number | null) => {
+    if (value === null) {
+      debouncedUpdateStatsDays.cancel()
+      setDraftStatsDays(null)
+      updateStatsDays(null)
+      return
+    }
+
+    setDraftStatsDays(value)
+    debouncedUpdateStatsDays(value)
+  }
+
   return (
     <Card title='Win/loss'>
       <div className='subtitle'>
-        Show your win/loss ratio on your overlay, in the bottom right corner. Turning this off will
-        also disable the !wl command.
+        Show your win/loss record in the overlay and !wl. Turning this off disables both.
       </div>
 
-      <div className={clsx('py-4 transition-all')}>
-        <div className='flex flex-col items-start space-y-2 md:space-y-3'>
-          <div className='flex items-center space-x-2'>
-            <TierSwitch settingKey={Settings.commandWL} label='Show win/loss' />
-          </div>
-        </div>
+      <div className='py-4'>
+        <TierSwitch settingKey={Settings.commandWL} label='Show win/loss' />
       </div>
 
-      <div className='my-6 flex justify-center space-x-4'>
-        <WinLossCard wl={[{ lose: 5, type: '10-5', win: 10 }]} />
+      <Form layout='vertical' className='max-w-xs'>
+        <Form.Item
+          colon={false}
+          label='Stats window'
+          extra={
+            <div className='space-y-1'>
+              <div aria-live='polite'>
+                {draftStatsDays === null
+                  ? 'This stream · Resets when a new stream starts'
+                  : `Last ${draftStatsDays} ${draftStatsDays === 1 ? 'day' : 'days'} · Keeps counting across streams`}
+              </div>
+              <div>
+                Leave blank for each stream, or enter 1–365 days. !today always shows today's stats.
+              </div>
+            </div>
+          }
+        >
+          {statsDaysLoading ? (
+            <Input aria-label='Stats window' placeholder='Loading...' disabled />
+          ) : (
+            <div className='flex items-center gap-2'>
+              <InputNumber
+                aria-label='Stats window'
+                min={1}
+                max={365}
+                precision={0}
+                placeholder='This stream'
+                className='w-32!'
+                disabled={statsDaysSaving}
+                value={draftStatsDays}
+                onChange={handleStatsDaysChange}
+              />
+              <span className='w-8 text-sm text-gray-400'>
+                {draftStatsDays === null ? null : draftStatsDays === 1 ? 'day' : 'days'}
+              </span>
+            </div>
+          )}
+        </Form.Item>
+      </Form>
+
+      <div className='my-6 flex justify-center'>
+        <WinLossCard
+          wl={{
+            records: [{ lose: 5, type: 'U', win: 10 }],
+            statsDays: draftStatsDays,
+          }}
+        />
       </div>
     </Card>
   )

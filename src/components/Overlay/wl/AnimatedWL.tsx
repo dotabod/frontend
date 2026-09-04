@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import WinLossCard from '@/components/Overlay/wl/WinLossCard'
 import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
+import type { wlType } from '@/lib/hooks/useSocket'
 import { motionProps } from '@/ui/utils'
 
 export const AnimatedWL = ({
@@ -10,7 +11,7 @@ export const AnimatedWL = ({
 }: {
   mainScreen?: boolean
   className?: string
-  wl: { lose: number; type: string; win: number }[]
+  wl: wlType
 }) => {
   const { wlPosition } = useOverlayPositions()
   const style = mainScreen ? { fontSize: wlPosition.fontSize } : {}

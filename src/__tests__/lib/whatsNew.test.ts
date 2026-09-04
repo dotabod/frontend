@@ -13,12 +13,9 @@ const CATEGORIES = ['chat', 'overlay', 'commands', 'pages', 'advanced', 'bets', 
 describe('whatsNew registry', () => {
   it('starts with the newest public-facing release', () => {
     expect(whatsNewSorted[0]).toMatchObject({
-      demo: {
-        exampleLabel: "See dendi's match history",
-        exampleUrl: 'https://dotabod.com/dendi/matches',
-      },
-      id: 'public-match-history',
-      releaseDate: '2026-08-25',
+      blogSlug: 'custom-win-loss-stat-windows',
+      id: 'custom-wl-stats-window',
+      releaseDate: '2026-09-04',
     })
   })
 

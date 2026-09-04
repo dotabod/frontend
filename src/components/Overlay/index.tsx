@@ -26,7 +26,7 @@ import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { useOBS } from '@/lib/hooks/useOBS'
-import { type ChatMessage, useSocket, type WinChance } from '@/lib/hooks/useSocket'
+import { type ChatMessage, useSocket, type WinChance, type wlType } from '@/lib/hooks/useSocket'
 import { useStreamOfflineNotification } from '@/lib/hooks/useStreamOfflineNotification'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
@@ -77,13 +77,10 @@ const OverlayPage = () => {
   const { roshan, setRoshan } = useRoshan()
   const { aegis, setAegis } = useAegis()
   const { notablePlayers, setNotablePlayers } = useNotablePlayers()
-  const [wl, setWL] = useState([
-    {
-      lose: 0,
-      type: 'U',
-      win: 0,
-    },
-  ])
+  const [wl, setWL] = useState<wlType>({
+    records: [{ lose: 0, type: 'U', win: 0 }],
+    statsDays: null,
+  })
   const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])

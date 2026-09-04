@@ -674,7 +674,7 @@ const CommandDetail: Record<
     alias: [],
     allowed: 'mods',
     cmd: '!resetwl',
-    description: 'Resets your win losses to 0-0.',
+    description: "Resets the overlay and !wl record to 0-0 without changing !today's daily stats.",
     response: (props) => (
       <TwitchChat {...props} command='!resetwl' response='Resetting win/loss to 0 for <channel>' />
     ),
@@ -900,16 +900,16 @@ const CommandDetail: Record<
     allowed: 'all',
     cmd: '!wl',
     description:
-      'Says the total wins and losses for current stream duration. Disabling this command will hide these statistics in the stream overlay.',
+      'Shows wins and losses from this stream by default, or from your configured 1-365 day rolling window. Disabling this command also hides the record in the stream overlay.',
     key: 'commandWL',
     response: (props, all = true) => (
       <>
-        <TwitchChat {...props} command='!wl' response='Ranked 0 W - 9 L | -270 MMR' />
+        <TwitchChat {...props} command='!wl' response='Ranked 0 W - 9 L | -270 MMR · This stream' />
         {all && (
           <TwitchChat
             {...props}
             command='!wl'
-            response='Ranked 0 W - 9 L | -270 MMR | Unranked 2 W - 1 L'
+            response='Ranked 0 W - 9 L | -270 MMR · Unranked 2 W - 1 L · Last 30 days'
           />
         )}
       </>

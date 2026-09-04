@@ -1,5 +1,6 @@
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
+import { Prisma } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { getServerSession } from '@/lib/api/getServerSession'
@@ -12,6 +13,9 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/lib/db', () => ({
   default: {
+    setting: {
+      create: vi.fn(),
+    },
     user: {
       findFirst: vi.fn(),
     },
@@ -31,6 +35,7 @@ vi.mock('@/lib/api/getServerSession', () => ({
 }))
 
 vi.mock('@/utils/subscription', () => ({
+  canAccessFeature: vi.fn(() => ({ hasAccess: true, requiredTier: 'FREE' })),
   FEATURE_TIERS: {},
   GRACE_PERIOD_END: new Date('2026-01-01T00:00:00.000Z'),
   getSubscription: vi.fn(),
@@ -69,6 +74,7 @@ describe('settings API', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.mocked(prisma.user.findFirst).mockResolvedValue(createSettingsResult() as never)
+    vi.mocked(prisma.setting.create).mockResolvedValue({ id: 'setting-id' } as never)
   })
 
   it('redacts the OBS password from an unauthenticated public overlay response', async () => {
@@ -104,5 +110,21 @@ describe('settings API', () => {
     expect(res.statusCode).toBe(200)
     expect(res.getHeader('Cache-Control')).toBe('private, no-store')
     expect(res._getJSONData().settings).toEqual(createSettingsResult().settings)
+  })
+
+  it('stores the per-stream WL mode as JSON null', async () => {
+    mockSession({ id: OWNER_ID, isImpersonating: false } as Session['user'])
+    const { req, res } = createMocks({
+      body: JSON.stringify({ key: 'wlStatsDays', value: null }) as never,
+      method: 'POST',
+    })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(prisma.setting.create).toHaveBeenCalledWith({
+      data: { key: 'wlStatsDays', userId: OWNER_ID, value: Prisma.JsonNull },
+      select: { id: true },
+    })
   })
 })

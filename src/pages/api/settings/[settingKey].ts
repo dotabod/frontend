@@ -1,4 +1,5 @@
 import { captureException } from '@sentry/nextjs'
+import { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
 import { getServerSession } from '@/lib/api/getServerSession'
@@ -107,16 +108,21 @@ async function handlePatchRequest(
       return res.status(200).json({ status: 'ok' })
     }
 
+    const settingValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
+      settingKey === Settings.wlStatsDays && validatedBody.value === null
+        ? Prisma.JsonNull
+        : (validatedBody.value as Prisma.InputJsonValue)
+
     await prisma.setting.upsert({
       create: {
         key: validatedBody.key,
         updatedAt: new Date(),
         userId,
-        value: validatedBody.value,
+        value: settingValue,
       },
       update: {
         updatedAt: new Date(),
-        value: validatedBody.value,
+        value: settingValue,
       },
       where: {
         key_userId: {

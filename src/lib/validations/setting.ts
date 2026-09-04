@@ -116,6 +116,7 @@ const settingsSchema = {
   translationLanguage: z.string().max(5),
   winProbabilityOverlay: z.boolean(),
   winProbabilityOverlayIntervalMinutes: z.number().min(0).max(60),
+  wlStatsDays: z.number().int().min(1).max(365).nullable(),
 }
 
 type SettingKeys = keyof typeof settingsSchema

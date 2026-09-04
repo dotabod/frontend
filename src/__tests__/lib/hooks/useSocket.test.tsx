@@ -105,6 +105,70 @@ describe('useSocket', () => {
     expect(socketState.mutate).toHaveBeenCalledTimes(2)
   })
 
+  it('stores the WL records with the stats window sent by the server', () => {
+    const setWL = vi.fn()
+
+    const TestComponent = () => {
+      useSocket({
+        setAegis: vi.fn(),
+        setBetData: vi.fn(),
+        setBlock: vi.fn(),
+        setChatMessages: vi.fn(),
+        setConnected: vi.fn(),
+        setNotablePlayers: vi.fn(),
+        setPaused: vi.fn(),
+        setPollData: vi.fn(),
+        setRadiantWinChance: vi.fn(),
+        setRankImageDetails: vi.fn(),
+        setRoshan: vi.fn(),
+        setWL,
+      })
+
+      return null
+    }
+
+    render(<TestComponent />)
+
+    const records = [{ lose: 5, type: 'R', win: 10 }]
+    act(() => {
+      socketState.handlers.get('update-wl')?.(records, 30)
+    })
+
+    expect(setWL).toHaveBeenCalledWith({ records, statsDays: 30 })
+  })
+
+  it('treats legacy WL socket updates without a window as this stream', () => {
+    const setWL = vi.fn()
+
+    const TestComponent = () => {
+      useSocket({
+        setAegis: vi.fn(),
+        setBetData: vi.fn(),
+        setBlock: vi.fn(),
+        setChatMessages: vi.fn(),
+        setConnected: vi.fn(),
+        setNotablePlayers: vi.fn(),
+        setPaused: vi.fn(),
+        setPollData: vi.fn(),
+        setRadiantWinChance: vi.fn(),
+        setRankImageDetails: vi.fn(),
+        setRoshan: vi.fn(),
+        setWL,
+      })
+
+      return null
+    }
+
+    render(<TestComponent />)
+
+    const records = [{ lose: 5, type: 'R', win: 10 }]
+    act(() => {
+      socketState.handlers.get('update-wl')?.(records)
+    })
+
+    expect(setWL).toHaveBeenCalledWith({ records, statsDays: null })
+  })
+
   it('normalizes the legacy empty block state to the main-screen state', () => {
     const setBlock = vi.fn()
 

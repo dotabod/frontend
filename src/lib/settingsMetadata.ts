@@ -171,6 +171,14 @@ export const settingsMetadata: SettingMetadata[] = [
   },
   {
     category: 'overlay',
+    description: 'Count this stream or keep a rolling record across streams',
+    key: 'wlStatsDays',
+    label: 'Win/loss stats window',
+    page: { path: '/dashboard/features/overlay', section: 'wl' },
+    searchTerms: ['win', 'loss', 'wl', 'record', 'stats', 'days', 'challenge', 'stream'],
+  },
+  {
+    category: 'overlay',
     description: 'Display current MMR on stream',
     key: 'mmr-overlay',
     label: 'MMR Overlay',

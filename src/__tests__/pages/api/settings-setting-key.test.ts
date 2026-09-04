@@ -1,5 +1,6 @@
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
+import { Prisma } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import handler from '@/pages/api/settings/[settingKey]'
@@ -162,6 +163,49 @@ describe('settings/[settingKey] API', () => {
       })
       // Only autoOptInNewFeatures=false triggers the freeze logic.
       expect(prisma.setting.findMany).not.toHaveBeenCalled()
+    })
+
+    it('accepts a WL stats window from 1 to 365 days', async () => {
+      mockSession()
+      const { req, res } = patchRequest('wlStatsDays', 30)
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(prisma.setting.upsert).toHaveBeenCalledWith({
+        create: { key: 'wlStatsDays', updatedAt: expect.any(Date), userId: USER_ID, value: 30 },
+        update: { updatedAt: expect.any(Date), value: 30 },
+        where: { key_userId: { key: 'wlStatsDays', userId: USER_ID } },
+      })
+    })
+
+    it('accepts null to keep WL stats scoped to this stream', async () => {
+      mockSession()
+      const { req, res } = patchRequest('wlStatsDays', null)
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(prisma.setting.upsert).toHaveBeenCalledWith({
+        create: {
+          key: 'wlStatsDays',
+          updatedAt: expect.any(Date),
+          userId: USER_ID,
+          value: Prisma.JsonNull,
+        },
+        update: { updatedAt: expect.any(Date), value: Prisma.JsonNull },
+        where: { key_userId: { key: 'wlStatsDays', userId: USER_ID } },
+      })
+    })
+
+    it('rejects a WL stats window longer than 365 days', async () => {
+      mockSession()
+      const { req, res } = patchRequest('wlStatsDays', 366)
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(422)
+      expect(prisma.setting.upsert).not.toHaveBeenCalled()
     })
 
     describe('freeze-on-disable for autoOptInNewFeatures', () => {
