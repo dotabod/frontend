@@ -1,6 +1,8 @@
-import '@testing-library/jest-dom/vitest'
+import * as matchers from '@testing-library/jest-dom/matchers'
 import React from 'react'
-import { vi } from 'vite-plus/test'
+import { expect, vi } from 'vite-plus/test'
+
+expect.extend(matchers)
 
 // Mock the framer-motion
 vi.mock('framer-motion', () => ({
@@ -41,7 +43,7 @@ interface MockFetchOptions {
 }
 
 // Helper function to create fetch responses
-global.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) =>
+globalThis.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) =>
   ({
     arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
     blob: () => Promise.resolve(new Blob([])),
@@ -63,18 +65,18 @@ global.createFetchResponse = (data: unknown, options: MockFetchOptions = {}) =>
   }) as unknown as Response
 
 // Add global fetch mock helper
-global.mockFetch = (response: unknown, options: MockFetchOptions = {}) => {
-  global.fetch = vi.fn().mockResolvedValue(createFetchResponse(response, options))
+globalThis.mockFetch = (response: unknown, options: MockFetchOptions = {}) => {
+  globalThis.fetch = vi.fn().mockResolvedValue(createFetchResponse(response, options))
 }
 
 // Add global fetch error mock helper
-global.mockFetchError = (errorMessage: string) => {
-  global.fetch = vi.fn().mockRejectedValue(new Error(errorMessage))
+globalThis.mockFetchError = (errorMessage: string) => {
+  globalThis.fetch = vi.fn().mockRejectedValue(new Error(errorMessage))
 }
 
 // Add global fetch network error mock helper
-global.mockFetchNetworkError = () => {
-  global.fetch = vi.fn().mockRejectedValue(new TypeError('Network request failed'))
+globalThis.mockFetchNetworkError = () => {
+  globalThis.fetch = vi.fn().mockRejectedValue(new TypeError('Network request failed'))
 }
 
 // Add type definitions for the global helpers

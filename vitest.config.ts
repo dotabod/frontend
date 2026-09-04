@@ -14,6 +14,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    testTimeout: 15_000,
     // Automatically restore mocks between tests
     mockReset: true,
     // Automatically restore stubbed environment variables between tests

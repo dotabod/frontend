@@ -480,13 +480,7 @@ describe('Stripe webhook handler', () => {
       })
 
       // Replace the mocked handler temporarily
-      const originalHandler = handler
-      vi.mocked(handler).mockImplementation(mockHandler)
-
-      await handler(req, res)
-
-      // Restore the original handler
-      vi.mocked(handler).mockImplementation(originalHandler)
+      await vi.mocked(handler).withImplementation(mockHandler, () => handler(req, res))
 
       expect(res.statusCode).toBe(200)
       expect(res._getJSONData()).toEqual({
@@ -520,13 +514,7 @@ describe('Stripe webhook handler', () => {
       })
 
       // Replace the mocked handler temporarily
-      const originalHandler = handler
-      vi.mocked(handler).mockImplementation(mockHandler)
-
-      await handler(req, res)
-
-      // Restore the original handler
-      vi.mocked(handler).mockImplementation(originalHandler)
+      await vi.mocked(handler).withImplementation(mockHandler, () => handler(req, res))
 
       expect(res.statusCode).toBe(500)
       expect(res._getJSONData()).toEqual({
