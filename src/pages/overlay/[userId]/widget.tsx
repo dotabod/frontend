@@ -56,12 +56,19 @@ function WidgetPage() {
       auth: { token: userId },
     })
 
-    socket.on('update-wl', (records: WLRecord[], statsDays: number | null = null) => {
-      if (isDev()) {
-        return
-      }
-      setWL({ records, statsDays })
-    })
+    socket.on(
+      'update-wl',
+      (
+        records: WLRecord[],
+        statsDays: number | null = null,
+        statsDaysTotal: number | null = null,
+      ) => {
+        if (isDev()) {
+          return
+        }
+        setWL({ records, statsDays, statsDaysTotal })
+      },
+    )
 
     socket.on('refresh-settings', () => {
       mutate()

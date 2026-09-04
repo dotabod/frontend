@@ -47,6 +47,7 @@ export interface WLRecord {
 export interface WLData {
   records: WLRecord[]
   statsDays: number | null
+  statsDaysTotal?: number | null
 }
 
 export type wlType = WLData
@@ -358,10 +359,17 @@ export const useSocket = ({
       setRankImageDetails(getRankImage(deets))
     })
 
-    socket.on('update-wl', (records: WLRecord[], statsDays: number | null = null) => {
-      updateLastReceived()
-      setWL({ records, statsDays })
-    })
+    socket.on(
+      'update-wl',
+      (
+        records: WLRecord[],
+        statsDays: number | null = null,
+        statsDaysTotal: number | null = null,
+      ) => {
+        updateLastReceived()
+        setWL({ records, statsDays, statsDaysTotal })
+      },
+    )
 
     socket.on('update-radiant-win-chance', (chanceDetails: WinChance) => {
       updateLastReceived()

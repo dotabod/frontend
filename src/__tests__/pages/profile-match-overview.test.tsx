@@ -17,7 +17,8 @@ const socketState = vi.hoisted(() => {
       if (event !== 'request-wl') return
       callback({
         records: [{ lose: 3, type: 'R', win: 8 }],
-        statsDays: 30,
+        statsDays: 14,
+        statsDaysTotal: 30,
       })
     }),
     off: vi.fn(),
@@ -257,13 +258,13 @@ describe('public profile match overview', () => {
   it('shows the configured WL window and updates the counter after a match', () => {
     render(<ProfilePage {...baseProps} />)
 
-    expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL8 W - 3 LLast 30 days')
+    expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL8 W - 3 L14 of 30 days')
 
     act(() => {
-      socketState.handlers.get('update-wl')?.([{ lose: 3, type: 'R', win: 9 }], 30)
+      socketState.handlers.get('update-wl')?.([{ lose: 3, type: 'R', win: 9 }], 14, 30)
     })
 
-    expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL9 W - 3 LLast 30 days')
+    expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL9 W - 3 L14 of 30 days')
   })
 
   it('summarizes the most played heroes and links to all hero win rates', () => {

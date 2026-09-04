@@ -3,12 +3,18 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 
 const updateStatsDays = vi.hoisted(() => vi.fn())
-const settingsState = vi.hoisted<{ statsDays: number | null }>(() => ({ statsDays: 7 }))
+const updateStatsStartDate = vi.hoisted(() => vi.fn())
+const settingsState = vi.hoisted<{ statsDays: number | null; statsStartDate: string | null }>(
+  () => ({
+    statsDays: 30,
+    statsStartDate: '2026-08-21',
+  }),
+)
 const socketState = vi.hoisted(() => {
   const handlers = new Map<string, (...args: unknown[]) => void>()
   const pendingResponses: Array<{
     callback: (response: unknown) => void
-    request: { statsDays?: number | null }
+    request: { statsDays?: number | null; statsStartDate?: string | null }
   }> = []
   const control: {
     autoRespond: boolean
@@ -20,7 +26,7 @@ const socketState = vi.hoisted(() => {
     emit: vi.fn(
       (
         event: string,
-        request: { statsDays?: number | null },
+        request: { statsDays?: number | null; statsStartDate?: string | null },
         callback: (response: unknown) => void,
       ) => {
         if (event !== 'request-wl') return
@@ -29,9 +35,11 @@ const socketState = vi.hoisted(() => {
           return
         }
         const statsDays = request.statsDays ?? null
+        const statsDaysTotal = request.statsStartDate ? statsDays : null
         callback({
-          records: control.records ?? [{ lose: 4, type: 'R', win: statsDays ?? 12 }],
-          statsDays,
+          records: control.records ?? [{ lose: 4, type: 'R', win: statsDaysTotal ? 14 : 12 }],
+          statsDays: statsDaysTotal ? 14 : statsDays,
+          statsDaysTotal,
         })
       },
     ),
@@ -55,9 +63,19 @@ vi.mock('socket.io-client', () => ({
 
 vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   useUpdateSetting: (key?: string) => ({
-    data: key === 'wlStatsDays' ? settingsState.statsDays : true,
+    data:
+      key === 'wlStatsDays'
+        ? settingsState.statsDays
+        : key === 'wlStatsStartDate'
+          ? settingsState.statsStartDate
+          : true,
     loading: false,
-    updateSetting: key === 'wlStatsDays' ? updateStatsDays : vi.fn(),
+    updateSetting:
+      key === 'wlStatsDays'
+        ? updateStatsDays
+        : key === 'wlStatsStartDate'
+          ? updateStatsStartDate
+          : vi.fn(),
   }),
 }))
 
@@ -69,11 +87,19 @@ vi.mock('@/components/Overlay/wl/WinLossCard', () => ({
   default: ({
     wl,
   }: {
-    wl: { records: Array<{ lose: number; win: number }>; statsDays: number | null }
+    wl: {
+      records: Array<{ lose: number; win: number }>
+      statsDays: number | null
+      statsDaysTotal?: number | null
+    }
   }) => (
     <div data-testid='preview-window'>
       {wl.records[0].win} W - {wl.records[0].lose} L ·{' '}
-      {wl.statsDays === null ? 'stream' : wl.statsDays}
+      {wl.statsDays === null
+        ? 'stream'
+        : wl.statsDaysTotal
+          ? `${wl.statsDays}/${wl.statsDaysTotal}`
+          : wl.statsDays}
     </div>
   ),
 }))
@@ -91,7 +117,9 @@ describe('WinLossOverlay', () => {
   afterEach(() => {
     vi.useRealTimers()
     updateStatsDays.mockReset()
-    settingsState.statsDays = 7
+    updateStatsStartDate.mockReset()
+    settingsState.statsDays = 30
+    settingsState.statsStartDate = '2026-08-21'
     socketState.handlers.clear()
     socketState.pendingResponses.length = 0
     socketState.control.autoRespond = true
@@ -107,94 +135,65 @@ describe('WinLossOverlay', () => {
   it("previews the user's current WL instead of a sample record", () => {
     render(<WinLossOverlay />)
 
-    expect(screen.getByTestId('preview-window')).toHaveTextContent('7 W - 4 L · 7')
+    expect(screen.getByTestId('preview-window')).toHaveTextContent('14 W - 4 L · 14/30')
     expect(socketState.io).toHaveBeenCalledWith(
       process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL,
       expect.objectContaining({ auth: { client: 'win-loss', token: 'user-1' } }),
     )
   })
 
-  it('saves the rolling number of days used by the overlay and !wl', () => {
-    vi.useFakeTimers()
+  it('saves a fixed challenge start date and duration together', () => {
     render(<WinLossOverlay />)
 
-    const input = screen.getByRole('spinbutton', { name: 'Stats window' })
-    expect(input).toHaveValue('7')
-
-    fireEvent.change(input, { target: { value: '30' } })
-
-    expect(updateStatsDays).not.toHaveBeenCalled()
-    act(() => {
-      vi.advanceTimersByTime(500)
+    fireEvent.change(screen.getByLabelText('Challenge start date'), {
+      target: { value: '2026-08-20' },
     })
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Challenge duration' }), {
+      target: { value: '45' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save challenge' }))
 
-    expect(updateStatsDays).toHaveBeenCalledWith(30)
-    expect(screen.getByTestId('preview-window')).toHaveTextContent('30 W - 4 L · 30')
-    expect(screen.getByText(/Last 30 days.*keeps counting across streams/i)).toBeInTheDocument()
-    expect(screen.getByText(/!today always shows today's stats/i)).toBeInTheDocument()
+    expect(updateStatsStartDate).toHaveBeenCalledWith('2026-08-20')
+    expect(updateStatsDays).toHaveBeenCalledWith(45)
+    expect(screen.getByText(/ends automatically.*returns to per-stream/i)).toBeInTheDocument()
   })
 
-  it('keeps the newest preview when an older request finishes later', () => {
+  it('requests the preview with the fixed challenge boundaries', () => {
     socketState.control.autoRespond = false
     render(<WinLossOverlay />)
 
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Stats window' }), {
-      target: { value: '30' },
-    })
-
     expect(socketState.pendingResponses.map(({ request }) => request)).toEqual([
-      { statsDays: 7 },
-      { statsDays: 30 },
+      { statsDays: 30, statsStartDate: '2026-08-21' },
     ])
 
     act(() => {
-      socketState.pendingResponses[1].callback({
-        records: [{ lose: 4, type: 'R', win: 30 }],
-        statsDays: 30,
-      })
-    })
-    expect(screen.getByTestId('preview-window')).toHaveTextContent('30 W - 4 L · 30')
-
-    act(() => {
       socketState.pendingResponses[0].callback({
-        records: [{ lose: 4, type: 'R', win: 7 }],
-        statsDays: 7,
+        records: [{ lose: 4, type: 'R', win: 30 }],
+        statsDays: 14,
+        statsDaysTotal: 30,
       })
     })
-    expect(screen.getByTestId('preview-window')).toHaveTextContent('30 W - 4 L · 30')
+    expect(screen.getByTestId('preview-window')).toHaveTextContent('30 W - 4 L · 14/30')
   })
 
-  it('keeps existing users per stream with a clearly explained blank value', () => {
+  it('keeps users per stream when no challenge is configured', () => {
     settingsState.statsDays = null
+    settingsState.statsStartDate = null
     render(<WinLossOverlay />)
 
-    const input = screen.getByRole('spinbutton', { name: 'Stats window' })
-    expect(input).toHaveValue('')
-    expect(input).toHaveAttribute('placeholder', 'This stream')
-    expect(input).toHaveAttribute('aria-valuemin', '1')
-    expect(input).toHaveAttribute('aria-valuemax', '365')
-    expect(screen.getByText(/This stream.*resets when a new stream starts/i)).toBeInTheDocument()
-    expect(screen.getByText(/Leave blank for each stream.*enter 1.*365 days/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/No challenge active.*resets when a new stream starts/i),
+    ).toBeInTheDocument()
     expect(screen.getByTestId('preview-window')).toHaveTextContent('12 W - 4 L · stream')
   })
 
-  it('clears a rolling counter back to per-stream mode without saving a queued day value', () => {
-    vi.useFakeTimers()
+  it('ends a challenge and returns the counter to per-stream mode', () => {
     render(<WinLossOverlay />)
 
-    const input = screen.getByRole('spinbutton', { name: 'Stats window' })
-    fireEvent.change(input, { target: { value: '30' } })
-    fireEvent.change(input, { target: { value: '' } })
+    fireEvent.click(screen.getByRole('button', { name: 'End challenge' }))
 
+    expect(updateStatsStartDate).toHaveBeenCalledWith(null)
     expect(updateStatsDays).toHaveBeenCalledWith(null)
-    expect(input).toHaveValue('')
-    expect(screen.getByTestId('preview-window')).toHaveTextContent('12 W - 4 L · stream')
-
-    act(() => {
-      vi.advanceTimersByTime(500)
-    })
-
-    expect(updateStatsDays).toHaveBeenCalledTimes(1)
   })
 
   it('adds a ranked win correction and immediately reloads the shared WL total', async () => {

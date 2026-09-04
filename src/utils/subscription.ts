@@ -82,6 +82,7 @@ export const FEATURE_TIERS: Record<SettingKeys | ChatterSettingKeys, Subscriptio
   commandOnline: SUBSCRIPTION_TIERS.FREE,
   commandWL: SUBSCRIPTION_TIERS.FREE,
   wlStatsDays: SUBSCRIPTION_TIERS.FREE,
+  wlStatsStartDate: SUBSCRIPTION_TIERS.FREE,
   commandRanked: SUBSCRIPTION_TIERS.FREE,
   commandRosh: SUBSCRIPTION_TIERS.PRO,
   'chatters.midas': SUBSCRIPTION_TIERS.PRO,

@@ -131,10 +131,10 @@ describe('useSocket', () => {
 
     const records = [{ lose: 5, type: 'R', win: 10 }]
     act(() => {
-      socketState.handlers.get('update-wl')?.(records, 30)
+      socketState.handlers.get('update-wl')?.(records, 14, 30)
     })
 
-    expect(setWL).toHaveBeenCalledWith({ records, statsDays: 30 })
+    expect(setWL).toHaveBeenCalledWith({ records, statsDays: 14, statsDaysTotal: 30 })
   })
 
   it('treats legacy WL socket updates without a window as this stream', () => {
@@ -166,7 +166,7 @@ describe('useSocket', () => {
       socketState.handlers.get('update-wl')?.(records)
     })
 
-    expect(setWL).toHaveBeenCalledWith({ records, statsDays: null })
+    expect(setWL).toHaveBeenCalledWith({ records, statsDays: null, statsDaysTotal: null })
   })
 
   it('normalizes the legacy empty block state to the main-screen state', () => {

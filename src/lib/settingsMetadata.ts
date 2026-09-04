@@ -171,11 +171,19 @@ export const settingsMetadata: SettingMetadata[] = [
   },
   {
     category: 'overlay',
-    description: 'Count this stream or keep a rolling record across streams',
+    description: 'Set the duration of a fixed win/loss challenge',
     key: 'wlStatsDays',
     label: 'Win/loss stats window',
     page: { path: '/dashboard/features/overlay', section: 'wl' },
-    searchTerms: ['win', 'loss', 'wl', 'record', 'stats', 'days', 'challenge', 'stream'],
+    searchTerms: ['win', 'loss', 'wl', 'record', 'stats', 'days', 'challenge', 'duration'],
+  },
+  {
+    category: 'overlay',
+    description: 'Set the date a win/loss challenge begins',
+    key: 'wlStatsStartDate',
+    label: 'Win/loss challenge start date',
+    page: { path: '/dashboard/features/overlay', section: 'wl' },
+    searchTerms: ['win', 'loss', 'wl', 'record', 'stats', 'date', 'challenge', 'start'],
   },
   {
     category: 'overlay',

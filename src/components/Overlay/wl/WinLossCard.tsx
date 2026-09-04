@@ -19,12 +19,18 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
   }
   const fontSize = res({ h: 18 })
   const windowFontSize = Math.max(res({ h: 12 }), 10)
-  const windowLabel =
-    wl.statsDays === null
-      ? 'This stream'
-      : `Last ${wl.statsDays} ${wl.statsDays === 1 ? 'day' : 'days'}`
-  const windowMarker =
-    wl.statsDays === null ? 'STREAM' : `${wl.statsDays} ${wl.statsDays === 1 ? 'DAY' : 'DAYS'}`
+  const windowLabel = (() => {
+    if (wl.statsDays === null) return 'This stream'
+    if (wl.statsDaysTotal) {
+      return `${wl.statsDays} of ${wl.statsDaysTotal} challenge days elapsed`
+    }
+    return `Last ${wl.statsDays} ${wl.statsDays === 1 ? 'day' : 'days'}`
+  })()
+  const windowMarker = (() => {
+    if (wl.statsDays === null) return 'STREAM'
+    if (wl.statsDaysTotal) return `${wl.statsDays} OF ${wl.statsDaysTotal} DAYS`
+    return `${wl.statsDays} ${wl.statsDays === 1 ? 'DAY' : 'DAYS'}`
+  })()
 
   return (
     <Card

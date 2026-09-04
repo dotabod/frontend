@@ -109,7 +109,8 @@ async function handlePatchRequest(
     }
 
     const settingValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
-      settingKey === Settings.wlStatsDays && validatedBody.value === null
+      [Settings.wlStatsDays, Settings.wlStatsStartDate].includes(settingKey as never) &&
+      validatedBody.value === null
         ? Prisma.JsonNull
         : (validatedBody.value as Prisma.InputJsonValue)
 

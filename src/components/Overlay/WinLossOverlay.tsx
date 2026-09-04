@@ -1,13 +1,18 @@
 import { Button, Form, Input, InputNumber, Radio, Skeleton } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWinLoss } from '@/lib/hooks/useWinLoss'
 import { Card } from '@/ui/card'
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import WinLossCard from './wl/WinLossCard'
+
+function getChallengeEndDate(startDate: string, durationDays: number): string {
+  const endDate = new Date(`${startDate}T00:00:00.000Z`)
+  endDate.setUTCDate(endDate.getUTCDate() + durationDays)
+  return endDate.toISOString().slice(0, 10)
+}
 
 export default function WinLossOverlay() {
   const userId = useSession().data?.user?.id
@@ -17,13 +22,21 @@ export default function WinLossOverlay() {
     isSaving: statsDaysSaving,
     updateSetting: updateStatsDays,
   } = useUpdateSetting<number | null>(Settings.wlStatsDays)
+  const {
+    data: statsStartDate,
+    loading: statsStartDateLoading,
+    isSaving: statsStartDateSaving,
+    updateSetting: updateStatsStartDate,
+  } = useUpdateSetting<string | null>(Settings.wlStatsStartDate)
   const [draftStatsDays, setDraftStatsDays] = useState<number | null>(() =>
     typeof statsDays === 'number' && Number.isFinite(statsDays) ? statsDays : null,
+  )
+  const [draftStatsStartDate, setDraftStatsStartDate] = useState<string | null>(() =>
+    typeof statsStartDate === 'string' ? statsStartDate : null,
   )
   const [adjustmentLobbyType, setAdjustmentLobbyType] = useState<0 | 7>(7)
   const [adjustmentSaving, setAdjustmentSaving] = useState(false)
   const [adjustmentError, setAdjustmentError] = useState<string | null>(null)
-  const debouncedUpdateStatsDays = useDebouncedCallback(updateStatsDays, 500)
   const {
     error: previewError,
     loading: previewLoading,
@@ -31,7 +44,8 @@ export default function WinLossOverlay() {
     wl,
   } = useWinLoss({
     statsDays: draftStatsDays,
-    userId: statsDaysLoading ? null : userId,
+    statsStartDate: draftStatsStartDate,
+    userId: statsDaysLoading || statsStartDateLoading ? null : userId,
   })
 
   useEffect(() => {
@@ -43,18 +57,24 @@ export default function WinLossOverlay() {
     setDraftStatsDays(null)
   }, [statsDays])
 
-  useEffect(() => () => debouncedUpdateStatsDays.cancel(), [debouncedUpdateStatsDays])
+  useEffect(() => {
+    setDraftStatsStartDate(typeof statsStartDate === 'string' ? statsStartDate : null)
+  }, [statsStartDate])
 
-  const handleStatsDaysChange = (value: number | null) => {
-    if (value === null) {
-      debouncedUpdateStatsDays.cancel()
-      setDraftStatsDays(null)
-      updateStatsDays(null)
-      return
-    }
+  const challengeConfigured = draftStatsDays !== null && draftStatsStartDate !== null
+  const settingsSaving = statsDaysSaving || statsStartDateSaving
 
-    setDraftStatsDays(value)
-    debouncedUpdateStatsDays(value)
+  const saveChallenge = () => {
+    if (!challengeConfigured) return
+    updateStatsStartDate(draftStatsStartDate)
+    updateStatsDays(draftStatsDays)
+  }
+
+  const endChallenge = () => {
+    setDraftStatsDays(null)
+    setDraftStatsStartDate(null)
+    updateStatsStartDate(null)
+    updateStatsDays(null)
   }
 
   const adjustWinLoss = async (won: boolean, delta: -1 | 1) => {
@@ -92,52 +112,65 @@ export default function WinLossOverlay() {
         <TierSwitch settingKey={Settings.commandWL} label='Show win/loss' />
       </div>
 
-      <Form layout='vertical' className='max-w-xs'>
-        <Form.Item
-          colon={false}
-          label='Stats window'
-          extra={
-            <div className='space-y-1'>
-              <div aria-live='polite'>
-                {draftStatsDays === null
-                  ? 'This stream · Resets when a new stream starts'
-                  : `Last ${draftStatsDays} ${draftStatsDays === 1 ? 'day' : 'days'} · Keeps counting across streams`}
-              </div>
-              <div>
-                Leave blank for each stream, or enter 1–365 days. !today always shows today's stats.
-              </div>
-            </div>
-          }
-        >
-          {statsDaysLoading ? (
-            <Input aria-label='Stats window' placeholder='Loading...' disabled />
-          ) : (
-            <div className='flex items-center gap-2'>
-              <InputNumber
-                aria-label='Stats window'
-                min={1}
-                max={365}
-                precision={0}
-                placeholder='This stream'
-                className='w-32!'
-                disabled={statsDaysSaving}
-                value={draftStatsDays}
-                onChange={handleStatsDaysChange}
+      <div className='mb-6 max-w-md'>
+        <div className='mb-1 text-sm font-medium'>Challenge window</div>
+        <p aria-live='polite' className='mb-3 text-sm text-gray-400'>
+          {challengeConfigured
+            ? `Counts matches from ${draftStatsStartDate} until ${getChallengeEndDate(draftStatsStartDate, draftStatsDays)}. It ends automatically and returns to per-stream stats.`
+            : 'No challenge active. The counter resets when a new stream starts.'}
+        </p>
+        <Form layout='vertical'>
+          <div className='grid gap-3 sm:grid-cols-[minmax(0,1fr)_9rem]'>
+            <Form.Item colon={false} label='Challenge start date' className='mb-0'>
+              <Input
+                aria-label='Challenge start date'
+                disabled={statsStartDateLoading || settingsSaving}
+                type='date'
+                value={draftStatsStartDate ?? ''}
+                onChange={(event) => setDraftStatsStartDate(event.target.value || null)}
               />
-              <span className='w-8 text-sm text-gray-400'>
-                {draftStatsDays === null ? null : draftStatsDays === 1 ? 'day' : 'days'}
-              </span>
-            </div>
-          )}
-        </Form.Item>
-      </Form>
+            </Form.Item>
+            <Form.Item colon={false} label='Duration' className='mb-0'>
+              <InputNumber
+                aria-label='Challenge duration'
+                className='w-full!'
+                disabled={statsDaysLoading || settingsSaving}
+                max={365}
+                min={1}
+                placeholder='30 days'
+                precision={0}
+                value={draftStatsDays}
+                onChange={setDraftStatsDays}
+              />
+            </Form.Item>
+          </div>
+          <div className='mt-3 flex flex-wrap gap-2'>
+            <Button
+              disabled={!challengeConfigured || settingsSaving}
+              loading={settingsSaving}
+              onClick={saveChallenge}
+              type='primary'
+            >
+              Save challenge
+            </Button>
+            {(statsDays !== null || statsStartDate !== null) && (
+              <Button disabled={settingsSaving} onClick={endChallenge}>
+                End challenge
+              </Button>
+            )}
+          </div>
+        </Form>
+        <p className='mt-2 text-xs text-gray-500'>
+          Choose 1–365 days. !today still reports today only.
+        </p>
+      </div>
 
       <fieldset className='max-w-md border-0 p-0'>
         <legend className='mb-1 text-sm font-medium'>Manual corrections</legend>
         <p className='mb-3 text-sm text-gray-400'>
           Add games played off stream or correct a missed result. Dotabod stores only this
-          correction, not your offline match history. It follows the same stats window and reset as
-          the counter.
+          correction, not your offline match history. It follows the active challenge or per-stream
+          counter.
         </p>
         <Radio.Group
           aria-label='Correction match type'

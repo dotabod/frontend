@@ -268,7 +268,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
         const settingValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
-          validatedBody.key === Settings.wlStatsDays && validatedBody.value === null
+          [Settings.wlStatsDays, Settings.wlStatsStartDate].includes(validatedBody.key as never) &&
+          validatedBody.value === null
             ? Prisma.JsonNull
             : (validatedBody.value as Prisma.InputJsonValue)
 

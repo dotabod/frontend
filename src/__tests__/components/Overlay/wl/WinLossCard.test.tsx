@@ -20,12 +20,13 @@ describe('WinLossCard', () => {
             { lose: 2, type: 'U', win: 3 },
           ],
           statsDays: 14,
+          statsDaysTotal: 30,
         }}
       />,
     )
 
-    expect(screen.getAllByText('14 DAYS')).toHaveLength(1)
-    const windowMarker = screen.getByLabelText('Last 14 days')
+    expect(screen.getAllByText('14 OF 30 DAYS')).toHaveLength(1)
+    const windowMarker = screen.getByLabelText('14 of 30 challenge days elapsed')
     expect(windowMarker).toBeInTheDocument()
     expect(windowMarker.parentElement).toHaveClass('flex-col', 'items-end')
     expect(screen.getByText('R')).toBeInTheDocument()

@@ -10,6 +10,7 @@ type WinLossResponse =
 
 interface UseWinLossOptions {
   statsDays?: number | null
+  statsStartDate?: string | null
   twitchId?: string | null
   userId?: string | null
 }
@@ -18,19 +19,21 @@ function isWinLossData(response: WinLossResponse): response is WLData {
   return 'records' in response && Array.isArray(response.records)
 }
 
-export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
+export function useWinLoss({ statsDays, statsStartDate, twitchId, userId }: UseWinLossOptions) {
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [wl, setWL] = useState<WLData | null>(null)
   const socketRef = useRef<Socket | null>(null)
   const statsDaysRef = useRef(statsDays)
+  const statsStartDateRef = useRef(statsStartDate)
   const lastRequestedWindowRef = useRef<string | null>(null)
   const requestIdRef = useRef(0)
   const requestCurrentWLRef = useRef<((force?: boolean) => void) | null>(null)
   const isPreview = userId != null
 
   statsDaysRef.current = statsDays
+  statsStartDateRef.current = statsStartDate
 
   useEffect(() => {
     const identifier = isPreview ? userId : twitchId
@@ -53,14 +56,20 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
 
     const requestCurrentWL = (force = false) => {
       const currentStatsDays = statsDaysRef.current
-      const requestKey = currentStatsDays === undefined ? 'configured' : String(currentStatsDays)
+      const currentStatsStartDate = statsStartDateRef.current
+      const requestKey =
+        currentStatsDays === undefined && currentStatsStartDate === undefined
+          ? 'configured'
+          : `${String(currentStatsDays)}:${String(currentStatsStartDate)}`
       if (!force && lastRequestedWindowRef.current === requestKey) return
 
       lastRequestedWindowRef.current = requestKey
       const requestId = ++requestIdRef.current
       socket.emit(
         'request-wl',
-        currentStatsDays === undefined ? {} : { statsDays: currentStatsDays },
+        currentStatsDays === undefined && currentStatsStartDate === undefined
+          ? {}
+          : { statsDays: currentStatsDays, statsStartDate: currentStatsStartDate },
         (response: WinLossResponse) => {
           if (requestId !== requestIdRef.current) return
           setLoading(false)
@@ -80,13 +89,17 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
       requestCurrentWL(true)
     }
     const handleDisconnect = () => setConnected(false)
-    const handleUpdate = (records: WLRecord[], updatedStatsDays: number | null = null) => {
+    const handleUpdate = (
+      records: WLRecord[],
+      updatedStatsDays: number | null = null,
+      statsDaysTotal: number | null = null,
+    ) => {
       if (isPreview) {
         requestCurrentWL(true)
         return
       }
       requestIdRef.current += 1
-      setWL({ records, statsDays: updatedStatsDays })
+      setWL({ records, statsDays: updatedStatsDays, statsDaysTotal })
       setLoading(false)
     }
 
@@ -115,7 +128,10 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
   useEffect(() => {
     if (!isPreview || !socketRef.current?.connected) return
 
-    const requestKey = statsDays === undefined ? 'configured' : String(statsDays)
+    const requestKey =
+      statsDays === undefined && statsStartDate === undefined
+        ? 'configured'
+        : `${String(statsDays)}:${String(statsStartDate)}`
     if (lastRequestedWindowRef.current === requestKey) return
 
     lastRequestedWindowRef.current = requestKey
@@ -123,7 +139,7 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
     setLoading(true)
     socketRef.current.emit(
       'request-wl',
-      statsDays === undefined ? {} : { statsDays },
+      statsDays === undefined && statsStartDate === undefined ? {} : { statsDays, statsStartDate },
       (response: WinLossResponse) => {
         if (requestId !== requestIdRef.current) return
         setLoading(false)
@@ -135,7 +151,7 @@ export function useWinLoss({ statsDays, twitchId, userId }: UseWinLossOptions) {
         setWL(response)
       },
     )
-  }, [isPreview, statsDays])
+  }, [isPreview, statsDays, statsStartDate])
 
   const refresh = useCallback(() => requestCurrentWLRef.current?.(true), [])
 

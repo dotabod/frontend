@@ -208,6 +208,35 @@ describe('settings/[settingKey] API', () => {
       expect(prisma.setting.upsert).not.toHaveBeenCalled()
     })
 
+    it('accepts an ISO date for the WL challenge start', async () => {
+      mockSession()
+      const { req, res } = patchRequest('wlStatsStartDate', '2026-08-21')
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(prisma.setting.upsert).toHaveBeenCalledWith({
+        create: {
+          key: 'wlStatsStartDate',
+          updatedAt: expect.any(Date),
+          userId: USER_ID,
+          value: '2026-08-21',
+        },
+        update: { updatedAt: expect.any(Date), value: '2026-08-21' },
+        where: { key_userId: { key: 'wlStatsStartDate', userId: USER_ID } },
+      })
+    })
+
+    it('rejects an invalid WL challenge start date', async () => {
+      mockSession()
+      const { req, res } = patchRequest('wlStatsStartDate', '2026-02-30')
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(422)
+      expect(prisma.setting.upsert).not.toHaveBeenCalled()
+    })
+
     describe('freeze-on-disable for autoOptInNewFeatures', () => {
       it('does not touch follow-master features when the master is turned on', async () => {
         mockSession()

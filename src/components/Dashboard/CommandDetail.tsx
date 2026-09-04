@@ -900,7 +900,7 @@ const CommandDetail: Record<
     allowed: 'all',
     cmd: '!wl',
     description:
-      'Shows wins and losses from this stream by default, or from your configured 1-365 day rolling window. Disabling this command also hides the record in the stream overlay.',
+      'Shows wins and losses from this stream by default, or from a fixed challenge with your chosen start date and duration. Disabling this command also hides the record in the stream overlay.',
     key: 'commandWL',
     response: (props, all = true) => (
       <>
@@ -909,7 +909,7 @@ const CommandDetail: Record<
           <TwitchChat
             {...props}
             command='!wl'
-            response='Ranked 0 W - 9 L | -270 MMR · Unranked 2 W - 1 L · Last 30 days'
+            response='Ranked 0 W - 9 L | -270 MMR · Unranked 2 W - 1 L · 14 of 30 days'
           />
         )}
       </>
