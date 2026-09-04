@@ -24,7 +24,7 @@ The field is blank by default, so existing streamers keep the same online/offlin
 
 The settings card previews your own record while you change the window. You can try 7, 30, or any other supported value and see the count before leaving the page.
 
-The overlay shows a small `STREAM` or `30D` marker beside the record, so viewers know which range they are watching. `!wl` spells it out at the end of the response as `This stream` or `Last 30 days`.
+The overlay shows `STREAM` or the number of days of match history currently included, such as `14 DAYS`. The `!wl` response and public profile use the same available span. A 30-day setting can initially show fewer days until Dotabod has a full 30 days of saved matches.
 
 Your public Dotabod profile shows the same record and range. It updates when a match finishes, so viewers following a challenge do not need to reload the page.
 

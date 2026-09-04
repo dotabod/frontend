@@ -59,7 +59,7 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
                   className={clsx(
                     'relative z-10 flex w-full cursor-pointer flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 rounded-md px-3 py-2 text-sm capitalize transition-colors sm:px-4 md:px-6',
                     'peer-focus-visible:outline-hidden peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900',
-                    selected ? 'font-semibold text-gray-900' : 'text-gray-300 hover:text-gray-100',
+                    selected ? 'font-semibold text-gray-950' : 'text-gray-300 hover:text-gray-100',
                   )}
                 >
                   {period}
@@ -67,9 +67,7 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
                     <span
                       className={clsx(
                         'rounded-full px-1.5 py-0.5 text-[0.625rem] font-semibold leading-none',
-                        selected
-                          ? 'bg-gray-900/15 text-gray-900'
-                          : 'bg-purple-500/15 text-purple-300',
+                        selected ? 'bg-gray-950 text-gray-200' : 'bg-purple-500/15 text-purple-300',
                       )}
                     >
                       Save {maxSavings}%

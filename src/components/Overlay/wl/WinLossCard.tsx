@@ -18,12 +18,13 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
     return null
   }
   const fontSize = res({ h: 18 })
-  const windowFontSize = Math.max(res({ h: 10 }), 8)
+  const windowFontSize = Math.max(res({ h: 12 }), 10)
   const windowLabel =
     wl.statsDays === null
       ? 'This stream'
       : `Last ${wl.statsDays} ${wl.statsDays === 1 ? 'day' : 'days'}`
-  const windowMarker = wl.statsDays === null ? 'STREAM' : `${wl.statsDays}D`
+  const windowMarker =
+    wl.statsDays === null ? 'STREAM' : `${wl.statsDays} ${wl.statsDays === 1 ? 'DAY' : 'DAYS'}`
 
   return (
     <Card
@@ -34,7 +35,17 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
       )}
       id='win-loss-card'
     >
-      <div className='flex items-start gap-1.5'>
+      <div className='flex flex-col items-end'>
+        <span
+          aria-label={windowLabel}
+          className={clsx(
+            'whitespace-nowrap font-sans font-semibold tracking-[0.04em] text-white/75',
+            mainScreen && 'text-[#e4d98d]/80',
+          )}
+          style={{ fontSize: windowFontSize, lineHeight: 1 }}
+        >
+          {windowMarker}
+        </span>
         <div>
           {wl.records.map(({ win, lose, type }) => (
             <div
@@ -51,16 +62,6 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
             </div>
           ))}
         </div>
-        <span
-          aria-label={windowLabel}
-          className={clsx(
-            'mt-0.5 whitespace-nowrap font-sans font-medium tracking-[0.08em] text-white/45',
-            mainScreen && 'text-[#e4d98d]/55',
-          )}
-          style={{ fontSize: windowFontSize, lineHeight: 1 }}
-        >
-          {windowMarker}
-        </span>
       </div>
     </Card>
   )

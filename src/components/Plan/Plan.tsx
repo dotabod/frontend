@@ -909,7 +909,7 @@ function Plan({
               className={clsx(
                 'mt-6 w-full',
                 featured
-                  ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+                  ? 'bg-purple-500 text-gray-950 hover:bg-purple-400 font-semibold'
                   : 'border border-gray-700 bg-transparent text-gray-200 hover:border-gray-600 hover:bg-gray-800',
               )}
               aria-label={`${buttonText} (${name} plan)`}
@@ -927,7 +927,7 @@ function Plan({
             className={clsx(
               'mt-6',
               featured
-                ? 'bg-purple-500 hover:bg-purple-400 text-gray-900 font-semibold'
+                ? 'bg-purple-500 text-gray-950 hover:bg-purple-400 font-semibold'
                 : 'border border-gray-700 bg-transparent text-gray-200 hover:border-gray-600 hover:bg-gray-800',
             )}
             aria-label={`${buttonText} (${name} plan)`}

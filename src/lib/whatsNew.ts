@@ -42,7 +42,7 @@ export const whatsNew: WhatsNewEntry[] = [
     deepLink: { path: '/dashboard/features/overlay', section: 'wl' },
     demoCommand: 'commandWL',
     details: [
-      'Leave Stats window blank to keep the familiar reset at every new stream, or enter 1 to 365 days for a challenge that continues across streams. The overlay shows STREAM or a compact 30D-style marker, and !wl states the range in plain language.',
+      'Leave Stats window blank to keep the familiar reset at every new stream, or enter 1 to 365 days for a challenge that continues across streams. The overlay, !wl, and public profile show the exact span of saved matches currently included.',
       'The settings card recalculates your record as you change the window. Your public profile shows the same range and updates after each tracked match.',
       '!resetwl starts the configured window from 0-0 without changing other stream-session commands. !today keeps its one-day hero breakdown.',
     ],
