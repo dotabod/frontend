@@ -248,21 +248,19 @@ function Start-DotabodInstaller {
       }
     }
 
+    $payloadFile = Join-Path ([System.IO.Path]::GetTempPath()) "dotabod-network-test-$([guid]::NewGuid().ToString('N')).bin"
     try {
-      $handler = New-Object System.Net.Http.HttpClientHandler
-      $handler.AutomaticDecompression = [System.Net.DecompressionMethods]::None
-      $client = New-Object System.Net.Http.HttpClient($handler)
-      $client.Timeout = [TimeSpan]::FromSeconds(20)
-      $bytes = $client.GetByteArrayAsync("$gsiUrl/diagnostics/payload").GetAwaiter().GetResult()
-      $result.PayloadBytes = $bytes.Length
-      $result.PayloadComplete = $bytes.Length -eq $diagnosticPayloadBytes
+      # Use the same Windows web stack as the health test. A separate HttpClient can
+      # bypass a user's configured proxy and create a false failure in WARP proxy mode.
+      Invoke-WebRequest -Uri "$gsiUrl/diagnostics/payload" -TimeoutSec 20 -UseBasicParsing -OutFile $payloadFile
+      $result.PayloadBytes = (Get-Item -LiteralPath $payloadFile).Length
+      $result.PayloadComplete = $result.PayloadBytes -eq $diagnosticPayloadBytes
     }
     catch {
-      if (-not $result.Error) { $result.Error = "Payload test failed: $($_.Exception.Message)" }
+      $result.Error = "Payload test failed: $($_.Exception.Message)"
     }
     finally {
-      if ($null -ne $client) { $client.Dispose() }
-      if ($null -ne $handler) { $handler.Dispose() }
+      Remove-Item -LiteralPath $payloadFile -Force -ErrorAction SilentlyContinue
     }
 
     try {
@@ -287,9 +285,9 @@ function Start-DotabodInstaller {
     Write-Log "  TCP port 443: $(if ($result.Tcp443) { 'OK' } else { 'FAILED' })"
     Write-Log "  HTTPS health: $($result.HealthSuccesses)/$($result.HealthAttempts) successful"
     Write-Log "  64 KB transfer: $($result.PayloadBytes)/$diagnosticPayloadBytes bytes"
-    Write-Log "  Cloudflare WARP adapter: $(if ($result.WarpDetected) { 'detected' } else { 'not detected' })"
+    Write-Log "  Cloudflare WARP adapter: $(if ($result.WarpDetected) { 'detected (not proof it is active)' } else { 'not detected' })"
     Write-Log "  WinHTTP proxy: $($result.WinHttpProxy)" "DEBUG"
-    if ($result.Error) { Write-Log "  Last network error: $($result.Error)" "DEBUG" }
+    if ($result.Error) { Write-Log "  Last network error: $($result.Error)" "INFO" DarkYellow }
 
     return [pscustomobject]$result
   }
