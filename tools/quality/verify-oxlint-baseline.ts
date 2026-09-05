@@ -142,18 +142,23 @@ const compareJsonKeys = (left: string, right: string): number => {
   return 0
 }
 
-const canonicalizeJsonValue = (value: JsonValue): JsonValue => {
+const canonicalizeJsonValue = (value: JsonValue, parentKey?: string): JsonValue => {
   const primitive = jsonPrimitiveSchema.safeParse(value)
   if (primitive.success) {
     return primitive.data
   }
   if (Array.isArray(value)) {
-    return value.map(canonicalizeJsonValue)
+    const entries = value.map((entry) => canonicalizeJsonValue(entry))
+    const pluginNames = z.array(z.string()).safeParse(entries)
+    if (parentKey === 'plugins' && pluginNames.success) {
+      return pluginNames.data.toSorted(compareJsonKeys)
+    }
+    return entries
   }
   const record = jsonRecordSchema.parse(value)
   return Object.fromEntries(
     Object.entries(record)
-      .map(([key, nestedValue]) => [key, canonicalizeJsonValue(nestedValue)] as const)
+      .map(([key, nestedValue]) => [key, canonicalizeJsonValue(nestedValue, key)] as const)
       .toSorted(([left], [right]) => compareJsonKeys(left, right)),
   )
 }

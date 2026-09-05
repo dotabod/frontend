@@ -175187,7 +175187,7 @@
           "."
         ],
         "name": "app",
-        "resolvedConfigSha256": "70fefb702d6b1c9873ecd597107f9b91ee0fa64360c504aadb03628967677abb",
+        "resolvedConfigSha256": "97c4f189733d1ed9b8c779f8e59c550ec727142f80c450ecf01008eae0de4811",
         "scope": {
           "ignorePatterns": ["supabase/functions/**"],
           "paths": ["."]
@@ -175210,7 +175210,7 @@
           "supabase/functions"
         ],
         "name": "deno",
-        "resolvedConfigSha256": "ab43d9b30706058e490a692edc36313f3b7316b446c5d8ae20410c78e04ebcfe",
+        "resolvedConfigSha256": "eba69dd26d55212a9675753603a668f3e61a2639cc53ee730c39a5dee3b33a3e",
         "scope": {
           "ignorePatterns": [],
           "paths": ["supabase/functions"]

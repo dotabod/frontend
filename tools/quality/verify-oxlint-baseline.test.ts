@@ -47,6 +47,15 @@ describe('Oxlint baseline summaries', () => {
     expect(canonicalJson(config)).toBe('{"Z":"uppercase","a":"lowercase","ä":"umlaut"}')
   })
 
+  it('treats resolved plugin lists as unordered sets across native platforms', () => {
+    const armConfig =
+      '{"plugins":["react","unicorn","typescript"],"overrides":[{"files":["*.tsx","*.ts"],"plugins":["vitest","react"]}]}'
+    const x64Config =
+      '{"overrides":[{"plugins":["react","vitest"],"files":["*.tsx","*.ts"]}],"plugins":["typescript","react","unicorn"]}'
+
+    expect(canonicalJson(armConfig)).toBe(canonicalJson(x64Config))
+  })
+
   it('identifies the exact resolved configuration policy field that changes', () => {
     const baseline = {
       oxlintVersion: 'Version: 1.81.0',
