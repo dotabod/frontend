@@ -49,9 +49,9 @@ describe('Oxlint baseline summaries', () => {
 
   it('treats resolved plugin lists as unordered sets across native platforms', () => {
     const armConfig =
-      '{"plugins":["react","unicorn","typescript"],"overrides":[{"files":["*.tsx","*.ts"],"plugins":["vitest","react"]}]}'
+      '{"plugins":["react","unicorn","typescript"],"jsPlugins":[{"name":"sonarjs","specifier":"eslint-plugin-sonarjs"},{"name":"react-doctor","specifier":"oxlint-plugin-react-doctor"}],"overrides":[{"files":["*.tsx","*.ts"],"plugins":["vitest","react"]}]}'
     const x64Config =
-      '{"overrides":[{"plugins":["react","vitest"],"files":["*.tsx","*.ts"]}],"plugins":["typescript","react","unicorn"]}'
+      '{"overrides":[{"plugins":["react","vitest"],"files":["*.tsx","*.ts"]}],"jsPlugins":[{"specifier":"oxlint-plugin-react-doctor","name":"react-doctor"},{"specifier":"eslint-plugin-sonarjs","name":"sonarjs"}],"plugins":["typescript","react","unicorn"]}'
 
     expect(canonicalJson(armConfig)).toBe(canonicalJson(x64Config))
   })
@@ -86,7 +86,9 @@ describe('Oxlint baseline summaries', () => {
       ),
     }
 
-    expect(policyDifferences(baseline, current)).toStrictEqual(['targets.app.resolvedConfigSha256'])
+    expect(policyDifferences(baseline, current)).toStrictEqual([
+      `targets.app.resolvedConfigSha256 (${baseline.targets[0].resolvedConfigSha256} -> ${current.targets[0].resolvedConfigSha256})`,
+    ])
   })
 
   it('uses UTF-8 byte offsets for label spans and retains surrounding lines', () => {

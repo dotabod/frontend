@@ -153,6 +153,11 @@ const canonicalizeJsonValue = (value: JsonValue, parentKey?: string): JsonValue 
     if (parentKey === 'plugins' && pluginNames.success) {
       return pluginNames.data.toSorted(compareJsonKeys)
     }
+    if (parentKey === 'jsPlugins') {
+      return entries.toSorted((left, right) =>
+        compareJsonKeys(JSON.stringify(left), JSON.stringify(right)),
+      )
+    }
     return entries
   }
   const record = jsonRecordSchema.parse(value)
@@ -624,7 +629,12 @@ export const policyDifferences = (
     }
     for (const field of policyTargetFields) {
       if (JSON.stringify(baselineTarget[field]) !== JSON.stringify(currentTarget[field])) {
-        differences.push(`targets.${baselineTarget.name}.${field}`)
+        const fieldPath = `targets.${baselineTarget.name}.${field}`
+        if (field === 'configSha256' || field === 'resolvedConfigSha256') {
+          differences.push(`${fieldPath} (${baselineTarget[field]} -> ${currentTarget[field]})`)
+        } else {
+          differences.push(fieldPath)
+        }
       }
     }
   }
