@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/script', () => ({
   default: ({ src, id }: { src?: string; id?: string }) => (

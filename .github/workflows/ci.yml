@@ -28,7 +28,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Run vp check
-        run: pnpm exec vp check
+      - name: Run quality checks
+        run: pnpm quality
       - name: Run tests
         run: pnpm test

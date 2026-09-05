@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')

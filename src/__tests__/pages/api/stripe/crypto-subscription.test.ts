@@ -2,7 +2,7 @@
 import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createCryptoSubscription,
   findExistingCryptoSubscription,

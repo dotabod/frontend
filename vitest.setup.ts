@@ -1,6 +1,6 @@
 import * as matchers from '@testing-library/jest-dom/matchers'
 import React from 'react'
-import { expect, vi } from 'vite-plus/test'
+import { expect, vi } from 'vitest'
 
 expect.extend(matchers)
 

@@ -2,7 +2,7 @@
 import { render } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMockSession } from '@/__tests__/utils/mockFactories'
 import { canAccessFeature } from '@/utils/subscription'
 

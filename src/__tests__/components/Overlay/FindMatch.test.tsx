@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { FindMatch } from '@/components/Overlay/main/FindMatch'
 import { Settings } from '@/lib/defaultSettings'
 

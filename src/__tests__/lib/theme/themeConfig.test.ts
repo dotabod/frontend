@@ -1,5 +1,5 @@
 import { theme } from 'antd'
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 import themeConfig from '@/lib/theme/themeConfig'
 
 type Oklch = [lightness: number, chroma: number, hue?: number]

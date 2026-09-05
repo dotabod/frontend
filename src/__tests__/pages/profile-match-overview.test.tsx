@@ -1,5 +1,5 @@
 import { act, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import ProfilePage, { getServerSideProps } from '@/pages/[username]'
 
 const prismaMocks = vi.hoisted(() => ({

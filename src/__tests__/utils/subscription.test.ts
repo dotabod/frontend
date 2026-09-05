@@ -4,7 +4,7 @@ import {
   SubscriptionTier,
   TransactionType,
 } from '@prisma/client'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 // We need to mock the module before importing it
 vi.mock('@/utils/subscription', async () => {

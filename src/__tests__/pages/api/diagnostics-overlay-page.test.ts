@@ -1,6 +1,6 @@
 import type { NextApiHandler } from 'next'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/diagnostics/overlay-page'
 

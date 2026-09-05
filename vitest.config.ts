@@ -1,13 +1,18 @@
 import path from 'node:path'
+
 import react from '@vitejs/plugin-react'
-import { defineConfig, loadEnv } from 'vite-plus'
+import { loadEnv } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '.prisma-mongo/client': path.resolve(__dirname, './node_modules/.prisma-mongo/client'),
-      '@': path.resolve(__dirname, './src'),
+      '.prisma-mongo/client': path.resolve(
+        import.meta.dirname,
+        './node_modules/.prisma-mongo/client',
+      ),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   test: {

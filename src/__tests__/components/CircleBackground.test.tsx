@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { CircleBackground } from '@/components/CircleBackground'
 
 // Mock useId to return a consistent ID for testing

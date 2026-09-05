@@ -2,7 +2,7 @@ import type { SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/install/[token]'
 
 // Mock the auth module to prevent environment variable checks

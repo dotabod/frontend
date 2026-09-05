@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import BillingPage from '@/pages/dashboard/billing'
 
 const { messageMock } = vi.hoisted(() => ({

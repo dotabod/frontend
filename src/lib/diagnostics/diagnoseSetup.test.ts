@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 import { diagnoseSetup, isCompleteDiagnosticPayload } from './diagnoseSetup'
 
 const now = new Date('2026-09-04T12:00:00.000Z').getTime()

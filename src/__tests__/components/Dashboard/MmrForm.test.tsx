@@ -1,6 +1,6 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MmrForm from '@/components/Dashboard/Features/MmrForm'
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 

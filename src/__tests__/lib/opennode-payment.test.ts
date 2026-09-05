@@ -1,5 +1,5 @@
 import type { OpenNodeCharge } from '@prisma/client'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => {
   const tx = {}

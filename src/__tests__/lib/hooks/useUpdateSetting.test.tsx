@@ -1,7 +1,7 @@
 import { act, render, waitFor } from '@testing-library/react'
 import * as Sentry from '@sentry/nextjs'
 import useSWR from 'swr'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useUpdate, useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 const mutateMock = vi.hoisted(() => vi.fn())

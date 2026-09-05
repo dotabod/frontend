@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 
 const useSubscriptionContextMock = vi.fn()

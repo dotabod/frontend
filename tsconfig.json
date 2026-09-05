@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": ["./src/*"],
       "*": ["./*"]
@@ -22,9 +21,7 @@
     "jsx": "react-jsx",
     "useUnknownInCatchVariables": false,
     "plugins": [
-      {
-        "name": "next"
-      }
+      { "name": "next" }
     ],
     "strictNullChecks": true
   },

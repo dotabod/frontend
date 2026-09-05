@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 
 const updateStatsDays = vi.hoisted(() => vi.fn())

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { captureException, withScope } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import handler from '@/pages/api/test-emote-set'
 

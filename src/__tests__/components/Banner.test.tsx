@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import useSWR from 'swr'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Banner from '@/components/Banner'
 
 vi.mock('swr', () => ({

@@ -1,6 +1,6 @@
 import type { GiftSubscription, Subscription, User } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/user/gift-subscriptions'
 
 // Mock prisma

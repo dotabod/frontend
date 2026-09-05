@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
 
 const originalFetch = globalThis.fetch

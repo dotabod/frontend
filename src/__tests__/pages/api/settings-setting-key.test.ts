@@ -2,7 +2,7 @@ import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
 import { Prisma } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/settings/[settingKey]'
 
 // Mock the auth module to prevent environment variable checks

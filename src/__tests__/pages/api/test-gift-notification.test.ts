@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { GiftSubscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@/pages/api/test-gift-notification'
 
 // Mock dependencies

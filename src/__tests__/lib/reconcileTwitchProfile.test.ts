@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { reconcileTwitchProfile } from '@/lib/reconcileTwitchProfile'
 
 const originalFetch = globalThis.fetch

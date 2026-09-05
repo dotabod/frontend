@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 
 vi.mock('next-auth/react', () => ({
