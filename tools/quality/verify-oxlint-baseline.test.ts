@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   aggregateDiagnostics,
+  canonicalJson,
   compareDiagnostics,
+  policyDifferences,
   summarizeDiagnostic,
 } from './verify-oxlint-baseline'
 import type { OxlintDiagnostic } from './verify-oxlint-baseline'
@@ -27,6 +29,57 @@ const diagnostic = (overrides: Partial<OxlintDiagnostic> = {}): OxlintDiagnostic
 })
 
 describe('Oxlint baseline summaries', () => {
+  it('canonicalizes resolved configuration object keys while retaining array order', () => {
+    const firstConfig =
+      '{"rules":{"zebra":"deny","alpha":"allow"},"plugins":["react","typescript"],"overrides":[{"files":["*.tsx","*.ts"],"rules":{"beta":"deny","alpha":"allow"}}]}'
+    const reorderedConfig =
+      '{"overrides":[{"rules":{"alpha":"allow","beta":"deny"},"files":["*.tsx","*.ts"]}],"plugins":["react","typescript"],"rules":{"alpha":"allow","zebra":"deny"}}'
+
+    expect(canonicalJson(firstConfig)).toBe(canonicalJson(reorderedConfig))
+    expect(canonicalJson(firstConfig)).toBe(
+      '{"overrides":[{"files":["*.tsx","*.ts"],"rules":{"alpha":"allow","beta":"deny"}}],"plugins":["react","typescript"],"rules":{"alpha":"allow","zebra":"deny"}}',
+    )
+  })
+
+  it('sorts resolved configuration keys by Unicode code unit instead of the host locale', () => {
+    const config = '{"ä":"umlaut","a":"lowercase","Z":"uppercase"}'
+
+    expect(canonicalJson(config)).toBe('{"Z":"uppercase","a":"lowercase","ä":"umlaut"}')
+  })
+
+  it('identifies the exact resolved configuration policy field that changes', () => {
+    const baseline = {
+      oxlintVersion: 'Version: 1.81.0',
+      targets: [
+        {
+          config: 'oxlint.config.ts',
+          configSha256: 'a'.repeat(64),
+          invocation: ['--config', 'oxlint.config.ts'],
+          name: 'app' as const,
+          resolvedConfigSha256: 'b'.repeat(64),
+          scope: { ignorePatterns: [], paths: ['.'] },
+        },
+        {
+          config: 'oxlint.deno.config.ts',
+          configSha256: 'c'.repeat(64),
+          invocation: ['--config', 'oxlint.deno.config.ts'],
+          name: 'deno' as const,
+          resolvedConfigSha256: 'd'.repeat(64),
+          scope: { ignorePatterns: [], paths: ['supabase/functions'] },
+        },
+      ],
+      toolTsconfigSha256: 'e'.repeat(64),
+    }
+    const current = {
+      ...baseline,
+      targets: baseline.targets.map((target) =>
+        target.name === 'app' ? { ...target, resolvedConfigSha256: 'f'.repeat(64) } : target,
+      ),
+    }
+
+    expect(policyDifferences(baseline, current)).toStrictEqual(['targets.app.resolvedConfigSha256'])
+  })
+
   it('uses UTF-8 byte offsets for label spans and retains surrounding lines', () => {
     sourceByFile.set(exampleFile, 'before\né🙂ok\nafter')
     const offset = Buffer.from('before\né', 'utf-8').byteLength

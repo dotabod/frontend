@@ -15,6 +15,8 @@
 
 import postgres from 'npm:postgres@3.4.5'
 
+import { internalServerErrorResponse } from './error-response.ts'
+
 const CRM_BASE = 'https://api.hubapi.com/crm/v3'
 const LOOKBACK_HOURS = Number(Deno.env.get('SYNC_LOOKBACK_HOURS') ?? '2')
 const CONCURRENCY = 8
@@ -287,8 +289,8 @@ Deno.serve(async (req) => {
       },
     )
   } catch (error) {
-    console.error('sync-hubspot fatal', String(error))
-    return new Response(JSON.stringify({ error: String(error) }), { status: 500 })
+    const failure = error instanceof Error ? error : new Error(String(error))
+    return internalServerErrorResponse(failure)
   } finally {
     await sql.end()
   }

@@ -1418,26 +1418,6 @@
         "severity": "error"
       }
     },
-    "02691763250afd205e9dded01efa09035882c422bb4d057bdacd9dd8d4a92410": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(react-compiler-no-manual-memoization)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const searchResultsContent = useMemo(() => {",
-              "next": "if (!isOpen) {",
-              "previous": ""
-            },
-            "span": "useMemo(() => {\n    if (!isOpen) {\n      return null\n    }\n\n    if (query && searchResults.length === 0) {\n      return (\n        <div style={{ width: 400 }}>\n          <Empty\n            image={<Settings className='mx-auto h-8 w-8 text-gray-400' />}\n            description={\n              <div className='text-center'>\n                <p className='text-sm text-gray-300'>No results found for \"{query}\"</p>\n                <p className='mt-1 text-xs text-gray-400'>Try searching with different keywords</p>\n              </div>\n            }\n          />\n        </div>\n      )\n    }\n\n    if (searchResults.length === 0) {\n      return null\n    }\n\n    // data-index spans both sections so it stays in sync with keyboard selection\n    // (navResults/settingResults are the same split orderedResults uses).\n    const renderRow = (result: SearchResult, index: number) => {\n      const Icon: NavIcon = isNavResult(result) ? (result.icon ?? CornerDownRight) : Settings\n      const categoryLabel = isNavResult(result) ? null : getCategoryLabel(result.category)\n      const description = isNavResult(result) ? null : result.description\n\n      return (\n        <List.Item\n          key={result.key}\n          data-index={index}\n          className={clsx(\n            'mx-2 cursor-pointer rounded-md transition-colors',\n            selectedIndex === index && 'bg-gray-700',\n          )}\n          onClick={() => {\n            navigateToSetting(result)\n          }}\n          onMouseEnter={() => {\n            setSelectedIndex(index)\n          }}\n          style={{\n            backgroundColor: selectedIndex === index ? '#374151' : 'transparent',\n            margin: '0 8px',\n            padding: '8px 12px',\n          }}\n        >\n          <List.Item.Meta\n            avatar={<Icon className='h-4 w-4 text-gray-400' />}\n            title={\n              <div className='flex items-center justify-between'>\n                <div className='flex items-center gap-2'>\n                  <span className='text-sm text-gray-100'>{result.label}</span>\n                  {categoryLabel && <span className='text-xs text-gray-400'>{categoryLabel}</span>}\n                </div>\n                <ChevronRight className='h-4 w-4 text-gray-400' />\n              </div>\n            }\n            description={\n              description ? <span className='text-xs text-gray-300'>{description}</span> : null\n            }\n          />\n        </List.Item>\n      )\n    }\n\n    return (\n      <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>\n        {navResults.length > 0 && (\n          <>\n            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>\n              Go to…\n            </Typography.Text>\n            <List\n              size='small'\n              dataSource={navResults}\n              renderItem={(result, index) => renderRow(result, index)}\n            />\n          </>\n        )}\n        {settingResults.length > 0 && (\n          <>\n            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>\n              Search Results\n            </Typography.Text>\n            <List\n              size='small'\n              dataSource={settingResults}\n              renderItem={(result, index) => renderRow(result, navResults.length + index)}\n            />\n          </>\n        )}\n      </div>\n    )\n  }, [isOpen, query, searchResults, selectedIndex])",
-            "text": ""
-          }
-        ],
-        "message": "React Compiler can cache this value automatically. Verify that removing `useMemo` preserves behavior before simplifying it.",
-        "severity": "error"
-      }
-    },
     "0270155116b5838f2038389f1415327f401e313fccb6dbf05f808efb9604ac3c": {
       "count": 1,
       "summary": {
@@ -3652,26 +3632,6 @@
         "severity": "error"
       }
     },
-    "055e7bbb53fc45994df08ebd54a6fccc2ddc9af18aa6fa2928f1871a81a3f5ad": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-wildcard-import)",
-        "file": "src/components/Gift/GiftSubscriptionForm/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export * from './GiftSubscriptionForm'",
-              "next": "",
-              "previous": ""
-            },
-            "span": "export * from './GiftSubscriptionForm'",
-            "text": ""
-          }
-        ],
-        "message": "Explicitly export the specific member needed.",
-        "severity": "error"
-      }
-    },
     "05626222f284b2acf8191a1889f7add2af37e019fd7b7bac5d4f77bcc2b99bb5": {
       "count": 1,
       "summary": {
@@ -4287,6 +4247,26 @@
           }
         ],
         "message": "Expected !== and instead saw !=",
+        "severity": "error"
+      }
+    },
+    "06176a90277195801f84ffbf29dcc0bfd8bff92e54f2d094e677c0c3fee89773": {
+      "count": 1,
+      "summary": {
+        "code": "react-doctor(no-giant-component)",
+        "file": "src/components/Dashboard/SettingsSearch.tsx",
+        "labels": [
+          {
+            "context": {
+              "current": "export const SettingsSearch = () => {",
+              "next": "const router = useRouter()",
+              "previous": ""
+            },
+            "span": "SettingsSearch",
+            "text": ""
+          }
+        ],
+        "message": "Component \"SettingsSearch\" is over 300 lines long, which is hard to read & change. Split it into a few smaller components.",
         "severity": "error"
       }
     },
@@ -6988,26 +6968,6 @@
           }
         ],
         "message": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion.",
-        "severity": "error"
-      }
-    },
-    "09ddd2b3b6acbcb39eec2e0d01f9e20b3816e2796fec49f46350cdae8cc50fd7": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-wildcard-import)",
-        "file": "src/components/Plan/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export * from './PriceDisplay'",
-              "next": "",
-              "previous": "export { default } from './Plan'"
-            },
-            "span": "export * from './PriceDisplay'",
-            "text": ""
-          }
-        ],
-        "message": "Explicitly export the specific member needed.",
         "severity": "error"
       }
     },
@@ -11332,26 +11292,6 @@
         "severity": "error"
       }
     },
-    "0fbcdc55dd5f454a31feeaa5dc4d51e40785747138791b607a171a04d4f4caef": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/crypto-invoice.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=fresh2')",
-              "next": "})",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
-        "severity": "error"
-      }
-    },
     "0fc22c93b5ee61acd8ab4c71b4c1f2de77a250d996e1db580272f2137075a3ff": {
       "count": 1,
       "summary": {
@@ -15352,26 +15292,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "15dbe8e219e74e7f72f66c409364670c07ad830c04f9826886924eec72864847": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(func-style)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "export function SettingsSearch() {",
-              "next": "const router = useRouter()",
-              "previous": ""
-            },
-            "span": "function SettingsSearch() {\n  const router = useRouter()\n  const { data: session } = useSession()\n  const isAdmin = session?.user?.role === 'admin'\n  const isImpersonating = Boolean(session?.user?.isImpersonating)\n  const [query, setQuery] = useState('')\n  const [isOpen, setIsOpen] = useState(false)\n  const [selectedIndex, setSelectedIndex] = useState(0)\n  const searchInputRef = useRef<InputRef>(null)\n  const listContainerRef = useRef<HTMLDivElement>(null)\n  const isKeyboardNavigationRef = useRef(false)\n\n  // Page-navigation entries derived from the nav config — the ⌘K \"safety net\"\n  // that keeps every relocated destination one keystroke away. Respects the same\n  // admin/impersonator gating as the sidebar so it never offers an unreachable page.\n  const navSearchItems = useMemo<NavSearchItem[]>(() => {\n    const opts = { isAdmin, isImpersonating }\n    const items = [\n      ...filterNav(navConfig.primary, opts),\n      ...filterNav(navConfig.bottom, opts).flatMap((item) => item.children ?? [item]),\n      ...filterNav(navConfig.account, opts),\n      ...filterNav(navConfig.help, opts),\n    ]\n\n    return items\n      .filter((item) => item.href)\n      .map((item) => ({\n        category: 'navigation' as const,\n        description: '',\n        external: isExternalNavItem(item),\n        icon: item.icon,\n        isNavigation: true as const,\n        key: item.href as string,\n        label: item.name,\n        page: { path: item.href as string },\n        searchTerms: [item.name.toLowerCase()],\n      }))\n  }, [isAdmin, isImpersonating])\n\n  // Simple fuzzy search implementation\n  const searchResults = useMemo(() => {\n    if (!query.trim()) {\n      return []\n    }\n\n    const searchQuery = query.toLowerCase()\n    const results: SearchResult[] = []\n    const seenKeys = new Set<string>()\n\n    for (const setting of [...navSearchItems, ...settingsMetadata]) {\n      // Skip if we've already seen this setting\n      if (seenKeys.has(setting.key)) {\n        continue\n      }\n\n      const searchableText = getSearchableText(setting)\n\n      // Calculate score based on match quality\n      let score = 0\n\n      // Exact match in label\n      if (setting.label.toLowerCase() === searchQuery) {\n        score += 100\n      } else if (setting.label.toLowerCase().includes(searchQuery)) {\n        score += 50\n      }\n\n      // Match in key\n      if (setting.key.toLowerCase().includes(searchQuery)) {\n        score += 30\n      }\n\n      // Match in description\n      if (setting.description.toLowerCase().includes(searchQuery)) {\n        score += 20\n      }\n\n      // Match in search terms\n      for (const term of setting.searchTerms) {\n        if (term === searchQuery) {\n          score += 40\n        } else if (term.includes(searchQuery)) {\n          score += 15\n        }\n      }\n\n      // Fuzzy match - check if all characters appear in order within reasonable distance\n      const chars = [...searchQuery]\n      let charIndex = 0\n      let firstFoundIndex = -1\n      let lastFoundIndex = -1\n      const maxGap = 2 // Maximum gap between consecutive characters\n\n      for (let i = 0; i < searchableText.length && charIndex < chars.length; i++) {\n        if (searchableText[i] === chars[charIndex]) {\n          if (charIndex === 0) {\n            // First character found\n            firstFoundIndex = i\n            lastFoundIndex = i\n            charIndex++\n          } else {\n            // Check if this character is close enough to the previous one\n            const gap = i - lastFoundIndex\n            if (gap <= maxGap) {\n              lastFoundIndex = i\n              charIndex++\n            } else {\n              // Gap too large, restart search\n              if (searchableText[i] === chars[0]) {\n                firstFoundIndex = i\n                lastFoundIndex = i\n                charIndex = 1\n              } else {\n                charIndex = 0\n                firstFoundIndex = -1\n                lastFoundIndex = -1\n              }\n            }\n          }\n        }\n      }\n\n      // Only give fuzzy points for complete matches with good density\n      if (charIndex === chars.length && searchQuery.length >= 4) {\n        const matchSpan = lastFoundIndex - firstFoundIndex + 1\n        const density = chars.length / matchSpan\n        // Require very high density (at least 50% of the span should be our characters)\n        if (density >= 0.5) {\n          score += 5\n        }\n      }\n\n      if (score > 0) {\n        seenKeys.add(setting.key)\n        results.push({ ...setting, score })\n      }\n    }\n\n    // Sort by score descending\n    return results.toSorted((a, b) => b.score - a.score).slice(0, 10)\n  }, [query, navSearchItems])\n\n  // Page jumps surface first, then settings — a single index space for keyboard nav.\n  const navResults = searchResults.filter(isNavResult)\n  const settingResults = searchResults.filter((result) => !isNavResult(result))\n  const orderedResults = [...navResults, ...settingResults]\n\n  // Handle navigation to a result (settings page section, internal page, or external link)\n  const navigateToSetting = (result: SearchResult) => {\n    setIsOpen(false)\n    setQuery('')\n\n    // External resources (Discord, GitHub, status) open in a new tab.\n    if (isNavResult(result) && result.external) {\n      window.open(result.page.path, '_blank', 'noopener,noreferrer')\n      return\n    }\n\n    // Navigate to the page\n    void router.push(result.page.path).then(() => {\n      // After navigation, scroll to the section if specified\n      if (result.page.section) {\n        setTimeout(() => {\n          if (!result.page.section) {\n            return\n          }\n          const element = document.getElementById(result.page.section)\n          if (element) {\n            element.scrollIntoView({ behavior: 'smooth', block: 'center' })\n            // Add a highlight effect\n            element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2')\n            setTimeout(() => {\n              element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2')\n            }, 2000)\n          }\n        }, 300)\n      }\n    })\n  }\n\n  const handleInputKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {\n    if (!isOpen) {\n      return\n    }\n\n    switch (e.key) {\n      case 'ArrowDown': {\n        e.preventDefault()\n        isKeyboardNavigationRef.current = true\n        setSelectedIndex((prev) =>\n          orderedResults.length === 0 ? 0 : (prev + 1) % orderedResults.length,\n        )\n        setTimeout(() => {\n          isKeyboardNavigationRef.current = false\n        }, 100)\n        break\n      }\n      case 'ArrowUp': {\n        e.preventDefault()\n        isKeyboardNavigationRef.current = true\n        setSelectedIndex((prev) =>\n          orderedResults.length === 0\n            ? 0\n            : (prev - 1 + orderedResults.length) % orderedResults.length,\n        )\n        setTimeout(() => {\n          isKeyboardNavigationRef.current = false\n        }, 100)\n        break\n      }\n      case 'Enter': {\n        e.preventDefault()\n        if (orderedResults[selectedIndex]) {\n          navigateToSetting(orderedResults[selectedIndex])\n        }\n        break\n      }\n      case 'Escape': {\n        e.preventDefault()\n        setIsOpen(false)\n        searchInputRef.current?.blur()\n        break\n      }\n    }\n  }\n\n  // Handle click outside - simplified since Popover handles this\n  useEffect(() => {\n    const handleClickOutside = (_e: MouseEvent) => {\n      // Only handle cases where we want to close on outside click\n      if (isOpen && !query) {\n        setIsOpen(false)\n      }\n    }\n\n    document.addEventListener('mousedown', handleClickOutside)\n    return () => {\n      document.removeEventListener('mousedown', handleClickOutside)\n    }\n  }, [isOpen, query])\n\n  // Scroll selected item into view when selectedIndex changes\n  useEffect(() => {\n    if (\n      isOpen &&\n      orderedResults.length > 0 &&\n      listContainerRef.current &&\n      isKeyboardNavigationRef.current\n    ) {\n      const selectedElement = listContainerRef.current.querySelector(\n        `[data-index=\"${selectedIndex}\"]`,\n      ) as HTMLElement\n      if (selectedElement) {\n        selectedElement.scrollIntoView({\n          behavior: 'smooth',\n          block: 'center',\n        })\n      }\n    }\n  }, [selectedIndex, isOpen, orderedResults.length])\n\n  // Global keyboard shortcut (Ctrl/Cmd + K)\n  useEffect(() => {\n    const handleGlobalKeyDown = (e: KeyboardEvent) => {\n      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {\n        e.preventDefault()\n        searchInputRef.current?.focus()\n        setIsOpen(true)\n      }\n    }\n\n    window.addEventListener('keydown', handleGlobalKeyDown)\n    return () => {\n      window.removeEventListener('keydown', handleGlobalKeyDown)\n    }\n  }, [])\n\n  const getCategoryLabel = (category: SettingMetadata['category']) => {\n    const labels = {\n      advanced: 'Advanced',\n      bets: 'Bets',\n      chat: 'Chat',\n      commands: 'Commands',\n      display: 'Display',\n      mmr: 'MMR',\n      obs: 'OBS',\n      overlay: 'Overlay',\n      stream: 'Stream',\n    }\n    return labels[category] || category\n  }\n\n  const searchResultsContent = useMemo(() => {\n    if (!isOpen) {\n      return null\n    }\n\n    if (query && searchResults.length === 0) {\n      return (\n        <div style={{ width: 400 }}>\n          <Empty\n            image={<Settings className='mx-auto h-8 w-8 text-gray-400' />}\n            description={\n              <div className='text-center'>\n                <p className='text-sm text-gray-300'>No results found for \"{query}\"</p>\n                <p className='mt-1 text-xs text-gray-400'>Try searching with different keywords</p>\n              </div>\n            }\n          />\n        </div>\n      )\n    }\n\n    if (searchResults.length === 0) {\n      return null\n    }\n\n    // data-index spans both sections so it stays in sync with keyboard selection\n    // (navResults/settingResults are the same split orderedResults uses).\n    const renderRow = (result: SearchResult, index: number) => {\n      const Icon: NavIcon = isNavResult(result) ? (result.icon ?? CornerDownRight) : Settings\n      const categoryLabel = isNavResult(result) ? null : getCategoryLabel(result.category)\n      const description = isNavResult(result) ? null : result.description\n\n      return (\n        <List.Item\n          key={result.key}\n          data-index={index}\n          className={clsx(\n            'mx-2 cursor-pointer rounded-md transition-colors',\n            selectedIndex === index && 'bg-gray-700',\n          )}\n          onClick={() => {\n            navigateToSetting(result)\n          }}\n          onMouseEnter={() => {\n            setSelectedIndex(index)\n          }}\n          style={{\n            backgroundColor: selectedIndex === index ? '#374151' : 'transparent',\n            margin: '0 8px',\n            padding: '8px 12px',\n          }}\n        >\n          <List.Item.Meta\n            avatar={<Icon className='h-4 w-4 text-gray-400' />}\n            title={\n              <div className='flex items-center justify-between'>\n                <div className='flex items-center gap-2'>\n                  <span className='text-sm text-gray-100'>{result.label}</span>\n                  {categoryLabel && <span className='text-xs text-gray-400'>{categoryLabel}</span>}\n                </div>\n                <ChevronRight className='h-4 w-4 text-gray-400' />\n              </div>\n            }\n            description={\n              description ? <span className='text-xs text-gray-300'>{description}</span> : null\n            }\n          />\n        </List.Item>\n      )\n    }\n\n    return (\n      <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>\n        {navResults.length > 0 && (\n          <>\n            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>\n              Go to…\n            </Typography.Text>\n            <List\n              size='small'\n              dataSource={navResults}\n              renderItem={(result, index) => renderRow(result, index)}\n            />\n          </>\n        )}\n        {settingResults.length > 0 && (\n          <>\n            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>\n              Search Results\n            </Typography.Text>\n            <List\n              size='small'\n              dataSource={settingResults}\n              renderItem={(result, index) => renderRow(result, navResults.length + index)}\n            />\n          </>\n        )}\n      </div>\n    )\n  }, [isOpen, query, searchResults, selectedIndex])\n\n  return (\n    <div className='mx-auto flex w-full max-w-md'>\n      <Popover\n        content={searchResultsContent}\n        trigger={[]}\n        open={isOpen && (searchResults.length > 0 || Boolean(query && searchResults.length === 0))}\n        onOpenChange={(open) => {\n          if (!open) {\n            setIsOpen(false)\n          }\n        }}\n        placement='bottomLeft'\n      >\n        <Input.Search\n          ref={searchInputRef}\n          value={query}\n          onChange={(e) => {\n            setQuery(e.target.value)\n            setSelectedIndex(0)\n            setIsOpen(true)\n          }}\n          onFocus={() => {\n            setIsOpen(true)\n          }}\n          onKeyDown={handleInputKeyDown}\n          placeholder='Search or jump to… (⌘K)'\n          size='large'\n          style={{\n            backgroundColor: '#1f2937',\n            borderColor: '#374151',\n            width: '100%',\n          }}\n        />\n      </Popover>\n    </div>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "Expected a function expression.",
         "severity": "error"
       }
     },
@@ -54685,26 +54605,6 @@
         "severity": "error"
       }
     },
-    "509c6dd15e94b84b231e1dee6723c27f581000ea229014fd97e5647518b9a356": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/create-checkout.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://checkout.stripe.com/no-crypto')",
-              "next": "expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
-        "severity": "error"
-      }
-    },
     "50b13d28d9dc4a6a26f5b8ddf4384f7ae5e3788f507f8906bf7537db27164d33": {
       "count": 1,
       "summary": {
@@ -54722,62 +54622,6 @@
           }
         ],
         "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
-    "50b8d47f7db6505d3cfc0717ab7bdc32891663c271450c8915afdaac941272ee": {
-      "count": 1,
-      "summary": {
-        "code": "react(memo-dependencies)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "}, [isOpen, query, searchResults, selectedIndex])",
-              "next": "",
-              "previous": ")"
-            },
-            "span": "[isOpen, query, searchResults, selectedIndex]",
-            "text": "This dependency list is missing values used by the callback"
-          },
-          {
-            "context": {
-              "current": "const categoryLabel = isNavResult(result) ? null : getCategoryLabel(result.category)",
-              "next": "const description = isNavResult(result) ? null : result.description",
-              "previous": "const Icon: NavIcon = isNavResult(result) ? (result.icon ?? CornerDownRight) : Settings"
-            },
-            "span": "getCategoryLabel",
-            "text": "Missing dependency `getCategoryLabel`"
-          },
-          {
-            "context": {
-              "current": "dataSource={navResults}",
-              "next": "renderItem={(result, index) => renderRow(result, index)}",
-              "previous": "size='small'"
-            },
-            "span": "navResults",
-            "text": "Missing dependency `navResults`"
-          },
-          {
-            "context": {
-              "current": "navigateToSetting(result)",
-              "next": "}}",
-              "previous": "onClick={() => {"
-            },
-            "span": "navigateToSetting",
-            "text": "Missing dependency `navigateToSetting`"
-          },
-          {
-            "context": {
-              "current": "dataSource={settingResults}",
-              "next": "renderItem={(result, index) => renderRow(result, navResults.length + index)}",
-              "previous": "size='small'"
-            },
-            "span": "settingResults",
-            "text": "Missing dependency `settingResults`"
-          }
-        ],
-        "message": "Found missing memoization dependencies",
         "severity": "error"
       }
     },
@@ -55127,26 +54971,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "5181ab2c4f615b540db752906575dfefe180ad77bd2af1d2d0a18ef1f9f6dd19": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/create-checkout.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=7777')",
-              "next": "expect(mocks.prisma.nowPaymentsInvoice.create).toHaveBeenCalledWith({",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
         "severity": "error"
       }
     },
@@ -57252,35 +57076,6 @@
           }
         ],
         "message": "Prefer await to then()/catch()/finally()",
-        "severity": "error"
-      }
-    },
-    "549f652aa0f4fc9f59820dd2c0c41748fdf2d602775d161a8d6d997ef36b7ac6": {
-      "count": 1,
-      "summary": {
-        "code": "oxc(no-barrel-file)",
-        "file": "src/components/Plan/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export * from './FeatureList'",
-              "next": "export { default } from './Plan'",
-              "previous": ""
-            },
-            "span": "'./FeatureList'",
-            "text": "1573 modules"
-          },
-          {
-            "context": {
-              "current": "export * from './PriceDisplay'",
-              "next": "",
-              "previous": "export { default } from './Plan'"
-            },
-            "span": "'./PriceDisplay'",
-            "text": "2033 modules"
-          }
-        ],
-        "message": "Barrel file detected, 3608 modules are loaded which exceeds the threshold of 100.",
         "severity": "error"
       }
     },
@@ -63777,26 +63572,6 @@
         "severity": "error"
       }
     },
-    "5df5de3c91e4913838f5039efbeae68c3c262fa19b5d877864231bbcfe18897e": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/crypto-invoice.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=replacement')",
-              "next": "})",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
-        "severity": "error"
-      }
-    },
     "5dfb86802c0a1e56d9260491c9c51f4546e19cfb04ebefeb028323dfb8ba204f": {
       "count": 1,
       "summary": {
@@ -67188,26 +66963,6 @@
           }
         ],
         "message": "`'` can be escaped with &apos; or &lsquo; or &#39; or &rsquo;",
-        "severity": "error"
-      }
-    },
-    "62de71d2f9025d6cc54f632ec9075a380fdb4e6f6d85b0894d121ac5931aa0be": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/create-checkout.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://checkout.stripe.com/abc')",
-              "next": "expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
         "severity": "error"
       }
     },
@@ -74601,26 +74356,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "6d2a87c9a9424f3c761d72e3545d8dd71e6117a123294a457e4c791ac47e0f1f": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(no-giant-component)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "export function SettingsSearch() {",
-              "next": "const router = useRouter()",
-              "previous": ""
-            },
-            "span": "SettingsSearch",
-            "text": ""
-          }
-        ],
-        "message": "Component \"SettingsSearch\" is over 300 lines long, which is hard to read & change. Split it into a few smaller components.",
         "severity": "error"
       }
     },
@@ -91464,71 +91199,6 @@
         "severity": "error"
       }
     },
-    "860727feb14032610d0c2e247f499578f70a284c648f48e484e84b8add3773cb": {
-      "count": 1,
-      "summary": {
-        "code": "react-hooks(exhaustive-deps)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "dataSource={navResults}",
-              "next": "renderItem={(result, index) => renderRow(result, index)}",
-              "previous": "size='small'"
-            },
-            "span": "navResults",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "{settingResults.length > 0 && (",
-              "next": "<>",
-              "previous": ")}"
-            },
-            "span": "settingResults",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "dataSource={settingResults}",
-              "next": "renderItem={(result, index) => renderRow(result, navResults.length + index)}",
-              "previous": "size='small'"
-            },
-            "span": "settingResults",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "{navResults.length > 0 && (",
-              "next": "<>",
-              "previous": "<div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>"
-            },
-            "span": "navResults",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "navigateToSetting(result)",
-              "next": "}}",
-              "previous": "onClick={() => {"
-            },
-            "span": "navigateToSetting",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "}, [isOpen, query, searchResults, selectedIndex])",
-              "next": "",
-              "previous": ")"
-            },
-            "span": "[isOpen, query, searchResults, selectedIndex]",
-            "text": ""
-          }
-        ],
-        "message": "React Hook useMemo has missing dependencies: 'navResults', 'settingResults.length', 'settingResults', 'navResults.length', and 'navigateToSetting'",
-        "severity": "error"
-      }
-    },
     "860fd944c9743e07d6ce38247e750d710478e850acf058180f0d2f97adceac1e": {
       "count": 3,
       "summary": {
@@ -96121,26 +95791,6 @@
           }
         ],
         "message": "Define this declaration in a local scope or bind explicitly the property to the global object.",
-        "severity": "error"
-      }
-    },
-    "8c4534fc1a40895d3e9f83a4c0a1bea58a8ada0da468af4a5b7b56e1b51ff578": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(func-style)",
-        "file": "src/utils/gift-links.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export function createGiftLink(username: string): string {",
-              "next": "if (!username) {",
-              "previous": "*/"
-            },
-            "span": "function createGiftLink(username: string): string {\n  if (!username) {\n    return '/gift'\n  }\n\n  // Ensure the username is properly formatted\n  const formattedUsername = username.trim().toLowerCase()\n\n  return `/${formattedUsername}/gift`\n}",
-            "text": ""
-          }
-        ],
-        "message": "Expected a function expression.",
         "severity": "error"
       }
     },
@@ -100765,26 +100415,6 @@
         "severity": "error"
       }
     },
-    "93ba2df0045fbd2cbfb82fe721368bcbee1b70252019da76a35cbc3746089c4a": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const selectedElement = listContainerRef.current.querySelector(",
-              "next": "`[data-index=\"${selectedIndex}\"]`,",
-              "previous": ") {"
-            },
-            "span": "listContainerRef.current.querySelector(\n        `[data-index=\"${selectedIndex}\"]`,\n      ) as HTMLElement",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
     "93ba46822a43ff1c9b9f616d82f3e001d62ec90ae40c00bdf31c481a65e5df0b": {
       "count": 1,
       "summary": {
@@ -101289,26 +100919,6 @@
           }
         ],
         "message": "Mocked modules must be dynamic imported.",
-        "severity": "error"
-      }
-    },
-    "9468fb61207e3b93f0a9f8881fecf875115f4e80128a03594f61d5fad2f0b19b": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const selectedElement = listContainerRef.current.querySelector(",
-              "next": "`[data-index=\"${selectedIndex}\"]`,",
-              "previous": ") {"
-            },
-            "span": "listContainerRef.current.querySelector(\n        `[data-index=\"${selectedIndex}\"]`,\n      ) as HTMLElement",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion.",
         "severity": "error"
       }
     },
@@ -104570,26 +104180,6 @@
           }
         ],
         "message": "Filename should be in kebab-case",
-        "severity": "error"
-      }
-    },
-    "98f501902cbe7b4eac25db18c4b7a7f4be2538424a5f1da85f99fda4474c1647": {
-      "count": 1,
-      "summary": {
-        "code": "unicorn(prefer-response-static-json)",
-        "file": "supabase/functions/sync-hubspot/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return new Response(JSON.stringify({ error: String(error) }), { status: 500 })",
-              "next": "} finally {",
-              "previous": "console.error('sync-hubspot fatal', String(error))"
-            },
-            "span": "JSON.stringify",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using `Response.json(…)` over `JSON.stringify()`.",
         "severity": "error"
       }
     },
@@ -119695,35 +119285,6 @@
         "severity": "error"
       }
     },
-    "af73ad7cae90987dcfe7b161ec3719432b98a8d132d06aa339a20844b20e0d9a": {
-      "count": 1,
-      "summary": {
-        "code": "unicorn(consistent-function-scoping)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "export function SettingsSearch() {",
-              "next": "const router = useRouter()",
-              "previous": ""
-            },
-            "span": "SettingsSearch",
-            "text": "Outer scope where this function is defined"
-          },
-          {
-            "context": {
-              "current": "const getCategoryLabel = (category: SettingMetadata['category']) => {",
-              "next": "const labels = {",
-              "previous": ""
-            },
-            "span": "getCategoryLabel",
-            "text": "This function does not use any variables from the parent function"
-          }
-        ],
-        "message": "Function `getCategoryLabel` does not capture any variables from its parent scope",
-        "severity": "error"
-      }
-    },
     "af76dd0b93978d9083c7e28fe0f3164cc0a3f0c2d2024d0ff5e3cb50cd01dc52": {
       "count": 1,
       "summary": {
@@ -125139,26 +124700,6 @@
         "severity": "error"
       }
     },
-    "b7a3ec902bbd9368c162aa63256bb48d336a7769b64752efd83f9ab56dfd3586": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/crypto-invoice.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=fresh')",
-              "next": "expect(mocks.createNowPaymentsInvoice).toHaveBeenCalledWith(",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
-        "severity": "error"
-      }
-    },
     "b7ab5d3b648094f4669a496cd29c3221f3013c085d153eaa4c51837d55c91b86": {
       "count": 1,
       "summary": {
@@ -128548,26 +128089,6 @@
           }
         ],
         "message": "Unsafe return of a value of type `any`.",
-        "severity": "error"
-      }
-    },
-    "bd7123e19ae5b84e1cf1e27e6018a1cf1bf4f460002b4c0aa82b96cb3b669dc0": {
-      "count": 1,
-      "summary": {
-        "code": "react(function-component-definition)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "export function SettingsSearch() {",
-              "next": "const router = useRouter()",
-              "previous": ""
-            },
-            "span": "function SettingsSearch() {\n  const router = useRouter()\n  const { data: session } = useSession()\n  const isAdmin = session?.user?.role === 'admin'\n  const isImpersonating = Boolean(session?.user?.isImpersonating)\n  const [query, setQuery] = useState('')\n  const [isOpen, setIsOpen] = useState(false)\n  const [selectedIndex, setSelectedIndex] = useState(0)\n  const searchInputRef = useRef<InputRef>(null)\n  const listContainerRef = useRef<HTMLDivElement>(null)\n  const isKeyboardNavigationRef = useRef(false)\n\n  // Page-navigation entries derived from the nav config — the ⌘K \"safety net\"\n  // that keeps every relocated destination one keystroke away. Respects the same\n  // admin/impersonator gating as the sidebar so it never offers an unreachable page.\n  const navSearchItems = useMemo<NavSearchItem[]>(() => {\n    const opts = { isAdmin, isImpersonating }\n    const items = [\n      ...filterNav(navConfig.primary, opts),\n      ...filterNav(navConfig.bottom, opts).flatMap((item) => item.children ?? [item]),\n      ...filterNav(navConfig.account, opts),\n      ...filterNav(navConfig.help, opts),\n    ]\n\n    return items\n      .filter((item) => item.href)\n      .map((item) => ({\n        category: 'navigation' as const,\n        description: '',\n        external: isExternalNavItem(item),\n        icon: item.icon,\n        isNavigation: true as const,\n        key: item.href as string,\n        label: item.name,\n        page: { path: item.href as string },\n        searchTerms: [item.name.toLowerCase()],\n      }))\n  }, [isAdmin, isImpersonating])\n\n  // Simple fuzzy search implementation\n  const searchResults = useMemo(() => {\n    if (!query.trim()) {\n      return []\n    }\n\n    const searchQuery = query.toLowerCase()\n    const results: SearchResult[] = []\n    const seenKeys = new Set<string>()\n\n    for (const setting of [...navSearchItems, ...settingsMetadata]) {\n      // Skip if we've already seen this setting\n      if (seenKeys.has(setting.key)) {\n        continue\n      }\n\n      const searchableText = getSearchableText(setting)\n\n      // Calculate score based on match quality\n      let score = 0\n\n      // Exact match in label\n      if (setting.label.toLowerCase() === searchQuery) {\n        score += 100\n      } else if (setting.label.toLowerCase().includes(searchQuery)) {\n        score += 50\n      }\n\n      // Match in key\n      if (setting.key.toLowerCase().includes(searchQuery)) {\n        score += 30\n      }\n\n      // Match in description\n      if (setting.description.toLowerCase().includes(searchQuery)) {\n        score += 20\n      }\n\n      // Match in search terms\n      for (const term of setting.searchTerms) {\n        if (term === searchQuery) {\n          score += 40\n        } else if (term.includes(searchQuery)) {\n          score += 15\n        }\n      }\n\n      // Fuzzy match - check if all characters appear in order within reasonable distance\n      const chars = [...searchQuery]\n      let charIndex = 0\n      let firstFoundIndex = -1\n      let lastFoundIndex = -1\n      const maxGap = 2 // Maximum gap between consecutive characters\n\n      for (let i = 0; i < searchableText.length && charIndex < chars.length; i++) {\n        if (searchableText[i] === chars[charIndex]) {\n          if (charIndex === 0) {\n            // First character found\n            firstFoundIndex = i\n            lastFoundIndex = i\n            charIndex++\n          } else {\n            // Check if this character is close enough to the previous one\n            const gap = i - lastFoundIndex\n            if (gap <= maxGap) {\n              lastFoundIndex = i\n              charIndex++\n            } else {\n              // Gap too large, restart search\n              if (searchableText[i] === chars[0]) {\n                firstFoundIndex = i\n                lastFoundIndex = i\n                charIndex = 1\n              } else {\n                charIndex = 0\n                firstFoundIndex = -1\n                lastFoundIndex = -1\n              }\n            }\n          }\n        }\n      }\n\n      // Only give fuzzy points for complete matches with good density\n      if (charIndex === chars.length && searchQuery.length >= 4) {\n        const matchSpan = lastFoundIndex - firstFoundIndex + 1\n        const density = chars.length / matchSpan\n        // Require very high density (at least 50% of the span should be our characters)\n        if (density >= 0.5) {\n          score += 5\n        }\n      }\n\n      if (score > 0) {\n        seenKeys.add(setting.key)\n        results.push({ ...setting, score })\n      }\n    }\n\n    // Sort by score descending\n    return results.toSorted((a, b) => b.score - a.score).slice(0, 10)\n  }, [query, navSearchItems])\n\n  // Page jumps surface first, then settings — a single index space for keyboard nav.\n  const navResults = searchResults.filter(isNavResult)\n  const settingResults = searchResults.filter((result) => !isNavResult(result))\n  const orderedResults = [...navResults, ...settingResults]\n\n  // Handle navigation to a result (settings page section, internal page, or external link)\n  const navigateToSetting = (result: SearchResult) => {\n    setIsOpen(false)\n    setQuery('')\n\n    // External resources (Discord, GitHub, status) open in a new tab.\n    if (isNavResult(result) && result.external) {\n      window.open(result.page.path, '_blank', 'noopener,noreferrer')\n      return\n    }\n\n    // Navigate to the page\n    void router.push(result.page.path).then(() => {\n      // After navigation, scroll to the section if specified\n      if (result.page.section) {\n        setTimeout(() => {\n          if (!result.page.section) {\n            return\n          }\n          const element = document.getElementById(result.page.section)\n          if (element) {\n            element.scrollIntoView({ behavior: 'smooth', block: 'center' })\n            // Add a highlight effect\n            element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2')\n            setTimeout(() => {\n              element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2')\n            }, 2000)\n          }\n        }, 300)\n      }\n    })\n  }\n\n  const handleInputKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {\n    if (!isOpen) {\n      return\n    }\n\n    switch (e.key) {\n      case 'ArrowDown': {\n        e.preventDefault()\n        isKeyboardNavigationRef.current = true\n        setSelectedIndex((prev) =>\n          orderedResults.length === 0 ? 0 : (prev + 1) % orderedResults.length,\n        )\n        setTimeout(() => {\n          isKeyboardNavigationRef.current = false\n        }, 100)\n        break\n      }\n      case 'ArrowUp': {\n        e.preventDefault()\n        isKeyboardNavigationRef.current = true\n        setSelectedIndex((prev) =>\n          orderedResults.length === 0\n            ? 0\n            : (prev - 1 + orderedResults.length) % orderedResults.length,\n        )\n        setTimeout(() => {\n          isKeyboardNavigationRef.current = false\n        }, 100)\n        break\n      }\n      case 'Enter': {\n        e.preventDefault()\n        if (orderedResults[selectedIndex]) {\n          navigateToSetting(orderedResults[selectedIndex])\n        }\n        break\n      }\n      case 'Escape': {\n        e.preventDefault()\n        setIsOpen(false)\n        searchInputRef.current?.blur()\n        break\n      }\n    }\n  }\n\n  // Handle click outside - simplified since Popover handles this\n  useEffect(() => {\n    const handleClickOutside = (_e: MouseEvent) => {\n      // Only handle cases where we want to close on outside click\n      if (isOpen && !query) {\n        setIsOpen(false)\n      }\n    }\n\n    document.addEventListener('mousedown', handleClickOutside)\n    return () => {\n      document.removeEventListener('mousedown', handleClickOutside)\n    }\n  }, [isOpen, query])\n\n  // Scroll selected item into view when selectedIndex changes\n  useEffect(() => {\n    if (\n      isOpen &&\n      orderedResults.length > 0 &&\n      listContainerRef.current &&\n      isKeyboardNavigationRef.current\n    ) {\n      const selectedElement = listContainerRef.current.querySelector(\n        `[data-index=\"${selectedIndex}\"]`,\n      ) as HTMLElement\n      if (selectedElement) {\n        selectedElement.scrollIntoView({\n          behavior: 'smooth',\n          block: 'center',\n        })\n      }\n    }\n  }, [selectedIndex, isOpen, orderedResults.length])\n\n  // Global keyboard shortcut (Ctrl/Cmd + K)\n  useEffect(() => {\n    const handleGlobalKeyDown = (e: KeyboardEvent) => {\n      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {\n        e.preventDefault()\n        searchInputRef.current?.focus()\n        setIsOpen(true)\n      }\n    }\n\n    window.addEventListener('keydown', handleGlobalKeyDown)\n    return () => {\n      window.removeEventListener('keydown', handleGlobalKeyDown)\n    }\n  }, [])\n\n  const getCategoryLabel = (category: SettingMetadata['category']) => {\n    const labels = {\n      advanced: 'Advanced',\n      bets: 'Bets',\n      chat: 'Chat',\n      commands: 'Commands',\n      display: 'Display',\n      mmr: 'MMR',\n      obs: 'OBS',\n      overlay: 'Overlay',\n      stream: 'Stream',\n    }\n    return labels[category] || category\n  }\n\n  const searchResultsContent = useMemo(() => {\n    if (!isOpen) {\n      return null\n    }\n\n    if (query && searchResults.length === 0) {\n      return (\n        <div style={{ width: 400 }}>\n          <Empty\n            image={<Settings className='mx-auto h-8 w-8 text-gray-400' />}\n            description={\n              <div className='text-center'>\n                <p className='text-sm text-gray-300'>No results found for \"{query}\"</p>\n                <p className='mt-1 text-xs text-gray-400'>Try searching with different keywords</p>\n              </div>\n            }\n          />\n        </div>\n      )\n    }\n\n    if (searchResults.length === 0) {\n      return null\n    }\n\n    // data-index spans both sections so it stays in sync with keyboard selection\n    // (navResults/settingResults are the same split orderedResults uses).\n    const renderRow = (result: SearchResult, index: number) => {\n      const Icon: NavIcon = isNavResult(result) ? (result.icon ?? CornerDownRight) : Settings\n      const categoryLabel = isNavResult(result) ? null : getCategoryLabel(result.category)\n      const description = isNavResult(result) ? null : result.description\n\n      return (\n        <List.Item\n          key={result.key}\n          data-index={index}\n          className={clsx(\n            'mx-2 cursor-pointer rounded-md transition-colors',\n            selectedIndex === index && 'bg-gray-700',\n          )}\n          onClick={() => {\n            navigateToSetting(result)\n          }}\n          onMouseEnter={() => {\n            setSelectedIndex(index)\n          }}\n          style={{\n            backgroundColor: selectedIndex === index ? '#374151' : 'transparent',\n            margin: '0 8px',\n            padding: '8px 12px',\n          }}\n        >\n          <List.Item.Meta\n            avatar={<Icon className='h-4 w-4 text-gray-400' />}\n            title={\n              <div className='flex items-center justify-between'>\n                <div className='flex items-center gap-2'>\n                  <span className='text-sm text-gray-100'>{result.label}</span>\n                  {categoryLabel && <span className='text-xs text-gray-400'>{categoryLabel}</span>}\n                </div>\n                <ChevronRight className='h-4 w-4 text-gray-400' />\n              </div>\n            }\n            description={\n              description ? <span className='text-xs text-gray-300'>{description}</span> : null\n            }\n          />\n        </List.Item>\n      )\n    }\n\n    return (\n      <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>\n        {navResults.length > 0 && (\n          <>\n            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>\n              Go to…\n            </Typography.Text>\n            <List\n              size='small'\n              dataSource={navResults}\n              renderItem={(result, index) => renderRow(result, index)}\n            />\n          </>\n        )}\n        {settingResults.length > 0 && (\n          <>\n            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>\n              Search Results\n            </Typography.Text>\n            <List\n              size='small'\n              dataSource={settingResults}\n              renderItem={(result, index) => renderRow(result, navResults.length + index)}\n            />\n          </>\n        )}\n      </div>\n    )\n  }, [isOpen, query, searchResults, selectedIndex])\n\n  return (\n    <div className='mx-auto flex w-full max-w-md'>\n      <Popover\n        content={searchResultsContent}\n        trigger={[]}\n        open={isOpen && (searchResults.length > 0 || Boolean(query && searchResults.length === 0))}\n        onOpenChange={(open) => {\n          if (!open) {\n            setIsOpen(false)\n          }\n        }}\n        placement='bottomLeft'\n      >\n        <Input.Search\n          ref={searchInputRef}\n          value={query}\n          onChange={(e) => {\n            setQuery(e.target.value)\n            setSelectedIndex(0)\n            setIsOpen(true)\n          }}\n          onFocus={() => {\n            setIsOpen(true)\n          }}\n          onKeyDown={handleInputKeyDown}\n          placeholder='Search or jump to… (⌘K)'\n          size='large'\n          style={{\n            backgroundColor: '#1f2937',\n            borderColor: '#374151',\n            width: '100%',\n          }}\n        />\n      </Popover>\n    </div>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "Function component is not an arrow function",
         "severity": "error"
       }
     },
@@ -133303,26 +132824,6 @@
         "severity": "error"
       }
     },
-    "c436c844a9c4503183b33d9d8d84c36757d4b0053c208bf33792b64efd252c7a": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "next.config.mjs",
-        "labels": [
-          {
-            "context": {
-              "current": "withSentryConfig(nextConfig, {",
-              "next": "// For all available options, see:",
-              "previous": "export default withSentryConfig("
-            },
-            "span": "{\n    // For all available options, see:\n    // https://github.com/getsentry/sentry-webpack-plugin#options\n\n    org: 'mgates-llc',\n    project: 'dotabod-frontend',\n\n    release: {\n      name: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,\n    },\n\n    // Only print logs for uploading source maps in CI\n    silent: !process.env.CI,\n\n    // For all available options, see:\n    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/\n\n    // Upload a larger set of source maps for prettier stack traces (increases build time)\n    widenClientFileUpload: true,\n\n    // Comment out the property that's causing the linter error\n    // TranspileClientSDK: true,\n\n    // Hides source maps from generated client bundles\n    sourcemaps: {\n      assets: './**/*.map',\n      deleteSourcemapsAfterUpload: true,\n    },\n\n    // Annotate React components in breadcrumbs and session replay.\n    // Turbopack equivalent of webpack.reactComponentAnnotation (Sentry >= 10.43.0).\n    _experimental: {\n      turbopackReactComponentAnnotation: {\n        enabled: true,\n      },\n    },\n\n    // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.\n    // This can increase your server load as well as your hosting bill.\n    // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-\n    // Side errors will fail.\n    // TunnelRoute: \"/monitoring\",\n\n    // Webpack-only options; ignored under the default Turbopack build (Next 16),\n    // So they only take effect with `next build --webpack`.\n    webpack: {\n      // Tree-shake Sentry logger statements to reduce bundle size\n      treeshake: {\n        removeDebugLogging: true,\n      },\n      // Automatic instrumentation of Vercel Cron Monitors\n      automaticVercelMonitors: true,\n    },\n  }",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
-        "severity": "error"
-      }
-    },
     "c4531b11de557d09d0fde1fb618b2f8ba80eb80285e0ace2d63eed3962842882": {
       "count": 1,
       "summary": {
@@ -136503,26 +136004,6 @@
           }
         ],
         "message": "Unsafe member access ._getJSONData on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "c8de5093140fd53b2deea79bfd7615a545ad9ee58d805df518820ce928b4fc86": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-wildcard-import)",
-        "file": "src/components/Plan/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export * from './FeatureList'",
-              "next": "export { default } from './Plan'",
-              "previous": ""
-            },
-            "span": "export * from './FeatureList'",
-            "text": ""
-          }
-        ],
-        "message": "Explicitly export the specific member needed.",
         "severity": "error"
       }
     },
@@ -142442,26 +141923,6 @@
         "severity": "error"
       }
     },
-    "d0dd94f8cfd7101e69e79500bfc5ece93d60cfaefc34df1c84ab900caa783fa5": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (selectedElement) {",
-              "next": "selectedElement.scrollIntoView({",
-              "previous": ") as HTMLElement"
-            },
-            "span": "selectedElement",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected object value in conditional. An object is always truthy.",
-        "severity": "error"
-      }
-    },
     "d0ea4cb698322ffaa81cf3ab9b4da3b888953961952199a0729ad472161e1464": {
       "count": 1,
       "summary": {
@@ -144945,26 +144406,6 @@
         "severity": "error"
       }
     },
-    "d4dbc289e8c663f10b899f3a0b75f9d542151daccea38485299b03f9036495b7": {
-      "count": 1,
-      "summary": {
-        "code": "oxc(no-barrel-file)",
-        "file": "src/components/Gift/GiftSubscriptionForm/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export * from './GiftSubscriptionForm'",
-              "next": "",
-              "previous": ""
-            },
-            "span": "'./GiftSubscriptionForm'",
-            "text": "5861 modules"
-          }
-        ],
-        "message": "Barrel file detected, 5862 modules are loaded which exceeds the threshold of 100.",
-        "severity": "error"
-      }
-    },
     "d4e22c548bc85bba4b99a9a236baa4c19256a191122d16f01073368249dadbe6": {
       "count": 1,
       "summary": {
@@ -147369,26 +146810,6 @@
           }
         ],
         "message": "`'` can be escaped with &apos; or &lsquo; or &#39; or &rsquo;",
-        "severity": "error"
-      }
-    },
-    "d84ad41c3ad49097124783e07e88da6c17a6329020ea4194cfe757b8173c8493": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/stripe/crypto-invoice.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=existing')",
-              "next": "expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()",
-              "previous": "expect(res._getStatusCode()).toBe(200)"
-            },
-            "span": "url",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .url on an `any` value.",
         "severity": "error"
       }
     },
@@ -149859,26 +149280,6 @@
           }
         ],
         "message": "Unsafe member access .message on an `any` value.",
-        "severity": "error"
-      }
-    },
-    "dbd88a4c0e769523faaebf82caa756d6448fad38945a856ac1e1c8ea4b7f5be0": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(no-barrel-import)",
-        "file": "src/components/Billing/BillingPlans.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "import Plan from '../Plan'",
-              "next": "import { SubscriptionStatus } from '../Subscription/SubscriptionStatus'",
-              "previous": ""
-            },
-            "span": "import Plan from '../Plan'",
-            "text": ""
-          }
-        ],
-        "message": "This ships extra code to your users & slows page load. Import directly from \"../Plan/Plan\".",
         "severity": "error"
       }
     },
@@ -155652,26 +155053,6 @@
           }
         ],
         "message": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.",
-        "severity": "error"
-      }
-    },
-    "e3973799f15ccf252ef5b94f802ef8984572759d9467bfe923a4337c3b2aca27": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "next.config.mjs",
-        "labels": [
-          {
-            "context": {
-              "current": "webpack: {",
-              "next": "// Tree-shake Sentry logger statements to reduce bundle size",
-              "previous": "// So they only take effect with `next build --webpack`."
-            },
-            "span": "{\n      // Tree-shake Sentry logger statements to reduce bundle size\n      treeshake: {\n        removeDebugLogging: true,\n      },\n      // Automatic instrumentation of Vercel Cron Monitors\n      automaticVercelMonitors: true,\n    }",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
         "severity": "error"
       }
     },
@@ -167120,26 +166501,6 @@
         "severity": "error"
       }
     },
-    "f42376c4990bb3d01cc08dcaa0440f51ce8b5853d327943887623c969ea88c63": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(prefer-module-scope-pure-function)",
-        "file": "src/components/Dashboard/SettingsSearch.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const getCategoryLabel = (category: SettingMetadata['category']) => {",
-              "next": "const labels = {",
-              "previous": ""
-            },
-            "span": "(category: SettingMetadata['category']) => {\n    const labels = {\n      advanced: 'Advanced',\n      bets: 'Bets',\n      chat: 'Chat',\n      commands: 'Commands',\n      display: 'Display',\n      mmr: 'MMR',\n      obs: 'OBS',\n      overlay: 'Overlay',\n      stream: 'Stream',\n    }\n    return labels[category] || category\n  }",
-            "text": ""
-          }
-        ],
-        "message": "`getCategoryLabel` inside `SettingsSearch` uses no local state but is rebuilt on every render, so it wastes work & breaks memoized children. Move it to the top of the file, outside the component.",
-        "severity": "error"
-      }
-    },
     "f424775a4cbe2cb82dbbec511dfa1e15d133865c44cf7b94003872d7246afed3": {
       "count": 1,
       "summary": {
@@ -175434,7 +174795,9 @@
           "src/__tests__/pages/dashboard/managers.test.tsx",
           "src/__tests__/pages/match-history.test.tsx",
           "src/__tests__/pages/profile-match-overview.test.tsx",
+          "src/__tests__/supabase/sync-hubspot/error-response.test.ts",
           "src/__tests__/types/twitch.test.ts",
+          "src/__tests__/utils/gift-links.test.ts",
           "src/__tests__/utils/mockFactories.ts",
           "src/__tests__/utils/subscription.test.ts",
           "src/components/AccessibleEmoji.tsx",
@@ -175509,7 +174872,6 @@
           "src/components/ErrorBoundary.tsx",
           "src/components/Gift/GiftSubscriptionForm/GiftPreview.tsx",
           "src/components/Gift/GiftSubscriptionForm/GiftSubscriptionForm.tsx",
-          "src/components/Gift/GiftSubscriptionForm/index.ts",
           "src/components/Homepage/AppScreen.tsx",
           "src/components/Homepage/AuthForm.tsx",
           "src/components/Homepage/BackgroundIllustration.tsx",
@@ -175579,7 +174941,6 @@
           "src/components/Plan/PaymentMethodPicker.tsx",
           "src/components/Plan/Plan.tsx",
           "src/components/Plan/PriceDisplay.tsx",
-          "src/components/Plan/index.ts",
           "src/components/PlanDescription.tsx",
           "src/components/Pricing.tsx",
           "src/components/ProfileMatchOverview.tsx",
@@ -175826,7 +175187,7 @@
           "."
         ],
         "name": "app",
-        "resolvedConfigSha256": "afa086432c6b79195d179863dd41e2d4d00d2cc1e196966eafd94312c1e571e1",
+        "resolvedConfigSha256": "70fefb702d6b1c9873ecd597107f9b91ee0fa64360c504aadb03628967677abb",
         "scope": {
           "ignorePatterns": ["supabase/functions/**"],
           "paths": ["."]
@@ -175835,7 +175196,10 @@
       {
         "config": "oxlint.deno.config.ts",
         "configSha256": "081b2c77b1b0b0cd395e99fe89d62d01d7820994b3f9e22367a6ff9dddf56fbd",
-        "files": ["supabase/functions/sync-hubspot/index.ts"],
+        "files": [
+          "supabase/functions/sync-hubspot/error-response.ts",
+          "supabase/functions/sync-hubspot/index.ts"
+        ],
         "invocation": [
           "--disable-nested-config",
           "--config",
@@ -175846,7 +175210,7 @@
           "supabase/functions"
         ],
         "name": "deno",
-        "resolvedConfigSha256": "ca365938677fc7b70cc9efc6327ef05cf5dadb95088f3929e748d30e2bd38def",
+        "resolvedConfigSha256": "ab43d9b30706058e490a692edc36313f3b7316b446c5d8ae20410c78e04ebcfe",
         "scope": {
           "ignorePatterns": [],
           "paths": ["supabase/functions"]

@@ -5,7 +5,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import { withSentryConfig } from '@sentry/nextjs'
+import { withSentryConfig } from '@sentry/nextjs/config'
 
 /**
  * @type {import('next').NextConfig}
@@ -160,59 +160,54 @@ const nextConfig = {
   },
 }
 
-export default withSentryConfig(
-  withSentryConfig(nextConfig, {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
-
-    org: 'mgates-llc',
-    project: 'dotabod-frontend',
-
-    release: {
-      name: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+export default withSentryConfig(nextConfig, {
+  // Annotate React components in breadcrumbs and session replay.
+  // Turbopack equivalent of webpack.reactComponentAnnotation (Sentry >= 10.43.0).
+  _experimental: {
+    turbopackReactComponentAnnotation: {
+      enabled: true,
     },
+  },
 
-    // Only print logs for uploading source maps in CI
-    silent: !process.env.CI,
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
 
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+  org: 'mgates-llc',
+  project: 'dotabod-frontend',
 
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
+  release: {
+    name: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+  },
 
-    // Comment out the property that's causing the linter error
-    // TranspileClientSDK: true,
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
 
-    // Hides source maps from generated client bundles
-    sourcemaps: {
-      assets: './**/*.map',
-      deleteSourcemapsAfterUpload: true,
+  // Comment out the property that's causing the linter error
+  // TranspileClientSDK: true,
+
+  // Hides source maps from generated client bundles
+  sourcemaps: {
+    assets: './**/*.map',
+    deleteSourcemapsAfterUpload: true,
+  },
+
+  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+  // Side errors will fail.
+  // TunnelRoute: "/monitoring",
+
+  // Webpack-only options; ignored under the default Turbopack build (Next 16),
+  // So they only take effect with `next build --webpack`.
+  webpack: {
+    // Automatic instrumentation of Vercel Cron Monitors
+    automaticVercelMonitors: true,
+    // Tree-shake Sentry logger statements to reduce bundle size
+    treeshake: {
+      removeDebugLogging: true,
     },
+  },
 
-    // Annotate React components in breadcrumbs and session replay.
-    // Turbopack equivalent of webpack.reactComponentAnnotation (Sentry >= 10.43.0).
-    _experimental: {
-      turbopackReactComponentAnnotation: {
-        enabled: true,
-      },
-    },
-
-    // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-    // This can increase your server load as well as your hosting bill.
-    // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-    // Side errors will fail.
-    // TunnelRoute: "/monitoring",
-
-    // Webpack-only options; ignored under the default Turbopack build (Next 16),
-    // So they only take effect with `next build --webpack`.
-    webpack: {
-      // Tree-shake Sentry logger statements to reduce bundle size
-      treeshake: {
-        removeDebugLogging: true,
-      },
-      // Automatic instrumentation of Vercel Cron Monitors
-      automaticVercelMonitors: true,
-    },
-  }),
-)
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+})

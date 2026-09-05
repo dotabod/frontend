@@ -38,7 +38,22 @@ const isNavResult = (item: SearchableItem): item is NavSearchItem => 'isNavigati
 const getSearchableText = (item: SearchableItem): string =>
   [item.label, item.description, ...item.searchTerms, item.key].join(' ').toLowerCase()
 
-export function SettingsSearch() {
+const getCategoryLabel = (category: SettingMetadata['category']): string => {
+  const labels = {
+    advanced: 'Advanced',
+    bets: 'Bets',
+    chat: 'Chat',
+    commands: 'Commands',
+    display: 'Display',
+    mmr: 'MMR',
+    obs: 'OBS',
+    overlay: 'Overlay',
+    stream: 'Stream',
+  }
+  return labels[category] || category
+}
+
+export const SettingsSearch = () => {
   const router = useRouter()
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === 'admin'
@@ -287,9 +302,9 @@ export function SettingsSearch() {
       listContainerRef.current &&
       isKeyboardNavigationRef.current
     ) {
-      const selectedElement = listContainerRef.current.querySelector(
+      const selectedElement = listContainerRef.current.querySelector<HTMLElement>(
         `[data-index="${selectedIndex}"]`,
-      ) as HTMLElement
+      )
       if (selectedElement) {
         selectedElement.scrollIntoView({
           behavior: 'smooth',
@@ -315,22 +330,7 @@ export function SettingsSearch() {
     }
   }, [])
 
-  const getCategoryLabel = (category: SettingMetadata['category']) => {
-    const labels = {
-      advanced: 'Advanced',
-      bets: 'Bets',
-      chat: 'Chat',
-      commands: 'Commands',
-      display: 'Display',
-      mmr: 'MMR',
-      obs: 'OBS',
-      overlay: 'Overlay',
-      stream: 'Stream',
-    }
-    return labels[category] || category
-  }
-
-  const searchResultsContent = useMemo(() => {
+  const searchResultsContent = (() => {
     if (!isOpen) {
       return null
     }
@@ -429,7 +429,7 @@ export function SettingsSearch() {
         )}
       </div>
     )
-  }, [isOpen, query, searchResults, selectedIndex])
+  })()
 
   return (
     <div className='mx-auto flex w-full max-w-md'>

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -42,6 +43,8 @@ vi.mock('@/utils/subscription', () => ({
 }))
 
 let handler: typeof import('@/pages/api/stripe/crypto-invoice').default
+
+const cryptoInvoiceResponseSchema = z.object({ url: z.string().url() })
 
 beforeAll(async () => {
   ;({ default: handler } = await import('@/pages/api/stripe/crypto-invoice'))
@@ -86,7 +89,9 @@ describe('POST /api/stripe/crypto-invoice', () => {
     await handler(req, res)
 
     expect(res._getStatusCode()).toBe(200)
-    expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=existing')
+    expect(cryptoInvoiceResponseSchema.parse(res._getJSONData()).url).toBe(
+      'https://nowpayments.io/payment/?iid=existing',
+    )
     expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
   })
 
@@ -115,7 +120,9 @@ describe('POST /api/stripe/crypto-invoice', () => {
       where: { stripeInvoiceId: 'in_renew_1' },
     })
     expect(res._getStatusCode()).toBe(200)
-    expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=replacement')
+    expect(cryptoInvoiceResponseSchema.parse(res._getJSONData()).url).toBe(
+      'https://nowpayments.io/payment/?iid=replacement',
+    )
   })
 
   it('creates a fresh NOWPayments invoice when none exists for this renewal', async () => {
@@ -138,7 +145,9 @@ describe('POST /api/stripe/crypto-invoice', () => {
     await handler(req, res)
 
     expect(res._getStatusCode()).toBe(200)
-    expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=fresh')
+    expect(cryptoInvoiceResponseSchema.parse(res._getJSONData()).url).toBe(
+      'https://nowpayments.io/payment/?iid=fresh',
+    )
     expect(mocks.createNowPaymentsInvoice).toHaveBeenCalledWith(
       expect.objectContaining({
         ipn_callback_url: 'https://dotabod.com/api/webhooks/nowpayments',
@@ -183,7 +192,9 @@ describe('POST /api/stripe/crypto-invoice', () => {
 
     expect(mocks.stripe.invoices.finalizeInvoice).toHaveBeenCalledWith('in_renew_1')
     expect(res._getStatusCode()).toBe(200)
-    expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=fresh2')
+    expect(cryptoInvoiceResponseSchema.parse(res._getJSONData()).url).toBe(
+      'https://nowpayments.io/payment/?iid=fresh2',
+    )
   })
 
   it('rejects a void or uncollectible invoice', async () => {

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -54,6 +55,8 @@ vi.mock('@/utils/subscription', () => ({
 }))
 
 let handler: typeof import('@/pages/api/stripe/create-checkout').default
+
+const checkoutResponseSchema = z.object({ url: z.string().url() })
 
 beforeAll(async () => {
   ;({ default: handler } = await import('@/pages/api/stripe/create-checkout'))
@@ -219,7 +222,9 @@ describe('POST /api/stripe/create-checkout', () => {
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
-      expect(res._getJSONData().url).toBe('https://nowpayments.io/payment/?iid=7777')
+      expect(checkoutResponseSchema.parse(res._getJSONData()).url).toBe(
+        'https://nowpayments.io/payment/?iid=7777',
+      )
       expect(mocks.prisma.nowPaymentsInvoice.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           nowPaymentsId: '7777',
@@ -239,7 +244,9 @@ describe('POST /api/stripe/create-checkout', () => {
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
-      expect(res._getJSONData().url).toBe('https://checkout.stripe.com/abc')
+      expect(checkoutResponseSchema.parse(res._getJSONData()).url).toBe(
+        'https://checkout.stripe.com/abc',
+      )
       expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
       expect(mocks.prisma.nowPaymentsInvoice.create).not.toHaveBeenCalled()
     })
@@ -255,7 +262,9 @@ describe('POST /api/stripe/create-checkout', () => {
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
-      expect(res._getJSONData().url).toBe('https://checkout.stripe.com/no-crypto')
+      expect(checkoutResponseSchema.parse(res._getJSONData()).url).toBe(
+        'https://checkout.stripe.com/no-crypto',
+      )
       expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
     })
   })

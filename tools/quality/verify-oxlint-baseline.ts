@@ -124,6 +124,43 @@ const targets: Target[] = [
 
 const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
 
+type JsonValue = boolean | null | number | string | JsonValue[] | { [key: string]: JsonValue }
+
+const jsonPrimitiveSchema = z.union([z.boolean(), z.null(), z.number(), z.string()])
+const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
+  z.union([jsonPrimitiveSchema, z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema)]),
+)
+const jsonRecordSchema = z.record(z.string(), jsonValueSchema)
+
+const compareJsonKeys = (left: string, right: string): number => {
+  if (left < right) {
+    return -1
+  }
+  if (left > right) {
+    return 1
+  }
+  return 0
+}
+
+const canonicalizeJsonValue = (value: JsonValue): JsonValue => {
+  const primitive = jsonPrimitiveSchema.safeParse(value)
+  if (primitive.success) {
+    return primitive.data
+  }
+  if (Array.isArray(value)) {
+    return value.map(canonicalizeJsonValue)
+  }
+  const record = jsonRecordSchema.parse(value)
+  return Object.fromEntries(
+    Object.entries(record)
+      .map(([key, nestedValue]) => [key, canonicalizeJsonValue(nestedValue)] as const)
+      .toSorted(([left], [right]) => compareJsonKeys(left, right)),
+  )
+}
+
+export const canonicalJson = (value: string): string =>
+  JSON.stringify(canonicalizeJsonValue(jsonValueSchema.parse(JSON.parse(value))))
+
 const normalizedFile = (filename: string): string => {
   const absoluteFile = path.resolve(repositoryRoot, filename)
   const relativeFile = path.relative(repositoryRoot, absoluteFile)
@@ -503,7 +540,7 @@ const resolvedConfigDigest = (target: Target): string => {
   if (result.status !== 0) {
     throw new Error(`Could not resolve ${target.config}: ${result.stderr}`)
   }
-  return sha256(result.stdout)
+  return sha256(canonicalJson(result.stdout))
 }
 
 const currentPolicy = (): Policy => {
@@ -550,6 +587,49 @@ const policyWithoutCoverage = (policy: Policy): PolicyWithoutCoverage => ({
   ...policy,
   targets: policy.targets.map(({ files: _files, ...target }) => target),
 })
+
+const policyTargetFields = [
+  'config',
+  'configSha256',
+  'invocation',
+  'resolvedConfigSha256',
+  'scope',
+] as const satisfies readonly (keyof PolicyWithoutCoverage['targets'][number])[]
+
+export const policyDifferences = (
+  baselinePolicy: PolicyWithoutCoverage,
+  currentPolicyValue: PolicyWithoutCoverage,
+): string[] => {
+  const differences: string[] = []
+  if (baselinePolicy.oxlintVersion !== currentPolicyValue.oxlintVersion) {
+    differences.push('oxlintVersion')
+  }
+  if (baselinePolicy.toolTsconfigSha256 !== currentPolicyValue.toolTsconfigSha256) {
+    differences.push('toolTsconfigSha256')
+  }
+
+  const currentTargets = new Map(
+    currentPolicyValue.targets.map((target) => [target.name, target] as const),
+  )
+  for (const baselineTarget of baselinePolicy.targets) {
+    const currentTarget = currentTargets.get(baselineTarget.name)
+    if (currentTarget === undefined) {
+      differences.push(`targets.${baselineTarget.name}`)
+      continue
+    }
+    for (const field of policyTargetFields) {
+      if (JSON.stringify(baselineTarget[field]) !== JSON.stringify(currentTarget[field])) {
+        differences.push(`targets.${baselineTarget.name}.${field}`)
+      }
+    }
+  }
+  for (const currentTarget of currentPolicyValue.targets) {
+    if (!baselinePolicy.targets.some((target) => target.name === currentTarget.name)) {
+      differences.push(`targets.${currentTarget.name}`)
+    }
+  }
+  return differences
+}
 
 const coverageChanges = (baselinePolicy: Policy, currentPolicyValue: Policy) => {
   const missing: { file: string; target: Target['name'] }[] = []
@@ -623,12 +703,13 @@ const readBaseline = (): Baseline =>
   baselineSchema.parse(JSON.parse(readFileSync(baselinePath, 'utf-8')))
 
 const assertPolicyMatches = (baseline: Baseline, policy: Policy): void => {
-  if (
-    JSON.stringify(policyWithoutCoverage(baseline.policy)) !==
-    JSON.stringify(policyWithoutCoverage(policy))
-  ) {
+  const differences = policyDifferences(
+    policyWithoutCoverage(baseline.policy),
+    policyWithoutCoverage(policy),
+  )
+  if (differences.length > 0) {
     throw new Error(
-      'Oxlint policy changed (version, config digest, resolved config, invocation, or scope); review it and deliberately bootstrap a new baseline.',
+      `Oxlint policy changed: ${differences.join(', ')}. Review it and deliberately bootstrap a new baseline.`,
     )
   }
 }

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { FeatureList } from '@/components/Plan'
+import { FeatureList } from '@/components/Plan/FeatureList'
 
 describe(FeatureList, () => {
   it('renders provided features', () => {

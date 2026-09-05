@@ -15,6 +15,13 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  ssr: {
+    resolve: {
+      // DOM tests should load browser exports instead of Sentry's server-only
+      // instrumentation graph, which expects a real Node file URL at import time.
+      conditions: ['browser', 'import', 'default'],
+    },
+  },
   test: {
     environment: 'happy-dom',
     globals: true,

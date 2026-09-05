@@ -12,7 +12,7 @@ import {
 } from '@/utils/subscription'
 import type { PricePeriod } from '@/utils/subscription'
 
-import Plan from '../Plan'
+import Plan from '../Plan/Plan'
 import { SubscriptionStatus } from '../Subscription/SubscriptionStatus'
 import { PeriodToggle } from './PeriodToggle'
 
