@@ -2,11 +2,10 @@ import { Button, Progress, Select, Spin } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { forwardRef } from 'react'
+
 import NumberTicker from '@/components/magicui/number-ticker'
-import useLanguageTranslations, {
-  type CrowdinLanguage,
-  getLanguageProgress,
-} from '@/lib/hooks/useLanguageTranslation'
+import useLanguageTranslations, { getLanguageProgress } from '@/lib/hooks/useLanguageTranslation'
+import type { CrowdinLanguage } from '@/lib/hooks/useLanguageTranslation'
 import { useUpdateLocale } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 
@@ -101,7 +100,7 @@ export default function LanguageCard() {
   })
 
   const UsedBy = () => (
-    <div className='space-x-1 flex flex-row items-center mb-2'>
+    <div className='mb-2 flex flex-row items-center space-x-1'>
       <span>Used by</span>
       {isLoading ? (
         <Spin size='small' />
@@ -184,7 +183,9 @@ export default function LanguageCard() {
             value: x.value,
           }))}
           value={localeOption?.locale}
-          onChange={(value) => updateLocale(value)}
+          onChange={(value) => {
+            updateLocale(value)
+          }}
         />
       </div>
 

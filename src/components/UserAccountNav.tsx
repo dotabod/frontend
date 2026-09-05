@@ -1,27 +1,19 @@
 import { BellOutlined } from '@ant-design/icons'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import {
-  Badge,
-  Button,
-  Dropdown,
-  Empty,
-  type MenuProps,
-  Popover,
-  Skeleton,
-  Space,
-  Tabs,
-} from 'antd'
+import { Badge, Button, Dropdown, Empty, Popover, Skeleton, Space, Tabs } from 'antd'
+import type { MenuProps } from 'antd'
 import clsx from 'clsx'
+import type { Session } from 'next-auth'
+import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import type { Session } from 'next-auth'
-import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import { filterNav, navConfig, navItemToMenuItem } from '@/components/Dashboard/navigation'
 import { fetcher } from '@/lib/fetcher'
-import { SETTINGS_SWR_OPTIONS, STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
 // Notifications shown in the dashboard bell, discriminated by `type`.
 interface BaseNotification {
@@ -64,7 +56,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     error: notificationError,
     mutate: refreshGiftNotifications,
   } = useSWR('/api/notifications?includeRead=true', fetcher, {
-    ...STABLE_SWR_OPTIONS,
+    ...SETTINGS_SWR_OPTIONS,
     // Configuration to fetch only once on mount
     // Keep error handling
     loadingTimeout: 8000, // 8 seconds
@@ -91,7 +83,9 @@ const UserButton = ({ user, className }: UserButtonProps) => {
       }
     }, 3000) // 3 seconds timeout
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+    }
   }, [imageLoaded])
 
   const notifications = (giftNotificationData?.notifications || []) as AppNotification[]
@@ -224,10 +218,10 @@ const UserButton = ({ user, className }: UserButtonProps) => {
         trigger='click'
         content={
           <div className='w-full max-w-sm'>
-            <div className='flex justify-between items-center mb-3'>
-              <h3 className='font-semibold text-white text-lg'>Notifications</h3>
+            <div className='mb-3 flex items-center justify-between'>
+              <h3 className='text-lg font-semibold text-white'>Notifications</h3>
               {totalUnreadNotifications > 0 && (
-                <span className='bg-blue-600 text-white text-xs px-2 py-1 rounded-full'>
+                <span className='rounded-full bg-blue-600 px-2 py-1 text-xs text-white'>
                   {totalUnreadNotifications} new
                 </span>
               )}
@@ -269,11 +263,11 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                         <div
                           key={notification.id}
                           className={clsx(
-                            'relative rounded-lg p-4 mb-2',
+                            'relative mb-2 rounded-lg p-4',
                             notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
                           )}
                         >
-                          <div className='flex justify-between items-start'>
+                          <div className='flex items-start justify-between'>
                             <div className='font-semibold text-white'>New features</div>
                             <div className='text-xs text-gray-400'>
                               {new Date(notification.createdAt).toLocaleDateString()}
@@ -291,7 +285,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                             </Link>
                             {!notification.read && (
                               <Button
-                                onClick={() => dismissNotification(notification.id)}
+                                onClick={async () => dismissNotification(notification.id)}
                                 size='small'
                               >
                                 Dismiss
@@ -306,11 +300,11 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                       <div
                         key={notification.id}
                         className={clsx(
-                          'relative rounded-lg p-4 mb-2',
+                          'relative mb-2 rounded-lg p-4',
                           notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
                         )}
                       >
-                        <div className='flex justify-between items-start'>
+                        <div className='flex items-start justify-between'>
                           <div className='font-semibold text-white'>Gift Subscription</div>
                           <div className='text-xs text-gray-400'>
                             {new Date(notification.createdAt).toLocaleDateString()}
@@ -320,11 +314,11 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                           {`${notification.senderName || 'Someone'} has gifted you ${formatGiftType(notification.giftType, notification.giftQuantity)}!`}
                         </p>
                         {notification.giftMessage && (
-                          <p className='mt-2 italic text-gray-400'>"{notification.giftMessage}"</p>
+                          <p className='mt-2 text-gray-400 italic'>"{notification.giftMessage}"</p>
                         )}
                         {!notification.read && (
                           <Button
-                            onClick={() => dismissNotification(notification.id)}
+                            onClick={async () => dismissNotification(notification.id)}
                             className='mt-2'
                             size='small'
                           >
@@ -336,28 +330,30 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                   })}
 
                 {totalFilteredNotifications > pageSize && (
-                  <div className='flex justify-between items-center mt-4'>
+                  <div className='mt-4 flex items-center justify-between'>
                     <Space>
                       <Button
                         type='text'
                         size='small'
                         disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() => {
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }}
                       >
                         Previous
                       </Button>
-                      <span className='text-gray-400 text-xs'>
+                      <span className='text-xs text-gray-400'>
                         Page {currentPage} of {Math.ceil(totalFilteredNotifications / pageSize)}
                       </span>
                       <Button
                         type='text'
                         size='small'
                         disabled={currentPage >= Math.ceil(totalFilteredNotifications / pageSize)}
-                        onClick={() =>
+                        onClick={() => {
                           setCurrentPage((prev) =>
                             Math.min(prev + 1, Math.ceil(totalFilteredNotifications / pageSize)),
                           )
-                        }
+                        }}
                       >
                         Next
                       </Button>
@@ -380,7 +376,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
           </div>
         }
       >
-        <div className='cursor-pointer mr-4'>
+        <div className='mr-4 cursor-pointer'>
           <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
             <BellOutlined style={{ color: '#fff', fontSize: '20px' }} />
           </Badge>
@@ -390,17 +386,17 @@ const UserButton = ({ user, className }: UserButtonProps) => {
       {/* User Profile with loading skeleton */}
       <Dropdown menu={{ items: accountMenuItems }}>
         <Link href='/dashboard' prefetch={false}>
-          <div className='flex items-center cursor-pointer'>
+          <div className='flex cursor-pointer items-center'>
             <div className='relative'>
               {isLive && (
-                <span className='absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full z-10'>
+                <span className='absolute -top-2 -right-2 z-10 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white'>
                   Live
                 </span>
               )}
 
               {/* Show skeleton while loading, but only for a reasonable time */}
               {(isSettingsLoading || !imageLoaded) && (
-                <div className='w-10 h-10'>
+                <div className='h-10 w-10'>
                   <Skeleton.Avatar active size={40} shape='circle' />
                 </div>
               )}
@@ -413,7 +409,9 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                   alt='User Avatar'
                   src={user?.image || '/images/hero/default.png'}
                   className='rounded-full'
-                  onLoad={() => setImageLoaded(true)}
+                  onLoad={() => {
+                    setImageLoaded(true)
+                  }}
                 />
               </div>
             </div>
@@ -428,17 +426,17 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                 </>
               ) : (
                 <>
-                  <p className='text-base font-medium text-white uppercase my-0!'>
+                  <p className='my-0! text-base font-medium text-white uppercase'>
                     {user?.name || 'TECHLEED'}
                   </p>
-                  <p className='text-sm text-gray-400 my-0!'>
+                  <p className='my-0! text-sm text-gray-400'>
                     {isLive ? 'Streaming now' : 'Offline'}
                   </p>
                 </>
               )}
             </div>
 
-            <ChevronDownIcon className='h-5 w-5 ml-2 text-gray-400' />
+            <ChevronDownIcon className='ml-2 h-5 w-5 text-gray-400' />
           </div>
         </Link>
       </Dropdown>

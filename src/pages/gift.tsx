@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect } from 'react'
+import { useEffect } from 'react'
+import type { ReactElement } from 'react'
+
 import { GiftSubscriptionForm } from '@/components/Gift/GiftSubscriptionForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'

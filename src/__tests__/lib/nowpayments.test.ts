@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
@@ -35,7 +36,7 @@ describe('verifyNowPaymentsSignature', () => {
       payment_status: 'finished',
     }
     const sig = sign(body)
-    expect(verifyNowPaymentsSignature(body, sig)).toBe(true)
+    expect(verifyNowPaymentsSignature(body, sig)).toBeTruthy()
   })
 
   it('rejects a tampered body', () => {
@@ -46,39 +47,39 @@ describe('verifyNowPaymentsSignature', () => {
     }
     const sig = sign(body)
     const tampered = { ...body, payment_status: 'failed' }
-    expect(verifyNowPaymentsSignature(tampered, sig)).toBe(false)
+    expect(verifyNowPaymentsSignature(tampered, sig)).toBeFalsy()
   })
 
   it('rejects a missing signature header', () => {
-    expect(verifyNowPaymentsSignature({ payment_id: 1 }, undefined)).toBe(false)
+    expect(verifyNowPaymentsSignature({ payment_id: 1 }, undefined)).toBeFalsy()
   })
 
   it('rejects an array signature header', () => {
-    expect(verifyNowPaymentsSignature({ payment_id: 1 }, ['sig1', 'sig2'])).toBe(false)
+    expect(verifyNowPaymentsSignature({ payment_id: 1 }, ['sig1', 'sig2'])).toBeFalsy()
   })
 
   it('rejects a signature signed with a different secret', () => {
     const body = { payment_id: 123, payment_status: 'finished' }
     const sig = sign(body, 'wrong-secret')
-    expect(verifyNowPaymentsSignature(body, sig)).toBe(false)
+    expect(verifyNowPaymentsSignature(body, sig)).toBeFalsy()
   })
 
   it('is order-independent within nested objects', () => {
     const a = { fee: { currency: 'btc', depositFee: 0.1 }, payment_id: 1 }
     const b = { fee: { currency: 'btc', depositFee: 0.1 }, payment_id: 1 }
     const sig = sign(a)
-    expect(verifyNowPaymentsSignature(b, sig)).toBe(true)
+    expect(verifyNowPaymentsSignature(b, sig)).toBeTruthy()
   })
 })
 
 describe('isNowPaymentsConfirmed', () => {
   it('returns true only for finished', () => {
-    expect(isNowPaymentsConfirmed('finished')).toBe(true)
-    expect(isNowPaymentsConfirmed('confirmed')).toBe(false)
-    expect(isNowPaymentsConfirmed('waiting')).toBe(false)
-    expect(isNowPaymentsConfirmed('partially_paid')).toBe(false)
-    expect(isNowPaymentsConfirmed('failed')).toBe(false)
-    expect(isNowPaymentsConfirmed(null)).toBe(false)
-    expect(isNowPaymentsConfirmed(undefined)).toBe(false)
+    expect(isNowPaymentsConfirmed('finished')).toBeTruthy()
+    expect(isNowPaymentsConfirmed('confirmed')).toBeFalsy()
+    expect(isNowPaymentsConfirmed('waiting')).toBeFalsy()
+    expect(isNowPaymentsConfirmed('partially_paid')).toBeFalsy()
+    expect(isNowPaymentsConfirmed('failed')).toBeFalsy()
+    expect(isNowPaymentsConfirmed(null)).toBeFalsy()
+    expect(isNowPaymentsConfirmed(undefined)).toBeFalsy()
   })
 })

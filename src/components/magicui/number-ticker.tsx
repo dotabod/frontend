@@ -41,5 +41,5 @@ export default function NumberTicker({
     [springValue],
   )
 
-  return <span className={clsx('inline-block tabular-nums tracking-wider', className)} ref={ref} />
+  return <span className={clsx('inline-block tracking-wider tabular-nums', className)} ref={ref} />
 }

@@ -105,7 +105,7 @@ async function createJob(matchId: string): Promise<number> {
     if (!cachedJob) {
       throw new Error(`Job request for match ${matchId} was in cache but returned undefined`)
     }
-    return cachedJob
+    return await cachedJob
   }
 
   // Set up the retry operation
@@ -162,7 +162,7 @@ async function createJob(matchId: string): Promise<number> {
     ) // 5 minutes
   })
 
-  return jobPromise
+  return await jobPromise
 }
 
 async function getJobStatus(jobId: number): Promise<boolean> {
@@ -173,7 +173,7 @@ async function getJobStatus(jobId: number): Promise<boolean> {
     if (!cachedStatus) {
       throw new Error(`Job status for job ${jobId} was in cache but returned undefined`)
     }
-    return cachedStatus
+    return await cachedStatus
   }
 
   // Set up the retry operation
@@ -231,5 +231,5 @@ async function getJobStatus(jobId: number): Promise<boolean> {
     ) // 5 minutes
   })
 
-  return statusPromise
+  return await statusPromise
 }

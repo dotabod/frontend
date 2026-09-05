@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { ProfileSectionNav } from '@/components/ProfileSectionNav'
@@ -13,10 +14,9 @@ import {
   encodeMatchHistoryCursor,
   formatQueueLabel,
   formatStreamerScore,
-  type HeroPerformance,
-  type MatchHistoryRow,
   readKda,
 } from '@/lib/matchHistory'
+import type { HeroPerformance, MatchHistoryRow } from '@/lib/matchHistory'
 
 const PAGE_SIZE = 20
 
@@ -54,7 +54,9 @@ export interface MatchHistoryPageProps {
 }
 
 function periodStart(period: MatchPeriod): Date | null {
-  if (period === 'all') return null
+  if (period === 'all') {
+    return null
+  }
   const days = period === '7d' ? 7 : 30
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 }
@@ -69,8 +71,12 @@ function normalizeView(value: string | string[] | undefined): MatchView {
 
 function matchHistoryHref(username: string, period: MatchPeriod, view: MatchView): string {
   const search = new URLSearchParams()
-  if (period !== 'all') search.set('period', period)
-  if (view === 'heroes') search.set('view', view)
+  if (period !== 'all') {
+    search.set('period', period)
+  }
+  if (view === 'heroes') {
+    search.set('view', view)
+  }
   const query = search.toString()
   return `/${username}/matches${query ? `?${query}` : ''}`
 }
@@ -81,7 +87,7 @@ function WinRateBar({ value }: { value: number }) {
       <div className='h-1.5 w-16 overflow-hidden rounded-full bg-gray-700 sm:w-20' aria-hidden>
         <div className='h-full rounded-full bg-purple-500' style={{ width: `${value}%` }} />
       </div>
-      <span className='w-10 text-right font-medium tabular-nums text-gray-200'>{value}%</span>
+      <span className='w-10 text-right font-medium text-gray-200 tabular-nums'>{value}%</span>
     </div>
   )
 }
@@ -93,7 +99,7 @@ function HeroWinRatesTable({ heroes }: { heroes: HeroPerformance[] }) {
         <h2 id='hero-win-rates-heading' className='text-lg font-semibold text-gray-100'>
           Hero win rates
         </h2>
-        <span className='text-xs tabular-nums text-gray-400'>
+        <span className='text-xs text-gray-400 tabular-nums'>
           {heroes.length} {heroes.length === 1 ? 'hero' : 'heroes'}
         </span>
       </div>
@@ -147,11 +153,11 @@ function HeroWinRatesTable({ heroes }: { heroes: HeroPerformance[] }) {
                       <span className='truncate font-medium text-gray-100'>{hero.heroName}</span>
                     </div>
                   </td>
-                  <td className='col-start-2 row-start-1 block text-right text-sm tabular-nums text-gray-400 sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
+                  <td className='col-start-2 row-start-1 block text-right text-sm text-gray-400 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
                     <span className='sm:hidden'>{hero.matches} matches</span>
                     <span className='hidden sm:inline'>{hero.matches}</span>
                   </td>
-                  <td className='col-start-1 row-start-2 block text-sm tabular-nums text-gray-300 sm:table-cell sm:px-3 sm:py-3 sm:align-middle'>
+                  <td className='col-start-1 row-start-2 block text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:align-middle'>
                     <span className='text-emerald-300'>{hero.wins}W</span>
                     <span className='mx-1.5 text-gray-600' aria-hidden>
                       /
@@ -246,7 +252,7 @@ function MatchList({ matches }: { matches: MatchHistoryRow[] }) {
 
               <td className='col-start-1 row-start-2 block text-sm text-gray-400 sm:table-cell sm:px-3 sm:py-4 sm:align-middle'>
                 <span className='mr-2 text-xs text-gray-400 sm:hidden'>KDA</span>
-                <span className='tabular-nums text-gray-200'>
+                <span className='text-gray-200 tabular-nums'>
                   {match.kda
                     ? `${match.kda.kills} / ${match.kda.deaths} / ${match.kda.assists}`
                     : 'Not recorded'}
@@ -268,7 +274,7 @@ function MatchList({ matches }: { matches: MatchHistoryRow[] }) {
                   className='inline-flex items-center gap-1.5 text-xs font-medium text-purple-300! transition-colors hover:text-purple-200! focus-visible:rounded-sm focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400'
                 >
                   <span>OpenDota</span>
-                  <span className='tabular-nums text-gray-400'>#{match.matchId}</span>
+                  <span className='text-gray-400 tabular-nums'>#{match.matchId}</span>
                   <ArrowUpRight size={13} aria-hidden />
                 </a>
               </td>
@@ -287,23 +293,23 @@ function MatchSummary({ summary }: Pick<MatchHistoryPageProps, 'summary'>) {
       <dl className='mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1'>
         <div>
           <dt className='sr-only'>Wins</dt>
-          <dd className='font-semibold tabular-nums text-emerald-300'>{summary.wins} wins</dd>
+          <dd className='font-semibold text-emerald-300 tabular-nums'>{summary.wins} wins</dd>
         </div>
         <div>
           <dt className='sr-only'>Losses</dt>
-          <dd className='font-semibold tabular-nums text-red-300'>{summary.losses} losses</dd>
+          <dd className='font-semibold text-red-300 tabular-nums'>{summary.losses} losses</dd>
         </div>
         <div>
           <dt className='sr-only'>Win rate</dt>
-          <dd className='text-sm tabular-nums text-gray-200'>{summary.winRate}% win rate</dd>
+          <dd className='text-sm text-gray-200 tabular-nums'>{summary.winRate}% win rate</dd>
         </div>
         <div>
           <dt className='sr-only'>Matches</dt>
-          <dd className='text-sm tabular-nums text-gray-400'>{summary.matches} matches</dd>
+          <dd className='text-sm text-gray-400 tabular-nums'>{summary.matches} matches</dd>
         </div>
         <div>
           <dt className='sr-only'>Heroes</dt>
-          <dd className='text-sm tabular-nums text-gray-400'>
+          <dd className='text-sm text-gray-400 tabular-nums'>
             {summary.heroesPlayed} {summary.heroesPlayed === 1 ? 'hero' : 'heroes'}
           </dd>
         </div>
@@ -378,7 +384,7 @@ const MatchHistoryPage = ({
                     </p>
                   </div>
                   {oldestTrackedLabel && (
-                    <p className='text-xs tabular-nums text-gray-400 sm:pb-1'>
+                    <p className='text-xs text-gray-400 tabular-nums sm:pb-1'>
                       Tracking since {oldestTrackedLabel}
                     </p>
                   )}
@@ -404,7 +410,7 @@ const MatchHistoryPage = ({
                         key={option.value}
                         href={matchHistoryHref(username, period, option.value)}
                         aria-current={active ? 'page' : undefined}
-                        className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
+                        className={`rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
                           active
                             ? 'bg-gray-700 text-gray-100!'
                             : 'text-gray-400! hover:bg-gray-800 hover:text-gray-200!'
@@ -429,7 +435,7 @@ const MatchHistoryPage = ({
                           key={option.value}
                           href={matchHistoryHref(username, option.value, view)}
                           aria-current={active ? 'page' : undefined}
-                          className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
+                          className={`rounded-md px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
                             active
                               ? 'bg-gray-700 text-gray-100!'
                               : 'text-gray-400! hover:bg-gray-800 hover:text-gray-200!'
@@ -499,7 +505,9 @@ export const getServerSideProps: GetServerSideProps<MatchHistoryPageProps> = asy
   res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600')
 
   const username = (params?.username as string)?.toLowerCase()
-  if (!username) return { notFound: true }
+  if (!username) {
+    return { notFound: true }
+  }
 
   const period = normalizePeriod(query.period)
   const view = normalizeView(query.view)
@@ -507,10 +515,12 @@ export const getServerSideProps: GetServerSideProps<MatchHistoryPageProps> = asy
   const start = periodStart(period)
 
   const user = await prisma.user.findFirst({
-    where: { name: username },
     select: { displayName: true, id: true, image: true, name: true },
+    where: { name: username },
   })
-  if (!user) return { notFound: true }
+  if (!user) {
+    return { notFound: true }
+  }
 
   const periodWhere = {
     userId: user.id,
@@ -529,15 +539,13 @@ export const getServerSideProps: GetServerSideProps<MatchHistoryPageProps> = asy
 
   const [groups, matchRows, oldestTracked] = await Promise.all([
     prisma.matches.groupBy({
+      _count: { _all: true },
       by: ['hero_name', 'won'],
       where: periodWhere,
-      _count: { _all: true },
     }),
     view === 'matches'
       ? prisma.matches.findMany({
-          where: { ...periodWhere, ...cursorWhere },
           orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-          take: PAGE_SIZE + 1,
           select: {
             created_at: true,
             dire_score: true,
@@ -553,12 +561,14 @@ export const getServerSideProps: GetServerSideProps<MatchHistoryPageProps> = asy
             radiant_score: true,
             won: true,
           },
+          take: PAGE_SIZE + 1,
+          where: { ...periodWhere, ...cursorWhere },
         })
       : Promise.resolve([]),
     prisma.matches.findFirst({
-      where: { userId: user.id, won: { not: null } },
       orderBy: [{ created_at: 'asc' }, { id: 'asc' }],
       select: { created_at: true },
+      where: { userId: user.id, won: { not: null } },
     }),
   ])
 

@@ -1,8 +1,10 @@
 import clsx from 'clsx'
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { useId } from 'react'
+
 import { plans } from '@/components/Billing/BillingPlans'
-import { calculateSavings, type PricePeriod } from '@/utils/subscription'
+import { calculateSavings } from '@/utils/subscription'
+import type { PricePeriod } from '@/utils/subscription'
 
 interface PeriodToggleProps {
   activePeriod: PricePeriod
@@ -44,7 +46,9 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
                   name={`billing-period-${groupId}`}
                   value={period}
                   checked={selected}
-                  onChange={() => onChange(period)}
+                  onChange={() => {
+                    onChange(period)
+                  }}
                   className='peer sr-only'
                 />
                 {selected && (
@@ -58,7 +62,7 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
                 <span
                   className={clsx(
                     'relative z-10 flex w-full cursor-pointer flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 rounded-md px-3 py-2 text-sm capitalize transition-colors sm:px-4 md:px-6',
-                    'peer-focus-visible:outline-hidden peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900',
+                    'peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 peer-focus-visible:outline-hidden',
                     selected ? 'font-semibold text-gray-950' : 'text-gray-300 hover:text-gray-100',
                   )}
                 >
@@ -66,7 +70,7 @@ export function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
                   {showSavings && (
                     <span
                       className={clsx(
-                        'rounded-full px-1.5 py-0.5 text-[0.625rem] font-semibold leading-none',
+                        'rounded-full px-1.5 py-0.5 text-[0.625rem] leading-none font-semibold',
                         selected ? 'bg-gray-950 text-gray-200' : 'bg-purple-500/15 text-purple-300',
                       )}
                     >

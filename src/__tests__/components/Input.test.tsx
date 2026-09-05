@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
 import { Input } from '@/components/Input'
 
 // Mock the antd Input component
@@ -9,7 +10,7 @@ vi.mock('antd', () => ({
   ),
 }))
 
-describe('Input', () => {
+describe(Input, () => {
   it('renders an input element', () => {
     render(<Input data-testid='input' />)
 
@@ -42,6 +43,6 @@ describe('Input', () => {
     const input = screen.getByTestId('input')
     fireEvent.change(input, { target: { value: 'test value' } })
 
-    expect(handleChange).toHaveBeenCalled()
+    expect(handleChange).toHaveBeenCalledOnce()
   })
 })

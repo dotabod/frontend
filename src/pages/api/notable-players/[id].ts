@@ -2,9 +2,10 @@ import { captureException } from '@sentry/nextjs'
 import { detect } from 'curse-filter'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { prismaMongo } from '@/lib/db'
 
@@ -25,12 +26,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, authOptions)
 
     if (!session?.user?.id || !session?.user?.twitchId) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
 
     const id = req.query.id as string
     if (!id) {
-      return res.status(400).json({ error: 'Missing player ID' })
+      res.status(400).json({ error: 'Missing player ID' })
+      return
     }
 
     // Find the player, ensuring it belongs to the user's channel
@@ -42,18 +45,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         name: true,
       },
       where: {
-        channel: `${session.user.twitchId}`,
+        channel: session.user.twitchId,
         id,
       },
     })
 
     if (!player) {
-      return res.status(404).json({ error: 'Player not found' })
+      res.status(404).json({ error: 'Player not found' })
+      return
     }
 
     // GET - Retrieve a specific notable player
     if (req.method === 'GET') {
-      return res.status(200).json(player)
+      res.status(200).json(player)
+      return
     }
 
     // PUT - Update a notable player
@@ -65,7 +70,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         where: { id },
       })
 
-      return res.status(200).json(updatedPlayer)
+      res.status(200).json(updatedPlayer)
+      return
     }
 
     // DELETE - Delete a notable player
@@ -77,15 +83,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(204).end()
     }
 
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors })
+      res.status(400).json({ error: error.errors })
+      return
     }
 
     console.error('Error in notable-players/[id] API:', error)
     captureException(error)
-    return res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' })
+    return
   }
 }
 

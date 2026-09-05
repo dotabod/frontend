@@ -2,6 +2,7 @@ import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/settings/accounts'
@@ -12,12 +13,12 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/lib/db', () => ({
   default: {
+    $transaction: vi.fn(),
     steamAccount: {
       delete: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
     },
-    $transaction: vi.fn(),
   },
 }))
 
@@ -131,7 +132,7 @@ describe('settings/accounts API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData().accounts).toEqual([
+    expect(res._getJSONData().accounts).toStrictEqual([
       {
         canEdit: true,
         leaderboard_rank: 10,
@@ -181,7 +182,7 @@ describe('settings/accounts API', () => {
       expect.objectContaining({ where: { steam32Id: 111 } }),
     )
     expect(prisma.steamAccount.delete).toHaveBeenCalledWith({ where: { steam32Id: 222 } })
-    expect(prisma.$transaction).toHaveBeenCalledTimes(1)
+    expect(prisma.$transaction).toHaveBeenCalledOnce()
   })
 
   it('rejects a mixed owned and non-owned PATCH before making any writes', async () => {

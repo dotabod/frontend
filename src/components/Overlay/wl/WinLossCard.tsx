@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
 import type { wlType } from '@/lib/hooks/useSocket'
@@ -20,15 +21,21 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
   const fontSize = res({ h: 18 })
   const windowFontSize = Math.max(res({ h: 12 }), 10)
   const windowLabel = (() => {
-    if (wl.statsDays === null) return 'This stream'
+    if (wl.statsDays === null) {
+      return 'This stream'
+    }
     if (wl.statsDaysTotal) {
       return `${wl.statsDays} of ${wl.statsDaysTotal} challenge days elapsed`
     }
     return `Last ${wl.statsDays} ${wl.statsDays === 1 ? 'day' : 'days'}`
   })()
   const windowMarker = (() => {
-    if (wl.statsDays === null) return 'STREAM'
-    if (wl.statsDaysTotal) return `${wl.statsDays} OF ${wl.statsDaysTotal} DAYS`
+    if (wl.statsDays === null) {
+      return 'STREAM'
+    }
+    if (wl.statsDaysTotal) {
+      return `${wl.statsDays} OF ${wl.statsDaysTotal} DAYS`
+    }
     return `${wl.statsDays} ${wl.statsDays === 1 ? 'DAY' : 'DAYS'}`
   })()
 
@@ -45,7 +52,7 @@ const WinLossCard = ({ mainScreen = false, wl, className = '' }: WLType) => {
         <span
           aria-label={windowLabel}
           className={clsx(
-            'whitespace-nowrap font-sans font-semibold tracking-[0.04em] text-white/75',
+            'font-sans font-semibold tracking-[0.04em] whitespace-nowrap text-white/75',
             mainScreen && 'text-[#e4d98d]/80',
           )}
           style={{ fontSize: windowFontSize, lineHeight: 1 }}

@@ -1,6 +1,7 @@
 import { Button } from 'antd'
 import { CrownIcon, SparklesIcon } from 'lucide-react'
 import Link from 'next/link'
+
 import { useFeatureAccess, useSubscription } from '@/hooks/useSubscription'
 import { useTrack } from '@/lib/track'
 
@@ -15,9 +16,9 @@ const ObsProUpsell = () => {
   }
 
   return (
-    <div className='rounded-md border border-yellow-700/40 bg-yellow-950/15 px-4 py-3 mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-      <div className='flex gap-3 items-start md:items-center'>
-        <CrownIcon className='h-5 w-5 text-yellow-400 shrink-0 mt-0.5 md:mt-0' />
+    <div className='mb-4 flex flex-col gap-3 rounded-md border border-yellow-700/40 bg-yellow-950/15 px-4 py-3 md:flex-row md:items-center md:justify-between'>
+      <div className='flex items-start gap-3 md:items-center'>
+        <CrownIcon className='mt-0.5 h-5 w-5 shrink-0 text-yellow-400 md:mt-0' />
         <div>
           <p className='font-medium text-yellow-50'>Skip this with Pro</p>
           <p className='text-sm text-yellow-100/70'>
@@ -28,7 +29,9 @@ const ObsProUpsell = () => {
       </div>
       <Link
         href='/dashboard/billing'
-        onClick={() => track('overlay/upsell_click', { source: 'obs_manual' })}
+        onClick={() => {
+          track('overlay/upsell_click', { source: 'obs_manual' })
+        }}
       >
         <Button
           type='primary'

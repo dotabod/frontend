@@ -1,7 +1,9 @@
 import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type Stripe from 'stripe'
+
 import { stripe } from '@/lib/stripe-server'
+
 import { GiftService } from '../services/gift-service'
 import { withErrorHandling } from '../utils/error-handling'
 import {
@@ -198,7 +200,7 @@ export async function handleCheckoutCompleted(
               if (regularSubscription.stripeSubscriptionId) {
                 // Check if the regular subscription is of the same period as the crypto one being purchased
                 const regularPeriod = regularSubscription.stripePriceId
-                  ? getCurrentPeriod(regularSubscription.stripePriceId as string)
+                  ? getCurrentPeriod(regularSubscription.stripePriceId)
                   : 'unknown'
 
                 // Log for debugging
@@ -319,7 +321,7 @@ export async function handleCheckoutCompleted(
 
                 const renewalInvoiceId =
                   typeof baseMetadata.renewalInvoiceId === 'string'
-                    ? (baseMetadata.renewalInvoiceId as string)
+                    ? baseMetadata.renewalInvoiceId
                     : null
 
                 if (renewalInvoiceId) {
@@ -512,7 +514,7 @@ export async function handleCheckoutCompleted(
 
               const renewalInvoiceId =
                 typeof baseMetadata.renewalInvoiceId === 'string'
-                  ? (baseMetadata.renewalInvoiceId as string)
+                  ? baseMetadata.renewalInvoiceId
                   : null
 
               if (renewalInvoiceId) {

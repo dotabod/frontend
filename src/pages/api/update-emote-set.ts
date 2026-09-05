@@ -1,11 +1,12 @@
 import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { emotesRequired } from '@/components/Dashboard/ChatBot'
 import type { EmoteSetResponse, SevenTVUserResponse } from '@/lib/7tv'
 import { get7TVUser } from '@/lib/7tv'
-import { getServerSession } from '@/lib/api/getServerSession'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
@@ -13,28 +14,33 @@ import { canAccessFeature, getSubscription } from '@/utils/subscription'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const subscription = await getSubscription(session.user.id)
   const { hasAccess } = canAccessFeature('auto7TV', subscription)
 
   if (!hasAccess) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const twitchId = session?.user?.twitchId
 
   if (!twitchId) {
-    return res.status(400).json({ message: 'Twitch ID is required' })
+    res.status(400).json({ message: 'Twitch ID is required' })
+    return
   }
 
   // Check if emotesRequired is defined and not empty
   if (!emotesRequired || emotesRequired.length === 0) {
-    return res.status(400).json({ message: 'No emotes defined for addition' })
+    res.status(400).json({ message: 'No emotes defined for addition' })
+    return
   }
 
   try {
@@ -47,26 +53,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Check if SEVENTV_AUTH environment variable is set
     if (!process.env.SEVENTV_AUTH) {
       console.error('SEVENTV_AUTH environment variable is not set')
-      return res.status(500).json({ message: 'Server configuration error' })
+      res.status(500).json({ message: 'Server configuration error' })
+      return
     }
 
     // Check if twitchId exists
     if (!twitchId) {
       console.error('User does not have a Twitch ID')
-      return res.status(400).json({ message: 'Twitch ID not found for user' })
+      res.status(400).json({ message: 'Twitch ID not found for user' })
+      return
     }
 
     let stvResponse: SevenTVUserResponse | null = null
     try {
       stvResponse = await get7TVUser(twitchId)
     } catch {
-      return res.status(404).json({ message: '7TV user not found' })
+      res.status(404).json({ message: '7TV user not found' })
+      return
     }
 
     // Check if stvResponse is valid
     if (!stvResponse?.user) {
       console.error('Failed to get 7TV user:', stvResponse)
-      return res.status(404).json({ message: '7TV user not found' })
+      res.status(404).json({ message: '7TV user not found' })
+      return
     }
 
     try {
@@ -76,25 +86,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       if (!activeEmoteSetId) {
         console.error('7TV user does not have an active emote set:', stvResponse)
-        return res.status(400).json({ message: 'No active 7TV emote set found' })
+        res.status(400).json({ message: 'No active 7TV emote set found' })
+        return
       }
 
       console.log('Checking existing emotes in the active emote set...')
-      const userEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
+      const userEmoteSet = await client.request<EmoteSetResponse>(GET_EMOTE_SET_FOR_CARD, {
         id: activeEmoteSetId,
         limit: 100,
-      })) as EmoteSetResponse
-      if (!userEmoteSet) {
-        throw new Error('Emote set not found')
-      }
-
+      })
       const existingEmoteNames = new Set(userEmoteSet.emoteSet.emotes.map((e) => e.name))
       const emotesAlreadyInSet = emotesRequired.every((emote) =>
         existingEmoteNames.has(emote.label),
       )
 
       if (emotesAlreadyInSet) {
-        return res.status(200).json({ message: 'Emote set already updated' })
+        res.status(200).json({ message: 'Emote set already updated' })
+        return
       }
 
       console.log('Adding emotes to emote set...')
@@ -118,14 +126,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       )
       console.log('Verifying emote set update...')
 
-      const updatedEmoteSet = (await client.request(GET_EMOTE_SET_FOR_CARD, {
+      const updatedEmoteSet = await client.request<EmoteSetResponse>(GET_EMOTE_SET_FOR_CARD, {
         id: activeEmoteSetId,
         limit: 100,
-      })) as EmoteSetResponse
-      if (!updatedEmoteSet) {
-        throw new Error('Emote set not found')
-      }
-
+      })
       const missingEmotes: string[] = []
       for (const emote of emotesRequired) {
         const emoteInSet = updatedEmoteSet.emoteSet.emotes.find((e) => e.name === emote.label)
@@ -137,7 +141,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (missingEmotes.length > 0) {
         console.error('Failed to add emotes:', missingEmotes)
         console.error('Failed emote details:', failedEmotes)
-        return res.status(500).json({
+        res.status(500).json({
           failedEmotes: failedEmotes.map((f) => ({
             error: String(f.error),
             name: f.name,
@@ -145,13 +149,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           message: 'Failed to add some emotes',
           missingEmotes,
         })
+        return
       }
 
       console.log('Emote set update verified successfully')
-      return res.status(200).json({ message: 'Emote set updated successfully' })
+      res.status(200).json({ message: 'Emote set updated successfully' })
+      return
     } catch (error) {
       if (error instanceof Error && error.message) {
-        return res.status(403).json({ message: error.message })
+        res.status(403).json({ message: error.message })
+        return
       }
       throw error
     }
@@ -160,11 +167,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Provide more detailed error information
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     const errorStack = error instanceof Error ? error.stack : undefined
-    return res.status(500).json({
+    res.status(500).json({
       error: errorMessage,
       message: 'Internal server error',
-      stack: process.env.VERCEL_ENV !== 'production' ? errorStack : undefined,
+      stack: process.env.VERCEL_ENV === 'production' ? undefined : errorStack,
     })
+    return
   }
 }
 

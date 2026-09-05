@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { zeroPad } from 'react-countdown'
+
 import { Settings } from '@/lib/defaultSettings'
 import type { TransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -15,7 +16,9 @@ export const MatchTimer = ({ res }: { res: TransformRes }) => {
       setDuration((duration) => duration + 1)
     }, 1000)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+    }
   }, [])
 
   const minutes = Math.floor(duration / 60)
@@ -34,7 +37,7 @@ export const MatchTimer = ({ res }: { res: TransformRes }) => {
       id='match-timer'
       className='match-timer absolute flex space-x-4'
     >
-      <span className='pt-1 align-bottom font-[Radiance] text-base font-thin uppercase tracking-wide text-[#99dfee]'>
+      <span className='pt-1 align-bottom font-[Radiance] text-base font-thin tracking-wide text-[#99dfee] uppercase'>
         {findMatchText}
       </span>
       <span className='align-bottom font-[Radiance] text-base font-thin tracking-[1px] text-white transition-opacity duration-[0.3s] ease-[ease-in]'>

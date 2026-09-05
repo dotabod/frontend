@@ -3,19 +3,34 @@ import * as Sentry from '@sentry/nextjs'
 import { App } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import useSWR, { type MutatorOptions, useSWRConfig } from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
+import type { MutatorOptions } from 'swr'
+
 import { useSubscription } from '@/hooks/useSubscription'
-import { type SettingKeys, Settings } from '@/lib/defaultSettings'
-import { type ChatterSettingKeys, canAccessFeature, type FeatureTier } from '@/utils/subscription'
+import { Settings } from '@/lib/defaultSettings'
+import type { SettingKeys } from '@/lib/defaultSettings'
+import { canAccessFeature } from '@/utils/subscription'
+import type { ChatterSettingKeys, FeatureTier } from '@/utils/subscription'
+
 import { fetcher } from '../fetcher'
 import { getValueOrDefault } from '../settings'
 
 function describeMutationFailure(status?: number): string {
-  if (status === 403) return "You don't have permission to change this setting."
-  if (status === 401) return "Couldn't save. Sign in again."
-  if (status === 400 || status === 422) return "That setting can't be set to this value."
-  if (status === 429) return "You're changing settings too quickly. Try again in a moment."
-  if (status === undefined) return "Couldn't reach the server. Check your connection."
+  if (status === 403) {
+    return "You don't have permission to change this setting."
+  }
+  if (status === 401) {
+    return "Couldn't save. Sign in again."
+  }
+  if (status === 400 || status === 422) {
+    return "That setting can't be set to this value."
+  }
+  if (status === 429) {
+    return "You're changing settings too quickly. Try again in a moment."
+  }
+  if (status === undefined) {
+    return "Couldn't reach the server. Check your connection."
+  }
   return "Couldn't save. Try again in a moment."
 }
 
@@ -86,8 +101,6 @@ export const SETTINGS_SWR_OPTIONS = {
   revalidateOnFocus: false,
   revalidateOnReconnect: false,
 } as const
-
-export const STABLE_SWR_OPTIONS = SETTINGS_SWR_OPTIONS
 
 export const useUpdate = <
   TData extends Record<string, unknown> = Record<string, unknown>,
@@ -175,13 +188,13 @@ export const useUpdate = <
           type: 'success',
         })
         return dataTransform(currentData, newValue)
-      } catch (err) {
+      } catch (error) {
         if (controller.signal.aborted) {
           // The request may have reached the server before unmount; keep the
           // optimistic value so SWR doesn't roll it back on the user.
           return dataTransform(currentData, newValue)
         }
-        Sentry.captureException(err, {
+        Sentry.captureException(error, {
           tags: { feature: 'settings-mutation' },
           extra: { path: targetPath, status: response?.status },
         })
@@ -189,7 +202,7 @@ export const useUpdate = <
           content: describeMutationFailure(response?.status),
           type: 'error',
         })
-        throw err
+        throw error
       } finally {
         abortControllersRef.current.delete(controller)
         setPendingCount((n) => n - 1)
@@ -202,7 +215,7 @@ export const useUpdate = <
     })
   }
 
-  return { data, error, loading, isSaving, mutate, updateSetting }
+  return { data, error, isSaving, loading, mutate, updateSetting }
 }
 
 export function useUpdateAccount() {
@@ -242,7 +255,7 @@ export function useUpdateAccount() {
     path: '/api/settings/accounts',
   })
 
-  return { data, loading, isSaving, update: updateSetting }
+  return { data, isSaving, loading, update: updateSetting }
 }
 
 export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
@@ -252,7 +265,7 @@ export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
     ...props,
   })
 
-  return { data, loading, isSaving, update: updateSetting }
+  return { data, isSaving, loading, update: updateSetting }
 }
 
 // Define type for rankOnly settings
@@ -410,10 +423,10 @@ export function useUpdateSetting<T = boolean>(
   return {
     data: value as T,
     error,
-    loading,
     isSaving,
+    loading,
     mutate: () => url && mutate(url),
-    original: (data || {}) as SettingsData,
+    original: data || {},
     tierAccess,
     updateSetting,
   }

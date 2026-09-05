@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useDebouncedCallback } from 'use-debounce'
+
 import { AccessibleEmoji } from '@/components/AccessibleEmoji'
 import { Input } from '@/components/Input'
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
@@ -15,12 +16,12 @@ import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import {
   SETTINGS_SWR_OPTIONS,
-  type SettingsSteamAccount,
-  STABLE_SWR_OPTIONS,
   useUpdateAccount,
   useUpdateSetting,
 } from '@/lib/hooks/useUpdateSetting'
-import { getRankDetail, getRankImage, type RankType } from '@/lib/ranks'
+import type { SettingsSteamAccount } from '@/lib/hooks/useUpdateSetting'
+import { getRankDetail, getRankImage } from '@/lib/ranks'
+import type { RankType } from '@/lib/ranks'
 
 // Add type for form values
 interface FormValues {
@@ -137,7 +138,11 @@ const MmrForm = ({ hideText = false }) => {
 
   const steamIds = accounts.map((a) => a.steam32Id)
   const path = `/api/steam/${steamIds.join('/')}`
-  const { data: steamData } = useSWR(steamIds.length > 0 ? path : null, fetcher, STABLE_SWR_OPTIONS)
+  const { data: steamData } = useSWR(
+    steamIds.length > 0 ? path : null,
+    fetcher,
+    SETTINGS_SWR_OPTIONS,
+  )
 
   useEffect(() => {
     if (data?.accounts) {
@@ -164,7 +169,7 @@ const MmrForm = ({ hideText = false }) => {
 
   return (
     <>
-      {form.values.accounts?.length !== 0 ? (
+      {form.values.accounts?.length === 0 ? null : (
         <div className={clsx('transition-all')}>
           <form
             onSubmit={form.onSubmit((values) => {
@@ -213,7 +218,7 @@ const MmrForm = ({ hideText = false }) => {
                             className='mx-1 inline'
                           >
                             {multiUsedBy}
-                            <ExternalLinkIcon className='inline ml-1 h-4 w-4' />
+                            <ExternalLinkIcon className='ml-1 inline h-4 w-4' />
                           </a>
                           removes it from their dashboard. Or, join our{' '}
                           <Link href='/dashboard/help'>help page</Link> for support.
@@ -325,7 +330,7 @@ const MmrForm = ({ hideText = false }) => {
             )}
           </form>
         </div>
-      ) : null}
+      )}
 
       {form.values.accounts.length === 0 && (
         <div className='mt-6'>
@@ -353,7 +358,7 @@ const MmrForm = ({ hideText = false }) => {
                   onChange={debouncedMmr}
                 />
               )}
-              <label htmlFor='mmr' className='mb-2 flex text-sm text-gray-400 '>
+              <label htmlFor='mmr' className='mb-2 flex text-sm text-gray-400'>
                 Enter your current MMR
               </label>
             </div>

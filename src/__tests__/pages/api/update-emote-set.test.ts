@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/update-emote-set'
 
 const mockChatBotModule = vi.hoisted(() => ({
@@ -85,6 +86,7 @@ vi.mock('@/lib/getTwitchTokens', () => ({
 }))
 
 import { GraphQLClient } from 'graphql-request'
+
 // Import mocked modules
 import { get7TVUser } from '@/lib/7tv'
 import { getServerSession } from '@/lib/api/getServerSession'
@@ -139,7 +141,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Forbidden' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Forbidden' })
   })
 
   it('returns 403 when user is not authenticated', async () => {
@@ -152,7 +154,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Forbidden' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Forbidden' })
   })
 
   it('returns 403 when user does not have access to auto7TV feature', async () => {
@@ -198,7 +200,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Forbidden' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Forbidden' })
   })
 
   it('returns 400 when Twitch ID is missing', async () => {
@@ -244,7 +246,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ message: 'Twitch ID is required' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Twitch ID is required' })
   })
 
   it('returns 400 when emotesRequired is not defined', async () => {
@@ -292,7 +294,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ message: 'No emotes defined for addition' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'No emotes defined for addition' })
   })
 
   it('returns 500 when SEVENTV_AUTH is not set', async () => {
@@ -341,7 +343,7 @@ describe('update-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ message: 'Server configuration error' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Server configuration error' })
   })
 
   it('returns 404 when 7TV user is not found', async () => {
@@ -506,8 +508,8 @@ describe('update-emote-set API', () => {
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData().message).toBe('Emote set already updated')
     const requestedQueries = mockRequest.mock.calls.map(([query]) => String(query))
-    expect(requestedQueries.some((query) => query.includes('UpdateUserConnection'))).toBe(false)
-    expect(requestedQueries.some((query) => query.includes('ChangeEmoteInSet'))).toBe(false)
+    expect(requestedQueries.some((query) => query.includes('UpdateUserConnection'))).toBeFalsy()
+    expect(requestedQueries.some((query) => query.includes('ChangeEmoteInSet'))).toBeFalsy()
   })
 
   it('successfully updates emote set', async () => {
@@ -590,7 +592,7 @@ describe('update-emote-set API', () => {
     expect(addEmoteCalls).toHaveLength(2)
     expect(addEmoteCalls[0][1]).toMatchObject({ id: 'active-set-123' })
     const requestedQueries = mockRequest.mock.calls.map(([query]) => String(query))
-    expect(requestedQueries.some((query) => query.includes('UpdateUserConnection'))).toBe(false)
+    expect(requestedQueries.some((query) => query.includes('UpdateUserConnection'))).toBeFalsy()
   })
 
   it('handles errors when adding emotes', async () => {

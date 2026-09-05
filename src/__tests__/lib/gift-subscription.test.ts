@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
+
 import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 
 describe('Gift Subscription Utilities', () => {
-  describe('calculateGiftEndDate', () => {
+  describe(calculateGiftEndDate, () => {
     it('should correctly calculate monthly gift subscription end dates', () => {
       const startDate = new Date('2025-03-15T00:00:00Z')
       const endDate = calculateGiftEndDate('monthly', 1, startDate)
@@ -62,7 +63,7 @@ describe('Gift Subscription Utilities', () => {
     })
   })
 
-  describe('aggregateGiftDuration', () => {
+  describe(aggregateGiftDuration, () => {
     it('should correctly aggregate gift durations when no active subscription exists', () => {
       const now = new Date('2025-03-15T00:00:00Z')
       const giftType = 'monthly'
@@ -123,7 +124,7 @@ describe('Gift Subscription Utilities', () => {
       // Should still be lifetime (far future date)
       expect(newExpiration.getFullYear()).toBeGreaterThanOrEqual(2125)
       // And should be the same as the original lifetime date
-      expect(newExpiration).toEqual(lifetimeExpiration)
+      expect(newExpiration).toStrictEqual(lifetimeExpiration)
     })
   })
 })

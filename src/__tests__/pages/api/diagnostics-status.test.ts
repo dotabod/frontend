@@ -2,6 +2,7 @@ import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/diagnostics/status'
@@ -34,7 +35,7 @@ describe('diagnostics status API', () => {
     expect(prisma.setting.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ userId: 'owner' }) }),
     )
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       gsiLastSeenAt: '2026-09-04T12:00:00.000Z',
       overlayPageLastSeenAt: null,
       overlaySocketLastSeenAt: null,

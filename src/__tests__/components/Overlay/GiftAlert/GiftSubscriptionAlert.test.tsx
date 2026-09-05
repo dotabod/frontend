@@ -1,8 +1,9 @@
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import GiftSubscriptionAlert from '../../../../components/Overlay/GiftAlert/GiftSubscriptionAlert'
 
-describe('GiftSubscriptionAlert', () => {
+describe(GiftSubscriptionAlert, () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -78,6 +79,6 @@ describe('GiftSubscriptionAlert', () => {
     })
 
     // Now it should be called
-    expect(onCompleteMock).toHaveBeenCalledTimes(1)
+    expect(onCompleteMock).toHaveBeenCalledOnce()
   })
 })

@@ -3,11 +3,12 @@ import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { stripe } from '@/lib/stripe-server'
 import {
   createCryptoSubscription,
   findExistingCryptoSubscription,
 } from '@/lib/stripe/utils/subscription-utils'
-import { stripe } from '@/lib/stripe-server'
 import { CRYPTO_PRICE_IDS, getCurrentPeriod } from '@/utils/subscription'
 
 // Mock subscription utils
@@ -78,7 +79,7 @@ describe('Crypto Subscription Utilities', () => {
     vi.restoreAllMocks()
   })
 
-  describe('findExistingCryptoSubscription', () => {
+  describe(findExistingCryptoSubscription, () => {
     it('should find existing crypto subscription by customer ID', async () => {
       const mockSubscription = {
         id: 'sub_123',
@@ -96,7 +97,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toEqual(mockSubscription)
+      expect(result).toStrictEqual(mockSubscription)
       expect(mockTx.subscription.findFirst).toHaveBeenCalledWith({
         where: {
           OR: [
@@ -131,7 +132,7 @@ describe('Crypto Subscription Utilities', () => {
     })
   })
 
-  describe('createCryptoSubscription', () => {
+  describe(createCryptoSubscription, () => {
     const mockPriceId = 'crypto_monthly'
     const mockCustomerId = 'cus_test_123'
     const mockUserId = 'user_123'
@@ -172,7 +173,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toBe(true)
+      expect(result).toBeTruthy()
       expect(stripe.invoices.create).toHaveBeenCalledWith({
         auto_advance: true,
         automatically_finalizes_at: expect.any(Number),
@@ -216,7 +217,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toBe(true)
+      expect(result).toBeTruthy()
       expect(stripe.invoices.create).toHaveBeenCalledWith({
         auto_advance: true,
         automatically_finalizes_at: expect.any(Number),
@@ -253,7 +254,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toBe(true)
+      expect(result).toBeTruthy()
       expect(mockTx.subscription.create).toHaveBeenCalledWith({
         data: {
           cancelAtPeriodEnd: false,
@@ -286,7 +287,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toBe(true)
+      expect(result).toBeTruthy()
       expect(mockTx.subscription.create).not.toHaveBeenCalled()
       expect(mockTx.subscription.findFirst).toHaveBeenCalledWith({
         select: {
@@ -311,7 +312,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toBe(true) // Function still succeeds but creates subscription without renewal
+      expect(result).toBeTruthy() // Function still succeeds but creates subscription without renewal
     })
 
     it('should throw error when subscription creation fails for regular subscriptions', async () => {
@@ -325,10 +326,10 @@ describe('Crypto Subscription Utilities', () => {
     })
   })
 
-  describe('CRYPTO_PRICE_IDS', () => {
+  describe(CRYPTO_PRICE_IDS, () => {
     it('should contain valid crypto price IDs', () => {
       expect(CRYPTO_PRICE_IDS).toBeDefined()
-      expect(Array.isArray(CRYPTO_PRICE_IDS)).toBe(true)
+      expect(Array.isArray(CRYPTO_PRICE_IDS)).toBeTruthy()
       expect(CRYPTO_PRICE_IDS.length).toBeGreaterThan(0)
 
       // Check that all crypto price IDs start with 'crypto_'
@@ -409,7 +410,7 @@ describe('Crypto Subscription Utilities', () => {
         existingSubscription.currentPeriodEnd,
       )
 
-      expect(result).toBe(true)
+      expect(result).toBeTruthy()
       expect(mockTx.subscription.update).toHaveBeenCalledWith({
         data: {
           cancelAtPeriodEnd: true,
@@ -487,7 +488,7 @@ describe('Crypto Subscription Utilities', () => {
         existingSubscription.currentPeriodEnd,
       )
 
-      expect(result).toBe(true)
+      expect(result).toBeTruthy()
       expect(mockTx.subscription.update).toHaveBeenCalledWith({
         data: {
           cancelAtPeriodEnd: true,
@@ -539,7 +540,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toEqual(existingSubscription)
+      expect(result).toStrictEqual(existingSubscription)
       // No upgrade should occur - lifetime subscriptions don't get upgraded
     })
 
@@ -568,7 +569,7 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toEqual(existingSubscription)
+      expect(result).toStrictEqual(existingSubscription)
       // No upgrade operations should be performed
     })
 
@@ -594,7 +595,7 @@ describe('Crypto Subscription Utilities', () => {
           from !== to &&
             (from === 'monthly' || from === 'annual') &&
             (to === 'monthly' || to === 'annual'),
-        ).toBe(true)
+        ).toBeTruthy()
       })
 
       // Invalid upgrades should not meet the criteria
@@ -605,7 +606,7 @@ describe('Crypto Subscription Utilities', () => {
             (from === 'monthly' || from === 'annual') &&
             (to === 'monthly' || to === 'annual')
           ),
-        ).toBe(true)
+        ).toBeTruthy()
       })
     })
   })

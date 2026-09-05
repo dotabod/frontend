@@ -3,7 +3,9 @@ import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { Cookie } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { COOKIE_EVENTS, type CookiePreferences, useCookiePreferences } from '@/lib/cookieManager'
+
+import { COOKIE_EVENTS, useCookiePreferences } from '@/lib/cookieManager'
+import type { CookiePreferences } from '@/lib/cookieManager'
 
 const { Title, Paragraph } = Typography
 
@@ -228,7 +230,9 @@ const CookieConsent = () => {
       <Drawer
         title='Cookie Preferences'
         placement='bottom'
-        onClose={() => setShowSettings(false)}
+        onClose={() => {
+          setShowSettings(false)
+        }}
         open={showSettings}
         height={600}
         width='100%'
@@ -327,7 +331,7 @@ const CookieConsent = () => {
                         />
                       ),
                       key: `${key}-cookies`,
-                      label: `View ${category.cookies.length} cookie${category.cookies.length !== 1 ? 's' : ''}`,
+                      label: `View ${category.cookies.length} cookie${category.cookies.length === 1 ? '' : 's'}`,
                     },
                   ]}
                 />

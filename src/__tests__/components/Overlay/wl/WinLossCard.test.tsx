@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
 import WinLossCard from '@/components/Overlay/wl/WinLossCard'
 
 vi.mock('@/lib/hooks/useTransformRes', () => ({
@@ -10,7 +11,7 @@ vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   useUpdateSetting: () => ({ data: true }),
 }))
 
-describe('WinLossCard', () => {
+describe(WinLossCard, () => {
   it('shows the stats window once beside ranked and unranked records', () => {
     render(
       <WinLossCard

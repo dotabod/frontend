@@ -23,7 +23,7 @@ export const primaryNavLinks: NavLink[] = [
 ]
 
 // Footer-only links (legal + community). The footer renders primary + these.
-export const bottomNavLinks: NavLink[] = [
+const bottomNavLinks: NavLink[] = [
   ['Privacy Policy', '/privacy-policy'],
   ['Terms of Service', '/terms-of-service'],
   ['Cookie Policy', '/cookies'],

@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
+
 import { diagnoseSetup, isCompleteDiagnosticPayload } from './diagnoseSetup'
 
 const now = new Date('2026-09-04T12:00:00.000Z').getTime()
 const recent = '2026-09-04T11:59:30.000Z'
 
-describe('diagnoseSetup', () => {
+describe(diagnoseSetup, () => {
   it('rejects a response truncated near the Cloudflare throttling boundary', () => {
-    expect(isCompleteDiagnosticPayload(16 * 1024)).toBe(false)
-    expect(isCompleteDiagnosticPayload(64 * 1024)).toBe(true)
+    expect(isCompleteDiagnosticPayload(16 * 1024)).toBeFalsy()
+    expect(isCompleteDiagnosticPayload(64 * 1024)).toBeTruthy()
   })
 
   it('reports a healthy setup when the OBS socket and Dota GSI are recent', () => {

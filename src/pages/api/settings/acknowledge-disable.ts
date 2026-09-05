@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -10,7 +11,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   if (req.method === 'POST') {
@@ -18,7 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const { notificationId } = req.body
 
       if (!notificationId) {
-        return res.status(400).json({ message: 'Notification ID is required' })
+        res.status(400).json({ message: 'Notification ID is required' })
+        return
       }
 
       // Update the notification to mark it as acknowledged
@@ -33,20 +36,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
 
       if (result.count === 0) {
-        return res.status(404).json({ message: 'Notification not found' })
+        res.status(404).json({ message: 'Notification not found' })
+        return
       }
 
-      return res.status(200).json({ message: 'Notification acknowledged successfully' })
+      res.status(200).json({ message: 'Notification acknowledged successfully' })
+      return
     } catch (error) {
       captureException(error)
-      return res.status(500).json({
+      res.status(500).json({
         error: error instanceof Error ? error.message : 'Unknown error',
         message: 'Failed to acknowledge disable reason',
       })
+      return
     }
   }
 
-  return res.status(405).json({ message: 'Method Not Allowed' })
+  res.status(405).json({ message: 'Method Not Allowed' })
 }
 
 export default withMethods(['POST'], withAuthentication(handler))

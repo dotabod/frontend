@@ -1,7 +1,9 @@
 import { Skeleton } from 'antd'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { type ReactElement, useEffect } from 'react'
+import { useEffect } from 'react'
+import type { ReactElement } from 'react'
+
 import { GiftSubscriptionForm } from '@/components/Gift/GiftSubscriptionForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
@@ -24,7 +26,7 @@ const GiftSubscriptionPage: NextPageWithLayout = () => {
 
   if (loading) {
     return (
-      <div className='flex justify-center items-center'>
+      <div className='flex items-center justify-center'>
         <Card className='w-full max-w-2xl'>
           <Skeleton active avatar paragraph={{ rows: 4 }} />
           <div className='mt-8'>

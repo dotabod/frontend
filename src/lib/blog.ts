@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+
 import matter from 'gray-matter'
 
 export interface Post {
@@ -19,7 +20,7 @@ export function getAllPosts(): Post[] {
   return filenames
     .filter((filename) => filename.endsWith('.md'))
     .map((filename) => {
-      const fileContents = fs.readFileSync(path.join(postsDirectory, filename), 'utf8')
+      const fileContents = fs.readFileSync(path.join(postsDirectory, filename), 'utf-8')
       const { data } = matter(fileContents)
 
       const date = data.date

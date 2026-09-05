@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
+
 import { parseLastFmResponse } from '@/lib/hooks/useLastFm'
 
-describe('parseLastFmResponse', () => {
+describe(parseLastFmResponse, () => {
   it('reads Last.fm now playing state from the @attr field', () => {
     expect(
       parseLastFmResponse({
@@ -18,7 +19,7 @@ describe('parseLastFmResponse', () => {
           ],
         },
       }),
-    ).toEqual({
+    ).toStrictEqual({
       album: 'Album',
       albumArt: 'https://example.com/cover.jpg',
       artist: 'Artist',
@@ -46,7 +47,7 @@ describe('parseLastFmResponse', () => {
           ],
         },
       }),
-    ).toEqual({
+    ).toStrictEqual({
       album: 'The Chronic "Remastered"',
       albumArt: null,
       artist: 'Dr. Dre & Friends',

@@ -7,7 +7,9 @@ const mocks = vi.hoisted(() => {
   return {
     handleInvoiceEvent: vi.fn(),
     prisma: {
-      $transaction: vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback(tx)),
+      $transaction: vi.fn(
+        async (callback: (tx: unknown) => Promise<unknown>) => await callback(tx),
+      ),
       openNodeCharge: {
         update: vi.fn(),
       },
@@ -55,10 +57,10 @@ const baseCharge: OpenNodeCharge = {
   userId: 'user_1',
 }
 
-describe('processConfirmedOpenNodePayment', () => {
+describe(processConfirmedOpenNodePayment, () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.prisma.$transaction.mockImplementation(async (callback) => callback(mocks.tx))
+    mocks.prisma.$transaction.mockImplementation(async (callback) => await callback(mocks.tx))
     mocks.handleInvoiceEvent.mockResolvedValue(true)
     mocks.prisma.subscription.findFirst.mockResolvedValue({ id: 'sub_1' })
   })

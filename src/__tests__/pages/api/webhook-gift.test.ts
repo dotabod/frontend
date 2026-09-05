@@ -2,6 +2,7 @@ import type { PrismaClient } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import type { Stripe } from 'stripe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
 
@@ -108,7 +109,7 @@ vi.mock('@/lib/gift-subscription', () => ({
 
 // Mock the getRawBody function
 vi.mock('raw-body', () => ({
-  default: vi.fn(() => {
+  default: vi.fn(async () => {
     const mockEvent = {
       api_version: '2023-10-16',
       created: Math.floor(Date.now() / 1000),
@@ -209,7 +210,7 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
       },
     }
 
-    vi.mocked(prisma.$transaction).mockImplementationOnce((callback) =>
+    vi.mocked(prisma.$transaction).mockImplementationOnce(async (callback) =>
       callback(mockTx as unknown as PrismaClient),
     )
 
@@ -217,7 +218,7 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
 
     // Verify the response
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true })
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 
   it('processes lifetime gift subscriptions correctly', async () => {
@@ -232,7 +233,7 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
 
     // Verify the response
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true })
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 
   it('extends existing subscription when user already has one', async () => {
@@ -247,7 +248,7 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
 
     // Verify the response
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true })
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 
   it('handles user subscribing after receiving a gift subscription', async () => {
@@ -315,7 +316,7 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
       },
     }
 
-    vi.mocked(prisma.$transaction).mockImplementationOnce((callback) =>
+    vi.mocked(prisma.$transaction).mockImplementationOnce(async (callback) =>
       callback(mockTx as unknown as PrismaClient),
     )
 
@@ -323,6 +324,6 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
 
     // Verify the response
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true })
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 })

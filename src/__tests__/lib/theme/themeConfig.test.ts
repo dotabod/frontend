@@ -1,5 +1,6 @@
 import { theme } from 'antd'
 import { describe, expect, it } from 'vitest'
+
 import themeConfig from '@/lib/theme/themeConfig'
 
 type Oklch = [lightness: number, chroma: number, hue?: number]
@@ -44,20 +45,19 @@ function oklchToRgba([lightness, chroma, hue = 0]: Oklch): Rgba {
 }
 
 function parseColor(value: string): Rgba {
-  const variable = value.match(/^var\((--[^)]+)\)$/)?.[1]
+  const variable = /^var\((--[^)]+)\)$/.exec(value)?.[1]
   if (variable) {
     const resolved = cssColorValues[variable]
-    if (!resolved) throw new Error(`Missing test color value for ${variable}`)
+    if (!resolved) {
+      throw new Error(`Missing test color value for ${variable}`)
+    }
     return oklchToRgba(resolved)
   }
 
-  const shorthandHex = value.match(/^#([\da-f]{3})$/i)?.[1]
+  const shorthandHex = /^#([\da-f]{3})$/i.exec(value)?.[1]
   const hex = shorthandHex
-    ? shorthandHex
-        .split('')
-        .map((character) => `${character}${character}`)
-        .join('')
-    : value.match(/^#([\da-f]{6})$/i)?.[1]
+    ? [...shorthandHex].map((character) => `${character}${character}`).join('')
+    : /^#([\da-f]{6})$/i.exec(value)?.[1]
   if (hex) {
     return [
       Number.parseInt(hex.slice(0, 2), 16) / 255,
@@ -67,10 +67,7 @@ function parseColor(value: string): Rgba {
     ]
   }
 
-  const rgb = value
-    .match(/^rgba?\(([^)]+)\)$/)?.[1]
-    ?.split(',')
-    .map(Number)
+  const rgb = /^rgba?\(([^)]+)\)$/.exec(value)?.[1]?.split(',').map(Number)
   if (rgb?.length === 3 || rgb?.length === 4) {
     return [rgb[0] / 255, rgb[1] / 255, rgb[2] / 255, rgb[3] ?? 1]
   }
@@ -100,8 +97,12 @@ function contrastRatio(foreground: string, background: string, canvas?: string) 
   let backgroundColor = parseColor(background)
   const canvasColor = parseColor(canvas ?? 'var(--color-gray-900)')
 
-  if (backgroundColor[3] < 1) backgroundColor = composite(backgroundColor, canvasColor)
-  if (foregroundColor[3] < 1) foregroundColor = composite(foregroundColor, backgroundColor)
+  if (backgroundColor[3] < 1) {
+    backgroundColor = composite(backgroundColor, canvasColor)
+  }
+  if (foregroundColor[3] < 1) {
+    foregroundColor = composite(foregroundColor, backgroundColor)
+  }
 
   const foregroundLuminance = relativeLuminance(foregroundColor)
   const backgroundLuminance = relativeLuminance(backgroundColor)

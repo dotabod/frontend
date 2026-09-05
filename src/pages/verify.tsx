@@ -13,10 +13,12 @@ import {
   Tag,
   Typography,
 } from 'antd'
+import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { signIn, useSession } from 'next-auth/react'
-import { type ReactElement, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import TwitchChat from '@/components/TwitchChat'
@@ -500,7 +502,7 @@ const VerifyPage: NextPageWithLayout = () => {
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <Container>
-        <div className='flex flex-col min-h-[60vh]'>
+        <div className='flex min-h-[60vh] flex-col'>
           <Skeleton.Avatar active size={80} shape='circle' />
           <Skeleton.Input active style={{ marginTop: 16, width: 200 }} />
         </div>
@@ -512,7 +514,7 @@ const VerifyPage: NextPageWithLayout = () => {
   if (checkingAccount) {
     return (
       <Container>
-        <div className='flex flex-col min-h-[60vh]'>
+        <div className='flex min-h-[60vh] flex-col'>
           <Title level={2} className='mb-6'>
             Get Dotabod Verified
           </Title>
@@ -526,17 +528,17 @@ const VerifyPage: NextPageWithLayout = () => {
 
   return (
     <Container>
-      <div className='flex flex-col min-h-[60vh]'>
+      <div className='flex min-h-[60vh] flex-col'>
         <Title level={2} className='mb-6'>
           Get Dotabod Verified
         </Title>
 
         {/* Step 1: Twitch Authentication Status */}
         {status !== 'authenticated' && (
-          <Card className='w-full mb-6'>
-            <div className='flex items-center mb-2'>
+          <Card className='mb-6 w-full'>
+            <div className='mb-2 flex items-center'>
               <div className='mr-2 flex-shrink-0'>
-                <span className='text-gray-500 text-2xl'>○</span>
+                <span className='text-2xl text-gray-500'>○</span>
               </div>
               <Title level={4} className='m-0'>
                 Twitch Authentication
@@ -564,7 +566,7 @@ const VerifyPage: NextPageWithLayout = () => {
         {/* Step 2: Steam Authentication */}
         <Card
           title='Steam Authentication'
-          className='w-full shadow-sm hover:shadow-md transition-shadow'
+          className='w-full shadow-sm transition-shadow hover:shadow-md'
         >
           <p>
             {linkedAccounts.length > 0
@@ -598,7 +600,7 @@ const VerifyPage: NextPageWithLayout = () => {
                           key='set-primary'
                           type='text'
                           icon={<StarOutlined />}
-                          onClick={() => setPrimaryAccount(account.steam32Id)}
+                          onClick={async () => setPrimaryAccount(account.steam32Id)}
                           loading={Boolean(actionLoading[`setPrimary_${account.steam32Id}`])}
                           disabled={Boolean(actionLoading[`setPrimary_${account.steam32Id}`])}
                           title='Set as primary account'
@@ -611,7 +613,9 @@ const VerifyPage: NextPageWithLayout = () => {
                         type='text'
                         danger
                         icon={<DeleteOutlined />}
-                        onClick={() => showUnlinkConfirmation(account.steam32Id)}
+                        onClick={() => {
+                          showUnlinkConfirmation(account.steam32Id)
+                        }}
                         loading={Boolean(actionLoading[`unlink_${account.steam32Id}`])}
                         disabled={Boolean(actionLoading[`unlink_${account.steam32Id}`])}
                         title='Unlink this account'
@@ -630,7 +634,7 @@ const VerifyPage: NextPageWithLayout = () => {
                         </div>
                       }
                       title={
-                        <div className='flex items-center gap-2 flex-wrap'>
+                        <div className='flex flex-wrap items-center gap-2'>
                           <Text strong>
                             {account.name ||
                               account.profile?.profile.personaname ||
@@ -656,7 +660,7 @@ const VerifyPage: NextPageWithLayout = () => {
                         <img
                           src={getRankImageUrl(account.profile.rank_tier)}
                           alt='Rank Medal'
-                          className='w-12 h-12'
+                          className='h-12 w-12'
                         />
                         <div className='flex flex-col gap-2'>
                           <Text strong>
@@ -728,9 +732,9 @@ const VerifyPage: NextPageWithLayout = () => {
               </div>
             </div>
           ) : (
-            <div className='flex flex-col gap-4 mt-4'>
+            <div className='mt-4 flex flex-col gap-4'>
               {loading ? (
-                <Skeleton.Button active size='large' style={{ width: '100%', height: 40 }} />
+                <Skeleton.Button active size='large' style={{ height: 40, width: '100%' }} />
               ) : (
                 <Button
                   type='primary'
@@ -751,7 +755,9 @@ const VerifyPage: NextPageWithLayout = () => {
           title='Unlink Steam Account'
           open={unlinkModalVisible}
           onOk={handleUnlinkConfirm}
-          onCancel={() => setUnlinkModalVisible(false)}
+          onCancel={() => {
+            setUnlinkModalVisible(false)
+          }}
           okText='Unlink'
           cancelText='Cancel'
           okButtonProps={{

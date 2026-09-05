@@ -53,7 +53,7 @@ describe('createAndStoreCryptoInvoice', () => {
       userId: 'user_1',
     })
 
-    expect(result).toEqual({
+    expect(result).toStrictEqual({
       nowPaymentsId: '7777',
       url: 'https://nowpayments.io/payment/?iid=fresh',
     })
@@ -100,7 +100,7 @@ describe('createAndStoreCryptoInvoice', () => {
       userId: 'user_1',
     })
 
-    expect(result).toEqual({
+    expect(result).toStrictEqual({
       nowPaymentsId: '7777',
       url: 'https://nowpayments.io/payment/?iid=winner',
     })

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
 import { Badge } from '@/components/Badge'
 
 // Mock the useTransformRes hook
@@ -15,7 +16,7 @@ vi.mock('next/image', () => ({
   ),
 }))
 
-describe('Badge', () => {
+describe(Badge, () => {
   it('renders correctly with image prop', () => {
     render(<Badge image='test-image.png' alt='rank badge' data-testid='badge' />)
 

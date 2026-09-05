@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -6,14 +7,17 @@ import { featureFlags } from '@/lib/featureFlags'
 import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
 import { CRYPTO_PRICE_IDS } from '@/utils/subscription'
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   // Check if crypto payments feature is enabled
   if (!featureFlags.enableCryptoPayments) {
-    return res.status(403).json({ error: 'Crypto payments are currently disabled' })
+    res.status(403).json({ error: 'Crypto payments are currently disabled' })
+    return
   }
 
   try {
@@ -22,11 +26,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Prevent impersonation for security
     if (session?.user?.isImpersonating) {
-      return res.status(403).json({ message: 'Unauthorized' })
+      res.status(403).json({ message: 'Unauthorized' })
+      return
     }
 
     if (!session?.user?.id) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
 
     // Get the user's subscription
@@ -43,7 +49,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!subscription) {
-      return res.status(404).json({ error: 'No active subscription found' })
+      res.status(404).json({ error: 'No active subscription found' })
+      return
     }
 
     // Validate that the subscription was paid with crypto
@@ -62,37 +69,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isCryptoSubscription = isCryptoPayment || hasCryptoPriceId
 
     if (!isCryptoSubscription) {
-      return res.status(400).json({ error: 'This subscription is not paid with crypto' })
+      res.status(400).json({ error: 'This subscription is not paid with crypto' })
+      return
     }
 
     // Check if this subscription was upgraded to a different plan
     if (metadata.upgradedTo) {
       const upgradedTo = typeof metadata.upgradedTo === 'string' ? metadata.upgradedTo : 'newer'
-      return res.status(400).json({
+      res.status(400).json({
         error: `This subscription has been upgraded to a ${upgradedTo} plan. Please use the newer subscription for payments.`,
       })
+      return
     }
 
     // Get the renewal invoice ID from metadata
     const renewalInvoiceId = metadata.renewalInvoiceId as string
 
     if (!renewalInvoiceId) {
-      return res.status(404).json({ error: 'No renewal invoice found for this subscription' })
+      res.status(404).json({ error: 'No renewal invoice found for this subscription' })
+      return
     }
 
     try {
       let invoice = await stripe.invoices.retrieve(renewalInvoiceId)
 
       if (invoice.status === 'void' || invoice.status === 'uncollectible') {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'This invoice has been canceled. No payment is required.',
         })
+        return
       }
 
       if (invoice.status !== 'draft' && invoice.status !== 'open') {
-        return res.status(400).json({
+        res.status(400).json({
           error: `Invoice is not in a payable state. Current status: ${invoice.status}`,
         })
+        return
       }
 
       const existing = await prisma.nowPaymentsInvoice.findUnique({
@@ -109,7 +121,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ])
       if (existing) {
         if (REUSABLE_STATUSES.has(existing.status)) {
-          return res.status(200).json({ url: existing.hostedInvoiceUrl })
+          res.status(200).json({ url: existing.hostedInvoiceUrl })
+          return
         }
         await prisma.nowPaymentsInvoice.delete({
           where: { stripeInvoiceId: renewalInvoiceId },
@@ -127,13 +140,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         userId: session.user.id,
       })
 
-      return res.status(200).json({ url })
+      res.status(200).json({ url })
+      return
     } catch (error) {
       console.error('Error processing crypto renewal invoice:', error)
-      return res.status(500).json({ error: 'Failed to process invoice payment' })
+      res.status(500).json({ error: 'Failed to process invoice payment' })
+      return
     }
   } catch (error) {
     console.error('Error handling crypto invoice:', error)
-    return res.status(500).json({ error: 'Failed to process request' })
+    res.status(500).json({ error: 'Failed to process request' })
+    return
   }
 }

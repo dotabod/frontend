@@ -1,8 +1,10 @@
 import clsx from 'clsx'
 import Image from 'next/image'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 export default function NotablePlayersCard() {
@@ -11,7 +13,7 @@ export default function NotablePlayersCard() {
   return (
     <Card title='Notable players' feature='notablePlayersOverlay'>
       <div className='subtitle'>Show notable players for 2 minutes under the hero top bar.</div>
-      <div className={clsx('pb-12 pt-4 transition-all')}>
+      <div className={clsx('pt-4 pb-12 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           <div className='flex items-center'>
             <TierSwitch
@@ -61,7 +63,7 @@ export default function NotablePlayersCard() {
           alt='minimap blocker'
           width={413}
           height={50}
-          src={'/images/dashboard/notable-players.png'}
+          src='/images/dashboard/notable-players.png'
         />
         <span>Players with their country flags</span>
       </div>

@@ -1,5 +1,6 @@
 import { act, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import ProfilePage, { getServerSideProps } from '@/pages/[username]'
 
 const prismaMocks = vi.hoisted(() => ({
@@ -14,7 +15,9 @@ const socketState = vi.hoisted(() => {
     connected: true,
     disconnect: vi.fn(),
     emit: vi.fn((event: string, _request: unknown, callback: (response: unknown) => void) => {
-      if (event !== 'request-wl') return
+      if (event !== 'request-wl') {
+        return
+      }
       callback({
         records: [{ lose: 3, type: 'R', win: 8 }],
         statsDays: 14,

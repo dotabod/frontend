@@ -36,8 +36,11 @@ for (let i = 0; i < args.length; i++) {
     byNameArg = args[i + 1]
     i++
   } else if (!v.startsWith('--')) {
-    if (!userIdArg) userIdArg = v
-    else if (!reasonArg) reasonArg = v
+    if (!userIdArg) {
+      userIdArg = v
+    } else if (!reasonArg) {
+      reasonArg = v
+    }
   }
 }
 
@@ -57,14 +60,18 @@ async function resolveTarget(): Promise<{ id: string; name: string }> {
       select: { id: true, name: true },
       where: { name: userIdArg },
     })
-    if (!u) throw new Error(`No user found by name: ${userIdArg}`)
+    if (!u) {
+      throw new Error(`No user found by name: ${userIdArg}`)
+    }
     return u
   }
   const u = await prisma.user.findUnique({
     select: { id: true, name: true },
     where: { id: userIdArg! },
   })
-  if (!u) throw new Error(`No user found by id: ${userIdArg}`)
+  if (!u) {
+    throw new Error(`No user found by id: ${userIdArg}`)
+  }
   return u
 }
 
@@ -76,37 +83,45 @@ async function main() {
   // upstream charges manually.
   const [stripeSubs, openNodeCharges, nowPayments, paypalSubs] = await Promise.all([
     prisma.subscription.findMany({
-      select: { id: true, tier: true, status: true, stripeSubscriptionId: true },
-      where: { userId: target.id, status: { in: ['ACTIVE', 'TRIALING'] } },
+      select: { id: true, status: true, stripeSubscriptionId: true, tier: true },
+      where: { status: { in: ['ACTIVE', 'TRIALING'] }, userId: target.id },
     }),
     prisma.openNodeCharge.findMany({
       select: { id: true, status: true },
-      where: { userId: target.id, status: { in: ['paid', 'confirmed'] } },
+      where: { status: { in: ['paid', 'confirmed'] }, userId: target.id },
     }),
     prisma.nowPaymentsInvoice.findMany({
       select: { id: true, status: true },
-      where: { userId: target.id, status: { in: ['finished', 'partially_paid', 'confirmed'] } },
+      where: { status: { in: ['finished', 'partially_paid', 'confirmed'] }, userId: target.id },
     }),
     prisma.payPalSubscription.findMany({
       select: { id: true, status: true },
-      where: { userId: target.id, status: { in: ['ACTIVE', 'APPROVED'] } },
+      where: { status: { in: ['ACTIVE', 'APPROVED'] }, userId: target.id },
     }),
   ])
 
   if (stripeSubs.length || openNodeCharges.length || nowPayments.length || paypalSubs.length) {
     console.warn('⚠️  Active billing artifacts found — cancel/refund manually if needed:')
-    if (stripeSubs.length) console.warn('   Stripe subscriptions:', stripeSubs)
-    if (openNodeCharges.length) console.warn('   OpenNode charges:', openNodeCharges)
-    if (nowPayments.length) console.warn('   NowPayments invoices:', nowPayments)
-    if (paypalSubs.length) console.warn('   PayPal subscriptions:', paypalSubs)
+    if (stripeSubs.length) {
+      console.warn('   Stripe subscriptions:', stripeSubs)
+    }
+    if (openNodeCharges.length) {
+      console.warn('   OpenNode charges:', openNodeCharges)
+    }
+    if (nowPayments.length) {
+      console.warn('   NowPayments invoices:', nowPayments)
+    }
+    if (paypalSubs.length) {
+      console.warn('   PayPal subscriptions:', paypalSubs)
+    }
   }
 
   await prisma.$transaction(async (tx) => {
     await tx.user.update({
       data: {
         bannedAt: new Date(),
-        bannedReason: reasonArg!,
         bannedBy: byArg ?? null,
+        bannedReason: reasonArg!,
       },
       where: { id: target.id },
     })
@@ -116,20 +131,20 @@ async function main() {
     // disabled. Mirrors what commandDisable.disable() does in shared-utils.
     await tx.setting.upsert({
       create: {
+        autoDisabledAt: new Date(),
+        autoDisabledBy: byArg ?? null,
+        disableMetadata: { banned: true, reason: reasonArg! },
+        disableReason: 'MANUAL_DISABLE',
         key: 'commandDisable',
         userId: target.id,
         value: true,
-        disableReason: 'MANUAL_DISABLE',
-        autoDisabledAt: new Date(),
-        autoDisabledBy: byArg ?? null,
-        disableMetadata: { banned: true, reason: reasonArg! },
       },
       update: {
-        value: true,
-        disableReason: 'MANUAL_DISABLE',
         autoDisabledAt: new Date(),
         autoDisabledBy: byArg ?? null,
         disableMetadata: { banned: true, reason: reasonArg! },
+        disableReason: 'MANUAL_DISABLE',
+        value: true,
       },
       where: { key_userId: { key: 'commandDisable', userId: target.id } },
     })
@@ -155,8 +170,8 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
+  .catch((error) => {
+    console.error(error)
     process.exit(1)
   })
-  .finally(() => prisma.$disconnect())
+  .finally(async () => prisma.$disconnect())

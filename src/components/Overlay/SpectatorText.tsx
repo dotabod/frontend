@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'

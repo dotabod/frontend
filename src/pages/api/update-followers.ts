@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
@@ -45,15 +46,15 @@ async function updateFollows(userId: string) {
 
   const totalFollowerCount = await fetchFollowerCount(providerAccountId, accessToken)
 
-  if (totalFollowerCount !== null) {
+  if (totalFollowerCount === null) {
+    // Console.log(`Failed to update followers for user ${user.name}`)
+    // Do nothing
+  } else {
     await prisma.user.update({
       data: { followers: totalFollowerCount, updatedAt: new Date() },
       where: { id: userId },
     })
     console.log(`Updated followers for user ${userId} to ${totalFollowerCount}`)
-  } else {
-    // Console.log(`Failed to update followers for user ${user.name}`)
-    // Do nothing
   }
 }
 
@@ -64,7 +65,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
   if (!session?.user?.id) {
     return res.status(403).end()

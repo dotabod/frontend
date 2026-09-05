@@ -2,6 +2,7 @@ import { detect } from 'curse-filter'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
+
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
@@ -38,7 +39,8 @@ export type GiftCheckoutRequest = z.infer<typeof giftCheckoutSchema>
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   try {
@@ -52,10 +54,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!validationResult.success) {
       const errors = validationResult.error.format()
 
-      return res.status(400).json({
+      res.status(400).json({
         details: errors,
         error: 'Invalid request data',
       })
+      return
     }
 
     const { recipientUsername, priceId, giftMessage, giftSenderName, giftSenderEmail, quantity } =
@@ -63,17 +66,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Check for profanity in gift message and sender name
     if (giftMessage && checkForProfanity(giftMessage)) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Validation failed',
         message: 'Gift message contains inappropriate language. Please revise it.',
       })
+      return
     }
 
     if (giftSenderName && checkForProfanity(giftSenderName)) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Validation failed',
         message: 'Sender name contains inappropriate language. Please revise it.',
       })
+      return
     }
 
     // Find the recipient user by username (name or displayName)
@@ -84,7 +89,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!recipientUser) {
-      return res.status(404).json({ error: 'Recipient not found' })
+      res.status(404).json({ error: 'Recipient not found' })
+      return
     }
 
     // Check if the recipient already has a lifetime subscription
@@ -106,10 +112,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     if (hasLifetime) {
-      return res.status(400).json({
+      res.status(400).json({
         message:
           'The recipient already has a lifetime subscription. They cannot receive additional subscriptions.',
       })
+      return
     }
 
     // Always use one-time payment mode for gift credits
@@ -179,13 +186,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('Failed to create checkout session')
     }
 
-    return res.status(200).json({ url: checkoutSession.url })
+    res.status(200).json({ url: checkoutSession.url })
+    return
   } catch (error) {
     console.error('Gift checkout creation failed:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    return res.status(500).json({
+    res.status(500).json({
       details: errorMessage,
       error: 'Failed to create gift checkout session',
     })
+    return
   }
 }

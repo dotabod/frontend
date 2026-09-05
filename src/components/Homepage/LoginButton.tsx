@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
 import { Button } from 'antd'
 import clsx from 'clsx'
+import { signIn, useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
-import { signIn, useSession } from 'next-auth/react'
 import type { ComponentProps } from 'react'
 import { useState } from 'react'
+
 import { UserAccountNav } from '../UserAccountNav'
 
 interface LoginButtonProps extends ComponentProps<typeof Button> {
@@ -26,10 +27,11 @@ export function LoginButton({ className, ...props }: LoginButtonProps) {
     <Button
       className={clsx(className)}
       loading={loading}
-      onClick={() => {
+      onClick={async () => {
         setLoading(true)
-        return !user
-          ? signIn('twitch', {
+        return user
+          ? router.push('/dashboard')
+          : signIn('twitch', {
               callbackUrl:
                 searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
               redirect: false,
@@ -41,8 +43,9 @@ export function LoginButton({ className, ...props }: LoginButtonProps) {
                 Sentry.captureException(error)
                 console.log(error)
               })
-              .finally(() => setLoading(false))
-          : router.push('/dashboard')
+              .finally(() => {
+                setLoading(false)
+              })
       }}
       {...props}
     >

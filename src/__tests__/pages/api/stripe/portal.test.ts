@@ -50,7 +50,7 @@ describe('/api/stripe/portal', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(405)
-    expect(res._getJSONData()).toEqual({ error: 'Method not allowed' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Method not allowed' })
   })
 
   it('returns 401 when user is not authenticated', async () => {
@@ -60,7 +60,7 @@ describe('/api/stripe/portal', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Unauthorized' })
   })
 
   it('creates portal session with active subscription customer ID', async () => {
@@ -77,7 +77,7 @@ describe('/api/stripe/portal', () => {
       return_url: 'https://dotabod.com/dashboard/billing',
     })
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ url: 'https://billing.stripe.com/session/active' })
+    expect(res._getJSONData()).toStrictEqual({ url: 'https://billing.stripe.com/session/active' })
   })
 
   it('falls back to historical customer ID when active subscription has none', async () => {
@@ -102,7 +102,9 @@ describe('/api/stripe/portal', () => {
       return_url: 'https://dotabod.com/dashboard/billing',
     })
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ url: 'https://billing.stripe.com/session/historical' })
+    expect(res._getJSONData()).toStrictEqual({
+      url: 'https://billing.stripe.com/session/historical',
+    })
   })
 
   it('returns actionable error when no Stripe customer exists', async () => {
@@ -114,7 +116,7 @@ describe('/api/stripe/portal', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       code: 'NO_STRIPE_CUSTOMER',
       error: 'No Stripe customer found',
       guidance: 'No active Stripe billing profile found. If you need help, contact support.',

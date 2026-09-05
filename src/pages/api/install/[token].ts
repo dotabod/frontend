@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { buildGsiConfig } from '@/lib/gsiConfig'
@@ -14,10 +15,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const userId = token || session?.user?.id
 
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
   if (!userId) {
-    return res.status(403).json({ message: 'Unauthorized' })
+    res.status(403).json({ message: 'Unauthorized' })
+    return
   }
 
   // Check subscription access
@@ -25,7 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { hasAccess, requiredTier } = canAccessFeature('autoInstaller', subscription)
 
   if (!hasAccess) {
-    return res.status(403).json({ error: 'This feature requires a subscription', requiredTier })
+    res.status(403).json({ error: 'This feature requires a subscription', requiredTier })
+    return
   }
 
   try {
@@ -46,7 +50,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(200).send(fileData)
   } catch (error) {
     captureException(error)
-    return res.status(500).json({ error: error.message, message: 'Failed to get info' })
+    res.status(500).json({ error: error.message, message: 'Failed to get info' })
+    return
   }
 }
 

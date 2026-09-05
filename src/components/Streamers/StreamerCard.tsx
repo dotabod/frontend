@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import type { FC } from 'react'
+
 import { Badge } from '@/components/Badge'
-import { getRankDetail, getRankImage, type StreamerTier } from '@/lib/ranks'
+import { getRankDetail, getRankImage } from '@/lib/ranks'
+import type { StreamerTier } from '@/lib/ranks'
 
 export interface StreamerSummary {
   name: string
@@ -52,7 +54,7 @@ export const StreamerCard: FC<{ streamer: StreamerSummary }> = ({ streamer }) =>
               {label}
             </Link>
             {isLive && (
-              <span className='flex flex-shrink-0 items-center gap-1 rounded-md bg-red-700 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white'>
+              <span className='flex flex-shrink-0 items-center gap-1 rounded-md bg-red-700 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-white uppercase'>
                 <span className='h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse' />
                 Live
               </span>

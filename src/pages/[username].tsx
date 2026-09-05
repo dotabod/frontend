@@ -6,16 +6,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import { Container } from '@/components/Container'
 import {
   bestRarity,
-  type CosmeticItem,
   hexA,
   RARITY_META,
   RarityChip,
   rarityRank,
   STEAM_CDN,
 } from '@/components/CosmeticSet'
+import type { CosmeticItem } from '@/components/CosmeticSet'
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -28,10 +29,9 @@ import {
   buildHeroPerformance,
   formatQueueLabel,
   formatStreamerScore,
-  type HeroPerformance,
-  type MatchHistoryRow,
   readKda,
 } from '@/lib/matchHistory'
+import type { HeroPerformance, MatchHistoryRow } from '@/lib/matchHistory'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
@@ -41,15 +41,15 @@ const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
 interface CollectionSummary {
   count: number
   // A few of the rarest heroes, for the fanned hand.
-  cards: Array<{
+  cards: {
     heroId: number
     heroName: string
     heroImg: string | null
     // null (not undefined): undefined is unserializable from getStaticProps.
     bestRarity: string | null
-  }>
+  }[]
   // Trophy rarities across the whole collection, rarest first.
-  tally: Array<{ rarity: string; count: number }>
+  tally: { rarity: string; count: number }[]
 }
 
 // The discovery hook on the main page: a held hand of the streamer's rarest hero cards
@@ -71,11 +71,11 @@ function FannedHand({ username, collection }: { username: string; collection: Co
           return (
             <div
               key={c.heroId}
-              className='absolute left-1/2 top-1 h-32 w-[88px] overflow-hidden rounded-xl border bg-gray-900 shadow-lg transition-transform duration-300 ease-out'
+              className='absolute top-1 left-1/2 h-32 w-[88px] overflow-hidden rounded-xl border bg-gray-900 shadow-lg transition-transform duration-300 ease-out'
               style={{
                 borderColor: hexA(accent, 0.55),
-                zIndex: i,
                 transform: `translateX(calc(-50% + ${offset * 26}px * var(--k))) rotate(calc(${offset * 7}deg * var(--k)))`,
+                zIndex: i,
               }}
             >
               {c.heroImg && (
@@ -133,10 +133,10 @@ function CollectionTeaser({ username, name }: { username: string; name: string }
           return (
             <div
               key={i}
-              className='absolute left-1/2 top-1 flex h-32 w-[88px] items-center justify-center rounded-xl border border-dashed border-gray-700 bg-gray-900/40 transition-transform duration-300 ease-out group-hover/fan:[--k:1.15] [--k:1]'
+              className='absolute top-1 left-1/2 flex h-32 w-[88px] items-center justify-center rounded-xl border border-dashed border-gray-700 bg-gray-900/40 transition-transform duration-300 ease-out [--k:1] group-hover/fan:[--k:1.15]'
               style={{
-                zIndex: i,
                 transform: `translateX(calc(-50% + ${offset * 26}px * var(--k))) rotate(calc(${offset * 7}deg * var(--k)))`,
+                zIndex: i,
               }}
             >
               <SparklesIcon size={20} className='text-gray-700' aria-hidden />
@@ -271,15 +271,15 @@ const PageContent = ({
           <Skeleton active paragraph={{ rows: 1 }} />
         </div>
 
-        <div className='flex items-baseline sm:gap-6 gap-2 max-w-full flex-wrap mb-4'>
+        <div className='mb-4 flex max-w-full flex-wrap items-baseline gap-2 sm:gap-6'>
           <Skeleton.Button active size='default' shape='default' style={{ width: 200 }} />
           <Skeleton.Button active size='default' shape='default' style={{ width: 200 }} />
           <Skeleton.Input active size='default' style={{ width: 300 }} />
         </div>
 
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 mb-10'>
+        <div className='mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
           {['sk1', 'sk2', 'sk3', 'sk4', 'sk5', 'sk6', 'sk7', 'sk8'].map((key) => (
-            <div key={key} className='border border-gray-700 rounded-lg p-4'>
+            <div key={key} className='rounded-lg border border-gray-700 p-4'>
               <Skeleton active paragraph={{ rows: 3 }} />
             </div>
           ))}
@@ -347,7 +347,7 @@ const PageContent = ({
       if (subscriptionInfo.isGracePeriodPro) {
         return (
           <Tooltip title='Using Pro features during free trial period'>
-            <Tag color='blue' className='flex! gap-1 items-center py-0.5'>
+            <Tag color='blue' className='flex! items-center gap-1 py-0.5'>
               <CrownIcon size={14} className='inline-block flex-shrink-0' />
               <span>Free Trial</span>
             </Tag>
@@ -358,7 +358,7 @@ const PageContent = ({
       if (subscriptionInfo.isLifetime) {
         return (
           <Tooltip title='Lifetime Pro Subscriber'>
-            <Tag color='gold' className='flex! gap-1 items-center py-0.5'>
+            <Tag color='gold' className='flex! items-center gap-1 py-0.5'>
               <CrownIcon size={14} className='inline-block flex-shrink-0' />
               <span>Lifetime Pro</span>
             </Tag>
@@ -368,7 +368,7 @@ const PageContent = ({
 
       return (
         <Tooltip title='Pro Subscriber'>
-          <Tag color='gold' className='flex! gap-1 items-center py-0.5'>
+          <Tag color='gold' className='flex! items-center gap-1 py-0.5'>
             <CrownIcon size={14} className='inline-block flex-shrink-0' />
             <span>Pro</span>
           </Tag>
@@ -419,7 +419,7 @@ const PageContent = ({
                 className='relative rounded-full ring-2 ring-gray-700'
               />
               {profile?.stream_online && (
-                <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-2 py-px text-[10px] font-bold uppercase tracking-wide text-white'>
+                <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-2 py-px text-[10px] font-bold tracking-wide text-white uppercase'>
                   Live
                 </span>
               )}
@@ -474,7 +474,7 @@ const PageContent = ({
                 </Link>
                 <Link
                   href={createGiftLink(
-                    (ssrUsername || (typeof username === 'string' ? username : '')) as string,
+                    ssrUsername || (typeof username === 'string' ? username : ''),
                   )}
                   passHref
                 >
@@ -504,12 +504,12 @@ const PageContent = ({
 
             {collection && collection.count > 0 ? (
               <FannedHand
-                username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
+                username={ssrUsername || (typeof username === 'string' ? username : '')}
                 collection={collection}
               />
             ) : (
               <CollectionTeaser
-                username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
+                username={ssrUsername || (typeof username === 'string' ? username : '')}
                 name={profile?.displayName || profile?.name || 'this streamer'}
               />
             )}
@@ -522,13 +522,13 @@ const PageContent = ({
         <ProfileMatchOverview
           heroPerformance={heroPerformance}
           recentMatches={recentMatches}
-          username={(ssrUsername || (typeof username === 'string' ? username : '')) as string}
+          username={ssrUsername || (typeof username === 'string' ? username : '')}
         />
 
         {/* Featured commands strip */}
         {!finalLoading && enabledFeaturedCommands.length > 0 && (
           <div className='mb-10'>
-            <p className='mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500'>
+            <p className='mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase'>
               Popular commands
             </p>
             <div className='-mx-1 flex gap-3 overflow-x-auto px-1 pb-2'>
@@ -544,7 +544,7 @@ const PageContent = ({
                         ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                     }, 50)
                   }}
-                  className='w-48 flex-shrink-0 cursor-pointer rounded-lg border border-gray-700 bg-gray-900/80 px-4 py-3 text-left hover:border-purple-500 hover:bg-gray-900 transition-colors'
+                  className='w-48 flex-shrink-0 cursor-pointer rounded-lg border border-gray-700 bg-gray-900/80 px-4 py-3 text-left transition-colors hover:border-purple-500 hover:bg-gray-900'
                 >
                   <div className='mb-1 font-mono text-sm font-semibold text-purple-400'>
                     {CommandDetail[key].cmd}
@@ -562,12 +562,16 @@ const PageContent = ({
         <div className='mb-6 flex flex-wrap items-center gap-3'>
           <Segmented
             value={enabled}
-            onChange={(v) => setEnabled(v as string)}
+            onChange={(v) => {
+              setEnabled(v as string)
+            }}
             options={['All', 'Enabled', 'Disabled']}
           />
           <Segmented
             value={permission}
-            onChange={(v) => setPermission(v as string)}
+            onChange={(v) => {
+              setPermission(v as string)
+            }}
             options={['All', 'Mods', 'Viewers']}
           />
           <Input
@@ -575,7 +579,9 @@ const PageContent = ({
             value={searchTerm}
             maxLength={200}
             style={{ width: 260 }}
-            onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+            onChange={(e) => {
+              setSearchTerm(e.target.value.toLowerCase())
+            }}
           />
           {!finalLoading && (
             <span className='ml-auto text-sm text-gray-500'>
@@ -602,7 +608,9 @@ const PageContent = ({
                 readonly
                 id={key}
                 isOpen={openCardKey === key}
-                onClose={() => setOpenCardKey(null)}
+                onClose={() => {
+                  setOpenCardKey(null)
+                }}
                 publicLoading={finalLoading}
                 publicIsEnabled={commands.find((c) => c.command === key)?.isEnabled}
                 command={CommandDetail[key]}
@@ -675,12 +683,14 @@ function isMaintenanceModeEnabled() {
 // Shape the streamer's loadouts into the fanned-hand summary: rarest few heroes plus a
 // trophy tally. Heroes.json is imported here (server-only) so it stays out of the bundle.
 async function buildCollectionSummary(
-  loadouts: Array<{ heroId: number; heroName: string; items: unknown }>,
+  loadouts: { heroId: number; heroName: string; items: unknown }[],
 ): Promise<CollectionSummary> {
   // The count only needs the row count, so it stays reliable even if a row's items
   // JSON is malformed. The decorative cards/tally are best-effort below.
   const count = loadouts.length
-  if (!count) return { count: 0, cards: [], tally: [] }
+  if (!count) {
+    return { count: 0, cards: [], tally: [] }
+  }
 
   // A row's items can be null or a non-array shape from an older/partial capture;
   // coerce so a bad row can never throw and 404 the whole profile page.
@@ -697,10 +707,10 @@ async function buildCollectionSummary(
       .map((l) => {
         const img = heroes[String(l.heroId)]?.img
         return {
-          heroId: l.heroId,
-          heroName: l.heroName,
-          heroImg: img ? `${STEAM_CDN}${img}` : null,
           bestRarity: bestRarity(itemsOf(l.items)) ?? null,
+          heroId: l.heroId,
+          heroImg: img ? `${STEAM_CDN}${img}` : null,
+          heroName: l.heroName,
         }
       })
       .sort(
@@ -711,20 +721,21 @@ async function buildCollectionSummary(
       .slice(0, 5)
 
     const tallyCounts = new Map<string, number>()
-    for (const l of loadouts)
+    for (const l of loadouts) {
       for (const item of itemsOf(l.items))
         if (rarityRank(item) >= 4)
           tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
+    }
     const tally = [...tallyCounts.entries()]
-      .map(([rarity, count]) => ({ rarity, count }))
+      .map(([rarity, count]) => ({ count, rarity }))
       .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
       .slice(0, 3)
 
-    return { count, cards, tally }
+    return { cards, count, tally }
   } catch (error) {
     // Never let cosmetic shaping break the page — fall back to the bare count.
     console.error('Error building collection summary:', error)
-    return { count, cards: [], tally: [] }
+    return { cards: [], count, tally: [] }
   }
 }
 
@@ -753,13 +764,13 @@ const CommandsPage = ({
   const profileJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
-    url: `https://dotabod.com/${username}`,
     mainEntity: {
       '@type': 'Person',
       name: userData.displayName || userData.name,
       url: `https://twitch.tv/${userData.name}`,
       ...(userData.image ? { image: userData.image } : {}),
     },
+    url: `https://dotabod.com/${username}`,
   }
 
   return (
@@ -830,6 +841,9 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
             providerAccountId: true,
           },
         },
+        cosmeticLoadouts: {
+          select: { heroId: true, heroName: true, items: true, updatedAt: true },
+        },
         createdAt: true,
         displayName: true,
         id: true,
@@ -848,9 +862,6 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
           },
         },
         stream_online: true,
-        cosmeticLoadouts: {
-          select: { heroId: true, heroName: true, items: true, updatedAt: true },
-        },
       },
       where: {
         name: username.toLowerCase(),
@@ -865,14 +876,12 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
       buildCollectionSummary(userData.cosmeticLoadouts),
       getSubscription(userData.id),
       prisma.matches.groupBy({
+        _count: { _all: true },
         by: ['hero_name', 'won'],
         where: { userId: userData.id, won: { not: null } },
-        _count: { _all: true },
       }),
       prisma.matches.findMany({
-        where: { userId: userData.id, won: { not: null } },
         orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-        take: 5,
         select: {
           created_at: true,
           dire_score: true,
@@ -887,6 +896,8 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
           radiant_score: true,
           won: true,
         },
+        take: 5,
+        where: { userId: userData.id, won: { not: null } },
       }),
       import('dotaconstants/build/heroes.json'),
     ])
@@ -946,6 +957,9 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
 
     return {
       props: {
+        collection,
+        heroPerformance,
+        recentMatches,
         subscriptionInfo,
         userData: {
           createdAt: userData.createdAt.toISOString(),
@@ -958,9 +972,6 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
           twitchId: userData.Account?.providerAccountId ?? null,
         },
         username: username.toLowerCase(),
-        collection,
-        heroPerformance,
-        recentMatches,
       },
     }
   } catch (error) {

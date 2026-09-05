@@ -35,7 +35,7 @@ export const GiftPreview = ({ senderName, giftMessage }: GiftPreviewProps) => {
       </p>
 
       <div className='mt-5'>
-        <span className='mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+        <span className='mb-2 block text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
           Twitch chat
         </span>
         <TwitchChat responses={[giftChatMessage]} />

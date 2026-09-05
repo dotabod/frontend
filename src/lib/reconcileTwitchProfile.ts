@@ -33,7 +33,9 @@ async function fetchHelix(accessToken: string): Promise<HelixUser | null> {
         'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
       },
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      return null
+    }
     const body = (await res.json()) as { data?: HelixUser[] }
     return body.data?.[0] ?? null
   } catch {
@@ -51,19 +53,21 @@ export async function reconcileTwitchProfile({
   currentDisplayName,
 }: ReconcileArgs): Promise<ReconcileResult> {
   const helix = await fetchHelix(accessToken)
-  if (!helix) return 'helix-unavailable'
+  if (!helix) {
+    return 'helix-unavailable'
+  }
 
   if (currentName === helix.login && currentDisplayName === helix.display_name) {
     return 'no-change'
   }
 
   await prisma.user.update({
-    where: { id: userId },
     data: {
-      name: helix.login,
       displayName: helix.display_name,
+      name: helix.login,
       updatedAt: new Date(),
     },
+    where: { id: userId },
   })
   return 'updated'
 }

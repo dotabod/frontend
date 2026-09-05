@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
+
 import { useDynamicResizing, useWindowResize } from './hooks'
 
 const TopHud = styled.div`
@@ -79,7 +81,9 @@ export const InGameOutsideCenterV2 = ({ children }: { children: React.ReactNode 
   useEffect(() => {
     updateContentWidth()
     window.addEventListener('resize', updateContentWidth)
-    return () => window.removeEventListener('resize', updateContentWidth)
+    return () => {
+      window.removeEventListener('resize', updateContentWidth)
+    }
   }, [updateContentWidth])
 
   useWindowResize(resizeHandler)

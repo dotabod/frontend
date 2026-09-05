@@ -15,7 +15,7 @@ vi.mock('@/components/Dashboard/Features/TierBadge', () => ({
 
 import { TierSwitch } from '@/components/Dashboard/Features/TierSwitch'
 
-describe('TierSwitch', () => {
+describe(TierSwitch, () => {
   it('uses its visible string label as the switch accessible name', () => {
     render(<TierSwitch settingKey='commandToday' label='Use !today hero stats' />)
 

@@ -1,7 +1,8 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { ranks } from '@/lib/ranks'
@@ -116,7 +117,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { steam32Id } = req.body
 
   if (!steam32Id) {
-    return res.status(400).json({ message: 'Missing steam32Id parameter' })
+    res.status(400).json({ message: 'Missing steam32Id parameter' })
+    return
   }
 
   try {
@@ -124,7 +126,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, authOptions)
 
     if (!session?.user?.id) {
-      return res.status(401).json({ message: 'Unauthorized' })
+      res.status(401).json({ message: 'Unauthorized' })
+      return
     }
 
     // Check if the steam32Id is associated with the user
@@ -136,9 +139,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!steamAccount) {
-      return res
-        .status(404)
-        .json({ message: 'Steam account not found or not associated with the user' })
+      res.status(404).json({ message: 'Steam account not found or not associated with the user' })
+      return
     }
 
     // Fetch profile data from OpenDota API
@@ -146,7 +148,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const profile = await fetchOpenDotaProfile(accountId)
 
     if (!profile) {
-      return res.status(404).json({ message: 'Failed to fetch profile data from OpenDota' })
+      res.status(404).json({ message: 'Failed to fetch profile data from OpenDota' })
+      return
     }
 
     // Estimate MMR from rank tier if available
@@ -164,7 +167,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    return res.status(200).json({
+    res.status(200).json({
       data: {
         leaderboardRank: updatedAccount.leaderboard_rank,
         mmr: updatedAccount.mmr,
@@ -173,10 +176,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       profile,
       success: true,
     })
+    return
   } catch (error) {
     captureException(error)
     console.error('Error updating Steam account profile data:', error)
-    return res.status(500).json({ message: 'Internal server error' })
+    res.status(500).json({ message: 'Internal server error' })
+    return
   }
 }
 

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import prisma from '@/lib/db'
 import { captureOrder } from '@/lib/paypal'
 import { completeLifetimeOrder, syncPaypalSubscription } from '@/lib/paypal-subscriptions'

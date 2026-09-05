@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
 vi.mock('@/lib/db', () => ({
   default: {
-    notification: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
+    notification: { findFirst: vi.fn(), findMany: vi.fn(), update: vi.fn() },
     subscription: { findMany: vi.fn() },
   },
 }))
@@ -23,8 +23,8 @@ const auth = (userId: string | null) =>
 
 describe('notifications API', () => {
   beforeEach(() => {
-    vi.mocked(prisma.subscription.findMany).mockResolvedValue([] as any)
-    vi.mocked(prisma.notification.findMany).mockResolvedValue([] as any)
+    vi.mocked(prisma.subscription.findMany).mockResolvedValue([])
+    vi.mocked(prisma.notification.findMany).mockResolvedValue([])
   })
 
   it('GET 401 when unauthenticated', async () => {
@@ -38,34 +38,34 @@ describe('notifications API', () => {
     auth('u1')
     vi.mocked(prisma.notification.findMany).mockResolvedValue([
       {
-        id: 'g1',
-        type: 'GIFT_SUBSCRIPTION',
-        isRead: false,
         createdAt: new Date(),
-        userId: 'u1',
         giftSubscription: {
-          giftType: 'monthly',
-          giftQuantity: 2,
           giftMessage: 'hi',
+          giftQuantity: 2,
+          giftType: 'monthly',
           senderName: 'Bob',
         },
+        id: 'g1',
+        isRead: false,
+        type: 'GIFT_SUBSCRIPTION',
+        userId: 'u1',
       },
       {
-        id: 'f1',
-        type: 'NEW_FEATURE',
-        isRead: false,
         createdAt: new Date(),
-        userId: 'u1',
         giftSubscription: null,
+        id: 'f1',
+        isRead: false,
+        type: 'NEW_FEATURE',
+        userId: 'u1',
       },
       // orphaned gift (its giftSubscription row was deleted) → dropped
       {
-        id: 'g2',
-        type: 'GIFT_SUBSCRIPTION',
-        isRead: false,
         createdAt: new Date(),
-        userId: 'u1',
         giftSubscription: null,
+        id: 'g2',
+        isRead: false,
+        type: 'GIFT_SUBSCRIPTION',
+        userId: 'u1',
       },
     ] as any)
 
@@ -77,15 +77,15 @@ describe('notifications API', () => {
     expect(json.totalNotifications).toBe(2)
     const byId = Object.fromEntries(json.notifications.map((n: any) => [n.id, n]))
     expect(byId.g1).toMatchObject({
-      type: 'GIFT_SUBSCRIPTION',
-      senderName: 'Bob',
-      giftType: 'monthly',
       giftQuantity: 2,
+      giftType: 'monthly',
+      senderName: 'Bob',
+      type: 'GIFT_SUBSCRIPTION',
     })
     expect(byId.f1).toMatchObject({ type: 'NEW_FEATURE' })
     expect(byId.f1.senderName).toBeUndefined()
     expect(byId.g2).toBeUndefined()
-    expect(json.hasLifetime).toBe(false)
+    expect(json.hasLifetime).toBeFalsy()
   })
 
   it('GET reports hasLifetime from active subscriptions', async () => {
@@ -95,7 +95,7 @@ describe('notifications API', () => {
     ] as any)
     const { req, res } = createMocks({ method: 'GET' })
     await handler(req, res)
-    expect(res._getJSONData().hasLifetime).toBe(true)
+    expect(res._getJSONData().hasLifetime).toBeTruthy()
   })
 
   it('GET defaults to unread-only unless includeRead=true', async () => {
@@ -111,7 +111,7 @@ describe('notifications API', () => {
     auth('u1')
     vi.mocked(prisma.notification.findFirst).mockResolvedValue({ id: 'n1', userId: 'u1' } as any)
     vi.mocked(prisma.notification.update).mockResolvedValue({ id: 'n1' } as any)
-    const { req, res } = createMocks({ method: 'POST', body: { notificationId: 'n1' } })
+    const { req, res } = createMocks({ body: { notificationId: 'n1' }, method: 'POST' })
     await handler(req, res)
     expect(res.statusCode).toBe(200)
     expect(prisma.notification.update).toHaveBeenCalledWith(
@@ -124,8 +124,8 @@ describe('notifications API', () => {
 
   it("POST 404 when the notification isn't the caller's", async () => {
     auth('u1')
-    vi.mocked(prisma.notification.findFirst).mockResolvedValue(null as any)
-    const { req, res } = createMocks({ method: 'POST', body: { notificationId: 'n1' } })
+    vi.mocked(prisma.notification.findFirst).mockResolvedValue(null)
+    const { req, res } = createMocks({ body: { notificationId: 'n1' }, method: 'POST' })
     await handler(req, res)
     expect(res.statusCode).toBe(404)
     expect(prisma.notification.update).not.toHaveBeenCalled()
@@ -133,7 +133,7 @@ describe('notifications API', () => {
 
   it('POST 400 on an invalid body', async () => {
     auth('u1')
-    const { req, res } = createMocks({ method: 'POST', body: {} })
+    const { req, res } = createMocks({ body: {}, method: 'POST' })
     await handler(req, res)
     expect(res.statusCode).toBe(400)
   })

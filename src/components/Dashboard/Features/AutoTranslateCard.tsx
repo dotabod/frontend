@@ -1,9 +1,11 @@
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { Alert, Select, Tag } from 'antd'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { localePatchSchema } from '@/lib/validations/setting'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 // Convert locale schema to options for the Select component
@@ -47,7 +49,7 @@ export default function AutoTranslateCard(): React.ReactNode {
   return (
     <Card
       title={
-        <div className='flex items-center space-x-2 mb-4'>
+        <div className='mb-4 flex items-center space-x-2'>
           <span>Automatic Translation</span> <Tag color='green'>New</Tag>
         </div>
       }
@@ -58,14 +60,14 @@ export default function AutoTranslateCard(): React.ReactNode {
       </div>
 
       <div className='mb-4'>
-        <p className='text-sm text-gray-300 mb-4'>
+        <p className='mb-4 text-sm text-gray-300'>
           Choose how you want translations to appear: in your chat, on your stream overlay, or both.
           When enabled, Dotabod will translate incoming in-game chat messages from other languages
           to your selected target language, helping international viewers understand conversations.
         </p>
       </div>
 
-      <div className='flex items-center space-x-2 mb-4'>
+      <div className='mb-4 flex items-center space-x-2'>
         <TierSwitch
           hideTierBadge
           settingKey={Settings.autoTranslate}
@@ -76,7 +78,7 @@ export default function AutoTranslateCard(): React.ReactNode {
         </Tag>
       </div>
 
-      <div className='flex items-center space-x-2 mb-4'>
+      <div className='mb-4 flex items-center space-x-2'>
         <TierSwitch
           hideTierBadge
           settingKey={Settings.translateOnOverlay}
@@ -91,7 +93,7 @@ export default function AutoTranslateCard(): React.ReactNode {
         <div className='mb-4'>
           <label
             htmlFor='translation-language-select'
-            className='block text-sm font-medium text-gray-300 mb-2'
+            className='mb-2 block text-sm font-medium text-gray-300'
           >
             Target Language
           </label>
@@ -108,7 +110,7 @@ export default function AutoTranslateCard(): React.ReactNode {
             style={{ width: 200 }}
             placeholder='Select target language'
           />
-          <p className='text-xs text-gray-400 mt-1'>
+          <p className='mt-1 text-xs text-gray-400'>
             Chat messages from your games will be translated to this language on the overlay.
           </p>
         </div>
@@ -140,7 +142,7 @@ export default function AutoTranslateCard(): React.ReactNode {
         />
       )}
 
-      <div className='mt-4 p-3 bg-gray-800 rounded-md'>
+      <div className='mt-4 rounded-md bg-gray-800 p-3'>
         <p className='text-xs text-gray-400'>
           <strong>How it works:</strong> Dotabod uses DeepL to convert incoming in-game chat
           messages in real-time. Independently toggle where you want translations to appear - in

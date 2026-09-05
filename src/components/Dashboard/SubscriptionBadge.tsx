@@ -1,11 +1,13 @@
 import { Badge, Skeleton, Tag, Tooltip } from 'antd'
 import { CrownIcon, Wallet } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { useMemo } from 'react'
+
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { getSubscriptionStatusInfo } from '@/utils/subscription'
+
 import { plans } from '../Billing/BillingPlans'
 
 export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
@@ -136,7 +138,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
 
   const subscriptionContent = collapsed ? (
     <div
-      className={`${commonClasses} justify-center mx-auto hover:cursor-pointer hover:opacity-90 transition-opacity duration-200 hover:scale-110`}
+      className={`${commonClasses} mx-auto justify-center transition-opacity duration-200 hover:scale-110 hover:cursor-pointer hover:opacity-90`}
     >
       <Tooltip {...tooltipProps}>
         <Link href='/dashboard/billing'>
@@ -156,22 +158,22 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
               size='small'
               shape='default'
               block
-              className='px-3 py-1.5 rounded-md transition-all duration-200 w-full min-w-[130px]'
+              className='w-full min-w-[130px] rounded-md px-3 py-1.5 transition-all duration-200'
             />
           ) : (
             <Tag
               color={badgeDetails?.color || statusInfo?.badge}
-              className='px-3 py-1.5 rounded-md transition-all duration-200 hover:shadow-md w-full'
+              className='w-full rounded-md px-3 py-1.5 transition-all duration-200 hover:shadow-md'
             >
-              <div className={`${commonClasses} justify-center w-full`}>
-                <div className='flex items-center justify-center gap-4 w-full'>
+              <div className={`${commonClasses} w-full justify-center`}>
+                <div className='flex w-full items-center justify-center gap-4'>
                   {badgeDetails?.icon ? (
-                    <div className='flex items-center justify-between w-full'>
+                    <div className='flex w-full items-center justify-between'>
                       {badgeDetails.icon}
                       <span className='font-medium'>{badgeDetails.text}</span>
                     </div>
                   ) : (
-                    <div className='flex items-center justify-between w-full'>
+                    <div className='flex w-full items-center justify-between'>
                       {logo}
                       <span className='font-medium'>{currentPlan?.name} Plan</span>
                     </div>
@@ -179,7 +181,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
                 </div>
               </div>
               {!badgeDetails && statusInfo?.message && (
-                <div className='text-center text-xs mt-1 opacity-90 break-words w-full'>
+                <div className='mt-1 w-full text-center text-xs break-words opacity-90'>
                   {statusInfo.message}
                 </div>
               )}

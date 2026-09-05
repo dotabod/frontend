@@ -1,24 +1,18 @@
 'use client'
 
-import { Empty, Input, type InputRef, List, Popover, Typography } from 'antd'
+import { Empty, Input, List, Popover, Typography } from 'antd'
+import type { InputRef } from 'antd'
 import clsx from 'clsx'
 import { ChevronRight, CornerDownRight, Settings } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import {
-  type KeyboardEvent as ReactKeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import {
-  filterNav,
-  isExternalNavItem,
-  type NavIcon,
-  navConfig,
-} from '@/components/Dashboard/navigation'
-import { type SettingMetadata, settingsMetadata } from '@/lib/settingsMetadata'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
+
+import { filterNav, isExternalNavItem, navConfig } from '@/components/Dashboard/navigation'
+import type { NavIcon } from '@/components/Dashboard/navigation'
+import { settingsMetadata } from '@/lib/settingsMetadata'
+import type { SettingMetadata } from '@/lib/settingsMetadata'
 
 // A synthesized "go to page" entry, shaped like SettingMetadata so the existing
 // scorer can rank it right alongside real settings.
@@ -131,7 +125,7 @@ export function SettingsSearch() {
       }
 
       // Fuzzy match - check if all characters appear in order within reasonable distance
-      const chars = Array.from(searchQuery)
+      const chars = [...searchQuery]
       let charIndex = 0
       let firstFoundIndex = -1
       let lastFoundIndex = -1
@@ -280,7 +274,9 @@ export function SettingsSearch() {
     }
 
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [isOpen, query])
 
   // Scroll selected item into view when selectedIndex changes
@@ -314,7 +310,9 @@ export function SettingsSearch() {
     }
 
     window.addEventListener('keydown', handleGlobalKeyDown)
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown)
+    }
   }, [])
 
   const getCategoryLabel = (category: SettingMetadata['category']) => {
@@ -345,7 +343,7 @@ export function SettingsSearch() {
             description={
               <div className='text-center'>
                 <p className='text-sm text-gray-300'>No results found for "{query}"</p>
-                <p className='text-xs text-gray-400 mt-1'>Try searching with different keywords</p>
+                <p className='mt-1 text-xs text-gray-400'>Try searching with different keywords</p>
               </div>
             }
           />
@@ -369,11 +367,15 @@ export function SettingsSearch() {
           key={result.key}
           data-index={index}
           className={clsx(
-            'cursor-pointer rounded-md mx-2 transition-colors',
+            'mx-2 cursor-pointer rounded-md transition-colors',
             selectedIndex === index && 'bg-gray-700',
           )}
-          onClick={() => navigateToSetting(result)}
-          onMouseEnter={() => setSelectedIndex(index)}
+          onClick={() => {
+            navigateToSetting(result)
+          }}
+          onMouseEnter={() => {
+            setSelectedIndex(index)
+          }}
           style={{
             backgroundColor: selectedIndex === index ? '#374151' : 'transparent',
             margin: '0 8px',
@@ -403,7 +405,7 @@ export function SettingsSearch() {
       <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>
         {navResults.length > 0 && (
           <>
-            <Typography.Text className='text-xs font-medium text-gray-400 px-3 py-1 block'>
+            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>
               Go to…
             </Typography.Text>
             <List
@@ -415,7 +417,7 @@ export function SettingsSearch() {
         )}
         {settingResults.length > 0 && (
           <>
-            <Typography.Text className='text-xs font-medium text-gray-400 px-3 py-1 block'>
+            <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>
               Search Results
             </Typography.Text>
             <List
@@ -430,7 +432,7 @@ export function SettingsSearch() {
   }, [isOpen, query, searchResults, selectedIndex])
 
   return (
-    <div className='flex w-full max-w-md mx-auto'>
+    <div className='mx-auto flex w-full max-w-md'>
       <Popover
         content={searchResultsContent}
         trigger={[]}
@@ -450,7 +452,9 @@ export function SettingsSearch() {
             setSelectedIndex(0)
             setIsOpen(true)
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsOpen(true)
+          }}
           onKeyDown={handleInputKeyDown}
           placeholder='Search or jump to… (⌘K)'
           size='large'

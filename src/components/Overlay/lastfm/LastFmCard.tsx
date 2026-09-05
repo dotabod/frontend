@@ -2,6 +2,7 @@ import { Typography } from 'antd'
 import clsx from 'clsx'
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -142,12 +143,14 @@ const AlbumArtImage = ({
       animate={{ opacity: imageLoaded ? 1 : 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className='rounded object-cover rounded-sm'
+      className='rounded rounded-sm object-cover'
       onError={() => {
         setImageError(true)
         setImageLoaded(true)
       }}
-      onLoad={() => setImageLoaded(true)}
+      onLoad={() => {
+        setImageLoaded(true)
+      }}
     />
   )
 }
@@ -226,7 +229,7 @@ const LastFmCard = ({
               <Text
                 strong
                 className={clsx(
-                  'block m-0 p-0',
+                  'm-0 block p-0',
                   transparent ? 'text-white drop-shadow-sm' : 'text-gray-100',
                 )}
               >
@@ -234,7 +237,7 @@ const LastFmCard = ({
               </Text>
               <Text
                 className={clsx(
-                  'block m-0 p-0 text-xs -mt-1',
+                  'm-0 -mt-1 block p-0 text-xs',
                   transparent ? 'text-gray-200/90 drop-shadow-sm' : 'text-gray-300',
                 )}
               >

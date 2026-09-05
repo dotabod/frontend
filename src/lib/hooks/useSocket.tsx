@@ -9,9 +9,12 @@ import {
   EventSubChannelPredictionProgressEvent,
 } from '@twurple/eventsub-base'
 import { useRouter } from 'next/router'
-import { type Dispatch, type SetStateAction, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import { useDispatch } from 'react-redux'
-import io, { type Socket } from 'socket.io-client'
+import io from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
+
 import type { NotablePlayer } from '@/components/Overlay/NotablePlayers'
 import type { PollData } from '@/components/Overlay/PollOverlay'
 import { Settings } from '@/lib/defaultSettings'
@@ -20,7 +23,9 @@ import { fetcher } from '@/lib/fetcher'
 import { getMatchData, matchDataCache } from '@/lib/hooks/openDotaAPI'
 import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { getRankImage, type RankType } from '@/lib/ranks'
+import { getRankImage } from '@/lib/ranks'
+import type { RankType } from '@/lib/ranks'
+
 import {
   setMinimapDataBuildings,
   setMinimapDataCouriers,
@@ -184,7 +189,9 @@ export const useSocket = ({
     }, 15_000)
 
     const diagnosticHeartbeat = setInterval(() => {
-      if (socket?.connected) socket.emit('diagnostic-heartbeat')
+      if (socket?.connected) {
+        socket.emit('diagnostic-heartbeat')
+      }
     }, 60_000)
 
     // Update lastReceivedTime whenever we get any data
@@ -375,7 +382,8 @@ export const useSocket = ({
       updateLastReceived()
       // TODO: set setRadiantWinChance(null) on new match to avoid animation between matches
       if (!chanceDetails) {
-        return setRadiantWinChance((prev) => (prev ? { ...prev, visible: false } : null))
+        setRadiantWinChance((prev) => (prev ? { ...prev, visible: false } : null))
+        return
       }
       setRadiantWinChance({ ...chanceDetails, visible: true })
     })

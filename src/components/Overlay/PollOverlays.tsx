@@ -1,9 +1,12 @@
 import { AnimatePresence } from 'framer-motion'
 import type { Dispatch, SetStateAction } from 'react'
-import { type PollData, PollOverlay } from '@/components/Overlay/PollOverlay'
+
+import { PollOverlay } from '@/components/Overlay/PollOverlay'
+import type { PollData } from '@/components/Overlay/PollOverlay'
 import { Settings } from '@/lib/defaultSettings'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+
 import { WinProbability } from './WinProbability'
 
 type BetData = {

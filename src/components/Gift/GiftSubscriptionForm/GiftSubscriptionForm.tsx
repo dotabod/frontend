@@ -11,10 +11,12 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+
 import { plans } from '@/components/Billing/BillingPlans'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
 import { Card } from '@/ui/card'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+
 import { GiftPreview } from './GiftPreview'
 
 // Define the form values type
@@ -44,16 +46,16 @@ const PRO_HIGHLIGHTS = [
 
 const HOW_IT_WORKS = [
   {
-    title: 'They get notified in chat',
     body: 'A message in their Twitch chat announces your gift, usually within 1 to 3 minutes of checkout.',
+    title: 'They get notified in chat',
   },
   {
-    title: 'New to Pro? Credits apply automatically',
     body: "If they've never subscribed, they set up Pro and your credits cover the months you gifted. No charge until those run out.",
+    title: 'New to Pro? Credits apply automatically',
   },
   {
-    title: 'Already Pro? The time just stacks',
     body: 'Existing subscribers keep their plan and your credits extend it, so they get Pro for longer.',
+    title: 'Already Pro? The time just stacks',
   },
 ]
 
@@ -73,14 +75,14 @@ export const GiftSubscriptionForm = ({
 
   const reduceMotion = useReducedMotion()
   const fadeUp = (delay: number) => ({
-    initial: reduceMotion ? false : { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
+    initial: reduceMotion ? false : { opacity: 0, y: 14 },
     transition: { delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   })
 
   // Pull the live monthly Pro price so the buyer always sees the total.
   const proMonthly = plans.find((p) => p.tier === SUBSCRIPTION_TIERS.PRO)?.price.monthly ?? '$6'
-  const currency = proMonthly.match(/[^0-9.]/)?.[0] ?? '$'
+  const currency = /[^0-9.]/.exec(proMonthly)?.[0] ?? '$'
   const unitPrice = Number.parseFloat(proMonthly.replaceAll(/[^0-9.]/g, '')) || 6
   const total = unitPrice * quantity
   const formatPrice = (value: number) => `${currency}${value % 1 === 0 ? value : value.toFixed(2)}`
@@ -240,13 +242,13 @@ export const GiftSubscriptionForm = ({
 
       {/* Hero */}
       <motion.header {...fadeUp(0)} className='pt-12 md:pt-16'>
-        <p className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+        <p className='text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
           A gift that keeps streaming
         </p>
-        <h1 className='mt-3 text-balance text-4xl font-semibold leading-tight tracking-tight text-gray-100 sm:text-5xl'>
+        <h1 className='mt-3 text-4xl leading-tight font-semibold tracking-tight text-balance text-gray-100 sm:text-5xl'>
           {recipientLink ? <>Gift Dotabod Pro to {recipientLink}</> : 'Gift Dotabod Pro'}
         </h1>
-        <p className='mt-4 max-w-2xl text-pretty text-lg text-gray-400'>
+        <p className='mt-4 max-w-2xl text-lg text-pretty text-gray-400'>
           {recipientUsername
             ? `Hand ${displayName} the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.`
             : 'Hand your favorite Dota 2 streamer the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.'}
@@ -298,7 +300,9 @@ export const GiftSubscriptionForm = ({
                         key={months}
                         type='button'
                         aria-pressed={selected}
-                        onClick={() => setQuantity(months)}
+                        onClick={() => {
+                          setQuantity(months)
+                        }}
                         className={clsx(
                           'rounded-md border px-4 py-2 text-sm font-medium transition-colors duration-200',
                           selected
@@ -316,7 +320,9 @@ export const GiftSubscriptionForm = ({
                       min={1}
                       max={100}
                       value={quantity}
-                      onChange={(value) => setQuantity(Number(value) || 1)}
+                      onChange={(value) => {
+                        setQuantity(Number(value) || 1)
+                      }}
                       controls={false}
                       size='small'
                       style={{ width: 56 }}
@@ -347,7 +353,7 @@ export const GiftSubscriptionForm = ({
                 tooltip='Shown to the recipient. Leave blank to gift anonymously.'
                 rules={[
                   {
-                    validator: (_, value) => {
+                    validator: async (_, value) => {
                       if (value && checkForProfanity(value)) {
                         return Promise.reject('Please remove inappropriate language from your name')
                       }
@@ -369,7 +375,7 @@ export const GiftSubscriptionForm = ({
                 tooltip='A personal note shown with your gift.'
                 rules={[
                   {
-                    validator: (_, value) => {
+                    validator: async (_, value) => {
                       if (value && checkForProfanity(value)) {
                         return Promise.reject(
                           'Please remove inappropriate language from your message',

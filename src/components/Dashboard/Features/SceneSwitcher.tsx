@@ -1,9 +1,12 @@
 import { Input, Tag } from 'antd'
 import Image from 'next/image'
 import { useDebouncedCallback } from 'use-debounce'
-import { defaultSettings, type SettingKeys, Settings } from '@/lib/defaultSettings'
+
+import { defaultSettings, Settings } from '@/lib/defaultSettings'
+import type { SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierInput } from './TierInput'
 import { TierSwitch } from './TierSwitch'
 
@@ -98,7 +101,7 @@ export default function SceneSwitcher(): React.ReactNode {
                   {!loading && (
                     <TierInput
                       hideTierBadge
-                      settingKey={sceneKey as SettingKeys}
+                      settingKey={sceneKey}
                       label={scene.label}
                       placeholder={defaultSettings[sceneKey]}
                       value={scene.value}

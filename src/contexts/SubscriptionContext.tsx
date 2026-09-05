@@ -1,10 +1,13 @@
 import { useRouter } from 'next/router'
-import { createContext, type ReactNode, useContext } from 'react'
+import { createContext, useContext } from 'react'
+import type { ReactNode } from 'react'
 import useSWR from 'swr'
+
 import { useSubscription as useSubscriptionData } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
-import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
-import { hasPaidPlan, isInGracePeriod, type SubscriptionRow } from '@/utils/subscription'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { hasPaidPlan, isInGracePeriod } from '@/utils/subscription'
+import type { SubscriptionRow } from '@/utils/subscription'
 
 // Define the expected response shape for credit balance
 interface CreditBalanceResponse {
@@ -42,7 +45,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     // Add type argument here
     creditBalanceKey,
     fetcher,
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
 
   const formattedCreditBalance = creditBalanceData?.formatted || '$0.00'

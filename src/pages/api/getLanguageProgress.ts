@@ -1,7 +1,8 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -82,7 +83,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       languageProgress,
       percentage,
       project,
-      total: languageId !== 'en' ? total : undefined,
+      total: languageId === 'en' ? undefined : total,
     })
   } catch (error) {
     captureException(error)

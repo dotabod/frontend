@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
+
 import type { HeroPerformance, MatchHistoryRow } from '@/lib/matchHistory'
 
 const OVERVIEW_ROW_LIMIT = 5
@@ -79,11 +80,11 @@ function HeroOverview({ heroes, username }: { heroes: HeroPerformance[]; usernam
                       <span className='truncate font-medium text-gray-100'>{hero.heroName}</span>
                     </div>
                   </td>
-                  <td className='col-start-2 row-start-1 block text-right text-sm tabular-nums text-gray-300 sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
+                  <td className='col-start-2 row-start-1 block text-right text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
                     <span className='sm:hidden'>{hero.matches} matches</span>
                     <span className='hidden sm:inline'>{hero.matches}</span>
                   </td>
-                  <td className='col-start-1 row-start-2 block text-sm tabular-nums text-gray-300 sm:table-cell sm:px-3 sm:py-3 sm:align-middle'>
+                  <td className='col-start-1 row-start-2 block text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:align-middle'>
                     {hero.wins}W / {hero.losses}L
                   </td>
                   <td
@@ -100,7 +101,7 @@ function HeroOverview({ heroes, username }: { heroes: HeroPerformance[]; usernam
                           style={{ width: `${hero.winRate}%` }}
                         />
                       </div>
-                      <span className='w-10 text-right text-sm tabular-nums text-gray-200'>
+                      <span className='w-10 text-right text-sm text-gray-200 tabular-nums'>
                         {hero.winRate}%
                       </span>
                     </div>
@@ -207,7 +208,7 @@ function MatchOverview({ matches, username }: { matches: MatchHistoryRow[]; user
                     </td>
                     <td className='col-start-1 row-start-3 block text-sm md:table-cell md:px-3 md:py-4 md:align-middle'>
                       <span className='mr-2 text-xs text-gray-400 md:hidden'>KDA</span>
-                      <span className='tabular-nums text-gray-200'>
+                      <span className='text-gray-200 tabular-nums'>
                         {match.kda
                           ? `${match.kda.kills} / ${match.kda.deaths} / ${match.kda.assists}`
                           : 'Not recorded'}
@@ -215,7 +216,7 @@ function MatchOverview({ matches, username }: { matches: MatchHistoryRow[]; user
                     </td>
                     <td className='col-start-2 row-start-3 block text-right text-sm md:table-cell md:px-3 md:py-4 md:text-left md:align-middle'>
                       <span className='mr-2 text-xs text-gray-400 md:hidden'>Score</span>
-                      <span className='tabular-nums text-gray-300'>
+                      <span className='text-gray-300 tabular-nums'>
                         {match.score ?? 'Not recorded'}
                       </span>
                     </td>

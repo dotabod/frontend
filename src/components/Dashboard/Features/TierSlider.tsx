@@ -1,8 +1,11 @@
-import { Slider, type SliderSingleProps } from 'antd'
+import { Slider } from 'antd'
+import type { SliderSingleProps } from 'antd'
 import { useEffect, useState } from 'react'
+
 import type { SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import type { ChatterSettingKeys } from '@/utils/subscription'
+
 import { TierBadge } from './TierBadge'
 
 interface TierSliderProps extends Omit<SliderSingleProps, 'onChange'> {

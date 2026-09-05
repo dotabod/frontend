@@ -10,14 +10,15 @@ import {
   Space,
   Typography,
 } from 'antd'
-import Head from 'next/head'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { fetcher } from '@/lib/fetcher'
-import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import type { NextPageWithLayout } from '@/pages/_app'
 
@@ -39,7 +40,7 @@ const TestGiftPage: NextPageWithLayout = () => {
   const { data: giftNotificationData } = useSWR(
     status === 'authenticated' ? '/api/notifications' : null,
     fetcher,
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
 
   const [hasLifetime, setHasLifetime] = useState(false)
@@ -149,9 +150,11 @@ const TestGiftPage: NextPageWithLayout = () => {
                 <div style={{ marginBottom: 16 }}>
                   <Text strong>Gift Type:</Text>
                   <Select
-                    style={{ width: 200, marginLeft: 8 }}
+                    style={{ marginLeft: 8, width: 200 }}
                     value={giftType}
-                    onChange={(value) => setGiftType(value)}
+                    onChange={(value) => {
+                      setGiftType(value)
+                    }}
                   >
                     <Option value='monthly'>Monthly</Option>
                     <Option value='annual'>Annual</Option>
@@ -163,11 +166,13 @@ const TestGiftPage: NextPageWithLayout = () => {
                   <div style={{ marginBottom: 16 }}>
                     <Text strong>Quantity:</Text>
                     <InputNumber
-                      style={{ width: 100, marginLeft: 8 }}
+                      style={{ marginLeft: 8, width: 100 }}
                       min={1}
                       max={100}
                       value={giftQuantity}
-                      onChange={(value) => setGiftQuantity(Number(value) || 1)}
+                      onChange={(value) => {
+                        setGiftQuantity(Number(value) || 1)
+                      }}
                     />
                     <Text style={{ marginLeft: 8 }}>
                       {giftType === 'monthly' ? 'months' : 'years'}
@@ -180,7 +185,9 @@ const TestGiftPage: NextPageWithLayout = () => {
                   <Input.TextArea
                     rows={3}
                     value={giftMessage}
-                    onChange={(e) => setGiftMessage(e.target.value)}
+                    onChange={(e) => {
+                      setGiftMessage(e.target.value)
+                    }}
                     style={{ marginTop: 8 }}
                   />
                 </div>

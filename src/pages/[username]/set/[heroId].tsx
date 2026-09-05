@@ -4,9 +4,9 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+
 import { Container } from '@/components/Container'
 import {
-  type CosmeticItem,
   hexA,
   ItemTile,
   RARITY_META,
@@ -16,6 +16,7 @@ import {
   sortByRarity,
   STEAM_CDN,
 } from '@/components/CosmeticSet'
+import type { CosmeticItem } from '@/components/CosmeticSet'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { ProfileSectionNav } from '@/components/ProfileSectionNav'
 import prisma from '@/lib/db'
@@ -60,13 +61,20 @@ const DetailPage = ({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable)
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) {
         return
-      if (e.key === 'ArrowLeft' && prev) void router.push(`/${username}/set/${prev.heroId}`)
-      if (e.key === 'ArrowRight' && next) void router.push(`/${username}/set/${next.heroId}`)
+      }
+      if (e.key === 'ArrowLeft' && prev) {
+        void router.push(`/${username}/set/${prev.heroId}`)
+      }
+      if (e.key === 'ArrowRight' && next) {
+        void router.push(`/${username}/set/${next.heroId}`)
+      }
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+    }
   }, [router, username, prev, next])
 
   const sorted = sortByRarity(items)
@@ -75,10 +83,11 @@ const DetailPage = ({
   const featuredKeys = new Set(featured.map((i) => i.defindex))
 
   const rarityCounts = new Map<string, number>()
-  for (const i of items)
+  for (const i of items) {
     if (i.rarity) rarityCounts.set(i.rarity, (rarityCounts.get(i.rarity) ?? 0) + 1)
+  }
   const summaryChips = [...rarityCounts.entries()]
-    .map(([rarity, count]) => ({ rarity, count, meta: RARITY_META[rarity] }))
+    .map(([rarity, count]) => ({ count, meta: RARITY_META[rarity], rarity }))
     .filter((x) => x.meta && x.meta.rank >= 3)
     .sort((a, b) => b.meta.rank - a.meta.rank)
     .slice(0, 4)
@@ -174,7 +183,7 @@ const DetailPage = ({
             )}
             <Link
               href={`/${username}/set`}
-              className='flex-shrink-0 text-xs font-medium uppercase tracking-wider text-gray-500 hover:text-gray-300'
+              className='flex-shrink-0 text-xs font-medium tracking-wider text-gray-500 uppercase hover:text-gray-300'
             >
               {position} of {total}
             </Link>
@@ -195,7 +204,7 @@ const DetailPage = ({
         <Container className='py-10'>
           {featured.length > 0 && (
             <section className='mb-12'>
-              <h2 className='mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500'>
+              <h2 className='mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase'>
                 Spotlight
               </h2>
               <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
@@ -208,7 +217,7 @@ const DetailPage = ({
 
           <section>
             {featured.length > 0 && (
-              <h2 className='mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500'>
+              <h2 className='mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase'>
                 Full loadout
               </h2>
             )}
@@ -245,32 +254,40 @@ const DetailPage = ({
 export const getServerSideProps: GetServerSideProps<DetailPageProps> = async ({ params }) => {
   const username = (params?.username as string)?.toLowerCase()
   const heroId = Number(params?.heroId)
-  if (!username || !Number.isInteger(heroId)) return { notFound: true }
+  if (!username || !Number.isInteger(heroId)) {
+    return { notFound: true }
+  }
 
   const user = await prisma.user.findFirst({
-    where: { name: username },
     select: {
-      name: true,
-      displayName: true,
       cosmeticLoadouts: {
         select: { heroId: true, heroName: true, items: true, updatedAt: true },
       },
+      displayName: true,
+      name: true,
     },
+    where: { name: username },
   })
 
-  if (!user) return { notFound: true }
+  if (!user) {
+    return { notFound: true }
+  }
 
   const loadouts = user.cosmeticLoadouts
   // Same ordering as the collection grid so prev/next match what the user just saw.
   const ordered = [...loadouts].sort((a, b) => {
     const aBest = bestRank(a.items as unknown as CosmeticItem[])
     const bBest = bestRank(b.items as unknown as CosmeticItem[])
-    if (bBest !== aBest) return bBest - aBest
+    if (bBest !== aBest) {
+      return bBest - aBest
+    }
     return b.updatedAt.getTime() - a.updatedAt.getTime()
   })
 
   const idx = ordered.findIndex((l) => l.heroId === heroId)
-  if (idx === -1) return { notFound: true }
+  if (idx === -1) {
+    return { notFound: true }
+  }
 
   const current = ordered[idx]
   const prevSib = ordered[idx - 1]
@@ -284,22 +301,22 @@ export const getServerSideProps: GetServerSideProps<DetailPageProps> = async ({ 
 
   return {
     props: {
-      username: user.name,
       displayName: user.displayName || user.name,
       heroId: current.heroId,
       heroImage: heroImg ? `${STEAM_CDN}${heroImg}` : null,
       heroName: current.heroName,
       items: current.items as unknown as CosmeticItem[],
+      next: nextSib ? { heroId: nextSib.heroId, heroName: nextSib.heroName } : null,
+      position: idx + 1,
+      prev: prevSib ? { heroId: prevSib.heroId, heroName: prevSib.heroName } : null,
+      total: ordered.length,
       updatedIso: current.updatedAt.toISOString(),
       updatedLabel: new Intl.DateTimeFormat('en-US', {
         dateStyle: 'medium',
         timeStyle: 'short',
         timeZone: 'UTC',
       }).format(current.updatedAt),
-      position: idx + 1,
-      total: ordered.length,
-      prev: prevSib ? { heroId: prevSib.heroId, heroName: prevSib.heroName } : null,
-      next: nextSib ? { heroId: nextSib.heroId, heroName: nextSib.heroName } : null,
+      username: user.name,
     },
   }
 }
@@ -307,7 +324,9 @@ export const getServerSideProps: GetServerSideProps<DetailPageProps> = async ({ 
 // Highest rarity rank in a loadout, computed server-side for the prev/next ordering.
 function bestRank(items: CosmeticItem[]): number {
   let best = -1
-  for (const i of items) best = Math.max(best, rarityRank(i))
+  for (const i of items) {
+    best = Math.max(best, rarityRank(i))
+  }
   return best
 }
 

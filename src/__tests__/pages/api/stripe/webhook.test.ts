@@ -134,7 +134,7 @@ describe('Stripe webhook handler', () => {
   })
 
   it('should have the correct API config', () => {
-    expect(config).toEqual({
+    expect(config).toStrictEqual({
       api: {
         bodyParser: false,
       },
@@ -149,7 +149,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(405)
-    expect(res._getJSONData()).toEqual({ error: 'Method not allowed' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Method not allowed' })
   })
 
   it('should return 400 if stripe-signature is missing', async () => {
@@ -161,7 +161,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ error: 'Webhook configuration error' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Webhook configuration error' })
   })
 
   it('should return 400 if webhook verification fails', async () => {
@@ -176,7 +176,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ error: 'Webhook verification failed' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Webhook verification failed' })
   })
 
   it('should return 500 if webhook processing fails', async () => {
@@ -191,7 +191,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ error: 'Webhook processing failed' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Webhook processing failed' })
   })
 
   it('should return 200 for successful webhook processing', async () => {
@@ -206,7 +206,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ received: true })
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 
   it('should return 400 if webhook secret is missing', async () => {
@@ -220,7 +220,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ error: 'Missing webhook secret' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Missing webhook secret' })
   })
 
   it('should handle duplicate events correctly (idempotency)', async () => {
@@ -235,7 +235,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ idempotent: true, received: true })
+    expect(res._getJSONData()).toStrictEqual({ idempotent: true, received: true })
   })
 
   it('should ignore irrelevant event types', async () => {
@@ -251,7 +251,7 @@ describe('Stripe webhook handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ ignored: true, received: true })
+    expect(res._getJSONData()).toStrictEqual({ ignored: true, received: true })
   })
 
   describe('Event type handling', () => {
@@ -280,7 +280,7 @@ describe('Stripe webhook handler', () => {
         await handler(req, res)
 
         expect(res.statusCode).toBe(200)
-        expect(res._getJSONData()).toEqual({ received: true })
+        expect(res._getJSONData()).toStrictEqual({ received: true })
       })
     }
   })
@@ -300,7 +300,7 @@ describe('Stripe webhook handler', () => {
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      expect(res._getJSONData()).toEqual({
+      expect(res._getJSONData()).toStrictEqual({
         endDate: '2025-04-15T15:22:58.000Z',
         gift: true,
         received: true,
@@ -322,7 +322,7 @@ describe('Stripe webhook handler', () => {
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      expect(res._getJSONData()).toEqual({
+      expect(res._getJSONData()).toStrictEqual({
         endDate: '2025-04-15T15:22:58.000Z',
         gift: true,
         hasExistingSubscription: true,
@@ -345,7 +345,7 @@ describe('Stripe webhook handler', () => {
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      expect(res._getJSONData()).toEqual({
+      expect(res._getJSONData()).toStrictEqual({
         endDate: '2025-06-15T15:22:58.000Z',
         finalQuantity: 3,
         gift: true,
@@ -442,7 +442,7 @@ describe('Stripe webhook handler', () => {
   describe('Error handling', () => {
     it('should handle malformed request bodies gracefully', async () => {
       const { req, res } = createMocks({
-        body: {} as Record<string, unknown>,
+        body: {},
         headers: {
           'stripe-signature': 'valid_signature',
           'stripe-webhook-secret': 'test_secret',
@@ -453,7 +453,7 @@ describe('Stripe webhook handler', () => {
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      expect(res._getJSONData()).toEqual({ received: true })
+      expect(res._getJSONData()).toStrictEqual({ received: true })
     })
 
     it('should retry failed transactions', async () => {
@@ -480,15 +480,15 @@ describe('Stripe webhook handler', () => {
       })
 
       // Replace the mocked handler temporarily
-      await vi.mocked(handler).withImplementation(mockHandler, () => handler(req, res))
+      await vi.mocked(handler).withImplementation(mockHandler, async () => handler(req, res))
 
       expect(res.statusCode).toBe(200)
-      expect(res._getJSONData()).toEqual({
+      expect(res._getJSONData()).toStrictEqual({
         attempts: 2,
         received: true,
         retried: true,
       })
-      expect(mockHandler).toHaveBeenCalledTimes(1)
+      expect(mockHandler).toHaveBeenCalledOnce()
     })
 
     it('should handle transaction timeouts', async () => {
@@ -514,14 +514,14 @@ describe('Stripe webhook handler', () => {
       })
 
       // Replace the mocked handler temporarily
-      await vi.mocked(handler).withImplementation(mockHandler, () => handler(req, res))
+      await vi.mocked(handler).withImplementation(mockHandler, async () => handler(req, res))
 
       expect(res.statusCode).toBe(500)
-      expect(res._getJSONData()).toEqual({
+      expect(res._getJSONData()).toStrictEqual({
         error: 'Webhook processing failed',
         timeout: true,
       })
-      expect(mockHandler).toHaveBeenCalledTimes(1)
+      expect(mockHandler).toHaveBeenCalledOnce()
     })
   })
 })

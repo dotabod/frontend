@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { aggregateGiftDuration, calculateGiftEndDate } from '@/lib/gift-subscription'
 import { isInGracePeriod } from '@/utils/subscription'
 
@@ -15,7 +16,7 @@ describe('Gift Subscription Functions', () => {
     vi.setSystemTime(new Date(2023, 5, 15, 12, 0, 0)) // June 15, 2023, noon
   })
 
-  describe('calculateGiftEndDate', () => {
+  describe(calculateGiftEndDate, () => {
     it('calculates end date for monthly subscription', () => {
       const startDate = new Date(2023, 5, 15) // June 15, 2023
       const endDate = calculateGiftEndDate('monthly', 1, startDate)
@@ -134,7 +135,7 @@ describe('Gift Subscription Functions', () => {
     })
   })
 
-  describe('aggregateGiftDuration', () => {
+  describe(aggregateGiftDuration, () => {
     it('extends existing expiration date', () => {
       const existingExpiration = new Date('2023-08-15T00:00:00Z') // 2 months from now
       const newExpiration = aggregateGiftDuration('monthly', 3, existingExpiration)
@@ -176,7 +177,7 @@ describe('Gift Subscription Functions', () => {
       expect(newExpiration.getDate()).toBe(15) // Actual result from the implementation
     })
 
-    it('handles grace period correctly', () => {
+    it('handles grace period correctly', async () => {
       // Mock that we're in the grace period
       vi.mocked(isInGracePeriod).mockReturnValue(true)
 

@@ -147,18 +147,15 @@ This is optional but useful if you want to make your stream look unique for diff
 
 #### Minimap blocker
 
-`[dotabod] blocking minimap`
-Whenever the minimap is first shown, switch to this scene
+`[dotabod] blocking minimap` Whenever the minimap is first shown, switch to this scene
 
 #### Picks blocker
 
-`[dotabod] blocking picks`
-As soon as picks are shown and heroes are able to be selected, switch to this scene
+`[dotabod] blocking picks` As soon as picks are shown and heroes are able to be selected, switch to this scene
 
 #### Game disconnected
 
-`[dotabod] game disconnected`
-Switch to this scene when you disconnect and leave a Dota game
+`[dotabod] game disconnected` Switch to this scene when you disconnect and leave a Dota game
 
 ## Managers
 

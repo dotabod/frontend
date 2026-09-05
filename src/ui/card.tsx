@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
+
 import { LockedFeatureOverlay } from '@/components/Dashboard/Features/LockedFeatureOverlay'
 import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 import { useFeatureAccess } from '@/hooks/useSubscription'
@@ -26,13 +27,17 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
       tabIndex={0}
       className={clsx('relative', className)}
       onMouseEnter={() => !hasAccess && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+      }}
       onFocus={() => !hasAccess && setIsHovered(true)}
-      onBlur={() => setIsHovered(false)}
+      onBlur={() => {
+        setIsHovered(false)
+      }}
       {...props}
     >
       {!hasAccess && !isHovered && requiredTier && (
-        <div className='absolute top-2 right-2 z-10 pointer-events-none'>
+        <div className='pointer-events-none absolute top-2 right-2 z-10'>
           <TierBadge tooltip={false} requiredTier={requiredTier} />
         </div>
       )}
@@ -80,7 +85,7 @@ interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 Card.Footer = function CardFooter({ className, children, ...props }: CardFooterProps) {
   return (
     <div className={clsx('block text-sm font-medium sm:rounded-b-lg', className)} {...props}>
-      <div className='grid w-full border-t border-solid border-gray-700  pt-4' />
+      <div className='grid w-full border-t border-solid border-gray-700 pt-4' />
       {children}
     </div>
   )

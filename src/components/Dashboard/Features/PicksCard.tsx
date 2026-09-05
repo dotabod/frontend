@@ -1,8 +1,10 @@
 import clsx from 'clsx'
 import Image from 'next/image'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 export default function PicksCard() {
@@ -18,7 +20,7 @@ export default function PicksCard() {
           label='Enable pick blocker'
         />
       </div>
-      <div className={clsx(' transition-all', !isEnabled && 'opacity-40')}>
+      <div className={clsx('transition-all', !isEnabled && 'opacity-40')}>
         <p>
           There are several pick blocker overlays phases available. Dotabod intelligently auto
           chooses which one to show.

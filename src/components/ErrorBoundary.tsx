@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { Button } from 'antd'
-import { Component, type ErrorInfo, Fragment, type ReactNode } from 'react'
+import { Component, Fragment } from 'react'
+import type { ErrorInfo, ReactNode } from 'react'
 
 interface Props {
   children: ReactNode

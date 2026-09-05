@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
   buildHeroPerformance,
   buildMatchHistorySummary,
@@ -31,7 +32,7 @@ describe('match history helpers', () => {
       { count: 1, heroName: null, won: false },
     ])
 
-    expect(summary).toEqual({
+    expect(summary).toStrictEqual({
       heroesPlayed: 2,
       losses: 3,
       matches: 7,
@@ -51,7 +52,7 @@ describe('match history helpers', () => {
       heroes,
     )
 
-    expect(performance).toEqual([
+    expect(performance).toStrictEqual([
       {
         heroImage: 'https://cdn.cloudflare.steamstatic.com/heroes/icons/axe.png?',
         heroKey: 'npc_dota_hero_axe',
@@ -79,7 +80,7 @@ describe('match history helpers', () => {
       id: 'f535cf8e-0114-4ff5-a63f-ef5e1f93db6a',
     }
 
-    expect(decodeMatchHistoryCursor(encodeMatchHistoryCursor(cursor))).toEqual(cursor)
+    expect(decodeMatchHistoryCursor(encodeMatchHistoryCursor(cursor))).toStrictEqual(cursor)
     expect(decodeMatchHistoryCursor('not-a-cursor')).toBeNull()
     expect(
       decodeMatchHistoryCursor(
@@ -89,7 +90,7 @@ describe('match history helpers', () => {
   })
 
   it('normalizes optional KDA values and describes the queue', () => {
-    expect(readKda({ assists: 15, deaths: 2, kills: 10 })).toEqual({
+    expect(readKda({ assists: 15, deaths: 2, kills: 10 })).toStrictEqual({
       assists: 15,
       deaths: 2,
       kills: 10,

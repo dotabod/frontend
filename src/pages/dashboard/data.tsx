@@ -1,9 +1,10 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Button, Modal, message, Space, Typography } from 'antd'
-import Head from 'next/head'
 import { signOut, useSession } from 'next-auth/react'
+import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
@@ -125,7 +126,7 @@ const DataPage = () => {
         <Card title={<span>Export your data</span>}>
           <Space direction='vertical' className='w-full' size='large'>
             <Text>You'll get a JSON file with:</Text>
-            <ul className='list-disc pl-4 '>
+            <ul className='list-disc pl-4'>
               <li>Account details</li>
               <li>Settings and preferences</li>
               <li>Connected Twitch account</li>

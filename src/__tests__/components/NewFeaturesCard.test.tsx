@@ -18,7 +18,7 @@ vi.mock('@/components/Dashboard/Features/TierSwitch', () => ({
 
 import NewFeaturesCard from '@/components/Dashboard/Features/NewFeaturesCard'
 
-describe('NewFeaturesCard', () => {
+describe(NewFeaturesCard, () => {
   it("renders the master toggle and links to What's New", () => {
     render(<NewFeaturesCard />)
 

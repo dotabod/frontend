@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import { TierSwitch } from '@/components/Dashboard/Features/TierSwitch'
 import WhatsNewFeed from '@/components/Dashboard/Features/WhatsNewFeed'
@@ -11,7 +12,7 @@ import { whatsNewSorted } from '@/lib/whatsNew'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const WhatsNewPage: NextPageWithLayout = () => {
-  const { data: master } = useUpdateSetting<boolean>(Settings.autoOptInNewFeatures)
+  const { data: master } = useUpdateSetting(Settings.autoOptInNewFeatures)
 
   return (
     <>

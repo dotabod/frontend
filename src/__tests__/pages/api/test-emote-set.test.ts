@@ -2,6 +2,7 @@
 import { captureException, withScope } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import handler from '@/pages/api/test-emote-set'
 
@@ -81,7 +82,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ success: false })
+    expect(res._getJSONData()).toStrictEqual({ success: false })
   })
 
   it('returns 401 when authorization header is invalid in production', async () => {
@@ -98,7 +99,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ success: false })
+    expect(res._getJSONData()).toStrictEqual({ success: false })
   })
 
   it('returns 405 for non-GET methods', async () => {
@@ -109,7 +110,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(405)
-    expect(res._getJSONData()).toEqual({ message: 'Method not allowed' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Method not allowed' })
   })
 
   it('returns 403 when CRON_TWITCH_ID is missing', async () => {
@@ -122,7 +123,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Forbidden' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Forbidden' })
   })
 
   it('returns 500 when SEVENTV_AUTH is missing', async () => {
@@ -135,7 +136,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ message: 'Server configuration error' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Server configuration error' })
   })
 
   it('returns 500 when the user has no active emote set', async () => {
@@ -154,7 +155,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       error: 'No active 7TV emote set found',
       message: 'Internal server error',
     })
@@ -186,7 +187,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ message: 'Emote set test completed successfully' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Emote set test completed successfully' })
     expect(get7TVUser).toHaveBeenCalledWith('test-twitch-id')
     expect(create7TVClient).toHaveBeenCalledWith('test-auth-token')
     expect(mockClient.request).toHaveBeenCalledWith('mock-change-emote-query', {
@@ -232,7 +233,7 @@ describe('test-emote-set API', () => {
     const mutationCalls = mockClient.request.mock.calls.filter(
       ([query]) => query === 'mock-change-emote-query',
     )
-    expect(mutationCalls.map(([, variables]) => variables.action)).toEqual([
+    expect(mutationCalls.map(([, variables]) => variables.action)).toStrictEqual([
       'REMOVE',
       'ADD',
       'REMOVE',
@@ -264,7 +265,7 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       error: 'Verification failed',
       message: 'Internal server error',
     })
@@ -290,11 +291,11 @@ describe('test-emote-set API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       error: 'Test error',
       message: 'Internal server error',
     })
-    expect(captureException).toHaveBeenCalled()
-    expect(withScope).toHaveBeenCalled()
+    expect(captureException).toHaveBeenCalledOnce()
+    expect(withScope).toHaveBeenCalledOnce()
   })
 })

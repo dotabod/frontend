@@ -20,9 +20,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "useUnknownInCatchVariables": false,
-    "plugins": [
-      { "name": "next" }
-    ],
+    "plugins": [{ "name": "next" }],
     "strictNullChecks": true
   },
   "include": [

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
 import { GiftPreview } from '@/components/Gift/GiftSubscriptionForm/GiftPreview'
 
 vi.mock('@/components/TwitchChat', () => ({
@@ -10,7 +11,7 @@ vi.mock('@/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
-describe('GiftPreview', () => {
+describe(GiftPreview, () => {
   it('shows the Twitch chat preview with sender and message', () => {
     render(<GiftPreview senderName='Tester' giftMessage='hello' />)
 

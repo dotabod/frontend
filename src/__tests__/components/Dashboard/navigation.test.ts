@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import {
   filterNav,
   findBestMatchingMenuItem,
@@ -14,7 +15,7 @@ vi.mock('next/link', () => ({ default: () => null }))
 
 describe('navConfig regions', () => {
   it('exposes a flat 8-item primary rail in IA order, each with name + href + icon', () => {
-    expect(navConfig.primary.map((item) => item.href)).toEqual([
+    expect(navConfig.primary.map((item) => item.href)).toStrictEqual([
       '/dashboard',
       '/dashboard/features',
       '/dashboard/features/overlay',
@@ -35,7 +36,7 @@ describe('navConfig regions', () => {
 
   it('only Setup is hidden from impersonators in the primary rail', () => {
     const hidden = navConfig.primary.filter((item) => item.hideForImpersonator).map((i) => i.name)
-    expect(hidden).toEqual(['Setup'])
+    expect(hidden).toStrictEqual(['Setup'])
   })
 
   it('bottom region holds diagnostics, Team access, Help center, and the Admin accordion', () => {
@@ -45,7 +46,7 @@ describe('navConfig regions', () => {
     expect(diagnostics.name).toBe('Diagnostics')
 
     expect(teamAccess.href).toBe('/dashboard/managers')
-    expect(teamAccess.hideForImpersonator).toBe(true)
+    expect(teamAccess.hideForImpersonator).toBeTruthy()
     expect(teamAccess.children).toBeUndefined()
 
     // Help center is pinned in the rail and visible to everyone (no impersonator gate).
@@ -55,10 +56,10 @@ describe('navConfig regions', () => {
     expect(helpCenter.adminOnly).toBeUndefined()
 
     expect(admin.name).toBe('Admin')
-    expect(admin.adminOnly).toBe(true)
-    expect(admin.hideForImpersonator).toBe(true)
+    expect(admin.adminOnly).toBeTruthy()
+    expect(admin.hideForImpersonator).toBeTruthy()
     expect(admin.key).toBe('admin-menu')
-    expect(admin.children?.map((c) => c.href)).toEqual([
+    expect(admin.children?.map((c) => c.href)).toStrictEqual([
       '/dashboard/admin',
       '/dashboard/admin/manage-channel',
       '/dashboard/admin/test-gift',
@@ -66,14 +67,14 @@ describe('navConfig regions', () => {
   })
 
   it('account region (avatar dropdown) gates Billing + Your data for impersonators only', () => {
-    expect(navConfig.account.map((i) => i.name)).toEqual(['Billing', 'Gift Pro', 'Your data'])
+    expect(navConfig.account.map((i) => i.name)).toStrictEqual(['Billing', 'Gift Pro', 'Your data'])
 
     const gated = navConfig.account.filter((i) => i.hideForImpersonator).map((i) => i.name)
-    expect(gated).toEqual(['Billing', 'Your data'])
+    expect(gated).toStrictEqual(['Billing', 'Your data'])
   })
 
   it('help region lists resources and flags external links', () => {
-    expect(navConfig.help.map((i) => i.name)).toEqual([
+    expect(navConfig.help.map((i) => i.name)).toStrictEqual([
       'Help center',
       'Discord',
       'GitHub',
@@ -82,19 +83,19 @@ describe('navConfig regions', () => {
     ])
 
     const external = navConfig.help.filter(isExternalNavItem).map((i) => i.name)
-    expect(external).toEqual(['Discord', 'GitHub', 'Service status'])
+    expect(external).toStrictEqual(['Discord', 'GitHub', 'Service status'])
   })
 })
 
-describe('filterNav', () => {
+describe(filterNav, () => {
   it('drops the Admin accordion for non-admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: false, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual(['Diagnostics', 'Team access', 'Help center'])
+    expect(result.map((i) => i.name)).toStrictEqual(['Diagnostics', 'Team access', 'Help center'])
   })
 
   it('keeps the Admin accordion for admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: true, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual([
+    expect(result.map((i) => i.name)).toStrictEqual([
       'Diagnostics',
       'Team access',
       'Help center',
@@ -105,17 +106,17 @@ describe('filterNav', () => {
   it('hides Setup / Team access / Billing / Your data for impersonators everywhere', () => {
     const opts = { isAdmin: true, isImpersonating: true }
 
-    expect(filterNav(navConfig.primary, opts).some((i) => i.name === 'Setup')).toBe(false)
+    expect(filterNav(navConfig.primary, opts).some((i) => i.name === 'Setup')).toBeFalsy()
     // Team access + Admin both drop; diagnostics and Help center stay available.
-    expect(filterNav(navConfig.bottom, opts).map((i) => i.name)).toEqual([
+    expect(filterNav(navConfig.bottom, opts).map((i) => i.name)).toStrictEqual([
       'Diagnostics',
       'Help center',
     ])
-    expect(filterNav(navConfig.account, opts).map((i) => i.name)).toEqual(['Gift Pro'])
+    expect(filterNav(navConfig.account, opts).map((i) => i.name)).toStrictEqual(['Gift Pro'])
   })
 })
 
-describe('findBestMatchingMenuItem', () => {
+describe(findBestMatchingMenuItem, () => {
   it.each([
     ['/dashboard', { key: '/dashboard', parentKey: '' }],
     ['/dashboard/features', { key: '/dashboard/features', parentKey: '' }],
@@ -137,11 +138,11 @@ describe('findBestMatchingMenuItem', () => {
     ['/dashboard/features/overlay/extra', { key: '/dashboard/features/overlay', parentKey: '' }],
     ['/dashboard/commands/new', { key: '/dashboard/commands', parentKey: '' }],
   ] as const)('maps %s correctly', (pathname, expected) => {
-    expect(findBestMatchingMenuItem(pathname)).toEqual(expected)
+    expect(findBestMatchingMenuItem(pathname)).toStrictEqual(expected)
   })
 })
 
-describe('navItemToMenuItem', () => {
+describe(navItemToMenuItem, () => {
   it('keys items by href and carries an icon', () => {
     const item = navItemToMenuItem(navConfig.primary[0])
     expect(item).toMatchObject({ key: '/dashboard' })

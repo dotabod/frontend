@@ -1,13 +1,10 @@
 import { Select } from 'antd'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { StreamerCard, type StreamerSummary } from '@/components/Streamers/StreamerCard'
-import {
-  type StreamerTier,
-  tierDisplayOrder,
-  tierEmblem,
-  tierLabel,
-  tierRangeLabel,
-} from '@/lib/ranks'
+
+import { StreamerCard } from '@/components/Streamers/StreamerCard'
+import type { StreamerSummary } from '@/components/Streamers/StreamerCard'
+import { tierDisplayOrder, tierEmblem, tierLabel, tierRangeLabel } from '@/lib/ranks'
+import type { StreamerTier } from '@/lib/ranks'
 
 export type SortKey = 'mmr_desc' | 'mmr_asc' | 'followers_desc'
 
@@ -18,10 +15,13 @@ const sortOptions: { label: string; value: SortKey }[] = [
 ]
 
 const comparators: Record<SortKey, (a: StreamerSummary, b: StreamerSummary) => number> = {
-  mmr_desc: (a, b) => b.mmr - a.mmr,
-  mmr_asc: (a, b) => a.mmr - b.mmr,
   followers_desc: (a, b) => (b.followers ?? -1) - (a.followers ?? -1),
+  mmr_asc: (a, b) => a.mmr - b.mmr,
+  mmr_desc: (a, b) => b.mmr - a.mmr,
 }
+
+const isStreamerTier = (tier: string): tier is StreamerTier =>
+  tierDisplayOrder.some((knownTier) => knownTier === tier)
 
 // Immortal sorts by standing (best first) regardless of the chosen MMR sort, since the
 // leaderboard number is the meaningful ranking there.
@@ -52,11 +52,11 @@ const buildGroups = (streamers: StreamerSummary[], sort: SortKey): Group[] => {
   return tierDisplayOrder
     .filter((tier) => byTier.has(tier))
     .map((tier) => ({
-      tier,
       streamers: byTier
         .get(tier)!
         .slice()
         .sort(tier === 'immortal' ? immortalComparator : comparators[sort]),
+      tier,
     }))
 }
 
@@ -91,12 +91,12 @@ const TierGroupSection = ({
           className='h-9 w-9 flex-shrink-0 object-contain'
         />
         <div className='flex-1'>
-          <h3 id={headingId} className='text-lg font-semibold leading-tight text-gray-100'>
+          <h3 id={headingId} className='text-lg leading-tight font-semibold text-gray-100'>
             {tierLabel[group.tier]}
           </h3>
           <p className='text-xs text-gray-500'>{tierRangeLabel(group.tier)}</p>
         </div>
-        <span className='text-sm tabular-nums text-gray-400'>{group.streamers.length}</span>
+        <span className='text-sm text-gray-400 tabular-nums'>{group.streamers.length}</span>
       </div>
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {group.streamers.map((streamer) => (
@@ -127,9 +127,13 @@ export const StreamersDirectory = ({
     if (!el) {
       return
     }
-    const observer = new ResizeObserver(() => setRailHeight(el.offsetHeight))
+    const observer = new ResizeObserver(() => {
+      setRailHeight(el.offsetHeight)
+    })
     observer.observe(el)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+    }
   }, [])
 
   const liveGroups = useMemo<Group[]>(() => buildGroups(live, sort), [live, sort])
@@ -143,8 +147,10 @@ export const StreamersDirectory = ({
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        if (visible[0]) {
-          setActiveTier(visible[0].target.getAttribute('data-tier') as StreamerTier)
+        const section = visible[0]?.target.closest<HTMLElement>('[data-tier]')
+        const tier = section?.dataset.tier
+        if (tier && isStreamerTier(tier)) {
+          setActiveTier(tier)
         }
       },
       // Bias the trigger line just below the sticky rail so the active chip flips as a
@@ -154,7 +160,9 @@ export const StreamersDirectory = ({
     for (const el of sectionRefs.current.values()) {
       observer.observe(el)
     }
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+    }
   }, [rosterGroups, railHeight])
 
   const jumpTo = (tier: StreamerTier) => {
@@ -215,7 +223,9 @@ export const StreamersDirectory = ({
                 <button
                   key={tier}
                   type='button'
-                  onClick={() => jumpTo(tier)}
+                  onClick={() => {
+                    jumpTo(tier)
+                  }}
                   aria-current={active ? 'true' : undefined}
                   className={`group flex min-h-9 flex-shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-medium transition-colors duration-200 sm:min-h-0 sm:px-2.5 sm:py-1 sm:text-xs ${
                     active

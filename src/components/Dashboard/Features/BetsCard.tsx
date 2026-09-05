@@ -2,14 +2,16 @@ import { Button, Form, Spin, Tag } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { Input } from '../../Input'
 import { TierSwitch } from './TierSwitch'
 
 export default function BetsCard() {
-  const { data: isEnabled } = useUpdateSetting<boolean>(Settings.bets)
+  const { data: isEnabled } = useUpdateSetting(Settings.bets)
   const {
     data: info,
     loading,
@@ -23,7 +25,9 @@ export default function BetsCard() {
 
   const [form] = Form.useForm()
 
-  useEffect(() => form.resetFields(), [info])
+  useEffect(() => {
+    form.resetFields()
+  }, [info])
 
   return (
     <Card title='Twitch predictions' feature='bets'>
@@ -62,7 +66,7 @@ export default function BetsCard() {
               label='Title'
               name='title'
               help={
-                <div className='my-2 text-xs flex flex-row items-center'>
+                <div className='my-2 flex flex-row items-center text-xs'>
                   <Tag>[heroname]</Tag>
                   <span>will be replaced with the hero name</span>
                 </div>

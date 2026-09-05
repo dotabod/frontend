@@ -1,25 +1,27 @@
 import { Alert, Button, Divider, List, Spin, Tabs, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useSetupModStatus } from '@/lib/hooks/useSetupModStatus'
 import {
-  STABLE_SWR_OPTIONS,
+  SETTINGS_SWR_OPTIONS,
   useUpdateAccount,
   useUpdateSetting,
 } from '@/lib/hooks/useUpdateSetting'
 import { useTrack } from '@/lib/track'
 import { StepComponent } from '@/pages/dashboard/help'
 import { Card } from '@/ui/card'
+
 import MmrForm from './Features/MmrForm'
 
 const SevenTVBaseEmoteURL = (id: string) => `https://cdn.7tv.app/emote/${id}/2x.webp`
@@ -117,16 +119,16 @@ export default function ChatBot() {
   // Pro: fire-and-forget the POST that adds dotabod as a moderator. We don't read its
   // Result anymore — current mod state comes from useSetupModStatus below — but the
   // POST still needs to run so the auto-mod action happens for Pro users.
-  useSWR(hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null, fetcher, STABLE_SWR_OPTIONS)
+  useSWR(hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null, fetcher, SETTINGS_SWR_OPTIONS)
   const { data: modStatus } = useSetupModStatus()
   const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')
   const { error: updateEmoteSetError } = useSWR(
     hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,
-    (url) => {
+    async (url) => {
       track('updateEmoteSet called')
       return fetcher(url)
     },
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
   const [activeKey7TV, setActiveKey7TV] = useState('auto')
   const [activeKeyMod, setActiveKeyMod] = useState('auto')
@@ -218,7 +220,9 @@ export default function ChatBot() {
     // Every 5 seconds
     const intervalId = setInterval(fetchUserData, 5000)
 
-    return () => clearInterval(intervalId)
+    return () => {
+      clearInterval(intervalId)
+    }
   }, [stvUrl, updateEmoteSetError])
 
   const { data: mmr } = useUpdateSetting(Settings.mmr)
@@ -261,20 +265,7 @@ export default function ChatBot() {
                     ]}
                     steps={[
                       <span className='flex flex-col gap-4' key={1}>
-                        {!stepOneComplete ? (
-                          <>
-                            <div>
-                              <span>
-                                Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
-                              </span>
-                              <span className='text-xs text-gray-500'>
-                                {' '}
-                                (you can change it later)
-                              </span>
-                            </div>
-                            <MmrForm hideText={true} />
-                          </>
-                        ) : (
+                        {stepOneComplete ? (
                           <div>
                             <span>
                               Dotabod knows your MMR.{' '}
@@ -288,10 +279,25 @@ export default function ChatBot() {
                               </Link>
                             </span>
                           </div>
+                        ) : (
+                          <>
+                            <div>
+                              <span>
+                                Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
+                              </span>
+                              <span className='text-xs text-gray-500'>
+                                {' '}
+                                (you can change it later)
+                              </span>
+                            </div>
+                            <MmrForm hideText={true} />
+                          </>
                         )}
                       </span>,
                       <span className='flex flex-row items-center gap-2' key={1}>
-                        {!stepModComplete ? (
+                        {stepModComplete ? (
+                          <div>Dotabod is a moderator in your Twitch channel.</div>
+                        ) : (
                           <>
                             <Spin size='small' spinning={loading} />
                             <div>
@@ -299,8 +305,6 @@ export default function ChatBot() {
                               properly.
                             </div>
                           </>
-                        ) : (
-                          <div>Dotabod is a moderator in your Twitch channel.</div>
                         )}
                       </span>,
                     ]}
@@ -326,20 +330,7 @@ export default function ChatBot() {
                   hideTitle={true}
                   steps={[
                     <span className='flex flex-col gap-4' key={1}>
-                      {!stepOneComplete ? (
-                        <>
-                          <div>
-                            <span>
-                              Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
-                            </span>
-                            <span className='text-xs text-gray-500'>
-                              {' '}
-                              (you can change it later)
-                            </span>
-                          </div>
-                          <MmrForm hideText={true} />
-                        </>
-                      ) : (
+                      {stepOneComplete ? (
                         <div>
                           <span>
                             Dotabod knows your MMR.{' '}
@@ -353,12 +344,27 @@ export default function ChatBot() {
                             </Link>
                           </span>
                         </div>
+                      ) : (
+                        <>
+                          <div>
+                            <span>
+                              Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it
+                            </span>
+                            <span className='text-xs text-gray-500'>
+                              {' '}
+                              (you can change it later)
+                            </span>
+                          </div>
+                          <MmrForm hideText={true} />
+                        </>
                       )}
                     </span>,
                     <span key={1}>Go to your Twitch chat</span>,
                     <span key={2}>Type the command: /mod dotabod</span>,
                     <span key={3}>
-                      {!stepModComplete ? (
+                      {stepModComplete ? (
+                        <div>Dotabod is a moderator in your Twitch channel.</div>
+                      ) : (
                         <>
                           <Spin size='small' spinning={loading} />
                           <div>
@@ -366,8 +372,6 @@ export default function ChatBot() {
                             properly.
                           </div>
                         </>
-                      ) : (
-                        <div>Dotabod is a moderator in your Twitch channel.</div>
                       )}
                     </span>,
                   ]}
@@ -416,7 +420,9 @@ export default function ChatBot() {
                     <div key={1} className='flex flex-col gap-2'>
                       <div className='flex flex-row items-center gap-2'>
                         {loading && <Spin size='small' spinning={loading} />}
-                        {!user ? (
+                        {user ? (
+                          <div>You have a 7TV account connected to Twitch.</div>
+                        ) : (
                           <>
                             <div>
                               You don't have a 7TV account setup yet! Dotabod uses 7TV to display
@@ -437,15 +443,15 @@ export default function ChatBot() {
                               </Button>
                             </div>
                           </>
-                        ) : (
-                          <div>You have a 7TV account connected to Twitch.</div>
                         )}
                       </div>
                     </div>,
 
                     <div key={2}>
                       <div className='flex flex-row items-center gap-2'>
-                        {!user?.hasDotabodEditor ? (
+                        {user?.hasDotabodEditor ? (
+                          <div>Dotabod is an editor on your 7TV account.</div>
+                        ) : (
                           <div>
                             {user?.hasDotabodEmoteSet ? (
                               <div>
@@ -503,13 +509,11 @@ export default function ChatBot() {
                               </div>
                             )}
                           </div>
-                        ) : (
-                          <div>Dotabod is an editor on your 7TV account.</div>
                         )}
                       </div>
                     </div>,
                     <div key={3}>
-                      <div className='flex flex-row items-center gap-2 mb-4'>
+                      <div className='mb-4 flex flex-row items-center gap-2'>
                         <div className='flex flex-col'>
                           {updateEmoteSetError ? (
                             <div className='m-4'>
@@ -519,7 +523,9 @@ export default function ChatBot() {
                                 showIcon
                               />
                             </div>
-                          ) : !user?.hasDotabodEmoteSet ? (
+                          ) : user?.hasDotabodEmoteSet ? (
+                            <div>All required emotes have been added to your channel!</div>
+                          ) : (
                             <div className='flex flex-row gap-4'>
                               <Spin size='small' spinning={true} />
                               <p>
@@ -527,8 +533,6 @@ export default function ChatBot() {
                                 previous steps are completed.
                               </p>
                             </div>
-                          ) : (
-                            <div>All required emotes have been added to your channel!</div>
                           )}
                         </div>
                       </div>

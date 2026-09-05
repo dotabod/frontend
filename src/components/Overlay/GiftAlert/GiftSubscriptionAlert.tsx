@@ -2,6 +2,7 @@ import { clsx } from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GiftIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 
 interface GiftSubscriptionAlertProps {
@@ -56,7 +57,9 @@ const GiftSubscriptionAlert = ({
       }, 500) // Allow time for exit animation
     }, 10_000)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+    }
   }, [onComplete, preview])
 
   // Set appropriate animation properties based on preview mode
@@ -73,28 +76,28 @@ const GiftSubscriptionAlert = ({
           exit={exitAnimation}
           transition={{ duration: 0.5 }}
           className={clsx(
-            preview ? '' : 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50',
+            preview ? '' : 'fixed top-4 left-1/2 z-50 -translate-x-1/2 transform',
             'flex flex-col items-center',
             className,
           )}
         >
-          <div className='bg-purple-900 bg-opacity-90 rounded-lg p-4 shadow-lg border-2 border-purple-500'>
-            <div className='flex items-center justify-center mb-2'>
-              <GiftIcon className='h-8 w-8 text-yellow-400 mr-2' />
-              <h2 className='text-white text-xl font-bold'>Gift Subscription Received!</h2>
+          <div className='bg-opacity-90 rounded-lg border-2 border-purple-500 bg-purple-900 p-4 shadow-lg'>
+            <div className='mb-2 flex items-center justify-center'>
+              <GiftIcon className='mr-2 h-8 w-8 text-yellow-400' />
+              <h2 className='text-xl font-bold text-white'>Gift Subscription Received!</h2>
             </div>
 
             <div className='text-center text-white'>
               <p className='text-lg'>
                 <span className='font-bold text-yellow-400'>{senderName}</span> gifted you
               </p>
-              <p className='text-xl font-bold text-green-400 my-1'>
+              <p className='my-1 text-xl font-bold text-green-400'>
                 {formatGiftType()} of Dotabod Pro
               </p>
 
               {giftMessage && (
-                <div className='p-2 bg-purple-800 rounded-md'>
-                  <span className='text-gray-200 text-2xl'>{giftMessage}</span>
+                <div className='rounded-md bg-purple-800 p-2'>
+                  <span className='text-2xl text-gray-200'>{giftMessage}</span>
                 </div>
               )}
             </div>

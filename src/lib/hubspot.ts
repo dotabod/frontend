@@ -58,7 +58,7 @@ export function subscriptionToValue(
 let propertiesEnsured: Promise<void> | null = null
 
 async function readBody(res: { text(): Promise<string> }): Promise<string> {
-  return res.text().catch(() => '')
+  return await res.text().catch(() => '')
 }
 
 async function createProperty(token: string, prop: PropertyDef) {
@@ -83,9 +83,9 @@ async function createProperty(token: string, prop: PropertyDef) {
   }
 }
 
-function ensureContactProperties(token: string) {
+async function ensureContactProperties(token: string) {
   if (!propertiesEnsured) {
-    propertiesEnsured = Promise.all(CONTACT_PROPERTIES.map((p) => createProperty(token, p)))
+    propertiesEnsured = Promise.all(CONTACT_PROPERTIES.map(async (p) => createProperty(token, p)))
       .then(() => {})
       .catch((error) => {
         // Allow a retry on the next request rather than caching the failure.
@@ -112,7 +112,7 @@ export async function syncHubSpotContact(
     // PATCH by email supports partial updates; batch/upsert with idProperty=email
     // does not and returns 409 for any existing contact.
     const patchUrl = `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`
-    const patch = () =>
+    const patch = async () =>
       fetch(patchUrl, {
         body: JSON.stringify({ properties }),
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

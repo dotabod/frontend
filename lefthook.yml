@@ -6,13 +6,9 @@ pre-commit:
       run: |
         npx oxfmt {staged_files} \
           && git add {staged_files}
-    lint-fix:
-      glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
-      run: |
-        npx oxlint --fix --type-aware --type-check --max-warnings=0 {staged_files} \
-          && git add {staged_files}
-    check:
-      run: npm run format && npm run lint
+    # The full, strict Oxlint ratchet runs in CI via `pnpm quality`. Running
+    # raw Oxlint on a staged legacy file here would reject an unrelated commit
+    # for existing baselined findings that `--fix` cannot repair.
     # Full project tsc — catches Prisma/generated-type errors that Oxlint
     # doesn't analyze. Vercel's `next build` runs the real
     # TypeScript compiler too; this hook surfaces the same class of error

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
+
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
@@ -12,6 +13,7 @@ import {
   selectIsPreview,
   selectSettings,
 } from '@/lib/redux/store'
+
 import Building from './Building'
 import Courier from './Courier'
 import Creep from './Creep'

@@ -1,10 +1,11 @@
-import { captureException } from '@sentry/nextjs'
 import { Prisma } from '@prisma/client'
+import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
@@ -18,21 +19,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const keyValidation = settingKeySchema.safeParse(settingKey)
   if (!keyValidation.success) {
-    return res.status(422).json({ error: 'Invalid setting key' })
+    res.status(422).json({ error: 'Invalid setting key' })
+    return
   }
 
-  const validKey = keyValidation.data as keyof typeof settingKeySchema.Values
+  const validKey = keyValidation.data
 
   if (!session?.user?.id) {
     return res.status(500).end()
   }
 
   if (req.method === 'GET') {
-    return handleGetRequest(req, res, session.user.id, validKey)
+    return await handleGetRequest(req, res, session.user.id, validKey)
   }
 
   if (req.method === 'PATCH') {
-    return handlePatchRequest(req, res, session.user.id, validKey)
+    return await handlePatchRequest(req, res, session.user.id, validKey)
   }
 
   return res.status(405).end() // Method Not Allowed
@@ -61,7 +63,8 @@ async function handleGetRequest(
       }
     }
 
-    return res.status(200).json(setting)
+    res.status(200).json(setting)
+    return
   } catch (error) {
     captureException(error)
     console.error('Error fetching setting:', error)
@@ -79,7 +82,8 @@ async function handlePatchRequest(
   if (session?.user?.isImpersonating) {
     // Filter out obsServerPassword
     if (settingKey === Settings.obsServerPassword) {
-      return res.status(403).json({ message: 'Forbidden' })
+      res.status(403).json({ message: 'Forbidden' })
+      return
     }
   }
 
@@ -105,7 +109,8 @@ async function handlePatchRequest(
         },
       })
 
-      return res.status(200).json({ status: 'ok' })
+      res.status(200).json({ status: 'ok' })
+      return
     }
 
     const settingValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
@@ -146,8 +151,8 @@ async function handlePatchRequest(
         .map((entry) => entry.settingKey)
 
       const existing = await prisma.setting.findMany({
-        where: { key: { in: followMasterKeys }, userId },
         select: { key: true },
+        where: { key: { in: followMasterKeys }, userId },
       })
       const alreadySet = new Set(existing.map((row) => row.key))
       const toFreeze = followMasterKeys.filter((key) => !alreadySet.has(key))
@@ -159,13 +164,15 @@ async function handlePatchRequest(
       }
     }
 
-    return res.status(200).json({ status: 'ok' })
+    res.status(200).json({ status: 'ok' })
+    return
   } catch (error) {
     captureException(error)
     console.error('Error updating setting:', error)
 
     if (error instanceof z.ZodError) {
-      return res.status(422).json(error.issues)
+      res.status(422).json(error.issues)
+      return
     }
 
     return res.status(500).end()

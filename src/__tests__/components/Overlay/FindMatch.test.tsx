@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+
 import { FindMatch } from '@/components/Overlay/main/FindMatch'
 import { Settings } from '@/lib/defaultSettings'
 
@@ -29,7 +30,7 @@ vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   }),
 }))
 
-describe('FindMatch', () => {
+describe(FindMatch, () => {
   it('renders the active queue label in the streamer locale over the blank asset', () => {
     render(<FindMatch />)
 

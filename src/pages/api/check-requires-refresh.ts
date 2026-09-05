@@ -1,22 +1,26 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' })
+    res.status(405).json({ message: 'Method Not Allowed' })
+    return
   }
 
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   try {
@@ -52,10 +56,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // TODO: Remove this once we have a way to check if the user has the correct scopes
     requiresRefresh = false
 
-    return res.status(200).json(requiresRefresh)
+    res.status(200).json(requiresRefresh)
+    return
   } catch (error) {
     captureException(error)
-    return res.status(500).json({ error: error.message, message: 'Failed to get info' })
+    res.status(500).json({ error: error.message, message: 'Failed to get info' })
+    return
   }
 }
 

@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion'
+
 import { Settings } from '@/lib/defaultSettings'
 import { getDotaFindingMatchLabel } from '@/lib/dotaFindingMatchLabel'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
+
 import { MatchTimer } from './MatchTimer'
 
 export const FindMatch = () => {
@@ -23,7 +25,7 @@ export const FindMatch = () => {
             top: res({ h: 144 }),
             width: res({ w: 120 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold tracking-wide text-[#6A9561] capitalize'
         >
           Finding a Match
         </span>
@@ -37,7 +39,7 @@ export const FindMatch = () => {
             top: res({ h: 144 }),
             width: res({ w: 120 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold capitalize tracking-wide text-[#6A9561]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-[#1b1c1f] font-[Radiance] font-semibold tracking-wide text-[#6A9561] capitalize'
         >
           Main menu
         </span>
@@ -53,7 +55,7 @@ export const FindMatch = () => {
             top: res({ h: 224 }),
             width: res({ w: 131 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold tracking-wide text-[#77b26b] uppercase'
         >
           Finding a match
         </span>
@@ -67,7 +69,7 @@ export const FindMatch = () => {
             top: res({ h: 224 }),
             width: res({ w: 131 }),
           }}
-          className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold uppercase tracking-wide text-[#77b26b]'
+          className='font-outline-2 absolute flex items-center rounded-xs bg-black font-[Radiance] font-semibold tracking-wide text-[#77b26b] uppercase'
         >
           Main menu
         </span>
@@ -89,7 +91,7 @@ export const FindMatch = () => {
           id='find-match-queue-blocker-bg'
           width={res({ w: 840 })}
           height={res({ h: 355 })}
-          src={`/images/overlay/finding-match${!isFindingMatchEnabled ? '-old' : ''}.png`}
+          src={`/images/overlay/finding-match${isFindingMatchEnabled ? '' : '-old'}.png`}
           alt='Finding Match'
           className='rounded-lg'
         />
@@ -108,7 +110,7 @@ export const FindMatch = () => {
                 h: 1,
               })}px ${res({ w: 2 })}px rgba(0, 0, 0, 0.95)`,
             }}
-            className='absolute z-10 whitespace-nowrap font-[Radiance] font-light uppercase leading-none text-[#e8eef2]'
+            className='absolute z-10 font-[Radiance] leading-none font-light whitespace-nowrap text-[#e8eef2] uppercase'
           >
             {getDotaFindingMatchLabel(settings.locale)}
           </span>

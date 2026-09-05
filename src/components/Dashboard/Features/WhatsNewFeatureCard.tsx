@@ -1,8 +1,11 @@
 import Link from 'next/link'
+
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { deepLinkLabel, entryToggleChecked, type WhatsNewEntry } from '@/lib/whatsNew'
+import { deepLinkLabel, entryToggleChecked } from '@/lib/whatsNew'
+import type { WhatsNewEntry } from '@/lib/whatsNew'
 import { formatDate } from '@/utils/formatDate'
+
 import { TierSwitch } from './TierSwitch'
 
 const CATEGORY_LABELS: Record<WhatsNewEntry['category'], string> = {
@@ -72,7 +75,7 @@ export default function WhatsNewFeatureCard({
       </div>
 
       <div className='mt-4 max-w-3xl'>
-        <h3 id={titleId} className='m-0! text-lg font-semibold leading-7 text-gray-100'>
+        <h3 id={titleId} className='m-0! text-lg leading-7 font-semibold text-gray-100'>
           {entry.title}
         </h3>
         <p className='mt-2 mb-0! text-sm leading-6 text-gray-300'>{entry.description}</p>
@@ -106,7 +109,7 @@ export default function WhatsNewFeatureCard({
 
       {entry.details && entry.details.length > 0 && (
         <details className='group mt-5 border-t border-gray-700 pt-4'>
-          <summary className='flex w-fit cursor-pointer list-none select-none items-center gap-2 rounded-sm text-sm font-medium text-gray-300 hover:text-purple-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-400 [&::-webkit-details-marker]:hidden'>
+          <summary className='flex w-fit cursor-pointer list-none items-center gap-2 rounded-sm text-sm font-medium text-gray-300 select-none hover:text-purple-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-400 [&::-webkit-details-marker]:hidden'>
             <span
               aria-hidden='true'
               className='inline-block text-gray-500 transition-transform duration-200 group-open:rotate-90'
@@ -131,7 +134,9 @@ export default function WhatsNewFeatureCard({
             <TierSwitch
               settingKey={entry.settingKey}
               checked={checked}
-              onChange={(enabled) => updateSetting(enabled)}
+              onChange={(enabled) => {
+                updateSetting(enabled)
+              }}
               label={`Use ${entry.title}`}
               hideTierBadge
             />

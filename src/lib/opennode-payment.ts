@@ -1,7 +1,8 @@
 import type { OpenNodeCharge } from '@prisma/client'
+
 import prisma from '@/lib/db'
-import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 import { stripe } from '@/lib/stripe-server'
+import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 
 const OPENNODE_CONFIRMED_STATUSES = new Set(['paid', 'confirmed'])
 
@@ -18,7 +19,7 @@ export function isOpenNodePaymentConfirmed(status: string | null | undefined): b
 
 function getMetadata(charge: OpenNodeCharge): Record<string, unknown> {
   return charge.metadata && typeof charge.metadata === 'object' && !Array.isArray(charge.metadata)
-    ? (charge.metadata as Record<string, unknown>)
+    ? charge.metadata
     : {}
 }
 
@@ -83,7 +84,7 @@ export async function processConfirmedOpenNodePayment(
       )
     }
 
-    const handled = await prisma.$transaction(async (tx) => handleInvoiceEvent(invoice, tx))
+    const handled = await prisma.$transaction(async (tx) => await handleInvoiceEvent(invoice, tx))
     if (!handled) {
       throw new Error(`Invoice handler returned false for ${charge.stripeInvoiceId}`)
     }

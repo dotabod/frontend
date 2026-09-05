@@ -12,6 +12,7 @@ vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 
 import fetch from 'node-fetch'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import handler from '@/pages/api/hubspot/visitor-token'
@@ -38,7 +39,7 @@ describe('GET /api/hubspot/visitor-token', () => {
     vi.stubEnv('HUBSPOT_PRIVATE_APP_TOKEN', 'test-token')
     vi.mocked(getSubscription).mockResolvedValue(anyVal({ status: 'ACTIVE', tier: 'PRO' }))
     vi.mocked(fetch).mockResolvedValue(tokenOk())
-    vi.mocked(syncHubSpotContact).mockResolvedValue()
+    vi.mocked(syncHubSpotContact).mockResolvedValue(undefined)
     vi.mocked(subscriptionToValue).mockReturnValue('pro')
   })
 
@@ -70,9 +71,11 @@ describe('GET /api/hubspot/visitor-token', () => {
     await handler(anyVal(req), anyVal(res))
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({ email: 'gamer@example.com', token: 'vtok' })
+    expect(res._getJSONData()).toStrictEqual({ email: 'gamer@example.com', token: 'vtok' })
 
-    await vi.waitFor(() => expect(syncHubSpotContact).toHaveBeenCalled())
+    await vi.waitFor(() => {
+      expect(syncHubSpotContact).toHaveBeenCalledOnce()
+    })
     expect(syncHubSpotContact).toHaveBeenCalledWith('test-token', {
       email: 'gamer@example.com',
       subscription: 'pro',
@@ -110,7 +113,9 @@ describe('GET /api/hubspot/visitor-token', () => {
     await handler(anyVal(req), anyVal(res))
 
     expect(res.statusCode).toBe(200)
-    await vi.waitFor(() => expect(syncHubSpotContact).toHaveBeenCalled())
+    await vi.waitFor(() => {
+      expect(syncHubSpotContact).toHaveBeenCalledOnce()
+    })
     expect(syncHubSpotContact).toHaveBeenCalledWith('test-token', {
       email: 'gamer@example.com',
       subscription: undefined,

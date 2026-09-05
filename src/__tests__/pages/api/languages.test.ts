@@ -1,5 +1,6 @@
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/languages'
 
 // Mock fetch
@@ -44,7 +45,7 @@ describe('languages API', () => {
 
     // Mock successful fetch response
     global.fetch = vi.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(mockResponse),
+      json: async () => Promise.resolve(mockResponse),
       ok: true,
     })
 
@@ -70,7 +71,7 @@ describe('languages API', () => {
 
     // Verify response
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       approvalProgress: 50,
       translationProgress: 75,
     })
@@ -95,7 +96,7 @@ describe('languages API', () => {
     // Verify error handling
     expect(captureException).toHaveBeenCalledWith(mockError)
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ error: 'Fetch error' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Fetch error' })
   })
 
   it('handles non-OK fetch responses correctly', async () => {
@@ -116,9 +117,9 @@ describe('languages API', () => {
     await handler(req, res)
 
     // Verify error handling
-    expect(captureException).toHaveBeenCalled()
+    expect(captureException).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       error: 'Failed to fetch Crowdin language progress. Status: 404',
     })
   })
@@ -134,7 +135,7 @@ describe('languages API', () => {
     await handler(req, res)
 
     // Verify error handling
-    expect(captureException).toHaveBeenCalled()
+    expect(captureException).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(500)
   })
 })

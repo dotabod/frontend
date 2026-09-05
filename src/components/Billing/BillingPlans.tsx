@@ -1,15 +1,17 @@
 import { StarOutlined } from '@ant-design/icons'
-import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import {
   getCurrentPeriod,
   gracePeriodPrettyDate,
   isSubscriptionActive,
-  type PricePeriod,
   SUBSCRIPTION_TIERS,
 } from '@/utils/subscription'
+import type { PricePeriod } from '@/utils/subscription'
+
 import Plan from '../Plan'
 import { SubscriptionStatus } from '../Subscription/SubscriptionStatus'
 import { PeriodToggle } from './PeriodToggle'
@@ -130,7 +132,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
         <div className='mx-auto mb-12 max-w-3xl text-center'>
           <h2
             id='pricing-title'
-            className='text-balance text-4xl font-semibold leading-tight tracking-tight text-gray-100 sm:text-5xl'
+            className='text-4xl leading-tight font-semibold tracking-tight text-balance text-gray-100 sm:text-5xl'
           >
             Two plans. Free covers the basics, Pro covers the rest.
           </h2>
@@ -149,7 +151,7 @@ export function BillingPlans({ showTitle = true }: BillingPlansProps) {
               <SubscriptionStatus />
             </p>
           ) : (
-            <p className='mt-4 text-pretty text-base text-gray-400'>
+            <p className='mt-4 text-base text-pretty text-gray-400'>
               Start on Free, no card needed. Move up to Pro when you want the full kit.
             </p>
           )}

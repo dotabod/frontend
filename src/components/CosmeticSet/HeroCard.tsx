@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { type PointerEvent, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { PointerEvent } from 'react'
+
 import { hexA, RARITY_META } from './cosmetics'
 
 export interface HeroCardData {
@@ -15,9 +17,9 @@ export interface HeroCardData {
 type Size = 'sm' | 'md' | 'lg'
 
 const SIZE: Record<Size, { name: string; meta: string }> = {
-  sm: { name: 'text-sm', meta: 'text-[10px]' },
-  md: { name: 'text-base', meta: 'text-[11px]' },
-  lg: { name: 'text-xl sm:text-2xl', meta: 'text-xs' },
+  lg: { meta: 'text-xs', name: 'text-xl sm:text-2xl' },
+  md: { meta: 'text-[11px]', name: 'text-base' },
+  sm: { meta: 'text-[10px]', name: 'text-sm' },
 }
 
 // Treatment tiers (the Pokémon holo-vs-common instinct): chase cards earn the most
@@ -28,10 +30,14 @@ function useReducedMotion() {
   const [reduced, setReduced] = useState(true)
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReduced(mq.matches)
+    const update = () => {
+      setReduced(mq.matches)
+    }
     update()
     mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
+    return () => {
+      mq.removeEventListener('change', update)
+    }
   }, [])
   return reduced
 }
@@ -62,7 +68,9 @@ export function HeroCard({
 
   const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
     const el = planeRef.current
-    if (!el || !interactive) return
+    if (!el || !interactive) {
+      return
+    }
     const r = e.currentTarget.getBoundingClientRect()
     const px = (e.clientX - r.left) / r.width
     const py = (e.clientY - r.top) / r.height
@@ -75,7 +83,9 @@ export function HeroCard({
 
   const reset = () => {
     const el = planeRef.current
-    if (!el) return
+    if (!el) {
+      return
+    }
     el.style.setProperty('--rx', '0deg')
     el.style.setProperty('--ry', '0deg')
     el.style.setProperty('--sheen', '0')
@@ -86,7 +96,7 @@ export function HeroCard({
       href={`/${username}/set/${card.heroId}`}
       onPointerMove={onMove}
       onPointerLeave={reset}
-      className={`group/card block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 ${className}`}
+      className={`group/card block rounded-2xl focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:outline-none ${className}`}
       style={{ perspective: interactive ? '900px' : undefined }}
       aria-label={`${card.heroName} — ${card.itemCount} cosmetics${meta ? `, up to ${meta.label}` : ''}`}
     >
@@ -95,13 +105,13 @@ export function HeroCard({
         className='relative aspect-[5/7] overflow-hidden rounded-2xl border bg-gray-900 transition-transform duration-200 ease-out will-change-transform group-hover/card:-translate-y-0.5'
         style={{
           borderColor: t === 'flat' ? hexA(accent, 0.3) : hexA(accent, 0.55),
-          transform: interactive ? 'rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))' : undefined,
           boxShadow:
             t === 'chase'
               ? `0 0 0 1px ${hexA(accent, 0.8)}, 0 12px 40px ${hexA(accent, 0.28)}`
               : t === 'foil'
                 ? `0 8px 30px ${hexA(accent, 0.16)}`
                 : '0 6px 20px rgba(0,0,0,0.35)',
+          transform: interactive ? 'rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))' : undefined,
         }}
       >
         {/* Hero splash as the card face. */}
@@ -137,8 +147,8 @@ export function HeroCard({
             aria-hidden
             className='pointer-events-none absolute inset-0 mix-blend-screen transition-opacity duration-200'
             style={{
-              opacity: 'var(--sheen,0)' as unknown as number,
               background: `radial-gradient(40% 30% at var(--mx,50%) var(--my,0%), ${hexA(accent, 0.5)}, transparent 70%)`,
+              opacity: 'var(--sheen,0)' as unknown as number,
             }}
           />
         )}
@@ -154,18 +164,18 @@ export function HeroCard({
         )}
 
         {card.justPlayed && (
-          <span className='absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-purple-200 ring-1 ring-purple-400/40 backdrop-blur-sm'>
+          <span className='absolute top-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-purple-200 uppercase ring-1 ring-purple-400/40 backdrop-blur-sm'>
             Just played
           </span>
         )}
 
         {/* Name / rarity / count strip. */}
         <div className='absolute inset-x-0 bottom-0 p-3'>
-          <p className={`line-clamp-2 font-bold leading-tight text-white ${s.name}`}>
+          <p className={`line-clamp-2 leading-tight font-bold text-white ${s.name}`}>
             {card.heroName}
           </p>
           <div
-            className={`mt-1 flex items-center gap-1.5 font-semibold uppercase tracking-wider ${s.meta}`}
+            className={`mt-1 flex items-center gap-1.5 font-semibold tracking-wider uppercase ${s.meta}`}
           >
             {meta && <span style={{ color: meta.color }}>{meta.label}</span>}
             {meta && <span className='text-gray-600'>·</span>}
@@ -181,7 +191,7 @@ function Corner({ pos, accent }: { pos: string; accent: string }) {
   return (
     <span
       aria-hidden
-      className={`absolute h-4 w-4 border-l-2 border-t-2 ${pos}`}
+      className={`absolute h-4 w-4 border-t-2 border-l-2 ${pos}`}
       style={{ borderColor: hexA(accent, 0.85) }}
     />
   )

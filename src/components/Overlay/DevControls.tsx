@@ -1,7 +1,9 @@
-import { Button, Checkbox, type CheckboxChangeEvent, Input, InputNumber, Select } from 'antd'
+import { Button, Checkbox, Input, InputNumber, Select } from 'antd'
+import type { CheckboxChangeEvent } from 'antd'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
@@ -197,21 +199,21 @@ export const DevControls = ({
         transform: `translate(${position.x}px, ${position.y}px)`,
         zIndex: 50,
       }}
-      className='flex flex-col gap-3 p-4 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
+      className='flex flex-col gap-3 rounded-lg bg-gray-900/80 p-4 shadow-lg backdrop-blur-md'
     >
       <div
         role='button'
         tabIndex={0}
         aria-label='Drag to move window'
         onMouseDown={handleMouseDown}
-        className='absolute top-0 right-0 left-0 h-6 bg-gray-800/50 rounded-t-lg flex items-center justify-center text-xs text-gray-400 cursor-move select-none'
+        className='absolute top-0 right-0 left-0 flex h-6 cursor-move items-center justify-center rounded-t-lg bg-gray-800/50 text-xs text-gray-400 select-none'
       >
         Drag to move
       </div>
 
       {/* Block controls group */}
-      <div className='flex flex-col gap-2 mt-4'>
-        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
+      <div className='mt-4 flex flex-col gap-2'>
+        <div className='mb-1 text-xs font-semibold tracking-wider text-gray-300 uppercase'>
           Block Controls
         </div>
         <div className='flex gap-2'>
@@ -245,7 +247,7 @@ export const DevControls = ({
 
       {/* LastFM settings group */}
       <div className='flex flex-col gap-2'>
-        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
+        <div className='mb-1 text-xs font-semibold tracking-wider text-gray-300 uppercase'>
           LastFM Settings
         </div>
         <InputNumber
@@ -260,7 +262,7 @@ export const DevControls = ({
       </div>
 
       {/* Dev Image Toggle */}
-      <div className='flex items-center gap-2 mt-2'>
+      <div className='mt-2 flex items-center gap-2'>
         <Checkbox
           checked={showDevImage}
           onChange={handleShowDevImageChange}
@@ -271,7 +273,7 @@ export const DevControls = ({
       </div>
 
       {/* Dev Mode Toggle */}
-      <div className='flex items-center gap-2 mt-2'>
+      <div className='mt-2 flex items-center gap-2'>
         <Checkbox
           checked={devModeEnabled}
           onChange={handleDevModeToggle}
@@ -286,13 +288,15 @@ export const DevControls = ({
 
       {/* Chat Messages Testing group */}
       <div className='flex flex-col gap-2'>
-        <div className='text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>
+        <div className='mb-1 text-xs font-semibold tracking-wider text-gray-300 uppercase'>
           Chat Messages Testing
         </div>
         <div className='flex gap-2'>
           <Input
             value={testChatMessage}
-            onChange={(e) => setTestChatMessage(e.target.value)}
+            onChange={(e) => {
+              setTestChatMessage(e.target.value)
+            }}
             placeholder='Enter test chat message'
             style={{ width: 200 }}
             onPressEnter={handleAddTestChatMessage}
@@ -305,19 +309,39 @@ export const DevControls = ({
           <Button onClick={handleClearChatMessages} size='small' danger>
             Clear Messages
           </Button>
-          <span className='text-xs text-gray-400 self-center'>{chatMessages.length} messages</span>
+          <span className='self-center text-xs text-gray-400'>{chatMessages.length} messages</span>
         </div>
         <div className='flex flex-wrap gap-1'>
-          <Button size='small' onClick={() => handleAddSampleMessage('Hello everyone!')}>
+          <Button
+            size='small'
+            onClick={() => {
+              handleAddSampleMessage('Hello everyone!')
+            }}
+          >
             Sample 1
           </Button>
-          <Button size='small' onClick={() => handleAddSampleMessage('Good luck team!')}>
+          <Button
+            size='small'
+            onClick={() => {
+              handleAddSampleMessage('Good luck team!')
+            }}
+          >
             Sample 2
           </Button>
-          <Button size='small' onClick={() => handleAddSampleMessage('Nice play!')}>
+          <Button
+            size='small'
+            onClick={() => {
+              handleAddSampleMessage('Nice play!')
+            }}
+          >
             Sample 3
           </Button>
-          <Button size='small' onClick={() => handleAddSampleMessage('GG WP')}>
+          <Button
+            size='small'
+            onClick={() => {
+              handleAddSampleMessage('GG WP')
+            }}
+          >
             Sample 4
           </Button>
         </div>
@@ -352,7 +376,7 @@ export const DevModeToggle = () => {
         right: '1rem',
         zIndex: 50,
       }}
-      className='p-2 rounded-lg shadow-lg bg-gray-900/80 backdrop-blur-md'
+      className='rounded-lg bg-gray-900/80 p-2 shadow-lg backdrop-blur-md'
     >
       <Button type='primary' onClick={enableDevMode}>
         Enable Dev Mode

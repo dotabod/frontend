@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
@@ -56,46 +57,53 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const subscription = await getSubscription(session.user.id)
   const tierAccess = canAccessFeature('managers', subscription)
 
   if (!tierAccess.hasAccess) {
-    return res.status(403).json({
+    res.status(403).json({
       error: true,
       message: 'This feature requires Pro subscription',
     })
+    return
   }
 
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Unauthorized' })
+    res.status(403).json({ message: 'Unauthorized' })
+    return
   }
 
   if (method === 'POST') {
     const { moderatorChannelIds } = req.body
 
     if (!Array.isArray(moderatorChannelIds)) {
-      return res.status(400).json({ message: 'moderatorChannelIds must be an array' })
+      res.status(400).json({ message: 'moderatorChannelIds must be an array' })
+      return
     }
 
     const parsedModeratorChannelIds = moderatorChannelIds.map((id) => Number.parseInt(id, 10))
 
     const parseResult = approvedModeratorSchema.safeParse(parsedModeratorChannelIds)
     if (!parseResult.success) {
-      return res.status(400).json({
+      res.status(400).json({
         errors: parseResult.error.errors,
         message: 'Invalid moderatorChannelIds',
       })
+      return
     }
 
     try {
       await approveModerators(session?.user?.id, parsedModeratorChannelIds)
-      return res.status(200).json({ message: 'Managers approved successfully' })
+      res.status(200).json({ message: 'Managers approved successfully' })
+      return
     } catch (error) {
       console.error('Failed to approve managers:', error)
-      return res.status(500).json({ error, message: 'Error approving managers' })
+      res.status(500).json({ error, message: 'Error approving managers' })
+      return
     }
   } else {
     res.setHeader('Allow', ['POST'])

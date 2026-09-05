@@ -39,7 +39,7 @@ const entries: WhatsNewEntry[] = [
   },
 ]
 
-describe('WhatsNewFeed', () => {
+describe(WhatsNewFeed, () => {
   it('filters the chronological feed into user-facing groups', () => {
     render(<WhatsNewFeed entries={entries} readOnly />)
 

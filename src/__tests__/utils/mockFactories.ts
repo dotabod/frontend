@@ -1,72 +1,36 @@
-// @ts-nocheck
-import type { UseRouterResult } from 'next/router'
 import type { Session } from 'next-auth'
+import type { SessionContextValue } from 'next-auth/react'
+import type { NextRouter } from 'next/router'
 import type { SWRResponse } from 'swr'
+import { vi } from 'vitest'
 
-interface MockSessionData {
-  user: {
-    name: string
-    email: string
-    id: string
-    image: string
-  }
-  expires: string
-  status: 'authenticated' | 'unauthenticated' | 'loading'
-  update: ReturnType<typeof vi.fn>
-}
+type AuthenticatedSession = Extract<SessionContextValue, { status: 'authenticated' }>
+type StreamStatus = { stream_online: boolean }
 
-interface MockRouterData {
-  query: Record<string, string>
-  pathname: string
-  replace: ReturnType<typeof vi.fn>
-  push: ReturnType<typeof vi.fn>
-  reload: ReturnType<typeof vi.fn>
-  back: ReturnType<typeof vi.fn>
-  prefetch: ReturnType<typeof vi.fn>
-  beforePopState: ReturnType<typeof vi.fn>
-  events: {
-    on: ReturnType<typeof vi.fn>
-    off: ReturnType<typeof vi.fn>
-    emit: ReturnType<typeof vi.fn>
-  }
-  isFallback: boolean
-  isReady: boolean
-  isPreview: boolean
-  asPath: string
-  basePath: string
-  isLocaleDomain: boolean
-  route: string
-  forward: ReturnType<typeof vi.fn>
-}
-
-interface MockSWRData<T = unknown> {
-  data: T
-  error: unknown
-  isLoading: boolean
-  isValidating: boolean
-  mutate: ReturnType<typeof vi.fn>
-}
-
-export function createMockSession(
-  overrides?: Partial<MockSessionData>,
-): Session & { status: 'authenticated'; update: ReturnType<typeof vi.fn> } {
-  return {
-    data: {
-      expires: '1',
-      status: 'authenticated',
-      update: vi.fn(),
-      user: {
-        email: 'test@example.com',
-        id: 'user-123',
-        image: 'https://example.com/avatar.png',
-        name: 'Test User',
-      },
-      ...overrides,
+export function createMockSession(overrides?: Partial<Session>): AuthenticatedSession {
+  const session = {
+    expires: '1',
+    user: {
+      email: 'test@example.com',
+      id: 'user-123',
+      image: 'https://example.com/avatar.png',
+      isImpersonating: false,
+      locale: 'en',
+      name: 'Test User',
+      scope: '',
+      twitchId: 'twitch-123',
     },
-  } as unknown as Session & { status: 'authenticated'; update: ReturnType<typeof vi.fn> }
+    ...overrides,
+  } satisfies Session
+
+  return {
+    data: session,
+    status: 'authenticated',
+    update: vi.fn<(data?: unknown) => Promise<Session | null>>().mockResolvedValue(session),
+  }
 }
 
-export function createMockRouter(overrides?: Partial<MockRouterData>): UseRouterResult {
+export function createMockRouter(overrides?: Partial<NextRouter>): NextRouter {
   return {
     asPath: '',
     back: vi.fn(),
@@ -90,18 +54,18 @@ export function createMockRouter(overrides?: Partial<MockRouterData>): UseRouter
     replace: vi.fn(),
     route: '',
     ...overrides,
-  } as unknown as UseRouterResult
+  } satisfies NextRouter
 }
 
-export function createMockSWR<T = { stream_online: boolean }>(
-  overrides?: Partial<MockSWRData<T>>,
-): SWRResponse<T, unknown> {
+export function createMockSWR(
+  overrides?: Partial<SWRResponse<StreamStatus, unknown>>,
+): SWRResponse<StreamStatus, unknown> {
   return {
-    data: { stream_online: false } as T,
-    error: null,
+    data: { stream_online: false },
+    error: undefined,
     isLoading: false,
     isValidating: false,
     mutate: vi.fn(),
     ...overrides,
-  } as unknown as SWRResponse<T, unknown>
+  } satisfies SWRResponse<StreamStatus, unknown>
 }
