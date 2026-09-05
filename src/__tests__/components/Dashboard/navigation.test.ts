@@ -42,7 +42,7 @@ describe('navConfig regions', () => {
     const [diagnostics, teamAccess, helpCenter, admin] = navConfig.bottom
 
     expect(diagnostics.href).toBe('/dashboard/diagnostics')
-    expect(diagnostics.name).toBe('Connection diagnostics')
+    expect(diagnostics.name).toBe('Diagnostics')
 
     expect(teamAccess.href).toBe('/dashboard/managers')
     expect(teamAccess.hideForImpersonator).toBe(true)
@@ -89,17 +89,13 @@ describe('navConfig regions', () => {
 describe('filterNav', () => {
   it('drops the Admin accordion for non-admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: false, isImpersonating: false })
-    expect(result.map((i) => i.name)).toEqual([
-      'Connection diagnostics',
-      'Team access',
-      'Help center',
-    ])
+    expect(result.map((i) => i.name)).toEqual(['Diagnostics', 'Team access', 'Help center'])
   })
 
   it('keeps the Admin accordion for admins', () => {
     const result = filterNav(navConfig.bottom, { isAdmin: true, isImpersonating: false })
     expect(result.map((i) => i.name)).toEqual([
-      'Connection diagnostics',
+      'Diagnostics',
       'Team access',
       'Help center',
       'Admin',
@@ -112,7 +108,7 @@ describe('filterNav', () => {
     expect(filterNav(navConfig.primary, opts).some((i) => i.name === 'Setup')).toBe(false)
     // Team access + Admin both drop; diagnostics and Help center stay available.
     expect(filterNav(navConfig.bottom, opts).map((i) => i.name)).toEqual([
-      'Connection diagnostics',
+      'Diagnostics',
       'Help center',
     ])
     expect(filterNav(navConfig.account, opts).map((i) => i.name)).toEqual(['Gift Pro'])

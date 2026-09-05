@@ -68,7 +68,7 @@ vi.mock('antd', () => {
     Drawer: ({ children, open, ...props }) => (open ? <div {...props}>{children}</div> : null),
     Layout,
     Menu: ({ items }) => renderItems(items),
-    Tag: ({ children }) => <span>{children}</span>,
+    Tag: ({ children, color: _color, ...props }) => <span {...props}>{children}</span>,
     theme: { useToken: () => ({ token: { colorBgLayout: 'rgb(31, 41, 55)' } }) },
   }
 })
@@ -133,5 +133,21 @@ describe('DashboardShell responsive navigation', () => {
     expect(screen.getByTestId('dashboard-utility-navigation')).toHaveClass('shrink-0')
     expect(screen.getByRole('link', { name: 'Team access' })).toBeVisible()
     expect(screen.getByRole('link', { name: 'Help center' })).toBeVisible()
+  })
+
+  it('renders the short Diagnostics label with a readable New tag', () => {
+    render(
+      <DashboardShell>
+        <main>Dashboard content</main>
+      </DashboardShell>,
+    )
+
+    const diagnosticsLink = screen.getByRole('link', {
+      name: 'Diagnostics New',
+    })
+
+    expect(diagnosticsLink).toHaveClass('min-w-0', 'w-full')
+    expect(diagnosticsLink.firstElementChild).toHaveClass('min-w-0', 'truncate')
+    expect(screen.getByText('New')).toHaveClass('shrink-0')
   })
 })

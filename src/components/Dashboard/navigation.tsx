@@ -74,7 +74,7 @@ export const navConfig: NavConfig = {
     { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
   ],
   bottom: [
-    { href: '/dashboard/diagnostics', icon: Activity, name: 'Connection diagnostics', new: true },
+    { href: '/dashboard/diagnostics', icon: Activity, name: 'Diagnostics', new: true },
     { hideForImpersonator: true, href: '/dashboard/managers', icon: Users, name: 'Team access' },
     // Pinned at the bottom of the rail, visible to everyone (incl. impersonators).
     HELP_CENTER,
@@ -137,17 +137,25 @@ export function navItemToMenuItem(
     <Link
       {...props}
       href={item.href}
-      className='text-gray-200! flex flex-row gap-2 items-center'
+      className='text-gray-200! flex w-full min-w-0 flex-row items-center gap-2'
       target={external ? '_blank' : '_self'}
       rel={external ? 'noreferrer' : undefined}
     >
-      {item.name}
-      {item.new && <Tag color='green'>New</Tag>}
+      <span className='min-w-0 flex-1 truncate'>{item.name}</span>
+      {item.new && (
+        <Tag color='green' className='m-0! shrink-0'>
+          New
+        </Tag>
+      )}
     </Link>
   ) : (
-    <div className='flex flex-row gap-2 items-center'>
-      {item.name}
-      {item.new && <Tag color='green'>New</Tag>}
+    <div className='flex w-full min-w-0 flex-row items-center gap-2'>
+      <span className='min-w-0 flex-1 truncate'>{item.name}</span>
+      {item.new && (
+        <Tag color='green' className='m-0! shrink-0'>
+          New
+        </Tag>
+      )}
     </div>
   )
 
