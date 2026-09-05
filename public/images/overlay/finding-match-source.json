@@ -1,0 +1,23 @@
+{
+  "clientResolution": "1920x1080",
+  "crop": {
+    "height": 355,
+    "left": 1080,
+    "top": 725,
+    "width": 840
+  },
+  "dotaBuildId": "25132749",
+  "schemaVersion": 1,
+  "source": "installed Dota 2 client window",
+  "states": {
+    "finding": {
+      "capturedAt": "2026-09-05T23:06:06.323Z",
+      "findingMatchTextRemoved": true,
+      "nativeResolution": "3840x2160"
+    },
+    "idle": {
+      "capturedAt": "2026-09-05T23:07:57.481Z",
+      "nativeResolution": "3840x2160"
+    }
+  }
+}
