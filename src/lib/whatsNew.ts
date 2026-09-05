@@ -34,7 +34,7 @@ export const whatsNew: WhatsNewEntry[] = [
     id: 'custom-wl-stats-window',
     title: 'Keep your win/loss counter across streams',
     description:
-      "The overlay and !wl still reset each stream by default. For a longer challenge, choose its start date and a 1-365 day duration. The counter returns to per-stream mode when the challenge ends. !today still shows today's stats.",
+      'Choose a start date and duration to keep one record across streams. You can also correct missed or off-stream results without giving Dotabod access to your offline match history.',
     releaseDate: '2026-09-04',
     category: 'overlay',
     command: '!wl',
@@ -43,7 +43,8 @@ export const whatsNew: WhatsNewEntry[] = [
     demoCommand: 'commandWL',
     details: [
       'Set a challenge start date and duration to keep one record across streams. The overlay, !wl, and public profile show progress such as 14 of 30 days, then return to per-stream mode automatically.',
-      'The settings card recalculates your record as you edit the challenge. Your public profile shows the same progress and updates after each tracked match.',
+      'For a correction, choose ranked or unranked, enter an amount from 1 to 1000, then add or remove wins or losses. A total cannot go below zero.',
+      'Dotabod stores the correction instead of tracking your offline matches. The corrected record appears in the overlay, !wl, and your public profile.',
       '!resetwl starts the configured window from 0-0 without changing other stream-session commands. !today keeps its one-day hero breakdown.',
     ],
   },
