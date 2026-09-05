@@ -32,6 +32,7 @@ interface SettingEntry {
 
 interface SettingsData {
   settings?: SettingEntry[]
+  locale?: string | null
   mmr?: number | null
   rankOnly?: RankOnlyInfo
   Account?: {

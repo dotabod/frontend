@@ -141,7 +141,7 @@
   @font-face {
     font-family: 'Radiance';
     src: url('/fonts/radiance-light.otf') format('opentype');
-    font-weight: thin;
+    font-weight: 300;
   }
 }
 

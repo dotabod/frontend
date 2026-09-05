@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Settings } from '@/lib/defaultSettings'
+import { getDotaFindingMatchLabel } from '@/lib/dotaFindingMatchLabel'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
@@ -8,6 +9,7 @@ import { MatchTimer } from './MatchTimer'
 export const FindMatch = () => {
   const res = useTransformRes()
   const { data: isFindingMatchEnabled } = useUpdateSetting(Settings.queueBlockerFindMatch)
+  const { original: settings } = useUpdateSetting()
 
   return (
     <>
@@ -91,6 +93,26 @@ export const FindMatch = () => {
           alt='Finding Match'
           className='rounded-lg'
         />
+
+        {isFindingMatchEnabled && (
+          <span
+            data-testid='finding-match-label'
+            style={{
+              bottom: res({ h: 28 }),
+              fontSize: res({ w: 28 }),
+              letterSpacing: res({ w: 2.5 }),
+              right: res({ w: 112 }),
+              textShadow: `0 0 ${res({ w: 4 })}px rgba(222, 242, 255, 0.9), 0 0 ${res({
+                w: 8,
+              })}px rgba(222, 242, 255, 0.35), 0 ${res({
+                h: 1,
+              })}px ${res({ w: 2 })}px rgba(0, 0, 0, 0.95)`,
+            }}
+            className='absolute z-10 whitespace-nowrap font-[Radiance] font-light uppercase leading-none text-[#e8eef2]'
+          >
+            {getDotaFindingMatchLabel(settings.locale)}
+          </span>
+        )}
       </motion.div>
     </>
   )

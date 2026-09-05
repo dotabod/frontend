@@ -196,6 +196,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             },
           },
           beta_tester: true,
+          locale: true,
           mmr: true,
           settings: {
             select: {

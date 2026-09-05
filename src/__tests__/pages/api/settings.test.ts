@@ -55,6 +55,7 @@ function createSettingsResult() {
     Account: [{ providerAccountId: 'twitch-id' }],
     SteamAccount: [],
     beta_tester: false,
+    locale: 'ru-RU',
     mmr: 1234,
     settings: [
       { key: 'obsServerPassword', value: 'super-secret' },
@@ -85,7 +86,13 @@ describe('settings API', () => {
 
     expect(res.statusCode).toBe(200)
     expect(res.getHeader('Cache-Control')).toBe('private, no-store')
+    expect(res._getJSONData().locale).toBe('ru-RU')
     expect(res._getJSONData().settings).toEqual([{ key: 'aegis', value: true }])
+    expect(prisma.user.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({ locale: true }),
+      }),
+    )
   })
 
   it('returns the public Twitch channel id used by the live profile counter', async () => {
