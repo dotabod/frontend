@@ -4,6 +4,25 @@ import Link from 'next/link'
 import type { HeroPerformance, MatchHistoryRow } from '@/lib/matchHistory'
 
 const OVERVIEW_ROW_LIMIT = 5
+const DOTABOD_ORIGIN = 'https://dotabod.com'
+const TWITCH_USERNAME_PATTERN = /^[a-z0-9_]{1,25}$/iu
+
+const profileMatchesLink = (username: string, view?: 'heroes'): string => {
+  if (!TWITCH_USERNAME_PATTERN.test(username)) {
+    return '/'
+  }
+
+  const url = new URL(`/${encodeURIComponent(username)}/matches`, DOTABOD_ORIGIN)
+  if (url.origin !== DOTABOD_ORIGIN || url.protocol !== 'https:') {
+    return '/'
+  }
+
+  if (view !== undefined) {
+    url.searchParams.set('view', view)
+  }
+
+  return `${url.pathname}${url.search}`
+}
 
 function SectionLink({ href, label }: { href: string; label: string }) {
   return (
@@ -30,7 +49,10 @@ function HeroOverview({ heroes, username }: { heroes: HeroPerformance[]; usernam
           </h2>
           <span className='text-sm text-gray-400'>All time</span>
         </div>
-        <SectionLink href={`/${username}/matches?view=heroes`} label='View all hero win rates' />
+        <SectionLink
+          href={profileMatchesLink(username, 'heroes')}
+          label='View all hero win rates'
+        />
       </div>
 
       {visibleHeroes.length === 0 ? (
@@ -127,7 +149,7 @@ function MatchOverview({ matches, username }: { matches: MatchHistoryRow[]; user
         <h2 id='latest-matches-heading' className='text-xl font-semibold text-gray-100'>
           Latest matches
         </h2>
-        <SectionLink href={`/${username}/matches`} label='View all matches' />
+        <SectionLink href={profileMatchesLink(username)} label='View all matches' />
       </div>
 
       {visibleMatches.length === 0 ? (

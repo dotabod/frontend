@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 
 import { plans } from '@/components/Billing/BillingPlans'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
+import { getSafeStripeCheckoutUrl } from '@/lib/stripe/checkout-redirect'
 import { Card } from '@/ui/card'
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
@@ -200,8 +201,15 @@ export const GiftSubscriptionForm = ({
         return
       }
 
-      // If we get here, we have a URL
-      window.location.href = result.url
+      const checkoutUrl = getSafeStripeCheckoutUrl(result.url)
+      if (checkoutUrl === undefined) {
+        const errorText = 'Received an invalid checkout URL. Please try again.'
+        setFormError(errorText)
+        message.error(errorText)
+        return
+      }
+
+      window.location.assign(checkoutUrl)
     } catch (error: unknown) {
       console.error('Gift checkout error:', error)
       // Handle any unexpected errors

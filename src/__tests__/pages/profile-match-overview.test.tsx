@@ -325,4 +325,29 @@ describe('public profile match overview', () => {
       '/streamer/matches',
     )
   })
+
+  it('keeps profile navigation on Dotabod when a supplied username resembles a protocol-relative URL', () => {
+    const unsafeUsername = '//attacker.example'
+    const { rerender } = render(
+      <ProfilePage
+        {...baseProps}
+        username={unsafeUsername}
+        collection={{ cards: [], count: 1, tally: [] }}
+      />,
+    )
+
+    expect(
+      screen.getByRole('link', { name: '1 heroes collected, open collection' }),
+    ).toHaveAttribute('href', '/streamers')
+
+    rerender(<ProfilePage {...baseProps} username={unsafeUsername} collection={null} />)
+
+    expect(
+      screen.getByRole('link', { name: '0 heroes collected, learn how the collection works' }),
+    ).toHaveAttribute('href', '/streamers')
+    expect(screen.getByRole('link', { name: 'Match history' })).toHaveAttribute(
+      'href',
+      '/streamers',
+    )
+  })
 })

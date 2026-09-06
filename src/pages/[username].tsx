@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { z } from 'zod/v4'
 
 import { Container } from '@/components/Container'
 import {
@@ -25,6 +26,8 @@ import { ProfileWinLossCounter } from '@/components/ProfileWinLossCounter'
 import prisma from '@/lib/db'
 import { fetcher } from '@/lib/fetcher'
 import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
+import { serializeJsonLd } from '@/lib/json-ld'
+import type { ProfileJsonLd } from '@/lib/json-ld'
 import {
   buildHeroPerformance,
   formatQueueLabel,
@@ -37,6 +40,20 @@ import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
 
 const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
+const TWITCH_LOGIN_PATTERN = /^[a-z0-9_]{1,25}$/u
+const profileUsernameSchema = z.string().trim().toLowerCase().regex(TWITCH_LOGIN_PATTERN)
+
+const getProfileUsername = (username: string | undefined): string | null => {
+  const parsedUsername = profileUsernameSchema.safeParse(username)
+  return parsedUsername.success ? parsedUsername.data : null
+}
+
+const getProfileRoute = (username: string | undefined, suffix: '/matches' | '/set') => {
+  const profileUsername = getProfileUsername(username)
+  return profileUsername === null
+    ? '/streamers'
+    : `/${encodeURIComponent(profileUsername)}${suffix}`
+}
 
 interface CollectionSummary {
   count: number
@@ -60,7 +77,7 @@ function FannedHand({ username, collection }: { username: string; collection: Co
   const mid = (cards.length - 1) / 2
   return (
     <Link
-      href={`/${username}/set`}
+      href={getProfileRoute(username, '/set')}
       aria-label={`${collection.count} heroes collected, open collection`}
       className='group/fan block flex-shrink-0 self-center focus-visible:outline-none sm:basis-full lg:basis-auto'
     >
@@ -123,7 +140,7 @@ function FannedHand({ username, collection }: { username: string; collection: Co
 function CollectionTeaser({ username, name }: { username: string; name: string }) {
   return (
     <Link
-      href={`/${username}/set`}
+      href={getProfileRoute(username, '/set')}
       aria-label='0 heroes collected, learn how the collection works'
       className='group/fan block flex-shrink-0 self-center focus-visible:outline-none sm:basis-full lg:basis-auto'
     >
@@ -488,7 +505,10 @@ const PageContent = ({
                   </Button>
                 </Link>
                 <Link
-                  href={`/${ssrUsername || (typeof username === 'string' ? username : '')}/matches`}
+                  href={getProfileRoute(
+                    ssrUsername || (typeof username === 'string' ? username : undefined),
+                    '/matches',
+                  )}
                   passHref
                 >
                   <Button
@@ -761,17 +781,20 @@ const CommandsPage = ({
   const pageTitle = `${userData.displayName || userData.name} - ${userData.mmr || 0} MMR | Dotabod`
   const pageDescription = `View ${userData.displayName || userData.name}'s Dota 2 commands and stream stats on Dotabod. ${userData.stream_online ? 'Currently live streaming!' : 'Stream offline.'}`
 
-  const profileJsonLd = {
+  const profileJsonLd: ProfileJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
     mainEntity: {
       '@type': 'Person',
       name: userData.displayName || userData.name,
       url: `https://twitch.tv/${userData.name}`,
-      ...(userData.image ? { image: userData.image } : {}),
     },
     url: `https://dotabod.com/${username}`,
   }
+  if (userData.image !== null && userData.image !== '') {
+    profileJsonLd.mainEntity.image = userData.image
+  }
+  const profileJsonLdText = serializeJsonLd(profileJsonLd)
 
   return (
     <>
@@ -787,10 +810,7 @@ const CommandsPage = ({
         <meta property='twitter:description' content={pageDescription} />
         <meta property='twitter:image' content={userData.image || '/images/hero/default.png'} />
         <link rel='canonical' href={`https://dotabod.com/${username}`} />
-        <script
-          type='application/ld+json'
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(profileJsonLd) }}
-        />
+        <script type='application/ld+json'>{profileJsonLdText}</script>
       </Head>
       <HomepageShell
         dontUseTitle
@@ -817,7 +837,8 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
   // ISR writes cost more than they save. Stale-while-revalidate keeps repeat hits warm.
   res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=86400')
 
-  const username = params?.username as string
+  const parsedUsername = profileUsernameSchema.safeParse(params?.username)
+  const username = parsedUsername.success ? parsedUsername.data : null
 
   if (isMaintenanceModeEnabled()) {
     return {
@@ -828,7 +849,7 @@ export const getServerSideProps: GetServerSideProps<UserProfileProps> = async ({
     }
   }
 
-  if (!username) {
+  if (username === null) {
     return { notFound: true }
   }
 

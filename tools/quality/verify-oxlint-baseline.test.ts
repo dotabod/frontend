@@ -278,6 +278,70 @@ describe('Oxlint baseline summaries', () => {
     ])
   })
 
+  it('retains an unchanged complexity score when a function body changes', () => {
+    const legacySource = 'const PageContent = ({\n  legacyBranch()\n}) => {}'
+    const legacySpanOffset = legacySource.indexOf('({')
+    sourceByFile.set(exampleFile, legacySource)
+    const baseline = aggregateDiagnostics(
+      [
+        {
+          diagnostics: [
+            diagnostic({
+              code: 'eslint(complexity)',
+              labels: [
+                {
+                  span: {
+                    column: legacySpanOffset + 1,
+                    length: Buffer.byteLength(legacySource.slice(legacySpanOffset)),
+                    line: 1,
+                    offset: legacySpanOffset,
+                  },
+                },
+              ],
+              message: 'function has a complexity of 83. Maximum allowed is 20.',
+            }),
+          ],
+          target: 'app',
+        },
+      ],
+      readSource,
+    )
+
+    const currentSource = 'const PageContent = ({\n  safeRoute()\n  updatedBranch()\n}) => {}'
+    const currentSpanOffset = currentSource.indexOf('({')
+    sourceByFile.set(exampleFile, currentSource)
+    const current = aggregateDiagnostics(
+      [
+        {
+          diagnostics: [
+            diagnostic({
+              code: 'eslint(complexity)',
+              labels: [
+                {
+                  span: {
+                    column: currentSpanOffset + 1,
+                    length: Buffer.byteLength(currentSource.slice(currentSpanOffset)),
+                    line: 1,
+                    offset: currentSpanOffset,
+                  },
+                },
+              ],
+              message: 'function has a complexity of 83. Maximum allowed is 20.',
+            }),
+          ],
+          target: 'app',
+        },
+      ],
+      readSource,
+    )
+
+    expect(compareDiagnostics(current, baseline)).toStrictEqual({
+      additions: [],
+      improvements: [],
+      removals: [],
+    })
+  })
+
   it('rejects a complexity regression after a lower score has been pruned', () => {
     sourceByFile.set(exampleFile, 'first\nalert\nlast')
     const baseline = aggregateDiagnostics(

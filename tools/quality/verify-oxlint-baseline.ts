@@ -443,13 +443,13 @@ const appendMetricEntries = (
   }
 }
 
-const lowerMetricPair = (group: EntryGroup<ScoredEntry>): boolean => {
+const singleMetricPair = (group: EntryGroup<ScoredEntry>): boolean => {
   if (!isSinglePair(group)) {
     return false
   }
   const [addition] = group.additions
   const [removal] = group.removals
-  return addition.entry.count === 1 && removal.entry.count === 1 && addition.score < removal.score
+  return addition.entry.count === 1 && removal.entry.count === 1
 }
 
 const metricImprovements = (groups: Map<string, EntryGroup<ScoredEntry>>): MetricMatches => {
@@ -457,13 +457,18 @@ const metricImprovements = (groups: Map<string, EntryGroup<ScoredEntry>>): Metri
   const removals = new Set<BaselineEntry>()
   const improvements: Differences['improvements'] = []
   for (const group of groups.values()) {
-    if (lowerMetricPair(group)) {
-      const [addition] = group.additions
-      const [removal] = group.removals
-      const current = addition.entry
-      const baseline = removal.entry
+    if (!singleMetricPair(group)) {
+      continue
+    }
+    const [addition] = group.additions
+    const [removal] = group.removals
+    const current = addition.entry
+    const baseline = removal.entry
+    if (addition.score <= removal.score) {
       additions.add(current)
       removals.add(baseline)
+    }
+    if (addition.score < removal.score) {
       improvements.push({ baseline, current })
     }
   }
