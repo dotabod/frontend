@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       for (const delivery of message.deliveries) {
         const key = delivery.status as keyof typeof stats
         if (key in stats) {
-          stats[key]++
+          stats[key] += 1
         }
       }
 

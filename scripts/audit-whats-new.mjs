@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-function option(name, fallback) {
+const option = function option(name, fallback) {
   const index = process.argv.indexOf(`--${name}`)
   return index === -1 ? fallback : process.argv[index + 1]
 }
@@ -9,9 +9,9 @@ function option(name, fallback) {
 const baseUrl = option(
   'base-url',
   process.env.FRONTEND_BASE_URL ?? 'http://127.0.0.1:3100',
-).replace(/\/$/, '')
+).replace(/\/$/u, '')
 const cdpUrl = option('cdp-url', process.env.FRONTEND_CDP_URL ?? 'http://127.0.0.1:9223').replace(
-  /\/$/,
+  /\/$/u,
   '',
 )
 const axeScriptPath = option('axe-script', process.env.FRONTEND_AXE_SCRIPT || null)
@@ -51,7 +51,7 @@ socket.addEventListener('message', (event) => {
   }
 })
 
-async function send(method, params = {}) {
+const send = async function send(method, params = {}) {
   commandId += 1
   socket.send(JSON.stringify({ id: commandId, method, params }))
   return new Promise((resolve, reject) => pending.set(commandId, { reject, resolve }))
@@ -59,7 +59,7 @@ async function send(method, params = {}) {
 
 const delay = async (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
 
-async function evaluate(expression, awaitPromise = false) {
+const evaluate = async function evaluate(expression, awaitPromise = false) {
   const result = await send('Runtime.evaluate', { awaitPromise, expression, returnByValue: true })
   if (result.exceptionDetails) {
     const description = result.exceptionDetails.exception?.description
@@ -68,7 +68,7 @@ async function evaluate(expression, awaitPromise = false) {
   return result.result.value
 }
 
-async function waitFor(expression, label) {
+const waitFor = async function waitFor(expression, label) {
   for (let attempt = 0; attempt < 60; attempt += 1) {
     if (await evaluate(expression)) {
       return
@@ -78,13 +78,13 @@ async function waitFor(expression, label) {
   throw new Error(`Timed out waiting for ${label}`)
 }
 
-function assert(condition, message, failures) {
+const assert = function assert(condition, message, failures) {
   if (!condition) {
     failures.push(message)
   }
 }
 
-async function pressTab() {
+const pressTab = async function pressTab() {
   await send('Input.dispatchKeyEvent', { code: 'Tab', key: 'Tab', type: 'keyDown' })
   await send('Input.dispatchKeyEvent', { code: 'Tab', key: 'Tab', type: 'keyUp' })
 }

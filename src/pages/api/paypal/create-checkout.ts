@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
-import { featureFlags } from '@/lib/featureFlags'
+import { featureFlags } from '@/lib/feature-flags'
 import { createPaypalApproval } from '@/lib/paypal-checkout'
 
 // Dedicated PayPal checkout endpoint. Intentionally does NOT import stripe-server

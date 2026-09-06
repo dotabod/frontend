@@ -6,7 +6,7 @@ import type { ICreateInvoice } from '@nowpaymentsio/nowpayments-api-js/src/types
 
 const NOWPAYMENTS_BASE_URL = 'https://api.nowpayments.io/v1'
 
-function getApiKey(): string {
+const getApiKey = function getApiKey(): string {
   const key = process.env.NOWPAYMENTS_API_KEY
   if (!key) {
     throw new Error('NOWPAYMENTS_API_KEY is not set')
@@ -14,7 +14,7 @@ function getApiKey(): string {
   return key
 }
 
-function getIpnSecret(): string {
+const getIpnSecret = function getIpnSecret(): string {
   const secret = process.env.NOWPAYMENTS_IPN_SECRET
   if (!secret) {
     throw new Error('NOWPAYMENTS_IPN_SECRET is not set')
@@ -54,7 +54,11 @@ export interface NowPaymentsPaymentStatus extends Omit<GetPaymentStatusReturn, '
   fee?: Record<string, unknown>
 }
 
-async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
+const request = async function request<T>(
+  method: 'GET' | 'POST',
+  path: string,
+  body?: unknown,
+): Promise<T> {
   const options: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -81,21 +85,17 @@ async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown):
   return parsed as T
 }
 
-export async function createNowPaymentsInvoice(
+export const createNowPaymentsInvoice = async function createNowPaymentsInvoice(
   params: CreateInvoiceParams,
 ): Promise<NowPaymentsInvoiceResponse> {
   return await request<NowPaymentsInvoiceResponse>('POST', '/invoice', params)
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+const isRecord = function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-/**
- * Recursively sorts an object's keys alphabetically. Matches the canonicalization
- * NOWPayments uses to build the IPN signature.
- */
-export function sortObject(value: unknown): unknown {
+export const sortObject = function sortObject(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map((v) => sortObject(v))
   }
@@ -109,11 +109,7 @@ export function sortObject(value: unknown): unknown {
   return value
 }
 
-/**
- * Verifies an `x-nowpayments-sig` header against the parsed webhook body.
- * Algorithm: HMAC-SHA512(JSON.stringify(sortObject(body)), IPN_SECRET) → hex.
- */
-export function verifyNowPaymentsSignature(
+export const verifyNowPaymentsSignature = function verifyNowPaymentsSignature(
   body: Record<string, unknown>,
   signature: string | string[] | undefined,
 ): boolean {
@@ -140,16 +136,22 @@ const NOWPAYMENTS_CONFIRMED_STATUSES = new Set<NowPaymentsStatus>(['finished'])
 
 const NOWPAYMENTS_STATUSES = new Set<string>(NOWPAYMENTS_STATUS_VALUES)
 
-function isNowPaymentsStatus(value: unknown): value is NowPaymentsStatus {
+const isNowPaymentsStatus = function isNowPaymentsStatus(
+  value: unknown,
+): value is NowPaymentsStatus {
   return typeof value === 'string' && NOWPAYMENTS_STATUSES.has(value)
 }
 
-export function isNowPaymentsConfirmed(status: string | null | undefined): boolean {
+export const isNowPaymentsConfirmed = function isNowPaymentsConfirmed(
+  status: string | null | undefined,
+): boolean {
   return isNowPaymentsStatus(status) && NOWPAYMENTS_CONFIRMED_STATUSES.has(status)
 }
 
 // Intentionally a partial check: only the fields the handler reads, not a full schema.
-export function isNowPaymentsPaymentStatus(body: unknown): body is NowPaymentsPaymentStatus {
+export const isNowPaymentsPaymentStatus = function isNowPaymentsPaymentStatus(
+  body: unknown,
+): body is NowPaymentsPaymentStatus {
   return (
     isRecord(body) &&
     typeof body.order_id === 'string' &&

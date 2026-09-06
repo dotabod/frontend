@@ -3,7 +3,7 @@ import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import { Container } from '@/components/Container'
+import { Container } from '@/components/container'
 import {
   bestRarity,
   hexA,
@@ -14,8 +14,8 @@ import {
   STEAM_CDN,
 } from '@/components/CosmeticSet'
 import type { CosmeticItem, HeroCardData } from '@/components/CosmeticSet'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { ProfileSectionNav } from '@/components/ProfileSectionNav'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { ProfileSectionNav } from '@/components/profile-section-nav'
 import prisma from '@/lib/db'
 
 type Card = HeroCardData & { updatedIso: string }
@@ -30,7 +30,7 @@ interface SetPageProps {
   tally: { rarity: string; count: number }[]
 }
 
-function CompletionMeter({
+const CompletionMeter = function CompletionMeter({
   collected,
   roster,
   accent,
@@ -63,7 +63,7 @@ function CompletionMeter({
 
 // Faint placeholders for heroes not yet played: empty slots in the binder, there to
 // be filled. Kept to a teaser count so a sparse collection still feels aspirational.
-function GhostSlot() {
+const GhostSlot = function GhostSlot() {
   return (
     <div className='flex aspect-[5/7] items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40'>
       <Sparkles size={20} className='text-gray-700' aria-hidden />
@@ -71,7 +71,7 @@ function GhostSlot() {
   )
 }
 
-function EmptyBinder({ displayName }: { displayName: string }) {
+const EmptyBinder = function EmptyBinder({ displayName }: { displayName: string }) {
   return (
     <div className='py-6 sm:py-12'>
       <div className='mx-auto max-w-xl text-center'>
@@ -298,7 +298,7 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
     .map((l) => {
       const items = Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : []
       const heroImg = heroes[String(l.heroId)]?.img
-      const heroCardImg = heroImg?.replace('/heroes/', '/heroes/crops/').replace(/\?$/, '')
+      const heroCardImg = heroImg?.replace('/heroes/', '/heroes/crops/').replace(/\?$/u, '')
       return {
         bestRarity: bestRarity(items),
         heroId: l.heroId,

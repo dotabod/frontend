@@ -28,10 +28,10 @@ const CONCURRENCY = 8
 
 const args = process.argv.slice(2)
 let limit = Number.POSITIVE_INFINITY
-for (let i = 0; i < args.length; i++) {
+for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--limit' && args[i + 1]) {
     limit = Number(args[i + 1])
-    i++
+    i += 1
   }
 }
 
@@ -44,7 +44,11 @@ if (!token) {
 let synced = 0
 let failed = 0
 
-async function syncUser(user: { id: string; email: string | null; displayName: string | null }) {
+const syncUser = async function syncUser(user: {
+  id: string
+  email: string | null
+  displayName: string | null
+}) {
   if (!user.email) {
     return
   }
@@ -62,9 +66,9 @@ async function syncUser(user: { id: string; email: string | null; displayName: s
       subscription,
       username: user.displayName ?? '',
     })
-    synced++
+    synced += 1
   } catch {
-    failed++
+    failed += 1
   }
   if ((synced + failed) % 500 === 0) {
     console.log(`  …processed ${synced + failed} (synced ${synced}, failed ${failed})`)
@@ -72,18 +76,20 @@ async function syncUser(user: { id: string; email: string | null; displayName: s
 }
 
 // Run an array of users through syncUser with bounded concurrency.
-async function runPool(users: { id: string; email: string | null; displayName: string | null }[]) {
+const runPool = async function runPool(
+  users: { id: string; email: string | null; displayName: string | null }[],
+) {
   let cursor = 0
-  async function worker() {
+  const worker = async function worker() {
     while (cursor < users.length) {
-      const user = users[cursor++]
+      const user = users[(cursor += 1)]
       await syncUser(user)
     }
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, worker))
 }
 
-async function main() {
+const main = async function main() {
   console.log('Backfilling HubSpot contacts from users with an email…')
   let lastId: string | null = null
   let processed = 0

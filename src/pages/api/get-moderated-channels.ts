@@ -5,15 +5,18 @@ import fetch from 'node-fetch'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 import { GENERIC_FEATURE_TIERS, isInGracePeriod } from '@/utils/subscription'
 
 const TWITCH_MODERATED_CHANNELS_URL = 'https://api.twitch.tv/helix/moderation/channels'
 
-export async function getModeratedChannels(userId: string | undefined, accessToken: string) {
+export const getModeratedChannels = async function getModeratedChannels(
+  userId: string | undefined,
+  accessToken: string,
+) {
   try {
     if (!userId) {
       throw new Error('User ID is required')
@@ -25,7 +28,8 @@ export async function getModeratedChannels(userId: string | undefined, accessTok
       broadcaster_name: string
     }[] = []
     let after: string | undefined
-    const first = 100 // Maximum items per page
+    // Maximum items per page
+    const first = 100
 
     do {
       const url = new URL(TWITCH_MODERATED_CHANNELS_URL)
@@ -89,7 +93,7 @@ export async function getModeratedChannels(userId: string | undefined, accessTok
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const search = req.query.search as string | undefined
 

@@ -29,10 +29,10 @@ let chargeId: string | null = null
 let dryRun = false
 
 // Parse arguments
-for (let i = 0; i < args.length; i++) {
+for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--charge-id' && args[i + 1]) {
     chargeId = args[i + 1]
-    i++
+    i += 1
   } else if (args[i] === '--dry-run') {
     dryRun = true
   } else if (!args[i].startsWith('--')) {
@@ -56,7 +56,7 @@ interface FixResult {
   subscriptionId?: string
 }
 
-async function prompt(question: string): Promise<string> {
+const prompt = async function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -70,7 +70,7 @@ async function prompt(question: string): Promise<string> {
   })
 }
 
-async function discoverChargesToFix(): Promise<ChargeToFix[]> {
+const discoverChargesToFix = async function discoverChargesToFix(): Promise<ChargeToFix[]> {
   // Find all paid/confirmed charges
   const paidCharges = await prisma.openNodeCharge.findMany({
     orderBy: { createdAt: 'desc' },
@@ -114,7 +114,7 @@ async function discoverChargesToFix(): Promise<ChargeToFix[]> {
   return results
 }
 
-async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
+const fixSingleCharge = async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
   const result: FixResult = {
     charge,
     skipped: false,
@@ -240,7 +240,7 @@ async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
   }
 }
 
-async function runDiscoveryMode(): Promise<void> {
+const runDiscoveryMode = async function runDiscoveryMode(): Promise<void> {
   console.log('='.repeat(80))
   console.log('OpenNode Payment Recovery - Discovery Mode')
   console.log('='.repeat(80))
@@ -265,7 +265,7 @@ async function runDiscoveryMode(): Promise<void> {
   console.log(`Found ${chargesToFix.length} charge(s) that need attention:`)
   console.log()
 
-  for (let i = 0; i < chargesToFix.length; i++) {
+  for (let i = 0; i < chargesToFix.length; i += 1) {
     const { charge, reason } = chargesToFix[i]
     console.log(`${i + 1}. ${charge.openNodeChargeId}`)
     console.log(`   Invoice: ${charge.stripeInvoiceId}`)
@@ -298,7 +298,7 @@ async function runDiscoveryMode(): Promise<void> {
 
   const results: FixResult[] = []
 
-  for (let i = 0; i < chargesToFix.length; i++) {
+  for (let i = 0; i < chargesToFix.length; i += 1) {
     const { charge, reason } = chargesToFix[i]
 
     console.log('-'.repeat(80))
@@ -361,7 +361,7 @@ async function runDiscoveryMode(): Promise<void> {
   }
 }
 
-async function runSingleChargeMode(): Promise<void> {
+const runSingleChargeMode = async function runSingleChargeMode(): Promise<void> {
   console.log('='.repeat(80))
   console.log('OpenNode Payment Recovery Script')
   console.log('='.repeat(80))
@@ -618,7 +618,7 @@ async function runSingleChargeMode(): Promise<void> {
   console.log()
 }
 
-async function main() {
+const main = async function main() {
   try {
     // If no arguments provided, run discovery mode
     if (!invoiceId && !chargeId) {

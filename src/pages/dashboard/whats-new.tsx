@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { TierSwitch } from '@/components/Dashboard/Features/TierSwitch'
-import WhatsNewFeed from '@/components/Dashboard/Features/WhatsNewFeed'
-import Header from '@/components/Dashboard/Header'
-import { Settings } from '@/lib/defaultSettings'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
-import { whatsNewSorted } from '@/lib/whatsNew'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import { TierSwitch } from '@/components/Dashboard/Features/tier-switch'
+import WhatsNewFeed from '@/components/Dashboard/Features/whats-new-feed'
+import Header from '@/components/Dashboard/header'
+import { Settings } from '@/lib/default-settings'
+import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
+import { whatsNewSorted } from '@/lib/whats-new'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const WhatsNewPage: NextPageWithLayout = () => {

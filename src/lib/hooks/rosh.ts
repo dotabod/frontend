@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { isDev } from '@/lib/devConsts'
+import { isDev } from '@/lib/dev-consts'
 
 const devTotalTimer = 480_000
 

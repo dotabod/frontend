@@ -62,7 +62,13 @@ const leaderRanks = [
   { image: '80.png', range: [1001, 100_000], sparklingEffect: false },
 ]
 
-function lookupLeaderRank({ mmr, standing }: { mmr: number; standing: number | null }) {
+const lookupLeaderRank = function lookupLeaderRank({
+  mmr,
+  standing,
+}: {
+  mmr: number
+  standing: number | null
+}) {
   const lowestImmortalRank = leaderRanks.at(-1)
   const defaultNotFound = { mmr, myRank: lowestImmortalRank, standing }
 
@@ -76,7 +82,7 @@ function lookupLeaderRank({ mmr, standing }: { mmr: number; standing: number | n
   return { mmr, myRank, standing }
 }
 
-export function getRankDetail(mmr: string | number, standing: number | null) {
+export const getRankDetail = function getRankDetail(mmr: string | number, standing: number | null) {
   const mmrNum = Number(mmr)
 
   if (!mmrNum || mmrNum < 0) {
@@ -107,7 +113,7 @@ export function getRankDetail(mmr: string | number, standing: number | null) {
 }
 
 // Used for obs overlay
-export function getRankImage(rank: RankType) {
+export const getRankImage = function getRankImage(rank: RankType) {
   if (!rank?.mmr) {
     return { image: '0.png', leaderboard: 0, rank: null }
   }
@@ -137,7 +143,7 @@ type RankTierKey = (typeof rankTiers)[number]['key']
 
 // Maps a tier key to the MMR bounds used for filtering. Immortal has no upper bound
 // and starts one point above Divine☆5. Returns null for an unknown tier.
-function tierMmrRange(key: string): { gte?: number; lte?: number } | null {
+const tierMmrRange = function tierMmrRange(key: string): { gte?: number; lte?: number } | null {
   if (key === 'immortal') {
     const divineMax = ranks.at(-1)?.range[1] ?? 0
     return { gte: divineMax + 1 }
@@ -157,7 +163,7 @@ function tierMmrRange(key: string): { gte?: number; lte?: number } | null {
   return { gte: lo === 0 ? 1 : lo, lte: group.at(-1)?.range[1] }
 }
 
-export function getRankTitle(rankTier?: string | number): string {
+export const getRankTitle = function getRankTitle(rankTier?: string | number): string {
   if (!rankTier || Number(rankTier) === 0) {
     return 'Uncalibrated'
   }
@@ -226,7 +232,10 @@ export const tierLabel: Record<StreamerTier, string> = {
 
 // Resolve a streamer into a single tier bucket. Immortal is a leaderboard standing
 // (or MMR above Divine); mmr<=0 means uncalibrated, not Herald.
-export function tierForRank(mmr: number, standing: number | null): StreamerTier {
+export const tierForRank = function tierForRank(
+  mmr: number,
+  standing: number | null,
+): StreamerTier {
   const divineMax = ranks.at(-1)?.range[1] ?? 5629
   if ((standing && standing > 0) || mmr > divineMax) {
     return 'immortal'
@@ -247,7 +256,7 @@ export function tierForRank(mmr: number, standing: number | null): StreamerTier 
 }
 
 // Human-readable MMR band shown under each section header.
-export function tierRangeLabel(tier: StreamerTier): string {
+export const tierRangeLabel = function tierRangeLabel(tier: StreamerTier): string {
   if (tier === 'immortal') {
     return 'Leaderboard'
   }

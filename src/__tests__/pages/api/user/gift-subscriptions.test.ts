@@ -27,7 +27,7 @@ vi.mock('@/lib/auth', () => ({
 }))
 
 // Mock formatDate
-vi.mock('@/utils/formatDate', () => ({
+vi.mock('@/utils/format-date', () => ({
   formatDate: vi.fn((_date) => '2025-01-01'),
 }))
 

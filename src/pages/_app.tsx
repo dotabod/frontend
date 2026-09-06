@@ -23,14 +23,14 @@ import { createRoot } from 'react-dom/client'
 import type { Root } from 'react-dom/client'
 import { Provider } from 'react-redux'
 
-import ErrorBoundary from '@/components/ErrorBoundary'
-import SentrySession from '@/components/SentrySession'
-import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
-import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
-import { useCookiePreferences } from '@/lib/cookieManager'
-import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
+import ErrorBoundary from '@/components/error-boundary'
+import SentrySession from '@/components/sentry-session'
+import { SubscriptionProvider } from '@/contexts/subscription-context'
+import { SubscriptionProviderMain } from '@/hooks/subscription-provider'
+import { useCookiePreferences } from '@/lib/cookie-manager'
+import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlay-utils'
 import store from '@/lib/redux/store'
-import themeConfig from '@/lib/theme/themeConfig'
+import themeConfig from '@/lib/theme/theme-config'
 
 const isInvalidLocalCheck = checkForInvalidOverlay(
   typeof window === 'undefined' ? '' : window.location.pathname,

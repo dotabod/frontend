@@ -34,10 +34,9 @@ export interface OpenNodeCharge {
   metadata?: Record<string, unknown>
 }
 
-/**
- * Creates an OpenNode charge
- */
-export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promise<OpenNodeCharge> {
+export const createOpenNodeCharge = async function createOpenNodeCharge(
+  params: OpenNodeChargeParams,
+): Promise<OpenNodeCharge> {
   try {
     if (process.env.VERCEL_ENV !== 'production') {
       console.log('OPENNODE_API_KEY', process.env.OPENNODE_API_KEY)
@@ -54,10 +53,9 @@ export async function createOpenNodeCharge(params: OpenNodeChargeParams): Promis
   }
 }
 
-/**
- * Verifies OpenNode webhook signature
- */
-export async function verifyOpenNodeWebhook(eventData: unknown): Promise<boolean> {
+export const verifyOpenNodeWebhook = async function verifyOpenNodeWebhook(
+  eventData: unknown,
+): Promise<boolean> {
   try {
     if (
       typeof eventData !== 'object' ||
@@ -87,10 +85,9 @@ export async function verifyOpenNodeWebhook(eventData: unknown): Promise<boolean
   }
 }
 
-/**
- * Gets the status of an OpenNode charge
- */
-export async function getOpenNodeChargeStatus(chargeId: string): Promise<OpenNodeCharge | null> {
+export const getOpenNodeChargeStatus = async function getOpenNodeChargeStatus(
+  chargeId: string,
+): Promise<OpenNodeCharge | null> {
   try {
     const response = await chargeInfo(chargeId)
 
@@ -104,10 +101,10 @@ export async function getOpenNodeChargeStatus(chargeId: string): Promise<OpenNod
   }
 }
 
-/**
- * Constructs hosted checkout URL with options
- */
-export function buildCheckoutUrl(chargeId: string, hostedUrl?: string): string {
+export const buildCheckoutUrl = function buildCheckoutUrl(
+  chargeId: string,
+  hostedUrl?: string,
+): string {
   const baseUrl =
     hostedUrl ||
     (process.env.VERCEL_ENV === 'production'

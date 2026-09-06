@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { SETUP_SIGNAL_KEYS } from '@/lib/setupSignalKeys'
+import { SETUP_SIGNAL_KEYS } from '@/lib/setup-signal-keys'
 
 const diagnosticKeys = [
   SETUP_SIGNAL_KEYS.gsiLastSeen,
@@ -12,7 +12,7 @@ const diagnosticKeys = [
   SETUP_SIGNAL_KEYS.overlaySocketLastSeen,
 ]
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
     res.status(403).json({ message: 'Unauthorized' })

@@ -2,13 +2,13 @@ import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
-import { getTwitchTokens } from '../../lib/getTwitchTokens'
+import { getTwitchTokens } from '../../lib/get-twitch-tokens'
 
-async function checkBan(broadcasterId: string | undefined, accessToken: string) {
+const checkBan = async function checkBan(broadcasterId: string | undefined, accessToken: string) {
   if (!broadcasterId) {
     throw new Error('Broadcaster ID is required')
   }
@@ -34,7 +34,7 @@ async function checkBan(broadcasterId: string | undefined, accessToken: string) 
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method Not Allowed' })
     return

@@ -13,10 +13,10 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import { Container } from '@/components/container'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import type { NextPageWithLayout } from '@/pages/_app'
-import { formatDate } from '@/utils/formatDate'
+import { formatDate } from '@/utils/format-date'
 
 const { Title, Text } = Typography
 
@@ -113,7 +113,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     })
     .map((filename) => ({
       params: {
-        slug: filename.replace(/\.md$/, ''),
+        slug: filename.replace(/\.md$/u, ''),
       },
     }))
 
@@ -159,7 +159,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       rehypePlugins: [rehypeSlug, rehypeHighlight],
       remarkPlugins: [remarkGfm],
     },
-    scope: processedData, // Use the processed data
+    // Use the processed data
+    scope: processedData,
   })
 
   // Ensure date is a string for serialization
@@ -175,7 +176,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         date: dateString,
         description: processedData.description || '',
         image: processedData.image || null,
-        slug, // Add slug to meta for canonical URL
+        // Add slug to meta for canonical URL
+        slug,
         title: processedData.title || 'Untitled',
       },
       source: mdxSource,

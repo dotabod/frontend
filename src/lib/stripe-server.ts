@@ -2,7 +2,7 @@ import Stripe from 'stripe'
 
 let instance: Stripe | null = null
 
-function getStripe(): Stripe {
+const getStripe = function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {
     throw new Error('Missing STRIPE_SECRET_KEY environment variable')
   }

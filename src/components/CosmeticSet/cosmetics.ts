@@ -49,12 +49,12 @@ export const RARITY_META: Record<string, { rank: number; color: string; label: s
 
 // Slots arrive as raw tokens like "body_head"; show them as "Body Head".
 export const formatSlot = (slot: string) =>
-  slot.replaceAll('_', ' ').replaceAll(/\b\w/g, (c) => c.toUpperCase())
+  slot.replaceAll('_', ' ').replaceAll(/\b\w/gu, (c) => c.toUpperCase())
 
 // Fallback monogram for items that have no captured icon (most do not).
 export const initials = (name: string) =>
   name
-    .split(/\s+/)
+    .split(/\s+/u)
     .slice(0, 2)
     .map((w) => w[0] ?? '')
     .join('')
@@ -69,14 +69,14 @@ export const hexA = (hex: string, alpha: number) =>
 export const rarityOf = (item: CosmeticItem) => (item.rarity ? RARITY_META[item.rarity] : undefined)
 export const rarityRank = (item: CosmeticItem) => rarityOf(item)?.rank ?? -1
 
-export function marketUrl(item: CosmeticItem): string | null {
+export const marketUrl = function marketUrl(item: CosmeticItem): string | null {
   if (!item.marketable || !item.marketHashName) {
     return null
   }
   return `https://steamcommunity.com/market/listings/570/${encodeURIComponent(item.marketHashName)}`
 }
 
-export function sortByRarity(items: CosmeticItem[]): CosmeticItem[] {
+export const sortByRarity = function sortByRarity(items: CosmeticItem[]): CosmeticItem[] {
   return [...items].sort((a, b) => {
     const byRarity = rarityRank(b) - rarityRank(a)
     if (byRarity) {
@@ -94,7 +94,7 @@ export function sortByRarity(items: CosmeticItem[]): CosmeticItem[] {
 
 // Highest-rank rarity present in a loadout. Drives a hero card's accent and which
 // treatment tier (flat / foil / chase) it gets.
-export function bestRarity(items: CosmeticItem[]): string | undefined {
+export const bestRarity = function bestRarity(items: CosmeticItem[]): string | undefined {
   let best: string | undefined
   let bestRank = -1
   for (const i of items) {
@@ -109,7 +109,7 @@ export function bestRarity(items: CosmeticItem[]): string | undefined {
 
 // rarity -> count across a loadout, rarest first. Reused for the collection header
 // tally and the per-card chip summary.
-function rarityTally(items: CosmeticItem[]): [string, number][] {
+const rarityTally = function rarityTally(items: CosmeticItem[]): [string, number][] {
   const counts = new Map<string, number>()
   for (const i of items) {
     if (i.rarity) counts.set(i.rarity, (counts.get(i.rarity) ?? 0) + 1)

@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import { getSubscription } from '@/utils/subscription'
@@ -14,7 +14,12 @@ const HUBSPOT_VISITOR_TOKEN_URL =
 
 // Best-effort, fire-and-forget: enrich the HubSpot contact without blocking the
 // Token response that gates the chat widget load.
-async function enrichContact(token: string, userId: string, email: string, username: string) {
+const enrichContact = async function enrichContact(
+  token: string,
+  userId: string,
+  email: string,
+  username: string,
+) {
   let subscription: string | undefined
   try {
     subscription = subscriptionToValue(await getSubscription(userId))
@@ -26,7 +31,7 @@ async function enrichContact(token: string, userId: string, email: string, usern
   await syncHubSpotContact(token, { email, subscription, username })
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const email = session?.user?.email
 

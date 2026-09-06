@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -16,7 +16,7 @@ const accountUpdateSchema = z.array(
   }),
 )
 
-async function getAccounts(userId: string) {
+const getAccounts = async function getAccounts(userId: string) {
   try {
     const accounts = await prisma.steamAccount.findMany({
       select: {
@@ -73,7 +73,7 @@ async function getAccounts(userId: string) {
   }
 }
 
-async function handleGetRequest(res: NextApiResponse, userId: string) {
+const handleGetRequest = async function handleGetRequest(res: NextApiResponse, userId: string) {
   const accounts = await getAccounts(userId)
   if (!accounts) {
     return res.status(500).end()
@@ -81,7 +81,11 @@ async function handleGetRequest(res: NextApiResponse, userId: string) {
   res.json({ accounts })
 }
 
-async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, userId: string) {
+const handlePatchRequest = async function handlePatchRequest(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  userId: string,
+) {
   try {
     const accountUpdates = accountUpdateSchema.parse(JSON.parse(req.body))
     const requestedAccountIds = [...new Set(accountUpdates.map(({ steam32Id }) => steam32Id))]
@@ -127,7 +131,7 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const userId = session?.user?.id
 
@@ -144,7 +148,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return await handlePatchRequest(req, res, userId)
   }
 
-  return res.status(405).end() // Method Not Allowed
+  // Method Not Allowed
+  return res.status(405).end()
 }
 
 export default withMethods(['GET', 'PATCH'], handler)

@@ -75,7 +75,7 @@ describe('createAndStoreCryptoInvoice', () => {
         stripeInvoice: { ...stripeInvoice, amount_remaining: 0 },
         userId: 'user_1',
       }),
-    ).rejects.toThrow(/no balance due/)
+    ).rejects.toThrow(/no balance due/u)
     expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
   })
 
@@ -119,6 +119,6 @@ describe('createAndStoreCryptoInvoice', () => {
         stripeInvoice,
         userId: 'user_1',
       }),
-    ).rejects.toThrow(/db down/)
+    ).rejects.toThrow(/db down/u)
   })
 })

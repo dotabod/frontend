@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import { Card } from '@/ui/card'
 
 // Define form values interface
@@ -41,7 +41,8 @@ const ContactPage: React.FC = () => {
       // Note: HubSpot field names might be 'email', 'content' etc. Adjust as needed.
       const data = {
         context: {
-          pageName: 'Dotabod Contact Us', // Or a more specific name if needed
+          // Or a more specific name if needed
+          pageName: 'Dotabod Contact Us',
           pageUri: window.location.href,
         },
         fields: [
@@ -105,11 +106,13 @@ const ContactPage: React.FC = () => {
         // Attempt to open as a fallback if toggle fails
         try {
           widget.open()
-          setIsChatWidgetOpen(true) // Assume opened on fallback
+          // Assume opened on fallback
+          setIsChatWidgetOpen(true)
         } catch (openError) {
           console.error('Error opening HubSpot chat widget after toggle failed:', openError)
           message.error('Could not open chat support.')
-          setIsChatWidgetOpen(false) // Reset state if fallback open fails
+          // Reset state if fallback open fails
+          setIsChatWidgetOpen(false)
         }
       }
     } else {
@@ -118,16 +121,19 @@ const ContactPage: React.FC = () => {
       message.error(
         'Chat support is unavailable at the moment. It might be blocked by your browser or extensions.',
       )
-      setIsChatWidgetOpen(false) // Ensure state is false if widget isn't available
+      // Ensure state is false if widget isn't available
+      setIsChatWidgetOpen(false)
     }
   }
 
   return (
     <HomepageShell
       seo={{
-        canonicalUrl: 'https://dotabod.com/contact', // Assuming this is the canonical URL
+        // Assuming this is the canonical URL
+        canonicalUrl: 'https://dotabod.com/contact',
         description: 'Get in touch with the Dotabod team. Send us your questions or feedback.',
-        noindex: false, // Make sure search engines can index this page if desired
+        // Make sure search engines can index this page if desired
+        noindex: false,
         title: 'Contact Us | Dotabod',
       }}
     >
@@ -140,7 +146,8 @@ const ContactPage: React.FC = () => {
               layout='vertical'
               onFinish={handleSubmit}
               className='flex flex-col gap-4'
-              requiredMark={false} // Optional: hide default required marks
+              // Optional: hide default required marks
+              requiredMark={false}
             >
               <Form.Item
                 name='email'
@@ -172,7 +179,7 @@ const ContactPage: React.FC = () => {
                       }
                       const wordCount = (value as string)
                         .trim()
-                        .split(/\s+/)
+                        .split(/\s+/u)
                         .filter((word) => word.length > 0).length
                       if (wordCount < 2) {
                         return Promise.reject(new Error('Message must contain at least 2 words'))

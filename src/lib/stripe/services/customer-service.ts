@@ -3,7 +3,7 @@ import type Stripe from 'stripe'
 
 import { stripe } from '@/lib/stripe-server'
 
-import { debugLog } from '../utils/debugLog'
+import { debugLog } from '../utils/debug-log'
 import { withErrorHandling } from '../utils/error-handling'
 
 /**
@@ -28,7 +28,8 @@ export class CustomerService {
       async () => {
         // Look for any existing subscription to get a customer ID
         const subscription = await this.tx.subscription.findFirst({
-          orderBy: { createdAt: 'desc' }, // Use the most recent subscription
+          // Use the most recent subscription
+          orderBy: { createdAt: 'desc' },
           select: { stripeCustomerId: true },
           where: { userId: user.id },
         })

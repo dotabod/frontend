@@ -7,14 +7,14 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 
 import prisma from '@/lib/db'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { reconcileTwitchProfile } from '@/lib/reconcileTwitchProfile'
-import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
+import { reconcileTwitchProfile } from '@/lib/reconcile-twitch-profile'
+import { twitchHelixProfile } from '@/lib/twitch-helix-profile'
 import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
 import { parseTwitchProfile } from '@/types/twitch'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 
-import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
+import { chatBotScopes, chatVerifyScopes, defaultScopes } from './auth-scopes'
 
 const extractCookieValue = (cookieHeader: string | string[] | undefined, name: string) => {
   if (!cookieHeader) {
@@ -205,16 +205,15 @@ export const authOptions: NextAuthOptions = {
 
       const roleFromScopes = getRoleFromScopes()
 
-      const scopesToUpdate =
-        roleFromScopes === 'chatter'
-          ? chatVerifyScopes
-          : roleFromScopes === 'bot'
-            ? chatBotScopes
-            : alreadyHasStreamerScopes && isLoggingInAsChatter
-              ? // Use old scopes
-                (provider?.Account?.scope ?? defaultScopes)
-              : // Use new scopes
-                (account?.scope ?? defaultScopes)
+      let scopesToUpdate = account?.scope ?? defaultScopes
+      if (roleFromScopes === 'chatter') {
+        scopesToUpdate = chatVerifyScopes
+      } else if (roleFromScopes === 'bot') {
+        scopesToUpdate = chatBotScopes
+      } else if (alreadyHasStreamerScopes && isLoggingInAsChatter) {
+        // Preserve the existing streamer scopes when signing in as a chatter.
+        scopesToUpdate = provider?.Account?.scope ?? defaultScopes
+      }
 
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
       if (
@@ -572,7 +571,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: {
-    maxAge: 3 * 24 * 60 * 60, // 3 days in seconds
+    // 3 days in seconds
+    maxAge: 3 * 24 * 60 * 60,
     strategy: 'jwt',
   },
 }

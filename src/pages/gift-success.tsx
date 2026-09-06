@@ -6,8 +6,8 @@ import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import TwitchChat from '@/components/TwitchChat'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import TwitchChat from '@/components/twitch-chat'
 import { stripe } from '@/lib/stripe-server'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
@@ -89,8 +89,8 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
             <>
               You gifted <span className='font-medium text-gray-200'>{parsedQuantity}</span>{' '}
               {parsedQuantity === 1 ? 'month' : 'months'} of Dotabod Pro to{' '}
-              <span className='font-medium text-gray-200'>{recipient}</span>. They'll be notified
-              shortly.
+              <span className='font-medium text-gray-200'>{recipient}</span>. They&apos;ll be
+              notified shortly.
             </>
           ) : (
             <>
@@ -125,7 +125,9 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
             {formattedGiftMessage && (
               <div className='flex justify-between gap-3'>
                 <dt className='text-gray-500'>Message</dt>
-                <dd className='text-right text-gray-300 italic'>"{formattedGiftMessage}"</dd>
+                <dd className='text-right text-gray-300 italic'>
+                  &quot;{formattedGiftMessage}&quot;
+                </dd>
               </div>
             )}
           </dl>
@@ -140,16 +142,16 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
             <p>
               The notification can take{' '}
               <span className='font-medium text-gray-200'>1 to 3 minutes</span> to reach the
-              recipient's Twitch chat.
+              recipient&apos;s Twitch chat.
             </p>
-            <p>If they're live right now, it'll appear in their Twitch chat shortly.</p>
+            <p>If they&apos;re live right now, it&apos;ll appear in their Twitch chat shortly.</p>
           </div>
         </Card>
       </motion.div>
 
       <motion.div {...fadeUp(0.16)} className='mt-6'>
         <Card>
-          <h2 className='text-lg font-medium text-gray-100'>How it'll appear</h2>
+          <h2 className='text-lg font-medium text-gray-100'>How it&apos;ll appear</h2>
           <div className='mt-4'>
             <span className='mb-2 block text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
               Twitch chat

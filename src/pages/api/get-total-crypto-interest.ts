@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
 
-async function getTotalCryptoInterest() {
+const getTotalCryptoInterest = async function getTotalCryptoInterest() {
   try {
     // Get all settings with crypto interest data where interested is true
     const cryptoInterestSettings = await prisma.setting.count({
@@ -27,7 +27,7 @@ async function getTotalCryptoInterest() {
   }
 }
 
-async function handler(_req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(_req: NextApiRequest, res: NextApiResponse) {
   try {
     const { totalInterest, userCount } = await getTotalCryptoInterest()
 

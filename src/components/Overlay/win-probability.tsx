@@ -1,0 +1,123 @@
+import clsx from 'clsx'
+import { motion } from 'framer-motion'
+import { Logomark } from 'src/components/logo'
+
+import { Settings } from '@/lib/default-settings'
+import type { WinChance } from '@/lib/hooks/use-socket'
+import { useTransformRes } from '@/lib/hooks/use-transform-res'
+import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
+import { motionProps } from '@/ui/utils'
+
+import { AnimatedNumber } from './animated-number'
+import { TextWithEmotes } from './text-with-emotes'
+
+const SeparatorImg = ({
+  pos,
+  children,
+  ...props
+}: {
+  pos: number
+  children: React.ReactNode
+} & React.ComponentProps<typeof Logomark>) => (
+  <div
+    className='relative bottom-[15px] duration-[2s] ease-in-out'
+    style={{
+      left: `calc(${Math.min(pos, 98)}% - 15px)`,
+    }}
+  >
+    <Logomark
+      {...props}
+      className='rounded-full bg-black shadow-[0_0_10px_0_rgba(0,0,0,0.5)]'
+      style={{
+        height: '30px',
+        width: '30px',
+      }}
+    />
+    <div className='flex space-x-2'>{children}</div>
+  </div>
+)
+
+const FillRadiant = ({ width }: { width: number }) => (
+  <div
+    className='rounded-l bg-linear-to-r from-green-500 to-lime-500 text-right'
+    style={{ transition: 'width 1.5s ease-in-out', width: `${width}%` }}
+  />
+)
+
+const FillDire = ({ width }: { width: number }) => (
+  <div
+    className='rounded-r bg-linear-to-r from-red-600 to-red-500'
+    style={{ transition: 'width 1.5s ease-in-out', width: `${width}%` }}
+  />
+)
+
+const Text = ({
+  pos = null,
+  className = '',
+  children,
+}: {
+  pos?: number | null
+  className?: string
+  children: React.ReactNode
+}) => (
+  <div
+    className={clsx(
+      'text-shadow relative flex translate-x-[-50%] flex-col text-center text-sm text-white duration-[2s] ease-in-out',
+      className,
+    )}
+    style={{ left: pos ? `${Math.min(pos, 98)}%` : 0 }}
+  >
+    {children}
+  </div>
+)
+
+export const WinProbability = ({ radiantWinChance }: { radiantWinChance: WinChance }) => {
+  const { data: isEnabled } = useUpdateSetting(Settings.winProbabilityOverlay)
+  const res = useTransformRes()
+
+  if (!isEnabled || !radiantWinChance) {
+    return null
+  }
+
+  // Make sure radiantWinChance.value is between 0 and 100
+  const radiantWinChanceValue = Math.min(Math.max(radiantWinChance.value, 0), 100)
+
+  return (
+    <motion.div id='win-probability' key='wp-overlay-inner' {...motionProps}>
+      <div
+        className={`relative rounded transition-[top_0.2s_ease-out,_opacity_0.2s_ease] ${
+          radiantWinChance.visible ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <Text pos={radiantWinChanceValue}>
+          <h1
+            className='font-outline-2 text-center font-bold text-slate-50'
+            style={{
+              fontSize: res({ h: 20 }),
+            }}
+          >
+            <TextWithEmotes emotes={[]} text='Win probability' />
+          </h1>
+        </Text>
+        <div className='flex h-[5px] shadow-[0_0_10px_0_rgba(0,0,0,0.5)]'>
+          <FillRadiant width={radiantWinChanceValue} />
+          <FillDire width={100 - radiantWinChanceValue} />
+        </div>
+        <SeparatorImg pos={radiantWinChanceValue}>
+          <Text className='font-outline-2 flex-row! text-center font-bold text-green-400!'>
+            <AnimatedNumber from={100 - radiantWinChanceValue} to={radiantWinChanceValue} />
+            <span>%</span>
+          </Text>
+          <Text className='font-outline-2 flex-row! text-center font-bold text-red-400!'>
+            <AnimatedNumber from={radiantWinChanceValue} to={100 - radiantWinChanceValue} />
+            <span>%</span>
+          </Text>
+        </SeparatorImg>
+
+        <Text className='bottom-[20px]' pos={radiantWinChanceValue}>
+          <span className='font-outline-2 text-slate-50'>(2m delay)</span>
+        </Text>
+      </div>
+    </motion.div>
+  )
+}

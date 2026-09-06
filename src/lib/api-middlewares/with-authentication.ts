@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 
-export function withAuthentication(handler: NextApiHandler) {
+export const withAuthentication = function withAuthentication(handler: NextApiHandler) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await getServerSession(req, res, authOptions)
     const userId = (req.query.id as string) || session?.user?.id || (req.query.token as string)

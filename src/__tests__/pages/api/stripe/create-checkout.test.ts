@@ -41,9 +41,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => ({ default: mocks.prisma }))
 vi.mock('@/lib/stripe-server', () => ({ stripe: mocks.stripe }))
-vi.mock('@/lib/api/getServerSession', () => ({ getServerSession: mocks.getServerSession }))
+vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: mocks.getServerSession }))
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
-vi.mock('@/lib/featureFlags', () => ({ featureFlags: mocks.featureFlags }))
+vi.mock('@/lib/feature-flags', () => ({ featureFlags: mocks.featureFlags }))
 vi.mock('@/lib/nowpayments', () => ({
   createNowPaymentsInvoice: mocks.createNowPaymentsInvoice,
 }))
@@ -74,7 +74,7 @@ const session = {
   },
 }
 
-function buildReq(body: Record<string, unknown> = { priceId: 'price_mo' }) {
+const buildReq = function buildReq(body: Record<string, unknown> = { priceId: 'price_mo' }) {
   return createMocks<NextApiRequest, NextApiResponse>({
     body,
     headers: { referer: 'https://dotabod.com/dashboard/billing' },
@@ -82,7 +82,7 @@ function buildReq(body: Record<string, unknown> = { priceId: 'price_mo' }) {
   })
 }
 
-function arrangeTransaction(timeline: string[]) {
+const arrangeTransaction = function arrangeTransaction(timeline: string[]) {
   const tx = {
     subscription: {
       findFirst: vi.fn().mockResolvedValue({ stripeCustomerId: 'cus_1' }),

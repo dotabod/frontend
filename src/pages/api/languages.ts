@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 const CROWDIN_API_BASE_URL = 'https://api.crowdin.com/api/v2'
 
-async function fetchLanguageProgress(
+const fetchLanguageProgress = async function fetchLanguageProgress(
   projectId: string,
   languageId: string,
   token: string | undefined,

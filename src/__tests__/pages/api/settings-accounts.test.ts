@@ -3,7 +3,7 @@ import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/settings/accounts'
 
@@ -34,20 +34,20 @@ vi.mock('@/lib/api-middlewares/with-authentication', () => ({
   withAuthentication: (handler: NextApiHandler) => handler,
 }))
 
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
 const USER_ID = 'session-user'
 const VICTIM_ID = 'victim-user'
 
-function mockSession(userId?: string) {
+const mockSession = function mockSession(userId?: string) {
   vi.mocked(getServerSession).mockResolvedValue(
     userId ? ({ user: { id: userId } } as Session) : null,
   )
 }
 
-function patchRequest(updates: unknown, query: Record<string, string> = {}) {
+const patchRequest = function patchRequest(updates: unknown, query: Record<string, string> = {}) {
   return createMocks({
     body: JSON.stringify(updates) as never,
     method: 'PATCH',

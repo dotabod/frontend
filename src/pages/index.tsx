@@ -1,11 +1,11 @@
 import type { ReactElement } from 'react'
 
-import { Faqs } from '@/components/Homepage/Faqs'
-import { Hero } from '@/components/Homepage/Hero'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { PrimaryFeatures } from '@/components/Homepage/PrimaryFeatures'
-import { SecondaryFeatures } from '@/components/Homepage/SecondaryFeatures'
-import { Pricing } from '@/components/Pricing'
+import { Faqs } from '@/components/Homepage/faqs'
+import { Hero } from '@/components/Homepage/hero'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { PrimaryFeatures } from '@/components/Homepage/primary-features'
+import { SecondaryFeatures } from '@/components/Homepage/secondary-features'
+import { Pricing } from '@/components/pricing'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const Index: NextPageWithLayout = () => (

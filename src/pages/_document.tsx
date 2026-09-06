@@ -3,7 +3,7 @@ import { ConfigProvider } from 'antd'
 import Document, { Head, Html, Main, NextScript } from 'next/document'
 import type { DocumentContext } from 'next/document'
 
-import themeConfig from '@/lib/theme/themeConfig'
+import themeConfig from '@/lib/theme/theme-config'
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {

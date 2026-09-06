@@ -2,15 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
-/**
- * This is a test endpoint to create a gift notification for the current user.
- * It should only be used in development.
- */
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
     res.status(401).json({ message: 'Unauthorized' })
@@ -79,7 +75,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Calculate the end date based on quantity
-    const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+    // 30 days from now
+    const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
     // If quantity > 1, extend the period end date
     if (finalGiftQuantity > 1) {

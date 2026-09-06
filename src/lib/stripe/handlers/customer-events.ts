@@ -2,15 +2,9 @@ import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
 
 import { CustomerService } from '../services/customer-service'
-import { debugLog } from '../utils/debugLog'
+import { debugLog } from '../utils/debug-log'
 
-/**
- * Handles a customer deleted event from Stripe
- * @param customer The Stripe customer object
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleCustomerDeleted(
+export const handleCustomerDeleted = async function handleCustomerDeleted(
   customer: Stripe.Customer,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {

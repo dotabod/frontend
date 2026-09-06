@@ -2,8 +2,8 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { ReactElement } from 'react'
 
-import { GiftSubscriptionForm } from '@/components/Gift/GiftSubscriptionForm/GiftSubscriptionForm'
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import { GiftSubscriptionForm } from '@/components/Gift/GiftSubscriptionForm/gift-subscription-form'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { createGiftLink } from '@/utils/gift-links'
 

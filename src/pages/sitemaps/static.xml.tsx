@@ -55,7 +55,8 @@ ${staticPages
 </urlset>`
 
     res.setHeader('Content-Type', 'application/xml')
-    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=86400') // Cache for 24 hours
+    // Cache for 24 hours
+    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=86400')
     res.write(sitemap)
     res.end()
 

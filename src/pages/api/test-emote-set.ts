@@ -10,18 +10,21 @@ import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
 const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
 const TEST_EMOTE_NAME = 'DOTABOD_TEST'
 
-async function getEmoteSet(client: GraphQLClient, emoteSetId: string) {
+const getEmoteSet = async function getEmoteSet(client: GraphQLClient, emoteSetId: string) {
   return await client.request(GET_EMOTE_SET_FOR_CARD, {
     id: emoteSetId,
     limit: 1000,
   })
 }
 
-function hasTestEmote(emoteSet: EmoteSetResponse) {
+const hasTestEmote = function hasTestEmote(emoteSet: EmoteSetResponse) {
   return emoteSet.emoteSet.emotes.some((emote) => emote.name === TEST_EMOTE_NAME)
 }
 
-async function removeTestEmoteIfPresent(client: GraphQLClient, emoteSetId: string) {
+const removeTestEmoteIfPresent = async function removeTestEmoteIfPresent(
+  client: GraphQLClient,
+  emoteSetId: string,
+) {
   const emoteSet = await getEmoteSet(client, emoteSetId)
 
   if (!hasTestEmote(emoteSet)) {
@@ -36,7 +39,7 @@ async function removeTestEmoteIfPresent(client: GraphQLClient, emoteSetId: strin
   })
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const authHeader = req.headers?.authorization
   if (
     process.env.NODE_ENV !== 'development' &&

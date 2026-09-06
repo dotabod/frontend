@@ -19,7 +19,7 @@ beforeEach(() => {
   vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 })
 
-function sign(body: Record<string, unknown>, secret = 'test-ipn-secret'): string {
+const sign = function sign(body: Record<string, unknown>, secret = 'test-ipn-secret'): string {
   return crypto
     .createHmac('sha512', secret)
     .update(JSON.stringify(sortObject(body)))

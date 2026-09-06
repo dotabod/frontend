@@ -1,9 +1,9 @@
 import type { CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 
-import { Settings } from '@/lib/defaultSettings'
-import type { blockType } from '@/lib/devConsts'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { Settings } from '@/lib/default-settings'
+import type { blockType } from '@/lib/dev-consts'
+import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import {
   selectBuildings,
   selectCouriers,
@@ -14,13 +14,13 @@ import {
   selectSettings,
 } from '@/lib/redux/store'
 
-import Building from './Building'
-import Courier from './Courier'
-import Creep from './Creep'
-import Hero from './Hero'
-import HeroUnit from './HeroUnit'
+import Building from './building'
+import Courier from './courier'
+import Creep from './creep'
+import Hero from './hero'
+import HeroUnit from './hero-unit'
 
-function Minimap({ block }: { block: blockType }) {
+const Minimap = function Minimap({ block }: { block: blockType }) {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)
@@ -71,7 +71,6 @@ function Minimap({ block }: { block: blockType }) {
     </div>
   )
 }
-
 const wrapper = 'wrapper-minimap'
 const xl = 'xl'
 const preview = 'preview'

@@ -11,13 +11,7 @@ import {
   isLifetimePrice,
 } from '../utils/subscription-utils'
 
-/**
- * Handles a charge succeeded event from Stripe
- * @param charge The Stripe charge object
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleChargeSucceeded(
+export const handleChargeSucceeded = async function handleChargeSucceeded(
   charge: Stripe.Charge,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -167,13 +161,7 @@ export async function handleChargeSucceeded(
   )
 }
 
-/**
- * Handles a charge refunded event from Stripe
- * @param charge The Stripe charge object with refund information
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleChargeRefunded(
+export const handleChargeRefunded = async function handleChargeRefunded(
   charge: Stripe.Charge,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -252,10 +240,7 @@ export async function handleChargeRefunded(
   return false
 }
 
-/**
- * Checks if a payment intent is associated with a gift checkout
- */
-async function isGiftPayment(paymentIntentId: string): Promise<boolean> {
+const isGiftPayment = async function isGiftPayment(paymentIntentId: string): Promise<boolean> {
   try {
     const sessions = await stripe.checkout.sessions.list({
       limit: 1,
@@ -273,12 +258,7 @@ async function isGiftPayment(paymentIntentId: string): Promise<boolean> {
   }
 }
 
-/**
- * Handles a gift credit refund by reversing the customer balance credit
- * @param charge The Stripe charge object with refund information
- * @param tx The transaction client
- */
-async function handleGiftCreditRefund(
+const handleGiftCreditRefund = async function handleGiftCreditRefund(
   charge: Stripe.Charge,
   tx: Prisma.TransactionClient,
 ): Promise<void> {
@@ -392,7 +372,8 @@ async function handleGiftCreditRefund(
       // For customer balance credits, create a positive balance transaction to offset the credit
       // This effectively "cancels out" the original negative credit amount
       const balanceTransaction = await stripe.customers.createBalanceTransaction(customerId, {
-        amount: refundAmount, // Positive amount to reverse the credit
+        // Positive amount to reverse the credit
+        amount: refundAmount,
         currency: giftTransaction.currency,
         description: `Refund of gift credit from ${giftTransaction.giftSubscription?.senderName || 'Anonymous'}`,
         metadata: {
@@ -431,7 +412,8 @@ async function handleGiftCreditRefund(
       }
     } catch (error) {
       console.error('Error processing gift credit refund:', error)
-      throw error // Rethrow to be caught by withErrorHandling
+      // Rethrow to be caught by withErrorHandling
+      throw error
     }
   } else {
     console.log(`No gift transaction record found for refund of checkout ${session.id}`)
@@ -487,13 +469,7 @@ async function handleGiftCreditRefund(
   }
 }
 
-/**
- * Helper function to retrieve a userId from a payment intent
- * @param paymentIntentId The Stripe payment intent ID
- * @param tx The transaction client
- * @returns The user ID if found, null otherwise
- */
-async function getUserIdFromPaymentIntent(
+const getUserIdFromPaymentIntent = async function getUserIdFromPaymentIntent(
   paymentIntentId: string,
   tx: Prisma.TransactionClient,
 ): Promise<string | null> {
@@ -553,13 +529,7 @@ async function getUserIdFromPaymentIntent(
   }
 }
 
-/**
- * Processes subscription updates for a refund
- * @param userId The user ID associated with the refund
- * @param charge The Stripe charge object with refund information
- * @param tx The transaction client
- */
-async function processSubscriptionRefund(
+const processSubscriptionRefund = async function processSubscriptionRefund(
   userId: string,
   charge: Stripe.Charge,
   tx: Prisma.TransactionClient,

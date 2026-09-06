@@ -27,7 +27,7 @@ const PLANS = [
   { interval: 'YEAR', key: 'ANNUAL', name: 'Dotabod Pro (Annual)', value: '57' },
 ]
 
-async function token() {
+const token = async function token() {
   const auth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')
   const res = await fetch(`${BASE}/v1/oauth2/token`, {
     body: 'grant_type=client_credentials',
@@ -44,7 +44,7 @@ async function token() {
   return data.access_token
 }
 
-async function api(accessToken, path, body) {
+const api = async function api(accessToken, path, body) {
   const res = await fetch(`${BASE}${path}`, {
     body: JSON.stringify(body),
     headers: {
@@ -61,7 +61,7 @@ async function api(accessToken, path, body) {
   return data
 }
 
-async function main() {
+const main = async function main() {
   console.log(`\n=== Creating PayPal plans in ${env.toUpperCase()} (${BASE}) ===\n`)
   const accessToken = await token()
 

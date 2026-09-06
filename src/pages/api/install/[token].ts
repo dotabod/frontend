@@ -3,13 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { buildGsiConfig } from '@/lib/gsiConfig'
+import { buildGsiConfig } from '@/lib/gsi-config'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   const token = decodeURIComponent((req.query.token as string) || '').trim()
   const userId = token || session?.user?.id

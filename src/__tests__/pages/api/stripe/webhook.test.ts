@@ -72,7 +72,8 @@ vi.mock('@/pages/api/stripe/webhook', () => ({
       // Handle gift subscription with existing subscriptions
       if (req.headers['has-existing-subscription'] === 'true') {
         return res.status(200).json({
-          endDate: '2025-04-15T15:22:58.000Z', // Example end date
+          // Example end date
+          endDate: '2025-04-15T15:22:58.000Z',
           gift: true,
           hasExistingSubscription: true,
           received: true,
@@ -82,7 +83,8 @@ vi.mock('@/pages/api/stripe/webhook', () => ({
       // Handle gift subscription with quantity adjustments
       if (req.headers['adjusted-quantity'] === 'true') {
         return res.status(200).json({
-          endDate: '2025-06-15T15:22:58.000Z', // Example end date with adjusted quantity
+          // Example end date with adjusted quantity
+          endDate: '2025-06-15T15:22:58.000Z',
           finalQuantity: 3,
           gift: true,
           originalQuantity: 1,
@@ -93,7 +95,8 @@ vi.mock('@/pages/api/stripe/webhook', () => ({
 
       // Default gift subscription handling
       return res.status(200).json({
-        endDate: '2025-04-15T15:22:58.000Z', // Example end date
+        // Example end date
+        endDate: '2025-04-15T15:22:58.000Z',
         gift: true,
         received: true,
       })
@@ -386,7 +389,8 @@ describe('Stripe webhook handler', () => {
 
       // Check the result
       expect(endDate.getUTCFullYear()).toBe(2025)
-      expect(endDate.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
+      // February is month 1 (0-indexed)
+      expect(endDate.getUTCMonth()).toBe(1)
       expect(endDate.getUTCDate()).toBe(28)
 
       // Test with a leap year
@@ -395,7 +399,8 @@ describe('Stripe webhook handler', () => {
 
       // Check the result
       expect(leapYearEnd.getUTCFullYear()).toBe(2024)
-      expect(leapYearEnd.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
+      // February is month 1 (0-indexed)
+      expect(leapYearEnd.getUTCMonth()).toBe(1)
       expect(leapYearEnd.getUTCDate()).toBe(29)
     })
 

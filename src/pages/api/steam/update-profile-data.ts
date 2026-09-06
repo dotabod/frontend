@@ -2,7 +2,7 @@ import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { ranks } from '@/lib/ranks'
@@ -31,7 +31,9 @@ interface OpenDotaProfile {
 }
 
 // Fetch player profile from OpenDota API
-async function fetchOpenDotaProfile(accountId: number): Promise<OpenDotaProfile | null> {
+const fetchOpenDotaProfile = async function fetchOpenDotaProfile(
+  accountId: number,
+): Promise<OpenDotaProfile | null> {
   try {
     const response = await fetch(`https://api.opendota.com/api/players/${accountId}`)
     if (!response.ok) {
@@ -55,7 +57,7 @@ type Region =
   | 'PERU'
   | 'BRAZIL'
 
-function _estimateMMR(leaderboard_rank: number, region: Region): number {
+const _estimateMMR = function _estimateMMR(leaderboard_rank: number, region: Region): number {
   // Max leaderboard rank is 5000
   if (leaderboard_rank <= 0 || leaderboard_rank > 5000) {
     return 8500
@@ -89,7 +91,7 @@ function _estimateMMR(leaderboard_rank: number, region: Region): number {
   return Math.round(baseMMR)
 }
 
-export function rankTierToMmr(rankTier: string | number) {
+export const rankTierToMmr = function rankTierToMmr(rankTier: string | number) {
   if (!Number(rankTier)) {
     return 0
   }
@@ -112,7 +114,7 @@ export function rankTierToMmr(rankTier: string | number) {
   return ((rank?.range[0] ?? 0) + (rank?.range[1] ?? 0)) / 2
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Extract steam32Id from request body
   const { steam32Id } = req.body
 

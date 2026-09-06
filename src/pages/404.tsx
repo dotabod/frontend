@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
 
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 type NavLinkItem = [string, string, string?]
@@ -93,7 +93,7 @@ const NotFound: NextPageWithLayout = () => {
             Oops! Page not found
           </h1>
           <p className='mt-6 text-base leading-7 text-gray-300'>
-            The page you're looking for doesn't exist or has been moved.
+            The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
 
           {/* Main navigation links */}

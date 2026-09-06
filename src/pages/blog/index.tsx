@@ -4,13 +4,13 @@ import Head from 'next/head'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
 
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import { Container } from '@/components/container'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import { getAllPosts } from '@/lib/blog'
 import type { Post } from '@/lib/blog'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
-import { formatDate } from '@/utils/formatDate'
+import { formatDate } from '@/utils/format-date'
 
 const { Title, Text, Paragraph } = Typography
 

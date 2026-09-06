@@ -16,10 +16,10 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
 import { fetcher } from '@/lib/fetcher'
-import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/use-update-setting'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const { Content } = Layout

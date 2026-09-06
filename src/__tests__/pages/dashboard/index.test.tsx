@@ -5,7 +5,11 @@ import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createMockRouter, createMockSession, createMockSWR } from '@/__tests__/utils/mockFactories'
+import {
+  createMockRouter,
+  createMockSession,
+  createMockSWR,
+} from '@/__tests__/utils/mock-factories'
 import SetupPage from '@/pages/dashboard/index'
 
 // Mock the dependencies
@@ -28,7 +32,7 @@ vi.mock('@/lib/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
-vi.mock('@/lib/server/dashboardAccess', () => ({
+vi.mock('@/lib/server/dashboard-access', () => ({
   requireDashboardAccess: vi.fn(() => async () => ({ props: {} })),
 }))
 
@@ -65,7 +69,7 @@ vi.mock('@/utils/subscription', () => ({
   isInGracePeriod: vi.fn().mockReturnValue(false),
 }))
 
-vi.mock('@/hooks/useSubscription', () => ({
+vi.mock('@/hooks/use-subscription', () => ({
   useFeatureAccess: () => ({
     hasAccess: true,
     requiredTier: 'FREE',
@@ -89,24 +93,24 @@ vi.mock('@/hooks/useSubscription', () => ({
   }),
 }))
 
-vi.mock('@/components/Dashboard/DashboardShell', () => ({
+vi.mock('@/components/Dashboard/dashboard-shell', () => ({
   default: ({ children }) => <div data-testid='dashboard-shell'>{children}</div>,
 }))
 
 // Mock components that might cause issues
-vi.mock('@/components/Dashboard/ChatBot', () => ({
+vi.mock('@/components/Dashboard/chat-bot', () => ({
   default: () => <div data-testid='chat-bot'>Chat Bot</div>,
 }))
 
-vi.mock('@/components/Dashboard/ExportCFG', () => ({
+vi.mock('@/components/Dashboard/export-cfg', () => ({
   default: () => <div data-testid='export-cfg'>Export CFG</div>,
 }))
 
-vi.mock('@/components/Dashboard/OBSOverlay', () => ({
+vi.mock('@/components/Dashboard/obs-overlay', () => ({
   default: () => <div data-testid='obs-overlay'>OBS Overlay</div>,
 }))
 
-vi.mock('@/components/Dashboard/Header', () => ({
+vi.mock('@/components/Dashboard/header', () => ({
   default: () => <div data-testid='dashboard-header'>Dashboard Header</div>,
 }))
 
@@ -143,7 +147,7 @@ vi.mock('canvas-confetti', () => ({
 }))
 
 // Mock contexts
-vi.mock('@/contexts/SubscriptionContext', () => ({
+vi.mock('@/contexts/subscription-context', () => ({
   useSubscriptionContext: () => ({
     isLoading: false,
     subscription: {

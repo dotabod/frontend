@@ -36,8 +36,10 @@ describe('Gift Subscription Utilities', () => {
 
       // Check the result - should be February 28 in a non-leap year
       expect(endDate.getUTCFullYear()).toBe(2025)
-      expect(endDate.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
-      expect(endDate.getUTCDate()).toBe(28) // Last day of February 2025
+      // February is month 1 (0-indexed)
+      expect(endDate.getUTCMonth()).toBe(1)
+      // Last day of February 2025
+      expect(endDate.getUTCDate()).toBe(28)
 
       // Test with a leap year
       const leapYearStart = new Date('2024-01-31T00:00:00Z')
@@ -50,8 +52,10 @@ describe('Gift Subscription Utilities', () => {
 
       // Check the result - should be February 29 in a leap year
       expect(leapYearEnd.getUTCFullYear()).toBe(2024)
-      expect(leapYearEnd.getUTCMonth()).toBe(1) // February is month 1 (0-indexed)
-      expect(leapYearEnd.getUTCDate()).toBe(29) // Last day of February 2024 (leap year)
+      // February is month 1 (0-indexed)
+      expect(leapYearEnd.getUTCMonth()).toBe(1)
+      // Last day of February 2024 (leap year)
+      expect(leapYearEnd.getUTCDate()).toBe(29)
     })
 
     it('should handle lifetime gift subscriptions correctly', () => {
@@ -80,7 +84,8 @@ describe('Gift Subscription Utilities', () => {
       const now = new Date('2025-03-15T00:00:00Z')
       const giftType = 'monthly'
       const quantity = 2
-      const currentExpiration = new Date('2025-05-15T00:00:00Z') // 2 months from now
+      // 2 months from now
+      const currentExpiration = new Date('2025-05-15T00:00:00Z')
 
       const newExpiration = aggregateGiftDuration(giftType, quantity, currentExpiration, now)
 
@@ -92,7 +97,8 @@ describe('Gift Subscription Utilities', () => {
       const now = new Date('2025-03-15T00:00:00Z')
       const giftType = 'monthly'
       const quantity = 2
-      const currentExpiration = new Date('2025-02-15T00:00:00Z') // 1 month ago
+      // 1 month ago
+      const currentExpiration = new Date('2025-02-15T00:00:00Z')
 
       const newExpiration = aggregateGiftDuration(giftType, quantity, currentExpiration, now)
 

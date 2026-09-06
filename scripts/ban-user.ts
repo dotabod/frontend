@@ -27,14 +27,14 @@ let reasonArg: string | null = null
 let byArg: string | null = null
 let byNameArg: string | null = null
 
-for (let i = 0; i < args.length; i++) {
+for (let i = 0; i < args.length; i += 1) {
   const v = args[i]
   if (v === '--by' && args[i + 1]) {
     byArg = args[i + 1]
-    i++
+    i += 1
   } else if (v === '--by-name' && args[i + 1]) {
     byNameArg = args[i + 1]
-    i++
+    i += 1
   } else if (!v.startsWith('--')) {
     if (!userIdArg) {
       userIdArg = v
@@ -54,7 +54,7 @@ if (!userIdArg || !reasonArg) {
 
 const prisma = new PrismaClient()
 
-async function resolveTarget(): Promise<{ id: string; name: string }> {
+const resolveTarget = async function resolveTarget(): Promise<{ id: string; name: string }> {
   if (byNameArg && userIdArg) {
     const u = await prisma.user.findFirst({
       select: { id: true, name: true },
@@ -75,7 +75,7 @@ async function resolveTarget(): Promise<{ id: string; name: string }> {
   return u
 }
 
-async function main() {
+const main = async function main() {
   const target = await resolveTarget()
   console.log(`Banning user ${target.name} (${target.id}) — reason: ${reasonArg}`)
 

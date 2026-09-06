@@ -34,7 +34,7 @@ vi.mock('@sentry/nextjs', () => ({
 const TEST_EMOTE_NAME = 'DOTABOD_TEST'
 const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
 
-function mockEmoteSet(emotes: { name: string }[] = []) {
+const mockEmoteSet = function mockEmoteSet(emotes: { name: string }[] = []) {
   return {
     emoteSet: {
       capacity: 100,

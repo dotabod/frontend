@@ -14,13 +14,7 @@ import {
 } from '../utils/subscription-utils'
 import { handleSubscriptionEvent } from './subscription-events'
 
-/**
- * Handles a checkout session completed event from Stripe
- * @param session The Stripe checkout session
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleCheckoutCompleted(
+export const handleCheckoutCompleted = async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -435,7 +429,8 @@ export async function handleCheckoutCompleted(
                     priceId,
                     session.customer as string,
                     tx,
-                    currentEndDate, // Pass the current end date to ensure they don't lose time
+                    // Pass the current end date to ensure they don't lose time
+                    currentEndDate,
                   )
                 }
               }

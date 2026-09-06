@@ -2,14 +2,14 @@ import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 
-function convertSteam32To64(steam32Id: string | number) {
+const convertSteam32To64 = function convertSteam32To64(steam32Id: string | number) {
   return BigInt(steam32Id) + 76_561_197_960_265_728n
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {

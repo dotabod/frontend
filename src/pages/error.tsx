@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import { useTrack } from '@/lib/track'
 import type { NextPageWithLayout } from '@/pages/_app'
 

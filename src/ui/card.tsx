@@ -2,9 +2,9 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 
-import { LockedFeatureOverlay } from '@/components/Dashboard/Features/LockedFeatureOverlay'
-import { TierBadge } from '@/components/Dashboard/Features/TierBadge'
-import { useFeatureAccess } from '@/hooks/useSubscription'
+import { LockedFeatureOverlay } from '@/components/Dashboard/Features/locked-feature-overlay'
+import { TierBadge } from '@/components/Dashboard/Features/tier-badge'
+import { useFeatureAccess } from '@/hooks/use-subscription'
 import type { FeatureTier, GenericFeature } from '@/utils/subscription'
 
 interface CardProps {
@@ -17,7 +17,12 @@ interface FeatureWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
   feature?: FeatureTier | GenericFeature
 }
 
-export function FeatureWrapper({ feature, children, className, ...props }: FeatureWrapperProps) {
+export const FeatureWrapper = function FeatureWrapper({
+  feature,
+  children,
+  className,
+  ...props
+}: FeatureWrapperProps) {
   const [isHovered, setIsHovered] = useState(false)
   const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
@@ -59,7 +64,7 @@ export function FeatureWrapper({ feature, children, className, ...props }: Featu
   )
 }
 
-export function Card({ className, feature, title, children, ...props }: CardProps) {
+export const Card = function Card({ className, feature, title, children, ...props }: CardProps) {
   return (
     <FeatureWrapper
       feature={feature}

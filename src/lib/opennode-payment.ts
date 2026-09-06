@@ -13,17 +13,19 @@ export interface OpenNodePaymentProcessResult {
   subscriptionCreated: boolean
 }
 
-export function isOpenNodePaymentConfirmed(status: string | null | undefined): boolean {
+export const isOpenNodePaymentConfirmed = function isOpenNodePaymentConfirmed(
+  status: string | null | undefined,
+): boolean {
   return status != null && OPENNODE_CONFIRMED_STATUSES.has(status)
 }
 
-function getMetadata(charge: OpenNodeCharge): Record<string, unknown> {
+const getMetadata = function getMetadata(charge: OpenNodeCharge): Record<string, unknown> {
   return charge.metadata && typeof charge.metadata === 'object' && !Array.isArray(charge.metadata)
     ? charge.metadata
     : {}
 }
 
-export async function processConfirmedOpenNodePayment(
+export const processConfirmedOpenNodePayment = async function processConfirmedOpenNodePayment(
   charge: OpenNodeCharge,
   status = charge.status,
 ): Promise<OpenNodePaymentProcessResult> {

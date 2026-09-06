@@ -43,7 +43,7 @@ const CONTACT_PROPERTIES = [
   },
 ]
 
-function hsHeaders(token: string) {
+const hsHeaders = function hsHeaders(token: string) {
   return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 }
 
@@ -54,8 +54,12 @@ function hsHeaders(token: string) {
 const MIN_INTERVAL_MS = 120
 let nextSlot = 0
 
-async function hsFetch(url: string, init: RequestInit, retries = 5): Promise<Response> {
-  for (let attempt = 0; ; attempt++) {
+const hsFetch = async function hsFetch(
+  url: string,
+  init: RequestInit,
+  retries = 5,
+): Promise<Response> {
+  for (let attempt = 0; ; attempt += 1) {
     const now = Date.now()
     const wait = Math.max(0, nextSlot - now)
     nextSlot = Math.max(now, nextSlot) + MIN_INTERVAL_MS
@@ -75,7 +79,7 @@ async function hsFetch(url: string, init: RequestInit, retries = 5): Promise<Res
   }
 }
 
-async function ensureContactProperties(token: string) {
+const ensureContactProperties = async function ensureContactProperties(token: string) {
   await Promise.all(
     CONTACT_PROPERTIES.map(async (prop) => {
       const res = await hsFetch(`${CRM_BASE}/properties/contacts`, {
@@ -99,7 +103,10 @@ interface Contact {
 
 // Mirrors syncHubSpotContact in src/lib/hubspot.ts: PATCH by email, create on 404,
 // retry PATCH on a create-409 race.
-async function syncContact(token: string, { email, username, subscription }: Contact) {
+const syncContact = async function syncContact(
+  token: string,
+  { email, username, subscription }: Contact,
+) {
   const properties = { dotabod_subscription: subscription, twitch_username: username }
   const patchUrl = `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`
   const patch = () =>
@@ -134,7 +141,7 @@ async function syncContact(token: string, { email, username, subscription }: Con
   throw new Error(`patch failed: ${patchRes.status} ${await patchRes.text()}`)
 }
 
-function dbClient() {
+const dbClient = function dbClient() {
   return postgres({
     database: Deno.env.get('POSTGRES_DB') ?? 'postgres',
     host: Deno.env.get('POSTGRES_HOST') ?? 'supabase-db',
@@ -146,7 +153,7 @@ function dbClient() {
   })
 }
 
-async function readSecrets(sql: ReturnType<typeof postgres>) {
+const readSecrets = async function readSecrets(sql: ReturnType<typeof postgres>) {
   const rows = (await sql`
     select name, decrypted_secret from vault.decrypted_secrets
     where name in (${VAULT_TOKEN_NAME}, ${VAULT_SYNC_SECRET_NAME})
@@ -161,7 +168,10 @@ async function readSecrets(sql: ReturnType<typeof postgres>) {
 // Users whose own row OR whose subscription changed in the window, with the
 // "best" subscription mapped to a HubSpot value (mirrors subscriptionToValue +
 // getSubscription's active-first / lifetime / most-recent preference).
-async function fetchChanged(sql: ReturnType<typeof postgres>, hours: number): Promise<Contact[]> {
+const fetchChanged = async function fetchChanged(
+  sql: ReturnType<typeof postgres>,
+  hours: number,
+): Promise<Contact[]> {
   const rows = await sql`
     with picked as (
       select distinct on (s."userId") s."userId",
@@ -197,7 +207,7 @@ async function fetchChanged(sql: ReturnType<typeof postgres>, hours: number): Pr
 
 // Targeted reheal: sync an explicit list of emails (e.g. contacts that failed an
 // earlier run and may never change again, so the updated_at window won't catch them).
-async function fetchByEmails(
+const fetchByEmails = async function fetchByEmails(
   sql: ReturnType<typeof postgres>,
   emails: string[],
 ): Promise<Contact[]> {
@@ -229,18 +239,18 @@ async function fetchByEmails(
 
 // Bounded-concurrency sync of a contact list. Request rate is governed by the
 // throttle inside hsFetch, so concurrency only controls processing overlap.
-async function runSync(token: string, contacts: Contact[]) {
+const runSync = async function runSync(token: string, contacts: Contact[]) {
   let synced = 0
   let failed = 0
   let cursor = 0
   const worker = async () => {
     while (cursor < contacts.length) {
-      const c = contacts[cursor++]
+      const c = contacts[(cursor += 1)]
       try {
         await syncContact(token, c)
-        synced++
+        synced += 1
       } catch (error) {
-        failed++
+        failed += 1
         console.error('sync failed for', c.email, String(error))
       }
     }

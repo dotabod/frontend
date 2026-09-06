@@ -22,38 +22,28 @@ export interface LocalFetchOptions extends RequestInit {
   targetAddressSpace?: TargetAddressSpace
 }
 
-/**
- * Check if we're running in a secure context
- */
-function isSecureContext(): boolean {
+const isSecureContext = function isSecureContext(): boolean {
   if (typeof window === 'undefined') {
     return false
   }
   return window.isSecureContext ?? false
 }
 
-/**
- * Detect if we're running in Chrome (or Chromium-based browsers)
- */
-function isChrome(): boolean {
+const isChrome = function isChrome(): boolean {
   if (typeof navigator === 'undefined') {
     return false
   }
   const ua = navigator.userAgent
-  return ua.includes('Chrome') && !/Edg|OPR|Brave/.test(ua)
+  return ua.includes('Chrome') && !/Edg|OPR|Brave/u.test(ua)
 }
 
-/**
- * Get Chrome major version number
- * Returns null if not Chrome or version cannot be determined
- */
-function getChromeVersion(): number | null {
+const getChromeVersion = function getChromeVersion(): number | null {
   if (!isChrome() || typeof navigator === 'undefined') {
     return null
   }
 
   const ua = navigator.userAgent
-  const match = /Chrome\/(\d+)/.exec(ua)
+  const match = /Chrome\/(\d+)/u.exec(ua)
   if (!match) {
     return null
   }
@@ -62,19 +52,12 @@ function getChromeVersion(): number | null {
   return Number.isNaN(version) ? null : version
 }
 
-/**
- * Check if Chrome version supports LNA (>=142)
- */
-function isChromeLnaEnabled(): boolean {
+const isChromeLnaEnabled = function isChromeLnaEnabled(): boolean {
   const version = getChromeVersion()
   return version !== null && version >= 142
 }
 
-/**
- * Query the local-network-access permission state
- * Returns 'unsupported' if permissions API is not available or not in secure context
- */
-export async function queryLnaPermission(): Promise<LnaPermissionState> {
+export const queryLnaPermission = async function queryLnaPermission(): Promise<LnaPermissionState> {
   // LNA requires secure context
   if (!isSecureContext()) {
     return 'unsupported'
@@ -97,15 +80,7 @@ export async function queryLnaPermission(): Promise<LnaPermissionState> {
   }
 }
 
-/**
- * Build fetch options with targetAddressSpace annotation
- * Only adds targetAddressSpace if supported by the browser
- *
- * @param baseInit - Base RequestInit options
- * @param addressSpace - 'local' or 'loopback' to indicate target address space
- * @returns RequestInit with targetAddressSpace added if supported
- */
-export function buildLocalFetchOptions(
+export const buildLocalFetchOptions = function buildLocalFetchOptions(
   baseInit: RequestInit,
   addressSpace: TargetAddressSpace,
 ): LocalFetchOptions {
@@ -123,13 +98,6 @@ export function buildLocalFetchOptions(
   return options
 }
 
-/**
- * Check if LNA should be checked/enforced for the current browser context
- * Returns true if:
- * - Running in Chrome >=142
- * - In a secure context
- * - Permissions API is available
- */
-export function shouldCheckLna(): boolean {
+export const shouldCheckLna = function shouldCheckLna(): boolean {
   return isSecureContext() && isChromeLnaEnabled() && 'permissions' in navigator
 }

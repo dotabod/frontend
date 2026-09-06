@@ -17,17 +17,20 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         OR: [
           { followers: { gte: 1 } },
           { settings: { some: {} } },
-          { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } }, // Created within last year
+          // Created within last year
+          { createdAt: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } },
         ],
       },
     })
 
-    const USERS_PER_SITEMAP = 5000 // 5k users per sitemap file
+    // 5k users per sitemap file
+    const USERS_PER_SITEMAP = 5000
     const numSitemaps = Math.ceil(totalUsers / USERS_PER_SITEMAP)
 
     // Generate sitemap index XML with optimized structure for 30k+ users
     // For now, we'll use a manageable number of static sitemaps
-    const maxSitemaps = Math.min(numSitemaps, 6) // Limit to 6 sitemaps (30k users max)
+    // Limit to 6 sitemaps (30k users max)
+    const maxSitemaps = Math.min(numSitemaps, 6)
 
     const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -46,7 +49,8 @@ ${Array.from({ length: maxSitemaps }, (_, i) => i + 1)
 </sitemapindex>`
 
     res.setHeader('Content-Type', 'text/xml')
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400') // Cache for 1 hour
+    // Cache for 1 hour
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400')
     res.write(sitemapIndex)
     res.end()
 

@@ -52,15 +52,15 @@ vi.mock('@/utils/subscription', () => ({
   getSubscription: vi.fn().mockResolvedValue(null),
 }))
 
-vi.mock('@/components/Homepage/HomepageShell', () => ({
+vi.mock('@/components/Homepage/homepage-shell', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
-vi.mock('@/components/Dashboard/Features/CommandsCard', () => ({
+vi.mock('@/components/Dashboard/Features/commands-card', () => ({
   default: () => null,
 }))
 
-vi.mock('@/lib/hooks/useUpdateSetting', () => ({
+vi.mock('@/lib/hooks/use-update-setting', () => ({
   useGetSettingsByUsername: () => ({ data: null, error: null, loading: false, notFound: false }),
 }))
 

@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Read the PowerShell script from private directory
     const scriptPath = path.join(process.cwd(), 'src', 'lib', 'private', 'install.ps1')

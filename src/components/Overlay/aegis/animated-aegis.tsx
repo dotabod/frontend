@@ -1,0 +1,55 @@
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+
+import { AegisTimer } from '@/components/Overlay/aegis/aegis-timer'
+import { PlayerTopbar } from '@/components/Overlay/player-topbar'
+import { Settings } from '@/lib/default-settings'
+import type { blockType } from '@/lib/dev-consts'
+import type { AegisState } from '@/lib/hooks/rosh'
+import { useTransformRes } from '@/lib/hooks/use-transform-res'
+import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
+
+interface AnimatedAegisProps {
+  block: blockType
+  aegis: AegisState
+  paused: boolean
+  onComplete: () => void
+}
+
+export const AnimatedAegis = ({ aegis, paused, onComplete, block }: AnimatedAegisProps) => {
+  const res = useTransformRes()
+  const { data: isEnabled } = useUpdateSetting(Settings.aegis)
+
+  if (!aegis || !block) {
+    return null
+  }
+  if (!isEnabled || block.type !== 'playing' || !aegis.expireS) {
+    return null
+  }
+
+  return (
+    <PlayerTopbar position={aegis.playerId ?? 0}>
+      <CountdownCircleTimer
+        isPlaying={!paused}
+        duration={aegis.expireS}
+        colors='#0000000'
+        trailColor='#0000000'
+        onComplete={onComplete}
+        size={res({
+          w: 55,
+        })}
+        strokeWidth={res({
+          w: 3,
+        })}
+      >
+        {(props) => {
+          const totalSeconds = props.remainingTime
+          // Convert totalSeconds into minutes and seconds
+          const minutes = Math.floor(totalSeconds / 60)
+          const seconds = totalSeconds - minutes * 60
+
+          return <AegisTimer minutes={minutes} seconds={seconds} res={res} />
+        }}
+      </CountdownCircleTimer>
+    </PlayerTopbar>
+  )
+}

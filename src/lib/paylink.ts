@@ -5,10 +5,10 @@ export interface PaylinkToken {
   expiresAt: number
 }
 
-/**
- * Verifies and decodes a paylink token
- */
-export function verifyPaylinkToken(invoiceId: string, token: string): PaylinkToken | null {
+export const verifyPaylinkToken = function verifyPaylinkToken(
+  invoiceId: string,
+  token: string,
+): PaylinkToken | null {
   const [signature, expStr] = (token || '').split('.')
 
   if (!signature || !expStr) {

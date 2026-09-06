@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createMockSession } from '@/__tests__/utils/mockFactories'
+import { createMockSession } from '@/__tests__/utils/mock-factories'
 import { canAccessFeature } from '@/utils/subscription'
 
 // Mock the actual page component to avoid useSubscription issues
@@ -28,7 +28,7 @@ vi.mock('@/lib/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
-vi.mock('@/hooks/useSubscription', () => ({
+vi.mock('@/hooks/use-subscription', () => ({
   useFeatureAccess: () => ({
     hasAccess: true,
     requiredTier: 'FREE',
@@ -77,15 +77,15 @@ vi.mock('@/utils/subscription', () => ({
   isInGracePeriod: vi.fn().mockReturnValue(false),
 }))
 
-vi.mock('@/components/Dashboard/DashboardShell', () => ({
+vi.mock('@/components/Dashboard/dashboard-shell', () => ({
   default: ({ children }) => <div data-testid='dashboard-shell'>{children}</div>,
 }))
 
-vi.mock('@/components/Dashboard/ModeratedChannels', () => ({
+vi.mock('@/components/Dashboard/moderated-channels', () => ({
   default: () => <div data-testid='moderated-channels'>Moderated Channels</div>,
 }))
 
-vi.mock('@/components/Dashboard/Header', () => ({
+vi.mock('@/components/Dashboard/header', () => ({
   default: () => <div data-testid='dashboard-header'>Dashboard Header</div>,
 }))
 
@@ -105,7 +105,7 @@ vi.mock('antd', () => ({
 }))
 
 // Mock contexts
-vi.mock('@/contexts/SubscriptionContext', () => ({
+vi.mock('@/contexts/subscription-context', () => ({
   useSubscriptionContext: () => ({
     isLoading: false,
     subscription: {

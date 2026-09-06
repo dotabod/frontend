@@ -3,9 +3,9 @@ import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { ProfileSectionNav } from '@/components/ProfileSectionNav'
+import { Container } from '@/components/container'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { ProfileSectionNav } from '@/components/profile-section-nav'
 import prisma from '@/lib/db'
 import {
   buildHeroPerformance,
@@ -15,8 +15,8 @@ import {
   formatQueueLabel,
   formatStreamerScore,
   readKda,
-} from '@/lib/matchHistory'
-import type { HeroPerformance, MatchHistoryRow } from '@/lib/matchHistory'
+} from '@/lib/match-history'
+import type { HeroPerformance, MatchHistoryRow } from '@/lib/match-history'
 
 const PAGE_SIZE = 20
 
@@ -53,7 +53,7 @@ export interface MatchHistoryPageProps {
   view: MatchView
 }
 
-function periodStart(period: MatchPeriod): Date | null {
+const periodStart = function periodStart(period: MatchPeriod): Date | null {
   if (period === 'all') {
     return null
   }
@@ -61,15 +61,21 @@ function periodStart(period: MatchPeriod): Date | null {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 }
 
-function normalizePeriod(value: string | string[] | undefined): MatchPeriod {
+const normalizePeriod = function normalizePeriod(
+  value: string | string[] | undefined,
+): MatchPeriod {
   return value === '7d' || value === '30d' ? value : 'all'
 }
 
-function normalizeView(value: string | string[] | undefined): MatchView {
+const normalizeView = function normalizeView(value: string | string[] | undefined): MatchView {
   return value === 'heroes' ? 'heroes' : 'matches'
 }
 
-function matchHistoryHref(username: string, period: MatchPeriod, view: MatchView): string {
+const matchHistoryHref = function matchHistoryHref(
+  username: string,
+  period: MatchPeriod,
+  view: MatchView,
+): string {
   const search = new URLSearchParams()
   if (period !== 'all') {
     search.set('period', period)
@@ -81,7 +87,7 @@ function matchHistoryHref(username: string, period: MatchPeriod, view: MatchView
   return `/${username}/matches${query ? `?${query}` : ''}`
 }
 
-function WinRateBar({ value }: { value: number }) {
+const WinRateBar = function WinRateBar({ value }: { value: number }) {
   return (
     <div className='flex items-center justify-end gap-3 sm:justify-start'>
       <div className='h-1.5 w-16 overflow-hidden rounded-full bg-gray-700 sm:w-20' aria-hidden>
@@ -92,7 +98,7 @@ function WinRateBar({ value }: { value: number }) {
   )
 }
 
-function HeroWinRatesTable({ heroes }: { heroes: HeroPerformance[] }) {
+const HeroWinRatesTable = function HeroWinRatesTable({ heroes }: { heroes: HeroPerformance[] }) {
   return (
     <section aria-labelledby='hero-win-rates-heading'>
       <div className='mb-4 flex items-end justify-between gap-4'>
@@ -177,7 +183,7 @@ function HeroWinRatesTable({ heroes }: { heroes: HeroPerformance[] }) {
   )
 }
 
-function MatchList({ matches }: { matches: MatchHistoryRow[] }) {
+const MatchList = function MatchList({ matches }: { matches: MatchHistoryRow[] }) {
   const orderedMatches = [...matches].sort(
     (first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt),
   )
@@ -286,7 +292,7 @@ function MatchList({ matches }: { matches: MatchHistoryRow[] }) {
   )
 }
 
-function MatchSummary({ summary }: Pick<MatchHistoryPageProps, 'summary'>) {
+const MatchSummary = function MatchSummary({ summary }: Pick<MatchHistoryPageProps, 'summary'>) {
   return (
     <section aria-label='Match record' className='min-w-0'>
       <p className='text-xs font-medium tracking-[0.14em] text-gray-400 uppercase'>Record</p>
@@ -453,7 +459,8 @@ const MatchHistoryPage = ({
                 <section className='rounded-lg border border-gray-700 bg-gray-900 px-6 py-14 text-center'>
                   <h2 className='text-lg font-semibold text-gray-100'>No matches in this period</h2>
                   <p className='mx-auto mt-2 max-w-lg text-sm leading-6 text-gray-400'>
-                    Try a longer time range, or check back after {displayName}'s next tracked match.
+                    Try a longer time range, or check back after {displayName}&apos;s next tracked
+                    match.
                   </p>
                 </section>
               ) : (

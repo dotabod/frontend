@@ -4,7 +4,7 @@ import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import handler from '@/pages/api/settings/[settingKey]'
+import handler from '@/pages/api/settings/[setting-key]'
 
 // Mock the auth module to prevent environment variable checks
 vi.mock('@/lib/auth', () => ({
@@ -43,7 +43,7 @@ vi.mock('@/lib/api-middlewares/with-authentication', () => ({
 }))
 
 // Mock the getServerSession function
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
@@ -54,9 +54,9 @@ vi.mock('@/utils/subscription', () => ({
 }))
 
 // Import the mocked modules
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
-import { whatsNew } from '@/lib/whatsNew'
+import { whatsNew } from '@/lib/whats-new'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 const USER_ID = 'user-id'
@@ -66,13 +66,13 @@ const FOLLOW_MASTER_KEYS = whatsNew
   .filter((entry) => entry.followsNewFeatureMaster && entry.settingKey)
   .map((entry) => entry.settingKey as string)
 
-function mockSession(overrides: Partial<Session['user']> = {}) {
+const mockSession = function mockSession(overrides: Partial<Session['user']> = {}) {
   vi.mocked(getServerSession).mockResolvedValue({
     user: { id: USER_ID, isImpersonating: false, ...overrides },
   } as Session)
 }
 
-function patchRequest(settingKey: string, value: unknown) {
+const patchRequest = function patchRequest(settingKey: string, value: unknown) {
   return createMocks({
     // The handler manually JSON.parses the body (Next's bodyParser leaves it as a raw string
     // since the frontend fetch call doesn't set a Content-Type header), so the mock must match.

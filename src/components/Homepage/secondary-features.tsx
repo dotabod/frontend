@@ -1,0 +1,196 @@
+import { Popover } from 'antd'
+import { SparklesIcon } from 'lucide-react'
+import Image from 'next/image'
+import React from 'react'
+import { Container } from 'src/components/container'
+import CommandDetail from 'src/components/Dashboard/command-detail'
+import TwitchChat from 'src/components/twitch-chat'
+
+import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid'
+import type { BentoGridItemProps } from '@/components/magicui/bento-grid'
+import { Settings } from '@/lib/default-settings'
+
+import { chatterInfo } from '../Dashboard/Features/chatter-card'
+import { MMRBadge } from '../Overlay/rank/mmr-badge'
+
+export const SecondaryFeatures = function SecondaryFeatures() {
+  const features: BentoGridItemProps[] = [
+    {
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          {CommandDetail[Settings.commandWL].response({}, false)}
+        </div>
+      ),
+      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2',
+      cta: (
+        <Popover
+          className='self-end'
+          content={
+            <Image
+              alt='wl overlay'
+              width={534}
+              height={82}
+              src='/images/dashboard/wl-overlay.png'
+            />
+          }
+        >
+          <button type='button' className='flex items-center space-x-1 text-purple-300'>
+            <SparklesIcon className='text-purple-200' height={22} />
+            <span>Preview</span>
+          </button>
+        </Popover>
+      ),
+      description:
+        'Instantly display your ranked or unranked win-loss record, current MMR, and progress to next rank on stream with one simple command.',
+      disableHover: false,
+      name: 'Real-Time Win/Loss Overlay',
+    },
+    {
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          {CommandDetail[Settings.commandMmr].response()}
+          <div className='mt-6 flex justify-center space-x-4'>
+            <MMRBadge image='55.png' rank={3860} className='self-center rounded-md!' />
+            <MMRBadge
+              image='92.png'
+              className='self-center rounded-md!'
+              leaderboard={1}
+              rank={13_150}
+            />
+          </div>
+        </div>
+      ),
+      className: 'lg:row-start-1 lg:row-end-3 lg:col-start-2 lg:col-end-3',
+      cta: (
+        <Popover
+          content={
+            <Image
+              alt='mmr tracker'
+              width={534}
+              height={82}
+              src='/images/dashboard/mmr-tracker.png'
+            />
+          }
+        >
+          <button type='button' className='flex items-center space-x-1 text-purple-300'>
+            <SparklesIcon className='text-purple-200' height={22} />
+            <span>Preview</span>
+          </button>
+        </Popover>
+      ),
+      description: 'Show off your current rank, or leaderboard standing on stream.',
+      disableHover: false,
+      name: 'MMR badge and tracking',
+    },
+    {
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          {CommandDetail[Settings.commandSmurfs].response()}
+        </div>
+      ),
+      className: 'lg:row-start-1 lg:row-end-2 lg:col-start-3 lg:col-end-4',
+      description:
+        'Immediately identify smurfs by displaying the lifetime matches of players in your current game.',
+      name: 'Instant Smurf Detection',
+    },
+    {
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          <TwitchChat
+            responses={[
+              chatterInfo.smoke.message,
+              chatterInfo.passiveDeath.message,
+              chatterInfo.pause.message,
+              chatterInfo.powerTreads.message,
+            ]}
+          />
+        </div>
+      ),
+      className: 'lg:row-start-2 lg:row-end-3 lg:col-start-3 lg:col-end-4',
+      description: 'But only when the game conditions meet the correct parameters.',
+      name: 'Dotabod has things to say',
+    },
+    {
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          <TwitchChat
+            responses={[
+              <React.Fragment key={1}>
+                <span>{chatterInfo.roshanKilled.message}</span>
+              </React.Fragment>,
+              <React.Fragment key={2}>
+                <span>{chatterInfo.roshPickup.message}</span>
+              </React.Fragment>,
+            ]}
+          />
+        </div>
+      ),
+      className: 'lg:row-start-3 lg:row-end-4 lg:col-start-1 lg:col-end-3',
+      cta: (
+        <Popover
+          content={
+            <div className='flex flex-col items-center space-y-4 text-white'>
+              <Image
+                alt='aegis timer'
+                width={372}
+                height={141}
+                src='/images/dashboard/just-aegis-timer.png'
+              />
+              <span>Aegis timer</span>
+              <Image
+                alt='rosh timer'
+                width={336}
+                height={249}
+                src='/images/dashboard/rosh-timer.png'
+              />
+              <span>Roshan timer</span>
+            </div>
+          }
+        >
+          <button type='button' className='flex items-center space-x-1 text-purple-300'>
+            <SparklesIcon className='text-purple-200' height={22} />
+            <span>Preview</span>
+          </button>
+        </Popover>
+      ),
+      description: 'Automatic timers clearly showing Roshan respawn windows and Aegis pickups.',
+      disableHover: false,
+      name: 'Roshan & Aegis Timers',
+    },
+    {
+      background: (
+        <div className='flex flex-col items-center justify-center'>
+          {CommandDetail[Settings.commandGM].response()}
+        </div>
+      ),
+      className: 'lg:row-start-3 lg:row-end-4 lg:col-start-3 lg:col-end-4',
+      description: CommandDetail[Settings.commandGM].description,
+      name: 'In-Game Medal Tracking',
+    },
+  ]
+
+  return (
+    <section
+      id='secondary-features'
+      aria-label='Features for building a portfolio'
+      className='py-20'
+    >
+      <Container>
+        <div className='mx-auto max-w-2xl sm:text-center'>
+          <h2 className='text-3xl font-medium tracking-tight text-gray-200'>
+            But wait, there&apos;s more.
+          </h2>
+          <p className='mt-2 text-lg text-gray-300'>
+            Under active development and speaking to multiple Dota 2 personalities, features are
+            being added as they are requested.
+          </p>
+        </div>
+        <BentoGrid className='lg:grid-rows-3'>
+          {features.map((feature, i) => (
+            <BentoCard key={i} {...feature} />
+          ))}
+        </BentoGrid>
+      </Container>
+    </section>
+  )
+}

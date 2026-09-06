@@ -4,7 +4,7 @@ import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/settings'
 
@@ -31,7 +31,7 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (_methods: string[], handler: NextApiHandler) => handler,
 }))
 
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
@@ -51,7 +51,7 @@ vi.mock('@/utils/subscription', () => ({
 const OWNER_ID = 'owner-id'
 const PUBLIC_ID = 'public-id'
 
-function createSettingsResult() {
+const createSettingsResult = function createSettingsResult() {
   return {
     Account: [{ providerAccountId: 'twitch-id' }],
     SteamAccount: [],
@@ -68,7 +68,7 @@ function createSettingsResult() {
   }
 }
 
-function mockSession(user?: Session['user']) {
+const mockSession = function mockSession(user?: Session['user']) {
   vi.mocked(getServerSession).mockResolvedValue(user ? ({ user } as Session) : null)
 }
 

@@ -2,7 +2,7 @@ import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
@@ -159,7 +159,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           metadata: {
             email: user.email || '',
             image: user.image || '',
-            isAutoApplied: 'true', // Indicate this was auto-applied via gift credit
+            // Indicate this was auto-applied via gift credit
+            isAutoApplied: 'true',
             isCryptoPayment: 'false',
             isGift: 'false',
             isNewSubscription: 'true',
@@ -179,13 +180,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // If the latest invoice exists and is paid (likely due to balance application),
         // Determine the correct currentPeriodEnd. Otherwise, estimate 30 days.
-        let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Default: 30 days
+        // Default: 30 days
+        let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         if (
           newStripeSubscription.latest_invoice &&
           typeof newStripeSubscription.latest_invoice === 'object' &&
-          'status' in newStripeSubscription.latest_invoice && // Type guard for Invoice object
+          // Type guard for Invoice object
+          'status' in newStripeSubscription.latest_invoice &&
           newStripeSubscription.latest_invoice.status === 'paid' &&
-          newStripeSubscription.items.data[0]?.current_period_end // Check if property exists
+          // Check if property exists
+          newStripeSubscription.items.data[0]?.current_period_end
         ) {
           // Use the period end from the Stripe subscription object if available
           currentPeriodEnd = new Date(
@@ -203,25 +207,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             cancelAtPeriodEnd: false,
             currentPeriodEnd,
-            isGift: false, // This subscription itself isn't a gift, it was paid for by gift *credit*
+            // This subscription itself isn't a gift, it was paid for by gift *credit*
+            isGift: false,
             metadata: {
               appliedAt: new Date().toISOString(),
               autoApplied: 'true',
-              creditBalanceUsed: balance.toString(), // Record the balance *before* application
+              // Record the balance *before* application
+              creditBalanceUsed: balance.toString(),
               source: 'gift-credit-auto-apply-reactivate-path',
             },
-            status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
+            // Assume active, Stripe webhooks will update if payment fails
+            status: SubscriptionStatus.ACTIVE,
             stripeCustomerId,
             stripePriceId: priceId,
-            stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
+            // Store the new Stripe Subscription ID
+            stripeSubscriptionId: newStripeSubscription.id,
             tier: 'PRO',
-            transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
+            // Or GIFT if fully paid by credit? Needs clarification.
+            transactionType: TransactionType.RECURRING,
             userId: userIdToUse,
           },
         })
 
         res.status(200).json({
-          creditApplied: Math.abs(balance) / 100, // Show the amount of credit potentially used
+          // Show the amount of credit potentially used
+          creditApplied: Math.abs(balance) / 100,
           message: 'Successfully applied gift credits to create a new subscription',
           priceId,
           success: true,
@@ -256,7 +266,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           metadata: {
             email: user.email || '',
             image: user.image || '',
-            isAutoApplied: 'true', // Indicate this was auto-applied via gift credit
+            // Indicate this was auto-applied via gift credit
+            isAutoApplied: 'true',
             isCryptoPayment: 'false',
             isGift: 'false',
             isNewSubscription: 'true',
@@ -276,13 +287,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // If the latest invoice exists and is paid (likely due to balance application),
         // Determine the correct currentPeriodEnd. Otherwise, estimate 30 days.
-        let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Default: 30 days
+        // Default: 30 days
+        let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         if (
           newStripeSubscription.latest_invoice &&
           typeof newStripeSubscription.latest_invoice === 'object' &&
-          'status' in newStripeSubscription.latest_invoice && // Type guard for Invoice object
+          // Type guard for Invoice object
+          'status' in newStripeSubscription.latest_invoice &&
           newStripeSubscription.latest_invoice.status === 'paid' &&
-          newStripeSubscription.items.data[0]?.current_period_end // Check if property exists
+          // Check if property exists
+          newStripeSubscription.items.data[0]?.current_period_end
         ) {
           // Use the period end from the Stripe subscription object if available
           currentPeriodEnd = new Date(
@@ -300,25 +314,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             cancelAtPeriodEnd: false,
             currentPeriodEnd,
-            isGift: false, // This subscription itself isn't a gift, it was paid for by gift *credit*
+            // This subscription itself isn't a gift, it was paid for by gift *credit*
+            isGift: false,
             metadata: {
               appliedAt: new Date().toISOString(),
               autoApplied: 'true',
-              creditBalanceUsed: balance.toString(), // Record the balance *before* application
+              // Record the balance *before* application
+              creditBalanceUsed: balance.toString(),
               source: 'gift-credit-auto-apply-new-path',
             },
-            status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
+            // Assume active, Stripe webhooks will update if payment fails
+            status: SubscriptionStatus.ACTIVE,
             stripeCustomerId,
             stripePriceId: priceId,
-            stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
+            // Store the new Stripe Subscription ID
+            stripeSubscriptionId: newStripeSubscription.id,
             tier: 'PRO',
-            transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
+            // Or GIFT if fully paid by credit? Needs clarification.
+            transactionType: TransactionType.RECURRING,
             userId: userIdToUse,
           },
         })
 
         res.status(200).json({
-          creditApplied: Math.abs(balance) / 100, // Show the amount of credit potentially used
+          // Show the amount of credit potentially used
+          creditApplied: Math.abs(balance) / 100,
           message: 'Successfully applied gift credits to create a new subscription',
           priceId,
           success: true,

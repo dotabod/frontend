@@ -312,7 +312,8 @@ describe('Crypto Subscription Utilities', () => {
         mockTx,
       )
 
-      expect(result).toBeTruthy() // Function still succeeds but creates subscription without renewal
+      // Function still succeeds but creates subscription without renewal
+      expect(result).toBeTruthy()
     })
 
     it('should throw error when subscription creation fails for regular subscriptions', async () => {
@@ -334,7 +335,7 @@ describe('Crypto Subscription Utilities', () => {
 
       // Check that all crypto price IDs start with 'crypto_'
       CRYPTO_PRICE_IDS.forEach((priceId) => {
-        expect(priceId).toMatch(/^crypto_/)
+        expect(priceId).toMatch(/^crypto_/u)
       })
     })
 

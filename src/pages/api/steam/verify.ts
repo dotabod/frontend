@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -12,7 +12,7 @@ const steamVerifySchema = z.object({
   steam32Id: z.string().transform((val) => Number.parseInt(val, 10)),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {

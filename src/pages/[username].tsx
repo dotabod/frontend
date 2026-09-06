@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { z } from 'zod/v4'
 
-import { Container } from '@/components/Container'
+import { Container } from '@/components/container'
 import {
   bestRarity,
   hexA,
@@ -18,14 +18,14 @@ import {
   STEAM_CDN,
 } from '@/components/CosmeticSet'
 import type { CosmeticItem } from '@/components/CosmeticSet'
-import CommandDetail from '@/components/Dashboard/CommandDetail'
-import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { ProfileMatchOverview } from '@/components/ProfileMatchOverview'
-import { ProfileWinLossCounter } from '@/components/ProfileWinLossCounter'
+import CommandDetail from '@/components/Dashboard/command-detail'
+import CommandsCard from '@/components/Dashboard/Features/commands-card'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { ProfileMatchOverview } from '@/components/profile-match-overview'
+import { ProfileWinLossCounter } from '@/components/profile-win-loss-counter'
 import prisma from '@/lib/db'
 import { fetcher } from '@/lib/fetcher'
-import { useGetSettingsByUsername } from '@/lib/hooks/useUpdateSetting'
+import { useGetSettingsByUsername } from '@/lib/hooks/use-update-setting'
 import { serializeJsonLd } from '@/lib/json-ld'
 import type { ProfileJsonLd } from '@/lib/json-ld'
 import {
@@ -33,8 +33,8 @@ import {
   formatQueueLabel,
   formatStreamerScore,
   readKda,
-} from '@/lib/matchHistory'
-import type { HeroPerformance, MatchHistoryRow } from '@/lib/matchHistory'
+} from '@/lib/match-history'
+import type { HeroPerformance, MatchHistoryRow } from '@/lib/match-history'
 import { getValueOrDefault } from '@/lib/settings'
 import { createGiftLink } from '@/utils/gift-links'
 import { getSubscription } from '@/utils/subscription'
@@ -72,7 +72,13 @@ interface CollectionSummary {
 // The discovery hook on the main page: a held hand of the streamer's rarest hero cards
 // that spreads on hover. One link into the collection (no nested anchors), so the cards
 // stay purely presentational here.
-function FannedHand({ username, collection }: { username: string; collection: CollectionSummary }) {
+const FannedHand = function FannedHand({
+  username,
+  collection,
+}: {
+  username: string
+  collection: CollectionSummary
+}) {
   const cards = collection.cards.slice(0, 5)
   const mid = (cards.length - 1) / 2
   return (
@@ -137,7 +143,13 @@ function FannedHand({ username, collection }: { username: string; collection: Co
 // The zero-state counterpart to FannedHand: faint ghost slots, an explicit "0 heroes
 // collected", and a line on how the binder fills up. Keeps the feature discoverable for
 // streamers who have not collected anything yet, and links into the (empty) collection.
-function CollectionTeaser({ username, name }: { username: string; name: string }) {
+const CollectionTeaser = function CollectionTeaser({
+  username,
+  name,
+}: {
+  username: string
+  name: string
+}) {
   return (
     <Link
       href={getProfileRoute(username, '/set')}
@@ -693,7 +705,7 @@ interface UserProfileProps {
   recentMatches: MatchHistoryRow[]
 }
 
-function isMaintenanceModeEnabled() {
+const isMaintenanceModeEnabled = function isMaintenanceModeEnabled() {
   return (
     process.env.IS_IN_MAINTENANCE_MODE === 'true' ||
     process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'true'
@@ -702,7 +714,7 @@ function isMaintenanceModeEnabled() {
 
 // Shape the streamer's loadouts into the fanned-hand summary: rarest few heroes plus a
 // trophy tally. Heroes.json is imported here (server-only) so it stays out of the bundle.
-async function buildCollectionSummary(
+const buildCollectionSummary = async function buildCollectionSummary(
   loadouts: { heroId: number; heroName: string; items: unknown }[],
 ): Promise<CollectionSummary> {
   // The count only needs the row count, so it stays reliable even if a row's items

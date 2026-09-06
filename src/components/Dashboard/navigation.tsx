@@ -22,7 +22,7 @@ import {
 import Link from 'next/link'
 import type React from 'react'
 
-import Discord from '@/images/logos/Discord'
+import Discord from '@/images/logos/discord'
 
 export type NavIcon = React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
 
@@ -116,11 +116,7 @@ export const navConfig: NavConfig = {
 export const isExternalNavItem = (item: NavItem): boolean =>
   item.external ?? Boolean(item.href?.startsWith('http'))
 
-/**
- * Convert a NavItem into an Ant `Menu`/`Dropdown` item. Shared by the sidebar
- * and the avatar dropdown so every surface renders labels/icons identically.
- */
-export function navItemToMenuItem(
+export const navItemToMenuItem = function navItemToMenuItem(
   item: NavItem,
   opts: { collapsed?: boolean; isChild?: boolean } = {},
 ): NonNullable<MenuProps['items']>[number] {
@@ -169,12 +165,7 @@ export function navItemToMenuItem(
   } as NonNullable<MenuProps['items']>[number]
 }
 
-/**
- * Drop items the current viewer shouldn't see: `adminOnly` for non-admins and
- * `hideForImpersonator` for impersonators (parent and children). A parent whose
- * children all get filtered out is dropped too. Pure — works for every region.
- */
-export function filterNav(
+export const filterNav = function filterNav(
   items: NavItem[],
   opts: { isImpersonating?: boolean; isAdmin?: boolean } = {},
 ): NavItem[] {
