@@ -20,7 +20,7 @@ import Creep from './creep'
 import Hero from './hero'
 import HeroUnit from './hero-unit'
 
-const Minimap = function Minimap({ block }: { block: blockType }) {
+const Minimap = ({ block }: { block: blockType }) => {
   const { data: isSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: isXL } = useUpdateSetting(Settings['minimap-xl'])
   const { data: isRight } = useUpdateSetting(Settings.minimapRight)

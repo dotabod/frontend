@@ -6,7 +6,7 @@ import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 
 import { TierSwitch } from './tier-switch'
 
-export default function CommandsCard({
+const CommandsCard = ({
   id,
   command,
   readonly,
@@ -21,7 +21,7 @@ export default function CommandsCard({
   publicLoading?: boolean
   isOpen?: boolean
   onClose?: () => void
-}): React.ReactNode {
+}): React.ReactNode => {
   const { data: isEnabled, updateSetting } = useUpdateSetting(command.key)
   const { hasAccess } = useFeatureAccess(command.key)
 
@@ -110,3 +110,5 @@ export default function CommandsCard({
     </Collapse>
   )
 }
+
+export default CommandsCard

@@ -8,7 +8,7 @@ import { TierSwitch } from './tier-switch'
 // Account-wide control for how new dotabod features (across chat, overlays, betting, etc.)
 // roll out — deliberately NOT a feature-specific toggle. The master sets the default for
 // features a streamer hasn't touched; each feature's own toggle lives on the What's New page.
-export default function NewFeaturesCard() {
+const NewFeaturesCard = () => {
   return (
     <Card title='New features'>
       <div className='mb-4'>
@@ -30,3 +30,5 @@ export default function NewFeaturesCard() {
     </Card>
   )
 }
+
+export default NewFeaturesCard

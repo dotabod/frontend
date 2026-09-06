@@ -42,13 +42,7 @@ interface SEOProps {
   noindex?: boolean
 }
 
-export default function DashboardShell({
-  children,
-  seo,
-}: {
-  children: React.ReactElement
-  seo?: SEOProps
-}) {
+const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?: SEOProps }) => {
   const { status, data } = useSession()
   const router = useRouter()
   // `broken` (set by the Sider breakpoint) is our single "is mobile" signal.
@@ -438,3 +432,5 @@ export default function DashboardShell({
     </>
   )
 }
+
+export default DashboardShell

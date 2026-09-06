@@ -10,7 +10,7 @@ import { TierBadge } from './tier-badge'
 import { TierSlider } from './tier-slider'
 import { TierSwitch } from './tier-switch'
 
-export default function MinimapCard(): React.ReactNode {
+const MinimapCard = (): React.ReactNode => {
   const { data: isEnabled } = useUpdateSetting(Settings['minimap-blocker'])
   const { data: minimapSimple } = useUpdateSetting(Settings['minimap-simple'])
   const { data: minimapXl } = useUpdateSetting(Settings['minimap-xl'])
@@ -147,3 +147,5 @@ export default function MinimapCard(): React.ReactNode {
     </Card>
   )
 }
+
+export default MinimapCard

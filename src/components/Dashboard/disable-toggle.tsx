@@ -38,7 +38,7 @@ const Toggle = () => {
   )
 }
 
-export const DisableToggle = function DisableToggle() {
+export const DisableToggle = () => {
   const { data } = useSWR('/api/check-ban', fetcher, SETTINGS_SWR_OPTIONS)
   const { notification } = App.useApp()
   const user = useSession()?.data?.user

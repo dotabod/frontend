@@ -13,7 +13,7 @@ import { Settings } from '@/lib/default-settings'
 import { chatterInfo } from '../Dashboard/Features/chatter-card'
 import { MMRBadge } from '../Overlay/rank/mmr-badge'
 
-export const SecondaryFeatures = function SecondaryFeatures() {
+export const SecondaryFeatures = () => {
   const features: BentoGridItemProps[] = [
     {
       background: (

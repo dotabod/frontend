@@ -5,7 +5,7 @@ import { NavLinks } from 'src/components/nav-links'
 
 import { QrCodeBorder } from './qr-code-border'
 
-export const Footer = function Footer() {
+export const Footer = () => {
   return (
     <footer className='border-t border-gray-500 bg-gray-900'>
       <Container>

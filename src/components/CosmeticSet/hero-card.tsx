@@ -45,7 +45,7 @@ const useReducedMotion = function useReducedMotion() {
 // A hero in the collection, rendered as a trading card: 5:7 portrait, full-bleed
 // splash art, a bottom scrim with name + best rarity. On pointer-move it tilts and a
 // sheen follows the cursor — the holographic-card feel — unless reduced motion is set.
-export const HeroCard = function HeroCard({
+export const HeroCard = ({
   username,
   card,
   size = 'md',
@@ -55,7 +55,7 @@ export const HeroCard = function HeroCard({
   card: HeroCardData
   size?: Size
   className?: string
-}) {
+}) => {
   const planeRef = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
   const interactive = !reduced
@@ -187,7 +187,7 @@ export const HeroCard = function HeroCard({
   )
 }
 
-const Corner = function Corner({ pos, accent }: { pos: string; accent: string }) {
+const Corner = ({ pos, accent }: { pos: string; accent: string }) => {
   return (
     <span
       aria-hidden

@@ -13,7 +13,7 @@ interface HelpMenuProps {
 
 // "?" popover holding help + external resources. Replaces the five old sidebar
 // "Help" rows; everything stays one click away without bloating the rail.
-export const HelpMenu = function HelpMenu({ collapsed = false, onNavigate }: HelpMenuProps) {
+export const HelpMenu = ({ collapsed = false, onNavigate }: HelpMenuProps) => {
   const content = (
     <div className='flex w-48 flex-col'>
       {navConfig.help.map((item) => {

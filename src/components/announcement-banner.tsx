@@ -16,7 +16,7 @@ interface AnnouncementBannerProps {
 const glowClipPath =
   'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)'
 
-export default function AnnouncementBanner({ announcement, onDismiss }: AnnouncementBannerProps) {
+const AnnouncementBanner = ({ announcement, onDismiss }: AnnouncementBannerProps) => {
   return (
     <aside
       aria-label='Latest Dotabod update'
@@ -65,3 +65,5 @@ export default function AnnouncementBanner({ announcement, onDismiss }: Announce
     </aside>
   )
 }
+
+export default AnnouncementBanner

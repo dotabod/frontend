@@ -348,7 +348,7 @@ const groupedChatterInfo = Object.entries(chatterInfo).reduce<
 
 type GroupedChatterItem = (typeof groupedChatterInfo)[string][number]
 
-export default function ChatterCard() {
+const ChatterCard = () => {
   const { data: isEnabled } = useUpdateSetting(Settings.chatter)
   const { data: dbChatters, updateSetting: updateChatters } = useUpdateSetting<
     Record<string, { enabled: boolean }>
@@ -405,3 +405,5 @@ export default function ChatterCard() {
     </>
   )
 }
+
+export default ChatterCard

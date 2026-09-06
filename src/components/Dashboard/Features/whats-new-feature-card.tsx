@@ -21,7 +21,7 @@ const CATEGORY_LABELS: Record<WhatsNewEntry['category'], string> = {
 
 // One feature in the release feed. The public route renders it read-only; the dashboard adds
 // an inline control only when that release owns a setting.
-export default function WhatsNewFeatureCard({
+const WhatsNewFeatureCard = ({
   entry,
   master,
   latest,
@@ -33,7 +33,7 @@ export default function WhatsNewFeatureCard({
   latest?: boolean
   readOnly?: boolean
   showDate?: boolean
-}) {
+}) => {
   // Always call the hook (rules of hooks); it no-ops when there's no settingKey.
   const { data: value, updateSetting } = useUpdateSetting<boolean | null>(entry.settingKey)
   const checked = entryToggleChecked(entry, value, master)
@@ -174,3 +174,5 @@ export default function WhatsNewFeatureCard({
     </article>
   )
 }
+
+export default WhatsNewFeatureCard

@@ -33,7 +33,7 @@ import PaymentMethodPicker from './payment-method-picker'
 import type { PaymentMethod } from './payment-method-picker'
 import { PriceDisplay } from './price-display'
 
-const Plan = function Plan({
+const Plan = ({
   name,
   tier,
   price,
@@ -65,7 +65,7 @@ const Plan = function Plan({
   featured?: boolean
   subscription?: SubscriptionRow | null
   hasTrial?: boolean
-}) {
+}) => {
   const {
     data: cryptoInterest,
     loading: loadingCryptoInterest,

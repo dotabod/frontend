@@ -6,7 +6,7 @@ import { Settings } from '@/lib/default-settings'
 import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import { Card } from '@/ui/card'
 
-export default function StreamDelayCard() {
+const StreamDelayCard = () => {
   const { data: delay, loading, updateSetting } = useUpdateSetting<number>(Settings.streamDelay)
 
   // Convert milliseconds to minutes and seconds
@@ -103,3 +103,5 @@ export default function StreamDelayCard() {
     </Card>
   )
 }
+
+export default StreamDelayCard

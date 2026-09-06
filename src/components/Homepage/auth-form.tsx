@@ -7,7 +7,7 @@ import * as React from 'react'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const UserAuthForm = function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export const UserAuthForm = ({ className, ...props }: UserAuthFormProps) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
 

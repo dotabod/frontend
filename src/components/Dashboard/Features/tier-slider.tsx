@@ -18,7 +18,7 @@ interface TierSliderProps extends Omit<SliderSingleProps, 'onChange'> {
   debounceMs?: number
 }
 
-export const TierSlider = function TierSlider({
+export const TierSlider = ({
   settingKey,
   label,
   className,
@@ -30,7 +30,7 @@ export const TierSlider = function TierSlider({
   // Default debounce of 500ms
   debounceMs = 500,
   ...sliderProps
-}: TierSliderProps) {
+}: TierSliderProps) => {
   const { data: rawValue, updateSetting, tierAccess } = useUpdateSetting<number>(settingKey)
   const [localValue, setLocalValue] = useState<number>(externalValue ?? rawValue ?? 0)
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null)

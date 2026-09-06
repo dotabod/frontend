@@ -1,6 +1,6 @@
 import { Alert, Tag } from 'antd'
 
-export default function RegionalBlockingNote() {
+const RegionalBlockingNote = () => {
   return (
     <Alert
       message='Overlay works in your browser but stays blank in OBS?'
@@ -41,3 +41,5 @@ export default function RegionalBlockingNote() {
     />
   )
 }
+
+export default RegionalBlockingNote

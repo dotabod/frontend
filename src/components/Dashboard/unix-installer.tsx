@@ -8,7 +8,7 @@ import { useUpdate } from '@/lib/hooks/use-update-setting'
 
 import DownloadButton from './download-button'
 
-export default function UnixInstaller() {
+const UnixInstaller = () => {
   const user = useSession()?.data?.user
   const { data } = useUpdate({ path: '/api/settings' })
   const [url, setUrl] = useState('')
@@ -118,3 +118,5 @@ export default function UnixInstaller() {
     </>
   )
 }
+
+export default UnixInstaller

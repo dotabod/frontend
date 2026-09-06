@@ -17,12 +17,7 @@ interface FeatureWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
   feature?: FeatureTier | GenericFeature
 }
 
-export const FeatureWrapper = function FeatureWrapper({
-  feature,
-  children,
-  className,
-  ...props
-}: FeatureWrapperProps) {
+export const FeatureWrapper = ({ feature, children, className, ...props }: FeatureWrapperProps) => {
   const [isHovered, setIsHovered] = useState(false)
   const { hasAccess, requiredTier } = useFeatureAccess(feature)
 
@@ -64,7 +59,7 @@ export const FeatureWrapper = function FeatureWrapper({
   )
 }
 
-export const Card = function Card({ className, feature, title, children, ...props }: CardProps) {
+export const Card = ({ className, feature, title, children, ...props }: CardProps) => {
   return (
     <FeatureWrapper
       feature={feature}

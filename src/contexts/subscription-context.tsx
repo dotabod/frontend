@@ -29,11 +29,7 @@ interface SubscriptionContextType {
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined)
 
-export const SubscriptionProvider = function SubscriptionProvider({
-  children,
-}: {
-  children: ReactNode
-}) {
+export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
   const { subscription, isLoading } = useSubscriptionData()
   const inGracePeriod = isInGracePeriod()

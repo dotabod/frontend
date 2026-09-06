@@ -14,27 +14,7 @@ const LANGUAGE_OPTIONS = localePatchSchema.options.map((locale) => ({
   value: locale,
 }))
 
-/**
- * AutoTranslateCard component controls automatic translation of chat messages.
- *
- * Backend Integration:
- * The backend should check the `autoTranslate` setting and use the `translationLanguage`
- * to translate incoming chat messages to the specified language:
- *
- * ```typescript
- * // Check if auto translation is enabled
- * const autoTranslateEnabled = dotaClient.client.settings?.autoTranslate || false;
- * const targetLanguage = dotaClient.client.settings?.translationLanguage || 'en';
- *
- * if (autoTranslateEnabled && message) {
- *   // Translate message to target language using Google Translate API
- *   const translatedMessage = await translateMessage(message, targetLanguage);
- *   // Send translated message via socket
- *   socket.emit('chatMessage', { message: translatedMessage });
- * }
- * ```
- */
-export default function AutoTranslateCard(): React.ReactNode {
+const AutoTranslateCard = (): React.ReactNode => {
   const { data: isChatTranslateEnabled } = useUpdateSetting(Settings.autoTranslate)
   const { data: targetLanguage, updateSetting: updateLanguage } = useUpdateSetting<string>(
     Settings.translationLanguage,
@@ -152,3 +132,5 @@ export default function AutoTranslateCard(): React.ReactNode {
     </Card>
   )
 }
+
+export default AutoTranslateCard

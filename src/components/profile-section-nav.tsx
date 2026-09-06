@@ -14,10 +14,7 @@ const sections: { href: 'matches' | 'set'; label: string; section: ProfileSectio
   { href: 'set', label: 'Cosmetic collection', section: 'collection' },
 ]
 
-export const ProfileSectionNav = function ProfileSectionNav({
-  current,
-  username,
-}: ProfileSectionNavProps) {
+export const ProfileSectionNav = ({ current, username }: ProfileSectionNavProps) => {
   return (
     <div className='border-b border-gray-800 bg-gray-950 font-sans'>
       <Container>

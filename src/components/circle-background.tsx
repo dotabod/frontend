@@ -6,12 +6,12 @@ interface CircleBackgroundProps extends SVGProps<SVGSVGElement> {
   height?: number
 }
 
-export const CircleBackground = function CircleBackground({
+export const CircleBackground = ({
   color,
   width = 558,
   height = 558,
   ...props
-}: CircleBackgroundProps) {
+}: CircleBackgroundProps) => {
   // Use a static ID for the gradient
   const id = 'circle-gradient-static'
 

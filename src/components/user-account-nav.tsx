@@ -455,7 +455,7 @@ interface UserAccountNavProps {
   className?: string
 }
 
-export const UserAccountNav = function UserAccountNav({ className }: UserAccountNavProps) {
+export const UserAccountNav = ({ className }: UserAccountNavProps) => {
   const user = useSession()?.data?.user
 
   if (!user) {

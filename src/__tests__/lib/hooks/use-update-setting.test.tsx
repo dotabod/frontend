@@ -65,7 +65,7 @@ describe(useUpdate, () => {
 
     global.fetch = vi.fn().mockResolvedValue({ ok: true })
 
-    const TestComponent = function TestComponent() {
+    const TestComponent = () => {
       const { updateSetting } = useUpdate<Record<string, unknown>, { value: boolean }>({
         dataTransform: (data, newValue) => ({
           ...data,
@@ -129,7 +129,7 @@ describe(useUpdate, () => {
       await promise
     })
 
-    const TestComponent = function TestComponent() {
+    const TestComponent = () => {
       const result = useUpdate<Record<string, unknown>, { value: boolean }>({
         dataTransform: (data, newValue) => ({ ...data, value: newValue.value }),
         path: '/api/settings',
@@ -183,7 +183,7 @@ describe(useUpdate, () => {
       await promise.catch(() => {})
     })
 
-    const TestComponent = function TestComponent() {
+    const TestComponent = () => {
       const { updateSetting } = useUpdate<Record<string, unknown>, { value: boolean }>({
         dataTransform: (data, newValue) => ({ ...data, value: newValue.value }),
         path: '/api/settings',
@@ -254,7 +254,7 @@ describe(useUpdateAccount, () => {
       error: undefined,
     } as ReturnType<typeof useSWR>)
 
-    const TestComponent = function TestComponent() {
+    const TestComponent = () => {
       refs.update = useUpdateAccount().update
       return null
     }
@@ -304,7 +304,7 @@ describe('useUpdateSetting (chatters)', () => {
       error: undefined,
     } as ReturnType<typeof useSWR>)
 
-    const TestComponent = function TestComponent() {
+    const TestComponent = () => {
       const { data, updateSetting } = useUpdateSetting<boolean | null>('chatters.tip')
       refs.updateSetting = updateSetting
       refs.value = data

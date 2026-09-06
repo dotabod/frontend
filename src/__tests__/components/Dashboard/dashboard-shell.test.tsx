@@ -44,9 +44,14 @@ vi.mock('antd', () => {
   const Layout = Component
   Layout.Content = Component
   Layout.Header = Component
-  Layout.Sider = ({ children, collapsed: _collapsed, collapsible: _collapsible, ...props }) => (
-    <aside {...props}>{children}</aside>
-  )
+  Layout.Sider = function ({
+    children,
+    collapsed: _collapsed,
+    collapsible: _collapsible,
+    ...props
+  }) {
+    return <aside {...props}>{children}</aside>
+  }
 
   const renderItems = (items = []) => (
     <ul>

@@ -7,7 +7,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from '../Dashboard/Features/tier-switch'
 
-export default function BetsOverlay() {
+const BetsOverlay = () => {
   const { data: showLivePolls } = useUpdateSetting(Settings.livePolls)
 
   return (
@@ -35,3 +35,5 @@ export default function BetsOverlay() {
     </Card>
   )
 }
+
+export default BetsOverlay

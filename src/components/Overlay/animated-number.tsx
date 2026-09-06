@@ -6,7 +6,7 @@ interface AnimatedNumberProps {
   to: number
 }
 
-export const AnimatedNumber = function AnimatedNumber({ from, to }: AnimatedNumberProps) {
+export const AnimatedNumber = ({ from, to }: AnimatedNumberProps) => {
   const ref = useRef<HTMLSpanElement>(null)
   const motionValue = useMotionValue(from)
   const springValue = useSpring(motionValue)

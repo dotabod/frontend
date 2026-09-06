@@ -151,7 +151,7 @@ const OBSText = ({ copyURL, track }: { copyURL: string; track: ReturnType<typeof
   </div>
 )
 
-export default function OBSOverlay() {
+const OBSOverlay = () => {
   const user = useSession()?.data?.user
   const track = useTrack()
   const copyURL = useBaseUrl(`overlay/${user ? user.id : ''}`)
@@ -252,3 +252,5 @@ export default function OBSOverlay() {
     </Card>
   )
 }
+
+export default OBSOverlay

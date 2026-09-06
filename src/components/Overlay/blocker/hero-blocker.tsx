@@ -3,13 +3,13 @@ import Image from 'next/image'
 import type { blockType } from '@/lib/dev-consts'
 import { useTransformRes } from '@/lib/hooks/use-transform-res'
 
-export const HeroBlocker = function HeroBlocker({
+export const HeroBlocker = ({
   teamName,
   type,
 }: {
   teamName: blockType['team']
   type?: blockType['type']
-}) {
+}) => {
   const res = useTransformRes()
 
   if (!type) {

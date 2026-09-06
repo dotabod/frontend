@@ -37,14 +37,14 @@ interface BillingNoticeProps {
 
 // One inline callout language for the billing page: a full 1px border, a tinted
 // Surface, and a leading icon. No side stripes, no 2px borders, no AntD skin.
-export const BillingNotice = function BillingNotice({
+export const BillingNotice = ({
   tone = 'neutral',
   icon,
   title,
   children,
   action,
   className,
-}: BillingNoticeProps) {
+}: BillingNoticeProps) => {
   const t = toneClasses[tone]
   return (
     <div

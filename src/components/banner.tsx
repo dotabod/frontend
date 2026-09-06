@@ -24,7 +24,7 @@ const isFresh = function isFresh(date: string): boolean {
   return daysSince >= 0 && daysSince <= BANNER_FRESHNESS_DAYS
 }
 
-export default function Banner({ whatsNewPath = '/whats-new' }: BannerProps) {
+const Banner = ({ whatsNewPath = '/whats-new' }: BannerProps) => {
   const { data, isLoading } = useSWR<{ post: LatestPost | null }>('/api/latest-post', fetcher)
   const [dismissedSlug, setDismissedSlug] = useState<string | null>(null)
 
@@ -69,3 +69,5 @@ export default function Banner({ whatsNewPath = '/whats-new' }: BannerProps) {
 
   return <AnnouncementBanner announcement={announcement} onDismiss={dismiss} />
 }
+
+export default Banner

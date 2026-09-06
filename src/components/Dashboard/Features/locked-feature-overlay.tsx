@@ -11,7 +11,7 @@ interface LockedFeatureOverlayProps {
   message?: React.ReactNode
 }
 
-export const LockedFeatureOverlay = function LockedFeatureOverlay({
+export const LockedFeatureOverlay = ({
   requiredTier,
   message = (
     <span>
@@ -19,7 +19,7 @@ export const LockedFeatureOverlay = function LockedFeatureOverlay({
       your stream
     </span>
   ),
-}: LockedFeatureOverlayProps) {
+}: LockedFeatureOverlayProps) => {
   if (!requiredTier || requiredTier === SUBSCRIPTION_TIERS.FREE) {
     return null
   }

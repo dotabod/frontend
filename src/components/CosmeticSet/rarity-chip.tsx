@@ -1,12 +1,6 @@
 import { hexA, RARITY_META } from './cosmetics'
 
-export const RarityChip = function RarityChip({
-  rarity,
-  count,
-}: {
-  rarity: string
-  count: number
-}) {
+export const RarityChip = ({ rarity, count }: { rarity: string; count: number }) => {
   const r = RARITY_META[rarity]
   if (!r) {
     return null

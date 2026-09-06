@@ -7,7 +7,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from './tier-switch'
 
-export default function RoshCard() {
+const RoshCard = () => {
   const { data: hasAegis } = useUpdateSetting(Settings.aegis)
   const { data: hasRosh } = useUpdateSetting(Settings.rosh)
 
@@ -70,3 +70,5 @@ export default function RoshCard() {
     </Card>
   )
 }
+
+export default RoshCard

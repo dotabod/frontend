@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-export const MenuIcon = function MenuIcon(props: SVGProps<SVGSVGElement>) {
+export const MenuIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg viewBox='0 0 24 24' fill='none' aria-hidden='true' {...props}>
       <path

@@ -5,7 +5,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from './tier-switch'
 
-export default function DotabodChatter() {
+const DotabodChatter = () => {
   return (
     <Card>
       <div className='title'>
@@ -30,3 +30,5 @@ export default function DotabodChatter() {
     </Card>
   )
 }
+
+export default DotabodChatter

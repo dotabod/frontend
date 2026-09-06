@@ -8,7 +8,7 @@ import { useDebouncedCallback } from 'use-debounce'
 
 import { useTrack } from '@/lib/track'
 
-export default function ModeratedChannels() {
+const ModeratedChannels = () => {
   const { data } = useSession()
   const user = data?.user
   const [moderatedChannels, setModeratedChannels] = useState<
@@ -182,3 +182,5 @@ export default function ModeratedChannels() {
     </div>
   )
 }
+
+export default ModeratedChannels

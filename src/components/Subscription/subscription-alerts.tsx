@@ -17,13 +17,13 @@ interface SubscriptionAlertsProps {
   giftSubInfo?: GiftSubInfo
 }
 
-export const SubscriptionAlerts = function SubscriptionAlerts({
+export const SubscriptionAlerts = ({
   giftInfo,
   statusInfo,
   handlePortalAccess,
   isLoading: _isLoading,
   hideManageButton = false,
-}: SubscriptionAlertsProps) {
+}: SubscriptionAlertsProps) => {
   const {
     subscription,
     isLifetimePlan,

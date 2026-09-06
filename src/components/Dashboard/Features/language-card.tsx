@@ -15,8 +15,11 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   code: string
 }
 
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ code: _code, translation, label, ...others }: ItemProps, ref) => (
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>(function (
+  { code: _code, translation, label, ...others }: ItemProps,
+  ref,
+) {
+  return (
     <div
       ref={ref}
       className='flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-2'
@@ -43,12 +46,12 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
         </div>
       )}
     </div>
-  ),
-)
+  )
+})
 
 SelectItem.displayName = 'SelectItem'
 
-export default function LanguageCard() {
+const LanguageCard = () => {
   const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()
 
   const languageId = localeOption?.locale ?? 'en-US'
@@ -208,3 +211,5 @@ export default function LanguageCard() {
     </Card>
   )
 }
+
+export default LanguageCard

@@ -72,13 +72,13 @@ interface CollectionSummary {
 // The discovery hook on the main page: a held hand of the streamer's rarest hero cards
 // that spreads on hover. One link into the collection (no nested anchors), so the cards
 // stay purely presentational here.
-const FannedHand = function FannedHand({
+const FannedHand = ({
   username,
   collection,
 }: {
   username: string
   collection: CollectionSummary
-}) {
+}) => {
   const cards = collection.cards.slice(0, 5)
   const mid = (cards.length - 1) / 2
   return (
@@ -143,13 +143,7 @@ const FannedHand = function FannedHand({
 // The zero-state counterpart to FannedHand: faint ghost slots, an explicit "0 heroes
 // collected", and a line on how the binder fills up. Keeps the feature discoverable for
 // streamers who have not collected anything yet, and links into the (empty) collection.
-const CollectionTeaser = function CollectionTeaser({
-  username,
-  name,
-}: {
-  username: string
-  name: string
-}) {
+const CollectionTeaser = ({ username, name }: { username: string; name: string }) => {
   return (
     <Link
       href={getProfileRoute(username, '/set')}

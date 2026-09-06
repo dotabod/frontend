@@ -20,7 +20,7 @@ const isMaintenanceMode = process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'tr
 
 let socket: Socket | null = null
 
-const WidgetPage = function WidgetPage() {
+const WidgetPage = () => {
   const { mutate } = useUpdateSetting(Settings.commandWL)
   const router = useRouter()
   const { userId } = router.query

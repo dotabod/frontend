@@ -4,13 +4,13 @@ import Link from 'next/link'
 import { formatSlot, hexA, initials, marketUrl, rarityOf } from './cosmetics'
 import type { CosmeticItem } from './cosmetics'
 
-export const ItemTile = function ItemTile({
+export const ItemTile = ({
   item,
   featured = false,
 }: {
   item: CosmeticItem
   featured?: boolean
-}) {
+}) => {
   const href = marketUrl(item)
   const r = rarityOf(item)
   const accent = r?.color

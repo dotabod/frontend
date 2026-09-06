@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-export const ChevronUpIcon = function ChevronUpIcon(props: SVGProps<SVGSVGElement>) {
+export const ChevronUpIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg viewBox='0 0 24 24' fill='none' aria-hidden='true' {...props}>
       <path d='M17 14l-5-5-5 5' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round' />

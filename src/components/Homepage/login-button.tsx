@@ -13,7 +13,7 @@ interface LoginButtonProps extends ComponentProps<typeof Button> {
   className?: string
 }
 
-export const LoginButton = function LoginButton({ className, ...props }: LoginButtonProps) {
+export const LoginButton = ({ className, ...props }: LoginButtonProps) => {
   const searchParams = useSearchParams()
   const user = useSession()?.data?.user
   const [loading, setLoading] = useState(false)

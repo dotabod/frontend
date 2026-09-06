@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import { useInView, useMotionValue, useSpring } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 
-export default function NumberTicker({
+const NumberTicker = ({
   value,
   direction = 'up',
   delay = 0,
@@ -15,7 +15,7 @@ export default function NumberTicker({
   className?: string
   // Delay in s
   delay?: number
-}) {
+}) => {
   const ref = useRef<HTMLSpanElement>(null)
   const motionValue = useMotionValue(direction === 'down' ? value : 0)
   const springValue = useSpring(motionValue, {
@@ -44,3 +44,5 @@ export default function NumberTicker({
 
   return <span className={clsx('inline-block tracking-wider tabular-nums', className)} ref={ref} />
 }
+
+export default NumberTicker

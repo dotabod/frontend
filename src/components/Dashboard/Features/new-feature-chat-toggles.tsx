@@ -12,7 +12,7 @@ import { TierSwitch } from './tier-switch'
 // the What's New card (see entryToggleChecked), so a plain TierSwitch would mis-render the
 // tri-state `null` default as "off". This gives the toggles a permanent home on the Chat
 // features page; they previously lived ONLY in What's New, where streamers couldn't find them.
-const MasterFollowingToggle = function MasterFollowingToggle({
+const MasterFollowingToggle = ({
   settingKey,
   label,
   description,
@@ -20,7 +20,7 @@ const MasterFollowingToggle = function MasterFollowingToggle({
   settingKey: typeof Settings.cosmeticsAnnounce | typeof Settings.smokeActivated
   label: string
   description: ReactNode
-}) {
+}) => {
   const { data: master } = useUpdateSetting(Settings.autoOptInNewFeatures)
   const { data: value, updateSetting } = useUpdateSetting<boolean | null>(settingKey)
 
@@ -39,7 +39,7 @@ const MasterFollowingToggle = function MasterFollowingToggle({
   )
 }
 
-export default function NewFeatureChatToggles() {
+const NewFeatureChatToggles = () => {
   return (
     <Card title='New chat features'>
       <div className='ml-4 flex flex-col space-y-4'>
@@ -66,3 +66,5 @@ export default function NewFeatureChatToggles() {
     </Card>
   )
 }
+
+export default NewFeatureChatToggles

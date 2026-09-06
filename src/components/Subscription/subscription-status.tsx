@@ -10,7 +10,7 @@ interface CreditBalance {
   formattedAmount: string
 }
 
-const SubscriptionStatusComponent = function SubscriptionStatusComponent() {
+const SubscriptionStatusComponent = () => {
   const {
     subscription: rawSubscription,
     inGracePeriod,

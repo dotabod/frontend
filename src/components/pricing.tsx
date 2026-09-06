@@ -2,7 +2,7 @@ import { Container } from '@/components/container'
 
 import { BillingPlans } from './Billing/billing-plans'
 
-export const Pricing = function Pricing() {
+export const Pricing = () => {
   return (
     <section
       id='pricing'

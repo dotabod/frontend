@@ -15,11 +15,7 @@ const getWindowLabel = function getWindowLabel(
   return `Last ${statsDays} ${statsDays === 1 ? 'day' : 'days'}`
 }
 
-export const ProfileWinLossCounter = function ProfileWinLossCounter({
-  twitchId,
-}: {
-  twitchId?: string | null
-}) {
+export const ProfileWinLossCounter = ({ twitchId }: { twitchId?: string | null }) => {
   const { connected, error, loading, wl } = useWinLoss({ twitchId })
 
   if (!twitchId || error) {

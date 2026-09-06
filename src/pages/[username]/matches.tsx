@@ -87,7 +87,7 @@ const matchHistoryHref = function matchHistoryHref(
   return `/${username}/matches${query ? `?${query}` : ''}`
 }
 
-const WinRateBar = function WinRateBar({ value }: { value: number }) {
+const WinRateBar = ({ value }: { value: number }) => {
   return (
     <div className='flex items-center justify-end gap-3 sm:justify-start'>
       <div className='h-1.5 w-16 overflow-hidden rounded-full bg-gray-700 sm:w-20' aria-hidden>
@@ -98,7 +98,7 @@ const WinRateBar = function WinRateBar({ value }: { value: number }) {
   )
 }
 
-const HeroWinRatesTable = function HeroWinRatesTable({ heroes }: { heroes: HeroPerformance[] }) {
+const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => {
   return (
     <section aria-labelledby='hero-win-rates-heading'>
       <div className='mb-4 flex items-end justify-between gap-4'>
@@ -183,7 +183,7 @@ const HeroWinRatesTable = function HeroWinRatesTable({ heroes }: { heroes: HeroP
   )
 }
 
-const MatchList = function MatchList({ matches }: { matches: MatchHistoryRow[] }) {
+const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
   const orderedMatches = [...matches].sort(
     (first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt),
   )
@@ -292,7 +292,7 @@ const MatchList = function MatchList({ matches }: { matches: MatchHistoryRow[] }
   )
 }
 
-const MatchSummary = function MatchSummary({ summary }: Pick<MatchHistoryPageProps, 'summary'>) {
+const MatchSummary = ({ summary }: Pick<MatchHistoryPageProps, 'summary'>) => {
   return (
     <section aria-label='Match record' className='min-w-0'>
       <p className='text-xs font-medium tracking-[0.14em] text-gray-400 uppercase'>Record</p>

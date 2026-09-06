@@ -7,7 +7,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from '../Dashboard/Features/tier-switch'
 
-export default function WinProbabilityOverlay() {
+const WinProbabilityOverlay = () => {
   const { data: showWinProb } = useUpdateSetting(Settings.winProbabilityOverlay)
 
   return (
@@ -32,3 +32,5 @@ export default function WinProbabilityOverlay() {
     </Card>
   )
 }
+
+export default WinProbabilityOverlay

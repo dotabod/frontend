@@ -10,7 +10,7 @@ import { Card } from '@/ui/card'
 import { TierInput } from './tier-input'
 import { TierSwitch } from './tier-switch'
 
-export default function QueueCard() {
+const QueueCard = () => {
   const { data: isEnabled, loading } = useUpdateSetting(Settings.queueBlocker)
   const { data: isFindingMatchEnabled } = useUpdateSetting(Settings.queueBlockerFindMatch)
   const { data: findMatchText, updateSetting: updateFindMatchText } = useUpdateSetting(
@@ -118,3 +118,5 @@ export default function QueueCard() {
     </Card>
   )
 }
+
+export default QueueCard

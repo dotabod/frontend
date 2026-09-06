@@ -11,7 +11,7 @@ import LastFmCard from './lastfm/last-fm-card'
 
 const { Paragraph } = Typography
 
-export default function LastFmOverlay() {
+const LastFmOverlay = () => {
   const { data: username, updateSetting } = useUpdateSetting<string>(Settings.lastFmUsername)
   const [inputValue, setInputValue] = useState('')
   const initializedRef = useRef(false)
@@ -148,3 +148,5 @@ export default function LastFmOverlay() {
     </Card>
   )
 }
+
+export default LastFmOverlay

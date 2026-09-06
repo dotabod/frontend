@@ -7,7 +7,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from './tier-switch'
 
-export default function NotablePlayersCard() {
+const NotablePlayersCard = () => {
   const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
 
   return (
@@ -70,3 +70,5 @@ export default function NotablePlayersCard() {
     </Card>
   )
 }
+
+export default NotablePlayersCard

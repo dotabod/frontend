@@ -112,7 +112,7 @@ const TwitchUser = ({
   )
 }
 
-export const Hero = function Hero() {
+export const Hero = () => {
   const session = useSession()
   // Get users from api/featured-users
   const { data: users, isLoading } = useSWR<{

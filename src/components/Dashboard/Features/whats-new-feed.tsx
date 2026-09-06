@@ -26,7 +26,7 @@ const entriesForFilter = function entriesForFilter(entries: WhatsNewEntry[], fil
   return categories ? entries.filter((entry) => categories.includes(entry.category)) : entries
 }
 
-export default function WhatsNewFeed({
+const WhatsNewFeed = ({
   entries,
   master,
   readOnly,
@@ -34,7 +34,7 @@ export default function WhatsNewFeed({
   entries: WhatsNewEntry[]
   master?: boolean
   readOnly?: boolean
-}) {
+}) => {
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('all')
   const visibleFilters = useMemo(
     () =>
@@ -134,3 +134,5 @@ export default function WhatsNewFeed({
     </div>
   )
 }
+
+export default WhatsNewFeed

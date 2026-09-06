@@ -7,7 +7,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from './tier-switch'
 
-export default function PicksCard() {
+const PicksCard = () => {
   const { data: isEnabled } = useUpdateSetting(Settings['picks-blocker'])
 
   return (
@@ -59,3 +59,5 @@ export default function PicksCard() {
     </Card>
   )
 }
+
+export default PicksCard

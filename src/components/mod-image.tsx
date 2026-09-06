@@ -5,7 +5,7 @@ interface ModImageProps {
   className?: string
 }
 
-export default function ModImage({ className = '' }: ModImageProps) {
+const ModImage = ({ className = '' }: ModImageProps) => {
   return (
     <Image
       height={18}
@@ -16,3 +16,5 @@ export default function ModImage({ className = '' }: ModImageProps) {
     />
   )
 }
+
+export default ModImage

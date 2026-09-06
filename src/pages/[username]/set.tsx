@@ -30,7 +30,7 @@ interface SetPageProps {
   tally: { rarity: string; count: number }[]
 }
 
-const CompletionMeter = function CompletionMeter({
+const CompletionMeter = ({
   collected,
   roster,
   accent,
@@ -38,7 +38,7 @@ const CompletionMeter = function CompletionMeter({
   collected: number
   roster: number
   accent: string
-}) {
+}) => {
   const pct = roster > 0 ? Math.min(100, Math.round((collected / roster) * 100)) : 0
   return (
     <div className='max-w-md'>
@@ -63,7 +63,7 @@ const CompletionMeter = function CompletionMeter({
 
 // Faint placeholders for heroes not yet played: empty slots in the binder, there to
 // be filled. Kept to a teaser count so a sparse collection still feels aspirational.
-const GhostSlot = function GhostSlot() {
+const GhostSlot = () => {
   return (
     <div className='flex aspect-[5/7] items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40'>
       <Sparkles size={20} className='text-gray-700' aria-hidden />
@@ -71,7 +71,7 @@ const GhostSlot = function GhostSlot() {
   )
 }
 
-const EmptyBinder = function EmptyBinder({ displayName }: { displayName: string }) {
+const EmptyBinder = ({ displayName }: { displayName: string }) => {
   return (
     <div className='py-6 sm:py-12'>
       <div className='mx-auto max-w-xl text-center'>

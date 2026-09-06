@@ -12,13 +12,16 @@ export default class MyDocument extends Document {
 
     ctx.renderPage = () =>
       originalRenderPage({
-        enhanceApp: (App) => (props) => (
-          <StyleProvider cache={cache} hashPriority='high'>
-            <ConfigProvider theme={themeConfig}>
-              <App {...props} />
-            </ConfigProvider>
-          </StyleProvider>
-        ),
+        enhanceApp: (App) =>
+          function (props) {
+            return (
+              <StyleProvider cache={cache} hashPriority='high'>
+                <ConfigProvider theme={themeConfig}>
+                  <App {...props} />
+                </ConfigProvider>
+              </StyleProvider>
+            )
+          },
       })
 
     const initialProps = await Document.getInitialProps(ctx)

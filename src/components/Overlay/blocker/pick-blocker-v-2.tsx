@@ -85,7 +85,7 @@ export const PickScreenV2 = () => {
   )
 }
 
-export const OverlayV2 = function OverlayV2({ children }: { children: React.ReactNode }) {
+export const OverlayV2 = ({ children }: { children: React.ReactNode }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const { uiRescale, resizeHandler } = useDynamicResizing(contentRef)
 

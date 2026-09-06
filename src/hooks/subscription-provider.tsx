@@ -19,11 +19,7 @@ interface SettingsSubscriptionResponse {
 
 export const SubscriptionContext = createContext<SubscriptionContextType | null>(null)
 
-export const SubscriptionProviderMain = function SubscriptionProviderMain({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const SubscriptionProviderMain = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
   const queryUserId = router.query.userId
   const userId = Array.isArray(queryUserId) ? queryUserId[0] : queryUserId

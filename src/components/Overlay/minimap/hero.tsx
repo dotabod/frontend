@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { selectHeroUnits, selectMainHero, selectSettings } from '@/lib/redux/store'
 import type { MinimapUnitProps } from '@/lib/redux/store'
 
-const Hero = function Hero({ data, team }: MinimapUnitProps) {
+const Hero = ({ data, team }: MinimapUnitProps) => {
   const heroUnits = useSelector(selectHeroUnits)
   // Default, custom, or icon
   const rawDisplayType = useSelector(selectSettings)?.hero_display

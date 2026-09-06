@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-export const Logomark = function Logomark(props: SVGProps<SVGSVGElement>) {
+export const Logomark = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       viewBox='37.4 13.88 425.53 461.48'
@@ -33,7 +33,7 @@ export const Logomark = function Logomark(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-export const Logo = function Logo(props: SVGProps<SVGSVGElement>) {
+export const Logo = (props: SVGProps<SVGSVGElement>) => {
   return (
     <div className='flex h-full items-center space-x-2'>
       <svg viewBox='0 0 45 40' aria-hidden='true' {...props}>
@@ -44,7 +44,7 @@ export const Logo = function Logo(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-export const DarkLogo = function DarkLogo(props: SVGProps<SVGSVGElement>) {
+export const DarkLogo = (props: SVGProps<SVGSVGElement>) => {
   return (
     <div className='flex h-full items-center space-x-2'>
       <svg viewBox='0 0 45 40' aria-hidden='true' {...props}>

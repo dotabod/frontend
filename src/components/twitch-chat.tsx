@@ -2,7 +2,7 @@ import clsx from 'clsx'
 
 import ModImage from './mod-image'
 
-export default function TwitchChat({
+const TwitchChat = ({
   command = '',
   className = '',
   modOnly = false,
@@ -14,7 +14,7 @@ export default function TwitchChat({
   modOnly?: boolean
   responses?: React.ReactNode[]
   response?: React.ReactNode
-}) {
+}) => {
   if (response) {
     responses.push(response)
   }
@@ -43,3 +43,5 @@ export default function TwitchChat({
     </div>
   )
 }
+
+export default TwitchChat

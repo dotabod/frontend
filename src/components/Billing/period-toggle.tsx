@@ -14,7 +14,7 @@ interface PeriodToggleProps {
 // Ease-out-quint
 const EASE = [0.22, 1, 0.36, 1] as const
 
-export const PeriodToggle = function PeriodToggle({ activePeriod, onChange }: PeriodToggleProps) {
+export const PeriodToggle = ({ activePeriod, onChange }: PeriodToggleProps) => {
   const periods: PricePeriod[] = ['monthly', 'annual', 'lifetime']
   const reduce = useReducedMotion()
   const groupId = useId()

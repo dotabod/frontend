@@ -10,7 +10,7 @@ import { Card } from '@/ui/card'
 import { TierInput } from './tier-input'
 import { TierSwitch } from './tier-switch'
 
-export default function SceneSwitcher(): React.ReactNode {
+const SceneSwitcher = (): React.ReactNode => {
   const { data: isEnabled, loading: l0 } = useUpdateSetting(Settings['obs-scene-switcher'])
   const {
     data: obsDc,
@@ -129,3 +129,5 @@ export default function SceneSwitcher(): React.ReactNode {
     </Card>
   )
 }
+
+export default SceneSwitcher

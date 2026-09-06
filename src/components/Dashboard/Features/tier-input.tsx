@@ -16,7 +16,7 @@ interface TierInputProps extends Omit<InputProps, 'onChange'> {
   hideTierBadge?: boolean
 }
 
-export const TierInput = function TierInput({
+export const TierInput = ({
   settingKey,
   label,
   hideTierBadge,
@@ -26,7 +26,7 @@ export const TierInput = function TierInput({
   onChange: externalOnChange,
   helpText,
   ...inputProps
-}: TierInputProps) {
+}: TierInputProps) => {
   const { data: rawValue, updateSetting, tierAccess } = useUpdateSetting<string>(settingKey)
 
   const isDisabled = externalDisabled || !tierAccess.hasAccess

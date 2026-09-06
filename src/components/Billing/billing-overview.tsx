@@ -26,10 +26,7 @@ interface BillingOverviewProps {
   onOpenPortal: () => Promise<void>
 }
 
-export const BillingOverview = function BillingOverview({
-  isLoading,
-  onOpenPortal,
-}: BillingOverviewProps) {
+export const BillingOverview = ({ isLoading, onOpenPortal }: BillingOverviewProps) => {
   const {
     subscription,
     inGracePeriod,

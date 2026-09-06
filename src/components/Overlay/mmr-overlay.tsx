@@ -8,7 +8,7 @@ import { Card } from '@/ui/card'
 
 import { TierSwitch } from '../Dashboard/Features/tier-switch'
 
-export default function MmrOverlay() {
+const MmrOverlay = () => {
   const { data: showRankMmr } = useUpdateSetting(Settings.showRankMmr)
   const { data: showRankImage } = useUpdateSetting(Settings.showRankImage)
   const { data: showRankLeader } = useUpdateSetting(Settings.showRankLeader)
@@ -62,3 +62,5 @@ export default function MmrOverlay() {
     </Card>
   )
 }
+
+export default MmrOverlay

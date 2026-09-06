@@ -59,13 +59,13 @@ const bodyAnimation = {
   },
 }
 
-const BlockScreen = function BlockScreen({
+const BlockScreen = ({
   custom,
   animated = false,
 }: {
   custom?: ScreenAnimationCustom
   animated?: boolean
-}) {
+}) => {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
@@ -99,13 +99,13 @@ const BlockScreen = function BlockScreen({
   )
 }
 
-const BetsScreen = function BetsScreen({
+const BetsScreen = ({
   custom,
   animated = false,
 }: {
   custom?: ScreenAnimationCustom
   animated?: boolean
-}) {
+}) => {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
@@ -133,13 +133,13 @@ const BetsScreen = function BetsScreen({
   )
 }
 
-const OBSScreen = function OBSScreen({
+const OBSScreen = ({
   custom,
   animated = false,
 }: {
   custom?: ScreenAnimationCustom
   animated?: boolean
-}) {
+}) => {
   return (
     <AppScreen className='w-full'>
       <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
@@ -235,7 +235,7 @@ const usePrevious = function usePrevious(value: number) {
   return ref.current
 }
 
-const FeaturesDesktop = function FeaturesDesktop() {
+const FeaturesDesktop = () => {
   const [changeCount, setChangeCount] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const prevIndex = usePrevious(selectedIndex)
@@ -309,7 +309,7 @@ const FeaturesDesktop = function FeaturesDesktop() {
   )
 }
 
-const FeaturesMobile = function FeaturesMobile() {
+const FeaturesMobile = () => {
   const [activeIndex, setActiveIndex] = useState(0)
   const slideContainerRef = useRef<HTMLDivElement>(null)
   const slideRefs = useRef<HTMLDivElement[]>([])
@@ -401,7 +401,7 @@ const FeaturesMobile = function FeaturesMobile() {
   )
 }
 
-export const PrimaryFeatures = function PrimaryFeatures() {
+export const PrimaryFeatures = () => {
   return (
     <section
       id='features'

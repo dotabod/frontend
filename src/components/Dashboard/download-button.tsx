@@ -1,6 +1,6 @@
 import { Button } from 'antd'
 
-const JustButton = function JustButton({
+const JustButton = ({
   url,
   data,
   user,
@@ -12,7 +12,7 @@ const JustButton = function JustButton({
   user: { name: string }
   extension?: string
   onClick?: () => void
-}) {
+}) => {
   return (
     <div>
       <a
@@ -34,7 +34,7 @@ const JustButton = function JustButton({
   )
 }
 
-const DownloadButton = function DownloadButton({
+const DownloadButton = ({
   url,
   data,
   user,
@@ -42,7 +42,7 @@ const DownloadButton = function DownloadButton({
   url: string
   data?: { beta_tester?: boolean }
   user: { name: string }
-}) {
+}) => {
   return <JustButton url={url} data={data} user={user} />
 }
 export default DownloadButton

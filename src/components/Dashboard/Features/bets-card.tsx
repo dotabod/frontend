@@ -10,7 +10,7 @@ import { Card } from '@/ui/card'
 import { Input } from '../../input'
 import { TierSwitch } from './tier-switch'
 
-export default function BetsCard() {
+const BetsCard = () => {
   const { data: isEnabled } = useUpdateSetting(Settings.bets)
   const {
     data: info,
@@ -126,3 +126,5 @@ export default function BetsCard() {
     </Card>
   )
 }
+
+export default BetsCard

@@ -9,7 +9,7 @@ import { Card } from '@/ui/card'
 
 import WindowsInstaller from './windows-installer'
 
-const InstallPage = function InstallPage() {
+const InstallPage = () => {
   const track = useTrack()
   const [activeKey, setActiveKey] = useState('windows')
   const [autoRoutedToManual, setAutoRoutedToManual] = useState(false)

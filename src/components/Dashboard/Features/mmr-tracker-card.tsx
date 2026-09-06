@@ -7,7 +7,7 @@ import { Card } from '@/ui/card'
 import MmrForm from './mmr-form'
 import { TierSwitch } from './tier-switch'
 
-export default function MmrTrackerCard() {
+const MmrTrackerCard = () => {
   return (
     <Card title='MMR tracker'>
       <div className='subtitle'>
@@ -40,3 +40,5 @@ export default function MmrTrackerCard() {
     </Card>
   )
 }
+
+export default MmrTrackerCard

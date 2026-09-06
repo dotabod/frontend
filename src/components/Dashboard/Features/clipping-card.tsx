@@ -31,25 +31,7 @@ const LOOKUP_COMMANDS = [
   '!profile',
 ]
 
-/**
- * ClippingCard component controls the vision fallback that gives Dotabod match
- * rosters once Valve's live API stops returning them (8500+ MMR / Immortal).
- *
- * Backend Integration:
- * The backend should check the `disableAutoClipping` setting from the user's settings
- * in addition to the existing is8500Plus check:
- *
- * ```typescript
- * // Check if user has disabled clipping in their settings
- * const clippingDisabled = dotaClient.client.settings?.disableAutoClipping || false;
- *
- * // Only create a clip if the user is >= 8500 MMR AND has not disabled clipping
- * if (!is8500Plus(dotaClient.client) || clippingDisabled) {
- *   return
- * }
- * ```
- */
-export default function ClippingCard(): React.ReactNode {
+const ClippingCard = (): React.ReactNode => {
   const { data: isDisabled, updateSetting } = useUpdateSetting(Settings.disableAutoClipping)
 
   return (
@@ -153,3 +135,5 @@ export default function ClippingCard(): React.ReactNode {
     </Card>
   )
 }
+
+export default ClippingCard

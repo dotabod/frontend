@@ -102,7 +102,7 @@ export const plans = [
   },
 ]
 
-export const BillingPlans = function BillingPlans({ showTitle = true }: BillingPlansProps) {
+export const BillingPlans = ({ showTitle = true }: BillingPlansProps) => {
   const [activePeriod, setActivePeriod] = useState<PricePeriod>('monthly')
   const { data: session } = useSession()
   const { subscription, inGracePeriod, hasActivePlan } = useSubscriptionContext()

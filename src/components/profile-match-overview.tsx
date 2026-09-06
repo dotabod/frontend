@@ -24,7 +24,7 @@ const profileMatchesLink = (username: string, view?: 'heroes'): string => {
   return `${url.pathname}${url.search}`
 }
 
-const SectionLink = function SectionLink({ href, label }: { href: string; label: string }) {
+const SectionLink = ({ href, label }: { href: string; label: string }) => {
   return (
     <Link
       href={href}
@@ -37,13 +37,7 @@ const SectionLink = function SectionLink({ href, label }: { href: string; label:
   )
 }
 
-const HeroOverview = function HeroOverview({
-  heroes,
-  username,
-}: {
-  heroes: HeroPerformance[]
-  username: string
-}) {
+const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; username: string }) => {
   const visibleHeroes = heroes.slice(0, OVERVIEW_ROW_LIMIT)
 
   return (
@@ -144,13 +138,7 @@ const HeroOverview = function HeroOverview({
   )
 }
 
-const MatchOverview = function MatchOverview({
-  matches,
-  username,
-}: {
-  matches: MatchHistoryRow[]
-  username: string
-}) {
+const MatchOverview = ({ matches, username }: { matches: MatchHistoryRow[]; username: string }) => {
   const visibleMatches = [...matches]
     .sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt))
     .slice(0, OVERVIEW_ROW_LIMIT)
@@ -280,7 +268,7 @@ const MatchOverview = function MatchOverview({
   )
 }
 
-export const ProfileMatchOverview = function ProfileMatchOverview({
+export const ProfileMatchOverview = ({
   heroPerformance,
   recentMatches,
   username,
@@ -288,7 +276,7 @@ export const ProfileMatchOverview = function ProfileMatchOverview({
   heroPerformance: HeroPerformance[]
   recentMatches: MatchHistoryRow[]
   username: string
-}) {
+}) => {
   return (
     <div data-testid='profile-match-overview' className='mb-12 space-y-10 font-sans'>
       <HeroOverview heroes={heroPerformance} username={username} />

@@ -3,7 +3,7 @@ import clsx from 'clsx'
 
 import { Card } from '@/ui/card'
 
-export default function IdeaCard() {
+const IdeaCard = () => {
   return (
     <Card className='hover:border-indigo-800'>
       <div className='title'>
@@ -33,3 +33,5 @@ export default function IdeaCard() {
     </Card>
   )
 }
+
+export default IdeaCard

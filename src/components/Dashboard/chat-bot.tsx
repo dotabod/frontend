@@ -107,7 +107,7 @@ const EmoteList: React.FC<{
   />
 )
 
-export default function ChatBot() {
+const ChatBot = () => {
   const { data: accountData } = useUpdateAccount()
   const session = useSession()
   const [emotes, setEmotes] = useState<Emote[]>([])
@@ -582,3 +582,5 @@ export default function ChatBot() {
     </Card>
   )
 }
+
+export default ChatBot

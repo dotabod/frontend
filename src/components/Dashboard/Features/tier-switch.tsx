@@ -17,7 +17,7 @@ interface TierSwitchProps {
   hideTierBadge?: boolean
 }
 
-export const TierSwitch = function TierSwitch({
+export const TierSwitch = ({
   settingKey,
   label,
   className,
@@ -25,7 +25,7 @@ export const TierSwitch = function TierSwitch({
   checked: externalChecked,
   onChange: externalOnChange,
   hideTierBadge,
-}: TierSwitchProps) {
+}: TierSwitchProps) => {
   const labelId = useId()
   const { data: enabled, updateSetting, tierAccess, isSaving } = useUpdateSetting(settingKey)
 

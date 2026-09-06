@@ -19,7 +19,7 @@ const getChallengeEndDate = function getChallengeEndDate(
   return endDate.toISOString().slice(0, 10)
 }
 
-export default function WinLossOverlay() {
+const WinLossOverlay = () => {
   const userId = useSession().data?.user?.id
   const {
     data: statsDays,
@@ -277,3 +277,5 @@ export default function WinLossOverlay() {
     </Card>
   )
 }
+
+export default WinLossOverlay
