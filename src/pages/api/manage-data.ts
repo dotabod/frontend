@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
+
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
@@ -49,11 +50,13 @@ function serializeData(data: unknown): JsonValue {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
+    return
   }
 
   if (session.user.isImpersonating) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
+    return
   }
 
   try {
@@ -78,10 +81,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Transform BigInt values before sending response
       const serializedData = serializeData(userData)
 
-      return res.status(200).json({
+      res.status(200).json({
         data: serializedData,
         message: 'Data exported successfully',
       })
+      return
     }
 
     if (action === 'delete') {
@@ -111,12 +115,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { id: session.user.id },
       })
 
-      return res.status(200).json({
+      res.status(200).json({
         message: 'Account deleted successfully',
       })
+      return
     }
   } catch (error) {
     console.error('Error managing data:', error)
-    return res.status(500).json({ error: 'Failed to process request' })
+    res.status(500).json({ error: 'Failed to process request' })
+    return
   }
 }

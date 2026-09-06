@@ -1,7 +1,7 @@
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 
-export interface AnnouncementBannerContent {
+interface AnnouncementBannerContent {
   href: string
   label: string
   prefix: string
@@ -44,7 +44,7 @@ export default function AnnouncementBanner({ announcement, onDismiss }: Announce
         {announcement.prefix}: {announcement.title}.{' '}
         <Link
           href={announcement.href}
-          className='whitespace-nowrap font-semibold text-teal-300 hover:text-teal-200'
+          className='font-semibold whitespace-nowrap text-teal-300 hover:text-teal-200'
         >
           {announcement.label}&nbsp;<span aria-hidden='true'>&rarr;</span>
         </Link>

@@ -1,8 +1,10 @@
 import { clsx } from 'clsx'
 import type { Dispatch, SetStateAction } from 'react'
+
 import { AnimatedAegis } from '@/components/Overlay/aegis/AnimatedAegis'
 import { InGameOutsideCenterV2, InGameV2 } from '@/components/Overlay/blocker/InGameV2'
-import { type NotablePlayer, NotablePlayers } from '@/components/Overlay/NotablePlayers'
+import { NotablePlayers } from '@/components/Overlay/NotablePlayers'
+import type { NotablePlayer } from '@/components/Overlay/NotablePlayers'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
 import { AnimateRosh } from '@/components/Overlay/rosh/AnimateRosh'
 import { SpectatorText } from '@/components/Overlay/SpectatorText'
@@ -15,6 +17,7 @@ import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
 import type { RankImageDetails, wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+
 import { MinimapBlocker } from './blocker/MinimapBlocker'
 
 interface InGameOverlaysProps {

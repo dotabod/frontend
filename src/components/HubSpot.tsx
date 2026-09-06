@@ -1,6 +1,6 @@
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import Script from 'next/script'
-import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
 
 const HubSpot = () => {

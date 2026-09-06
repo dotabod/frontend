@@ -1,8 +1,9 @@
 import { message } from 'antd'
-import Head from 'next/head'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
+
 import { BillingOverview } from '@/components/Billing/BillingOverview'
 import { BillingPlans } from '@/components/Billing/BillingPlans'
 import { PaymentStatusAlert } from '@/components/Billing/PaymentStatusAlert'

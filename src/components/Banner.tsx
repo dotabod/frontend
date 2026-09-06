@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import AnnouncementBanner from '@/components/AnnouncementBanner'
 import { fetcher } from '@/lib/fetcher'
 import { whatsNewSorted } from '@/lib/whatsNew'

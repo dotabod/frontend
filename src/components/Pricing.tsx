@@ -1,4 +1,5 @@
 import { Container } from '@/components/Container'
+
 import { BillingPlans } from './Billing/BillingPlans'
 
 export function Pricing() {

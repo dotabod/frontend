@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
+
 import { getDotaFindingMatchLabel } from '@/lib/dotaFindingMatchLabel'
 
-describe('getDotaFindingMatchLabel', () => {
+describe(getDotaFindingMatchLabel, () => {
   it.each([
     ['en', 'Finding Match'],
     ['de-DE', 'Partie wird gesucht'],

@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import MatchHistoryPage, { getServerSideProps } from '@/pages/[username]/matches'
 
 const prismaMocks = vi.hoisted(() => ({
@@ -125,7 +126,9 @@ describe('public match history page', () => {
         nextCursor: expect.any(String),
       },
     })
-    if (!('props' in result)) throw new Error('Expected match-history props')
+    if (!('props' in result)) {
+      throw new Error('Expected match-history props')
+    }
     expect((await result.props).matches).toHaveLength(20)
   })
 
@@ -285,7 +288,7 @@ describe('public match history page', () => {
 
     expect(
       screen.getAllByRole('link', { name: /Open match/ }).map((link) => link.getAttribute('href')),
-    ).toEqual([
+    ).toStrictEqual([
       'https://www.opendota.com/matches/8964010930',
       'https://www.opendota.com/matches/8964010928',
     ])

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const ctorSpy = vi.fn()
 
@@ -12,7 +12,7 @@ vi.mock('stripe', () => ({
 }))
 
 async function load() {
-  return import('@/lib/stripe-server')
+  return await import('@/lib/stripe-server')
 }
 
 describe('lib/stripe-server', () => {
@@ -46,7 +46,7 @@ describe('lib/stripe-server', () => {
     expect(stripe.customers).toBeDefined()
     void stripe.customers
 
-    expect(ctorSpy).toHaveBeenCalledTimes(1)
+    expect(ctorSpy).toHaveBeenCalledOnce()
     expect(ctorSpy).toHaveBeenCalledWith('sk_test_123', {
       apiVersion: '2025-03-31.basil',
       typescript: true,

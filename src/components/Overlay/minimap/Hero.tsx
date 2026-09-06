@@ -1,10 +1,7 @@
 import { useSelector } from 'react-redux'
-import {
-  type MinimapUnitProps,
-  selectHeroUnits,
-  selectMainHero,
-  selectSettings,
-} from '@/lib/redux/store'
+
+import { selectHeroUnits, selectMainHero, selectSettings } from '@/lib/redux/store'
+import type { MinimapUnitProps } from '@/lib/redux/store'
 
 function Hero({ data, team }: MinimapUnitProps) {
   const heroUnits = useSelector(selectHeroUnits)

@@ -62,11 +62,17 @@ if (SENTRY_DSN) {
     // shape so genuine stack-overflow bugs in our own code still surface.
     beforeSend(event, hint) {
       const error = hint?.originalException
-      if (!(error instanceof RangeError)) return event
-      if (!/Maximum call stack size exceeded/i.test(error.message)) return event
+      if (!(error instanceof RangeError)) {
+        return event
+      }
+      if (!/Maximum call stack size exceeded/i.test(error.message)) {
+        return event
+      }
 
       const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? []
-      if (frames.length === 0) return event
+      if (frames.length === 0) {
+        return event
+      }
 
       const allExtensionFrames = frames.every(
         (f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,

@@ -1,5 +1,6 @@
 import { SubscriptionStatus } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import prisma from '@/lib/db'
 import { captureOrder, verifyWebhookSignature } from '@/lib/paypal'
 import {
@@ -37,7 +38,8 @@ interface PayPalWebhookEvent {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   try {
@@ -45,7 +47,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const valid = await verifyWebhookSignature(req.headers, rawBody)
     if (!valid) {
       console.error('PayPal webhook signature verification failed')
-      return res.status(400).json({ error: 'Invalid signature' })
+      res.status(400).json({ error: 'Invalid signature' })
+      return
     }
 
     const event = JSON.parse(rawBody) as PayPalWebhookEvent
@@ -100,9 +103,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    return res.status(200).json({ message: 'OK' })
+    res.status(200).json({ message: 'OK' })
+    return
   } catch (error) {
     console.error('PayPal webhook processing failed:', error)
-    return res.status(500).json({ error: 'Webhook processing failed' })
+    res.status(500).json({ error: 'Webhook processing failed' })
+    return
   }
 }

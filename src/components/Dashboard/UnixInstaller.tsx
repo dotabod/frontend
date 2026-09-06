@@ -1,9 +1,11 @@
 import { Typography } from 'antd'
-import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
+
 import { buildGsiConfig } from '@/lib/gsiConfig'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
+
 import DownloadButton from './DownloadButton'
 
 export default function UnixInstaller() {
@@ -18,7 +20,9 @@ export default function UnixInstaller() {
     const blob = new Blob([buildGsiConfig(user.id)], { type: 'text/plain' })
     const objectUrl = URL.createObjectURL(blob)
     setUrl(objectUrl)
-    return () => URL.revokeObjectURL(objectUrl)
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
   }, [user?.id])
 
   return (
@@ -77,7 +81,7 @@ export default function UnixInstaller() {
                 </video>
                 <div>
                   <div>Full path to save config file to:</div>
-                  <Typography.Text code className='whitespace-pre-wrap break-all'>
+                  <Typography.Text code className='break-all whitespace-pre-wrap'>
                     .../Steam/steamapps/common/dota 2 beta/game/dota/cfg/gamestate_integration/
                   </Typography.Text>
                 </div>

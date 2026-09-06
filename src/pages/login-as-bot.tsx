@@ -1,8 +1,10 @@
 import { Button, Typography } from 'antd'
+import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { signIn, useSession } from 'next-auth/react'
-import { type ReactElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { chatBotScopes } from '@/lib/authScopes'
@@ -26,7 +28,9 @@ const Login: NextPageWithLayout = () => {
       })
     }, 1000)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+    }
   }, [router])
 
   const handleSignIn = () => {

@@ -1,9 +1,11 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierBadge } from './TierBadge'
 import { TierSlider } from './TierSlider'
 import { TierSwitch } from './TierSwitch'
@@ -78,7 +80,7 @@ export default function MinimapCard(): React.ReactNode {
         Semi-transparent blocker that auto places itself over your minimap to deter people from
         farming your wards.
       </div>
-      <div className={clsx('pb-12 pt-4 transition-all')}>
+      <div className={clsx('pt-4 pb-12 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           {switches.map((props) => (
             <TierSwitch key={props.settingKey} {...props} />
@@ -114,7 +116,7 @@ export default function MinimapCard(): React.ReactNode {
             alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
-            src={`/images/overlay/minimap/741-${'Complex'}-${
+            src={`/images/overlay/minimap/741-Complex-${
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />
@@ -132,7 +134,7 @@ export default function MinimapCard(): React.ReactNode {
             alt='minimap blocker'
             width={minimapXl ? 280 : 240}
             height={minimapXl ? 280 : 240}
-            src={`/images/overlay/minimap/741-${'Simple'}-${
+            src={`/images/overlay/minimap/741-Simple-${
               minimapXl ? 'X' : ''
             }Large-AntiStreamSnipeMap.png`}
           />

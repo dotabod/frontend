@@ -74,7 +74,7 @@ const UserSelector = ({
         alt='User Profile'
         width={30}
         height={30}
-        className='rounded-full flex'
+        className='flex rounded-full'
         onError={(e) => {
           e.currentTarget.src = '/images/hero/default.png'
         }}

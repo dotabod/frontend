@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import useSWR from 'swr'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import Banner from '@/components/Banner'
 
 vi.mock('swr', () => ({
@@ -29,15 +30,15 @@ function mockPost(post: { slug: string; title: string; description: string; date
     isLoading: false,
     isValidating: false,
     mutate: vi.fn(),
-  } as unknown as ReturnType<typeof useSWR>)
+  })
 }
 
-describe('Banner', () => {
+describe(Banner, () => {
   const freshPost = {
+    date: '2025-10-02T12:00:00Z',
+    description: 'NOWPayments support',
     slug: 'crypto-payments-launch',
     title: 'Pay with crypto',
-    description: 'NOWPayments support',
-    date: '2025-10-02T12:00:00Z',
   }
 
   beforeEach(() => {

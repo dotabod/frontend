@@ -20,11 +20,13 @@ const outputDir = path.resolve(
 )
 
 await fs.mkdir(outputDir, { recursive: true })
-const axeSource = axeScriptPath ? await fs.readFile(axeScriptPath, 'utf8') : null
+const axeSource = axeScriptPath ? await fs.readFile(axeScriptPath, 'utf-8') : null
 
-const tabs = await fetch(`${cdpUrl}/json/list`).then((response) => response.json())
+const tabs = await fetch(`${cdpUrl}/json/list`).then(async (response) => response.json())
 const tab = tabs.find((candidate) => candidate.type === 'page')
-if (!tab) throw new Error(`No Chromium page target found at ${cdpUrl}`)
+if (!tab) {
+  throw new Error(`No Chromium page target found at ${cdpUrl}`)
+}
 
 const socket = new WebSocket(tab.webSocketDebuggerUrl)
 const pending = new Map()
@@ -38,19 +40,24 @@ await new Promise((resolve, reject) => {
 socket.addEventListener('message', (event) => {
   const message = JSON.parse(event.data)
   const request = pending.get(message.id)
-  if (!request) return
+  if (!request) {
+    return
+  }
   pending.delete(message.id)
-  if (message.error) request.reject(new Error(message.error.message))
-  else request.resolve(message.result)
+  if (message.error) {
+    request.reject(new Error(message.error.message))
+  } else {
+    request.resolve(message.result)
+  }
 })
 
-function send(method, params = {}) {
+async function send(method, params = {}) {
   commandId += 1
   socket.send(JSON.stringify({ id: commandId, method, params }))
   return new Promise((resolve, reject) => pending.set(commandId, { reject, resolve }))
 }
 
-const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
+const delay = async (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
 
 async function evaluate(expression, awaitPromise = false) {
   const result = await send('Runtime.evaluate', { awaitPromise, expression, returnByValue: true })
@@ -63,14 +70,18 @@ async function evaluate(expression, awaitPromise = false) {
 
 async function waitFor(expression, label) {
   for (let attempt = 0; attempt < 60; attempt += 1) {
-    if (await evaluate(expression)) return
+    if (await evaluate(expression)) {
+      return
+    }
     await delay(200)
   }
   throw new Error(`Timed out waiting for ${label}`)
 }
 
 function assert(condition, message, failures) {
-  if (!condition) failures.push(message)
+  if (!condition) {
+    failures.push(message)
+  }
 }
 
 async function pressTab() {
@@ -178,7 +189,9 @@ for (const viewport of viewports) {
         outlineWidth: styles.outlineWidth,
       }
     })()`)
-    if (keyboardFocus) break
+    if (keyboardFocus) {
+      break
+    }
   }
 
   let violations = []
@@ -263,7 +276,7 @@ for (const viewport of viewports) {
     failures,
   )
 
-  audits.push({ filtered, initial, keyboardFocus, violations, viewport: viewport.name })
+  audits.push({ filtered, initial, keyboardFocus, viewport: viewport.name, violations })
 }
 
 await fs.writeFile(

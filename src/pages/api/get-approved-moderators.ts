@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
@@ -9,21 +10,24 @@ async function getApprovedModerators(req: NextApiRequest, res: NextApiResponse) 
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Unauthorized' })
+    res.status(403).json({ message: 'Unauthorized' })
+    return
   }
 
   const subscription = await getSubscription(session.user.id)
   const tierAccess = canAccessFeature('managers', subscription)
 
   if (!tierAccess.hasAccess) {
-    return res.status(403).json({
+    res.status(403).json({
       error: true,
       message: 'This feature requires Pro subscription',
     })
+    return
   }
 
   try {

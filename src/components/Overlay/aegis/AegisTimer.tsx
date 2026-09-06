@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { zeroPad } from 'react-countdown'
+
 import type { TransformRes } from '@/lib/hooks/useTransformRes'
 
 interface AegisTimerProps {

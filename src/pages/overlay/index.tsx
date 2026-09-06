@@ -1,8 +1,9 @@
 import { Spin } from 'antd'
-import Head from 'next/head'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 
@@ -36,7 +37,9 @@ const OverlayPage = () => {
 
     window.addEventListener('resize', resizeListener)
 
-    return () => window.removeEventListener('resize', resizeListener)
+    return () => {
+      window.removeEventListener('resize', resizeListener)
+    }
   }, [])
 
   if (isMaintenanceMode) {
@@ -67,7 +70,9 @@ const OverlayPage = () => {
         >
           <iframe
             title='dotabod overlay'
-            onLoad={() => setIsLoading(false)}
+            onLoad={() => {
+              setIsLoading(false)
+            }}
             className='rounded-lg border border-gray-400'
             src={`/overlay/${data?.user?.id}`}
             style={{

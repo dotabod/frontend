@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
@@ -18,7 +19,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           access, collect, store, use, and/or share ("process") your personal information when you
           use our services ("Services"), including when you:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             Visit our website at{' '}
             <a href='https://dotabod.com' target='_blank' rel='noreferrer'>
@@ -60,7 +61,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
             <em> below to find the section you are looking for.</em>
           </strong>
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             <strong>What personal information do we process?</strong> When you visit, use, or
             navigate our Services, we may process personal information depending on how you interact
@@ -247,7 +248,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           .
         </p>
         <p>The information we collect includes:</p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             <em>Log and Usage Data.</em> Log and usage data is service-related, diagnostic, usage,
             and performance information our servers automatically collect when you access or use our
@@ -296,7 +297,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
             interact with our Services, including:
           </strong>
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             <strong>
               To facilitate account creation and authentication and otherwise manage user accounts.
@@ -376,7 +377,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           legal bases we rely on in order to process your personal information. As such, we may rely
           on the following legal bases to process your personal information:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             <strong>Consent.</strong> We may process your information if you have given us
             permission (i.e., consent) to use your personal information for a specific purpose. You
@@ -394,7 +395,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
             interests do not outweigh your interests and fundamental rights and freedoms. For
             example, we may process your personal information for some of the purposes described in
             order to:
-            <ul className='list-disc list-inside'>
+            <ul className='list-inside list-disc'>
               <li>
                 Analyze how our Services are used so we can improve them to engage and retain users
               </li>
@@ -433,7 +434,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           In some exceptional cases, we may be legally permitted under applicable law to process
           your information without your consent, including, for example:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             If collection is clearly in the interests of an individual and consent cannot be
             obtained in a timely way
@@ -480,7 +481,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           following third parties.
         </p>
         <p>We may need to share your personal information in the following situations:</p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             <strong>Business Transfers.</strong> We may share or transfer your information in
             connection with, or during negotiations of, any merger, sale of company assets,
@@ -726,7 +727,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           If you would at any time like to review or change the information in your account or
           terminate your account, you can:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>Log in to your account settings and update your user account.</li>
         </ul>
         <p>
@@ -892,7 +893,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           instances where you interact with us in person, online, or by phone or mail in the context
           of:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>Receiving help through our customer support channels;</li>
           <li>Participation in customer surveys or contests; and</li>
           <li>Facilitation in the delivery of our Services and to respond to your inquiries.</li>
@@ -901,7 +902,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           We will use and retain the collected personal information as needed to provide the
           Services or for:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>Category A - As long as the user has an account with us</li>
           <li>Category G - As long as the user has an account with us</li>
         </ul>
@@ -941,7 +942,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           absolute, and in certain cases, we may decline your request as permitted by law. These
           rights include:
         </p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             <strong>Right to know</strong> whether or not we are processing your personal data
           </li>
@@ -969,7 +970,7 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           </li>
         </ul>
         <p>Depending upon the state where you live, you may also have the following rights:</p>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             Right to access the categories of personal data being processed (as permitted by
             applicable law, including Minnesota's privacy law)

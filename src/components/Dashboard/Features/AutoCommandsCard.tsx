@@ -1,10 +1,12 @@
 import { Alert, Checkbox, Collapse, Spin, Tag } from 'antd'
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
+
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 const AUTO_COMMAND_KEYS = [
@@ -105,8 +107,12 @@ export const AutoCommandsCard = () => {
                       <Checkbox
                         checked={checked}
                         disabled={rowsDisabled}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={(e) => handleCommandToggle(key, e.target.checked)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                        }}
+                        onChange={(e) => {
+                          handleCommandToggle(key, e.target.checked)
+                        }}
                       />
                       <div className='flex flex-col'>
                         <span className='font-mono text-sm'>{command.cmd}</span>

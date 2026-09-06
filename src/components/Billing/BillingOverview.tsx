@@ -1,6 +1,7 @@
 import { Button, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
+
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Card } from '@/ui/card'
 import {
@@ -8,6 +9,7 @@ import {
   isPaypalSubscription,
   isSubscriptionActive,
 } from '@/utils/subscription'
+
 import { BillingNotice } from './BillingNotice'
 
 const chipClasses = {
@@ -60,7 +62,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
   return (
     <Card className='space-y-5'>
       <div className='flex flex-wrap items-center gap-2'>
-        <span className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+        <span className='text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
           Current plan
         </span>
         <span
@@ -81,7 +83,7 @@ export function BillingOverview({ isLoading, onOpenPortal }: BillingOverviewProp
 
       <div className='flex flex-col gap-4 border-t border-gray-800 pt-5 sm:flex-row sm:items-end sm:justify-between'>
         <div className='space-y-1'>
-          <div className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+          <div className='text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
             {summary.nextStepLabel}
           </div>
           <div className='text-base font-medium text-gray-100'>{summary.nextStepValue}</div>

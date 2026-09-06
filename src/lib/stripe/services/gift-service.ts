@@ -1,7 +1,10 @@
-import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, TransactionType } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
+
 import { stripe } from '@/lib/stripe-server'
 import { getSubscriptionTier } from '@/utils/subscription'
+
 import { withErrorHandling } from '../utils/error-handling'
 import { CustomerService } from './customer-service'
 
@@ -9,9 +12,9 @@ import { CustomerService } from './customer-service'
  * Service for managing gift subscription operations using Stripe customer balance credits
  */
 export class GiftService {
-  private customerService: CustomerService
+  private readonly customerService: CustomerService
 
-  constructor(private tx: Prisma.TransactionClient) {
+  constructor(private readonly tx: Prisma.TransactionClient) {
     this.customerService = new CustomerService(tx)
   }
 

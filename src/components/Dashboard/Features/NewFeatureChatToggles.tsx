@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 // New-feature chat toggles (cosmetic-set announcements, team smoke alerts). They follow the
@@ -19,7 +21,7 @@ function MasterFollowingToggle({
   label: string
   description: ReactNode
 }) {
-  const { data: master } = useUpdateSetting<boolean>(Settings.autoOptInNewFeatures)
+  const { data: master } = useUpdateSetting(Settings.autoOptInNewFeatures)
   const { data: value, updateSetting } = useUpdateSetting<boolean | null>(settingKey)
 
   return (
@@ -27,7 +29,9 @@ function MasterFollowingToggle({
       <TierSwitch
         settingKey={settingKey}
         checked={value ?? master}
-        onChange={(checked) => updateSetting(checked)}
+        onChange={(checked) => {
+          updateSetting(checked)
+        }}
         label={label}
       />
       <p className='ml-12 text-sm text-gray-400'>{description}</p>

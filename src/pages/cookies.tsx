@@ -1,6 +1,7 @@
 import { Button, Collapse, Space, Table, Tag } from 'antd'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
+
 import { getCookieCategories } from '@/components/CookieConsent'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { showCookieConsentBanner, showCookieConsentSettings } from '@/lib/cookieManager'
@@ -22,9 +23,9 @@ const ManageCookiePreferences = () => {
   }
 
   return (
-    <div className='border border-gray-200 rounded-lg p-6 my-6 text-center'>
-      <h3 className='text-xl font-semibold mb-4'>Manage Your Cookie Preferences</h3>
-      <p className='text-sm mb-6'>
+    <div className='my-6 rounded-lg border border-gray-200 p-6 text-center'>
+      <h3 className='mb-4 text-xl font-semibold'>Manage Your Cookie Preferences</h3>
+      <p className='mb-6 text-sm'>
         You can adjust your cookie preferences at any time. Click the button below to open the
         cookie settings panel.
       </p>
@@ -52,14 +53,14 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
   )
 
   return (
-    <div className='max-w-4xl mx-auto p-6 font-sans'>
+    <div className='mx-auto max-w-4xl p-6 font-sans'>
       {/* Title */}
-      <h1 className='text-3xl font-bold mb-2'>COOKIE POLICY</h1>
-      <p className='text-sm text-gray-500 mb-6'>Last updated: {new Date().toLocaleDateString()}</p>
+      <h1 className='mb-2 text-3xl font-bold'>COOKIE POLICY</h1>
+      <p className='mb-6 text-sm text-gray-500'>Last updated: {new Date().toLocaleDateString()}</p>
 
       {/* Introduction */}
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>Introduction</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>Introduction</h2>
         <p className='mb-4'>
           {companyName} ("we", "our", or "us") uses cookies on our website ({websiteUrl}) (the
           "Service"). By using the Service, you consent to the use of cookies.
@@ -73,7 +74,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
 
       {/* What are cookies */}
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>What are Cookies</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>What are Cookies</h2>
         <p className='mb-4'>
           Cookies are small pieces of text sent to your web browser by a website you visit. A cookie
           file is stored in your web browser and allows the Service or a third party to recognize
@@ -91,13 +92,13 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
 
       {/* How we use cookies */}
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>How {companyName} Uses Cookies</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>How {companyName} Uses Cookies</h2>
         <p className='mb-4'>
           When you use and access the Service, we may place a number of cookie files in your web
           browser.
         </p>
         <p className='mb-4'>We use cookies for the following purposes:</p>
-        <ul className='list-disc pl-8 mb-4'>
+        <ul className='mb-4 list-disc pl-8'>
           <li>To enable certain functions of the Service</li>
           <li>To provide analytics</li>
           <li>To store your preferences</li>
@@ -111,7 +112,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
 
       {/* Cookie Categories */}
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>Cookie Categories</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>Cookie Categories</h2>
 
         <Collapse className='mb-6'>
           {Object.entries(cookieCategories).map(([key, category]) => (
@@ -157,7 +158,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
 
       {/* All Cookies Table */}
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>Complete List of Cookies</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>Complete List of Cookies</h2>
         <Table
           dataSource={allCookies}
           columns={[
@@ -205,7 +206,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
 
       {/* Rest of the policy content */}
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>Third-party Cookies</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>Third-party Cookies</h2>
         <p className='mb-4'>
           In addition to our own cookies, we may also use various third-party cookies to report
           usage statistics of the Service, deliver advertisements on and through the Service, and so
@@ -214,7 +215,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
       </div>
 
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>What are Your Choices Regarding Cookies</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>What are Your Choices Regarding Cookies</h2>
         <p className='mb-4'>
           If you'd like to delete cookies or instruct your web browser to delete or refuse cookies,
           please visit the help pages of your web browser.
@@ -227,13 +228,13 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
       </div>
 
       <div className='mb-8'>
-        <h2 className='text-2xl font-semibold mb-4'>
+        <h2 className='mb-4 text-2xl font-semibold'>
           Where Can You Find More Information About Cookies
         </h2>
         <p className='mb-4'>
           You can learn more about cookies at the following third-party websites:
         </p>
-        <ul className='list-disc pl-8 mb-4'>
+        <ul className='mb-4 list-disc pl-8'>
           <li>
             <a
               href='https://www.allaboutcookies.org/'

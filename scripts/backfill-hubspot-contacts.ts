@@ -45,7 +45,9 @@ let synced = 0
 let failed = 0
 
 async function syncUser(user: { id: string; email: string | null; displayName: string | null }) {
-  if (!user.email) return
+  if (!user.email) {
+    return
+  }
   let subscription: string | undefined
   try {
     subscription = subscriptionToValue(await getSubscription(user.id))
@@ -70,9 +72,7 @@ async function syncUser(user: { id: string; email: string | null; displayName: s
 }
 
 // Run an array of users through syncUser with bounded concurrency.
-async function runPool(
-  users: Array<{ id: string; email: string | null; displayName: string | null }>,
-) {
+async function runPool(users: { id: string; email: string | null; displayName: string | null }[]) {
   let cursor = 0
   async function worker() {
     while (cursor < users.length) {
@@ -92,15 +92,17 @@ async function main() {
     const take = Math.min(PAGE_SIZE, limit - processed)
     const page = await prisma.user.findMany({
       orderBy: { id: 'asc' },
-      select: { id: true, email: true, displayName: true },
+      select: { displayName: true, email: true, id: true },
       take,
       where: { email: { not: null }, ...(lastId ? { id: { gt: lastId } } : {}) },
     })
-    if (page.length === 0) break
+    if (page.length === 0) {
+      break
+    }
 
     await runPool(page)
     processed += page.length
-    lastId = page[page.length - 1].id
+    lastId = page.at(-1).id
     console.log(`Page done — ${processed} users processed (synced ${synced}, failed ${failed})`)
   }
 
@@ -108,8 +110,8 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
+  .catch((error) => {
+    console.error(error)
     process.exit(1)
   })
-  .finally(() => prisma.$disconnect())
+  .finally(async () => prisma.$disconnect())

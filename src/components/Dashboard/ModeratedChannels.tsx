@@ -2,8 +2,10 @@ import { captureException } from '@sentry/nextjs'
 import { Button, Select, Spin, Tooltip } from 'antd'
 import { StopCircleIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+
 import { useTrack } from '@/lib/track'
 
 export default function ModeratedChannels() {
@@ -97,7 +99,7 @@ export default function ModeratedChannels() {
         alt='User Profile'
         width={30}
         height={30}
-        className='rounded-full flex'
+        className='flex rounded-full'
         onError={(e) => {
           e.currentTarget.src = '/images/hero/default.png'
         }}
@@ -151,7 +153,7 @@ export default function ModeratedChannels() {
   )
 
   return (
-    <div className='flex flex-col grow items-center moderated-channels'>
+    <div className='moderated-channels flex grow flex-col items-center'>
       <Tooltip
         title='Choose a channel to manage. Only streamers with an active Dotabod subscription will be shown.'
         placement='right'

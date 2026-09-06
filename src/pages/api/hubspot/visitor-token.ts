@@ -2,8 +2,9 @@ import { captureException } from '@sentry/nextjs'
 import { waitUntil } from '@vercel/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import { getSubscription } from '@/utils/subscription'
@@ -37,7 +38,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = process.env.HUBSPOT_PRIVATE_APP_TOKEN
   if (!token) {
     captureException(new Error('HUBSPOT_PRIVATE_APP_TOKEN is not set'))
-    return res.status(500).json({ message: 'HubSpot is not configured' })
+    res.status(500).json({ message: 'HubSpot is not configured' })
+    return
   }
 
   const [firstName, ...rest] = (session.user.name ?? '').trim().split(' ')
@@ -71,7 +73,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     visitorToken = data.token
   } catch (error: unknown) {
     captureException(error instanceof Error ? error : new Error(String(error)))
-    return res.status(500).json({ message: 'Failed to create visitor token' })
+    res.status(500).json({ message: 'Failed to create visitor token' })
+    return
   }
 
   // Respond immediately — the widget only needs the token to identify the visitor.

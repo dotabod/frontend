@@ -2,9 +2,10 @@ import { SubscriptionStatus } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
@@ -93,19 +94,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const search = req.query.search as string | undefined
 
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   if (search && !session?.user?.role?.includes('admin')) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   if (search !== undefined && !search.trim()) {
-    return res.status(200).json([])
+    res.status(200).json([])
+    return
   }
 
   if (search?.trim()) {
@@ -127,18 +132,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         ],
       },
     })
-    return res.status(200).json(
+    res.status(200).json(
       users.map((user) => ({
         image: user.user.image,
         label: user.user.name,
         value: user.providerAccountId,
       })),
     )
+    return
   }
 
   const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
   if (error) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const response = await getModeratedChannels(providerAccountId, accessToken)
@@ -147,7 +154,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   let filteredResponse = Array.isArray(response) ? [...response] : []
 
   if (!Array.isArray(response)) {
-    return res.status(200).json([])
+    res.status(200).json([])
+    return
   }
 
   // Filter response to only include channels with required tier
@@ -177,7 +185,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     )
   }
 
-  return res.status(200).json(filteredResponse)
+  res.status(200).json(filteredResponse)
 }
 
 export default withMethods(['GET'], withAuthentication(handler))

@@ -14,6 +14,7 @@
 
 import type { OpenNodeCharge } from '@prisma/client'
 import { PrismaClient, SubscriptionStatus, TransactionType } from '@prisma/client'
+
 import { stripe } from '@/lib/stripe-server'
 
 // Parse command line arguments
@@ -329,16 +330,16 @@ async function checkSingleCharge(): Promise<void> {
     }
   }
 
-  if (!lifetimeSubscription) {
-    issues.push('User does not have an active LIFETIME subscription')
-    if (charge.status === 'paid' || charge.status === 'confirmed') {
-      recommendations.push('Run the recovery script to complete payment processing')
-    }
-  } else {
+  if (lifetimeSubscription) {
     console.log('✅ User has an active LIFETIME subscription')
     if (!charge.lastWebhookAt) {
       warnings.push('Subscription exists but lastWebhookAt is NULL')
       recommendations.push('Run recovery script with --dry-run to update lastWebhookAt')
+    }
+  } else {
+    issues.push('User does not have an active LIFETIME subscription')
+    if (charge.status === 'paid' || charge.status === 'confirmed') {
+      recommendations.push('Run the recovery script to complete payment processing')
     }
   }
 

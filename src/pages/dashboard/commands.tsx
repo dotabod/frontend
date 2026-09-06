@@ -1,6 +1,8 @@
 import { Empty, Input, Segmented } from 'antd'
 import Head from 'next/head'
-import { type ReactElement, useState } from 'react'
+import { useState } from 'react'
+import type { ReactElement } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
 import Header from '@/components/Dashboard/Header'
@@ -8,6 +10,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import { useUpdate } from '@/lib/hooks/useUpdateSetting'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 import { getValueOrDefault } from '@/lib/settings'
+
 import CommandDetail from '../../components/Dashboard/CommandDetail'
 
 const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
@@ -80,15 +83,19 @@ const CommandsPage = () => {
         title='Commands'
       />
 
-      <div className='flex items-baseline sm:gap-x-6 gap-y-2 max-w-full flex-wrap'>
+      <div className='flex max-w-full flex-wrap items-baseline gap-y-2 sm:gap-x-6'>
         <Segmented
           value={enabled}
-          onChange={(v) => setEnabled(v as string)}
+          onChange={(v) => {
+            setEnabled(v as string)
+          }}
           options={['All', 'Enabled', 'Disabled']}
         />
         <Segmented
           value={permission}
-          onChange={(v) => setPermission(v as string)}
+          onChange={(v) => {
+            setPermission(v as string)
+          }}
           options={['All', 'Mods', 'Plebs']}
         />
         <Input
@@ -96,7 +103,9 @@ const CommandsPage = () => {
           value={searchTerm}
           style={{ width: 300 }}
           maxLength={200}
-          onChange={(e) => setSearchTerm(`${e.target.value?.toLowerCase()}`)}
+          onChange={(e) => {
+            setSearchTerm(`${e.target.value?.toLowerCase()}`)
+          }}
         />
       </div>
       {filteredCommands.length === 0 && (

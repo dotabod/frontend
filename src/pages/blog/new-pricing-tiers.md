@@ -9,14 +9,11 @@ Since Dotabod launched, we've proudly provided everything free for over 22,000 p
 
 ### Here’s what the new plans look like
 
-- **Free Plan ($0/month)**
-  Ideal for casual streamers, this tier gives you essential tools: multi-language support, basic minimap blockers, core chat commands (!mmr, !wl), and everything you need for effortless streaming.
+- **Free Plan ($0/month)** Ideal for casual streamers, this tier gives you essential tools: multi-language support, basic minimap blockers, core chat commands (!mmr, !wl), and everything you need for effortless streaming.
 
-- **Pro Plan ($6/month)**
-  Designed for streamers ready to turn passion into growth. Unlock powerful automation (OBS/Twitch integrations), dynamic overlays like Roshan timers and win-probability displays, plus early access to new beta features. This is your ticket to a pro-level streaming experience.
+- **Pro Plan ($6/month)** Designed for streamers ready to turn passion into growth. Unlock powerful automation (OBS/Twitch integrations), dynamic overlays like Roshan timers and win-probability displays, plus early access to new beta features. This is your ticket to a pro-level streaming experience.
 
-- **Lifetime Plan ($99 one-time payment)**
-  Pay once, stream forever. Lifetime access includes all current and future features, regular updates, and ongoing support, letting you permanently secure your streaming toolkit.
+- **Lifetime Plan ($99 one-time payment)** Pay once, stream forever. Lifetime access includes all current and future features, regular updates, and ongoing support, letting you permanently secure your streaming toolkit.
 
 From today until April 30, everyone gets complete access to all features—both Free and Pro. Try it out, explore what's possible, and confidently pick the plan that's best for you.
 

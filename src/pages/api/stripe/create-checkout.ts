@@ -1,6 +1,8 @@
-import { Prisma, type TransactionType } from '@prisma/client'
+import { Prisma } from '@prisma/client'
+import type { TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -18,23 +20,27 @@ interface CheckoutRequestBody {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   try {
     // Authenticate user
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
     if (session.user.isImpersonating) {
-      return res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
+      res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
+      return
     }
 
     // Parse and validate request body
     const { priceId, isGift, paymentMethod } = (await req.body) as CheckoutRequestBody
     if (!priceId) {
-      return res.status(400).json({ error: 'Price ID is required' })
+      res.status(400).json({ error: 'Price ID is required' })
+      return
     }
 
     // Verify price and determine purchase type
@@ -76,10 +82,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       userId: session.user.id,
     })
 
-    return res.status(200).json({ url: checkoutUrl })
+    res.status(200).json({ url: checkoutUrl })
+    return
   } catch (error) {
     console.error('Checkout creation failed:', error)
-    return res.status(500).json({ error: 'Failed to create checkout session' })
+    res.status(500).json({ error: 'Failed to create checkout session' })
+    return
   }
 }
 
@@ -155,7 +163,7 @@ async function createStripeCustomer(user: {
   locale?: string | null
   twitchId?: string | null
 }) {
-  return stripe.customers.create({
+  return await stripe.customers.create({
     email: user.email ?? undefined,
     metadata: {
       email: user.email ?? '',

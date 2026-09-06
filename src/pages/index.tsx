@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+
 import { Faqs } from '@/components/Homepage/Faqs'
 import { Hero } from '@/components/Homepage/Hero'
 import HomepageShell from '@/components/Homepage/HomepageShell'

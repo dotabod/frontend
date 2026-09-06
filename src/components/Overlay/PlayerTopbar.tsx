@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import type React from 'react'
+
 import { usePlayerPositions } from '@/lib/hooks/useOverlayPositions'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { motionProps } from '@/ui/utils'
@@ -26,9 +27,7 @@ export const PlayerTopbar = ({
         top: res({ h: 65 }),
         width: res({ w: 62 }),
       }}
-      className={
-        'absolute space-x-1 truncate whitespace-pre-wrap break-all text-center text-sm leading-none text-white/90'
-      }
+      className='absolute space-x-1 truncate text-center text-sm leading-none break-all whitespace-pre-wrap text-white/90'
     >
       {children}
     </motion.div>

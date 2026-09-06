@@ -1,4 +1,5 @@
 import type { GetServerSideProps } from 'next'
+
 import prisma from '@/lib/db'
 
 // This page should never render, it only returns XML

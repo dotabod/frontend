@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FC } from 'react'
-
 import { Container } from 'src/components/Container'
 
 const faqs = [
@@ -89,7 +88,7 @@ export const Faqs: FC = () => (
             <ul className='space-y-10'>
               {column.map((faq, faqIndex) => (
                 <li key={faqIndex}>
-                  <h3 className='text-lg font-semibold leading-6 text-gray-200'>{faq.question}</h3>
+                  <h3 className='text-lg leading-6 font-semibold text-gray-200'>{faq.question}</h3>
                   <div className='mt-4 text-sm text-gray-300'>{faq.answer}</div>
                 </li>
               ))}

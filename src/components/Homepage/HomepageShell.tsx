@@ -1,10 +1,12 @@
 import Head from 'next/head'
 import type { ReactNode } from 'react'
+
 import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
 import { Footer } from '@/components/Homepage/Footer'
 import { Header } from '@/components/Homepage/Header'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
+
 import HubSpot from '../HubSpot'
 
 interface SEOProps {
@@ -63,9 +65,9 @@ const HomepageShell = ({
     defaultOgImage = `/api/og-image?title=${encodeURIComponent(username)}&subtitle=Commands, MMR Tracking, Live Stats, and more!`
   }
 
-  const defaultUrl = !process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
-    ? baseUrl
-    : `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
+  const defaultUrl = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
+    : baseUrl
 
   // Use SEO props if provided, otherwise use defaults
   const pageTitle = seo?.title || (title as string) || defaultTitle

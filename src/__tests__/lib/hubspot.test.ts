@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
@@ -17,10 +17,10 @@ async function load() {
 
 const res = (body: unknown = {}, status = 200) =>
   ({
+    json: async () => body,
     ok: status >= 200 && status < 300,
     status,
     statusText: 'OK',
-    json: async () => body,
     text: async () => (typeof body === 'string' ? body : JSON.stringify(body)),
   }) as any
 
@@ -63,7 +63,7 @@ describe('lib/hubspot', () => {
       const patch = fetchMock.mock.calls.find(isPatch)
       expect(patch).toBeDefined()
       expect((patch as unknown[])[1]).toMatchObject({ method: 'PATCH' })
-      expect(bodyOf(patch as unknown[])).toEqual({
+      expect(bodyOf(patch as unknown[])).toStrictEqual({
         properties: { dotabod_subscription: 'pro', twitch_username: 'gamer' },
       })
     })
@@ -75,7 +75,7 @@ describe('lib/hubspot', () => {
       await syncHubSpotContact('tok', { email: 'a@b.com', username: 'gamer' })
 
       const patch = fetchMock.mock.calls.find(isPatch)
-      expect(bodyOf(patch as unknown[]).properties).toEqual({
+      expect(bodyOf(patch as unknown[]).properties).toStrictEqual({
         twitch_username: 'gamer',
       })
     })
@@ -88,7 +88,7 @@ describe('lib/hubspot', () => {
 
       await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' })
 
-      expect(fetchMock.mock.calls.some(isPatch)).toBe(true)
+      expect(fetchMock.mock.calls.some(isPatch)).toBeTruthy()
     })
 
     it('falls back to creating the contact when PATCH returns 404', async () => {
@@ -104,8 +104,8 @@ describe('lib/hubspot', () => {
       )
       expect(create).toBeDefined()
       expect(bodyOf(create as unknown[]).properties).toMatchObject({
-        email: 'a@b.com',
         dotabod_subscription: 'pro',
+        email: 'a@b.com',
         twitch_username: 'gamer',
       })
     })
@@ -151,7 +151,7 @@ describe('lib/hubspot', () => {
         syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
       ).resolves.toBeUndefined()
       expect(patchCalls).toBe(2)
-      expect(captureException).toHaveBeenCalled()
+      expect(captureException).toHaveBeenCalledOnce()
     })
 
     it('never throws and reports to Sentry when the patch fails', async () => {
@@ -163,7 +163,7 @@ describe('lib/hubspot', () => {
       await expect(
         syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
       ).resolves.toBeUndefined()
-      expect(captureException).toHaveBeenCalled()
+      expect(captureException).toHaveBeenCalledOnce()
     })
 
     it('reports a non-409 property-create failure without throwing or upserting', async () => {
@@ -175,8 +175,8 @@ describe('lib/hubspot', () => {
       await expect(
         syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
       ).resolves.toBeUndefined()
-      expect(captureException).toHaveBeenCalled()
-      expect(fetchMock.mock.calls.some((c) => isUrl(c, '/contacts/batch/upsert'))).toBe(false)
+      expect(captureException).toHaveBeenCalledOnce()
+      expect(fetchMock.mock.calls.some((c) => isUrl(c, '/contacts/batch/upsert'))).toBeFalsy()
     })
   })
 })

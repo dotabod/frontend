@@ -3,6 +3,7 @@ import { Empty } from 'antd'
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { StreamerSummary } from '@/components/Streamers/StreamerCard'
@@ -16,9 +17,13 @@ interface StreamersPageProps {
   roster: StreamerSummary[]
 }
 
-type StreamAccount = { steam32Id: number; mmr: number; leaderboard_rank: number | null }
+interface StreamAccount {
+  steam32Id: number
+  mmr: number
+  leaderboard_rank: number | null
+}
 
-type StreamerRow = {
+interface StreamerRow {
   name: string
   displayName: string | null
   image: string | null
@@ -81,15 +86,15 @@ const toSummary = (user: StreamerRow, isLive: boolean, now: number): StreamerSum
   const standing = pickStanding(user.SteamAccount, user.steam32Id)
   const lastMatch = user.matches[0]?.updated_at
   return {
-    name: user.name,
     displayName: user.displayName,
-    image: user.image,
-    mmr,
     followers: user.followers,
-    standing,
-    tier: tierForRank(mmr, standing),
+    image: user.image,
     isLive,
     lastMatchLabel: isLive || !lastMatch ? null : formatRelativeAgo(lastMatch, now),
+    mmr,
+    name: user.name,
+    standing,
+    tier: tierForRank(mmr, standing),
   }
 }
 
@@ -102,8 +107,6 @@ const StreamersPage: NextPageWithLayout<StreamersPageProps> = ({ live, roster })
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Dota 2 streamers using Dotabod',
-    url: 'https://dotabod.com/streamers',
     mainEntity: {
       '@type': 'ItemList',
       itemListElement: [...live, ...roster].slice(0, 50).map((streamer, index) => ({
@@ -117,6 +120,8 @@ const StreamersPage: NextPageWithLayout<StreamersPageProps> = ({ live, roster })
         },
       })),
     },
+    name: 'Dota 2 streamers using Dotabod',
+    url: 'https://dotabod.com/streamers',
   }
 
   return (
@@ -189,13 +194,13 @@ const streamerSelect = {
   followers: true,
   steam32Id: true,
   SteamAccount: {
-    select: { steam32Id: true, mmr: true, leaderboard_rank: true },
+    select: { leaderboard_rank: true, mmr: true, steam32Id: true },
   },
   // Most recent tracked match, used to show "last played" on offline cards.
   matches: {
     orderBy: { updated_at: 'desc' },
-    take: 1,
     select: { updated_at: true },
+    take: 1,
   },
 } satisfies Prisma.UserSelect
 
@@ -212,16 +217,19 @@ export const getServerSideProps: GetServerSideProps<StreamersPageProps> = async 
   const recentCutoff = new Date(now - 30 * 24 * 60 * 60 * 1000)
 
   const liveUsers = await prisma.user.findMany({
-    where: {
-      stream_online: true,
-      hideFromLeaderboard: false,
-      bannedAt: null,
-      matches: { some: { updated_at: { gte: liveMatchCutoff } } },
-    },
     select: streamerSelect,
+    where: {
+      bannedAt: null,
+      hideFromLeaderboard: false,
+      matches: { some: { updated_at: { gte: liveMatchCutoff } } },
+      stream_online: true,
+    },
   })
 
   const rosterUsers = await prisma.user.findMany({
+    orderBy: { followers: 'desc' },
+    select: streamerSelect,
+    take: 300,
     where: {
       hideFromLeaderboard: false,
       bannedAt: null,
@@ -230,9 +238,6 @@ export const getServerSideProps: GetServerSideProps<StreamersPageProps> = async 
       stream_online: false,
       matches: { some: { updated_at: { gte: recentCutoff } } },
     },
-    orderBy: { followers: 'desc' },
-    take: 300,
-    select: streamerSelect,
   })
 
   return {

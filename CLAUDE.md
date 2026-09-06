@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Code Style
 
 - TypeScript for all code with strict typing
-- Formatting/linting via Vite+ (oxfmt + oxlint): 2-space indentation, single quotes, avoid semicolons. Run `pnpm exec vp check` (or `vp check --fix`).
+- Formatting/linting via standalone Oxfmt + Oxlint: 2-space indentation, single quotes, avoid semicolons. Run `pnpm check` (or `pnpm format:fix && pnpm lint:fix`). Run `pnpm quality` for the full gate, including Knip's unused-code/dependency analysis.
 - Use React functional components with hooks
 - Use `@/` imports with paths configured in tsconfig.json
 - Follow mobile-first responsive design with Tailwind CSS
@@ -24,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Test Guidelines
 
 - Place tests in `__tests__` folders next to source files
-- Use Vitest's `vi.mock()` at the top of test files
+- Test through dependency seams and injected fakes instead of `vi.mock()`; legacy module mocks are migration violations under the anti-slop rules
 - Follow Arrange-Act-Assert pattern
 - Use `vi.stubEnv()` instead of direct environment variable assignment
 - Reset mocks between tests with `vi.resetAllMocks()`
@@ -37,19 +37,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use redux for state management
 - Follow folder structure conventions
 
-<!--VITE PLUS START-->
-
-# Using Vite+, the Unified Toolchain for the Web
-
-This project is using Vite+, a unified toolchain built on top of Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt, and Vite Task. Vite+ wraps runtime management, package management, and frontend tooling in a single global CLI called `vp`. Vite+ is distinct from Vite, and it invokes Vite through `vp dev` and `vp build`. Run `vp help` to print a list of commands and `vp <command> --help` for information about a specific command.
-
-Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.dev/guide/.
-
 ## Review Checklist
 
-- [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check` and `vp test` to format, lint, type check and test changes.
-- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
-- [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
-
-<!--VITE PLUS END-->
+- [ ] Run `pnpm install` after pulling remote changes.
+- [ ] Run `pnpm quality` and `pnpm test` to format, lint, type check, detect unused code/dependencies, and test changes.

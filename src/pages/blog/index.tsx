@@ -3,9 +3,11 @@ import type { GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
-import { getAllPosts, type Post } from '@/lib/blog'
+import { getAllPosts } from '@/lib/blog'
+import type { Post } from '@/lib/blog'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 import { formatDate } from '@/utils/formatDate'
@@ -41,9 +43,9 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
         <meta property='twitter:description' content={pageDescription} />
       </Head>
       <Container className='pb-16'>
-        <div className='max-w-3xl mx-auto'>
+        <div className='mx-auto max-w-3xl'>
           <Title level={1}>Blog</Title>
-          <Paragraph className='text-lg   mb-8'>
+          <Paragraph className='mb-8 text-lg'>
             Updates, announcements, and insights about Dotabod.
           </Paragraph>
 
@@ -51,7 +53,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
             {posts.map((post) => (
               <Card key={post.slug}>
                 <Space direction='vertical' size='small'>
-                  <Text type='secondary' className='block mb-2'>
+                  <Text type='secondary' className='mb-2 block'>
                     {formatDate(post.date)}
                   </Text>
                   <Link href={`/blog/${post.slug}`} className='no-underline'>
@@ -62,7 +64,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
                   <Paragraph className=' '>{post.description}</Paragraph>
                   <Link
                     href={`/blog/${post.slug}`}
-                    className='text-purple-500 font-medium flex items-center'
+                    className='flex items-center font-medium text-purple-500'
                   >
                     Read article
                     <svg

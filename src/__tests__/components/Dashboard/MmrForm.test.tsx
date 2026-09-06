@@ -1,6 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import MmrForm from '@/components/Dashboard/Features/MmrForm'
 import { useUpdateAccount } from '@/lib/hooks/useUpdateSetting'
 
@@ -25,7 +26,7 @@ vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   useUpdateSetting: () => ({ data: 0, loading: false, updateSetting: vi.fn() }),
 }))
 
-describe('MmrForm', () => {
+describe(MmrForm, () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.mocked(useSWR).mockReturnValue({ data: { data: [] } } as ReturnType<typeof useSWR>)
@@ -57,7 +58,7 @@ describe('MmrForm', () => {
       isSaving: false,
       loading: false,
       update,
-    } as ReturnType<typeof useUpdateAccount>)
+    })
 
     const { container } = render(<MmrForm />)
 

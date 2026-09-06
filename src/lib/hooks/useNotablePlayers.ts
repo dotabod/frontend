@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+
 import type { NotablePlayer } from '@/components/Overlay/NotablePlayers'
 import { isDev } from '@/lib/devConsts'
 

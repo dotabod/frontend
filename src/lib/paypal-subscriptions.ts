@@ -1,6 +1,9 @@
-import { type PayPalOrder, SubscriptionStatus, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, TransactionType } from '@prisma/client'
+import type { PayPalOrder } from '@prisma/client'
+
 import prisma from '@/lib/db'
-import { getSubscription, type PayPalCaptureResult } from '@/lib/paypal'
+import { getSubscription } from '@/lib/paypal'
+import type { PayPalCaptureResult } from '@/lib/paypal'
 
 function mapStatus(paypalStatus: string): SubscriptionStatus {
   switch (paypalStatus) {

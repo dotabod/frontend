@@ -1,5 +1,6 @@
 import { BeakerIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline'
-import { Tag, type MenuProps } from 'antd'
+import { Tag } from 'antd'
+import type { MenuProps } from 'antd'
 import {
   DollarSignIcon,
   Gift,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import type React from 'react'
+
 import Discord from '@/images/logos/Discord'
 
 export type NavIcon = React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
@@ -63,15 +65,15 @@ const HELP_CENTER: NavItem = {
 
 // Single source of truth feeding the sidebar, avatar menu, "?" menu and ⌘K palette.
 export const navConfig: NavConfig = {
-  primary: [
-    { hideForImpersonator: true, href: '/dashboard', icon: BeakerIcon, name: 'Setup' },
-    { href: '/dashboard/features', icon: LayoutDashboard, name: 'Overview' },
-    { href: '/dashboard/features/overlay', icon: MonitorPlay, name: 'Stream overlay' },
-    { href: '/dashboard/features/chat', icon: MessagesSquare, name: 'Chat features' },
-    { href: '/dashboard/commands', icon: SquareTerminal, name: 'Chat commands' },
-    { href: '/dashboard/notable-players', icon: Star, name: 'Notable players' },
-    { href: '/dashboard/features/advanced', icon: SlidersHorizontal, name: 'Advanced' },
-    { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
+  account: [
+    {
+      hideForImpersonator: true,
+      href: '/dashboard/billing',
+      icon: DollarSignIcon,
+      name: 'Billing',
+    },
+    { href: '/gift', icon: Gift, name: 'Gift Pro' },
+    { hideForImpersonator: true, href: '/dashboard/data', icon: HardDriveIcon, name: 'Your data' },
   ],
   bottom: [
     { href: '/dashboard/diagnostics', icon: Activity, name: 'Diagnostics', new: true },
@@ -91,22 +93,22 @@ export const navConfig: NavConfig = {
       name: 'Admin',
     },
   ],
-  account: [
-    {
-      hideForImpersonator: true,
-      href: '/dashboard/billing',
-      icon: DollarSignIcon,
-      name: 'Billing',
-    },
-    { href: '/gift', icon: Gift, name: 'Gift Pro' },
-    { hideForImpersonator: true, href: '/dashboard/data', icon: HardDriveIcon, name: 'Your data' },
-  ],
   help: [
     HELP_CENTER,
     { href: 'https://discord.dotabod.com', icon: Discord, name: 'Discord' },
     { href: 'https://github.com/dotabod/', icon: Github, name: 'GitHub' },
     { href: 'https://status.dotabod.com', icon: Info, name: 'Service status' },
     { href: '/blog', icon: NewspaperIcon, name: 'Blog' },
+  ],
+  primary: [
+    { hideForImpersonator: true, href: '/dashboard', icon: BeakerIcon, name: 'Setup' },
+    { href: '/dashboard/features', icon: LayoutDashboard, name: 'Overview' },
+    { href: '/dashboard/features/overlay', icon: MonitorPlay, name: 'Stream overlay' },
+    { href: '/dashboard/features/chat', icon: MessagesSquare, name: 'Chat features' },
+    { href: '/dashboard/commands', icon: SquareTerminal, name: 'Chat commands' },
+    { href: '/dashboard/notable-players', icon: Star, name: 'Notable players' },
+    { href: '/dashboard/features/advanced', icon: SlidersHorizontal, name: 'Advanced' },
+    { href: '/dashboard/whats-new', icon: Sparkles, name: "What's New" },
   ],
 }
 
@@ -137,7 +139,7 @@ export function navItemToMenuItem(
     <Link
       {...props}
       href={item.href}
-      className='text-gray-200! flex w-full min-w-0 flex-row items-center gap-2'
+      className='flex w-full min-w-0 flex-row items-center gap-2 text-gray-200!'
       target={external ? '_blank' : '_self'}
       rel={external ? 'noreferrer' : undefined}
     >

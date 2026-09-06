@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import type { MinimapUnitProps } from '@/lib/redux/store'

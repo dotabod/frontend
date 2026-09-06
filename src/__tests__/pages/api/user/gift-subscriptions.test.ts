@@ -1,6 +1,7 @@
 import type { GiftSubscription, Subscription, User } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/user/gift-subscriptions'
 
 // Mock prisma
@@ -31,6 +32,7 @@ vi.mock('@/utils/formatDate', () => ({
 }))
 
 import { getServerSession } from 'next-auth'
+
 // Import mocked modules
 import prisma from '@/lib/db'
 
@@ -51,7 +53,7 @@ describe('gift-subscriptions API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(405)
-    expect(res._getJSONData()).toEqual({ error: 'Method not allowed' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Method not allowed' })
   })
 
   it('returns 401 for unauthenticated requests', async () => {
@@ -64,9 +66,9 @@ describe('gift-subscriptions API', () => {
 
     await handler(req, res)
 
-    expect(getServerSession).toHaveBeenCalled()
+    expect(getServerSession).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Unauthorized' })
   })
 
   it('returns no gifts when user has no gift subscriptions', async () => {
@@ -89,7 +91,7 @@ describe('gift-subscriptions API', () => {
 
     await handler(req, res)
 
-    expect(getServerSession).toHaveBeenCalled()
+    expect(getServerSession).toHaveBeenCalledOnce()
     expect(prisma.subscription.findMany).toHaveBeenCalledWith({
       include: {
         giftDetails: true,
@@ -104,7 +106,7 @@ describe('gift-subscriptions API', () => {
       },
     })
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       giftCount: 0,
       giftMessage: '',
       giftSubscriptions: [],
@@ -183,7 +185,7 @@ describe('gift-subscriptions API', () => {
     expect(res.statusCode).toBe(200)
 
     const responseData = res._getJSONData()
-    expect(responseData).toEqual({
+    expect(responseData).toStrictEqual({
       giftCount: 1,
       giftMessage: `Your Pro subscription is active until ${endDate.toLocaleDateString()}`,
       giftSubscriptions: [
@@ -299,7 +301,7 @@ describe('gift-subscriptions API', () => {
     expect(res.statusCode).toBe(200)
 
     const responseData = res._getJSONData()
-    expect(responseData).toEqual({
+    expect(responseData).toStrictEqual({
       giftCount: 2,
       giftMessage: `Your Pro subscription is active until ${endDate1.toLocaleDateString()}`,
       giftSubscriptions: [
@@ -407,6 +409,6 @@ describe('gift-subscriptions API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ error: 'Failed to fetch gift subscriptions' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Failed to fetch gift subscriptions' })
   })
 })

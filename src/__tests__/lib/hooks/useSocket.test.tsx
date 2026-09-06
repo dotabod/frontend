@@ -1,5 +1,6 @@
 import { act, cleanup, render } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { useSocket } from '@/lib/hooks/useSocket'
 
 type SocketHandler = (...args: unknown[]) => void
@@ -52,7 +53,7 @@ vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   }),
 }))
 
-describe('useSocket', () => {
+describe(useSocket, () => {
   afterEach(() => {
     cleanup()
     socketState.handlers.clear()
@@ -95,7 +96,7 @@ describe('useSocket', () => {
       socketState.handlers.get('connect')?.()
     })
 
-    expect(socketState.mutate).toHaveBeenCalledTimes(1)
+    expect(socketState.mutate).toHaveBeenCalledOnce()
     expect(setConnected).toHaveBeenCalledWith(true)
 
     act(() => {
@@ -195,7 +196,7 @@ describe('useSocket', () => {
 
     act(() => {
       socketState.handlers.get('block')?.({
-        matchId: 8978976957,
+        matchId: 8_978_976_957,
         state: 'DOTA_GAMERULES_STATE_POST_GAME',
         team: 'radiant',
         type: 'empty',
@@ -203,7 +204,7 @@ describe('useSocket', () => {
     })
 
     expect(setBlock).toHaveBeenCalledWith({
-      matchId: 8978976957,
+      matchId: 8_978_976_957,
       state: 'DOTA_GAMERULES_STATE_POST_GAME',
       team: 'radiant',
       type: null,
@@ -236,7 +237,7 @@ describe('useSocket', () => {
 
     act(() => {
       socketState.handlers.get('block')?.({
-        matchId: 8978976957,
+        matchId: 8_978_976_957,
         state: 'DOTA_GAMERULES_STATE_INIT',
         team: 'radiant',
         type: 'empty',
@@ -244,7 +245,7 @@ describe('useSocket', () => {
     })
 
     expect(setBlock).toHaveBeenCalledWith({
-      matchId: 8978976957,
+      matchId: 8_978_976_957,
       state: 'DOTA_GAMERULES_STATE_INIT',
       team: 'radiant',
       type: null,
@@ -277,7 +278,7 @@ describe('useSocket', () => {
 
     act(() => {
       socketState.handlers.get('block')?.({
-        matchId: 8978976957,
+        matchId: 8_978_976_957,
         state: 'DOTA_GAMERULES_STATE_STRATEGY_TIME',
         team: 'radiant',
         type: 'empty',
@@ -285,7 +286,7 @@ describe('useSocket', () => {
     })
 
     expect(setBlock).toHaveBeenCalledWith({
-      matchId: 8978976957,
+      matchId: 8_978_976_957,
       state: 'DOTA_GAMERULES_STATE_STRATEGY_TIME',
       team: 'radiant',
       type: 'empty',

@@ -143,7 +143,7 @@ function BlockScreen({
             height={280}
             width={280}
             className='rounded-xl'
-            src={'/images/overlay/minimap/741-Complex-Large-AntiStreamSnipeMap.png'}
+            src='/images/overlay/minimap/741-Complex-Large-AntiStreamSnipeMap.png'
             style={{
               backgroundImage:
                 "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
@@ -286,7 +286,7 @@ function FeaturesDesktop() {
         ))}
       </TabList>
       <div className='relative col-span-6'>
-        <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+        <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
           <CircleBackground color='#13B5C8' className='animate-spin-slower' />
         </div>
         <PhoneFrame className='z-10 mx-auto w-full max-w-[366px]'>
@@ -345,7 +345,7 @@ function FeaturesMobile() {
     <>
       <div
         ref={slideContainerRef}
-        className='-mb-4 flex snap-x snap-mandatory -space-x-4 overflow-x-auto overscroll-x-contain scroll-smooth pb-4 [scrollbar-width:none] sm:-space-x-6 [&::-webkit-scrollbar]:hidden'
+        className='-mb-4 flex snap-x snap-mandatory [scrollbar-width:none] -space-x-4 overflow-x-auto overscroll-x-contain scroll-smooth pb-4 sm:-space-x-6 [&::-webkit-scrollbar]:hidden'
       >
         {features.map((feature, featureIndex) => (
           <div
@@ -358,7 +358,7 @@ function FeaturesMobile() {
             className='w-full flex-none snap-center'
           >
             <div className='relative transform overflow-hidden rounded-2xl bg-gray-800'>
-              <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+              <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
                 <CircleBackground
                   color='#13B5C8'
                   className={featureIndex % 2 === 1 ? 'rotate-180' : undefined}

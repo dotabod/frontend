@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/script', () => ({
   default: ({ src, id }: { src?: string; id?: string }) => (
@@ -10,8 +10,9 @@ vi.mock('next/script', () => ({
 vi.mock('next/router', () => ({ useRouter: vi.fn() }))
 vi.mock('next-auth/react', () => ({ useSession: vi.fn() }))
 
-import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
+
 import HubSpot from '@/components/HubSpot'
 
 const anyVal = (v: unknown) => v as any
@@ -52,8 +53,8 @@ describe('HubSpot component', () => {
 
   it('loads the widget without identification for anonymous visitors', () => {
     render(<HubSpot />)
-    expect(widget.load).toHaveBeenCalledTimes(1)
-    expect(window.hsConversationsSettings).toEqual({ loadImmediately: false })
+    expect(widget.load).toHaveBeenCalledOnce()
+    expect(window.hsConversationsSettings).toStrictEqual({ loadImmediately: false })
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
@@ -74,8 +75,10 @@ describe('HubSpot component', () => {
 
     render(<HubSpot />)
 
-    await waitFor(() => expect(widget.load).toHaveBeenCalled())
-    expect(window.hsConversationsSettings).toEqual({
+    await waitFor(() => {
+      expect(widget.load).toHaveBeenCalledOnce()
+    })
+    expect(window.hsConversationsSettings).toStrictEqual({
       identificationEmail: 'gamer@example.com',
       identificationToken: 'vtok',
       loadImmediately: false,
@@ -99,8 +102,10 @@ describe('HubSpot component', () => {
 
     render(<HubSpot />)
 
-    await waitFor(() => expect(widget.load).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(widget.load).toHaveBeenCalledOnce()
+    })
     expect(json).not.toHaveBeenCalled()
-    expect(window.hsConversationsSettings).toEqual({ loadImmediately: false })
+    expect(window.hsConversationsSettings).toStrictEqual({ loadImmediately: false })
   })
 })

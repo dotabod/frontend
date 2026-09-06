@@ -1,5 +1,7 @@
-import { type Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, TransactionType } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
+
 import { stripe } from '@/lib/stripe-server'
 
 /**

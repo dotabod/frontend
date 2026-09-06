@@ -1,7 +1,9 @@
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import { type ReactElement, useEffect } from 'react'
+import { useEffect } from 'react'
+import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import WhatsNewFeed from '@/components/Dashboard/Features/WhatsNewFeed'
 import HomepageShell from '@/components/Homepage/HomepageShell'

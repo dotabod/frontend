@@ -17,7 +17,7 @@ export function AppScreen({
 }
 
 AppScreen.Header = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
-  function AppScreenHeader({ children }, ref) {
+  ({ children }, ref) => {
     return (
       <div ref={ref} className='mt-6 px-4 text-white'>
         {children}
@@ -26,10 +26,7 @@ AppScreen.Header = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
   },
 )
 
-AppScreen.Title = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function AppScreenTitle(
-  { children },
-  ref,
-) {
+AppScreen.Title = forwardRef<HTMLDivElement, { children: React.ReactNode }>(({ children }, ref) => {
   return (
     <div ref={ref} className='text-2xl text-white'>
       {children}
@@ -38,7 +35,7 @@ AppScreen.Title = forwardRef<HTMLDivElement, { children: React.ReactNode }>(func
 })
 
 AppScreen.Subtitle = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
-  function AppScreenSubtitle({ children }, ref) {
+  ({ children }, ref) => {
     return (
       <div ref={ref} className='text-sm text-gray-500'>
         {children}
@@ -48,7 +45,7 @@ AppScreen.Subtitle = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
 )
 
 AppScreen.Body = forwardRef<HTMLDivElement, { children: React.ReactNode; className: string }>(
-  function AppScreenBody({ children, className }, ref) {
+  ({ children, className }, ref) => {
     return (
       <div ref={ref} className={clsx('mt-6 flex-auto rounded-t-2xl bg-transparent', className)}>
         {children}

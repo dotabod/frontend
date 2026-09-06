@@ -1,4 +1,4 @@
-export const fetcher = (url: string, param = null) =>
+export const fetcher = async (url: string, param = null) =>
   fetch(url + (param || '')).then(async (r) => {
     if (!r.ok) {
       const error = new Error('An error occurred while fetching the data.') as Error & {
@@ -9,5 +9,5 @@ export const fetcher = (url: string, param = null) =>
       error.status = r.status
       throw error
     }
-    return r.json()
+    return await r.json()
   })

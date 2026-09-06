@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+
 import { isDev } from '@/lib/devConsts'
 
 export const useIsDevMode = () => {

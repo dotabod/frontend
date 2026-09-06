@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
+
 import { MagicCard } from './magic-card'
 
 const BentoGrid = ({ children, className }: { children: ReactNode; className?: string }) => (
@@ -31,7 +32,7 @@ const BentoCard = ({
   <div
     className={clsx(
       'group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl',
-      'transform-gpu bg-gray-950 [border:1px_solid_rgba(255,255,255,.1)] [box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]',
+      'transform-gpu bg-gray-950 [box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] [border:1px_solid_rgba(255,255,255,.1)]',
       className,
     )}
   >
@@ -52,7 +53,7 @@ const BentoCard = ({
             )}
           />
         )}
-        <h3 className='text-xl font-semibold text-neutral-300 pointer-events-auto'>{name}</h3>
+        <h3 className='pointer-events-auto text-xl font-semibold text-neutral-300'>{name}</h3>
         <div className='max-w-lg text-neutral-400'>{description}</div>
       </div>
 

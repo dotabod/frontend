@@ -1,18 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
+
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   try {
     // Get the current user session
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
 
     const userId = session.user.id
@@ -79,15 +82,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       giftMessage = 'You have active gift subscriptions!'
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       giftCount,
       giftMessage,
       giftSubscriptions: formattedGifts,
       hasGifts,
       hasLifetime,
     })
+    return
   } catch (error) {
     console.error('Error fetching gift subscriptions:', error)
-    return res.status(500).json({ error: 'Failed to fetch gift subscriptions' })
+    res.status(500).json({ error: 'Failed to fetch gift subscriptions' })
+    return
   }
 }

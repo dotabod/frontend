@@ -1,15 +1,17 @@
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CopyButton } from '@mantine/core'
 import { captureException } from '@sentry/nextjs'
-import { Button, Drawer, Layout, Menu, type MenuProps, theme } from 'antd'
+import { Button, Drawer, Layout, Menu, theme } from 'antd'
+import type { MenuProps } from 'antd'
 import clsx from 'clsx'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import Banner from '@/components/Banner'
 import CookieConsent from '@/components/CookieConsent'
 import { DisableToggle } from '@/components/Dashboard/DisableToggle'
@@ -22,7 +24,8 @@ import { useFeatureAccess } from '@/hooks/useSubscription'
 import { fetcher } from '@/lib/fetcher'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import useMaybeSignout from '@/lib/hooks/useMaybeSignout'
-import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+
 import { HelpMenu } from './HelpMenu'
 import { filterNav, findBestMatchingMenuItem, navConfig, navItemToMenuItem } from './navigation'
 import { SettingsSearch } from './SettingsSearch'
@@ -69,7 +72,7 @@ export default function DashboardShell({
     'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.'
   const host =
     process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ||
-    (typeof window !== 'undefined' ? window.location.host : 'dotabod.com')
+    (typeof window === 'undefined' ? 'dotabod.com' : window.location.host)
   const defaultOgImage = `https://${host}/images/welcome.png`
   const defaultUrl = `https://${host}/dashboard`
 
@@ -98,13 +101,13 @@ export default function DashboardShell({
       fetch('/api/update-followers').catch((error) => {
         captureException(error)
 
-        return console.error(error)
+        console.error(error)
       })
       if (hasAutoModeratorAccess) {
         fetch('/api/make-dotabod-mod').catch((error) => {
           captureException(error)
 
-          return console.error(error)
+          console.error(error)
         })
       }
     }
@@ -137,7 +140,7 @@ export default function DashboardShell({
   const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
     status === 'authenticated' ? '/api/notifications' : null,
     fetcher,
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
 
   const [hasGiftNotification, setHasGiftNotification] = useState(false)
@@ -338,7 +341,9 @@ export default function DashboardShell({
           <Drawer
             placement='left'
             open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
+            onClose={() => {
+              setDrawerOpen(false)
+            }}
             width={250}
             closable={false}
             rootClassName='md:hidden'
@@ -351,7 +356,11 @@ export default function DashboardShell({
               },
             }}
           >
-            {renderNav({ onNavigate: () => setDrawerOpen(false) })}
+            {renderNav({
+              onNavigate: () => {
+                setDrawerOpen(false)
+              },
+            })}
           </Drawer>
 
           <Layout className='min-h-0 min-w-0 overflow-hidden bg-gray-800!'>
@@ -366,9 +375,11 @@ export default function DashboardShell({
                   aria-label='Open navigation menu'
                   className='flex shrink-0 items-center md:hidden!'
                   icon={<Bars3Icon className='h-6 w-6 text-gray-200' />}
-                  onClick={() => setDrawerOpen(true)}
+                  onClick={() => {
+                    setDrawerOpen(true)
+                  }}
                 />
-                <div className='min-w-0 w-full max-w-lg'>
+                <div className='w-full max-w-lg min-w-0'>
                   <SettingsSearch />
                 </div>
               </div>
@@ -396,7 +407,7 @@ export default function DashboardShell({
               <GiftNotification
                 senderName={giftDetails.senderName}
                 giftMessage={giftDetails.giftMessage}
-                giftType={giftDetails.giftType as 'monthly' | 'annual' | 'lifetime'}
+                giftType={giftDetails.giftType}
                 giftQuantity={giftDetails.giftQuantity}
                 onDismiss={dismissGiftNotification}
                 hasLifetime={hasLifetime}

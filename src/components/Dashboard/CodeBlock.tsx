@@ -2,6 +2,7 @@ import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import { Button, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
+
 import { useTrack } from '@/lib/track'
 
 const CodeBlock = () => {
@@ -15,14 +16,16 @@ const CodeBlock = () => {
       .writeText(`powershell -c "irm https://${window.location.host}/install | iex"`)
       .then(() => {
         setCopied(true)
-        setTimeout(() => setCopied(false), 2500)
+        setTimeout(() => {
+          setCopied(false)
+        }, 2500)
       })
   }
 
   return (
-    <div className='mb-4 mt-0 sm:max-w-sm lg:max-w-2xl max-w-full'>
-      <div className='mb-1 flex p-5 sm:p-4 xs:p-3 justify-between items-center flex-row border-2 border-purple-400 rounded-sm text-lg sm:text-base xs:text-sm'>
-        <pre className='bg-gray-900 overflow-hidden text-white rounded-sm mb-0'>
+    <div className='mt-0 mb-4 max-w-full sm:max-w-sm lg:max-w-2xl'>
+      <div className='xs:p-3 xs:text-sm mb-1 flex flex-row items-center justify-between rounded-sm border-2 border-purple-400 p-5 text-lg sm:p-4 sm:text-base'>
+        <pre className='mb-0 overflow-hidden rounded-sm bg-gray-900 text-white'>
           <code>
             <span className='command-line'>
               <span style={{ color: '#F8F8F2' }}>powershell </span>
@@ -51,11 +54,11 @@ const CodeBlock = () => {
           />
         </Tooltip>
       </div>
-      <div className='flex flex-row justify-between items-center'>
+      <div className='flex flex-row items-center justify-between'>
         <Link
           target='_blank'
           href='https://github.com/dotabod/frontend/blob/master/src/lib/private/install.ps1'
-          className=' text-gray-400!'
+          className='text-gray-400!'
         >
           View source
         </Link>

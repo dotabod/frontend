@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -15,7 +16,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ message: 'Unauthorized' })
+    return
   }
 
   if (req.method === 'POST') {
@@ -45,11 +47,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           })
         }
 
-        return res.status(200).json({
+        res.status(200).json({
           existingAccount: true,
           message: 'Steam account already linked to your profile',
           steam32Id: body.steam32Id,
         })
+        return
       }
 
       const steamAccount = await prisma.$transaction(async (tx) => {
@@ -74,24 +77,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return created
       })
 
-      return res.status(200).json({
+      res.status(200).json({
         existingAccount: false,
         message: 'Steam account linked successfully',
         steamAccount,
       })
+      return
     } catch (error) {
       captureException(error)
       console.error('Error saving Steam ID:', error)
 
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ errors: error.errors, message: 'Invalid request data' })
+        res.status(400).json({ errors: error.errors, message: 'Invalid request data' })
+        return
       }
 
-      return res.status(500).json({ message: 'Internal server error' })
+      res.status(500).json({ message: 'Internal server error' })
+      return
     }
   }
 
-  return res.status(405).json({ message: 'Method not allowed' })
+  res.status(405).json({ message: 'Method not allowed' })
 }
 
 export default withMethods(['POST'], handler)

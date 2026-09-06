@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -6,7 +7,8 @@ import prisma from '@/lib/db'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.role?.includes('admin')) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
+    return
   }
 
   if (req.method === 'GET') {
@@ -60,18 +62,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     })
 
-    return res.status(200).json(messagesWithStats)
+    res.status(200).json(messagesWithStats)
+    return
   }
 
   if (req.method === 'POST') {
     const { message, sendAt, userId, isForAllUsers } = req.body
 
     if (!message || !sendAt) {
-      return res.status(400).json({ error: 'Missing required fields' })
+      res.status(400).json({ error: 'Missing required fields' })
+      return
     }
 
     if (!isForAllUsers && !userId) {
-      return res.status(400).json({ error: 'Either userId or isForAllUsers must be provided' })
+      res.status(400).json({ error: 'Either userId or isForAllUsers must be provided' })
+      return
     }
 
     // If we have a userId and it's not for all users, we need to find the actual user ID
@@ -90,13 +95,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
 
         if (!account) {
-          return res.status(404).json({ error: 'User not found with the provided account ID' })
+          res.status(404).json({ error: 'User not found with the provided account ID' })
+          return
         }
 
         actualUserId = account.userId
       } catch (error) {
         console.error('Error finding user by provider account ID:', error)
-        return res.status(500).json({ error: 'Failed to process user ID' })
+        res.status(500).json({ error: 'Failed to process user ID' })
+        return
       }
     }
 
@@ -111,12 +118,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       })
 
-      return res.status(200).json(createdMessage)
+      res.status(200).json(createdMessage)
+      return
     } catch (error) {
       console.error('Error creating scheduled message:', error)
-      return res.status(500).json({ error: 'Failed to create scheduled message' })
+      res.status(500).json({ error: 'Failed to create scheduled message' })
+      return
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' })
+  res.status(405).json({ error: 'Method not allowed' })
 }

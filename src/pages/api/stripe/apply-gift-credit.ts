@@ -1,6 +1,7 @@
 import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -15,7 +16,8 @@ import { getSubscription, isSubscriptionActive } from '@/utils/subscription'
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   try {
@@ -26,10 +28,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!userId) {
       // If no userId in body, check if authenticated user
       if (!session?.user) {
-        return res.status(401).json({ error: 'Unauthorized' })
+        res.status(401).json({ error: 'Unauthorized' })
+        return
       }
       if (session.user.isImpersonating) {
-        return res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
+        res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
+        return
       }
     }
 
@@ -37,7 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userIdToUse = userId || session?.user.id
 
     if (!userIdToUse) {
-      return res.status(400).json({ error: 'Missing user ID' })
+      res.status(400).json({ error: 'Missing user ID' })
+      return
     }
 
     // Check if the user has an active subscription already
@@ -50,11 +55,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       !activeSubscription.isGift &&
       isSubscriptionActive(activeSubscription)
     ) {
-      return res.status(200).json({
+      res.status(200).json({
         activeSubscription: true,
         message: 'User already has an active subscription',
         success: false,
       })
+      return
     }
 
     // Get the user's Stripe customer ID
@@ -70,7 +76,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      res.status(404).json({ error: 'User not found' })
+      return
     }
 
     // Find the user's Stripe customer ID
@@ -83,10 +90,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const stripeCustomerId = subscription?.stripeCustomerId
 
     if (!stripeCustomerId) {
-      return res.status(404).json({
+      res.status(404).json({
         error: 'No Stripe customer found for this user',
         success: false,
       })
+      return
     }
 
     // Get customer balance
@@ -94,10 +102,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Check if the customer is deleted
     if (customer.deleted) {
-      return res.status(404).json({
+      res.status(404).json({
         error: 'Stripe customer associated with this user has been deleted.',
         success: false,
       })
+      return
     }
 
     // Safely access the balance after ensuring the customer is not deleted
@@ -105,11 +114,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // If balance is zero or positive, there are no credits to use
     if (balance >= 0) {
-      return res.status(200).json({
+      res.status(200).json({
         balance,
         message: 'No credit balance available',
         success: false,
       })
+      return
     }
 
     // Check for inactive subscriptions that can be reactivated
@@ -202,7 +212,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
             status: SubscriptionStatus.ACTIVE, // Assume active, Stripe webhooks will update if payment fails
             stripeCustomerId,
-            stripePriceId: priceId as string,
+            stripePriceId: priceId,
             stripeSubscriptionId: newStripeSubscription.id, // Store the new Stripe Subscription ID
             tier: 'PRO',
             transactionType: TransactionType.RECURRING, // Or GIFT if fully paid by credit? Needs clarification.
@@ -210,21 +220,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         })
 
-        return res.status(200).json({
+        res.status(200).json({
           creditApplied: Math.abs(balance) / 100, // Show the amount of credit potentially used
           message: 'Successfully applied gift credits to create a new subscription',
           priceId,
           success: true,
         })
+        return
       } catch (error) {
         console.error('Error creating subscription from inactive path:', error)
         // Check for specific Stripe errors if needed
         // If (error instanceof Stripe.errors.StripeCardError) { ... }
-        return res.status(500).json({
+        res.status(500).json({
           details: error.message,
           error: 'Failed to create subscription using gift credits',
           success: false,
         })
+        return
       }
     } else {
       // No existing subscription to reactivate, create a new one
@@ -305,29 +317,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         })
 
-        return res.status(200).json({
+        res.status(200).json({
           creditApplied: Math.abs(balance) / 100, // Show the amount of credit potentially used
           message: 'Successfully applied gift credits to create a new subscription',
           priceId,
           success: true,
         })
+        return
       } catch (error) {
         console.error('Error creating new subscription:', error)
         // Check for specific Stripe errors if needed
         // If (error instanceof Stripe.errors.StripeCardError) { ... }
-        return res.status(500).json({
+        res.status(500).json({
           details: error.message,
           error: 'Failed to create new subscription using gift credits',
           success: false,
         })
+        return
       }
     }
   } catch (error) {
     console.error('Error applying gift credit:', error)
-    return res.status(500).json({
+    res.status(500).json({
       details: error.message,
       error: 'An unexpected error occurred',
       success: false,
     })
+    return
   }
 }

@@ -1,16 +1,23 @@
 import { Skeleton } from 'antd'
+
 import { useWinLoss } from '@/lib/hooks/useWinLoss'
 
 function getWindowLabel(statsDays: number | null, statsDaysTotal?: number | null): string {
-  if (statsDays === null) return 'This stream'
-  if (statsDaysTotal) return `${statsDays} of ${statsDaysTotal} days`
+  if (statsDays === null) {
+    return 'This stream'
+  }
+  if (statsDaysTotal) {
+    return `${statsDays} of ${statsDaysTotal} days`
+  }
   return `Last ${statsDays} ${statsDays === 1 ? 'day' : 'days'}`
 }
 
 export function ProfileWinLossCounter({ twitchId }: { twitchId?: string | null }) {
   const { connected, error, loading, wl } = useWinLoss({ twitchId })
 
-  if (!twitchId || error) return null
+  if (!twitchId || error) {
+    return null
+  }
   if (loading || !wl) {
     return <Skeleton.Input active size='small' style={{ height: 20, width: 150 }} />
   }

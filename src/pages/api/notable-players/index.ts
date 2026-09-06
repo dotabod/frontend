@@ -2,9 +2,10 @@ import { captureException } from '@sentry/nextjs'
 import { detect } from 'curse-filter'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { prismaMongo } from '@/lib/db'
 
@@ -25,11 +26,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, authOptions)
 
     if (!session?.user?.id || !session?.user?.twitchId) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
 
     // Get the user's Twitch ID to use as the channel - convert to string
-    const channel = `${session.user.twitchId}`
+    const channel = session.user.twitchId
 
     // GET - List notable players for the user's channel
     if (req.method === 'GET') {
@@ -42,7 +44,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      return res.status(200).json(notablePlayers)
+      res.status(200).json(notablePlayers)
+      return
     }
 
     // POST - Create a new notable player
@@ -60,7 +63,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
 
       if (existingPlayer) {
-        return res.status(409).json({ error: 'Player already exists' })
+        res.status(409).json({ error: 'Player already exists' })
+        return
       }
 
       // Create the new notable player with type assertion for the data
@@ -73,18 +77,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      return res.status(201).json(newPlayer)
+      res.status(201).json(newPlayer)
+      return
     }
 
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors })
+      res.status(400).json({ error: error.errors })
+      return
     }
 
     console.error('Error in notable-players API:', error)
     captureException(error)
-    return res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' })
+    return
   }
 }
 

@@ -2,18 +2,18 @@ import { ArrowUpRight, Sparkles } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+
 import { Container } from '@/components/Container'
 import {
   bestRarity,
-  type CosmeticItem,
   hexA,
-  type HeroCardData,
   HeroCard,
   RARITY_META,
   RarityChip,
   rarityRank,
   STEAM_CDN,
 } from '@/components/CosmeticSet'
+import type { CosmeticItem, HeroCardData } from '@/components/CosmeticSet'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { ProfileSectionNav } from '@/components/ProfileSectionNav'
 import prisma from '@/lib/db'
@@ -27,7 +27,7 @@ interface SetPageProps {
   rosterSize: number
   cards: Card[]
   // Whole-collection tally of the trophy rarities (legendary and up), rarest first.
-  tally: Array<{ rarity: string; count: number }>
+  tally: { rarity: string; count: number }[]
 }
 
 function CompletionMeter({
@@ -52,8 +52,8 @@ function CompletionMeter({
         <div
           className='h-full rounded-full transition-[width] duration-500 ease-out'
           style={{
-            width: `${pct}%`,
             background: `linear-gradient(90deg, ${hexA(accent, 0.5)}, ${accent})`,
+            width: `${pct}%`,
           }}
         />
       </div>
@@ -185,13 +185,11 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
         <ProfileSectionNav current='collection' username={username} />
 
         <Container className='py-10'>
-          {!hasCards ? (
-            <EmptyBinder displayName={displayName} />
-          ) : (
+          {hasCards ? (
             <>
               {featured && (
                 <section className='mb-12'>
-                  <h2 className='mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500'>
+                  <h2 className='mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase'>
                     {featured.justPlayed ? 'Newest pull' : 'Latest hero'}
                   </h2>
                   <div className='grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,235px)_1fr] sm:items-end'>
@@ -227,7 +225,7 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
 
               {rest.length > 0 && (
                 <section>
-                  <h2 className='mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500'>
+                  <h2 className='mb-4 text-xs font-semibold tracking-widest text-gray-500 uppercase'>
                     The collection
                   </h2>
                   <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
@@ -246,6 +244,8 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
                 </p>
               )}
             </>
+          ) : (
+            <EmptyBinder displayName={displayName} />
           )}
         </Container>
       </HomepageShell>
@@ -255,21 +255,25 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
 
 export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ params }) => {
   const username = (params?.username as string)?.toLowerCase()
-  if (!username) return { notFound: true }
+  if (!username) {
+    return { notFound: true }
+  }
 
   const user = await prisma.user.findFirst({
-    where: { name: username },
     select: {
-      name: true,
-      displayName: true,
-      image: true,
       cosmeticLoadouts: {
         select: { heroId: true, heroName: true, items: true, updatedAt: true },
       },
+      displayName: true,
+      image: true,
+      name: true,
     },
+    where: { name: username },
   })
 
-  if (!user) return { notFound: true }
+  if (!user) {
+    return { notFound: true }
+  }
 
   // Loaded here (not at module scope) so the hero map stays out of the client bundle.
   const heroes = (await import('dotaconstants/build/heroes.json')).default as Record<
@@ -286,8 +290,8 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
   const loadouts = user.cosmeticLoadouts
   const newestId = loadouts.reduce<{ id: number; at: number }>(
     (acc, l) =>
-      l.updatedAt.getTime() > acc.at ? { id: l.heroId, at: l.updatedAt.getTime() } : acc,
-    { id: -1, at: -1 },
+      l.updatedAt.getTime() > acc.at ? { at: l.updatedAt.getTime(), id: l.heroId } : acc,
+    { at: -1, id: -1 },
   ).id
 
   const cards: Card[] = loadouts
@@ -296,14 +300,14 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
       const heroImg = heroes[String(l.heroId)]?.img
       const heroCardImg = heroImg?.replace('/heroes/', '/heroes/crops/').replace(/\?$/, '')
       return {
-        heroId: l.heroId,
-        heroName: l.heroName,
-        heroImg: heroCardImg ? `${STEAM_CDN}${heroCardImg}` : null,
-        itemCount: items.length,
         bestRarity: bestRarity(items),
+        heroId: l.heroId,
+        heroImg: heroCardImg ? `${STEAM_CDN}${heroCardImg}` : null,
+        heroName: l.heroName,
+        itemCount: items.length,
+        justPlayed: l.heroId === newestId,
         updatedIso: l.updatedAt.toISOString(),
         updatedLabel: fmt.format(l.updatedAt),
-        justPlayed: l.heroId === newestId,
       }
     })
     // Binder opens on the holos: rarity desc, then most recent.
@@ -311,29 +315,32 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
       const byRarity =
         (b.bestRarity ? (RARITY_META[b.bestRarity]?.rank ?? -1) : -1) -
         (a.bestRarity ? (RARITY_META[a.bestRarity]?.rank ?? -1) : -1)
-      if (byRarity) return byRarity
+      if (byRarity) {
+        return byRarity
+      }
       return b.updatedIso.localeCompare(a.updatedIso)
     })
 
   // Trophy tally: count individual items of legendary rarity and up across every hero.
   const tallyCounts = new Map<string, number>()
-  for (const l of loadouts)
+  for (const l of loadouts) {
     for (const item of Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : [])
       if (rarityRank(item) >= 4)
         tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
+  }
   const tally = [...tallyCounts.entries()]
-    .map(([rarity, count]) => ({ rarity, count }))
+    .map(([rarity, count]) => ({ count, rarity }))
     .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
     .slice(0, 4)
 
   return {
     props: {
-      username: user.name,
+      cards,
       displayName: user.displayName || user.name,
       image: user.image,
       rosterSize,
-      cards,
       tally,
+      username: user.name,
     },
   }
 }

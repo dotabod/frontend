@@ -5,8 +5,11 @@ import React from 'react'
 import { Container } from 'src/components/Container'
 import CommandDetail from 'src/components/Dashboard/CommandDetail'
 import TwitchChat from 'src/components/TwitchChat'
-import { BentoCard, BentoGrid, type BentoGridItemProps } from '@/components/magicui/bento-grid'
+
+import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid'
+import type { BentoGridItemProps } from '@/components/magicui/bento-grid'
 import { Settings } from '@/lib/defaultSettings'
+
 import { chatterInfo } from '../Dashboard/Features/ChatterCard'
 import { MMRBadge } from '../Overlay/rank/MMRBadge'
 

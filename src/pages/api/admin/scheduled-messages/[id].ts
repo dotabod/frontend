@@ -1,18 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
+
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.role?.includes('admin')) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
+    return
   }
 
   const { id } = req.query
 
   if (typeof id !== 'string') {
-    return res.status(400).json({ error: 'Invalid ID' })
+    res.status(400).json({ error: 'Invalid ID' })
+    return
   }
 
   // GET a single scheduled message with delivery stats
@@ -31,7 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!scheduledMessage) {
-      return res.status(404).json({ error: 'Scheduled message not found' })
+      res.status(404).json({ error: 'Scheduled message not found' })
+      return
     }
 
     // Get delivery stats
@@ -59,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const totalUsers = await prisma.user.count()
     const targetUserCount = scheduledMessage.isForAllUsers ? totalUsers : 1
 
-    return res.status(200).json({
+    res.status(200).json({
       ...scheduledMessage,
       deliveryStats: {
         ...stats,
@@ -69,6 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalTargetUsers: targetUserCount,
       },
     })
+    return
   }
 
   // UPDATE a scheduled message
@@ -76,7 +81,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { message, sendAt, userId, isForAllUsers } = req.body
 
     if (!message && !sendAt && userId === undefined && isForAllUsers === undefined) {
-      return res.status(400).json({ error: 'No fields to update' })
+      res.status(400).json({ error: 'No fields to update' })
+      return
     }
 
     const existingMessage = await prisma.scheduledMessage.findUnique({
@@ -84,12 +90,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!existingMessage) {
-      return res.status(404).json({ error: 'Scheduled message not found' })
+      res.status(404).json({ error: 'Scheduled message not found' })
+      return
     }
 
     // Don't allow editing messages that have already been sent
     if (existingMessage.status === 'DELIVERED') {
-      return res.status(400).json({ error: 'Cannot edit a message that has already been sent' })
+      res.status(400).json({ error: 'Cannot edit a message that has already been sent' })
+      return
     }
 
     const updateData: Record<string, unknown> = {}
@@ -120,7 +128,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { id },
     })
 
-    return res.status(200).json(updatedMessage)
+    res.status(200).json(updatedMessage)
+    return
   }
 
   // DELETE a scheduled message
@@ -130,7 +139,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!existingMessage) {
-      return res.status(404).json({ error: 'Scheduled message not found' })
+      res.status(404).json({ error: 'Scheduled message not found' })
+      return
     }
 
     // If the message is pending, we can delete it completely
@@ -157,8 +167,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    return res.status(200).json({ success: true })
+    res.status(200).json({ success: true })
+    return
   }
 
-  return res.status(405).json({ error: 'Method not allowed' })
+  res.status(405).json({ error: 'Method not allowed' })
 }

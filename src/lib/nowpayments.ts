@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+
 import type { InvoiceReturn } from '@nowpaymentsio/nowpayments-api-js/src/actions/create-invoice'
 import type { GetPaymentStatusReturn } from '@nowpaymentsio/nowpayments-api-js/src/actions/get-payment-status'
 import type { ICreateInvoice } from '@nowpaymentsio/nowpayments-api-js/src/types'
@@ -83,7 +84,7 @@ async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown):
 export async function createNowPaymentsInvoice(
   params: CreateInvoiceParams,
 ): Promise<NowPaymentsInvoiceResponse> {
-  return request<NowPaymentsInvoiceResponse>('POST', '/invoice', params)
+  return await request<NowPaymentsInvoiceResponse>('POST', '/invoice', params)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

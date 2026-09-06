@@ -1,6 +1,6 @@
 export type BrowserProbeStatus = 'idle' | 'running' | 'passed' | 'failed'
 
-export type SetupDiagnosisCode =
+type SetupDiagnosisCode =
   | 'checking'
   | 'healthy'
   | 'browser_blocked'
@@ -30,7 +30,9 @@ export function isCompleteDiagnosticPayload(byteLength: number): boolean {
 }
 
 function isFresh(timestamp: string | null, now: number): boolean {
-  if (!timestamp) return false
+  if (!timestamp) {
+    return false
+  }
   const parsed = Date.parse(timestamp)
   return Number.isFinite(parsed) && now - parsed <= FRESH_MS
 }
@@ -53,11 +55,21 @@ export function diagnoseSetup({
   const overlaySocketFresh = isFresh(overlaySocketLastSeenAt, now)
   const gsiFresh = isFresh(gsiLastSeenAt, now)
 
-  if (!overlayPageLastSeenAt) return { code: 'obs_page_missing', severity: 'warning' }
-  if (!overlayPageFresh) return { code: 'obs_page_missing', severity: 'warning' }
-  if (!overlaySocketFresh) return { code: 'obs_socket_missing', severity: 'error' }
-  if (!gsiLastSeenAt) return { code: 'gsi_missing', severity: 'warning' }
-  if (!gsiFresh) return { code: 'gsi_stale', severity: 'warning' }
+  if (!overlayPageLastSeenAt) {
+    return { code: 'obs_page_missing', severity: 'warning' }
+  }
+  if (!overlayPageFresh) {
+    return { code: 'obs_page_missing', severity: 'warning' }
+  }
+  if (!overlaySocketFresh) {
+    return { code: 'obs_socket_missing', severity: 'error' }
+  }
+  if (!gsiLastSeenAt) {
+    return { code: 'gsi_missing', severity: 'warning' }
+  }
+  if (!gsiFresh) {
+    return { code: 'gsi_stale', severity: 'warning' }
+  }
 
   return { code: 'healthy', severity: 'success' }
 }

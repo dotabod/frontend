@@ -15,10 +15,12 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import * as Flags from 'mantine-flagpack'
-import Head from 'next/head'
 import { useSession } from 'next-auth/react'
-import { type ReactElement, useEffect, useState } from 'react'
+import Head from 'next/head'
+import { useEffect, useState } from 'react'
+import type { ReactElement } from 'react'
 import { z } from 'zod'
+
 import CommandDetail from '@/components/Dashboard/CommandDetail'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
@@ -174,15 +176,15 @@ const NotablePlayersPage: NextPageWithLayout = () => {
   const columns: ColumnsType<NotablePlayer> = [
     {
       dataIndex: 'name',
-      key: 'name',
-      width: 240,
       ellipsis: { showTitle: false },
+      key: 'name',
       render: (text: string) => (
         <Text strong ellipsis={{ tooltip: text }}>
           {text}
         </Text>
       ),
       title: 'Name',
+      width: 240,
     },
     {
       dataIndex: 'account_id',
@@ -223,14 +225,16 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             <Button
               icon={<Pencil className='h-4 w-4' />}
               type='text'
-              onClick={() => handleOpenEditModal(record)}
+              onClick={() => {
+                handleOpenEditModal(record)
+              }}
               disabled={isLoading}
             />
           </Tooltip>
           <Popconfirm
             title='Delete player'
             description='Are you sure you want to delete this player?'
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={async () => handleDelete(record.id)}
             okText='Delete'
             cancelText='Cancel'
             okButtonProps={{ danger: true }}
@@ -263,7 +267,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
 
       <ErrorBoundary>
         <Card title='Your Notable Players' className='mb-6'>
-          <div className='flex justify-between items-center mb-6'>
+          <div className='mb-6 flex items-center justify-between'>
             <Button
               type='primary'
               icon={<Plus className='h-4 w-4' />}
@@ -275,7 +279,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           </div>
 
           {isLoading && notablePlayers.length === 0 ? (
-            <div className='flex justify-center items-center py-12'>
+            <div className='flex items-center justify-center py-12'>
               <Spin size='large' />
             </div>
           ) : (
@@ -284,7 +288,9 @@ const NotablePlayersPage: NextPageWithLayout = () => {
               dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
               pagination={{
                 hideOnSinglePage: true,
-                onShowSizeChange: (_current, size) => setPageSize(size),
+                onShowSizeChange: (_current, size) => {
+                  setPageSize(size)
+                },
                 pageSize,
                 position: ['bottomCenter'],
                 showSizeChanger: true,
@@ -314,7 +320,9 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       <Modal
         title={isEditMode ? 'Edit Notable Player' : 'Add Notable Player'}
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => {
+          setIsModalOpen(false)
+        }}
         footer={null}
         destroyOnClose
       >
@@ -368,7 +376,13 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           </Form.Item>
 
           <div className='flex justify-end gap-4 pt-4'>
-            <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                setIsModalOpen(false)
+              }}
+            >
+              Cancel
+            </Button>
             <Button type='primary' htmlType='submit' loading={isLoading}>
               {isEditMode ? 'Update Player' : 'Add Player'}
             </Button>

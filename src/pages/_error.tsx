@@ -39,7 +39,7 @@ CustomErrorComponent.getInitialProps = async (contextData: NextPageContext) => {
   }
 
   // This will contain the status code of the response
-  return NextErrorComponent.getInitialProps(contextData)
+  return await NextErrorComponent.getInitialProps(contextData)
 }
 
 export default CustomErrorComponent

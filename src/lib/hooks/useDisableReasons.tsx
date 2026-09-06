@@ -1,8 +1,9 @@
 import type { DisableReason } from '@prisma/client'
 import { useCallback } from 'react'
 import useSWR from 'swr'
+
 import { fetcher } from '@/lib/fetcher'
-import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 
 interface DisableNotification {
   id: string
@@ -33,7 +34,7 @@ export function useDisableReasons() {
   const { data, error, mutate } = useSWR<DisableReasonsData>(
     '/api/settings/disable-reasons',
     fetcher,
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
 
   const acknowledgeDisableReason = useCallback(

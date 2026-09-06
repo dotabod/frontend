@@ -1,8 +1,9 @@
+import { Prisma } from '@prisma/client'
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
-import { Prisma } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/settings'
@@ -35,16 +36,16 @@ vi.mock('@/lib/api/getServerSession', () => ({
 }))
 
 vi.mock('@/utils/subscription', () => ({
-  canAccessFeature: vi.fn(() => ({ hasAccess: true, requiredTier: 'FREE' })),
   FEATURE_TIERS: {},
   GRACE_PERIOD_END: new Date('2026-01-01T00:00:00.000Z'),
-  getSubscription: vi.fn(),
-  isInGracePeriod: vi.fn(() => false),
-  isSubscriptionActive: vi.fn(() => false),
   SUBSCRIPTION_TIERS: {
     FREE: 'FREE',
     PRO: 'PRO',
   },
+  canAccessFeature: vi.fn(() => ({ hasAccess: true, requiredTier: 'FREE' })),
+  getSubscription: vi.fn(),
+  isInGracePeriod: vi.fn(() => false),
+  isSubscriptionActive: vi.fn(() => false),
 }))
 
 const OWNER_ID = 'owner-id'
@@ -87,7 +88,7 @@ describe('settings API', () => {
     expect(res.statusCode).toBe(200)
     expect(res.getHeader('Cache-Control')).toBe('private, no-store')
     expect(res._getJSONData().locale).toBe('ru-RU')
-    expect(res._getJSONData().settings).toEqual([{ key: 'aegis', value: true }])
+    expect(res._getJSONData().settings).toStrictEqual([{ key: 'aegis', value: true }])
     expect(prisma.user.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         select: expect.objectContaining({ locale: true }),
@@ -126,7 +127,7 @@ describe('settings API', () => {
     expect(prisma.user.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: PUBLIC_ID } }),
     )
-    expect(res._getJSONData().settings).toEqual([{ key: 'aegis', value: true }])
+    expect(res._getJSONData().settings).toStrictEqual([{ key: 'aegis', value: true }])
   })
 
   it('keeps the OBS password private and available to the owning dashboard session', async () => {
@@ -137,7 +138,7 @@ describe('settings API', () => {
 
     expect(res.statusCode).toBe(200)
     expect(res.getHeader('Cache-Control')).toBe('private, no-store')
-    expect(res._getJSONData().settings).toEqual(createSettingsResult().settings)
+    expect(res._getJSONData().settings).toStrictEqual(createSettingsResult().settings)
   })
 
   it('stores the per-stream WL mode as JSON null', async () => {

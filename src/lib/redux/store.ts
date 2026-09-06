@@ -1,4 +1,5 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit'
+
 import type { blockType } from '@/lib/devConsts'
 
 interface MinimapEntity {

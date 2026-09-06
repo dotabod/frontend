@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -15,7 +16,8 @@ import { getSubscription } from '@/utils/subscription'
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   res.setHeader('Cache-Control', 'private, max-age=30, stale-while-revalidate=60')
@@ -25,12 +27,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Prevent impersonation for security
     if (session?.user?.isImpersonating) {
-      return res.status(403).json({ message: 'Unauthorized' })
+      res.status(403).json({ message: 'Unauthorized' })
+      return
     }
 
     // Ensure user is authenticated
     if (!session?.user?.id) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
 
     // Try to find customer ID from subscription first
@@ -52,10 +56,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // If no customer ID exists anywhere, return 0 balance
     if (!customerId) {
-      return res.status(200).json({
+      res.status(200).json({
         balance: 0,
         formatted: '$0.00',
       })
+      return
     }
 
     // Retrieve the customer from Stripe to get their balance
@@ -65,22 +70,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const customer = await stripe.customers.retrieve(customerId)
       if (customer.deleted) {
-        return res.status(200).json({
+        res.status(200).json({
           balance: 0,
           formatted: '$0.00',
         })
+        return
       }
 
       // Get the customer's balance (negative value = available credit)
-      typedCustomer = customer as Stripe.Customer
+      typedCustomer = customer
       balance = typedCustomer.balance || 0
     } catch (stripeError) {
       console.error('Stripe customer retrieval error:', stripeError)
       // If the customer doesn't exist or there's a mode mismatch, return zero balance
-      return res.status(200).json({
+      res.status(200).json({
         balance: 0,
         formatted: '$0.00',
       })
+      return
     }
 
     // Format the balance for display
@@ -93,9 +100,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       balance: hasCredit ? Math.abs(balance) : 0, // Return positive value for credit
       formatted: hasCredit ? formatted : '$0.00',
     }
-    return res.status(200).json(response)
+    res.status(200).json(response)
+    return
   } catch (error) {
     console.error('Error fetching credit balance:', error)
-    return res.status(500).json({ error: 'Failed to fetch credit balance' })
+    res.status(500).json({ error: 'Failed to fetch credit balance' })
+    return
   }
 }

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+
 import LastFmCard from '@/components/Overlay/lastfm/LastFmCard'
 import { Settings } from '@/lib/defaultSettings'
 import type { blockType } from '@/lib/devConsts'

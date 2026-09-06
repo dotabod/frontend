@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -12,11 +13,13 @@ import prisma from '@/lib/db'
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
-    return res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ message: 'Unauthorized' })
+    return
   }
 
   if (!session?.user?.role?.includes('admin')) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
+    return
   }
 
   try {
@@ -27,9 +30,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const validGiftTypes = ['monthly', 'annual', 'lifetime']
 
     if (!validGiftTypes.includes(giftType)) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid gift type. Must be monthly, annual, or lifetime' })
+      res.status(400).json({ message: 'Invalid gift type. Must be monthly, annual, or lifetime' })
+      return
     }
 
     // Get gift message from request body or use default
@@ -41,7 +43,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Validate gift quantity
     if (Number.isNaN(giftQuantity) || giftQuantity < 1) {
-      return res.status(400).json({ message: 'Gift quantity must be a positive number' })
+      res.status(400).json({ message: 'Gift quantity must be a positive number' })
+      return
     }
 
     // For lifetime, enforce quantity = 1
@@ -156,7 +159,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       giftSubscription,
       hasLifetime,
       message: 'Test gift notification created',
@@ -165,9 +168,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       success: true,
       totalGiftedMonths: hasLifetime ? 'lifetime' : totalGiftedMonths,
     })
+    return
   } catch (error) {
     console.error('Error creating test gift notification:', error)
-    return res.status(500).json({ error: String(error), message: 'Internal server error' })
+    res.status(500).json({ error: String(error), message: 'Internal server error' })
+    return
   }
 }
 

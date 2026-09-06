@@ -15,10 +15,12 @@
  */
 
 import * as readline from 'node:readline'
+
 import type { OpenNodeCharge } from '@prisma/client'
 import { PrismaClient, SubscriptionStatus, TransactionType } from '@prisma/client'
-import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
+
 import { stripe } from '@/lib/stripe-server'
+import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 
 // Parse command line arguments
 const args = process.argv.slice(2)
@@ -60,7 +62,7 @@ async function prompt(question: string): Promise<string> {
     output: process.stdout,
   })
 
-  return new Promise((resolve) => {
+  return await new Promise((resolve) => {
     rl.question(question, (answer) => {
       rl.close()
       resolve(answer.toLowerCase().trim())

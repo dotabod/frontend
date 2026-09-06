@@ -40,7 +40,7 @@ function isChrome(): boolean {
     return false
   }
   const ua = navigator.userAgent
-  return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua)
+  return ua.includes('Chrome') && !/Edg|OPR|Brave/.test(ua)
 }
 
 /**
@@ -53,7 +53,7 @@ function getChromeVersion(): number | null {
   }
 
   const ua = navigator.userAgent
-  const match = ua.match(/Chrome\/(\d+)/)
+  const match = /Chrome\/(\d+)/.exec(ua)
   if (!match) {
     return null
   }
@@ -90,7 +90,7 @@ export async function queryLnaPermission(): Promise<LnaPermissionState> {
     const result = await navigator.permissions.query({
       name: 'local-network-access' as PermissionName,
     })
-    return result.state as LnaPermissionState
+    return result.state
   } catch {
     // Permission name not recognized or other error
     return 'unsupported'

@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
+
 import { Card } from '@/components/Card'
 import { Settings } from '@/lib/defaultSettings'
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
@@ -69,7 +70,7 @@ export const ChatMessagesOverlay = ({ chatMessages }: { chatMessages: ChatMessag
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className='text-white font-medium'
+                className='font-medium text-white'
                 layout
               >
                 {msg.message}

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
@@ -18,7 +18,7 @@ vi.mock('@/components/Dashboard/Features/TierSwitch', () => ({
 
 import NewFeaturesCard from '@/components/Dashboard/Features/NewFeaturesCard'
 
-describe('NewFeaturesCard', () => {
+describe(NewFeaturesCard, () => {
   it("renders the master toggle and links to What's New", () => {
     render(<NewFeaturesCard />)
 

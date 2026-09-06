@@ -1,5 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import type { ComponentProps, CSSProperties, ReactNode } from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import WinLossOverlay from '@/components/Overlay/WinLossOverlay'
 
 const updateStatsDays = vi.hoisted(() => vi.fn())
@@ -12,13 +14,13 @@ const settingsState = vi.hoisted<{ statsDays: number | null; statsStartDate: str
 )
 const socketState = vi.hoisted(() => {
   const handlers = new Map<string, (...args: unknown[]) => void>()
-  const pendingResponses: Array<{
+  const pendingResponses: {
     callback: (response: unknown) => void
     request: { statsDays?: number | null; statsStartDate?: string | null }
-  }> = []
+  }[] = []
   const control: {
     autoRespond: boolean
-    records: Array<{ lose: number; type: 'R' | 'U'; win: number }> | null
+    records: { lose: number; type: 'R' | 'U'; win: number }[] | null
   } = { autoRespond: true, records: null }
   const socket = {
     connected: true,
@@ -29,7 +31,9 @@ const socketState = vi.hoisted(() => {
         request: { statsDays?: number | null; statsStartDate?: string | null },
         callback: (response: unknown) => void,
       ) => {
-        if (event !== 'request-wl') return
+        if (event !== 'request-wl') {
+          return
+        }
         if (!control.autoRespond) {
           pendingResponses.push({ callback, request })
           return
@@ -51,6 +55,131 @@ const socketState = vi.hoisted(() => {
   }
 
   return { control, handlers, io: vi.fn(() => socket), pendingResponses, socket }
+})
+
+vi.mock('antd', async () => {
+  const { Children, cloneElement, isValidElement } = await import('react')
+
+  const Button = ({
+    children,
+    disabled,
+    loading,
+    type: _type,
+    ...props
+  }: ComponentProps<'button'> & { loading?: boolean }) => (
+    <button {...props} disabled={disabled || loading}>
+      {children}
+    </button>
+  )
+
+  const FormItem = ({
+    children,
+    colon: _colon,
+    label,
+    ...props
+  }: {
+    children: ReactNode
+    colon?: boolean
+    label?: ReactNode
+  } & ComponentProps<'div'>) => (
+    <div {...props}>
+      {label && <span>{label}</span>}
+      {children}
+    </div>
+  )
+
+  const Form = Object.assign(
+    ({ children, layout: _layout }: { children: ReactNode; layout?: string }) => (
+      <form>{children}</form>
+    ),
+    { Item: FormItem },
+  )
+
+  const Input = (props: ComponentProps<'input'>) => <input {...props} />
+
+  const InputNumber = ({
+    onChange,
+    precision: _precision,
+    value,
+    ...props
+  }: Omit<ComponentProps<'input'>, 'onChange' | 'value'> & {
+    onChange?: (value: number | null) => void
+    precision?: number
+    value?: number | null
+  }) => (
+    <input
+      {...props}
+      type='number'
+      value={value ?? ''}
+      onChange={(event) => {
+        onChange?.(event.currentTarget.value === '' ? null : Number(event.currentTarget.value))
+      }}
+    />
+  )
+
+  type RadioButtonProps = {
+    checked?: boolean
+    children: ReactNode
+    disabled?: boolean
+    onChange?: (event: { target: { value: number } }) => void
+    value?: number
+  }
+
+  const RadioButton = ({ children, checked, disabled, onChange, value }: RadioButtonProps) => (
+    <label>
+      <input
+        checked={checked}
+        disabled={disabled}
+        type='radio'
+        value={value}
+        onChange={() => {
+          onChange?.({ target: { value: value ?? 0 } })
+        }}
+      />
+      {children}
+    </label>
+  )
+
+  const RadioGroup = ({
+    'aria-label': ariaLabel,
+    children,
+    disabled,
+    onChange,
+    value,
+  }: {
+    'aria-label'?: string
+    children: ReactNode
+    disabled?: boolean
+    onChange?: (event: { target: { value: number } }) => void
+    value?: number
+  }) => (
+    <div aria-label={ariaLabel} role='radiogroup'>
+      {Children.map(children, (child) => {
+        if (!isValidElement<RadioButtonProps>(child)) {
+          return child
+        }
+
+        return cloneElement(child, {
+          checked: child.props.value === value,
+          disabled: disabled || child.props.disabled,
+          onChange,
+        })
+      })}
+    </div>
+  )
+
+  const SkeletonInput = ({ style }: { style?: CSSProperties }) => (
+    <div aria-busy='true' style={style} />
+  )
+
+  return {
+    Button,
+    Form,
+    Input,
+    InputNumber,
+    Radio: { Button: RadioButton, Group: RadioGroup },
+    Skeleton: { Input: SkeletonInput },
+  }
 })
 
 vi.mock('next-auth/react', () => ({
@@ -88,7 +217,7 @@ vi.mock('@/components/Overlay/wl/WinLossCard', () => ({
     wl,
   }: {
     wl: {
-      records: Array<{ lose: number; win: number }>
+      records: { lose: number; win: number }[]
       statsDays: number | null
       statsDaysTotal?: number | null
     }
@@ -113,7 +242,7 @@ vi.mock('@/ui/card', () => ({
   ),
 }))
 
-describe('WinLossOverlay', () => {
+describe(WinLossOverlay, () => {
   afterEach(() => {
     vi.useRealTimers()
     updateStatsDays.mockReset()
@@ -162,7 +291,7 @@ describe('WinLossOverlay', () => {
     socketState.control.autoRespond = false
     render(<WinLossOverlay />)
 
-    expect(socketState.pendingResponses.map(({ request }) => request)).toEqual([
+    expect(socketState.pendingResponses.map(({ request }) => request)).toStrictEqual([
       { statsDays: 30, statsStartDate: '2026-08-21' },
     ])
 

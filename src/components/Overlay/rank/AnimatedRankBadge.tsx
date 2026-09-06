@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+
 import { MMRBadge } from '@/components/Overlay/rank/MMRBadge'
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'

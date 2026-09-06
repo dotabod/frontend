@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
 
 const originalFetch = globalThis.fetch
@@ -14,29 +15,29 @@ afterEach(() => {
 })
 
 const oidcProfile = {
-  sub: '32474777',
-  preferred_username: 'TECHLEED',
   email: 'info@example.com',
   picture: 'https://example.com/pic.png',
+  preferred_username: 'TECHLEED',
+  sub: '32474777',
 }
 
 function mockFetchOnce(response: { ok?: boolean; status?: number; json?: () => Promise<unknown> }) {
   globalThis.fetch = vi.fn(async () => ({
+    json: response.json ?? (async () => ({})),
     ok: response.ok ?? true,
     status: response.status ?? 200,
-    json: response.json ?? (async () => ({})),
   })) as unknown as typeof fetch
 }
 
-describe('twitchHelixProfile', () => {
+describe(twitchHelixProfile, () => {
   it('returns the helix login as `name` and helix display_name as `displayName`', async () => {
     mockFetchOnce({
       json: async () => ({
         data: [
           {
+            display_name: 'TECHLEED',
             id: '32474777',
             login: 'techleed',
-            display_name: 'TECHLEED',
           },
         ],
       }),
@@ -44,12 +45,12 @@ describe('twitchHelixProfile', () => {
 
     const user = await twitchHelixProfile(oidcProfile, 'access-token-123')
 
-    expect(user).toEqual({
-      id: '32474777',
-      name: 'techleed',
+    expect(user).toStrictEqual({
       displayName: 'TECHLEED',
       email: 'info@example.com',
+      id: '32474777',
       image: 'https://example.com/pic.png',
+      name: 'techleed',
     })
 
     // Sanity-check that the correct Twitch endpoint was hit with the right headers.
@@ -86,7 +87,7 @@ describe('twitchHelixProfile', () => {
   it('falls back when the fetch itself throws (network blip)', async () => {
     globalThis.fetch = vi.fn(async () => {
       throw new Error('ECONNRESET')
-    }) as unknown as typeof fetch
+    })
 
     const user = await twitchHelixProfile(oidcProfile, 'tok')
 
@@ -99,15 +100,15 @@ describe('twitchHelixProfile', () => {
       json: async () => ({
         data: [
           {
+            display_name: 'カンジ',
             id: '999',
             login: 'kanjistreamer',
-            display_name: 'カンジ',
           },
         ],
       }),
     })
 
-    const user = await twitchHelixProfile({ sub: '999', preferred_username: 'カンジ' }, 'tok')
+    const user = await twitchHelixProfile({ preferred_username: 'カンジ', sub: '999' }, 'tok')
 
     expect(user.name).toBe('kanjistreamer')
     expect(user.displayName).toBe('カンジ')

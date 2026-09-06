@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -13,7 +14,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ message: 'Unauthorized' })
+    return
   }
 
   if (req.method === 'POST') {
@@ -28,18 +30,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         !params['openid.sig'] ||
         !params['openid.signed']
       ) {
-        return res.status(400).json({ message: 'Invalid OpenID parameters' })
+        res.status(400).json({ message: 'Invalid OpenID parameters' })
+        return
       }
 
       // Extract Steam ID from the claimed_id or identity
       const steamIdentity = params['openid.claimed_id'] || params['openid.identity']
       if (!steamIdentity) {
-        return res.status(400).json({ message: 'Missing Steam identity' })
+        res.status(400).json({ message: 'Missing Steam identity' })
+        return
       }
 
       const steamId64 = steamIdentity.split('/').pop()
       if (!steamId64) {
-        return res.status(400).json({ message: 'Could not extract Steam ID' })
+        res.status(400).json({ message: 'Could not extract Steam ID' })
+        return
       }
 
       // Validate the response by sending a verification request to Steam
@@ -74,7 +79,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // Check if verification is successful
       if (!verifyText.includes('is_valid:true')) {
         console.error('OpenID verification failed:', verifyText)
-        return res.status(400).json({ message: 'OpenID verification failed' })
+        res.status(400).json({ message: 'OpenID verification failed' })
+        return
       }
 
       // Convert Steam64 to Steam32 ID
@@ -173,19 +179,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         // Continue processing - we'll still return the verified Steam ID even if saving fails
       }
 
-      return res.status(200).json({
+      res.status(200).json({
         message: 'Steam authentication validated successfully',
         profileData,
         steam32Id,
       })
+      return
     } catch (error) {
       captureException(error)
       console.error('Error validating Steam authentication:', error)
-      return res.status(500).json({ message: 'Internal server error' })
+      res.status(500).json({ message: 'Internal server error' })
+      return
     }
   }
 
-  return res.status(405).json({ message: 'Method not allowed' })
+  res.status(405).json({ message: 'Method not allowed' })
 }
 
 export default withMethods(['POST'], handler)

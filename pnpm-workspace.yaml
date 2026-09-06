@@ -3,9 +3,11 @@ nodeLinker: hoisted
 publicHoistPattern:
   - '*prisma*'
 
-overrides:
-  '@voidzero-dev/vite-plus-test': npm:vitest@5.0.0
-  vitest: 5.0.0
+# typography's peer expression includes the non-semver token `insiders`;
+# allow the installed stable Tailwind release until upstream corrects it.
+peerDependencyRules:
+  allowedVersions:
+    tailwindcss: '4.3.3'
 
 allowBuilds:
   '@prisma/client': true
@@ -14,9 +16,3 @@ allowBuilds:
   lefthook: true
   prisma: true
   sharp: true
-
-minimumReleaseAgeExclude:
-  - '@vitest/coverage-v8@5.0.0'
-  - '@vitest/mocker@5.0.0'
-  - '@vitest/spy@5.0.0'
-  - vitest@5.0.0

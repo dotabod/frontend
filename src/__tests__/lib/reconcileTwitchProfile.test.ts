@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { reconcileTwitchProfile } from '@/lib/reconcileTwitchProfile'
 
 const originalFetch = globalThis.fetch
@@ -13,16 +14,16 @@ afterEach(() => {
   process.env.TWITCH_CLIENT_ID = originalClientId
 })
 
-function mockHelix(data: Array<{ id: string; login: string; display_name: string }> | null) {
+function mockHelix(data: { id: string; login: string; display_name: string }[] | null) {
   globalThis.fetch = vi.fn(async () => ({
+    json: async () => ({ data: data ?? [] }),
     ok: true,
     status: 200,
-    json: async () => ({ data: data ?? [] }),
   })) as unknown as typeof fetch
 }
 
 function makePrisma() {
-  const calls: Array<{ where: unknown; data: unknown }> = []
+  const calls: { where: unknown; data: unknown }[] = []
   return {
     calls,
     user: {
@@ -34,59 +35,59 @@ function makePrisma() {
   }
 }
 
-describe('reconcileTwitchProfile', () => {
+describe(reconcileTwitchProfile, () => {
   it('updates name and displayName when the login changed (login-only rename)', async () => {
     // Edge case: user changed Twitch login from `techleed → jamesleed` but
     // kept the same display name. The jwt() rename-detection check compares
     // preferred_username (= display name), which is unchanged, so it misses
     // the rename. This reconciler is the safety net.
-    mockHelix([{ id: '32474777', login: 'jamesleed', display_name: 'TECHLEED' }])
+    mockHelix([{ display_name: 'TECHLEED', id: '32474777', login: 'jamesleed' }])
     const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
+      accessToken: 'tok',
+      currentDisplayName: 'TECHLEED',
+      currentName: 'techleed',
       prisma: prisma as never,
       userId: 'u-1',
-      accessToken: 'tok',
-      currentName: 'techleed',
-      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('updated')
     expect(prisma.calls).toHaveLength(1)
     expect(prisma.calls[0].data).toMatchObject({
-      name: 'jamesleed',
       displayName: 'TECHLEED',
+      name: 'jamesleed',
     })
   })
 
   it('updates when displayName changed (the typical rename)', async () => {
-    mockHelix([{ id: '32474777', login: 'jamesleed', display_name: 'JAMESLEED' }])
+    mockHelix([{ display_name: 'JAMESLEED', id: '32474777', login: 'jamesleed' }])
     const prisma = makePrisma()
 
     await reconcileTwitchProfile({
+      accessToken: 'tok',
+      currentDisplayName: 'TECHLEED',
+      currentName: 'techleed',
       prisma: prisma as never,
       userId: 'u-1',
-      accessToken: 'tok',
-      currentName: 'techleed',
-      currentDisplayName: 'TECHLEED',
     })
 
     expect(prisma.calls[0].data).toMatchObject({
-      name: 'jamesleed',
       displayName: 'JAMESLEED',
+      name: 'jamesleed',
     })
   })
 
   it('skips the prisma.update when nothing changed (idempotent)', async () => {
-    mockHelix([{ id: '32474777', login: 'techleed', display_name: 'TECHLEED' }])
+    mockHelix([{ display_name: 'TECHLEED', id: '32474777', login: 'techleed' }])
     const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
+      accessToken: 'tok',
+      currentDisplayName: 'TECHLEED',
+      currentName: 'techleed',
       prisma: prisma as never,
       userId: 'u-1',
-      accessToken: 'tok',
-      currentName: 'techleed',
-      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('no-change')
@@ -96,36 +97,36 @@ describe('reconcileTwitchProfile', () => {
   it('backfills a NULL displayName from Helix on next sign-in (legacy row recovery)', async () => {
     // Legacy users created before the TwitchProvider.profile() override may
     // have displayName=NULL. Their next sign-in should populate it.
-    mockHelix([{ id: '32474777', login: 'techleed', display_name: 'TECHLEED' }])
+    mockHelix([{ display_name: 'TECHLEED', id: '32474777', login: 'techleed' }])
     const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
+      accessToken: 'tok',
+      currentDisplayName: null,
+      currentName: 'techleed',
       prisma: prisma as never,
       userId: 'u-1',
-      accessToken: 'tok',
-      currentName: 'techleed',
-      currentDisplayName: null,
     })
 
     expect(result).toBe('updated')
     expect(prisma.calls[0].data).toMatchObject({
-      name: 'techleed',
       displayName: 'TECHLEED',
+      name: 'techleed',
     })
   })
 
   it('returns "helix-unavailable" without throwing when /helix/users fails (network blip)', async () => {
     globalThis.fetch = vi.fn(async () => {
       throw new Error('ECONNRESET')
-    }) as unknown as typeof fetch
+    })
     const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
+      accessToken: 'tok',
+      currentDisplayName: 'TECHLEED',
+      currentName: 'techleed',
       prisma: prisma as never,
       userId: 'u-1',
-      accessToken: 'tok',
-      currentName: 'techleed',
-      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('helix-unavailable')
@@ -137,11 +138,11 @@ describe('reconcileTwitchProfile', () => {
     const prisma = makePrisma()
 
     const result = await reconcileTwitchProfile({
+      accessToken: 'tok',
+      currentDisplayName: 'TECHLEED',
+      currentName: 'techleed',
       prisma: prisma as never,
       userId: 'u-1',
-      accessToken: 'tok',
-      currentName: 'techleed',
-      currentDisplayName: 'TECHLEED',
     })
 
     expect(result).toBe('helix-unavailable')

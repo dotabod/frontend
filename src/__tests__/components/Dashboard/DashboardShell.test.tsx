@@ -1,9 +1,10 @@
 // @ts-nocheck
 import { render, screen } from '@testing-library/react'
-import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 
 vi.mock('next-auth/react', () => ({
@@ -75,7 +76,9 @@ vi.mock('antd', () => {
 
 vi.mock('@/components/Banner', () => ({ default: () => <div>Announcement</div> }))
 vi.mock('@/components/CookieConsent', () => ({ default: () => null }))
-vi.mock('@/components/Dashboard/DisableToggle', () => ({ DisableToggle: () => <div>Toggle</div> }))
+vi.mock('@/components/Dashboard/DisableToggle', () => ({
+  DisableToggle: () => <div>Toggle</div>,
+}))
 vi.mock('@/components/Dashboard/SubscriptionBadge', () => ({
   SubscriptionBadge: () => <div>Subscription</div>,
 }))
@@ -85,9 +88,13 @@ vi.mock('@/components/Logo', () => ({
 }))
 vi.mock('@/components/Subscription/GiftNotification', () => ({ default: () => null }))
 vi.mock('@/components/UserAccountNav', () => ({ UserAccountNav: () => <div>Account</div> }))
-vi.mock('@/hooks/useSubscription', () => ({ useFeatureAccess: () => ({ hasAccess: false }) }))
-vi.mock('@/lib/hooks/useBaseUrl', () => ({ useBaseUrl: () => 'https://example.com/overlay' }))
-vi.mock('@/lib/hooks/useMaybeSignout', () => ({ default: () => undefined }))
+vi.mock('@/hooks/useSubscription', () => ({
+  useFeatureAccess: () => ({ hasAccess: false }),
+}))
+vi.mock('@/lib/hooks/useBaseUrl', () => ({
+  useBaseUrl: () => 'https://example.com/overlay',
+}))
+vi.mock('@/lib/hooks/useMaybeSignout', () => ({ default: () => {} }))
 vi.mock('@/components/Dashboard/HelpMenu', () => ({ HelpMenu: () => <div>Help</div> }))
 vi.mock('@/components/Dashboard/SettingsSearch', () => ({
   SettingsSearch: () => <div>Search</div>,

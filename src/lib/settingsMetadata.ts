@@ -887,7 +887,7 @@ export const settingsMetadata: SettingMetadata[] = [
 ]
 
 // Helper function to get all searchable text for a setting
-export function getSearchableText(setting: SettingMetadata): string {
+function getSearchableText(setting: SettingMetadata): string {
   return [setting.label, setting.description, ...setting.searchTerms, setting.key]
     .join(' ')
     .toLowerCase()

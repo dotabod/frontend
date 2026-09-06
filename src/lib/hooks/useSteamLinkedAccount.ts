@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+
 import { fetcher } from '@/lib/fetcher'
 import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
 

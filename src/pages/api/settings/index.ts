@@ -2,8 +2,9 @@ import { Prisma } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/defaultSettings'
@@ -145,37 +146,42 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })
 
         if (!data) {
-          return res.json({})
+          res.json({})
+          return
         }
 
         const subscription = getSettingsSubscription(data.subscription)
 
         const { Account, subscription: _subscriptionRows, ...userData } = data
 
-        return res.json({
+        res.json({
           ...userData,
           subscription,
           twitchId: Account?.providerAccountId ?? null,
         })
+        return
       } catch (error) {
         captureException(error)
         console.error(error)
-        return res.status(404).json({
+        res.status(404).json({
           error: 'User not found',
         })
+        return
       }
     }
   }
 
   if (!userId && !session?.user?.id) {
-    return res.status(403).json({ message: 'Unauthorized' })
+    res.status(403).json({ message: 'Unauthorized' })
+    return
   }
 
   if (req.method === 'GET') {
     try {
       const resolvedUserId = userId ?? session?.user?.id
       if (!resolvedUserId) {
-        return res.status(403).json({ message: 'Unauthorized' })
+        res.status(403).json({ message: 'Unauthorized' })
+        return
       }
 
       const isPublicOverlayRequest = Boolean(userId)
@@ -216,7 +222,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
 
       if (!data) {
-        return res.status(404).json({ message: 'User not found' })
+        res.status(404).json({ message: 'User not found' })
+        return
       }
 
       if (isPublicOverlayRequest || session?.user?.isImpersonating) {
@@ -230,10 +237,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const { subscription: _subscriptionRows, ...userData } = data
 
-      return res.json({
+      res.json({
         ...userData,
         subscription,
       })
+      return
     } catch (error) {
       captureException(error)
       console.error('Error fetching user:', error)
@@ -243,7 +251,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'POST') {
     if (!session?.user?.id) {
-      return res.status(403).json({ message: 'Unauthorized' })
+      res.status(403).json({ message: 'Unauthorized' })
+      return
     }
 
     try {
@@ -251,7 +260,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const keyValidation = settingKeySchema.safeParse(parsedBody.key)
       if (!keyValidation.success) {
-        return res.status(422).json({ error: 'Invalid setting key' })
+        res.status(422).json({ error: 'Invalid setting key' })
+        return
       }
 
       // Get user's subscription
@@ -264,7 +274,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
         if (session.user.isImpersonating) {
           if (validatedBody.key === Settings.obsServerPassword) {
-            return res.status(403).json({ message: 'Forbidden' })
+            res.status(403).json({ message: 'Forbidden' })
+            return
           }
         }
 
@@ -285,7 +296,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         })
 
-        return res.json(post)
+        res.json(post)
+        return
       } catch (error) {
         if (error instanceof z.ZodError) {
           // Check if error is related to subscription access
@@ -293,12 +305,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             (e) => e.message === 'Your subscription tier does not have access to this feature',
           )
           if (subscriptionError) {
-            return res.status(403).json({
+            res.status(403).json({
               error: 'Subscription tier does not have access to this feature',
               requiredTier: FEATURE_TIERS[validKey],
             })
+            return
           }
-          return res.status(422).json(error.issues)
+          res.status(422).json(error.issues)
+          return
         }
         throw error
       }

@@ -1,7 +1,9 @@
 import type { SubscriptionTier } from '@prisma/client'
 import { Button } from 'antd'
 import Link from 'next/link'
+
 import { SUBSCRIPTION_TIERS } from '@/utils/subscription'
+
 import { TierBadge } from './TierBadge'
 
 interface LockedFeatureOverlayProps {
@@ -23,17 +25,17 @@ export function LockedFeatureOverlay({
   }
 
   return (
-    <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg backdrop-blur-md z-10'>
-      <div className='flex flex-col items-center gap-6 p-8 max-w-lg'>
+    <div className='absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-black/60 backdrop-blur-md'>
+      <div className='flex max-w-lg flex-col items-center gap-6 p-8'>
         <TierBadge tooltip={false} requiredTier={requiredTier} />
 
         <div className='text-center'>
-          <p className='text-white text-lg font-medium mb-2'>{message}</p>
+          <p className='mb-2 text-lg font-medium text-white'>{message}</p>
           <Link href='/dashboard/billing'>
             <Button
               type='primary'
               size='large'
-              className='shadow-lg hover:scale-105 transition-transform duration-200'
+              className='shadow-lg transition-transform duration-200 hover:scale-105'
             >
               Upgrade now
             </Button>

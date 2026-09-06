@@ -2,9 +2,11 @@ import { Button, Form, Spin } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
+
 import { defaultSettings, Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierInput } from './TierInput'
 import { TierSwitch } from './TierSwitch'
 
@@ -16,7 +18,9 @@ export default function QueueCard() {
   )
 
   const [form] = Form.useForm()
-  useEffect(() => form.resetFields(), [findMatchText])
+  useEffect(() => {
+    form.resetFields()
+  }, [findMatchText])
 
   return (
     <Card title='Queue blocker' feature='queueBlockerFindMatchText'>
@@ -30,7 +34,7 @@ export default function QueueCard() {
           label='Enable queue blocker overlay'
         />
       </div>
-      <div className='mb-5 mt-5 flex items-center space-x-2'>
+      <div className='mt-5 mb-5 flex items-center space-x-2'>
         <TierSwitch
           hideTierBadge
           settingKey={Settings.queueBlockerFindMatch}
@@ -43,7 +47,9 @@ export default function QueueCard() {
           layout='vertical'
           initialValues={{ text: findMatchText }}
           name='bets-form'
-          onFinish={(form) => updateFindMatchText(form.text)}
+          onFinish={(form) => {
+            updateFindMatchText(form.text)
+          }}
         >
           <Form.Item colon={false} label={<span>Custom find match text</span>} name='text'>
             <TierInput

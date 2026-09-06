@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
+
 import { SubscriptionAlerts } from '@/components/Subscription/SubscriptionAlerts'
 
 const useSubscriptionContextMock = vi.fn()
@@ -47,7 +48,7 @@ vi.mock('antd', () => ({
   },
 }))
 
-describe('SubscriptionAlerts', () => {
+describe(SubscriptionAlerts, () => {
   const giftInfo = {
     giftCount: 0,
     giftMessage: '',

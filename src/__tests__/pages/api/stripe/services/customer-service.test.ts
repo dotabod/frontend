@@ -1,8 +1,9 @@
 // @ts-nocheck
 import type { Prisma } from '@prisma/client'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
-import { CustomerService } from '@/lib/stripe/services/customer-service'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { stripe } from '@/lib/stripe-server'
+import { CustomerService } from '@/lib/stripe/services/customer-service'
 
 vi.mock('@/lib/stripe-server', () => ({
   stripe: {

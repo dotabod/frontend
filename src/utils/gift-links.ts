@@ -7,13 +7,13 @@
  * @param username The username to gift a subscription to
  * @returns The URL for the gift page
  */
-export function createGiftLink(username: string): string {
-  if (!username) {
+export const createGiftLink = (username: string): string => {
+  const formattedUsername = username.trim().toLowerCase()
+
+  // Legacy Twitch login names can be 1–25 letters, numbers, or underscores.
+  if (!/^[a-z0-9_]{1,25}$/u.test(formattedUsername)) {
     return '/gift'
   }
 
-  // Ensure the username is properly formatted
-  const formattedUsername = username.trim().toLowerCase()
-
-  return `/${formattedUsername}/gift`
+  return `/${encodeURIComponent(formattedUsername)}/gift`
 }

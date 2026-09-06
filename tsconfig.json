@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": ["./src/*"],
       "*": ["./*"]
@@ -21,11 +20,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "useUnknownInCatchVariables": false,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "plugins": [{ "name": "next" }],
     "strictNullChecks": true
   },
   "include": [

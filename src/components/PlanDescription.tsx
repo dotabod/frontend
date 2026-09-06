@@ -1,5 +1,6 @@
 import { SubscriptionStatus } from '@prisma/client'
 import { useEffect, useState } from 'react'
+
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import {
   GRACE_PERIOD_END,
@@ -7,6 +8,7 @@ import {
   isInGracePeriod,
   SUBSCRIPTION_TIERS,
 } from '@/utils/subscription'
+
 import ErrorBoundary from './ErrorBoundary'
 
 interface PlanDescriptionProps {
@@ -86,13 +88,13 @@ export const PlanDescription = ({
         {/* Always render a message container, but only show content based on messageType */}
         <div className='additional-message'>
           {messageType === 'crypto' && (
-            <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+            <span className='mt-1 block translate-y-0 transform text-amber-400 opacity-100 transition-all duration-300 ease-in-out'>
               Note: Free trial is not available with crypto payments
             </span>
           )}
 
           {messageType === 'paypal' && (
-            <span className='block mt-1 text-amber-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+            <span className='mt-1 block translate-y-0 transform text-amber-400 opacity-100 transition-all duration-300 ease-in-out'>
               {hasCreditBalance
                 ? `Note: PayPal checkout will not apply your ${formattedCreditBalance} account credit, and free trials are not available with PayPal.`
                 : 'Note: Free trial is not available with PayPal payments'}
@@ -100,26 +102,26 @@ export const PlanDescription = ({
           )}
 
           {messageType === 'credit-checkout' && (
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out'>
+            <span className='mt-1 block text-purple-400 transition-all duration-300 ease-in-out'>
               You have {formattedCreditBalance} credit that will be applied at checkout
             </span>
           )}
 
           {messageType === 'credit-invoice' && (
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out'>
+            <span className='mt-1 block text-purple-400 transition-all duration-300 ease-in-out'>
               You have {formattedCreditBalance} credit that will be applied to your next invoice
             </span>
           )}
 
           {messageType === 'grace-period' && (
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+            <span className='mt-1 block translate-y-0 transform text-purple-400 opacity-100 transition-all duration-300 ease-in-out'>
               Includes free trial until {gracePeriodPrettyDate}{' '}
               {daysRemaining !== null && `(${daysRemaining} days)`}
             </span>
           )}
 
           {messageType === 'trial' && (
-            <span className='block mt-1 text-purple-400 transition-all duration-300 ease-in-out transform translate-y-0 opacity-100'>
+            <span className='mt-1 block translate-y-0 transform text-purple-400 opacity-100 transition-all duration-300 ease-in-out'>
               Includes 14 day free trial
             </span>
           )}

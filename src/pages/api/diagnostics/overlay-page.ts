@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
 import { SETUP_SIGNAL_KEYS } from '@/lib/setupSignalKeys'
@@ -8,7 +9,10 @@ const bodySchema = z.object({ userId: z.string().uuid() })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const parsed = bodySchema.safeParse(req.body)
-  if (!parsed.success) return res.status(422).json({ message: 'Invalid user ID' })
+  if (!parsed.success) {
+    res.status(422).json({ message: 'Invalid user ID' })
+    return
+  }
 
   const { userId } = parsed.data
   await prisma.setting.upsert({

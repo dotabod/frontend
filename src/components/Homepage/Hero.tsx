@@ -1,17 +1,19 @@
 import { Button, Popover, Skeleton } from 'antd'
 import { LucideHome, LucideTerminalSquare } from 'lucide-react'
+import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { signIn, useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { Container } from 'src/components/Container'
 import dotaLogo from 'src/images/logos/dota.svg'
 import TwitchSvg from 'src/images/logos/twitch.svg'
 import useSWR from 'swr'
+
 import { BackgroundIllustration } from '@/components/Homepage/BackgroundIllustration'
 import { PhoneFrame } from '@/components/Homepage/PhoneFrame'
 import { fetcher } from '@/lib/fetcher'
 import { useTrack } from '@/lib/track'
+
 import { LiveIcon } from './LiveIcon'
 
 const TwitchUser = ({
@@ -37,7 +39,7 @@ const TwitchUser = ({
   }
 
   const popoverContent = (
-    <div className='flex flex-col items-center py-2 px-4'>
+    <div className='flex flex-col items-center px-4 py-2'>
       <p className='mb-4 text-center'>Sign in to get started with your own Dotabod experience!</p>
       <Button type='primary' onClick={handleSignIn}>
         Sign in with Twitch
@@ -57,7 +59,7 @@ const TwitchUser = ({
         >
           <button
             type='button'
-            className='flex w-full flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105 cursor-pointer'
+            className='hover:bg-primary-100 flex w-full cursor-pointer flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl'
             onClick={() => {
               onClick?.()
               setOpen(true)
@@ -74,7 +76,7 @@ const TwitchUser = ({
               unoptimized
               className='rounded-lg shadow-lg'
             />
-            <span className='text-xs text-gray-300 transition-colors duration-300 ease-in-out group-hover:text-primary-foreground'>
+            <span className='group-hover:text-primary-foreground text-xs text-gray-300 transition-colors duration-300 ease-in-out'>
               {userName}
             </span>
           </button>
@@ -86,7 +88,7 @@ const TwitchUser = ({
   return (
     <li className='relative'>
       <Link
-        className='flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:bg-primary-100 hover:shadow-xl hover:scale-105'
+        className='hover:bg-primary-100 flex flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl'
         rel='noreferrer'
         onClick={onClick}
         href={`/${userName}`}
@@ -102,7 +104,7 @@ const TwitchUser = ({
           unoptimized
           className='rounded-lg shadow-lg'
         />
-        <span className='text-xs text-gray-300 transition-colors duration-300 ease-in-out group-hover:text-primary-foreground'>
+        <span className='group-hover:text-primary-foreground text-xs text-gray-300 transition-colors duration-300 ease-in-out'>
           {userName}
         </span>
       </Link>
@@ -128,7 +130,7 @@ export function Hero() {
   return (
     <div className='overflow-hidden py-4 sm:py-4 lg:pb-4 xl:pb-4'>
       <Container>
-        <div className='lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20 items-center'>
+        <div className='items-center lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20'>
           <div className='relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6'>
             <div className='space-y-4'>
               <h1 className='text-4xl font-bold tracking-tight text-gray-200 sm:text-5xl'>
@@ -175,8 +177,8 @@ export function Hero() {
             </div>
           </div>
           <div className='relative row-span-1 lg:col-span-5 lg:row-span-2 xl:col-span-6'>
-            <BackgroundIllustration className='absolute left-1/2 top-4 h-[1026px] w-[1026px] -translate-x-1/3 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ml-12 xl:-top-14 xl:ml-0' />
-            <div className='-mx-4 h-[180px] px-9 -mt-10 [mask-image:linear-gradient(to_bottom,white_60%,transparent)] sm:mx-0 lg:mt-0 lg:absolute lg:-inset-x-10 lg:-bottom-20 lg:-top-10 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32'>
+            <BackgroundIllustration className='absolute top-4 left-1/2 h-[1026px] w-[1026px] -translate-x-1/3 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] stroke-gray-300/70 sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ml-12 xl:-top-14 xl:ml-0' />
+            <div className='-mx-4 -mt-10 h-[180px] [mask-image:linear-gradient(to_bottom,white_60%,transparent)] px-9 sm:mx-0 lg:absolute lg:-inset-x-10 lg:-top-10 lg:-bottom-20 lg:mt-0 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32'>
               <PhoneFrame className='mx-auto max-w-[180px] lg:max-w-[366px]' priority>
                 <Image
                   src={dotaLogo}
@@ -210,7 +212,7 @@ export function Hero() {
 
               <div className='relative lg:col-span-7 xl:col-span-6'>
                 {isLoading || !users?.topLive?.length ? (
-                  <ul className='mx-auto flex max-w-xl flex-wrap justify-center lg:mx-0 lg:justify-start pt-4'>
+                  <ul className='mx-auto flex max-w-xl flex-wrap justify-center pt-4 lg:mx-0 lg:justify-start'>
                     {[...Array(10)].map((_, i) => (
                       <li key={`skeleton-${i}`} className='relative'>
                         <div className='flex flex-col items-center space-y-2 px-4 py-2'>
@@ -261,7 +263,9 @@ export function Hero() {
                 <div className='mt-4 text-center lg:text-left'>
                   <Link
                     href='/streamers'
-                    onClick={() => track('homepage - browse all streamers')}
+                    onClick={() => {
+                      track('homepage - browse all streamers')
+                    }}
                     className='text-sm font-medium text-purple-300 transition-colors hover:text-purple-200'
                   >
                     Browse all live streamers →

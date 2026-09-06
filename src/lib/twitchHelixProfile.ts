@@ -41,8 +41,8 @@ export interface TwitchProfileUser {
 function noteFallback(reason: string, extra?: Record<string, unknown>) {
   addBreadcrumb({
     category: 'auth',
-    message: 'twitchHelixProfile fallback',
     data: { reason, ...extra },
+    message: 'twitchHelixProfile fallback',
   })
 }
 
@@ -65,9 +65,9 @@ async function fetchHelixUser(accessToken: string): Promise<HelixUser | null> {
       return null
     }
     return user
-  } catch (err) {
+  } catch (error) {
     noteFallback('fetch_throw', {
-      error: err instanceof Error ? err.message : String(err),
+      error: error instanceof Error ? error.message : String(error),
     })
     return null
   }
@@ -80,10 +80,10 @@ export async function twitchHelixProfile(
   const helix = await fetchHelixUser(accessToken)
   const preferred = profile.preferred_username ?? ''
   return {
-    id: profile.sub ?? helix?.id ?? '',
-    name: helix?.login ?? preferred.toLowerCase(),
     displayName: helix?.display_name ?? preferred,
     email: profile.email,
+    id: profile.sub ?? helix?.id ?? '',
     image: profile.picture,
+    name: helix?.login ?? preferred.toLowerCase(),
   }
 }

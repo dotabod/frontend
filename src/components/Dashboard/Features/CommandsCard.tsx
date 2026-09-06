@@ -1,7 +1,9 @@
 import { Collapse, Tag } from 'antd'
+
 import type CommandDetail from '@/components/Dashboard/CommandDetail'
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+
 import { TierSwitch } from './TierSwitch'
 
 export default function CommandsCard({
@@ -36,7 +38,7 @@ export default function CommandsCard({
     >
       <Collapse.Panel
         className={`rounded-lg! border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-xs hover:shadow-gray-500${
-          readonly && (publicIsEnabled !== undefined ? !publicIsEnabled : !isEnabled)
+          readonly && (publicIsEnabled === undefined ? !isEnabled : !publicIsEnabled)
             ? ' opacity-50'
             : ''
         }`}
@@ -47,7 +49,7 @@ export default function CommandsCard({
               <span>{command.title}</span>
               <div>
                 {command.allowed === 'mods' && (
-                  <div className='flex gap-2 flex-wrap'>
+                  <div className='flex flex-wrap gap-2'>
                     <Tag color='green'>Mods</Tag>
                     <Tag color='red'>Streamer</Tag>
                   </div>
@@ -58,13 +60,13 @@ export default function CommandsCard({
             {command.key &&
               (readonly ? (
                 <span
-                  className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    (publicIsEnabled !== undefined ? publicIsEnabled : isEnabled)
+                  className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${
+                    (publicIsEnabled === undefined ? isEnabled : publicIsEnabled)
                       ? 'bg-green-950 text-green-400 ring-1 ring-green-800'
                       : 'bg-gray-800 text-gray-600'
                   }`}
                 >
-                  {(publicIsEnabled !== undefined ? publicIsEnabled : isEnabled)
+                  {(publicIsEnabled === undefined ? isEnabled : publicIsEnabled)
                     ? 'Enabled'
                     : 'Disabled'}
                 </span>
@@ -72,7 +74,7 @@ export default function CommandsCard({
                 <TierSwitch
                   settingKey={command.key}
                   disabled={!hasAccess}
-                  checked={publicIsEnabled !== undefined ? publicIsEnabled : isEnabled}
+                  checked={publicIsEnabled === undefined ? isEnabled : publicIsEnabled}
                   onChange={hasAccess ? updateSetting : undefined}
                 />
               ))}
@@ -86,7 +88,7 @@ export default function CommandsCard({
           <div className='py-1'>
             <p className='ml-1'>Command</p>
             <div className='flex flex-wrap'>
-              <div className='mb-2 mr-2'>
+              <div className='mr-2 mb-2'>
                 <Tag>{command.cmd}</Tag>
               </div>
             </div>
@@ -97,7 +99,7 @@ export default function CommandsCard({
             <p className='ml-1'>Alias</p>
             <div className='flex flex-wrap'>
               {command.alias.map((alias) => (
-                <div key={`${alias}`} className='mb-2 mr-2'>
+                <div key={alias} className='mr-2 mb-2'>
                   <Tag>!{alias}</Tag>
                 </div>
               ))}

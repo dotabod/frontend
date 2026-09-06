@@ -1,8 +1,10 @@
 import { Switch } from 'antd'
 import { useId } from 'react'
+
 import type { SettingKeys } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import type { ChatterSettingKeys } from '@/utils/subscription'
+
 import { TierBadge } from './TierBadge'
 
 interface TierSwitchProps {
@@ -36,7 +38,7 @@ export function TierSwitch({
   const handleChange = externalOnChange ?? updateSetting
   return (
     <div className={`flex items-center gap-2 ${className || ''}`}>
-      <div className='flex items-center gap-2 flex-nowrap'>
+      <div className='flex flex-nowrap items-center gap-2'>
         <Switch
           aria-labelledby={label ? labelId : undefined}
           checked={isChecked}

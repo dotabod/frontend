@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 
@@ -21,7 +22,8 @@ export function withAuthentication(handler: NextApiHandler) {
     }
 
     if (!userId && !username) {
-      return res.status(403).json({ message: 'Unauthorized' })
+      res.status(403).json({ message: 'Unauthorized' })
+      return
     }
 
     return handler(req, res)

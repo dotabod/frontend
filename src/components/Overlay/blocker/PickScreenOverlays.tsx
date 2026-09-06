@@ -1,5 +1,6 @@
 import { clsx } from 'clsx'
 import { motion } from 'framer-motion'
+
 import { HeroBlocker } from '@/components/Overlay/blocker/HeroBlocker'
 import { PickScreenV2 } from '@/components/Overlay/blocker/PickBlockerV2'
 import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
@@ -62,7 +63,7 @@ export const PickScreenOverlays = ({
         <div
           className={clsx(
             'flex h-full w-full items-end justify-end bg-slate-800/50 backdrop-blur-lg backdrop-filter',
-            'absolute ',
+            'absolute',
             (type === 'strategy-2' || !shouldBlock || isRight) &&
               'right-0! bg-slate-800/0 backdrop-blur-none backdrop-filter-none',
             isRight && 'justify-start!',

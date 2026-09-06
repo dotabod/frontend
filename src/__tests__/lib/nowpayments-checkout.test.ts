@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -53,7 +53,7 @@ describe('createAndStoreCryptoInvoice', () => {
       userId: 'user_1',
     })
 
-    expect(result).toEqual({
+    expect(result).toStrictEqual({
       nowPaymentsId: '7777',
       url: 'https://nowpayments.io/payment/?iid=fresh',
     })
@@ -100,7 +100,7 @@ describe('createAndStoreCryptoInvoice', () => {
       userId: 'user_1',
     })
 
-    expect(result).toEqual({
+    expect(result).toStrictEqual({
       nowPaymentsId: '7777',
       url: 'https://nowpayments.io/payment/?iid=winner',
     })

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   useUpdateSetting: vi.fn(() => ({
@@ -15,7 +15,7 @@ vi.mock('@/components/Dashboard/Features/TierBadge', () => ({
 
 import { TierSwitch } from '@/components/Dashboard/Features/TierSwitch'
 
-describe('TierSwitch', () => {
+describe(TierSwitch, () => {
   it('uses its visible string label as the switch accessible name', () => {
     render(<TierSwitch settingKey='commandToday' label='Use !today hero stats' />)
 

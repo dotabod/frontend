@@ -2,10 +2,12 @@ import { App, Button, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import useSWR from 'swr'
+
 import { Settings } from '@/lib/defaultSettings'
 import { fetcher } from '@/lib/fetcher'
 import { useDisableReasons } from '@/lib/hooks/useDisableReasons'
 import { SETTINGS_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+
 import { TierSwitch } from './Features/TierSwitch'
 
 const Toggle = () => {
@@ -28,7 +30,9 @@ const Toggle = () => {
         label={`Dotabod is ${checkBanOrDisable ? 'disabled' : 'enabled'}`}
         disabled={data?.banned}
         checked={!checkBanOrDisable}
-        onChange={(checked) => updateSetting(!checked)}
+        onChange={(checked) => {
+          updateSetting(!checked)
+        }}
       />
     </Tooltip>
   )

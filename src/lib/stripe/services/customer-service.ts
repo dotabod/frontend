@@ -1,6 +1,8 @@
 import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
+
 import { stripe } from '@/lib/stripe-server'
+
 import { debugLog } from '../utils/debugLog'
 import { withErrorHandling } from '../utils/error-handling'
 
@@ -8,7 +10,7 @@ import { withErrorHandling } from '../utils/error-handling'
  * Service for managing customer-related operations
  */
 export class CustomerService {
-  constructor(private tx: Prisma.TransactionClient) {}
+  constructor(private readonly tx: Prisma.TransactionClient) {}
 
   /**
    * Ensures a customer exists for a user, either by finding an existing one or creating a new one

@@ -2,6 +2,8 @@ import type { Prisma } from '@prisma/client'
 import { SubscriptionStatus } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
+
+import { stripe } from '@/lib/stripe-server'
 import { handleChargeRefunded, handleChargeSucceeded } from '@/lib/stripe/handlers/charge-events'
 import { handleCheckoutCompleted } from '@/lib/stripe/handlers/checkout-events'
 import { handleCustomerDeleted } from '@/lib/stripe/handlers/customer-events'
@@ -13,7 +15,6 @@ import {
 import { debugLog } from '@/lib/stripe/utils/debugLog'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 import { withTransaction } from '@/lib/stripe/utils/transaction'
-import { stripe } from '@/lib/stripe-server'
 
 export const config = {
   api: {
@@ -275,7 +276,8 @@ async function getRawBody(req: NextApiRequest): Promise<string> {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     debugLog('Webhook handler received non-POST request')
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
   debugLog('Webhook handler received POST request')
 
@@ -285,7 +287,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (error) {
     debugLog('Webhook verification failed:', error)
-    return res.status(400).json({ error })
+    res.status(400).json({ error })
+    return
   }
 
   debugLog('Checking if event is relevant...', { eventId: event?.id, eventType: event?.type })
@@ -294,7 +297,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       eventId: event?.id,
       eventType: event?.type,
     })
-    return res.status(200).json({ received: true })
+    res.status(200).json({ received: true })
+    return
   }
   debugLog('Event is relevant.', { eventId: event.id, eventType: event.type })
 
@@ -302,7 +306,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     debugLog(`Starting processing for event ${event.id} (${event.type})`)
     const result = await withTransaction(async (tx) => {
       debugLog(`Inside transaction for event ${event.id} (${event.type})`)
-      return processEventIdempotently(
+      return await processEventIdempotently(
         event.id,
         event.type,
         async (tx) => {
@@ -319,7 +323,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (result === false) {
       console.error(`Webhook processing failed for event ${event.id} (${event.type})`)
       debugLog(`Webhook processing marked as failed for event ${event.id}, responding 500.`)
-      return res.status(500).json({ error: 'Webhook processing failed', received: true })
+      res.status(500).json({ error: 'Webhook processing failed', received: true })
+      return
     }
 
     // Handle the case where the event was already processed
@@ -327,16 +332,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       debugLog(
         `Event ${event.id} (${event.type}) was already processed at ${result.processedAt instanceof Date ? result.processedAt.toISOString() : String(result.processedAt)}. Responding 200 OK.`,
       )
-      return res.status(200).json({
+      res.status(200).json({
         processed: true,
         processedAt: result.processedAt,
         received: true,
         skipped: true,
       })
+      return
     }
 
     debugLog(`Successfully processed event ${event.id} (${event.type}). Responding 200 OK.`)
-    return res.status(200).json({ processed: true, received: true })
+    res.status(200).json({ processed: true, received: true })
+    return
   } catch (error) {
     console.error(
       `Unhandled error in webhook handler for event ${event.id} (${event.type}):`,
@@ -345,6 +352,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Return 200 to prevent Stripe from retrying, as this might be a persistent error
     // We'll handle the failure through our own monitoring and recovery process
     debugLog(`Responding 200 OK after unhandled error for event ${event.id} (${event.type})`)
-    return res.status(200).json({ processed: false, received: true })
+    res.status(200).json({ processed: false, received: true })
+    return
   }
 }

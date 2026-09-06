@@ -1,13 +1,15 @@
 import { App, Button, Progress, Steps } from 'antd'
 import confetti from 'canvas-confetti'
 import { Bitcoin } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import { type ReactElement, useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import type { ReactElement } from 'react'
 import useSWR from 'swr'
+
 import ChatBot from '@/components/Dashboard/ChatBot'
 import ConnectSteam from '@/components/Dashboard/ConnectSteam'
 import DashboardShell from '@/components/Dashboard/DashboardShell'
@@ -219,11 +221,11 @@ const SetupPage = () => {
     ({ message, description }: { message: string; description: string }) => (
       <div className='crypto-success-notification animate-glow'>
         <div className='flex items-center'>
-          <Bitcoin className='mr-2 text-amber-400 animate-spin-slow' size={24} />
-          <div className='crypto-gradient-text font-bold text-lg'>{message}</div>
+          <Bitcoin className='animate-spin-slow mr-2 text-amber-400' size={24} />
+          <div className='crypto-gradient-text text-lg font-bold'>{message}</div>
         </div>
         <div className='mt-2 pl-8'>{description}</div>
-        <div className='absolute top-0 left-0 w-full h-full crypto-active-bg pointer-events-none' />
+        <div className='crypto-active-bg pointer-events-none absolute top-0 left-0 h-full w-full' />
       </div>
     ),
     [],
@@ -337,7 +339,7 @@ const SetupPage = () => {
   ]
 
   const NavigationButtons = (
-    <div className='flex justify-between mx-auto'>
+    <div className='mx-auto flex justify-between'>
       <div>
         {active > 0 && (
           <Button size='large' onClick={prevStep}>
@@ -389,7 +391,7 @@ const SetupPage = () => {
           showInfo={false}
         />
         {completedSignals.length > 0 && (
-          <p className='text-xs text-gray-500 mt-1'>
+          <p className='mt-1 text-xs text-gray-500'>
             {completedSignals.map((s) => `${s.label} verified`).join(', ')}
           </p>
         )}
@@ -402,7 +404,7 @@ const SetupPage = () => {
           track('setup/change_step', { step: newActiveStep })
         }}
         items={steps}
-        className='flex justify-center mb-8!'
+        className='mb-8! flex justify-center'
       />
 
       {NavigationButtons}

@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 
@@ -43,30 +44,35 @@ async function isModerator(broadcasterId: string, accessToken: string): Promise<
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
-    return res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ message: 'Unauthorized' })
+    return
   }
 
   const userId = session.user.id
   const cached = cache.get(userId)
   if (cached && cached.expiresAt > Date.now()) {
-    return res.status(200).json({ modded: cached.modded })
+    res.status(200).json({ modded: cached.modded })
+    return
   }
 
   try {
     const { providerAccountId, accessToken, error } = await getTwitchTokens(userId)
     if (error || !providerAccountId || !accessToken) {
-      return res.status(200).json({ modded: false, reason: 'no_twitch_token' })
+      res.status(200).json({ modded: false, reason: 'no_twitch_token' })
+      return
     }
     const modded = await isModerator(providerAccountId, accessToken)
     cache.set(userId, { expiresAt: Date.now() + CACHE_TTL_MS, modded })
-    return res.status(200).json({ modded })
+    res.status(200).json({ modded })
+    return
   } catch (error) {
     // 401/403/404 from helix are expected user states (no scopes, deleted broadcaster) —
     // Log to Sentry only for unexpected failures so we keep the signal high.
     if (!(error instanceof HelixStatusError)) {
       captureException(error)
     }
-    return res.status(200).json({ modded: false, reason: 'check_failed' })
+    res.status(200).json({ modded: false, reason: 'check_failed' })
+    return
   }
 }
 
