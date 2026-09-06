@@ -12,10 +12,8 @@ export const PhoneFrame = ({
   children,
   priority: _priority = false,
   ...props
-}: PhoneFrameProps) => {
-  return (
-    <div className={clsx('relative aspect-366/729', className)} {...props}>
-      {children}
-    </div>
-  )
-}
+}: PhoneFrameProps) => (
+  <div className={clsx('relative aspect-366/729', className)} {...props}>
+    {children}
+  </div>
+)

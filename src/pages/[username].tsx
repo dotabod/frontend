@@ -143,42 +143,40 @@ const FannedHand = ({
 // The zero-state counterpart to FannedHand: faint ghost slots, an explicit "0 heroes
 // collected", and a line on how the binder fills up. Keeps the feature discoverable for
 // streamers who have not collected anything yet, and links into the (empty) collection.
-const CollectionTeaser = ({ username, name }: { username: string; name: string }) => {
-  return (
-    <Link
-      href={getProfileRoute(username, '/set')}
-      aria-label='0 heroes collected, learn how the collection works'
-      className='group/fan block flex-shrink-0 self-center focus-visible:outline-none sm:basis-full lg:basis-auto'
-    >
-      <div className='relative mx-auto h-36 w-[260px]'>
-        {[0, 1, 2].map((i) => {
-          const offset = i - 1
-          return (
-            <div
-              key={i}
-              className='absolute top-1 left-1/2 flex h-32 w-[88px] items-center justify-center rounded-xl border border-dashed border-gray-700 bg-gray-900/40 transition-transform duration-300 ease-out [--k:1] group-hover/fan:[--k:1.15]'
-              style={{
-                transform: `translateX(calc(-50% + ${offset * 26}px * var(--k))) rotate(calc(${offset * 7}deg * var(--k)))`,
-                zIndex: i,
-              }}
-            >
-              <SparklesIcon size={20} className='text-gray-700' aria-hidden />
-            </div>
-          )
-        })}
-      </div>
-      <div className='mt-4 text-center'>
-        <p className='text-sm font-semibold text-white'>0 heroes collected</p>
-        <p className='mx-auto mt-1 max-w-[240px] text-xs leading-5 text-gray-400'>
-          Heroes {name} plays on stream show up here.
-        </p>
-        <span className='mt-2 inline-block text-sm font-medium text-purple-300 transition-colors group-hover/fan:text-purple-200'>
-          See how it works →
-        </span>
-      </div>
-    </Link>
-  )
-}
+const CollectionTeaser = ({ username, name }: { username: string; name: string }) => (
+  <Link
+    href={getProfileRoute(username, '/set')}
+    aria-label='0 heroes collected, learn how the collection works'
+    className='group/fan block flex-shrink-0 self-center focus-visible:outline-none sm:basis-full lg:basis-auto'
+  >
+    <div className='relative mx-auto h-36 w-[260px]'>
+      {[0, 1, 2].map((i) => {
+        const offset = i - 1
+        return (
+          <div
+            key={i}
+            className='absolute top-1 left-1/2 flex h-32 w-[88px] items-center justify-center rounded-xl border border-dashed border-gray-700 bg-gray-900/40 transition-transform duration-300 ease-out [--k:1] group-hover/fan:[--k:1.15]'
+            style={{
+              transform: `translateX(calc(-50% + ${offset * 26}px * var(--k))) rotate(calc(${offset * 7}deg * var(--k)))`,
+              zIndex: i,
+            }}
+          >
+            <SparklesIcon size={20} className='text-gray-700' aria-hidden />
+          </div>
+        )
+      })}
+    </div>
+    <div className='mt-4 text-center'>
+      <p className='text-sm font-semibold text-white'>0 heroes collected</p>
+      <p className='mx-auto mt-1 max-w-[240px] text-xs leading-5 text-gray-400'>
+        Heroes {name} plays on stream show up here.
+      </p>
+      <span className='mt-2 inline-block text-sm font-medium text-purple-300 transition-colors group-hover/fan:text-purple-200'>
+        See how it works →
+      </span>
+    </div>
+  </Link>
+)
 
 const FEATURED_COMMAND_KEYS = [
   'commandMmr',
@@ -589,14 +587,14 @@ const PageContent = ({
           <Segmented
             value={enabled}
             onChange={(v) => {
-              setEnabled(v as string)
+              setEnabled(v)
             }}
             options={['All', 'Enabled', 'Disabled']}
           />
           <Segmented
             value={permission}
             onChange={(v) => {
-              setPermission(v as string)
+              setPermission(v)
             }}
             options={['All', 'Mods', 'Viewers']}
           />
@@ -748,9 +746,11 @@ const buildCollectionSummary = async function buildCollectionSummary(
 
     const tallyCounts = new Map<string, number>()
     for (const l of loadouts) {
-      for (const item of itemsOf(l.items))
-        if (rarityRank(item) >= 4)
+      for (const item of itemsOf(l.items)) {
+        if (rarityRank(item) >= 4) {
           tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
+        }
+      }
     }
     const tally = [...tallyCounts.entries()]
       .map(([rarity, count]) => ({ count, rarity }))

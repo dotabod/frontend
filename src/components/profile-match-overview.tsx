@@ -24,18 +24,16 @@ const profileMatchesLink = (username: string, view?: 'heroes'): string => {
   return `${url.pathname}${url.search}`
 }
 
-const SectionLink = ({ href, label }: { href: string; label: string }) => {
-  return (
-    <Link
-      href={href}
-      aria-label={label}
-      className='inline-flex items-center gap-1 text-sm font-medium text-purple-300! transition-colors hover:text-purple-200! focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400'
-    >
-      View all
-      <ArrowUpRight size={14} aria-hidden />
-    </Link>
-  )
-}
+const SectionLink = ({ href, label }: { href: string; label: string }) => (
+  <Link
+    href={href}
+    aria-label={label}
+    className='inline-flex items-center gap-1 text-sm font-medium text-purple-300! transition-colors hover:text-purple-200! focus-visible:outline-2! focus-visible:outline-offset-2 focus-visible:outline-purple-400'
+  >
+    View all
+    <ArrowUpRight size={14} aria-hidden />
+  </Link>
+)
 
 const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; username: string }) => {
   const visibleHeroes = heroes.slice(0, OVERVIEW_ROW_LIMIT)
@@ -276,11 +274,9 @@ export const ProfileMatchOverview = ({
   heroPerformance: HeroPerformance[]
   recentMatches: MatchHistoryRow[]
   username: string
-}) => {
-  return (
-    <div data-testid='profile-match-overview' className='mb-12 space-y-10 font-sans'>
-      <HeroOverview heroes={heroPerformance} username={username} />
-      <MatchOverview matches={recentMatches} username={username} />
-    </div>
-  )
-}
+}) => (
+  <div data-testid='profile-match-overview' className='mb-12 space-y-10 font-sans'>
+    <HeroOverview heroes={heroPerformance} username={username} />
+    <MatchOverview matches={recentMatches} username={username} />
+  </div>
+)

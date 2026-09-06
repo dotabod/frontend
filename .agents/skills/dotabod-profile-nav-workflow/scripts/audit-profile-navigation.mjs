@@ -26,7 +26,7 @@ const axeSource = axeScriptPath ? await fs.readFile(axeScriptPath, 'utf8') : nul
 
 const tabs = await fetch(`${cdpUrl}/json/list`).then((response) => response.json())
 const tab = tabs.find((candidate) => candidate.type === 'page')
-if (!tab) throw new Error(`No Chromium page target found at ${cdpUrl}`)
+if (!tab) {throw new Error(`No Chromium page target found at ${cdpUrl}`)}
 
 const socket = new WebSocket(tab.webSocketDebuggerUrl)
 const pending = new Map()
@@ -40,10 +40,10 @@ await new Promise((resolve, reject) => {
 socket.addEventListener('message', (event) => {
   const message = JSON.parse(event.data)
   const request = pending.get(message.id)
-  if (!request) return
+  if (!request) {return}
   pending.delete(message.id)
-  if (message.error) request.reject(new Error(message.error.message))
-  else request.resolve(message.result)
+  if (message.error) {request.reject(new Error(message.error.message))}
+  else {request.resolve(message.result)}
 })
 
 function send(method, params = {}) {
@@ -65,7 +65,7 @@ async function evaluate(expression, awaitPromise = false) {
 
 async function waitFor(expression, label) {
   for (let attempt = 0; attempt < 50; attempt += 1) {
-    if (await evaluate(expression)) return
+    if (await evaluate(expression)) {return}
     await delay(200)
   }
   throw new Error(`Timed out waiting for ${label}`)
@@ -97,7 +97,7 @@ async function navigate(route, readySelector = 'nav[aria-label="Profile sections
 }
 
 function assert(condition, message, failures) {
-  if (!condition) failures.push(message)
+  if (!condition) {failures.push(message)}
 }
 
 await send('Page.enable')
@@ -606,7 +606,7 @@ for (let index = 0; index < 40; index += 1) {
       outlineWidth: styles.outlineWidth,
     }
   })()`)
-  if (keyboardFocus) break
+  if (keyboardFocus) {break}
 }
 
 assert(Boolean(keyboardFocus), 'Keyboard focus never reached profile navigation', failures)

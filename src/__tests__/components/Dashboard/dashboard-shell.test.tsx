@@ -44,7 +44,7 @@ vi.mock('antd', () => {
   const Layout = Component
   Layout.Content = Component
   Layout.Header = Component
-  Layout.Sider = function ({
+  Layout.Sider = function Sider({
     children,
     collapsed: _collapsed,
     collapsible: _collapsible,

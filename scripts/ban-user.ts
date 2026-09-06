@@ -67,7 +67,7 @@ const resolveTarget = async function resolveTarget(): Promise<{ id: string; name
   }
   const u = await prisma.user.findUnique({
     select: { id: true, name: true },
-    where: { id: userIdArg! },
+    where: { id: userIdArg },
   })
   if (!u) {
     throw new Error(`No user found by id: ${userIdArg}`)
@@ -121,7 +121,7 @@ const main = async function main() {
       data: {
         bannedAt: new Date(),
         bannedBy: byArg ?? null,
-        bannedReason: reasonArg!,
+        bannedReason: reasonArg,
       },
       where: { id: target.id },
     })
@@ -133,7 +133,7 @@ const main = async function main() {
       create: {
         autoDisabledAt: new Date(),
         autoDisabledBy: byArg ?? null,
-        disableMetadata: { banned: true, reason: reasonArg! },
+        disableMetadata: { banned: true, reason: reasonArg },
         disableReason: 'MANUAL_DISABLE',
         key: 'commandDisable',
         userId: target.id,
@@ -142,7 +142,7 @@ const main = async function main() {
       update: {
         autoDisabledAt: new Date(),
         autoDisabledBy: byArg ?? null,
-        disableMetadata: { banned: true, reason: reasonArg! },
+        disableMetadata: { banned: true, reason: reasonArg },
         disableReason: 'MANUAL_DISABLE',
         value: true,
       },

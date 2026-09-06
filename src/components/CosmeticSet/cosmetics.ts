@@ -112,7 +112,9 @@ export const bestRarity = function bestRarity(items: CosmeticItem[]): string | u
 const rarityTally = function rarityTally(items: CosmeticItem[]): [string, number][] {
   const counts = new Map<string, number>()
   for (const i of items) {
-    if (i.rarity) counts.set(i.rarity, (counts.get(i.rarity) ?? 0) + 1)
+    if (i.rarity) {
+      counts.set(i.rarity, (counts.get(i.rarity) ?? 0) + 1)
+    }
   }
   return [...counts.entries()].sort(
     (a, b) => (RARITY_META[b[0]]?.rank ?? -1) - (RARITY_META[a[0]]?.rank ?? -1),

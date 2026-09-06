@@ -109,7 +109,9 @@ describe('update-emote-set API', () => {
 
     // Reset the mock request function
     mockRequest = vi.fn()
-    vi.mocked(GraphQLClient).mockImplementation(function (this: { request: typeof mockRequest }) {
+    vi.mocked(GraphQLClient).mockImplementation(function GraphQLClientMock(this: {
+      request: typeof mockRequest
+    }) {
       this.request = mockRequest
     } as unknown as new () => GraphQLClient)
   })

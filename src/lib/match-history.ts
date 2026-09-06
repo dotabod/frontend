@@ -65,7 +65,9 @@ const heroMetadataByKey = function heroMetadataByKey(
 ): Map<string, HeroMetadata> {
   const byKey = new Map<string, HeroMetadata>()
   for (const hero of Object.values(heroes)) {
-    if (hero.name) byKey.set(hero.name, hero)
+    if (hero.name) {
+      byKey.set(hero.name, hero)
+    }
   }
   return byKey
 }

@@ -84,7 +84,9 @@ const DetailPage = ({
 
   const rarityCounts = new Map<string, number>()
   for (const i of items) {
-    if (i.rarity) rarityCounts.set(i.rarity, (rarityCounts.get(i.rarity) ?? 0) + 1)
+    if (i.rarity) {
+      rarityCounts.set(i.rarity, (rarityCounts.get(i.rarity) ?? 0) + 1)
+    }
   }
   const summaryChips = [...rarityCounts.entries()]
     .map(([rarity, count]) => ({ count, meta: RARITY_META[rarity], rarity }))

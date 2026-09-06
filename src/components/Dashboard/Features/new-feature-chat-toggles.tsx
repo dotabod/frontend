@@ -39,32 +39,30 @@ const MasterFollowingToggle = ({
   )
 }
 
-const NewFeatureChatToggles = () => {
-  return (
-    <Card title='New chat features'>
-      <div className='ml-4 flex flex-col space-y-4'>
-        <MasterFollowingToggle
-          settingKey={Settings.cosmeticsAnnounce}
-          label='Cosmetic set announcements'
-          description={
-            <>
-              When you pick a hero, Dotabod posts your equipped cosmetic set in chat with a link to
-              your collection. This is separate from the{' '}
-              <Link href='/dashboard/commands' className='text-purple-400 hover:text-purple-300'>
-                <code>!set</code> command
-              </Link>
-              , which only replies on demand.
-            </>
-          }
-        />
-        <MasterFollowingToggle
-          settingKey={Settings.smokeActivated}
-          label='Team smoke alerts'
-          description='When your team pops Smoke of Deceit without you, Dotabod ribs you in chat a few seconds later for getting left behind. Separate from the Smoke alert (when your own hero is smoked) in the chatter list below.'
-        />
-      </div>
-    </Card>
-  )
-}
+const NewFeatureChatToggles = () => (
+  <Card title='New chat features'>
+    <div className='ml-4 flex flex-col space-y-4'>
+      <MasterFollowingToggle
+        settingKey={Settings.cosmeticsAnnounce}
+        label='Cosmetic set announcements'
+        description={
+          <>
+            When you pick a hero, Dotabod posts your equipped cosmetic set in chat with a link to
+            your collection. This is separate from the{' '}
+            <Link href='/dashboard/commands' className='text-purple-400 hover:text-purple-300'>
+              <code>!set</code> command
+            </Link>
+            , which only replies on demand.
+          </>
+        }
+      />
+      <MasterFollowingToggle
+        settingKey={Settings.smokeActivated}
+        label='Team smoke alerts'
+        description='When your team pops Smoke of Deceit without you, Dotabod ribs you in chat a few seconds later for getting left behind. Separate from the Smoke alert (when your own hero is smoked) in the chatter list below.'
+      />
+    </div>
+  </Card>
+)
 
 export default NewFeatureChatToggles

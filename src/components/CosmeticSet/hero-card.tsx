@@ -187,12 +187,10 @@ export const HeroCard = ({
   )
 }
 
-const Corner = ({ pos, accent }: { pos: string; accent: string }) => {
-  return (
-    <span
-      aria-hidden
-      className={`absolute h-4 w-4 border-t-2 border-l-2 ${pos}`}
-      style={{ borderColor: hexA(accent, 0.85) }}
-    />
-  )
-}
+const Corner = ({ pos, accent }: { pos: string; accent: string }) => (
+  <span
+    aria-hidden
+    className={`absolute h-4 w-4 border-t-2 border-l-2 ${pos}`}
+    style={{ borderColor: hexA(accent, 0.85) }}
+  />
+)

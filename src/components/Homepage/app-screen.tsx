@@ -8,15 +8,13 @@ export const AppScreen = ({
 }: {
   children?: React.ReactNode
   className?: string
-} & React.HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <div className={clsx('flex flex-col', className)} {...props}>
-      {children}
-    </div>
-  )
-}
+} & React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={clsx('flex flex-col', className)} {...props}>
+    {children}
+  </div>
+)
 
-AppScreen.Header = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function (
+AppScreen.Header = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function Header(
   { children },
   ref,
 ) {
@@ -27,7 +25,7 @@ AppScreen.Header = forwardRef<HTMLDivElement, { children: React.ReactNode }>(fun
   )
 })
 
-AppScreen.Title = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function (
+AppScreen.Title = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function Title(
   { children },
   ref,
 ) {
@@ -38,7 +36,7 @@ AppScreen.Title = forwardRef<HTMLDivElement, { children: React.ReactNode }>(func
   )
 })
 
-AppScreen.Subtitle = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function (
+AppScreen.Subtitle = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function Subtitle(
   { children },
   ref,
 ) {
@@ -50,7 +48,7 @@ AppScreen.Subtitle = forwardRef<HTMLDivElement, { children: React.ReactNode }>(f
 })
 
 AppScreen.Body = forwardRef<HTMLDivElement, { children: React.ReactNode; className: string }>(
-  function ({ children, className }, ref) {
+  function Body({ children, className }, ref) {
     return (
       <div ref={ref} className={clsx('mt-6 flex-auto rounded-t-2xl bg-transparent', className)}>
         {children}

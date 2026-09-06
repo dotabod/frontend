@@ -87,14 +87,14 @@ const CommandsPage = () => {
         <Segmented
           value={enabled}
           onChange={(v) => {
-            setEnabled(v as string)
+            setEnabled(v)
           }}
           options={['All', 'Enabled', 'Disabled']}
         />
         <Segmented
           value={permission}
           onChange={(v) => {
-            setPermission(v as string)
+            setPermission(v)
           }}
           options={['All', 'Mods', 'Plebs']}
         />
@@ -104,7 +104,7 @@ const CommandsPage = () => {
           style={{ width: 300 }}
           maxLength={200}
           onChange={(e) => {
-            setSearchTerm(`${e.target.value?.toLowerCase()}`)
+            setSearchTerm(e.target.value?.toLowerCase())
           }}
         />
       </div>

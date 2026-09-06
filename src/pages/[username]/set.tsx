@@ -63,36 +63,32 @@ const CompletionMeter = ({
 
 // Faint placeholders for heroes not yet played: empty slots in the binder, there to
 // be filled. Kept to a teaser count so a sparse collection still feels aspirational.
-const GhostSlot = () => {
-  return (
-    <div className='flex aspect-[5/7] items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40'>
-      <Sparkles size={20} className='text-gray-700' aria-hidden />
-    </div>
-  )
-}
+const GhostSlot = () => (
+  <div className='flex aspect-[5/7] items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40'>
+    <Sparkles size={20} className='text-gray-700' aria-hidden />
+  </div>
+)
 
-const EmptyBinder = ({ displayName }: { displayName: string }) => {
-  return (
-    <div className='py-6 sm:py-12'>
-      <div className='mx-auto max-w-xl text-center'>
-        <h2 className='text-xl font-semibold text-white sm:text-2xl'>This binder is empty</h2>
-        <p className='mx-auto mt-3 max-w-md text-sm leading-6 text-gray-400'>
-          When {displayName} picks a hero on stream, its equipped set gets pulled into the
-          collection. Anyone in chat can also type{' '}
-          <span className='rounded bg-gray-800 px-1.5 py-0.5 font-semibold text-purple-300'>
-            !set
-          </span>{' '}
-          to capture the current hero.
-        </p>
-      </div>
-      <div className='mx-auto mt-10 grid max-w-md grid-cols-2 gap-4 opacity-40 sm:grid-cols-4'>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <GhostSlot key={i} />
-        ))}
-      </div>
+const EmptyBinder = ({ displayName }: { displayName: string }) => (
+  <div className='py-6 sm:py-12'>
+    <div className='mx-auto max-w-xl text-center'>
+      <h2 className='text-xl font-semibold text-white sm:text-2xl'>This binder is empty</h2>
+      <p className='mx-auto mt-3 max-w-md text-sm leading-6 text-gray-400'>
+        When {displayName} picks a hero on stream, its equipped set gets pulled into the collection.
+        Anyone in chat can also type{' '}
+        <span className='rounded bg-gray-800 px-1.5 py-0.5 font-semibold text-purple-300'>
+          !set
+        </span>{' '}
+        to capture the current hero.
+      </p>
     </div>
-  )
-}
+    <div className='mx-auto mt-10 grid max-w-md grid-cols-2 gap-4 opacity-40 sm:grid-cols-4'>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <GhostSlot key={i} />
+      ))}
+    </div>
+  </div>
+)
 
 const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: SetPageProps) => {
   const collected = cards.length
@@ -324,9 +320,11 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
   // Trophy tally: count individual items of legendary rarity and up across every hero.
   const tallyCounts = new Map<string, number>()
   for (const l of loadouts) {
-    for (const item of Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : [])
-      if (rarityRank(item) >= 4)
+    for (const item of Array.isArray(l.items) ? (l.items as unknown as CosmeticItem[]) : []) {
+      if (rarityRank(item) >= 4) {
         tallyCounts.set(item.rarity as string, (tallyCounts.get(item.rarity as string) ?? 0) + 1)
+      }
+    }
   }
   const tally = [...tallyCounts.entries()]
     .map(([rarity, count]) => ({ count, rarity }))

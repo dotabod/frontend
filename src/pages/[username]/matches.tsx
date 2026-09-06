@@ -87,101 +87,97 @@ const matchHistoryHref = function matchHistoryHref(
   return `/${username}/matches${query ? `?${query}` : ''}`
 }
 
-const WinRateBar = ({ value }: { value: number }) => {
-  return (
-    <div className='flex items-center justify-end gap-3 sm:justify-start'>
-      <div className='h-1.5 w-16 overflow-hidden rounded-full bg-gray-700 sm:w-20' aria-hidden>
-        <div className='h-full rounded-full bg-purple-500' style={{ width: `${value}%` }} />
-      </div>
-      <span className='w-10 text-right font-medium text-gray-200 tabular-nums'>{value}%</span>
+const WinRateBar = ({ value }: { value: number }) => (
+  <div className='flex items-center justify-end gap-3 sm:justify-start'>
+    <div className='h-1.5 w-16 overflow-hidden rounded-full bg-gray-700 sm:w-20' aria-hidden>
+      <div className='h-full rounded-full bg-purple-500' style={{ width: `${value}%` }} />
     </div>
-  )
-}
+    <span className='w-10 text-right font-medium text-gray-200 tabular-nums'>{value}%</span>
+  </div>
+)
 
-const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => {
-  return (
-    <section aria-labelledby='hero-win-rates-heading'>
-      <div className='mb-4 flex items-end justify-between gap-4'>
-        <h2 id='hero-win-rates-heading' className='text-lg font-semibold text-gray-100'>
-          Hero win rates
-        </h2>
-        <span className='text-xs text-gray-400 tabular-nums'>
-          {heroes.length} {heroes.length === 1 ? 'hero' : 'heroes'}
-        </span>
+const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => (
+  <section aria-labelledby='hero-win-rates-heading'>
+    <div className='mb-4 flex items-end justify-between gap-4'>
+      <h2 id='hero-win-rates-heading' className='text-lg font-semibold text-gray-100'>
+        Hero win rates
+      </h2>
+      <span className='text-xs text-gray-400 tabular-nums'>
+        {heroes.length} {heroes.length === 1 ? 'hero' : 'heroes'}
+      </span>
+    </div>
+
+    {heroes.length === 0 ? (
+      <div className='rounded-lg border border-gray-700 bg-gray-900 px-6 py-12 text-center'>
+        <p className='font-medium text-gray-200'>No hero data in this period</p>
+        <p className='mt-1 text-sm text-gray-400'>
+          Hero information was not recorded for these matches.
+        </p>
       </div>
-
-      {heroes.length === 0 ? (
-        <div className='rounded-lg border border-gray-700 bg-gray-900 px-6 py-12 text-center'>
-          <p className='font-medium text-gray-200'>No hero data in this period</p>
-          <p className='mt-1 text-sm text-gray-400'>
-            Hero information was not recorded for these matches.
-          </p>
-        </div>
-      ) : (
-        <div className='overflow-hidden rounded-lg border border-gray-700 bg-gray-900'>
-          <table aria-label='Hero win rates' className='w-full table-fixed'>
-            <thead className='hidden bg-gray-950/40 text-left text-xs text-gray-400 sm:table-header-group'>
-              <tr className='border-b border-gray-800'>
-                <th scope='col' className='px-5 py-2.5 font-medium'>
-                  Hero
-                </th>
-                <th scope='col' className='w-28 px-3 py-2.5 font-medium'>
-                  Matches
-                </th>
-                <th scope='col' className='w-32 px-3 py-2.5 font-medium'>
-                  Record
-                </th>
-                <th scope='col' className='w-44 px-3 py-2.5 pr-5 font-medium'>
-                  Win rate
-                </th>
+    ) : (
+      <div className='overflow-hidden rounded-lg border border-gray-700 bg-gray-900'>
+        <table aria-label='Hero win rates' className='w-full table-fixed'>
+          <thead className='hidden bg-gray-950/40 text-left text-xs text-gray-400 sm:table-header-group'>
+            <tr className='border-b border-gray-800'>
+              <th scope='col' className='px-5 py-2.5 font-medium'>
+                Hero
+              </th>
+              <th scope='col' className='w-28 px-3 py-2.5 font-medium'>
+                Matches
+              </th>
+              <th scope='col' className='w-32 px-3 py-2.5 font-medium'>
+                Record
+              </th>
+              <th scope='col' className='w-44 px-3 py-2.5 pr-5 font-medium'>
+                Win rate
+              </th>
+            </tr>
+          </thead>
+          <tbody className='divide-y divide-gray-800/80'>
+            {heroes.map((hero) => (
+              <tr
+                key={hero.heroKey}
+                className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 p-4 transition-colors hover:bg-gray-800/45 sm:table-row sm:p-0'
+              >
+                <td className='col-start-1 row-start-1 block min-w-0 sm:table-cell sm:px-5 sm:py-3 sm:align-middle'>
+                  <div className='flex min-w-0 items-center gap-3'>
+                    {hero.heroImage ? (
+                      <img
+                        src={hero.heroImage}
+                        alt=''
+                        aria-hidden
+                        width={36}
+                        height={36}
+                        className='h-9 w-9 rounded-md bg-gray-800 object-cover ring-1 ring-gray-700'
+                      />
+                    ) : (
+                      <span className='h-9 w-9 rounded-md bg-gray-800' aria-hidden />
+                    )}
+                    <span className='truncate font-medium text-gray-100'>{hero.heroName}</span>
+                  </div>
+                </td>
+                <td className='col-start-2 row-start-1 block text-right text-sm text-gray-400 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
+                  <span className='sm:hidden'>{hero.matches} matches</span>
+                  <span className='hidden sm:inline'>{hero.matches}</span>
+                </td>
+                <td className='col-start-1 row-start-2 block text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:align-middle'>
+                  <span className='text-emerald-300'>{hero.wins}W</span>
+                  <span className='mx-1.5 text-gray-600' aria-hidden>
+                    /
+                  </span>
+                  <span className='text-red-300'>{hero.losses}L</span>
+                </td>
+                <td className='col-start-2 row-start-2 block text-sm sm:table-cell sm:px-3 sm:py-3 sm:pr-5 sm:align-middle'>
+                  <WinRateBar value={hero.winRate} />
+                </td>
               </tr>
-            </thead>
-            <tbody className='divide-y divide-gray-800/80'>
-              {heroes.map((hero) => (
-                <tr
-                  key={hero.heroKey}
-                  className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 p-4 transition-colors hover:bg-gray-800/45 sm:table-row sm:p-0'
-                >
-                  <td className='col-start-1 row-start-1 block min-w-0 sm:table-cell sm:px-5 sm:py-3 sm:align-middle'>
-                    <div className='flex min-w-0 items-center gap-3'>
-                      {hero.heroImage ? (
-                        <img
-                          src={hero.heroImage}
-                          alt=''
-                          aria-hidden
-                          width={36}
-                          height={36}
-                          className='h-9 w-9 rounded-md bg-gray-800 object-cover ring-1 ring-gray-700'
-                        />
-                      ) : (
-                        <span className='h-9 w-9 rounded-md bg-gray-800' aria-hidden />
-                      )}
-                      <span className='truncate font-medium text-gray-100'>{hero.heroName}</span>
-                    </div>
-                  </td>
-                  <td className='col-start-2 row-start-1 block text-right text-sm text-gray-400 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
-                    <span className='sm:hidden'>{hero.matches} matches</span>
-                    <span className='hidden sm:inline'>{hero.matches}</span>
-                  </td>
-                  <td className='col-start-1 row-start-2 block text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:align-middle'>
-                    <span className='text-emerald-300'>{hero.wins}W</span>
-                    <span className='mx-1.5 text-gray-600' aria-hidden>
-                      /
-                    </span>
-                    <span className='text-red-300'>{hero.losses}L</span>
-                  </td>
-                  <td className='col-start-2 row-start-2 block text-sm sm:table-cell sm:px-3 sm:py-3 sm:pr-5 sm:align-middle'>
-                    <WinRateBar value={hero.winRate} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
-  )
-}
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+)
 
 const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
   const orderedMatches = [...matches].sort(
@@ -292,37 +288,35 @@ const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
   )
 }
 
-const MatchSummary = ({ summary }: Pick<MatchHistoryPageProps, 'summary'>) => {
-  return (
-    <section aria-label='Match record' className='min-w-0'>
-      <p className='text-xs font-medium tracking-[0.14em] text-gray-400 uppercase'>Record</p>
-      <dl className='mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1'>
-        <div>
-          <dt className='sr-only'>Wins</dt>
-          <dd className='font-semibold text-emerald-300 tabular-nums'>{summary.wins} wins</dd>
-        </div>
-        <div>
-          <dt className='sr-only'>Losses</dt>
-          <dd className='font-semibold text-red-300 tabular-nums'>{summary.losses} losses</dd>
-        </div>
-        <div>
-          <dt className='sr-only'>Win rate</dt>
-          <dd className='text-sm text-gray-200 tabular-nums'>{summary.winRate}% win rate</dd>
-        </div>
-        <div>
-          <dt className='sr-only'>Matches</dt>
-          <dd className='text-sm text-gray-400 tabular-nums'>{summary.matches} matches</dd>
-        </div>
-        <div>
-          <dt className='sr-only'>Heroes</dt>
-          <dd className='text-sm text-gray-400 tabular-nums'>
-            {summary.heroesPlayed} {summary.heroesPlayed === 1 ? 'hero' : 'heroes'}
-          </dd>
-        </div>
-      </dl>
-    </section>
-  )
-}
+const MatchSummary = ({ summary }: Pick<MatchHistoryPageProps, 'summary'>) => (
+  <section aria-label='Match record' className='min-w-0'>
+    <p className='text-xs font-medium tracking-[0.14em] text-gray-400 uppercase'>Record</p>
+    <dl className='mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1'>
+      <div>
+        <dt className='sr-only'>Wins</dt>
+        <dd className='font-semibold text-emerald-300 tabular-nums'>{summary.wins} wins</dd>
+      </div>
+      <div>
+        <dt className='sr-only'>Losses</dt>
+        <dd className='font-semibold text-red-300 tabular-nums'>{summary.losses} losses</dd>
+      </div>
+      <div>
+        <dt className='sr-only'>Win rate</dt>
+        <dd className='text-sm text-gray-200 tabular-nums'>{summary.winRate}% win rate</dd>
+      </div>
+      <div>
+        <dt className='sr-only'>Matches</dt>
+        <dd className='text-sm text-gray-400 tabular-nums'>{summary.matches} matches</dd>
+      </div>
+      <div>
+        <dt className='sr-only'>Heroes</dt>
+        <dd className='text-sm text-gray-400 tabular-nums'>
+          {summary.heroesPlayed} {summary.heroesPlayed === 1 ? 'hero' : 'heroes'}
+        </dd>
+      </div>
+    </dl>
+  </section>
+)
 
 const MatchHistoryPage = ({
   displayName,

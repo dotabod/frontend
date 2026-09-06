@@ -65,39 +65,37 @@ const BlockScreen = ({
 }: {
   custom?: ScreenAnimationCustom
   animated?: boolean
-}) => {
-  return (
-    <AppScreen className='w-full'>
-      <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
-        <AppScreen.Title>Custom covers</AppScreen.Title>
-        <AppScreen.Subtitle>
-          Semi-transparent blocker that auto places itself over your minimap. Works with{' '}
-          <span className='text-white'>extra large</span> minimaps, and also{' '}
-          <span className='text-white'>simple</span> minimaps backgrounds.
-        </AppScreen.Subtitle>
-      </MotionAppScreenHeader>
-      <MotionAppScreenBody
-        className='bg-transparent'
-        {...(animated ? { ...bodyAnimation, custom } : {})}
-      >
-        <div className='flex flex-col items-center space-y-4 text-white'>
-          <Image
-            alt='minimap blocker'
-            height={280}
-            width={280}
-            className='rounded-xl'
-            src='/images/overlay/minimap/741-Complex-Large-AntiStreamSnipeMap.png'
-            style={{
-              backgroundImage:
-                "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
-            }}
-          />
-          <span>Minimap blocker</span>
-        </div>
-      </MotionAppScreenBody>
-    </AppScreen>
-  )
-}
+}) => (
+  <AppScreen className='w-full'>
+    <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
+      <AppScreen.Title>Custom covers</AppScreen.Title>
+      <AppScreen.Subtitle>
+        Semi-transparent blocker that auto places itself over your minimap. Works with{' '}
+        <span className='text-white'>extra large</span> minimaps, and also{' '}
+        <span className='text-white'>simple</span> minimaps backgrounds.
+      </AppScreen.Subtitle>
+    </MotionAppScreenHeader>
+    <MotionAppScreenBody
+      className='bg-transparent'
+      {...(animated ? { ...bodyAnimation, custom } : {})}
+    >
+      <div className='flex flex-col items-center space-y-4 text-white'>
+        <Image
+          alt='minimap blocker'
+          height={280}
+          width={280}
+          className='rounded-xl'
+          src='/images/overlay/minimap/741-Complex-Large-AntiStreamSnipeMap.png'
+          style={{
+            backgroundImage:
+              "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==')",
+          }}
+        />
+        <span>Minimap blocker</span>
+      </div>
+    </MotionAppScreenBody>
+  </AppScreen>
+)
 
 const BetsScreen = ({
   custom,
@@ -105,33 +103,31 @@ const BetsScreen = ({
 }: {
   custom?: ScreenAnimationCustom
   animated?: boolean
-}) => {
-  return (
-    <AppScreen className='w-full'>
-      <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
-        <AppScreen.Title>Give gamba</AppScreen.Title>
-        <AppScreen.Subtitle>
-          Create and close bets <span className='text-white'>automatically</span> for every match.
-        </AppScreen.Subtitle>
-      </MotionAppScreenHeader>
-      <MotionAppScreenBody
-        className='bg-transparent'
-        {...(animated ? { ...bodyAnimation, custom } : {})}
-      >
-        <div className='flex flex-col items-center space-y-4 text-white'>
-          <Image
-            className='rounded-xl'
-            src='/images/dashboard/bets.png'
-            alt='bets screen'
-            unoptimized={true}
-            width={600}
-            height={840}
-          />
-        </div>
-      </MotionAppScreenBody>
-    </AppScreen>
-  )
-}
+}) => (
+  <AppScreen className='w-full'>
+    <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
+      <AppScreen.Title>Give gamba</AppScreen.Title>
+      <AppScreen.Subtitle>
+        Create and close bets <span className='text-white'>automatically</span> for every match.
+      </AppScreen.Subtitle>
+    </MotionAppScreenHeader>
+    <MotionAppScreenBody
+      className='bg-transparent'
+      {...(animated ? { ...bodyAnimation, custom } : {})}
+    >
+      <div className='flex flex-col items-center space-y-4 text-white'>
+        <Image
+          className='rounded-xl'
+          src='/images/dashboard/bets.png'
+          alt='bets screen'
+          unoptimized={true}
+          width={600}
+          height={840}
+        />
+      </div>
+    </MotionAppScreenBody>
+  </AppScreen>
+)
 
 const OBSScreen = ({
   custom,
@@ -139,34 +135,32 @@ const OBSScreen = ({
 }: {
   custom?: ScreenAnimationCustom
   animated?: boolean
-}) => {
-  return (
-    <AppScreen className='w-full'>
-      <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
-        <AppScreen.Title>Dotabod has things to say</AppScreen.Title>
-        <AppScreen.Subtitle>
-          So many chatter options to choose from, why not just{' '}
-          <span className='text-white'>enable them all</span>?
-        </AppScreen.Subtitle>
-      </MotionAppScreenHeader>
-      <MotionAppScreenBody
-        className='bg-transparent'
-        {...(animated ? { ...bodyAnimation, custom } : {})}
-      >
-        <div className='flex flex-col items-center space-y-4 text-white'>
-          <Image
-            className='rounded-xl'
-            src='https://i.imgur.com/NgczeXd.png'
-            alt='chatter toggles'
-            unoptimized={true}
-            width={738}
-            height={1126}
-          />
-        </div>
-      </MotionAppScreenBody>
-    </AppScreen>
-  )
-}
+}) => (
+  <AppScreen className='w-full'>
+    <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
+      <AppScreen.Title>Dotabod has things to say</AppScreen.Title>
+      <AppScreen.Subtitle>
+        So many chatter options to choose from, why not just{' '}
+        <span className='text-white'>enable them all</span>?
+      </AppScreen.Subtitle>
+    </MotionAppScreenHeader>
+    <MotionAppScreenBody
+      className='bg-transparent'
+      {...(animated ? { ...bodyAnimation, custom } : {})}
+    >
+      <div className='flex flex-col items-center space-y-4 text-white'>
+        <Image
+          className='rounded-xl'
+          src='https://i.imgur.com/NgczeXd.png'
+          alt='chatter toggles'
+          unoptimized={true}
+          width={738}
+          height={1126}
+        />
+      </div>
+    </MotionAppScreenBody>
+  </AppScreen>
+)
 
 const features = [
   {
@@ -401,31 +395,29 @@ const FeaturesMobile = () => {
   )
 }
 
-export const PrimaryFeatures = () => {
-  return (
-    <section
-      id='features'
-      aria-label='Features for streaing all your Dota'
-      className='bg-gray-900 py-20'
-    >
-      <Container>
-        <div className='mx-auto max-w-2xl lg:mx-0 lg:max-w-3xl'>
-          <h2 className='text-3xl font-medium tracking-tight text-white'>
-            Best features you need to stream. Try it for yourself.
-          </h2>
-          <p className='mt-2 text-lg text-gray-400'>
-            Dotabod was built for streamers like you who play by their own rules and aren&apos;t
-            going to let anything get in the way of their dreams. If other streaming tools are
-            afraid to build it, Dotabod has it.
-          </p>
-        </div>
-      </Container>
-      <div className='mt-16 md:hidden'>
-        <FeaturesMobile />
+export const PrimaryFeatures = () => (
+  <section
+    id='features'
+    aria-label='Features for streaing all your Dota'
+    className='bg-gray-900 py-20'
+  >
+    <Container>
+      <div className='mx-auto max-w-2xl lg:mx-0 lg:max-w-3xl'>
+        <h2 className='text-3xl font-medium tracking-tight text-white'>
+          Best features you need to stream. Try it for yourself.
+        </h2>
+        <p className='mt-2 text-lg text-gray-400'>
+          Dotabod was built for streamers like you who play by their own rules and aren&apos;t going
+          to let anything get in the way of their dreams. If other streaming tools are afraid to
+          build it, Dotabod has it.
+        </p>
       </div>
-      <Container className='hidden md:mt-20 md:block'>
-        <FeaturesDesktop />
-      </Container>
-    </section>
-  )
-}
+    </Container>
+    <div className='mt-16 md:hidden'>
+      <FeaturesMobile />
+    </div>
+    <Container className='hidden md:mt-20 md:block'>
+      <FeaturesDesktop />
+    </Container>
+  </section>
+)

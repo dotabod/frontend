@@ -59,26 +59,24 @@ export const FeatureWrapper = ({ feature, children, className, ...props }: Featu
   )
 }
 
-export const Card = ({ className, feature, title, children, ...props }: CardProps) => {
-  return (
-    <FeatureWrapper
-      feature={feature}
-      className={clsx(
-        'duration-200',
-        'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
-        className,
-      )}
-      {...props}
-    >
-      {title && (
-        <div className='title'>
-          <h3>{title}</h3>
-        </div>
-      )}
-      {children}
-    </FeatureWrapper>
-  )
-}
+export const Card = ({ className, feature, title, children, ...props }: CardProps) => (
+  <FeatureWrapper
+    feature={feature}
+    className={clsx(
+      'duration-200',
+      'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
+      className,
+    )}
+    {...props}
+  >
+    {title && (
+      <div className='title'>
+        <h3>{title}</h3>
+      </div>
+    )}
+    {children}
+  </FeatureWrapper>
+)
 
 interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 

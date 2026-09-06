@@ -15,7 +15,7 @@ interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
   code: string
 }
 
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>(function (
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>(function SelectItem(
   { code: _code, translation, label, ...others }: ItemProps,
   ref,
 ) {

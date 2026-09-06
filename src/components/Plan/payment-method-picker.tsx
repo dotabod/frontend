@@ -43,7 +43,7 @@ const noteFor = function noteFor(method: PaymentMethod, period: PricePeriod): st
   }
 }
 
-const PaymentMethodPicker = memo(function ({
+const PaymentMethodPicker = memo(function PaymentMethodPicker({
   value,
   onChange,
   activePeriod,

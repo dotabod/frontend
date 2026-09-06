@@ -61,7 +61,7 @@ const syncUser = async function syncUser(user: {
     subscription = undefined
   }
   try {
-    await syncHubSpotContact(token!, {
+    await syncHubSpotContact(token, {
       email: user.email,
       subscription,
       username: user.displayName ?? '',

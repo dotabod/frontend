@@ -83,19 +83,19 @@ function parseArgs(argv) {
       usage()
       process.exit(0)
     }
-    if (argument === '--skip-axe') options.skipAxe = true
-    else if (argument === '--skip-build') options.skipBuild = true
-    else if (argument === '--skip-database') options.skipDatabase = true
-    else if (argument === '--skip-generate') options.skipGenerate = true
-    else if (argument === '--keep-temporaries') options.keepTemporaries = true
+    if (argument === '--skip-axe') {options.skipAxe = true}
+    else if (argument === '--skip-build') {options.skipBuild = true}
+    else if (argument === '--skip-database') {options.skipDatabase = true}
+    else if (argument === '--skip-generate') {options.skipGenerate = true}
+    else if (argument === '--keep-temporaries') {options.keepTemporaries = true}
     else if (argument === '--check-command') {
       const value = argv[index + 1]
-      if (!value) throw new Error('--check-command requires a value')
+      if (!value) {throw new Error('--check-command requires a value')}
       options.checkCommands.push(value)
       index += 1
     } else if (argument === '--env') {
       const value = argv[index + 1]
-      if (!value?.includes('=')) throw new Error('--env requires NAME=value')
+      if (!value?.includes('=')) {throw new Error('--env requires NAME=value')}
       const separator = value.indexOf('=')
       const name = value.slice(0, separator)
       if (!/^[A-Z_][A-Z0-9_]*$/.test(name)) {
@@ -105,7 +105,7 @@ function parseArgs(argv) {
       index += 1
     } else if (valueOptions.has(argument)) {
       const value = argv[index + 1]
-      if (!value) throw new Error(`${argument} requires a value`)
+      if (!value) {throw new Error(`${argument} requires a value`)}
       options[valueOptions.get(argument)] = value
       index += 1
     } else {
@@ -121,7 +121,7 @@ function parseArgs(argv) {
     options[key] = value
   }
 
-  if (!options.verifyCommand) throw new Error('--verify-command is required')
+  if (!options.verifyCommand) {throw new Error('--verify-command is required')}
   if (new Set([options.appPort, options.cdpPort, options.postgresPort]).size !== 3) {
     throw new Error('App, CDP, and Postgres ports must be distinct')
   }
@@ -140,8 +140,8 @@ async function portIsFree(port) {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
     server.once('error', (error) => {
-      if (error.code === 'EADDRINUSE') resolve(false)
-      else reject(error)
+      if (error.code === 'EADDRINUSE') {resolve(false)}
+      else {reject(error)}
     })
     server.listen(port, '127.0.0.1', () => {
       server.close((error) => (error ? reject(error) : resolve(true)))
@@ -195,8 +195,8 @@ async function runShell(command, env, outputDir, label) {
   return new Promise((resolve, reject) => {
     child.once('error', reject)
     child.once('exit', (code, signal) => {
-      if (code === 0) resolve()
-      else reject(new Error(`${label} failed (${signal ?? `exit ${code}`})`))
+      if (code === 0) {resolve()}
+      else {reject(new Error(`${label} failed (${signal ?? `exit ${code}`})`))}
     })
   })
 }
@@ -213,8 +213,8 @@ async function runProcess(command, args, env, outputDir, label) {
   return new Promise((resolve, reject) => {
     child.once('error', reject)
     child.once('exit', (code, signal) => {
-      if (code === 0) resolve()
-      else reject(new Error(`${label} failed (${signal ?? `exit ${code}`})`))
+      if (code === 0) {resolve()}
+      else {reject(new Error(`${label} failed (${signal ?? `exit ${code}`})`))}
     })
   })
 }
@@ -234,7 +234,7 @@ async function waitForUrl(url, label, attempts = 120) {
 }
 
 async function findPostgresBin() {
-  if (process.env.POSTGRES_BIN) return process.env.POSTGRES_BIN
+  if (process.env.POSTGRES_BIN) {return process.env.POSTGRES_BIN}
   const root = '/usr/lib/postgresql'
   const versions = await fsp.readdir(root).catch(() => [])
   versions.sort((left, right) => right.localeCompare(left, undefined, { numeric: true }))
@@ -268,29 +268,29 @@ async function findChromium() {
 }
 
 function killProcessGroup(child, signal) {
-  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) return
+  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) {return}
   try {
     process.kill(-child.pid, signal)
   } catch (error) {
-    if (error.code !== 'ESRCH') throw error
+    if (error.code !== 'ESRCH') {throw error}
   }
 }
 
 async function stopChild(child) {
-  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) return
+  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) {return}
   killProcessGroup(child, 'SIGTERM')
   await Promise.race([
     new Promise((resolve) => child.once('exit', resolve)),
     new Promise((resolve) => setTimeout(resolve, 5000)),
   ])
-  if (child.exitCode === null && child.signalCode === null) killProcessGroup(child, 'SIGKILL')
+  if (child.exitCode === null && child.signalCode === null) {killProcessGroup(child, 'SIGKILL')}
 }
 
 async function restoreGeneratedNextEnv(snapshot) {
-  if (snapshot === null) return
+  if (snapshot === null) {return}
   const filePath = path.join(repoRoot, 'next-env.d.ts')
   const current = await fsp.readFile(filePath, 'utf8').catch(() => null)
-  if (current === snapshot) return
+  if (current === snapshot) {return}
   const normalized = current?.replace(
     'import "./.next/types/routes.d.ts";',
     'import "./.next/dev/types/routes.d.ts";',
@@ -306,9 +306,9 @@ async function restoreGeneratedNextEnv(snapshot) {
 }
 
 async function cleanup(options, nextEnvSnapshot) {
-  if (cleanupStarted) return
+  if (cleanupStarted) {return}
   cleanupStarted = true
-  for (const child of [...runningChildren].reverse()) await stopChild(child)
+  for (const child of [...runningChildren].reverse()) {await stopChild(child)}
   if (postgres) {
     await runProcess(
       path.join(postgres.bin, 'pg_ctl'),
@@ -510,7 +510,7 @@ async function main() {
   } finally {
     report.completedAt = new Date().toISOString()
     report.durationMs = new Date(report.completedAt).getTime() - startedAt.getTime()
-    if (options.keepTemporaries) report.temporaryPaths = [...temporaryPaths]
+    if (options.keepTemporaries) {report.temporaryPaths = [...temporaryPaths]}
     await fsp.writeFile(
       path.join(options.outputDir, 'frontend-verification-report.json'),
       `${JSON.stringify(report, null, 2)}\n`,
@@ -518,7 +518,7 @@ async function main() {
     await cleanup(options, nextEnvSnapshot)
   }
 
-  if (failure) throw failure
+  if (failure) {throw failure}
   console.log(`\n[frontend-verification] passed; artifacts: ${options.outputDir}`)
 }
 

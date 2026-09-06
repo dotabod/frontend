@@ -13,7 +13,7 @@ export default class MyDocument extends Document {
     ctx.renderPage = () =>
       originalRenderPage({
         enhanceApp: (App) =>
-          function (props) {
+          function EnhancedApp(props) {
             return (
               <StyleProvider cache={cache} hashPriority='high'>
                 <ConfigProvider theme={themeConfig}>
