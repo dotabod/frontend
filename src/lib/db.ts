@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
+import { getPrismaDatasourceUrl } from '@/lib/prisma-datasource-url'
+
 import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 
 // Extend the global object for TypeScript so the singletons survive hot reloads
@@ -9,8 +11,13 @@ declare global {
 }
 
 // Create singleton instances for both clients
-const prisma = globalThis.prismaGlobal || new PrismaClient()
-export const prismaMongo = globalThis.prismaMongoGlobal || new PrismaMongo()
+const datasourceUrl = getPrismaDatasourceUrl(process.env.DATABASE_URL, Boolean(process.env.VERCEL))
+const prisma =
+  globalThis.prismaGlobal ??
+  new PrismaClient(
+    datasourceUrl === undefined || datasourceUrl.length === 0 ? undefined : { datasourceUrl },
+  )
+export const prismaMongo = globalThis.prismaMongoGlobal ?? new PrismaMongo()
 
 // Only store the instances on the global object in development to prevent
 // Multiple instances during hot-reloading

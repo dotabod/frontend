@@ -23134,26 +23134,6 @@
         "severity": "error"
       }
     },
-    "279049bde7b7feb8dd0ae77b0f89d58b651a8f48c7aae419c811a9a5c2e86235": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/lib/db.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const prisma = globalThis.prismaGlobal || new PrismaClient()",
-              "next": "export const prismaMongo = globalThis.prismaMongoGlobal || new PrismaMongo()",
-              "previous": "// Create singleton instances for both clients"
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
-        "severity": "error"
-      }
-    },
     "2794f9339cc5ae570bd3b0cc74d4f8efd95063292d0993b41213ba282e9e4172": {
       "count": 1,
       "summary": {
@@ -62615,26 +62595,6 @@
           }
         ],
         "message": "Unsafe member access .split on an `any` value.",
-        "severity": "error"
-      }
-    },
-    "6b8a5b9e571853fd4670a39722eb8907250133a11df3e084bb8b8afbaf777d44": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/lib/db.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export const prismaMongo = globalThis.prismaMongoGlobal || new PrismaMongo()",
-              "next": "",
-              "previous": "const prisma = globalThis.prismaGlobal || new PrismaClient()"
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
         "severity": "error"
       }
     },
@@ -148184,6 +148144,7 @@
           "src/__tests__/lib/nowpayments-payment.test.ts",
           "src/__tests__/lib/nowpayments.test.ts",
           "src/__tests__/lib/opennode-payment.test.ts",
+          "src/__tests__/lib/prisma-datasource-url.test.ts",
           "src/__tests__/lib/reconcile-twitch-profile.test.ts",
           "src/__tests__/lib/server/dashboard-access.test.ts",
           "src/__tests__/lib/stripe-server.test.ts",
@@ -148454,6 +148415,7 @@
           "src/lib/paypal-client.ts",
           "src/lib/paypal-subscriptions.ts",
           "src/lib/paypal.ts",
+          "src/lib/prisma-datasource-url.ts",
           "src/lib/ranks.ts",
           "src/lib/reconcile-twitch-profile.ts",
           "src/lib/redux/store.ts",
