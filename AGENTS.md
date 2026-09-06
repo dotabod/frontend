@@ -11,15 +11,22 @@ This repository contains the Dotabod website, dashboard, and OBS overlay. It is 
 
 ## Commands
 
-- Development server: `pnpm dev`
-- Local production build: `pnpm build-local`
-- Targeted test: `pnpm exec vitest run <test file or pattern>`
-- All tests: `pnpm test`
-- Fast static gate: `pnpm check`
-- Full quality gate: `pnpm quality`
-- Format/fix: `pnpm format:fix` and `pnpm lint:fix`
+- Lightweight formatting: `pnpm exec oxfmt <edited files>`
+- GitHub CI workflow: `.github/workflows/ci.yml`
+- Manually dispatch CI for a pushed branch: `gh workflow run ci.yml --ref <branch>`
+- Watch the dispatched run: `gh run watch --exit-status`
 
 Install dependencies only when package or lockfile inputs changed, or when the installed environment is missing or inconsistent.
+
+## Production-host resource policy
+
+This checkout shares a host with production services. Builds and repository-wide checks must run only on GitHub-hosted runners.
+
+- Never run `pnpm dev`, `pnpm build`, `pnpm build-local`, `next build`, `pnpm test`, `pnpm quality`, `pnpm check`, full-project lint/typecheck, Prisma generation, or the frontend verification harness on this host.
+- Do not substitute a similar local build, test, browser, coverage, or static-analysis command. If GitHub Actions is unavailable, report verification as blocked.
+- Local work is limited to inspection, editing, targeted formatting, `git diff --check`, and other negligible-cost operations.
+- Commit with `--no-verify` if an older checkout still has resource-intensive hooks.
+- For pre-merge verification, push a feature branch, dispatch `ci.yml` for that branch, and wait for a successful conclusion. Do not merge or push the change to `master` until remote CI passes.
 
 ## Code conventions
 
@@ -36,6 +43,7 @@ Install dependencies only when package or lockfile inputs changed, or when the i
 - Use `vi.stubEnv()` for environment changes and reset mocks between tests.
 - Add regression tests for behavior changes when they meaningfully demonstrate the result. Use proportionate validation for prose, formatting, generated output, and low-impact configuration changes.
 - For visual changes, inspect the rendered result at affected desktop and mobile sizes. Use the project verification skills only when their route/scope matches or production-bundle browser verification is needed.
-- During implementation, run targeted checks. Before PR readiness, run `pnpm quality` and `pnpm test`; distinguish pre-existing failures from regressions.
+- Put focused regression coverage in the change, but execute it through GitHub Actions rather than on this host.
+- Before PR readiness, require the GitHub `CI` workflow to pass its quality, test, and production-build steps; distinguish pre-existing failures from regressions.
 
 Finish when the requested behavior is implemented, the affected surface has been inspected, and relevant checks pass. Report any blocked or unverified requirement with the specific reason and the smallest next step.

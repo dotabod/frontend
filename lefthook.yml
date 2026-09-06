@@ -6,15 +6,5 @@ pre-commit:
       run: |
         npx oxfmt {staged_files} \
           && git add -f -- {staged_files}
-    # The full, strict Oxlint ratchet runs in CI via `pnpm quality`. Running
-    # raw Oxlint on a staged legacy file here would reject an unrelated commit
-    # for existing baselined findings that `--fix` cannot repair.
-    # Full project tsc — catches Prisma/generated-type errors that Oxlint
-    # doesn't analyze. Vercel's `next build` runs the real
-    # TypeScript compiler too; this hook surfaces the same class of error
-    # locally before it red-lights the deploy. tsc is incremental
-    # (tsconfig.json sets `incremental: true`), so warm runs are fast.
-    typecheck:
-      run: npm run typecheck
-    test:
-      run: npx vitest run
+    # Full lint, typecheck, tests, and builds are intentionally GitHub-only.
+    # This checkout may share its host with production services.
