@@ -1,4 +1,5 @@
-import type { NextApiHandler } from 'next'
+import { Prisma } from '@prisma/client'
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -39,5 +40,35 @@ describe('overlay page diagnostic beacon', () => {
     await handler(req, res)
     expect(res.statusCode).toBe(422)
     expect(prisma.setting.upsert).not.toHaveBeenCalled()
+  })
+
+  it('returns not found when the overlay user no longer exists', async () => {
+    vi.mocked(prisma.setting).upsert.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Foreign key constraint failed', {
+        clientVersion: 'test',
+        code: 'P2003',
+      }),
+    )
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      body: { userId: '00000000-0000-4000-8000-000000000000' },
+      method: 'POST',
+    })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(404)
+  })
+
+  it('rethrows unrelated database failures', async () => {
+    const outage = new Prisma.PrismaClientUnknownRequestError('Database unavailable', {
+      clientVersion: 'test',
+    })
+    vi.mocked(prisma.setting).upsert.mockRejectedValue(outage)
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      body: { userId: '00000000-0000-4000-8000-000000000000' },
+      method: 'POST',
+    })
+
+    await expect(handler(req, res)).rejects.toBe(outage)
   })
 })

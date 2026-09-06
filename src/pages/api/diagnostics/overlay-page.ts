@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
@@ -15,11 +16,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { userId } = parsed.data
-  await prisma.setting.upsert({
-    create: { key: SETUP_SIGNAL_KEYS.overlayPageLastSeen, userId, value: true },
-    update: { updatedAt: new Date(), value: true },
-    where: { key_userId: { key: SETUP_SIGNAL_KEYS.overlayPageLastSeen, userId } },
-  })
+  try {
+    await prisma.setting.upsert({
+      create: { key: SETUP_SIGNAL_KEYS.overlayPageLastSeen, userId, value: true },
+      update: { updatedAt: new Date(), value: true },
+      where: { key_userId: { key: SETUP_SIGNAL_KEYS.overlayPageLastSeen, userId } },
+    })
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      res.status(404).json({ message: 'User not found' })
+      return
+    }
+    throw error
+  }
   return res.status(204).end()
 }
 
