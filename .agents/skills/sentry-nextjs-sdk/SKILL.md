@@ -7,7 +7,7 @@ parent: sentry-sdk-setup
 disable-model-invocation: true
 ---
 
-> [All Skills](../../SKILL_TREE.md) > [SDK Setup](../sentry-sdk-setup/SKILL.md) > Next.js SDK
+> [All Skills](../../SKILL_TREE.md) > Next.js SDK setup
 
 # Sentry Next.js SDK
 

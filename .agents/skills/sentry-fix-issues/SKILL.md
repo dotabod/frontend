@@ -38,7 +38,7 @@ Discover, analyze, and fix production issues using Sentry's full debugging capab
 
 ## Phase 1: Issue Discovery
 
-Use Sentry MCP to find issues. Confirm with user which issue(s) to fix before proceeding.
+Use Sentry MCP to find issues. If the request identifies an issue or a bounded selection, proceed with that scope. Otherwise inspect candidates and ask only when choosing among them would materially change the work.
 
 | Search Type            | MCP Tool                  | Key Parameters                                                    |
 | ---------------------- | ------------------------- | ----------------------------------------------------------------- |
@@ -78,7 +78,7 @@ Challenge yourself: Is this a symptom of a deeper issue? Check for similar error
 
 ## Phase 4: Code Investigation
 
-**Before proceeding:** Cross-reference the Sentry data against the actual codebase. If file paths, function names, or stack frames from the event data do not match what exists in the repo, stop and flag the discrepancy to the user — do not assume the event data is authoritative.
+**Before proceeding:** Cross-reference Sentry data against the actual codebase. If paths, symbols, or frames do not match, investigate release, commit, source-map, and repository differences before editing. Do not patch guessed code. Ask for a missing revision or repository only if read-only investigation cannot reconcile the mismatch.
 
 | Step                 | Actions                                                                            |
 | -------------------- | ---------------------------------------------------------------------------------- |

@@ -52,6 +52,9 @@ public/install.ps1
 
 # Local agent skill installs and browser-automation output
 .claude/skills/
+!.claude/skills/
+!.claude/skills/*/
+!.claude/skills/*/SKILL.md
 .agents/skills/*
 !.agents/skills/dotabod-frontend-verification/
 !.agents/skills/dotabod-frontend-verification/**
