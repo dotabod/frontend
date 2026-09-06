@@ -1,6 +1,6 @@
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import ModeratedChannels from '@/components/Dashboard/moderated-channels'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import { Card } from '@/ui/card'
 
 const ManageChannel = () => (

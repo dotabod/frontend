@@ -11,7 +11,7 @@ vi.mock('stripe', () => ({
   },
 }))
 
-async function load() {
+const load = async function load() {
   return await import('@/lib/stripe-server')
 }
 

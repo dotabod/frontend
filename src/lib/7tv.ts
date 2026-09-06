@@ -39,7 +39,7 @@ export interface SevenTVUserResponse {
   }
 }
 
-export async function get7TVUser(twitchId: string) {
+export const get7TVUser = async function get7TVUser(twitchId: string) {
   const response = await fetch(`https://7tv.io/v3/users/twitch/${twitchId}?cacheBust=${Date.now()}`)
   if (!response.ok) {
     throw new Error(`Failed to fetch user data: ${response.statusText}`)
@@ -51,7 +51,7 @@ export async function get7TVUser(twitchId: string) {
   return stvResponse
 }
 
-export function create7TVClient(authToken?: string) {
+export const create7TVClient = function create7TVClient(authToken?: string) {
   if (!authToken) {
     throw new Error('No 7TV auth token provided')
   }

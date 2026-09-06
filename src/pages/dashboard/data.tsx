@@ -5,9 +5,9 @@ import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import Header from '@/components/Dashboard/Header'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import Header from '@/components/Dashboard/header'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 
@@ -72,7 +72,7 @@ const DataPage = () => {
             <li>Disconnects your Twitch and Steam accounts</li>
             <li>Invalidates your overlay URL and Dota 2 token</li>
           </ul>
-          <Paragraph>You can't undo this.</Paragraph>
+          <Paragraph>You can&apos;t undo this.</Paragraph>
         </div>
       ),
       icon: <ExclamationCircleOutlined />,
@@ -125,7 +125,7 @@ const DataPage = () => {
       <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
         <Card title={<span>Export your data</span>}>
           <Space direction='vertical' className='w-full' size='large'>
-            <Text>You'll get a JSON file with:</Text>
+            <Text>You&apos;ll get a JSON file with:</Text>
             <ul className='list-disc pl-4'>
               <li>Account details</li>
               <li>Settings and preferences</li>
@@ -148,7 +148,7 @@ const DataPage = () => {
 
         <Card title={<span>Delete your account</span>}>
           <div className='subtitle'>
-            Permanently removes everything we have about your account. You can't undo this.
+            Permanently removes everything we have about your account. You can&apos;t undo this.
           </div>
           <Space direction='vertical' className='w-full' size='large'>
             <Text>This will:</Text>

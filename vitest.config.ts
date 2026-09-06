@@ -45,7 +45,7 @@ export default defineConfig({
         '**/dist/**',
         '**/__tests__/**',
       ],
-      include: ['src/components/Overlay/GiftAlert/GiftSubscriptionAlert.tsx'],
+      include: ['src/components/Overlay/GiftAlert/gift-subscription-alert.tsx'],
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },

@@ -36,7 +36,7 @@ const CONTACT_PROPERTIES: PropertyDef[] = [
   },
 ]
 
-export function subscriptionToValue(
+export const subscriptionToValue = function subscriptionToValue(
   sub: { tier?: string | null; status?: string | null; transactionType?: string | null } | null,
 ): string {
   if (!sub?.tier || sub.tier === 'FREE') {
@@ -57,11 +57,11 @@ export function subscriptionToValue(
 // Memoized per server instance so we only attempt property creation once.
 let propertiesEnsured: Promise<void> | null = null
 
-async function readBody(res: { text(): Promise<string> }): Promise<string> {
+const readBody = async function readBody(res: { text(): Promise<string> }): Promise<string> {
   return await res.text().catch(() => '')
 }
 
-async function createProperty(token: string, prop: PropertyDef) {
+const createProperty = async function createProperty(token: string, prop: PropertyDef) {
   const res = await fetch(`${CRM_BASE}/properties/contacts`, {
     body: JSON.stringify({
       fieldType: prop.fieldType,
@@ -83,7 +83,7 @@ async function createProperty(token: string, prop: PropertyDef) {
   }
 }
 
-async function ensureContactProperties(token: string) {
+const ensureContactProperties = async function ensureContactProperties(token: string) {
   if (!propertiesEnsured) {
     propertiesEnsured = Promise.all(CONTACT_PROPERTIES.map(async (p) => createProperty(token, p)))
       .then(() => {})
@@ -99,7 +99,7 @@ async function ensureContactProperties(token: string) {
 // Best-effort: never throws, so it can't break the visitor-token response.
 // `subscription` is optional: when omitted (e.g. the tier lookup failed) we leave
 // the existing dotabod_subscription value untouched rather than overwriting it.
-export async function syncHubSpotContact(
+export const syncHubSpotContact = async function syncHubSpotContact(
   token: string,
   { email, username, subscription }: { email: string; username: string; subscription?: string },
 ) {

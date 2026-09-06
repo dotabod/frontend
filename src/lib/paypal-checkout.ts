@@ -7,11 +7,11 @@ type Period = 'monthly' | 'annual' | 'lifetime'
 // Best-effort Stripe price ID purely as a display hint for the dashboard's
 // Period detection. Empty when not configured (e.g. sandbox) — PayPal does not
 // Need it; the period drives everything functional.
-function displayPriceId(period: Period): string | null {
+const displayPriceId = function displayPriceId(period: Period): string | null {
   return getPriceId(SUBSCRIPTION_TIERS.PRO, period, false) || null
 }
 
-function getPlanId(period: 'monthly' | 'annual'): string {
+const getPlanId = function getPlanId(period: 'monthly' | 'annual'): string {
   const env =
     period === 'annual' ? process.env.PAYPAL_PLAN_ID_ANNUAL : process.env.PAYPAL_PLAN_ID_MONTHLY
   if (!env) {
@@ -20,7 +20,7 @@ function getPlanId(period: 'monthly' | 'annual'): string {
   return env
 }
 
-function getLifetimeAmountCents(): number {
+const getLifetimeAmountCents = function getLifetimeAmountCents(): number {
   const cents = Number.parseInt(process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS ?? '', 10)
   if (!Number.isFinite(cents) || cents <= 0) {
     throw new Error('LIFETIME_SUBSCRIPTION_PRICE_CENTS is not configured')
@@ -28,12 +28,7 @@ function getLifetimeAmountCents(): number {
   return cents
 }
 
-/**
- * Creates the appropriate PayPal resource for a purchase and returns the URL to
- * redirect the buyer to for approval. Recurring plans use PayPal Subscriptions
- * (PayPal owns billing); lifetime uses a one-time Order. No Stripe involved.
- */
-export async function createPaypalApproval(params: {
+export const createPaypalApproval = async function createPaypalApproval(params: {
   period: Period
   userId: string
   email?: string

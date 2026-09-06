@@ -12,9 +12,9 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (_methods: string[], handler: NextApiHandler) => handler,
 }))
-vi.mock('@/lib/api/getServerSession', () => ({ getServerSession: vi.fn() }))
+vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: vi.fn() }))
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/notifications'
 

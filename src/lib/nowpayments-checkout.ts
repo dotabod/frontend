@@ -11,7 +11,7 @@ interface Params {
   metadata?: Record<string, unknown>
 }
 
-export async function createAndStoreCryptoInvoice({
+export const createAndStoreCryptoInvoice = async function createAndStoreCryptoInvoice({
   stripeInvoice,
   userId,
   orderDescription,

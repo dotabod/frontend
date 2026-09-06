@@ -4,7 +4,7 @@ vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 
 // Fresh module graph per test so the memoized property-creation promise resets.
-async function load() {
+const load = async function load() {
   const fetchMod = await import('node-fetch')
   const sentry = await import('@sentry/nextjs')
   const mod = await import('@/lib/hubspot')

@@ -29,7 +29,7 @@ vi.mock('@/lib/db', () => ({
 }))
 
 // Mock the Twitch tokens
-vi.mock('@/lib/getTwitchTokens', () => ({
+vi.mock('@/lib/get-twitch-tokens', () => ({
   getTwitchTokens: vi.fn(),
 }))
 
@@ -42,7 +42,7 @@ vi.mock('@sentry/nextjs', () => ({
 }))
 
 // Mock the authentication
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
@@ -52,9 +52,9 @@ vi.mock('@/lib/auth', () => ({
 
 import { captureException } from '@sentry/nextjs'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 
 describe('update-followers API', () => {
   beforeEach(() => {

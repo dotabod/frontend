@@ -1,17 +1,17 @@
 import { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { emotesRequired } from '@/components/Dashboard/ChatBot'
+import { emotesRequired } from '@/components/Dashboard/chat-bot'
 import type { EmoteSetResponse, SevenTVUserResponse } from '@/lib/7tv'
 import { get7TVUser } from '@/lib/7tv'
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
     res.status(403).json({ message: 'Forbidden' })

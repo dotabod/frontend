@@ -3,12 +3,15 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
-async function addModerator(broadcasterId: string | undefined, accessToken: string) {
+const addModerator = async function addModerator(
+  broadcasterId: string | undefined,
+  accessToken: string,
+) {
   if (!broadcasterId) {
     throw new Error('Broadcaster ID is required')
   }
@@ -43,11 +46,12 @@ async function addModerator(broadcasterId: string | undefined, accessToken: stri
   } catch (error) {
     captureException(error)
     console.error(error)
-    return { error: error.message, message: 'Error', status: 'ERROR' } // Handle error gracefully
+    // Handle error gracefully
+    return { error: error.message, message: 'Error', status: 'ERROR' }
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
     res.status(403).json({ message: 'Forbidden' })

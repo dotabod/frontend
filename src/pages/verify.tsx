@@ -19,10 +19,10 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
 
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import TwitchChat from '@/components/TwitchChat'
-import { chatVerifyScopes } from '@/lib/authScopes'
+import { Container } from '@/components/container'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import TwitchChat from '@/components/twitch-chat'
+import { chatVerifyScopes } from '@/lib/auth-scopes'
 import { getRankTitle } from '@/lib/ranks'
 import { useTrack } from '@/lib/track'
 import type { NextPageWithLayout } from '@/pages/_app'
@@ -63,10 +63,9 @@ interface LinkedAccount {
   loading?: boolean
 }
 
-/**
- * Update player profile in our database and fetch OpenDota data from our backend
- */
-async function updatePlayerProfile(steam32Id: string | number): Promise<OpenDotaProfile | null> {
+const updatePlayerProfile = async function updatePlayerProfile(
+  steam32Id: string | number,
+): Promise<OpenDotaProfile | null> {
   try {
     const response = await fetch('/api/steam/update-profile-data', {
       body: JSON.stringify({ steam32Id }),
@@ -111,7 +110,7 @@ const VerifyPage: NextPageWithLayout = () => {
       notification.error({
         description: (
           <span>
-            You don't have access to the Streamer dashboard.{' '}
+            You don&apos;t have access to the Streamer dashboard.{' '}
             <Button loading={isSigningOut} onClick={handleStreamerLogin}>
               Click here to login
             </Button>{' '}
@@ -418,7 +417,8 @@ const VerifyPage: NextPageWithLayout = () => {
         setLinkedAccounts(
           remainingAccounts.map((account, index) => ({
             ...account,
-            isPrimary: index === 0, // Make the first account primary
+            // Make the first account primary
+            isPrimary: index === 0,
           })),
         )
 
@@ -693,7 +693,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
                 <Link href='/dashboard' prefetch={false}>
                   <Button type='primary' size='large' className='px-8'>
-                    Go to Streamer's Dashboard
+                    Go to Streamer&apos;s Dashboard
                   </Button>
                 </Link>
               </div>

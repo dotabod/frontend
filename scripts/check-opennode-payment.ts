@@ -23,10 +23,10 @@ let invoiceId: string | null = null
 let chargeId: string | null = null
 
 // Parse arguments
-for (let i = 0; i < args.length; i++) {
+for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--charge-id' && args[i + 1]) {
     chargeId = args[i + 1]
-    i++
+    i += 1
   } else if (!args[i].startsWith('--')) {
     invoiceId = args[i]
   }
@@ -41,7 +41,9 @@ interface ChargeWithStatus {
   reason: string
 }
 
-async function discoverProblematicCharges(): Promise<ChargeWithStatus[]> {
+const discoverProblematicCharges = async function discoverProblematicCharges(): Promise<
+  ChargeWithStatus[]
+> {
   // Find all paid/confirmed charges
   const paidCharges = await prisma.openNodeCharge.findMany({
     orderBy: { createdAt: 'desc' },
@@ -86,7 +88,7 @@ async function discoverProblematicCharges(): Promise<ChargeWithStatus[]> {
   return results
 }
 
-async function showDiscoverySummary(): Promise<void> {
+const showDiscoverySummary = async function showDiscoverySummary(): Promise<void> {
   console.log('='.repeat(80))
   console.log('OpenNode Payment Discovery')
   console.log('='.repeat(80))
@@ -114,7 +116,7 @@ async function showDiscoverySummary(): Promise<void> {
   console.log('='.repeat(80))
   console.log()
 
-  for (let i = 0; i < chargesToFix.length; i++) {
+  for (let i = 0; i < chargesToFix.length; i += 1) {
     const { charge, hasLifetimeSubscription, reason } = chargesToFix[i]
 
     console.log(`${i + 1}. Charge: ${charge.openNodeChargeId}`)
@@ -148,7 +150,7 @@ async function showDiscoverySummary(): Promise<void> {
   console.log()
 }
 
-async function checkSingleCharge(): Promise<void> {
+const checkSingleCharge = async function checkSingleCharge(): Promise<void> {
   console.log('='.repeat(80))
   console.log('OpenNode Payment Diagnostic Check')
   console.log('='.repeat(80))
@@ -397,7 +399,7 @@ async function checkSingleCharge(): Promise<void> {
   console.log()
 }
 
-async function main() {
+const main = async function main() {
   try {
     // If no arguments provided, run discovery mode
     if (!invoiceId && !chargeId) {

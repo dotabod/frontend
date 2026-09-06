@@ -31,14 +31,14 @@ beforeAll(async () => {
   ;({ default: handler } = await import('@/pages/api/webhooks/nowpayments/index'))
 })
 
-function sign(body: Record<string, unknown>): string {
+const sign = function sign(body: Record<string, unknown>): string {
   return crypto
     .createHmac('sha512', 'test-ipn-secret')
     .update(JSON.stringify(sortObject(body)))
     .digest('hex')
 }
 
-function buildReq(body: Record<string, unknown>, signature?: string) {
+const buildReq = function buildReq(body: Record<string, unknown>, signature?: string) {
   return createMocks<NextApiRequest, NextApiResponse>({
     body,
     headers: signature ? { 'x-nowpayments-sig': signature } : {},

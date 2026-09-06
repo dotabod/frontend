@@ -3,14 +3,17 @@ import * as z from 'zod'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 const approvedModeratorSchema = z.array(z.number())
 
-async function approveModerators(userId: string, newModeratorChannelIds: number[]) {
+const approveModerators = async function approveModerators(
+  userId: string,
+  newModeratorChannelIds: number[],
+) {
   try {
     // Fetch the current list of approved moderator channel IDs
     const currentModerators = await prisma.approvedModerator.findMany({
@@ -51,7 +54,7 @@ async function approveModerators(userId: string, newModeratorChannelIds: number[
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
   const session = await getServerSession(req, res, authOptions)

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { ProfileMatchOverview } from '@/components/ProfileMatchOverview'
+import { ProfileMatchOverview } from '@/components/profile-match-overview'
 
 describe(ProfileMatchOverview, () => {
   it('renders same-origin profile links for a valid username', () => {

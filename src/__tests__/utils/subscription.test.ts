@@ -86,7 +86,8 @@ describe('Subscription priority logic', () => {
       locale: 'en',
       mmr: 0,
       name: '',
-      proExpiration: null, // Set to null to avoid virtual gift subscription
+      // Set to null to avoid virtual gift subscription
+      proExpiration: null,
       steam32Id: null,
       streamCategory: null,
       streamPlatform: null,

@@ -37,7 +37,7 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: mocks.getServerSession,
 }))
 

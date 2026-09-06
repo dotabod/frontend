@@ -13,7 +13,7 @@ export interface NowPaymentsProcessResult {
   subscriptionCreated: boolean
 }
 
-function getMetadata(invoice: NowPaymentsInvoice): Record<string, unknown> {
+const getMetadata = function getMetadata(invoice: NowPaymentsInvoice): Record<string, unknown> {
   return invoice.metadata &&
     typeof invoice.metadata === 'object' &&
     !Array.isArray(invoice.metadata)
@@ -21,7 +21,7 @@ function getMetadata(invoice: NowPaymentsInvoice): Record<string, unknown> {
     : {}
 }
 
-export async function processConfirmedNowPaymentsPayment(
+export const processConfirmedNowPaymentsPayment = async function processConfirmedNowPaymentsPayment(
   invoice: NowPaymentsInvoice,
   payment: NowPaymentsPaymentStatus,
 ): Promise<NowPaymentsProcessResult> {

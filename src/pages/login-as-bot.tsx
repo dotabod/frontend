@@ -5,9 +5,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
 
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { chatBotScopes } from '@/lib/authScopes'
+import { Container } from '@/components/container'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { chatBotScopes } from '@/lib/auth-scopes'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const Login: NextPageWithLayout = () => {

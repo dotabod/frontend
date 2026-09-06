@@ -4,8 +4,8 @@ import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import Header from '@/components/Dashboard/Header'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import Header from '@/components/Dashboard/header'
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'true'
 

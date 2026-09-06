@@ -3,7 +3,7 @@ import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
 import handler from '@/pages/api/win-loss-adjustments'
 
@@ -23,11 +23,11 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (_methods: string[], route: NextApiHandler) => route,
 }))
 
-vi.mock('@/lib/api/getServerSession', () => ({ getServerSession: vi.fn() }))
+vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: vi.fn() }))
 
 const USER_ID = 'user-1'
 
-function postRequest(body: unknown) {
+const postRequest = function postRequest(body: unknown) {
   return createMocks({ body: body as never, method: 'POST' })
 }
 

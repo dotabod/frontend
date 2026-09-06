@@ -7,14 +7,14 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
 
 import prisma from '@/lib/db'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
-import { reconcileTwitchProfile } from '@/lib/reconcileTwitchProfile'
-import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
+import { reconcileTwitchProfile } from '@/lib/reconcile-twitch-profile'
+import { twitchHelixProfile } from '@/lib/twitch-helix-profile'
 import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
 import { parseTwitchProfile } from '@/types/twitch'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 
-import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
+import { chatBotScopes, chatVerifyScopes, defaultScopes } from './auth-scopes'
 
 const extractCookieValue = (cookieHeader: string | string[] | undefined, name: string) => {
   if (!cookieHeader) {
@@ -205,16 +205,15 @@ export const authOptions: NextAuthOptions = {
 
       const roleFromScopes = getRoleFromScopes()
 
-      const scopesToUpdate =
-        roleFromScopes === 'chatter'
-          ? chatVerifyScopes
-          : roleFromScopes === 'bot'
-            ? chatBotScopes
-            : alreadyHasStreamerScopes && isLoggingInAsChatter
-              ? // Use old scopes
-                (provider?.Account?.scope ?? defaultScopes)
-              : // Use new scopes
-                (account?.scope ?? defaultScopes)
+      let scopesToUpdate = account?.scope ?? defaultScopes
+      if (roleFromScopes === 'chatter') {
+        scopesToUpdate = chatVerifyScopes
+      } else if (roleFromScopes === 'bot') {
+        scopesToUpdate = chatBotScopes
+      } else if (alreadyHasStreamerScopes && isLoggingInAsChatter) {
+        // Preserve the existing streamer scopes when signing in as a chatter.
+        scopesToUpdate = provider?.Account?.scope ?? defaultScopes
+      }
 
       // Name change case. This case is further handled in the webhook utils for `twitch-events`
       if (
@@ -356,12 +355,16 @@ export const authOptions: NextAuthOptions = {
     error(code, metadata) {
       // `code` is typed string by NextAuth, but the `/api/auth/_log` POST path
       // unpacks it from `req.body` so a crafted client can send a non-string.
-      if (typeof code !== 'string') return
+      if (typeof code !== 'string') {
+        return
+      }
       // `CLIENT_*` codes come from the browser via /api/auth/_log when
       // next-auth/react's fetch to /api/auth/session blips (ad-blockers, tab
       // closed mid-request, mobile network). They drown out actionable
       // server-side codes like OAUTH_CALLBACK_ERROR.
-      if (code.startsWith('CLIENT_')) return
+      if (code.startsWith('CLIENT_')) {
+        return
+      }
       console.error(`[next-auth][error][${code}]`, metadata)
       const maybeError =
         metadata instanceof Error ? metadata : (metadata as { error?: unknown } | undefined)?.error
@@ -380,7 +383,9 @@ export const authOptions: NextAuthOptions = {
       })
     },
     warn(code) {
-      if (typeof code !== 'string') return
+      if (typeof code !== 'string') {
+        return
+      }
       console.warn(`[next-auth][warn][${code}]`)
       const known = KNOWN_NEXTAUTH_WARN_CODES.has(code) ? code : 'unknown'
       captureMessage('next-auth warning', {
@@ -572,7 +577,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: {
-    maxAge: 3 * 24 * 60 * 60, // 3 days in seconds
+    // 3 days in seconds
+    maxAge: 3 * 24 * 60 * 60,
     strategy: 'jwt',
   },
 }

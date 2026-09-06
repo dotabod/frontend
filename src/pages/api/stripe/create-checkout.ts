@@ -3,10 +3,10 @@ import type { TransactionType } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { featureFlags } from '@/lib/featureFlags'
+import { featureFlags } from '@/lib/feature-flags'
 import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
@@ -91,7 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function ensureCustomer(
+const ensureCustomer = async function ensureCustomer(
   user: {
     id: string
     email?: string | null
@@ -104,7 +104,8 @@ async function ensureCustomer(
 ): Promise<string> {
   // Look for any existing subscription to get a customer ID
   const subscription = await tx.subscription.findFirst({
-    orderBy: { createdAt: 'desc' }, // Use the most recent subscription
+    // Use the most recent subscription
+    orderBy: { createdAt: 'desc' },
     select: { stripeCustomerId: true },
     where: { userId: user.id },
   })
@@ -155,7 +156,7 @@ async function ensureCustomer(
   return customerId
 }
 
-async function createStripeCustomer(user: {
+const createStripeCustomer = async function createStripeCustomer(user: {
   id: string
   email?: string | null
   name?: string | null
@@ -199,7 +200,9 @@ interface CheckoutSessionParams {
   isCryptoPayment: boolean
 }
 
-async function createCheckoutSession(params: CheckoutSessionParams): Promise<string> {
+const createCheckoutSession = async function createCheckoutSession(
+  params: CheckoutSessionParams,
+): Promise<string> {
   const {
     customerId,
     priceId,
@@ -295,11 +298,7 @@ async function createCheckoutSession(params: CheckoutSessionParams): Promise<str
   return session.url ?? ''
 }
 
-/**
- * Creates a Stripe invoice (for record-keeping) and a matching NOWPayments
- * hosted invoice, then returns the NOWPayments-hosted checkout URL.
- */
-async function createCryptoInvoice(
+const createCryptoInvoice = async function createCryptoInvoice(
   params: Omit<CheckoutSessionParams, 'isGift' | 'isCryptoPayment' | 'isPaypalPayment'>,
 ): Promise<string> {
   const {

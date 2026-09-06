@@ -2,7 +2,7 @@ import { sendGTMEvent } from '@next/third-parties/google'
 import { useSession } from 'next-auth/react'
 import { useCallback } from 'react'
 
-import { useCookiePreferences } from './cookieManager'
+import { useCookiePreferences } from './cookie-manager'
 
 export const useTrack = () => {
   const session = useSession()

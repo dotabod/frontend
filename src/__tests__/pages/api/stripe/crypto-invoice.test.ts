@@ -32,9 +32,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => ({ default: mocks.prisma }))
 vi.mock('@/lib/stripe-server', () => ({ stripe: mocks.stripe }))
-vi.mock('@/lib/api/getServerSession', () => ({ getServerSession: mocks.getServerSession }))
+vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: mocks.getServerSession }))
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
-vi.mock('@/lib/featureFlags', () => ({ featureFlags: mocks.featureFlags }))
+vi.mock('@/lib/feature-flags', () => ({ featureFlags: mocks.featureFlags }))
 vi.mock('@/lib/nowpayments', () => ({
   createNowPaymentsInvoice: mocks.createNowPaymentsInvoice,
 }))
@@ -50,7 +50,7 @@ beforeAll(async () => {
   ;({ default: handler } = await import('@/pages/api/stripe/crypto-invoice'))
 })
 
-function buildReq() {
+const buildReq = function buildReq() {
   return createMocks<NextApiRequest, NextApiResponse>({ method: 'POST' })
 }
 

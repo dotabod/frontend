@@ -21,7 +21,7 @@ vi.mock('@/lib/db', () => ({
   },
 }))
 
-vi.mock('@/components/Homepage/HomepageShell', () => ({
+vi.mock('@/components/Homepage/homepage-shell', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
@@ -61,7 +61,7 @@ const baseProps = {
   view: 'matches' as const,
 }
 
-function databaseMatch(index: number) {
+const databaseMatch = function databaseMatch(index: number) {
   return {
     created_at: new Date(Date.UTC(2026, 7, 25 - index, 12)),
     dire_score: 33,
@@ -164,7 +164,7 @@ describe('public match history page', () => {
     expect(within(record).getByText('60% win rate')).toBeInTheDocument()
     expect(within(record).getByText('10 matches')).toBeInTheDocument()
     expect(within(record).getByText('2 heroes')).toBeInTheDocument()
-    expect(screen.queryByText(/Results include matches/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Results include matches/iu)).not.toBeInTheDocument()
     expect(screen.getByTestId('match-history-page')).toHaveClass('font-sans')
   })
 
@@ -180,11 +180,11 @@ describe('public match history page', () => {
       within(screen.getByRole('table', { name: 'Recent matches' })).getByText('Axe'),
     ).toBeInTheDocument()
     expect(screen.getByText('8 / 3 / 12')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /8964010929/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /8964010929/iu })).toHaveAttribute(
       'href',
       'https://www.opendota.com/matches/8964010929',
     )
-    expect(screen.getByRole('link', { name: /8964010929/i })).toHaveTextContent('OpenDota')
+    expect(screen.getByRole('link', { name: /8964010929/iu })).toHaveTextContent('OpenDota')
   })
 
   it('switches to hero win rates while preserving the period filter', () => {
@@ -287,7 +287,7 @@ describe('public match history page', () => {
     render(<MatchHistoryPage {...baseProps} matches={[olderMatch, newerMatch]} />)
 
     expect(
-      screen.getAllByRole('link', { name: /Open match/ }).map((link) => link.getAttribute('href')),
+      screen.getAllByRole('link', { name: /Open match/u }).map((link) => link.getAttribute('href')),
     ).toStrictEqual([
       'https://www.opendota.com/matches/8964010930',
       'https://www.opendota.com/matches/8964010928',

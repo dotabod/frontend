@@ -49,7 +49,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const opendodtacharge = {
       amount,
-      auto_settle: false, // Configure based on treasury policy
+      // Configure based on treasury policy
+      auto_settle: false,
       callback_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/webhooks/opennode`,
       currency,
       customer_email: invoice.customer_email || undefined,
@@ -61,7 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       notif_email: invoice.customer_email || undefined,
       success_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
-      ttl: 60, // 1 hour expiration,
+      // 1 hour expiration,
+      ttl: 60,
     }
     const charge = await createOpenNodeCharge(opendodtacharge)
 

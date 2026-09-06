@@ -14,7 +14,7 @@ const requestSchema = z.object({
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
 
 // Helper function to transform BigInt to String
-function serializeData(data: unknown): JsonValue {
+const serializeData = function serializeData(data: unknown): JsonValue {
   if (data === null || data === undefined) {
     return null
   }

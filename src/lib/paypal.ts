@@ -1,14 +1,14 @@
 const LIVE_BASE_URL = 'https://api-m.paypal.com'
 const SANDBOX_BASE_URL = 'https://api-m.sandbox.paypal.com'
 
-function getBaseUrl(): string {
+const getBaseUrl = function getBaseUrl(): string {
   if (process.env.PAYPAL_API_BASE) {
     return process.env.PAYPAL_API_BASE
   }
   return process.env.NODE_ENV === 'production' ? LIVE_BASE_URL : SANDBOX_BASE_URL
 }
 
-function getClientId(): string {
+const getClientId = function getClientId(): string {
   const id = process.env.PAYPAL_CLIENT_ID
   if (!id) {
     throw new Error('PAYPAL_CLIENT_ID is not set')
@@ -16,7 +16,7 @@ function getClientId(): string {
   return id
 }
 
-function getClientSecret(): string {
+const getClientSecret = function getClientSecret(): string {
   const secret = process.env.PAYPAL_CLIENT_SECRET
   if (!secret) {
     throw new Error('PAYPAL_CLIENT_SECRET is not set')
@@ -24,7 +24,7 @@ function getClientSecret(): string {
   return secret
 }
 
-function getWebhookId(): string {
+const getWebhookId = function getWebhookId(): string {
   const id = process.env.PAYPAL_WEBHOOK_ID
   if (!id) {
     throw new Error('PAYPAL_WEBHOOK_ID is not set')
@@ -32,7 +32,7 @@ function getWebhookId(): string {
   return id
 }
 
-async function getAccessToken(): Promise<string> {
+const getAccessToken = async function getAccessToken(): Promise<string> {
   const auth = Buffer.from(`${getClientId()}:${getClientSecret()}`).toString('base64')
   const res = await fetch(`${getBaseUrl()}/v1/oauth2/token`, {
     body: 'grant_type=client_credentials',
@@ -49,7 +49,7 @@ async function getAccessToken(): Promise<string> {
   return data.access_token
 }
 
-async function authedRequest<T>(
+const authedRequest = async function authedRequest<T>(
   method: 'GET' | 'POST',
   path: string,
   body?: unknown,
@@ -102,11 +102,11 @@ export interface PayPalCaptureResult {
   payerId: string | null
 }
 
-function formatAmount(amountCents: number): string {
+const formatAmount = function formatAmount(amountCents: number): string {
   return (amountCents / 100).toFixed(2)
 }
 
-function findApproveLink(links: PayPalLink[] | undefined): string {
+const findApproveLink = function findApproveLink(links: PayPalLink[] | undefined): string {
   const approveUrl = links?.find((l) => l.rel === 'payer-action' || l.rel === 'approve')?.href
   if (!approveUrl) {
     throw new Error('PayPal response returned no approval link')
@@ -114,10 +114,7 @@ function findApproveLink(links: PayPalLink[] | undefined): string {
   return approveUrl
 }
 
-/**
- * Creates a one-time PayPal order (used only for lifetime purchases).
- */
-export async function createOrder(params: {
+export const createOrder = async function createOrder(params: {
   amountCents: number
   currency: string
   userId: string
@@ -162,7 +159,9 @@ interface PayPalCaptureApiResponse {
   }[]
 }
 
-export async function captureOrder(orderId: string): Promise<PayPalCaptureResult> {
+export const captureOrder = async function captureOrder(
+  orderId: string,
+): Promise<PayPalCaptureResult> {
   const res = await authedRequest<PayPalCaptureApiResponse>(
     'POST',
     `/v2/checkout/orders/${orderId}/capture`,
@@ -187,11 +186,7 @@ interface PayPalSubscriptionResponse {
   links?: PayPalLink[]
 }
 
-/**
- * Creates a PayPal subscription against an existing billing plan. PayPal owns
- * the recurring schedule and auto-charges each cycle.
- */
-export async function createSubscription(params: {
+export const createSubscription = async function createSubscription(params: {
   planId: string
   userId: string
   returnUrl: string
@@ -221,7 +216,9 @@ export interface PayPalSubscriptionDetails {
   customId: string | null
 }
 
-export async function getSubscription(subscriptionId: string): Promise<PayPalSubscriptionDetails> {
+export const getSubscription = async function getSubscription(
+  subscriptionId: string,
+): Promise<PayPalSubscriptionDetails> {
   const sub = await authedRequest<PayPalSubscriptionResponse & { custom_id?: string }>(
     'GET',
     `/v1/billing/subscriptions/${subscriptionId}`,
@@ -240,7 +237,7 @@ interface VerifyWebhookResponse {
   verification_status: 'SUCCESS' | 'FAILURE'
 }
 
-export async function verifyWebhookSignature(
+export const verifyWebhookSignature = async function verifyWebhookSignature(
   headers: Record<string, string | string[] | undefined>,
   rawBody: string,
 ): Promise<boolean> {

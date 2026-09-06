@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { ReactElement } from 'react'
 
-import { Container } from '@/components/Container'
-import WhatsNewFeed from '@/components/Dashboard/Features/WhatsNewFeed'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { whatsNewSorted } from '@/lib/whatsNew'
+import { Container } from '@/components/container'
+import WhatsNewFeed from '@/components/Dashboard/Features/whats-new-feed'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { whatsNewSorted } from '@/lib/whats-new'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const pageTitle = "What's New | Dotabod"

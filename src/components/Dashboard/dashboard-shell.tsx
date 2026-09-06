@@ -1,0 +1,436 @@
+import { Bars3Icon } from '@heroicons/react/24/outline'
+import { CopyButton } from '@mantine/core'
+import { captureException } from '@sentry/nextjs'
+import { Button, Drawer, Layout, Menu, theme } from 'antd'
+import type { MenuProps } from 'antd'
+import clsx from 'clsx'
+import { useSession } from 'next-auth/react'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import useSWR from 'swr'
+
+import Banner from '@/components/banner'
+import CookieConsent from '@/components/cookie-consent'
+import { DisableToggle } from '@/components/Dashboard/disable-toggle'
+import { SubscriptionBadge } from '@/components/Dashboard/subscription-badge'
+import HubSpot from '@/components/hub-spot'
+import { DarkLogo } from '@/components/logo'
+import GiftNotification from '@/components/Subscription/gift-notification'
+import { UserAccountNav } from '@/components/user-account-nav'
+import { useFeatureAccess } from '@/hooks/use-subscription'
+import { fetcher } from '@/lib/fetcher'
+import { useBaseUrl } from '@/lib/hooks/use-base-url'
+import useMaybeSignout from '@/lib/hooks/use-maybe-signout'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/use-update-setting'
+
+import { HelpMenu } from './help-menu'
+import { filterNav, findBestMatchingMenuItem, navConfig, navItemToMenuItem } from './navigation'
+import { SettingsSearch } from './settings-search'
+
+const { Header, Sider, Content } = Layout
+
+// Add SEO interface
+interface SEOProps {
+  title?: string
+  description?: string
+  ogImage?: string
+  canonicalUrl?: string
+  ogType?: string
+  noindex?: boolean
+}
+
+const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?: SEOProps }) => {
+  const { status, data } = useSession()
+  const router = useRouter()
+  // `broken` (set by the Sider breakpoint) is our single "is mobile" signal.
+  const [broken, setBroken] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const copyOverlayUrl = useBaseUrl(`overlay/${data?.user?.id ?? ''}`)
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken()
+  // Seed selection from the initial route so off-sidebar pages (billing/data/help)
+  // don't briefly false-highlight Setup before the route effect runs.
+  const [current, setCurrent] = useState(() => findBestMatchingMenuItem(router.pathname).key)
+  const [adminOpenKeys, setAdminOpenKeys] = useState<string[]>(() => {
+    const { parentKey } = findBestMatchingMenuItem(router.pathname)
+    return parentKey ? [parentKey] : []
+  })
+
+  // Default SEO values
+  const defaultTitle = 'Dashboard | Dotabod'
+  const defaultDescription =
+    'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.'
+  const host =
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ||
+    (typeof window === 'undefined' ? 'dotabod.com' : window.location.host)
+  const defaultOgImage = `https://${host}/images/welcome.png`
+  const defaultUrl = `https://${host}/dashboard`
+
+  // Use SEO props if provided, otherwise use defaults
+  const pageTitle = seo?.title || defaultTitle
+  const pageDescription = seo?.description || defaultDescription
+  const pageImage = seo?.ogImage || defaultOgImage
+  const pageUrl = seo?.canonicalUrl || defaultUrl
+  const pageType = seo?.ogType || 'website'
+  const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
+
+  // Handle Admin accordion open/close
+  const onAdminOpenChange: MenuProps['onOpenChange'] = (keys) => {
+    setAdminOpenKeys(keys)
+  }
+
+  useMaybeSignout()
+
+  useEffect(() => {
+    const lastUpdate = localStorage.getItem('lastSingleRunAPI')
+    const now = new Date()
+
+    if (!lastUpdate || now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000) {
+      localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
+
+      fetch('/api/update-followers').catch((error) => {
+        captureException(error)
+
+        console.error(error)
+      })
+      if (hasAutoModeratorAccess) {
+        fetch('/api/make-dotabod-mod').catch((error) => {
+          captureException(error)
+
+          console.error(error)
+        })
+      }
+    }
+  }, [hasAutoModeratorAccess])
+
+  // Update selected menu item (and open the Admin accordion) when the route changes.
+  // Also close the mobile drawer here: tapping a drawer link navigates via the nested
+  // <Link>, and relying on Menu.onClick bubbling to close it is unreliable on touch —
+  // closing on the route change itself guarantees the new page isn't left hidden behind it.
+  useEffect(() => {
+    const { pathname } = router
+    const { key, parentKey } = findBestMatchingMenuItem(pathname)
+
+    setCurrent(key)
+    setDrawerOpen(false)
+
+    if (parentKey && !adminOpenKeys.includes(parentKey)) {
+      setAdminOpenKeys((prev) => [...prev, parentKey])
+    }
+  }, [router.pathname, router.asPath])
+
+  // Close the mobile drawer once we're back on a desktop layout
+  useEffect(() => {
+    if (!broken) {
+      setDrawerOpen(false)
+    }
+  }, [broken])
+
+  // Fetch notifications from the API (gift toast filters to gift type below)
+  const { data: giftNotificationData, mutate: refreshGiftNotifications } = useSWR(
+    status === 'authenticated' ? '/api/notifications' : null,
+    fetcher,
+    SETTINGS_SWR_OPTIONS,
+  )
+
+  const [hasGiftNotification, setHasGiftNotification] = useState(false)
+  const [giftDetails, setGiftDetails] = useState<{
+    id: string
+    senderName: string
+    giftMessage?: string
+    giftType: 'monthly' | 'annual' | 'lifetime'
+    giftQuantity?: number
+  } | null>(null)
+  const [hasLifetime, setHasLifetime] = useState(false)
+  const [totalNotifications, setTotalNotifications] = useState(0)
+
+  // Update notification state when data changes
+  useEffect(() => {
+    // This toast is gift-specific; the notifications endpoint now returns other types
+    // too (e.g. new-feature), so consider only unread GIFT_SUBSCRIPTION rows.
+    const unreadGifts = (giftNotificationData?.notifications || []).filter(
+      (n) => n?.type === 'GIFT_SUBSCRIPTION' && !n?.read,
+    )
+    const giftNotification = unreadGifts[0]
+    if (giftNotification) {
+      setGiftDetails({
+        giftMessage: giftNotification.giftMessage,
+        giftQuantity: giftNotification.giftQuantity || 1,
+        giftType: giftNotification.giftType,
+        id: giftNotification.id,
+        senderName: giftNotification.senderName,
+      })
+      setHasGiftNotification(true)
+    } else {
+      setHasGiftNotification(false)
+      setGiftDetails(null)
+    }
+
+    setHasLifetime(giftNotificationData?.hasLifetime || false)
+    // Gift-only count for the toast copy; the endpoint's totalNotifications mixes types.
+    setTotalNotifications(unreadGifts.length)
+  }, [giftNotificationData])
+
+  const dismissGiftNotification = async () => {
+    if (giftDetails?.id) {
+      try {
+        // Call API to mark notification as read
+        const response = await fetch('/api/notifications', {
+          body: JSON.stringify({
+            notificationId: giftDetails.id,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Failed to mark notification as read:', errorData)
+          throw new Error(errorData.message || 'Failed to mark notification as read')
+        }
+
+        // Refresh notifications after marking as read
+        void refreshGiftNotifications()
+      } catch (error) {
+        console.error('Failed to mark notification as read:', error)
+      }
+    }
+  }
+
+  if (status !== 'authenticated') {
+    return null
+  }
+
+  const isImpersonating = Boolean(data?.user?.isImpersonating)
+  const isAdmin = data?.user?.role === 'admin'
+  const navOpts = { isAdmin, isImpersonating }
+
+  // Region item lists, filtered once for the current viewer.
+  const primaryItems = filterNav(navConfig.primary, navOpts)
+  const bottomItems = filterNav(navConfig.bottom, navOpts)
+  const utilityItems = bottomItems.filter((item) => !item.adminOnly)
+  const adminItems = bottomItems.filter((item) => item.adminOnly)
+
+  // The flat primary rail + bottom-pinned utilities. Rendered (with full labels) in
+  // both the desktop Sider and the mobile Drawer so the two never drift apart.
+  const renderNav = ({ onNavigate }: { onNavigate?: () => void }) => {
+    const onMenuClick: MenuProps['onClick'] = (e) => {
+      setCurrent(e.key)
+      onNavigate?.()
+    }
+
+    const menuStyle = { background: colorBgLayout, borderInlineEnd: 'none' as const }
+
+    return (
+      <nav aria-label='Dashboard' className='flex h-full min-h-0 flex-col overflow-hidden'>
+        <div className='shrink-0'>
+          <div className='m-auto mb-4 flex h-12 w-full justify-center gap-2 px-4 pt-4'>
+            <Link href='/'>
+              <DarkLogo className='h-full w-auto' />
+            </Link>
+          </div>
+
+          <SubscriptionBadge collapsed={false} />
+
+          <div className='flex justify-center py-2'>
+            <DisableToggle />
+          </div>
+        </div>
+
+        <div
+          data-testid='dashboard-primary-navigation'
+          className='min-h-0 flex-1 overflow-y-auto overscroll-contain'
+        >
+          <Menu
+            onClick={onMenuClick}
+            selectedKeys={[current]}
+            style={menuStyle}
+            mode='inline'
+            items={primaryItems.map((item) => navItemToMenuItem(item))}
+          />
+        </div>
+
+        {(utilityItems.length > 0 || adminItems.length > 0) && (
+          <div
+            data-testid='dashboard-utility-navigation'
+            className='shrink-0 border-t border-gray-700 pt-2 pb-[env(safe-area-inset-bottom)]'
+          >
+            {utilityItems.length > 0 && (
+              <Menu
+                onClick={onMenuClick}
+                selectedKeys={[current]}
+                style={menuStyle}
+                mode='inline'
+                items={utilityItems.map((item) => navItemToMenuItem(item))}
+              />
+            )}
+
+            {adminItems.length > 0 && (
+              <Menu
+                onClick={onMenuClick}
+                selectedKeys={[current]}
+                openKeys={adminOpenKeys}
+                onOpenChange={onAdminOpenChange}
+                style={menuStyle}
+                mode='inline'
+                items={adminItems.map((item) => navItemToMenuItem(item))}
+              />
+            )}
+          </div>
+        )}
+      </nav>
+    )
+  }
+
+  return (
+    <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name='title' content={pageTitle} />
+        <meta name='description' content={pageDescription} />
+        <meta property='og:type' content={pageType} />
+        <meta property='og:url' content={pageUrl} />
+        <meta property='og:title' content={pageTitle} />
+        <meta property='og:description' content={pageDescription} />
+        <meta property='og:image' content={pageImage} />
+
+        <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:url' content={pageUrl} />
+        <meta property='twitter:title' content={pageTitle} />
+        <meta property='twitter:description' content={pageDescription} />
+        <meta property='twitter:image' content={pageImage} />
+
+        {seo?.canonicalUrl && <link rel='canonical' href={seo.canonicalUrl} />}
+
+        {/* Dashboard pages should generally not be indexed by search engines */}
+        {seo?.noindex && <meta name='robots' content='noindex, nofollow' />}
+      </Head>
+      <HubSpot />
+      <div data-testid='dashboard-viewport' className='h-dvh overflow-hidden bg-gray-800'>
+        <Layout className='h-full min-h-0 bg-gray-800'>
+          <Sider
+            breakpoint='md'
+            collapsedWidth={0}
+            onBreakpoint={setBroken}
+            style={{
+              background: colorBgLayout,
+            }}
+            width={250}
+            className='h-dvh shrink-0 overflow-hidden border-r-transparent'
+            trigger={null}
+            collapsible
+            collapsed={broken}
+          >
+            {/* On mobile the Sider collapses to 0 width; skip its content so it can't
+                leak past the zero-width container — the Drawer handles mobile nav. */}
+            {!broken && renderNav({})}
+          </Sider>
+
+          <Drawer
+            placement='left'
+            open={drawerOpen}
+            onClose={() => {
+              setDrawerOpen(false)
+            }}
+            width={250}
+            closable={false}
+            rootClassName='md:hidden'
+            styles={{
+              body: {
+                background: colorBgLayout,
+                height: '100%',
+                overflow: 'hidden',
+                padding: 0,
+              },
+            }}
+          >
+            {renderNav({
+              onNavigate: () => {
+                setDrawerOpen(false)
+              },
+            })}
+          </Drawer>
+
+          <Layout className='min-h-0 min-w-0 overflow-hidden bg-gray-800!'>
+            <div className='shrink-0'>
+              <Banner whatsNewPath='/dashboard/whats-new' />
+            </div>
+
+            <Header className='flex h-auto! shrink-0 items-center justify-between gap-3 bg-gray-900! p-4! leading-normal! md:gap-4 md:p-8!'>
+              <div className='flex min-w-0 flex-1 items-center gap-2 md:gap-3'>
+                <Button
+                  type='text'
+                  aria-label='Open navigation menu'
+                  className='flex shrink-0 items-center md:hidden!'
+                  icon={<Bars3Icon className='h-6 w-6 text-gray-200' />}
+                  onClick={() => {
+                    setDrawerOpen(true)
+                  }}
+                />
+                <div className='w-full max-w-lg min-w-0'>
+                  <SettingsSearch />
+                </div>
+              </div>
+
+              <div className='flex w-fit shrink-0 items-center gap-2 py-1 md:gap-3 md:py-2'>
+                <div className='hidden md:block'>
+                  <CopyButton value={copyOverlayUrl}>
+                    {({ copied, copy }) => (
+                      <Button
+                        type='dashed'
+                        size='small'
+                        className={clsx(copied && 'border-green-600! text-green-600!')}
+                        onClick={copy}
+                      >
+                        {copied ? 'Overlay URL copied' : 'Copy Overlay URL'}
+                      </Button>
+                    )}
+                  </CopyButton>
+                </div>
+                <HelpMenu />
+                <UserAccountNav />
+              </div>
+            </Header>
+            {hasGiftNotification && giftDetails && (
+              <GiftNotification
+                senderName={giftDetails.senderName}
+                giftMessage={giftDetails.giftMessage}
+                giftType={giftDetails.giftType}
+                giftQuantity={giftDetails.giftQuantity}
+                onDismiss={dismissGiftNotification}
+                hasLifetime={hasLifetime}
+                totalNotifications={totalNotifications}
+              />
+            )}
+
+            <div
+              data-testid='dashboard-content-scroll'
+              className='min-h-0 flex-1 overflow-y-auto overscroll-contain'
+            >
+              <div className='flex min-h-full flex-col'>
+                <Content className='w-full flex-1 space-y-6 bg-gray-800 p-4 transition-all md:p-8'>
+                  {children}
+                </Content>
+                <footer className='shrink-0 border-t border-gray-700 bg-gray-900 px-4 pt-4 pb-1 text-center text-xs text-gray-400'>
+                  <p>
+                    Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This
+                    site is not affiliated with Valve Corporation.
+                  </p>
+                </footer>
+              </div>
+            </div>
+          </Layout>
+        </Layout>
+      </div>
+      <CookieConsent />
+    </>
+  )
+}
+
+export default DashboardShell

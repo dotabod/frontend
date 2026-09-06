@@ -3,15 +3,15 @@ import Head from 'next/head'
 import { useState } from 'react'
 import type { ReactElement } from 'react'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import CommandsCard from '@/components/Dashboard/Features/CommandsCard'
-import Header from '@/components/Dashboard/Header'
-import ErrorBoundary from '@/components/ErrorBoundary'
-import { useUpdate } from '@/lib/hooks/useUpdateSetting'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import CommandsCard from '@/components/Dashboard/Features/commands-card'
+import Header from '@/components/Dashboard/header'
+import ErrorBoundary from '@/components/error-boundary'
+import { useUpdate } from '@/lib/hooks/use-update-setting'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import { getValueOrDefault } from '@/lib/settings'
 
-import CommandDetail from '../../components/Dashboard/CommandDetail'
+import CommandDetail from '../../components/Dashboard/command-detail'
 
 const commandKeys = Object.keys(CommandDetail) as (keyof typeof CommandDetail)[]
 
@@ -87,14 +87,14 @@ const CommandsPage = () => {
         <Segmented
           value={enabled}
           onChange={(v) => {
-            setEnabled(v as string)
+            setEnabled(v)
           }}
           options={['All', 'Enabled', 'Disabled']}
         />
         <Segmented
           value={permission}
           onChange={(v) => {
-            setPermission(v as string)
+            setPermission(v)
           }}
           options={['All', 'Mods', 'Plebs']}
         />
@@ -104,7 +104,7 @@ const CommandsPage = () => {
           style={{ width: 300 }}
           maxLength={200}
           onChange={(e) => {
-            setSearchTerm(`${e.target.value?.toLowerCase()}`)
+            setSearchTerm(e.target.value?.toLowerCase())
           }}
         />
       </div>

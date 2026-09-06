@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       isLifetime: subscription.transactionType === 'LIFETIME',
       isPro: subscription.tier === SUBSCRIPTION_TIERS.PRO,
       status: subscription.status,
-      tier: subscription.tier as SubscriptionTier,
+      tier: subscription.tier,
     })
     return
   } catch (error) {

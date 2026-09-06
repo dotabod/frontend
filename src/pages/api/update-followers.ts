@@ -3,13 +3,16 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 
 // Helper function to fetch follower count for a user
-async function fetchFollowerCount(providerAccountId: string, accessToken: string) {
+const fetchFollowerCount = async function fetchFollowerCount(
+  providerAccountId: string,
+  accessToken: string,
+) {
   const url = `https://api.twitch.tv/helix/channels/followers?broadcaster_id=${Number(
     providerAccountId,
   )}`
@@ -29,12 +32,13 @@ async function fetchFollowerCount(providerAccountId: string, accessToken: string
     return data.total
   } catch (error) {
     captureException(error)
-    return null // Handle error gracefully, possibly returning null or a default value
+    // Handle error gracefully, possibly returning null or a default value
+    return null
   }
 }
 
 // Main function to update followers count
-async function updateFollows(userId: string) {
+const updateFollows = async function updateFollows(userId: string) {
   const { providerAccountId, accessToken, error } = await getTwitchTokens(userId)
   if (error) {
     return
@@ -58,7 +62,7 @@ async function updateFollows(userId: string) {
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(500).end()
   }

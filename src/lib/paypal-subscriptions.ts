@@ -5,7 +5,7 @@ import prisma from '@/lib/db'
 import { getSubscription } from '@/lib/paypal'
 import type { PayPalCaptureResult } from '@/lib/paypal'
 
-function mapStatus(paypalStatus: string): SubscriptionStatus {
+const mapStatus = function mapStatus(paypalStatus: string): SubscriptionStatus {
   switch (paypalStatus) {
     case 'ACTIVE': {
       return SubscriptionStatus.ACTIVE
@@ -23,11 +23,9 @@ function mapStatus(paypalStatus: string): SubscriptionStatus {
   }
 }
 
-/**
- * Fetches the authoritative subscription state from PayPal and mirrors it into
- * our subscriptions table (the source of truth the apps read). No Stripe.
- */
-export async function syncPaypalSubscription(paypalSubscriptionId: string): Promise<boolean> {
+export const syncPaypalSubscription = async function syncPaypalSubscription(
+  paypalSubscriptionId: string,
+): Promise<boolean> {
   const record = await prisma.payPalSubscription.findUnique({
     where: { paypalSubscriptionId },
   })
@@ -92,7 +90,7 @@ export async function syncPaypalSubscription(paypalSubscriptionId: string): Prom
   return true
 }
 
-function computeFallbackPeriodEnd(priceType: string): Date {
+const computeFallbackPeriodEnd = function computeFallbackPeriodEnd(priceType: string): Date {
   const end = new Date()
   if (priceType === 'annual') {
     end.setFullYear(end.getFullYear() + 1)
@@ -102,11 +100,7 @@ function computeFallbackPeriodEnd(priceType: string): Date {
   return end
 }
 
-/**
- * Marks the subscriptions row for a PayPal subscription as canceled/past due
- * when PayPal reports cancellation, suspension, expiry, or a failed payment.
- */
-export async function markPaypalSubscriptionInactive(
+export const markPaypalSubscriptionInactive = async function markPaypalSubscriptionInactive(
   paypalSubscriptionId: string,
   status: SubscriptionStatus,
 ): Promise<void> {
@@ -122,10 +116,7 @@ export async function markPaypalSubscriptionInactive(
   })
 }
 
-/**
- * Writes the lifetime subscriptions row for a captured one-time PayPal order.
- */
-export async function completeLifetimeOrder(
+export const completeLifetimeOrder = async function completeLifetimeOrder(
   order: PayPalOrder,
   capture: PayPalCaptureResult,
 ): Promise<void> {

@@ -15,7 +15,7 @@ vi.mock('framer-motion', () => ({
 
 // Mock the Prisma Mongo client
 vi.mock('.prisma-mongo/client', () => {
-  function MockPrismaMongoClient(this: Record<string, unknown>) {
+  const MockPrismaMongoClient = function MockPrismaMongoClient(this: Record<string, unknown>) {
     this.$disconnect = vi.fn().mockResolvedValue()
     this.cards = {
       findUnique: vi.fn().mockResolvedValue({ id: 'mock-card-id' }),
@@ -31,7 +31,7 @@ vi.mock('.prisma-mongo/client', () => {
 })
 
 // Mock any other dependencies as needed
-vi.mock('@/lib/hooks/useTransformRes', () => ({
+vi.mock('@/lib/hooks/use-transform-res', () => ({
   useTransformRes: () => (params: Record<string, unknown>) => params,
 }))
 

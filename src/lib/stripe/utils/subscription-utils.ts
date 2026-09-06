@@ -4,12 +4,7 @@ import type Stripe from 'stripe'
 
 import { stripe } from '@/lib/stripe-server'
 
-/**
- * Verifies if a price ID represents a lifetime subscription
- * @param priceId The Stripe price ID to check
- * @returns true if the price is for a lifetime subscription, false otherwise
- */
-export async function isLifetimePrice(priceId: string): Promise<boolean> {
+export const isLifetimePrice = async function isLifetimePrice(priceId: string): Promise<boolean> {
   const { getCurrentPeriod } = await import('@/utils/subscription')
   const pricePeriod = getCurrentPeriod(priceId)
 
@@ -27,15 +22,7 @@ export async function isLifetimePrice(priceId: string): Promise<boolean> {
   return false
 }
 
-/**
- * Checks if a subscription already exists for a user and payment
- * @param userId The user ID
- * @param customerId The Stripe customer ID
- * @param sessionId The checkout session ID (for crypto payments)
- * @param tx The Prisma transaction client
- * @returns The existing subscription if found, null otherwise
- */
-export async function findExistingCryptoSubscription(
+export const findExistingCryptoSubscription = async function findExistingCryptoSubscription(
   userId: string,
   customerId: string,
   sessionId: string,
@@ -63,15 +50,7 @@ export async function findExistingCryptoSubscription(
   })
 }
 
-/**
- * Creates a lifetime purchase record
- * @param userId The user ID
- * @param customerId The Stripe customer ID
- * @param priceId The Stripe price ID
- * @param tx The transaction client
- * @returns The created subscription
- */
-export async function createLifetimePurchase(
+export const createLifetimePurchase = async function createLifetimePurchase(
   userId: string,
   customerId: string,
   priceId: string | null,
@@ -122,17 +101,7 @@ export async function createLifetimePurchase(
   })
 }
 
-/**
- * Creates a crypto subscription with renewal invoice
- * @param userId The user ID
- * @param session The Stripe checkout session
- * @param priceId The Stripe price ID
- * @param customerId The Stripe customer ID
- * @param tx The transaction client
- * @param startFromDate Optional start date for upgrades
- * @returns true if successful, false otherwise
- */
-export async function createCryptoSubscription(
+export const createCryptoSubscription = async function createCryptoSubscription(
   userId: string,
   session: Stripe.Checkout.Session,
   priceId: string,
@@ -183,12 +152,14 @@ export async function createCryptoSubscription(
     // For crypto payments, we create a draft invoice instead of a subscription
     // Since crypto payments are one-time and not recurring
     const invoice = await stripe.invoices.create({
-      auto_advance: true, // Enable automatic advancement so Stripe handles finalization
+      // Enable automatic advancement so Stripe handles finalization
+      auto_advance: true,
       automatically_finalizes_at: Math.floor(renewalDate.getTime() / 1000),
       collection_method: 'send_invoice',
       customer: customerId,
       description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
-      due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000), // Due date 7 days after finalization date
+      // Due date 7 days after finalization date
+      due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000),
       metadata: {
         isCryptoPayment: 'true',
         isRenewalInvoice: 'true',
@@ -222,7 +193,8 @@ export async function createCryptoSubscription(
     // Create a subscription record with auto-expiry at period end
     await tx.subscription.create({
       data: {
-        cancelAtPeriodEnd: true, // Will expire at the end of the period
+        // Will expire at the end of the period
+        cancelAtPeriodEnd: true,
         currentPeriodEnd: periodEnd,
         metadata: {
           checkoutSessionId: session.id,
@@ -230,12 +202,14 @@ export async function createCryptoSubscription(
           paymentIntentId: (session.payment_intent as string) || undefined,
           priceType: pricePeriod,
           renewalDueDate: renewalDate.toISOString(),
-          renewalInvoiceId, // Store reference to the draft invoice,
+          // Store reference to the draft invoice,
+          renewalInvoiceId,
         },
         status: SubscriptionStatus.ACTIVE,
         stripeCustomerId: customerId,
         stripePriceId: priceId,
-        stripeSubscriptionId: `crypto_${session.id}`, // Use a prefix to identify crypto payments
+        // Use a prefix to identify crypto payments
+        stripeSubscriptionId: `crypto_${session.id}`,
         tier: 'PRO',
         transactionType: TransactionType.RECURRING,
         userId,

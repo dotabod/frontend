@@ -6,9 +6,9 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
 import type { ReactElement } from 'react'
 
-import { Container } from '@/components/Container'
-import { UserAuthForm } from '@/components/Homepage/AuthForm'
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import { Container } from '@/components/container'
+import { UserAuthForm } from '@/components/Homepage/auth-form'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 // Closed set of NextAuth error codes — anything outside this is treated as
@@ -61,7 +61,7 @@ const Login: NextPageWithLayout = () => {
           <span>This sign-in link is no longer valid. Please request a new one.</span>
         ) : (
           <span>
-            We couldn't log you in. First, try to login with{' '}
+            We couldn&apos;t log you in. First, try to login with{' '}
             <a
               href='https://support.google.com/chrome/answer/95464?hl=en&co=GENIE.Platform%3DDesktop'
               target='_blank'
@@ -69,8 +69,8 @@ const Login: NextPageWithLayout = () => {
             >
               Incognito mode in Chrome
             </a>
-            . If that doesn't work, maybe you already have an account on Dotabod with this email.
-            Try to update your email on{' '}
+            . If that doesn&apos;t work, maybe you already have an account on Dotabod with this
+            email. Try to update your email on{' '}
             <a href='https://www.twitch.tv/settings/security' target='_blank' rel='noreferrer'>
               Twitch
             </a>{' '}
@@ -107,8 +107,8 @@ const Login: NextPageWithLayout = () => {
       notification.info({
         description: (
           <span>
-            You've been logged out. Please login again to relink your account to Twitch. Reach out
-            to us through our <Link href='/contact'>contact page</Link> for more help.
+            You&apos;ve been logged out. Please login again to relink your account to Twitch. Reach
+            out to us through our <Link href='/contact'>contact page</Link> for more help.
           </span>
         ),
         duration: 50_000,

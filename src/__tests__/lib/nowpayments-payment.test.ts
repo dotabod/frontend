@@ -180,7 +180,7 @@ describe('processConfirmedNowPaymentsPayment', () => {
     mocks.handleInvoiceEvent.mockResolvedValue(false)
 
     await expect(processConfirmedNowPaymentsPayment(baseInvoice, basePayment)).rejects.toThrow(
-      /Invoice handler returned false/,
+      /Invoice handler returned false/u,
     )
 
     expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenLastCalledWith({

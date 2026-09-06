@@ -2,12 +2,7 @@ import type { GiftCheckoutRequest } from '@/lib/stripe/gift-checkout-request'
 
 type GiftCheckoutParams = GiftCheckoutRequest
 
-/**
- * Creates a checkout session for gifting a subscription
- * @param params Gift checkout parameters
- * @returns The checkout URL or error information
- */
-export async function createGiftCheckoutSession(
+export const createGiftCheckoutSession = async function createGiftCheckoutSession(
   params: GiftCheckoutParams,
 ): Promise<{ url: string } | { error: string } | { message: string }> {
   const response = await fetch('/api/stripe/create-gift-checkout', {
@@ -28,14 +23,7 @@ export async function createGiftCheckoutSession(
   return data
 }
 
-/**
- * Calculates the end date for a gift subscription based on type and quantity
- * @param giftType The type of gift (monthly, annual, lifetime)
- * @param quantity The number of periods to add
- * @param startDate The date to start calculating from (defaults to now)
- * @returns The calculated end date
- */
-export function calculateGiftEndDate(
+export const calculateGiftEndDate = function calculateGiftEndDate(
   giftType: string,
   quantity: number,
   startDate: Date = new Date(),
@@ -79,15 +67,7 @@ export function calculateGiftEndDate(
   return endDate
 }
 
-/**
- * Aggregates gift durations to calculate the new expiration date
- * @param giftType The type of gift (monthly, annual, lifetime)
- * @param quantity The number of periods to add
- * @param existingExpiration The existing expiration date (if any)
- * @param startDate The date to start calculating from if no existing expiration
- * @returns The new expiration date
- */
-export function aggregateGiftDuration(
+export const aggregateGiftDuration = function aggregateGiftDuration(
   giftType: string,
   quantity: number,
   existingExpiration: Date | null = null,
@@ -102,7 +82,8 @@ export function aggregateGiftDuration(
 
   // Check if existing expiration is already a lifetime subscription
   if (existingExpiration && existingExpiration.getFullYear() >= 2100) {
-    return existingExpiration // Keep the existing lifetime subscription
+    // Keep the existing lifetime subscription
+    return existingExpiration
   }
 
   // Determine the base date to start from

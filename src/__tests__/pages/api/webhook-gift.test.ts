@@ -256,7 +256,8 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
       body: {
         data: {
           object: {
-            current_period_end: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days from now
+            // 30 days from now
+            current_period_end: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
             customer: 'cus_123',
             id: 'sub_123',
             items: {
@@ -286,7 +287,8 @@ describe('Stripe Webhook Handler - Gift Subscriptions', () => {
 
     // Mock existing gift subscription
     const giftExpiration = new Date()
-    giftExpiration.setMonth(giftExpiration.getMonth() + 2) // Gift expires in 2 months
+    // Gift expires in 2 months
+    giftExpiration.setMonth(giftExpiration.getMonth() + 2)
 
     const mockTx = {
       subscription: {

@@ -22,9 +22,9 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import UserSelector from '@/components/Dashboard/UserSelector'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import UserSelector from '@/components/Dashboard/user-selector'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import { Card } from '@/ui/card'
 
 const { Title } = Typography
@@ -113,7 +113,8 @@ const AdminPage = () => {
       setEditingMessage(null)
       form.setFieldsValue({
         message: '',
-        sendAt: new Date(), // Default to now
+        // Default to now
+        sendAt: new Date(),
         userId: '',
       })
     }

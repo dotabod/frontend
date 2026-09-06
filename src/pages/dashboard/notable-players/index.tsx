@@ -21,12 +21,12 @@ import { useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
 import { z } from 'zod'
 
-import CommandDetail from '@/components/Dashboard/CommandDetail'
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import Header from '@/components/Dashboard/Header'
-import ErrorBoundary from '@/components/ErrorBoundary'
+import CommandDetail from '@/components/Dashboard/command-detail'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import Header from '@/components/Dashboard/header'
+import ErrorBoundary from '@/components/error-boundary'
 import type { NotablePlayer } from '@/lib/db'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 
@@ -359,7 +359,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
               <div>
                 <Text type='secondary'>
                   Enter the 2-letter ISO country code (e.g., us, ru, cn). This will display the
-                  country flag next to the player's name.
+                  country flag next to the player&apos;s name.
                   <a
                     href='https://www.iban.com/country-codes'
                     target='_blank'

@@ -190,7 +190,8 @@ export class GiftService {
                 console.error('Failed to auto-apply gift credits:', autoApplyError)
                 // Don't fail the overall process if auto-apply fails
               }
-            }, 500) // Small delay to ensure transaction completes
+              // Small delay to ensure transaction completes
+            }, 500)
           }
 
           return true
@@ -251,7 +252,8 @@ export class GiftService {
   ): Promise<Stripe.CustomerBalanceTransaction> {
     try {
       const balanceTransaction = await stripe.customers.createBalanceTransaction(customerId, {
-        amount, // Negative amount to credit the customer
+        // Negative amount to credit the customer
+        amount,
         currency: 'usd',
         description: `Gift subscription credit: ${metadata.giftType} x ${metadata.giftQuantity}`,
         metadata,

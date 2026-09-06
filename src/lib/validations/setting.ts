@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-import { commands } from '@/lib/defaultSettings'
+import { commands } from '@/lib/default-settings'
 import { canAccessFeature } from '@/utils/subscription'
 import type { SubscriptionRow } from '@/utils/subscription'
 
@@ -14,7 +14,7 @@ const settingsSchema = {
   betsInfo: z.object({
     duration: z
       .string()
-      .regex(/^\d+$/, 'Duration must be a numeric string')
+      .regex(/^\d+$/u, 'Duration must be a numeric string')
       .transform((str) => Number.parseInt(str, 10))
       .refine((num) => num >= 30 && num <= 1800, {
         message: 'Duration must be between 30 and 1800 seconds',
@@ -121,7 +121,7 @@ const settingsSchema = {
   wlStatsDays: z.number().int().min(1).max(365).nullable(),
   wlStatsStartDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .regex(/^\d{4}-\d{2}-\d{2}$/u)
     .refine((value) => {
       const date = new Date(`${value}T00:00:00.000Z`)
       return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value

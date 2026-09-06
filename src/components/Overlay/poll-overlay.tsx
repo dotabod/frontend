@@ -1,0 +1,109 @@
+import { Center, Progress } from '@mantine/core'
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import Countdown, { zeroPad } from 'react-countdown'
+import type { CountdownRenderProps } from 'react-countdown'
+import TwitchFetcher from 'twitch-fetcher'
+
+import { useTransformRes } from '@/lib/hooks/use-transform-res'
+import { useGetSettings } from '@/lib/hooks/use-update-setting'
+import { motionProps } from '@/ui/utils'
+
+import { TextWithEmotes } from './text-with-emotes'
+
+export interface PollData {
+  title: string
+  endDate: number | string | Date
+  choices: { title: string; totalVotes?: number }[]
+}
+
+const PollColors = [
+  '#3159ff',
+  '#ee27a6',
+  '#8d8d00',
+  '#00b700',
+  '#bf0000',
+  '#4B0082',
+  '#9400D3',
+  '#00bb68',
+  '#c46300',
+  '#c60000',
+]
+const PollTimer = ({ minutes, seconds, completed }: CountdownRenderProps) =>
+  completed ? null : (
+    <span className='font-outline-2 text-slate-50'>
+      {zeroPad(minutes)}:{zeroPad(seconds)}
+    </span>
+  )
+
+export const PollOverlay = ({
+  title,
+  choices,
+  endDate,
+  onComplete,
+}: PollData & { onComplete: () => void }) => {
+  const [emotes, setEmotes] = useState([])
+  const { data } = useGetSettings()
+  const res = useTransformRes()
+  const providerAccountId = data?.Account?.providerAccountId
+
+  useEffect(() => {
+    if (!providerAccountId) {
+      return
+    }
+
+    const emoteFetcher = new TwitchFetcher()
+    emoteFetcher
+      .getEmotesByID(providerAccountId, {
+        '7tv': true,
+        bttv: true,
+      })
+      .then(setEmotes)
+      .catch((_e: unknown) => {
+        // Don't need to report on users that don't have a 7tv or bttv account
+      })
+  }, [providerAccountId])
+
+  const totalVotes = choices.reduce((acc, choice) => acc + (choice.totalVotes ?? 0), 0)
+  const choicesWithPercent = choices.map((choice) => {
+    const percent = totalVotes
+      ? Math.round(((choice.totalVotes ?? 0) / totalVotes) * 100)
+      : Math.round(100 / choices.length)
+    return { ...choice, percent }
+  })
+
+  return (
+    <motion.div key='poll-overlay-inner' {...motionProps}>
+      <h1
+        className='font-outline-2 text-center font-bold text-slate-50'
+        style={{
+          fontSize: res({ h: 20 }),
+        }}
+      >
+        <TextWithEmotes emotes={emotes} text={title} />
+      </h1>
+      <Progress.Root
+        size={res({ w: 24 })}
+        className='border border-slate-600 shadow-lg'
+        radius='lg'
+      >
+        {choicesWithPercent.map((choice, i) => (
+          <Progress.Section
+            key={choice.title}
+            value={choice.percent}
+            color={PollColors[i] || PollColors[0]}
+          >
+            <Progress.Label>{`${choice.title}${
+              choice.totalVotes ? ` ${choice.percent}% (${choice.totalVotes.toLocaleString()})` : ''
+            }`}</Progress.Label>
+          </Progress.Section>
+        ))}
+      </Progress.Root>
+      <Center>
+        {endDate && (
+          <Countdown onComplete={onComplete} renderer={PollTimer} date={new Date(endDate)} />
+        )}
+      </Center>
+    </motion.div>
+  )
+}

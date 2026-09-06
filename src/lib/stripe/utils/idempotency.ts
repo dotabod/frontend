@@ -1,19 +1,8 @@
 import type { Prisma } from '@prisma/client'
 
-import { debugLog } from './debugLog'
+import { debugLog } from './debug-log'
 
-/**
- * Processes a webhook event idempotently, ensuring it's only processed once
- * @param eventId The Stripe event ID
- * @param eventType The Stripe event type
- * @param processor The function to process the event
- * @param tx The transaction client
- * @returns
- *   - true if the event was newly processed successfully
- *   - { skipped: true, processedAt: Date } if already processed (not an error)
- *   - false if there was an error during processing
- */
-export async function processEventIdempotently(
+export const processEventIdempotently = async function processEventIdempotently(
   eventId: string,
   eventType: string,
   processor: (tx: Prisma.TransactionClient) => Promise<void>,
@@ -83,7 +72,8 @@ export async function processEventIdempotently(
         )
         return { processedAt: new Date(), skipped: true }
       }
-      throw error // Re-throw other errors
+      // Re-throw other errors
+      throw error
     }
 
     // Process the event

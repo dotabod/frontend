@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react'
 import type { Socket } from 'socket.io-client'
 import io from 'socket.io-client'
 
-import { AnimatedRankBadge } from '@/components/Overlay/rank/AnimatedRankBadge'
-import { AnimatedWL } from '@/components/Overlay/wl/AnimatedWL'
-import { RestrictFeature } from '@/components/RestrictFeature'
-import { Settings } from '@/lib/defaultSettings'
-import { isDev } from '@/lib/devConsts'
-import { useOverlayPositions } from '@/lib/hooks/useOverlayPositions'
-import type { WLRecord, wlType } from '@/lib/hooks/useSocket'
-import { useTransformRes } from '@/lib/hooks/useTransformRes'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { AnimatedRankBadge } from '@/components/Overlay/rank/animated-rank-badge'
+import { AnimatedWL } from '@/components/Overlay/wl/animated-wl'
+import { RestrictFeature } from '@/components/restrict-feature'
+import { Settings } from '@/lib/default-settings'
+import { isDev } from '@/lib/dev-consts'
+import { useOverlayPositions } from '@/lib/hooks/use-overlay-positions'
+import type { WLRecord, wlType } from '@/lib/hooks/use-socket'
+import { useTransformRes } from '@/lib/hooks/use-transform-res'
+import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import { getRankDetail, getRankImage } from '@/lib/ranks'
 import type { RankType } from '@/lib/ranks'
 
@@ -20,7 +20,7 @@ const isMaintenanceMode = process.env.NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE === 'tr
 
 let socket: Socket | null = null
 
-function WidgetPage() {
+const WidgetPage = () => {
   const { mutate } = useUpdateSetting(Settings.commandWL)
   const router = useRouter()
   const { userId } = router.query
@@ -175,5 +175,4 @@ function WidgetPage() {
     </div>
   )
 }
-
 export default WidgetPage

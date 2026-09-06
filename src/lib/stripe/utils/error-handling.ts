@@ -1,15 +1,4 @@
-/**
- * Utility functions for consistent error handling in webhook handlers
- */
-
-/**
- * Executes an operation with consistent error handling
- * @param operation The async operation to execute
- * @param context Description of the operation context for error logging
- * @param userId Optional user ID for more detailed error logging
- * @returns The result of the operation or null if an error occurred
- */
-export async function withErrorHandling<T>(
+export const withErrorHandling = async function withErrorHandling<T>(
   operation: () => Promise<T>,
   context: string,
   userId?: string,

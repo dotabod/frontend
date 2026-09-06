@@ -8,33 +8,33 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
-import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
-import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
-import { ChatMessagesOverlay } from '@/components/Overlay/ChatMessagesOverlay'
-import { InGameOverlays } from '@/components/Overlay/InGameOverlays'
-import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
-import type { PollData } from '@/components/Overlay/PollOverlay'
-import { PollOverlays } from '@/components/Overlay/PollOverlays'
-import { Settings } from '@/lib/defaultSettings'
-import { devBlockTypes, devPoll, devRadiantWinChance, devRank, devWL } from '@/lib/devConsts'
-import type { blockType } from '@/lib/devConsts'
+import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/in-game-v-2'
+import { PickScreenOverlays } from '@/components/Overlay/blocker/pick-screen-overlays'
+import { ChatMessagesOverlay } from '@/components/Overlay/chat-messages-overlay'
+import { InGameOverlays } from '@/components/Overlay/in-game-overlays'
+import { MainScreenOverlays } from '@/components/Overlay/main-screen-overlays'
+import type { PollData } from '@/components/Overlay/poll-overlay'
+import { PollOverlays } from '@/components/Overlay/poll-overlays'
+import { Settings } from '@/lib/default-settings'
+import { devBlockTypes, devPoll, devRadiantWinChance, devRank, devWL } from '@/lib/dev-consts'
+import type { blockType } from '@/lib/dev-consts'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
-import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
-import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
-import { useOBS } from '@/lib/hooks/useOBS'
-import { useSocket } from '@/lib/hooks/useSocket'
-import type { ChatMessage, WinChance, wlType } from '@/lib/hooks/useSocket'
-import { useStreamOfflineNotification } from '@/lib/hooks/useStreamOfflineNotification'
-import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { useWindowSize } from '@/lib/hooks/useWindowSize'
-import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
+import { useIsDevMode } from '@/lib/hooks/use-is-dev-mode'
+import { useNotablePlayers } from '@/lib/hooks/use-notable-players'
+import { useOBS } from '@/lib/hooks/use-obs'
+import { useSocket } from '@/lib/hooks/use-socket'
+import type { ChatMessage, WinChance, wlType } from '@/lib/hooks/use-socket'
+import { useStreamOfflineNotification } from '@/lib/hooks/use-stream-offline-notification'
+import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
+import { useWindowSize } from '@/lib/hooks/use-window-size'
+import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlay-utils'
 import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 
-import { RestrictFeature } from '../RestrictFeature'
-import { OverlayV2 } from './blocker/PickBlockerV2'
-import { DevControls, DevModeToggle } from './DevControls'
-import { AnimatedLastFm } from './lastfm/AnimatedLastFm'
+import { RestrictFeature } from '../restrict-feature'
+import { OverlayV2 } from './blocker/pick-blocker-v-2'
+import { DevControls, DevModeToggle } from './dev-controls'
+import { AnimatedLastFm } from './lastfm/animated-last-fm'
 
 interface PotentialError {
   status?: number
@@ -129,7 +129,7 @@ const OverlayPage = () => {
     const isOldOBS =
       // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)
       // Check if we're running in an older version that needs compatibility
-      Number.parseInt(/Chrome\/(\d+)/.exec(navigator.userAgent)?.[1] || '999', 10) < 127
+      Number.parseInt(/Chrome\/(\d+)/u.exec(navigator.userAgent)?.[1] || '999', 10) < 127
 
     setIsOldObs(isOldOBS)
   }, [])

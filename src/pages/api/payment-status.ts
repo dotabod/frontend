@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { getOpenNodeChargeStatus } from '@/lib/opennode'
@@ -103,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-function getStatusInfo(status: string) {
+const getStatusInfo = function getStatusInfo(status: string) {
   switch (status) {
     case 'processing': {
       return {

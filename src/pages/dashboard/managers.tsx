@@ -5,13 +5,13 @@ import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import Header from '@/components/Dashboard/Header'
-import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
-import ErrorBoundary from '@/components/ErrorBoundary'
-import { useSubscription } from '@/hooks/useSubscription'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import Header from '@/components/Dashboard/header'
+import ModeratedChannels from '@/components/Dashboard/moderated-channels'
+import ErrorBoundary from '@/components/error-boundary'
+import { useSubscription } from '@/hooks/use-subscription'
 import { fetcher } from '@/lib/fetcher'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
 import { canAccessFeature } from '@/utils/subscription'
@@ -49,8 +49,10 @@ const ModeratorsPage = () => {
     }[]
   >('/api/get-moderated-channels', fetcher)
 
-  const [loading, setLoading] = useState<boolean>(false) // Loading state
-  const [selectedModerators, setSelectedModerators] = useState<string[]>([]) // Selected moderators
+  // Loading state
+  const [loading, setLoading] = useState<boolean>(false)
+  // Selected moderators
+  const [selectedModerators, setSelectedModerators] = useState<string[]>([])
 
   useEffect(() => {
     if (!loadingApprovedMods && Array.isArray(approvedMods)) {
@@ -59,7 +61,8 @@ const ModeratorsPage = () => {
   }, [approvedMods, loadingApprovedMods])
 
   const handleApprove = async () => {
-    setLoading(true) // Set loading state
+    // Set loading state
+    setLoading(true)
     track('approve_moderators_start')
 
     try {
@@ -166,7 +169,7 @@ const ModeratorsPage = () => {
           >
             <div className='subtitle'>
               <p>
-                By approving a user, you're allowing them to access and modify your Dotabod
+                By approving a user, you&apos;re allowing them to access and modify your Dotabod
                 dashboard. Approved managers can manage features, toggle commands, and update
                 settings on your behalf.
               </p>
@@ -233,12 +236,13 @@ const ModeratorsPage = () => {
             </p>
             <p className='mb-4'>
               <Tag color='blue'>For Mods</Tag> As a mod, you can manage streamers who have approved
-              you. Use the selector above to choose which streamer's dashboard you want to manage.
+              you. Use the selector above to choose which streamer&apos;s dashboard you want to
+              manage.
             </p>
             <p>
-              <Tag color='green'>For Managing Mods</Tag> When managing a streamer's account, you'll
-              see a badge indicating you're accessing the streamer's account, and any changes you
-              make will be applied to the streamer's Dotabod configuration.
+              <Tag color='green'>For Managing Mods</Tag> When managing a streamer&apos;s account,
+              you&apos;ll see a badge indicating you&apos;re accessing the streamer&apos;s account,
+              and any changes you make will be applied to the streamer&apos;s Dotabod configuration.
             </p>
           </div>
         </Card>

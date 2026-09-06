@@ -4,11 +4,11 @@ import { z } from 'zod'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
-import { SETUP_SIGNAL_KEYS } from '@/lib/setupSignalKeys'
+import { SETUP_SIGNAL_KEYS } from '@/lib/setup-signal-keys'
 
 const bodySchema = z.object({ userId: z.string().uuid() })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const parsed = bodySchema.safeParse(req.body)
   if (!parsed.success) {
     res.status(422).json({ message: 'Invalid user ID' })

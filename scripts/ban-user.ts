@@ -27,14 +27,14 @@ let reasonArg: string | null = null
 let byArg: string | null = null
 let byNameArg: string | null = null
 
-for (let i = 0; i < args.length; i++) {
+for (let i = 0; i < args.length; i += 1) {
   const v = args[i]
   if (v === '--by' && args[i + 1]) {
     byArg = args[i + 1]
-    i++
+    i += 1
   } else if (v === '--by-name' && args[i + 1]) {
     byNameArg = args[i + 1]
-    i++
+    i += 1
   } else if (!v.startsWith('--')) {
     if (!userIdArg) {
       userIdArg = v
@@ -54,7 +54,7 @@ if (!userIdArg || !reasonArg) {
 
 const prisma = new PrismaClient()
 
-async function resolveTarget(): Promise<{ id: string; name: string }> {
+const resolveTarget = async function resolveTarget(): Promise<{ id: string; name: string }> {
   if (byNameArg && userIdArg) {
     const u = await prisma.user.findFirst({
       select: { id: true, name: true },
@@ -67,7 +67,7 @@ async function resolveTarget(): Promise<{ id: string; name: string }> {
   }
   const u = await prisma.user.findUnique({
     select: { id: true, name: true },
-    where: { id: userIdArg! },
+    where: { id: userIdArg },
   })
   if (!u) {
     throw new Error(`No user found by id: ${userIdArg}`)
@@ -75,7 +75,7 @@ async function resolveTarget(): Promise<{ id: string; name: string }> {
   return u
 }
 
-async function main() {
+const main = async function main() {
   const target = await resolveTarget()
   console.log(`Banning user ${target.name} (${target.id}) — reason: ${reasonArg}`)
 
@@ -121,7 +121,7 @@ async function main() {
       data: {
         bannedAt: new Date(),
         bannedBy: byArg ?? null,
-        bannedReason: reasonArg!,
+        bannedReason: reasonArg,
       },
       where: { id: target.id },
     })
@@ -133,7 +133,7 @@ async function main() {
       create: {
         autoDisabledAt: new Date(),
         autoDisabledBy: byArg ?? null,
-        disableMetadata: { banned: true, reason: reasonArg! },
+        disableMetadata: { banned: true, reason: reasonArg },
         disableReason: 'MANUAL_DISABLE',
         key: 'commandDisable',
         userId: target.id,
@@ -142,7 +142,7 @@ async function main() {
       update: {
         autoDisabledAt: new Date(),
         autoDisabledBy: byArg ?? null,
-        disableMetadata: { banned: true, reason: reasonArg! },
+        disableMetadata: { banned: true, reason: reasonArg },
         disableReason: 'MANUAL_DISABLE',
         value: true,
       },

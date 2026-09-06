@@ -3,8 +3,8 @@ import type { Prisma, Subscription } from '@prisma/client'
 
 import type { StatusInfo } from '@/components/Subscription/types'
 import prisma from '@/lib/db'
-import type { defaultSettings, SettingKeys } from '@/lib/defaultSettings'
-import { formatDate } from '@/utils/formatDate'
+import type { defaultSettings, SettingKeys } from '@/lib/default-settings'
+import { formatDate } from '@/utils/format-date'
 
 export interface BillingSummaryInfo {
   headline: string
@@ -194,7 +194,9 @@ export const GENERIC_FEATURE_TIERS = {
 
 export type GenericFeature = keyof typeof GENERIC_FEATURE_TIERS
 
-export function getRequiredTier(feature?: FeatureTier | GenericFeature): SubscriptionTier {
+export const getRequiredTier = function getRequiredTier(
+  feature?: FeatureTier | GenericFeature,
+): SubscriptionTier {
   if (!feature) {
     return SUBSCRIPTION_TIERS.PRO
   }
@@ -209,7 +211,7 @@ export function getRequiredTier(feature?: FeatureTier | GenericFeature): Subscri
 // Add this constant at the top with other constants
 export const GRACE_PERIOD_END = new Date('2025-04-30T23:59:59.999Z')
 
-export function canAccessFeature(
+export const canAccessFeature = function canAccessFeature(
   feature: FeatureTier | GenericFeature,
   subscription: Partial<SubscriptionRow> | null,
 ): { hasAccess: boolean; requiredTier: SubscriptionTier } {
@@ -220,7 +222,8 @@ export function canAccessFeature(
   // Grant Pro access to all users during this period
   if (isInGracePeriod()) {
     return {
-      hasAccess: true, // All features are accessible during grace period
+      // All features are accessible during grace period
+      hasAccess: true,
       requiredTier,
     }
   }
@@ -252,7 +255,7 @@ export function canAccessFeature(
   }
 }
 
-export function isSubscriptionActive(
+export const isSubscriptionActive = function isSubscriptionActive(
   subscription: { status: SubscriptionStatus | null | undefined } | null,
 ): boolean {
   if (!subscription?.status) {
@@ -272,7 +275,7 @@ export function isSubscriptionActive(
 // The `paypal_` id), so when an id is present it is authoritative and stale
 // `paymentProvider` metadata can't misclassify the row. Metadata is only a
 // Fallback for records that have no subscription id yet.
-export function isPaypalSubscription(
+export const isPaypalSubscription = function isPaypalSubscription(
   subscription: { metadata?: unknown; stripeSubscriptionId?: string | null } | null | undefined,
 ): boolean {
   if (!subscription) {
@@ -321,7 +324,7 @@ const PRICE_IDS: SubscriptionPriceId[] = [
 // Alias of PRICE_IDS rather than a duplicated literal.
 export const CRYPTO_PRICE_IDS: SubscriptionPriceId[] = PRICE_IDS
 
-export function getPriceId(
+export const getPriceId = function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,
   payWithCrypto: boolean,
@@ -340,7 +343,7 @@ export function getPriceId(
   return price.lifetime
 }
 
-export function getCurrentPeriod(priceId?: string | null): PricePeriod {
+export const getCurrentPeriod = function getCurrentPeriod(priceId?: string | null): PricePeriod {
   if (!priceId) {
     return 'monthly'
   }
@@ -358,10 +361,11 @@ export function getCurrentPeriod(priceId?: string | null): PricePeriod {
     return 'lifetime'
   }
 
-  return 'monthly' // Default to monthly if no match found
+  // Default to monthly if no match found
+  return 'monthly'
 }
 
-function getPlanLabel(
+const getPlanLabel = function getPlanLabel(
   tier?: SubscriptionTier | null,
   stripePriceId?: string | null,
   transactionType?: string | null,
@@ -388,7 +392,10 @@ function getPlanLabel(
 //   )
 // }
 
-export async function getSubscription(userId: string, tx?: Prisma.TransactionClient) {
+export const getSubscription = async function getSubscription(
+  userId: string,
+  tx?: Prisma.TransactionClient,
+) {
   const db = tx || prisma
 
   // Find all active subscriptions for the user
@@ -468,8 +475,10 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
         currentPeriodEnd: GRACE_PERIOD_END,
         giftDetails: null,
         isGift: false,
-        isGracePeriodVirtual: true, // Specifically mark as grace period virtual subscription
-        isVirtual: true, // Mark as virtual subscription for grace period
+        // Specifically mark as grace period virtual subscription
+        isGracePeriodVirtual: true,
+        // Mark as virtual subscription for grace period
+        isVirtual: true,
         status: SubscriptionStatus.TRIALING,
         stripeCustomerId: '',
         stripePriceId: '',
@@ -486,14 +495,17 @@ export async function getSubscription(userId: string, tx?: Prisma.TransactionCli
   return subscriptions[0]
 }
 
-export function calculateSavings(monthlyPrice: string, annualPrice: string): number {
+export const calculateSavings = function calculateSavings(
+  monthlyPrice: string,
+  annualPrice: string,
+): number {
   const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
   const annual = Number.parseFloat(annualPrice.replace('$', ''))
   return Math.round(((monthly - annual) / monthly) * 100)
 }
 
 // Add a function to check if we're in the grace period
-export function isInGracePeriod(): boolean {
+export const isInGracePeriod = function isInGracePeriod(): boolean {
   return new Date() < GRACE_PERIOD_END
 }
 
@@ -503,7 +515,7 @@ export const gracePeriodPrettyDate = formatDate(GRACE_PERIOD_END)
 // Get the day after grace period ends (for consistent messaging with subscription dates)
 
 // Update the getSubscriptionStatusInfo function
-export function getSubscriptionStatusInfo(
+export const getSubscriptionStatusInfo = function getSubscriptionStatusInfo(
   status: SubscriptionStatus | null | undefined,
   cancelAtPeriodEnd?: boolean,
   currentPeriodEnd?: Date | null,
@@ -628,7 +640,7 @@ export function getSubscriptionStatusInfo(
   }
 }
 
-export function getBillingSummaryInfo({
+export const getBillingSummaryInfo = function getBillingSummaryInfo({
   status,
   cancelAtPeriodEnd,
   currentPeriodEnd,
@@ -930,7 +942,7 @@ export function getBillingSummaryInfo({
 }
 
 // Add new helper for determining tier
-export function getSubscriptionTier(
+export const getSubscriptionTier = function getSubscriptionTier(
   priceId: string | null | undefined,
   status: SubscriptionStatus | null,
 ): SubscriptionTier {
@@ -949,7 +961,9 @@ export function getSubscriptionTier(
 }
 
 // Update the hasPaidSubscription check
-export function hasPaidPlan(subscription: Partial<SubscriptionRow> | null): boolean {
+export const hasPaidPlan = function hasPaidPlan(
+  subscription: Partial<SubscriptionRow> | null,
+): boolean {
   if (!subscription) {
     return false
   }

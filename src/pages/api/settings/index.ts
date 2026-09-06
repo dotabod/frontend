@@ -4,10 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
-import { Settings } from '@/lib/defaultSettings'
+import { Settings } from '@/lib/default-settings'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
 import {
   FEATURE_TIERS,
@@ -62,7 +62,9 @@ type SettingsSubscriptionRow = Prisma.SubscriptionGetPayload<{
   select: typeof subscriptionRelationQuery.select
 }>
 
-function getSettingsSubscription(subscriptions: SettingsSubscriptionRow[]) {
+const getSettingsSubscription = function getSettingsSubscription(
+  subscriptions: SettingsSubscriptionRow[],
+) {
   const activeSubscription = subscriptions.find(
     (sub) => (sub.status === 'ACTIVE' || sub.status === 'TRIALING') && sub.stripeSubscriptionId,
   )
@@ -101,7 +103,7 @@ function getSettingsSubscription(subscriptions: SettingsSubscriptionRow[]) {
   }
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   const userId = req.query.id as string | undefined

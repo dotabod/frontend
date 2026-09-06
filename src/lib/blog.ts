@@ -14,7 +14,7 @@ export interface Post {
 
 const postsDirectory = path.join(process.cwd(), 'src/pages/blog')
 
-export function getAllPosts(): Post[] {
+export const getAllPosts = function getAllPosts(): Post[] {
   const filenames = fs.readdirSync(postsDirectory)
 
   return filenames
@@ -34,7 +34,7 @@ export function getAllPosts(): Post[] {
         date,
         description: data.description || '',
         draft: Boolean(data.draft),
-        slug: filename.replace(/\.md$/, ''),
+        slug: filename.replace(/\.md$/u, ''),
         title: data.title || 'Untitled',
       }
     })
@@ -42,6 +42,6 @@ export function getAllPosts(): Post[] {
     .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
-export function getLatestPost(): Post | null {
+export const getLatestPost = function getLatestPost(): Post | null {
   return getAllPosts()[0] ?? null
 }

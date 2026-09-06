@@ -29,15 +29,15 @@ vi.mock('@/utils/subscription', () => ({
   }),
 }))
 
-vi.mock('@/lib/server/dashboardAccess', () => ({
+vi.mock('@/lib/server/dashboard-access', () => ({
   requireDashboardAccess: () => async () => ({ props: {} }),
 }))
 
-vi.mock('@/components/Billing/BillingPlans', () => ({
+vi.mock('@/components/Billing/billing-plans', () => ({
   BillingPlans: () => <div data-testid='billing-plans'>Billing Plans</div>,
 }))
 
-vi.mock('@/components/Billing/BillingOverview', () => ({
+vi.mock('@/components/Billing/billing-overview', () => ({
   BillingOverview: ({ onOpenPortal }) => (
     <div data-testid='billing-overview'>
       <button onClick={onOpenPortal} type='button'>
@@ -47,17 +47,17 @@ vi.mock('@/components/Billing/BillingOverview', () => ({
   ),
 }))
 
-vi.mock('@/components/Billing/PaymentStatusAlert', () => ({
+vi.mock('@/components/Billing/payment-status-alert', () => ({
   PaymentStatusAlert: () => <div data-testid='payment-status-alert'>Payment status alert</div>,
 }))
 
-vi.mock('@/components/Subscription/SubscriptionAlerts', () => ({
+vi.mock('@/components/Subscription/subscription-alerts', () => ({
   SubscriptionAlerts: ({ hideManageButton }) => (
     <div data-testid='subscription-alerts'>hideManageButton:{String(hideManageButton)}</div>
   ),
 }))
 
-vi.mock('@/components/Dashboard/Header', () => ({
+vi.mock('@/components/Dashboard/header', () => ({
   default: ({ title, subtitle }) => (
     <div>
       <h1>{title}</h1>
@@ -66,7 +66,7 @@ vi.mock('@/components/Dashboard/Header', () => ({
   ),
 }))
 
-vi.mock('@/components/Dashboard/DashboardShell', () => ({
+vi.mock('@/components/Dashboard/dashboard-shell', () => ({
   default: ({ children }) => <div data-testid='dashboard-shell'>{children}</div>,
 }))
 
@@ -77,7 +77,7 @@ vi.mock('antd', () => ({
   message: messageMock,
 }))
 
-vi.mock('@/contexts/SubscriptionContext', () => ({
+vi.mock('@/contexts/subscription-context', () => ({
   useSubscriptionContext: () => ({
     creditBalance: 0,
     formattedCreditBalance: '$0.00',
@@ -131,7 +131,7 @@ describe('Dashboard Billing Page', () => {
     render(<BillingPage />)
 
     expect(screen.getByRole('heading', { name: 'Billing' })).toBeInTheDocument()
-    expect(screen.getByText(/your current plan, renewal date/i)).toBeInTheDocument()
+    expect(screen.getByText(/your current plan, renewal date/iu)).toBeInTheDocument()
     expect(screen.getByTestId('billing-overview')).toBeInTheDocument()
     expect(screen.getByTestId('subscription-alerts')).toHaveTextContent('hideManageButton:true')
     expect(screen.getByRole('heading', { name: 'Compare plans' })).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('Dashboard Billing Page', () => {
 
     render(<BillingPage />)
 
-    fireEvent.click(screen.getByRole('button', { name: /open billing portal/i }))
+    fireEvent.click(screen.getByRole('button', { name: /open billing portal/iu }))
 
     await waitFor(() => {
       expect(messageMock.info).toHaveBeenCalledWith('No active Stripe billing profile found.')

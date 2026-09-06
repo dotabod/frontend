@@ -1,12 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
-async function getApprovedModerators(req: NextApiRequest, res: NextApiResponse) {
+const getApprovedModerators = async function getApprovedModerators(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {

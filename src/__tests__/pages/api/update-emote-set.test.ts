@@ -43,7 +43,7 @@ vi.mock('@/lib/7tv', () => ({
 // Mock GraphQL client and gql
 vi.mock('graphql-request', () => {
   const mockRequest = vi.fn()
-  function MockGraphQLClient(this: { request: typeof mockRequest }) {
+  const MockGraphQLClient = function MockGraphQLClient(this: { request: typeof mockRequest }) {
     this.request = mockRequest
   }
   return {
@@ -53,7 +53,7 @@ vi.mock('graphql-request', () => {
 })
 
 // Mock authentication
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
@@ -68,14 +68,14 @@ vi.mock('@/utils/subscription', () => ({
 }))
 
 // Mock ChatBot emotes
-vi.mock('@/components/Dashboard/ChatBot', () => ({
+vi.mock('@/components/Dashboard/chat-bot', () => ({
   get emotesRequired() {
     return mockChatBotModule.emotesRequired
   },
 }))
 
 // Mock getTwitchTokens to avoid environment variable issues
-vi.mock('@/lib/getTwitchTokens', () => ({
+vi.mock('@/lib/get-twitch-tokens', () => ({
   CLIENT_ID: 'mock-client-id',
   CLIENT_SECRET: 'mock-client-secret',
   default: vi.fn().mockResolvedValue({
@@ -89,7 +89,7 @@ import { GraphQLClient } from 'graphql-request'
 
 // Import mocked modules
 import { get7TVUser } from '@/lib/7tv'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 describe('update-emote-set API', () => {
@@ -109,7 +109,9 @@ describe('update-emote-set API', () => {
 
     // Reset the mock request function
     mockRequest = vi.fn()
-    vi.mocked(GraphQLClient).mockImplementation(function (this: { request: typeof mockRequest }) {
+    vi.mocked(GraphQLClient).mockImplementation(function GraphQLClientMock(this: {
+      request: typeof mockRequest
+    }) {
       this.request = mockRequest
     } as unknown as new () => GraphQLClient)
   })
@@ -559,7 +561,7 @@ describe('update-emote-set API', () => {
       const queryText = String(query)
       if (queryText.includes('GetEmoteSetForCard')) {
         expect(variables).toMatchObject({ id: 'active-set-123' })
-        getEmoteSetRequestCount++
+        getEmoteSetRequestCount += 1
         // First call: no emotes
         if (getEmoteSetRequestCount === 1) {
           return {
@@ -642,7 +644,7 @@ describe('update-emote-set API', () => {
       const queryText = String(query)
       if (queryText.includes('GetEmoteSetForCard')) {
         expect(variables).toMatchObject({ id: 'active-set-123' })
-        getEmoteSetRequestCount++
+        getEmoteSetRequestCount += 1
         // First call: no emotes
         if (getEmoteSetRequestCount === 1) {
           return {

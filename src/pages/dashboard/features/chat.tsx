@@ -1,12 +1,12 @@
 import Head from 'next/head'
 import type { ReactElement } from 'react'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
-import NewFeatureChatToggles from '@/components/Dashboard/Features/NewFeatureChatToggles'
-import Header from '@/components/Dashboard/Header'
-import ErrorBoundary from '@/components/ErrorBoundary'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import ChatterCard from '@/components/Dashboard/Features/chatter-card'
+import NewFeatureChatToggles from '@/components/Dashboard/Features/new-feature-chat-toggles'
+import Header from '@/components/Dashboard/header'
+import ErrorBoundary from '@/components/error-boundary'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const FeaturesPage: NextPageWithLayout = () => (

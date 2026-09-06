@@ -2,9 +2,9 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import SetPage from '@/pages/[username]/set'
-import DetailPage from '@/pages/[username]/set/[heroId]'
+import DetailPage from '@/pages/[username]/set/[hero-id]'
 
-vi.mock('@/components/Homepage/HomepageShell', () => ({
+vi.mock('@/components/Homepage/homepage-shell', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 

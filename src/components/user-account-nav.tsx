@@ -1,0 +1,466 @@
+import { BellOutlined } from '@ant-design/icons'
+import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { Badge, Button, Dropdown, Empty, Popover, Skeleton, Space, Tabs } from 'antd'
+import type { MenuProps } from 'antd'
+import clsx from 'clsx'
+import type { Session } from 'next-auth'
+import { signOut, useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import useSWR from 'swr'
+
+import { filterNav, navConfig, navItemToMenuItem } from '@/components/Dashboard/navigation'
+import { fetcher } from '@/lib/fetcher'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/use-update-setting'
+
+// Notifications shown in the dashboard bell, discriminated by `type`.
+interface BaseNotification {
+  id: string
+  createdAt: string
+  read?: boolean
+}
+interface GiftNotification extends BaseNotification {
+  type?: 'GIFT_SUBSCRIPTION'
+  senderName: string
+  giftMessage?: string
+  giftType: 'monthly' | 'annual' | 'lifetime'
+  giftQuantity?: number
+}
+interface NewFeatureNotification extends BaseNotification {
+  type: 'NEW_FEATURE'
+}
+type AppNotification = GiftNotification | NewFeatureNotification
+
+interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
+  user: Session['user']
+  icon?: React.ReactNode
+  className?: string
+}
+
+const UserButton = ({ user, className }: UserButtonProps) => {
+  const router = useRouter()
+  const [imageLoaded, setImageLoaded] = useState(false)
+
+  const shouldFetchSettings = router.isReady && router.pathname.startsWith('/dashboard')
+  const { data, isLoading: isSettingsLoading } = useSWR(
+    shouldFetchSettings ? '/api/settings' : null,
+    fetcher,
+    SETTINGS_SWR_OPTIONS,
+  )
+
+  // Fetch gift notifications with dedupingInterval to prevent request pileup
+  const {
+    data: giftNotificationData,
+    error: notificationError,
+    mutate: refreshGiftNotifications,
+  } = useSWR('/api/notifications?includeRead=true', fetcher, {
+    ...SETTINGS_SWR_OPTIONS,
+    // Configuration to fetch only once on mount
+    // Keep error handling
+    // 8 seconds
+    loadingTimeout: 8000,
+    // 5 seconds
+    errorRetryInterval: 5000,
+    errorRetryCount: 3,
+    onErrorRetry: (_error, _key, _config, revalidate, { retryCount }) => {
+      // Only retry up to 3 times
+      if (retryCount >= 3) {
+        return
+      }
+
+      // Retry after 5 seconds
+      setTimeout(() => revalidate({ retryCount }), 5000)
+    },
+  })
+
+  // Force image to load even if notifications fail
+  useEffect(() => {
+    // If there's an error with notifications or it's taking too long,
+    // Ensure the image is shown after a timeout
+    const timer = setTimeout(() => {
+      if (!imageLoaded) {
+        setImageLoaded(true)
+      }
+      // 3 seconds timeout
+    }, 3000)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [imageLoaded])
+
+  const notifications = (giftNotificationData?.notifications || []) as AppNotification[]
+  const totalUnreadNotifications = notifications.filter((n) => !n.read).length
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 5
+
+  // Add notification filter state
+  const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'read'>('all')
+
+  // Filter notifications based on active tab
+  const filteredNotifications = notifications.filter((notification) => {
+    if (activeTab === 'all') {
+      return true
+    }
+    if (activeTab === 'unread') {
+      return !notification.read
+    }
+    if (activeTab === 'read') {
+      return notification.read
+    }
+    return true
+  })
+
+  // Sort notifications - unread first
+  const sortedNotifications = [...filteredNotifications].toSorted((a, b) => {
+    // First sort by read status (unread first)
+    if (a.read !== b.read) {
+      return a.read ? 1 : -1
+    }
+    // Then sort by date (newest first)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+
+  const totalFilteredNotifications = filteredNotifications.length
+
+  const isLive = data?.stream_online
+
+  // Handle notification dismissal
+  const dismissNotification = async (notificationId: string) => {
+    try {
+      await fetch('/api/notifications', {
+        body: JSON.stringify({
+          notificationId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
+
+      // Refresh notifications after dismissal
+      void refreshGiftNotifications()
+    } catch (error) {
+      console.error('Failed to dismiss notification:', error)
+    }
+  }
+
+  // Format gift type for display
+  const formatGiftType = (type: string, quantity = 1) => {
+    if (quantity <= 1) {
+      switch (type) {
+        case 'monthly': {
+          return 'a month of Dotabod Pro'
+        }
+        case 'annual': {
+          return 'a year of Dotabod Pro'
+        }
+        case 'lifetime': {
+          return 'Dotabod Pro Lifetime'
+        }
+        default: {
+          return 'Dotabod Pro'
+        }
+      }
+    }
+
+    switch (type) {
+      case 'monthly': {
+        return `${quantity} months of Dotabod Pro`
+      }
+      case 'annual': {
+        return `${quantity} years of Dotabod Pro`
+      }
+      case 'lifetime': {
+        return 'Dotabod Pro Lifetime'
+      }
+      default: {
+        return 'Dotabod Pro'
+      }
+    }
+  }
+
+  // Account entries (Billing/Gift/Your data) live in this dropdown now. filterNav
+  // drops Billing + Your data for impersonators — gating the old dropdown lacked.
+  const accountItems = filterNav(navConfig.account, {
+    isImpersonating: Boolean(user?.isImpersonating),
+  }).map((item) => navItemToMenuItem(item))
+
+  const accountMenuItems: MenuProps['items'] = [
+    {
+      key: 'dashboard',
+      label: (
+        <Link href='/dashboard' prefetch={false}>
+          Dashboard
+        </Link>
+      ),
+    },
+    { type: 'divider' },
+    ...accountItems,
+    { type: 'divider' },
+    {
+      key: 'logout',
+      label: 'Logout',
+      onClick: () => {
+        void signOut({
+          callbackUrl: window.location.origin,
+          redirect: true,
+        })
+      },
+    },
+  ]
+
+  return (
+    <div className={clsx('flex items-center', className)}>
+      {/* Notification Bell with Ant Design Popover */}
+      <Popover
+        trigger='click'
+        content={
+          <div className='w-full max-w-sm'>
+            <div className='mb-3 flex items-center justify-between'>
+              <h3 className='text-lg font-semibold text-white'>Notifications</h3>
+              {totalUnreadNotifications > 0 && (
+                <span className='rounded-full bg-blue-600 px-2 py-1 text-xs text-white'>
+                  {totalUnreadNotifications} new
+                </span>
+              )}
+            </div>
+
+            <Tabs
+              defaultActiveKey='all'
+              onChange={(key) => {
+                setActiveTab(key as 'all' | 'unread' | 'read')
+                setCurrentPage(1)
+              }}
+              items={[
+                {
+                  key: 'all',
+                  label: 'All',
+                },
+                {
+                  key: 'unread',
+                  label: `Unread ${totalUnreadNotifications > 0 ? `(${totalUnreadNotifications})` : ''}`,
+                },
+                {
+                  key: 'read',
+                  label: 'Read',
+                },
+              ]}
+            />
+
+            {notificationError ? (
+              <div className='py-6 text-center text-gray-400'>
+                Unable to load notifications. Please try again later.
+              </div>
+            ) : totalFilteredNotifications > 0 ? (
+              <div className='max-h-80 overflow-y-auto'>
+                {sortedNotifications
+                  .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                  .map((notification) => {
+                    if (notification.type === 'NEW_FEATURE') {
+                      return (
+                        <div
+                          key={notification.id}
+                          className={clsx(
+                            'relative mb-2 rounded-lg p-4',
+                            notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
+                          )}
+                        >
+                          <div className='flex items-start justify-between'>
+                            <div className='font-semibold text-white'>New features</div>
+                            <div className='text-xs text-gray-400'>
+                              {new Date(notification.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <p className='mt-1 text-gray-300'>
+                            Dotabod now turns on new features automatically. Don&apos;t want new
+                            stuff on by default? You can opt out anytime.
+                          </p>
+                          <div className='mt-2 flex gap-2'>
+                            <Link href='/dashboard/whats-new'>
+                              <Button type='primary' size='small'>
+                                See what&apos;s new
+                              </Button>
+                            </Link>
+                            {!notification.read && (
+                              <Button
+                                onClick={async () => dismissNotification(notification.id)}
+                                size='small'
+                              >
+                                Dismiss
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <div
+                        key={notification.id}
+                        className={clsx(
+                          'relative mb-2 rounded-lg p-4',
+                          notification.read ? 'bg-gray-800/50' : 'bg-gray-800',
+                        )}
+                      >
+                        <div className='flex items-start justify-between'>
+                          <div className='font-semibold text-white'>Gift Subscription</div>
+                          <div className='text-xs text-gray-400'>
+                            {new Date(notification.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <p className='mt-1 text-gray-300'>
+                          {`${notification.senderName || 'Someone'} has gifted you ${formatGiftType(notification.giftType, notification.giftQuantity)}!`}
+                        </p>
+                        {notification.giftMessage && (
+                          <p className='mt-2 text-gray-400 italic'>
+                            &quot;{notification.giftMessage}&quot;
+                          </p>
+                        )}
+                        {!notification.read && (
+                          <Button
+                            onClick={async () => dismissNotification(notification.id)}
+                            className='mt-2'
+                            size='small'
+                          >
+                            Dismiss
+                          </Button>
+                        )}
+                      </div>
+                    )
+                  })}
+
+                {totalFilteredNotifications > pageSize && (
+                  <div className='mt-4 flex items-center justify-between'>
+                    <Space>
+                      <Button
+                        type='text'
+                        size='small'
+                        disabled={currentPage === 1}
+                        onClick={() => {
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }}
+                      >
+                        Previous
+                      </Button>
+                      <span className='text-xs text-gray-400'>
+                        Page {currentPage} of {Math.ceil(totalFilteredNotifications / pageSize)}
+                      </span>
+                      <Button
+                        type='text'
+                        size='small'
+                        disabled={currentPage >= Math.ceil(totalFilteredNotifications / pageSize)}
+                        onClick={() => {
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, Math.ceil(totalFilteredNotifications / pageSize)),
+                          )
+                        }}
+                      >
+                        Next
+                      </Button>
+                    </Space>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Empty
+                description={
+                  activeTab === 'all'
+                    ? 'No notifications'
+                    : activeTab === 'unread'
+                      ? 'No unread notifications'
+                      : 'No read notifications'
+                }
+                className='py-6'
+              />
+            )}
+          </div>
+        }
+      >
+        <div className='mr-4 cursor-pointer'>
+          <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
+            <BellOutlined style={{ color: '#fff', fontSize: '20px' }} />
+          </Badge>
+        </div>
+      </Popover>
+
+      {/* User Profile with loading skeleton */}
+      <Dropdown menu={{ items: accountMenuItems }}>
+        <Link href='/dashboard' prefetch={false}>
+          <div className='flex cursor-pointer items-center'>
+            <div className='relative'>
+              {isLive && (
+                <span className='absolute -top-2 -right-2 z-10 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white'>
+                  Live
+                </span>
+              )}
+
+              {/* Show skeleton while loading, but only for a reasonable time */}
+              {(isSettingsLoading || !imageLoaded) && (
+                <div className='h-10 w-10'>
+                  <Skeleton.Avatar active size={40} shape='circle' />
+                </div>
+              )}
+
+              {/* Hidden until loaded, then shown */}
+              <div className={!imageLoaded || isSettingsLoading ? 'hidden' : 'block'}>
+                <Image
+                  width={40}
+                  height={40}
+                  alt='User Avatar'
+                  src={user?.image || '/images/hero/default.png'}
+                  className='rounded-full'
+                  onLoad={() => {
+                    setImageLoaded(true)
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className='ml-3 hidden flex-col sm:flex'>
+              {isSettingsLoading ? (
+                <>
+                  <Skeleton.Input active size='small' style={{ height: 16, width: 100 }} />
+                  <div className='mt-1'>
+                    <Skeleton.Input active size='small' style={{ height: 14, width: 80 }} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className='my-0! text-base font-medium text-white uppercase'>
+                    {user?.name || 'TECHLEED'}
+                  </p>
+                  <p className='my-0! text-sm text-gray-400'>
+                    {isLive ? 'Streaming now' : 'Offline'}
+                  </p>
+                </>
+              )}
+            </div>
+
+            <ChevronDownIcon className='ml-2 h-5 w-5 text-gray-400' />
+          </div>
+        </Link>
+      </Dropdown>
+    </div>
+  )
+}
+
+UserButton.displayName = 'UserButton'
+
+interface UserAccountNavProps {
+  className?: string
+}
+
+export const UserAccountNav = ({ className }: UserAccountNavProps) => {
+  const user = useSession()?.data?.user
+
+  if (!user) {
+    return null
+  }
+
+  return <UserButton user={user} className={className} />
+}

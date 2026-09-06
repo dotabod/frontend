@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 
-import { Container } from '@/components/Container'
-import HomepageShell from '@/components/Homepage/HomepageShell'
+import { Container } from '@/components/container'
+import HomepageShell from '@/components/Homepage/homepage-shell'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const TermsOfService: NextPageWithLayout = () => (
@@ -22,9 +22,10 @@ const TermsOfService: NextPageWithLayout = () => (
           </strong>
         </div>
         <div>
-          We are Dotabod ("<strong>Company</strong>," "<strong>we</strong>," "<strong>us</strong>
-          ," "<strong>our</strong>"), a company registered in Texas, United States at 501 Brazos St,
-          Austin, TX 78701.
+          We are Dotabod (&quot;<strong>Company</strong>,&quot; &quot;<strong>we</strong>,&quot;
+          &quot;<strong>us</strong>
+          ,&quot; &quot;<strong>our</strong>&quot;), a company registered in Texas, United States at
+          501 Brazos St, Austin, TX 78701.
         </div>
         <br />
         <div>
@@ -32,9 +33,9 @@ const TermsOfService: NextPageWithLayout = () => (
           <a href='https://dotabod.com' target='_blank' rel='noreferrer'>
             https://dotabod.com
           </a>{' '}
-          (the "<strong>Site</strong>"), as well as any other related products and services that
-          refer or link to these legal terms (the "<strong>Legal Terms</strong>") (collectively, the
-          "<strong>Services</strong>").
+          (the &quot;<strong>Site</strong>&quot;), as well as any other related products and
+          services that refer or link to these legal terms (the &quot;<strong>Legal Terms</strong>
+          &quot;) (collectively, the &quot;<strong>Services</strong>&quot;).
         </div>
         <br />
         <div>
@@ -50,8 +51,8 @@ const TermsOfService: NextPageWithLayout = () => (
         <br />
         <div>
           These Legal Terms constitute a legally binding agreement made between you, whether
-          personally or on behalf of an entity ("<strong>you</strong>
-          "), and Dotabod, concerning your access to and use of the Services. You agree that by
+          personally or on behalf of an entity (&quot;<strong>you</strong>
+          &quot;), and Dotabod, concerning your access to and use of the Services. You agree that by
           accessing the Services, you have read, understood, and agreed to be bound by all of these
           Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY
           PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.
@@ -61,10 +62,10 @@ const TermsOfService: NextPageWithLayout = () => (
           Supplemental terms and conditions or documents that may be posted on the Services from
           time to time are hereby expressly incorporated herein by reference. We reserve the right,
           in our sole discretion, to make changes or modifications to these Legal Terms from time to
-          time. We will alert you about any changes by updating the "Last updated" date of these
-          Legal Terms, and you waive any right to receive specific notice of each such change. It is
-          your responsibility to periodically review these Legal Terms to stay informed of updates.
-          You will be subject to, and will be deemed to have been made aware of and to have
+          time. We will alert you about any changes by updating the &quot;Last updated&quot; date of
+          these Legal Terms, and you waive any right to receive specific notice of each such change.
+          It is your responsibility to periodically review these Legal Terms to stay informed of
+          updates. You will be subject to, and will be deemed to have been made aware of and to have
           accepted, the changes in any revised Legal Terms by your continued use of the Services
           after the date such revised Legal Terms are posted.
         </div>
@@ -215,9 +216,9 @@ const TermsOfService: NextPageWithLayout = () => (
         <div>
           We are the owner or the licensee of all intellectual property rights in our Services,
           including all source code, databases, functionality, software, website designs, audio,
-          video, text, photographs, and graphics in the Services (collectively, the "
-          <strong>Content</strong>"), as well as the trademarks, service marks, and logos contained
-          therein (the "<strong>Marks</strong>").
+          video, text, photographs, and graphics in the Services (collectively, the &quot;
+          <strong>Content</strong>&quot;), as well as the trademarks, service marks, and logos
+          contained therein (the &quot;<strong>Marks</strong>&quot;).
         </div>
         <br />
         <div>
@@ -227,15 +228,15 @@ const TermsOfService: NextPageWithLayout = () => (
         </div>
         <br />
         <div>
-          The Content and Marks are provided in or through the Services "<strong>AS IS</strong>" for
-          your personal, non-commercial use only.
+          The Content and Marks are provided in or through the Services &quot;<strong>AS IS</strong>
+          &quot; for your personal, non-commercial use only.
         </div>
         <div>
           <strong>Your use of our Services</strong>
         </div>
         <div>
-          Subject to your compliance with these Legal Terms, including the "
-          <a href='#prohibited'>PROHIBITED ACTIVITIES</a>" section below, we grant you a
+          Subject to your compliance with these Legal Terms, including the &quot;
+          <a href='#prohibited'>PROHIBITED ACTIVITIES</a>&quot; section below, we grant you a
           non-exclusive, non-transferable, revocable license to:
         </div>
         <ul className='list-inside list-disc'>
@@ -278,16 +279,17 @@ const TermsOfService: NextPageWithLayout = () => (
           <strong>Your submissions</strong>
         </div>
         <div>
-          Please review this section and the "<a href='#prohibited'>PROHIBITED ACTIVITIES</a>"
-          section carefully prior to using our Services to understand the (a) rights you give us and
-          (b) obligations you have when you post or upload any content through the Services.
+          Please review this section and the &quot;<a href='#prohibited'>PROHIBITED ACTIVITIES</a>
+          &quot; section carefully prior to using our Services to understand the (a) rights you give
+          us and (b) obligations you have when you post or upload any content through the Services.
         </div>
         <br />
         <div>
           <strong>Submissions:</strong> By directly sending us any question, comment, suggestion,
-          idea, feedback, or other information about the Services ("<strong>Submissions</strong>
-          "), you agree to assign to us all intellectual property rights in such Submission. You
-          agree that we shall own this Submission and be entitled to its unrestricted use and
+          idea, feedback, or other information about the Services (&quot;
+          <strong>Submissions</strong>
+          &quot;), you agree to assign to us all intellectual property rights in such Submission.
+          You agree that we shall own this Submission and be entitled to its unrestricted use and
           dissemination for any lawful purpose, commercial or otherwise, without acknowledgment or
           compensation to you.
         </div>
@@ -298,8 +300,8 @@ const TermsOfService: NextPageWithLayout = () => (
         </div>
         <ul className='list-inside list-disc'>
           <li>
-            confirm that you have read and agree with our "
-            <a href='#prohibited'>PROHIBITED ACTIVITIES</a>" and will not post, send, publish,
+            confirm that you have read and agree with our &quot;
+            <a href='#prohibited'>PROHIBITED ACTIVITIES</a>&quot; and will not post, send, publish,
             upload, or transmit through the Services any Submission that is illegal, harassing,
             hateful, harmful, defamatory, obscene, bullying, abusive, discriminatory, threatening to
             any person or group, sexually explicit, false, inaccurate, deceitful, or misleading;
@@ -320,7 +322,7 @@ const TermsOfService: NextPageWithLayout = () => (
         <div>
           You are solely responsible for your Submissions and you expressly agree to reimburse us
           for any and all losses that we may suffer because of your breach of (a) this section, (b)
-          any third party's intellectual property rights, or (c) applicable law.
+          any third party&apos;s intellectual property rights, or (c) applicable law.
         </div>
         <br />
         <div id='userreps'>
@@ -409,7 +411,7 @@ const TermsOfService: NextPageWithLayout = () => (
         </div>
         <div>
           We offer a 14-day free trial to new users who register with the Services. The account will
-          be charged according to the user's chosen subscription at the end of the free trial.
+          be charged according to the user&apos;s chosen subscription at the end of the free trial.
         </div>
         <br />
         <div>
@@ -471,7 +473,7 @@ const TermsOfService: NextPageWithLayout = () => (
           <li>
             Upload or transmit (or attempt to upload or to transmit) viruses, Trojan horses, or
             other material, including excessive use of capital letters and spamming (continuous
-            posting of repetitive text), that interferes with any party's uninterrupted use and
+            posting of repetitive text), that interferes with any party&apos;s uninterrupted use and
             enjoyment of the Services or modifies, impairs, disrupts, alters, or interferes with the
             use, features, functions, operation, or maintenance of the Services.
           </li>
@@ -487,9 +489,9 @@ const TermsOfService: NextPageWithLayout = () => (
           <li>
             Upload or transmit (or attempt to upload or to transmit) any material that acts as a
             passive or active information collection or transmission mechanism, including without
-            limitation, clear graphics interchange formats ("gifs"), 1×1 pixels, web bugs, cookies,
-            or other similar devices (sometimes referred to as "spyware" or "passive collection
-            mechanisms" or "pcms").
+            limitation, clear graphics interchange formats (&quot;gifs&quot;), 1×1 pixels, web bugs,
+            cookies, or other similar devices (sometimes referred to as &quot;spyware&quot; or
+            &quot;passive collection mechanisms&quot; or &quot;pcms&quot;).
           </li>
           <li>
             Interfere with, disrupt, or create an undue burden on the Services or the networks or
@@ -504,8 +506,8 @@ const TermsOfService: NextPageWithLayout = () => (
             the Services, or any portion of the Services.
           </li>
           <li>
-            Copy or adapt the Services' software, including but not limited to Flash, PHP, HTML,
-            JavaScript, or other code.
+            Copy or adapt the Services&apos; software, including but not limited to Flash, PHP,
+            HTML, JavaScript, or other code.
           </li>
           <li>
             Except as permitted by applicable law, decipher, decompile, disassemble, or reverse
@@ -539,11 +541,11 @@ const TermsOfService: NextPageWithLayout = () => (
           opportunity to create, submit, post, display, transmit, perform, publish, distribute, or
           broadcast content and materials to us or on the Services, including but not limited to
           text, writings, video, audio, photographs, graphics, comments, suggestions, or personal
-          information or other material (collectively, "<strong>Contributions</strong>").
+          information or other material (collectively, &quot;<strong>Contributions</strong>&quot;).
           Contributions may be viewable by other users of the Services and through third-party
           websites. As such, any Contributions you transmit may be treated in accordance with the
-          Services' Privacy Policy. When you create or make available any Contributions, you thereby
-          represent and warrant that:
+          Services&apos; Privacy Policy. When you create or make available any Contributions, you
+          thereby represent and warrant that:
         </div>
         <ul className='list-inside list-disc'>
           <li>
@@ -632,19 +634,19 @@ const TermsOfService: NextPageWithLayout = () => (
         </div>
         <div>
           As part of the functionality of the Services, you may link your account with online
-          accounts you have with third-party service providers (each such account, a "
-          <strong>Third-Party Account</strong>") by either: (1) providing your Third-Party Account
-          login information through the Services; or (2) allowing us to access your Third-Party
-          Account, as is permitted under the applicable terms and conditions that govern your use of
-          each Third-Party Account. You represent and warrant that you are entitled to disclose your
-          Third-Party Account login information to us and/or grant us access to your Third-Party
-          Account, without breach by you of any of the terms and conditions that govern your use of
-          the applicable Third-Party Account, and without obligating us to pay any fees or making us
-          subject to any usage limitations imposed by the third-party service provider of the
-          Third-Party Account. By granting us access to any Third-Party Accounts, you understand
-          that (1) we may access, make available, and store (if applicable) any content that you
-          have provided to and stored in your Third-Party Account (the "
-          <strong>Social Network Content</strong>") so that it is available on and through the
+          accounts you have with third-party service providers (each such account, a &quot;
+          <strong>Third-Party Account</strong>&quot;) by either: (1) providing your Third-Party
+          Account login information through the Services; or (2) allowing us to access your
+          Third-Party Account, as is permitted under the applicable terms and conditions that govern
+          your use of each Third-Party Account. You represent and warrant that you are entitled to
+          disclose your Third-Party Account login information to us and/or grant us access to your
+          Third-Party Account, without breach by you of any of the terms and conditions that govern
+          your use of the applicable Third-Party Account, and without obligating us to pay any fees
+          or making us subject to any usage limitations imposed by the third-party service provider
+          of the Third-Party Account. By granting us access to any Third-Party Accounts, you
+          understand that (1) we may access, make available, and store (if applicable) any content
+          that you have provided to and stored in your Third-Party Account (the &quot;
+          <strong>Social Network Content</strong>&quot;) so that it is available on and through the
           Services via your account, including without limitation any friend lists and (2) we may
           submit to and receive from your Third-Party Account additional information to the extent
           you are notified when you link your account with the Third-Party Account. Depending on the
@@ -674,16 +676,16 @@ const TermsOfService: NextPageWithLayout = () => (
           <strong>11. THIRD-PARTY WEBSITES AND CONTENT</strong>
         </div>
         <div>
-          The Services may contain (or you may be sent via the Site) links to other websites ("
-          <strong>Third-Party Websites</strong>") as well as articles, photographs, text, graphics,
-          pictures, designs, music, sound, video, information, applications, software, and other
-          content or items belonging to or originating from third parties ("
-          <strong>Third-Party Content</strong>"). Such Third-Party Websites and Third-Party Content
-          are not investigated, monitored, or checked for accuracy, appropriateness, or completeness
-          by us, and we are not responsible for any Third-Party Websites accessed through the
-          Services or any Third-Party Content posted on, available through, or installed from the
-          Services, including the content, accuracy, offensiveness, opinions, reliability, privacy
-          practices, or other policies of or contained in the Third-Party Websites or the
+          The Services may contain (or you may be sent via the Site) links to other websites (&quot;
+          <strong>Third-Party Websites</strong>&quot;) as well as articles, photographs, text,
+          graphics, pictures, designs, music, sound, video, information, applications, software, and
+          other content or items belonging to or originating from third parties (&quot;
+          <strong>Third-Party Content</strong>&quot;). Such Third-Party Websites and Third-Party
+          Content are not investigated, monitored, or checked for accuracy, appropriateness, or
+          completeness by us, and we are not responsible for any Third-Party Websites accessed
+          through the Services or any Third-Party Content posted on, available through, or installed
+          from the Services, including the content, accuracy, offensiveness, opinions, reliability,
+          privacy practices, or other policies of or contained in the Third-Party Websites or the
           Third-Party Content. Inclusion of, linking to, or permitting the use or installation of
           any Third-Party Websites or any Third-Party Content does not imply approval or endorsement
           thereof by us. If you decide to leave the Services and access the Third-Party Websites or
@@ -803,8 +805,9 @@ const TermsOfService: NextPageWithLayout = () => (
           by binding arbitration. YOU UNDERSTAND THAT WITHOUT THIS PROVISION, YOU WOULD HAVE THE
           RIGHT TO SUE IN COURT AND HAVE A JURY TRIAL. The arbitration shall be commenced and
           conducted under the Commercial Arbitration Rules of the American Arbitration Association
-          ("AAA") and, where appropriate, the AAA's Supplementary Procedures for Consumer Related
-          Disputes ("AAA Consumer Rules"), both of which are available at the{' '}
+          (&quot;AAA&quot;) and, where appropriate, the AAA&apos;s Supplementary Procedures for
+          Consumer Related Disputes (&quot;AAA Consumer Rules&quot;), both of which are available at
+          the{' '}
           <a href='http://www.adr.org' target='_blank' rel='noreferrer'>
             American Arbitration Association (AAA) website
           </a>
@@ -886,8 +889,8 @@ const TermsOfService: NextPageWithLayout = () => (
           DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, IN CONNECTION WITH THE SERVICES AND YOUR USE
           THEREOF, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
           FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE MAKE NO WARRANTIES OR REPRESENTATIONS
-          ABOUT THE ACCURACY OR COMPLETENESS OF THE SERVICES' CONTENT OR THE CONTENT OF ANY WEBSITES
-          OR MOBILE APPLICATIONS LINKED TO THE SERVICES AND WE WILL ASSUME NO LIABILITY OR
+          ABOUT THE ACCURACY OR COMPLETENESS OF THE SERVICES&apos; CONTENT OR THE CONTENT OF ANY
+          WEBSITES OR MOBILE APPLICATIONS LINKED TO THE SERVICES AND WE WILL ASSUME NO LIABILITY OR
           RESPONSIBILITY FOR ANY (1) ERRORS, MISTAKES, OR INACCURACIES OF CONTENT AND MATERIALS, (2)
           PERSONAL INJURY OR PROPERTY DAMAGE, OF ANY NATURE WHATSOEVER, RESULTING FROM YOUR ACCESS
           TO AND USE OF THE SERVICES, (3) ANY UNAUTHORIZED ACCESS TO OR USE OF OUR SECURE SERVERS
@@ -929,17 +932,17 @@ const TermsOfService: NextPageWithLayout = () => (
         <div>
           You agree to defend, indemnify, and hold us harmless, including our subsidiaries,
           affiliates, and all of our respective officers, agents, partners, and employees, from and
-          against any loss, damage, liability, claim, or demand, including reasonable attorneys'
-          fees and expenses, made by any third party due to or arising out of: (1) use of the
-          Services; (2) breach of these Legal Terms; (3) any breach of your representations and
-          warranties set forth in these Legal Terms; (4) your violation of the rights of a third
-          party, including but not limited to intellectual property rights; or (5) any overt harmful
-          act toward any other user of the Services with whom you connected via the Services.
-          Notwithstanding the foregoing, we reserve the right, at your expense, to assume the
-          exclusive defense and control of any matter for which you are required to indemnify us,
-          and you agree to cooperate, at your expense, with our defense of such claims. We will use
-          reasonable efforts to notify you of any such claim, action, or proceeding which is subject
-          to this indemnification upon becoming aware of it.
+          against any loss, damage, liability, claim, or demand, including reasonable
+          attorneys&apos; fees and expenses, made by any third party due to or arising out of: (1)
+          use of the Services; (2) breach of these Legal Terms; (3) any breach of your
+          representations and warranties set forth in these Legal Terms; (4) your violation of the
+          rights of a third party, including but not limited to intellectual property rights; or (5)
+          any overt harmful act toward any other user of the Services with whom you connected via
+          the Services. Notwithstanding the foregoing, we reserve the right, at your expense, to
+          assume the exclusive defense and control of any matter for which you are required to
+          indemnify us, and you agree to cooperate, at your expense, with our defense of such
+          claims. We will use reasonable efforts to notify you of any such claim, action, or
+          proceeding which is subject to this indemnification upon becoming aware of it.
         </div>
         <br />
         <div id='userdata'>

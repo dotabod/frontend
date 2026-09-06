@@ -10,20 +10,14 @@ import {
   isLifetimePrice,
 } from '../utils/subscription-utils'
 
-function toMetadataObject(value: unknown): Record<string, unknown> {
+const toMetadataObject = function toMetadataObject(value: unknown): Record<string, unknown> {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     return value as Record<string, unknown>
   }
   return {}
 }
 
-/**
- * Handles an invoice event from Stripe (payment succeeded or failed)
- * @param invoice The Stripe invoice object
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleInvoiceEvent(
+export const handleInvoiceEvent = async function handleInvoiceEvent(
   invoice: Stripe.Invoice,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -82,7 +76,9 @@ export async function handleInvoiceEvent(
   )
 }
 
-function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+const getInvoiceSubscriptionId = function getInvoiceSubscriptionId(
+  invoice: Stripe.Invoice,
+): string | null {
   const firstLineItem = invoice.lines.data[0]
 
   if (!firstLineItem) {
@@ -105,13 +101,7 @@ function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   return null
 }
 
-/**
- * Handles a crypto invoice payment event from Stripe
- * @param invoice The Stripe invoice object
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-async function handleCryptoInvoiceEvent(
+const handleCryptoInvoiceEvent = async function handleCryptoInvoiceEvent(
   invoice: Stripe.Invoice,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -267,12 +257,14 @@ async function handleCryptoInvoiceEvent(
             // Create a new draft invoice for the next period
             // Use type assertion to fix customerId type issue
             const params: Stripe.InvoiceCreateParams = {
-              auto_advance: true, // Enable automatic advancement so Stripe handles finalization
+              // Enable automatic advancement so Stripe handles finalization
+              auto_advance: true,
               automatically_finalizes_at: Math.floor(renewalDate.getTime() / 1000),
               collection_method: 'send_invoice',
               customer: customerId,
               description: `Crypto Dotabod Pro ${pricePeriod.charAt(0).toUpperCase() + pricePeriod.slice(1)} subscription`,
-              due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000), // Due date 7 days after finalization date
+              // Due date 7 days after finalization date
+              due_date: Math.floor((renewalDate.getTime() + 7 * 24 * 60 * 60 * 1000) / 1000),
               metadata: {
                 isCryptoPayment: 'true',
                 isRenewalInvoice: 'true',
@@ -305,7 +297,8 @@ async function handleCryptoInvoiceEvent(
             // Update the subscription with the new period end and invoice ID
             await tx.subscription.update({
               data: {
-                cancelAtPeriodEnd: true, // Will expire at the end of the period
+                // Will expire at the end of the period
+                cancelAtPeriodEnd: true,
                 currentPeriodEnd: newPeriodEnd,
                 metadata: {
                   ...toMetadataObject(subscription.metadata),
@@ -394,12 +387,7 @@ async function handleCryptoInvoiceEvent(
   )
 }
 
-/**
- * Maps a Stripe subscription status to our internal status
- * @param status The Stripe subscription status
- * @returns The mapped status
- */
-function mapStripeStatus(status: string): SubscriptionStatus {
+const mapStripeStatus = function mapStripeStatus(status: string): SubscriptionStatus {
   switch (status) {
     case 'active': {
       return SubscriptionStatus.ACTIVE
@@ -434,7 +422,7 @@ type CryptoUserResolutionSource =
   | 'opennode_charge'
   | 'subscription_lookup'
 
-async function resolveUserIdForCryptoInvoice(
+const resolveUserIdForCryptoInvoice = async function resolveUserIdForCryptoInvoice(
   invoice: Stripe.Invoice,
   tx: Prisma.TransactionClient,
 ): Promise<{ userId: string; source: CryptoUserResolutionSource } | null> {
@@ -482,13 +470,7 @@ async function resolveUserIdForCryptoInvoice(
   return null
 }
 
-/**
- * Handles an OpenNode crypto invoice.paid event
- * @param invoice The Stripe invoice object with OpenNode metadata
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-async function handleOpenNodeInvoicePaid(
+const handleOpenNodeInvoicePaid = async function handleOpenNodeInvoicePaid(
   invoice: Stripe.Invoice,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -736,10 +718,7 @@ async function handleOpenNodeInvoicePaid(
   )
 }
 
-/**
- * Handles crypto subscription renewal logic
- */
-async function handleCryptoRenewal(
+const handleCryptoRenewal = async function handleCryptoRenewal(
   invoice: Stripe.Invoice,
   subscription: Prisma.SubscriptionGetPayload<object>,
   tx: Prisma.TransactionClient,

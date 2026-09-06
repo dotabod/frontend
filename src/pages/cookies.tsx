@@ -2,9 +2,9 @@ import { Button, Collapse, Space, Table, Tag } from 'antd'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 
-import { getCookieCategories } from '@/components/CookieConsent'
-import HomepageShell from '@/components/Homepage/HomepageShell'
-import { showCookieConsentBanner, showCookieConsentSettings } from '@/lib/cookieManager'
+import { getCookieCategories } from '@/components/cookie-consent'
+import HomepageShell from '@/components/Homepage/homepage-shell'
+import { showCookieConsentBanner, showCookieConsentSettings } from '@/lib/cookie-manager'
 import type { NextPageWithLayout } from '@/pages/_app'
 
 const { Panel } = Collapse
@@ -62,8 +62,9 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
       <div className='mb-8'>
         <h2 className='mb-4 text-2xl font-semibold'>Introduction</h2>
         <p className='mb-4'>
-          {companyName} ("we", "our", or "us") uses cookies on our website ({websiteUrl}) (the
-          "Service"). By using the Service, you consent to the use of cookies.
+          {companyName} (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) uses cookies on our
+          website ({websiteUrl}) (the &quot;Service&quot;). By using the Service, you consent to the
+          use of cookies.
         </p>
         <p className='mb-4'>
           Our Cookie Policy explains what cookies are, how we use cookies, how third parties we may
@@ -81,9 +82,9 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
           you and make your next visit easier and the Service more useful to you.
         </p>
         <p className='mb-4'>
-          Cookies can be "persistent" or "session" cookies. Persistent cookies remain on your
-          personal computer or mobile device when you go offline, while session cookies are deleted
-          as soon as you close your web browser.
+          Cookies can be &quot;persistent&quot; or &quot;session&quot; cookies. Persistent cookies
+          remain on your personal computer or mobile device when you go offline, while session
+          cookies are deleted as soon as you close your web browser.
         </p>
       </div>
 
@@ -217,8 +218,8 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
       <div className='mb-8'>
         <h2 className='mb-4 text-2xl font-semibold'>What are Your Choices Regarding Cookies</h2>
         <p className='mb-4'>
-          If you'd like to delete cookies or instruct your web browser to delete or refuse cookies,
-          please visit the help pages of your web browser.
+          If you&apos;d like to delete cookies or instruct your web browser to delete or refuse
+          cookies, please visit the help pages of your web browser.
         </p>
         <p className='mb-4'>
           Please note, however, that if you delete cookies or refuse to accept them, you might not

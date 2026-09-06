@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getLatestPost } from '@/lib/blog'
 
-async function handler(_req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(_req: NextApiRequest, res: NextApiResponse) {
   try {
     const latest = getLatestPost()
     const post = latest

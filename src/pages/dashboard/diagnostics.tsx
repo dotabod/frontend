@@ -6,11 +6,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import io from 'socket.io-client'
 import useSWR from 'swr'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import { diagnoseSetup, isCompleteDiagnosticPayload } from '@/lib/diagnostics/diagnoseSetup'
-import type { BrowserProbeStatus } from '@/lib/diagnostics/diagnoseSetup'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import { diagnoseSetup, isCompleteDiagnosticPayload } from '@/lib/diagnostics/diagnose-setup'
+import type { BrowserProbeStatus } from '@/lib/diagnostics/diagnose-setup'
 import { fetcher } from '@/lib/fetcher'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 
 interface DiagnosticStatus {
   gsiLastSeenAt: string | null
@@ -54,7 +54,7 @@ const diagnosisCopy = {
   },
 } as const
 
-function formatSeen(value: string | null): string {
+const formatSeen = function formatSeen(value: string | null): string {
   if (!value) {
     return 'Never'
   }
@@ -84,7 +84,7 @@ const DiagnosticsPage = () => {
     }, 15_000)
 
     try {
-      const payloadCheck = fetch(`${endpoint.replace(/\/$/, '')}/diagnostics/payload`, {
+      const payloadCheck = fetch(`${endpoint.replace(/\/$/u, '')}/diagnostics/payload`, {
         cache: 'no-store',
         signal: controller.signal,
       }).then(async (response) => {

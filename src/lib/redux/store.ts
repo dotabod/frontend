@@ -1,6 +1,6 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit'
 
-import type { blockType } from '@/lib/devConsts'
+import type { blockType } from '@/lib/dev-consts'
 
 interface MinimapEntity {
   teamP: string

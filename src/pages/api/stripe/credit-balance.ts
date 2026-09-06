@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type Stripe from 'stripe'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
@@ -97,7 +97,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const formatted = `$${(absBalance / 100).toFixed(2)}`
 
     const response = {
-      balance: hasCredit ? Math.abs(balance) : 0, // Return positive value for credit
+      // Return positive value for credit
+      balance: hasCredit ? Math.abs(balance) : 0,
       formatted: hasCredit ? formatted : '$0.00',
     }
     res.status(200).json(response)

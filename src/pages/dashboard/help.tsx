@@ -10,17 +10,17 @@ import type { ReactElement, ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import Header from '@/components/Dashboard/Header'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import Header from '@/components/Dashboard/header'
 import {
   CfgLocationNote,
   LiveRequiredNote,
   PowerShellFailureSteps,
   PowerShellSetupStep,
-} from '@/components/Dashboard/PowerShellTroubleshooting'
+} from '@/components/Dashboard/power-shell-troubleshooting'
 import { fetcher } from '@/lib/fetcher'
-import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/use-update-setting'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 import { Card } from '@/ui/card'
 
 // Define form values interface
@@ -93,9 +93,9 @@ const faqs: Faq[] = [
             <span key={1}>
               <strong>Play any Dota 2 match or demo a hero</strong>
               <div className='mt-1 text-sm'>
-                While you're live, Dotabod detects your Steam account automatically. Type{' '}
-                <Tag>!innate</Tag> in chat: if Dotabod replies with your hero's innate, it found
-                your Steam account.
+                While you&apos;re live, Dotabod detects your Steam account automatically. Type{' '}
+                <Tag>!innate</Tag> in chat: if Dotabod replies with your hero&apos;s innate, it
+                found your Steam account.
               </div>
             </span>,
             <span key={2}>
@@ -129,8 +129,8 @@ const faqs: Faq[] = [
                     Your Steam account may be linked to another Dotabod user. Only one user can link
                     a Steam account at a time. Open{' '}
                     <Link href='/dashboard/features'>the MMR tracker on the Features page</Link> to
-                    see who's currently using it. Ask them to remove the link, or use the support
-                    form below for help unlinking.
+                    see who&apos;s currently using it. Ask them to remove the link, or use the
+                    support form below for help unlinking.
                   </div>
                 </span>,
                 <span key={3}>
@@ -173,7 +173,7 @@ const faqs: Faq[] = [
           "In OBS, move the Dotabod browser source above your other sources so they don't cover it.",
           <span key={5}>
             <strong>Using OBS 31 or later?</strong> A Chromium change in OBS 31+ can show blank
-            overlays. If that's you:
+            overlays. If that&apos;s you:
             <div className='mt-2'>
               <a
                 href='https://github.com/obsproject/obs-studio/releases/download/30.2.3/OBS-Studio-30.2.3-Windows-Installer.exe'
@@ -182,7 +182,7 @@ const faqs: Faq[] = [
               >
                 Download OBS 30.2.3
               </a>{' '}
-              and run the installer. You don't need to uninstall first.
+              and run the installer. You don&apos;t need to uninstall first.
             </div>
           </span>,
           <span key={6}>
@@ -195,8 +195,8 @@ const faqs: Faq[] = [
           <span key={8}>
             <strong>Regional blocking note</strong>
             <div className='mt-1 text-sm'>
-              Some ISPs and networks block Cloudflare, which can hide the overlay. If that's you,
-              try the community tool{' '}
+              Some ISPs and networks block Cloudflare, which can hide the overlay. If that&apos;s
+              you, try the community tool{' '}
               <a
                 href='https://github.com/Flowseal/zapret-discord-youtube'
                 target='_blank'
@@ -205,7 +205,7 @@ const faqs: Faq[] = [
                 zapret-discord-youtube
               </a>
               . Add <Tag>dotabod.com</Tag> and <Tag>gsi.dotabod.com</Tag> to{' '}
-              <code>lists/list-general.txt</code> on separate lines. If that doesn't help, some
+              <code>lists/list-general.txt</code> on separate lines. If that doesn&apos;t help, some
               users have had success with{' '}
               <a
                 href='https://github.com/Flowseal/zapret-discord-youtube/releases/tag/1.9.0b'
@@ -310,7 +310,7 @@ const faqs: Faq[] = [
     answer: (
       <div className='flex flex-col gap-3'>
         <p>
-          Dotabod is a streaming tool, so it activates only when you're live on Twitch. That
+          Dotabod is a streaming tool, so it activates only when you&apos;re live on Twitch. That
           includes detecting and connecting your Steam account.
         </p>
         <LiveRequiredNote />
@@ -322,8 +322,8 @@ const faqs: Faq[] = [
             <li>Play a match or demo a hero.</li>
             <li>Steam connects and appears in your MMR tracker.</li>
             <li>
-              You're done. Future matches auto-connect, regardless of stream status, and you never
-              need to run the script again.
+              You&apos;re done. Future matches auto-connect, regardless of stream status, and you
+              never need to run the script again.
             </li>
           </ol>
         </div>
@@ -411,7 +411,8 @@ const TroubleshootPage = () => {
   // Check if HubSpot is blocked
   useEffect(() => {
     let checkAttempts = 0
-    const maxAttempts = 5 // 2.5 seconds with 500ms interval
+    // 2.5 seconds with 500ms interval
+    const maxAttempts = 5
     let checkInterval: NodeJS.Timeout | null = null
 
     const checkHubspotAvailability = () => {
@@ -432,7 +433,7 @@ const TroubleshootPage = () => {
         setHubspotBlocked(true)
       }
 
-      checkAttempts++
+      checkAttempts += 1
     }
 
     if (typeof window !== 'undefined') {

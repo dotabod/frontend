@@ -8,7 +8,7 @@ function option(name, fallback) {
 
 function requireLocalDatabase() {
   const raw = process.env.DATABASE_URL
-  if (!raw) throw new Error('DATABASE_URL is required')
+  if (!raw) {throw new Error('DATABASE_URL is required')}
 
   const database = new URL(raw)
   if (!['127.0.0.1', 'localhost'].includes(database.hostname)) {
@@ -18,13 +18,13 @@ function requireLocalDatabase() {
 
 async function pageProps(url) {
   const response = await fetch(url)
-  if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.status}`)
+  if (!response.ok) {throw new Error(`Failed to fetch ${url}: ${response.status}`)}
 
   const html = await response.text()
   const match = html.match(
     /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/,
   )
-  if (!match) throw new Error(`Missing __NEXT_DATA__ on ${url}`)
+  if (!match) {throw new Error(`Missing __NEXT_DATA__ on ${url}`)}
   return JSON.parse(match[1]).props.pageProps
 }
 
@@ -43,7 +43,7 @@ requireLocalDatabase()
 const username = option('username', 'maxid1337')
 const heroId = Number(option('hero-id', '2'))
 const sourceOrigin = option('source-origin', 'https://dotabod.com').replace(/\/$/, '')
-if (!Number.isInteger(heroId)) throw new Error('--hero-id must be an integer')
+if (!Number.isInteger(heroId)) {throw new Error('--hero-id must be an integer')}
 
 const [collection, detail] = await Promise.all([
   pageProps(`${sourceOrigin}/${username}/set`),
@@ -53,12 +53,12 @@ const [collection, detail] = await Promise.all([
 if (!Array.isArray(collection.cards) || collection.cards.length === 0) {
   throw new Error('Public collection fixture contains no cards')
 }
-if (!Array.isArray(detail.items)) throw new Error('Public hero detail fixture contains no items')
+if (!Array.isArray(detail.items)) {throw new Error('Public hero detail fixture contains no items')}
 
 const prisma = new PrismaClient()
 try {
   const existing = await prisma.user.findFirst({ where: { name: username }, select: { id: true } })
-  if (existing) await prisma.user.delete({ where: { id: existing.id } })
+  if (existing) {await prisma.user.delete({ where: { id: existing.id } })}
 
   const user = await prisma.user.create({
     data: {

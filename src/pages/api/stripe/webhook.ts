@@ -12,7 +12,7 @@ import {
   handleSubscriptionDeleted,
   handleSubscriptionEvent,
 } from '@/lib/stripe/handlers/subscription-events'
-import { debugLog } from '@/lib/stripe/utils/debugLog'
+import { debugLog } from '@/lib/stripe/utils/debug-log'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 import { withTransaction } from '@/lib/stripe/utils/transaction'
 
@@ -32,16 +32,14 @@ const relevantEvents = new Set<Stripe.Event.Type>([
   'invoice.payment_failed',
   'invoice.marked_uncollectible',
   'invoice.overdue',
-  'invoice.paid', // Fallback for invoices marked paid_out_of_band via crypto settlement
+  // Fallback for invoices marked paid_out_of_band via crypto settlement
+  'invoice.paid',
   'checkout.session.completed',
   'charge.succeeded',
   'charge.refunded',
 ])
 
-/**
- * Helper function to find a user by Stripe customer ID
- */
-async function findUserByCustomerId(
+const findUserByCustomerId = async function findUserByCustomerId(
   customerId: string,
   tx: Prisma.TransactionClient,
 ): Promise<{ id: string } | null> {
@@ -58,12 +56,7 @@ async function findUserByCustomerId(
   return null
 }
 
-/**
- * Verifies the webhook signature and constructs the event
- * @param req The incoming request
- * @returns The verified event or an error
- */
-async function verifyWebhook(
+const verifyWebhook = async function verifyWebhook(
   req: NextApiRequest,
 ): Promise<{ event?: Stripe.Event; error?: string }> {
   debugLog('Entering verifyWebhook')
@@ -91,12 +84,7 @@ async function verifyWebhook(
   }
 }
 
-/**
- * Processes a webhook event based on its type
- * @param event The Stripe event
- * @param tx The transaction client
- */
-async function processWebhookEvent(
+const processWebhookEvent = async function processWebhookEvent(
   event: Stripe.Event,
   tx: Prisma.TransactionClient,
 ): Promise<void> {
@@ -255,12 +243,7 @@ async function processWebhookEvent(
   debugLog(`Exiting processWebhookEvent for event ${event.id} (${event.type})`)
 }
 
-/**
- * Gets the raw body from the request
- * @param req The incoming request
- * @returns The raw body as a string
- */
-async function getRawBody(req: NextApiRequest): Promise<string> {
+const getRawBody = async function getRawBody(req: NextApiRequest): Promise<string> {
   const chunks: Uint8Array[] = []
   for await (const chunk of req) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)

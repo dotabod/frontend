@@ -2,15 +2,9 @@ import { Prisma } from '@prisma/client'
 
 import prisma from '@/lib/db'
 
-import { debugLog } from './debugLog'
+import { debugLog } from './debug-log'
 
-/**
- * Executes an operation within a database transaction with retry logic
- * @param operation The operation to execute within the transaction
- * @param maxRetries Maximum number of retry attempts (default: 3)
- * @returns The result of the operation or null if all retries failed
- */
-export async function withTransaction<T>(
+export const withTransaction = async function withTransaction<T>(
   operation: (tx: Prisma.TransactionClient) => Promise<T>,
   maxRetries = 3,
 ): Promise<T | null> {
@@ -22,14 +16,16 @@ export async function withTransaction<T>(
     try {
       debugLog(`Attempting transaction, try ${retryCount + 1}/${maxRetries}`)
       const result = await prisma.$transaction(operation, {
-        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, // Ensure consistent reads
-        timeout: 30_000, // Increase from 10000 to 30000 (30 seconds)
+        // Ensure consistent reads
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        // Increase from 10000 to 30000 (30 seconds)
+        timeout: 30_000,
       })
       debugLog(`Transaction attempt ${retryCount + 1} successful`)
       return result
     } catch (error) {
       lastError = error
-      retryCount++
+      retryCount += 1
       debugLog(`Transaction attempt ${retryCount} failed:`, { error })
 
       if (retryCount < maxRetries) {

@@ -1,4 +1,4 @@
-export async function createCheckoutSession(
+export const createCheckoutSession = async function createCheckoutSession(
   priceId: string,
   userId: string,
   paymentMethod?: string,

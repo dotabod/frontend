@@ -3,9 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
-import { getTwitchTokens } from '@/lib/getTwitchTokens'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 
 class HelixStatusError extends Error {
   constructor(public status: number) {
@@ -19,7 +19,10 @@ class HelixStatusError extends Error {
 const CACHE_TTL_MS = 60 * 1000
 const cache = new Map<string, { modded: boolean; expiresAt: number }>()
 
-async function isModerator(broadcasterId: string, accessToken: string): Promise<boolean> {
+const isModerator = async function isModerator(
+  broadcasterId: string,
+  accessToken: string,
+): Promise<boolean> {
   const botProviderId = process.env.TWITCH_BOT_PROVIDERID
   if (!botProviderId) {
     throw new Error('TWITCH_BOT_PROVIDERID is not set')
@@ -41,7 +44,7 @@ async function isModerator(broadcasterId: string, accessToken: string): Promise<
   return Array.isArray(body.data) && body.data.length > 0
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
     res.status(401).json({ message: 'Unauthorized' })

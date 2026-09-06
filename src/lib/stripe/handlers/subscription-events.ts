@@ -5,16 +5,10 @@ import type Stripe from 'stripe'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscriptionTier } from '@/utils/subscription'
 
-import { debugLog } from '../utils/debugLog'
+import { debugLog } from '../utils/debug-log'
 import { withErrorHandling } from '../utils/error-handling'
 
-/**
- * Handles a subscription event from Stripe
- * @param subscription The Stripe subscription
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleSubscriptionEvent(
+export const handleSubscriptionEvent = async function handleSubscriptionEvent(
   subscription: Stripe.Subscription,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -30,7 +24,8 @@ export async function handleSubscriptionEvent(
   } catch (error) {
     console.error(`Failed to retrieve customer ${customerId}:`, error)
     debugLog('Failed to retrieve customer', { customerId, error })
-    return false // Cannot proceed without customer
+    // Cannot proceed without customer
+    return false
   }
 
   if (!customer || customer.deleted) {
@@ -143,13 +138,7 @@ export async function handleSubscriptionEvent(
   return finalResult
 }
 
-/**
- * Handles a subscription deleted event from Stripe
- * @param subscription The Stripe subscription
- * @param tx The transaction client
- * @returns True if the operation was successful, false otherwise
- */
-export async function handleSubscriptionDeleted(
+export const handleSubscriptionDeleted = async function handleSubscriptionDeleted(
   subscription: Stripe.Subscription,
   tx: Prisma.TransactionClient,
 ): Promise<boolean> {
@@ -207,12 +196,7 @@ export async function handleSubscriptionDeleted(
   return finalResult
 }
 
-/**
- * Maps a Stripe subscription status to a SubscriptionStatus
- * @param status The Stripe subscription status
- * @returns The corresponding SubscriptionStatus
- */
-function mapStripeStatus(status: string): SubscriptionStatus {
+const mapStripeStatus = function mapStripeStatus(status: string): SubscriptionStatus {
   debugLog('Mapping Stripe status', { status })
   let mappedStatus: SubscriptionStatus
   switch (status) {

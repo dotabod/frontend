@@ -10,18 +10,18 @@ import { useCallback, useEffect, useMemo } from 'react'
 import type { ReactElement } from 'react'
 import useSWR from 'swr'
 
-import ChatBot from '@/components/Dashboard/ChatBot'
-import ConnectSteam from '@/components/Dashboard/ConnectSteam'
-import DashboardShell from '@/components/Dashboard/DashboardShell'
-import ExportCFG from '@/components/Dashboard/ExportCFG'
-import Header from '@/components/Dashboard/Header'
-import OBSOverlay from '@/components/Dashboard/OBSOverlay'
+import ChatBot from '@/components/Dashboard/chat-bot'
+import ConnectSteam from '@/components/Dashboard/connect-steam'
+import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import ExportCFG from '@/components/Dashboard/export-cfg'
+import Header from '@/components/Dashboard/header'
+import OBSOverlay from '@/components/Dashboard/obs-overlay'
 import { fetcher } from '@/lib/fetcher'
-import { useSetupModStatus } from '@/lib/hooks/useSetupModStatus'
-import { useSteamLinkedAccount } from '@/lib/hooks/useSteamLinkedAccount'
-import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
-import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
-import { SETUP_SIGNAL_KEYS } from '@/lib/setupSignalKeys'
+import { useSetupModStatus } from '@/lib/hooks/use-setup-mod-status'
+import { useSteamLinkedAccount } from '@/lib/hooks/use-steam-linked-account'
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/use-update-setting'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
+import { SETUP_SIGNAL_KEYS } from '@/lib/setup-signal-keys'
 import { useTrack } from '@/lib/track'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
 
@@ -162,11 +162,13 @@ const SetupPage = () => {
       void router.replace(
         {
           pathname: router.pathname,
-          query: { ...router.query, step: newActiveStep + 1 }, // +1 to make it 1-indexed for the URL
+          // +1 to make it 1-indexed for the URL
+          query: { ...router.query, step: newActiveStep + 1 },
         },
         undefined,
         { shallow: true },
-      ) // `shallow: true` to not trigger data fetching methods again
+        // `shallow: true` to not trigger data fetching methods again
+      )
     },
     [router],
   )
@@ -273,7 +275,8 @@ const SetupPage = () => {
         document.body.classList.add('crypto-payment-success')
         setTimeout(() => {
           document.body.classList.remove('crypto-payment-success')
-        }, 60_000) // Remove after 1 minute
+          // Remove after 1 minute
+        }, 60_000)
       } else {
         notification.success({
           description,

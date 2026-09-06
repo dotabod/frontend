@@ -14,7 +14,7 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
   withMethods: (_methods, fn) => fn,
 }))
 
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
@@ -39,7 +39,7 @@ vi.mock('@/lib/db', () => ({
 }))
 
 // Import the mocked dependencies
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 import prisma from '@/lib/db'
 
 describe('test-gift-notification API', () => {

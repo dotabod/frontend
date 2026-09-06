@@ -1,7 +1,7 @@
 import type { ChatterSettingKeys } from '@/utils/subscription'
 
-import type { SettingKeys } from './defaultSettings'
-import { defaultSettings } from './defaultSettings'
+import type { SettingKeys } from './default-settings'
+import { defaultSettings } from './default-settings'
 
 interface Setting {
   key: string
@@ -10,7 +10,7 @@ interface Setting {
 
 type ChattersSettings = typeof defaultSettings.chatters
 
-export function getValueOrDefault(
+export const getValueOrDefault = function getValueOrDefault(
   key: SettingKeys | ChatterSettingKeys | undefined,
   settings?: Setting[],
 ): unknown {

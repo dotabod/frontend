@@ -36,7 +36,7 @@ vi.mock('@/lib/api-middlewares/with-authentication', () => ({
 }))
 
 // Mock the getServerSession function
-vi.mock('@/lib/api/getServerSession', () => ({
+vi.mock('@/lib/api/get-server-session', () => ({
   getServerSession: vi.fn(),
 }))
 
@@ -48,7 +48,7 @@ vi.mock('@/utils/subscription', () => ({
 
 import { captureException } from '@sentry/nextjs'
 
-import { getServerSession } from '@/lib/api/getServerSession'
+import { getServerSession } from '@/lib/api/get-server-session'
 // Import the mocked modules
 import prisma from '@/lib/db'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'

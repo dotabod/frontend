@@ -13,7 +13,7 @@ const replay = Sentry.replayIntegration({
   maskAllText: false,
 })
 
-function handleNavigation(url: URL) {
+const handleNavigation = function handleNavigation(url: URL) {
   try {
     if (url.pathname.startsWith('/overlay')) {
       void replay.stop()
@@ -52,8 +52,8 @@ if (SENTRY_DSN) {
     // (WindowsInstaller.tsx), but extensions that wrap window.fetch can
     // surface them as global unhandled rejections.
     ignoreErrors: [
-      /Failed to fetch \(localhost:/i,
-      /NetworkError when attempting to fetch resource\.? \(localhost:/i,
+      /Failed to fetch \(localhost:/iu,
+      /NetworkError when attempting to fetch resource\.? \(localhost:/iu,
     ],
     // Some Yandex Browser extensions / AV products monkey-patch
     // Object.getOwnPropertyDescriptor with a wrapper that recurses into
@@ -65,7 +65,7 @@ if (SENTRY_DSN) {
       if (!(error instanceof RangeError)) {
         return event
       }
-      if (!/Maximum call stack size exceeded/i.test(error.message)) {
+      if (!/Maximum call stack size exceeded/iu.test(error.message)) {
         return event
       }
 

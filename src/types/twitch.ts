@@ -11,7 +11,9 @@ const twitchProfileSchema = z.object({
 
 export type TwitchProfile = z.infer<typeof twitchProfileSchema>
 
-export function parseTwitchProfile(profile: unknown): TwitchProfile | undefined {
+export const parseTwitchProfile = function parseTwitchProfile(
+  profile: unknown,
+): TwitchProfile | undefined {
   const parsed = twitchProfileSchema.safeParse(profile)
   return parsed.success ? parsed.data : undefined
 }
