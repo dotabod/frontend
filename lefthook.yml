@@ -5,7 +5,7 @@ pre-commit:
       glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css}'
       run: |
         npx oxfmt {staged_files} \
-          && git add {staged_files}
+          && git add -f -- {staged_files}
     # The full, strict Oxlint ratchet runs in CI via `pnpm quality`. Running
     # raw Oxlint on a staged legacy file here would reject an unrelated commit
     # for existing baselined findings that `--fix` cannot repair.

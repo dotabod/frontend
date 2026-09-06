@@ -2,6 +2,8 @@
 
 The harness owns the disposable production-like environment. Feature adapters own data and assertions.
 
+This harness requires a Linux environment with Bash, PostgreSQL tools, Chromium, and POSIX process groups. On Windows, use an available local Linux or WSL environment after checking prerequisites. If none is available, complete independent local checks and report browser verification as blocked. Do not substitute production services or weaken the local-database and cleanup safeguards.
+
 ## Standard run
 
 Run from the repository root:
@@ -90,4 +92,4 @@ Hide third-party widgets only inside screenshot automation. Do not edit product 
 
 ## Completion
 
-Inspect every screenshot before the harness exits if you are running infrastructure manually for debugging. For normal harness runs, inspect artifacts immediately afterward. Finish with the feature's targeted tests, `pnpm exec vp check`, `pnpm typecheck`, `git diff --check`, and `git status --short --branch` as appropriate to the request.
+Inspect every screenshot before the harness exits if you are running infrastructure manually for debugging. For normal harness runs, inspect artifacts immediately afterward. Run relevant tests and static checks before browser verification. Repeat checks only if subsequent changes invalidate their earlier results. Finish with `pnpm check`, `git diff --check`, and `git status --short --branch` as appropriate to the request, and report any unmet verification requirement.

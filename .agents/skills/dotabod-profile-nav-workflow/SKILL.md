@@ -24,7 +24,7 @@ Honor explicitly requested design and TDD skills first. This skill adds the proj
 
 ## TDD boundary
 
-Before implementation, add route-level tests that exercise the real page components and prove:
+Reuse existing route-level tests. When changing navigation behavior, add or update tests that exercise the real page components and prove the affected invariants:
 
 1. Match history links to `/${username}/set`.
 2. Collection and hero detail link to `/${username}/matches`.
@@ -32,7 +32,7 @@ Before implementation, add route-level tests that exercise the real page compone
 4. Hero detail still renders its previous and next hero links.
 5. Match history still renders its period controls.
 
-Run the targeted files and confirm failures are caused by the missing navigation behavior, then implement the smallest shared component and rerun.
+For new behavior, confirm the expected regression before implementing when practical. For styling changes or reverification, run existing tests without manufacturing failures or rebuilding already-correct navigation. Implement the smallest scoped change and rerun affected checks.
 
 ## Project-specific cascade traps
 
@@ -55,4 +55,4 @@ Read [references/verification.md](references/verification.md) before production 
 
 ## Handoff
 
-Report the red/green test evidence, targeted tests, `vp check`, `pnpm typecheck`, production build result, browser journey, scoped WCAG result, and links to all six screenshots. Mention any build fallback or expected Sentry warning. Do not commit unless requested.
+Report applicable regression evidence, targeted tests, `pnpm check`, production build result, browser journey, scoped WCAG result, and links to all six screenshots. Mention any build fallback, expected Sentry warning, or unmet verification requirement. Do not commit unless requested.

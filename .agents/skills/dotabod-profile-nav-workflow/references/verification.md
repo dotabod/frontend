@@ -9,9 +9,8 @@ From the repository root:
 ```bash
 node .agents/skills/dotabod-frontend-verification/scripts/run-frontend-verification.mjs \
   --output-dir artifacts/profile-navigation \
-  --check-command 'pnpm exec vp test run src/__tests__/pages/match-history.test.tsx src/__tests__/pages/collection-navigation.test.tsx' \
-  --check-command 'pnpm exec vp check' \
-  --check-command 'pnpm typecheck' \
+  --check-command 'pnpm exec vitest run src/__tests__/pages/match-history.test.tsx src/__tests__/pages/collection-navigation.test.tsx' \
+  --check-command 'pnpm check' \
   --check-command 'git diff --check' \
   --seed-command 'node .agents/skills/dotabod-profile-nav-workflow/scripts/seed-profile-fixture.mjs --username maxid1337 --hero-id 2' \
   --verify-command 'node .agents/skills/dotabod-profile-nav-workflow/scripts/audit-profile-navigation.mjs --base-url "$FRONTEND_BASE_URL" --cdp-url "$FRONTEND_CDP_URL" --username maxid1337 --hero-id 2 --axe-script "$FRONTEND_AXE_SCRIPT" --output-dir "$FRONTEND_OUTPUT_DIR"'
