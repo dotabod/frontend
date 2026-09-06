@@ -1,8 +1,9 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import prisma from '@/lib/db'
 import SetPage from '@/pages/[username]/set'
-import DetailPage from '@/pages/[username]/set/[hero-id]'
+import DetailPage, { getServerSideProps } from '@/pages/[username]/set/[hero-id]'
 
 vi.mock('@/components/Homepage/homepage-shell', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -37,6 +38,36 @@ const detailProps = {
 }
 
 describe('cosmetic collection profile navigation', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.spyOn(prisma.user, 'findFirst').mockResolvedValue(
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SAFETY: The fixture includes every field selected by this route.
+      {
+        cosmeticLoadouts: [
+          {
+            heroId: 2,
+            heroName: 'Axe',
+            items: [],
+            updatedAt: new Date('2026-08-24T12:00:00.000Z'),
+          },
+        ],
+        displayName: 'Streamer',
+        name: 'streamer',
+      } as never,
+    )
+  })
+
+  it('loads a hero from the dynamic route parameter', async () => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SAFETY: The route handler reads only `params`; omitted request context fields cannot affect this assertion.
+    const result = await getServerSideProps({
+      params: { 'hero-id': '2', username: 'Streamer' },
+    } as never)
+
+    expect(result).toMatchObject({
+      props: { heroId: 2, heroName: 'Axe', username: 'streamer' },
+    })
+  })
+
   it('links the collection page to match history', () => {
     render(<SetPage {...setProps} />)
 

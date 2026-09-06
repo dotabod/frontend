@@ -255,7 +255,8 @@ const DetailPage = ({
 
 export const getServerSideProps: GetServerSideProps<DetailPageProps> = async ({ params }) => {
   const username = (params?.username as string)?.toLowerCase()
-  const heroId = Number(params?.heroId)
+  const heroIdParam = params?.['hero-id'] ?? params?.heroId
+  const heroId = Number(Array.isArray(heroIdParam) ? heroIdParam[0] : heroIdParam)
   if (!username || !Number.isInteger(heroId)) {
     return { notFound: true }
   }

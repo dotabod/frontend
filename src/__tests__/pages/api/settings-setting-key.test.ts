@@ -78,11 +78,11 @@ const patchRequest = function patchRequest(settingKey: string, value: unknown) {
     // since the frontend fetch call doesn't set a Content-Type header), so the mock must match.
     body: JSON.stringify({ value }) as never,
     method: 'PATCH',
-    query: { settingKey },
+    query: { 'setting-key': settingKey },
   })
 }
 
-describe('settings/[settingKey] API', () => {
+describe('settings/[setting-key] API', () => {
   beforeEach(() => {
     vi.resetAllMocks()
 
@@ -150,7 +150,7 @@ describe('settings/[settingKey] API', () => {
       expect(prisma.setting.upsert).not.toHaveBeenCalled()
     })
 
-    it('upserts a plain setting and returns 200', async () => {
+    it('upserts a plain setting from the dynamic route parameter and returns 200', async () => {
       mockSession()
       const { req, res } = patchRequest('aegis', true)
 

@@ -15,7 +15,8 @@ import { getSubscription } from '@/utils/subscription'
 
 const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  const settingKey = req.query.settingKey as string
+  const settingKeyParam = req.query['setting-key'] ?? req.query.settingKey
+  const settingKey = Array.isArray(settingKeyParam) ? settingKeyParam[0] : settingKeyParam
 
   const keyValidation = settingKeySchema.safeParse(settingKey)
   if (!keyValidation.success) {

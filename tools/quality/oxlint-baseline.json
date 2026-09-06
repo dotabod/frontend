@@ -32192,26 +32192,6 @@
         "severity": "error"
       }
     },
-    "375cc80807f1807f92fdcc5449f3f425829086fe40d223d5ea1a23ab8abb1c78": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/pages/api/settings/[setting-key].ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const settingKey = req.query.settingKey as string",
-              "next": "",
-              "previous": "const session = await getServerSession(req, res, authOptions)"
-            },
-            "span": "req.query.settingKey as string",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'string' is more narrow than the original type.",
-        "severity": "error"
-      }
-    },
     "3762895e3d1fa7c5637fc025a8c753b14b1f514b367e01e36ad5c54ede145f84": {
       "count": 1,
       "summary": {
@@ -104230,26 +104210,6 @@
           }
         ],
         "message": "Unsafe member access .id on an `any` value.",
-        "severity": "error"
-      }
-    },
-    "b51722c911f013933c8a80c3b6d078c04f4d1db4cf55d28236ceed44a459753c": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/pages/api/settings/[setting-key].ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const settingKey = req.query.settingKey as string",
-              "next": "",
-              "previous": "const session = await getServerSession(req, res, authOptions)"
-            },
-            "span": "req.query.settingKey as string",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
