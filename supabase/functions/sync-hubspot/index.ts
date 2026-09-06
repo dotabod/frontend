@@ -13,7 +13,9 @@
 // durable home. Auth: the x-sync-secret header must match the Vault 'hubspot_sync_secret'
 // (VERIFY_JWT is off on this stack and the anon key is public, so we gate ourselves).
 
+import { delay } from 'jsr:@std/async/delay'
 import postgres from 'npm:postgres@3.4.5'
+import { z } from 'npm:zod@3.25.76'
 
 import { internalServerErrorResponse } from './error-response.ts'
 
@@ -59,24 +61,28 @@ const hsFetch = async function hsFetch(
   init: RequestInit,
   retries = 5,
 ): Promise<Response> {
-  for (let attempt = 0; ; attempt += 1) {
+  const attemptFetch = async (attempt: number): Promise<Response> => {
     const now = Date.now()
     const wait = Math.max(0, nextSlot - now)
     nextSlot = Math.max(now, nextSlot) + MIN_INTERVAL_MS
     if (wait > 0) {
-      await new Promise((r) => setTimeout(r, wait))
+      await delay(wait)
     }
 
-    const res = await fetch(url, init)
-    if (res.status !== 429 || attempt >= retries) {
-      return res
+    const response = await fetch(url, init)
+    if (response.status !== 429 || attempt >= retries) {
+      return response
     }
-    const retryAfter = Number(res.headers.get('Retry-After'))
+
+    const retryAfter = Number(response.headers.get('Retry-After'))
     const backoff =
       Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1000 * (attempt + 1)
-    await res.body?.cancel()
-    await new Promise((r) => setTimeout(r, backoff))
+    await response.body?.cancel()
+    await delay(backoff)
+    return attemptFetch(attempt + 1)
   }
+
+  return await attemptFetch(0)
 }
 
 const ensureContactProperties = async function ensureContactProperties(token: string) {
@@ -100,6 +106,22 @@ interface Contact {
   username: string
   subscription: string
 }
+
+interface SecretRow {
+  name: string
+  decryptedSecret: string
+}
+
+const secretRowsSchema = z
+  .object({ decrypted_secret: z.string(), name: z.string() })
+  .transform(({ decrypted_secret: decryptedSecret, name }): SecretRow => ({
+    decryptedSecret,
+    name,
+  }))
+  .array()
+const contactRowsSchema = z
+  .object({ email: z.string(), subscription: z.string(), username: z.string() })
+  .array()
 
 // Mirrors syncHubSpotContact in src/lib/hubspot.ts: PATCH by email, create on 404,
 // retry PATCH on a create-409 race.
@@ -154,11 +176,13 @@ const dbClient = function dbClient() {
 }
 
 const readSecrets = async function readSecrets(sql: ReturnType<typeof postgres>) {
-  const rows = (await sql`
+  const rows = await sql`
     select name, decrypted_secret from vault.decrypted_secrets
     where name in (${VAULT_TOKEN_NAME}, ${VAULT_SYNC_SECRET_NAME})
-  `) as unknown as { name: string; decrypted_secret: string }[]
-  const map = new Map(rows.map((r) => [r.name, r.decrypted_secret]))
+  `
+  const map = new Map(
+    secretRowsSchema.parse(rows).map((row) => [row.name, row.decryptedSecret] as const),
+  )
   return {
     syncSecret: map.get(VAULT_SYNC_SECRET_NAME) ?? '',
     token: map.get(VAULT_TOKEN_NAME) ?? '',
@@ -202,7 +226,7 @@ const fetchChanged = async function fetchChanged(
         )
       )
   `
-  return rows as unknown as Contact[]
+  return contactRowsSchema.parse(rows)
 }
 
 // Targeted reheal: sync an explicit list of emails (e.g. contacts that failed an
@@ -234,7 +258,7 @@ const fetchByEmails = async function fetchByEmails(
     left join picked p on p."userId" = u.id
     where u.email = any(${emails})
   `
-  return rows as unknown as Contact[]
+  return contactRowsSchema.parse(rows)
 }
 
 // Bounded-concurrency sync of a contact list. Request rate is governed by the
@@ -244,16 +268,20 @@ const runSync = async function runSync(token: string, contacts: Contact[]) {
   let failed = 0
   let cursor = 0
   const worker = async () => {
-    while (cursor < contacts.length) {
-      const c = contacts[(cursor += 1)]
-      try {
-        await syncContact(token, c)
-        synced += 1
-      } catch (error) {
-        failed += 1
-        console.error('sync failed for', c.email, String(error))
-      }
+    const contact = contacts[cursor]
+    cursor += 1
+    if (!contact) {
+      return
     }
+
+    try {
+      await syncContact(token, contact)
+      synced += 1
+    } catch (error) {
+      failed += 1
+      console.error('sync failed for', contact.email, String(error))
+    }
+    return worker()
   }
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, contacts.length) }, worker))
   return { considered: contacts.length, failed, synced }
@@ -264,12 +292,10 @@ Deno.serve(async (req) => {
   try {
     const { token, syncSecret } = await readSecrets(sql)
     if (syncSecret && req.headers.get('x-sync-secret') !== syncSecret) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401 })
+      return Response.json({ error: 'unauthorized' }, { status: 401 })
     }
     if (!token) {
-      return new Response(JSON.stringify({ error: `vault secret ${VAULT_TOKEN_NAME} not set` }), {
-        status: 500,
-      })
+      return Response.json({ error: `vault secret ${VAULT_TOKEN_NAME} not set` }, { status: 500 })
     }
 
     // Two modes:
@@ -292,12 +318,7 @@ Deno.serve(async (req) => {
     }
 
     const result = await runSync(token, contacts)
-    return new Response(
-      JSON.stringify({ mode: emails.length > 0 ? 'emails' : 'window', ...result }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
+    return Response.json({ mode: emails.length > 0 ? 'emails' : 'window', ...result })
   } catch (error) {
     const failure = error instanceof Error ? error : new Error(String(error))
     return internalServerErrorResponse(failure)
