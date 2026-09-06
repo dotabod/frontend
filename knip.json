@@ -2,6 +2,6 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": [".agents/**", "public/styles/obs-compat.css"],
   "ignoreBinaries": ["doppler"],
-  "ignoreDependencies": ["npm"],
+  "ignoreDependencies": ["jsr", "npm"],
   "entry": ["scripts/**/*.{ts,mjs}", "supabase/functions/**/*.ts"]
 }

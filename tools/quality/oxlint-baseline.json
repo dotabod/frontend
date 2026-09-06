@@ -15569,26 +15569,6 @@
         "severity": "error"
       }
     },
-    "19e7c2927b7460041374ce819544a1ea5a6e17d6a662fd932a217995316e3819": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Gift/GiftSubscriptionForm/gift-subscription-form.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const displayName = recipientDisplayName || recipientUsername || 'this streamer'",
-              "next": "const recipientLink = recipientUsername ? (",
-              "previous": ""
-            },
-            "span": "recipientUsername",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "19ffcc13f46ad51dad2b6df8fbbdc7f9dfd27edecf194794a770f2fd81a752ea": {
       "count": 1,
       "summary": {
@@ -26357,26 +26337,6 @@
         "severity": "error"
       }
     },
-    "2cd75f2e5914e278ee64765d288aa8d82b9c78c49481ef9da00f83365f1ce358": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "languageId as string,",
-              "next": "token,",
-              "previous": "projectId as string,"
-            },
-            "span": "languageId as string",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'string' is more narrow than the original type.",
-        "severity": "error"
-      }
-    },
     "2cdbfa3e5da34b756baa61bab8fa95644000ac136e9568661a88d66bc02d576d": {
       "count": 1,
       "summary": {
@@ -27168,26 +27128,6 @@
               "previous": "// Simulate success after retry"
             },
             "span": "return res.status(200).json({\n            attempts: 2,\n            received: true,\n            retried: true,\n          })",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe return of a value of type `any`.",
-        "severity": "error"
-      }
-    },
-    "2e129883b2b95d2557b4fbec075356b475ac93b21f100609bb1e6815ec2a598a": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-return)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return data.data[0].data",
-              "next": "}",
-              "previous": "const data = await response.json()"
-            },
-            "span": "return data.data[0].data",
             "text": ""
           }
         ],
@@ -49745,26 +49685,6 @@
           }
         ],
         "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
-        "severity": "error"
-      }
-    },
-    "54dd362e82f70e3a401501ce7e9a24543dfd060bf4e9d804e846d8c48153ddbd": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "projectId as string,",
-              "next": "languageId as string,",
-              "previous": "const languageProgress = await fetchLanguageProgress("
-            },
-            "span": "projectId as string",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'string' is more narrow than the original type.",
         "severity": "error"
       }
     },
@@ -80899,26 +80819,6 @@
         "severity": "error"
       }
     },
-    "8b5ac4f70e5cc87a130a6128945c3e6ba73b3219fb12ff5f1ddcf0b73e577af0": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const data = await response.json()",
-              "next": "return data.data[0].data",
-              "previous": ""
-            },
-            "span": "data = await response.json()",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "8b6283b44f5d1597dad10482c0679702de98408477f04a068b21817467a2af4f": {
       "count": 1,
       "summary": {
@@ -87886,26 +87786,6 @@
         "severity": "error"
       }
     },
-    "97a2f43bb21138ea1bdca3d058d59f5a3c4795ed3d79710083162834759c5c77": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Gift/GiftSubscriptionForm/gift-subscription-form.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const recipientLink = recipientUsername ? (",
-              "next": "<Link",
-              "previous": "const displayName = recipientDisplayName || recipientUsername || 'this streamer'"
-            },
-            "span": "recipientUsername",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "97a66718cd999afb4d58a8130f9717658cb2974b512263c91b8eb5570581e0bb": {
       "count": 1,
       "summary": {
@@ -88441,26 +88321,6 @@
           }
         ],
         "message": "Unsafe argument of type any assigned to a parameter of type Response.",
-        "severity": "error"
-      }
-    },
-    "9861cfab8df99367871ab3883ca23fdeb46e8c6551750c180bd2323aebccfa40": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "languageId as string,",
-              "next": "token,",
-              "previous": "projectId as string,"
-            },
-            "span": "languageId as string",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
@@ -102128,26 +101988,6 @@
         "severity": "error"
       }
     },
-    "b07567f4375fa339e17caf8bb9795d9bbcd2460c855e2cfc895fd57881cab515": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Gift/GiftSubscriptionForm/gift-subscription-form.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{recipientUsername",
-              "next": "? `Hand ${displayName} the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.`",
-              "previous": "<p className='mt-4 max-w-2xl text-lg text-pretty text-gray-400'>"
-            },
-            "span": "recipientUsername",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "b07c0725d7f0bc32cf6e69f3672d526febccf3d2cdf3324462f231e7611a8920": {
       "count": 1,
       "summary": {
@@ -107487,46 +107327,6 @@
         "severity": "error"
       }
     },
-    "bacf60439781278c5b64991039ad985f4a82b59893dff8447eaed063bae0f44f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Gift/GiftSubscriptionForm/gift-subscription-form.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const displayName = recipientDisplayName || recipientUsername || 'this streamer'",
-              "next": "const recipientLink = recipientUsername ? (",
-              "previous": ""
-            },
-            "span": "recipientDisplayName",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "bad2212a67d76c65580eed717c6a28b21a8dcffafcd211d464d1fc3ec9e0dae6": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/components/Gift/GiftSubscriptionForm/gift-subscription-form.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const displayName = recipientDisplayName || recipientUsername || 'this streamer'",
-              "next": "const recipientLink = recipientUsername ? (",
-              "previous": ""
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
-        "severity": "error"
-      }
-    },
     "bad73eca08fcf00b9002930da65b824b41707837e753557d942c20701ccf75d3": {
       "count": 2,
       "summary": {
@@ -110116,26 +109916,6 @@
           }
         ],
         "message": "Unsafe argument of type any assigned to a parameter of type string | undefined.",
-        "severity": "error"
-      }
-    },
-    "bed10dabbf0320070d04495c8320965c619340650b6bad1cf9af38cc1dea528c": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return data.data[0].data",
-              "next": "}",
-              "previous": "const data = await response.json()"
-            },
-            "span": "data",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .data on an `any` value.",
         "severity": "error"
       }
     },
@@ -117367,26 +117147,6 @@
           }
         ],
         "message": "Unsafe return of a value of type `any`.",
-        "severity": "error"
-      }
-    },
-    "caff359cbf1e36f9543222360daad66b4d787f4c4d862f9b4e7dd61cdd32f1ab": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const languageProgress = await fetchLanguageProgress(",
-              "next": "projectId as string,",
-              "previous": "try {"
-            },
-            "span": "languageProgress = await fetchLanguageProgress(\n      projectId as string,\n      languageId as string,\n      token,\n    )",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -140821,26 +140581,6 @@
         "severity": "error"
       }
     },
-    "f2187f7f8675c80f8f7e122c97599c169d890aeecd8074f3486b788d11458e5f": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/pages/api/languages.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "projectId as string,",
-              "next": "languageId as string,",
-              "previous": "const languageProgress = await fetchLanguageProgress("
-            },
-            "span": "projectId as string",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
     "f21d22d5f8780edc12ef456ac3cf1bfe1d0fc76889cd5df0b25797957d559cd9": {
       "count": 1,
       "summary": {
@@ -149326,12 +149066,8 @@
         "name": "app",
         "resolvedConfigSha256": "c0c208cf8ff15b7a20a4ff6c86712ca2289f5ddd5cc522b89a67ca1704f34fa1",
         "scope": {
-          "ignorePatterns": [
-            "supabase/functions/**"
-          ],
-          "paths": [
-            "."
-          ]
+          "ignorePatterns": ["supabase/functions/**"],
+          "paths": ["."]
         }
       },
       {
@@ -149354,9 +149090,7 @@
         "resolvedConfigSha256": "6c6c97b8453def202543b9830ada155f95f1a1375685319dec3501f5c65e59a1",
         "scope": {
           "ignorePatterns": [],
-          "paths": [
-            "supabase/functions"
-          ]
+          "paths": ["supabase/functions"]
         }
       }
     ],

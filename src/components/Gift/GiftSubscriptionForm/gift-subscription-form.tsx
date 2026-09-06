@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { z } from 'zod'
 
 import { plans } from '@/components/Billing/billing-plans'
 import { createGiftCheckoutSession } from '@/lib/gift-subscription'
@@ -35,6 +36,35 @@ interface GiftSubscriptionFormProps {
 }
 
 const DURATION_PRESETS = [1, 3, 6, 12]
+const TWITCH_USERNAME_PATTERN = /^[a-z0-9_]{1,25}$/u
+const twitchUsernameSchema = z.string().regex(TWITCH_USERNAME_PATTERN)
+
+const getValidRecipientUsername = (username: string | undefined): string | null => {
+  const parsedUsername = twitchUsernameSchema.safeParse(username)
+  return parsedUsername.success ? parsedUsername.data : null
+}
+
+const getRecipientDisplayName = (displayName: string | undefined, username: string | null) => {
+  const normalizedDisplayName = displayName?.trim()
+  return normalizedDisplayName !== undefined && normalizedDisplayName.length > 0
+    ? normalizedDisplayName
+    : (username ?? 'this streamer')
+}
+
+const getRecipientLink = (username: string | null, displayName: string) => {
+  if (username === null) {
+    return null
+  }
+
+  return (
+    <Link
+      href={`/${encodeURIComponent(username)}`}
+      className='text-purple-300 underline-offset-4 hover:underline'
+    >
+      {displayName}
+    </Link>
+  )
+}
 
 const PRO_HIGHLIGHTS = [
   'Auto Twitch predictions on every match',
@@ -226,15 +256,9 @@ export const GiftSubscriptionForm = ({
     }
   }
 
-  const displayName = recipientDisplayName || recipientUsername || 'this streamer'
-  const recipientLink = recipientUsername ? (
-    <Link
-      href={`/${recipientUsername}`}
-      className='text-purple-300 underline-offset-4 hover:underline'
-    >
-      {displayName}
-    </Link>
-  ) : null
+  const validRecipientUsername = getValidRecipientUsername(recipientUsername)
+  const displayName = getRecipientDisplayName(recipientDisplayName, validRecipientUsername)
+  const recipientLink = getRecipientLink(validRecipientUsername, displayName)
 
   return (
     <div className='mx-auto w-full max-w-5xl px-4 pb-20 md:px-6'>
@@ -257,9 +281,9 @@ export const GiftSubscriptionForm = ({
           {recipientLink ? <>Gift Dotabod Pro to {recipientLink}</> : 'Gift Dotabod Pro'}
         </h1>
         <p className='mt-4 max-w-2xl text-lg text-pretty text-gray-400'>
-          {recipientUsername
-            ? `Hand ${displayName} the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.`
-            : 'Hand your favorite Dota 2 streamer the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.'}
+          {validRecipientUsername === null
+            ? 'Hand your favorite Dota 2 streamer the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.'
+            : `Hand ${displayName} the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.`}
         </p>
         <ul className='mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500'>
           <li className='flex items-center gap-1.5'>
