@@ -1,41 +1,131 @@
 import { detect } from 'curse-filter'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
-import { z } from 'zod'
+import type { Session } from 'next-auth'
+import { z } from 'zod/v4'
 
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import { getGiftDuration, getGiftTextValidationError } from '@/lib/stripe/gift-checkout'
+import { giftCheckoutSchema } from '@/lib/stripe/gift-checkout-request'
+import type { GiftCheckoutRequest } from '@/lib/stripe/gift-checkout-request'
 import { GIFT_PRICE_IDS } from '@/utils/subscription'
 
 // Function to check for profanity in text
 const checkForProfanity = (text: string | undefined): boolean => {
-  if (!text) {
+  if (text === undefined || text === '') {
     return false
   }
   return detect(text)
 }
 
-// Function to sanitize input
-const sanitizeInput = (text: string | undefined): string => {
-  if (!text) {
-    return ''
+export type { GiftCheckoutRequest } from '@/lib/stripe/gift-checkout-request'
+
+const getFirstNonEmptyString = (...values: (string | null | undefined)[]): string | undefined => {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== '') {
+      return value
+    }
   }
-  // Basic sanitization - remove any HTML tags and limit length
-  return text.replaceAll(/<[^>]*>?/gm, '').slice(0, 200)
+
+  return undefined
 }
 
-// Define the request schema for validation
-const giftCheckoutSchema = z.object({
-  giftMessage: z.string().optional(),
-  giftSenderEmail: z.string().email().optional(),
-  giftSenderName: z.string().optional(),
-  priceId: z.string().min(1, 'Price ID is required'),
-  quantity: z.number().int().min(1).default(1),
-  recipientUsername: z.string().min(1, 'Recipient username is required'),
-})
+type GiftRecipientResult =
+  | { status: 'has-lifetime-subscription' }
+  | { status: 'not-found' }
+  | {
+      status: 'eligible'
+      user: NonNullable<Awaited<ReturnType<typeof prisma.user.findFirst>>>
+    }
 
-export type GiftCheckoutRequest = z.infer<typeof giftCheckoutSchema>
+const findGiftRecipient = async (recipientUsername: string): Promise<GiftRecipientResult> => {
+  const recipientUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ displayName: recipientUsername }, { name: recipientUsername }],
+    },
+  })
+
+  if (recipientUser === null) {
+    return { status: 'not-found' }
+  }
+
+  const recipientSubscriptions = await prisma.subscription.findMany({
+    include: { giftDetails: true },
+    where: {
+      status: 'ACTIVE',
+      userId: recipientUser.id,
+    },
+  })
+  const hasLifetimeSubscription = recipientSubscriptions.some(
+    (subscription) =>
+      subscription.giftDetails?.giftType === 'lifetime' ||
+      (subscription.tier === 'PRO' && subscription.transactionType === 'LIFETIME'),
+  )
+
+  if (hasLifetimeSubscription) {
+    return { status: 'has-lifetime-subscription' }
+  }
+
+  return { status: 'eligible', user: recipientUser }
+}
+
+const createGiftCheckout = async ({
+  giftSenderEmail,
+  giftSenderName,
+  giftMessage,
+  priceId,
+  quantity,
+  recipientUser,
+  recipientUsername,
+  userSession,
+}: GiftCheckoutRequest & {
+  recipientUser: NonNullable<Awaited<ReturnType<typeof prisma.user.findFirst>>>
+  userSession: Session | null
+}) => {
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
+  const [giftPriceInfo] = GIFT_PRICE_IDS
+  const recipientDisplayName = getFirstNonEmptyString(recipientUser.displayName, recipientUser.name)
+  const checkoutSession = await stripe.checkout.sessions.create({
+    allow_promotion_codes: true,
+    cancel_url: `${baseUrl}/gift?canceled=true`,
+    customer_email: getFirstNonEmptyString(giftSenderEmail, userSession?.user?.email),
+    line_items: [
+      {
+        adjustable_quantity: {
+          enabled: true,
+          maximum: 100,
+          minimum: 1,
+        },
+        price: priceId,
+        quantity,
+      },
+    ],
+    metadata: {
+      giftDuration: getGiftDuration(priceId, giftPriceInfo),
+      giftMessage: giftMessage ?? '',
+      giftQuantity: quantity.toString(),
+      giftSenderEmail: getFirstNonEmptyString(giftSenderEmail, userSession?.user?.email) ?? '',
+      giftSenderName: getFirstNonEmptyString(giftSenderName) ?? 'Anonymous',
+      gifterId: userSession?.user?.id ?? null,
+      isGift: 'true',
+      recipientDisplayName: recipientDisplayName ?? '',
+      recipientUserId: recipientUser.id,
+      recipientUsername,
+      useCustomerBalance: 'true',
+    },
+    mode: 'payment',
+    payment_method_types: ['card'],
+    success_url: `${baseUrl}/gift-success?session_id={CHECKOUT_SESSION_ID}`,
+  })
+
+  if (checkoutSession.url === null) {
+    throw new Error('Failed to create checkout session')
+  }
+
+  return checkoutSession.url
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -48,11 +138,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userSession = await getServerSession(req, res, authOptions)
 
     // Parse and validate request body
-    const body = await req.body
-    const validationResult = giftCheckoutSchema.safeParse(body)
+    const validationResult = giftCheckoutSchema.safeParse(req.body)
 
     if (!validationResult.success) {
-      const errors = validationResult.error.format()
+      const errors = z.treeifyError(validationResult.error)
 
       res.status(400).json({
         details: errors,
@@ -64,8 +153,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { recipientUsername, priceId, giftMessage, giftSenderName, giftSenderEmail, quantity } =
       validationResult.data
 
-    // Check for profanity in gift message and sender name
-    if (giftMessage && checkForProfanity(giftMessage)) {
+    const textValidationError = getGiftTextValidationError(
+      { giftMessage, giftSenderName },
+      checkForProfanity,
+    )
+    if (textValidationError === 'message') {
       res.status(400).json({
         error: 'Validation failed',
         message: 'Gift message contains inappropriate language. Please revise it.',
@@ -73,7 +165,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    if (giftSenderName && checkForProfanity(giftSenderName)) {
+    if (textValidationError === 'senderName') {
       res.status(400).json({
         error: 'Validation failed',
         message: 'Sender name contains inappropriate language. Please revise it.',
@@ -81,37 +173,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    // Find the recipient user by username (name or displayName)
-    const recipientUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ name: recipientUsername }, { displayName: recipientUsername }],
-      },
-    })
-
-    if (!recipientUser) {
+    const recipient = await findGiftRecipient(recipientUsername)
+    if (recipient.status === 'not-found') {
       res.status(404).json({ error: 'Recipient not found' })
       return
     }
 
-    // Check if the recipient already has a lifetime subscription
-    const recipientSubscriptions = await prisma.subscription.findMany({
-      include: {
-        giftDetails: true,
-      },
-      where: {
-        status: 'ACTIVE',
-        userId: recipientUser.id,
-      },
-    })
-
-    // Check if recipient has a lifetime subscription
-    const hasLifetime = recipientSubscriptions.some(
-      (sub) =>
-        sub.giftDetails?.giftType === 'lifetime' ||
-        (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),
-    )
-
-    if (hasLifetime) {
+    if (recipient.status === 'has-lifetime-subscription') {
       res.status(400).json({
         message:
           'The recipient already has a lifetime subscription. They cannot receive additional subscriptions.',
@@ -119,75 +187,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    // Always use one-time payment mode for gift credits
-    const finalQuantity = quantity
-
-    // Create a checkout session for the gift
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
-    // Pass only the Stripe session id. The success page reads the gift
-    // details from the session metadata server-side, so the recipient's
-    // name and the buyer's personal message never land in the URL, browser
-    // history, or request logs.
-    const successUrl = `${baseUrl}/gift-success?session_id={CHECKOUT_SESSION_ID}`
-    const cancelUrl = `${baseUrl}/gift?canceled=true`
-
-    // Get gift duration from price ID using GIFT_PRICE_IDS
-    // Determine gift duration based on which price ID field matches
-    const giftPriceInfo = GIFT_PRICE_IDS[0]
-    const giftDuration =
-      priceId === giftPriceInfo?.lifetime
-        ? 'lifetime'
-        : priceId === giftPriceInfo?.annual
-          ? 'annual'
-          : 'monthly'
-
-    // Create the checkout session
-    const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: finalQuantity,
-          // Allow customers to adjust quantity during checkout
-          adjustable_quantity: {
-            enabled: true,
-            maximum: 100,
-            minimum: 1,
-          },
-        },
-      ],
-      // Always use payment mode for gift credits
-      mode: 'payment',
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      allow_promotion_codes: true,
-      // Collect email if not logged in and no email provided
-      customer_email: giftSenderEmail || userSession?.user?.email || undefined,
-      metadata: {
-        isGift: 'true',
-        recipientUserId: recipientUser.id,
-        recipientUsername,
-        // Friendly name for the success page (prefers display name over login).
-        recipientDisplayName: recipientUser.displayName || recipientUser.name || '',
-        giftDuration,
-        giftMessage: sanitizeInput(giftMessage),
-        giftSenderName: sanitizeInput(giftSenderName) || 'Anonymous',
-        giftQuantity: finalQuantity.toString(),
-        // Add the gifter ID if the user is logged in
-        gifterId: userSession?.user?.id || null,
-        // Add gifter email if provided or available from session
-        giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',
-        // Flag that we're using the customer balance approach
-        useCustomerBalance: 'true',
-      },
+    const url = await createGiftCheckout({
+      giftMessage,
+      giftSenderEmail,
+      giftSenderName,
+      priceId,
+      quantity,
+      recipientUser: recipient.user,
+      recipientUsername,
+      userSession,
     })
 
-    if (!checkoutSession.url) {
-      throw new Error('Failed to create checkout session')
-    }
-
-    res.status(200).json({ url: checkoutSession.url })
-    return
+    res.status(200).json({ url })
   } catch (error) {
     console.error('Gift checkout creation failed:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -195,6 +206,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       details: errorMessage,
       error: 'Failed to create gift checkout session',
     })
-    return
   }
 }

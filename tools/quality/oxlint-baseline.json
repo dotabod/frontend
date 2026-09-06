@@ -11412,26 +11412,6 @@
         "severity": "error"
       }
     },
-    "0fe6d87f08048ce2a50e38883b46002c169ffb551aa082bd8e83dd71c2a73287": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const checkoutSession = await stripe.checkout.sessions.create({",
-              "next": "payment_method_types: ['card'],",
-              "previous": "// Create the checkout session"
-            },
-            "span": "{\n      payment_method_types: ['card'],\n      line_items: [\n        {\n          price: priceId,\n          quantity: finalQuantity,\n          // Allow customers to adjust quantity during checkout\n          adjustable_quantity: {\n            enabled: true,\n            maximum: 100,\n            minimum: 1,\n          },\n        },\n      ],\n      // Always use payment mode for gift credits\n      mode: 'payment',\n      success_url: successUrl,\n      cancel_url: cancelUrl,\n      allow_promotion_codes: true,\n      // Collect email if not logged in and no email provided\n      customer_email: giftSenderEmail || userSession?.user?.email || undefined,\n      metadata: {\n        isGift: 'true',\n        recipientUserId: recipientUser.id,\n        recipientUsername,\n        // Friendly name for the success page (prefers display name over login).\n        recipientDisplayName: recipientUser.displayName || recipientUser.name || '',\n        giftDuration,\n        giftMessage: sanitizeInput(giftMessage),\n        giftSenderName: sanitizeInput(giftSenderName) || 'Anonymous',\n        giftQuantity: finalQuantity.toString(),\n        // Add the gifter ID if the user is logged in\n        gifterId: userSession?.user?.id || null,\n        // Add gifter email if provided or available from session\n        giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',\n        // Flag that we're using the customer balance approach\n        useCustomerBalance: 'true',\n      },\n    }",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
-        "severity": "error"
-      }
-    },
     "0fe7e6ebabe5bbdf392b0f2cfbbedc167bdbe0c72e781a44a6f5027d4d1c5c2b": {
       "count": 1,
       "summary": {
@@ -12650,26 +12630,6 @@
         "severity": "error"
       }
     },
-    "11f68a401a04dbcae8d61f028816ce9db95cd8025801af81c09d28504b9b0579": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "recipientDisplayName: recipientUser.displayName || recipientUser.name || '',",
-              "next": "giftDuration,",
-              "previous": "// Friendly name for the success page (prefers display name over login)."
-            },
-            "span": "recipientUser.displayName",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "11fa1788026bad9e97fe10c88cfdf03917ed20d3f0ad1012f6193409e6bd6755": {
       "count": 1,
       "summary": {
@@ -13167,26 +13127,6 @@
           }
         ],
         "message": "Mocked modules must be dynamic imported.",
-        "severity": "error"
-      }
-    },
-    "12a46d6105daf49b304f5238131f5cc83e16be010014e251b8744e7c2a3122cc": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (giftSenderName && checkForProfanity(giftSenderName)) {",
-              "next": "res.status(400).json({",
-              "previous": ""
-            },
-            "span": "giftSenderName",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -32951,26 +32891,6 @@
         "severity": "error"
       }
     },
-    "2fae0110dbc934ff8e521024e39c46380b509dbb99de6596d71561a912690598": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!checkoutSession.url) {",
-              "next": "throw new Error('Failed to create checkout session')",
-              "previous": ""
-            },
-            "span": "checkoutSession.url",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "2fb24a4f5ea5c2b611abac52afaaa6d553392b5753a308001692013661257abd": {
       "count": 1,
       "summary": {
@@ -38667,26 +38587,6 @@
           }
         ],
         "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
-    "38a00f9e988bc16fb59242af03e0d3bc6f22b1e8bb0146a424e72f98cf40005b": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/pages/api/webhooks/opennode/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export default async function handler(req: NextApiRequest, res: NextApiResponse) {",
-              "next": "try {",
-              "previous": ""
-            },
-            "span": "async function handler(req: NextApiRequest, res: NextApiResponse) {\n  try {\n    // In Next.js, req.body is already parsed for application/json content-type\n    const event: OpenNodeCharge = req.body\n\n    if (!event || typeof event !== 'object') {\n      console.error('Invalid webhook body', req.body)\n      res.status(400).json({ error: 'Invalid webhook body' })\n      return\n    }\n\n    // Verify OpenNode signature\n    const isValid = await verifyOpenNodeWebhook(event)\n    if (!isValid) {\n      console.error('Invalid signature', event)\n\n      // In development, log the signature verification failure but continue processing\n      // This allows testing with OpenNode's webhook simulator\n      if (process.env.VERCEL_ENV === 'production') {\n        res.status(400).json({ error: 'Invalid signature' })\n        return\n      }\n      console.warn('Signature verification failed in development - continuing processing')\n    }\n\n    const charge = event || {}\n    const { status } = charge\n    const chargeId: string = charge.id\n    // @ts-expect-error OpenNode charge metadata is not typed\n    const invoiceId: string | undefined = charge.metadata?.stripe_invoice_id\n\n    if (!chargeId || !invoiceId) {\n      res.status(200).json({ message: 'OK' })\n      return\n    }\n\n    console.log(`Processing OpenNode webhook: charge ${chargeId} status ${status}`)\n\n    // Check if already processed (idempotency)\n    const existingCharge = await prisma.openNodeCharge.findUnique({\n      where: { openNodeChargeId: chargeId },\n    })\n\n    const existingMetadata = (existingCharge?.metadata as Record<string, unknown>) || {}\n    const alreadyProcessedSuccessfully = existingMetadata.processedSuccessfully === true\n\n    if (\n      existingCharge?.lastWebhookAt &&\n      existingCharge?.status === status &&\n      (status !== 'paid' && status !== 'confirmed' ? true : alreadyProcessedSuccessfully)\n    ) {\n      console.log(\n        `Charge ${chargeId} already processed at ${existingCharge.lastWebhookAt.toISOString()} with status ${status}`,\n      )\n      res.status(200).json({ message: 'Already processed' })\n      return\n    }\n\n    // Handle payment confirmation\n    if (isOpenNodePaymentConfirmed(status)) {\n      try {\n        if (!existingCharge) {\n          throw new Error(`OpenNode charge ${chargeId} not found for invoice ${invoiceId}`)\n        }\n\n        await processConfirmedOpenNodePayment(existingCharge, status)\n        console.log('✅ Successfully processed OpenNode payment')\n      } catch (error) {\n        console.error(`❌ Failed to process OpenNode payment ${chargeId}:`, error)\n        // Return non-2xx so OpenNode retries the webhook for transient failures\n        res.status(500).json({ error: 'Failed to process OpenNode payment' })\n        return\n      }\n    } else {\n      // For non-payment statuses, just update lastWebhookAt\n      await prisma.openNodeCharge.updateMany({\n        data: {\n          lastWebhookAt: new Date(),\n          status,\n        },\n        where: { openNodeChargeId: chargeId },\n      })\n    }\n\n    res.status(200).json({ message: 'OK' })\n    return\n  } catch (error) {\n    console.error('OpenNode webhook processing failed:', error)\n    res.status(500).json({ error: 'Webhook processing failed' })\n    return\n  }\n}",
-            "text": ""
-          }
-        ],
-        "message": "async function `handler` has a complexity of 22. Maximum allowed is 20.",
         "severity": "error"
       }
     },
@@ -45542,26 +45442,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "43164501e30b2cf39e1fcd5c737fd566d7b068f1b0fff2cdaa85abe801653a3d": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(zod-v4-prefer-top-level-string-formats)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "giftSenderEmail: z.string().email().optional(),",
-              "next": "giftSenderName: z.string().optional(),",
-              "previous": "giftMessage: z.string().optional(),"
-            },
-            "span": "z.string().email()",
-            "text": ""
-          }
-        ],
-        "message": "This `z.string().<format>()` check is deprecated in Zod 4, so it can break during the upgrade.",
         "severity": "error"
       }
     },
@@ -54196,26 +54076,6 @@
         "severity": "error"
       }
     },
-    "4fec1dcca5020fd6f026f3d5b7dc3c6e3695c127a801514a5bfcb324e29eb9b8": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(prefer-destructuring)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const giftPriceInfo = GIFT_PRICE_IDS[0]",
-              "next": "const giftDuration =",
-              "previous": "// Determine gift duration based on which price ID field matches"
-            },
-            "span": "GIFT_PRICE_IDS[0]",
-            "text": ""
-          }
-        ],
-        "message": "Use Array destructuring.",
-        "severity": "error"
-      }
-    },
     "4ff42d0d437163e301b8ebe6882409d0d176490ee69eac993764f0d40a449aed": {
       "count": 1,
       "summary": {
@@ -59028,26 +58888,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "570887526e006d6fe56659820d0f864140fae2f94f134fe85b9bab68457381c3": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "customer_email: giftSenderEmail || userSession?.user?.email || undefined,",
-              "next": "metadata: {",
-              "previous": "// Collect email if not logged in and no email provided"
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
         "severity": "error"
       }
     },
@@ -72521,26 +72361,6 @@
         "severity": "error"
       }
     },
-    "6a7da0c1d2e4a4d8af42f62250b62b3ac477247405cb3ed8629c34725fd17374": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',",
-              "next": "// Flag that we're using the customer balance approach",
-              "previous": "// Add gifter email if provided or available from session"
-            },
-            "span": "userSession?.user?.email",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "6a80f17ecdd047e1e83aa4cddd65e69f68723c48c408c4d37a108e45ed6ce1ba": {
       "count": 1,
       "summary": {
@@ -75205,26 +75025,6 @@
           }
         ],
         "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
-        "severity": "error"
-      }
-    },
-    "6e7eee27e00e74469f015a1916cee9d71e4c9d148c88f650d537e0045dbee1d6": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "recipientDisplayName: recipientUser.displayName || recipientUser.name || '',",
-              "next": "giftDuration,",
-              "previous": "// Friendly name for the success page (prefers display name over login)."
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
         "severity": "error"
       }
     },
@@ -79257,26 +79057,6 @@
           }
         ],
         "message": "Promises must be awaited, add void operator to ignore.",
-        "severity": "error"
-      }
-    },
-    "7461ce9742cb24a890ac3b79e37378c312a37c910405f15a1964764e501e6e13": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-nested-conditional)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": ": priceId === giftPriceInfo?.annual",
-              "next": "? 'annual'",
-              "previous": "? 'lifetime'"
-            },
-            "span": "priceId === giftPriceInfo?.annual\n          ? 'annual'\n          : 'monthly'",
-            "text": ""
-          }
-        ],
-        "message": "Extract this nested ternary operation into an independent statement.",
         "severity": "error"
       }
     },
@@ -85233,26 +85013,6 @@
         "severity": "error"
       }
     },
-    "7d1b11bc548c7df2239f8ed7a7afe8864efa6768c81f57c34990796e037486de": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "}",
-              "previous": "})"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
     "7d1e891d644e29ac2108f0dda6a82c6fb60777882a5fcb4a0f467021d9e67362": {
       "count": 1,
       "summary": {
@@ -86986,26 +86746,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "7fe9b5222a1253a7d6804663b5d1176dd925dafa196bb7fe1b2fed6d188a8971": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "metadata: {",
-              "next": "isGift: 'true',",
-              "previous": "customer_email: giftSenderEmail || userSession?.user?.email || undefined,"
-            },
-            "span": "{\n        isGift: 'true',\n        recipientUserId: recipientUser.id,\n        recipientUsername,\n        // Friendly name for the success page (prefers display name over login).\n        recipientDisplayName: recipientUser.displayName || recipientUser.name || '',\n        giftDuration,\n        giftMessage: sanitizeInput(giftMessage),\n        giftSenderName: sanitizeInput(giftSenderName) || 'Anonymous',\n        giftQuantity: finalQuantity.toString(),\n        // Add the gifter ID if the user is logged in\n        gifterId: userSession?.user?.id || null,\n        // Add gifter email if provided or available from session\n        giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',\n        // Flag that we're using the customer balance approach\n        useCustomerBalance: 'true',\n      }",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
         "severity": "error"
       }
     },
@@ -90607,26 +90347,6 @@
           }
         ],
         "message": "Module \"clsx\" has named export \"clsx\"",
-        "severity": "error"
-      }
-    },
-    "852bda40f515be55624d5f8e3dd91e00c25cb75b3cb4cc3a7bbc4b4294acdbe8": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "gifterId: userSession?.user?.id || null,",
-              "next": "// Add gifter email if provided or available from session",
-              "previous": "// Add the gifter ID if the user is logged in"
-            },
-            "span": "userSession?.user?.id",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -98845,26 +98565,6 @@
           }
         ],
         "message": "Unsafe call of a(n) `error` type typed value.",
-        "severity": "error"
-      }
-    },
-    "90ff5fcc79f5945a737a7dad0dfcff75ec644bd05c22b42b7fb243cc98b3bf24": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const body = await req.body",
-              "next": "const validationResult = giftCheckoutSchema.safeParse(body)",
-              "previous": "// Parse and validate request body"
-            },
-            "span": "body = await req.body",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -110834,26 +110534,6 @@
         "severity": "error"
       }
     },
-    "a229b0077990976fd014558264108ada52b06c5022418719e0e0cff06170e76f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!text) {",
-              "next": "return ''",
-              "previous": "const sanitizeInput = (text: string | undefined): string => {"
-            },
-            "span": "text",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "a229cb9f792596835d07e572eeceba88d4c1df1cc5368becc1c4b8d901dba04b": {
       "count": 1,
       "summary": {
@@ -119674,26 +119354,6 @@
         "severity": "error"
       }
     },
-    "b06014b2d57240a3c3e12291ef170d6482e01b63a5f2487e5f91936cf0b3287d": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "customer_email: giftSenderEmail || userSession?.user?.email || undefined,",
-              "next": "metadata: {",
-              "previous": "// Collect email if not logged in and no email provided"
-            },
-            "span": "giftSenderEmail",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "b06999f2941d284d49d0d5d26ddfbee405d93c5838682935e4f06e5c9233927e": {
       "count": 1,
       "summary": {
@@ -120538,26 +120198,6 @@
           }
         ],
         "message": "Expected a function expression.",
-        "severity": "error"
-      }
-    },
-    "b1535ee5d53e34c1b46dfc51530e8c0bd641c0c2135d675adc86c3f55918156d": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "gifterId: userSession?.user?.id || null,",
-              "next": "// Add gifter email if provided or available from session",
-              "previous": "// Add the gifter ID if the user is logged in"
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
         "severity": "error"
       }
     },
@@ -122641,26 +122281,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "b430fc8ce5ff33db961b8453d9a1343027fd50d15da22f9d55da81e0aee590df": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "} catch (error) {",
-              "previous": "res.status(200).json({ url: checkoutSession.url })"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
         "severity": "error"
       }
     },
@@ -136727,26 +136347,6 @@
         "severity": "error"
       }
     },
-    "ca250cd839dd0bb4b466c25cd154e14e1207dc7f841fa037dc6e31d55cd627ad": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',",
-              "next": "// Flag that we're using the customer balance approach",
-              "previous": "// Add gifter email if provided or available from session"
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
-        "severity": "error"
-      }
-    },
     "ca26ae4e89876e41c70cc84a6b672a4e7018c63636776face512346011ded7a4": {
       "count": 1,
       "summary": {
@@ -139626,26 +139226,6 @@
           }
         ],
         "message": "Extract this nested ternary operation into an independent statement.",
-        "severity": "error"
-      }
-    },
-    "cddf0cda1f3d73481944bfd6f0bcc551eda3792259deb5c7337d47e218567796": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export default async function handler(req: NextApiRequest, res: NextApiResponse) {",
-              "next": "if (req.method !== 'POST') {",
-              "previous": ""
-            },
-            "span": "async function handler(req: NextApiRequest, res: NextApiResponse) {\n  if (req.method !== 'POST') {\n    res.status(405).json({ error: 'Method not allowed' })\n    return\n  }\n\n  try {\n    // Get the user session if available\n    const userSession = await getServerSession(req, res, authOptions)\n\n    // Parse and validate request body\n    const body = await req.body\n    const validationResult = giftCheckoutSchema.safeParse(body)\n\n    if (!validationResult.success) {\n      const errors = validationResult.error.format()\n\n      res.status(400).json({\n        details: errors,\n        error: 'Invalid request data',\n      })\n      return\n    }\n\n    const { recipientUsername, priceId, giftMessage, giftSenderName, giftSenderEmail, quantity } =\n      validationResult.data\n\n    // Check for profanity in gift message and sender name\n    if (giftMessage && checkForProfanity(giftMessage)) {\n      res.status(400).json({\n        error: 'Validation failed',\n        message: 'Gift message contains inappropriate language. Please revise it.',\n      })\n      return\n    }\n\n    if (giftSenderName && checkForProfanity(giftSenderName)) {\n      res.status(400).json({\n        error: 'Validation failed',\n        message: 'Sender name contains inappropriate language. Please revise it.',\n      })\n      return\n    }\n\n    // Find the recipient user by username (name or displayName)\n    const recipientUser = await prisma.user.findFirst({\n      where: {\n        OR: [{ name: recipientUsername }, { displayName: recipientUsername }],\n      },\n    })\n\n    if (!recipientUser) {\n      res.status(404).json({ error: 'Recipient not found' })\n      return\n    }\n\n    // Check if the recipient already has a lifetime subscription\n    const recipientSubscriptions = await prisma.subscription.findMany({\n      include: {\n        giftDetails: true,\n      },\n      where: {\n        status: 'ACTIVE',\n        userId: recipientUser.id,\n      },\n    })\n\n    // Check if recipient has a lifetime subscription\n    const hasLifetime = recipientSubscriptions.some(\n      (sub) =>\n        sub.giftDetails?.giftType === 'lifetime' ||\n        (sub.tier === 'PRO' && sub.transactionType === 'LIFETIME'),\n    )\n\n    if (hasLifetime) {\n      res.status(400).json({\n        message:\n          'The recipient already has a lifetime subscription. They cannot receive additional subscriptions.',\n      })\n      return\n    }\n\n    // Always use one-time payment mode for gift credits\n    const finalQuantity = quantity\n\n    // Create a checkout session for the gift\n    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'\n    // Pass only the Stripe session id. The success page reads the gift\n    // details from the session metadata server-side, so the recipient's\n    // name and the buyer's personal message never land in the URL, browser\n    // history, or request logs.\n    const successUrl = `${baseUrl}/gift-success?session_id={CHECKOUT_SESSION_ID}`\n    const cancelUrl = `${baseUrl}/gift?canceled=true`\n\n    // Get gift duration from price ID using GIFT_PRICE_IDS\n    // Determine gift duration based on which price ID field matches\n    const giftPriceInfo = GIFT_PRICE_IDS[0]\n    const giftDuration =\n      priceId === giftPriceInfo?.lifetime\n        ? 'lifetime'\n        : priceId === giftPriceInfo?.annual\n          ? 'annual'\n          : 'monthly'\n\n    // Create the checkout session\n    const checkoutSession = await stripe.checkout.sessions.create({\n      payment_method_types: ['card'],\n      line_items: [\n        {\n          price: priceId,\n          quantity: finalQuantity,\n          // Allow customers to adjust quantity during checkout\n          adjustable_quantity: {\n            enabled: true,\n            maximum: 100,\n            minimum: 1,\n          },\n        },\n      ],\n      // Always use payment mode for gift credits\n      mode: 'payment',\n      success_url: successUrl,\n      cancel_url: cancelUrl,\n      allow_promotion_codes: true,\n      // Collect email if not logged in and no email provided\n      customer_email: giftSenderEmail || userSession?.user?.email || undefined,\n      metadata: {\n        isGift: 'true',\n        recipientUserId: recipientUser.id,\n        recipientUsername,\n        // Friendly name for the success page (prefers display name over login).\n        recipientDisplayName: recipientUser.displayName || recipientUser.name || '',\n        giftDuration,\n        giftMessage: sanitizeInput(giftMessage),\n        giftSenderName: sanitizeInput(giftSenderName) || 'Anonymous',\n        giftQuantity: finalQuantity.toString(),\n        // Add the gifter ID if the user is logged in\n        gifterId: userSession?.user?.id || null,\n        // Add gifter email if provided or available from session\n        giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',\n        // Flag that we're using the customer balance approach\n        useCustomerBalance: 'true',\n      },\n    })\n\n    if (!checkoutSession.url) {\n      throw new Error('Failed to create checkout session')\n    }\n\n    res.status(200).json({ url: checkoutSession.url })\n    return\n  } catch (error) {\n    console.error('Gift checkout creation failed:', error)\n    const errorMessage = error instanceof Error ? error.message : 'Unknown error'\n    res.status(500).json({\n      details: errorMessage,\n      error: 'Failed to create gift checkout session',\n    })\n    return\n  }\n}",
-            "text": ""
-          }
-        ],
-        "message": "async function `handler` has a complexity of 31. Maximum allowed is 20.",
         "severity": "error"
       }
     },
@@ -142892,26 +142472,6 @@
         "severity": "error"
       }
     },
-    "d250f5d5e5101f53d4b044253bea565f716df18b4fbc63046133e7e6b2d4ba42": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!text) {",
-              "next": "return false",
-              "previous": "const checkForProfanity = (text: string | undefined): boolean => {"
-            },
-            "span": "text",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "d258a75d7e047f3f8602d24a73f426738565d1b954032280be77b0cc054716cd": {
       "count": 1,
       "summary": {
@@ -145695,26 +145255,6 @@
         "severity": "error"
       }
     },
-    "d6af6dfe0ac2d573d33e2300967e757ff0731a550b1fb894639c9f099c16cba9": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "giftSenderEmail: giftSenderEmail || userSession?.user?.email || '',",
-              "next": "// Flag that we're using the customer balance approach",
-              "previous": "// Add gifter email if provided or available from session"
-            },
-            "span": "giftSenderEmail",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "d6b2689e73f5704037ba1ef0bbb925b4f5c77971fc4325a2fa982f35add4c5ec": {
       "count": 1,
       "summary": {
@@ -146490,26 +146030,6 @@
           }
         ],
         "message": "Unsafe member access ._getJSONData on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "d7f743246e69ecac5d150b84d9575b23c683e16dacb770bb8d3eeff719dbec8e": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (giftMessage && checkForProfanity(giftMessage)) {",
-              "next": "res.status(400).json({",
-              "previous": "// Check for profanity in gift message and sender name"
-            },
-            "span": "giftMessage",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -151515,26 +151035,6 @@
         "severity": "error"
       }
     },
-    "dec5bfb22563915ced841d204f4405aaf9df45716baad17cd4a238bdfd746f69": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-nested-ternary)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "priceId === giftPriceInfo?.lifetime",
-              "next": "? 'lifetime'",
-              "previous": "const giftDuration ="
-            },
-            "span": "priceId === giftPriceInfo?.lifetime\n        ? 'lifetime'\n        : priceId === giftPriceInfo?.annual\n          ? 'annual'\n          : 'monthly'",
-            "text": ""
-          }
-        ],
-        "message": "Do not nest ternary expressions.",
-        "severity": "error"
-      }
-    },
     "decfbadb9b43ed6add326b3bd41dce017ec127f75301a011edf51311032a44dd": {
       "count": 1,
       "summary": {
@@ -151592,26 +151092,6 @@
           }
         ],
         "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
-    "ded992a18b1f838b39e5f045aa27997915618b2e04fda1c395e0dd3f835a95e1": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(require-unicode-regexp)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return text.replaceAll(/<[^>]*>?/gm, '').slice(0, 200)",
-              "next": "}",
-              "previous": "// Basic sanitization - remove any HTML tags and limit length"
-            },
-            "span": "/<[^>]*>?/gm",
-            "text": ""
-          }
-        ],
-        "message": "Use the 'u' flag.",
         "severity": "error"
       }
     },
@@ -164325,26 +163805,6 @@
         "severity": "error"
       }
     },
-    "f11ebce6249153932b8842f88d4295b4920e0b5a69ccc4671f20f9801563755d": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(expression-complexity)",
-        "file": "src/pages/api/webhooks/opennode/index.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "existingCharge?.lastWebhookAt &&",
-              "next": "existingCharge?.status === status &&",
-              "previous": "if ("
-            },
-            "span": "existingCharge?.lastWebhookAt &&\n      existingCharge?.status === status &&\n      (status !== 'paid' && status !== 'confirmed' ? true : alreadyProcessedSuccessfully)",
-            "text": ""
-          }
-        ],
-        "message": "Reduce the number of conditional operators (4) used in the expression (maximum allowed 3).",
-        "severity": "error"
-      }
-    },
     "f12c4d60438a18a4b323d86aab17a33316499ece8b138efb64b08568454b49a8": {
       "count": 1,
       "summary": {
@@ -168316,26 +167776,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "f6a3224171f59382336de7a762598ec2b7c0f2d47f77dcdf649a524e0912b1ed": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "customer_email: giftSenderEmail || userSession?.user?.email || undefined,",
-              "next": "metadata: {",
-              "previous": "// Collect email if not logged in and no email provided"
-            },
-            "span": "userSession?.user?.email",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -173749,26 +173189,6 @@
         "severity": "error"
       }
     },
-    "feae39c9204850b91026a82c06e391492e7c73a697991b485f450dcb72a066e1": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "src/pages/api/stripe/create-gift-checkout.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "{",
-              "next": "price: priceId,",
-              "previous": "line_items: ["
-            },
-            "span": "{\n          price: priceId,\n          quantity: finalQuantity,\n          // Allow customers to adjust quantity during checkout\n          adjustable_quantity: {\n            enabled: true,\n            maximum: 100,\n            minimum: 1,\n          },\n        }",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
-        "severity": "error"
-      }
-    },
     "feb3bfafa42e3678cec8d227a80f84c220bd49411185bcff6ced22da6611c0f3": {
       "count": 1,
       "summary": {
@@ -174757,6 +174177,7 @@
           "src/__tests__/lib/reconcileTwitchProfile.test.ts",
           "src/__tests__/lib/server/dashboardAccess.test.ts",
           "src/__tests__/lib/stripe-server.test.ts",
+          "src/__tests__/lib/stripe/gift-checkout.test.ts",
           "src/__tests__/lib/theme/themeConfig.test.ts",
           "src/__tests__/lib/twitchHelixProfile.test.ts",
           "src/__tests__/lib/whatsNew.test.ts",
@@ -174773,6 +174194,7 @@
           "src/__tests__/pages/api/settings-setting-key.test.ts",
           "src/__tests__/pages/api/settings.test.ts",
           "src/__tests__/pages/api/stripe/create-checkout.test.ts",
+          "src/__tests__/pages/api/stripe/create-gift-checkout.test.ts",
           "src/__tests__/pages/api/stripe/crypto-invoice.test.ts",
           "src/__tests__/pages/api/stripe/crypto-subscription.test.ts",
           "src/__tests__/pages/api/stripe/gift-webhook.test.ts",
@@ -174788,6 +174210,7 @@
           "src/__tests__/pages/api/user/gift-subscriptions.test.ts",
           "src/__tests__/pages/api/webhook-gift.test.ts",
           "src/__tests__/pages/api/webhooks/nowpayments.test.ts",
+          "src/__tests__/pages/api/webhooks/opennode.test.ts",
           "src/__tests__/pages/api/win-loss-adjustments.test.ts",
           "src/__tests__/pages/collection-navigation.test.tsx",
           "src/__tests__/pages/dashboard/billing.test.tsx",
@@ -175028,6 +174451,8 @@
           "src/lib/setupSignalKeys.ts",
           "src/lib/stripe-server.ts",
           "src/lib/stripe.ts",
+          "src/lib/stripe/gift-checkout-request.ts",
+          "src/lib/stripe/gift-checkout.ts",
           "src/lib/stripe/handlers/charge-events.ts",
           "src/lib/stripe/handlers/checkout-events.ts",
           "src/lib/stripe/handlers/customer-events.ts",
