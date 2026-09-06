@@ -1,9 +1,11 @@
 import { Button, message, Skeleton } from 'antd'
 import { AlertTriangleIcon, ClockIcon, CreditCardIcon, GiftIcon } from 'lucide-react'
 import { useState } from 'react'
+
 import { BillingNotice } from '@/components/Billing/BillingNotice'
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
+
 import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
 
 interface SubscriptionAlertsProps {
@@ -109,7 +111,7 @@ export function SubscriptionAlerts({
         icon={<GiftIcon size={18} />}
         title='Credit balance available'
         action={
-          !hasActivePlan ? (
+          hasActivePlan ? undefined : (
             <Button
               type='primary'
               size='small'
@@ -119,7 +121,7 @@ export function SubscriptionAlerts({
             >
               {isApplyingCredits ? 'Applying…' : 'Apply credits now'}
             </Button>
-          ) : undefined
+          )
         }
       >
         <p>

@@ -1,8 +1,10 @@
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { Alert, Tag } from 'antd'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 const EXPLICIT_NOTE_COMMANDS = [
@@ -57,12 +59,14 @@ export default function ClippingCard(): React.ReactNode {
         Valve's live API stops sending roster data at that bracket.
       </div>
 
-      <div className='flex items-center space-x-2 my-4'>
+      <div className='my-4 flex items-center space-x-2'>
         <TierSwitch
           hideTierBadge
           settingKey={Settings.disableAutoClipping}
           checked={!isDisabled}
-          onChange={(checked) => updateSetting(!checked)}
+          onChange={(checked) => {
+            updateSetting(!checked)
+          }}
           label='High-MMR match detection'
         />
         <Tag color={isDisabled ? 'red' : 'green'}>
@@ -71,35 +75,35 @@ export default function ClippingCard(): React.ReactNode {
       </div>
 
       <div className='mb-4'>
-        <p className='text-sm font-medium text-gray-300 mb-2'>Powers these commands:</p>
+        <p className='mb-2 text-sm font-medium text-gray-300'>Powers these commands:</p>
         <div className='space-y-3'>
           <div>
-            <p className='text-xs text-gray-400 mb-1'>Shows a "no data" message when off:</p>
+            <p className='mb-1 text-xs text-gray-400'>Shows a "no data" message when off:</p>
             <div className='flex flex-wrap gap-2'>
               {EXPLICIT_NOTE_COMMANDS.map(({ cmd, desc }) => (
-                <span key={cmd} className='bg-gray-800 px-2 py-0.5 rounded text-xs'>
+                <span key={cmd} className='rounded bg-gray-800 px-2 py-0.5 text-xs'>
                   <code>{cmd}</code> <span className='text-gray-400'>· {desc}</span>
                 </span>
               ))}
             </div>
           </div>
           <div>
-            <p className='text-xs text-gray-400 mb-1'>Roster silently comes back empty:</p>
+            <p className='mb-1 text-xs text-gray-400'>Roster silently comes back empty:</p>
             <div className='flex flex-wrap gap-2'>
               {SILENT_COMMANDS.map(({ cmd, desc }) => (
-                <span key={cmd} className='bg-gray-800 px-2 py-0.5 rounded text-xs'>
+                <span key={cmd} className='rounded bg-gray-800 px-2 py-0.5 text-xs'>
                   <code>{cmd}</code> <span className='text-gray-400'>· {desc}</span>
                 </span>
               ))}
             </div>
           </div>
           <div>
-            <p className='text-xs text-gray-400 mb-1'>
+            <p className='mb-1 text-xs text-gray-400'>
               Only when asked about a teammate or opponent (asking about yourself always works):
             </p>
             <div className='flex flex-wrap gap-2'>
               {LOOKUP_COMMANDS.map((cmd) => (
-                <code key={cmd} className='bg-gray-800 px-2 py-0.5 rounded text-xs'>
+                <code key={cmd} className='rounded bg-gray-800 px-2 py-0.5 text-xs'>
                   {cmd}
                 </code>
               ))}
@@ -116,10 +120,10 @@ export default function ClippingCard(): React.ReactNode {
               <p className='mb-2'>
                 With detection off, these commands lose match data for players with 8500+ MMR:
               </p>
-              <ul className='list-disc ml-5'>
+              <ul className='ml-5 list-disc'>
                 {[...EXPLICIT_NOTE_COMMANDS, ...SILENT_COMMANDS].map(({ cmd, desc }) => (
                   <li key={cmd}>
-                    <code className='bg-gray-800 px-1 py-0.5 rounded'>{cmd}</code> - {desc}
+                    <code className='rounded bg-gray-800 px-1 py-0.5'>{cmd}</code> - {desc}
                   </li>
                 ))}
                 <li>Teammate/opponent lookups: {LOOKUP_COMMANDS.join(', ')}</li>
@@ -137,7 +141,7 @@ export default function ClippingCard(): React.ReactNode {
         />
       )}
 
-      <div className='mt-4 p-3 bg-gray-800 rounded-md'>
+      <div className='mt-4 rounded-md bg-gray-800 p-3'>
         <p className='text-xs text-gray-400'>
           <strong>How it works:</strong> since Valve won't hand over the data directly, Dotabod
           grabs a 5-second Twitch clip of the draft/hero bar and reads it with vision AI. The clip

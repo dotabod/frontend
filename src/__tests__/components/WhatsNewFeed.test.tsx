@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
@@ -39,7 +39,7 @@ const entries: WhatsNewEntry[] = [
   },
 ]
 
-describe('WhatsNewFeed', () => {
+describe(WhatsNewFeed, () => {
   it('filters the chronological feed into user-facing groups', () => {
     render(<WhatsNewFeed entries={entries} readOnly />)
 

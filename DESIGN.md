@@ -190,9 +190,7 @@ State tones are used as a triplet: border + tinted background (40% alpha on the 
 
 ## 3. Typography
 
-**Body Font:** Inter (variable, weights 100–900, loaded from `/fonts/Inter-roman.var.woff2`).
-**Display Font:** Inter (same family; hierarchy is built from weight and size, not from a second family).
-**Reserved fonts:** Radiance and RadianceM are loaded for the OBS overlay's Dota-themed UI only. They must not appear in the dashboard.
+**Body Font:** Inter (variable, weights 100–900, loaded from `/fonts/Inter-roman.var.woff2`). **Display Font:** Inter (same family; hierarchy is built from weight and size, not from a second family). **Reserved fonts:** Radiance and RadianceM are loaded for the OBS overlay's Dota-themed UI only. They must not appear in the dashboard.
 
 **Character:** A single neutral sans speaking at a moderate scale. Inter does the work — tight numerals, level x-height, no italic flourish. Hierarchy comes from weight contrast (400 / 500 / 600) and size jumps, not from family switching.
 

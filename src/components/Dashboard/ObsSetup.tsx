@@ -1,16 +1,18 @@
 import { ReloadOutlined } from '@ant-design/icons' // Icon for refresh button
 import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, message, Select, Space, Spin, Tooltip } from 'antd'
-import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import OBSWebSocket from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+
 import { useFeatureAccess } from '@/hooks/useSubscription'
 import { Settings } from '@/lib/defaultSettings'
 import { useBaseUrl } from '@/lib/hooks/useBaseUrl'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
-import { type LnaPermissionState, queryLnaPermission, shouldCheckLna } from '@/lib/lna'
+import { queryLnaPermission, shouldCheckLna } from '@/lib/lna'
+import type { LnaPermissionState } from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
 
@@ -276,13 +278,13 @@ const ObsSetup: React.FC = () => {
 
       if (sceneUuids.length === 1) {
         const singleScene = sceneUuids[0]
-        if (!scenesWithOverlay.includes(singleScene)) {
+        if (scenesWithOverlay.includes(singleScene)) {
+          // If the single scene already has the overlay, no action needed
+          setSelectedScenes(scenesWithOverlay)
+        } else {
           // If there's only one scene and it doesn't have the overlay, auto-add
           setSelectedScenes([singleScene])
           await handleSceneSelect([singleScene], currentBaseWidth, currentBaseHeight)
-        } else {
-          // If the single scene already has the overlay, no action needed
-          setSelectedScenes(scenesWithOverlay)
         }
       }
 
@@ -454,7 +456,7 @@ const ObsSetup: React.FC = () => {
 
     setObs(new OBSWebSocket())
     updatePort(Number(values.port))
-    updatePassword(`${values.password}`)
+    updatePassword(values.password)
 
     track('obs/connect', { port: values.port })
   }
@@ -471,7 +473,15 @@ const ObsSetup: React.FC = () => {
       case 'FETCH_SCENES_ERROR':
       case 'ADD_TO_SCENE_ERROR':
       case 'UNKNOWN_ERROR': {
-        return <Button onClick={() => setObs(new OBSWebSocket())}>Retry</Button>
+        return (
+          <Button
+            onClick={() => {
+              setObs(new OBSWebSocket())
+            }}
+          >
+            Retry
+          </Button>
+        )
       }
 
       case 'VERSION_TOO_OLD': {
@@ -610,7 +620,7 @@ const ObsSetup: React.FC = () => {
 
           {error && (
             <Alert
-              message={`${error.message}${error.code !== 'VERSION_TOO_NEW' ? '. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.' : ''}`}
+              message={`${error.message}${error.code === 'VERSION_TOO_NEW' ? '' : '. Make sure OBS is running and the WebSocket server is enabled. Press OK after enabling the server.'}`}
               type={getAlertType()}
               showIcon
               action={<div className='space-x-4'>{renderErrorAction()}</div>}
@@ -658,7 +668,9 @@ const ObsSetup: React.FC = () => {
                 <Input
                   autoComplete='new-password'
                   placeholder='Enter the OBS WebSocket password'
-                  onPressEnter={() => form.submit()}
+                  onPressEnter={() => {
+                    form.submit()
+                  }}
                   onChange={debouncedFormSubmit}
                 />
               </Form.Item>
@@ -680,7 +692,9 @@ const ObsSetup: React.FC = () => {
                   min={1}
                   max={65_535}
                   onChange={debouncedFormSubmit}
-                  onPressEnter={() => form.submit()}
+                  onPressEnter={() => {
+                    form.submit()
+                  }}
                 />
               </Form.Item>
             </Space>

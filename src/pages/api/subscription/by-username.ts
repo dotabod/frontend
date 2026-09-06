@@ -1,5 +1,6 @@
 import type { SubscriptionTier } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import prisma from '@/lib/db'
 import { getSubscription, isInGracePeriod, SUBSCRIPTION_TIERS } from '@/utils/subscription'
 
@@ -8,7 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { username } = req.query
 
     if (!username || typeof username !== 'string') {
-      return res.status(400).json({ error: 'Username is required' })
+      res.status(400).json({ error: 'Username is required' })
+      return
     }
 
     // Find the user by username
@@ -22,7 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      res.status(404).json({ error: 'User not found' })
+      return
     }
 
     // Get the subscription for the user
@@ -40,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isGracePeriodPro = inGracePeriod && !hasPaidOrLifetime
 
     if (!subscription) {
-      return res.status(200).json({
+      res.status(200).json({
         inGracePeriod,
         isGracePeriodPro: false,
         isLifetime: false,
@@ -48,10 +51,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         status: null,
         tier: SUBSCRIPTION_TIERS.FREE,
       })
+      return
     }
 
     // Return subscription information
-    return res.status(200).json({
+    res.status(200).json({
       inGracePeriod,
       isGracePeriodPro,
       isLifetime: subscription.transactionType === 'LIFETIME',
@@ -59,8 +63,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       status: subscription.status,
       tier: subscription.tier as SubscriptionTier,
     })
+    return
   } catch (error) {
     console.error('Error in subscription by username route:', error)
-    return res.status(500).json({ error: 'Internal Server Error' })
+    res.status(500).json({ error: 'Internal Server Error' })
+    return
   }
 }

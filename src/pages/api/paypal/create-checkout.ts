@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { featureFlags } from '@/lib/featureFlags'
@@ -8,25 +9,30 @@ import { createPaypalApproval } from '@/lib/paypal-checkout'
 // So PayPal works without Stripe credentials (fully decoupled).
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ error: 'Method not allowed' })
+    return
   }
 
   if (!featureFlags.enablePaypalPayments) {
-    return res.status(403).json({ error: 'PayPal payments are not enabled' })
+    res.status(403).json({ error: 'PayPal payments are not enabled' })
+    return
   }
 
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      res.status(401).json({ error: 'Unauthorized' })
+      return
     }
     if (session.user.isImpersonating) {
-      return res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
+      res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })
+      return
     }
 
     const { period } = (await req.body) as { period?: string }
     if (period !== 'monthly' && period !== 'annual' && period !== 'lifetime') {
-      return res.status(400).json({ error: 'Valid period is required' })
+      res.status(400).json({ error: 'Valid period is required' })
+      return
     }
 
     const url = await createPaypalApproval({
@@ -35,9 +41,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       userId: session.user.id,
     })
 
-    return res.status(200).json({ url })
+    res.status(200).json({ url })
+    return
   } catch (error) {
     console.error('PayPal checkout creation failed:', error)
-    return res.status(500).json({ error: 'Failed to create PayPal checkout' })
+    res.status(500).json({ error: 'Failed to create PayPal checkout' })
+    return
   }
 }

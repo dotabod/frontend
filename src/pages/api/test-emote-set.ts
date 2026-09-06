@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import type { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import type { EmoteSetResponse } from '@/lib/7tv'
 import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
@@ -10,10 +11,10 @@ const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
 const TEST_EMOTE_NAME = 'DOTABOD_TEST'
 
 async function getEmoteSet(client: GraphQLClient, emoteSetId: string) {
-  return (await client.request(GET_EMOTE_SET_FOR_CARD, {
+  return await client.request(GET_EMOTE_SET_FOR_CARD, {
     id: emoteSetId,
     limit: 1000,
-  })) as EmoteSetResponse
+  })
 }
 
 function hasTestEmote(emoteSet: EmoteSetResponse) {
@@ -42,25 +43,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     process.env.VERCEL_ENV !== 'development' &&
     (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`)
   ) {
-    return res.status(401).json({ success: false })
+    res.status(401).json({ success: false })
+    return
   }
 
   if (req.method !== 'GET') {
     console.log('Invalid method:', req.method)
-    return res.status(405).json({ message: 'Method not allowed' })
+    res.status(405).json({ message: 'Method not allowed' })
+    return
   }
 
   const twitchId = process.env.CRON_TWITCH_ID
 
   if (!twitchId) {
     console.log('No Twitch ID found')
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const authToken = process.env.SEVENTV_AUTH
   if (!authToken) {
     console.log('No 7TV auth token found')
-    return res.status(500).json({ message: 'Server configuration error' })
+    res.status(500).json({ message: 'Server configuration error' })
+    return
   }
 
   const client = create7TVClient(authToken)

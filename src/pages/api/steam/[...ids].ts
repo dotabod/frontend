@@ -1,7 +1,8 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 
 function convertSteam32To64(steam32Id: string | number) {
@@ -34,7 +35,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const json = await response.json()
     // Return an array of avatars for each steam id from the input
 
-    return res.status(200).json({
+    res.status(200).json({
       data:
         json?.response?.players.map(
           (player: { avatarfull: string; personaname: string; steamid: string }) => ({
@@ -44,6 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }),
         ) || [],
     })
+    return
   } catch (error) {
     captureException(error)
     console.error(error)

@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
+
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { useTrack } from '@/lib/track'
 import type { NextPageWithLayout } from '@/pages/_app'
@@ -52,7 +53,7 @@ const AuthErrorPage: NextPageWithLayout = () => {
 
   return (
     <div
-      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr lg:grid-cols-[max(50%,36rem)_1fr]'
+      className='grid-rows-[1fr,auto,1fr grid grid-cols-1 lg:grid-cols-[max(50%,36rem)_1fr]'
       style={{
         minHeight: 'inherit',
       }}
@@ -63,7 +64,7 @@ const AuthErrorPage: NextPageWithLayout = () => {
           {errorMessage && <p className='mt-6 text-base leading-7'>{errorMessage}</p>}
           <div className='mt-10'>
             {/* oxlint-disable-next-line nextjs/no-html-link-for-pages -- _error page renders before Next router is ready */}
-            <a href='/' className='text-sm font-semibold leading-7'>
+            <a href='/' className='text-sm leading-7 font-semibold'>
               <span aria-hidden='true'>&larr;</span> Back to home
             </a>
           </div>

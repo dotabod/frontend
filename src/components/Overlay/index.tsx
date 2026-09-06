@@ -5,8 +5,9 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
+
 import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/InGameV2'
 import { PickScreenOverlays } from '@/components/Overlay/blocker/PickScreenOverlays'
 import { ChatMessagesOverlay } from '@/components/Overlay/ChatMessagesOverlay'
@@ -15,25 +16,21 @@ import { MainScreenOverlays } from '@/components/Overlay/MainScreenOverlays'
 import type { PollData } from '@/components/Overlay/PollOverlay'
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 import { Settings } from '@/lib/defaultSettings'
-import {
-  type blockType,
-  devBlockTypes,
-  devPoll,
-  devRadiantWinChance,
-  devRank,
-  devWL,
-} from '@/lib/devConsts'
+import { devBlockTypes, devPoll, devRadiantWinChance, devRank, devWL } from '@/lib/devConsts'
+import type { blockType } from '@/lib/devConsts'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
 import { useNotablePlayers } from '@/lib/hooks/useNotablePlayers'
 import { useOBS } from '@/lib/hooks/useOBS'
-import { type ChatMessage, useSocket, type WinChance, type wlType } from '@/lib/hooks/useSocket'
+import { useSocket } from '@/lib/hooks/useSocket'
+import type { ChatMessage, WinChance, wlType } from '@/lib/hooks/useSocket'
 import { useStreamOfflineNotification } from '@/lib/hooks/useStreamOfflineNotification'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWindowSize } from '@/lib/hooks/useWindowSize'
 import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
 import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
+
 import { RestrictFeature } from '../RestrictFeature'
 import { OverlayV2 } from './blocker/PickBlockerV2'
 import { DevControls, DevModeToggle } from './DevControls'
@@ -49,7 +46,7 @@ interface PotentialError {
 // Or _app.tsx will render InvalidOverlayPage directly.
 // For now, we keep a local check as a fallback or if this page is accessed directly not through _app standard flow.
 const isInvalidLocalCheck = checkForInvalidOverlay(
-  typeof window !== 'undefined' ? window.location.pathname : '',
+  typeof window === 'undefined' ? '' : window.location.pathname,
 )
 
 const OverlayPage = () => {
@@ -66,7 +63,9 @@ const OverlayPage = () => {
 
   useEffect(() => {
     const userId = typeof router.query.userId === 'string' ? router.query.userId : null
-    if (!userId || typeof window.obsstudio !== 'object') return
+    if (!userId || typeof window.obsstudio !== 'object') {
+      return
+    }
 
     const reportPageLoaded = () => {
       fetch('/api/diagnostics/overlay-page', {
@@ -79,7 +78,9 @@ const OverlayPage = () => {
 
     reportPageLoaded()
     const interval = window.setInterval(reportPageLoaded, 60_000)
-    return () => window.clearInterval(interval)
+    return () => {
+      window.clearInterval(interval)
+    }
   }, [router.query.userId])
 
   const [block, setBlock] = useState<blockType>({
@@ -128,7 +129,7 @@ const OverlayPage = () => {
     const isOldOBS =
       // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)
       // Check if we're running in an older version that needs compatibility
-      Number.parseInt(navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] || '999', 10) < 127
+      Number.parseInt(/Chrome\/(\d+)/.exec(navigator.userAgent)?.[1] || '999', 10) < 127
 
     setIsOldObs(isOldOBS)
   }, [])
@@ -147,7 +148,9 @@ const OverlayPage = () => {
       setShowMainScreenOverlay(true)
       setHasShownOnce(true)
     }, 10_000)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+    }
   }, [connected, hasShownOnce])
 
   useEffect(() => {

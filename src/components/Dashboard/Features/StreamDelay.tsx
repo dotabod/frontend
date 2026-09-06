@@ -1,6 +1,7 @@
 import { Form, Input, InputNumber } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
@@ -60,7 +61,7 @@ export default function StreamDelayCard() {
       <div className='subtitle mb-2'>Increase the delay that Dotabod responds to game events.</div>
 
       <Form layout='vertical'>
-        <div className='flex gap-4 items-end'>
+        <div className='flex items-end gap-4'>
           <Form.Item label='Minutes' colon={false} className='mb-0'>
             {!loading && (
               <InputNumber
@@ -95,7 +96,7 @@ export default function StreamDelayCard() {
           </Form.Item>
         </div>
 
-        <div className='text-xs text-gray-500 mt-2'>
+        <div className='mt-2 text-xs text-gray-500'>
           Maximum: 50 minutes • Current: {minutes}m {seconds}s
         </div>
       </Form>

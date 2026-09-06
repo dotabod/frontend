@@ -2,13 +2,14 @@ import Link from 'next/link'
 import { Container } from 'src/components/Container'
 import { Logomark } from 'src/components/Logo'
 import { NavLinks } from 'src/components/NavLinks'
+
 import { QrCodeBorder } from './QrCodeBorder'
 
 export function Footer() {
   return (
     <footer className='border-t border-gray-500 bg-gray-900'>
       <Container>
-        <div className='flex flex-col items-start justify-between gap-y-12 pb-6 pt-16 lg:flex-row lg:items-center lg:py-16'>
+        <div className='flex flex-col items-start justify-between gap-y-12 pt-16 pb-6 lg:flex-row lg:items-center lg:py-16'>
           <div>
             <div className='flex items-center text-gray-200'>
               <Logomark className='h-10 w-auto flex-none fill-cyan-500' />
@@ -18,7 +19,7 @@ export function Footer() {
               </div>
             </div>
             <nav className='mt-11'>
-              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+              <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4'>
                 <NavLinks bottom={true} />
               </div>
             </nav>

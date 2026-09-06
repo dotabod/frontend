@@ -1,9 +1,10 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
@@ -65,29 +66,33 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const subscription = await getSubscription(session.user.id)
   const tierAccess = canAccessFeature('managers', subscription)
 
   if (!tierAccess.hasAccess) {
-    return res.status(403).json({
+    res.status(403).json({
       error: true,
       message: 'This feature requires a subscription',
     })
+    return
   }
 
   const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
   if (error) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
   const response = await getModerators(providerAccountId, accessToken)
-  return res.status(200).json(response)
+  res.status(200).json(response)
 }
 
 export default withMethods(['GET'], withAuthentication(handler))

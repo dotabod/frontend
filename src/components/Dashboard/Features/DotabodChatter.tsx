@@ -1,6 +1,8 @@
 import { Tooltip } from 'antd'
+
 import { Settings } from '@/lib/defaultSettings'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 export default function DotabodChatter() {

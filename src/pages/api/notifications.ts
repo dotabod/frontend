@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -17,7 +18,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) {
-      return res.status(401).json({ message: 'Unauthorized' })
+      res.status(401).json({ message: 'Unauthorized' })
+      return
     }
 
     const userId = session.user.id
@@ -86,14 +88,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           })
           .filter(Boolean)
 
-        return res.status(200).json({
+        res.status(200).json({
           hasLifetime,
           notifications,
           totalNotifications: notifications.length,
         })
+        return
       } catch (error) {
         console.error('Error fetching notifications:', error)
-        return res.status(500).json({ error: String(error), message: 'Internal server error' })
+        res.status(500).json({ error: String(error), message: 'Internal server error' })
+        return
       }
     }
 
@@ -101,9 +105,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       try {
         const validationResult = markAsReadSchema.safeParse(req.body)
         if (!validationResult.success) {
-          return res
+          res
             .status(400)
             .json({ errors: validationResult.error.format(), message: 'Invalid request body' })
+          return
         }
 
         const { notificationId } = validationResult.data
@@ -117,7 +122,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         })
 
         if (!notification) {
-          return res.status(404).json({ message: 'Notification not found' })
+          res.status(404).json({ message: 'Notification not found' })
+          return
         }
 
         await prisma.notification.update({
@@ -130,17 +136,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           },
         })
 
-        return res.status(200).json({ message: 'Notification marked as read' })
+        res.status(200).json({ message: 'Notification marked as read' })
+        return
       } catch (error) {
         console.error('Error marking notification as read:', error)
-        return res.status(500).json({ error: String(error), message: 'Internal server error' })
+        res.status(500).json({ error: String(error), message: 'Internal server error' })
+        return
       }
     }
 
-    return res.status(405).json({ message: 'Method not allowed' })
+    res.status(405).json({ message: 'Method not allowed' })
+    return
   } catch (error) {
     console.error('Unexpected error in notifications API:', error)
-    return res.status(500).json({ error: String(error), message: 'Internal server error' })
+    res.status(500).json({ error: String(error), message: 'Internal server error' })
+    return
   }
 }
 

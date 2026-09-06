@@ -1,10 +1,6 @@
-import {
-  type Prisma,
-  type Subscription,
-  SubscriptionStatus,
-  SubscriptionTier,
-  TransactionType,
-} from '@prisma/client'
+import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import type { Prisma, Subscription } from '@prisma/client'
+
 import type { StatusInfo } from '@/components/Subscription/types'
 import prisma from '@/lib/db'
 import type { defaultSettings, SettingKeys } from '@/lib/defaultSettings'
@@ -576,7 +572,7 @@ export function getSubscriptionStatusInfo(
         badge: cancelAtPeriodEnd ? (isEndingSoon ? 'red' : 'gold') : 'gold',
         message: cancelAtPeriodEnd
           ? isEndingSoon
-            ? `Ending in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`
+            ? `Ending in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'}`
             : `Subscription ends on ${endDate}`
           : currentPeriodEnd
             ? `Renews on ${endDate}`

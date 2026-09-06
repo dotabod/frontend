@@ -1,10 +1,40 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { OpenNodeCharge } from 'opennode/dist/types/v1'
+
 import prisma from '@/lib/db'
 import { verifyOpenNodeWebhook } from '@/lib/opennode'
 import { isOpenNodePaymentConfirmed, processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 
 export const runtime = 'nodejs'
+
+export const logOpenNodePaymentFailure = (chargeId: string, error: Error) => {
+  console.error('❌ Failed to process OpenNode payment', { chargeId, error })
+}
+
+type ExistingOpenNodeCharge = Pick<
+  NonNullable<Awaited<ReturnType<typeof prisma.openNodeCharge.findUnique>>>,
+  'lastWebhookAt' | 'status'
+>
+
+export const getDuplicateOpenNodeWebhookAt = ({
+  alreadyProcessedSuccessfully,
+  existingCharge,
+  status,
+}: {
+  alreadyProcessedSuccessfully: boolean
+  existingCharge: ExistingOpenNodeCharge | null
+  status: string
+}) => {
+  if (!existingCharge?.lastWebhookAt || existingCharge.status !== status) {
+    return null
+  }
+
+  if (status !== 'paid' && status !== 'confirmed') {
+    return existingCharge.lastWebhookAt
+  }
+
+  return alreadyProcessedSuccessfully ? existingCharge.lastWebhookAt : null
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -52,13 +82,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const existingMetadata = (existingCharge?.metadata as Record<string, unknown>) || {}
     const alreadyProcessedSuccessfully = existingMetadata.processedSuccessfully === true
 
-    if (
-      existingCharge?.lastWebhookAt &&
-      existingCharge?.status === status &&
-      (status !== 'paid' && status !== 'confirmed' ? true : alreadyProcessedSuccessfully)
-    ) {
+    const duplicateWebhookAt = getDuplicateOpenNodeWebhookAt({
+      alreadyProcessedSuccessfully,
+      existingCharge,
+      status,
+    })
+
+    if (duplicateWebhookAt) {
       console.log(
-        `Charge ${chargeId} already processed at ${existingCharge.lastWebhookAt.toISOString()} with status ${status}`,
+        `Charge ${chargeId} already processed at ${duplicateWebhookAt.toISOString()} with status ${status}`,
       )
       res.status(200).json({ message: 'Already processed' })
       return
@@ -74,7 +106,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await processConfirmedOpenNodePayment(existingCharge, status)
         console.log('✅ Successfully processed OpenNode payment')
       } catch (error) {
-        console.error(`❌ Failed to process OpenNode payment ${chargeId}:`, error)
+        const paymentError = error instanceof Error ? error : new Error(String(error))
+        logOpenNodePaymentFailure(chargeId, paymentError)
         // Return non-2xx so OpenNode retries the webhook for transient failures
         res.status(500).json({ error: 'Failed to process OpenNode payment' })
         return

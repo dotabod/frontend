@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import ChatterCard from '@/components/Dashboard/Features/ChatterCard'
 import NewFeatureChatToggles from '@/components/Dashboard/Features/NewFeatureChatToggles'

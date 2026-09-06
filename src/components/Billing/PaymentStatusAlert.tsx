@@ -2,6 +2,7 @@ import { App, Button } from 'antd'
 import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { BillingNotice } from './BillingNotice'
 
 const Spinner = () => <Loader2Icon size={16} className='animate-spin' />
@@ -161,7 +162,7 @@ export const PaymentStatusAlert = () => {
         tone='error'
         title="We couldn't check your payment"
         action={
-          <Button size='small' onClick={() => fetchPaymentStatus(invoice as string)}>
+          <Button size='small' onClick={async () => fetchPaymentStatus(invoice as string)}>
             Try again
           </Button>
         }
@@ -210,7 +211,7 @@ export const PaymentStatusAlert = () => {
             </Button>
           )}
           {paymentStatus.statusInfo.type === 'processing' && (
-            <Button size='small' onClick={() => fetchPaymentStatus(paymentStatus.invoiceId)}>
+            <Button size='small' onClick={async () => fetchPaymentStatus(paymentStatus.invoiceId)}>
               Refresh status
             </Button>
           )}

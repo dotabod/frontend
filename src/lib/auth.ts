@@ -1,15 +1,19 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { captureException, captureMessage } from '@sentry/nextjs'
 import type { NextAuthOptions } from 'next-auth'
-import { decode, encode, type JWT } from 'next-auth/jwt'
+import { decode, encode } from 'next-auth/jwt'
+import type { JWT } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import TwitchProvider from 'next-auth/providers/twitch'
+
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { reconcileTwitchProfile } from '@/lib/reconcileTwitchProfile'
 import { twitchHelixProfile } from '@/lib/twitchHelixProfile'
 import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
+import { parseTwitchProfile } from '@/types/twitch'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
+
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './authScopes'
 
 const extractCookieValue = (cookieHeader: string | string[] | undefined, name: string) => {
@@ -95,7 +99,7 @@ export const authOptions: NextAuthOptions = {
         return token
       }
 
-      const twitchProfile = profile as TwitchProfile | undefined
+      const twitchProfile: TwitchProfile | undefined = parseTwitchProfile(profile)
       const twitchUser = user as TwitchUser
 
       // displayName MUST prefer the fresh OIDC `preferred_username` over
@@ -139,7 +143,7 @@ export const authOptions: NextAuthOptions = {
           locale: true,
         },
         where: {
-          id: token.id || user.id || profile?.sub,
+          id: token.id || user.id || twitchProfile?.sub,
         },
       })
 
@@ -324,15 +328,17 @@ export const authOptions: NextAuthOptions = {
     // true, and the 5-min runSubscriptionHealthCheck reconciles missing
     // subs for the no-transition edge case.)
     signIn({ user, account }) {
-      if (!user.id || !account || account.provider !== 'twitch' || !account.access_token) return
+      if (!user.id || !account || account.provider !== 'twitch' || !account.access_token) {
+        return
+      }
       const userId = user.id
       const twitchUser = user as TwitchUser
       reconcileTwitchProfile({
+        accessToken: account.access_token,
+        currentDisplayName: twitchUser.displayName ?? null,
+        currentName: twitchUser.name ?? null,
         prisma,
         userId,
-        accessToken: account.access_token,
-        currentName: twitchUser.name ?? null,
-        currentDisplayName: twitchUser.displayName ?? null,
       }).catch((error) => {
         console.error('Error reconciling twitch profile:', error)
         captureException(error, { extra: { userId } })
@@ -346,6 +352,7 @@ export const authOptions: NextAuthOptions = {
   // still mirror to console so Vercel function logs keep their familiar
   // `[next-auth]` markers for grep-based triage.
   logger: {
+    debug() {},
     error(code, metadata) {
       // `code` is typed string by NextAuth, but the `/api/auth/_log` POST path
       // unpacks it from `req.body` so a crafted client can send a non-string.
@@ -369,7 +376,7 @@ export const authOptions: NextAuthOptions = {
           source: 'next-auth',
           code: known === 'unknown' ? code.slice(0, 60) : code,
         },
-        extra: metadata instanceof Error ? undefined : (metadata as Record<string, unknown>),
+        extra: metadata instanceof Error ? undefined : metadata,
       })
     },
     warn(code) {
@@ -385,7 +392,6 @@ export const authOptions: NextAuthOptions = {
         },
       })
     },
-    debug() {},
   },
   pages: {
     error: '/error',
@@ -561,7 +567,7 @@ export const authOptions: NextAuthOptions = {
       // INSERT — eliminating the window where the backend's twitch-events
       // watcher had to retroactively fix the row.
       async profile(profile, tokens) {
-        return twitchHelixProfile(profile, tokens.access_token ?? '')
+        return await twitchHelixProfile(profile, tokens.access_token ?? '')
       },
     }),
   ],

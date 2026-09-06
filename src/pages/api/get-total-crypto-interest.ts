@@ -1,5 +1,6 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import prisma from '@/lib/db'
 

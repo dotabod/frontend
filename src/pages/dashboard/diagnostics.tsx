@@ -1,16 +1,14 @@
 import { Alert, Button, Card, Tag } from 'antd'
 import { Activity, CircleCheck, CircleX, LoaderCircle } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSession } from 'next-auth/react'
 import io from 'socket.io-client'
 import useSWR from 'swr'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
-import {
-  diagnoseSetup,
-  type BrowserProbeStatus,
-  isCompleteDiagnosticPayload,
-} from '@/lib/diagnostics/diagnoseSetup'
+import { diagnoseSetup, isCompleteDiagnosticPayload } from '@/lib/diagnostics/diagnoseSetup'
+import type { BrowserProbeStatus } from '@/lib/diagnostics/diagnoseSetup'
 import { fetcher } from '@/lib/fetcher'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
@@ -57,7 +55,9 @@ const diagnosisCopy = {
 } as const
 
 function formatSeen(value: string | null): string {
-  if (!value) return 'Never'
+  if (!value) {
+    return 'Never'
+  }
   return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'medium' }).format(
     new Date(value),
   )
@@ -73,18 +73,24 @@ const DiagnosticsPage = () => {
   const runProbe = useCallback(async () => {
     const token = session.data?.user?.id
     const endpoint = process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL
-    if (!token || !endpoint) return
+    if (!token || !endpoint) {
+      return
+    }
 
     setBrowserProbe('running')
     const controller = new AbortController()
-    const timeout = window.setTimeout(() => controller.abort(), 15_000)
+    const timeout = window.setTimeout(() => {
+      controller.abort()
+    }, 15_000)
 
     try {
       const payloadCheck = fetch(`${endpoint.replace(/\/$/, '')}/diagnostics/payload`, {
         cache: 'no-store',
         signal: controller.signal,
       }).then(async (response) => {
-        if (!response.ok) throw new Error('Payload request failed')
+        if (!response.ok) {
+          throw new Error('Payload request failed')
+        }
         const payload = await response.arrayBuffer()
         if (!isCompleteDiagnosticPayload(payload.byteLength)) {
           throw new Error('Payload was truncated')

@@ -1,5 +1,6 @@
 import { act, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import ProfilePage, { getServerSideProps } from '@/pages/[username]'
 
 const prismaMocks = vi.hoisted(() => ({
@@ -14,7 +15,9 @@ const socketState = vi.hoisted(() => {
     connected: true,
     disconnect: vi.fn(),
     emit: vi.fn((event: string, _request: unknown, callback: (response: unknown) => void) => {
-      if (event !== 'request-wl') return
+      if (event !== 'request-wl') {
+        return
+      }
       callback({
         records: [{ lose: 3, type: 'R', win: 8 }],
         statsDays: 14,
@@ -320,6 +323,31 @@ describe('public profile match overview', () => {
     expect(screen.getByRole('link', { name: 'View all matches' })).toHaveAttribute(
       'href',
       '/streamer/matches',
+    )
+  })
+
+  it('keeps profile navigation on Dotabod when a supplied username resembles a protocol-relative URL', () => {
+    const unsafeUsername = '//attacker.example'
+    const { rerender } = render(
+      <ProfilePage
+        {...baseProps}
+        username={unsafeUsername}
+        collection={{ cards: [], count: 1, tally: [] }}
+      />,
+    )
+
+    expect(
+      screen.getByRole('link', { name: '1 heroes collected, open collection' }),
+    ).toHaveAttribute('href', '/streamers')
+
+    rerender(<ProfilePage {...baseProps} username={unsafeUsername} collection={null} />)
+
+    expect(
+      screen.getByRole('link', { name: '0 heroes collected, learn how the collection works' }),
+    ).toHaveAttribute('href', '/streamers')
+    expect(screen.getByRole('link', { name: 'Match history' })).toHaveAttribute(
+      'href',
+      '/streamers',
     )
   })
 })

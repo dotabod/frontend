@@ -1,9 +1,10 @@
 import { Button, notification, Select, Tag } from 'antd'
-import Head from 'next/head'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import ModeratedChannels from '@/components/Dashboard/ModeratedChannels'
@@ -175,7 +176,7 @@ const ModeratorsPage = () => {
               </p>
             </div>
 
-            <div className='max-w-sm flex flex-col gap-4'>
+            <div className='flex max-w-sm flex-col gap-4'>
               <Select
                 disabled={!tierAccess.hasAccess}
                 optionFilterProp='label'

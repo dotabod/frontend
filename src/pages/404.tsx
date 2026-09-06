@@ -4,6 +4,7 @@ import { GiftIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { useState } from 'react'
+
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
 
@@ -45,8 +46,12 @@ const NotFound: NextPageWithLayout = () => {
               ? 'text-gray-300 hover:text-gray-500 hover:delay-[0ms]'
               : 'text-purple-400 hover:text-purple-300'
           }`}
-          onMouseEnter={() => setHoveredIndex(index)}
-          onMouseLeave={() => setHoveredIndex(null)}
+          onMouseEnter={() => {
+            setHoveredIndex(index)
+          }}
+          onMouseLeave={() => {
+            setHoveredIndex(null)
+          }}
         >
           <AnimatePresence>
             {hoveredIndex === index && isMainNav && (
@@ -74,7 +79,7 @@ const NotFound: NextPageWithLayout = () => {
 
   return (
     <div
-      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr] lg:grid-cols-[max(50%,36rem)_1fr] bg-gray-900 text-gray-100'
+      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr] bg-gray-900 text-gray-100 lg:grid-cols-[max(50%,36rem)_1fr]'
       style={{
         minHeight: 'inherit',
       }}
@@ -84,7 +89,7 @@ const NotFound: NextPageWithLayout = () => {
           <div className='text-purple-400'>
             <span className='text-7xl font-bold'>404</span>
           </div>
-          <h1 className='mt-4 text-3xl font-bold tracking-tight sm:text-5xl text-white'>
+          <h1 className='mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl'>
             Oops! Page not found
           </h1>
           <p className='mt-6 text-base leading-7 text-gray-300'>
@@ -93,7 +98,7 @@ const NotFound: NextPageWithLayout = () => {
 
           {/* Main navigation links */}
           <div className='mt-8'>
-            <h2 className='text-sm font-semibold text-gray-300 mb-3'>Main navigation:</h2>
+            <h2 className='mb-3 text-sm font-semibold text-gray-300'>Main navigation:</h2>
             <div className='flex flex-wrap gap-1'>
               {mainNavLinks.map((link, index) => renderNavLink(link, index))}
             </div>
@@ -101,7 +106,7 @@ const NotFound: NextPageWithLayout = () => {
 
           {/* Additional helpful links */}
           <div className='mt-8'>
-            <h2 className='text-sm font-semibold text-gray-300 mb-3'>Additional links:</h2>
+            <h2 className='mb-3 text-sm font-semibold text-gray-300'>Additional links:</h2>
             <div className='grid grid-cols-2 gap-x-4 gap-y-1'>
               {additionalLinks.map((link, index) =>
                 renderNavLink(link, index + mainNavLinks.length, false),
@@ -112,7 +117,7 @@ const NotFound: NextPageWithLayout = () => {
           <div className='mt-10'>
             <Link
               href='/'
-              className='inline-flex items-center rounded-md bg-purple-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 transition-colors'
+              className='inline-flex items-center rounded-md bg-purple-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600'
             >
               <span aria-hidden='true'>&larr;</span>
               <span className='ml-1'>Back to home</span>
@@ -121,11 +126,11 @@ const NotFound: NextPageWithLayout = () => {
         </div>
       </main>
       <div className='hidden lg:relative lg:col-start-2 lg:row-start-1 lg:row-end-4 lg:block'>
-        <div className='absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10' />
+        <div className='absolute inset-0 z-10 bg-gradient-to-r from-gray-900 to-transparent' />
         <img
           src='/images/404.webp'
           alt='Lost in space illustration'
-          className='absolute inset-0 h-full w-full object-cover rounded-sm opacity-80'
+          className='absolute inset-0 h-full w-full rounded-sm object-cover opacity-80'
         />
       </div>
     </div>

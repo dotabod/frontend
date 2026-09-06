@@ -1,10 +1,6 @@
-import {
-  type Subscription,
-  SubscriptionStatus,
-  SubscriptionTier,
-  TransactionType,
-} from '@prisma/client'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import type { Subscription } from '@prisma/client'
+import { describe, expect, it, vi } from 'vitest'
 
 // We need to mock the module before importing it
 vi.mock('@/utils/subscription', async () => {
@@ -71,6 +67,9 @@ describe('Subscription priority logic', () => {
     // Mock the database calls with proper types
     // Set proExpiration to null to avoid the virtual gift subscription
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -100,9 +99,6 @@ describe('Subscription priority logic', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     vi.mocked(prisma.subscription.findMany).mockResolvedValue([
@@ -124,6 +120,9 @@ describe('Subscription priority logic', () => {
   it('returns null when no subscriptions exist and grace period check fails', async () => {
     // Mock the database calls
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -153,9 +152,6 @@ describe('Subscription priority logic', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     // Return empty array to simulate no subscriptions
@@ -170,7 +166,7 @@ describe('Subscription priority logic', () => {
   })
 })
 
-describe('getBillingSummaryInfo', () => {
+describe(getBillingSummaryInfo, () => {
   it('summarizes an active paid subscription with Stripe management', () => {
     const summary = getBillingSummaryInfo({
       cancelAtPeriodEnd: false,
@@ -189,7 +185,7 @@ describe('getBillingSummaryInfo', () => {
     expect(summary.headline).toBe('Your Pro plan is active')
     expect(summary.nextStepLabel).toBe('Renews')
     expect(summary.nextStepValue).toBe('April 20, 2026')
-    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.canManageInStripe).toBeTruthy()
     expect(summary.portalButtonLabel).toBe('Open billing portal')
   })
 
@@ -229,7 +225,7 @@ describe('getBillingSummaryInfo', () => {
     })
 
     expect(summary.statusLabel).toBe('Complimentary access')
-    expect(summary.canManageInStripe).toBe(false)
+    expect(summary.canManageInStripe).toBeFalsy()
     expect(summary.portalSummaryLabel).toBe('No Stripe billing profile yet')
   })
 
@@ -249,7 +245,7 @@ describe('getBillingSummaryInfo', () => {
     })
 
     expect(summary.headline).toBe('You have lifetime access to Dotabod Pro')
-    expect(summary.canManageInStripe).toBe(false)
+    expect(summary.canManageInStripe).toBeFalsy()
     expect(summary.creditMessage).toContain('$25.00')
   })
 
@@ -271,7 +267,7 @@ describe('getBillingSummaryInfo', () => {
     expect(summary.headline).toBe('Your subscription has been canceled')
     expect(summary.statusLabel).toBe('Canceled')
     expect(summary.tone).toBe('info')
-    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.canManageInStripe).toBeTruthy()
   })
 
   it('summarizes an incomplete subscription with warning tone', () => {
@@ -292,7 +288,7 @@ describe('getBillingSummaryInfo', () => {
     expect(summary.headline).toBe('Your payment is incomplete')
     expect(summary.statusLabel).toBe('Incomplete')
     expect(summary.tone).toBe('warning')
-    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.canManageInStripe).toBeTruthy()
     expect(summary.portalButtonLabel).toBe('Update payment method')
   })
 
@@ -334,7 +330,7 @@ describe('getBillingSummaryInfo', () => {
     expect(summary.headline).toBe('Your invoice is unpaid')
     expect(summary.statusLabel).toBe('Unpaid')
     expect(summary.tone).toBe('error')
-    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.canManageInStripe).toBeTruthy()
     expect(summary.portalButtonLabel).toBe('Pay invoice')
   })
 
@@ -356,7 +352,7 @@ describe('getBillingSummaryInfo', () => {
     expect(summary.headline).toBe('Your subscription is paused')
     expect(summary.statusLabel).toBe('Paused')
     expect(summary.tone).toBe('warning')
-    expect(summary.canManageInStripe).toBe(true)
+    expect(summary.canManageInStripe).toBeTruthy()
     expect(summary.portalButtonLabel).toBe('Resume subscription')
   })
 })

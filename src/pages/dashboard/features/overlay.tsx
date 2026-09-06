@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import AutoTranslateCard from '@/components/Dashboard/Features/AutoTranslateCard'
 import MinimapCard from '@/components/Dashboard/Features/MinimapCard'

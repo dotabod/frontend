@@ -1,34 +1,39 @@
+import { createCache, StyleProvider } from '@ant-design/cssinjs'
+import { MantineProvider } from '@mantine/core'
+import { GoogleAnalytics } from '@next/third-parties/google'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
+import { App as AntProvider, ConfigProvider, unstableSetRender } from 'antd'
+import type { NextPage } from 'next'
+import type { Session } from 'next-auth'
+
+import '@/styles/tailwind.css'
+import '@/styles/crypto-animations.css'
+import { SessionProvider } from 'next-auth/react'
+import type { AppProps } from 'next/app'
+
+import '@mantine/core/styles.css'
+import { useRouter } from 'next/router'
+import Script from 'next/script'
+import type { ReactElement, ReactNode } from 'react'
+
+import 'antd/dist/reset.css'
+import 'focus-visible'
+import { useEffect, useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import type { Root } from 'react-dom/client'
+import { Provider } from 'react-redux'
+
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SentrySession from '@/components/SentrySession'
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext'
 import { SubscriptionProviderMain } from '@/hooks/SubscriptionProvider'
 import { useCookiePreferences } from '@/lib/cookieManager'
+import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
 import store from '@/lib/redux/store'
 import themeConfig from '@/lib/theme/themeConfig'
-import '@/styles/tailwind.css'
-import '@/styles/crypto-animations.css'
-import { createCache, StyleProvider } from '@ant-design/cssinjs'
-import { MantineProvider } from '@mantine/core'
-import '@mantine/core/styles.css'
-import { GoogleAnalytics } from '@next/third-parties/google'
-import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
-import { App as AntProvider, ConfigProvider, unstableSetRender } from 'antd'
-import 'antd/dist/reset.css'
-import 'focus-visible'
-import type { NextPage } from 'next'
-import type { AppProps } from 'next/app'
-import { useRouter } from 'next/router'
-import Script from 'next/script'
-import type { Session } from 'next-auth'
-import { SessionProvider } from 'next-auth/react'
-import type { ReactElement, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
-import { Provider } from 'react-redux'
-import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlayUtils'
 
 const isInvalidLocalCheck = checkForInvalidOverlay(
-  typeof window !== 'undefined' ? window.location.pathname : '',
+  typeof window === 'undefined' ? '' : window.location.pathname,
 )
 
 // Define a type for the container with _reactRoot property

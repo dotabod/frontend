@@ -1,9 +1,10 @@
 // @ts-nocheck
 import { render, screen } from '@testing-library/react'
-import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import useSWR from 'swr'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { createMockRouter, createMockSession, createMockSWR } from '@/__tests__/utils/mockFactories'
 import SetupPage from '@/pages/dashboard/index'
 

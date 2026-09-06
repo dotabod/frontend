@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('next-auth/next', () => ({
   getServerSession: vi.fn(),
@@ -17,6 +17,7 @@ vi.mock('@/lib/db', () => ({
 }))
 
 import { getServerSession } from 'next-auth/next'
+
 import prisma from '@/lib/db'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
 
@@ -26,11 +27,11 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-describe('requireDashboardAccess', () => {
+describe(requireDashboardAccess, () => {
   it('redirects to /error?error=ACCOUNT_BANNED when users.bannedAt is set', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-banned', role: 'user' },
-    } as any)
+    })
     vi.mocked(prisma.user.findUnique).mockResolvedValue({ bannedAt: new Date() } as any)
 
     const result = (await requireDashboardAccess()(ctx)) as { redirect: { destination: string } }
@@ -41,12 +42,12 @@ describe('requireDashboardAccess', () => {
   it('passes through when bannedAt is null', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-ok', role: 'user' },
-    } as any)
+    })
     vi.mocked(prisma.user.findUnique).mockResolvedValue({ bannedAt: null } as any)
 
     const result = (await requireDashboardAccess()(ctx)) as { props: Record<string, unknown> }
 
-    expect(result.props).toEqual({})
+    expect(result.props).toStrictEqual({})
   })
 
   it('redirects to /login when there is no session (skips ban check entirely)', async () => {

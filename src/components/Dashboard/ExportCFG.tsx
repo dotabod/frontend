@@ -2,9 +2,11 @@ import { AppleOutlined, LinuxOutlined, WindowsOutlined } from '@ant-design/icons
 import { Alert, Button, Tabs } from 'antd'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+
 import UnixInstaller from '@/components/Dashboard/UnixInstaller'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
+
 import WindowsInstaller from './WindowsInstaller'
 
 function InstallPage() {
@@ -64,8 +66,10 @@ function InstallPage() {
               The Automatic installer is Windows only. If you play Dota 2 on Windows,{' '}
               <Button
                 type='link'
-                onClick={() => updateUrlWithGsiType('windows')}
-                className='p-0! h-auto! align-baseline!'
+                onClick={() => {
+                  updateUrlWithGsiType('windows')
+                }}
+                className='h-auto! p-0! align-baseline!'
               >
                 switch to the Automatic tab
               </Button>{' '}

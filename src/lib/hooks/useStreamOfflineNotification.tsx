@@ -41,7 +41,9 @@ export const useStreamOfflineNotification = (
         refreshSettingsRef.current()
       }, OFFLINE_SETTINGS_REFRESH_MS)
 
-      return () => window.clearInterval(refreshTimer)
+      return () => {
+        window.clearInterval(refreshTimer)
+      }
     }
 
     notification.destroy('stream-offline')

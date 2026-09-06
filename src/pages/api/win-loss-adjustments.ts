@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -20,7 +21,8 @@ const adjustmentSchema = z.object({
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Unauthorized' })
+    res.status(403).json({ message: 'Unauthorized' })
+    return
   }
 
   try {
@@ -34,10 +36,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       select: { createdAt: true },
     })
 
-    return res.status(201).json(created)
+    res.status(201).json(created)
+    return
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(422).json(error.issues)
+      res.status(422).json(error.issues)
+      return
     }
 
     captureException(error)

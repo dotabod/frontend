@@ -1,7 +1,8 @@
-import { act, render, waitFor } from '@testing-library/react'
 import * as Sentry from '@sentry/nextjs'
+import { act, render, waitFor } from '@testing-library/react'
 import useSWR from 'swr'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useUpdate, useUpdateAccount, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 
 const mutateMock = vi.hoisted(() => vi.fn())
@@ -38,7 +39,7 @@ vi.mock('@/hooks/useSubscription', () => ({
   useSubscription: () => ({ subscription: null }),
 }))
 
-describe('useUpdate', () => {
+describe(useUpdate, () => {
   beforeEach(() => {
     mutateMock.mockResolvedValue(undefined)
   })
@@ -117,7 +118,7 @@ describe('useUpdate', () => {
 
     let resolveFetch: ((value: Response) => void) | undefined
     global.fetch = vi.fn(
-      () =>
+      async () =>
         new Promise<Response>((resolve) => {
           resolveFetch = resolve
         }),
@@ -141,14 +142,14 @@ describe('useUpdate', () => {
 
     render(<TestComponent />)
 
-    expect(refs.isSaving).toBe(false)
+    expect(refs.isSaving).toBeFalsy()
 
     act(() => {
       refs.updateSetting?.({ value: true }, '/api/settings/bets')
     })
 
     await waitFor(() => {
-      expect(refs.isSaving).toBe(true)
+      expect(refs.isSaving).toBeTruthy()
     })
 
     await act(async () => {
@@ -156,7 +157,7 @@ describe('useUpdate', () => {
     })
 
     await waitFor(() => {
-      expect(refs.isSaving).toBe(false)
+      expect(refs.isSaving).toBeFalsy()
     })
 
     expect(savingHistory).toContain(true)
@@ -174,7 +175,7 @@ describe('useUpdate', () => {
       error: undefined,
     } as ReturnType<typeof useSWR>)
 
-    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 403 } as Response)
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 403 })
 
     let updatePromise: Promise<unknown> | undefined
     mutateMock.mockImplementation(async (_path, promise) => {
@@ -204,23 +205,23 @@ describe('useUpdate', () => {
     expect(Sentry.captureException).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
-        tags: expect.objectContaining({ feature: 'settings-mutation' }),
         extra: expect.objectContaining({ status: 403, path: '/api/settings/bets' }),
+        tags: expect.objectContaining({ feature: 'settings-mutation' }),
       }),
     )
     expect(messageOpenMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'error',
         content: expect.stringContaining('permission'),
+        type: 'error',
       }),
     )
   })
 })
 
-describe('useUpdateAccount', () => {
+describe(useUpdateAccount, () => {
   beforeEach(() => {
     mutateMock.mockResolvedValue(undefined)
-    global.fetch = vi.fn().mockResolvedValue({ ok: true } as Response)
+    global.fetch = vi.fn().mockResolvedValue({ ok: true })
   })
 
   afterEach(() => {
@@ -279,7 +280,7 @@ describe('useUpdateAccount', () => {
 describe('useUpdateSetting (chatters)', () => {
   beforeEach(() => {
     mutateMock.mockResolvedValue(undefined)
-    global.fetch = vi.fn().mockResolvedValue({ ok: true } as Response)
+    global.fetch = vi.fn().mockResolvedValue({ ok: true })
   })
 
   afterEach(() => {
@@ -313,7 +314,7 @@ describe('useUpdateSetting (chatters)', () => {
     render(<TestComponent />)
 
     // Sanity: the switch starts in the stored (disabled) state.
-    expect(refs.value).toBe(false)
+    expect(refs.value).toBeFalsy()
 
     act(() => {
       refs.updateSetting?.(true)

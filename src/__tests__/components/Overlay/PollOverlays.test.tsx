@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { PollOverlays } from '@/components/Overlay/PollOverlays'
 
 const pollOverlayMock = vi.hoisted(() => ({
@@ -25,7 +26,7 @@ vi.mock('@/lib/hooks/useUpdateSetting', () => ({
   useUpdateSetting: () => ({ data: true }),
 }))
 
-describe('PollOverlays', () => {
+describe(PollOverlays, () => {
   beforeEach(() => {
     pollOverlayMock.lastOnComplete = null
   })
@@ -92,8 +93,8 @@ describe('PollOverlays', () => {
       const baseProps = {
         pollData: null,
         radiantWinChance: null,
-        setPollData: vi.fn(),
         setBetData,
+        setPollData: vi.fn(),
       }
 
       const { rerender } = render(

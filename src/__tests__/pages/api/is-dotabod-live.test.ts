@@ -1,7 +1,8 @@
 // @ts-nocheck
 import type { NextApiHandler } from 'next'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/is-dotabod-live'
 
 // Mock the prisma client
@@ -24,6 +25,7 @@ vi.mock('@/lib/api-middlewares/with-methods', () => ({
 }))
 
 import { captureException } from '@sentry/nextjs'
+
 // Import the mocked modules
 import prisma from '@/lib/db'
 
@@ -65,7 +67,7 @@ describe('is-dotabod-live API', () => {
         name: 'dotabod',
       },
     })
-    expect(res._getJSONData()).toBe(true)
+    expect(res._getJSONData()).toBeTruthy()
   })
 
   it('returns false when dotabod is not live', async () => {
@@ -86,7 +88,7 @@ describe('is-dotabod-live API', () => {
         name: 'dotabod',
       },
     })
-    expect(res._getJSONData()).toBe(false)
+    expect(res._getJSONData()).toBeFalsy()
   })
 
   it('returns false when dotabod is not found', async () => {
@@ -107,7 +109,7 @@ describe('is-dotabod-live API', () => {
         name: 'dotabod',
       },
     })
-    expect(res._getJSONData()).toBe(false)
+    expect(res._getJSONData()).toBeFalsy()
   })
 
   it('handles database errors correctly', async () => {
@@ -127,9 +129,9 @@ describe('is-dotabod-live API', () => {
     // Wait for any pending promises to resolve (like the .catch handler)
     await new Promise(process.nextTick)
 
-    expect(prisma.user.findFirst).toHaveBeenCalled()
+    expect(prisma.user.findFirst).toHaveBeenCalledOnce()
     // The handler should be passing the error to captureException
-    expect(captureException).toHaveBeenCalledTimes(1)
+    expect(captureException).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(500)
   })
 })

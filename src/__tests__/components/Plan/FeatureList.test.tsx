@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vite-plus/test'
-import { FeatureList } from '@/components/Plan'
+import { describe, expect, it } from 'vitest'
 
-describe('FeatureList', () => {
+import { FeatureList } from '@/components/Plan/FeatureList'
+
+describe(FeatureList, () => {
   it('renders provided features', () => {
     const features = ['One', 'Two']
     render(<FeatureList features={features} featured={false} payWithCrypto={false} />)

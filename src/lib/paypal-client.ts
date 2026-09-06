@@ -11,5 +11,5 @@ export async function createPaypalCheckout(period: string): Promise<{ url: strin
     throw new Error('Failed to create checkout session')
   }
 
-  return response.json()
+  return await response.json()
 }

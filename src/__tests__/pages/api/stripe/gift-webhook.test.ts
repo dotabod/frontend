@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
  * Tests for the Stripe webhook handler specifically for gift subscriptions
@@ -137,7 +137,7 @@ describe('Gift Subscription Webhook Handler', () => {
   })
 
   it('should have the correct API config', () => {
-    expect(config).toEqual({
+    expect(config).toStrictEqual({
       api: {
         bodyParser: false,
       },
@@ -157,7 +157,7 @@ describe('Gift Subscription Webhook Handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       endDate: '2025-04-15T15:22:58.000Z',
       gift: true,
       giftType: 'monthly',
@@ -179,7 +179,7 @@ describe('Gift Subscription Webhook Handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       endDate: '2026-03-15T15:22:58.000Z',
       gift: true,
       giftType: 'annual',
@@ -201,7 +201,7 @@ describe('Gift Subscription Webhook Handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       endDate: '2099-12-31T23:59:59.999Z',
       gift: true,
       giftType: 'lifetime',
@@ -223,7 +223,7 @@ describe('Gift Subscription Webhook Handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       endDate: '2025-04-15T15:22:58.000Z',
       gift: true,
       hasExistingSubscription: true,
@@ -245,7 +245,7 @@ describe('Gift Subscription Webhook Handler', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       endDate: '2025-06-15T15:22:58.000Z',
       finalQuantity: 3,
       gift: true,

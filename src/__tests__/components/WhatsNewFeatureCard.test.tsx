@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
@@ -31,25 +31,25 @@ import WhatsNewFeatureCard from '@/components/Dashboard/Features/WhatsNewFeature
 import type { WhatsNewEntry } from '@/lib/whatsNew'
 
 const entry: WhatsNewEntry = {
-  id: 'demo',
-  title: 'Demo feature',
-  description: 'A demo feature.',
-  releaseDate: '2026-06-10',
-  category: 'chat',
-  settingKey: 'cosmeticsAnnounce',
-  followsNewFeatureMaster: true,
-  command: '!demo',
   blogSlug: 'hello-world',
+  category: 'chat',
+  command: '!demo',
   deepLink: { path: '/dashboard/commands', section: 'y' },
   demo: {
     chat: 'Playing Pudge Pog new card unlocked, 3 cosmetics saved → dotabod.com/streamer/set',
-    exampleUrl: 'https://dotabod.com/streamer/set',
     exampleLabel: "See streamer's set page →",
+    exampleUrl: 'https://dotabod.com/streamer/set',
   },
+  description: 'A demo feature.',
   details: ['First how-it-works paragraph.', 'Second how-it-works paragraph.'],
+  followsNewFeatureMaster: true,
+  id: 'demo',
+  releaseDate: '2026-06-10',
+  settingKey: 'cosmeticsAnnounce',
+  title: 'Demo feature',
 }
 
-describe('WhatsNewFeatureCard', () => {
+describe(WhatsNewFeatureCard, () => {
   it('renders a labeled release article with its category, state, and actions', () => {
     render(<WhatsNewFeatureCard entry={entry} master latest />)
 
@@ -82,7 +82,7 @@ describe('WhatsNewFeatureCard', () => {
   it('renders the live command sample (with flag/emoji images) when demoCommand is set', () => {
     render(
       <WhatsNewFeatureCard
-        entry={{ ...entry, demoCommand: 'commandNP', demo: undefined }}
+        entry={{ ...entry, demo: undefined, demoCommand: 'commandNP' }}
         master
       />,
     )
@@ -94,7 +94,7 @@ describe('WhatsNewFeatureCard', () => {
   it('omits the toggle when the feature has no setting', () => {
     render(
       <WhatsNewFeatureCard
-        entry={{ ...entry, settingKey: undefined, followsNewFeatureMaster: false }}
+        entry={{ ...entry, followsNewFeatureMaster: false, settingKey: undefined }}
         master={false}
       />,
     )

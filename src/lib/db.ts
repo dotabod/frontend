@@ -1,5 +1,6 @@
-import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 import { PrismaClient } from '@prisma/client'
+
+import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 
 // Extend the global object for TypeScript so the singletons survive hot reloads
 declare global {

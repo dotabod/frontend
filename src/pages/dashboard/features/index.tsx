@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import type { ReactElement } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import BetsCard from '@/components/Dashboard/Features/BetsCard'
 import IdeaCard from '@/components/Dashboard/Features/IdeaCard'

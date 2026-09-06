@@ -1,6 +1,8 @@
 import Link from 'next/link'
+
 import { Settings } from '@/lib/defaultSettings'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from './TierSwitch'
 
 // Account-wide control for how new dotabod features (across chat, overlays, betting, etc.)

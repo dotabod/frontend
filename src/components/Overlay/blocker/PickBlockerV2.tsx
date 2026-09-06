@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
 import styled from 'styled-components'
+
 import { useIsDevMode } from '@/lib/hooks/useIsDevMode'
+
 import { useDynamicResizing, useWindowResize } from './hooks'
 
 const TopHud = styled.div`

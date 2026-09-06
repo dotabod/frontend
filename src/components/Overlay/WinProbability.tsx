@@ -1,11 +1,13 @@
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
 import { Logomark } from 'src/components/Logo'
+
 import { Settings } from '@/lib/defaultSettings'
 import type { WinChance } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
+
 import { AnimatedNumber } from './AnimatedNumber'
 import { TextWithEmotes } from './TextWithEmotes'
 

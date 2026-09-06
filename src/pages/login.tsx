@@ -1,9 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
 import { App, Typography } from 'antd'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import { type ReactElement, useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
+import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import { UserAuthForm } from '@/components/Homepage/AuthForm'
 import HomepageShell from '@/components/Homepage/HomepageShell'
@@ -47,7 +49,7 @@ const Login: NextPageWithLayout = () => {
           // Fingerprint is bounded by KNOWN_AUTH_ERRORS so unknown codes
           // can't create unbounded Sentry issues.
           fingerprint: ['login-error', known],
-          tags: { page: 'login', oauthError: known },
+          tags: { oauthError: known, page: 'login' },
           extra: known === 'Unknown' ? { rawCode: code.slice(0, 100) } : undefined,
         })
       }
@@ -94,7 +96,9 @@ const Login: NextPageWithLayout = () => {
   }, [router.push, status])
 
   useEffect(() => {
-    if (status === 'authenticated') return
+    if (status === 'authenticated') {
+      return
+    }
     const rawError = router.query.error
     const errorCode = Array.isArray(rawError) ? rawError[0] : rawError
     if (errorCode) {

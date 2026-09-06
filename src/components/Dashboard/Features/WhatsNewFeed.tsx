@@ -1,21 +1,24 @@
 import { useMemo, useState } from 'react'
+
 import ErrorBoundary from '@/components/ErrorBoundary'
-import { groupWhatsNewByDate, type WhatsNewEntry } from '@/lib/whatsNew'
+import { groupWhatsNewByDate } from '@/lib/whatsNew'
+import type { WhatsNewEntry } from '@/lib/whatsNew'
 import { formatDate } from '@/utils/formatDate'
+
 import WhatsNewFeatureCard from './WhatsNewFeatureCard'
 
 type FeedFilter = 'all' | 'chat' | 'stream' | 'dashboard' | 'pages'
 
-const FILTERS: Array<{
+const FILTERS: {
   id: FeedFilter
   label: string
   categories?: WhatsNewEntry['category'][]
-}> = [
+}[] = [
   { id: 'all', label: 'All updates' },
-  { id: 'chat', label: 'Chat & commands', categories: ['chat', 'commands'] },
-  { id: 'stream', label: 'Stream tools', categories: ['overlay', 'stream', 'bets', 'mmr'] },
-  { id: 'dashboard', label: 'Dashboard & billing', categories: ['advanced'] },
-  { id: 'pages', label: 'Public pages', categories: ['pages'] },
+  { categories: ['chat', 'commands'], id: 'chat', label: 'Chat & commands' },
+  { categories: ['overlay', 'stream', 'bets', 'mmr'], id: 'stream', label: 'Stream tools' },
+  { categories: ['advanced'], id: 'dashboard', label: 'Dashboard & billing' },
+  { categories: ['pages'], id: 'pages', label: 'Public pages' },
 ]
 
 function entriesForFilter(entries: WhatsNewEntry[], filter: FeedFilter) {
@@ -63,7 +66,9 @@ export default function WhatsNewFeed({
                   type='button'
                   aria-label={filter.label}
                   aria-pressed={selected}
-                  onClick={() => setActiveFilter(filter.id)}
+                  onClick={() => {
+                    setActiveFilter(filter.id)
+                  }}
                   className={`flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-left text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
                     selected
                       ? 'border-gray-500 bg-gray-700 text-gray-100'

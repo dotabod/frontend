@@ -1,7 +1,9 @@
 import { Tag, Tooltip } from 'antd'
 import clsx from 'clsx'
+
 import { Settings } from '@/lib/defaultSettings'
 import { Card } from '@/ui/card'
+
 import MmrForm from './MmrForm'
 import { TierSwitch } from './TierSwitch'
 

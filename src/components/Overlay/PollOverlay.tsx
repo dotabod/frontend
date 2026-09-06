@@ -1,11 +1,14 @@
 import { Center, Progress } from '@mantine/core'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import Countdown, { type CountdownRenderProps, zeroPad } from 'react-countdown'
+import Countdown, { zeroPad } from 'react-countdown'
+import type { CountdownRenderProps } from 'react-countdown'
 import TwitchFetcher from 'twitch-fetcher'
+
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useGetSettings } from '@/lib/hooks/useUpdateSetting'
 import { motionProps } from '@/ui/utils'
+
 import { TextWithEmotes } from './TextWithEmotes'
 
 export interface PollData {
@@ -63,9 +66,9 @@ export const PollOverlay = ({
 
   const totalVotes = choices.reduce((acc, choice) => acc + (choice.totalVotes ?? 0), 0)
   const choicesWithPercent = choices.map((choice) => {
-    const percent = !totalVotes
-      ? Math.round(100 / choices.length)
-      : Math.round(((choice.totalVotes ?? 0) / totalVotes) * 100)
+    const percent = totalVotes
+      ? Math.round(((choice.totalVotes ?? 0) / totalVotes) * 100)
+      : Math.round(100 / choices.length)
     return { ...choice, percent }
   })
 

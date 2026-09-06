@@ -1,5 +1,5 @@
 import type { NowPaymentsInvoice } from '@prisma/client'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -9,7 +9,9 @@ const mocks = vi.hoisted(() => {
   return {
     handleInvoiceEvent: vi.fn(),
     prisma: {
-      $transaction: vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback(tx)),
+      $transaction: vi.fn(
+        async (callback: (tx: unknown) => Promise<unknown>) => await callback(tx),
+      ),
       nowPaymentsInvoice: { update: vi.fn() },
       subscription: { findFirst: vi.fn() },
     },
@@ -73,7 +75,7 @@ describe('processConfirmedNowPaymentsPayment', () => {
   beforeEach(() => {
     vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
     vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
-    mocks.prisma.$transaction.mockImplementation(async (cb) => cb(mocks.tx))
+    mocks.prisma.$transaction.mockImplementation(async (cb) => await cb(mocks.tx))
     mocks.handleInvoiceEvent.mockResolvedValue(true)
     mocks.prisma.subscription.findFirst.mockResolvedValue({ id: 'sub_1' })
   })
@@ -91,15 +93,15 @@ describe('processConfirmedNowPaymentsPayment', () => {
     const result = await processConfirmedNowPaymentsPayment(baseInvoice, basePayment)
 
     expect(result.reason).toBe('processed')
-    expect(result.stripeInvoiceMarkedPaid).toBe(true)
-    expect(result.subscriptionCreated).toBe(true)
+    expect(result.stripeInvoiceMarkedPaid).toBeTruthy()
+    expect(result.subscriptionCreated).toBeTruthy()
     expect(mocks.stripe.invoices.pay).toHaveBeenCalledWith(
       'in_1',
       { paid_out_of_band: true },
       { idempotencyKey: 'nowpayments-np_inv_1' },
     )
     expect(mocks.handleInvoiceEvent).toHaveBeenCalledWith(paidInvoice, mocks.tx)
-    expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenCalledTimes(1)
+    expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenCalledOnce()
     expect(mocks.prisma.nowPaymentsInvoice.update).toHaveBeenCalledWith({
       data: expect.objectContaining({
         lastWebhookAt: expect.any(Date),
@@ -167,7 +169,7 @@ describe('processConfirmedNowPaymentsPayment', () => {
     const result = await processConfirmedNowPaymentsPayment(baseInvoice, basePayment)
 
     expect(result.reason).toBe('processed')
-    expect(result.stripeInvoiceMarkedPaid).toBe(false)
+    expect(result.stripeInvoiceMarkedPaid).toBeFalsy()
     expect(mocks.stripe.invoices.pay).not.toHaveBeenCalled()
     expect(mocks.handleInvoiceEvent).toHaveBeenCalledWith(paidInvoice, mocks.tx)
   })

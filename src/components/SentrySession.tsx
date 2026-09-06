@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
+
 import { useCookiePreferences } from '@/lib/cookieManager'
 
 const SentrySession = () => {

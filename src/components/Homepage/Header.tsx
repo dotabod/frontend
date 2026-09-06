@@ -3,10 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { GiftIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { FC } from 'react'
-
 import { Container } from 'src/components/Container'
 import { Logo } from 'src/components/Logo'
 import { NavLinks, primaryNavLinks } from 'src/components/NavLinks'
+
 import { ChevronUpIcon } from '../ChevronUpIcon'
 import { LoginButton } from './LoginButton'
 import { MenuIcon } from './MenuIcon'
@@ -29,7 +29,7 @@ export const Header: FC = () => (
             {({ open }) => (
               <>
                 <PopoverButton
-                  className='relative z-10 -m-2 inline-flex items-center rounded-lg stroke-slate-300 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 active:stroke-gray-900 not-focus-visible:focus:outline-hidden'
+                  className='relative z-10 -m-2 inline-flex items-center rounded-lg stroke-slate-300 p-2 hover:bg-gray-200/50 hover:stroke-gray-600 not-focus-visible:focus:outline-hidden active:stroke-gray-900'
                   aria-label='Toggle site navigation'
                 >
                   {({ open }) =>
@@ -57,7 +57,7 @@ export const Header: FC = () => (
                           transition: { duration: 0.2 },
                           y: -32,
                         }}
-                        className='absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-800 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20'
+                        className='absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-800 px-6 pt-32 pb-6 shadow-2xl shadow-gray-900/20'
                       >
                         {/* Derived from the same primaryNavLinks the desktop nav uses
                             so the two never drift. Legal + GitHub/Discord live in the footer. */}

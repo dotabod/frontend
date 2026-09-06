@@ -2,6 +2,7 @@ import { CheckCircleFilled } from '@ant-design/icons'
 import { Alert, Button, Collapse, Tag } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
+
 import { useSteamLinkedAccount } from '@/lib/hooks/useSteamLinkedAccount'
 import { useTrack } from '@/lib/track'
 import { Card } from '@/ui/card'
@@ -36,7 +37,7 @@ const ConnectSteam = ({ isLive }: Props) => {
   return (
     <Card>
       <div className='mb-6'>
-        <h2 className='text-xl font-semibold mb-1'>Connect your Steam account</h2>
+        <h2 className='mb-1 text-xl font-semibold'>Connect your Steam account</h2>
         <p className='text-gray-400'>
           Play any match or demo a hero while your stream is live. Your Steam account links
           automatically the first time, once only.
@@ -56,8 +57,8 @@ const ConnectSteam = ({ isLive }: Props) => {
               The page will keep retrying in the background. If this sticks,{' '}
               <button
                 type='button'
-                onClick={() => mutate()}
-                className='underline bg-transparent border-0 p-0 cursor-pointer text-inherit'
+                onClick={async () => mutate()}
+                className='cursor-pointer border-0 bg-transparent p-0 text-inherit underline'
               >
                 try again
               </button>{' '}
@@ -77,7 +78,7 @@ const ConnectSteam = ({ isLive }: Props) => {
             Launch Dota 2
           </Button>
           {hasLaunchedDota && (
-            <p className='text-xs text-gray-400 mt-2 text-center'>
+            <p className='mt-2 text-center text-xs text-gray-400'>
               Once you&apos;re in a match (or demo), this page will update on its own.
             </p>
           )}
@@ -97,7 +98,9 @@ const ConnectSteam = ({ isLive }: Props) => {
       <div className='mt-8'>
         <Collapse
           ghost
-          onChange={() => track('setup/collapse_test_dotabod')}
+          onChange={() => {
+            track('setup/collapse_test_dotabod')
+          }}
           items={[
             {
               children: <TroubleshootingContent isLive={isLive} />,
@@ -130,7 +133,7 @@ const StatusPanel = ({
   }
 
   return (
-    <div className='rounded-md border border-gray-700 bg-gray-900/40 p-4 space-y-3'>
+    <div className='space-y-3 rounded-md border border-gray-700 bg-gray-900/40 p-4'>
       <StatusRow
         label='Stream'
         value={isLive ? 'Live' : 'Offline'}
@@ -171,7 +174,7 @@ const StatusRow = ({
         {value}
       </Tag>
     </div>
-    {hint && <p className='text-xs text-gray-500 mt-1'>{hint}</p>}
+    {hint && <p className='mt-1 text-xs text-gray-500'>{hint}</p>}
   </div>
 )
 
@@ -185,7 +188,7 @@ const TroubleshootingContent = ({ isLive }: { isLive: boolean }) => (
       />
     )}
     <p>Two ways to trigger the first connection:</p>
-    <ul className='list-disc ml-5 space-y-1 text-gray-400'>
+    <ul className='ml-5 list-disc space-y-1 text-gray-400'>
       <li>
         Quick check: demo any hero, then type <Tag>!innate</Tag> in chat to confirm Dotabod sees the
         game.

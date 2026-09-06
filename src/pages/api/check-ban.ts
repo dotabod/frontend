@@ -1,9 +1,11 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+
 import { getTwitchTokens } from '../../lib/getTwitchTokens'
 
 async function checkBan(broadcasterId: string | undefined, accessToken: string) {
@@ -34,13 +36,15 @@ async function checkBan(broadcasterId: string | undefined, accessToken: string) 
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' })
+    res.status(405).json({ message: 'Method Not Allowed' })
+    return
   }
 
   const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   try {
@@ -48,7 +52,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
     if (error) {
-      return res.status(403).json({ message: 'Forbidden' })
+      res.status(403).json({ message: 'Forbidden' })
+      return
     }
 
     const banResponse = await checkBan(providerAccountId, accessToken)
@@ -75,10 +80,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       disabledAt: commandDisableSetting?.autoDisabledAt,
     }
 
-    return res.status(200).json(response)
+    res.status(200).json(response)
+    return
   } catch (error) {
     captureException(error)
-    return res.status(500).json({ error: error.message, message: 'Failed to get ban info' })
+    res.status(500).json({ error: error.message, message: 'Failed to get ban info' })
+    return
   }
 }
 

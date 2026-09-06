@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { Bitcoin, CreditCard, Wallet } from 'lucide-react'
 import { memo, useId } from 'react'
+
 import type { PricePeriod } from '@/utils/subscription'
 
 export type PaymentMethod = 'card' | 'paypal' | 'crypto'
@@ -85,7 +86,9 @@ const PaymentMethodPicker = memo(
                     name={`payment-method-${groupId}`}
                     value={method}
                     checked={selected}
-                    onChange={() => onChange(method)}
+                    onChange={() => {
+                      onChange(method)
+                    }}
                     className='peer sr-only'
                   />
                   {selected && (
@@ -99,7 +102,7 @@ const PaymentMethodPicker = memo(
                   <span
                     className={clsx(
                       'relative z-10 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm px-2 py-1.5 text-sm transition-colors',
-                      'peer-focus-visible:outline-hidden peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900',
+                      'peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 peer-focus-visible:outline-hidden',
                       selected ? 'font-medium text-gray-100' : 'text-gray-400 hover:text-gray-200',
                     )}
                   >

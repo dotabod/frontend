@@ -5,6 +5,7 @@ import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
+
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import TwitchChat from '@/components/TwitchChat'
 import { stripe } from '@/lib/stripe-server'
@@ -34,8 +35,8 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
   const reduceMotion = useReducedMotion()
 
   const fadeUp = (delay: number) => ({
-    initial: reduceMotion ? false : { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
+    initial: reduceMotion ? false : { opacity: 0, y: 14 },
     transition: { delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   })
 
@@ -80,10 +81,10 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
         <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/15 ring-1 ring-purple-500/30'>
           <CheckIcon className='h-8 w-8 text-purple-300' aria-hidden />
         </div>
-        <h1 className='mt-6 text-balance text-4xl font-semibold tracking-tight text-gray-100 sm:text-5xl'>
+        <h1 className='mt-6 text-4xl font-semibold tracking-tight text-balance text-gray-100 sm:text-5xl'>
           Your gift is on its way
         </h1>
-        <p className='mx-auto mt-4 max-w-lg text-pretty text-lg text-gray-400'>
+        <p className='mx-auto mt-4 max-w-lg text-lg text-pretty text-gray-400'>
           {recipient ? (
             <>
               You gifted <span className='font-medium text-gray-200'>{parsedQuantity}</span>{' '}
@@ -124,7 +125,7 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
             {formattedGiftMessage && (
               <div className='flex justify-between gap-3'>
                 <dt className='text-gray-500'>Message</dt>
-                <dd className='text-right italic text-gray-300'>"{formattedGiftMessage}"</dd>
+                <dd className='text-right text-gray-300 italic'>"{formattedGiftMessage}"</dd>
               </div>
             )}
           </dl>
@@ -150,7 +151,7 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
         <Card>
           <h2 className='text-lg font-medium text-gray-100'>How it'll appear</h2>
           <div className='mt-4'>
-            <span className='mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+            <span className='mb-2 block text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
               Twitch chat
             </span>
             <TwitchChat responses={[giftChatMessage]} />
@@ -215,10 +216,10 @@ GiftSuccessPage.getLayout = function getLayout(page: ReactElement) {
 
 export const getServerSideProps: GetServerSideProps<GiftSuccessProps> = async ({ query }) => {
   const fallback: GiftSuccessProps = {
+    giftMessage: '',
+    quantity: 1,
     recipient: '',
     senderName: 'Anonymous',
-    quantity: 1,
-    giftMessage: '',
   }
 
   const sessionId = typeof query.session_id === 'string' ? query.session_id : null
@@ -243,11 +244,11 @@ export const getServerSideProps: GetServerSideProps<GiftSuccessProps> = async ({
 
     return {
       props: {
+        giftMessage: session.metadata?.giftMessage || '',
+        quantity,
         recipient:
           session.metadata?.recipientDisplayName || session.metadata?.recipientUsername || '',
         senderName: session.metadata?.giftSenderName || 'Anonymous',
-        quantity,
-        giftMessage: session.metadata?.giftMessage || '',
       },
     }
   } catch {

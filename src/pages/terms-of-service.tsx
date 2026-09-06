@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+
 import { Container } from '@/components/Container'
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import type { NextPageWithLayout } from '@/pages/_app'
@@ -237,7 +238,7 @@ const TermsOfService: NextPageWithLayout = () => (
           <a href='#prohibited'>PROHIBITED ACTIVITIES</a>" section below, we grant you a
           non-exclusive, non-transferable, revocable license to:
         </div>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>access the Services; and</li>
           <li>
             download or print a copy of any portion of the Content to which you have properly gained
@@ -295,7 +296,7 @@ const TermsOfService: NextPageWithLayout = () => (
           <strong>You are responsible for what you post or upload:</strong> By sending us
           Submissions through any part of the Services you:
         </div>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             confirm that you have read and agree with our "
             <a href='#prohibited'>PROHIBITED ACTIVITIES</a>" and will not post, send, publish,
@@ -356,7 +357,7 @@ const TermsOfService: NextPageWithLayout = () => (
           <strong>5. PURCHASES AND PAYMENT</strong>
         </div>
         <div>We accept the following forms of payment:</div>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>- Visa</li>
           <li>- Mastercard</li>
           <li>- American Express</li>
@@ -439,7 +440,7 @@ const TermsOfService: NextPageWithLayout = () => (
         </div>
         <br />
         <div>As a user of the Services, you agree not to:</div>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             Systematically retrieve data or other content from the Services to create or compile,
             directly or indirectly, a collection, compilation, database, or directory without
@@ -544,7 +545,7 @@ const TermsOfService: NextPageWithLayout = () => (
           Services' Privacy Policy. When you create or make available any Contributions, you thereby
           represent and warrant that:
         </div>
-        <ul className='list-disc list-inside'>
+        <ul className='list-inside list-disc'>
           <li>
             The creation, distribution, transmission, public display, or performance, and the
             accessing, downloading, or copying of your Contributions do not and will not infringe

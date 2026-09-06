@@ -1,7 +1,9 @@
 import { signOut, useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import useSWR from 'swr'
-import { STABLE_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+
+import { SETTINGS_SWR_OPTIONS } from '@/lib/hooks/useUpdateSetting'
+
 import { fetcher } from '../fetcher'
 
 // Custom hook to conditionally sign out a user based on session and refresh status
@@ -14,7 +16,7 @@ const useMaybeSignout = (skip = false) => {
   const { data: requiresRefresh } = useSWR(
     shouldFetch ? '/api/check-requires-refresh' : null,
     fetcher,
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
 
   const user = session?.user

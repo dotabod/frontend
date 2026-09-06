@@ -2,7 +2,8 @@ import type { SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/install/[token]'
 
 // Mock the auth module to prevent environment variable checks
@@ -46,6 +47,7 @@ vi.mock('@/utils/subscription', () => ({
 }))
 
 import { captureException } from '@sentry/nextjs'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 // Import the mocked modules
 import prisma from '@/lib/db'
@@ -86,7 +88,7 @@ describe('install/[token] API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Forbidden' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Forbidden' })
   })
 
   it('returns 403 when no userId is provided', async () => {
@@ -106,7 +108,7 @@ describe('install/[token] API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Unauthorized' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Unauthorized' })
   })
 
   it('returns 403 when user does not have access to the feature', async () => {
@@ -142,7 +144,7 @@ describe('install/[token] API', () => {
 
     vi.mocked(canAccessFeature).mockReturnValue({
       hasAccess: false,
-      requiredTier: 'PRO' as SubscriptionTier,
+      requiredTier: 'PRO',
     })
 
     await handler(req, res)
@@ -150,7 +152,7 @@ describe('install/[token] API', () => {
     expect(getSubscription).toHaveBeenCalledWith('test-token')
     expect(canAccessFeature).toHaveBeenCalledWith('autoInstaller', expect.anything())
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       error: 'This feature requires a subscription',
       requiredTier: 'PRO',
     })
@@ -189,7 +191,7 @@ describe('install/[token] API', () => {
 
     vi.mocked(canAccessFeature).mockReturnValue({
       hasAccess: true,
-      requiredTier: 'FREE' as SubscriptionTier,
+      requiredTier: 'FREE',
     })
 
     const mockError = new Error('Database error')
@@ -207,7 +209,10 @@ describe('install/[token] API', () => {
     })
     expect(captureException).toHaveBeenCalledWith(mockError)
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ error: 'Database error', message: 'Failed to get info' })
+    expect(res._getJSONData()).toStrictEqual({
+      error: 'Database error',
+      message: 'Failed to get info',
+    })
   })
 
   it('returns the config file when user has access', async () => {
@@ -244,11 +249,14 @@ describe('install/[token] API', () => {
 
     vi.mocked(canAccessFeature).mockReturnValue({
       hasAccess: true,
-      requiredTier: 'FREE' as SubscriptionTier,
+      requiredTier: 'FREE',
     })
 
     // Mock the user with required properties
     vi.mocked(prisma.user.findFirstOrThrow).mockResolvedValue({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -278,9 +286,6 @@ describe('install/[token] API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     await handler(req, res)
@@ -362,11 +367,14 @@ describe('install/[token] API', () => {
 
     vi.mocked(canAccessFeature).mockReturnValue({
       hasAccess: true,
-      requiredTier: 'FREE' as SubscriptionTier,
+      requiredTier: 'FREE',
     })
 
     // Mock the user with required properties
     vi.mocked(prisma.user.findFirstOrThrow).mockResolvedValue({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -396,9 +404,6 @@ describe('install/[token] API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     await handler(req, res)

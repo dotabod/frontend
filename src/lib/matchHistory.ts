@@ -62,7 +62,9 @@ function fallbackHeroName(heroKey: string): string {
 
 function heroMetadataByKey(heroes: Record<string, HeroMetadata>): Map<string, HeroMetadata> {
   const byKey = new Map<string, HeroMetadata>()
-  for (const hero of Object.values(heroes)) if (hero.name) byKey.set(hero.name, hero)
+  for (const hero of Object.values(heroes)) {
+    if (hero.name) byKey.set(hero.name, hero)
+  }
   return byKey
 }
 
@@ -78,9 +80,15 @@ export function buildMatchHistorySummary(groups: MatchResultGroup[]): {
   const heroes = new Set<string>()
 
   for (const group of groups) {
-    if (group.won === true) wins += group.count
-    if (group.won === false) losses += group.count
-    if (group.heroName) heroes.add(group.heroName)
+    if (group.won === true) {
+      wins += group.count
+    }
+    if (group.won === false) {
+      losses += group.count
+    }
+    if (group.heroName) {
+      heroes.add(group.heroName)
+    }
   }
 
   const matches = wins + losses
@@ -101,10 +109,15 @@ export function buildHeroPerformance(
   const combined = new Map<string, { losses: number; wins: number }>()
 
   for (const group of groups) {
-    if (!group.heroName || group.won === null) continue
+    if (!group.heroName || group.won === null) {
+      continue
+    }
     const current = combined.get(group.heroName) ?? { losses: 0, wins: 0 }
-    if (group.won) current.wins += group.count
-    else current.losses += group.count
+    if (group.won) {
+      current.wins += group.count
+    } else {
+      current.losses += group.count
+    }
     combined.set(group.heroName, current)
   }
 
@@ -135,11 +148,13 @@ export function encodeMatchHistoryCursor(cursor: MatchHistoryCursor): string {
 export function decodeMatchHistoryCursor(
   value: string | string[] | undefined,
 ): MatchHistoryCursor | null {
-  if (typeof value !== 'string' || !value) return null
+  if (typeof value !== 'string' || !value) {
+    return null
+  }
 
   try {
     const decoded = JSON.parse(
-      Buffer.from(value, 'base64url').toString('utf8'),
+      Buffer.from(value, 'base64url').toString('utf-8'),
     ) as Partial<MatchHistoryCursor>
     if (
       typeof decoded.createdAt !== 'string' ||
@@ -156,7 +171,9 @@ export function decodeMatchHistoryCursor(
 }
 
 export function readKda(value: unknown): Kda | null {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
   const candidate = value as Partial<Kda>
   if (
     typeof candidate.kills !== 'number' ||
@@ -204,6 +221,8 @@ export function formatStreamerScore({
   myTeam: string
   radiantScore: number | null
 }): string | null {
-  if (radiantScore === null || direScore === null) return null
+  if (radiantScore === null || direScore === null) {
+    return null
+  }
   return myTeam === 'dire' ? `${direScore}–${radiantScore}` : `${radiantScore}–${direScore}`
 }

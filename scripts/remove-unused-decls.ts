@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process'
+
 import { Project, SyntaxKind } from 'ts-morph'
 
 interface Diagnostic {
@@ -8,7 +9,7 @@ interface Diagnostic {
   labels: { span: { offset: number; length: number; line: number; column: number } }[]
 }
 
-const result = spawnSync('npx', ['oxlint', '--format=json'], { encoding: 'utf8' })
+const result = spawnSync('npx', ['oxlint', '--format=json'], { encoding: 'utf-8' })
 const { diagnostics } = JSON.parse(result.stdout) as { diagnostics: Diagnostic[] }
 
 const unused = diagnostics.filter((d) => d.code === 'eslint(no-unused-vars)')

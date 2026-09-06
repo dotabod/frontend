@@ -1,17 +1,19 @@
-import { SubscriptionStatus, type SubscriptionTier, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, TransactionType } from '@prisma/client'
+import type { SubscriptionTier } from '@prisma/client'
 import { App, Button, Tooltip } from 'antd'
 import clsx from 'clsx'
 import { Bitcoin, Wallet } from 'lucide-react'
+import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { signIn, useSession } from 'next-auth/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import useSWR from 'swr'
+
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext'
 import { Settings } from '@/lib/defaultSettings'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { fetcher } from '@/lib/fetcher'
-import { STABLE_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+import { SETTINGS_SWR_OPTIONS, useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { createPaypalCheckout } from '@/lib/paypal-client'
 import { createCheckoutSession } from '@/lib/stripe'
 import {
@@ -20,14 +22,15 @@ import {
   gracePeriodPrettyDate,
   isPaypalSubscription,
   isSubscriptionActive,
-  type PricePeriod,
   SUBSCRIPTION_TIERS,
-  type SubscriptionRow,
 } from '@/utils/subscription'
+import type { PricePeriod, SubscriptionRow } from '@/utils/subscription'
+
 import ErrorBoundary from '../ErrorBoundary'
 import { Logomark } from '../Logo'
 import { FeatureList } from './FeatureList'
-import PaymentMethodPicker, { type PaymentMethod } from './PaymentMethodPicker'
+import PaymentMethodPicker from './PaymentMethodPicker'
+import type { PaymentMethod } from './PaymentMethodPicker'
 import { PriceDisplay } from './PriceDisplay'
 
 function Plan({
@@ -75,7 +78,7 @@ function Plan({
   const { data: cryptoInterestData, mutate: mutateCryptoInterestData } = useSWR(
     '/api/get-total-crypto-interest',
     fetcher,
-    STABLE_SWR_OPTIONS,
+    SETTINGS_SWR_OPTIONS,
   )
 
   const { message, modal, notification } = App.useApp()
@@ -484,12 +487,12 @@ function Plan({
               cancelText: 'Cancel',
               className: 'text-base',
               content: (
-                <div className='space-y-2 mt-2'>
+                <div className='mt-2 space-y-2'>
                   <p>
                     You currently have an active {currentIsPeriod} subscription. Here's what will
                     happen:
                   </p>
-                  <ul className='list-disc pl-4 space-y-1'>
+                  <ul className='list-disc space-y-1 pl-4'>
                     <li>You'll be charged for a new {activePeriod} subscription</li>
                     <li>Once payment is complete, your subscription will be extended</li>
                     <li>Your access to Pro features will continue uninterrupted</li>
@@ -550,12 +553,12 @@ function Plan({
               cancelText: 'Cancel',
               className: 'text-base',
               content: (
-                <div className='space-y-2 mt-2'>
+                <div className='mt-2 space-y-2'>
                   <p>
                     You're switching from a regular {currentRegularPeriod} plan to a crypto{' '}
                     {activePeriod} plan. Here's what will happen:
                   </p>
-                  <ul className='list-disc pl-4 space-y-1'>
+                  <ul className='list-disc space-y-1 pl-4'>
                     <li>You'll be charged for a new crypto-based {activePeriod} subscription</li>
                     <li>Your current regular subscription will be canceled</li>
                     <li>
@@ -622,12 +625,12 @@ function Plan({
             cancelText: 'Cancel',
             className: 'text-base',
             content: (
-              <div className='space-y-2 mt-2'>
+              <div className='mt-2 space-y-2'>
                 <p>
                   You're switching from a crypto {currentCryptoPeriod} plan to a regular{' '}
                   {activePeriod} plan. Here's what will happen:
                 </p>
-                <ul className='list-disc pl-4 space-y-1'>
+                <ul className='list-disc space-y-1 pl-4'>
                   <li>You'll be charged for a new subscription with your payment card</li>
                   <li>Your current crypto subscription will remain active until its end date</li>
                   <li>Any pending crypto invoices will be automatically canceled</li>
@@ -682,9 +685,9 @@ function Plan({
             cancelText: 'Cancel',
             className: 'text-base',
             content: (
-              <div className='space-y-2 mt-2'>
+              <div className='mt-2 space-y-2'>
                 <p>You currently have an active subscription. Here's what will happen:</p>
-                <ul className='list-disc pl-4 space-y-1'>
+                <ul className='list-disc space-y-1 pl-4'>
                   <li>You'll be charged once for lifetime access</li>
                   <li>Your current subscription will be automatically canceled</li>
                   <li>Your access to Pro features will continue uninterrupted</li>
@@ -753,11 +756,7 @@ function Plan({
         }
 
         // For new subscriptions, create checkout session
-        const priceId = getPriceId(
-          tier as Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
-          activePeriod,
-          usePayWithCrypto,
-        )
+        const priceId = getPriceId(tier, activePeriod, usePayWithCrypto)
         const response = await createCheckoutSession(priceId, session.user.id, selectedMethod)
 
         if (!response.url) {
@@ -824,7 +823,7 @@ function Plan({
         className={clsx(
           'relative flex flex-col rounded-2xl p-6 sm:p-8',
           featured
-            ? 'order-first bg-gray-900 shadow-lg shadow-black/20 ring-1 ring-purple-500/50 lg:order-none'
+            ? 'order-first bg-gray-900 shadow-lg ring-1 shadow-black/20 ring-purple-500/50 lg:order-none'
             : 'bg-gray-900/40 ring-1 ring-gray-800',
         )}
       >
@@ -854,12 +853,12 @@ function Plan({
             tier === SUBSCRIPTION_TIERS.PRO &&
             !hasActivePlan &&
             activePeriod !== 'lifetime' && (
-              <span className='text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full'>
+              <span className='rounded-full bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300'>
                 Free until {gracePeriodPrettyDate}
               </span>
             )}
           {hasActivePlan && isCurrentPlan && (
-            <span className='text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300'>
+            <span className='rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300'>
               Your plan
             </span>
           )}
@@ -902,14 +901,14 @@ function Plan({
           <Tooltip title='Your credit balance will be automatically applied at checkout'>
             <Button
               loading={redirectingToCheckout}
-              onClick={() => handleSubscribe()}
+              onClick={async () => handleSubscribe()}
               disabled={isButtonDisabled()}
               size={featured ? 'large' : 'middle'}
               color={featured ? 'danger' : 'default'}
               className={clsx(
                 'mt-6 w-full',
                 featured
-                  ? 'bg-purple-500 text-gray-950 hover:bg-purple-400 font-semibold'
+                  ? 'bg-purple-500 font-semibold text-gray-950 hover:bg-purple-400'
                   : 'border border-gray-700 bg-transparent text-gray-200 hover:border-gray-600 hover:bg-gray-800',
               )}
               aria-label={`${buttonText} (${name} plan)`}
@@ -920,14 +919,14 @@ function Plan({
         ) : (
           <Button
             loading={redirectingToCheckout}
-            onClick={() => handleSubscribe()}
+            onClick={async () => handleSubscribe()}
             disabled={isButtonDisabled()}
             size={featured ? 'large' : 'middle'}
             color={featured ? 'danger' : 'default'}
             className={clsx(
               'mt-6',
               featured
-                ? 'bg-purple-500 text-gray-950 hover:bg-purple-400 font-semibold'
+                ? 'bg-purple-500 font-semibold text-gray-950 hover:bg-purple-400'
                 : 'border border-gray-700 bg-transparent text-gray-200 hover:border-gray-600 hover:bg-gray-800',
             )}
             aria-label={`${buttonText} (${name} plan)`}
@@ -946,26 +945,8 @@ function Plan({
                   : "Let us know if you'd like to pay with cryptocurrency"
               }
             >
-              {!cryptoInterest?.interested ? (
-                <Button
-                  type='link'
-                  size='small'
-                  icon={<Bitcoin size={16} />}
-                  onClick={handleCryptoInterest}
-                  loading={session ? loadingCryptoInterest : false}
-                  className={clsx(
-                    'text-xs',
-                    featured
-                      ? 'text-purple-300 hover:text-purple-200'
-                      : 'text-gray-400 hover:text-gray-300',
-                  )}
-                >
-                  <span className='break-words'>
-                    {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 0} interested)`}
-                  </span>
-                </Button>
-              ) : (
-                <div className='flex flex-col gap-1 items-center'>
+              {cryptoInterest?.interested ? (
+                <div className='flex flex-col items-center gap-1'>
                   <span className='text-xs break-words'>
                     {`Thanks for your interest in crypto payments! (${cryptoInterestData?.userCount ?? 1} interested)`}
                   </span>
@@ -984,6 +965,24 @@ function Plan({
                     Remove my interest
                   </Button>
                 </div>
+              ) : (
+                <Button
+                  type='link'
+                  size='small'
+                  icon={<Bitcoin size={16} />}
+                  onClick={handleCryptoInterest}
+                  loading={session ? loadingCryptoInterest : false}
+                  className={clsx(
+                    'text-xs',
+                    featured
+                      ? 'text-purple-300 hover:text-purple-200'
+                      : 'text-gray-400 hover:text-gray-300',
+                  )}
+                >
+                  <span className='break-words'>
+                    {`Interested in paying with crypto? (${cryptoInterestData?.userCount ?? 0} interested)`}
+                  </span>
+                </Button>
               )}
             </Tooltip>
           </div>

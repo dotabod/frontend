@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/update-followers'
 
 // Mock the middleware
@@ -50,6 +51,7 @@ vi.mock('@/lib/auth', () => ({
 }))
 
 import { captureException } from '@sentry/nextjs'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
@@ -77,7 +79,7 @@ describe('update-followers API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(405)
-    expect(res._getJSONData()).toEqual({ message: 'Method not allowed' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Method not allowed' })
   })
 
   it('returns 403 when user is not authenticated', async () => {
@@ -115,7 +117,7 @@ describe('update-followers API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(403)
-    expect(res._getJSONData()).toEqual({ message: 'Forbidden' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Forbidden' })
   })
 
   it('successfully updates followers', async () => {
@@ -144,7 +146,7 @@ describe('update-followers API', () => {
 
     // Mock fetch response for follower count
     vi.mocked(global.fetch).mockResolvedValueOnce({
-      json: () => Promise.resolve({ total: 100 }),
+      json: async () => Promise.resolve({ total: 100 }),
       ok: true,
     } as unknown as Response)
 
@@ -169,9 +171,9 @@ describe('update-followers API', () => {
         },
       },
     )
-    expect(prisma.user.update).toHaveBeenCalled()
+    expect(prisma.user.update).toHaveBeenCalledOnce()
     const updateCall = vi.mocked(prisma.user.update).mock.calls[0][0]
-    expect(updateCall.where).toEqual({ id: 'user-123' })
+    expect(updateCall.where).toStrictEqual({ id: 'user-123' })
     expect(updateCall.data.followers).toBe(100)
     expect(updateCall.data.updatedAt).toBeDefined()
   })
@@ -212,8 +214,8 @@ describe('update-followers API', () => {
     expect(res._getData()).toBe('Followers updated successfully')
 
     expect(getTwitchTokens).toHaveBeenCalledWith('user-123')
-    expect(global.fetch).toHaveBeenCalled()
-    expect(captureException).toHaveBeenCalled()
+    expect(global.fetch).toHaveBeenCalledOnce()
+    expect(captureException).toHaveBeenCalledOnce()
   })
 
   it('handles Twitch token errors gracefully', async () => {
@@ -285,6 +287,6 @@ describe('update-followers API', () => {
     expect(res.statusCode).toBe(500)
     expect(res._getData()).toBe('Failed to update followers')
 
-    expect(captureException).toHaveBeenCalled()
+    expect(captureException).toHaveBeenCalledOnce()
   })
 })

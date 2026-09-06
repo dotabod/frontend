@@ -246,7 +246,7 @@
   }
 
   .title h3 {
-    @apply text-lg! font-medium! leading-6!;
+    @apply text-lg! leading-6! font-medium!;
   }
 
   .subtitle {

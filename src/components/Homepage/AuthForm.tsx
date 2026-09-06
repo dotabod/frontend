@@ -1,8 +1,8 @@
 import { captureException } from '@sentry/nextjs'
 import { Button } from 'antd'
 import clsx from 'clsx'
-import { useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -31,7 +31,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               captureException(error)
               console.log(error)
             })
-            .finally(() => setIsLoading(false))
+            .finally(() => {
+              setIsLoading(false)
+            })
         }}
       >
         <span className='space-x-2'>

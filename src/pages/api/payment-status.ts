@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
@@ -76,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    const invoiceAmount = ((invoice.total || invoice.amount_due || 0) as number) / 100
+    const invoiceAmount = (invoice.total || invoice.amount_due || 0) / 100
 
     // Return user-friendly status information
     res.status(200).json({

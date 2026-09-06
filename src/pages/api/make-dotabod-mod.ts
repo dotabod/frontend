@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import { getTwitchTokens } from '@/lib/getTwitchTokens'
 import { canAccessFeature, getSubscription } from '@/utils/subscription'
@@ -49,30 +50,36 @@ async function addModerator(broadcasterId: string | undefined, accessToken: stri
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
   if (!session?.user?.id) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   const subscription = await getSubscription(session.user.id)
   const { hasAccess } = canAccessFeature('autoModerator', subscription)
 
   if (!hasAccess) {
-    return res.status(403).json({ message: 'Forbidden' })
+    res.status(403).json({ message: 'Forbidden' })
+    return
   }
 
   try {
     const { providerAccountId, accessToken, error } = await getTwitchTokens(session.user.id)
     if (error) {
-      return res.status(403).json({ message: 'Forbidden' })
+      res.status(403).json({ message: 'Forbidden' })
+      return
     }
     const response = await addModerator(providerAccountId, accessToken)
-    return res.status(200).json(response)
+    res.status(200).json(response)
+    return
   } catch (error) {
     captureException(error)
     console.error('Failed to update mod:', error)
-    return res.status(500).json({ error: error.message, message: 'Failed to update mod' })
+    res.status(500).json({ error: error.message, message: 'Failed to update mod' })
+    return
   }
 }
 

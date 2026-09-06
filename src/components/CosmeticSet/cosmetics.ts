@@ -14,7 +14,7 @@ export interface CosmeticItem {
 }
 
 // In-game loadout order; used only as a tiebreak once items are ranked by rarity.
-export const SLOT_ORDER = [
+const SLOT_ORDER = [
   'weapon',
   'head',
   'shoulder',
@@ -37,19 +37,19 @@ export const SLOT_ORDER = [
 // not decoration. Kept as hex on purpose: fidelity to the external system matters more
 // than re-deriving them in OKLCH.
 export const RARITY_META: Record<string, { rank: number; color: string; label: string }> = {
-  common: { rank: 0, color: '#b0c3d9', label: 'Common' },
-  uncommon: { rank: 1, color: '#5e98d9', label: 'Uncommon' },
-  rare: { rank: 2, color: '#4b69ff', label: 'Rare' },
-  mythical: { rank: 3, color: '#8847ff', label: 'Mythical' },
-  legendary: { rank: 4, color: '#d32ce6', label: 'Legendary' },
-  immortal: { rank: 5, color: '#e4ae39', label: 'Immortal' },
-  arcana: { rank: 6, color: '#ade55c', label: 'Arcana' },
-  ancient: { rank: 7, color: '#eb4b4b', label: 'Ancient' },
+  ancient: { color: '#eb4b4b', label: 'Ancient', rank: 7 },
+  arcana: { color: '#ade55c', label: 'Arcana', rank: 6 },
+  common: { color: '#b0c3d9', label: 'Common', rank: 0 },
+  immortal: { color: '#e4ae39', label: 'Immortal', rank: 5 },
+  legendary: { color: '#d32ce6', label: 'Legendary', rank: 4 },
+  mythical: { color: '#8847ff', label: 'Mythical', rank: 3 },
+  rare: { color: '#4b69ff', label: 'Rare', rank: 2 },
+  uncommon: { color: '#5e98d9', label: 'Uncommon', rank: 1 },
 }
 
 // Slots arrive as raw tokens like "body_head"; show them as "Body Head".
 export const formatSlot = (slot: string) =>
-  slot.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  slot.replaceAll('_', ' ').replaceAll(/\b\w/g, (c) => c.toUpperCase())
 
 // Fallback monogram for items that have no captured icon (most do not).
 export const initials = (name: string) =>
@@ -70,18 +70,24 @@ export const rarityOf = (item: CosmeticItem) => (item.rarity ? RARITY_META[item.
 export const rarityRank = (item: CosmeticItem) => rarityOf(item)?.rank ?? -1
 
 export function marketUrl(item: CosmeticItem): string | null {
-  if (!item.marketable || !item.marketHashName) return null
+  if (!item.marketable || !item.marketHashName) {
+    return null
+  }
   return `https://steamcommunity.com/market/listings/570/${encodeURIComponent(item.marketHashName)}`
 }
 
 export function sortByRarity(items: CosmeticItem[]): CosmeticItem[] {
   return [...items].sort((a, b) => {
     const byRarity = rarityRank(b) - rarityRank(a)
-    if (byRarity) return byRarity
+    if (byRarity) {
+      return byRarity
+    }
     const ai = SLOT_ORDER.indexOf(a.slot)
     const bi = SLOT_ORDER.indexOf(b.slot)
     const bySlot = (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
-    if (bySlot) return bySlot
+    if (bySlot) {
+      return bySlot
+    }
     return a.name.localeCompare(b.name)
   })
 }
@@ -103,9 +109,11 @@ export function bestRarity(items: CosmeticItem[]): string | undefined {
 
 // rarity -> count across a loadout, rarest first. Reused for the collection header
 // tally and the per-card chip summary.
-export function rarityTally(items: CosmeticItem[]): Array<[string, number]> {
+function rarityTally(items: CosmeticItem[]): [string, number][] {
   const counts = new Map<string, number>()
-  for (const i of items) if (i.rarity) counts.set(i.rarity, (counts.get(i.rarity) ?? 0) + 1)
+  for (const i of items) {
+    if (i.rarity) counts.set(i.rarity, (counts.get(i.rarity) ?? 0) + 1)
+  }
   return [...counts.entries()].sort(
     (a, b) => (RARITY_META[b[0]]?.rank ?? -1) - (RARITY_META[a[0]]?.rank ?? -1),
   )

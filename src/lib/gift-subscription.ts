@@ -1,4 +1,4 @@
-import type { GiftCheckoutRequest } from '@/pages/api/stripe/create-gift-checkout'
+import type { GiftCheckoutRequest } from '@/lib/stripe/gift-checkout-request'
 
 type GiftCheckoutParams = GiftCheckoutRequest
 

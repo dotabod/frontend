@@ -1,8 +1,10 @@
 import type { NowPaymentsInvoice } from '@prisma/client'
+
 import prisma from '@/lib/db'
-import { isNowPaymentsConfirmed, type NowPaymentsPaymentStatus } from '@/lib/nowpayments'
-import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
+import { isNowPaymentsConfirmed } from '@/lib/nowpayments'
+import type { NowPaymentsPaymentStatus } from '@/lib/nowpayments'
 import { stripe } from '@/lib/stripe-server'
+import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 
 export interface NowPaymentsProcessResult {
   processed: boolean
@@ -15,7 +17,7 @@ function getMetadata(invoice: NowPaymentsInvoice): Record<string, unknown> {
   return invoice.metadata &&
     typeof invoice.metadata === 'object' &&
     !Array.isArray(invoice.metadata)
-    ? (invoice.metadata as Record<string, unknown>)
+    ? invoice.metadata
     : {}
 }
 
@@ -75,7 +77,9 @@ export async function processConfirmedNowPaymentsPayment(
       )
     }
 
-    const handled = await prisma.$transaction(async (tx) => handleInvoiceEvent(stripeInvoice, tx))
+    const handled = await prisma.$transaction(
+      async (tx) => await handleInvoiceEvent(stripeInvoice, tx),
+    )
     if (!handled) {
       throw new Error(`Invoice handler returned false for ${invoice.stripeInvoiceId}`)
     }

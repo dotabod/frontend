@@ -4,19 +4,18 @@ import {
   QuestionCircleOutlined,
 } from '@ant-design/icons'
 import { Alert, Steps, Typography } from 'antd'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import { type ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+
 import { useFeatureAccess } from '@/hooks/useSubscription'
-import {
-  buildLocalFetchOptions,
-  type LnaPermissionState,
-  queryLnaPermission,
-  shouldCheckLna,
-} from '@/lib/lna'
+import { buildLocalFetchOptions, queryLnaPermission, shouldCheckLna } from '@/lib/lna'
+import type { LnaPermissionState } from '@/lib/lna'
 import { useTrack } from '@/lib/track'
 import { FeatureWrapper } from '@/ui/card'
+
 import CodeBlock from './CodeBlock'
 
 const { Step } = Steps
@@ -49,7 +48,7 @@ const InstallationSteps = ({
               muted
               loop
               playsInline
-              className='w-full h-auto max-w-3xl rounded-lg'
+              className='h-auto w-full max-w-3xl rounded-lg'
             >
               <source src='/images/setup/how-to-automated-install.mp4' type='video/mp4' />
               Your browser does not support the video tag.
@@ -57,7 +56,7 @@ const InstallationSteps = ({
           )}
         </div>
       ),
-      title: !errorWithoutSuccess ? 'Connection check' : 'Connection check failed',
+      title: errorWithoutSuccess ? 'Connection check failed' : 'Connection check',
     },
     {
       description: 'Processing the provided token...',
@@ -267,7 +266,7 @@ const WindowsInstaller = () => {
           </Link>
           , and here&apos;s what it does on your computer:
         </p>
-        <ul className='ml-4 list-disc text-sm text-gray-400 space-y-1'>
+        <ul className='ml-4 list-disc space-y-1 text-sm text-gray-400'>
           <li>Opens a local page in your browser so this account can authenticate the install</li>
           <li>
             Writes one config file into your Dota 2 folder (the file Valve provides for streamer
@@ -291,7 +290,7 @@ const WindowsInstaller = () => {
       </div>
       {lnaChecked && lnaPermissionState === 'denied' && (
         <Alert
-          className='max-w-2xl mb-4'
+          className='mb-4 max-w-2xl'
           message='Browser blocked the installer connection'
           description={
             <span>
@@ -307,7 +306,7 @@ const WindowsInstaller = () => {
       )}
       {lnaChecked && lnaPermissionState === 'prompt' && !success && (
         <Alert
-          className='max-w-2xl mb-4'
+          className='mb-4 max-w-2xl'
           message="When your browser asks, click 'Allow'"
           description='Your browser needs one-time permission to connect to the installer running on your computer. Without it, the install will silently fail.'
           type='info'
@@ -323,12 +322,14 @@ const WindowsInstaller = () => {
         />
       )}
       {!success && (
-        <p className='mt-4 text-sm text-gray-400 flex items-start gap-2 max-w-2xl'>
+        <p className='mt-4 flex max-w-2xl items-start gap-2 text-sm text-gray-400'>
           <QuestionCircleOutlined className='mt-0.5 shrink-0' />
           <span>
             Script not working? Use{' '}
             <Link
-              onClick={() => track('setup/manual_steps')}
+              onClick={() => {
+                track('setup/manual_steps')
+              }}
               href='/dashboard?step=2&gsiType=manual'
             >
               the manual install

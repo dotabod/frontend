@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import io, { type Socket } from 'socket.io-client'
+import io from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
+
 import type { WLData, WLRecord } from './useSocket'
 
 type WinLossResponse =
@@ -61,7 +63,9 @@ export function useWinLoss({ statsDays, statsStartDate, twitchId, userId }: UseW
         currentStatsDays === undefined && currentStatsStartDate === undefined
           ? 'configured'
           : `${String(currentStatsDays)}:${String(currentStatsStartDate)}`
-      if (!force && lastRequestedWindowRef.current === requestKey) return
+      if (!force && lastRequestedWindowRef.current === requestKey) {
+        return
+      }
 
       lastRequestedWindowRef.current = requestKey
       const requestId = ++requestIdRef.current
@@ -71,7 +75,9 @@ export function useWinLoss({ statsDays, statsStartDate, twitchId, userId }: UseW
           ? {}
           : { statsDays: currentStatsDays, statsStartDate: currentStatsStartDate },
         (response: WinLossResponse) => {
-          if (requestId !== requestIdRef.current) return
+          if (requestId !== requestIdRef.current) {
+            return
+          }
           setLoading(false)
           if (!isWinLossData(response)) {
             setError(response.error)
@@ -88,7 +94,9 @@ export function useWinLoss({ statsDays, statsStartDate, twitchId, userId }: UseW
       setConnected(true)
       requestCurrentWL(true)
     }
-    const handleDisconnect = () => setConnected(false)
+    const handleDisconnect = () => {
+      setConnected(false)
+    }
     const handleUpdate = (
       records: WLRecord[],
       updatedStatsDays: number | null = null,
@@ -126,13 +134,17 @@ export function useWinLoss({ statsDays, statsStartDate, twitchId, userId }: UseW
   }, [isPreview, twitchId, userId])
 
   useEffect(() => {
-    if (!isPreview || !socketRef.current?.connected) return
+    if (!isPreview || !socketRef.current?.connected) {
+      return
+    }
 
     const requestKey =
       statsDays === undefined && statsStartDate === undefined
         ? 'configured'
         : `${String(statsDays)}:${String(statsStartDate)}`
-    if (lastRequestedWindowRef.current === requestKey) return
+    if (lastRequestedWindowRef.current === requestKey) {
+      return
+    }
 
     lastRequestedWindowRef.current = requestKey
     const requestId = ++requestIdRef.current
@@ -141,7 +153,9 @@ export function useWinLoss({ statsDays, statsStartDate, twitchId, userId }: UseW
       'request-wl',
       statsDays === undefined && statsStartDate === undefined ? {} : { statsDays, statsStartDate },
       (response: WinLossResponse) => {
-        if (requestId !== requestIdRef.current) return
+        if (requestId !== requestIdRef.current) {
+          return
+        }
         setLoading(false)
         if (!isWinLossData(response)) {
           setError(response.error)

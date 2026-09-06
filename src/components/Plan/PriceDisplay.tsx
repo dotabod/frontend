@@ -1,6 +1,8 @@
 import type { SubscriptionTier } from '@prisma/client'
 import clsx from 'clsx'
+
 import type { PricePeriod } from '@/utils/subscription'
+
 import { PlanDescription } from '../PlanDescription'
 
 interface Price {

@@ -122,7 +122,7 @@ export function getRankImage(rank: RankType) {
 // Rank tiers in ascending order. Each tier's position (1-based) is the medal digit used
 // in the `ranks` images (1 = Herald ... 7 = Divine). Immortal sits above the highest
 // non-leaderboard rank.
-export const rankTiers = [
+const rankTiers = [
   { key: 'herald' },
   { key: 'guardian' },
   { key: 'crusader' },
@@ -133,11 +133,11 @@ export const rankTiers = [
   { key: 'immortal' },
 ] as const
 
-export type RankTierKey = (typeof rankTiers)[number]['key']
+type RankTierKey = (typeof rankTiers)[number]['key']
 
 // Maps a tier key to the MMR bounds used for filtering. Immortal has no upper bound
 // and starts one point above Divine☆5. Returns null for an unknown tier.
-export function tierMmrRange(key: string): { gte?: number; lte?: number } | null {
+function tierMmrRange(key: string): { gte?: number; lte?: number } | null {
   if (key === 'immortal') {
     const divineMax = ranks.at(-1)?.range[1] ?? 0
     return { gte: divineMax + 1 }
@@ -201,26 +201,26 @@ export const tierDisplayOrder: StreamerTier[] = [
 // One representative medal per tier for section headers: the 5-star medal of the
 // bracket, the low-immortal medal for Immortal, the empty medal for uncalibrated.
 export const tierEmblem: Record<StreamerTier, string> = {
-  immortal: '80.png',
-  divine: '75.png',
   ancient: '65.png',
-  legend: '55.png',
   archon: '45.png',
   crusader: '35.png',
+  divine: '75.png',
   guardian: '25.png',
   herald: '15.png',
+  immortal: '80.png',
+  legend: '55.png',
   unranked: '0.png',
 }
 
 export const tierLabel: Record<StreamerTier, string> = {
-  immortal: 'Immortal',
-  divine: 'Divine',
   ancient: 'Ancient',
-  legend: 'Legend',
   archon: 'Archon',
   crusader: 'Crusader',
+  divine: 'Divine',
   guardian: 'Guardian',
   herald: 'Herald',
+  immortal: 'Immortal',
+  legend: 'Legend',
   unranked: 'Uncalibrated',
 }
 

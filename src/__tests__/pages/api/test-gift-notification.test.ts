@@ -1,7 +1,8 @@
 // @ts-nocheck
 import type { GiftSubscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/test-gift-notification'
 
 // Mock dependencies
@@ -60,11 +61,11 @@ describe('test-gift-notification API', () => {
       id: 'sub-123',
       isGift: true,
       metadata: null,
-      status: 'ACTIVE' as SubscriptionStatus,
+      status: 'ACTIVE',
       stripeCustomerId: null,
       stripePriceId: null,
       stripeSubscriptionId: null,
-      tier: 'PRO' as SubscriptionTier,
+      tier: 'PRO',
       transactionType: 'RECURRING',
       updatedAt: mockDate,
       userId: 'user-123',
@@ -103,7 +104,7 @@ describe('test-gift-notification API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       message: 'Unauthorized',
     })
   })
@@ -118,7 +119,7 @@ describe('test-gift-notification API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ message: 'Unauthorized' })
+    expect(res._getJSONData()).toStrictEqual({ message: 'Unauthorized' })
   })
 
   it('returns 401 when user is not an admin', async () => {
@@ -144,7 +145,7 @@ describe('test-gift-notification API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(401)
-    expect(res._getJSONData()).toEqual({ error: 'Unauthorized' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Unauthorized' })
   })
 
   it('returns 400 for invalid gift type', async () => {
@@ -173,7 +174,7 @@ describe('test-gift-notification API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       message: 'Invalid gift type. Must be monthly, annual, or lifetime',
     })
   })
@@ -207,7 +208,7 @@ describe('test-gift-notification API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       message: 'Gift quantity must be a positive number',
     })
   })
@@ -256,13 +257,13 @@ describe('test-gift-notification API', () => {
 
     expect(res.statusCode).toBe(200)
     const responseData = res._getJSONData()
-    expect(responseData.success).toBe(true)
+    expect(responseData.success).toBeTruthy()
     expect(responseData.message).toBe('Test gift notification created')
     expect(responseData.notification.id).toBe('notification-123')
     expect(responseData.giftSubscription.giftType).toBe('monthly')
     expect(responseData.giftSubscription.giftQuantity).toBe(2)
     expect(responseData.totalGiftedMonths).toBe(0)
-    expect(responseData.hasLifetime).toBe(false)
+    expect(responseData.hasLifetime).toBeFalsy()
   })
 
   it('successfully creates a lifetime gift notification', async () => {
@@ -335,13 +336,13 @@ describe('test-gift-notification API', () => {
 
     expect(res.statusCode).toBe(200)
     const responseData = res._getJSONData()
-    expect(responseData.success).toBe(true)
+    expect(responseData.success).toBeTruthy()
     expect(responseData.message).toBe('Test gift notification created')
     expect(responseData.notification.id).toBe('notification-123')
     expect(responseData.giftSubscription.giftType).toBe('lifetime')
     expect(responseData.giftSubscription.giftQuantity).toBe(1)
     expect(responseData.totalGiftedMonths).toBe('lifetime')
-    expect(responseData.hasLifetime).toBe(true)
+    expect(responseData.hasLifetime).toBeTruthy()
   })
 
   it('handles existing lifetime subscription', async () => {
@@ -403,10 +404,10 @@ describe('test-gift-notification API', () => {
 
     await handler(req, res)
 
-    expect(consoleWarnSpy).toHaveBeenCalled()
+    expect(consoleWarnSpy).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(200)
     const responseData = res._getJSONData()
-    expect(responseData.success).toBe(true)
+    expect(responseData.success).toBeTruthy()
   })
 
   it('handles server error', async () => {
@@ -440,7 +441,7 @@ describe('test-gift-notification API', () => {
 
     await handler(req, res)
 
-    expect(consoleErrorSpy).toHaveBeenCalled()
+    expect(consoleErrorSpy).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(500)
     expect(res._getJSONData().message).toBe('Internal server error')
   })

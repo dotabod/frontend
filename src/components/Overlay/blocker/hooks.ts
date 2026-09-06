@@ -1,4 +1,5 @@
-import { type RefObject, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import type { RefObject } from 'react'
 
 export const useWindowResize = (callback: () => void) => {
   useEffect(() => {
@@ -8,7 +9,9 @@ export const useWindowResize = (callback: () => void) => {
     callback()
 
     // Clean up
-    return () => window.removeEventListener('resize', callback)
+    return () => {
+      window.removeEventListener('resize', callback)
+    }
   }, [callback])
 }
 

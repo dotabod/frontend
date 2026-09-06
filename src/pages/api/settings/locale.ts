@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { localePatchSchema } from '@/lib/validations/setting'
@@ -24,7 +25,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    return res.json(locale)
+    res.json(locale)
+    return
   }
 
   if (req.method === 'PATCH') {
@@ -40,7 +42,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    return res.status(200).json({ status: 'ok' })
+    res.status(200).json({ status: 'ok' })
+    return
   }
 
   return res.status(500).end()

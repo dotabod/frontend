@@ -15,6 +15,8 @@
 
 import postgres from 'npm:postgres@3.4.5'
 
+import { internalServerErrorResponse } from './error-response.ts'
+
 const CRM_BASE = 'https://api.hubapi.com/crm/v3'
 const LOOKBACK_HOURS = Number(Deno.env.get('SYNC_LOOKBACK_HOURS') ?? '2')
 const CONCURRENCY = 8
@@ -57,12 +59,17 @@ async function hsFetch(url: string, init: RequestInit, retries = 5): Promise<Res
     const now = Date.now()
     const wait = Math.max(0, nextSlot - now)
     nextSlot = Math.max(now, nextSlot) + MIN_INTERVAL_MS
-    if (wait > 0) await new Promise((r) => setTimeout(r, wait))
+    if (wait > 0) {
+      await new Promise((r) => setTimeout(r, wait))
+    }
 
     const res = await fetch(url, init)
-    if (res.status !== 429 || attempt >= retries) return res
+    if (res.status !== 429 || attempt >= retries) {
+      return res
+    }
     const retryAfter = Number(res.headers.get('Retry-After'))
-    const backoff = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1000 * (attempt + 1)
+    const backoff =
+      Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 1000 * (attempt + 1)
     await res.body?.cancel()
     await new Promise((r) => setTimeout(r, backoff))
   }
@@ -103,17 +110,23 @@ async function syncContact(token: string, { email, username, subscription }: Con
     })
 
   const patchRes = await patch()
-  if (patchRes.ok) return
+  if (patchRes.ok) {
+    return
+  }
   if (patchRes.status === 404) {
     const createRes = await hsFetch(`${CRM_BASE}/objects/contacts`, {
       body: JSON.stringify({ properties: { email, ...properties } }),
       headers: hsHeaders(token),
       method: 'POST',
     })
-    if (createRes.ok) return
+    if (createRes.ok) {
+      return
+    }
     if (createRes.status === 409) {
       const retry = await patch()
-      if (retry.ok) return
+      if (retry.ok) {
+        return
+      }
       throw new Error(`patch-after-409 failed: ${retry.status} ${await retry.text()}`)
     }
     throw new Error(`create failed: ${createRes.status} ${await createRes.text()}`)
@@ -226,9 +239,9 @@ async function runSync(token: string, contacts: Contact[]) {
       try {
         await syncContact(token, c)
         synced++
-      } catch (err) {
+      } catch (error) {
         failed++
-        console.error('sync failed for', c.email, String(err))
+        console.error('sync failed for', c.email, String(error))
       }
     }
   }
@@ -269,12 +282,15 @@ Deno.serve(async (req) => {
     }
 
     const result = await runSync(token, contacts)
-    return new Response(JSON.stringify({ mode: emails.length > 0 ? 'emails' : 'window', ...result }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
-  } catch (err) {
-    console.error('sync-hubspot fatal', String(err))
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 })
+    return new Response(
+      JSON.stringify({ mode: emails.length > 0 ? 'emails' : 'window', ...result }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  } catch (error) {
+    const failure = error instanceof Error ? error : new Error(String(error))
+    return internalServerErrorResponse(failure)
   } finally {
     await sql.end()
   }

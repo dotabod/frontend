@@ -1,8 +1,9 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -77,7 +78,7 @@ async function handleGetRequest(res: NextApiResponse, userId: string) {
   if (!accounts) {
     return res.status(500).end()
   }
-  return res.json({ accounts })
+  res.json({ accounts })
 }
 
 async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, userId: string) {
@@ -113,11 +114,13 @@ async function handlePatchRequest(req: NextApiRequest, res: NextApiResponse, use
     })
 
     const updatedAccounts = await prisma.$transaction(updatePromises)
-    return res.json({ accounts: updatedAccounts })
+    res.json({ accounts: updatedAccounts })
+    return
   } catch (error) {
     captureException(error)
     if (error instanceof z.ZodError) {
-      return res.status(422).json(error.issues)
+      res.status(422).json(error.issues)
+      return
     }
     console.error('Error in handlePatchRequest:', error)
     return res.status(500).end()
@@ -129,7 +132,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const userId = session?.user?.id
 
   if (!userId) {
-    return res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ message: 'Unauthorized' })
+    return
   }
 
   if (req.method === 'GET') {

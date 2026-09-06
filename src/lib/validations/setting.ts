@@ -1,6 +1,8 @@
 import * as z from 'zod'
+
 import { commands } from '@/lib/defaultSettings'
-import { canAccessFeature, type SubscriptionRow } from '@/utils/subscription'
+import { canAccessFeature } from '@/utils/subscription'
+import type { SubscriptionRow } from '@/utils/subscription'
 
 // Define schemas for each specific setting
 const settingsSchema = {

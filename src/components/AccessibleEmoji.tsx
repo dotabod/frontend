@@ -1,5 +1,3 @@
-import type {} from 'react'
-
 interface AccessibleEmojiProps {
   emoji: string
   label: string

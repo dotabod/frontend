@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
+
 import HomepageShell from '@/components/Homepage/HomepageShell'
 import { Card } from '@/ui/card'
 
@@ -131,14 +132,14 @@ const ContactPage: React.FC = () => {
       }}
     >
       <div className='container mx-auto px-4 py-8 md:py-16'>
-        <div className='max-w-2xl mx-auto'>
-          <h1 className='text-3xl font-bold text-center text-white mb-8'>Contact Us</h1>
-          <Card className='p-6 md:p-8 bg-gray-700 border border-gray-600'>
+        <div className='mx-auto max-w-2xl'>
+          <h1 className='mb-8 text-center text-3xl font-bold text-white'>Contact Us</h1>
+          <Card className='border border-gray-600 bg-gray-700 p-6 md:p-8'>
             <Form
               form={form}
               layout='vertical'
               onFinish={handleSubmit}
-              className='gap-4 flex flex-col'
+              className='flex flex-col gap-4'
               requiredMark={false} // Optional: hide default required marks
             >
               <Form.Item
@@ -165,7 +166,7 @@ const ContactPage: React.FC = () => {
                     min: 80,
                   },
                   {
-                    validator: (_, value) => {
+                    validator: async (_, value) => {
                       if (!value) {
                         return Promise.resolve()
                       }
@@ -185,7 +186,7 @@ const ContactPage: React.FC = () => {
               </Form.Item>
 
               <Form.Item>
-                <div className='flex flex-wrap gap-3 items-center justify-center sm:justify-start'>
+                <div className='flex flex-wrap items-center justify-center gap-3 sm:justify-start'>
                   <Button type='primary' htmlType='submit' loading={submitting} size='large'>
                     Send Message
                   </Button>

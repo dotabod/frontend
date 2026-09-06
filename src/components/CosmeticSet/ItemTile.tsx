@@ -1,6 +1,8 @@
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
-import { type CosmeticItem, formatSlot, hexA, initials, marketUrl, rarityOf } from './cosmetics'
+
+import { formatSlot, hexA, initials, marketUrl, rarityOf } from './cosmetics'
+import type { CosmeticItem } from './cosmetics'
 
 export function ItemTile({ item, featured = false }: { item: CosmeticItem; featured?: boolean }) {
   const href = marketUrl(item)
@@ -48,7 +50,7 @@ export function ItemTile({ item, featured = false }: { item: CosmeticItem; featu
         ) : (
           <span
             aria-hidden
-            className={`select-none font-bold tracking-wide ${featured ? 'text-4xl' : 'text-2xl'}`}
+            className={`font-bold tracking-wide select-none ${featured ? 'text-4xl' : 'text-2xl'}`}
             style={{ color: accent ? hexA(accent, 0.85) : 'rgb(107 114 128)' }}
           >
             {initials(item.name)}
@@ -75,7 +77,7 @@ export function ItemTile({ item, featured = false }: { item: CosmeticItem; featu
 
       {r && (
         <span
-          className='mt-3 text-[11px] font-semibold uppercase tracking-wider'
+          className='mt-3 text-[11px] font-semibold tracking-wider uppercase'
           style={{ color: r.color }}
         >
           {r.label}
@@ -84,14 +86,16 @@ export function ItemTile({ item, featured = false }: { item: CosmeticItem; featu
     </div>
   )
 
-  if (!href) return inner
+  if (!href) {
+    return inner
+  }
 
   return (
     <Link
       href={href}
       target='_blank'
       rel='noopener noreferrer'
-      className='block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400'
+      className='block h-full rounded-xl focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:outline-none'
     >
       {inner}
     </Link>

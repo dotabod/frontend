@@ -1,7 +1,3 @@
-import type {} from '@prisma/client'
-import type {} from '@prisma/client/runtime/library'
-import type {} from '@/utils/subscription'
-
 // Shared gift subscription info type
 export interface GiftInfo {
   hasGifts: boolean

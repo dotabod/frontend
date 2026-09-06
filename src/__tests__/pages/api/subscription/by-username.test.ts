@@ -1,5 +1,6 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/subscription/by-username'
 
 // Mock prisma
@@ -43,7 +44,7 @@ describe('subscription/by-username API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(400)
-    expect(res._getJSONData()).toEqual({ error: 'Username is required' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Username is required' })
   })
 
   it('returns 404 when user is not found', async () => {
@@ -68,7 +69,7 @@ describe('subscription/by-username API', () => {
       },
     })
     expect(res.statusCode).toBe(404)
-    expect(res._getJSONData()).toEqual({ error: 'User not found' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'User not found' })
   })
 
   it('returns FREE tier when user has no subscription', async () => {
@@ -81,6 +82,9 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -110,9 +114,6 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     // Mock no subscription found
@@ -124,9 +125,9 @@ describe('subscription/by-username API', () => {
     await handler(req, res)
 
     expect(getSubscription).toHaveBeenCalledWith('user-123')
-    expect(isInGracePeriod).toHaveBeenCalled()
+    expect(isInGracePeriod).toHaveBeenCalledOnce()
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: false,
@@ -146,6 +147,9 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -175,9 +179,6 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     // Mock active PRO subscription
@@ -204,7 +205,7 @@ describe('subscription/by-username API', () => {
 
     expect(getSubscription).toHaveBeenCalledWith('user-456')
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: false,
@@ -224,6 +225,9 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -253,9 +257,6 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
 
     // Mock lifetime PRO subscription
@@ -282,7 +283,7 @@ describe('subscription/by-username API', () => {
 
     expect(getSubscription).toHaveBeenCalledWith('user-789')
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: true,
@@ -302,6 +303,9 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -331,9 +335,6 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
     // Mock gift PRO subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
@@ -364,7 +365,7 @@ describe('subscription/by-username API', () => {
 
     expect(getSubscription).toHaveBeenCalledWith('user-101')
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       inGracePeriod: false,
       isGracePeriodPro: false,
       isLifetime: false,
@@ -384,6 +385,9 @@ describe('subscription/by-username API', () => {
 
     // Mock user found
     vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({
+      bannedAt: null,
+      bannedBy: null,
+      bannedReason: null,
       beta_tester: false,
       createdAt: new Date(),
       currentViewers: null,
@@ -413,9 +417,6 @@ describe('subscription/by-username API', () => {
       updatedAt: new Date(),
       youtube: null,
       youtubeChannelId: null,
-      bannedAt: null,
-      bannedReason: null,
-      bannedBy: null,
     })
     // Mock FREE tier subscription
     vi.mocked(getSubscription).mockResolvedValueOnce({
@@ -441,7 +442,7 @@ describe('subscription/by-username API', () => {
 
     expect(getSubscription).toHaveBeenCalledWith('user-202')
     expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toEqual({
+    expect(res._getJSONData()).toStrictEqual({
       inGracePeriod: true,
       isGracePeriodPro: true,
       isLifetime: false,
@@ -465,6 +466,6 @@ describe('subscription/by-username API', () => {
     await handler(req, res)
 
     expect(res.statusCode).toBe(500)
-    expect(res._getJSONData()).toEqual({ error: 'Internal Server Error' })
+    expect(res._getJSONData()).toStrictEqual({ error: 'Internal Server Error' })
   })
 })

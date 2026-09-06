@@ -1,6 +1,8 @@
 import clsx from 'clsx'
+
 import NumberTicker from '@/components/magicui/number-ticker'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
+
 import { Badge } from '../../Badge'
 import { Card } from '../../Card'
 

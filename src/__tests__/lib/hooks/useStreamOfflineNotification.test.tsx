@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react'
 import type { App } from 'antd'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { useStreamOfflineNotification } from '@/lib/hooks/useStreamOfflineNotification'
 
 type Notification = ReturnType<typeof App.useApp>['notification']
@@ -18,7 +19,7 @@ function renderStreamOfflineNotification(
   return { ...render(<TestComponent />), refreshSettings }
 }
 
-describe('useStreamOfflineNotification', () => {
+describe(useStreamOfflineNotification, () => {
   afterEach(() => {
     vi.useRealTimers()
     vi.restoreAllMocks()

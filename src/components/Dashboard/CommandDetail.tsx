@@ -1,4 +1,5 @@
 import Image from 'next/image'
+
 import { chatterInfo } from '@/components/Dashboard/Features/ChatterCard'
 import TwitchChat from '@/components/TwitchChat'
 import type { CommandKeys, commands } from '@/lib/defaultSettings'
@@ -427,14 +428,14 @@ const CommandDetail: Record<
               width={24}
               height={24}
               alt='based'
-              className='ml-1 mr-1 inline'
+              className='mr-1 ml-1 inline'
             />
             <Image
               src='https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/1x.webp'
               width={24}
               height={24}
               alt='clap'
-              className='ml-1 mr-1 inline'
+              className='mr-1 ml-1 inline'
             />
             . Only mods can type.
           </>
@@ -478,7 +479,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='south korea'
-                className='ml-1 mr-1 inline'
+                className='mr-1 ml-1 inline'
               />
               DuBu (Shadow Shaman) ·
               <Image
@@ -486,7 +487,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='russia'
-                className='ml-1 mr-1 inline'
+                className='mr-1 ml-1 inline'
               />
               Collapse (Magnus) ·
               <Image
@@ -494,7 +495,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='estonia'
-                className='ml-1 mr-1 inline'
+                className='mr-1 ml-1 inline'
               />
               Puppy (Chen) ·
               <Image
@@ -502,7 +503,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='usa'
-                className='ml-1 mr-1 inline'
+                className='mr-1 ml-1 inline'
               />
               PPD (Tusk) ·
               <Image
@@ -510,7 +511,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='usa'
-                className='ml-1 mr-1 inline'
+                className='mr-1 ml-1 inline'
               />
               Rajjix (Timbersaw)
             </>

@@ -1,4 +1,5 @@
 import type { ChatterSettingKeys } from '@/utils/subscription'
+
 import type { SettingKeys } from './defaultSettings'
 import { defaultSettings } from './defaultSettings'
 

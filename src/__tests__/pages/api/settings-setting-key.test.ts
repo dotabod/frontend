@@ -1,8 +1,9 @@
+import { Prisma } from '@prisma/client'
 import type { NextApiHandler } from 'next'
 import type { Session } from 'next-auth'
-import { Prisma } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import handler from '@/pages/api/settings/[settingKey]'
 
 // Mock the auth module to prevent environment variable checks
@@ -13,6 +14,7 @@ vi.mock('@/lib/auth', () => ({
 // Mock the prisma client
 vi.mock('@/lib/db', () => ({
   default: {
+    $transaction: vi.fn(),
     setting: {
       create: vi.fn(),
       findFirst: vi.fn(),
@@ -22,7 +24,6 @@ vi.mock('@/lib/db', () => ({
     user: {
       update: vi.fn(),
     },
-    $transaction: vi.fn(),
   },
 }))
 
@@ -268,7 +269,7 @@ describe('settings/[settingKey] API', () => {
           })
         }
         expect(prisma.setting.create).toHaveBeenCalledTimes(FOLLOW_MASTER_KEYS.length)
-        expect(prisma.$transaction).toHaveBeenCalledTimes(1)
+        expect(prisma.$transaction).toHaveBeenCalledOnce()
       })
 
       it('does not overwrite a feature the streamer already set explicitly', async () => {
@@ -321,7 +322,9 @@ describe('settings/[settingKey] API', () => {
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      expect(res._getJSONData()).toEqual(expect.objectContaining({ key: 'aegis', value: true }))
+      expect(res._getJSONData()).toStrictEqual(
+        expect.objectContaining({ key: 'aegis', value: true }),
+      )
     })
 
     it('redacts obsServerPassword while impersonating', async () => {

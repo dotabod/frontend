@@ -1,10 +1,12 @@
 import { Button, Form, Input, InputNumber, Radio, Skeleton } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { useWinLoss } from '@/lib/hooks/useWinLoss'
 import { Card } from '@/ui/card'
+
 import { TierSwitch } from '../Dashboard/Features/TierSwitch'
 import WinLossCard from './wl/WinLossCard'
 
@@ -66,7 +68,9 @@ export default function WinLossOverlay() {
   const settingsSaving = statsDaysSaving || statsStartDateSaving
 
   const saveChallenge = () => {
-    if (!challengeConfigured) return
+    if (!challengeConfigured) {
+      return
+    }
     updateStatsStartDate(draftStatsStartDate)
     updateStatsDays(draftStatsDays)
   }
@@ -85,7 +89,9 @@ export default function WinLossOverlay() {
     adjustmentAmount <= 1000
 
   const adjustWinLoss = async (won: boolean, direction: -1 | 1) => {
-    if (!validAdjustmentAmount) return
+    if (!validAdjustmentAmount) {
+      return
+    }
 
     setAdjustmentSaving(true)
     setAdjustmentError(null)
@@ -100,7 +106,9 @@ export default function WinLossOverlay() {
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       })
-      if (!response.ok) throw new Error(`Win/loss adjustment failed: ${response.status}`)
+      if (!response.ok) {
+        throw new Error(`Win/loss adjustment failed: ${response.status}`)
+      }
       refreshWinLoss()
     } catch {
       setAdjustmentError("Couldn't update the record. Try again.")
@@ -140,7 +148,9 @@ export default function WinLossOverlay() {
                 disabled={statsStartDateLoading || settingsSaving}
                 type='date'
                 value={draftStatsStartDate ?? ''}
-                onChange={(event) => setDraftStatsStartDate(event.target.value || null)}
+                onChange={(event) => {
+                  setDraftStatsStartDate(event.target.value || null)
+                }}
               />
             </Form.Item>
             <Form.Item colon={false} label='Duration' className='mb-0'>
@@ -188,7 +198,9 @@ export default function WinLossOverlay() {
         <Radio.Group
           aria-label='Correction match type'
           disabled={adjustmentSaving}
-          onChange={(event) => setAdjustmentLobbyType(event.target.value as 0 | 7)}
+          onChange={(event) => {
+            setAdjustmentLobbyType(event.target.value as 0 | 7)
+          }}
           value={adjustmentLobbyType}
         >
           <Radio.Button value={7}>Ranked</Radio.Button>

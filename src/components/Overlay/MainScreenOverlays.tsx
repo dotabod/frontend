@@ -6,6 +6,7 @@ import type { blockType } from '@/lib/devConsts'
 import type { RankImageDetails, wlType } from '@/lib/hooks/useSocket'
 import { useTransformRes } from '@/lib/hooks/useTransformRes'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
+
 import { RestrictFeature } from '../RestrictFeature'
 
 interface MainScreenOverlaysProps {
@@ -40,7 +41,7 @@ export const MainScreenOverlays = ({ block, wl, rankImageDetails }: MainScreenOv
       >
         <div
           id='main-screen-wl-mmr-card'
-          className='absolute flex h-full items-center justify-center space-x-2 '
+          className='absolute flex h-full items-center justify-center space-x-2'
           style={{
             right: res({ w: 416 }),
             width: res({ w: 299 }),

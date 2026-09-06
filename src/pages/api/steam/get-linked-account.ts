@@ -1,7 +1,8 @@
 import { captureException } from '@sentry/nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from '@/lib/api/getServerSession'
+
 import { withMethods } from '@/lib/api-middlewares/with-methods'
+import { getServerSession } from '@/lib/api/getServerSession'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 
@@ -10,7 +11,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, authOptions)
 
     if (!session?.user?.id) {
-      return res.status(401).json({ message: 'Unauthorized' })
+      res.status(401).json({ message: 'Unauthorized' })
+      return
     }
 
     // Find the user's primary linked Steam account
@@ -39,7 +41,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!steamAccounts || steamAccounts.length === 0) {
-      return res.status(200).json({ linked: false })
+      res.status(200).json({ linked: false })
+      return
     }
 
     // Format the accounts data
@@ -49,7 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       steam32Id: account.steam32Id.toString(),
     }))
 
-    return res.status(200).json({
+    res.status(200).json({
       accounts: linkedAccounts,
       linked: true,
       primaryAccount: primarySteam32Id
@@ -62,10 +65,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         : null,
     })
+    return
   } catch (error) {
     captureException(error)
     console.error('Error fetching linked Steam accounts:', error)
-    return res.status(500).json({ message: 'Internal server error' })
+    res.status(500).json({ message: 'Internal server error' })
+    return
   }
 }
 

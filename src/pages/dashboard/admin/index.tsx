@@ -18,9 +18,10 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import UserSelector from '@/components/Dashboard/UserSelector'
 import { requireDashboardAccess } from '@/lib/server/dashboardAccess'
@@ -245,13 +246,15 @@ const AdminPage = () => {
         <Space>
           <Button
             icon={<EditOutlined />}
-            onClick={() => handleOpenDialog(record)}
+            onClick={() => {
+              handleOpenDialog(record)
+            }}
             disabled={record.status === 'DELIVERED'}
             type='text'
           />
           <Button
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
+            onClick={async () => handleDelete(record.id)}
             type='text'
             danger
           />

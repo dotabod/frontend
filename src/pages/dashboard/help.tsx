@@ -1,25 +1,15 @@
 import { MessageOutlined, SearchOutlined } from '@ant-design/icons'
-import {
-  Alert,
-  Button,
-  Collapse,
-  Divider,
-  Form,
-  Input,
-  message,
-  type StepProps,
-  Steps,
-  type StepsProps,
-  Tag,
-} from 'antd'
+import { Alert, Button, Collapse, Divider, Form, Input, message, Steps, Tag } from 'antd'
+import type { StepProps, StepsProps } from 'antd'
 import axios from 'axios'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import type React from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
+
 import DashboardShell from '@/components/Dashboard/DashboardShell'
 import Header from '@/components/Dashboard/Header'
 import {
@@ -293,7 +283,7 @@ const faqs: Faq[] = [
           </span>,
           <span key={1}>
             Already denied the prompt? Re-enable it:
-            <ol className='list-decimal list-inside mt-2 space-y-1'>
+            <ol className='mt-2 list-inside list-decimal space-y-1'>
               <li>Click the lock icon (or site icon) in Chrome&apos;s address bar.</li>
               <li>Open &quot;Site settings&quot;.</li>
               <li>Find &quot;Look for and connect to devices on your local network&quot;.</li>
@@ -303,7 +293,7 @@ const faqs: Faq[] = [
           </span>,
           <span key={2}>
             This permission lets Dotabod talk to:
-            <ul className='list-disc list-inside mt-2 space-y-1'>
+            <ul className='mt-2 list-inside list-disc space-y-1'>
               <li>The Windows installer service running on your computer.</li>
               <li>Your local OBS WebSocket server during OBS setup.</li>
             </ul>
@@ -555,7 +545,9 @@ const TroubleshootPage = () => {
           prefix={<SearchOutlined className='text-gray-500' />}
           placeholder='Search problems, e.g. overlay, steam, chat'
           value={query}
-          onChange={(event) => handleSearch(event.target.value)}
+          onChange={(event) => {
+            handleSearch(event.target.value)
+          }}
           aria-label='Search troubleshooting topics'
         />
 
@@ -573,7 +565,7 @@ const TroubleshootPage = () => {
               const categoryIds = items.map((faq) => faq.id)
               return (
                 <section key={category.id} className='space-y-3'>
-                  <h2 className='text-xs font-medium uppercase tracking-[0.2em] text-gray-500'>
+                  <h2 className='text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
                     {category.label}
                   </h2>
                   <Collapse
@@ -626,7 +618,7 @@ const TroubleshootPage = () => {
             </Form.Item>
 
             <Form.Item>
-              <div className='flex flex-wrap gap-3 items-center'>
+              <div className='flex flex-wrap items-center gap-3'>
                 <Button type='primary' htmlType='submit' loading={submitting}>
                   Send message
                 </Button>

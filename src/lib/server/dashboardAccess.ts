@@ -1,5 +1,6 @@
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
+
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 

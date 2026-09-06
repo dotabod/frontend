@@ -1,10 +1,12 @@
 import { Tooltip } from 'antd'
 import clsx from 'clsx'
 import Image from 'next/image'
+
 import { Settings } from '@/lib/defaultSettings'
 import { useUpdateSetting } from '@/lib/hooks/useUpdateSetting'
 import { Card } from '@/ui/card'
 import type { ChatterSettingKeys } from '@/utils/subscription'
+
 import DotabodChatter from './DotabodChatter'
 import { TierSwitch } from './TierSwitch'
 
@@ -333,20 +335,16 @@ export const chatterInfo = {
   },
 }
 
-const groupedChatterInfo = Object.entries(chatterInfo).reduce(
-  (acc, [key, value]) => {
-    const { category } = value
-    if (!acc[category]) {
-      acc[category] = []
-    }
-    acc[category].push({ ...value, id: key })
-    return acc
-  },
-  {} as Record<
-    string,
-    { id: string; tooltip: string; category: CATEGORIES; message: React.ReactNode }[]
-  >,
-)
+const groupedChatterInfo = Object.entries(chatterInfo).reduce<
+  Record<string, { id: string; tooltip: string; category: CATEGORIES; message: React.ReactNode }[]>
+>((acc, [key, value]) => {
+  const { category } = value
+  if (!acc[category]) {
+    acc[category] = []
+  }
+  acc[category].push({ ...value, id: key })
+  return acc
+}, {})
 
 type GroupedChatterItem = (typeof groupedChatterInfo)[string][number]
 
