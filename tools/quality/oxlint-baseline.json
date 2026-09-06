@@ -20544,26 +20544,6 @@
         "severity": "error"
       }
     },
-    "233d36d2f755402acb8f0120a68517ee6e13194e057e89c39b9f7a06456ae08b": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "after = data.pagination?.cursor",
-              "next": "} while (after)",
-              "previous": ""
-            },
-            "span": "after = data.pagination?.cursor",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "23402eaa2e7212865117762f3c30fbbbe5610965fe9d380dd153a7ac2aca53b8": {
       "count": 1,
       "summary": {
@@ -36282,26 +36262,6 @@
         "severity": "error"
       }
     },
-    "3d8dfc18057d0b6aabee21a388f988cb49b880bcaf19fc08d64be48aeb1c0343": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "moderatedChannels.push(...data.data)",
-              "next": "}",
-              "previous": "if (Array.isArray(data.data)) {"
-            },
-            "span": "...data.data",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe spread of an any type.",
-        "severity": "error"
-      }
-    },
     "3d98ac88ea9e3610e40e550774612e19b1cd883744eb9dc68fab37fb770b7cd4": {
       "count": 1,
       "summary": {
@@ -36508,26 +36468,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "3e1bb4b4cee04d18b1b56fce6af6bce188cc1631aa71b2573419cc8054f83d42": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "after = data.pagination?.cursor",
-              "next": "} while (after)",
-              "previous": ""
-            },
-            "span": "pagination",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .pagination on an `any` value.",
         "severity": "error"
       }
     },
@@ -42805,26 +42745,6 @@
           }
         ],
         "message": "Do not use useless `undefined`.",
-        "severity": "error"
-      }
-    },
-    "487a24ddc4ad7cbc664cede21fc7a7a156a2f3584756dbaeb7b4504bf9e6ac75": {
-      "count": 1,
-      "summary": {
-        "code": "import(no-cycle)",
-        "file": "src/lib/api-middlewares/with-authentication.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "import { authOptions } from '@/lib/auth'",
-              "next": "",
-              "previous": "import { getServerSession } from '@/lib/api/get-server-session'"
-            },
-            "span": "'@/lib/auth'",
-            "text": ""
-          }
-        ],
-        "message": "Dependency cycle detected",
         "severity": "error"
       }
     },
@@ -52099,26 +52019,6 @@
         "severity": "error"
       }
     },
-    "593c3eabede0c97f444103ebc99c4e115e6cfdf0cf3168078dc6854fc46bce97": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const response = await fetch(url.toString(), {",
-              "next": "headers: {",
-              "previous": ""
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
     "5945a4a1dfb5a5479dec4b929c7e7e25f819d3f098ec0f68d50e3207c2d4f6b1": {
       "count": 1,
       "summary": {
@@ -53663,6 +53563,26 @@
           }
         ],
         "message": "Unsafe assignment of an any value.",
+        "severity": "error"
+      }
+    },
+    "5bf4dbb0c679f68194eedcf40ca28b6d4530ab290148b26f76f1d30e8b85a3d3": {
+      "count": 1,
+      "summary": {
+        "code": "typescript(consistent-return)",
+        "file": "src/pages/api/diagnostics/overlay-page.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "return res.status(204).end()",
+              "next": "}",
+              "previous": "}"
+            },
+            "span": "return res.status(204).end()",
+            "text": ""
+          }
+        ],
+        "message": "Async function 'handler' expected no return value.",
         "severity": "error"
       }
     },
@@ -55317,26 +55237,6 @@
           }
         ],
         "message": "Unsafe member access .platform on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "5f22b040ed36461f3ecc23776b9a1bc7cc484568e2f6f41547a00226b5dcee6b": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "} while (after)",
-              "next": "",
-              "previous": "after = data.pagination?.cursor"
-            },
-            "span": "after",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -58718,26 +58618,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "64fa9d95912d8d402ea586083bd47a2e1dbb6ac209b5bbbc5b0540492c220498": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "moderatedChannels.push(...data.data)",
-              "next": "}",
-              "previous": "if (Array.isArray(data.data)) {"
-            },
-            "span": "data",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .data on an `any` value.",
         "severity": "error"
       }
     },
@@ -68175,26 +68055,6 @@
         "severity": "error"
       }
     },
-    "7638023bf7d78d79123b66aca1cdf0359d8ce9d25c840bcdc1ce26bf378ab9b6": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(consistent-return)",
-        "file": "src/pages/api/diagnostics/overlay-page.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return res.status(204).end()",
-              "next": "}",
-              "previous": "})"
-            },
-            "span": "return res.status(204).end()",
-            "text": ""
-          }
-        ],
-        "message": "Async function 'handler' expected no return value.",
-        "severity": "error"
-      }
-    },
     "763cd3ff4328dbd620441668447f1138a081ee24ab8829230a561e114b89578a": {
       "count": 1,
       "summary": {
@@ -68561,26 +68421,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "76b0cbcb296bb181617863feabf8b0d7e613248e4056af1c5b8032f678c219a0": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const data = await response.json()",
-              "next": "if (Array.isArray(data.data)) {",
-              "previous": ""
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
         "severity": "error"
       }
     },
@@ -79852,26 +79692,6 @@
         "severity": "error"
       }
     },
-    "89bb5a44a56adaa54c6ed70d3bc216fa6a5262ae5da50bd3ff88255363027e94": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(async-await-in-loop)",
-        "file": "scripts/fix-opennode-payment.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const lifetimeSubscription = await prisma.subscription.findFirst({",
-              "next": "where: {",
-              "previous": "// Check if user has active LIFETIME subscription"
-            },
-            "span": "await prisma.subscription.findFirst({\n      where: {\n        status: SubscriptionStatus.ACTIVE,\n        transactionType: TransactionType.LIFETIME,\n        userId: charge.userId,\n      },\n    })",
-            "text": ""
-          }
-        ],
-        "message": "This makes the for…of loop slow because each await runs one after another, so collect the independent calls & run them together with `await Promise.all(items.map(...))`",
-        "severity": "error"
-      }
-    },
     "89c38c8d049a9a1f1246c4650f54442e393f6ec0dea62a6e728752374276bc11": {
       "count": 1,
       "summary": {
@@ -83709,26 +83529,6 @@
         "severity": "error"
       }
     },
-    "90b0a389bb683af9d7545928577106e94e6ffdc31ff3214a6ecd74f0333923fa": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!userId) {",
-              "next": "throw new Error('User ID is required')",
-              "previous": "try {"
-            },
-            "span": "userId",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "90b0bcebcb26ddfd49c2f3925d6eb4de6d873e3dcd0b95731f832c73223917ef": {
       "count": 1,
       "summary": {
@@ -86836,26 +86636,6 @@
           }
         ],
         "message": "Import statements must come first",
-        "severity": "error"
-      }
-    },
-    "95c860ae9e36e4b984756000feea46b7bc3615514f5959af56b657f4413c4cee": {
-      "count": 1,
-      "summary": {
-        "code": "import(no-cycle)",
-        "file": "src/lib/auth.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "import { getModeratedChannels } from '@/pages/api/get-moderated-channels'",
-              "next": "import { parseTwitchProfile } from '@/types/twitch'",
-              "previous": "import { twitchHelixProfile } from '@/lib/twitch-helix-profile'"
-            },
-            "span": "'@/pages/api/get-moderated-channels'",
-            "text": ""
-          }
-        ],
-        "message": "Dependency cycle detected",
         "severity": "error"
       }
     },
@@ -91175,26 +90955,6 @@
           }
         ],
         "message": "Your users see an extra render with empty \"hasConsented\" because a useEffect sets its starting value.",
-        "severity": "error"
-      }
-    },
-    "9d58df4e9c6e4c55d4b8f289688cc25ab706a96acfd65c4325cd84943615457c": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const data = await response.json()",
-              "next": "if (Array.isArray(data.data)) {",
-              "previous": ""
-            },
-            "span": "data = await response.json()",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -95659,26 +95419,6 @@
         "severity": "error"
       }
     },
-    "a4c541f5a26396baffa35345e1ca871355942b346cf6108fcaf67bf9d58d1e2b": {
-      "count": 1,
-      "summary": {
-        "code": "import(no-cycle)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "import { withAuthentication } from '@/lib/api-middlewares/with-authentication'",
-              "next": "import { withMethods } from '@/lib/api-middlewares/with-methods'",
-              "previous": ""
-            },
-            "span": "'@/lib/api-middlewares/with-authentication'",
-            "text": ""
-          }
-        ],
-        "message": "Dependency cycle detected",
-        "severity": "error"
-      }
-    },
     "a4d92486b4847f93df7894f66e1d85b7ab7c2f7171c6885d53a394973d4fc750": {
       "count": 1,
       "summary": {
@@ -96143,26 +95883,6 @@
           }
         ],
         "message": "Unexpected `void` operator",
-        "severity": "error"
-      }
-    },
-    "a572bc943adced37ca5e5119052d2eeb3c81f8a4aa124ccd72ee0e327a7e18ce": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (after) {",
-              "next": "url.searchParams.append('after', after)",
-              "previous": "url.searchParams.append('first', first.toString())"
-            },
-            "span": "after",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -110695,26 +110415,6 @@
         "severity": "error"
       }
     },
-    "c0a9bc61c0ee33e737d7eb9c3319e79f12c2874fe9fd18bc5d34abb4295ca5a8": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(async-await-in-loop)",
-        "file": "scripts/paypal/create-plans.mjs",
-        "labels": [
-          {
-            "context": {
-              "current": "const created = await api(accessToken, '/v1/billing/plans', {",
-              "next": "billing_cycles: [",
-              "previous": "for (const plan of PLANS) {"
-            },
-            "span": "await api(accessToken, '/v1/billing/plans', {\n      billing_cycles: [\n        {\n          frequency: { interval_count: 1, interval_unit: plan.interval },\n          pricing_scheme: { fixed_price: { currency_code: 'USD', value: plan.value } },\n          sequence: 1,\n          tenure_type: 'REGULAR',\n          total_cycles: 0,\n        },\n      ],\n      name: plan.name,\n      payment_preferences: {\n        auto_bill_outstanding: true,\n        payment_failure_threshold: 2,\n        setup_fee: { currency_code: 'USD', value: '0' },\n        setup_fee_failure_action: 'CONTINUE',\n      },\n      product_id: product.id,\n      status: 'ACTIVE',\n    })",
-            "text": ""
-          }
-        ],
-        "message": "This makes the for…of loop slow because each await runs one after another, so collect the independent calls & run them together with `await Promise.all(items.map(...))`",
-        "severity": "error"
-      }
-    },
     "c0afbb68e9af6f8bef3e3af69d9ce590a0c6da0b8fa3d0acc82a75adfa670284": {
       "count": 1,
       "summary": {
@@ -110932,26 +110632,6 @@
           }
         ],
         "message": "Rename symbol \"shape\" for its domain role; \"shape\" describes structure rather than ownership.",
-        "severity": "error"
-      }
-    },
-    "c1197370eafbf8390471f417f1fb0ecc344c1063dcea0cd314869cad10fd82e5": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "'Client-Id': process.env.TWITCH_CLIENT_ID || '',",
-              "next": "},",
-              "previous": "Authorization: `Bearer ${accessToken}`,"
-            },
-            "span": "process.env.TWITCH_CLIENT_ID",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -118866,26 +118546,6 @@
         "severity": "error"
       }
     },
-    "ce39e3a6916dae170890ff089f0ee3f23c3d07b6f570bb29d08f8e1bd7a38b9e": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(async-await-in-loop)",
-        "file": "scripts/check-opennode-payment.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const lifetimeSubscription = await prisma.subscription.findFirst({",
-              "next": "where: {",
-              "previous": "// Check if user has active LIFETIME subscription"
-            },
-            "span": "await prisma.subscription.findFirst({\n      where: {\n        status: SubscriptionStatus.ACTIVE,\n        transactionType: TransactionType.LIFETIME,\n        userId: charge.userId,\n      },\n    })",
-            "text": ""
-          }
-        ],
-        "message": "This makes the for…of loop slow because each await runs one after another, so collect the independent calls & run them together with `await Promise.all(items.map(...))`",
-        "severity": "error"
-      }
-    },
     "ce3aa7277d18277e74d256fe79882894b27211ec67d039accd32f74c2248dde7": {
       "count": 1,
       "summary": {
@@ -121875,26 +121535,6 @@
           }
         ],
         "message": "This conditional spread hides property omission behind an empty object. Build the object in separate statements and add the property only when present.",
-        "severity": "error"
-      }
-    },
-    "d3367750bca1e2cd8aa85050fa26f932f8184c57cf83ea5c0ef071c3734d9611": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (Array.isArray(data.data)) {",
-              "next": "moderatedChannels.push(...data.data)",
-              "previous": "const data = await response.json()"
-            },
-            "span": "data",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .data on an `any` value.",
         "severity": "error"
       }
     },
@@ -140172,26 +139812,6 @@
         "severity": "error"
       }
     },
-    "f1654fd28a20f138e281e77a7f84a7a5d052d3cfc3fea1d4f8b69dff8438c2fd": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(prefer-nullish-coalescing)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "'Client-Id': process.env.TWITCH_CLIENT_ID || '',",
-              "next": "},",
-              "previous": "Authorization: `Bearer ${accessToken}`,"
-            },
-            "span": "||",
-            "text": ""
-          }
-        ],
-        "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
-        "severity": "error"
-      }
-    },
     "f16c0a5a808f18ec171c0c06637561ce58e74c7f1dec4cc6ec652ecc1d8e69b3": {
       "count": 1,
       "summary": {
@@ -146796,26 +146416,6 @@
         "severity": "error"
       }
     },
-    "fd3b0aa6cf4cb585eb571394d24c9bd9c68bb8a5cbed8c372cab167d378438cd": {
-      "count": 1,
-      "summary": {
-        "code": "import(no-cycle)",
-        "file": "src/pages/api/get-moderated-channels.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "import { authOptions } from '@/lib/auth'",
-              "next": "import prisma from '@/lib/db'",
-              "previous": "import { getServerSession } from '@/lib/api/get-server-session'"
-            },
-            "span": "'@/lib/auth'",
-            "text": ""
-          }
-        ],
-        "message": "Dependency cycle detected",
-        "severity": "error"
-      }
-    },
     "fd40bf12bbef272bf74c67259b1d291d6595435332969574ce52529560ef8ccf": {
       "count": 1,
       "summary": {
@@ -148611,6 +148211,7 @@
           "src/__tests__/components/profile-match-overview.test.tsx",
           "src/__tests__/components/whats-new-feature-card.test.tsx",
           "src/__tests__/components/whats-new-feed.test.tsx",
+          "src/__tests__/lib/auth.test.ts",
           "src/__tests__/lib/dota-finding-match-label.test.ts",
           "src/__tests__/lib/gift-subscription.test.ts",
           "src/__tests__/lib/hooks/use-last-fm.test.ts",
@@ -148920,6 +148521,7 @@
           "src/lib/theme/theme-config.ts",
           "src/lib/track.ts",
           "src/lib/twitch-helix-profile.ts",
+          "src/lib/twitch-moderated-channels.ts",
           "src/lib/validations/setting.ts",
           "src/lib/whats-new.ts",
           "src/pages/404.tsx",

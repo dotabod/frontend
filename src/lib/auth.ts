@@ -10,7 +10,7 @@ import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 import { reconcileTwitchProfile } from '@/lib/reconcile-twitch-profile'
 import { twitchHelixProfile } from '@/lib/twitch-helix-profile'
-import { getModeratedChannels } from '@/pages/api/get-moderated-channels'
+import { getModeratedChannels } from '@/lib/twitch-moderated-channels'
 import { parseTwitchProfile } from '@/types/twitch'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 
