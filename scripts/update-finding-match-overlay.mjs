@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* oxlint-disable typescript/consistent-return, typescript/no-unsafe-argument, typescript/no-unsafe-assignment, typescript/no-unsafe-member-access -- node:util parseArgs values are runtime-validated at each CLI boundary, but TypeScript 7 treats them as any in this MJS script. */
+
 // Refreshes the queue-blocker art the overlay draws over a streamer's main menu.
 //
 // With no arguments it screenshots the Dota 2 client running on this machine,
@@ -9,9 +11,10 @@
 //   node scripts/update-finding-match-overlay.mjs              # live client
 //   node scripts/update-finding-match-overlay.mjs -i frame.png # existing frame
 
-import { parseArgs } from 'node:util'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parseArgs } from 'node:util'
+
 import { withCapturedFrame } from './lib/capture-dota-window.mjs'
 import {
   generateFindingMatchOverlay,
@@ -30,7 +33,7 @@ const USAGE = `Usage: node scripts/update-finding-match-overlay.mjs [options]
 
 Options:
   -i, --input <png>      Process this screenshot instead of capturing the client.
-                         Accepts a 16:9 client screenshot or an existing 840x355 crop.
+                         Accepts a 1920x1080 screenshot or an existing 840x355 crop.
   -o, --output <png>     Write one specific file instead of routing by state.
       --output-dir <dir> Directory holding the overlay assets.
                          [default: public/images/overlay]
@@ -54,13 +57,25 @@ const { values } = parseArgs({
   },
 })
 
-if (values.help) {
+if (values.help === true) {
   console.log(USAGE)
   process.exit(0)
 }
 
 const describe = ({ output, state }) =>
   `Wrote the ${state} overlay to ${path.relative(process.cwd(), output) || output}`
+
+const parseSettleMs = () => {
+  if (values['settle-ms'] === undefined) {
+    return
+  }
+
+  const settleMs = Number(values['settle-ms'])
+  if (!Number.isInteger(settleMs) || settleMs < 0) {
+    throw new Error('--settle-ms must be a non-negative integer')
+  }
+  return settleMs
+}
 
 // --output asks for one specific file, so the state routing and the manifest
 // bookkeeping are both skipped.
@@ -74,39 +89,41 @@ const writeSingleFile = async (input) => {
 }
 
 const writeRoutedAsset = async (input, { buildId, nativeResolution }) => {
+  const source = nativeResolution === undefined ? undefined : { nativeResolution }
   const result = await processCapturedScreenshot({
     buildId: values['build-id'] ?? buildId ?? 'unknown',
     input,
     outputDirectory: values['output-dir'] ?? DEFAULT_OUTPUT_DIRECTORY,
-    source: nativeResolution ? { nativeResolution } : undefined,
+    source,
   })
   console.log(describe(result))
   console.log(`Recorded the capture in ${path.relative(process.cwd(), result.manifestPath)}`)
 }
 
 try {
-  if (values.input) {
-    await (values.output
-      ? writeSingleFile(values.input)
-      : writeRoutedAsset(values.input, { buildId: values['build-id'] }))
-  } else {
+  const settleMs = parseSettleMs()
+  if (values.input === undefined) {
     await withCapturedFrame(
       {
         keepFrameAt: values['keep-frame'],
-        settleMs: values['settle-ms'] ? Number(values['settle-ms']) : undefined,
+        settleMs,
       },
       async (capture) => {
         console.log(`Captured the ${capture.sourceSize} client as ${capture.resolution}`)
-        await (values.output
-          ? writeSingleFile(capture.output)
-          : writeRoutedAsset(capture.output, {
+        await (values.output === undefined
+          ? writeRoutedAsset(capture.output, {
               buildId: capture.buildId,
               // Only worth recording when the frame was actually resampled.
               nativeResolution:
                 capture.sourceSize === capture.resolution ? undefined : capture.sourceSize,
-            }))
+            })
+          : writeSingleFile(capture.output))
       },
     )
+  } else if (values.output === undefined) {
+    await writeRoutedAsset(values.input, { buildId: values['build-id'] })
+  } else {
+    await writeSingleFile(values.input)
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

@@ -1,5 +1,7 @@
+/* oxlint-disable typescript/no-unsafe-argument, typescript/no-unsafe-assignment, typescript/no-unsafe-call, typescript/no-unsafe-member-access, typescript/no-unsafe-return, typescript/strict-boolean-expressions -- Sharp's raw-pixel and metadata types are not inferred through this MJS image pipeline under TypeScript 7; dimensions and states are validated before use. */
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+
 import sharp from 'sharp'
 
 export const FINDING_MATCH_CROP = {
@@ -46,7 +48,9 @@ const ratioInRegion = (data, info, region, predicate) => {
   for (let y = region.top; y < region.bottom; y += 1) {
     for (let x = region.left; x < region.right; x += 1) {
       const offset = (y * info.width + x) * info.channels
-      if (predicate(data[offset], data[offset + 1], data[offset + 2])) matches += 1
+      if (predicate(data[offset], data[offset + 1], data[offset + 2])) {
+        matches += 1
+      }
       pixels += 1
     }
   }
@@ -58,12 +62,18 @@ const rgbToHue = (red, green, blue) => {
   const maximum = Math.max(red, green, blue)
   const minimum = Math.min(red, green, blue)
   const difference = maximum - minimum
-  if (difference === 0) return 0
+  if (difference === 0) {
+    return 0
+  }
 
   let hue
-  if (maximum === red) hue = ((green - blue) / difference) % 6
-  else if (maximum === green) hue = (blue - red) / difference + 2
-  else hue = (red - green) / difference + 4
+  if (maximum === red) {
+    hue = ((green - blue) / difference) % 6
+  } else if (maximum === green) {
+    hue = (blue - red) / difference + 2
+  } else {
+    hue = (red - green) / difference + 4
+  }
 
   return (hue * 60 + 360) % 360
 }
@@ -80,14 +90,18 @@ const classifyPixels = (data, info) => {
     return (hue <= 25 || hue >= 345) && saturation(red, green, blue) > 0.38 && red > 80
   })
 
-  if (redRatio > 0.08) return 'finding'
+  if (redRatio > 0.08) {
+    return 'finding'
+  }
 
   const greenRatio = ratioInRegion(data, info, IDLE_CONTROL, (red, green, blue) => {
     const hue = rgbToHue(red, green, blue)
     return hue >= 70 && hue <= 165 && saturation(red, green, blue) > 0.22 && green > 50
   })
 
-  if (greenRatio > 0.12) return 'idle'
+  if (greenRatio > 0.12) {
+    return 'idle'
+  }
 
   return 'unknown'
 }
@@ -144,6 +158,7 @@ const ERASED_REGIONS = [
   { detect: isQueueLineText, edit: QUEUE_EDIT, radius: 2, scan: QUEUE_SCAN },
 ]
 
+// oxlint-disable-next-line sonarjs/cognitive-complexity -- the nested loops mirror the mask's region, pixel, and dilation dimensions directly
 const buildTextMask = (data, info) => {
   const mask = new Uint8Array(info.width * info.height)
 
@@ -151,17 +166,23 @@ const buildTextMask = (data, info) => {
     const detected = new Uint8Array(info.width * info.height)
     for (let y = scan.top; y <= scan.bottom; y += 1) {
       for (let x = scan.left; x <= scan.right; x += 1) {
-        if (detect(data, info, x, y, scan)) detected[y * info.width + x] = 1
+        if (detect(data, info, x, y, scan)) {
+          detected[y * info.width + x] = 1
+        }
       }
     }
 
     for (let y = scan.top; y <= scan.bottom; y += 1) {
       for (let x = scan.left; x <= scan.right; x += 1) {
-        if (!detected[y * info.width + x]) continue
+        if (!detected[y * info.width + x]) {
+          continue
+        }
 
         for (let deltaY = -radius; deltaY <= radius; deltaY += 1) {
           for (let deltaX = -radius; deltaX <= radius; deltaX += 1) {
-            if (deltaX * deltaX + deltaY * deltaY > radius * radius) continue
+            if (deltaX * deltaX + deltaY * deltaY > radius * radius) {
+              continue
+            }
             const targetX = x + deltaX
             const targetY = y + deltaY
             if (
@@ -191,7 +212,9 @@ const initializeMaskedRuns = (pixels, mask, info, edit) => {
       }
 
       const start = x
-      while (x <= edit.right && mask[y * info.width + x]) x += 1
+      while (x <= edit.right && mask[y * info.width + x]) {
+        x += 1
+      }
       const end = x - 1
       const left = (y * info.width + Math.max(0, start - 1)) * info.channels
       const right = (y * info.width + Math.min(info.width - 1, end + 1)) * info.channels
@@ -208,18 +231,23 @@ const initializeMaskedRuns = (pixels, mask, info, edit) => {
   }
 }
 
+// oxlint-disable-next-line sonarjs/cognitive-complexity -- the iterative inpainting loop is clearer when kept beside its mask traversal
 const eraseFindingMatchText = (data, info) => {
   const mask = buildTextMask(data, info)
-  if (!mask.some(Boolean)) return data
+  if (!mask.some(Boolean)) {
+    return data
+  }
 
   let current = Float32Array.from(data)
-  let next = current.slice()
+  let next = new Float32Array(current)
   const maskedPixels = []
   for (const { edit } of ERASED_REGIONS) {
     initializeMaskedRuns(current, mask, info, edit)
     for (let y = edit.top; y <= edit.bottom; y += 1) {
       for (let x = edit.left; x <= edit.right; x += 1) {
-        if (mask[y * info.width + x]) maskedPixels.push([x, y])
+        if (mask[y * info.width + x]) {
+          maskedPixels.push([x, y])
+        }
       }
     }
   }
@@ -248,7 +276,9 @@ const eraseFindingMatchText = (data, info) => {
   }
 
   for (let pixel = 0; pixel < mask.length; pixel += 1) {
-    if (!mask[pixel]) continue
+    if (!mask[pixel]) {
+      continue
+    }
     const offset = pixel * info.channels
     for (let channel = 0; channel < info.channels; channel += 1) {
       data[offset + channel] = Math.round(current[offset + channel])
@@ -267,8 +297,11 @@ export const generateFindingMatchOverlay = async ({ input, output, state = 'auto
     throw new Error('Could not identify the Dota 2 queue state from the expected controls')
   }
 
-  if (detectedState === 'finding') eraseFindingMatchText(data, info)
+  if (detectedState === 'finding') {
+    eraseFindingMatchText(data, info)
+  }
 
+  await mkdir(path.dirname(output), { recursive: true })
   const temporary = `${output}.${process.pid}.tmp.png`
   await sharp(data, { raw: info }).png({ compressionLevel: 9 }).toFile(temporary)
   await rename(temporary, output)
@@ -298,9 +331,11 @@ export const processCapturedScreenshot = async ({
   const manifestPath = path.join(outputDirectory, 'finding-match-source.json')
   let manifest
   try {
-    manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
+    manifest = JSON.parse(await readFile(manifestPath, 'utf-8'))
   } catch (error) {
-    if (error?.code !== 'ENOENT') throw error
+    if (error?.code !== 'ENOENT') {
+      throw error
+    }
   }
 
   if (
@@ -312,20 +347,25 @@ export const processCapturedScreenshot = async ({
       clientResolution: '1920x1080',
       crop: FINDING_MATCH_CROP,
       dotaBuildId: buildId,
-      ...(source?.menuFingerprint ? { menuFingerprint: source.menuFingerprint } : {}),
       schemaVersion: 1,
       source: 'installed Dota 2 client window',
       states: {},
     }
+    if (source?.menuFingerprint) {
+      manifest.menuFingerprint = source.menuFingerprint
+    }
   }
 
-  manifest.states[state] = {
-    capturedAt,
-    ...(state === 'finding' ? { findingMatchTextRemoved: true } : {}),
-    // Records that the frame was downscaled from a larger client, so a later
-    // maintainer can tell a resampled crop from a native 1080p one.
-    ...(source?.nativeResolution ? { nativeResolution: source.nativeResolution } : {}),
+  const stateCapture = { capturedAt }
+  if (state === 'finding') {
+    stateCapture.findingMatchTextRemoved = true
   }
+  // Records that the frame was downscaled from a larger client, so a later
+  // maintainer can tell a resampled crop from a native 1080p one.
+  if (source?.nativeResolution) {
+    stateCapture.nativeResolution = source.nativeResolution
+  }
+  manifest.states[state] = stateCapture
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 
   return { manifestPath, output: path.resolve(output), state }

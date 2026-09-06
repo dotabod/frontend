@@ -1,3 +1,4 @@
+/* oxlint-disable typescript/no-unsafe-argument, typescript/no-unsafe-assignment, typescript/no-unsafe-call, typescript/no-unsafe-member-access, typescript/no-unsafe-return, typescript/strict-boolean-expressions, typescript/strict-void-return -- This Node-only MJS boundary consumes execFile errors and JSON emitted by the owned PowerShell script; TypeScript 7 cannot infer those runtime shapes. */
 import { execFile } from 'node:child_process'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -29,12 +30,23 @@ export const captureDotaWindow = async ({ output, settleMs }) => {
     )
   }
 
-  const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', CAPTURE_SCRIPT, '-Output', output]
-  if (settleMs !== undefined) args.push('-SettleMs', String(settleMs))
+  const args = [
+    '-NoProfile',
+    '-ExecutionPolicy',
+    'Bypass',
+    '-File',
+    CAPTURE_SCRIPT,
+    '-Output',
+    output,
+  ]
+  if (settleMs !== undefined) {
+    args.push('-SettleMs', String(settleMs))
+  }
 
   let lastError
   for (const shell of POWERSHELL_CANDIDATES) {
     try {
+      // oxlint-disable-next-line eslint/no-await-in-loop -- candidates must run sequentially so a missing executable can fall through without launching multiple captures
       const { stdout } = await run(shell, args, { windowsHide: true })
       return JSON.parse(stdout.trim())
     } catch (error) {
@@ -45,7 +57,7 @@ export const captureDotaWindow = async ({ output, settleMs }) => {
       // PowerShell writes `throw` messages to stderr; they are already written
       // for a human, so surface them instead of the generic exec failure.
       const detail = String(error.stderr ?? '').trim()
-      throw new Error(detail || error.message)
+      throw new Error(detail || error.message, { cause: error })
     }
   }
 
@@ -56,13 +68,15 @@ export const captureDotaWindow = async ({ output, settleMs }) => {
  * Captures into a throwaway directory and cleans it up afterwards, unless the
  * caller wants to keep the full frame around to debug a bad crop.
  */
-export const withCapturedFrame = async ({ keepFrameAt, settleMs }, use) => {
+export const withCapturedFrame = async ({ keepFrameAt, settleMs }, consume) => {
   const directory = keepFrameAt ? null : await mkdtemp(path.join(tmpdir(), 'dotabod-capture-'))
   const output = keepFrameAt ?? path.join(directory, 'dota-frame.png')
 
   try {
-    return await use(await captureDotaWindow({ output, settleMs }))
+    return await consume(await captureDotaWindow({ output, settleMs }))
   } finally {
-    if (directory) await rm(directory, { force: true, recursive: true })
+    if (directory) {
+      await rm(directory, { force: true, recursive: true })
+    }
   }
 }
