@@ -20,7 +20,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
         },
       })
       .then((data) => {
-        res.json(data?.stream_online || false)
+        res.json(data?.stream_online ?? false)
       })
       .catch((error) => {
         captureException(error)

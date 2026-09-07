@@ -2,7 +2,7 @@
 
 import { Empty, Input, List, Popover, Typography } from 'antd'
 import type { InputRef } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { ChevronRight, CornerDownRight, Settings } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'

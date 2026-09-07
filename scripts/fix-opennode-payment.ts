@@ -77,23 +77,20 @@ const discoverChargesToFix = async function discoverChargesToFix(): Promise<Char
     where: { status: { in: ['paid', 'confirmed'] } },
   })
 
-  const results: ChargeToFix[] = []
+  const results = await Promise.all(
+    paidCharges.map(async (charge) => {
+      const lifetimeSubscription = await prisma.subscription.findFirst({
+        where: {
+          status: SubscriptionStatus.ACTIVE,
+          transactionType: TransactionType.LIFETIME,
+          userId: charge.userId,
+        },
+      })
 
-  for (const charge of paidCharges) {
-    // Check if user has active LIFETIME subscription
-    const lifetimeSubscription = await prisma.subscription.findFirst({
-      where: {
-        status: SubscriptionStatus.ACTIVE,
-        transactionType: TransactionType.LIFETIME,
-        userId: charge.userId,
-      },
-    })
+      const hasLifetime = Boolean(lifetimeSubscription)
+      const missingWebhook = !charge.lastWebhookAt
+      const needsFix = !hasLifetime || missingWebhook
 
-    const hasLifetime = Boolean(lifetimeSubscription)
-    const missingWebhook = !charge.lastWebhookAt
-    const needsFix = !hasLifetime || missingWebhook
-
-    if (needsFix) {
       let reason = ''
       if (!hasLifetime && missingWebhook) {
         reason = 'No subscription + webhook never processed'
@@ -103,15 +100,16 @@ const discoverChargesToFix = async function discoverChargesToFix(): Promise<Char
         reason = 'Webhook never processed (subscription exists)'
       }
 
-      results.push({
+      return {
         charge,
         hasLifetimeSubscription: hasLifetime,
+        needsFix,
         reason,
-      })
-    }
-  }
+      }
+    }),
+  )
 
-  return results
+  return results.filter((result) => result.needsFix)
 }
 
 const fixSingleCharge = async function fixSingleCharge(charge: OpenNodeCharge): Promise<FixResult> {
@@ -408,7 +406,7 @@ const runSingleChargeMode = async function runSingleChargeMode(): Promise<void> 
   console.log(`   User ID: ${charge.userId}`)
   console.log(`   Status: ${charge.status}`)
   console.log(`   Amount: ${charge.amount} ${charge.currency.toUpperCase()}`)
-  console.log(`   Last Webhook At: ${charge.lastWebhookAt || 'NULL'}`)
+  console.log(`   Last Webhook At: ${charge.lastWebhookAt ?? 'NULL'}`)
   console.log()
 
   // Step 2: Validate charge status
@@ -471,10 +469,10 @@ const runSingleChargeMode = async function runSingleChargeMode(): Promise<void> 
   console.log(`   Status: ${invoice.status}`)
   console.log(`   Customer ID: ${invoice.customer}`)
   console.log('   Metadata:')
-  console.log(`     - userId: ${invoice.metadata?.userId || 'N/A'}`)
-  console.log(`     - stripePriceId: ${invoice.metadata?.stripePriceId || 'N/A'}`)
-  console.log(`     - paymentProvider: ${invoice.metadata?.paymentProvider || 'N/A'}`)
-  console.log(`     - isCryptoPayment: ${invoice.metadata?.isCryptoPayment || 'N/A'}`)
+  console.log(`     - userId: ${invoice.metadata?.userId ?? 'N/A'}`)
+  console.log(`     - stripePriceId: ${invoice.metadata?.stripePriceId ?? 'N/A'}`)
+  console.log(`     - paymentProvider: ${invoice.metadata?.paymentProvider ?? 'N/A'}`)
+  console.log(`     - isCryptoPayment: ${invoice.metadata?.isCryptoPayment ?? 'N/A'}`)
   console.log()
 
   // Step 5: Validate invoice metadata

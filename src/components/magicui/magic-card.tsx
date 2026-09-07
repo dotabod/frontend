@@ -1,6 +1,6 @@
 'use client'
 
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import type React from 'react'
 import { useEffect, useRef } from 'react'

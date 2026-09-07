@@ -9,8 +9,8 @@ declare global {
 }
 
 // Create singleton instances for both clients
-const prisma = globalThis.prismaGlobal || new PrismaClient()
-export const prismaMongo = globalThis.prismaMongoGlobal || new PrismaMongo()
+const prisma = globalThis.prismaGlobal ?? new PrismaClient()
+export const prismaMongo = globalThis.prismaMongoGlobal ?? new PrismaMongo()
 
 // Only store the instances on the global object in development to prevent
 // Multiple instances during hot-reloading

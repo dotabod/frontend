@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     for (const stat of deliveryStats) {
-      stats[stat.status as keyof typeof stats] = Number(stat._count.status)
+      stats[stat.status as keyof typeof stats] = stat._count.status
     }
 
     // Get total user count for percentage calculations

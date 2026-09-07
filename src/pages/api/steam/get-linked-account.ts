@@ -59,7 +59,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
         ? {
             profileData: {
               id: primarySteam32Id.toString(),
-              name: steamAccounts.find((a) => a.steam32Id === primarySteam32Id)?.name || 'Unknown',
+              name: steamAccounts.find((a) => a.steam32Id === primarySteam32Id)?.name ?? 'Unknown',
             },
             steam32Id: primarySteam32Id.toString(),
           }

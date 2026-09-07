@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import Image from 'next/image'
 
 import { Settings } from '@/lib/default-settings'

@@ -157,8 +157,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           customer: stripeCustomerId,
           items: [{ price: priceId }],
           metadata: {
-            email: user.email || '',
-            image: user.image || '',
+            email: user.email ?? '',
+            image: user.image ?? '',
             // Indicate this was auto-applied via gift credit
             isAutoApplied: 'true',
             isCryptoPayment: 'false',
@@ -264,8 +264,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           customer: stripeCustomerId,
           items: [{ price: priceId }],
           metadata: {
-            email: user.email || '',
-            image: user.image || '',
+            email: user.email ?? '',
+            image: user.image ?? '',
             // Indicate this was auto-applied via gift credit
             isAutoApplied: 'true',
             isCryptoPayment: 'false',

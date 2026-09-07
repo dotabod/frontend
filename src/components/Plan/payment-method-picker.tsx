@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { Bitcoin, CreditCard, Wallet } from 'lucide-react'
 import { memo, useId } from 'react'

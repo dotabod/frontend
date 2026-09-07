@@ -67,7 +67,7 @@ vi.mock('antd', async () => {
     type: _type,
     ...props
   }: ComponentProps<'button'> & { loading?: boolean }) => (
-    <button {...props} disabled={disabled || loading}>
+    <button {...props} disabled={disabled === true || loading === true}>
       {children}
     </button>
   )
@@ -161,7 +161,7 @@ vi.mock('antd', async () => {
 
         return cloneElement(child, {
           checked: child.props.value === value,
-          disabled: disabled || child.props.disabled,
+          disabled: disabled === true || child.props.disabled === true,
           onChange,
         })
       })}
@@ -188,6 +188,7 @@ vi.mock('next-auth/react', () => ({
 
 vi.mock('socket.io-client', () => ({
   default: socketState.io,
+  io: socketState.io,
 }))
 
 vi.mock('@/lib/hooks/use-update-setting', () => ({

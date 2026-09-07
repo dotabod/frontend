@@ -1,7 +1,7 @@
 import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { useForm } from '@mantine/form'
 import { Alert, Button, Form, InputNumber } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -51,7 +51,7 @@ const SteamAvatar = ({ data: response, id }: SteamAvatarProps) => {
       height={45}
       className='rounded-sm'
       src={
-        response?.data?.find((d) => `${d.id}` === `${id}`)?.avatar ||
+        response?.data?.find((d) => `${d.id}` === `${id}`)?.avatar ??
         'https://avatars.cloudflare.steamstatic.com/fe7c264f9d2b435dfc2c4e099e3a5fc0ab71f492.jpg'
       }
       alt='Steam avatar'
@@ -178,7 +178,7 @@ const MmrForm = ({ hideText = false }) => {
                   .filter((account) => account.canEdit)
                   .map((act) => ({
                     ...act,
-                    mmr: Number(act.mmr) || 0,
+                    mmr: act.mmr || 0,
                   })),
               )
               form.resetDirty()
@@ -252,14 +252,14 @@ const MmrForm = ({ hideText = false }) => {
                               className='flex items-center gap-2'
                             >
                               <span className='max-w-[90px] overflow-hidden text-ellipsis whitespace-nowrap'>
-                                {steamData?.name || account.name || 'Unknown steam name'}
+                                {steamData?.name ?? account.name ?? 'Unknown steam name'}
                               </span>
                               <ExternalLinkIcon className='h-4 w-4' />
                             </a>
                           }
                         >
                           <InputNumber
-                            disabled={Boolean(removed || !account.canEdit)}
+                            disabled={removed || !account.canEdit}
                             id={`${account.steam32Id}-mmr`}
                             placeholder='9000'
                             type='number'
@@ -271,7 +271,7 @@ const MmrForm = ({ hideText = false }) => {
                         </Form.Item>
 
                         <Button
-                          disabled={Boolean(removed || !account.canEdit)}
+                          disabled={removed || !account.canEdit}
                           danger
                           onClick={() => {
                             form.setValues({

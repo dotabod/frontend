@@ -417,7 +417,7 @@ export const handleCheckoutCompleted = async function handleCheckoutCompleted(
                   // Create a new subscription with the new period
                   // Calculate the new period end date based on when the previous subscription would have ended
                   // This ensures they don't lose time they've already paid for
-                  const currentEndDate = existingSubscription.currentPeriodEnd || new Date()
+                  const currentEndDate = existingSubscription.currentPeriodEnd ?? new Date()
 
                   // Create a new subscription for the new period
                   console.log(

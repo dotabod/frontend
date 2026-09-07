@@ -145,7 +145,7 @@ export const useUpdate = <
 
   const updateSetting = (newValue: TNewValue, customPath = '') => {
     const targetPath = customPath || path
-    const cachePath = path || targetPath
+    const cachePath = path ?? targetPath
     if (!targetPath) {
       return
     }
@@ -260,7 +260,7 @@ export const useUpdateAccount = function useUpdateAccount() {
 
 export const useUpdateLocale = (props?: Omit<UpdateProps, 'dataTransform'>) => {
   const { data, loading, isSaving, updateSetting } = useUpdate<{ locale?: string }, string>({
-    dataTransform: (data, newValue) => ({ locale: newValue || data?.locale }),
+    dataTransform: (data, newValue) => ({ locale: newValue ?? data?.locale }),
     path: '/api/settings/locale',
     ...props,
   })
@@ -364,7 +364,7 @@ export const useUpdateSetting = function useUpdateSetting<T = boolean>(
             return { ...setting, ...newValue }
           }
           return setting
-        }) || []
+        }) ?? []
 
       if (!newData?.find((setting) => setting.key === key)) {
         newData.push({ key, ...newValue })
@@ -377,7 +377,7 @@ export const useUpdateSetting = function useUpdateSetting<T = boolean>(
 
   let value = getValueOrDefault(key, data?.settings)
   if (key === Settings.mmr) {
-    value = data?.mmr || 0
+    value = data?.mmr ?? 0
   }
   // Chatter keys (`chatters.x`) are resolved by getValueOrDefault above, which falls back to
   // the real per-chatter default (on/off). Don't re-derive here with `?? false` — that showed
@@ -426,7 +426,7 @@ export const useUpdateSetting = function useUpdateSetting<T = boolean>(
     isSaving,
     loading,
     mutate: () => url && mutate(url),
-    original: data || {},
+    original: data ?? {},
     tierAccess,
     updateSetting,
   }

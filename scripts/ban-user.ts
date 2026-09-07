@@ -36,10 +36,10 @@ for (let i = 0; i < args.length; i += 1) {
     byNameArg = args[i + 1]
     i += 1
   } else if (!v.startsWith('--')) {
-    if (!userIdArg) {
+    if (userIdArg) {
+      reasonArg ??= v
+    } else {
       userIdArg = v
-    } else if (!reasonArg) {
-      reasonArg = v
     }
   }
 }

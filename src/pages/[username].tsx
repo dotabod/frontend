@@ -90,7 +90,7 @@ const FannedHand = ({
       <div className='relative mx-auto h-36 w-[260px] [--k:1] group-hover/fan:[--k:1.32]'>
         {cards.map((c, i) => {
           const offset = i - mid
-          const accent = (c.bestRarity && RARITY_META[c.bestRarity]?.color) || '#9146ff'
+          const accent = (c.bestRarity && RARITY_META[c.bestRarity]?.color) ?? '#9146ff'
           return (
             <div
               key={c.heroId}
@@ -248,7 +248,7 @@ const PageContent = ({
   }
 
   // Use SSR data if available, otherwise fall back to client-side data
-  const finalUserData = ssrUserData || data
+  const finalUserData = ssrUserData ?? data
   const finalLoading = ssrUserData ? false : loading
   const profile = finalUserData as {
     displayName?: string | null
@@ -343,7 +343,7 @@ const PageContent = ({
       const keysToSearch = ['alias', 'title', 'description', 'cmd']
       const commandDetail = CommandDetail[command]
       return keysToSearch.some((key) => {
-        const value = commandDetail[key as keyof typeof commandDetail] || ''
+        const value = commandDetail[key as keyof typeof commandDetail] ?? ''
         if (Array.isArray(value)) {
           return value.some(
             (alias) =>
@@ -407,7 +407,7 @@ const PageContent = ({
         <title>{`${finalLoading || !profile?.displayName ? '...' : profile.displayName}'s Dota 2 Commands — Dotabod`}</title>
         <meta
           name='description'
-          content={`Chat commands available in ${profile?.displayName || 'this streamer'}'s Twitch channel via Dotabod.`}
+          content={`Chat commands available in ${profile?.displayName ?? 'this streamer'}'s Twitch channel via Dotabod.`}
         />
         {username && typeof username === 'string' && (
           <link rel='canonical' href={`https://dotabod.com/${username}`} />
@@ -433,7 +433,7 @@ const PageContent = ({
                 onError={(e) => {
                   e.currentTarget.src = '/images/hero/default.png'
                 }}
-                src={profile?.image || '/images/hero/default.png'}
+                src={profile?.image ?? '/images/hero/default.png'}
                 alt='Profile'
                 width={100}
                 height={100}
@@ -461,7 +461,7 @@ const PageContent = ({
               </div>
 
               <div className='mb-6 flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-400'>
-                {profile?.mmr != null && profile.mmr > 0 && (
+                {profile?.mmr !== null && profile?.mmr !== undefined && profile.mmr > 0 && (
                   <span>⚔ {profile.mmr.toLocaleString()} MMR</span>
                 )}
                 <ProfileWinLossCounter twitchId={profile?.twitchId} />
@@ -495,7 +495,7 @@ const PageContent = ({
                 </Link>
                 <Link
                   href={createGiftLink(
-                    ssrUsername || (typeof username === 'string' ? username : ''),
+                    ssrUsername ?? (typeof username === 'string' ? username : ''),
                   )}
                   passHref
                 >
@@ -510,7 +510,7 @@ const PageContent = ({
                 </Link>
                 <Link
                   href={getProfileRoute(
-                    ssrUsername || (typeof username === 'string' ? username : undefined),
+                    ssrUsername ?? (typeof username === 'string' ? username : undefined),
                     '/matches',
                   )}
                   passHref
@@ -528,13 +528,13 @@ const PageContent = ({
 
             {collection && collection.count > 0 ? (
               <FannedHand
-                username={ssrUsername || (typeof username === 'string' ? username : '')}
+                username={ssrUsername ?? (typeof username === 'string' ? username : '')}
                 collection={collection}
               />
             ) : (
               <CollectionTeaser
-                username={ssrUsername || (typeof username === 'string' ? username : '')}
-                name={profile?.displayName || profile?.name || 'this streamer'}
+                username={ssrUsername ?? (typeof username === 'string' ? username : '')}
+                name={profile?.displayName ?? profile?.name ?? 'this streamer'}
               />
             )}
           </div>
@@ -546,7 +546,7 @@ const PageContent = ({
         <ProfileMatchOverview
           heroPerformance={heroPerformance}
           recentMatches={recentMatches}
-          username={ssrUsername || (typeof username === 'string' ? username : '')}
+          username={ssrUsername ?? (typeof username === 'string' ? username : '')}
         />
 
         {/* Featured commands strip */}
@@ -618,7 +618,7 @@ const PageContent = ({
           <Empty
             description={
               enabled === 'Enabled'
-                ? `${finalUserData?.displayName || 'This streamer'} has no enabled commands matching your search.`
+                ? `${finalUserData?.displayName ?? 'This streamer'} has no enabled commands matching your search.`
                 : 'No matching commands found.'
             }
             imageStyle={{ height: 60 }}
@@ -737,7 +737,7 @@ const buildCollectionSummary = async function buildCollectionSummary(
           heroName: l.heroName,
         }
       })
-      .sort(
+      .toSorted(
         (a, b) =>
           (b.bestRarity ? (RARITY_META[b.bestRarity]?.rank ?? -1) : -1) -
           (a.bestRarity ? (RARITY_META[a.bestRarity]?.rank ?? -1) : -1),
@@ -754,7 +754,7 @@ const buildCollectionSummary = async function buildCollectionSummary(
     }
     const tally = [...tallyCounts.entries()]
       .map(([rarity, count]) => ({ count, rarity }))
-      .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
+      .toSorted((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
       .slice(0, 3)
 
     return { cards, count, tally }
@@ -784,15 +784,15 @@ const CommandsPage = ({
     )
   }
 
-  const pageTitle = `${userData.displayName || userData.name} - ${userData.mmr || 0} MMR | Dotabod`
-  const pageDescription = `View ${userData.displayName || userData.name}'s Dota 2 commands and stream stats on Dotabod. ${userData.stream_online ? 'Currently live streaming!' : 'Stream offline.'}`
+  const pageTitle = `${userData.displayName ?? userData.name} - ${userData.mmr ?? 0} MMR | Dotabod`
+  const pageDescription = `View ${userData.displayName ?? userData.name}'s Dota 2 commands and stream stats on Dotabod. ${userData.stream_online ? 'Currently live streaming!' : 'Stream offline.'}`
 
   const profileJsonLd: ProfileJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
     mainEntity: {
       '@type': 'Person',
-      name: userData.displayName || userData.name,
+      name: userData.displayName ?? userData.name,
       url: `https://twitch.tv/${userData.name}`,
     },
     url: `https://dotabod.com/${username}`,
@@ -809,12 +809,12 @@ const CommandsPage = ({
         <meta name='description' content={pageDescription} />
         <meta property='og:title' content={pageTitle} />
         <meta property='og:description' content={pageDescription} />
-        <meta property='og:image' content={userData.image || '/images/hero/default.png'} />
+        <meta property='og:image' content={userData.image ?? '/images/hero/default.png'} />
         <meta property='og:url' content={`https://dotabod.com/${username}`} />
         <meta property='twitter:card' content='summary_large_image' />
         <meta property='twitter:title' content={pageTitle} />
         <meta property='twitter:description' content={pageDescription} />
-        <meta property='twitter:image' content={userData.image || '/images/hero/default.png'} />
+        <meta property='twitter:image' content={userData.image ?? '/images/hero/default.png'} />
         <link rel='canonical' href={`https://dotabod.com/${username}`} />
         <script type='application/ld+json'>{profileJsonLdText}</script>
       </Head>
@@ -822,7 +822,7 @@ const CommandsPage = ({
         dontUseTitle
         ogImage={{
           subtitle: 'Commands and settings available for this streamer.',
-          title: userData.displayName || userData.name,
+          title: userData.displayName ?? userData.name,
         }}
       >
         <PageContent

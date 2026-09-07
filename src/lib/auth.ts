@@ -274,7 +274,7 @@ export const authOptions: NextAuthOptions = {
       const result = {
         email: newUser.email,
         id: user.id,
-        image: newUser.image || '',
+        image: newUser.image ?? '',
         isImpersonating,
         locale: provider?.locale,
         name: newUser.displayName || newUser.name,
@@ -405,7 +405,7 @@ export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       async authorize(credentials, req) {
-        const channelToImpersonate = Number.parseInt(credentials?.channelToImpersonate ?? '0', 10)
+        const channelToImpersonate = Math.trunc(Number(credentials?.channelToImpersonate ?? '0'))
         if (!channelToImpersonate) {
           captureException(new Error('Invalid channel ID'))
           throw new Error('ACCESS_DENIED')
@@ -469,7 +469,7 @@ export const authOptions: NextAuthOptions = {
           if (
             Array.isArray(response) &&
             !response.find(
-              (channel) => Number.parseInt(channel.providerAccountId, 10) === channelToImpersonate,
+              (channel) => Math.trunc(Number(channel.providerAccountId)) === channelToImpersonate,
             )
           ) {
             captureException(new Error('You are not a moderator for this channel'), {
@@ -509,7 +509,7 @@ export const authOptions: NextAuthOptions = {
               moderatorChannelId: true,
             },
             where: {
-              moderatorChannelId: Number.parseInt(currentProviderId ?? '0', 10),
+              moderatorChannelId: Math.trunc(Number(currentProviderId ?? '0')),
               userId: userToImpersonate.userId,
             },
           })

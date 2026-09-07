@@ -48,8 +48,8 @@ const TestGiftPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (giftNotificationData) {
-      setHasLifetime(giftNotificationData.hasLifetime || false)
-      setTotalGiftedMonths(giftNotificationData.totalGiftedMonths || 0)
+      setHasLifetime(giftNotificationData.hasLifetime ?? false)
+      setTotalGiftedMonths(giftNotificationData.totalGiftedMonths ?? 0)
     }
   }, [giftNotificationData])
 
@@ -82,7 +82,7 @@ const TestGiftPage: NextPageWithLayout = () => {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create test notification')
+        throw new Error(data.message ?? 'Failed to create test notification')
       }
 
       messageApi.success('Test gift notification created successfully!')

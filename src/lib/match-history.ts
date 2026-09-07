@@ -141,7 +141,7 @@ export const buildHeroPerformance = function buildHeroPerformance(
         wins: result.wins,
       }
     })
-    .sort(
+    .toSorted(
       (a, b) =>
         b.matches - a.matches || b.winRate - a.winRate || a.heroName.localeCompare(b.heroName),
     )

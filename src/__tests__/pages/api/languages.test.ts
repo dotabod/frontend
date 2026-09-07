@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -12,7 +13,6 @@ vi.mock('@sentry/nextjs', () => ({
 }))
 
 // Import the mocked modules
-import { captureException } from '@sentry/nextjs'
 
 // Mock environment variables
 beforeEach(() => {

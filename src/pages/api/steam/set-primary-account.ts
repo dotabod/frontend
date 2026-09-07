@@ -23,7 +23,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     }
 
     // Parse steam32Id as a number
-    const parsedSteam32Id = Number.parseInt(steam32Id, 10)
+    const parsedSteam32Id = Math.trunc(Number(steam32Id))
     if (Number.isNaN(parsedSteam32Id)) {
       res.status(400).json({ message: 'Invalid Steam32 ID format' })
       return

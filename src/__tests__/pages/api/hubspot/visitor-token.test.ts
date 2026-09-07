@@ -1,5 +1,11 @@
+import fetch from 'node-fetch'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { getServerSession } from '@/lib/api/get-server-session'
+import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
+import handler from '@/pages/api/hubspot/visitor-token'
+import { getSubscription } from '@/utils/subscription'
 
 vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
@@ -10,13 +16,6 @@ vi.mock('@/lib/hubspot', () => ({
 vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))
 vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
-
-import fetch from 'node-fetch'
-
-import { getServerSession } from '@/lib/api/get-server-session'
-import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
-import handler from '@/pages/api/hubspot/visitor-token'
-import { getSubscription } from '@/utils/subscription'
 
 const anyVal = (v: unknown) => v as any
 

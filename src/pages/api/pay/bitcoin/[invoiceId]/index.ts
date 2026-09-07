@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Redirect to existing charge if still valid
       const checkoutUrl = buildCheckoutUrl(
         existingCharge.openNodeChargeId,
-        existingCharge.hostedCheckoutUrl || undefined,
+        existingCharge.hostedCheckoutUrl ?? undefined,
       )
       res.redirect(checkoutUrl)
       return
@@ -51,17 +51,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       amount,
       // Configure based on treasury policy
       auto_settle: false,
-      callback_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/webhooks/opennode`,
+      callback_url: `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/webhooks/opennode`,
       currency,
-      customer_email: invoice.customer_email || undefined,
-      description: `Invoice ${invoice.number || invoice.id}`,
+      customer_email: invoice.customer_email ?? undefined,
+      description: `Invoice ${invoice.number ?? invoice.id}`,
       metadata: {
         customer_id: invoice.customer,
         stripe_invoice_id: invoice.id,
         user_id: invoice.metadata?.userId,
       },
-      notif_email: invoice.customer_email || undefined,
-      success_url: `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
+      notif_email: invoice.customer_email ?? undefined,
+      success_url: `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/dashboard/billing?payment=processing&crypto=true&invoice=${invoiceId}`,
       // 1 hour expiration,
       ttl: 60,
     }
@@ -80,8 +80,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       openNodeChargeId: charge.id,
       status: charge.status,
       stripeCustomerId: invoice.customer as string,
-      stripeInvoiceId: invoice.id || '',
-      userId: invoice.metadata?.userId || '',
+      stripeInvoiceId: invoice.id ?? '',
+      userId: invoice.metadata?.userId ?? '',
     }
 
     await prisma.openNodeCharge.create({

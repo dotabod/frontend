@@ -10,7 +10,7 @@ import { TierSwitch } from './tier-switch'
 
 // Convert locale schema to options for the Select component
 const LANGUAGE_OPTIONS = localePatchSchema.options.map((locale) => ({
-  label: new Intl.DisplayNames(['en'], { type: 'language' }).of(locale.split('-')[0]) || locale,
+  label: new Intl.DisplayNames(['en'], { type: 'language' }).of(locale.split('-')[0]) ?? locale,
   value: locale,
 }))
 
@@ -104,7 +104,7 @@ const AutoTranslateCard = (): React.ReactNode => {
               <p className='mb-2'>
                 Chat messages from your games will be translated to{' '}
                 <strong>
-                  {LANGUAGE_OPTIONS.find((lang) => lang.value === targetLanguage)?.label ||
+                  {LANGUAGE_OPTIONS.find((lang) => lang.value === targetLanguage)?.label ??
                     'English'}
                 </strong>
                 {isChatTranslateEnabled && isOverlayTranslateEnabled

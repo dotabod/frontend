@@ -41,13 +41,13 @@ const BillingPage = () => {
       if (!response.ok) {
         if (payload?.code === 'NO_STRIPE_CUSTOMER') {
           message.info(
-            payload?.guidance ||
+            payload?.guidance ??
               "We don't have a Stripe billing profile on file for your account. Contact support if you're still being charged.",
           )
           return
         }
 
-        message.error(payload?.guidance || payload?.error || PORTAL_FALLBACK_ERROR)
+        message.error(payload?.guidance ?? payload?.error ?? PORTAL_FALLBACK_ERROR)
         return
       }
 

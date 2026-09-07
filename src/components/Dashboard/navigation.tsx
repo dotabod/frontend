@@ -160,7 +160,7 @@ export const navItemToMenuItem = function navItemToMenuItem(
   return {
     children: item.children?.map((child) => navItemToMenuItem(child, { collapsed, isChild: true })),
     icon,
-    key: item.href || item.key,
+    key: item.href ?? item.key,
     label,
   } as NonNullable<MenuProps['items']>[number]
 }

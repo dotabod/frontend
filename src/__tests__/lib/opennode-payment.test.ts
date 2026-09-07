@@ -1,6 +1,8 @@
 import type { OpenNodeCharge } from '@prisma/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
+
 const mocks = vi.hoisted(() => {
   const tx = {}
 
@@ -38,8 +40,6 @@ vi.mock('@/lib/stripe-server', () => ({
 vi.mock('@/lib/stripe/handlers/invoice-events', () => ({
   handleInvoiceEvent: mocks.handleInvoiceEvent,
 }))
-
-import { processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 
 const baseCharge: OpenNodeCharge = {
   amount: 99,

@@ -1,6 +1,6 @@
 import { captureException } from '@sentry/nextjs'
 import { Button } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
@@ -21,7 +21,7 @@ export const UserAuthForm = ({ className, ...props }: UserAuthFormProps) => {
           setIsLoading(true)
           signIn('twitch', {
             callbackUrl:
-              searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
+              searchParams?.get('from') ?? searchParams?.get('callbackUrl') ?? '/dashboard',
             redirect: false,
           })
             .then((e) => {

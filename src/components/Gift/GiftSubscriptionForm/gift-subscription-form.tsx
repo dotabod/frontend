@@ -1,5 +1,5 @@
 import { Alert, App, Button, Form, Input, InputNumber } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { detect } from 'curse-filter'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
@@ -114,7 +114,7 @@ export const GiftSubscriptionForm = ({
   // Pull the live monthly Pro price so the buyer always sees the total.
   const proMonthly = plans.find((p) => p.tier === SUBSCRIPTION_TIERS.PRO)?.price.monthly ?? '$6'
   const currency = /[^0-9.]/u.exec(proMonthly)?.[0] ?? '$'
-  const unitPrice = Number.parseFloat(proMonthly.replaceAll(/[^0-9.]/gu, '')) || 6
+  const unitPrice = Number(proMonthly.replaceAll(/[^0-9.]/gu, '')) || 6
   const total = unitPrice * quantity
   const formatPrice = (value: number) => `${currency}${value % 1 === 0 ? value : value.toFixed(2)}`
 
@@ -159,7 +159,7 @@ export const GiftSubscriptionForm = ({
 
       const submittedValues = {
         ...values,
-        quantity: Number(quantity) || 1,
+        quantity: quantity || 1,
       }
 
       // Client-side profanity check for immediate feedback
@@ -316,7 +316,7 @@ export const GiftSubscriptionForm = ({
               layout='vertical'
               onFinish={handleSubmit}
               requiredMark={false}
-              initialValues={{ recipientUsername: recipientUsername || '' }}
+              initialValues={{ recipientUsername: recipientUsername ?? '' }}
             >
               {/* Duration */}
               <div className='mb-6'>

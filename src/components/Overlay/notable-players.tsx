@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import * as Flags from 'mantine-flagpack'
 
 import { PlayerTopbar } from '@/components/Overlay/player-topbar'
@@ -27,13 +27,13 @@ export const NotablePlayers = ({
   const { data: isEnabled } = useUpdateSetting(Settings.notablePlayersOverlay)
   const { data: showFlags } = useUpdateSetting(Settings.notablePlayersOverlayFlags)
 
-  if (!isEnabled || !['spectator', 'playing'].includes(block.type || '')) {
+  if (!isEnabled || !['spectator', 'playing'].includes(block.type ?? '')) {
     return null
   }
 
   return (
     <div id='notable-players'>
-      {(players || []).map((player, i) => {
+      {(players ?? []).map((player, i) => {
         const flagKey = `${player.country_code?.toUpperCase()}Flag` as keyof typeof Flags
         const FlagComp = player.country_code ? Flags[flagKey] : null
 

@@ -1,6 +1,8 @@
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import handler from '@/pages/api/payment-status'
+
 const mocks = vi.hoisted(() => {
   const openNodeCharge = {
     amount: 131_136,
@@ -61,8 +63,6 @@ vi.mock('@/lib/opennode-payment', () => ({
 vi.mock('@/lib/stripe-server', () => ({
   stripe: mocks.stripe,
 }))
-
-import handler from '@/pages/api/payment-status'
 
 const invoice = {
   amount_due: 9900,

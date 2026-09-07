@@ -7,6 +7,8 @@
 //
 // Then set PAYPAL_PLAN_ID_MONTHLY / PAYPAL_PLAN_ID_ANNUAL in the matching config.
 
+import { z } from 'zod'
+
 const env = process.argv[2]
 if (env !== 'sandbox' && env !== 'live') {
   console.error('Usage: node create-plans.mjs <sandbox|live>')
@@ -26,6 +28,7 @@ const PLANS = [
   { interval: 'MONTH', key: 'MONTHLY', name: 'Dotabod Pro (Monthly)', value: '6' },
   { interval: 'YEAR', key: 'ANNUAL', name: 'Dotabod Pro (Annual)', value: '57' },
 ]
+const paypalResourceSchema = z.object({ id: z.string() })
 
 const token = async function token() {
   const auth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')
@@ -54,7 +57,7 @@ const api = async function api(accessToken, path, body) {
     },
     method: 'POST',
   })
-  const data = await res.json()
+  const data = z.unknown().parse(await res.json())
   if (!res.ok) {
     throw new Error(`${path} failed: ${res.status} ${JSON.stringify(data)}`)
   }
@@ -71,32 +74,39 @@ const main = async function main() {
     name: 'Dotabod Pro',
     type: 'SERVICE',
   })
-  console.log(`Product: ${product.id}`)
+  const productId = paypalResourceSchema.parse(product).id
+  console.log(`Product: ${productId}`)
+
+  const createdPlans = await Promise.all(
+    PLANS.map(async (plan) => {
+      const created = await api(accessToken, '/v1/billing/plans', {
+        billing_cycles: [
+          {
+            frequency: { interval_count: 1, interval_unit: plan.interval },
+            pricing_scheme: { fixed_price: { currency_code: 'USD', value: plan.value } },
+            sequence: 1,
+            tenure_type: 'REGULAR',
+            total_cycles: 0,
+          },
+        ],
+        name: plan.name,
+        payment_preferences: {
+          auto_bill_outstanding: true,
+          payment_failure_threshold: 2,
+          setup_fee: { currency_code: 'USD', value: '0' },
+          setup_fee_failure_action: 'CONTINUE',
+        },
+        product_id: productId,
+        status: 'ACTIVE',
+      })
+      return { createdId: paypalResourceSchema.parse(created).id, plan }
+    }),
+  )
 
   const results = {}
-  for (const plan of PLANS) {
-    const created = await api(accessToken, '/v1/billing/plans', {
-      billing_cycles: [
-        {
-          frequency: { interval_count: 1, interval_unit: plan.interval },
-          pricing_scheme: { fixed_price: { currency_code: 'USD', value: plan.value } },
-          sequence: 1,
-          tenure_type: 'REGULAR',
-          total_cycles: 0,
-        },
-      ],
-      name: plan.name,
-      payment_preferences: {
-        auto_bill_outstanding: true,
-        payment_failure_threshold: 2,
-        setup_fee: { currency_code: 'USD', value: '0' },
-        setup_fee_failure_action: 'CONTINUE',
-      },
-      product_id: product.id,
-      status: 'ACTIVE',
-    })
-    results[plan.key] = created.id
-    console.log(`${plan.name}: ${created.id}`)
+  for (const { createdId, plan } of createdPlans) {
+    results[plan.key] = createdId
+    console.log(`${plan.name}: ${createdId}`)
   }
 
   console.log('\nSet these in the matching Doppler config:')

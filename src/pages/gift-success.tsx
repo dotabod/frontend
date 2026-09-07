@@ -241,8 +241,8 @@ export const getServerSideProps: GetServerSideProps<GiftSuccessProps> = async ({
     // Prefer the real purchased quantity from the line item, since Stripe's
     // adjustable quantity lets the buyer change it during checkout.
     const lineQuantity = session.line_items?.data?.[0]?.quantity ?? undefined
-    const metaQuantity = Number.parseInt(session.metadata?.giftQuantity ?? '', 10)
-    const quantity = lineQuantity || (Number.isNaN(metaQuantity) ? 1 : metaQuantity) || 1
+    const metaQuantity = Math.trunc(Number(session.metadata?.giftQuantity ?? ''))
+    const quantity = lineQuantity ?? (Number.isNaN(metaQuantity) ? 1 : metaQuantity) ?? 1
 
     return {
       props: {

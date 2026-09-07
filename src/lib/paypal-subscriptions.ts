@@ -147,7 +147,7 @@ export const completeLifetimeOrder = async function completeLifetimeOrder(
             paypalOrderId: order.paypalOrderId,
           },
           status: SubscriptionStatus.ACTIVE,
-          stripePriceId: stripePriceId || undefined,
+          stripePriceId: stripePriceId ?? undefined,
           tier: 'PRO',
           transactionType: TransactionType.LIFETIME,
           userId: order.userId,

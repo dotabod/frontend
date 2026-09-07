@@ -1,4 +1,4 @@
-import Stripe from 'stripe'
+import { Stripe } from 'stripe'
 
 let instance: Stripe | null = null
 
@@ -6,12 +6,10 @@ const getStripe = function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {
     throw new Error('Missing STRIPE_SECRET_KEY environment variable')
   }
-  if (!instance) {
-    instance = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-03-31.basil',
-      typescript: true,
-    })
-  }
+  instance ??= new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-03-31.basil',
+    typescript: true,
+  })
   return instance
 }
 

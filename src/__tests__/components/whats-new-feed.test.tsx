@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import WhatsNewFeed from '@/components/Dashboard/Features/whats-new-feed'
+import type { WhatsNewEntry } from '@/lib/whats-new'
+
 vi.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
 }))
@@ -8,9 +11,6 @@ vi.mock('@/lib/hooks/use-update-setting', () => ({
   useUpdateSetting: vi.fn(() => ({ data: null, updateSetting: vi.fn() })),
 }))
 vi.mock('@/components/Dashboard/command-detail', () => ({ default: {} }))
-
-import WhatsNewFeed from '@/components/Dashboard/Features/whats-new-feed'
-import type { WhatsNewEntry } from '@/lib/whats-new'
 
 const entries: WhatsNewEntry[] = [
   {

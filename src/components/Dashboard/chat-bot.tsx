@@ -1,5 +1,5 @@
 import { Alert, Button, Divider, List, Spin, Tabs, Tooltip } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
@@ -81,7 +81,7 @@ const EmoteList: React.FC<{
       return 0
     })}
     renderItem={({ id, label }) => {
-      const added = user?.hasDotabodEmoteSet || emotes.find((e) => e?.name === label)
+      const added = user?.hasDotabodEmoteSet ?? emotes.find((e) => e?.name === label)
 
       return (
         <List.Item key={label}>
@@ -182,12 +182,10 @@ const ChatBot = () => {
                   editor.id?.toLowerCase() === '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase(),
               ),
             ),
-          hasDotabodEmoteSet: Boolean(
-            emotesRequired.every(
-              (emote) =>
-                Array.isArray(data.emote_set?.emotes) &&
-                data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),
-            ),
+          hasDotabodEmoteSet: emotesRequired.every(
+            (emote) =>
+              Array.isArray(data.emote_set?.emotes) &&
+              data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),
           ),
           id: data?.user?.id,
           personalSet: data?.emote_set?.id,
@@ -230,7 +228,7 @@ const ChatBot = () => {
 
   const accountCount = accountData?.accounts?.length ?? 0
   const stepOneComplete =
-    accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : Boolean(mmr)
+    accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : mmr
   const stepModComplete = Boolean(modStatus?.modded)
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor

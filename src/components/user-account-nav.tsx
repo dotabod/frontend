@@ -2,7 +2,7 @@ import { BellOutlined } from '@ant-design/icons'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { Badge, Button, Dropdown, Empty, Popover, Skeleton, Space, Tabs } from 'antd'
 import type { MenuProps } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import type { Session } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
@@ -91,7 +91,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
     }
   }, [imageLoaded])
 
-  const notifications = (giftNotificationData?.notifications || []) as AppNotification[]
+  const notifications = (giftNotificationData?.notifications ?? []) as AppNotification[]
   const totalUnreadNotifications = notifications.filter((n) => !n.read).length
 
   // Pagination state
@@ -187,7 +187,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
   // Account entries (Billing/Gift/Your data) live in this dropdown now. filterNav
   // drops Billing + Your data for impersonators — gating the old dropdown lacked.
   const accountItems = filterNav(navConfig.account, {
-    isImpersonating: Boolean(user?.isImpersonating),
+    isImpersonating: user?.isImpersonating,
   }).map((item) => navItemToMenuItem(item))
 
   const accountMenuItems: MenuProps['items'] = [

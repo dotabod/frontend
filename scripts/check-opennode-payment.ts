@@ -50,42 +50,39 @@ const discoverProblematicCharges = async function discoverProblematicCharges(): 
     where: { status: { in: ['paid', 'confirmed'] } },
   })
 
-  const results: ChargeWithStatus[] = []
+  return await Promise.all(
+    paidCharges.map(async (charge): Promise<ChargeWithStatus> => {
+      const lifetimeSubscription = await prisma.subscription.findFirst({
+        where: {
+          status: SubscriptionStatus.ACTIVE,
+          transactionType: TransactionType.LIFETIME,
+          userId: charge.userId,
+        },
+      })
 
-  for (const charge of paidCharges) {
-    // Check if user has active LIFETIME subscription
-    const lifetimeSubscription = await prisma.subscription.findFirst({
-      where: {
-        status: SubscriptionStatus.ACTIVE,
-        transactionType: TransactionType.LIFETIME,
-        userId: charge.userId,
-      },
-    })
+      const hasLifetime = Boolean(lifetimeSubscription)
+      const missingWebhook = !charge.lastWebhookAt
+      const needsFix = !hasLifetime || missingWebhook
 
-    const hasLifetime = Boolean(lifetimeSubscription)
-    const missingWebhook = !charge.lastWebhookAt
-    const needsFix = !hasLifetime || missingWebhook
+      let reason = ''
+      if (!hasLifetime && missingWebhook) {
+        reason = 'No subscription + webhook never processed'
+      } else if (!hasLifetime) {
+        reason = 'No active LIFETIME subscription'
+      } else if (missingWebhook) {
+        reason = 'Webhook never processed (subscription exists)'
+      } else {
+        reason = 'OK'
+      }
 
-    let reason = ''
-    if (!hasLifetime && missingWebhook) {
-      reason = 'No subscription + webhook never processed'
-    } else if (!hasLifetime) {
-      reason = 'No active LIFETIME subscription'
-    } else if (missingWebhook) {
-      reason = 'Webhook never processed (subscription exists)'
-    } else {
-      reason = 'OK'
-    }
-
-    results.push({
-      charge,
-      hasLifetimeSubscription: hasLifetime,
-      needsFix,
-      reason,
-    })
-  }
-
-  return results
+      return {
+        charge,
+        hasLifetimeSubscription: hasLifetime,
+        needsFix,
+        reason,
+      }
+    }),
+  )
 }
 
 const showDiscoverySummary = async function showDiscoverySummary(): Promise<void> {
@@ -125,7 +122,7 @@ const showDiscoverySummary = async function showDiscoverySummary(): Promise<void
     console.log(`   Amount:        ${charge.amount} ${charge.currency.toUpperCase()}`)
     console.log(`   Status:        ${charge.status}`)
     console.log(`   Created:       ${charge.createdAt.toISOString()}`)
-    console.log(`   Last Webhook:  ${charge.lastWebhookAt?.toISOString() || 'NULL ⚠️'}`)
+    console.log(`   Last Webhook:  ${charge.lastWebhookAt?.toISOString() ?? 'NULL ⚠️'}`)
     console.log(`   Has Lifetime:  ${hasLifetimeSubscription ? 'Yes' : 'No ⚠️'}`)
     console.log(`   Issue:         ${reason}`)
     console.log()
@@ -204,7 +201,7 @@ const checkSingleCharge = async function checkSingleCharge(): Promise<void> {
   console.log(`Status:           ${charge.status}`)
   console.log(`Created At:       ${charge.createdAt}`)
   console.log(`Updated At:       ${charge.updatedAt}`)
-  console.log(`Last Webhook At:  ${charge.lastWebhookAt || 'NULL ⚠️'}`)
+  console.log(`Last Webhook At:  ${charge.lastWebhookAt ?? 'NULL ⚠️'}`)
 
   if (charge.metadata) {
     console.log('Metadata:')
@@ -285,7 +282,7 @@ const checkSingleCharge = async function checkSingleCharge(): Promise<void> {
       console.log(`  Type:            ${sub.transactionType}`)
       console.log(`  Status:          ${sub.status}`)
       console.log(`  Tier:            ${sub.tier}`)
-      console.log(`  Price ID:        ${sub.stripePriceId || 'N/A'}`)
+      console.log(`  Price ID:        ${sub.stripePriceId ?? 'N/A'}`)
       console.log(`  Period End:      ${sub.currentPeriodEnd}`)
       console.log(`  Cancel At End:   ${sub.cancelAtPeriodEnd}`)
       console.log(`  Created:         ${sub.createdAt}`)

@@ -48,7 +48,7 @@ const ContactPage: React.FC = () => {
         fields: [
           {
             name: 'email',
-            value: values.email || session?.user?.email || session?.user?.name,
+            value: values.email ?? session?.user?.email ?? session?.user?.name,
           },
           {
             name: 'TICKET.subject',

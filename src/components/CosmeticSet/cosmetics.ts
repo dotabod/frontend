@@ -77,7 +77,7 @@ export const marketUrl = function marketUrl(item: CosmeticItem): string | null {
 }
 
 export const sortByRarity = function sortByRarity(items: CosmeticItem[]): CosmeticItem[] {
-  return [...items].sort((a, b) => {
+  return items.toSorted((a, b) => {
     const byRarity = rarityRank(b) - rarityRank(a)
     if (byRarity) {
       return byRarity
@@ -116,7 +116,7 @@ const rarityTally = function rarityTally(items: CosmeticItem[]): [string, number
       counts.set(i.rarity, (counts.get(i.rarity) ?? 0) + 1)
     }
   }
-  return [...counts.entries()].sort(
+  return [...counts.entries()].toSorted(
     (a, b) => (RARITY_META[b[0]]?.rank ?? -1) - (RARITY_META[a[0]]?.rank ?? -1),
   )
 }

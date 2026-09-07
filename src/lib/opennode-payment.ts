@@ -16,7 +16,7 @@ export interface OpenNodePaymentProcessResult {
 export const isOpenNodePaymentConfirmed = function isOpenNodePaymentConfirmed(
   status: string | null | undefined,
 ): boolean {
-  return status != null && OPENNODE_CONFIRMED_STATUSES.has(status)
+  return status !== null && status !== undefined && OPENNODE_CONFIRMED_STATUSES.has(status)
 }
 
 const getMetadata = function getMetadata(charge: OpenNodeCharge): Record<string, unknown> {

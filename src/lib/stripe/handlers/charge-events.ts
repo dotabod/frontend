@@ -360,7 +360,7 @@ const handleGiftCreditRefund = async function handleGiftCreditRefund(
           metadata: {
             ...(giftTransaction.metadata as Record<string, unknown>),
             refundAmount: refundAmount.toString(),
-            refundId: charge.refunds?.data?.[0]?.id || null,
+            refundId: charge.refunds?.data?.[0]?.id ?? null,
             refundProportion: refundProportion.toString(),
             refundedAt: new Date().toISOString(),
           },
@@ -379,7 +379,7 @@ const handleGiftCreditRefund = async function handleGiftCreditRefund(
         metadata: {
           isRefund: 'true',
           originalTransactionId: giftTransaction.id,
-          refundId: charge.refunds?.data?.[0]?.id || null,
+          refundId: charge.refunds?.data?.[0]?.id ?? null,
           refundedAt: new Date().toISOString(),
         },
       })
@@ -393,7 +393,7 @@ const handleGiftCreditRefund = async function handleGiftCreditRefund(
         await tx.subscription.updateMany({
           data: {
             metadata: {
-              refundId: charge.refunds?.data?.[0]?.id || null,
+              refundId: charge.refunds?.data?.[0]?.id ?? null,
               refundedAt: new Date().toISOString(),
             },
             status: SubscriptionStatus.CANCELED,
@@ -422,18 +422,18 @@ const handleGiftCreditRefund = async function handleGiftCreditRefund(
     if (customerId && session.metadata?.giftType && session.metadata?.giftQuantity) {
       try {
         const { giftType } = session.metadata
-        const giftQuantity = Number.parseInt(session.metadata.giftQuantity, 10) || 1
+        const giftQuantity = Math.trunc(Number(session.metadata.giftQuantity)) || 1
 
         // Calculate an approximate refund amount based on standard pricing
         const priceMap = {
           annual:
-            Number.parseInt(process.env.ANNUAL_SUBSCRIPTION_PRICE_CENTS || '4800', 10) *
+            Math.trunc(Number(process.env.ANNUAL_SUBSCRIPTION_PRICE_CENTS ?? '4800')) *
             giftQuantity,
           lifetime:
-            Number.parseInt(process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS || '30000', 10) *
+            Math.trunc(Number(process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS ?? '30000')) *
             giftQuantity,
           monthly:
-            Number.parseInt(process.env.MONTHLY_SUBSCRIPTION_PRICE_CENTS || '500', 10) *
+            Math.trunc(Number(process.env.MONTHLY_SUBSCRIPTION_PRICE_CENTS ?? '500')) *
             giftQuantity,
         }
 
@@ -453,7 +453,7 @@ const handleGiftCreditRefund = async function handleGiftCreditRefund(
               isEstimated: 'true',
               isRefund: 'true',
               paymentIntentId: paymentIntent,
-              refundId: charge.refunds?.data?.[0]?.id || null,
+              refundId: charge.refunds?.data?.[0]?.id ?? null,
               refundedAt: new Date().toISOString(),
             },
           })
@@ -563,7 +563,7 @@ const processSubscriptionRefund = async function processSubscriptionRefund(
             metadata: {
               ...(subscription.metadata as Record<string, unknown>),
               refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
-              refundId: charge.refunds?.data?.[0]?.id || null,
+              refundId: charge.refunds?.data?.[0]?.id ?? null,
               refundedAt: new Date().toISOString(),
             },
             status: SubscriptionStatus.CANCELED,
@@ -583,7 +583,7 @@ const processSubscriptionRefund = async function processSubscriptionRefund(
               ...(subscription.metadata as Record<string, unknown>),
               partiallyRefundedAt: new Date().toISOString(),
               refundAmount: charge.amount_refunded.toString(),
-              refundId: charge.refunds?.data?.[0]?.id || null,
+              refundId: charge.refunds?.data?.[0]?.id ?? null,
             },
             updatedAt: new Date(),
           },
@@ -605,7 +605,7 @@ const processSubscriptionRefund = async function processSubscriptionRefund(
             ...(subscription.metadata as Record<string, unknown>),
             fullyRefunded: 'true',
             refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
-            refundId: charge.refunds?.data?.[0]?.id || null,
+            refundId: charge.refunds?.data?.[0]?.id ?? null,
             refundedAt: new Date().toISOString(),
           },
           status: SubscriptionStatus.CANCELED,
@@ -624,7 +624,7 @@ const processSubscriptionRefund = async function processSubscriptionRefund(
             ...(subscription.metadata as Record<string, unknown>),
             fullyRefunded: charge.refunded ? 'true' : 'false',
             refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
-            refundId: charge.refunds?.data?.[0]?.id || null,
+            refundId: charge.refunds?.data?.[0]?.id ?? null,
             refundRecorded: new Date().toISOString(),
           },
           updatedAt: new Date(),

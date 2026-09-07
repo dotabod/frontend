@@ -50,11 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const formattedGifts = giftSubscriptions.map((sub) => ({
       createdAt: sub.createdAt,
       endDate: sub.currentPeriodEnd,
-      giftMessage: sub.giftDetails?.giftMessage || '',
-      giftQuantity: sub.giftDetails?.giftQuantity || 1,
-      giftType: sub.giftDetails?.giftType || 'monthly',
+      giftMessage: sub.giftDetails?.giftMessage ?? '',
+      giftQuantity: sub.giftDetails?.giftQuantity ?? 1,
+      giftType: sub.giftDetails?.giftType ?? 'monthly',
       id: sub.id,
-      senderName: sub.giftDetails?.senderName || 'Anonymous',
+      senderName: sub.giftDetails?.senderName ?? 'Anonymous',
     }))
 
     // Find the latest gift expiration date

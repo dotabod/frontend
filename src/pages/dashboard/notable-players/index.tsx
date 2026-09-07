@@ -89,7 +89,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
   const handleOpenEditModal = (player: NotablePlayer) => {
     form.setFieldsValue({
       account_id: player.account_id,
-      country_code: player.country_code || '',
+      country_code: player.country_code ?? '',
       name: player.name,
     })
     setIsEditMode(true)
@@ -130,7 +130,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             messageApi.error('A player with this account ID already exists')
             return
           }
-          throw new Error(errorData.error || 'Failed to create notable player')
+          throw new Error(errorData.error ?? 'Failed to create notable player')
         }
         messageApi.success('Player added successfully')
       }
@@ -204,7 +204,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       dataIndex: 'addedBy',
       key: 'addedBy',
       render: (text) => {
-        const name = text || session?.user?.name || '-'
+        const name = text ?? session?.user?.name ?? '-'
         if (name === '-') {
           return name
         }

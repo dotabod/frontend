@@ -114,7 +114,7 @@ const StreamersPage: NextPageWithLayout<StreamersPageProps> = ({ live, roster })
         position: index + 1,
         item: {
           '@type': 'ProfilePage',
-          name: streamer.displayName || streamer.name,
+          name: streamer.displayName ?? streamer.name,
           url: `https://dotabod.com/${streamer.name}`,
           ...(streamer.image ? { image: streamer.image } : {}),
         },

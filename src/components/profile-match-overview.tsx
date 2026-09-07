@@ -138,7 +138,7 @@ const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; usernam
 
 const MatchOverview = ({ matches, username }: { matches: MatchHistoryRow[]; username: string }) => {
   const visibleMatches = [...matches]
-    .sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt))
+    .toSorted((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt))
     .slice(0, OVERVIEW_ROW_LIMIT)
 
   return (

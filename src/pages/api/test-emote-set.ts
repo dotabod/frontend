@@ -79,7 +79,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
   try {
     const stvResponse = await get7TVUser(twitchId)
     userId = stvResponse.user?.id ?? ''
-    activeEmoteSetId = stvResponse.emote_set?.id || 'N/A'
+    activeEmoteSetId = stvResponse.emote_set?.id ?? 'N/A'
 
     if (!stvResponse.emote_set?.id) {
       throw new Error('No active 7TV emote set found')

@@ -25,14 +25,14 @@ export const StreamerCard: FC<{ streamer: StreamerSummary }> = ({ streamer }) =>
   const { name, displayName, image, mmr, standing, isLive, lastMatchLabel } = streamer
   const rank = getRankDetail(mmr, standing)
   const medal = rank ? getRankImage(rank as Parameters<typeof getRankImage>[0]) : null
-  const label = displayName || name
+  const label = displayName ?? name
 
   return (
     <div className='group relative flex flex-col rounded-lg border border-transparent bg-gray-900 p-4 shadow-lg transition-colors duration-200 hover:border-gray-600 motion-safe:hover:shadow-gray-500/10'>
       <div className='flex items-start gap-3'>
         <div className='flex-shrink-0'>
           <img
-            src={image || DEFAULT_AVATAR}
+            src={image ?? DEFAULT_AVATAR}
             onError={(e) => {
               e.currentTarget.src = DEFAULT_AVATAR
             }}

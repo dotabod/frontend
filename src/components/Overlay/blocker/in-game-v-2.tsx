@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 
 import { useIsDevMode } from '@/lib/hooks/use-is-dev-mode'
 

@@ -84,15 +84,13 @@ const createProperty = async function createProperty(token: string, prop: Proper
 }
 
 const ensureContactProperties = async function ensureContactProperties(token: string) {
-  if (!propertiesEnsured) {
-    propertiesEnsured = Promise.all(CONTACT_PROPERTIES.map(async (p) => createProperty(token, p)))
-      .then(() => {})
-      .catch((error) => {
-        // Allow a retry on the next request rather than caching the failure.
-        propertiesEnsured = null
-        throw error
-      })
-  }
+  propertiesEnsured ??= Promise.all(CONTACT_PROPERTIES.map(async (p) => createProperty(token, p)))
+    .then(() => {})
+    .catch((error) => {
+      // Allow a retry on the next request rather than caching the failure.
+      propertiesEnsured = null
+      throw error
+    })
   return propertiesEnsured
 }
 

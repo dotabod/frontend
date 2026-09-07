@@ -89,7 +89,7 @@ export const createLifetimePurchase = async function createLifetimePurchase(
       currentPeriodEnd: farFutureDate,
       status: SubscriptionStatus.ACTIVE,
       stripeCustomerId: customerId,
-      stripePriceId: priceId || undefined,
+      stripePriceId: priceId ?? undefined,
       tier: 'PRO',
       transactionType: TransactionType.LIFETIME,
       userId,
@@ -125,7 +125,7 @@ export const createCryptoSubscription = async function createCryptoSubscription(
   // Calculate the period end date based on the price period
   const isAnnual = pricePeriod === 'annual'
   // Use startFromDate if provided (for upgrades) or current date for new subscriptions
-  const startDate = startFromDate || new Date()
+  const startDate = startFromDate ?? new Date()
   const periodEnd = new Date(startDate)
 
   if (isAnnual) {

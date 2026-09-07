@@ -37,7 +37,8 @@ export const SubscriptionAlerts = ({
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
 
   const isVirtualGracePeriodSubscription =
-    (subscription != null &&
+    (subscription !== null &&
+      subscription !== undefined &&
       'isGracePeriodVirtual' in subscription &&
       Boolean(subscription.isGracePeriodVirtual)) ||
     (inGracePeriod &&
@@ -59,7 +60,7 @@ export const SubscriptionAlerts = ({
 
       if (!response.ok) {
         const body = await response.json().catch(() => null)
-        console.error('Failed to apply credits:', body?.error || response.statusText)
+        console.error('Failed to apply credits:', body?.error ?? response.statusText)
         message.error({
           content: 'There was an issue applying your credits. Please try again or contact support.',
           duration: 5,
@@ -78,7 +79,7 @@ export const SubscriptionAlerts = ({
         })
         window.location.reload()
       } else {
-        console.error('Failed to apply credits:', result.error || result.message)
+        console.error('Failed to apply credits:', result.error ?? result.message)
         message.error({
           content: 'There was an issue applying your credits. Please try again or contact support.',
           duration: 5,

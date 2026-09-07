@@ -1,5 +1,5 @@
 import { Button, Skeleton } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
 
 import { useSubscriptionContext } from '@/contexts/subscription-context'

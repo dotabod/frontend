@@ -168,7 +168,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
               // Fetch player profiles for all accounts
               for (const account of data.accounts) {
-                void fetchPlayerProfile(Number.parseInt(account.steam32Id, 10))
+                void fetchPlayerProfile(Math.trunc(Number(account.steam32Id)))
               }
             }
           }
@@ -203,7 +203,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
           if (!response.ok) {
             const error = await response.json()
-            throw new Error(error.message || 'Steam authentication validation failed')
+            throw new Error(error.message ?? 'Steam authentication validation failed')
           }
 
           const { steam32Id } = await response.json()
@@ -235,7 +235,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
                 // Fetch player profiles for all accounts
                 for (const account of data.accounts) {
-                  void fetchPlayerProfile(Number.parseInt(account.steam32Id, 10))
+                  void fetchPlayerProfile(Math.trunc(Number(account.steam32Id)))
                 }
               }
             }
@@ -601,8 +601,8 @@ const VerifyPage: NextPageWithLayout = () => {
                           type='text'
                           icon={<StarOutlined />}
                           onClick={async () => setPrimaryAccount(account.steam32Id)}
-                          loading={Boolean(actionLoading[`setPrimary_${account.steam32Id}`])}
-                          disabled={Boolean(actionLoading[`setPrimary_${account.steam32Id}`])}
+                          loading={actionLoading[`setPrimary_${account.steam32Id}`]}
+                          disabled={actionLoading[`setPrimary_${account.steam32Id}`]}
                           title='Set as primary account'
                         >
                           Set as Primary
@@ -616,8 +616,8 @@ const VerifyPage: NextPageWithLayout = () => {
                         onClick={() => {
                           showUnlinkConfirmation(account.steam32Id)
                         }}
-                        loading={Boolean(actionLoading[`unlink_${account.steam32Id}`])}
-                        disabled={Boolean(actionLoading[`unlink_${account.steam32Id}`])}
+                        loading={actionLoading[`unlink_${account.steam32Id}`]}
+                        disabled={actionLoading[`unlink_${account.steam32Id}`]}
                         title='Unlink this account'
                       >
                         Unlink
@@ -636,8 +636,8 @@ const VerifyPage: NextPageWithLayout = () => {
                       title={
                         <div className='flex flex-wrap items-center gap-2'>
                           <Text strong>
-                            {account.name ||
-                              account.profile?.profile.personaname ||
+                            {account.name ??
+                              account.profile?.profile.personaname ??
                               'Unknown Player'}
                           </Text>
                           {account.isPrimary && (

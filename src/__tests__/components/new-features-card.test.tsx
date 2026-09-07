@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import NewFeaturesCard from '@/components/Dashboard/Features/new-features-card'
+
 vi.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
 }))
@@ -15,8 +17,6 @@ vi.mock('@/ui/card', () => ({
 vi.mock('@/components/Dashboard/Features/tier-switch', () => ({
   TierSwitch: ({ label }: any) => <span>{label}</span>,
 }))
-
-import NewFeaturesCard from '@/components/Dashboard/Features/new-features-card'
 
 describe(NewFeaturesCard, () => {
   it("renders the master toggle and links to What's New", () => {

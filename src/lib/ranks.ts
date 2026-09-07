@@ -180,7 +180,7 @@ export const getRankTitle = function getRankTitle(rankTier?: string | number): s
   // For example: rank tier 53 means Legend 3, where 5 is the medal and 3 is the stars
   const stars = intRankTier % 10 > 5 ? 5 : intRankTier % 10
   const rank = ranks.find((rank) =>
-    rank.image.startsWith(`${Math.floor(Number(intRankTier / 10))}${stars}`),
+    rank.image.startsWith(`${Math.floor(intRankTier / 10)}${stars}`),
   )
 
   return rank?.title ?? 'Unknown'
@@ -249,7 +249,10 @@ export const tierForRank = function tierForRank(
     }
     const range = tierMmrRange(t.key)
     return (
-      range != null && mmr >= (range.gte ?? 0) && mmr <= (range.lte ?? Number.POSITIVE_INFINITY)
+      range !== null &&
+      range !== undefined &&
+      mmr >= (range.gte ?? 0) &&
+      mmr <= (range.lte ?? Number.POSITIVE_INFINITY)
     )
   })
   return (tier?.key as StreamerTier) ?? 'unranked'

@@ -180,7 +180,7 @@ const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => (
 )
 
 const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
-  const orderedMatches = [...matches].sort(
+  const orderedMatches = matches.toSorted(
     (first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt),
   )
 
@@ -361,7 +361,7 @@ const MatchHistoryPage = ({
                     onError={(event) => {
                       event.currentTarget.src = '/images/hero/default.png'
                     }}
-                    src={image || '/images/hero/default.png'}
+                    src={image ?? '/images/hero/default.png'}
                     alt=''
                     aria-hidden
                     width={36}
@@ -605,7 +605,7 @@ export const getServerSideProps: GetServerSideProps<MatchHistoryPageProps> = asy
 
   return {
     props: {
-      displayName: user.displayName || user.name,
+      displayName: user.displayName ?? user.name,
       heroPerformance,
       image: user.image,
       matches: pageRows.map((match) => {

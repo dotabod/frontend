@@ -1,5 +1,9 @@
 import { render, waitFor } from '@testing-library/react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import HubSpot from '@/components/hub-spot'
 
 vi.mock('next/script', () => ({
   default: ({ src, id }: { src?: string; id?: string }) => (
@@ -9,11 +13,6 @@ vi.mock('next/script', () => ({
 }))
 vi.mock('next/router', () => ({ useRouter: vi.fn() }))
 vi.mock('next-auth/react', () => ({ useSession: vi.fn() }))
-
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
-
-import HubSpot from '@/components/hub-spot'
 
 const anyVal = (v: unknown) => v as any
 

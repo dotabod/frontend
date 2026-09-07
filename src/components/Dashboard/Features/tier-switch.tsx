@@ -33,11 +33,11 @@ export const TierSwitch = ({
   // the parent owns the change handler, the parent also owns the saving signal.
   const usingInternalMutation = !externalOnChange
   const reflectSaving = usingInternalMutation && isSaving
-  const isDisabled = externalDisabled || !tierAccess.hasAccess || reflectSaving
+  const isDisabled = externalDisabled === true || !tierAccess.hasAccess || reflectSaving
   const isChecked = externalChecked ?? enabled
   const handleChange = externalOnChange ?? updateSetting
   return (
-    <div className={`flex items-center gap-2 ${className || ''}`}>
+    <div className={`flex items-center gap-2 ${className ?? ''}`}>
       <div className='flex flex-nowrap items-center gap-2'>
         <Switch
           aria-labelledby={label ? labelId : undefined}

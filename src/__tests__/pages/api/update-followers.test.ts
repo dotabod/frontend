@@ -1,7 +1,12 @@
 // @ts-nocheck
+
+import { captureException } from '@sentry/nextjs'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getServerSession } from '@/lib/api/get-server-session'
+import prisma from '@/lib/db'
+import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 import handler from '@/pages/api/update-followers'
 
 // Mock the middleware
@@ -49,12 +54,6 @@ vi.mock('@/lib/api/get-server-session', () => ({
 vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
-
-import { captureException } from '@sentry/nextjs'
-
-import { getServerSession } from '@/lib/api/get-server-session'
-import prisma from '@/lib/db'
-import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 
 describe('update-followers API', () => {
   beforeEach(() => {

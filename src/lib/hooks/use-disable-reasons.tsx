@@ -134,7 +134,7 @@ export const useDisableReasons = function useDisableReasons() {
         case 'MANUAL_DISABLE': {
           return {
             action: 'Use !enable command to re-enable',
-            description: `Dotabod was disabled by ${metadata?.disabled_by || 'a moderator'} using the ${metadata?.command || '!disable'} command.`,
+            description: `Dotabod was disabled by ${metadata?.disabled_by ?? 'a moderator'} using the ${metadata?.command ?? '!disable'} command.`,
             severity: 'medium' as const,
             title: 'Manually disabled',
           }
@@ -166,7 +166,7 @@ export const useDisableReasons = function useDisableReasons() {
                   ? 'Dotabod cannot send messages because the bot account is currently warned and must acknowledge the warning first.'
                   : metadata?.drop_reason === 'banned_phone_alias'
                     ? "Dotabod cannot send messages because the bot's phone number is banned from your channel."
-                    : `Dotabod cannot send messages due to: ${metadata?.drop_reason_message || 'chat permission restrictions'}.`,
+                    : `Dotabod cannot send messages due to: ${metadata?.drop_reason_message ?? 'chat permission restrictions'}.`,
             severity: 'high' as const,
             title: 'Chat permission denied',
           }
@@ -174,8 +174,8 @@ export const useDisableReasons = function useDisableReasons() {
 
         case 'SUBSCRIPTION_INSUFFICIENT': {
           return {
-            action: `Upgrade to ${metadata?.required_tier || 'Pro'}`,
-            description: `This feature requires a ${metadata?.required_tier || 'Pro'} subscription. Your current tier is ${metadata?.current_tier || 'Free'}.`,
+            action: `Upgrade to ${metadata?.required_tier ?? 'Pro'}`,
+            description: `This feature requires a ${metadata?.required_tier ?? 'Pro'} subscription. Your current tier is ${metadata?.current_tier ?? 'Free'}.`,
             severity: 'medium' as const,
             title: 'Subscription required',
           }
@@ -184,7 +184,7 @@ export const useDisableReasons = function useDisableReasons() {
         case 'API_ERROR': {
           return {
             action: 'Contact support if this persists',
-            description: `Failed to communicate with ${metadata?.api_endpoint || 'external service'}: ${metadata?.error_message || 'Unknown error'}`,
+            description: `Failed to communicate with ${metadata?.api_endpoint ?? 'external service'}: ${metadata?.error_message ?? 'Unknown error'}`,
             severity: 'medium' as const,
             title: 'API error occurred',
           }
@@ -213,7 +213,7 @@ export const useDisableReasons = function useDisableReasons() {
             action:
               'Use !clearsharing to reset, but ensure only one person has the Dotabod GSI config file',
             description: metadata?.blocked_steam32_id
-              ? `Multiple people are using Dotabod GSI files for this stream. Steam account "${metadata?.account_name || 'Unknown'}" was blocked to prevent conflicts. Only the first account per stream is allowed.`
+              ? `Multiple people are using Dotabod GSI files for this stream. Steam account "${metadata?.account_name ?? 'Unknown'}" was blocked to prevent conflicts. Only the first account per stream is allowed.`
               : 'Multiple Steam accounts are sending game data to this stream. Additional accounts are blocked to prevent conflicts.',
             severity: 'high' as const,
             title: 'Multiple Steam accounts detected',
