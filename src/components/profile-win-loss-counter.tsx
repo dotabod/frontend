@@ -16,7 +16,7 @@ const getWindowLabel = function getWindowLabel(
 }
 
 export const ProfileWinLossCounter = ({ twitchId }: { twitchId?: string | null }) => {
-  const { connected, error, loading, wl } = useWinLoss({ twitchId })
+  const { error, loading, wl } = useWinLoss({ twitchId })
 
   if (!twitchId || error) {
     return null
@@ -42,14 +42,6 @@ export const ProfileWinLossCounter = ({ twitchId }: { twitchId?: string | null }
       ))}
       <span className='rounded-md border border-gray-700 bg-gray-900/60 px-2 py-0.5 text-xs text-gray-400'>
         {getWindowLabel(wl.statsDays, wl.statsDaysTotal)}
-      </span>
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-emerald-400' : 'bg-gray-600'}`}
-        title={connected ? 'Updates as matches finish' : 'Reconnecting live stats'}
-        aria-hidden
-      />
-      <span className='sr-only'>
-        {connected ? 'Updates as matches finish' : 'Reconnecting live stats'}
       </span>
     </span>
   )

@@ -260,7 +260,7 @@ describe('public profile match overview', () => {
   })
 
   it('shows the configured WL window and updates the counter after a match', () => {
-    render(<ProfilePage {...baseProps} />)
+    render(<ProfilePage {...baseProps} userData={{ ...baseProps.userData, stream_online: true }} />)
 
     expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL8 W - 3 L14 of 30 days')
 
@@ -269,6 +269,22 @@ describe('public profile match overview', () => {
     })
 
     expect(screen.getByLabelText('Win/loss record')).toHaveTextContent('WL9 W - 3 L14 of 30 days')
+  })
+
+  it('does not show a redundant connection indicator for online streamers', () => {
+    render(<ProfilePage {...baseProps} userData={{ ...baseProps.userData, stream_online: true }} />)
+
+    expect(screen.getByLabelText('Win/loss record')).toBeInTheDocument()
+    expect(screen.queryByTitle('Updates as matches finish')).not.toBeInTheDocument()
+    expect(screen.queryByText('Updates as matches finish')).not.toBeInTheDocument()
+  })
+
+  it('hides live WL stats when the streamer is offline', () => {
+    render(<ProfilePage {...baseProps} />)
+
+    expect(screen.getByText('Offline')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Win/loss record')).not.toBeInTheDocument()
+    expect(screen.queryByTitle('Updates as matches finish')).not.toBeInTheDocument()
   })
 
   it('summarizes the most played heroes and links to all hero win rates', () => {

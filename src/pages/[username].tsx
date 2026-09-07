@@ -464,7 +464,7 @@ const PageContent = ({
                 {profile?.mmr !== null && profile?.mmr !== undefined && profile.mmr > 0 && (
                   <span>⚔ {profile.mmr.toLocaleString()} MMR</span>
                 )}
-                <ProfileWinLossCounter twitchId={profile?.twitchId} />
+                {profile?.stream_online && <ProfileWinLossCounter twitchId={profile.twitchId} />}
                 <span>
                   Using Dotabod since{' '}
                   {finalLoading || !profile?.createdAt
