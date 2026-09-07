@@ -19,6 +19,7 @@ import type { NotablePlayer } from '@/components/Overlay/notable-players'
 import type { PollData } from '@/components/Overlay/poll-overlay'
 import { Settings } from '@/lib/default-settings'
 import type { blockType } from '@/lib/dev-consts'
+import { reportOverlayPage } from '@/lib/diagnostics/report-overlay-page'
 import { fetcher } from '@/lib/fetcher'
 import { getMatchData, matchDataCache } from '@/lib/hooks/open-dota-api'
 import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
@@ -36,6 +37,15 @@ import {
 } from '../redux/store'
 
 let socket: Socket | null = null
+
+const handleOverlayDiagnosticProbe = function handleOverlayDiagnosticProbe(
+  userId: string | string[] | undefined,
+): void {
+  if (userId === undefined || Array.isArray(userId) || window.obsstudio === undefined) {
+    return
+  }
+  void reportOverlayPage(userId)
+}
 
 export interface WinChance {
   value: number
@@ -172,6 +182,7 @@ export const useSocket = ({
 
       console.log('Socket instance created:', Boolean(socket))
     }
+    const activeSocket = socket
 
     // Use socket.io's built-in ping event to track connection health
     socket.io.on('ping', () => {
@@ -351,6 +362,11 @@ export const useSocket = ({
       mutate()
     })
 
+    activeSocket.on('diagnostic-overlay-probe', () => {
+      updateLastReceived()
+      handleOverlayDiagnosticProbe(userId)
+    })
+
     socket.on('channelPollOrBet', (data: PollData | BetData, eventName: string) => {
       updateLastReceived()
       console.log('twitchEvent', { data, eventName })
@@ -425,14 +441,30 @@ export const useSocket = ({
       socket?.off('roshan-killed')
       socket?.off('auth_error')
       socket?.off('refresh-settings')
+      activeSocket.off('diagnostic-overlay-probe')
       socket?.off('channelPollOrBet')
       socket?.off('update-medal')
       socket?.off('update-wl')
       socket?.off('update-radiant-win-chance')
       socket?.off('refresh')
     }
-    // Only depend on userId
-  }, [userId])
+  }, [
+    dispatch,
+    mutate,
+    setAegis,
+    setBetData,
+    setBlock,
+    setChatMessages,
+    setConnected,
+    setNotablePlayers,
+    setPaused,
+    setPollData,
+    setRadiantWinChance,
+    setRankImageDetails,
+    setRoshan,
+    setWL,
+    userId,
+  ])
 }
 
 const _events = {
