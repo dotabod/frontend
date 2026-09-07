@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Verify Dotabod'
+  short_description: 'Verify public Dotabod profile UI on GitHub runners'
+  default_prompt: 'Use $verify-dotabod to run or interpret the GitHub-hosted production browser verification for this Dotabod public-profile change.'

@@ -1,0 +1,53 @@
+name: Verify Dotabod
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.agents/skills/verify-dotabod/**'
+      - '.agents/skills/dotabod-frontend-verification/**'
+      - '.agents/skills/dotabod-profile-nav-workflow/**'
+      - '.github/workflows/verify-dotabod.yml'
+      - 'prisma/**'
+      - 'prisma-mongo/**'
+      - 'src/components/CosmeticSet/**'
+      - 'src/components/profile-match-overview.tsx'
+      - 'src/components/profile-section-nav.tsx'
+      - 'src/lib/match-history.ts'
+      - 'src/pages/[username].tsx'
+      - 'src/pages/[username]/matches.tsx'
+      - 'src/pages/[username]/set.tsx'
+      - 'src/pages/[username]/set/[hero-id].tsx'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-dotabod-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  profile-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.2.2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify public profile UI
+        run: .agents/skills/verify-dotabod/scripts/run-profile-verification.sh
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotabod-profile-verification
+          path: artifacts/verify-dotabod/profile-navigation
+          if-no-files-found: warn
+          retention-days: 14
