@@ -22150,26 +22150,6 @@
         "severity": "error"
       }
     },
-    "293b15285222d6f5fecf8080281bbaaaf25ce78d37709453e4e6775c5b21b942": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(no-fetch-in-effect)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "useEffect(() => {",
-              "next": "const userId = typeof router.query.userId === 'string' ? router.query.userId : null",
-              "previous": ""
-            },
-            "span": "useEffect(() => {\n    const userId = typeof router.query.userId === 'string' ? router.query.userId : null\n    if (!userId || typeof window.obsstudio !== 'object') {\n      return\n    }\n\n    const reportPageLoaded = () => {\n      fetch('/api/diagnostics/overlay-page', {\n        body: JSON.stringify({ userId }),\n        headers: { 'Content-Type': 'application/json' },\n        keepalive: true,\n        method: 'POST',\n      }).catch(() => {})\n    }\n\n    reportPageLoaded()\n    const interval = window.setInterval(reportPageLoaded, 60_000)\n    return () => {\n      window.clearInterval(interval)\n    }\n  }, [router.query.userId])",
-            "text": ""
-          }
-        ],
-        "message": "fetch() inside useEffect can race, double-fire, or leak. Use a data-fetching layer or Server Component instead.",
-        "severity": "error"
-      }
-    },
     "294702204f6d9b1aa57085cc3949ba654c08671d9b11b0b8ea10136fed3398c7": {
       "count": 1,
       "summary": {
@@ -35503,26 +35483,6 @@
         "severity": "error"
       }
     },
-    "429c3fd01926cc82979619f9b12baeedb6442024406a9d14183eab3ac7a60162": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(consistent-return)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "return () => {",
-              "next": "window.clearInterval(interval)",
-              "previous": "const interval = window.setInterval(reportPageLoaded, 60_000)"
-            },
-            "span": "return () => {\n      window.clearInterval(interval)\n    }",
-            "text": ""
-          }
-        ],
-        "message": "Function expected no return value.",
-        "severity": "error"
-      }
-    },
     "42a4cf54c901f8dac82001d3384853f3a5019742012d5d3c0bebb39816f0981f": {
       "count": 1,
       "summary": {
@@ -43094,26 +43054,6 @@
         "severity": "error"
       }
     },
-    "50b13d28d9dc4a6a26f5b8ddf4384f7ae5e3788f507f8906bf7537db27164d33": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-runtime-typeof)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const userId = typeof router.query.userId === 'string' ? router.query.userId : null",
-              "next": "if (!userId || typeof window.obsstudio !== 'object') {",
-              "previous": "useEffect(() => {"
-            },
-            "span": "typeof router.query.userId",
-            "text": ""
-          }
-        ],
-        "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
     "50cdd1ccc41e77f502cbdbeb3b2fcd529c728833de796ade7c7a3a3fccab8f27": {
       "count": 1,
       "summary": {
@@ -45123,152 +45063,6 @@
           }
         ],
         "message": "Unsafe type assertion: type 'Session' is more narrow than the original type.",
-        "severity": "error"
-      }
-    },
-    "553cf2260aae9c1e913f78ae23c9986d656c7868a7b76bb76e6fe130e35a3fa5": {
-      "count": 1,
-      "summary": {
-        "code": "react-hooks(exhaustive-deps)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBetData(isEnd || !('outcomes' in data) ? null : data)",
-              "next": "}",
-              "previous": "} else {"
-            },
-            "span": "setBetData",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setBlock(normalizedData)",
-              "next": "}, 5000)",
-              "previous": "setTimeout(() => {"
-            },
-            "span": "setBlock",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "mutate()",
-              "next": "setConnected(true)",
-              "previous": "updateLastReceived()"
-            },
-            "span": "mutate",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setAegis(data)",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "setAegis",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setRoshan(data)",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "setRoshan",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setConnected(true)",
-              "next": "})",
-              "previous": "mutate()"
-            },
-            "span": "setConnected",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setRankImageDetails(getRankImage(deets))",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "setRankImageDetails",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setWL({ records, statsDays, statsDaysTotal })",
-              "next": "},",
-              "previous": "updateLastReceived()"
-            },
-            "span": "setWL",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setChatMessages((prev: ChatMessage[]) => [...prev.slice(-7), messageWithTimestamp])",
-              "next": "",
-              "previous": "// Add message to state"
-            },
-            "span": "setChatMessages",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "dispatch(setMinimapDataBuildings(data))",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "dispatch",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setPaused(data)",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "setPaused",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setNotablePlayers(data)",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "setNotablePlayers",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setPollData(isEnd || !('choices' in data) ? null : data)",
-              "next": "} else {",
-              "previous": "if (eventName.includes('Poll')) {"
-            },
-            "span": "setPollData",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "setRadiantWinChance((prev) => (prev ? { ...prev, visible: false } : null))",
-              "next": "return",
-              "previous": "if (!chanceDetails) {"
-            },
-            "span": "setRadiantWinChance",
-            "text": ""
-          },
-          {
-            "context": {
-              "current": "}, [userId])",
-              "next": "}",
-              "previous": "// Only depend on userId"
-            },
-            "span": "[userId]",
-            "text": ""
-          }
-        ],
-        "message": "React Hook useEffect has missing dependencies: 'setBetData', 'setBlock', 'mutate', 'setAegis', 'setRoshan', 'setConnected', 'setRankImageDetails', 'setWL', 'setChatMessages', 'dispatch', 'setPaused', 'setNotablePlayers', 'setPollData', and 'setRadiantWinChance'",
         "severity": "error"
       }
     },
@@ -68935,26 +68729,6 @@
         "severity": "error"
       }
     },
-    "83bc931e91effc5aad9f3e8ab1791f9eb99bfd38e8eadad54178f7ad47bd5166": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!userId || typeof window.obsstudio !== 'object') {",
-              "next": "return",
-              "previous": "const userId = typeof router.query.userId === 'string' ? router.query.userId : null"
-            },
-            "span": "userId",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "83ce6caa7ce1bacbd7aa92a6d7822e89aa1b1bfa1a74235345d73b653e9cab6d": {
       "count": 1,
       "summary": {
@@ -87937,26 +87711,6 @@
         "severity": "error"
       }
     },
-    "a8858f6c8625d824892fc5e178754c3358f658fe03c963f99cc85ac4d6bf7ce2": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const OverlayPage = () => {",
-              "next": "const router = useRouter()",
-              "previous": ""
-            },
-            "span": "() => {\n  const router = useRouter()\n  const { notification } = App.useApp()\n  const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)\n  const { original, error, mutate: refreshSettings } = useUpdateSetting()\n  const { height, width } = useWindowSize()\n  const [connected, setConnected] = useState(false)\n  const [showDevImage, setShowDevImage] = useState(true)\n  const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)\n  const [hasShownOnce, setHasShownOnce] = useState(false)\n  const reportedErrorStatus = useRef<number | null>(null)\n\n  useEffect(() => {\n    const userId = typeof router.query.userId === 'string' ? router.query.userId : null\n    if (!userId || typeof window.obsstudio !== 'object') {\n      return\n    }\n\n    const reportPageLoaded = () => {\n      fetch('/api/diagnostics/overlay-page', {\n        body: JSON.stringify({ userId }),\n        headers: { 'Content-Type': 'application/json' },\n        keepalive: true,\n        method: 'POST',\n      }).catch(() => {})\n    }\n\n    reportPageLoaded()\n    const interval = window.setInterval(reportPageLoaded, 60_000)\n    return () => {\n      window.clearInterval(interval)\n    }\n  }, [router.query.userId])\n\n  const [block, setBlock] = useState<blockType>({\n    matchId: null,\n    team: null,\n    type: null,\n  })\n  const [pollData, setPollData] = useState<PollData | null>(null)\n  const [betData, setBetData] = useState<{\n    title: string\n    endDate: PollData['endDate']\n    outcomes: { title: string; totalVotes: number; channelPoints: number }[]\n  } | null>(null)\n  const [paused, setPaused] = useState(false)\n  const { roshan, setRoshan } = useRoshan()\n  const { aegis, setAegis } = useAegis()\n  const { notablePlayers, setNotablePlayers } = useNotablePlayers()\n  const [wl, setWL] = useState<wlType>({\n    records: [{ lose: 0, type: 'U', win: 0 }],\n    statsDays: null,\n  })\n  const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)\n\n  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])\n\n  const [rankImageDetails, setRankImageDetails] = useState<{\n    image: string | null\n    rank: number | null\n    leaderboard: number | null\n    notLoaded?: boolean\n  }>({\n    image: '0.png',\n    leaderboard: 0,\n    notLoaded: true,\n    rank: 0,\n  })\n\n  const [isInIframe, setIsInIframe] = useState(false)\n  const isDevMode = useIsDevMode()\n  const is404 = error && typeof error === 'object' && 'status' in error && error.status === 404\n\n  // Add detection for OBS environment\n  const [isOldObs, setIsOldObs] = useState(false)\n  useEffect(() => {\n    // Check if running in OBS (older Chromium)\n    const isOldOBS =\n      // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)\n      // Check if we're running in an older version that needs compatibility\n      Math.trunc(Number(/Chrome\\/(\\d+)/u.exec(navigator.userAgent)?.[1] ?? '999')) < 127\n\n    setIsOldObs(isOldOBS)\n  }, [])\n\n  // Wait 10s after the first connect before showing MainScreenOverlays;\n  // Reconnects after that show immediately.\n  useEffect(() => {\n    if (!connected) {\n      return\n    }\n    if (hasShownOnce) {\n      setShowMainScreenOverlay(true)\n      return\n    }\n    const timer = setTimeout(() => {\n      setShowMainScreenOverlay(true)\n      setHasShownOnce(true)\n    }, 10_000)\n    return () => {\n      clearTimeout(timer)\n    }\n  }, [connected, hasShownOnce])\n\n  useEffect(() => {\n    if (!original) {\n      return\n    }\n\n    const steamAccount = original.SteamAccount?.[0]\n    const rank = getRankDetail(\n      steamAccount?.mmr ?? original.mmr ?? 0,\n      steamAccount?.leaderboard_rank ?? null,\n    )\n\n    if (!rank) {\n      return\n    }\n\n    const leaderboard =\n      'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? null)\n\n    const rankDetails: {\n      image: string\n      rank: number\n      leaderboard: number | null\n      notLoaded: boolean\n    } = {\n      image: rank.myRank?.image ?? '0.png',\n      leaderboard,\n      notLoaded: false,\n      rank: rank.mmr,\n    }\n\n    setRankImageDetails(rankDetails)\n  }, [original])\n\n  useStreamOfflineNotification(original?.stream_online, notification, refreshSettings)\n\n  useEffect(() => {\n    setIsInIframe(window.self !== window.top)\n  }, [])\n\n  useEffect(() => {\n    if (error && !is404) {\n      const status = (error as PotentialError)?.status\n      // Skip transient network errors (no status -> SWR will retry) and 5xx\n      // (already captured server-side in /api/settings). Report each status once.\n      const isReportable = typeof status === 'number' && status < 500 && status !== 404\n      if (isReportable && reportedErrorStatus.current !== status) {\n        reportedErrorStatus.current = status\n        Sentry.captureException(new Error('Error in overlay page fetching settings'), {\n          extra: {\n            message: (error as PotentialError)?.message,\n            status,\n          },\n        })\n      }\n    } else {\n      reportedErrorStatus.current = null\n    }\n\n    if (is404) {\n      // For 404 errors, add local storage cache to prevent repeated API calls\n      if (typeof window !== 'undefined' && window.localStorage) {\n        try {\n          // Store the invalid URL in local storage with timestamp\n          const pathKey = `invalid_overlay_${window.location.pathname}`\n          localStorage.setItem(\n            pathKey,\n            JSON.stringify({\n              status: 404,\n              timestamp: Date.now(),\n            }),\n          )\n        } catch {\n          // Ignore storage errors\n        }\n      }\n\n      notification.open({\n        description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',\n        duration: 0,\n        key: 'auth-error',\n        message: 'Authentication failed',\n        placement: 'bottomLeft',\n        type: 'error',\n      })\n    } else {\n      notification.destroy('auth-error')\n    }\n  }, [error, notification, is404])\n\n  useEffect(() => {\n    if (!isDevMode) {\n      return\n    }\n    setWL(devWL)\n    setPollData(devPoll)\n    setBlock(devBlockTypes)\n    setRankImageDetails(devRank)\n    setRadiantWinChance(devRadiantWinChance)\n  }, [isDevMode])\n\n  useSocket({\n    setAegis,\n    setBetData,\n    setBlock,\n    setChatMessages,\n    setConnected,\n    setNotablePlayers,\n    setPaused,\n    setPollData,\n    setRadiantWinChance,\n    setRankImageDetails,\n    setRoshan,\n    setWL,\n  })\n\n  useOBS({ block, connected })\n\n  // This specific check might become redundant if _app.tsx handles it robustly.\n  if (isInvalidLocalCheck) {\n    return <InvalidOverlayPage />\n  }\n\n  if (is404) {\n    // Return minimal content for 404s to reduce resource usage\n    // This helps when users mistype URLs or accounts are deleted\n    return (\n      <>\n        {/* oxlint-disable-next-line nextjs/no-duplicate-head -- conditional render path, only one Head per render */}\n        <Head>\n          <title>Dotabod | Invalid Overlay URL</title>\n          <meta name='robots' content='noindex' />\n        </Head>\n        <style global jsx>{`\n          html,\n          body {\n            overflow: hidden;\n            background-color: transparent;\n          }\n        `}</style>\n        <div className='hidden'>Invalid Dotabod overlay URL. Please check your OBS settings.</div>\n      </>\n    )\n  }\n\n  if (isDotabodDisabled) {\n    return isDevMode ? (\n      <>\n        <motion.div\n          className={clsx('absolute right-0 mt-9 block max-w-xs')}\n          key='not-live'\n          {...motionProps}\n        >\n          <Alert message='Dotabod is disabled!' />\n        </motion.div>\n        <Image\n          key='dev-image'\n          width={width}\n          height={height}\n          alt={`${block.type} dev screenshot`}\n          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}\n        />\n      </>\n    ) : null\n  }\n\n  // Main overlay content for valid users\n  return (\n    <>\n      <Head>\n        <title>Dotabod | Stream overlays</title>\n        {/* oxlint-disable-next-line nextjs/no-css-tags -- OBS legacy compatibility stylesheet */}\n        {isOldObs && <link rel='stylesheet' href='/styles/obs-compat.css' />}\n      </Head>\n      <style global jsx>{`\n        html,\n        body {\n          overflow: hidden;\n        }\n      `}</style>\n      <DevControls\n        block={block}\n        setBlock={setBlock}\n        showDevImage={showDevImage}\n        setShowDevImage={setShowDevImage}\n        chatMessages={chatMessages}\n        setChatMessages={setChatMessages}\n      />\n      <AnimatePresence>\n        <motion.div\n          key='not-detected'\n          {...motionProps}\n          style={{ display: isInIframe && rankImageDetails?.notLoaded ? 'block' : 'none' }}\n        >\n          <div id='not-detected'>\n            <Center style={{ height }}>\n              <div className='space-y-6 rounded-md bg-gray-300 p-4'>\n                <Spin spinning>\n                  <div className='flex text-center'>\n                    <div className='ml-3'>\n                      <h3 className='text-2xl font-medium text-gray-800'>Waiting for Dota</h3>\n                      <div className='mt-2 text-lg text-gray-700'>\n                        <p>Dotabod hasn&apos;t detected your game yet.</p>\n                      </div>\n                    </div>\n                  </div>\n                </Spin>\n              </div>\n            </Center>\n          </div>\n        </motion.div>\n\n        <OverlayV2>\n          <RestrictFeature feature='livePolls'>\n            <PollOverlays\n              pollData={pollData}\n              setBetData={setBetData}\n              setPollData={setPollData}\n              betData={betData}\n              radiantWinChance={radiantWinChance}\n            />\n          </RestrictFeature>\n\n          {showMainScreenOverlay && (\n            <MainScreenOverlays\n              key='main-screen-overlays'\n              block={block}\n              wl={wl}\n              rankImageDetails={rankImageDetails}\n            />\n          )}\n\n          <PickScreenOverlays\n            block={block}\n            key='hero-blocker-class'\n            rankImageDetails={rankImageDetails}\n            wl={wl}\n          />\n\n          <RestrictFeature feature='lastFmOverlay'>\n            <AnimatedLastFm block={block} />\n          </RestrictFeature>\n\n          <InGameOutsideCenterV2>\n            <RestrictFeature feature='autoTranslate'>\n              <ChatMessagesOverlay chatMessages={chatMessages} />\n            </RestrictFeature>\n          </InGameOutsideCenterV2>\n        </OverlayV2>\n\n        <InGameOverlays\n          key='in-game-overlays'\n          block={block}\n          wl={wl}\n          rankImageDetails={rankImageDetails}\n          paused={paused}\n          roshan={roshan}\n          setRoshan={setRoshan}\n          setAegis={setAegis}\n          aegis={aegis}\n          notablePlayers={notablePlayers}\n        />\n\n        {isDevMode && showDevImage && (\n          <Image\n            key='dev-image'\n            width={width}\n            height={height}\n            alt={`${block.type} dev screenshot`}\n            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}\n          />\n        )}\n      </AnimatePresence>\n      <DevModeToggle />\n    </>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "function has a complexity of 26. Maximum allowed is 20.",
-        "severity": "error"
-      }
-    },
     "a88dc28cb8f42277088f695165168fdbe5022c9f5a10f4e60e879ea1c5017568": {
       "count": 2,
       "summary": {
@@ -98539,26 +98293,6 @@
           }
         ],
         "message": "Enforces a maximum number assertion calls in a test body.",
-        "severity": "error"
-      }
-    },
-    "bf232632106b9e037c3c6afb6e2d3a7013ae0e9c4adf0447546655b1b59a9d02": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(prefer-useReducer)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const OverlayPage = () => {",
-              "next": "const router = useRouter()",
-              "previous": ""
-            },
-            "span": "{\n  const router = useRouter()\n  const { notification } = App.useApp()\n  const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)\n  const { original, error, mutate: refreshSettings } = useUpdateSetting()\n  const { height, width } = useWindowSize()\n  const [connected, setConnected] = useState(false)\n  const [showDevImage, setShowDevImage] = useState(true)\n  const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)\n  const [hasShownOnce, setHasShownOnce] = useState(false)\n  const reportedErrorStatus = useRef<number | null>(null)\n\n  useEffect(() => {\n    const userId = typeof router.query.userId === 'string' ? router.query.userId : null\n    if (!userId || typeof window.obsstudio !== 'object') {\n      return\n    }\n\n    const reportPageLoaded = () => {\n      fetch('/api/diagnostics/overlay-page', {\n        body: JSON.stringify({ userId }),\n        headers: { 'Content-Type': 'application/json' },\n        keepalive: true,\n        method: 'POST',\n      }).catch(() => {})\n    }\n\n    reportPageLoaded()\n    const interval = window.setInterval(reportPageLoaded, 60_000)\n    return () => {\n      window.clearInterval(interval)\n    }\n  }, [router.query.userId])\n\n  const [block, setBlock] = useState<blockType>({\n    matchId: null,\n    team: null,\n    type: null,\n  })\n  const [pollData, setPollData] = useState<PollData | null>(null)\n  const [betData, setBetData] = useState<{\n    title: string\n    endDate: PollData['endDate']\n    outcomes: { title: string; totalVotes: number; channelPoints: number }[]\n  } | null>(null)\n  const [paused, setPaused] = useState(false)\n  const { roshan, setRoshan } = useRoshan()\n  const { aegis, setAegis } = useAegis()\n  const { notablePlayers, setNotablePlayers } = useNotablePlayers()\n  const [wl, setWL] = useState<wlType>({\n    records: [{ lose: 0, type: 'U', win: 0 }],\n    statsDays: null,\n  })\n  const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)\n\n  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])\n\n  const [rankImageDetails, setRankImageDetails] = useState<{\n    image: string | null\n    rank: number | null\n    leaderboard: number | null\n    notLoaded?: boolean\n  }>({\n    image: '0.png',\n    leaderboard: 0,\n    notLoaded: true,\n    rank: 0,\n  })\n\n  const [isInIframe, setIsInIframe] = useState(false)\n  const isDevMode = useIsDevMode()\n  const is404 = error && typeof error === 'object' && 'status' in error && error.status === 404\n\n  // Add detection for OBS environment\n  const [isOldObs, setIsOldObs] = useState(false)\n  useEffect(() => {\n    // Check if running in OBS (older Chromium)\n    const isOldOBS =\n      // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)\n      // Check if we're running in an older version that needs compatibility\n      Math.trunc(Number(/Chrome\\/(\\d+)/u.exec(navigator.userAgent)?.[1] ?? '999')) < 127\n\n    setIsOldObs(isOldOBS)\n  }, [])\n\n  // Wait 10s after the first connect before showing MainScreenOverlays;\n  // Reconnects after that show immediately.\n  useEffect(() => {\n    if (!connected) {\n      return\n    }\n    if (hasShownOnce) {\n      setShowMainScreenOverlay(true)\n      return\n    }\n    const timer = setTimeout(() => {\n      setShowMainScreenOverlay(true)\n      setHasShownOnce(true)\n    }, 10_000)\n    return () => {\n      clearTimeout(timer)\n    }\n  }, [connected, hasShownOnce])\n\n  useEffect(() => {\n    if (!original) {\n      return\n    }\n\n    const steamAccount = original.SteamAccount?.[0]\n    const rank = getRankDetail(\n      steamAccount?.mmr ?? original.mmr ?? 0,\n      steamAccount?.leaderboard_rank ?? null,\n    )\n\n    if (!rank) {\n      return\n    }\n\n    const leaderboard =\n      'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? null)\n\n    const rankDetails: {\n      image: string\n      rank: number\n      leaderboard: number | null\n      notLoaded: boolean\n    } = {\n      image: rank.myRank?.image ?? '0.png',\n      leaderboard,\n      notLoaded: false,\n      rank: rank.mmr,\n    }\n\n    setRankImageDetails(rankDetails)\n  }, [original])\n\n  useStreamOfflineNotification(original?.stream_online, notification, refreshSettings)\n\n  useEffect(() => {\n    setIsInIframe(window.self !== window.top)\n  }, [])\n\n  useEffect(() => {\n    if (error && !is404) {\n      const status = (error as PotentialError)?.status\n      // Skip transient network errors (no status -> SWR will retry) and 5xx\n      // (already captured server-side in /api/settings). Report each status once.\n      const isReportable = typeof status === 'number' && status < 500 && status !== 404\n      if (isReportable && reportedErrorStatus.current !== status) {\n        reportedErrorStatus.current = status\n        Sentry.captureException(new Error('Error in overlay page fetching settings'), {\n          extra: {\n            message: (error as PotentialError)?.message,\n            status,\n          },\n        })\n      }\n    } else {\n      reportedErrorStatus.current = null\n    }\n\n    if (is404) {\n      // For 404 errors, add local storage cache to prevent repeated API calls\n      if (typeof window !== 'undefined' && window.localStorage) {\n        try {\n          // Store the invalid URL in local storage with timestamp\n          const pathKey = `invalid_overlay_${window.location.pathname}`\n          localStorage.setItem(\n            pathKey,\n            JSON.stringify({\n              status: 404,\n              timestamp: Date.now(),\n            }),\n          )\n        } catch {\n          // Ignore storage errors\n        }\n      }\n\n      notification.open({\n        description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',\n        duration: 0,\n        key: 'auth-error',\n        message: 'Authentication failed',\n        placement: 'bottomLeft',\n        type: 'error',\n      })\n    } else {\n      notification.destroy('auth-error')\n    }\n  }, [error, notification, is404])\n\n  useEffect(() => {\n    if (!isDevMode) {\n      return\n    }\n    setWL(devWL)\n    setPollData(devPoll)\n    setBlock(devBlockTypes)\n    setRankImageDetails(devRank)\n    setRadiantWinChance(devRadiantWinChance)\n  }, [isDevMode])\n\n  useSocket({\n    setAegis,\n    setBetData,\n    setBlock,\n    setChatMessages,\n    setConnected,\n    setNotablePlayers,\n    setPaused,\n    setPollData,\n    setRadiantWinChance,\n    setRankImageDetails,\n    setRoshan,\n    setWL,\n  })\n\n  useOBS({ block, connected })\n\n  // This specific check might become redundant if _app.tsx handles it robustly.\n  if (isInvalidLocalCheck) {\n    return <InvalidOverlayPage />\n  }\n\n  if (is404) {\n    // Return minimal content for 404s to reduce resource usage\n    // This helps when users mistype URLs or accounts are deleted\n    return (\n      <>\n        {/* oxlint-disable-next-line nextjs/no-duplicate-head -- conditional render path, only one Head per render */}\n        <Head>\n          <title>Dotabod | Invalid Overlay URL</title>\n          <meta name='robots' content='noindex' />\n        </Head>\n        <style global jsx>{`\n          html,\n          body {\n            overflow: hidden;\n            background-color: transparent;\n          }\n        `}</style>\n        <div className='hidden'>Invalid Dotabod overlay URL. Please check your OBS settings.</div>\n      </>\n    )\n  }\n\n  if (isDotabodDisabled) {\n    return isDevMode ? (\n      <>\n        <motion.div\n          className={clsx('absolute right-0 mt-9 block max-w-xs')}\n          key='not-live'\n          {...motionProps}\n        >\n          <Alert message='Dotabod is disabled!' />\n        </motion.div>\n        <Image\n          key='dev-image'\n          width={width}\n          height={height}\n          alt={`${block.type} dev screenshot`}\n          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}\n        />\n      </>\n    ) : null\n  }\n\n  // Main overlay content for valid users\n  return (\n    <>\n      <Head>\n        <title>Dotabod | Stream overlays</title>\n        {/* oxlint-disable-next-line nextjs/no-css-tags -- OBS legacy compatibility stylesheet */}\n        {isOldObs && <link rel='stylesheet' href='/styles/obs-compat.css' />}\n      </Head>\n      <style global jsx>{`\n        html,\n        body {\n          overflow: hidden;\n        }\n      `}</style>\n      <DevControls\n        block={block}\n        setBlock={setBlock}\n        showDevImage={showDevImage}\n        setShowDevImage={setShowDevImage}\n        chatMessages={chatMessages}\n        setChatMessages={setChatMessages}\n      />\n      <AnimatePresence>\n        <motion.div\n          key='not-detected'\n          {...motionProps}\n          style={{ display: isInIframe && rankImageDetails?.notLoaded ? 'block' : 'none' }}\n        >\n          <div id='not-detected'>\n            <Center style={{ height }}>\n              <div className='space-y-6 rounded-md bg-gray-300 p-4'>\n                <Spin spinning>\n                  <div className='flex text-center'>\n                    <div className='ml-3'>\n                      <h3 className='text-2xl font-medium text-gray-800'>Waiting for Dota</h3>\n                      <div className='mt-2 text-lg text-gray-700'>\n                        <p>Dotabod hasn&apos;t detected your game yet.</p>\n                      </div>\n                    </div>\n                  </div>\n                </Spin>\n              </div>\n            </Center>\n          </div>\n        </motion.div>\n\n        <OverlayV2>\n          <RestrictFeature feature='livePolls'>\n            <PollOverlays\n              pollData={pollData}\n              setBetData={setBetData}\n              setPollData={setPollData}\n              betData={betData}\n              radiantWinChance={radiantWinChance}\n            />\n          </RestrictFeature>\n\n          {showMainScreenOverlay && (\n            <MainScreenOverlays\n              key='main-screen-overlays'\n              block={block}\n              wl={wl}\n              rankImageDetails={rankImageDetails}\n            />\n          )}\n\n          <PickScreenOverlays\n            block={block}\n            key='hero-blocker-class'\n            rankImageDetails={rankImageDetails}\n            wl={wl}\n          />\n\n          <RestrictFeature feature='lastFmOverlay'>\n            <AnimatedLastFm block={block} />\n          </RestrictFeature>\n\n          <InGameOutsideCenterV2>\n            <RestrictFeature feature='autoTranslate'>\n              <ChatMessagesOverlay chatMessages={chatMessages} />\n            </RestrictFeature>\n          </InGameOutsideCenterV2>\n        </OverlayV2>\n\n        <InGameOverlays\n          key='in-game-overlays'\n          block={block}\n          wl={wl}\n          rankImageDetails={rankImageDetails}\n          paused={paused}\n          roshan={roshan}\n          setRoshan={setRoshan}\n          setAegis={setAegis}\n          aegis={aegis}\n          notablePlayers={notablePlayers}\n        />\n\n        {isDevMode && showDevImage && (\n          <Image\n            key='dev-image'\n            width={width}\n            height={height}\n            alt={`${block.type} dev screenshot`}\n            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}\n          />\n        )}\n      </AnimatePresence>\n      <DevModeToggle />\n    </>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "\"OverlayPage\" updates 5 separate useState values in one place — state that changes together is easier to keep consistent as a single useReducer action.",
         "severity": "error"
       }
     },
@@ -121682,26 +121416,6 @@
         "severity": "error"
       }
     },
-    "e9cb4162373c7e601a9c9f9d61524d4b5d1d1026b92f04343fa58ce0ba23b1ac": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-runtime-typeof)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!userId || typeof window.obsstudio !== 'object') {",
-              "next": "return",
-              "previous": "const userId = typeof router.query.userId === 'string' ? router.query.userId : null"
-            },
-            "span": "typeof window.obsstudio",
-            "text": ""
-          }
-        ],
-        "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
     "e9d33365a639cc0b69eaaf46d96e1beb6d7117d2b41e941506e48e2c51615f70": {
       "count": 1,
       "summary": {
@@ -127037,6 +126751,26 @@
         "severity": "error"
       }
     },
+    "f36f4b52cca2eeb93613cb64e3100003cb7bceafda3a5a963d45a16c100c12f1": {
+      "count": 1,
+      "summary": {
+        "code": "react-doctor(prefer-useReducer)",
+        "file": "src/components/Overlay/index.tsx",
+        "labels": [
+          {
+            "context": {
+              "current": "const OverlayPage = () => {",
+              "next": "const { notification } = App.useApp()",
+              "previous": ""
+            },
+            "span": "{\n  const { notification } = App.useApp()\n  const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)\n  const { original, error, mutate: refreshSettings } = useUpdateSetting()\n  const { height, width } = useWindowSize()\n  const [connected, setConnected] = useState(false)\n  const [showDevImage, setShowDevImage] = useState(true)\n  const [showMainScreenOverlay, setShowMainScreenOverlay] = useState(false)\n  const [hasShownOnce, setHasShownOnce] = useState(false)\n  const reportedErrorStatus = useRef<number | null>(null)\n\n  const [block, setBlock] = useState<blockType>({\n    matchId: null,\n    team: null,\n    type: null,\n  })\n  const [pollData, setPollData] = useState<PollData | null>(null)\n  const [betData, setBetData] = useState<{\n    title: string\n    endDate: PollData['endDate']\n    outcomes: { title: string; totalVotes: number; channelPoints: number }[]\n  } | null>(null)\n  const [paused, setPaused] = useState(false)\n  const { roshan, setRoshan } = useRoshan()\n  const { aegis, setAegis } = useAegis()\n  const { notablePlayers, setNotablePlayers } = useNotablePlayers()\n  const [wl, setWL] = useState<wlType>({\n    records: [{ lose: 0, type: 'U', win: 0 }],\n    statsDays: null,\n  })\n  const [radiantWinChance, setRadiantWinChance] = useState<WinChance | null>(null)\n\n  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])\n\n  const [rankImageDetails, setRankImageDetails] = useState<{\n    image: string | null\n    rank: number | null\n    leaderboard: number | null\n    notLoaded?: boolean\n  }>({\n    image: '0.png',\n    leaderboard: 0,\n    notLoaded: true,\n    rank: 0,\n  })\n\n  const [isInIframe, setIsInIframe] = useState(false)\n  const isDevMode = useIsDevMode()\n  const is404 = error && typeof error === 'object' && 'status' in error && error.status === 404\n\n  // Add detection for OBS environment\n  const [isOldObs, setIsOldObs] = useState(false)\n  useEffect(() => {\n    // Check if running in OBS (older Chromium)\n    const isOldOBS =\n      // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)\n      // Check if we're running in an older version that needs compatibility\n      Math.trunc(Number(/Chrome\\/(\\d+)/u.exec(navigator.userAgent)?.[1] ?? '999')) < 127\n\n    setIsOldObs(isOldOBS)\n  }, [])\n\n  // Wait 10s after the first connect before showing MainScreenOverlays;\n  // Reconnects after that show immediately.\n  useEffect(() => {\n    if (!connected) {\n      return\n    }\n    if (hasShownOnce) {\n      setShowMainScreenOverlay(true)\n      return\n    }\n    const timer = setTimeout(() => {\n      setShowMainScreenOverlay(true)\n      setHasShownOnce(true)\n    }, 10_000)\n    return () => {\n      clearTimeout(timer)\n    }\n  }, [connected, hasShownOnce])\n\n  useEffect(() => {\n    if (!original) {\n      return\n    }\n\n    const steamAccount = original.SteamAccount?.[0]\n    const rank = getRankDetail(\n      steamAccount?.mmr ?? original.mmr ?? 0,\n      steamAccount?.leaderboard_rank ?? null,\n    )\n\n    if (!rank) {\n      return\n    }\n\n    const leaderboard =\n      'standing' in rank ? rank.standing : (steamAccount?.leaderboard_rank ?? null)\n\n    const rankDetails: {\n      image: string\n      rank: number\n      leaderboard: number | null\n      notLoaded: boolean\n    } = {\n      image: rank.myRank?.image ?? '0.png',\n      leaderboard,\n      notLoaded: false,\n      rank: rank.mmr,\n    }\n\n    setRankImageDetails(rankDetails)\n  }, [original])\n\n  useStreamOfflineNotification(original?.stream_online, notification, refreshSettings)\n\n  useEffect(() => {\n    setIsInIframe(window.self !== window.top)\n  }, [])\n\n  useEffect(() => {\n    if (error && !is404) {\n      const status = (error as PotentialError)?.status\n      // Skip transient network errors (no status -> SWR will retry) and 5xx\n      // (already captured server-side in /api/settings). Report each status once.\n      const isReportable = typeof status === 'number' && status < 500 && status !== 404\n      if (isReportable && reportedErrorStatus.current !== status) {\n        reportedErrorStatus.current = status\n        Sentry.captureException(new Error('Error in overlay page fetching settings'), {\n          extra: {\n            message: (error as PotentialError)?.message,\n            status,\n          },\n        })\n      }\n    } else {\n      reportedErrorStatus.current = null\n    }\n\n    if (is404) {\n      // For 404 errors, add local storage cache to prevent repeated API calls\n      if (typeof window !== 'undefined' && window.localStorage) {\n        try {\n          // Store the invalid URL in local storage with timestamp\n          const pathKey = `invalid_overlay_${window.location.pathname}`\n          localStorage.setItem(\n            pathKey,\n            JSON.stringify({\n              status: 404,\n              timestamp: Date.now(),\n            }),\n          )\n        } catch {\n          // Ignore storage errors\n        }\n      }\n\n      notification.open({\n        description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',\n        duration: 0,\n        key: 'auth-error',\n        message: 'Authentication failed',\n        placement: 'bottomLeft',\n        type: 'error',\n      })\n    } else {\n      notification.destroy('auth-error')\n    }\n  }, [error, notification, is404])\n\n  useEffect(() => {\n    if (!isDevMode) {\n      return\n    }\n    setWL(devWL)\n    setPollData(devPoll)\n    setBlock(devBlockTypes)\n    setRankImageDetails(devRank)\n    setRadiantWinChance(devRadiantWinChance)\n  }, [isDevMode])\n\n  useSocket({\n    setAegis,\n    setBetData,\n    setBlock,\n    setChatMessages,\n    setConnected,\n    setNotablePlayers,\n    setPaused,\n    setPollData,\n    setRadiantWinChance,\n    setRankImageDetails,\n    setRoshan,\n    setWL,\n  })\n\n  useOBS({ block, connected })\n\n  // This specific check might become redundant if _app.tsx handles it robustly.\n  if (isInvalidLocalCheck) {\n    return <InvalidOverlayPage />\n  }\n\n  if (is404) {\n    // Return minimal content for 404s to reduce resource usage\n    // This helps when users mistype URLs or accounts are deleted\n    return (\n      <>\n        {/* oxlint-disable-next-line nextjs/no-duplicate-head -- conditional render path, only one Head per render */}\n        <Head>\n          <title>Dotabod | Invalid Overlay URL</title>\n          <meta name='robots' content='noindex' />\n        </Head>\n        <style global jsx>{`\n          html,\n          body {\n            overflow: hidden;\n            background-color: transparent;\n          }\n        `}</style>\n        <div className='hidden'>Invalid Dotabod overlay URL. Please check your OBS settings.</div>\n      </>\n    )\n  }\n\n  if (isDotabodDisabled) {\n    return isDevMode ? (\n      <>\n        <motion.div\n          className={clsx('absolute right-0 mt-9 block max-w-xs')}\n          key='not-live'\n          {...motionProps}\n        >\n          <Alert message='Dotabod is disabled!' />\n        </motion.div>\n        <Image\n          key='dev-image'\n          width={width}\n          height={height}\n          alt={`${block.type} dev screenshot`}\n          src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}\n        />\n      </>\n    ) : null\n  }\n\n  // Main overlay content for valid users\n  return (\n    <>\n      <Head>\n        <title>Dotabod | Stream overlays</title>\n        {/* oxlint-disable-next-line nextjs/no-css-tags -- OBS legacy compatibility stylesheet */}\n        {isOldObs && <link rel='stylesheet' href='/styles/obs-compat.css' />}\n      </Head>\n      <style global jsx>{`\n        html,\n        body {\n          overflow: hidden;\n        }\n      `}</style>\n      <DevControls\n        block={block}\n        setBlock={setBlock}\n        showDevImage={showDevImage}\n        setShowDevImage={setShowDevImage}\n        chatMessages={chatMessages}\n        setChatMessages={setChatMessages}\n      />\n      <AnimatePresence>\n        <motion.div\n          key='not-detected'\n          {...motionProps}\n          style={{ display: isInIframe && rankImageDetails?.notLoaded ? 'block' : 'none' }}\n        >\n          <div id='not-detected'>\n            <Center style={{ height }}>\n              <div className='space-y-6 rounded-md bg-gray-300 p-4'>\n                <Spin spinning>\n                  <div className='flex text-center'>\n                    <div className='ml-3'>\n                      <h3 className='text-2xl font-medium text-gray-800'>Waiting for Dota</h3>\n                      <div className='mt-2 text-lg text-gray-700'>\n                        <p>Dotabod hasn&apos;t detected your game yet.</p>\n                      </div>\n                    </div>\n                  </div>\n                </Spin>\n              </div>\n            </Center>\n          </div>\n        </motion.div>\n\n        <OverlayV2>\n          <RestrictFeature feature='livePolls'>\n            <PollOverlays\n              pollData={pollData}\n              setBetData={setBetData}\n              setPollData={setPollData}\n              betData={betData}\n              radiantWinChance={radiantWinChance}\n            />\n          </RestrictFeature>\n\n          {showMainScreenOverlay && (\n            <MainScreenOverlays\n              key='main-screen-overlays'\n              block={block}\n              wl={wl}\n              rankImageDetails={rankImageDetails}\n            />\n          )}\n\n          <PickScreenOverlays\n            block={block}\n            key='hero-blocker-class'\n            rankImageDetails={rankImageDetails}\n            wl={wl}\n          />\n\n          <RestrictFeature feature='lastFmOverlay'>\n            <AnimatedLastFm block={block} />\n          </RestrictFeature>\n\n          <InGameOutsideCenterV2>\n            <RestrictFeature feature='autoTranslate'>\n              <ChatMessagesOverlay chatMessages={chatMessages} />\n            </RestrictFeature>\n          </InGameOutsideCenterV2>\n        </OverlayV2>\n\n        <InGameOverlays\n          key='in-game-overlays'\n          block={block}\n          wl={wl}\n          rankImageDetails={rankImageDetails}\n          paused={paused}\n          roshan={roshan}\n          setRoshan={setRoshan}\n          setAegis={setAegis}\n          aegis={aegis}\n          notablePlayers={notablePlayers}\n        />\n\n        {isDevMode && showDevImage && (\n          <Image\n            key='dev-image'\n            width={width}\n            height={height}\n            alt={`${block.type} dev screenshot`}\n            src={`/images/dev/${width && height && Math.round((width / height) * 9) === 21 ? '21-9-' : ''}${block.type === 'spectator' ? 'playing' : (block.type ?? 'main-menu')}.png`}\n          />\n        )}\n      </AnimatePresence>\n      <DevModeToggle />\n    </>\n  )\n}",
+            "text": ""
+          }
+        ],
+        "message": "\"OverlayPage\" updates 5 separate useState values in one place — state that changes together is easier to keep consistent as a single useReducer action.",
+        "severity": "error"
+      }
+    },
     "f37b4cad4a815baadc7acecfcdf3cc19ae841b7383271e5ba32770c8f64e8865": {
       "count": 1,
       "summary": {
@@ -128259,26 +127993,6 @@
           }
         ],
         "message": "Do not use `Array#forEach`",
-        "severity": "error"
-      }
-    },
-    "f5ee3094043fec2133fa9640e7b3c5c2bc12b57a1aa60fd7d5cbaa84d25ff83e": {
-      "count": 1,
-      "summary": {
-        "code": "promise(prefer-await-to-then)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "}).catch(() => {})",
-              "next": "}",
-              "previous": "method: 'POST',"
-            },
-            "span": "catch",
-            "text": ""
-          }
-        ],
-        "message": "Prefer await to then()/catch()/finally()",
         "severity": "error"
       }
     },
@@ -129822,26 +129536,6 @@
           }
         ],
         "message": "Mocked modules must be dynamic imported.",
-        "severity": "error"
-      }
-    },
-    "f91d16442dd9eac2b74a19a6b326cba8d659716910f5b27710c6939fcde0d268": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-empty-function)",
-        "file": "src/components/Overlay/index.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "}).catch(() => {})",
-              "next": "}",
-              "previous": "method: 'POST',"
-            },
-            "span": "{}",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected empty function",
         "severity": "error"
       }
     },
@@ -134117,8 +133811,12 @@
         "name": "app",
         "resolvedConfigSha256": "c0c208cf8ff15b7a20a4ff6c86712ca2289f5ddd5cc522b89a67ca1704f34fa1",
         "scope": {
-          "ignorePatterns": ["supabase/functions/**"],
-          "paths": ["."]
+          "ignorePatterns": [
+            "supabase/functions/**"
+          ],
+          "paths": [
+            "."
+          ]
         }
       },
       {
@@ -134141,7 +133839,9 @@
         "resolvedConfigSha256": "6c6c97b8453def202543b9830ada155f95f1a1375685319dec3501f5c65e59a1",
         "scope": {
           "ignorePatterns": [],
-          "paths": ["supabase/functions"]
+          "paths": [
+            "supabase/functions"
+          ]
         }
       }
     ],

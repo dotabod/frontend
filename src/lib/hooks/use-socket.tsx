@@ -19,6 +19,7 @@ import type { NotablePlayer } from '@/components/Overlay/notable-players'
 import type { PollData } from '@/components/Overlay/poll-overlay'
 import { Settings } from '@/lib/default-settings'
 import type { blockType } from '@/lib/dev-consts'
+import { reportOverlayPage } from '@/lib/diagnostics/report-overlay-page'
 import { fetcher } from '@/lib/fetcher'
 import { getMatchData, matchDataCache } from '@/lib/hooks/open-dota-api'
 import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
@@ -36,20 +37,6 @@ import {
 } from '../redux/store'
 
 let socket: Socket | null = null
-
-const reportOverlayPage = async function reportOverlayPage(userId: string): Promise<boolean> {
-  try {
-    const response = await fetch('/api/diagnostics/overlay-page', {
-      body: JSON.stringify({ userId }),
-      headers: { 'Content-Type': 'application/json' },
-      keepalive: true,
-      method: 'POST',
-    })
-    return response.ok
-  } catch {
-    return false
-  }
-}
 
 const handleOverlayDiagnosticProbe = function handleOverlayDiagnosticProbe(
   userId: string | string[] | undefined,
@@ -195,6 +182,7 @@ export const useSocket = ({
 
       console.log('Socket instance created:', Boolean(socket))
     }
+    const activeSocket = socket
 
     // Use socket.io's built-in ping event to track connection health
     socket.io.on('ping', () => {
@@ -374,7 +362,7 @@ export const useSocket = ({
       mutate()
     })
 
-    socket.on('diagnostic-overlay-probe', () => {
+    activeSocket.on('diagnostic-overlay-probe', () => {
       updateLastReceived()
       handleOverlayDiagnosticProbe(userId)
     })
@@ -453,15 +441,30 @@ export const useSocket = ({
       socket?.off('roshan-killed')
       socket?.off('auth_error')
       socket?.off('refresh-settings')
-      socket?.off('diagnostic-overlay-probe')
+      activeSocket.off('diagnostic-overlay-probe')
       socket?.off('channelPollOrBet')
       socket?.off('update-medal')
       socket?.off('update-wl')
       socket?.off('update-radiant-win-chance')
       socket?.off('refresh')
     }
-    // Only depend on userId
-  }, [userId])
+  }, [
+    dispatch,
+    mutate,
+    setAegis,
+    setBetData,
+    setBlock,
+    setChatMessages,
+    setConnected,
+    setNotablePlayers,
+    setPaused,
+    setPollData,
+    setRadiantWinChance,
+    setRankImageDetails,
+    setRoshan,
+    setWL,
+    userId,
+  ])
 }
 
 const _events = {

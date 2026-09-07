@@ -318,7 +318,9 @@ describe(useSocket, () => {
     }
 
     try {
-      renderHook(() => useSocket(socketProps))
+      renderHook(() => {
+        useSocket(socketProps)
+      })
       expect(fetchMock).not.toHaveBeenCalled()
 
       act(() => {
