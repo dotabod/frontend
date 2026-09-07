@@ -215,6 +215,20 @@ interface PageContentProps {
   recentMatches?: MatchHistoryRow[]
 }
 
+const LiveProfileWinLossCounter = ({
+  isLive,
+  twitchId,
+}: {
+  isLive: boolean
+  twitchId?: string | null
+}) => {
+  if (!isLive) {
+    return null
+  }
+
+  return <ProfileWinLossCounter twitchId={twitchId} />
+}
+
 const PageContent = ({
   userData: ssrUserData,
   subscriptionInfo: ssrSubscriptionInfo,
@@ -464,7 +478,10 @@ const PageContent = ({
                 {profile?.mmr !== null && profile?.mmr !== undefined && profile.mmr > 0 && (
                   <span>⚔ {profile.mmr.toLocaleString()} MMR</span>
                 )}
-                {profile?.stream_online && <ProfileWinLossCounter twitchId={profile.twitchId} />}
+                <LiveProfileWinLossCounter
+                  isLive={profile?.stream_online === true}
+                  twitchId={profile?.twitchId}
+                />
                 <span>
                   Using Dotabod since{' '}
                   {finalLoading || !profile?.createdAt
