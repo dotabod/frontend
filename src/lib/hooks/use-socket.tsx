@@ -37,6 +37,29 @@ import {
 
 let socket: Socket | null = null
 
+const reportOverlayPage = async function reportOverlayPage(userId: string): Promise<boolean> {
+  try {
+    const response = await fetch('/api/diagnostics/overlay-page', {
+      body: JSON.stringify({ userId }),
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      method: 'POST',
+    })
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+const handleOverlayDiagnosticProbe = function handleOverlayDiagnosticProbe(
+  userId: string | string[] | undefined,
+): void {
+  if (userId === undefined || Array.isArray(userId) || window.obsstudio === undefined) {
+    return
+  }
+  void reportOverlayPage(userId)
+}
+
 export interface WinChance {
   value: number
   time: number
@@ -353,16 +376,7 @@ export const useSocket = ({
 
     socket.on('diagnostic-overlay-probe', () => {
       updateLastReceived()
-      if (userId === undefined || Array.isArray(userId) || window.obsstudio === undefined) {
-        return
-      }
-
-      void fetch('/api/diagnostics/overlay-page', {
-        body: JSON.stringify({ userId }),
-        headers: { 'Content-Type': 'application/json' },
-        keepalive: true,
-        method: 'POST',
-      }).catch(() => {})
+      handleOverlayDiagnosticProbe(userId)
     })
 
     socket.on('channelPollOrBet', (data: PollData | BetData, eventName: string) => {
