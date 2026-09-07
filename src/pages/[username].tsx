@@ -479,7 +479,7 @@ const PageContent = ({
                   <span>⚔ {profile.mmr.toLocaleString()} MMR</span>
                 )}
                 <LiveProfileWinLossCounter
-                  isLive={profile?.stream_online === true}
+                  isLive={profile.stream_online === true}
                   twitchId={profile?.twitchId}
                 />
                 <span>
