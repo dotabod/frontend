@@ -353,7 +353,7 @@ export const useSocket = ({
 
     socket.on('diagnostic-overlay-probe', () => {
       updateLastReceived()
-      if (typeof userId !== 'string' || typeof window.obsstudio !== 'object') {
+      if (userId === undefined || Array.isArray(userId) || window.obsstudio === undefined) {
         return
       }
 

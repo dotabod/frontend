@@ -65,9 +65,14 @@ describe(useSocket, () => {
     vi.restoreAllMocks()
   })
 
-  it('refreshes settings on socket connect and refresh-settings events', () => {
+  it('refreshes settings and reports the OBS page only when diagnostics probes it', () => {
     vi.useFakeTimers()
     const setConnected = vi.fn()
+    Object.defineProperty(window, 'obsstudio', { configurable: true, value: {} })
+    const fetchMock = vi.fn<typeof fetch>(
+      async () => await Promise.resolve(new Response(null, { status: 204 })),
+    )
+    vi.stubGlobal('fetch', fetchMock)
 
     const TestComponent = () => {
       useSocket({
@@ -89,11 +94,24 @@ describe(useSocket, () => {
     }
 
     render(<TestComponent />)
+    expect(fetchMock).not.toHaveBeenCalled()
 
     expect(socketState.ioMock).toHaveBeenCalledWith(
       process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL,
       expect.objectContaining({ reconnectionAttempts: Number.POSITIVE_INFINITY }),
     )
+
+    act(() => {
+      socketState.handlers.get('diagnostic-overlay-probe')?.()
+    })
+
+    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(fetchMock).toHaveBeenCalledWith('/api/diagnostics/overlay-page', {
+      body: JSON.stringify({ userId: 'overlay-token' }),
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      method: 'POST',
+    })
 
     act(() => {
       socketState.handlers.get('connect')?.()
@@ -107,46 +125,6 @@ describe(useSocket, () => {
     })
 
     expect(socketState.mutate).toHaveBeenCalledTimes(2)
-  })
-
-  it('reports the OBS overlay page once when diagnostics requests a probe', () => {
-    Object.defineProperty(window, 'obsstudio', { configurable: true, value: {} })
-    const fetchMock = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal('fetch', fetchMock)
-
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock: vi.fn(),
-        setChatMessages: vi.fn(),
-        setConnected: vi.fn(),
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL: vi.fn(),
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
-    expect(fetchMock).not.toHaveBeenCalled()
-
-    act(() => {
-      socketState.handlers.get('diagnostic-overlay-probe')?.()
-    })
-
-    expect(fetchMock).toHaveBeenCalledOnce()
-    expect(fetchMock).toHaveBeenCalledWith('/api/diagnostics/overlay-page', {
-      body: JSON.stringify({ userId: 'overlay-token' }),
-      headers: { 'Content-Type': 'application/json' },
-      keepalive: true,
-      method: 'POST',
-    })
   })
 
   it('stores the WL records with the stats window sent by the server', () => {

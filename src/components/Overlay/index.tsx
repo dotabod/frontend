@@ -5,7 +5,6 @@ import { clsx } from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { InGameOutsideCenterV2 } from '@/components/Overlay/blocker/in-game-v-2'
@@ -50,7 +49,6 @@ const isInvalidLocalCheck = checkForInvalidOverlay(
 )
 
 const OverlayPage = () => {
-  const router = useRouter()
   const { notification } = App.useApp()
   const { data: isDotabodDisabled } = useUpdateSetting(Settings.commandDisable)
   const { original, error, mutate: refreshSettings } = useUpdateSetting()
