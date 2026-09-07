@@ -14,10 +14,10 @@ on:
       - 'src/components/profile-match-overview.tsx'
       - 'src/components/profile-section-nav.tsx'
       - 'src/lib/match-history.ts'
-      - 'src/pages/[username].tsx'
-      - 'src/pages/[username]/matches.tsx'
-      - 'src/pages/[username]/set.tsx'
-      - 'src/pages/[username]/set/[hero-id].tsx'
+      - 'src/pages/\[username\].tsx'
+      - 'src/pages/\[username\]/matches.tsx'
+      - 'src/pages/\[username\]/set.tsx'
+      - 'src/pages/\[username\]/set/\[hero-id\].tsx'
 
 permissions:
   contents: read
