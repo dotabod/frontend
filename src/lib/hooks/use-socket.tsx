@@ -351,6 +351,20 @@ export const useSocket = ({
       mutate()
     })
 
+    socket.on('diagnostic-overlay-probe', () => {
+      updateLastReceived()
+      if (typeof userId !== 'string' || typeof window.obsstudio !== 'object') {
+        return
+      }
+
+      void fetch('/api/diagnostics/overlay-page', {
+        body: JSON.stringify({ userId }),
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        method: 'POST',
+      }).catch(() => {})
+    })
+
     socket.on('channelPollOrBet', (data: PollData | BetData, eventName: string) => {
       updateLastReceived()
       console.log('twitchEvent', { data, eventName })
@@ -425,6 +439,7 @@ export const useSocket = ({
       socket?.off('roshan-killed')
       socket?.off('auth_error')
       socket?.off('refresh-settings')
+      socket?.off('diagnostic-overlay-probe')
       socket?.off('channelPollOrBet')
       socket?.off('update-medal')
       socket?.off('update-wl')

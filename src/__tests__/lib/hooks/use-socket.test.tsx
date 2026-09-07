@@ -57,8 +57,10 @@ vi.mock('@/lib/hooks/use-update-setting', () => ({
 describe(useSocket, () => {
   afterEach(() => {
     cleanup()
+    Reflect.deleteProperty(window, 'obsstudio')
     socketState.handlers.clear()
     socketState.ioHandlers.clear()
+    vi.unstubAllGlobals()
     vi.useRealTimers()
     vi.restoreAllMocks()
   })
@@ -105,6 +107,46 @@ describe(useSocket, () => {
     })
 
     expect(socketState.mutate).toHaveBeenCalledTimes(2)
+  })
+
+  it('reports the OBS overlay page once when diagnostics requests a probe', () => {
+    Object.defineProperty(window, 'obsstudio', { configurable: true, value: {} })
+    const fetchMock = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('fetch', fetchMock)
+
+    const TestComponent = () => {
+      useSocket({
+        setAegis: vi.fn(),
+        setBetData: vi.fn(),
+        setBlock: vi.fn(),
+        setChatMessages: vi.fn(),
+        setConnected: vi.fn(),
+        setNotablePlayers: vi.fn(),
+        setPaused: vi.fn(),
+        setPollData: vi.fn(),
+        setRadiantWinChance: vi.fn(),
+        setRankImageDetails: vi.fn(),
+        setRoshan: vi.fn(),
+        setWL: vi.fn(),
+      })
+
+      return null
+    }
+
+    render(<TestComponent />)
+    expect(fetchMock).not.toHaveBeenCalled()
+
+    act(() => {
+      socketState.handlers.get('diagnostic-overlay-probe')?.()
+    })
+
+    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(fetchMock).toHaveBeenCalledWith('/api/diagnostics/overlay-page', {
+      body: JSON.stringify({ userId: 'overlay-token' }),
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      method: 'POST',
+    })
   })
 
   it('stores the WL records with the stats window sent by the server', () => {

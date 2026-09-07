@@ -61,28 +61,6 @@ const OverlayPage = () => {
   const [hasShownOnce, setHasShownOnce] = useState(false)
   const reportedErrorStatus = useRef<number | null>(null)
 
-  useEffect(() => {
-    const userId = typeof router.query.userId === 'string' ? router.query.userId : null
-    if (!userId || typeof window.obsstudio !== 'object') {
-      return
-    }
-
-    const reportPageLoaded = () => {
-      fetch('/api/diagnostics/overlay-page', {
-        body: JSON.stringify({ userId }),
-        headers: { 'Content-Type': 'application/json' },
-        keepalive: true,
-        method: 'POST',
-      }).catch(() => {})
-    }
-
-    reportPageLoaded()
-    const interval = window.setInterval(reportPageLoaded, 60_000)
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [router.query.userId])
-
   const [block, setBlock] = useState<blockType>({
     matchId: null,
     team: null,
