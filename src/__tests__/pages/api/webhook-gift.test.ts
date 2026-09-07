@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import prisma from '@/lib/db'
 import { stripe } from '@/lib/stripe-server'
+import handler from '@/pages/api/stripe/webhook'
 
 // Mock the webhook handler directly
 vi.mock('@/pages/api/stripe/webhook', () => ({
@@ -19,7 +20,6 @@ vi.mock('@/pages/api/stripe/webhook', () => ({
 }))
 
 // Import the mocked handler
-import handler from '@/pages/api/stripe/webhook'
 
 // Mock dependencies
 vi.mock('@/lib/stripe-server', () => ({

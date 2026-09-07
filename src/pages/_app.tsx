@@ -45,7 +45,7 @@ interface ContainerWithRoot extends Element {
 unstableSetRender((node, container) => {
   // Use the specific type instead of any
   const containerWithRoot = container as ContainerWithRoot
-  containerWithRoot._reactRoot ||= createRoot(container)
+  containerWithRoot._reactRoot ??= createRoot(container)
   const root = containerWithRoot._reactRoot
   root.render(node)
   return async () => {

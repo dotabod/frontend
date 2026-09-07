@@ -32,12 +32,12 @@ export class GiftService {
     return (
       (await withErrorHandling(
         async () => {
-          const giftSenderName = session.metadata?.giftSenderName || 'Anonymous'
-          const giftMessage = session.metadata?.giftMessage || ''
-          const giftType = session.metadata?.giftDuration || 'monthly'
+          const giftSenderName = session.metadata?.giftSenderName ?? 'Anonymous'
+          const giftMessage = session.metadata?.giftMessage ?? ''
+          const giftType = session.metadata?.giftDuration ?? 'monthly'
 
           // Get the initial quantity from metadata
-          let giftQuantity = Number.parseInt(session.metadata?.giftQuantity || '1', 10)
+          let giftQuantity = Math.trunc(Number(session.metadata?.giftQuantity ?? '1'))
 
           // For gift credits, get the actual quantity from the line items
           // In case the customer adjusted it during checkout
@@ -47,7 +47,7 @@ export class GiftService {
               limit: 1,
             })
             if (lineItems.data.length > 0) {
-              const actualQuantity = lineItems.data[0].quantity || 1
+              const actualQuantity = lineItems.data[0].quantity ?? 1
               if (actualQuantity !== giftQuantity) {
                 giftQuantity = actualQuantity
               }
@@ -58,8 +58,8 @@ export class GiftService {
           }
 
           // Get the payment amount from the checkout session
-          const paymentAmount = session.amount_total || 0
-          const _currency = session.currency || 'usd'
+          const paymentAmount = session.amount_total ?? 0
+          const _currency = session.currency ?? 'usd'
 
           // Find the recipient user
           const recipientUser = await this.tx.user.findUnique({
@@ -89,10 +89,10 @@ export class GiftService {
             checkoutSessionId: session.id,
             giftMessage,
             giftQuantity: giftQuantity.toString(),
-            giftSenderEmail: session.metadata?.giftSenderEmail || '',
+            giftSenderEmail: session.metadata?.giftSenderEmail ?? '',
             giftSenderName,
             giftType,
-            gifterId: session.metadata?.gifterId || '',
+            gifterId: session.metadata?.gifterId ?? '',
             recipientId: recipientUserId,
           })
 
@@ -100,17 +100,17 @@ export class GiftService {
           const giftTransaction = await this.tx.giftTransaction.create({
             data: {
               recipientId: recipientUserId,
-              gifterId: session.metadata?.gifterId || null,
+              gifterId: session.metadata?.gifterId ?? null,
               giftType,
               giftQuantity,
               amount: paymentAmount || 0,
-              currency: session.currency || 'usd',
+              currency: session.currency ?? 'usd',
               stripeSessionId: session.id,
               metadata: {
                 checkoutSessionId: session.id,
                 creditAmount: creditAmount.toString(),
                 giftMessage,
-                giftSenderEmail: session.metadata?.giftSenderEmail || '',
+                giftSenderEmail: session.metadata?.giftSenderEmail ?? '',
                 giftSenderName,
               },
               // Create a relation to a placeholder gift subscription
@@ -173,7 +173,7 @@ export class GiftService {
               try {
                 // Call the apply-gift-credit API endpoint
                 const autoApplyResponse = await fetch(
-                  `${process.env.NEXTAUTH_URL || 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
+                  `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
                   {
                     body: JSON.stringify({
                       userId: recipientUserId,

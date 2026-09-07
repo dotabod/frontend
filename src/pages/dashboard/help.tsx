@@ -486,7 +486,7 @@ const TroubleshootPage = () => {
         fields: [
           {
             name: 'email',
-            value: session.data?.user?.email || session.data?.user?.name,
+            value: session.data?.user?.email ?? session.data?.user?.name,
           },
           {
             name: 'TICKET.subject',

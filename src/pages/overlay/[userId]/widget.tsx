@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import type { Socket } from 'socket.io-client'
-import io from 'socket.io-client'
+import { io } from 'socket.io-client'
 
 import { AnimatedRankBadge } from '@/components/Overlay/rank/animated-rank-badge'
 import { AnimatedWL } from '@/components/Overlay/wl/animated-wl'
@@ -112,7 +112,7 @@ const WidgetPage = () => {
 
     const steamAccount = original.SteamAccount?.[0]
     const rank = getRankDetail(
-      Number(steamAccount?.mmr ?? original.mmr ?? 0),
+      steamAccount?.mmr ?? original.mmr ?? 0,
       steamAccount?.leaderboard_rank ?? null,
     )
 

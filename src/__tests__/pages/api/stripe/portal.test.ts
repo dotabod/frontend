@@ -1,6 +1,8 @@
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import handler from '@/pages/api/stripe/portal'
+
 const getServerSessionMock = vi.fn()
 const getSubscriptionMock = vi.fn()
 const historicalSubscriptionFindFirstMock = vi.fn()
@@ -35,8 +37,6 @@ vi.mock('@/lib/stripe-server', () => ({
     },
   },
 }))
-
-import handler from '@/pages/api/stripe/portal'
 
 describe('/api/stripe/portal', () => {
   beforeEach(() => {

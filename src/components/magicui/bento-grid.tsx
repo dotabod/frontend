@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
 
 import { MagicCard } from './magic-card'

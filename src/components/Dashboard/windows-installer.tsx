@@ -100,7 +100,7 @@ const WindowsInstaller = () => {
   const track = useTrack()
   const router = useRouter()
   const session = useSession()
-  const port = Number.parseInt(router.query.port as string, 10)
+  const port = Math.trunc(Number(router.query.port))
   const sanitizedPort = Number.isNaN(port) ? 8089 : Math.min(Math.max(port, 8000), 9000)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)

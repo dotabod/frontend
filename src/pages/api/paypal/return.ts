@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
  * authoritative source). For lifetime orders we capture the payment.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://dotabod.com'
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
   const billingUrl = `${baseUrl}/dashboard/billing`
   const type = req.query.type as string
 

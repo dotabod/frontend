@@ -1,5 +1,5 @@
 import { Typography } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 
@@ -120,7 +120,7 @@ const ScrollingText = ({ text, className }: { text: string; className?: string }
 const FALLBACK_IMAGE = 'https://cdn.7tv.app/emote/01FWR6BNTR0007SGPMW6AKG0Q9/4x.avif'
 
 const isValidImageUrl = (url?: string | null) =>
-  Boolean(url) && (url?.startsWith('http://') || url?.startsWith('https://'))
+  Boolean(url) && (url?.startsWith('http://') ?? url?.startsWith('https://'))
 
 const AlbumArtImage = ({
   albumArt,
@@ -138,7 +138,7 @@ const AlbumArtImage = ({
   return (
     <motion.img
       src={src}
-      alt={`${album || 'Album'} cover`}
+      alt={`${album ?? 'Album'} cover`}
       width={imageSize}
       height={imageSize}
       initial={{ opacity: 0 }}
@@ -187,7 +187,7 @@ const LastFmCard = ({
       <div className={clsx('flex items-center gap-2')}>
         <AnimatePresence mode='wait'>
           <motion.div
-            key={track.albumArt || 'no-art'}
+            key={track.albumArt ?? 'no-art'}
             className='flex-shrink-0 overflow-hidden rounded-md shadow-md'
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{

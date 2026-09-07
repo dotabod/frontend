@@ -28,7 +28,7 @@ export const createAndStoreCryptoInvoice = async function createAndStoreCryptoIn
 
   const priceAmount = amountRemaining / 100
   const priceCurrency = (stripeInvoice.currency || 'usd').toLowerCase()
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://dotabod.com'
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
 
   const npInvoice = await createNowPaymentsInvoice({
     cancel_url: `${baseUrl}/dashboard/billing?paid=false`,

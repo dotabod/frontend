@@ -503,7 +503,7 @@ const handleOpenNodeInvoicePaid = async function handleOpenNodeInvoicePaid(
     (await withErrorHandling(
       async () => {
         // First, try to get price ID from invoice metadata (most reliable for crypto payments)
-        let priceId: string | null = invoice.metadata?.stripePriceId || null
+        let priceId: string | null = invoice.metadata?.stripePriceId ?? null
 
         // If not in metadata, extract from line items (fallback for regular invoices)
         if (!priceId) {
@@ -691,7 +691,7 @@ const handleOpenNodeInvoicePaid = async function handleOpenNodeInvoicePaid(
               priceId,
               customerId,
               tx,
-              existingSubscription.currentPeriodEnd || new Date(),
+              existingSubscription.currentPeriodEnd ?? new Date(),
             )
           }
           // This is a renewal - extend existing subscription
@@ -728,7 +728,7 @@ const handleCryptoRenewal = async function handleCryptoRenewal(
   const baseDate =
     subscription.currentPeriodEnd instanceof Date
       ? subscription.currentPeriodEnd
-      : new Date(subscription.currentPeriodEnd || Date.now())
+      : new Date(subscription.currentPeriodEnd ?? Date.now())
 
   const newPeriodEnd = new Date(baseDate)
   if (isAnnual) {

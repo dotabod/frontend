@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'BILLING.SUBSCRIPTION.UPDATED':
       case 'PAYMENT.SALE.COMPLETED': {
         // For recurring payments the subscription id is on billing_agreement_id.
-        const subscriptionId = resource.billing_agreement_id || resource.id
+        const subscriptionId = resource.billing_agreement_id ?? resource.id
         if (subscriptionId) {
           await syncPaypalSubscription(subscriptionId)
         }

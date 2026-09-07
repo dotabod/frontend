@@ -1,5 +1,5 @@
 import { Alert, Checkbox, Collapse, Spin, Tag } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useEffect, useState } from 'react'
 
 import CommandDetail from '@/components/Dashboard/command-detail'

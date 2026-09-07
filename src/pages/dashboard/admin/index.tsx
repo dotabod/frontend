@@ -107,7 +107,7 @@ const AdminPage = () => {
       form.setFieldsValue({
         message: message.message,
         sendAt: message.sendAt,
-        userId: message.userId || '',
+        userId: message.userId ?? '',
       })
     } else {
       setEditingMessage(null)
@@ -189,7 +189,7 @@ const AdminPage = () => {
     },
     {
       key: 'recipient',
-      render: (_, record) => (record.isForAllUsers ? 'All Users' : record.userId || 'Unknown'),
+      render: (_, record) => (record.isForAllUsers ? 'All Users' : (record.userId ?? 'Unknown')),
       title: 'Recipient',
     },
     {
@@ -335,7 +335,7 @@ const AdminPage = () => {
                   ? {
                       message: editingMessage.message,
                       sendAt: editingMessage.sendAt,
-                      userId: editingMessage.userId || '',
+                      userId: editingMessage.userId ?? '',
                     }
                   : {
                       message: '',

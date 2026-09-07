@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { useId } from 'react'
 

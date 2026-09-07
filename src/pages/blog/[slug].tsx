@@ -164,7 +164,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   })
 
   // Ensure date is a string for serialization
-  const date = processedData.date || new Date().toISOString()
+  const date = processedData.date ?? new Date().toISOString()
 
   // Convert date to string if it's a Date object
   const dateString = date instanceof Date ? date.toISOString() : String(date)
@@ -172,13 +172,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       meta: {
-        author: processedData.author || null,
+        author: processedData.author ?? null,
         date: dateString,
-        description: processedData.description || '',
-        image: processedData.image || null,
+        description: processedData.description ?? '',
+        image: processedData.image ?? null,
         // Add slug to meta for canonical URL
         slug,
-        title: processedData.title || 'Untitled',
+        title: processedData.title ?? 'Untitled',
       },
       source: mdxSource,
     },

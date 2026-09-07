@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import io from 'socket.io-client'
+import { io } from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
 
 import type { WLData, WLRecord } from './use-socket'
@@ -37,7 +37,7 @@ export const useWinLoss = function useWinLoss({
   const lastRequestedWindowRef = useRef<string | null>(null)
   const requestIdRef = useRef(0)
   const requestCurrentWLRef = useRef<((force?: boolean) => void) | null>(null)
-  const isPreview = userId != null
+  const isPreview = userId !== null && userId !== undefined
 
   statsDaysRef.current = statsDays
   statsStartDateRef.current = statsStartDate

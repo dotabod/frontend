@@ -2,6 +2,10 @@ import type { NextApiHandler } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getServerSession } from '@/lib/api/get-server-session'
+import prisma from '@/lib/db'
+import handler from '@/pages/api/notifications'
+
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
 vi.mock('@/lib/db', () => ({
   default: {
@@ -10,13 +14,9 @@ vi.mock('@/lib/db', () => ({
   },
 }))
 vi.mock('@/lib/api-middlewares/with-methods', () => ({
-  withMethods: (_methods: string[], handler: NextApiHandler) => handler,
+  withMethods: (_methods: string[], nextHandler: NextApiHandler) => nextHandler,
 }))
 vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: vi.fn() }))
-
-import { getServerSession } from '@/lib/api/get-server-session'
-import prisma from '@/lib/db'
-import handler from '@/pages/api/notifications'
 
 const auth = (userId: string | null) =>
   vi.mocked(getServerSession).mockResolvedValue(userId ? ({ user: { id: userId } } as any) : null)

@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { Button } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { signIn, useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
@@ -33,7 +33,7 @@ export const LoginButton = ({ className, ...props }: LoginButtonProps) => {
           ? router.push('/dashboard')
           : signIn('twitch', {
               callbackUrl:
-                searchParams?.get('from') || searchParams?.get('callbackUrl') || '/dashboard',
+                searchParams?.get('from') ?? searchParams?.get('callbackUrl') ?? '/dashboard',
               redirect: false,
             })
               .then((e) => {

@@ -1,8 +1,13 @@
 // @ts-nocheck
+
+import { GraphQLClient } from 'graphql-request'
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { get7TVUser } from '@/lib/7tv'
+import { getServerSession } from '@/lib/api/get-server-session'
 import handler from '@/pages/api/update-emote-set'
+import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 const mockChatBotModule = vi.hoisted(() => ({
   emotesRequired: [
@@ -85,12 +90,7 @@ vi.mock('@/lib/get-twitch-tokens', () => ({
   }),
 }))
 
-import { GraphQLClient } from 'graphql-request'
-
 // Import mocked modules
-import { get7TVUser } from '@/lib/7tv'
-import { getServerSession } from '@/lib/api/get-server-session'
-import { canAccessFeature, getSubscription } from '@/utils/subscription'
 
 describe('update-emote-set API', () => {
   let mockRequest: ReturnType<typeof vi.fn>

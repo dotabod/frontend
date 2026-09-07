@@ -43,7 +43,7 @@ const HomepageShell = ({
   const defaultTitle = 'Dotabod - Enhance Your Dota 2 Streaming Experience'
   const defaultDescription =
     'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!'
-  const host = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL || 'dotabod.com'
+  const host = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ?? 'dotabod.com'
   const baseUrl = `https://${host}`
   // Generate dynamic OG image URL using parameters
   let defaultOgImage = '/images/welcome.png'
@@ -70,13 +70,13 @@ const HomepageShell = ({
     : baseUrl
 
   // Use SEO props if provided, otherwise use defaults
-  const pageTitle = seo?.title || (title as string) || defaultTitle
-  const pageDescription = seo?.description || defaultDescription
-  const pageImage = seo?.ogImage || defaultOgImage
+  const pageTitle = seo?.title ?? (title as string) ?? defaultTitle
+  const pageDescription = seo?.description ?? defaultDescription
+  const pageImage = seo?.ogImage ?? defaultOgImage
   // Ensure pageImage is an absolute URL
   const absolutePageImage = pageImage.startsWith('http') ? pageImage : `${baseUrl}${pageImage}`
-  const pageUrl = seo?.canonicalUrl || defaultUrl
-  const pageType = seo?.ogType || 'website'
+  const pageUrl = seo?.canonicalUrl ?? defaultUrl
+  const pageType = seo?.ogType ?? 'website'
 
   return (
     <>

@@ -1,6 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import WhatsNewFeatureCard from '@/components/Dashboard/Features/whats-new-feature-card'
+import type { WhatsNewEntry } from '@/lib/whats-new'
+
 vi.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
 }))
@@ -26,9 +29,6 @@ vi.mock('@/components/Dashboard/command-detail', () => ({
     },
   },
 }))
-
-import WhatsNewFeatureCard from '@/components/Dashboard/Features/whats-new-feature-card'
-import type { WhatsNewEntry } from '@/lib/whats-new'
 
 const entry: WhatsNewEntry = {
   blogSlug: 'hello-world',

@@ -43,7 +43,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
             id: `${BigInt(player.steamid) - 76_561_197_960_265_728n}`,
             name: player.personaname,
           }),
-        ) || [],
+        ) ?? [],
     })
     return
   } catch (error) {

@@ -48,8 +48,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     SETTINGS_SWR_OPTIONS,
   )
 
-  const formattedCreditBalance = creditBalanceData?.formatted || '$0.00'
-  const creditBalance = creditBalanceData?.balance || 0
+  const formattedCreditBalance = creditBalanceData?.formatted ?? '$0.00'
+  const creditBalance = creditBalanceData?.balance ?? 0
 
   return (
     <SubscriptionContext.Provider

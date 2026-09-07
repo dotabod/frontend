@@ -30,5 +30,5 @@ const DOTA_FINDING_MATCH_LABELS: Readonly<Record<string, string>> = {
 export const getDotaFindingMatchLabel = function getDotaFindingMatchLabel(
   locale?: string | null,
 ): string {
-  return (locale && DOTA_FINDING_MATCH_LABELS[locale]) || DOTA_FINDING_MATCH_LABELS.en
+  return (locale && DOTA_FINDING_MATCH_LABELS[locale]) ?? DOTA_FINDING_MATCH_LABELS.en
 }

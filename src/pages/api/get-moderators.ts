@@ -40,7 +40,7 @@ export const getModerators = async function getModerators(
       const response = await fetch(url.toString(), {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Client-Id': process.env.TWITCH_CLIENT_ID || '',
+          'Client-Id': process.env.TWITCH_CLIENT_ID ?? '',
         },
         method: 'GET',
       })

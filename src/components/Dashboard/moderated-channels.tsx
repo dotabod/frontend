@@ -103,7 +103,7 @@ const ModeratedChannels = () => {
         onError={(e) => {
           e.currentTarget.src = '/images/hero/default.png'
         }}
-        src={imageSrc || '/images/hero/default.png'}
+        src={imageSrc ?? '/images/hero/default.png'}
       />
       <span>{name}</span>
     </div>

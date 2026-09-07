@@ -18,7 +18,8 @@ const TERMINAL_STATUSES = new Set([
   'warning',
   'unknown',
 ])
-const isTerminalStatus = (type?: string) => type != null && TERMINAL_STATUSES.has(type)
+const isTerminalStatus = (type?: string) =>
+  type !== null && type !== undefined && TERMINAL_STATUSES.has(type)
 
 interface PaymentStatus {
   invoiceId: string
@@ -122,7 +123,7 @@ export const PaymentStatusAlert = () => {
       const res = await fetch('/api/stripe/crypto-invoice', { method: 'POST' })
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({ error: res.statusText }))
-        throw new Error(errBody?.error || `Request failed: ${res.status}`)
+        throw new Error(errBody?.error ?? `Request failed: ${res.status}`)
       }
       const { url } = await res.json()
       if (!url) {
@@ -224,7 +225,7 @@ export const PaymentStatusAlert = () => {
       <p>{paymentStatus.statusInfo.description}</p>
       <dl className='mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs opacity-80'>
         <dt>Invoice</dt>
-        <dd>{paymentStatus.invoice.number || paymentStatus.invoiceId}</dd>
+        <dd>{paymentStatus.invoice.number ?? paymentStatus.invoiceId}</dd>
         <dt>Amount</dt>
         <dd>
           {paymentStatus.amount} {(paymentStatus.currency ?? '').toUpperCase()}

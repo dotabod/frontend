@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/nextjs'
 import { Alert, Button, Form, Input, message, Select, Space, Spin, Tooltip } from 'antd'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import OBSWebSocket from 'obs-websocket-js'
+import { OBSWebSocket } from 'obs-websocket-js'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -141,10 +141,10 @@ const ObsSetup: React.FC = () => {
       setError({
         actionable: true,
         code: 'CONNECTION_CLOSED',
-        details: error?.message || 'Unknown error',
+        details: error?.message ?? 'Unknown error',
         message: 'Connection to OBS lost',
       })
-      track('obs/connection_closed', { error: error?.message || 'No error details' })
+      track('obs/connection_closed', { error: error?.message ?? 'No error details' })
     }
 
     const handleConnectionError = (error: Error) => {
@@ -180,8 +180,8 @@ const ObsSetup: React.FC = () => {
 
       try {
         const obsHost = 'localhost'
-        const obsPortValue = form.getFieldValue('port') || 4455
-        const obsPasswordValue = form.getFieldValue('password') || ''
+        const obsPortValue = form.getFieldValue('port') ?? 4455
+        const obsPasswordValue = form.getFieldValue('password') ?? ''
 
         await obs.connect(`ws://${obsHost}:${obsPortValue}`, obsPasswordValue, {
           eventSubscriptions: 0b1111_1111_1111_1111,

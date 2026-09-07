@@ -67,8 +67,8 @@ export const parseLastFmResponse = function parseLastFmResponse(
   }
 
   const albumArtUrl =
-    recentTrack.image?.find((img: LastFmImage) => img.size === 'medium')?.['#text'] ||
-    recentTrack.image?.[0]?.['#text'] ||
+    recentTrack.image?.find((img: LastFmImage) => img.size === 'medium')?.['#text'] ??
+    recentTrack.image?.[0]?.['#text'] ??
     null
 
   const albumArt = albumArtUrl?.includes(LASTFM_PLACEHOLDER_HASH) ? null : albumArtUrl
@@ -115,7 +115,7 @@ export const useLastFm = function useLastFm() {
       const parsed = parseLastFmResponse(data)
 
       if (!parsed) {
-        setError(data?.message || 'Not currently playing anything')
+        setError(data?.message ?? 'Not currently playing anything')
         setTrack(null)
         return
       }

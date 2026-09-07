@@ -30,12 +30,12 @@ export const getAllPosts = function getAllPosts(): Post[] {
         : new Date().toISOString()
 
       return {
-        author: data.author || null,
+        author: data.author ?? null,
         date,
-        description: data.description || '',
+        description: data.description ?? '',
         draft: Boolean(data.draft),
         slug: filename.replace(/\.md$/u, ''),
-        title: data.title || 'Untitled',
+        title: data.title ?? 'Untitled',
       }
     })
     .filter((post) => !post.draft)

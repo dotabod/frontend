@@ -36,6 +36,7 @@ const socketState = vi.hoisted(() => {
 
 vi.mock('socket.io-client', () => ({
   default: socketState.io,
+  io: socketState.io,
 }))
 
 vi.mock('@/lib/db', () => ({

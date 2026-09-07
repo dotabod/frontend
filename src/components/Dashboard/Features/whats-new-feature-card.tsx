@@ -81,9 +81,9 @@ const WhatsNewFeatureCard = ({
         <p className='mt-2 mb-0! text-sm leading-6 text-gray-300'>{entry.description}</p>
       </div>
 
-      {(entry.demoCommand || entry.demo?.chat || entry.demo?.exampleUrl) && (
+      {(entry.demoCommand ?? entry.demo?.chat ?? entry.demo?.exampleUrl) && (
         <div className='mt-5 rounded-md border border-gray-700 bg-gray-950/40 p-4'>
-          {(entry.demoCommand || entry.demo?.chat) && (
+          {(entry.demoCommand ?? entry.demo?.chat) && (
             <div className='mb-2 text-xs font-medium text-gray-400'>Example in chat</div>
           )}
           <div className='whats-new-command-demo text-sm text-gray-300'>

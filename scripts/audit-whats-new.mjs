@@ -14,7 +14,7 @@ const cdpUrl = option('cdp-url', process.env.FRONTEND_CDP_URL ?? 'http://127.0.0
   /\/$/u,
   '',
 )
-const axeScriptPath = option('axe-script', process.env.FRONTEND_AXE_SCRIPT || null)
+const axeScriptPath = option('axe-script', process.env.FRONTEND_AXE_SCRIPT ?? null)
 const outputDir = path.resolve(
   option('output-dir', process.env.FRONTEND_OUTPUT_DIR ?? 'artifacts/whats-new'),
 )
@@ -63,7 +63,7 @@ const evaluate = async function evaluate(expression, awaitPromise = false) {
   const result = await send('Runtime.evaluate', { awaitPromise, expression, returnByValue: true })
   if (result.exceptionDetails) {
     const description = result.exceptionDetails.exception?.description
-    throw new Error(description || result.exceptionDetails.text || 'Browser evaluation failed')
+    throw new Error(description ?? result.exceptionDetails.text ?? 'Browser evaluation failed')
   }
   return result.result.value
 }

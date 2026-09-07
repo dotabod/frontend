@@ -20,7 +20,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     if (!subscription?.metadata || typeof subscription.metadata !== 'object') {
       return 0
     }
-    return Number((subscription.metadata as Record<string, unknown>).creditBalance || 0)
+    return Number((subscription.metadata as Record<string, unknown>).creditBalance ?? 0)
   }, [subscription?.metadata])
 
   const statusInfo = getSubscriptionStatusInfo(
@@ -38,7 +38,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
   const commonClasses = 'flex items-center gap-2'
   const tooltipProps = {
     placement: collapsed ? ('right' as const) : undefined,
-    title: statusInfo?.message || 'Manage your subscription',
+    title: statusInfo?.message ?? 'Manage your subscription',
   }
 
   // Determine badge status
@@ -150,7 +150,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
     </div>
   ) : (
     <div className={`${commonClasses} justify-center`}>
-      <Tooltip title={badgeDetails?.tooltip || tooltipProps.title}>
+      <Tooltip title={badgeDetails?.tooltip ?? tooltipProps.title}>
         <Link href='/dashboard/billing' className='no-underline'>
           {isLoading || !currentPlan ? (
             <Skeleton.Button
@@ -162,7 +162,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
             />
           ) : (
             <Tag
-              color={badgeDetails?.color || statusInfo?.badge}
+              color={badgeDetails?.color ?? statusInfo?.badge}
               className='w-full rounded-md px-3 py-1.5 transition-all duration-200 hover:shadow-md'
             >
               <div className={`${commonClasses} w-full justify-center`}>

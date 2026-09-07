@@ -1,5 +1,5 @@
 import { Button, Progress, Select, Spin } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import Image from 'next/image'
 import { forwardRef } from 'react'
 
@@ -112,7 +112,7 @@ const LanguageCard = () => {
         <Spin size='small' />
       ) : (
         <>
-          <NumberTicker value={data?.total || data?.percentage || 0} />
+          <NumberTicker value={data?.total ?? data?.percentage ?? 0} />
           {!data?.total && data?.percentage && <span>% of</span>}
         </>
       )}
@@ -202,7 +202,8 @@ const LanguageCard = () => {
           target='_blank'
           type='link'
         >
-          {languageProgress?.data?.translationProgress != null &&
+          {languageProgress?.data?.translationProgress !== null &&
+          languageProgress?.data?.translationProgress !== undefined &&
           languageProgress.data.translationProgress < 100
             ? 'Help complete on Crowdin'
             : 'Fix locale issues on Crowdin'}

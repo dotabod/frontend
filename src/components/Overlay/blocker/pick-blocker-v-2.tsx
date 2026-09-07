@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 
 import { useIsDevMode } from '@/lib/hooks/use-is-dev-mode'
 

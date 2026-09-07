@@ -12,7 +12,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { useDispatch } from 'react-redux'
-import io from 'socket.io-client'
+import { io } from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
 
 import type { NotablePlayer } from '@/components/Overlay/notable-players'
@@ -304,7 +304,7 @@ export const useSocket = ({
       updateLastReceived()
       const messageWithTimestamp = {
         ...data,
-        timestamp: data.timestamp || Date.now(),
+        timestamp: data.timestamp ?? Date.now(),
       }
 
       // Add message to state

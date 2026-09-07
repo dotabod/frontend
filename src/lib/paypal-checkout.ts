@@ -21,7 +21,7 @@ const getPlanId = function getPlanId(period: 'monthly' | 'annual'): string {
 }
 
 const getLifetimeAmountCents = function getLifetimeAmountCents(): number {
-  const cents = Number.parseInt(process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS ?? '', 10)
+  const cents = Math.trunc(Number(process.env.LIFETIME_SUBSCRIPTION_PRICE_CENTS ?? ''))
   if (!Number.isFinite(cents) || cents <= 0) {
     throw new Error('LIFETIME_SUBSCRIPTION_PRICE_CENTS is not configured')
   }
@@ -34,7 +34,7 @@ export const createPaypalApproval = async function createPaypalApproval(params: 
   email?: string
 }): Promise<string> {
   const { period, userId, email } = params
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://dotabod.com'
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://dotabod.com'
   const cancelUrl = `${baseUrl}/dashboard/billing?paid=false`
   const stripePriceId = displayPriceId(period)
 

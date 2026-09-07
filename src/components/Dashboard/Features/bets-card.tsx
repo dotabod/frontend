@@ -1,5 +1,5 @@
 import { Button, Form, Spin, Tag } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import Image from 'next/image'
 import { useEffect } from 'react'
 

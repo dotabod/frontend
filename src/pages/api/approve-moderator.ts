@@ -88,7 +88,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
       return
     }
 
-    const parsedModeratorChannelIds = moderatorChannelIds.map((id) => Number.parseInt(id, 10))
+    const parsedModeratorChannelIds = moderatorChannelIds.map((id) => Math.trunc(Number(id)))
 
     const parseResult = approvedModeratorSchema.safeParse(parsedModeratorChannelIds)
     if (!parseResult.success) {

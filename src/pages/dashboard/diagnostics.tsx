@@ -3,7 +3,7 @@ import { Activity, CircleCheck, CircleX, LoaderCircle } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import io from 'socket.io-client'
+import { io } from 'socket.io-client'
 import useSWR from 'swr'
 
 import DashboardShell from '@/components/Dashboard/dashboard-shell'

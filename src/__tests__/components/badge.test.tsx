@@ -12,7 +12,7 @@ vi.mock('@/lib/hooks/use-transform-res', () => ({
 // Mock next/image
 vi.mock('next/image', () => ({
   default: (props: React.HTMLAttributes<HTMLImageElement> & { 'data-testid'?: string }) => (
-    <img data-testid={props['data-testid'] || 'mock-image'} alt='' {...props} />
+    <img data-testid={props['data-testid'] ?? 'mock-image'} alt='' {...props} />
   ),
 }))
 

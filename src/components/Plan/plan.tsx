@@ -1,7 +1,7 @@
 import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { SubscriptionTier } from '@prisma/client'
 import { App, Button, Tooltip } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { Bitcoin, Wallet } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import Image from 'next/image'

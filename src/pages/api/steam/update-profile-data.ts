@@ -100,14 +100,14 @@ export const rankTierToMmr = function rankTierToMmr(rankTier: string | number) {
   // Just gonna guess an immortal without standing is 6k mmr
   if (intRankTier > 77) {
     // Get the highest MMR from the ranks array
-    const highestRankMMR = ranks.at(-1)?.range[1] || 5619
+    const highestRankMMR = ranks.at(-1)?.range[1] ?? 5619
     return highestRankMMR + 50
   }
 
   // Floor to 5
   const stars = intRankTier % 10 > 5 ? 5 : intRankTier % 10
   const rank = ranks.find((rank) =>
-    rank.image.startsWith(`${Math.floor(Number(intRankTier / 10))}${stars}`),
+    rank.image.startsWith(`${Math.floor(intRankTier / 10)}${stars}`),
   )
 
   // Middle of range
@@ -136,7 +136,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     const steamAccount = await prisma.steamAccount.findFirst({
       where: {
         OR: [{ userId: session.user.id }, { connectedUserIds: { has: session.user.id } }],
-        steam32Id: Number.parseInt(steam32Id.toString(), 10),
+        steam32Id: Math.trunc(Number(steam32Id)),
       },
     })
 
@@ -146,7 +146,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     }
 
     // Fetch profile data from OpenDota API
-    const accountId = Number.parseInt(steam32Id.toString(), 10)
+    const accountId = Math.trunc(Number(steam32Id))
     const profile = await fetchOpenDotaProfile(accountId)
 
     if (!profile) {
@@ -160,7 +160,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     // Update the steam account with the new MMR and leaderboard rank
     const updatedAccount = await prisma.steamAccount.update({
       data: {
-        leaderboard_rank: profile.leaderboard_rank || null,
+        leaderboard_rank: profile.leaderboard_rank ?? null,
         mmr: estimatedMMR,
         updatedAt: new Date(),
       },

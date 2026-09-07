@@ -1,7 +1,7 @@
 import { Center } from '@mantine/core'
 import * as Sentry from '@sentry/nextjs'
 import { Alert, App, Spin } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -129,7 +129,7 @@ const OverlayPage = () => {
     const isOldOBS =
       // New OBS uses browser source/docks CEF (Chromium) version 127 (6533)
       // Check if we're running in an older version that needs compatibility
-      Number.parseInt(/Chrome\/(\d+)/u.exec(navigator.userAgent)?.[1] || '999', 10) < 127
+      Math.trunc(Number(/Chrome\/(\d+)/u.exec(navigator.userAgent)?.[1] ?? '999')) < 127
 
     setIsOldObs(isOldOBS)
   }, [])

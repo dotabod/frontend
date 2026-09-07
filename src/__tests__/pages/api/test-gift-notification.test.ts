@@ -1,8 +1,11 @@
 // @ts-nocheck
+
 import type { GiftSubscription, SubscriptionStatus, SubscriptionTier } from '@prisma/client'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getServerSession } from '@/lib/api/get-server-session'
+import prisma from '@/lib/db'
 import handler from '@/pages/api/test-gift-notification'
 
 // Mock dependencies
@@ -39,8 +42,6 @@ vi.mock('@/lib/db', () => ({
 }))
 
 // Import the mocked dependencies
-import { getServerSession } from '@/lib/api/get-server-session'
-import prisma from '@/lib/db'
 
 describe('test-gift-notification API', () => {
   beforeEach(() => {

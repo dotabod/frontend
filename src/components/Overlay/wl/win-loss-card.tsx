@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 
 import { Card } from '@/components/card'
 import { Settings } from '@/lib/default-settings'

@@ -91,10 +91,10 @@ const DetailPage = ({
   const summaryChips = [...rarityCounts.entries()]
     .map(([rarity, count]) => ({ count, meta: RARITY_META[rarity], rarity }))
     .filter((x) => x.meta && x.meta.rank >= 3)
-    .sort((a, b) => b.meta.rank - a.meta.rank)
+    .toSorted((a, b) => b.meta.rank - a.meta.rank)
     .slice(0, 4)
 
-  const topAccent = (sorted[0] && rarityOf(sorted[0])?.color) || '#9146ff'
+  const topAccent = (sorted[0] && rarityOf(sorted[0])?.color) ?? '#9146ff'
 
   const pageTitle = `${displayName}'s ${heroName} cosmetics | Dotabod`
   const pageDescription = `${heroName} loadout: ${items.length} equipped cosmetics, each linked to the Steam Community Market.`
@@ -278,7 +278,7 @@ export const getServerSideProps: GetServerSideProps<DetailPageProps> = async ({ 
 
   const loadouts = user.cosmeticLoadouts
   // Same ordering as the collection grid so prev/next match what the user just saw.
-  const ordered = [...loadouts].sort((a, b) => {
+  const ordered = loadouts.toSorted((a, b) => {
     const aBest = bestRank(a.items as unknown as CosmeticItem[])
     const bBest = bestRank(b.items as unknown as CosmeticItem[])
     if (bBest !== aBest) {
@@ -304,7 +304,7 @@ export const getServerSideProps: GetServerSideProps<DetailPageProps> = async ({ 
 
   return {
     props: {
-      displayName: user.displayName || user.name,
+      displayName: user.displayName ?? user.name,
       heroId: current.heroId,
       heroImage: heroImg ? `${STEAM_CDN}${heroImg}` : null,
       heroName: current.heroName,

@@ -99,8 +99,8 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
   const ghostCount = Math.min(6, remaining)
 
   const topAccent =
-    (featured?.bestRarity && RARITY_META[featured.bestRarity]?.color) ||
-    (cards[0]?.bestRarity && RARITY_META[cards[0].bestRarity]?.color) ||
+    (featured?.bestRarity && RARITY_META[featured.bestRarity]?.color) ??
+    (cards[0]?.bestRarity && RARITY_META[cards[0].bestRarity]?.color) ??
     '#9146ff'
 
   const pageTitle = `${displayName}'s hero cosmetic collection | Dotabod`
@@ -136,7 +136,7 @@ const SetPage = ({ username, displayName, image, rosterSize, cards, tally }: Set
                 onError={(e) => {
                   e.currentTarget.src = '/images/hero/default.png'
                 }}
-                src={image || '/images/hero/default.png'}
+                src={image ?? '/images/hero/default.png'}
                 alt={displayName}
                 width={28}
                 height={28}
@@ -307,7 +307,7 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
       }
     })
     // Binder opens on the holos: rarity desc, then most recent.
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       const byRarity =
         (b.bestRarity ? (RARITY_META[b.bestRarity]?.rank ?? -1) : -1) -
         (a.bestRarity ? (RARITY_META[a.bestRarity]?.rank ?? -1) : -1)
@@ -328,13 +328,13 @@ export const getServerSideProps: GetServerSideProps<SetPageProps> = async ({ par
   }
   const tally = [...tallyCounts.entries()]
     .map(([rarity, count]) => ({ count, rarity }))
-    .sort((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
+    .toSorted((a, b) => (RARITY_META[b.rarity]?.rank ?? 0) - (RARITY_META[a.rarity]?.rank ?? 0))
     .slice(0, 4)
 
   return {
     props: {
       cards,
-      displayName: user.displayName || user.name,
+      displayName: user.displayName ?? user.name,
       image: user.image,
       rosterSize,
       tally,

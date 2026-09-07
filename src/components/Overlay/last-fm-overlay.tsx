@@ -1,5 +1,5 @@
 import { Form, Input, Typography } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useEffect, useRef, useState } from 'react'
 
 import { Settings } from '@/lib/default-settings'

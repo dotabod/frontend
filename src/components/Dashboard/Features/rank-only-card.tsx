@@ -1,5 +1,5 @@
 import { Button, Form, Select, Spin } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useEffect, useState } from 'react'
 
 import { Settings } from '@/lib/default-settings'
@@ -53,7 +53,7 @@ export const RankOnlyCard = () => {
 
   const handleFormSubmit = (values: FormValues) => {
     // Automatically determine the minimumRankTier based on the selected rank
-    const minimumRank = values.minimumRank || 'Herald'
+    const minimumRank = values.minimumRank ?? 'Herald'
     const minimumRankTier = rankToTier[minimumRank] || rankToTier.Herald
 
     updateInfo({

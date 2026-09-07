@@ -305,7 +305,7 @@ export const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
   {
     tier: SUBSCRIPTION_TIERS.PRO,
     // Can only gift monthly for now
-    monthly: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID || '',
+    monthly: process.env.NEXT_PUBLIC_STRIPE_CREDIT_PRICE_ID ?? '',
     annual: '',
     lifetime: '',
   },
@@ -313,9 +313,9 @@ export const GIFT_PRICE_IDS: SubscriptionPriceId[] = [
 
 const PRICE_IDS: SubscriptionPriceId[] = [
   {
-    annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || '',
-    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID || '',
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
+    annual: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID ?? '',
+    lifetime: process.env.NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID ?? '',
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? '',
     tier: SUBSCRIPTION_TIERS.PRO,
   },
 ]
@@ -396,7 +396,7 @@ export const getSubscription = async function getSubscription(
   userId: string,
   tx?: Prisma.TransactionClient,
 ) {
-  const db = tx || prisma
+  const db = tx ?? prisma
 
   // Find all active subscriptions for the user
   const subscriptions = await db.subscription.findMany({
@@ -499,8 +499,8 @@ export const calculateSavings = function calculateSavings(
   monthlyPrice: string,
   annualPrice: string,
 ): number {
-  const monthly = Number.parseFloat(monthlyPrice.replace('$', '')) * 12
-  const annual = Number.parseFloat(annualPrice.replace('$', ''))
+  const monthly = Number(monthlyPrice.replace('$', '')) * 12
+  const annual = Number(annualPrice.replace('$', ''))
   return Math.round(((monthly - annual) / monthly) * 100)
 }
 
@@ -780,7 +780,7 @@ export const getBillingSummaryInfo = function getBillingSummaryInfo({
         ? 'Manage billing in Stripe'
         : 'No Stripe billing profile',
       statusLabel: 'Ending',
-      tone: statusInfo?.type || 'warning',
+      tone: statusInfo?.type ?? 'warning',
     }
   }
 
@@ -951,10 +951,10 @@ export const getSubscriptionTier = function getSubscriptionTier(
     const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS, ...CRYPTO_PRICE_IDS]
 
     const tierFromPrice = allPriceIds.find((price) =>
-      [price.monthly, price.annual, price.lifetime].includes(priceId || ''),
+      [price.monthly, price.annual, price.lifetime].includes(priceId ?? ''),
     )?.tier
 
-    return tierFromPrice || SUBSCRIPTION_TIERS.PRO
+    return tierFromPrice ?? SUBSCRIPTION_TIERS.PRO
   }
 
   return SUBSCRIPTION_TIERS.FREE

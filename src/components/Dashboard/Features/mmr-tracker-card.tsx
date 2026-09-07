@@ -1,5 +1,5 @@
 import { Tag, Tooltip } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 
 import { Settings } from '@/lib/default-settings'
 import { Card } from '@/ui/card'

@@ -15,7 +15,7 @@ const settingsSchema = {
     duration: z
       .string()
       .regex(/^\d+$/u, 'Duration must be a numeric string')
-      .transform((str) => Number.parseInt(str, 10))
+      .transform((str) => Math.trunc(Number(str)))
       .refine((num) => num >= 30 && num <= 1800, {
         message: 'Duration must be between 30 and 1800 seconds',
       }),

@@ -120,7 +120,7 @@ const SetupPage = () => {
   const router = useRouter()
   const maxStepIndex = 3
   const active = useMemo(() => {
-    const parsedStep = Number.parseInt(router.query.step as string, 10)
+    const parsedStep = Math.trunc(Number(router.query.step))
     return !Number.isNaN(parsedStep) && parsedStep > 0 ? Math.min(parsedStep - 1, maxStepIndex) : 0
   }, [router.query.step])
   const didJustPay = router.query.paid === 'true'
@@ -135,7 +135,7 @@ const SetupPage = () => {
   const trialDays = (() => {
     // If trial days are provided in the URL (from checkout success redirect), use that
     const trialDaysFromUrl = router.query.trialDays
-      ? Number.parseInt(router.query.trialDays as string, 10)
+      ? Math.trunc(Number(router.query.trialDays))
       : null
     if (trialDaysFromUrl !== null && !Number.isNaN(trialDaysFromUrl)) {
       return trialDaysFromUrl
@@ -152,9 +152,7 @@ const SetupPage = () => {
 
   // Get gift information from URL query params
   const hasGiftSubs = router.query.hasGifts === 'true'
-  const giftCount = router.query.giftCount
-    ? Number.parseInt(router.query.giftCount as string, 10)
-    : 0
+  const giftCount = router.query.giftCount ? Math.trunc(Number(router.query.giftCount)) : 0
 
   const updateStepInUrl = useCallback(
     (newActiveStep: number) => {

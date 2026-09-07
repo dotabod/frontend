@@ -35,7 +35,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
       }
 
       // Extract Steam ID from the claimed_id or identity
-      const steamIdentity = params['openid.claimed_id'] || params['openid.identity']
+      const steamIdentity = params['openid.claimed_id'] ?? params['openid.identity']
       if (!steamIdentity) {
         res.status(400).json({ message: 'Missing Steam identity' })
         return
@@ -49,7 +49,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
 
       // Validate the response by sending a verification request to Steam
       const verifyParams = new URLSearchParams({
-        'openid.assoc_handle': params['openid.assoc_handle'] || '',
+        'openid.assoc_handle': params['openid.assoc_handle'] ?? '',
         'openid.mode': 'check_authentication',
         'openid.ns': params['openid.ns'],
         'openid.sig': params['openid.sig'],
@@ -115,7 +115,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
 
       // Save the Steam ID to the user's account
       try {
-        const steam32IdInt = Number.parseInt(steam32Id, 10)
+        const steam32IdInt = Math.trunc(Number(steam32Id))
 
         await prisma.$transaction(async (tx) => {
           const existingSteamAccount = await tx.steamAccount.findUnique({
@@ -144,7 +144,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
           } else {
             await tx.steamAccount.create({
               data: {
-                name: profileData?.name || null,
+                name: profileData?.name ?? null,
                 steam32Id: steam32IdInt,
                 userId: session.user.id,
               },

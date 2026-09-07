@@ -36,7 +36,7 @@ const SubscriptionStatusComponent = () => {
         // For now, we'll simulate credit balance with metadata
         const creditBalanceAmount =
           subscription?.metadata && typeof subscription.metadata === 'object'
-            ? Number((subscription.metadata as Record<string, unknown>).creditBalance || 0)
+            ? Number((subscription.metadata as Record<string, unknown>).creditBalance ?? 0)
             : 0
 
         setCreditBalance({

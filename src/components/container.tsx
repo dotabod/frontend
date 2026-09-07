@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import type { HTMLAttributes } from 'react'
 
 export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {

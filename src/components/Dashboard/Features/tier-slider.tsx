@@ -35,7 +35,7 @@ export const TierSlider = ({
   const [localValue, setLocalValue] = useState<number>(externalValue ?? rawValue ?? 0)
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null)
 
-  const isDisabled = externalDisabled || !tierAccess.hasAccess
+  const isDisabled = externalDisabled ?? !tierAccess.hasAccess
 
   // Update local value when external value changes
   useEffect(() => {

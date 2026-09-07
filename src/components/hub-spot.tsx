@@ -18,7 +18,7 @@ const HubSpot = () => {
     }
 
     window._hsq = window._hsq || []
-    window.hsConversationsOnReady = window.hsConversationsOnReady || []
+    window.hsConversationsOnReady = window.hsConversationsOnReady ?? []
     // Keep the widget from auto-loading before identity resolves, but preserve any
     // Identification already set on a previous run so we don't transiently drop it.
     window.hsConversationsSettings = {

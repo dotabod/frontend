@@ -9,7 +9,7 @@ import prisma from '@/lib/db'
 
 const steamVerifySchema = z.object({
   name: z.string().optional(),
-  steam32Id: z.string().transform((val) => Number.parseInt(val, 10)),
+  steam32Id: z.string().transform((val) => Math.trunc(Number(val))),
 })
 
 const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {

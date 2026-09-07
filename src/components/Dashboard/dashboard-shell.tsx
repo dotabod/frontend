@@ -3,7 +3,7 @@ import { CopyButton } from '@mantine/core'
 import { captureException } from '@sentry/nextjs'
 import { Button, Drawer, Layout, Menu, theme } from 'antd'
 import type { MenuProps } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -65,17 +65,17 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
   const defaultDescription =
     'Manage your Dotabod settings, commands, and features to enhance your Dota 2 streaming experience.'
   const host =
-    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ??
     (typeof window === 'undefined' ? 'dotabod.com' : window.location.host)
   const defaultOgImage = `https://${host}/images/welcome.png`
   const defaultUrl = `https://${host}/dashboard`
 
   // Use SEO props if provided, otherwise use defaults
-  const pageTitle = seo?.title || defaultTitle
-  const pageDescription = seo?.description || defaultDescription
-  const pageImage = seo?.ogImage || defaultOgImage
-  const pageUrl = seo?.canonicalUrl || defaultUrl
-  const pageType = seo?.ogType || 'website'
+  const pageTitle = seo?.title ?? defaultTitle
+  const pageDescription = seo?.description ?? defaultDescription
+  const pageImage = seo?.ogImage ?? defaultOgImage
+  const pageUrl = seo?.canonicalUrl ?? defaultUrl
+  const pageType = seo?.ogType ?? 'website'
   const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
 
   // Handle Admin accordion open/close
@@ -152,14 +152,14 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
   useEffect(() => {
     // This toast is gift-specific; the notifications endpoint now returns other types
     // too (e.g. new-feature), so consider only unread GIFT_SUBSCRIPTION rows.
-    const unreadGifts = (giftNotificationData?.notifications || []).filter(
+    const unreadGifts = (giftNotificationData?.notifications ?? []).filter(
       (n) => n?.type === 'GIFT_SUBSCRIPTION' && !n?.read,
     )
     const giftNotification = unreadGifts[0]
     if (giftNotification) {
       setGiftDetails({
         giftMessage: giftNotification.giftMessage,
-        giftQuantity: giftNotification.giftQuantity || 1,
+        giftQuantity: giftNotification.giftQuantity ?? 1,
         giftType: giftNotification.giftType,
         id: giftNotification.id,
         senderName: giftNotification.senderName,
@@ -170,7 +170,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
       setGiftDetails(null)
     }
 
-    setHasLifetime(giftNotificationData?.hasLifetime || false)
+    setHasLifetime(giftNotificationData?.hasLifetime ?? false)
     // Gift-only count for the toast copy; the endpoint's totalNotifications mixes types.
     setTotalNotifications(unreadGifts.length)
   }, [giftNotificationData])
@@ -192,7 +192,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
         if (!response.ok) {
           const errorData = await response.json()
           console.error('Failed to mark notification as read:', errorData)
-          throw new Error(errorData.message || 'Failed to mark notification as read')
+          throw new Error(errorData.message ?? 'Failed to mark notification as read')
         }
 
         // Refresh notifications after marking as read
@@ -207,7 +207,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
     return null
   }
 
-  const isImpersonating = Boolean(data?.user?.isImpersonating)
+  const isImpersonating = data?.user?.isImpersonating
   const isAdmin = data?.user?.role === 'admin'
   const navOpts = { isAdmin, isImpersonating }
 

@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       })
 
-      customerId = subscriptionWithCustomerId?.stripeCustomerId || null
+      customerId = subscriptionWithCustomerId?.stripeCustomerId ?? null
     }
 
     // If no customer ID exists anywhere, return 0 balance

@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 
 import NumberTicker from '@/components/magicui/number-ticker'
 import { useTransformRes } from '@/lib/hooks/use-transform-res'
@@ -119,7 +119,7 @@ export const MMRBadge = ({
         leaderboardPosition={leaderboard}
         className={clsx(
           !image && 'mt-0',
-          (leaderboard || ['80.png', '91.png', '92.png'].includes(image ?? '')) && '-mt-1',
+          (leaderboard ?? ['80.png', '91.png', '92.png'].includes(image ?? '')) && '-mt-1',
           image && rank && !leaderboard && '-mt-3',
         )}
       />

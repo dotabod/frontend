@@ -69,7 +69,7 @@ const getSettingsSubscription = function getSettingsSubscription(
     (sub) => (sub.status === 'ACTIVE' || sub.status === 'TRIALING') && sub.stripeSubscriptionId,
   )
 
-  const subscription = activeSubscription || subscriptions[0] || null
+  const subscription = activeSubscription ?? subscriptions[0] ?? null
 
   if (!subscription && isInGracePeriod()) {
     return {

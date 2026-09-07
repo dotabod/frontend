@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { TierSwitch } from '@/components/Dashboard/Features/tier-switch'
+
 vi.mock('@/lib/hooks/use-update-setting', () => ({
   useUpdateSetting: vi.fn(() => ({
     data: true,
@@ -12,8 +14,6 @@ vi.mock('@/lib/hooks/use-update-setting', () => ({
 vi.mock('@/components/Dashboard/Features/tier-badge', () => ({
   TierBadge: () => null,
 }))
-
-import { TierSwitch } from '@/components/Dashboard/Features/tier-switch'
 
 describe(TierSwitch, () => {
   it('uses its visible string label as the switch accessible name', () => {

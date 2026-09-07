@@ -48,7 +48,7 @@ const getChromeVersion = function getChromeVersion(): number | null {
     return null
   }
 
-  const version = Number.parseInt(match[1], 10)
+  const version = Math.trunc(Number(match[1]))
   return Number.isNaN(version) ? null : version
 }
 

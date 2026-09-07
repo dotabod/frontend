@@ -380,7 +380,7 @@ export const whatsNew: WhatsNewEntry[] = [
 ]
 
 // Newest-first ordering, reused by the dashboard page, public page, and home teaser.
-export const whatsNewSorted = [...whatsNew].sort(
+export const whatsNewSorted = whatsNew.toSorted(
   (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
 )
 

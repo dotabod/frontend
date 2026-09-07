@@ -57,8 +57,8 @@ export const getMatchData = async function getMatchData(matchId: string, heroId:
     if (Array.isArray(opendotaMatch.data?.players)) {
       if (typeof opendotaMatch?.data?.radiant_win === 'boolean') {
         radiantWin = opendotaMatch?.data?.radiant_win
-        moreData.radiantScore = opendotaMatch?.data?.radiant_score || 0
-        moreData.direScore = opendotaMatch?.data?.dire_score || 0
+        moreData.radiantScore = opendotaMatch?.data?.radiant_score ?? 0
+        moreData.direScore = opendotaMatch?.data?.dire_score ?? 0
       }
 
       // Extract player-specific stats if heroId is provided
@@ -67,9 +67,9 @@ export const getMatchData = async function getMatchData(matchId: string, heroId:
           (p: { hero_id: number }) => p.hero_id === heroId,
         )
         if (player) {
-          moreData.kills = player.kills || 0
-          moreData.deaths = player.deaths || 0
-          moreData.assists = player.assists || 0
+          moreData.kills = player.kills ?? 0
+          moreData.deaths = player.deaths ?? 0
+          moreData.assists = player.assists ?? 0
         }
       }
 

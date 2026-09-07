@@ -1,6 +1,8 @@
 import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import handler, { config } from '@/pages/api/stripe/webhook'
+
 /**
  * Tests for the Stripe webhook handler specifically for gift subscriptions
  *
@@ -89,7 +91,6 @@ vi.mock('@/pages/api/stripe/webhook', () => ({
 }))
 
 // Import the mocked handler
-import handler, { config } from '@/pages/api/stripe/webhook'
 
 // Mock the database client
 vi.mock('@/lib/db', () => ({

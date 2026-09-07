@@ -32,10 +32,10 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
 
     // Get gift message from request body or use default
     const giftMessage =
-      req.body?.giftMessage || 'This is a test gift message. Enjoy your subscription!'
+      req.body?.giftMessage ?? 'This is a test gift message. Enjoy your subscription!'
 
     // Get gift quantity from request body or use default
-    const giftQuantity = Number.parseInt(req.body?.giftQuantity || '1', 10)
+    const giftQuantity = Math.trunc(Number(req.body?.giftQuantity ?? '1'))
 
     // Validate gift quantity
     if (Number.isNaN(giftQuantity) || giftQuantity < 1) {
@@ -152,7 +152,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
       } else if (sub.giftDetails?.giftType === 'monthly') {
         // Apply the gift quantity multiplier
         const quantity = sub.giftDetails.giftQuantity || 1
-        totalGiftedMonths += Number(quantity)
+        totalGiftedMonths += quantity
       }
     }
 

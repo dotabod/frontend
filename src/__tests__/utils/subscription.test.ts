@@ -2,6 +2,9 @@ import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/c
 import type { Subscription } from '@prisma/client'
 import { describe, expect, it, vi } from 'vitest'
 
+import prisma from '@/lib/db'
+import { getBillingSummaryInfo, getSubscription } from '@/utils/subscription'
+
 // We need to mock the module before importing it
 vi.mock('@/utils/subscription', async () => {
   // Import the actual module
@@ -24,8 +27,6 @@ vi.mock('@/lib/db', () => ({
 }))
 
 // Import mocked modules
-import prisma from '@/lib/db'
-import { getBillingSummaryInfo, getSubscription } from '@/utils/subscription'
 
 describe('Subscription priority logic', () => {
   it('should prioritize non-gift active subscription over gift subscription', async () => {

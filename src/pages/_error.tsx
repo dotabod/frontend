@@ -25,7 +25,7 @@ interface ErrorProps {
 }
 
 const CustomErrorComponent = (props: ErrorProps) => (
-  <NextErrorComponent statusCode={props.statusCode || 500} />
+  <NextErrorComponent statusCode={props.statusCode ?? 500} />
 )
 
 CustomErrorComponent.getInitialProps = async (contextData: NextPageContext) => {
@@ -35,7 +35,7 @@ CustomErrorComponent.getInitialProps = async (contextData: NextPageContext) => {
 
   // Guard against undefined NextErrorComponent or missing getInitialProps
   if (!NextErrorComponent || typeof NextErrorComponent.getInitialProps !== 'function') {
-    return { statusCode: contextData.res?.statusCode || 500 }
+    return { statusCode: contextData.res?.statusCode ?? 500 }
   }
 
   // This will contain the status code of the response

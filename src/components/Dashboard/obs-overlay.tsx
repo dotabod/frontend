@@ -1,7 +1,7 @@
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { CopyButton } from '@mantine/core'
 import { Button, Tabs, Tag } from 'antd'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'

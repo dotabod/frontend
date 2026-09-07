@@ -28,8 +28,8 @@ const TwitchUser = ({
   onClick?: () => void
 }) => {
   const session = useSession()
-  const userName = last ? session?.data?.user?.name || name : name
-  const imagesrc = last ? session?.data?.user?.image || image : image
+  const userName = last ? (session?.data?.user?.name ?? name) : name
+  const imagesrc = last ? (session?.data?.user?.image ?? image) : image
   const [open, setOpen] = useState(false)
   const track = useTrack()
 

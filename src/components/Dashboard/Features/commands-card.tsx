@@ -38,9 +38,7 @@ const CommandsCard = ({
     >
       <Collapse.Panel
         className={`rounded-lg! border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-xs hover:shadow-gray-500${
-          readonly && (publicIsEnabled === undefined ? !isEnabled : !publicIsEnabled)
-            ? ' opacity-50'
-            : ''
+          readonly && !(publicIsEnabled ?? isEnabled) ? ' opacity-50' : ''
         }`}
         style={{ padding: 0 }}
         header={
@@ -61,20 +59,18 @@ const CommandsCard = ({
               (readonly ? (
                 <span
                   className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${
-                    (publicIsEnabled === undefined ? isEnabled : publicIsEnabled)
+                    (publicIsEnabled ?? isEnabled)
                       ? 'bg-green-950 text-green-400 ring-1 ring-green-800'
                       : 'bg-gray-800 text-gray-600'
                   }`}
                 >
-                  {(publicIsEnabled === undefined ? isEnabled : publicIsEnabled)
-                    ? 'Enabled'
-                    : 'Disabled'}
+                  {(publicIsEnabled ?? isEnabled) ? 'Enabled' : 'Disabled'}
                 </span>
               ) : (
                 <TierSwitch
                   settingKey={command.key}
                   disabled={!hasAccess}
-                  checked={publicIsEnabled === undefined ? isEnabled : publicIsEnabled}
+                  checked={publicIsEnabled ?? isEnabled}
                   onChange={hasAccess ? updateSetting : undefined}
                 />
               ))}

@@ -1,4 +1,8 @@
+import { getServerSession } from 'next-auth/next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import prisma from '@/lib/db'
+import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 
 vi.mock('next-auth/next', () => ({
   getServerSession: vi.fn(),
@@ -15,11 +19,6 @@ vi.mock('@/lib/db', () => ({
     },
   },
 }))
-
-import { getServerSession } from 'next-auth/next'
-
-import prisma from '@/lib/db'
-import { requireDashboardAccess } from '@/lib/server/dashboard-access'
 
 const ctx = { req: {}, res: {} } as any
 

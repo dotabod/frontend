@@ -90,14 +90,14 @@ export const selectSettings = (state: AppState) => state.settings
 export const selectMainHero = (state: AppState) =>
   state.status ? state.status.hero.replace('npc_dota_hero_', '') : ''
 
-export const selectHeroes = (state: AppState) => (state.heroes ? state.heroes : [])
+export const selectHeroes = (state: AppState) => state.heroes ?? []
 
-export const selectHeroUnits = (state: AppState) => (state.hero_units ? state.hero_units : [])
+export const selectHeroUnits = (state: AppState) => state.hero_units ?? []
 
-export const selectBuildings = (state: AppState) => (state.buildings ? state.buildings : [])
+export const selectBuildings = (state: AppState) => state.buildings ?? []
 
-export const selectCreeps = (state: AppState) => (state.creeps ? state.creeps : [])
+export const selectCreeps = (state: AppState) => state.creeps ?? []
 
-export const selectCouriers = (state: AppState) => (state.couriers ? state.couriers : [])
+export const selectCouriers = (state: AppState) => state.couriers ?? []
 
 export default store

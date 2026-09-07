@@ -55,7 +55,7 @@ const buildGroups = (streamers: StreamerSummary[], sort: SortKey): Group[] => {
       streamers: byTier
         .get(tier)!
         .slice()
-        .sort(tier === 'immortal' ? immortalComparator : comparators[sort]),
+        .toSorted(tier === 'immortal' ? immortalComparator : comparators[sort]),
       tier,
     }))
 }
@@ -146,7 +146,7 @@ export const StreamersDirectory = ({
       (entries) => {
         const visible = entries
           .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+          .toSorted((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
         const section = visible[0]?.target.closest<HTMLElement>('[data-tier]')
         const tier = section?.dataset.tier
         if (tier && isStreamerTier(tier)) {

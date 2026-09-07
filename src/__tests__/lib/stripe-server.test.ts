@@ -2,14 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const ctorSpy = vi.fn()
 
-vi.mock('stripe', () => ({
-  default: class {
+vi.mock('stripe', () => {
+  const MockStripe = class {
     customers = { retrieve: vi.fn() }
     constructor(...args: unknown[]) {
       ctorSpy(...args)
     }
-  },
-}))
+  }
+
+  return { Stripe: MockStripe, default: MockStripe }
+})
 
 const load = async function load() {
   return await import('@/lib/stripe-server')

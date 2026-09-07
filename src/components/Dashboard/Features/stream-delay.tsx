@@ -10,13 +10,13 @@ const StreamDelayCard = () => {
   const { data: delay, loading, updateSetting } = useUpdateSetting<number>(Settings.streamDelay)
 
   // Convert milliseconds to minutes and seconds
-  const totalSeconds = Math.abs(Number(delay) || 0) / 1000
+  const totalSeconds = Math.abs(delay || 0) / 1000
   const [minutes, setMinutes] = useState(Math.floor(totalSeconds / 60))
   const [seconds, setSeconds] = useState(Math.floor(totalSeconds % 60))
 
   // Update local state when delay prop changes
   useEffect(() => {
-    const totalSec = Math.abs(Number(delay) || 0) / 1000
+    const totalSec = Math.abs(delay || 0) / 1000
     setMinutes(Math.floor(totalSec / 60))
     setSeconds(Math.floor(totalSec % 60))
   }, [delay])
@@ -27,7 +27,7 @@ const StreamDelayCard = () => {
   }, 500)
 
   const handleMinutesChange = (value: number | null) => {
-    const newMinutes = Math.max(0, Math.min(50, value || 0))
+    const newMinutes = Math.max(0, Math.min(50, value ?? 0))
     let newSeconds = seconds
 
     // If at max minutes (50), seconds must be 0
@@ -41,7 +41,7 @@ const StreamDelayCard = () => {
   }
 
   const handleSecondsChange = (value: number | null) => {
-    let newSeconds = Math.max(0, Math.min(59, value || 0))
+    let newSeconds = Math.max(0, Math.min(59, value ?? 0))
 
     // If at max minutes (50), seconds must be 0
     if (minutes === 50) {

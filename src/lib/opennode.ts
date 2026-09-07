@@ -106,7 +106,7 @@ export const buildCheckoutUrl = function buildCheckoutUrl(
   hostedUrl?: string,
 ): string {
   const baseUrl =
-    hostedUrl ||
+    hostedUrl ??
     (process.env.VERCEL_ENV === 'production'
       ? `https://checkout.opennode.com/${chargeId}`
       : `https://checkout.dev.opennode.com/${chargeId}`)
