@@ -16,6 +16,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: dotabod_test
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d dotabod_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -27,6 +40,19 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Prepare webhook reliability database
+        run: pnpm exec prisma db push --skip-generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+      - name: Prove webhook transaction reliability
+        run: >-
+          pnpm exec vitest run
+          src/__tests__/pages/api/stripe/utils/idempotency.postgres.test.ts
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          RUN_STRIPE_WEBHOOK_POSTGRES_TESTS: 'true'
       - name: Run quality checks
         run: pnpm quality
       - name: Run tests

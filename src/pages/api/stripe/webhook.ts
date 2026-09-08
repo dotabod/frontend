@@ -303,17 +303,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     debugLog(`Idempotent processing result for event ${event.id} (${event.type}):`, result)
 
-    if (result === false) {
-      console.error(`Webhook processing failed for event ${event.id} (${event.type})`)
-      debugLog(`Webhook processing marked as failed for event ${event.id}, responding 500.`)
-      res.status(500).json({ error: 'Webhook processing failed', received: true })
-      return
-    }
-
-    // Handle the case where the event was already processed
-    if (result && typeof result === 'object' && result.skipped) {
+    if (result.kind === 'duplicate') {
       debugLog(
-        `Event ${event.id} (${event.type}) was already processed at ${result.processedAt instanceof Date ? result.processedAt.toISOString() : String(result.processedAt)}. Responding 200 OK.`,
+        `Event ${event.id} (${event.type}) was already processed at ${result.processedAt.toISOString()}. Responding 200 OK.`,
       )
       res.status(200).json({
         processed: true,
@@ -328,14 +320,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ processed: true, received: true })
     return
   } catch (error) {
-    console.error(
-      `Unhandled error in webhook handler for event ${event.id} (${event.type}):`,
-      error,
-    )
-    // Return 200 to prevent Stripe from retrying, as this might be a persistent error
-    // We'll handle the failure through our own monitoring and recovery process
-    debugLog(`Responding 200 OK after unhandled error for event ${event.id} (${event.type})`)
-    res.status(200).json({ processed: false, received: true })
+    console.error(`Webhook processing failed for event ${event.id} (${event.type}):`, error)
+    debugLog(`Responding 500 after processing failed for event ${event.id} (${event.type})`)
+    res.status(500).json({ error: 'Webhook processing failed', received: true })
     return
   }
 }
