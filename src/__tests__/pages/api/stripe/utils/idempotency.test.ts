@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 import { PrismaClient } from '@prisma/client'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { BillingFacts } from '@/lib/stripe/utils/billing-facts'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 
 describe(processEventIdempotently, () => {
@@ -10,6 +11,7 @@ describe(processEventIdempotently, () => {
   const remove = vi.spyOn(tx.webhookEvent, 'delete')
   const findUnique = vi.spyOn(tx.webhookEvent, 'findUnique')
   const receipt = {
+    billingFacts: null,
     eventType: 'checkout.session.completed',
     id: 'receipt-1',
     processedAt: new Date('2026-09-07T12:00:00.000Z'),
@@ -35,7 +37,7 @@ describe(processEventIdempotently, () => {
       .mockResolvedValue()
 
     await expect(
-      processEventIdempotently('evt_1', 'checkout.session.completed', processor, tx),
+      processEventIdempotently('evt_1', 'checkout.session.completed', undefined, processor, tx),
     ).resolves.toStrictEqual({ kind: 'processed' })
 
     expect(processor).toHaveBeenCalledOnce()
@@ -48,7 +50,7 @@ describe(processEventIdempotently, () => {
     const processor = vi.fn<(transaction: Prisma.TransactionClient) => Promise<void>>()
 
     await expect(
-      processEventIdempotently('evt_1', 'checkout.session.completed', processor, tx),
+      processEventIdempotently('evt_1', 'checkout.session.completed', undefined, processor, tx),
     ).resolves.toStrictEqual({ kind: 'duplicate', processedAt: receipt.processedAt })
 
     expect(processor).not.toHaveBeenCalled()
@@ -62,6 +64,7 @@ describe(processEventIdempotently, () => {
       processEventIdempotently(
         'evt_1',
         'checkout.session.completed',
+        undefined,
         async () => {
           await Promise.resolve()
           throw processorError
@@ -72,5 +75,44 @@ describe(processEventIdempotently, () => {
 
     expect(create).toHaveBeenCalledOnce()
     expect(remove).not.toHaveBeenCalled()
+  })
+
+  it('stores billing facts on the receipt create', async () => {
+    const billingFacts = {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      cancellationReason: null,
+      currentPeriodEnd: 1_800_000_000,
+      endedAt: null,
+      kind: 'subscription',
+      livemode: true,
+      occurredAt: 1_700_000_000,
+      status: 'active',
+      stripeCustomerId: 'cus_test',
+      stripeSubscriptionId: 'sub_test',
+      trialEnd: null,
+      trialStart: null,
+      version: 1,
+    } satisfies BillingFacts
+    const processor = vi
+      .fn<(transaction: Prisma.TransactionClient) => Promise<void>>()
+      .mockResolvedValue()
+
+    await processEventIdempotently(
+      'evt_1',
+      'customer.subscription.updated',
+      billingFacts,
+      processor,
+      tx,
+    )
+
+    expect(create).toHaveBeenCalledWith({
+      data: {
+        billingFacts,
+        eventType: 'customer.subscription.updated',
+        processedAt: expect.any(Date),
+        stripeEventId: 'evt_1',
+      },
+    })
   })
 })

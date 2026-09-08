@@ -327,6 +327,7 @@ model WebhookEvent {
   stripeEventId String   @unique
   eventType     String
   processedAt   DateTime
+  billingFacts  Json?
 }
 
 model ScheduledMessage {

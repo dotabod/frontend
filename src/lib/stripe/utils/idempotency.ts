@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 
+import type { BillingFacts } from './billing-facts'
 import { debugLog } from './debug-log'
 
 export type IdempotentProcessingResult =
@@ -9,6 +10,7 @@ export type IdempotentProcessingResult =
 export const processEventIdempotently = async function processEventIdempotently(
   eventId: string,
   eventType: string,
+  billingFacts: BillingFacts | undefined,
   processor: (tx: Prisma.TransactionClient) => Promise<void>,
   tx: Prisma.TransactionClient,
 ): Promise<IdempotentProcessingResult> {
@@ -37,6 +39,7 @@ export const processEventIdempotently = async function processEventIdempotently(
   debugLog(`Attempting to create webhookEvent record for event ${eventId}`)
   await tx.webhookEvent.create({
     data: {
+      ...(billingFacts && { billingFacts }),
       eventType,
       processedAt: new Date(),
       stripeEventId: eventId,

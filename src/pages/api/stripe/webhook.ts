@@ -12,6 +12,7 @@ import {
   handleSubscriptionDeleted,
   handleSubscriptionEvent,
 } from '@/lib/stripe/handlers/subscription-events'
+import { extractBillingFacts } from '@/lib/stripe/utils/billing-facts'
 import { debugLog } from '@/lib/stripe/utils/debug-log'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 import { withTransaction } from '@/lib/stripe/utils/transaction'
@@ -32,6 +33,7 @@ const relevantEvents = new Set<Stripe.Event.Type>([
   'invoice.payment_failed',
   'invoice.marked_uncollectible',
   'invoice.overdue',
+  'invoice.voided',
   // Fallback for invoices marked paid_out_of_band via crypto settlement
   'invoice.paid',
   'checkout.session.completed',
@@ -84,9 +86,18 @@ const verifyWebhook = async function verifyWebhook(
   }
 }
 
-const processWebhookEvent = async function processWebhookEvent(
+export interface WebhookEventProcessorDependencies {
+  handleInvoiceEvent: typeof handleInvoiceEvent
+}
+
+const defaultWebhookEventProcessorDependencies: WebhookEventProcessorDependencies = {
+  handleInvoiceEvent,
+}
+
+export const processWebhookEvent = async function processWebhookEvent(
   event: Stripe.Event,
   tx: Prisma.TransactionClient,
+  dependencies: WebhookEventProcessorDependencies = defaultWebhookEventProcessorDependencies,
 ): Promise<void> {
   debugLog(`Entering processWebhookEvent for event ${event.id} (${event.type})`)
   // Type guard to ensure event.type is one of our supported event types
@@ -210,11 +221,13 @@ const processWebhookEvent = async function processWebhookEvent(
     case 'invoice.paid': {
       const invoice = event.data.object
       debugLog(`Calling handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
-      const handled = await handleInvoiceEvent(event.data.object, tx)
+      const handled = await dependencies.handleInvoiceEvent(event.data.object, tx)
       assertHandled(handled, event.type)
       debugLog(`Finished handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
       break
     }
+    case 'invoice.voided':
+      break
     case 'checkout.session.completed': {
       const session = event.data.object
       debugLog(`Calling handleCheckoutCompleted for session ${session.id}`)
@@ -300,12 +313,14 @@ export const createWebhookHandler = function createWebhookHandler(
     debugLog('Event is relevant.', { eventId: event.id, eventType: event.type })
 
     try {
+      const billingFacts = extractBillingFacts(event)
       debugLog(`Starting processing for event ${event.id} (${event.type})`)
       const result = await dependencies.withTransaction(async (transactionClient) => {
         debugLog(`Inside transaction for event ${event.id} (${event.type})`)
         return await processEventIdempotently(
           event.id,
           event.type,
+          billingFacts,
           async (processorTransactionClient) => {
             debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
             await dependencies.processWebhookEvent(event, processorTransactionClient)
