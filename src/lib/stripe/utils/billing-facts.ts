@@ -1,21 +1,21 @@
 import type Stripe from 'stripe'
 
-interface CommonBillingFacts {
-  readonly livemode: boolean
-  readonly occurredAt: number
-  readonly stripeCustomerId: string | null
-  readonly version: 1
-}
+type CommonBillingFacts = Readonly<{
+  livemode: boolean
+  occurredAt: number
+  stripeCustomerId: string | null
+  version: 1
+}>
 
-interface InvoicePaymentFact {
-  readonly amountPaidMinor: number
-  readonly currency: string
-  readonly paidAt: number
-  readonly paymentObjectId: string
-  readonly paymentObjectType: Stripe.InvoicePayment.Payment.Type
-  readonly status: string
-  readonly stripeInvoicePaymentId: string
-}
+type InvoicePaymentFact = Readonly<{
+  amountPaidMinor: number
+  currency: string
+  paidAt: number
+  paymentObjectId: string
+  paymentObjectType: Stripe.InvoicePayment.Payment.Type
+  status: string
+  stripeInvoicePaymentId: string
+}>
 
 export type InvoiceBillingFacts = CommonBillingFacts & {
   amountDueMinor: number

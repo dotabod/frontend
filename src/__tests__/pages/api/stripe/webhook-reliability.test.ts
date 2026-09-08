@@ -276,10 +276,7 @@ describe('Stripe webhook reliability', () => {
       },
     })
     expect(createData?.processedAt).toBeInstanceOf(Date)
-    expect({ body: res._getJSONData(), statusCode: res.statusCode }).toStrictEqual({
-      body: { processed: true, received: true },
-      statusCode: 200,
-    })
+    expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
   })
 
   it('retains an invoice fact when processing succeeds without a local subscription write', async () => {
@@ -303,9 +300,7 @@ describe('Stripe webhook reliability', () => {
       eventType: 'invoice.payment_failed',
       stripeEventId: 'evt_no_local_row',
     })
-    expect({ body: res._getJSONData(), statusCode: res.statusCode }).toStrictEqual({
-      body: { processed: true, received: true },
-      statusCode: 200,
-    })
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
   })
 })
