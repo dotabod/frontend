@@ -338,4 +338,42 @@ describe(useSocket, () => {
       vi.unstubAllGlobals()
     }
   })
+
+  it('removes translated chat messages after ten seconds across rerenders', () => {
+    vi.useFakeTimers()
+    type SocketProps = Parameters<typeof useSocket>[0]
+    const setChatMessages = vi.fn<SocketProps['setChatMessages']>()
+    const socketProps: SocketProps = {
+      setAegis: vi.fn<SocketProps['setAegis']>(),
+      setBetData: vi.fn<SocketProps['setBetData']>(),
+      setBlock: vi.fn<SocketProps['setBlock']>(),
+      setChatMessages,
+      setConnected: vi.fn<SocketProps['setConnected']>(),
+      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
+      setPaused: vi.fn<SocketProps['setPaused']>(),
+      setPollData: vi.fn<SocketProps['setPollData']>(),
+      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
+      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
+      setRoshan: vi.fn<SocketProps['setRoshan']>(),
+      setWL: vi.fn<SocketProps['setWL']>(),
+    }
+
+    const { rerender } = renderHook(() => {
+      useSocket(socketProps)
+    })
+
+    act(() => {
+      socketState.handlers.get('chatMessage')?.({ message: 'Translated message', timestamp: 1 })
+    })
+    expect(setChatMessages).toHaveBeenCalledOnce()
+
+    socketState.mutate = socketState.dispatch
+    rerender()
+
+    act(() => {
+      vi.advanceTimersByTime(10_000)
+    })
+
+    expect(setChatMessages).toHaveBeenCalledTimes(2)
+  })
 })
