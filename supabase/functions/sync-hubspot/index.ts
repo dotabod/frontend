@@ -201,10 +201,11 @@ const fetchChanged = async function fetchChanged(
       select distinct on (s."userId") s."userId",
         case
           when s.tier::text = 'FREE' then 'free'
-          when s."transactionType"::text = 'LIFETIME' then 'pro_lifetime'
           when s.status::text = 'TRIALING' then 'pro_trial'
           when s.status::text = 'PAST_DUE' then 'pro_past_due'
-          else 'pro'
+          when s.status::text = 'ACTIVE' and s."transactionType"::text = 'LIFETIME' then 'pro_lifetime'
+          when s.status::text = 'ACTIVE' then 'pro'
+          else 'free'
         end as sub_value
       from subscriptions s
       order by s."userId",
@@ -240,10 +241,11 @@ const fetchByEmails = async function fetchByEmails(
       select distinct on (s."userId") s."userId",
         case
           when s.tier::text = 'FREE' then 'free'
-          when s."transactionType"::text = 'LIFETIME' then 'pro_lifetime'
           when s.status::text = 'TRIALING' then 'pro_trial'
           when s.status::text = 'PAST_DUE' then 'pro_past_due'
-          else 'pro'
+          when s.status::text = 'ACTIVE' and s."transactionType"::text = 'LIFETIME' then 'pro_lifetime'
+          when s.status::text = 'ACTIVE' then 'pro'
+          else 'free'
         end as sub_value
       from subscriptions s
       order by s."userId",

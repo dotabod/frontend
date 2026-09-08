@@ -947,14 +947,18 @@ export const getSubscriptionTier = function getSubscriptionTier(
   status: SubscriptionStatus | null,
 ): SubscriptionTier {
   if (isSubscriptionActive({ status })) {
+    if (priceId === null || priceId === undefined) {
+      return SUBSCRIPTION_TIERS.PRO
+    }
+
     // Check both regular and gift price IDs
     const allPriceIds = [...PRICE_IDS, ...GIFT_PRICE_IDS, ...CRYPTO_PRICE_IDS]
 
     const tierFromPrice = allPriceIds.find((price) =>
-      [price.monthly, price.annual, price.lifetime].includes(priceId ?? ''),
+      [price.monthly, price.annual, price.lifetime].includes(priceId),
     )?.tier
 
-    return tierFromPrice ?? SUBSCRIPTION_TIERS.PRO
+    return tierFromPrice ?? SUBSCRIPTION_TIERS.FREE
   }
 
   return SUBSCRIPTION_TIERS.FREE

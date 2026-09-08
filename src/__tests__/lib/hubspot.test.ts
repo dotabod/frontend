@@ -45,6 +45,15 @@ describe('lib/hubspot', () => {
       expect(subscriptionToValue({ status: 'PAST_DUE', tier: 'PRO' })).toBe('pro_past_due')
       expect(subscriptionToValue({ status: 'ACTIVE', tier: 'PRO' })).toBe('pro')
     })
+
+    it('maps inactive and incomplete Pro rows to free', async () => {
+      const { subscriptionToValue } = await load()
+      expect(
+        subscriptionToValue({ status: 'CANCELED', tier: 'PRO', transactionType: 'LIFETIME' }),
+      ).toBe('free')
+      expect(subscriptionToValue({ status: 'INCOMPLETE', tier: 'PRO' })).toBe('free')
+      expect(subscriptionToValue({ tier: 'PRO' })).toBe('free')
+    })
   })
 
   describe('syncHubSpotContact', () => {
@@ -55,7 +64,13 @@ describe('lib/hubspot', () => {
       const { fetchMock, syncHubSpotContact } = await load()
       fetchMock.mockResolvedValue(res())
 
-      await syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'gamer' })
+      await expect(
+        syncHubSpotContact('tok', {
+          email: 'a@b.com',
+          subscription: 'pro',
+          username: 'gamer',
+        }),
+      ).resolves.toBeTruthy()
 
       const propertyCalls = fetchMock.mock.calls.filter((c) => isUrl(c, '/properties/contacts'))
       expect(propertyCalls).toHaveLength(2)
@@ -149,7 +164,7 @@ describe('lib/hubspot', () => {
 
       await expect(
         syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
-      ).resolves.toBeUndefined()
+      ).resolves.toBeFalsy()
       expect(patchCalls).toBe(2)
       expect(captureException).toHaveBeenCalledOnce()
     })
@@ -162,7 +177,7 @@ describe('lib/hubspot', () => {
 
       await expect(
         syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
-      ).resolves.toBeUndefined()
+      ).resolves.toBeFalsy()
       expect(captureException).toHaveBeenCalledOnce()
     })
 
@@ -174,7 +189,7 @@ describe('lib/hubspot', () => {
 
       await expect(
         syncHubSpotContact('tok', { email: 'a@b.com', subscription: 'pro', username: 'g' }),
-      ).resolves.toBeUndefined()
+      ).resolves.toBeFalsy()
       expect(captureException).toHaveBeenCalledOnce()
       expect(fetchMock.mock.calls.some((c) => isUrl(c, '/contacts/batch/upsert'))).toBeFalsy()
     })

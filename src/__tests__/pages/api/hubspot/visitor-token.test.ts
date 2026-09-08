@@ -38,7 +38,7 @@ describe('GET /api/hubspot/visitor-token', () => {
     vi.stubEnv('HUBSPOT_PRIVATE_APP_TOKEN', 'test-token')
     vi.mocked(getSubscription).mockResolvedValue(anyVal({ status: 'ACTIVE', tier: 'PRO' }))
     vi.mocked(fetch).mockResolvedValue(tokenOk())
-    vi.mocked(syncHubSpotContact).mockResolvedValue(undefined)
+    vi.mocked(syncHubSpotContact).mockResolvedValue(true)
     vi.mocked(subscriptionToValue).mockReturnValue('pro')
   })
 
