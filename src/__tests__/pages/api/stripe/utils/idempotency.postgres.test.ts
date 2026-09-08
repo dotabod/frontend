@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { setTimeout } from 'node:timers/promises'
 
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -71,9 +72,8 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     const eventId = `evt_concurrent_${randomUUID()}`
     receiptIds.add(eventId)
     let processorCalls = 0
-    const processorStarted = Promise.withResolvers<void>()
-    const processorReleased = Promise.withResolvers<void>()
-    const racingCreateStarted = Promise.withResolvers<void>()
+    const processorStarted = Promise.withResolvers<undefined>()
+    const processorReleased = Promise.withResolvers<undefined>()
     const countProcessor = async () => {
       await Promise.resolve()
       processorCalls += 1
@@ -86,7 +86,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
           'checkout.session.completed',
           async () => {
             processorCalls += 1
-            processorStarted.resolve()
+            processorStarted.resolve(undefined)
             await processorReleased.promise
           },
           tx,
@@ -95,31 +95,18 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
 
     await processorStarted.promise
 
-    const secondDelivery = withTransaction(async (tx) => {
-      const createReceipt = tx.webhookEvent.create.bind(tx.webhookEvent)
-      const createSpy = vi.spyOn(tx.webhookEvent, 'create').mockImplementation(async (args) => {
-        racingCreateStarted.resolve()
-        return await createReceipt(args)
-      })
+    const secondDelivery = withTransaction(
+      async (tx) =>
+        await processEventIdempotently(eventId, 'checkout.session.completed', countProcessor, tx),
+    )
+    const deliveries = Promise.allSettled([firstDelivery, secondDelivery])
 
-      try {
-        return await processEventIdempotently(
-          eventId,
-          'checkout.session.completed',
-          countProcessor,
-          tx,
-        )
-      } finally {
-        createSpy.mockRestore()
-      }
-    })
-    const secondDeliveryFailure = expect(secondDelivery).rejects.toMatchObject({ code: 'P2002' })
+    await setTimeout(100)
+    processorReleased.resolve(undefined)
 
-    await racingCreateStarted.promise
-    processorReleased.resolve()
-
-    await expect(firstDelivery).resolves.toStrictEqual({ kind: 'processed' })
-    await secondDeliveryFailure
+    const [firstResult, secondResult] = await deliveries
+    expect(firstResult).toStrictEqual({ status: 'fulfilled', value: { kind: 'processed' } })
+    expect(secondResult).toMatchObject({ reason: { code: 'P2002' }, status: 'rejected' })
 
     const laterDelivery = await withTransaction(
       async (tx) =>
