@@ -17,7 +17,7 @@ type InvoicePaymentFact = Readonly<{
   stripeInvoicePaymentId: string
 }>
 
-export type InvoiceBillingFacts = CommonBillingFacts & {
+type InvoiceBillingFacts = CommonBillingFacts & {
   amountDueMinor: number
   amountPaidMinor: number
   amountRemainingMinor: number
@@ -36,7 +36,7 @@ export type InvoiceBillingFacts = CommonBillingFacts & {
   voidedAt: number | null
 }
 
-export type SubscriptionBillingFacts = CommonBillingFacts & {
+type SubscriptionBillingFacts = CommonBillingFacts & {
   cancelAtPeriodEnd: boolean
   canceledAt: number | null
   cancellationReason: Stripe.Subscription.CancellationDetails.Reason | null
