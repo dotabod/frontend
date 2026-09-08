@@ -72,8 +72,8 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     const eventId = `evt_concurrent_${randomUUID()}`
     receiptIds.add(eventId)
     let processorCalls = 0
-    const processorStarted = Promise.withResolvers<undefined>()
-    const processorReleased = Promise.withResolvers<undefined>()
+    const processorStarted = Promise.withResolvers<boolean>()
+    const processorReleased = Promise.withResolvers<boolean>()
     const countProcessor = async () => {
       await Promise.resolve()
       processorCalls += 1
@@ -86,7 +86,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
           'checkout.session.completed',
           async () => {
             processorCalls += 1
-            processorStarted.resolve()
+            processorStarted.resolve(true)
             await processorReleased.promise
           },
           tx,
@@ -102,7 +102,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     const deliveries = Promise.allSettled([firstDelivery, secondDelivery])
 
     await setTimeout(100)
-    processorReleased.resolve()
+    processorReleased.resolve(true)
 
     const [firstResult, secondResult] = await deliveries
     expect(firstResult).toStrictEqual({ status: 'fulfilled', value: { kind: 'processed' } })
