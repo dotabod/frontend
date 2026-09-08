@@ -157,6 +157,11 @@ export const useSocket = ({
   // Can pass any key here, we just want mutate() function on `api/settings`
   const { mutate } = useUpdateSetting(Settings.commandWL)
 
+  const refreshSettingsRef = useRef(mutate)
+  useEffect(() => {
+    refreshSettingsRef.current = mutate
+  }, [mutate])
+
   // Ref to store timeout IDs for chat message cleanup
   const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
@@ -345,7 +350,7 @@ export const useSocket = ({
     socket.on('connect', () => {
       console.log('Socket connected event fired')
       updateLastReceived()
-      mutate()
+      refreshSettingsRef.current()
       setConnected(true)
     })
     socket.on('connect_error', (error) => {
@@ -359,7 +364,7 @@ export const useSocket = ({
 
     socket.on('refresh-settings', (_key: typeof Settings) => {
       updateLastReceived()
-      mutate()
+      refreshSettingsRef.current()
     })
 
     activeSocket.on('diagnostic-overlay-probe', () => {
@@ -407,7 +412,7 @@ export const useSocket = ({
 
     socket.on('refresh', () => {
       updateLastReceived()
-      mutate()
+      refreshSettingsRef.current()
     })
 
     // Clean up
@@ -450,7 +455,6 @@ export const useSocket = ({
     }
   }, [
     dispatch,
-    mutate,
     setAegis,
     setBetData,
     setBlock,
