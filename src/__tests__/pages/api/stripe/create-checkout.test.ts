@@ -15,6 +15,24 @@ interface StripeCustomerCreateInput {
   email?: string
   metadata: Record<string, string>
 }
+interface StripeInvoiceItemCreateInput {
+  customer: string
+  invoice: string
+  price_data: {
+    currency: string
+    product: string
+    unit_amount: number
+  }
+}
+interface StripePriceResult {
+  active?: boolean
+  currency?: string
+  id?: string
+  product?: string
+  recurring?: { interval: string; interval_count: number }
+  type?: string
+  unit_amount?: number | null
+}
 
 const mocks = vi.hoisted(() => ({
   createNowPaymentsInvoice: vi.fn(),
@@ -50,7 +68,9 @@ const mocks = vi.hoisted(() => ({
       >(),
       retrieve: vi.fn<(customerId: string) => Promise<{ id: string }>>(),
     },
-    invoiceItems: { create: vi.fn() },
+    invoiceItems: {
+      create: vi.fn<(params: StripeInvoiceItemCreateInput) => Promise<Record<string, never>>>(),
+    },
     invoices: {
       create: vi.fn(),
       finalizeInvoice: vi.fn(),
@@ -59,7 +79,7 @@ const mocks = vi.hoisted(() => ({
       update: vi.fn(),
       voidInvoice: vi.fn(),
     },
-    prices: { retrieve: vi.fn() },
+    prices: { retrieve: vi.fn<(priceId: string) => Promise<StripePriceResult>>() },
     subscriptions: {
       list: vi.fn<
         (params: {
