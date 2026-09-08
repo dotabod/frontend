@@ -84,6 +84,7 @@ describe('Stripe webhook reliability', () => {
   } as unknown as Prisma.TransactionClient
 
   beforeEach(() => {
+    vi.clearAllMocks()
     vi.stubEnv('STRIPE_WEBHOOK_SECRET', 'test-secret')
     vi.stubEnv('VERCEL_ENV', 'production')
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
