@@ -29412,26 +29412,6 @@
         "severity": "error"
       }
     },
-    "37d22a1d1aa63e01420918637b97b0c9f4b18dba4d818aba6bb0d6fe70333077": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(require-await)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "async () => {",
-              "next": "throw new Error('processor failed')",
-              "previous": "'checkout.session.completed',"
-            },
-            "span": "async () => {\n        throw new Error('processor failed')\n      }",
-            "text": ""
-          }
-        ],
-        "message": "Async function has no `await` expression.",
-        "severity": "error"
-      }
-    },
     "37dc2c74876d9d157dd571b2a8dda913a68c6ad322cb1183f61984055e061ef4": {
       "count": 1,
       "summary": {
@@ -87581,26 +87561,6 @@
           }
         ],
         "message": "Unsafe member access ['openid.ns'] on an `any` value.",
-        "severity": "error"
-      }
-    },
-    "a94cf256dcd2e064dcd53af82d832e658cd14d15d3de91724726ee366d16bd5d": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const result = await prisma.$transaction(operation, {",
-              "next": "// Ensure consistent reads",
-              "previous": "debugLog(`Attempting transaction, try ${retryCount + 1}/${maxRetries}`)"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
         "severity": "error"
       }
     },

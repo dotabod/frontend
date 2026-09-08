@@ -279,12 +279,12 @@ export const createWebhookHandler = function createWebhookHandler(
     debugLog('Webhook handler received POST request')
 
     debugLog('Verifying webhook signature...')
-    const { event, error } = await dependencies.verifyWebhook(req)
-    debugLog('Webhook verification completed.', { error, eventId: event?.id })
+    const { event, error: verificationError } = await dependencies.verifyWebhook(req)
+    debugLog('Webhook verification completed.', { error: verificationError, eventId: event?.id })
 
-    if (error) {
-      debugLog('Webhook verification failed:', error)
-      res.status(400).json({ error })
+    if (verificationError) {
+      debugLog('Webhook verification failed:', verificationError)
+      res.status(400).json({ error: verificationError })
       return
     }
 
@@ -301,17 +301,17 @@ export const createWebhookHandler = function createWebhookHandler(
 
     try {
       debugLog(`Starting processing for event ${event.id} (${event.type})`)
-      const result = await dependencies.withTransaction(async (tx) => {
+      const result = await dependencies.withTransaction(async (transactionClient) => {
         debugLog(`Inside transaction for event ${event.id} (${event.type})`)
         return await processEventIdempotently(
           event.id,
           event.type,
-          async (tx) => {
+          async (processorTransactionClient) => {
             debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
-            await dependencies.processWebhookEvent(event, tx)
+            await dependencies.processWebhookEvent(event, processorTransactionClient)
             debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
           },
-          tx,
+          transactionClient,
         )
       })
 
@@ -333,8 +333,11 @@ export const createWebhookHandler = function createWebhookHandler(
       debugLog(`Successfully processed event ${event.id} (${event.type}). Responding 200 OK.`)
       res.status(200).json({ processed: true, received: true })
       return
-    } catch (error) {
-      console.error(`Webhook processing failed for event ${event.id} (${event.type}):`, error)
+    } catch (processingError) {
+      console.error(
+        `Webhook processing failed for event ${event.id} (${event.type}):`,
+        processingError,
+      )
       debugLog(`Responding 500 after processing failed for event ${event.id} (${event.type})`)
       res.status(500).json({ error: 'Webhook processing failed', received: true })
       return
