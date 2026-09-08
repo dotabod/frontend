@@ -86,18 +86,9 @@ const verifyWebhook = async function verifyWebhook(
   }
 }
 
-export interface WebhookEventProcessorDependencies {
-  handleInvoiceEvent: typeof handleInvoiceEvent
-}
-
-const defaultWebhookEventProcessorDependencies: WebhookEventProcessorDependencies = {
-  handleInvoiceEvent,
-}
-
-export const processWebhookEvent = async function processWebhookEvent(
+const processWebhookEvent = async function processWebhookEvent(
   event: Stripe.Event,
   tx: Prisma.TransactionClient,
-  dependencies: WebhookEventProcessorDependencies = defaultWebhookEventProcessorDependencies,
 ): Promise<void> {
   debugLog(`Entering processWebhookEvent for event ${event.id} (${event.type})`)
   // Type guard to ensure event.type is one of our supported event types
@@ -221,13 +212,11 @@ export const processWebhookEvent = async function processWebhookEvent(
     case 'invoice.paid': {
       const invoice = event.data.object
       debugLog(`Calling handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
-      const handled = await dependencies.handleInvoiceEvent(event.data.object, tx)
+      const handled = await handleInvoiceEvent(event.data.object, tx)
       assertHandled(handled, event.type)
       debugLog(`Finished handleInvoiceEvent for invoice ${invoice.id} (event: ${event.type})`)
       break
     }
-    case 'invoice.voided':
-      break
     case 'checkout.session.completed': {
       const session = event.data.object
       debugLog(`Calling handleCheckoutCompleted for session ${session.id}`)
@@ -322,9 +311,11 @@ export const createWebhookHandler = function createWebhookHandler(
           event.type,
           billingFacts,
           async (processorTransactionClient) => {
-            debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
-            await dependencies.processWebhookEvent(event, processorTransactionClient)
-            debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
+            if (event.type !== 'invoice.voided') {
+              debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
+              await dependencies.processWebhookEvent(event, processorTransactionClient)
+              debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
+            }
           },
           transactionClient,
         )

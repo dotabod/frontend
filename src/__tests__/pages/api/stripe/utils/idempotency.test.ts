@@ -110,9 +110,10 @@ describe(processEventIdempotently, () => {
       data: {
         billingFacts,
         eventType: 'customer.subscription.updated',
-        processedAt: expect.any(Date),
+        processedAt: create.mock.calls[0]?.[0].data.processedAt,
         stripeEventId: 'evt_1',
       },
     })
+    expect(create.mock.calls[0]?.[0].data.processedAt).toBeInstanceOf(Date)
   })
 })

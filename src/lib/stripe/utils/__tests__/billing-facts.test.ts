@@ -6,7 +6,37 @@ import { extractBillingFacts } from '../billing-facts'
 const stripe = new Stripe('sk_test_dummy')
 const webhookSecret = 'billing-facts-test-secret'
 
-const createEvent = function createEvent(type: string, object: Record<string, unknown>) {
+interface InvoiceStatusTransitionsFixture {
+  finalized_at: number | null
+  marked_uncollectible_at: number | null
+  paid_at: number | null
+  voided_at: number | null
+}
+
+interface InvoiceFixtureOverrides {
+  id?: string
+  lines?: { data: object[] }
+  parent?: object | null
+  payments?: object
+  status?: string
+  status_transitions?: InvoiceStatusTransitionsFixture
+}
+
+interface SubscriptionFixtureOverrides {
+  cancel_at_period_end?: boolean
+  canceled_at?: number | null
+  cancellation_details?: { reason: string } | null
+  ended_at?: number | null
+  items?: {
+    data: Array<{ current_period_end: number; id?: string }>
+    has_more?: boolean
+  }
+  status?: string
+  trial_end?: number | null
+  trial_start?: number | null
+}
+
+const createEvent = function createEvent(type: string, object: object) {
   const payload = JSON.stringify({
     created: 1_750_000_000,
     data: { object },
@@ -19,10 +49,10 @@ const createEvent = function createEvent(type: string, object: Record<string, un
   return stripe.webhooks.constructEvent(payload, signature, webhookSecret)
 }
 
-const invoice = function invoice(overrides: Record<string, unknown> = {}) {
+const invoice = function invoice(overrides: InvoiceFixtureOverrides = {}) {
   return {
-    amount_due: 2_500,
-    amount_paid: 2_500,
+    amount_due: 2500,
+    amount_paid: 2500,
     amount_remaining: 0,
     attempt_count: 2,
     billing_reason: 'subscription_cycle',
@@ -54,7 +84,7 @@ const invoice = function invoice(overrides: Record<string, unknown> = {}) {
     payments: {
       data: [
         {
-          amount_paid: 1_500,
+          amount_paid: 1500,
           currency: 'usd',
           id: 'inpay_charge',
           payment: {
@@ -65,7 +95,7 @@ const invoice = function invoice(overrides: Record<string, unknown> = {}) {
           status_transitions: { canceled_at: null, paid_at: 1_750_000_100 },
         },
         {
-          amount_paid: 1_000,
+          amount_paid: 1000,
           currency: 'usd',
           id: 'inpay_intent',
           payment: { payment_intent: 'pi_paid', type: 'payment_intent' },
@@ -88,7 +118,15 @@ const invoice = function invoice(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const subscription = function subscription(overrides: Record<string, unknown> = {}) {
+const invoiceWithoutPayments = function invoiceWithoutPayments(
+  overrides: Omit<InvoiceFixtureOverrides, 'payments'> = {},
+) {
+  const fixture = invoice(overrides)
+  Reflect.deleteProperty(fixture, 'payments')
+  return fixture
+}
+
+const subscription = function subscription(overrides: SubscriptionFixtureOverrides = {}) {
   return {
     cancel_at_period_end: false,
     canceled_at: null,
@@ -119,8 +157,8 @@ describe(extractBillingFacts, () => {
     const event = createEvent('invoice.paid', invoice())
 
     expect(extractBillingFacts(event)).toStrictEqual({
-      amountDueMinor: 2_500,
-      amountPaidMinor: 2_500,
+      amountDueMinor: 2500,
+      amountPaidMinor: 2500,
       amountRemainingMinor: 0,
       attemptCount: 2,
       billingReason: 'subscription_cycle',
@@ -128,7 +166,7 @@ describe(extractBillingFacts, () => {
       currency: 'usd',
       invoicePayments: [
         {
-          amountPaidMinor: 1_500,
+          amountPaidMinor: 1500,
           currency: 'usd',
           paidAt: 1_750_000_100,
           paymentObjectId: 'ch_paid',
@@ -137,7 +175,7 @@ describe(extractBillingFacts, () => {
           stripeInvoicePaymentId: 'inpay_charge',
         },
         {
-          amountPaidMinor: 1_000,
+          amountPaidMinor: 1000,
           currency: 'usd',
           paidAt: 1_750_000_200,
           paymentObjectId: 'pi_paid',
@@ -194,10 +232,7 @@ describe(extractBillingFacts, () => {
     },
   ])('preserves $eventType status transitions', ({ eventType, status, transitions }) => {
     const fact = extractBillingFacts(
-      createEvent(
-        eventType,
-        invoice({ payments: undefined, status, status_transitions: transitions }),
-      ),
+      createEvent(eventType, invoiceWithoutPayments({ status, status_transitions: transitions })),
     )
 
     expect(fact).toMatchObject({
@@ -250,7 +285,7 @@ describe(extractBillingFacts, () => {
       const fact = extractBillingFacts(
         createEvent(
           'invoice.payment_failed',
-          invoice({ lines: { data: lines }, parent: null, payments: undefined }),
+          invoiceWithoutPayments({ lines: { data: lines }, parent: null }),
         ),
       )
 
@@ -262,15 +297,22 @@ describe(extractBillingFacts, () => {
     const fact = extractBillingFacts(
       createEvent(
         'invoice.payment_failed',
-        invoice({ lines: { data: [] }, parent: null, payments: undefined }),
+        invoiceWithoutPayments({ lines: { data: [] }, parent: null }),
       ),
     )
 
     expect(fact).toMatchObject({ stripeInvoiceId: 'in_paid', stripeSubscriptionId: null })
   })
 
+  it('marks absent embedded payment evidence unavailable', () => {
+    const fixture = invoiceWithoutPayments()
+
+    const fact = extractBillingFacts(createEvent('invoice.payment_failed', fixture))
+
+    expect(fact).toMatchObject({ invoicePayments: [], paymentEvidence: 'unavailable' })
+  })
+
   it.each([
-    undefined,
     { data: [], has_more: false },
     { data: [], has_more: true },
     {
@@ -286,16 +328,19 @@ describe(extractBillingFacts, () => {
       ],
       has_more: false,
     },
-  ])('marks absent or incomplete embedded payment evidence unavailable', (payments) => {
+  ])('marks incomplete embedded payment evidence unavailable', (payments) => {
     const fact = extractBillingFacts(createEvent('invoice.payment_failed', invoice({ payments })))
 
     expect(fact).toMatchObject({ invoicePayments: [], paymentEvidence: 'unavailable' })
   })
 
   it('rejects an invoice event without an invoice ID', () => {
-    expect(() =>
-      extractBillingFacts(createEvent('invoice.payment_failed', invoice({ id: undefined }))),
-    ).toThrow('missing an invoice ID')
+    const fixture = invoice()
+    Reflect.deleteProperty(fixture, 'id')
+
+    expect(() => extractBillingFacts(createEvent('invoice.payment_failed', fixture))).toThrow(
+      'missing an invoice ID',
+    )
   })
 
   it.each(['active', 'past_due', 'unpaid', 'incomplete_expired', 'canceled'])(
@@ -335,9 +380,12 @@ describe(extractBillingFacts, () => {
     },
   )
 
-  it('uses null when a subscription has no item period end', () => {
+  it.each([
+    { data: [], has_more: false },
+    { data: [{ current_period_end: 1_800_000_000 }], has_more: true },
+  ])('uses null when subscription item period coverage is unavailable', (items) => {
     const fact = extractBillingFacts(
-      createEvent('customer.subscription.created', subscription({ items: { data: [] } })),
+      createEvent('customer.subscription.created', subscription({ items })),
     )
 
     expect(fact).toMatchObject({ currentPeriodEnd: null })

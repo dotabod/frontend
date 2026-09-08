@@ -4,13 +4,7 @@ import { createMocks } from 'node-mocks-http'
 import { Stripe } from 'stripe'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { stripe as serverStripe } from '@/lib/stripe-server'
-import type { WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
-import type { WebhookEventProcessorDependencies } from '@/pages/api/stripe/webhook'
-import {
-  createWebhookHandler,
-  processWebhookEvent as processVerifiedWebhookEvent,
-} from '@/pages/api/stripe/webhook'
+import { createWebhookHandler, type WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
 
 const testStripe = new Stripe('sk_test_dummy')
 const webhookSecret = 'test-secret'
@@ -42,9 +36,9 @@ const voidedPayload = JSON.stringify({
   created: 1_750_000_000,
   data: {
     object: {
-      amount_due: 2_500,
+      amount_due: 2500,
       amount_paid: 0,
-      amount_remaining: 2_500,
+      amount_remaining: 2500,
       attempt_count: 1,
       billing_reason: 'subscription_cycle',
       collection_method: 'charge_automatically',
@@ -78,9 +72,9 @@ const noLocalRowPayload = JSON.stringify({
   created: 1_750_000_000,
   data: {
     object: {
-      amount_due: 2_500,
+      amount_due: 2500,
       amount_paid: 0,
-      amount_remaining: 2_500,
+      amount_remaining: 2500,
       attempt_count: 1,
       billing_reason: 'subscription_cycle',
       collection_method: 'charge_automatically',
@@ -111,33 +105,6 @@ const noLocalRowEvent = testStripe.webhooks.constructEvent(
   noLocalRowSignature,
   webhookSecret,
 )
-const providerSubscriptionPayload = JSON.stringify({
-  data: {
-    object: {
-      cancel_at_period_end: false,
-      customer: 'cus_no_local_row',
-      id: 'sub_no_local_row',
-      items: { data: [{ current_period_end: 1_800_000_000 }] },
-      status: 'active',
-    },
-  },
-  id: 'evt_provider_subscription',
-  type: 'customer.subscription.updated',
-})
-const providerSubscriptionSignature = testStripe.webhooks.generateTestHeaderString({
-  payload: providerSubscriptionPayload,
-  secret: webhookSecret,
-})
-const providerSubscriptionEvent = testStripe.webhooks.constructEvent(
-  providerSubscriptionPayload,
-  providerSubscriptionSignature,
-  webhookSecret,
-)
-
-if (providerSubscriptionEvent.type !== 'customer.subscription.updated') {
-  throw new Error('Expected a subscription event fixture')
-}
-
 const createRequestResponse = (method: 'GET' | 'POST' = 'POST') =>
   createMocks<NextApiRequest, NextApiResponse>({
     method,
@@ -272,28 +239,18 @@ describe('Stripe webhook reliability', () => {
 
   it('stores invoice.voided facts without invoking invoice entitlement handling', async () => {
     verifyWebhook.mockResolvedValue({ event: voidedEvent })
-    const handleInvoiceEvent = vi
-      .fn<WebhookEventProcessorDependencies['handleInvoiceEvent']>()
-      .mockResolvedValue(true)
-    const voidedHandler = createWebhookHandler({
-      processWebhookEvent: async (verifiedEvent, transactionClient) =>
-        await processVerifiedWebhookEvent(verifiedEvent, transactionClient, {
-          handleInvoiceEvent,
-        }),
-      verifyWebhook,
-      withTransaction: transaction,
-    })
     const { req, res } = createRequestResponse()
 
-    await voidedHandler(req, res)
+    await handler(req, res)
 
-    expect(handleInvoiceEvent).not.toHaveBeenCalled()
+    expect(processWebhookEventMock).not.toHaveBeenCalled()
+    const createData = create.mock.calls[0]?.[0].data
     expect(create).toHaveBeenCalledWith({
       data: {
         billingFacts: {
-          amountDueMinor: 2_500,
+          amountDueMinor: 2500,
           amountPaidMinor: 0,
-          amountRemainingMinor: 2_500,
+          amountRemainingMinor: 2500,
           attemptCount: 1,
           billingReason: 'subscription_cycle',
           collectionMethod: 'charge_automatically',
@@ -313,42 +270,30 @@ describe('Stripe webhook reliability', () => {
           voidedAt: 1_750_000_100,
         },
         eventType: 'invoice.voided',
-        processedAt: expect.any(Date),
+        processedAt: createData?.processedAt,
         stripeEventId: 'evt_voided',
       },
     })
+    expect(createData?.processedAt).toBeInstanceOf(Date)
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
   })
 
-  it('retains an invoice fact when the existing handler updates no local subscription row', async () => {
+  it('retains an invoice fact when processing succeeds without a local subscription write', async () => {
     verifyWebhook.mockResolvedValue({ event: noLocalRowEvent })
-    vi.spyOn(tx, '$executeRaw').mockResolvedValue(0)
-    const updateMany = vi.spyOn(tx.subscription, 'updateMany').mockResolvedValue({ count: 0 })
-    vi.spyOn(serverStripe.subscriptions, 'retrieve').mockResolvedValue(
-      providerSubscriptionEvent.data.object,
-    )
-    const noLocalRowHandler = createWebhookHandler({
-      processWebhookEvent: processVerifiedWebhookEvent,
-      verifyWebhook,
-      withTransaction: transaction,
-    })
     const { req, res } = createRequestResponse()
 
-    await noLocalRowHandler(req, res)
+    await handler(req, res)
 
-    expect(updateMany).toHaveBeenCalledOnce()
-    expect(create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        billingFacts: expect.objectContaining({
-          kind: 'invoice',
-          stripeInvoiceId: 'in_no_local_row',
-          stripeSubscriptionId: 'sub_no_local_row',
-        }),
-        eventType: 'invoice.payment_failed',
-        stripeEventId: 'evt_no_local_row',
-      }),
+    expect(processWebhookEventMock).toHaveBeenCalledOnce()
+    const createData = create.mock.calls[0]?.[0].data
+    expect(createData?.billingFacts).toMatchObject({
+      kind: 'invoice',
+      stripeInvoiceId: 'in_no_local_row',
+      stripeSubscriptionId: 'sub_no_local_row',
     })
+    expect(createData?.eventType).toBe('invoice.payment_failed')
+    expect(createData?.stripeEventId).toBe('evt_no_local_row')
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
   })

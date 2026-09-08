@@ -7,7 +7,7 @@ type CommonBillingFacts = {
   version: 1
 }
 
-export type InvoicePaymentFact = {
+type InvoicePaymentFact = {
   amountPaidMinor: number
   currency: string
   paidAt: number
@@ -61,6 +61,12 @@ const normalizeStripeId = function normalizeStripeId(reference: StripeIdReferenc
   return reference?.id ?? null
 }
 
+const isPresentStripeId = function isPresentStripeId(
+  value: string | null | undefined,
+): value is string {
+  return value !== null && value !== undefined && value !== ''
+}
+
 const findInvoiceSubscriptionId = function findInvoiceSubscriptionId(
   invoice: Stripe.Invoice,
 ): string | null {
@@ -69,27 +75,27 @@ const findInvoiceSubscriptionId = function findInvoiceSubscriptionId(
       invoice.parent.subscription_details?.subscription,
     )
 
-    if (parentSubscriptionId) {
+    if (isPresentStripeId(parentSubscriptionId)) {
       return parentSubscriptionId
     }
   }
 
   for (const line of invoice.lines.data) {
     const legacySubscriptionId = normalizeStripeId(line.subscription)
-    if (legacySubscriptionId) {
+    if (isPresentStripeId(legacySubscriptionId)) {
       return legacySubscriptionId
     }
 
     if (line.parent?.type === 'subscription_item_details') {
       const subscriptionId = line.parent.subscription_item_details?.subscription
-      if (subscriptionId) {
+      if (isPresentStripeId(subscriptionId)) {
         return subscriptionId
       }
     }
 
     if (line.parent?.type === 'invoice_item_details') {
       const subscriptionId = line.parent.invoice_item_details?.subscription
-      if (subscriptionId) {
+      if (isPresentStripeId(subscriptionId)) {
         return subscriptionId
       }
     }
@@ -102,7 +108,7 @@ const extractInvoicePayments = function extractInvoicePayments(
   invoice: Stripe.Invoice,
 ): Pick<InvoiceBillingFacts, 'invoicePayments' | 'paymentEvidence'> {
   const payments = invoice.payments
-  if (!payments || payments.has_more !== false || payments.data.length === 0) {
+  if (payments === undefined || payments.has_more !== false || payments.data.length === 0) {
     return { invoicePayments: [], paymentEvidence: 'unavailable' }
   }
 
@@ -116,11 +122,11 @@ const extractInvoicePayments = function extractInvoicePayments(
     const paidAt = invoicePayment.status_transitions.paid_at
 
     if (
-      !invoicePayment.id ||
-      !paymentObjectId ||
-      !invoicePayment.status ||
+      invoicePayment.id === '' ||
+      !isPresentStripeId(paymentObjectId) ||
+      invoicePayment.status === '' ||
       invoicePayment.amount_paid === null ||
-      !invoicePayment.currency ||
+      invoicePayment.currency === '' ||
       paidAt === null
     ) {
       return { invoicePayments: [], paymentEvidence: 'unavailable' }
@@ -144,7 +150,7 @@ const extractInvoiceBillingFacts = function extractInvoiceBillingFacts(
   event: Stripe.Event,
   invoice: Stripe.Invoice,
 ): InvoiceBillingFacts {
-  if (!invoice.id) {
+  if (!isPresentStripeId(invoice.id)) {
     throw new Error(`Stripe invoice event ${event.id} is missing an invoice ID`)
   }
 
@@ -175,7 +181,10 @@ const extractSubscriptionBillingFacts = function extractSubscriptionBillingFacts
   event: Stripe.Event,
   subscription: Stripe.Subscription,
 ): SubscriptionBillingFacts {
-  const periodEnds = subscription.items.data.map((item) => item.current_period_end)
+  const periodEnds =
+    subscription.items.has_more === false
+      ? subscription.items.data.map((item) => item.current_period_end)
+      : []
 
   return {
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -204,13 +213,16 @@ export const extractBillingFacts = function extractBillingFacts(
     case 'invoice.paid':
     case 'invoice.payment_failed':
     case 'invoice.payment_succeeded':
-    case 'invoice.voided':
+    case 'invoice.voided': {
       return extractInvoiceBillingFacts(event, event.data.object)
+    }
     case 'customer.subscription.created':
     case 'customer.subscription.deleted':
-    case 'customer.subscription.updated':
+    case 'customer.subscription.updated': {
       return extractSubscriptionBillingFacts(event, event.data.object)
-    default:
+    }
+    default: {
       return undefined
+    }
   }
 }
