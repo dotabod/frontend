@@ -43,20 +43,13 @@ const hasPriorStripeSubscription = async function hasPriorStripeSubscription(
   stripeCustomerIds: string[],
 ): Promise<boolean> {
   try {
-    const results = await Promise.all(
+    const subscriptionLists = await Promise.all(
       stripeCustomerIds.map(async (customer) => {
-        let hasSubscription = false
-        await stripe.subscriptions
-          .list({ customer, limit: 100, status: 'all' })
-          .autoPagingEach(() => {
-            hasSubscription = true
-            return false
-          })
-        return hasSubscription
+        return await stripe.subscriptions.list({ customer, limit: 1, status: 'all' })
       }),
     )
 
-    return results.some(Boolean)
+    return subscriptionLists.some((subscriptions) => subscriptions.data.length > 0)
   } catch (error) {
     console.error('Unable to verify prior Stripe subscriptions for trial eligibility:', error)
     return true
@@ -112,17 +105,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // And any nested non-tx prisma write deadlocks the pool.
     const { customerId, hasSubscriptionHistory, subscriptionData } = await prisma.$transaction(
       async (tx) => {
-        const ensuredCustomerId = await ensureCustomer(session.user, tx)
-        const [currentSubscription, subscriptions] = await Promise.all([
-          getSubscription(session.user.id, tx),
-          tx.subscription.findMany({
-            select: { id: true },
-            where: { userId: session.user.id },
-          }),
-        ])
+        const customer = await ensureCustomer(session.user, tx)
+        const currentSubscription = await getSubscription(session.user.id, tx)
         return {
-          customerId: ensuredCustomerId,
-          hasSubscriptionHistory: subscriptions.length > 0,
+          customerId: customer.id,
+          hasSubscriptionHistory: customer.hasSubscriptionHistory,
           subscriptionData: currentSubscription,
         }
       },
@@ -173,7 +160,7 @@ const ensureCustomer = async function ensureCustomer(
     twitchId?: string | null
   },
   tx: Prisma.TransactionClient,
-): Promise<string> {
+): Promise<{ hasSubscriptionHistory: boolean; id: string }> {
   // Look for any existing subscription to get a customer ID
   const subscription = await tx.subscription.findFirst({
     // Use the most recent subscription
@@ -225,7 +212,7 @@ const ensureCustomer = async function ensureCustomer(
     throw new Error('Unable to establish customer ID')
   }
 
-  return customerId
+  return { hasSubscriptionHistory: subscription !== null, id: customerId }
 }
 
 const createStripeCustomer = async function createStripeCustomer(user: {
@@ -368,7 +355,7 @@ const createCheckoutSession = async function createCheckoutSession(
 }
 
 const createCryptoInvoice = async function createCryptoInvoice(
-  params: Omit<CheckoutSessionParams, 'isGift' | 'isCryptoPayment' | 'isPaypalPayment'>,
+  params: Omit<CheckoutSessionParams, 'isCryptoPayment' | 'isTrialEligible'>,
 ): Promise<string> {
   const {
     customerId,

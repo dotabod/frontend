@@ -169,6 +169,10 @@ describe('Subscription priority logic', () => {
 })
 
 describe(getSubscriptionTier, () => {
+  it('keeps explicit internal Pro records without a price ID', () => {
+    expect(getSubscriptionTier(null, SubscriptionStatus.ACTIVE)).toBe(SubscriptionTier.PRO)
+  })
+
   it('does not grant Pro for an unknown active price', () => {
     expect(getSubscriptionTier('price_unknown', SubscriptionStatus.ACTIVE)).toBe(
       SubscriptionTier.FREE,

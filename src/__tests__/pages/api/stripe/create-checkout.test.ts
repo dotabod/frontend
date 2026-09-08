@@ -10,9 +10,9 @@ vi.stubEnv('NEXTAUTH_URL', 'https://dotabod.com')
 const mocks = vi.hoisted(() => ({
   createNowPaymentsInvoice: vi.fn(),
   featureFlags: { enableCryptoPayments: true },
-  getCheckoutPricePeriod: vi.fn(),
   getServerSession: vi.fn(),
   getSubscription: vi.fn(),
+  getCheckoutPricePeriod: vi.fn<(priceId: string) => 'annual' | 'lifetime' | 'monthly' | null>(),
   prisma: {
     $transaction: vi.fn(),
     nowPaymentsInvoice: {
@@ -25,7 +25,25 @@ const mocks = vi.hoisted(() => ({
     },
   },
   stripe: {
-    checkout: { sessions: { create: vi.fn() } },
+    subscriptions: {
+      list: vi.fn<
+        (params: {
+          customer: string
+          limit: number
+          status: 'all'
+        }) => Promise<{ data: { id: string }[] }>
+      >(),
+    },
+    checkout: {
+      sessions: {
+        create:
+          vi.fn<
+            (params: {
+              subscription_data?: { trial_period_days?: number }
+            }) => Promise<{ url: string }>
+          >(),
+      },
+    },
     customers: { create: vi.fn(), list: vi.fn(), retrieve: vi.fn() },
     invoiceItems: { create: vi.fn() },
     invoices: {
@@ -37,7 +55,6 @@ const mocks = vi.hoisted(() => ({
       voidInvoice: vi.fn(),
     },
     prices: { retrieve: vi.fn() },
-    subscriptions: { list: vi.fn() },
   },
 }))
 
@@ -49,7 +66,7 @@ vi.mock('@/lib/feature-flags', () => ({ featureFlags: mocks.featureFlags }))
 vi.mock('@/lib/nowpayments', () => ({
   createNowPaymentsInvoice: mocks.createNowPaymentsInvoice,
 }))
-vi.mock('@/utils/subscription', () => ({
+vi.mock(import('@/utils/subscription'), () => ({
   GRACE_PERIOD_END: new Date('2099-01-01'),
   getCheckoutPricePeriod: mocks.getCheckoutPricePeriod,
   getCurrentPeriod: () => 'monthly',
@@ -89,7 +106,6 @@ const arrangeTransaction = function arrangeTransaction(timeline: string[]) {
   const tx = {
     subscription: {
       findFirst: vi.fn().mockResolvedValue(null),
-      findMany: vi.fn().mockResolvedValue([]),
       updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
   }
@@ -120,9 +136,7 @@ describe('POST /api/stripe/create-checkout', () => {
       type: 'recurring',
       unit_amount: 1300,
     })
-    mocks.stripe.subscriptions.list.mockReturnValue({
-      autoPagingEach: async () => {},
-    })
+    mocks.stripe.subscriptions.list.mockResolvedValue({ data: [] })
   })
 
   describe('connection pool deadlock regression', () => {
@@ -261,20 +275,13 @@ describe('POST /api/stripe/create-checkout', () => {
       )
       expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
       expect(mocks.prisma.nowPaymentsInvoice.create).not.toHaveBeenCalled()
-      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subscription_data: expect.objectContaining({ trial_period_days: 14 }),
-        }),
-      )
+      const checkoutParams = mocks.stripe.checkout.sessions.create.mock.calls[0]?.[0]
+      expect(checkoutParams?.subscription_data?.trial_period_days).toBe(14)
     })
 
     it('does not grant a trial when Stripe has a prior subscription missing from the database', async () => {
       arrangeTransaction([])
-      mocks.stripe.subscriptions.list.mockImplementation(() => ({
-        autoPagingEach: async (callback: (subscription: unknown) => boolean | void) => {
-          callback({ id: 'sub_previous' })
-        },
-      }))
+      mocks.stripe.subscriptions.list.mockResolvedValue({ data: [{ id: 'sub_previous' }] })
       mocks.stripe.checkout.sessions.create.mockResolvedValue({
         url: 'https://checkout.stripe.com/returning',
       })
@@ -284,17 +291,13 @@ describe('POST /api/stripe/create-checkout', () => {
 
       expect(res._getStatusCode()).toBe(200)
       expect(mocks.stripe.subscriptions.list).toHaveBeenCalledOnce()
-      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() }),
-        }),
-      )
+      const checkoutParams = mocks.stripe.checkout.sessions.create.mock.calls[0]?.[0]
+      expect(checkoutParams?.subscription_data).not.toHaveProperty('trial_period_days')
     })
 
     it('does not grant a trial to an account with local subscription history', async () => {
       const tx = arrangeTransaction([])
       tx.subscription.findFirst.mockResolvedValue({ stripeCustomerId: 'cus_1' })
-      tx.subscription.findMany.mockResolvedValue([{ id: 'sub_previous' }])
       mocks.stripe.checkout.sessions.create.mockResolvedValue({
         url: 'https://checkout.stripe.com/returning',
       })
@@ -304,11 +307,8 @@ describe('POST /api/stripe/create-checkout', () => {
 
       expect(res._getStatusCode()).toBe(200)
       expect(mocks.stripe.subscriptions.list).not.toHaveBeenCalled()
-      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() }),
-        }),
-      )
+      const checkoutParams = mocks.stripe.checkout.sessions.create.mock.calls[0]?.[0]
+      expect(checkoutParams?.subscription_data).not.toHaveProperty('trial_period_days')
     })
 
     it('fails closed on trial eligibility lookup errors without blocking checkout', async () => {
@@ -324,11 +324,8 @@ describe('POST /api/stripe/create-checkout', () => {
       await handler(req, res)
 
       expect(res._getStatusCode()).toBe(200)
-      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() }),
-        }),
-      )
+      const checkoutParams = mocks.stripe.checkout.sessions.create.mock.calls[0]?.[0]
+      expect(checkoutParams?.subscription_data).not.toHaveProperty('trial_period_days')
     })
 
     it('falls back to a card checkout when the crypto feature flag is off', async () => {

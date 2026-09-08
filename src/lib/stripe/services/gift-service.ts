@@ -1,8 +1,9 @@
-import { SubscriptionStatus, SubscriptionTier, TransactionType } from '@prisma/client'
+import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
 
 import { stripe } from '@/lib/stripe-server'
+import { getSubscriptionTier } from '@/utils/subscription'
 
 import { withErrorHandling } from '../utils/error-handling'
 import { CustomerService } from './customer-service'
@@ -131,7 +132,7 @@ export class GiftService {
                       },
                       status: SubscriptionStatus.ACTIVE,
                       stripeCustomerId: recipientCustomerId,
-                      tier: SubscriptionTier.PRO,
+                      tier: getSubscriptionTier(null, SubscriptionStatus.ACTIVE),
                       transactionType:
                         giftType === 'lifetime'
                           ? TransactionType.LIFETIME
