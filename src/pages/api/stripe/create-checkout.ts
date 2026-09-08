@@ -9,13 +9,58 @@ import prisma from '@/lib/db'
 import { featureFlags } from '@/lib/feature-flags'
 import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
-import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
+import {
+  GRACE_PERIOD_END,
+  getCheckoutPricePeriod,
+  getSubscription,
+  isInGracePeriod,
+} from '@/utils/subscription'
 
 interface CheckoutRequestBody {
   priceId: string
-  period?: string
-  isGift?: boolean
   paymentMethod?: string
+}
+
+const isConfiguredCheckoutPrice = function isConfiguredCheckoutPrice(
+  price: Stripe.Price,
+  pricePeriod: 'annual' | 'lifetime' | 'monthly',
+  expectedInterval: 'month' | 'year',
+): boolean {
+  if (!price.active || price.currency !== 'usd') {
+    return false
+  }
+  if (pricePeriod === 'lifetime') {
+    return price.type === 'one_time'
+  }
+  return (
+    price.type === 'recurring' &&
+    price.recurring?.interval === expectedInterval &&
+    price.recurring.interval_count === 1
+  )
+}
+
+const hasPriorStripeSubscription = async function hasPriorStripeSubscription(
+  stripeCustomerIds: string[],
+): Promise<boolean> {
+  try {
+    const results = await Promise.all(
+      stripeCustomerIds.map(async (customer) => {
+        let hasSubscription = false
+        await stripe.subscriptions
+          .list({ customer, limit: 100, status: 'all' })
+          .autoPagingEach(() => {
+            hasSubscription = true
+            return false
+          })
+        return hasSubscription
+      }),
+    )
+
+    return results.some(Boolean)
+  } catch (error) {
+    console.error('Unable to verify prior Stripe subscriptions for trial eligibility:', error)
+    return true
+  }
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -37,14 +82,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Parse and validate request body
-    const { priceId, isGift, paymentMethod } = (await req.body) as CheckoutRequestBody
+    const { priceId, paymentMethod } = (await req.body) as CheckoutRequestBody
     if (!priceId) {
       res.status(400).json({ error: 'Price ID is required' })
       return
     }
 
+    const pricePeriod = getCheckoutPricePeriod(priceId)
+    if (!pricePeriod) {
+      res.status(400).json({ error: 'Price is not available for checkout' })
+      return
+    }
+
     // Verify price and determine purchase type
     const price = await stripe.prices.retrieve(priceId)
+    const expectedInterval = pricePeriod === 'monthly' ? 'month' : 'year'
+    if (!isConfiguredCheckoutPrice(price, pricePeriod, expectedInterval)) {
+      res.status(400).json({ error: 'Price is not available for checkout' })
+      return
+    }
+
     const isRecurring = price.type === 'recurring'
     const isLifetime = !isRecurring
     // Check if user wants to pay with crypto and if feature is enabled
@@ -53,11 +110,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Keep this transaction narrow: production runs with connection_limit=1, so
     // Any external API call inside the callback holds the only pool connection
     // And any nested non-tx prisma write deadlocks the pool.
-    const { customerId, subscriptionData } = await prisma.$transaction(
+    const { customerId, hasSubscriptionHistory, subscriptionData } = await prisma.$transaction(
       async (tx) => {
-        const customerId = await ensureCustomer(session.user, tx)
-        const subscriptionData = await getSubscription(session.user.id, tx)
-        return { customerId, subscriptionData }
+        const ensuredCustomerId = await ensureCustomer(session.user, tx)
+        const [currentSubscription, subscriptions] = await Promise.all([
+          getSubscription(session.user.id, tx),
+          tx.subscription.findMany({
+            select: { id: true },
+            where: { userId: session.user.id },
+          }),
+        ])
+        return {
+          customerId: ensuredCustomerId,
+          hasSubscriptionHistory: subscriptions.length > 0,
+          subscriptionData: currentSubscription,
+        }
       },
       {
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
@@ -65,14 +132,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     )
 
+    const isTrialEligible =
+      isRecurring && !isCryptoPayment && !hasSubscriptionHistory
+        ? !(await hasPriorStripeSubscription([customerId]))
+        : false
+
     const checkoutUrl = await createCheckoutSession({
       customerId,
       email: session.user.email ?? '',
       image: session.user.image ?? '',
       isCryptoPayment,
-      isGift,
       isLifetime,
       isRecurring,
+      isTrialEligible,
       locale: session.user.locale ?? '',
       name: session.user.name ?? '',
       priceId,
@@ -196,8 +268,8 @@ interface CheckoutSessionParams {
   locale: string
   twitchId: string
   referer?: string
-  isGift?: boolean
   isCryptoPayment: boolean
+  isTrialEligible: boolean
 }
 
 const createCheckoutSession = async function createCheckoutSession(
@@ -216,8 +288,8 @@ const createCheckoutSession = async function createCheckoutSession(
     locale,
     twitchId,
     referer,
-    isGift,
     isCryptoPayment,
+    isTrialEligible,
   } = params
 
   // If this is a crypto payment, use the NOWPayments hosted invoice flow
@@ -247,13 +319,10 @@ const createCheckoutSession = async function createCheckoutSession(
   // Simplified trial period logic
   let trialDays = 0
 
-  if (isGift) {
-    // No trial for gift purchases
-    trialDays = 0
-  } else if (isInGracePeriod()) {
+  if (isInGracePeriod()) {
     // If we're in the grace period, use days until grace period ends as trial
     trialDays = Math.ceil((GRACE_PERIOD_END.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  } else if (isRecurring) {
+  } else if (isRecurring && isTrialEligible) {
     // Standard trial for new self-subscriptions
     trialDays = 14
   }
@@ -274,7 +343,7 @@ const createCheckoutSession = async function createCheckoutSession(
       email,
       image,
       isCryptoPayment: 'false',
-      isGift: isGift ? 'true' : 'false',
+      isGift: 'false',
       isNewSubscription: isRecurring && !subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       isUpgradeToLifetime: isLifetime && subscriptionData?.stripeSubscriptionId ? 'true' : 'false',
       locale,

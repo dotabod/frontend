@@ -42,16 +42,16 @@ export const subscriptionToValue = function subscriptionToValue(
   if (!sub?.tier || sub.tier === 'FREE') {
     return 'free'
   }
-  if (sub.transactionType === 'LIFETIME') {
-    return 'pro_lifetime'
-  }
   if (sub.status === 'TRIALING') {
     return 'pro_trial'
   }
   if (sub.status === 'PAST_DUE') {
     return 'pro_past_due'
   }
-  return 'pro'
+  if (sub.status !== 'ACTIVE') {
+    return 'free'
+  }
+  return sub.transactionType === 'LIFETIME' ? 'pro_lifetime' : 'pro'
 }
 
 // Memoized per server instance so we only attempt property creation once.
@@ -100,7 +100,7 @@ const ensureContactProperties = async function ensureContactProperties(token: st
 export const syncHubSpotContact = async function syncHubSpotContact(
   token: string,
   { email, username, subscription }: { email: string; username: string; subscription?: string },
-) {
+): Promise<boolean> {
   try {
     await ensureContactProperties(token)
     const properties = {
@@ -118,7 +118,7 @@ export const syncHubSpotContact = async function syncHubSpotContact(
       })
     const patchRes = await patch()
     if (patchRes.ok) {
-      return
+      return true
     }
     // Contact doesn't exist yet (visitor-identification didn't create one) — create it.
     if (patchRes.status === 404) {
@@ -128,7 +128,7 @@ export const syncHubSpotContact = async function syncHubSpotContact(
         method: 'POST',
       })
       if (createRes.ok) {
-        return
+        return true
       }
       // 409 means the contact was created between our PATCH (404) and POST — either
       // visitor-identification finished provisioning it, or a concurrent request won
@@ -136,7 +136,7 @@ export const syncHubSpotContact = async function syncHubSpotContact(
       if (createRes.status === 409) {
         const retryRes = await patch()
         if (retryRes.ok) {
-          return
+          return true
         }
         const retryDetail = await readBody(retryRes)
         throw new Error(
@@ -154,5 +154,6 @@ export const syncHubSpotContact = async function syncHubSpotContact(
     )
   } catch (error) {
     captureException(error instanceof Error ? error : new Error(String(error)))
+    return false
   }
 }

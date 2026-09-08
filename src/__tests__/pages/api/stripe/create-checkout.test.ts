@@ -10,6 +10,7 @@ vi.stubEnv('NEXTAUTH_URL', 'https://dotabod.com')
 const mocks = vi.hoisted(() => ({
   createNowPaymentsInvoice: vi.fn(),
   featureFlags: { enableCryptoPayments: true },
+  getCheckoutPricePeriod: vi.fn(),
   getServerSession: vi.fn(),
   getSubscription: vi.fn(),
   prisma: {
@@ -36,6 +37,7 @@ const mocks = vi.hoisted(() => ({
       voidInvoice: vi.fn(),
     },
     prices: { retrieve: vi.fn() },
+    subscriptions: { list: vi.fn() },
   },
 }))
 
@@ -49,6 +51,7 @@ vi.mock('@/lib/nowpayments', () => ({
 }))
 vi.mock('@/utils/subscription', () => ({
   GRACE_PERIOD_END: new Date('2099-01-01'),
+  getCheckoutPricePeriod: mocks.getCheckoutPricePeriod,
   getCurrentPeriod: () => 'monthly',
   getSubscription: mocks.getSubscription,
   isInGracePeriod: () => false,
@@ -85,7 +88,8 @@ const buildReq = function buildReq(body: Record<string, unknown> = { priceId: 'p
 const arrangeTransaction = function arrangeTransaction(timeline: string[]) {
   const tx = {
     subscription: {
-      findFirst: vi.fn().mockResolvedValue({ stripeCustomerId: 'cus_1' }),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
       updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
   }
@@ -102,14 +106,22 @@ describe('POST /api/stripe/create-checkout', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.featureFlags.enableCryptoPayments = true
+    mocks.getCheckoutPricePeriod.mockReturnValue('monthly')
     mocks.getServerSession.mockResolvedValue(session)
     mocks.getSubscription.mockResolvedValue(null)
+    mocks.stripe.customers.list.mockResolvedValue({ data: [{ id: 'cus_1' }] })
     mocks.stripe.customers.retrieve.mockResolvedValue({ id: 'cus_1' })
     mocks.stripe.prices.retrieve.mockResolvedValue({
+      active: true,
       currency: 'usd',
+      id: 'price_mo',
       product: 'prod_1',
+      recurring: { interval: 'month', interval_count: 1 },
       type: 'recurring',
       unit_amount: 1300,
+    })
+    mocks.stripe.subscriptions.list.mockReturnValue({
+      autoPagingEach: async () => {},
     })
   })
 
@@ -249,6 +261,74 @@ describe('POST /api/stripe/create-checkout', () => {
       )
       expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
       expect(mocks.prisma.nowPaymentsInvoice.create).not.toHaveBeenCalled()
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subscription_data: expect.objectContaining({ trial_period_days: 14 }),
+        }),
+      )
+    })
+
+    it('does not grant a trial when Stripe has a prior subscription missing from the database', async () => {
+      arrangeTransaction([])
+      mocks.stripe.subscriptions.list.mockImplementation(() => ({
+        autoPagingEach: async (callback: (subscription: unknown) => boolean | void) => {
+          callback({ id: 'sub_previous' })
+        },
+      }))
+      mocks.stripe.checkout.sessions.create.mockResolvedValue({
+        url: 'https://checkout.stripe.com/returning',
+      })
+
+      const { req, res } = buildReq({ priceId: 'price_mo' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.stripe.subscriptions.list).toHaveBeenCalledOnce()
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() }),
+        }),
+      )
+    })
+
+    it('does not grant a trial to an account with local subscription history', async () => {
+      const tx = arrangeTransaction([])
+      tx.subscription.findFirst.mockResolvedValue({ stripeCustomerId: 'cus_1' })
+      tx.subscription.findMany.mockResolvedValue([{ id: 'sub_previous' }])
+      mocks.stripe.checkout.sessions.create.mockResolvedValue({
+        url: 'https://checkout.stripe.com/returning',
+      })
+
+      const { req, res } = buildReq({ priceId: 'price_mo' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.stripe.subscriptions.list).not.toHaveBeenCalled()
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() }),
+        }),
+      )
+    })
+
+    it('fails closed on trial eligibility lookup errors without blocking checkout', async () => {
+      arrangeTransaction([])
+      mocks.stripe.subscriptions.list.mockImplementation(() => {
+        throw new Error('Stripe unavailable')
+      })
+      mocks.stripe.checkout.sessions.create.mockResolvedValue({
+        url: 'https://checkout.stripe.com/no-trial',
+      })
+
+      const { req, res } = buildReq({ priceId: 'price_mo' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() }),
+        }),
+      )
     })
 
     it('falls back to a card checkout when the crypto feature flag is off', async () => {
@@ -291,6 +371,32 @@ describe('POST /api/stripe/create-checkout', () => {
     it('rejects requests missing priceId', async () => {
       const { req, res } = buildReq({})
       await handler(req, res)
+      expect(res._getStatusCode()).toBe(400)
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    })
+
+    it('rejects price IDs outside the configured checkout allowlist', async () => {
+      mocks.getCheckoutPricePeriod.mockReturnValue(null)
+      const { req, res } = buildReq({ priceId: 'price_unknown' })
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(400)
+      expect(mocks.stripe.prices.retrieve).not.toHaveBeenCalled()
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    })
+
+    it('rejects configured prices whose Stripe attributes do not match', async () => {
+      mocks.stripe.prices.retrieve.mockResolvedValue({
+        active: false,
+        currency: 'usd',
+        recurring: { interval: 'month', interval_count: 1 },
+        type: 'recurring',
+      })
+      const { req, res } = buildReq({ priceId: 'price_mo' })
+
+      await handler(req, res)
+
       expect(res._getStatusCode()).toBe(400)
       expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
     })

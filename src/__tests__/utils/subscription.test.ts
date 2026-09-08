@@ -3,7 +3,7 @@ import type { Subscription } from '@prisma/client'
 import { describe, expect, it, vi } from 'vitest'
 
 import prisma from '@/lib/db'
-import { getBillingSummaryInfo, getSubscription } from '@/utils/subscription'
+import { getBillingSummaryInfo, getSubscription, getSubscriptionTier } from '@/utils/subscription'
 
 // We need to mock the module before importing it
 vi.mock('@/utils/subscription', async () => {
@@ -165,6 +165,14 @@ describe('Subscription priority logic', () => {
     // The actual behavior is that result is null when there are no subscriptions
     // And we're not in the grace period
     expect(result).toBeNull()
+  })
+})
+
+describe(getSubscriptionTier, () => {
+  it('does not grant Pro for an unknown active price', () => {
+    expect(getSubscriptionTier('price_unknown', SubscriptionStatus.ACTIVE)).toBe(
+      SubscriptionTier.FREE,
+    )
   })
 })
 

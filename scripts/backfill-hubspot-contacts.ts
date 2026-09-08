@@ -2,7 +2,7 @@
 
 /**
  * One-time backfill: sync every Dotabod user with an email into HubSpot as a
- * CRM contact, so a Marketing Email blast can reach the whole user base.
+ * CRM contact so contact coverage and subscription labels can be reconciled.
  *
  * Today contacts are only synced when a logged-in user loads a page with the
  * HubSpot chat widget (see src/pages/api/hubspot/visitor-token.ts), so coverage
@@ -10,8 +10,8 @@
  * sets email, twitch_username, and dotabod_subscription via syncHubSpotContact.
  *
  * Idempotent: syncHubSpotContact PATCHes by email and creates on 404, so
- * re-running is safe. Errors per-contact are swallowed (Sentry) by the helper,
- * so the run never aborts mid-way; we keep our own success/skip counters.
+ * re-running is safe. Errors per-contact are reported to Sentry and returned
+ * to this script so its success and failure counters remain accurate.
  *
  * Usage:
  *   doppler run -- pnpm dlx tsx scripts/backfill-hubspot-contacts.ts [--limit N]
@@ -61,12 +61,16 @@ const syncUser = async function syncUser(user: {
     subscription = undefined
   }
   try {
-    await syncHubSpotContact(token, {
+    const didSync = await syncHubSpotContact(token, {
       email: user.email,
       subscription,
       username: user.displayName ?? '',
     })
-    synced += 1
+    if (didSync) {
+      synced += 1
+    } else {
+      failed += 1
+    }
   } catch {
     failed += 1
   }
@@ -82,7 +86,8 @@ const runPool = async function runPool(
   let cursor = 0
   const worker = async function worker() {
     while (cursor < users.length) {
-      const user = users[(cursor += 1)]
+      const user = users[cursor]
+      cursor += 1
       await syncUser(user)
     }
   }
