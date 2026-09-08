@@ -282,7 +282,7 @@ export const createWebhookHandler = function createWebhookHandler(
     const { event, error: verificationError } = await dependencies.verifyWebhook(req)
     debugLog('Webhook verification completed.', { error: verificationError, eventId: event?.id })
 
-    if (verificationError) {
+    if (verificationError !== undefined) {
       debugLog('Webhook verification failed:', verificationError)
       res.status(400).json({ error: verificationError })
       return
@@ -332,7 +332,6 @@ export const createWebhookHandler = function createWebhookHandler(
 
       debugLog(`Successfully processed event ${event.id} (${event.type}). Responding 200 OK.`)
       res.status(200).json({ processed: true, received: true })
-      return
     } catch (processingError) {
       console.error(
         `Webhook processing failed for event ${event.id} (${event.type}):`,
@@ -340,7 +339,6 @@ export const createWebhookHandler = function createWebhookHandler(
       )
       debugLog(`Responding 500 after processing failed for event ${event.id} (${event.type})`)
       res.status(500).json({ error: 'Webhook processing failed', received: true })
-      return
     }
   }
 }

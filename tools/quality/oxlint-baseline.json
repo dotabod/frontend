@@ -67384,26 +67384,6 @@
         "severity": "error"
       }
     },
-    "82510f88f6482231e049aca6547b9cd8cd9dedb90f5dcd7b3fbfb347e0b6a128": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "}",
-              "previous": "res.status(200).json({ processed: false, received: true })"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
     "82513c57c5fef0eaf22b351f1ca541ed33adf75f1608dad385fb0ffcb4d05a1a": {
       "count": 1,
       "summary": {
@@ -100181,26 +100161,6 @@
         "severity": "error"
       }
     },
-    "c3f404accd79e036038c2b9edb076b600eecbe18a408dbfeecb1328b62406d4f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "} catch (error) {",
-              "previous": "res.status(200).json({ processed: true, received: true })"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
     "c408dca20bc7d0db8fa0c483b19760289a5cb8f509ec6605e38979319492bb26": {
       "count": 1,
       "summary": {
@@ -123659,26 +123619,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "ef854f41edb4e0831abf15c448f84e9abbb7f360ee16d1da85cb41c94154292e": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (error) {",
-              "next": "debugLog('Webhook verification failed:', error)",
-              "previous": ""
-            },
-            "span": "error",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
