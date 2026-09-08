@@ -20,9 +20,9 @@ const signature = stripe.webhooks.generateTestHeaderString({
 })
 const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret)
 const irrelevantPayload = JSON.stringify({
-  data: { object: {} },
+  data: { object: { id: 'pm_irrelevant' } },
   id: 'evt_irrelevant',
-  type: 'ping',
+  type: 'payment_method.attached',
 })
 const irrelevantSignature = stripe.webhooks.generateTestHeaderString({
   payload: irrelevantPayload,
@@ -34,7 +34,7 @@ const irrelevantEvent = stripe.webhooks.constructEvent(
   webhookSecret,
 )
 
-const createRequestResponse = (method = 'POST') =>
+const createRequestResponse = (method: 'GET' | 'POST' = 'POST') =>
   createMocks<NextApiRequest, NextApiResponse>({
     method,
   })
