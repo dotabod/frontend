@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto'
 
-import type { Prisma } from '@prisma/client'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import prisma from '@/lib/db'
@@ -40,22 +39,23 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     scheduledMessageIds.add(scheduledMessageId)
 
     await expect(
-      withTransaction((tx) =>
-        processEventIdempotently(
-          eventId,
-          'checkout.session.completed',
-          async (tx) => {
-            await tx.scheduledMessage.create({
-              data: {
-                id: scheduledMessageId,
-                message: 'Webhook reliability rollback sentinel',
-                sendAt: new Date('2030-01-01T00:00:00.000Z'),
-              },
-            })
-            throw new Error('processor failed')
-          },
-          tx,
-        ),
+      withTransaction(
+        async (tx) =>
+          await processEventIdempotently(
+            eventId,
+            'checkout.session.completed',
+            async (tx) => {
+              await tx.scheduledMessage.create({
+                data: {
+                  id: scheduledMessageId,
+                  message: 'Webhook reliability rollback sentinel',
+                  sendAt: new Date('2030-01-01T00:00:00.000Z'),
+                },
+              })
+              throw new Error('processor failed')
+            },
+            tx,
+          ),
       ),
     ).rejects.toThrow('processor failed')
 
@@ -71,71 +71,59 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     const eventId = `evt_concurrent_${randomUUID()}`
     receiptIds.add(eventId)
     let processorCalls = 0
-    let releaseProcessor = () => undefined
-    let markProcessorStarted = () => undefined
-    const processorStarted = new Promise<void>((resolve) => {
-      markProcessorStarted = resolve
-    })
-    const processorReleased = new Promise<void>((resolve) => {
-      releaseProcessor = resolve
-    })
-    let markRacingCreateStarted = () => undefined
-    const racingCreateStarted = new Promise<void>((resolve) => {
-      markRacingCreateStarted = resolve
-    })
+    const processorStarted = Promise.withResolvers<void>()
+    const processorReleased = Promise.withResolvers<void>()
+    const racingCreateStarted = Promise.withResolvers<void>()
+    const countProcessor = async () => {
+      await Promise.resolve()
+      processorCalls += 1
+    }
 
-    const firstDelivery = withTransaction((tx) =>
-      processEventIdempotently(
-        eventId,
-        'checkout.session.completed',
-        async () => {
-          processorCalls += 1
-          markProcessorStarted()
-          await processorReleased
-        },
-        tx,
-      ),
+    const firstDelivery = withTransaction(
+      async (tx) =>
+        await processEventIdempotently(
+          eventId,
+          'checkout.session.completed',
+          async () => {
+            processorCalls += 1
+            processorStarted.resolve()
+            await processorReleased.promise
+          },
+          tx,
+        ),
     )
 
-    await processorStarted
+    await processorStarted.promise
 
-    const secondDelivery = withTransaction((tx) => {
-      const observedTx = {
-        webhookEvent: {
-          create: async (args: Prisma.WebhookEventCreateArgs) => {
-            markRacingCreateStarted()
-            return tx.webhookEvent.create(args)
-          },
-          findUnique: (args: Prisma.WebhookEventFindUniqueArgs) => tx.webhookEvent.findUnique(args),
-        },
-      } as unknown as Prisma.TransactionClient
+    const secondDelivery = withTransaction(async (tx) => {
+      const createReceipt = tx.webhookEvent.create.bind(tx.webhookEvent)
+      const createSpy = vi.spyOn(tx.webhookEvent, 'create').mockImplementation(async (args) => {
+        racingCreateStarted.resolve()
+        return await createReceipt(args)
+      })
 
-      return processEventIdempotently(
-        eventId,
-        'checkout.session.completed',
-        async () => {
-          processorCalls += 1
-        },
-        observedTx,
-      )
+      try {
+        return await processEventIdempotently(
+          eventId,
+          'checkout.session.completed',
+          countProcessor,
+          tx,
+        )
+      } finally {
+        createSpy.mockRestore()
+      }
     })
     const secondDeliveryFailure = expect(secondDelivery).rejects.toMatchObject({ code: 'P2002' })
 
-    await racingCreateStarted
-    releaseProcessor()
+    await racingCreateStarted.promise
+    processorReleased.resolve()
 
     await expect(firstDelivery).resolves.toStrictEqual({ kind: 'processed' })
     await secondDeliveryFailure
 
-    const laterDelivery = await withTransaction((tx) =>
-      processEventIdempotently(
-        eventId,
-        'checkout.session.completed',
-        async () => {
-          processorCalls += 1
-        },
-        tx,
-      ),
+    const laterDelivery = await withTransaction(
+      async (tx) =>
+        await processEventIdempotently(eventId, 'checkout.session.completed', countProcessor, tx),
     )
 
     expect(laterDelivery.kind).toBe('duplicate')
