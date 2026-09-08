@@ -36,6 +36,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
   it('rolls back the receipt and prior processor writes when the processor throws', async () => {
     const eventId = `evt_rollback_${randomUUID()}`
     const scheduledMessageId = randomUUID()
+    let processorCalls = 0
     receiptIds.add(eventId)
     scheduledMessageIds.add(scheduledMessageId)
 
@@ -46,6 +47,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
             eventId,
             'checkout.session.completed',
             async (transactionClient) => {
+              processorCalls += 1
               await transactionClient.scheduledMessage.create({
                 data: {
                   id: scheduledMessageId,
@@ -60,6 +62,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
       ),
     ).rejects.toThrow('processor failed')
 
+    expect(processorCalls).toBe(1)
     await expect(
       Promise.all([
         prisma.webhookEvent.findUnique({ where: { stripeEventId: eventId } }),

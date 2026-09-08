@@ -8,6 +8,7 @@ import type { WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
 import { createWebhookHandler } from '@/pages/api/stripe/webhook'
 
 const stripe = new Stripe('sk_test_dummy')
+const webhookSecret = 'test-secret'
 const payload = JSON.stringify({
   data: { object: { id: 'cs_reliability' } },
   id: 'evt_reliability',
@@ -15,13 +16,27 @@ const payload = JSON.stringify({
 })
 const signature = stripe.webhooks.generateTestHeaderString({
   payload,
-  secret: 'test-secret',
+  secret: webhookSecret,
 })
-const event = stripe.webhooks.constructEvent(payload, signature, 'test-secret')
+const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret)
+const irrelevantPayload = JSON.stringify({
+  data: { object: {} },
+  id: 'evt_irrelevant',
+  type: 'ping',
+})
+const irrelevantSignature = stripe.webhooks.generateTestHeaderString({
+  payload: irrelevantPayload,
+  secret: webhookSecret,
+})
+const irrelevantEvent = stripe.webhooks.constructEvent(
+  irrelevantPayload,
+  irrelevantSignature,
+  webhookSecret,
+)
 
-const createRequestResponse = () =>
+const createRequestResponse = (method = 'POST') =>
   createMocks<NextApiRequest, NextApiResponse>({
-    method: 'POST',
+    method,
   })
 
 describe('Stripe webhook reliability', () => {
@@ -53,6 +68,44 @@ describe('Stripe webhook reliability', () => {
     transaction.mockImplementation(async (operation) => await operation(tx))
     findUnique.mockResolvedValue(null)
     create.mockResolvedValue(receipt)
+  })
+
+  it('returns 405 for non-POST requests without verifying or processing', async () => {
+    const { req, res } = createRequestResponse('GET')
+
+    await handler(req, res)
+
+    expect(verifyWebhook).not.toHaveBeenCalled()
+    expect(transaction).not.toHaveBeenCalled()
+    expect(processWebhookEvent).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(405)
+    expect(res._getJSONData()).toStrictEqual({ error: 'Method not allowed' })
+  })
+
+  it('returns 400 when webhook verification fails without processing', async () => {
+    verifyWebhook.mockResolvedValue({ error: 'Webhook verification failed' })
+    const { req, res } = createRequestResponse()
+
+    await handler(req, res)
+
+    expect(verifyWebhook).toHaveBeenCalledOnce()
+    expect(transaction).not.toHaveBeenCalled()
+    expect(processWebhookEvent).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(400)
+    expect(res._getJSONData()).toStrictEqual({ error: 'Webhook verification failed' })
+  })
+
+  it('returns 200 for irrelevant events without processing', async () => {
+    verifyWebhook.mockResolvedValue({ event: irrelevantEvent })
+    const { req, res } = createRequestResponse()
+
+    await handler(req, res)
+
+    expect(verifyWebhook).toHaveBeenCalledOnce()
+    expect(transaction).not.toHaveBeenCalled()
+    expect(processWebhookEvent).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 
   it('returns 500 and invokes a rejected handler once per delivery', async () => {
