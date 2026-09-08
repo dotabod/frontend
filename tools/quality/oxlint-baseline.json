@@ -133409,12 +133409,8 @@
         "name": "app",
         "resolvedConfigSha256": "c0c208cf8ff15b7a20a4ff6c86712ca2289f5ddd5cc522b89a67ca1704f34fa1",
         "scope": {
-          "ignorePatterns": [
-            "supabase/functions/**"
-          ],
-          "paths": [
-            "."
-          ]
+          "ignorePatterns": ["supabase/functions/**"],
+          "paths": ["."]
         }
       },
       {
@@ -133437,9 +133433,7 @@
         "resolvedConfigSha256": "6c6c97b8453def202543b9830ada155f95f1a1375685319dec3501f5c65e59a1",
         "scope": {
           "ignorePatterns": [],
-          "paths": [
-            "supabase/functions"
-          ]
+          "paths": ["supabase/functions"]
         }
       }
     ],
