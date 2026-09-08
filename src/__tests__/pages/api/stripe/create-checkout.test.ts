@@ -6,13 +6,21 @@ import { z } from 'zod'
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 vi.stubEnv('NEXTAUTH_URL', 'https://dotabod.com')
+vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID', 'price_yr')
+vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID', 'price_life')
+vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID', 'price_mo')
+
+type ExistingSubscription = { stripeCustomerId: string } | null
+interface StripeCustomerCreateInput {
+  email?: string
+  metadata: Record<string, string>
+}
 
 const mocks = vi.hoisted(() => ({
   createNowPaymentsInvoice: vi.fn(),
   featureFlags: { enableCryptoPayments: true },
   getServerSession: vi.fn(),
   getSubscription: vi.fn(),
-  getCheckoutPricePeriod: vi.fn<(priceId: string) => 'annual' | 'lifetime' | 'monthly' | null>(),
   prisma: {
     $transaction: vi.fn(),
     nowPaymentsInvoice: {
@@ -25,15 +33,6 @@ const mocks = vi.hoisted(() => ({
     },
   },
   stripe: {
-    subscriptions: {
-      list: vi.fn<
-        (params: {
-          customer: string
-          limit: number
-          status: 'all'
-        }) => Promise<{ data: { id: string }[] }>
-      >(),
-    },
     checkout: {
       sessions: {
         create:
@@ -44,7 +43,13 @@ const mocks = vi.hoisted(() => ({
           >(),
       },
     },
-    customers: { create: vi.fn(), list: vi.fn(), retrieve: vi.fn() },
+    customers: {
+      create: vi.fn<(params: StripeCustomerCreateInput) => Promise<{ id: string }>>(),
+      list: vi.fn<
+        (params: { email: string; limit: number }) => Promise<{ data: { id: string }[] }>
+      >(),
+      retrieve: vi.fn<(customerId: string) => Promise<{ id: string }>>(),
+    },
     invoiceItems: { create: vi.fn() },
     invoices: {
       create: vi.fn(),
@@ -55,6 +60,15 @@ const mocks = vi.hoisted(() => ({
       voidInvoice: vi.fn(),
     },
     prices: { retrieve: vi.fn() },
+    subscriptions: {
+      list: vi.fn<
+        (params: {
+          customer: string
+          limit: number
+          status: 'all'
+        }) => Promise<{ data: { id: string }[] }>
+      >(),
+    },
   },
 }))
 
@@ -66,9 +80,8 @@ vi.mock('@/lib/feature-flags', () => ({ featureFlags: mocks.featureFlags }))
 vi.mock('@/lib/nowpayments', () => ({
   createNowPaymentsInvoice: mocks.createNowPaymentsInvoice,
 }))
-vi.mock(import('@/utils/subscription'), () => ({
+vi.mock('@/utils/subscription', () => ({
   GRACE_PERIOD_END: new Date('2099-01-01'),
-  getCheckoutPricePeriod: mocks.getCheckoutPricePeriod,
   getCurrentPeriod: () => 'monthly',
   getSubscription: mocks.getSubscription,
   isInGracePeriod: () => false,
@@ -105,8 +118,8 @@ const buildReq = function buildReq(body: Record<string, unknown> = { priceId: 'p
 const arrangeTransaction = function arrangeTransaction(timeline: string[]) {
   const tx = {
     subscription: {
-      findFirst: vi.fn().mockResolvedValue(null),
-      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findFirst: vi.fn<() => Promise<ExistingSubscription>>().mockResolvedValue(null),
+      updateMany: vi.fn<() => Promise<{ count: number }>>().mockResolvedValue({ count: 0 }),
     },
   }
   mocks.prisma.$transaction.mockImplementation(async (callback: (tx: unknown) => unknown) => {
@@ -122,7 +135,6 @@ describe('POST /api/stripe/create-checkout', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.featureFlags.enableCryptoPayments = true
-    mocks.getCheckoutPricePeriod.mockReturnValue('monthly')
     mocks.getServerSession.mockResolvedValue(session)
     mocks.getSubscription.mockResolvedValue(null)
     mocks.stripe.customers.list.mockResolvedValue({ data: [{ id: 'cus_1' }] })
@@ -373,7 +385,6 @@ describe('POST /api/stripe/create-checkout', () => {
     })
 
     it('rejects price IDs outside the configured checkout allowlist', async () => {
-      mocks.getCheckoutPricePeriod.mockReturnValue(null)
       const { req, res } = buildReq({ priceId: 'price_unknown' })
 
       await handler(req, res)

@@ -9,9 +9,9 @@ import { getSubscription } from '@/utils/subscription'
 
 vi.mock('@/lib/api/get-server-session', () => ({ getServerSession: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ authOptions: {} }))
-vi.mock(import('@/lib/hubspot'), () => ({
-  subscriptionToValue: vi.fn<typeof subscriptionToValue>(() => 'pro'),
-  syncHubSpotContact: vi.fn<typeof syncHubSpotContact>().mockResolvedValue(true),
+vi.mock('@/lib/hubspot', () => ({
+  subscriptionToValue: vi.fn(() => 'pro'),
+  syncHubSpotContact: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))
 vi.mock('node-fetch', () => ({ default: vi.fn() }))

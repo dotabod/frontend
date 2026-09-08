@@ -324,29 +324,6 @@ const PRICE_IDS: SubscriptionPriceId[] = [
 // Alias of PRICE_IDS rather than a duplicated literal.
 export const CRYPTO_PRICE_IDS: SubscriptionPriceId[] = PRICE_IDS
 
-export const getCheckoutPricePeriod = function getCheckoutPricePeriod(
-  priceId: string,
-): PricePeriod | null {
-  const price = PRICE_IDS.find((candidate) =>
-    [candidate.monthly, candidate.annual, candidate.lifetime].includes(priceId),
-  )
-
-  if (!price) {
-    return null
-  }
-  if (price.monthly === priceId) {
-    return 'monthly'
-  }
-  if (price.annual === priceId) {
-    return 'annual'
-  }
-  if (price.lifetime === priceId) {
-    return 'lifetime'
-  }
-
-  return null
-}
-
 export const getPriceId = function getPriceId(
   tier: Exclude<SubscriptionTier, typeof SUBSCRIPTION_TIERS.FREE>,
   period: PricePeriod,

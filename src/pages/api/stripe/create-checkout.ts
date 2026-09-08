@@ -9,12 +9,8 @@ import prisma from '@/lib/db'
 import { featureFlags } from '@/lib/feature-flags'
 import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
-import {
-  GRACE_PERIOD_END,
-  getCheckoutPricePeriod,
-  getSubscription,
-  isInGracePeriod,
-} from '@/utils/subscription'
+import { getCheckoutPricePeriod } from '@/lib/stripe/checkout-prices'
+import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 
 interface CheckoutRequestBody {
   priceId: string
@@ -44,9 +40,9 @@ const hasPriorStripeSubscription = async function hasPriorStripeSubscription(
 ): Promise<boolean> {
   try {
     const subscriptionLists = await Promise.all(
-      stripeCustomerIds.map(async (customer) => {
-        return await stripe.subscriptions.list({ customer, limit: 1, status: 'all' })
-      }),
+      stripeCustomerIds.map((customer) =>
+        stripe.subscriptions.list({ customer, limit: 1, status: 'all' }),
+      ),
     )
 
     return subscriptionLists.some((subscriptions) => subscriptions.data.length > 0)
