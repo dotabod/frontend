@@ -25,10 +25,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d dotabod_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd "pg_isready -U postgres -d dotabod_test" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -47,8 +44,7 @@ jobs:
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
       - name: Prove webhook transaction reliability
         run: >-
-          pnpm exec vitest run
-          src/__tests__/pages/api/stripe/utils/idempotency.postgres.test.ts
+          pnpm exec vitest run src/__tests__/pages/api/stripe/utils/idempotency.postgres.test.ts
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
