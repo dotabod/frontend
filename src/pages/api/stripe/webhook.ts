@@ -251,91 +251,96 @@ const getRawBody = async function getRawBody(req: NextApiRequest): Promise<strin
   return Buffer.concat(chunks).toString()
 }
 
-/**
- * Main webhook handler
- * @param req The incoming request
- * @param res The outgoing response
- */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    debugLog('Webhook handler received non-POST request')
-    res.status(405).json({ error: 'Method not allowed' })
-    return
-  }
-  debugLog('Webhook handler received POST request')
+type RunWebhookTransaction = (
+  operation: (tx: Prisma.TransactionClient) => ReturnType<typeof processEventIdempotently>,
+) => ReturnType<typeof processEventIdempotently>
 
-  debugLog('Verifying webhook signature...')
-  const { event, error } = await verifyWebhook(req)
-  debugLog('Webhook verification completed.', { error, eventId: event?.id })
+export interface WebhookHandlerDependencies {
+  processWebhookEvent: typeof processWebhookEvent
+  verifyWebhook: typeof verifyWebhook
+  withTransaction: RunWebhookTransaction
+}
 
-  if (error) {
-    debugLog('Webhook verification failed:', error)
-    res.status(400).json({ error })
-    return
-  }
+const defaultWebhookHandlerDependencies: WebhookHandlerDependencies = {
+  processWebhookEvent,
+  verifyWebhook,
+  withTransaction,
+}
 
-  debugLog('Checking if event is relevant...', { eventId: event?.id, eventType: event?.type })
-  if (!event || !relevantEvents.has(event.type)) {
-    debugLog('Event is not relevant or event is null. Responding 200 OK.', {
-      eventId: event?.id,
-      eventType: event?.type,
-    })
-    res.status(200).json({ received: true })
-    return
-  }
-  debugLog('Event is relevant.', { eventId: event.id, eventType: event.type })
+export const createWebhookHandler = function createWebhookHandler(
+  dependencies: WebhookHandlerDependencies = defaultWebhookHandlerDependencies,
+) {
+  return async function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method !== 'POST') {
+      debugLog('Webhook handler received non-POST request')
+      res.status(405).json({ error: 'Method not allowed' })
+      return
+    }
+    debugLog('Webhook handler received POST request')
 
-  try {
-    debugLog(`Starting processing for event ${event.id} (${event.type})`)
-    const result = await withTransaction(async (tx) => {
-      debugLog(`Inside transaction for event ${event.id} (${event.type})`)
-      return await processEventIdempotently(
-        event.id,
-        event.type,
-        async (tx) => {
-          debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
-          await processWebhookEvent(event, tx)
-          debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
-        },
-        tx,
-      )
-    })
+    debugLog('Verifying webhook signature...')
+    const { event, error: verificationError } = await dependencies.verifyWebhook(req)
+    debugLog('Webhook verification completed.', { error: verificationError, eventId: event?.id })
 
-    debugLog(`Idempotent processing result for event ${event.id} (${event.type}):`, result)
-
-    if (result === false) {
-      console.error(`Webhook processing failed for event ${event.id} (${event.type})`)
-      debugLog(`Webhook processing marked as failed for event ${event.id}, responding 500.`)
-      res.status(500).json({ error: 'Webhook processing failed', received: true })
+    if (verificationError !== undefined) {
+      debugLog('Webhook verification failed:', verificationError)
+      res.status(400).json({ error: verificationError })
       return
     }
 
-    // Handle the case where the event was already processed
-    if (result && typeof result === 'object' && result.skipped) {
-      debugLog(
-        `Event ${event.id} (${event.type}) was already processed at ${result.processedAt instanceof Date ? result.processedAt.toISOString() : String(result.processedAt)}. Responding 200 OK.`,
-      )
-      res.status(200).json({
-        processed: true,
-        processedAt: result.processedAt,
-        received: true,
-        skipped: true,
+    debugLog('Checking if event is relevant...', { eventId: event?.id, eventType: event?.type })
+    if (!event || !relevantEvents.has(event.type)) {
+      debugLog('Event is not relevant or event is null. Responding 200 OK.', {
+        eventId: event?.id,
+        eventType: event?.type,
       })
+      res.status(200).json({ received: true })
       return
     }
+    debugLog('Event is relevant.', { eventId: event.id, eventType: event.type })
 
-    debugLog(`Successfully processed event ${event.id} (${event.type}). Responding 200 OK.`)
-    res.status(200).json({ processed: true, received: true })
-    return
-  } catch (error) {
-    console.error(
-      `Unhandled error in webhook handler for event ${event.id} (${event.type}):`,
-      error,
-    )
-    // Return 200 to prevent Stripe from retrying, as this might be a persistent error
-    // We'll handle the failure through our own monitoring and recovery process
-    debugLog(`Responding 200 OK after unhandled error for event ${event.id} (${event.type})`)
-    res.status(200).json({ processed: false, received: true })
-    return
+    try {
+      debugLog(`Starting processing for event ${event.id} (${event.type})`)
+      const result = await dependencies.withTransaction(async (transactionClient) => {
+        debugLog(`Inside transaction for event ${event.id} (${event.type})`)
+        return await processEventIdempotently(
+          event.id,
+          event.type,
+          async (processorTransactionClient) => {
+            debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
+            await dependencies.processWebhookEvent(event, processorTransactionClient)
+            debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
+          },
+          transactionClient,
+        )
+      })
+
+      debugLog(`Idempotent processing result for event ${event.id} (${event.type}):`, result)
+
+      if (result.kind === 'duplicate') {
+        debugLog(
+          `Event ${event.id} (${event.type}) was already processed at ${result.processedAt.toISOString()}. Responding 200 OK.`,
+        )
+        res.status(200).json({
+          processed: true,
+          processedAt: result.processedAt,
+          received: true,
+          skipped: true,
+        })
+        return
+      }
+
+      debugLog(`Successfully processed event ${event.id} (${event.type}). Responding 200 OK.`)
+      res.status(200).json({ processed: true, received: true })
+    } catch (processingError) {
+      console.error(
+        `Webhook processing failed for event ${event.id} (${event.type}):`,
+        processingError,
+      )
+      debugLog(`Responding 500 after processing failed for event ${event.id} (${event.type})`)
+      res.status(500).json({ error: 'Webhook processing failed', received: true })
+    }
   }
 }
+
+export default createWebhookHandler()

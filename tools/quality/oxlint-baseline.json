@@ -4504,26 +4504,6 @@
         "severity": "error"
       }
     },
-    "089a01e1988edef9599cb59e2ec4f9489dbed9ed201862a40c62aa4e7c65c293": {
-      "count": 1,
-      "summary": {
-        "code": "promise(avoid-new)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await new Promise((resolve) => setTimeout(resolve, delay))",
-              "next": "}",
-              "previous": "debugLog(`Waiting ${delay}ms before retry ${retryCount + 1}/${maxRetries}`)"
-            },
-            "span": "new Promise((resolve) => setTimeout(resolve, delay))",
-            "text": ""
-          }
-        ],
-        "message": "Avoid creating new promises",
-        "severity": "error"
-      }
-    },
     "08a10ffd3aac30b0676ec05f518078a545b17611a66de79620d1d119236941c7": {
       "count": 1,
       "summary": {
@@ -8499,26 +8479,6 @@
         "severity": "error"
       }
     },
-    "0f16265175b00343cc2497c43d44fb26bd817d5bbfc2cdce1bf86948ac0e8710": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "deleteError,",
-              "next": "})",
-              "previous": "debugLog(`Failed to delete webhookEvent record for failed event ${eventId}`, {"
-            },
-            "span": "deleteError",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "0f276369cb445a9ca65d0e740869d9bb7430e8f131ac3e5b907cc61a0ef66af2": {
       "count": 1,
       "summary": {
@@ -10085,26 +10045,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "120fa5a8aad78ea259c2dee1d8072bf5b30b99e8df9d4334512031b51b6d9762": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "mockTx.webhookEvent.create.mockResolvedValue({ id: 'w1' })",
-              "next": "mockTx.webhookEvent.delete.mockResolvedValue({ id: 'w1' })",
-              "previous": "mockTx.webhookEvent.findUnique.mockResolvedValue(null)"
-            },
-            "span": "mockTx.webhookEvent.create.mockResolvedValue",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `error` type typed value.",
         "severity": "error"
       }
     },
@@ -17468,26 +17408,6 @@
         "severity": "error"
       }
     },
-    "210665ea601b32d18dbba2dacc24f6cd6b1bcc547bc7ff148a4d209dccdd59ce": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "mockTx.webhookEvent.delete.mockResolvedValue({ id: 'w1' })",
-              "next": "",
-              "previous": "mockTx.webhookEvent.create.mockResolvedValue({ id: 'w1' })"
-            },
-            "span": "mockTx.webhookEvent.delete.mockResolvedValue",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `error` type typed value.",
-        "severity": "error"
-      }
-    },
     "2116968d95b8ae27cf3d13e443cfb702db0648c733fdb691bb90f049e0c34d95": {
       "count": 1,
       "summary": {
@@ -17585,35 +17505,6 @@
           }
         ],
         "message": "Unsafe return of a value of type `any`.",
-        "severity": "error"
-      }
-    },
-    "217e9a8fb9a542e8da3ff907cfcdd5093949c244ff20b82a9c0cd8f6506acc1f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-shadow)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "} catch (error) {",
-              "next": "console.error(",
-              "previous": "return"
-            },
-            "span": "error",
-            "text": "'error' is declared here"
-          },
-          {
-            "context": {
-              "current": "const { event, error } = await verifyWebhook(req)",
-              "next": "debugLog('Webhook verification completed.', { error, eventId: event?.id })",
-              "previous": "debugLog('Verifying webhook signature...')"
-            },
-            "span": "error",
-            "text": "shadowed declaration is here"
-          }
-        ],
-        "message": "'error' is already declared in the upper scope.",
         "severity": "error"
       }
     },
@@ -17975,26 +17866,6 @@
         "severity": "error"
       }
     },
-    "22205009a3b5651ff3d592bc23a114fd36dfee5746c99410ea133264fe78bc4d": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "findUnique: vi.fn(),",
-              "next": "},",
-              "previous": "delete: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "2231420ccc62d47341f021a92cafaaaaf47dc8b5ade9cc8b333647c9485bbd88": {
       "count": 1,
       "summary": {
@@ -18101,35 +17972,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "224a6e8eae9e1e14c0179c8a50f570e54ae880909f2234190c57f2e18a7d3891": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(unbound-method)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(mockTx.webhookEvent.delete).toHaveBeenCalledWith({",
-              "next": "where: { stripeEventId: 'evt_1' },",
-              "previous": "})"
-            },
-            "span": "delete",
-            "text": "This reference may be unbound and lose `this` context"
-          },
-          {
-            "context": {
-              "current": "expect(mockTx.webhookEvent.delete).toHaveBeenCalledWith({",
-              "next": "where: { stripeEventId: 'evt_1' },",
-              "previous": "})"
-            },
-            "span": "mockTx.webhookEvent.delete",
-            "text": ""
-          }
-        ],
-        "message": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.",
         "severity": "error"
       }
     },
@@ -29570,26 +29412,6 @@
         "severity": "error"
       }
     },
-    "37d22a1d1aa63e01420918637b97b0c9f4b18dba4d818aba6bb0d6fe70333077": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(require-await)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "async () => {",
-              "next": "throw new Error('processor failed')",
-              "previous": "'checkout.session.completed',"
-            },
-            "span": "async () => {\n        throw new Error('processor failed')\n      }",
-            "text": ""
-          }
-        ],
-        "message": "Async function has no `await` expression.",
-        "severity": "error"
-      }
-    },
     "37dc2c74876d9d157dd571b2a8dda913a68c6ad322cb1183f61984055e061ef4": {
       "count": 1,
       "summary": {
@@ -34145,26 +33967,6 @@
         "severity": "error"
       }
     },
-    "401331063ed8e68dc413a91248c98d6f04deb2b5fced7f42fbf836a729ddfef3": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (error.code === 'P2002' && error.meta?.target?.includes('stripeEventId')) {",
-              "next": "// Try to fetch the existing record to get its processedAt",
-              "previous": "// Process has already recorded this event, so we can safely skip processing"
-            },
-            "span": "error.meta?.target?.includes",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `any` typed value.",
-        "severity": "error"
-      }
-    },
     "40283ea6bd788a777a6398b378a0255d5f783435421334109dc097108a2b8628": {
       "count": 1,
       "summary": {
@@ -34302,26 +34104,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "406f2f232b2cd97d62040a7f46f613fc64b486903667c23cac0ab35b04a9a13f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await new Promise((resolve) => setTimeout(resolve, delay))",
-              "next": "}",
-              "previous": "debugLog(`Waiting ${delay}ms before retry ${retryCount + 1}/${maxRetries}`)"
-            },
-            "span": "setTimeout(resolve, delay)",
-            "text": ""
-          }
-        ],
-        "message": "Value returned in a context where a void return is expected.",
         "severity": "error"
       }
     },
@@ -36741,26 +36523,6 @@
         "severity": "error"
       }
     },
-    "4577adcb4c0c1cc6af25734f7a9a6382a90c1cfe7ca28ac412c88ef252e7cb42": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await new Promise((resolve) => setTimeout(resolve, delay))",
-              "next": "}",
-              "previous": "debugLog(`Waiting ${delay}ms before retry ${retryCount + 1}/${maxRetries}`)"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
     "457d9f65d43cbc0b31aaa42d54a36f70715c477115b966218416cee383230744": {
       "count": 4,
       "summary": {
@@ -38128,26 +37890,6 @@
         "severity": "error"
       }
     },
-    "477edab42f472effa3228ca05baf0a9cc54f59b63621042aadd965d4331d7205": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (error.code === 'P2002' && error.meta?.target?.includes('stripeEventId')) {",
-              "next": "// Try to fetch the existing record to get its processedAt",
-              "previous": "// Process has already recorded this event, so we can safely skip processing"
-            },
-            "span": "error.meta?.target?.includes('stripeEventId')",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
-        "severity": "error"
-      }
-    },
     "478cc3ebbcb4a20a4617abe41e6bafaaf1c47c6530d45eb7d027ee0d288fd935": {
       "count": 1,
       "summary": {
@@ -39306,26 +39048,6 @@
         "severity": "error"
       }
     },
-    "498a7d599d62316ef4f2dd52efd4d501d395d4cf5bc27564399ac2cdde19c206": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (result && typeof result === 'object' && result.skipped) {",
-              "next": "debugLog(",
-              "previous": "// Handle the case where the event was already processed"
-            },
-            "span": "result",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected value in conditional. A union of different types has inconsistent truthiness.",
-        "severity": "error"
-      }
-    },
     "4997ba9d00a26f25d3367ab5deedf5565eb3a357849f67183af221537a2aab80": {
       "count": 1,
       "summary": {
@@ -40050,26 +39772,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "4b48dcb1b084c9bc44030d3a45825ecb1332e23fce626242cfbf7ea4e7dbc58d": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "debugLog(`Transaction attempt ${retryCount} failed:`, { error })",
-              "next": "",
-              "previous": "retryCount += 1"
-            },
-            "span": "error",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -48589,26 +48291,6 @@
         "severity": "error"
       }
     },
-    "5d14da6396a809e8680393f964d936dd92d01a96cb24fbfc2e1125b7fc87dbf7": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-runtime-typeof)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (result && typeof result === 'object' && result.skipped) {",
-              "next": "debugLog(",
-              "previous": "// Handle the case where the event was already processed"
-            },
-            "span": "typeof result",
-            "text": ""
-          }
-        ],
-        "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
     "5d1580bb292d84dbe5a31b39ed481048c7dbcb924c42eaeb1227c4c2b89fd41d": {
       "count": 1,
       "summary": {
@@ -51325,26 +51007,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "62c1b749e86206a60f256ab96915071afaebfc49552214d86e4352a0841354f7": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (error.code === 'P2002' && error.meta?.target?.includes('stripeEventId')) {",
-              "next": "// Try to fetch the existing record to get its processedAt",
-              "previous": "// Process has already recorded this event, so we can safely skip processing"
-            },
-            "span": "code",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .code on an `any` value.",
         "severity": "error"
       }
     },
@@ -60904,35 +60566,6 @@
         "severity": "error"
       }
     },
-    "75ccc4f5a7dd7b830f6f6ab9a4df2086106e437ca9b5698efd39cf45481523d5": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-shadow)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "async (tx) => {",
-              "next": "debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)",
-              "previous": "event.type,"
-            },
-            "span": "tx",
-            "text": "'tx' is declared here"
-          },
-          {
-            "context": {
-              "current": "const result = await withTransaction(async (tx) => {",
-              "next": "debugLog(`Inside transaction for event ${event.id} (${event.type})`)",
-              "previous": "debugLog(`Starting processing for event ${event.id} (${event.type})`)"
-            },
-            "span": "tx",
-            "text": "shadowed declaration is here"
-          }
-        ],
-        "message": "'tx' is already declared in the upper scope.",
-        "severity": "error"
-      }
-    },
     "75e1bdd132561c3298449e102daeb5f419a69f7369b5b9149361bc150d81fe3f": {
       "count": 1,
       "summary": {
@@ -67751,26 +67384,6 @@
         "severity": "error"
       }
     },
-    "82510f88f6482231e049aca6547b9cd8cd9dedb90f5dcd7b3fbfb347e0b6a128": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "}",
-              "previous": "res.status(200).json({ processed: false, received: true })"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
     "82513c57c5fef0eaf22b351f1ca541ed33adf75f1608dad385fb0ffcb4d05a1a": {
       "count": 1,
       "summary": {
@@ -71398,26 +71011,6 @@
           }
         ],
         "message": "Mocked modules must be dynamic imported.",
-        "severity": "error"
-      }
-    },
-    "893bd5789d7af1feee97a29df327e6f9774fa1e8a7f884fcd7f0d8efa39c28df": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "delete: vi.fn(),",
-              "next": "findUnique: vi.fn(),",
-              "previous": "create: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -87951,26 +87544,6 @@
         "severity": "error"
       }
     },
-    "a94cf256dcd2e064dcd53af82d832e658cd14d15d3de91724726ee366d16bd5d": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const result = await prisma.$transaction(operation, {",
-              "next": "// Ensure consistent reads",
-              "previous": "debugLog(`Attempting transaction, try ${retryCount + 1}/${maxRetries}`)"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
     "a95b027c595b0135850ffad7b54a000cb50359abb116eeac950ae74fc29dd55d": {
       "count": 1,
       "summary": {
@@ -88068,26 +87641,6 @@
           }
         ],
         "message": "Prefer `async`/`await` to the callback pattern",
-        "severity": "error"
-      }
-    },
-    "a976220188e9c1a5314c51b4a7646fd8e6ef978325edce43d08c3b5d51dafd0d": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(ban-ts-comment)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "// @ts-nocheck",
-              "next": "import type { Prisma } from '@prisma/client'",
-              "previous": ""
-            },
-            "span": " @ts-nocheck",
-            "text": ""
-          }
-        ],
-        "message": "Do not use @ts-nocheck because it alters compilation errors.",
         "severity": "error"
       }
     },
@@ -94257,26 +93810,6 @@
         "severity": "error"
       }
     },
-    "b71d43fade300657de2a24b36eb77aa66903700b0fed63c139d46a848d76175f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "processedAt: expect.any(Date),",
-              "next": "stripeEventId: 'evt_1',",
-              "previous": "eventType: 'checkout.session.completed',"
-            },
-            "span": "processedAt: expect.any(Date)",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "b71d70af3026981db8b9a61b9dffcddbe51acde49de5cc529b742def978030d6": {
       "count": 1,
       "summary": {
@@ -95963,26 +95496,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "bb67c328dfbdbb9f9168ff112c7632058743dd9c2014bd89d00e74fb4abebe28": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (error.code === 'P2002' && error.meta?.target?.includes('stripeEventId')) {",
-              "next": "// Try to fetch the existing record to get its processedAt",
-              "previous": "// Process has already recorded this event, so we can safely skip processing"
-            },
-            "span": "meta",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .meta on an `any` value.",
         "severity": "error"
       }
     },
@@ -100648,26 +100161,6 @@
         "severity": "error"
       }
     },
-    "c3f404accd79e036038c2b9edb076b600eecbe18a408dbfeecb1328b62406d4f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "} catch (error) {",
-              "previous": "res.status(200).json({ processed: true, received: true })"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
     "c408dca20bc7d0db8fa0c483b19760289a5cb8f509ec6605e38979319492bb26": {
       "count": 1,
       "summary": {
@@ -104996,26 +104489,6 @@
         "severity": "error"
       }
     },
-    "cc28f9d4e04403d961b1c952ce5a34fcab0f4b5a0cf84dd5b527660936551559": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "mockTx.webhookEvent.findUnique.mockResolvedValue(null)",
-              "next": "mockTx.webhookEvent.create.mockResolvedValue({ id: 'w1' })",
-              "previous": "it('deletes idempotency record when processing fails so retries are possible', async () => {"
-            },
-            "span": "mockTx.webhookEvent.findUnique.mockResolvedValue",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `error` type typed value.",
-        "severity": "error"
-      }
-    },
     "cc4aec2adb2ec14dd55e49b6268397bd8e2880b03936a9e47158a6ecb9545c3a": {
       "count": 2,
       "summary": {
@@ -105602,26 +105075,6 @@
           }
         ],
         "message": "Unsafe argument of type error typed assigned to a parameter of type NextApiRequest.",
-        "severity": "error"
-      }
-    },
-    "cd4244c70ab345f978106d336aded5c009158b81a3186388e7415d7b92449718": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "debugLog(`Error processing event ${eventId} (${eventType}):`, { error })",
-              "next": "return false",
-              "previous": "} catch (error) {"
-            },
-            "span": "error",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -115830,26 +115283,6 @@
         "severity": "error"
       }
     },
-    "e0380ac1c718f14c01a0ad24110761500ee7ba77a06560baa84f5dc5d92c19ff": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-promise-executor-return)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await new Promise((resolve) => setTimeout(resolve, delay))",
-              "next": "}",
-              "previous": "debugLog(`Waiting ${delay}ms before retry ${retryCount + 1}/${maxRetries}`)"
-            },
-            "span": "setTimeout(resolve, delay)",
-            "text": ""
-          }
-        ],
-        "message": "Return statement should not be used in Promise executor.",
-        "severity": "error"
-      }
-    },
     "e0398a2bf9aef2e2b42fa2e4663f0ef058aaf69b06e65cd4a614678396613db8": {
       "count": 1,
       "summary": {
@@ -117061,26 +116494,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "e2a0ee8e66f6b0fba37c94d20ac9348daee22989d0c195711ae0c4d9f65d668a": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/stripe/utils/idempotency.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "debugLog(`Error creating webhookEvent record for event ${eventId}`, { error })",
-              "next": "// If the error is a unique constraint violation, it means another concurrent",
-              "previous": "} catch (error) {"
-            },
-            "span": "error",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -121886,26 +121299,6 @@
         "severity": "error"
       }
     },
-    "eb099a87182159b08e16e36d3f5d0a634063f1771ba99eeac4b8ce2fbbb90a23": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "create: vi.fn(),",
-              "next": "delete: vi.fn(),",
-              "previous": "webhookEvent: {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "eb17126df337d8765dba6592aa3733f41b4e6616bf68a8c2c90377c5ca7bf2f6": {
       "count": 1,
       "summary": {
@@ -124226,55 +123619,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "ef8219fad7e1bc5004d46fb8670fb935e77b3d0297d92ff37e46f289dda83989": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(unbound-method)",
-        "file": "src/__tests__/pages/api/stripe/utils/idempotency.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(mockTx.webhookEvent.create).toHaveBeenCalledWith({",
-              "next": "data: {",
-              "previous": "expect(result).toBeFalsy()"
-            },
-            "span": "create",
-            "text": "This reference may be unbound and lose `this` context"
-          },
-          {
-            "context": {
-              "current": "expect(mockTx.webhookEvent.create).toHaveBeenCalledWith({",
-              "next": "data: {",
-              "previous": "expect(result).toBeFalsy()"
-            },
-            "span": "mockTx.webhookEvent.create",
-            "text": ""
-          }
-        ],
-        "message": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.",
-        "severity": "error"
-      }
-    },
-    "ef854f41edb4e0831abf15c448f84e9abbb7f360ee16d1da85cb41c94154292e": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/webhook.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (error) {",
-              "next": "debugLog('Webhook verification failed:', error)",
-              "previous": ""
-            },
-            "span": "error",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -130610,26 +129954,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "fbcf8f23a2632ea10e3f7d39f9051c3955a99e0c81015b749cef2c8a58cde519": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-known-value-widening)",
-        "file": "src/lib/stripe/utils/transaction.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "let lastError: unknown = null",
-              "next": "",
-              "previous": "let retryCount = 0"
-            },
-            "span": "null",
-            "text": ""
-          }
-        ],
-        "message": "The explicit unknown type on binding `lastError` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
         "severity": "error"
       }
     },
