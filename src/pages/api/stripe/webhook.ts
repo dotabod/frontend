@@ -261,12 +261,14 @@ export interface WebhookHandlerDependencies {
   withTransaction: RunWebhookTransaction
 }
 
+const defaultWebhookHandlerDependencies: WebhookHandlerDependencies = {
+  processWebhookEvent,
+  verifyWebhook,
+  withTransaction,
+}
+
 export const createWebhookHandler = function createWebhookHandler(
-  dependencies: WebhookHandlerDependencies = {
-    processWebhookEvent,
-    verifyWebhook,
-    withTransaction,
-  },
+  dependencies: WebhookHandlerDependencies = defaultWebhookHandlerDependencies,
 ) {
   return async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {

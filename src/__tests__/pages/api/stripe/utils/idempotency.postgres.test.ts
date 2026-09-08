@@ -45,8 +45,8 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
           await processEventIdempotently(
             eventId,
             'checkout.session.completed',
-            async (tx) => {
-              await tx.scheduledMessage.create({
+            async (transactionClient) => {
+              await transactionClient.scheduledMessage.create({
                 data: {
                   id: scheduledMessageId,
                   message: 'Webhook reliability rollback sentinel',
@@ -86,7 +86,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
           'checkout.session.completed',
           async () => {
             processorCalls += 1
-            processorStarted.resolve(undefined)
+            processorStarted.resolve()
             await processorReleased.promise
           },
           tx,
@@ -102,7 +102,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     const deliveries = Promise.allSettled([firstDelivery, secondDelivery])
 
     await setTimeout(100)
-    processorReleased.resolve(undefined)
+    processorReleased.resolve()
 
     const [firstResult, secondResult] = await deliveries
     expect(firstResult).toStrictEqual({ status: 'fulfilled', value: { kind: 'processed' } })

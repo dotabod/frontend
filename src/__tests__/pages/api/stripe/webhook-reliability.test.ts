@@ -4,7 +4,8 @@ import { createMocks } from 'node-mocks-http'
 import { Stripe } from 'stripe'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createWebhookHandler, type WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
+import type { WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
+import { createWebhookHandler } from '@/pages/api/stripe/webhook'
 
 const stripe = new Stripe('sk_test_dummy')
 const payload = JSON.stringify({
