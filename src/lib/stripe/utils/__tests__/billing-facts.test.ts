@@ -28,7 +28,7 @@ interface SubscriptionFixtureOverrides {
   cancellation_details?: { reason: string } | null
   ended_at?: number | null
   items?: {
-    data: Array<{ current_period_end: number; id?: string }>
+    data: { current_period_end: number; id?: string }[]
     has_more?: boolean
   }
   status?: string
@@ -36,7 +36,11 @@ interface SubscriptionFixtureOverrides {
   trial_start?: number | null
 }
 
-const createEvent = function createEvent(type: string, object: object) {
+interface StripeObjectFixture {
+  id?: string
+}
+
+const createEvent = function createEvent(type: string, object: StripeObjectFixture) {
   const payload = JSON.stringify({
     created: 1_750_000_000,
     data: { object },

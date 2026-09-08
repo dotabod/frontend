@@ -4,7 +4,8 @@ import { createMocks } from 'node-mocks-http'
 import { Stripe } from 'stripe'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createWebhookHandler, type WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
+import type { WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
+import { createWebhookHandler } from '@/pages/api/stripe/webhook'
 
 const testStripe = new Stripe('sk_test_dummy')
 const webhookSecret = 'test-secret'
@@ -275,8 +276,10 @@ describe('Stripe webhook reliability', () => {
       },
     })
     expect(createData?.processedAt).toBeInstanceOf(Date)
-    expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
+    expect({ body: res._getJSONData(), statusCode: res.statusCode }).toStrictEqual({
+      body: { processed: true, received: true },
+      statusCode: 200,
+    })
   })
 
   it('retains an invoice fact when processing succeeds without a local subscription write', async () => {
@@ -287,14 +290,22 @@ describe('Stripe webhook reliability', () => {
 
     expect(processWebhookEventMock).toHaveBeenCalledOnce()
     const createData = create.mock.calls[0]?.[0].data
-    expect(createData?.billingFacts).toMatchObject({
-      kind: 'invoice',
-      stripeInvoiceId: 'in_no_local_row',
-      stripeSubscriptionId: 'sub_no_local_row',
+    expect({
+      billingFacts: createData?.billingFacts,
+      eventType: createData?.eventType,
+      stripeEventId: createData?.stripeEventId,
+    }).toMatchObject({
+      billingFacts: {
+        kind: 'invoice',
+        stripeInvoiceId: 'in_no_local_row',
+        stripeSubscriptionId: 'sub_no_local_row',
+      },
+      eventType: 'invoice.payment_failed',
+      stripeEventId: 'evt_no_local_row',
     })
-    expect(createData?.eventType).toBe('invoice.payment_failed')
-    expect(createData?.stripeEventId).toBe('evt_no_local_row')
-    expect(res.statusCode).toBe(200)
-    expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
+    expect({ body: res._getJSONData(), statusCode: res.statusCode }).toStrictEqual({
+      body: { processed: true, received: true },
+      statusCode: 200,
+    })
   })
 })

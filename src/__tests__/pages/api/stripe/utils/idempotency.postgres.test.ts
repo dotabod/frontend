@@ -172,9 +172,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
       version: 1,
     } satisfies BillingFacts
     const laterFact = { ...originalFact, status: 'canceled' } satisfies BillingFacts
-    const processor = async () => {
-      await Promise.resolve()
-    }
+    const processor = vi.fn<() => Promise<void>>().mockResolvedValue()
 
     await withTransaction(
       async (tx) =>

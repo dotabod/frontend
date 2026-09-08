@@ -1,20 +1,20 @@
 import type Stripe from 'stripe'
 
-type CommonBillingFacts = {
-  livemode: boolean
-  occurredAt: number
-  stripeCustomerId: string | null
-  version: 1
+interface CommonBillingFacts {
+  readonly livemode: boolean
+  readonly occurredAt: number
+  readonly stripeCustomerId: string | null
+  readonly version: 1
 }
 
-type InvoicePaymentFact = {
-  amountPaidMinor: number
-  currency: string
-  paidAt: number
-  paymentObjectId: string
-  paymentObjectType: Stripe.InvoicePayment.Payment.Type
-  status: string
-  stripeInvoicePaymentId: string
+interface InvoicePaymentFact {
+  readonly amountPaidMinor: number
+  readonly currency: string
+  readonly paidAt: number
+  readonly paymentObjectId: string
+  readonly paymentObjectType: Stripe.InvoicePayment.Payment.Type
+  readonly status: string
+  readonly stripeInvoicePaymentId: string
 }
 
 export type InvoiceBillingFacts = CommonBillingFacts & {
@@ -53,12 +53,40 @@ export type BillingFacts = InvoiceBillingFacts | SubscriptionBillingFacts
 
 type StripeIdReference = string | { id: string } | null | undefined
 
+type InvoiceBillingEvent =
+  | Stripe.InvoiceMarkedUncollectibleEvent
+  | Stripe.InvoiceOverdueEvent
+  | Stripe.InvoicePaidEvent
+  | Stripe.InvoicePaymentFailedEvent
+  | Stripe.InvoicePaymentSucceededEvent
+  | Stripe.InvoiceVoidedEvent
+
+type SubscriptionBillingEvent =
+  | Stripe.CustomerSubscriptionCreatedEvent
+  | Stripe.CustomerSubscriptionDeletedEvent
+  | Stripe.CustomerSubscriptionUpdatedEvent
+
+const invoiceBillingEventTypes = new Set<Stripe.Event.Type>([
+  'invoice.marked_uncollectible',
+  'invoice.overdue',
+  'invoice.paid',
+  'invoice.payment_failed',
+  'invoice.payment_succeeded',
+  'invoice.voided',
+])
+
+const subscriptionBillingEventTypes = new Set<Stripe.Event.Type>([
+  'customer.subscription.created',
+  'customer.subscription.deleted',
+  'customer.subscription.updated',
+])
+
 const normalizeStripeId = function normalizeStripeId(reference: StripeIdReference): string | null {
-  if (typeof reference === 'string') {
-    return reference
+  if (reference instanceof Object) {
+    return reference.id
   }
 
-  return reference?.id ?? null
+  return reference ?? null
 }
 
 const isPresentStripeId = function isPresentStripeId(
@@ -107,8 +135,8 @@ const findInvoiceSubscriptionId = function findInvoiceSubscriptionId(
 const extractInvoicePayments = function extractInvoicePayments(
   invoice: Stripe.Invoice,
 ): Pick<InvoiceBillingFacts, 'invoicePayments' | 'paymentEvidence'> {
-  const payments = invoice.payments
-  if (payments === undefined || payments.has_more !== false || payments.data.length === 0) {
+  const { payments } = invoice
+  if (payments === undefined || payments.has_more || payments.data.length === 0) {
     return { invoicePayments: [], paymentEvidence: 'unavailable' }
   }
 
@@ -124,11 +152,12 @@ const extractInvoicePayments = function extractInvoicePayments(
     if (
       invoicePayment.id === '' ||
       !isPresentStripeId(paymentObjectId) ||
-      invoicePayment.status === '' ||
-      invoicePayment.amount_paid === null ||
-      invoicePayment.currency === '' ||
-      paidAt === null
+      invoicePayment.status === ''
     ) {
+      return { invoicePayments: [], paymentEvidence: 'unavailable' }
+    }
+
+    if (invoicePayment.amount_paid === null || invoicePayment.currency === '' || paidAt === null) {
       return { invoicePayments: [], paymentEvidence: 'unavailable' }
     }
 
@@ -181,10 +210,9 @@ const extractSubscriptionBillingFacts = function extractSubscriptionBillingFacts
   event: Stripe.Event,
   subscription: Stripe.Subscription,
 ): SubscriptionBillingFacts {
-  const periodEnds =
-    subscription.items.has_more === false
-      ? subscription.items.data.map((item) => item.current_period_end)
-      : []
+  const periodEnds = subscription.items.has_more
+    ? []
+    : subscription.items.data.map((item) => item.current_period_end)
 
   return {
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -204,25 +232,28 @@ const extractSubscriptionBillingFacts = function extractSubscriptionBillingFacts
   }
 }
 
+const isInvoiceBillingEvent = function isInvoiceBillingEvent(
+  event: Stripe.Event,
+): event is InvoiceBillingEvent {
+  return invoiceBillingEventTypes.has(event.type)
+}
+
+const isSubscriptionBillingEvent = function isSubscriptionBillingEvent(
+  event: Stripe.Event,
+): event is SubscriptionBillingEvent {
+  return subscriptionBillingEventTypes.has(event.type)
+}
+
 export const extractBillingFacts = function extractBillingFacts(
   event: Stripe.Event,
 ): BillingFacts | undefined {
-  switch (event.type) {
-    case 'invoice.marked_uncollectible':
-    case 'invoice.overdue':
-    case 'invoice.paid':
-    case 'invoice.payment_failed':
-    case 'invoice.payment_succeeded':
-    case 'invoice.voided': {
-      return extractInvoiceBillingFacts(event, event.data.object)
-    }
-    case 'customer.subscription.created':
-    case 'customer.subscription.deleted':
-    case 'customer.subscription.updated': {
-      return extractSubscriptionBillingFacts(event, event.data.object)
-    }
-    default: {
-      return undefined
-    }
+  if (isInvoiceBillingEvent(event)) {
+    return extractInvoiceBillingFacts(event, event.data.object)
   }
+
+  if (isSubscriptionBillingEvent(event)) {
+    return extractSubscriptionBillingFacts(event, event.data.object)
+  }
+
+  return undefined
 }
