@@ -4,6 +4,7 @@ import { setTimeout } from 'node:timers/promises'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import prisma from '@/lib/db'
+import type { BillingFacts } from '@/lib/stripe/utils/billing-facts'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 import { withTransaction } from '@/lib/stripe/utils/transaction'
 
@@ -39,13 +40,30 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
     let processorCalls = 0
     receiptIds.add(eventId)
     scheduledMessageIds.add(scheduledMessageId)
+    const billingFacts = {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      cancellationReason: null,
+      currentPeriodEnd: 1_800_000_000,
+      endedAt: null,
+      kind: 'subscription',
+      livemode: true,
+      occurredAt: 1_700_000_000,
+      status: 'past_due',
+      stripeCustomerId: 'cus_rollback',
+      stripeSubscriptionId: 'sub_rollback',
+      trialEnd: null,
+      trialStart: null,
+      version: 1,
+    } satisfies BillingFacts
 
     await expect(
       withTransaction(
         async (tx) =>
           await processEventIdempotently(
             eventId,
-            'checkout.session.completed',
+            'customer.subscription.updated',
+            billingFacts,
             async (transactionClient) => {
               processorCalls += 1
               await transactionClient.scheduledMessage.create({
@@ -87,6 +105,7 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
         await processEventIdempotently(
           eventId,
           'checkout.session.completed',
+          undefined,
           async () => {
             processorCalls += 1
             processorStarted.resolve(true)
@@ -100,7 +119,13 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
 
     const secondDelivery = withTransaction(
       async (tx) =>
-        await processEventIdempotently(eventId, 'checkout.session.completed', countProcessor, tx),
+        await processEventIdempotently(
+          eventId,
+          'checkout.session.completed',
+          undefined,
+          countProcessor,
+          tx,
+        ),
     )
     const deliveries = Promise.allSettled([firstDelivery, secondDelivery])
 
@@ -113,11 +138,66 @@ describePostgres('Stripe webhook PostgreSQL reliability', () => {
 
     const laterDelivery = await withTransaction(
       async (tx) =>
-        await processEventIdempotently(eventId, 'checkout.session.completed', countProcessor, tx),
+        await processEventIdempotently(
+          eventId,
+          'checkout.session.completed',
+          undefined,
+          countProcessor,
+          tx,
+        ),
     )
 
     expect(laterDelivery.kind).toBe('duplicate')
     expect(processorCalls).toBe(1)
     await expect(prisma.webhookEvent.count({ where: { stripeEventId: eventId } })).resolves.toBe(1)
   }, 20_000)
+
+  it('keeps the original billing fact when a later delivery is a duplicate', async () => {
+    const eventId = `evt_fact_${randomUUID()}`
+    receiptIds.add(eventId)
+    const originalFact = {
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      cancellationReason: null,
+      currentPeriodEnd: 1_800_000_000,
+      endedAt: null,
+      kind: 'subscription',
+      livemode: true,
+      occurredAt: 1_700_000_000,
+      status: 'active',
+      stripeCustomerId: 'cus_original',
+      stripeSubscriptionId: 'sub_original',
+      trialEnd: null,
+      trialStart: null,
+      version: 1,
+    } satisfies BillingFacts
+    const laterFact = { ...originalFact, status: 'canceled' } satisfies BillingFacts
+    const processor = vi.fn<() => Promise<void>>().mockResolvedValue()
+
+    await withTransaction(
+      async (tx) =>
+        await processEventIdempotently(
+          eventId,
+          'customer.subscription.updated',
+          originalFact,
+          processor,
+          tx,
+        ),
+    )
+    const duplicate = await withTransaction(
+      async (tx) =>
+        await processEventIdempotently(
+          eventId,
+          'customer.subscription.updated',
+          laterFact,
+          processor,
+          tx,
+        ),
+    )
+
+    expect(duplicate.kind).toBe('duplicate')
+    await expect(
+      prisma.webhookEvent.findUnique({ where: { stripeEventId: eventId } }),
+    ).resolves.toMatchObject({ billingFacts: originalFact })
+  })
 })

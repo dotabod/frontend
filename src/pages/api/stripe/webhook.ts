@@ -12,6 +12,7 @@ import {
   handleSubscriptionDeleted,
   handleSubscriptionEvent,
 } from '@/lib/stripe/handlers/subscription-events'
+import { extractBillingFacts } from '@/lib/stripe/utils/billing-facts'
 import { debugLog } from '@/lib/stripe/utils/debug-log'
 import { processEventIdempotently } from '@/lib/stripe/utils/idempotency'
 import { withTransaction } from '@/lib/stripe/utils/transaction'
@@ -32,6 +33,7 @@ const relevantEvents = new Set<Stripe.Event.Type>([
   'invoice.payment_failed',
   'invoice.marked_uncollectible',
   'invoice.overdue',
+  'invoice.voided',
   // Fallback for invoices marked paid_out_of_band via crypto settlement
   'invoice.paid',
   'checkout.session.completed',
@@ -300,16 +302,20 @@ export const createWebhookHandler = function createWebhookHandler(
     debugLog('Event is relevant.', { eventId: event.id, eventType: event.type })
 
     try {
+      const billingFacts = extractBillingFacts(event)
       debugLog(`Starting processing for event ${event.id} (${event.type})`)
       const result = await dependencies.withTransaction(async (transactionClient) => {
         debugLog(`Inside transaction for event ${event.id} (${event.type})`)
         return await processEventIdempotently(
           event.id,
           event.type,
+          billingFacts,
           async (processorTransactionClient) => {
-            debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
-            await dependencies.processWebhookEvent(event, processorTransactionClient)
-            debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
+            if (event.type !== 'invoice.voided') {
+              debugLog(`Executing processWebhookEvent for event ${event.id} (${event.type})`)
+              await dependencies.processWebhookEvent(event, processorTransactionClient)
+              debugLog(`Finished processWebhookEvent for event ${event.id} (${event.type})`)
+            }
           },
           transactionClient,
         )
