@@ -45,7 +45,7 @@ jobs:
         run: .agents/skills/verify-dotabod/scripts/run-profile-verification.sh
       - name: Upload verification evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dotabod-profile-verification
           path: artifacts/verify-dotabod/profile-navigation
