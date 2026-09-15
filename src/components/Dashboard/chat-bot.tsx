@@ -95,6 +95,37 @@ const EmoteList: React.FC<{
   />
 )
 
+const EmoteSetupStatus = ({
+  error,
+  hasEmoteSet,
+}: {
+  error: Error | undefined
+  hasEmoteSet: boolean
+}) => {
+  if (error !== undefined) {
+    return (
+      <div className='m-4'>
+        <Alert
+          message='There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually.'
+          type='error'
+          showIcon
+        />
+      </div>
+    )
+  }
+  if (hasEmoteSet) {
+    return <div>All required emotes have been added to your channel!</div>
+  }
+  return (
+    <div className='flex flex-row gap-4'>
+      <Spin size='small' spinning={true} />
+      <p>
+        Dotabod will automatically add the following emotes after the previous steps are completed.
+      </p>
+    </div>
+  )
+}
+
 interface SevenTvTabsProps {
   activeKey: string
   emotes: SevenTvEmote[]
@@ -116,7 +147,8 @@ const SevenTvTabs = ({
 }: SevenTvTabsProps) => {
   const stepTwoComplete = user?.id
   const stepThreeComplete = user?.hasDotabodEditor
-  const stepFourComplete = user?.hasDotabodEmoteSet
+  const stepFourComplete = user?.hasDotabodEmoteSet ?? false
+  const emoteStepErrorStatus = updateEmoteSetError === undefined ? undefined : 'error'
   const initialStep = [stepTwoComplete, stepThreeComplete, stepFourComplete].filter(Boolean).length
 
   return (
@@ -141,7 +173,7 @@ const SevenTvTabs = ({
                 { status: stepTwoComplete ? 'finish' : undefined },
                 { status: stepThreeComplete ? 'finish' : undefined },
                 {
-                  status: stepFourComplete ? 'finish' : updateEmoteSetError ? 'error' : undefined,
+                  status: stepFourComplete ? 'finish' : emoteStepErrorStatus,
                 },
               ]}
               steps={[
@@ -241,25 +273,10 @@ const SevenTvTabs = ({
                 <div key={3}>
                   <div className='mb-4 flex flex-row items-center gap-2'>
                     <div className='flex flex-col'>
-                      {updateEmoteSetError ? (
-                        <div className='m-4'>
-                          <Alert
-                            message='There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually.'
-                            type='error'
-                            showIcon
-                          />
-                        </div>
-                      ) : user?.hasDotabodEmoteSet ? (
-                        <div>All required emotes have been added to your channel!</div>
-                      ) : (
-                        <div className='flex flex-row gap-4'>
-                          <Spin size='small' spinning={true} />
-                          <p>
-                            Dotabod will automatically add the following emotes after the previous
-                            steps are completed.
-                          </p>
-                        </div>
-                      )}
+                      <EmoteSetupStatus
+                        error={updateEmoteSetError}
+                        hasEmoteSet={stepFourComplete}
+                      />
                     </div>
                   </div>
 

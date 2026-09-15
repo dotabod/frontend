@@ -27465,26 +27465,6 @@
         "severity": "error"
       }
     },
-    "34f5024e32772ec10d87df5fae958ce7e4686ad3c00fa29a05a62ae2a2b3146f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-nested-ternary)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{updateEmoteSetError ? (",
-              "next": "<div className='m-4'>",
-              "previous": "<div className='flex flex-col'>"
-            },
-            "span": "updateEmoteSetError ? (\n                            <div className='m-4'>\n                              <Alert\n                                message='There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually.'\n                                type='error'\n                                showIcon\n                              />\n                            </div>\n                          ) : user?.hasDotabodEmoteSet ? (\n                            <div>All required emotes have been added to your channel!</div>\n                          ) : (\n                            <div className='flex flex-row gap-4'>\n                              <Spin size='small' spinning={true} />\n                              <p>\n                                Dotabod will automatically add the following emotes after the\n                                previous steps are completed.\n                              </p>\n                            </div>\n                          )",
-            "text": ""
-          }
-        ],
-        "message": "Do not nest ternary expressions.",
-        "severity": "error"
-      }
-    },
     "3501b2666797bf400839ee2f712d2da679e257ded3605180a5e1f3d3e3546035": {
       "count": 1,
       "summary": {
@@ -28611,26 +28591,6 @@
           }
         ],
         "message": "Unsafe call of a(n) `error` type typed value.",
-        "severity": "error"
-      }
-    },
-    "3795150eedbb8a734213a6eb541d3325e270da8245324f7b847c8969a7507424": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-nested-conditional)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": ": updateEmoteSetError",
-              "next": "? 'error'",
-              "previous": "? 'finish'"
-            },
-            "span": "updateEmoteSetError\n                          ? 'error'\n                          : undefined",
-            "text": ""
-          }
-        ],
-        "message": "Extract this nested ternary operation into an independent statement.",
         "severity": "error"
       }
     },
@@ -44090,26 +44050,6 @@
         "severity": "error"
       }
     },
-    "563ee0f78909c405e40675e5bda7b8c67a3681290bc1af2260b2b146a824497c": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(no-giant-component)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const ChatBot = () => {",
-              "next": "const { data: accountData } = useUpdateAccount()",
-              "previous": ""
-            },
-            "span": "ChatBot",
-            "text": ""
-          }
-        ],
-        "message": "Component \"ChatBot\" is over 300 lines long, which is hard to read & change. Split it into a few smaller components.",
-        "severity": "error"
-      }
-    },
     "564bd33360dc68699835e53fd547f1e5f237732d527f94bf28b33509d9e34ffa": {
       "count": 1,
       "summary": {
@@ -59165,26 +59105,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "760006ff32a6404c144d79b31766958845a6033e8418ab7bac9ca5bb491524b9": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-nested-ternary)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "status: stepFourComplete",
-              "next": "? 'finish'",
-              "previous": "{"
-            },
-            "span": "stepFourComplete\n                        ? 'finish'\n                        : updateEmoteSetError\n                          ? 'error'\n                          : undefined",
-            "text": ""
-          }
-        ],
-        "message": "Do not nest ternary expressions.",
         "severity": "error"
       }
     },
@@ -84865,26 +84785,6 @@
           }
         ],
         "message": "Define a constant instead of duplicating this literal 3 times.",
-        "severity": "error"
-      }
-    },
-    "a7d931e25af2ac8e78155075c74fa39226e5da71f5ff7154aad6c30a08ba67d6": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-nested-conditional)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": ") : user?.hasDotabodEmoteSet ? (",
-              "next": "<div>All required emotes have been added to your channel!</div>",
-              "previous": "</div>"
-            },
-            "span": "user?.hasDotabodEmoteSet ? (\n                            <div>All required emotes have been added to your channel!</div>\n                          ) : (\n                            <div className='flex flex-row gap-4'>\n                              <Spin size='small' spinning={true} />\n                              <p>\n                                Dotabod will automatically add the following emotes after the\n                                previous steps are completed.\n                              </p>\n                            </div>\n                          )",
-            "text": ""
-          }
-        ],
-        "message": "Extract this nested ternary operation into an independent statement.",
         "severity": "error"
       }
     },
