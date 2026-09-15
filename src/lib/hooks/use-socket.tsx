@@ -313,7 +313,6 @@ export const useSocket = ({
 
     const handleRequestMatchData = async (
       { matchId, heroSlot }: MatchDataRequest,
-      // oxlint-disable-next-line promise/prefer-await-to-callbacks -- Socket.IO acknowledgements are callbacks by protocol.
       acknowledge: MatchDataAcknowledge,
     ) => {
       updateLastReceived()
@@ -335,7 +334,6 @@ export const useSocket = ({
 
     socket.on(
       'requestMatchData',
-      // oxlint-disable-next-line promise/prefer-await-to-callbacks -- The second Socket.IO event argument is its acknowledgement callback.
       (payload: MatchDataRequest, acknowledge: MatchDataAcknowledge) => {
         void handleRequestMatchData(payload, acknowledge)
       },
