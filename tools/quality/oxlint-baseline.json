@@ -93530,26 +93530,6 @@
         "severity": "error"
       }
     },
-    "bbefada19dfb33006d62bedb238339735f46b2e800b7c1464d97b900c3b52407": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "status: stepFourComplete",
-              "next": "? 'finish'",
-              "previous": "{"
-            },
-            "span": "stepFourComplete",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
-        "severity": "error"
-      }
-    },
     "bbf6187e98e88d99ab8cdb47f615d818035a36e0f3a07ee1606ef0b8e414fa16": {
       "count": 1,
       "summary": {
@@ -112546,26 +112526,6 @@
           }
         ],
         "message": "Importing \"motion\" ships about 30 kb of extra code and slows page load. Use \"m\" with LazyMotion instead.",
-        "severity": "error"
-      }
-    },
-    "e087ed904e94ec1cf11d49714799b3bada1031e1cfcc94292355a0c49cd5d484": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": ") : user?.hasDotabodEmoteSet ? (",
-              "next": "<div>All required emotes have been added to your channel!</div>",
-              "previous": "</div>"
-            },
-            "span": "user?.hasDotabodEmoteSet",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
         "severity": "error"
       }
     },
